@@ -8,7 +8,7 @@ general:
 
 dependencies:
   pre:
-    - ./tf_init.sh
+    - ./tf_init.sh $INFRA_BUCKET
 
 test:
   override:
