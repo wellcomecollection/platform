@@ -1,0 +1,16 @@
+machine:
+  timezone: UTC
+
+general:
+  build_dir: terraform
+
+dependencies:
+  pre:
+    - pip install awscli
+    - aws s3 cp s3://$INFRA_BUCKET/terraform_0.8.4_linux_amd64.zip .
+
+test:
+  override:
+    - ./terraform --version
+    - ./terraform get
+    - ./terraform plan --var "key_name=$KEY_NAME" --var "admin_cidr_ingress=$ADMIN_CIDR"
