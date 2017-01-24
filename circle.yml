@@ -8,9 +8,16 @@ dependencies:
   pre:
     - pip install awscli
     - aws s3 cp s3://$INFRA_BUCKET/terraform_0.8.4_linux_amd64.zip .
+    - unzip terraform_0.8.4_linux_amd64.zip
 
 test:
   override:
-    - ./terraform --version
+    - ./terraform remote config -backend=S3 -backend-config="bucket=$INFRA_BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region="eu-west-1"
     - ./terraform get
-    - ./terraform plan --var "key_name=$KEY_NAME" --var "admin_cidr_ingress=$ADMIN_CIDR"
+    - ./terraform plan --var "key_name=$KEY_NAME" --var "admin_cidr_ingress=$ADMIN_CIDR" -out=terraform.plan
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./terraform apply --var "key_name=$KEY_NAME" --var "admin_cidr_ingress=$ADMIN_CIDR" -out=terraform.plan
