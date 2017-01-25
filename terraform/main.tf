@@ -41,7 +41,7 @@ resource "aws_route_table_association" "a" {
 
 ### Compute
 
-resource "aws_autoscaling_group" "app" {
+resource "aws_autoscaling_group" "platform_asg" {
   name                 = "platform_asg"
   vpc_zone_identifier  = ["${aws_subnet.main.*.id}"]
   min_size             = "${var.asg_min}"
