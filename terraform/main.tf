@@ -297,7 +297,7 @@ resource "aws_alb_target_group" "platform" {
 }
 
 resource "aws_alb" "main" {
-  name            = "platform_alb"
+  name            = "platform-alb"
   subnets         = ["${aws_subnet.main.*.id}"]
   security_groups = ["${aws_security_group.lb_sg.id}"]
 }
