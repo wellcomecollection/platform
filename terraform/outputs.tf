@@ -3,11 +3,11 @@ output "instance_security_group" {
 }
 
 output "launch_configuration" {
-  value = "${aws_launch_configuration.app.id}"
+  value = "${aws_launch_configuration.platform.id}"
 }
 
 output "asg_name" {
-  value = "${aws_autoscaling_group.app.id}"
+  value = "${aws_autoscaling_group.platform_asg.id}"
 }
 
 output "elb_hostname" {
