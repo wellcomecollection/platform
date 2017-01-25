@@ -42,12 +42,12 @@ resource "aws_route_table_association" "a" {
 ### Compute
 
 resource "aws_autoscaling_group" "app" {
-  name                 = "tf-test-asg"
+  name                 = "platform_asg"
   vpc_zone_identifier  = ["${aws_subnet.main.*.id}"]
   min_size             = "${var.asg_min}"
   max_size             = "${var.asg_max}"
   desired_capacity     = "${var.asg_desired}"
-  launch_configuration = "${aws_launch_configuration.app.name}"
+  launch_configuration = "${aws_launch_configuration.platform.name}"
 }
 
 data "template_file" "cloud_config" {
@@ -83,7 +83,7 @@ data "aws_ami" "stable_coreos" {
   owners = ["595879546273"] # CoreOS
 }
 
-resource "aws_launch_configuration" "app" {
+resource "aws_launch_configuration" "platform" {
   security_groups = [
     "${aws_security_group.instance_sg.id}",
   ]
@@ -162,7 +162,7 @@ resource "aws_security_group" "instance_sg" {
 ## ECS
 
 resource "aws_ecs_cluster" "main" {
-  name = "terraform_example_ecs_cluster"
+  name = "platform_cluster"
 }
 
 data "template_file" "task_definition" {
@@ -170,28 +170,28 @@ data "template_file" "task_definition" {
 
   vars {
     image_url        = "ghost:latest"
-    container_name   = "ghost"
+    container_name   = "api"
     log_group_region = "${var.aws_region}"
     log_group_name   = "${aws_cloudwatch_log_group.app.name}"
   }
 }
 
-resource "aws_ecs_task_definition" "ghost" {
-  family                = "tf_example_ghost_td"
+resource "aws_ecs_task_definition" "platform_api" {
+  family                = "platform_task_definition"
   container_definitions = "${data.template_file.task_definition.rendered}"
 }
 
-resource "aws_ecs_service" "test" {
-  name            = "tf-example-ecs-ghost"
+resource "aws_ecs_service" "platform" {
+  name            = "platform_ecs_service"
   cluster         = "${aws_ecs_cluster.main.id}"
-  task_definition = "${aws_ecs_task_definition.ghost.arn}"
+  task_definition = "${aws_ecs_task_definition.platform_api.arn}"
   desired_count   = 1
   iam_role        = "${aws_iam_role.ecs_service.name}"
 
   load_balancer {
-    target_group_arn = "${aws_alb_target_group.test.id}"
-    container_name   = "ghost"
-    container_port   = "2368"
+    target_group_arn = "${aws_alb_target_group.platform.id}"
+    container_name   = "api"
+    container_port   = "8080"
   }
 
   depends_on = [
@@ -289,26 +289,26 @@ resource "aws_iam_role_policy" "instance" {
 
 ## ALB
 
-resource "aws_alb_target_group" "test" {
-  name     = "tf-example-ecs-ghost"
+resource "aws_alb_target_group" "platform" {
+  name     = "platform-alb-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.main.id}"
 }
 
 resource "aws_alb" "main" {
-  name            = "tf-example-alb-ecs"
+  name            = "platform_alb"
   subnets         = ["${aws_subnet.main.*.id}"]
   security_groups = ["${aws_security_group.lb_sg.id}"]
 }
 
-resource "aws_alb_listener" "front_end" {
+resource "aws_alb_listener" "platform_api_listener" {
   load_balancer_arn = "${aws_alb.main.id}"
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.test.id}"
+    target_group_arn = "${aws_alb_target_group.platform.id}"
     type             = "forward"
   }
 }
@@ -316,9 +316,9 @@ resource "aws_alb_listener" "front_end" {
 ## CloudWatch Logs
 
 resource "aws_cloudwatch_log_group" "ecs" {
-  name = "tf-ecs-group/ecs-agent"
+  name = "platform/ecs-agent"
 }
 
 resource "aws_cloudwatch_log_group" "app" {
-  name = "tf-ecs-group/app-ghost"
+  name = "platform/app"
 }
