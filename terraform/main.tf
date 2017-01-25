@@ -169,8 +169,8 @@ data "template_file" "task_definition" {
   template = "${file("${path.module}/task-definition.json")}"
 
   vars {
-    image_url        = "ghost:latest"
-    container_name   = "api"
+    image_url        = "${var.platform_api_container_url}"
+    container_name   = "platform_api"
     log_group_region = "${var.aws_region}"
     log_group_name   = "${aws_cloudwatch_log_group.app.name}"
   }
@@ -190,13 +190,13 @@ resource "aws_ecs_service" "platform" {
 
   load_balancer {
     target_group_arn = "${aws_alb_target_group.platform.id}"
-    container_name   = "api"
+    container_name   = "platform_api"
     container_port   = "8080"
   }
 
   depends_on = [
     "aws_iam_role_policy.ecs_service",
-    "aws_alb_listener.front_end",
+    "aws_alb_listener.platform_api_listener",
   ]
 }
 
