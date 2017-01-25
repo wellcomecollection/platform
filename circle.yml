@@ -12,7 +12,7 @@ dependencies:
 
 test:
   override:
-    - ./terraform plan --var "key_name=$KEY_NAME" --var "admin_cidr_ingress=$ADMIN_CIDR" -out=terraform.plan
+          - ./terraform plan --var "key_name=$KEY_NAME" --var "admin_cidr_ingress=$ADMIN_CIDR" --var "platform_api_container_url=$CONTAINER_URL" -out=terraform.plan
 
 deployment:
   production:
