@@ -294,6 +294,9 @@ resource "aws_alb_target_group" "platform" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.main.id}"
+  health_check {
+    path = "/management/healthcheck"
+  }
 }
 
 resource "aws_alb" "main" {
