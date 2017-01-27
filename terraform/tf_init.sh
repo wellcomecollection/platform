@@ -2,7 +2,7 @@
 
 INFRA_BUCKET=$1
 
-set +e
+set -e
 
 aws s3 cp s3://$INFRA_BUCKET/terraform_0.8.4_linux_amd64.zip .
 unzip terraform_0.8.4_linux_amd64.zip
@@ -14,5 +14,3 @@ unzip terraform_0.8.4_linux_amd64.zip
   -backend-config="region=eu-west-1"
 
 ./terraform get
-
-set -e
