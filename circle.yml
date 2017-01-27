@@ -1,5 +1,7 @@
 machine:
   timezone: UTC
+  services:
+    - docker
 
 general:
   build_dir: terraform
@@ -8,11 +10,14 @@ general:
 
 dependencies:
   pre:
+    - pip install awscli
     - ./tf_init.sh $INFRA_BUCKET
+    - `aws ecr get-login`
 
 test:
   override:
-    - ./tf_plan.sh $KEY_NAME $ADMIN_CIDR $CONTAINER_URL $INFRA_BUCKET $CIRCLE_SHA1
+    - ./layer_config $DEPLOY_ENV $IMAGE_URL
+    - ./tf_plan.sh $KEY_NAME $ADMIN_CIDR `cat image.url` $INFRA_BUCKET $CIRCLE_SHA1
 
 deployment:
   production:
