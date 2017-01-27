@@ -12,7 +12,6 @@ dependencies:
   pre:
     - pip install awscli
     - ./tf_init.sh $INFRA_BUCKET
-    - eval `aws ecr get-login`
 
 test:
   override:
