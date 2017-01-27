@@ -6,7 +6,7 @@ CONTAINER_URL=$3
 INFRA_BUCKET=$4
 BUILD_SHA1=$5
 
-set +e
+set -e
 
 ./terraform plan \
   --var "key_name=$KEY_NAME" \
@@ -15,5 +15,3 @@ set +e
   -out=terraform.plan
 
 aws s3 cp terraform.plan s3://$INFRA_BUCKET/$BUILD_SHA1/terraform.plan
-
-set -e
