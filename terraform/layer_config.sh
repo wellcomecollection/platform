@@ -3,10 +3,10 @@
 DEPLOY_ENV=$1
 IMAGE_URL=$2
 
-set +e
+set -e
 
 aws s3 cp s3://platform-infra/config/$DEPLOY_ENV/platform.conf .
-`aws ecr get-login`
+$(aws ecr get-login)
 
 docker pull $IMAGE_URL
 CONTAINER_ID=`docker run -d $IMAGE_URL`
@@ -16,5 +16,3 @@ docker kill $CONTAINER_ID
 docker push ${IMAGE_URL}_$DEPLOY_ENV
 
 echo ${IMAGE_URL}_$DEPLOY_ENV > image.url
-
-set -e
