@@ -6,7 +6,7 @@ IMAGE_URL=$2
 set +e
 
 aws s3 cp s3://platform-infra/config/$DEPLOY_ENV/platform.conf .
-eval `aws ecr get-login`
+`aws ecr get-login`
 
 docker pull $IMAGE_URL
 CONTAINER_ID=`docker run -d $IMAGE_URL`
