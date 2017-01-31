@@ -14,4 +14,4 @@ set -e
   --var "platform_api_container_url=$CONTAINER_URL" \
   -out=terraform.plan
 
-aws s3 cp terraform.plan s3://$INFRA_BUCKET/$BUILD_SHA1/terraform.plan
+aws s3 cp terraform.plan s3://$INFRA_BUCKET/plans/$BUILD_SHA1/terraform.plan
