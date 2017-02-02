@@ -11,14 +11,17 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class MainController @Inject()(
+class ManagementController @Inject()(
   elasticsearchService: ElasticsearchService
 ) extends Controller {
 
-  val apiBaseUrl = "/api/v0"
-
-  get("/") { request: Request =>
+  get("/management/healthcheck") { request: Request =>
     response.ok.json(Map("message" -> "ok"))
   }
 
+  get("/management/clusterhealth") { request: Request =>
+    elasticsearchService.client
+      .execute { clusterHealth() }
+      .map { response.ok.json }
+  }
 }
