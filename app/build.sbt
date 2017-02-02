@@ -1,10 +1,9 @@
 import sbt.Keys._
+import com.amazonaws.regions.{Region, Regions}
 
 name := "platform"
 
 organization := "uk.ac.wellcome"
-
-version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
@@ -16,7 +15,12 @@ resolvers += "maven.twttr.com" at "https://maven.twttr.com"
 
 Revolver.settings
 
+useJGit
+
 enablePlugins(JavaAppPackaging)
+enablePlugins(GitVersioning)
+
+git.baseVersion := "0.0.1"
 
 lazy val versions = new {
   val finatra = "2.7.0"
@@ -70,3 +74,11 @@ scalacOptions ++= Seq(
   "-feature",
   "-language:postfixOps"
 )
+
+dockerBaseImage := "anapsix/alpine-java"
+
+region           in ecr := Region.getRegion(Regions.EU_WEST_1)
+repositoryName   in ecr := s"${organization.value}/${name.value}:${version.value}"
+localDockerImage in ecr := s"${name.value}:${version.value}"
+
+push in ecr := (push in ecr dependsOn (publishLocal in Docker, login in ecr)).value
