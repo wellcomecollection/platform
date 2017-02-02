@@ -1,4 +1,4 @@
-package com.practice.modules
+package uk.ac.wellcome.platform.api.modules
 
 import javax.inject.Singleton
 
