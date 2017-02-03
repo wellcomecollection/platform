@@ -1,25 +1,22 @@
 import sbt.Keys._
 import com.amazonaws.regions.{Region, Regions}
 
-name := "platform"
-
-organization := "uk.ac.wellcome"
-
 scalaVersion := "2.11.8"
 
 fork in run := true
 
-resolvers += Resolver.sonatypeRepo("releases")
+enablePlugins(JavaAppPackaging)
+enablePlugins(GitVersioning)
 
+useJGit
+
+resolvers += Resolver.sonatypeRepo("releases")
 resolvers += "maven.twttr.com" at "https://maven.twttr.com"
 
 Revolver.settings
 
-useJGit
-
-enablePlugins(JavaAppPackaging)
-enablePlugins(GitVersioning)
-
+name := "platform"
+organization := "uk.ac.wellcome"
 git.baseVersion := "0.0.1"
 
 lazy val versions = new {

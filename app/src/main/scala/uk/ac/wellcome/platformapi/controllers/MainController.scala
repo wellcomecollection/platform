@@ -9,19 +9,25 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import scala.concurrent.Future
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 import com.twitter.finatra.request.QueryParam
 import com.twitter.finatra.validation.NotEmpty
 
-
 import uk.ac.wellcome.platform.api.models._
 
-case class RecordRequest(
+
+case class CalmRequest(
   @NotEmpty @QueryParam altRefNo: String
 )
 
-case class Response(
-  refno: String,
+case class RecordCollectionPair(
+  record: Option[Record],
+  collection: Option[Collection]
+)
+
+case class RecordResponse(
+  altRefNo: String,
   entries: Record,
   parent: Option[Collection]
 )
@@ -33,15 +39,25 @@ class MainController @Inject()(
 
   val apiBaseUrl = "/api/v0"
 
-  get(s"${apiBaseUrl}/record") { request: RecordRequest =>
-    calmService.findRecordsByAltRefNo(request.altRefNo).map { records =>
-      response.ok.json(records)
+  get(s"${apiBaseUrl}/record") { request: CalmRequest =>
+    val recordCollectionPair = for {
+      recordOption <- calmService.findRecordByAltRefNo(request.altRefNo)
+      collectionOption <- calmService.findParentCollectionByAltRefNo(request.altRefNo)
+    } yield RecordCollectionPair(recordOption, collectionOption)
+
+    recordCollectionPair.map { pair =>
+      pair.record
+        .map(record =>
+	  response.ok.json(RecordResponse(request.altRefNo, record, pair.collection)))
+	.getOrElse(response.notFound)
     }
   }
 
-  get(s"${apiBaseUrl}/collection") { request: Request =>
-    response.ok.json(Map("message" -> "ok"))
+  get(s"${apiBaseUrl}/collection") { request: CalmRequest =>
+    calmService.findCollectionByAltRefNo(request.altRefNo).map { collectionOption =>
+      collectionOption
+        .map(response.ok.json)
+	.getOrElse(response.notFound)
+    }
   }
-
-
 }

@@ -14,11 +14,24 @@ class CalmService @Inject()(
   elasticsearchService: ElasticsearchService
 ) {
 
-  def findRecordsByAltRefNo(altRefNo: String): Future[Array[Record]] =
+  private def parentAltRefNo(altRefNo: String): String =
+    altRefNo.take(altRefNo.lastIndexOf("/"))
+
+  def findParentCollectionByAltRefNo(altRefNo: String): Future[Option[Collection]] =
+    findCollectionByAltRefNo(parentAltRefNo(altRefNo))
+
+  def findRecordByAltRefNo(altRefNo: String): Future[Option[Record]] =
     elasticsearchService.client.execute {
       search("records/item").query(
         boolQuery().must(matchQuery("AltRefNo.keyword", altRefNo))
       )
-    }.map { _.hits.map { Record(_) }}
+    }.map { _.hits.headOption.map { Record(_) }}
 
+  def findCollectionByAltRefNo(altRefNo: String): Future[Option[Collection]] = {
+    elasticsearchService.client.execute {
+      search("records/collection").query(
+	boolQuery().must(matchQuery("AltRefNo.keyword", altRefNo))
+      )
+    }.map { _.hits.headOption.map { Collection(altRefNo, _) }}
+  }
 }
