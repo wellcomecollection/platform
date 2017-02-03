@@ -33,7 +33,6 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "finatra-httpclient" % versions.finatra,
   "ch.qos.logback" % "logback-classic" % versions.logback,
 
-  "com.typesafe" % "config" % "1.3.1",
   "org.elasticsearch" % "elasticsearch" % "5.1.2",
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.1.5",
   "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % "5.1.5",
@@ -79,3 +78,43 @@ repositoryName   in ecr := s"${organization.value}/${name.value}:${version.value
 localDockerImage in ecr := s"${name.value}:${version.value}"
 
 push in ecr := (push in ecr dependsOn (publishLocal in Docker, login in ecr)).value
+
+// TODO: Move to seperate plugin
+import complete.DefaultParsers._
+import scala.util.Try
+import S3._
+import java.io.File
+import com.typesafe.config._
+
+s3Settings
+
+lazy val pack = inputKey[Unit]("Containerise application for deployment.")
+lazy val configLocation = taskKey[Option[String]]("S3 location of config.")
+configLocation := { sys.props.get("config.location") }
+pack := {
+  val deployStage: String = Try { spaceDelimited("<arg>").parsed(0) }
+    .toOption
+    .getOrElse("dev")
+
+  val localConfigLocation = s"conf/application.${deployStage}.conf"
+
+  configLocation.value.map { bucket =>
+    host in S3.download     := bucket
+    mappings in S3.download := Seq((
+      new java.io.File(localConfigLocation),
+      s"config/${deployStage}/platform.conf"
+    ))
+  }
+
+  val conf = ConfigFactory.parseFile(new File(localConfigLocation)).resolve()
+
+  //TODO: Generate javaOptions from config without having to know keys
+  javaOptions in Universal ++= Seq(
+      s"-Dhost=${conf.getString("es.host")}"
+  )
+
+  println(S3.download.value)
+  println(deployStage)
+  println(configLocation.value)
+  println(conf)
+}
