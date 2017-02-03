@@ -4,23 +4,23 @@ import com.sksamuel.elastic4s.searches.RichSearchHit
 
 
 case class Record(
-  refno: String,
+  altRefNo: String,
   title: String,
-  material_type: String
-//  date: String,
-//  acquisition: String
+  materialType: String,
+  date: Option[String],
+  acquisition: Option[String]
 )
 case object Record {
-  def apply(esResult: RichSearchHit): Record = {
-    val data = esResult.sourceAsMap
+  def apply(hit: RichSearchHit): Record = {
+    val data: Map[String, AnyRef] =
+      hit.sourceAsMap.filter(o => o._2 != null)
 
     Record(
-      refno=data("AltRefNo").toString,
+      altRefNo=data("AltRefNo").toString,
       title=data("Title").toString,
-      material_type=data("Material").toString
-
-      //date=data.getOrElse("Date", "Unknown").toString,
-      //acquisition=data.getOrElse("Acquisition", "Unknown").toString
+      materialType=data("Material").toString,
+      date=data.get("Date").map(_.toString),
+      acquisition=data.get("Acquisition").map(_.toString)
     )
   }
 }

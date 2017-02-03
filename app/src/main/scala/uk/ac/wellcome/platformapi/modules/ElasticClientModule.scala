@@ -13,9 +13,9 @@ import org.elasticsearch.common.settings.Settings
 case class XPackConfig(user: String, ssl: Boolean)
 
 object XPackConfigModule extends TwitterModule {
-  private val xpackEnabled = flag("xpack.enabled", false, "xpack enabled")
-  private val user = flag("xpack.user", "", "xpack user:password")
-  private val sslEnabled = flag("xpack.sslEnabled", true, "xpack use ssl")
+  private val xpackEnabled = flag("es.xpack.enabled", false, "xpack enabled")
+  private val user = flag("es.xpack.user", "", "xpack user:password")
+  private val sslEnabled = flag("es.xpack.sslEnabled", true, "xpack use ssl")
 
   @Singleton
   @Provides
@@ -28,12 +28,12 @@ object XPackConfigModule extends TwitterModule {
 object ElasticClientModule extends TwitterModule {
   override val modules = Seq(XPackConfigModule)
 
-  private val host = flag("host", "localhost", "host name of ES")
-  private val port = flag("port", 9300, "port no of ES")
-  private val sniff = flag("sniff", false, "sniff ES nodes")
-  private val clusterName = flag("clusterName", "elasticsearch", "cluster name")
+  private val host = flag("es.host", "localhost", "host name of ES")
+  private val port = flag("es.port", 9300, "port no of ES")
+  private val sniff = flag("es.sniff", false, "sniff ES nodes")
+  private val clusterName = flag("es.clusterName", "elasticsearch", "cluster name")
 
-  val timeout = flag("timeout", 30, "default timeout duration of execution")
+  val timeout = flag("es.timeout", 30, "default timeout duration of execution")
 
   @Singleton
   @Provides
