@@ -6,6 +6,7 @@ DynamoDB with our given schema.
 """
 
 from datetime import datetime
+import json
 import re
 import tempfile
 
@@ -32,6 +33,7 @@ def find_new_records(path, last_ingest=None):
     # https://github.com/python-hyper/hyper-h2/blob/master/h2/utilities.py
     records = _retrieve_elements(path)
     records = _skip_updated_records(records, last_ingest)
+    records = _prepare_record_for_dynamodb(records)
 
     yield from records
 
@@ -139,6 +141,30 @@ def _skip_updated_records(records, since_date=None):
                     yield record
 
 
+def _prepare_record_for_dynamodb(records):
+    """
+    Generate a sequence of dictionaries that can be inserted into DynamoDB.
+    """
+    for record in records:
+        # Produce a dict of all the attributes on the record that aren't
+        # stored in one of the other Dynamo fields.  We'll convert this to
+        # a JSON string and store the encoded output, so discarding fields
+        # we already have improves performance and storage.
+        data = {
+            c.tag: c.text
+            for c in record.getchildren()
+            if c.tag not in ('RecordID', 'RecordType', 'RefNo', 'AltRefNo')
+        }
+
+        yield {
+            'RecordID': record.find('RecordID').text,
+            'RecordType': record.find('RecordType').text,
+            'RefNo': record.find('RefNo').text,
+            'AltRefNo': record.find('AltRefNo').text,
+            'data': json.dumps(data),
+        }
+
+
 if __name__ == '__main__':
     # To help us design the schema, this snippet will print a list of all
     # the fields on each record (along with their frequency).
@@ -146,10 +172,28 @@ if __name__ == '__main__':
     from pprint import pprint
     import sys
 
-    i = 0
-    fields = Counter()
-    for record in find_new_records(sys.argv[1]):
-        i += 1
-        fields.update([c.tag for c in record.getchildren()])
-    pprint(fields)
-    print('%d records' % i)
+    import boto3
+
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('CalmData')
+
+    # We do some bookkeeping to avoid sending the same record to DynamoDB
+    # multiple times, which is both slow and unnecessary cost.  The full
+    # Calm export has ~331k records, so the more we can skip, the better.
+    try:
+        existing = json.load(open('existing.json', 'r'))
+    except OSError:
+        existing = []
+
+    for i, record in enumerate(find_new_records(sys.argv[1])):
+
+        # Have we already sent this record to DynamoDB?
+        if record['RecordID'] in existing:
+            continue
+
+        r = table.put_item(Item=record)
+        assert r['ResponseMetadata']['HTTPStatusCode'] == 200
+
+        # Drop a record immediately that we've added this to DynamoDB.
+        existing.append(record['RecordID'])
+        json.dump(existing, open('existing.json', 'w'))
