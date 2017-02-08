@@ -82,39 +82,46 @@ push in ecr := (push in ecr dependsOn (publishLocal in Docker, login in ecr)).va
 // TODO: Move to seperate plugin
 import complete.DefaultParsers._
 import scala.util.Try
-import S3._
-import java.io.File
+import scala.collection.JavaConverters._
+import java.io.{File, InputStream}
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption._
 import com.typesafe.config._
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 
-s3Settings
 
-lazy val pack = inputKey[Unit]("Containerise application for deployment.")
-lazy val configLocation = taskKey[Option[String]]("S3 location of config.")
-configLocation := { sys.props.get("config.location") }
-pack := {
-  val deployStage: String = Try { spaceDelimited("<arg>").parsed(0) }
-    .toOption
-    .getOrElse("dev")
+lazy val deployStage = SettingKey[String]("deploy-env","Deploy environment.")
+lazy val settingsBucket = SettingKey[String]("settings-bucket","Settings bucket.")
+lazy val configure = taskKey[Seq[String]]("Containerise application for deployment.")
 
-  val localConfigLocation = s"conf/application.${deployStage}.conf"
+configure := {
+  val bucket    = settingsBucket.value
+  val stage     = deployStage.value
 
-  configLocation.value.map { bucket =>
-    host in S3.download     := bucket
-    mappings in S3.download := Seq((
-      new java.io.File(localConfigLocation),
-      s"config/${deployStage}/platform.conf"
-    ))
+  val key       = s"config/${stage}/platform.conf"
+  val localPath = s"conf/application.${stage}.conf"
+
+  if(stage != "dev") {
+    val s3Client = AmazonS3ClientBuilder.defaultClient()
+    val s3Object = s3Client.getObject(bucket, key)
+
+    val fileStream = s3Object.getObjectContent().asInstanceOf[InputStream]
+    val targetFile = new File(localPath)
+    val targetPath = targetFile.toPath()
+
+    Files.copy(fileStream, targetPath, REPLACE_EXISTING)
+    fileStream.close()
   }
 
-  val conf = ConfigFactory.parseFile(new File(localConfigLocation)).resolve()
+  val confSet = ConfigFactory
+    .parseFile(new File(localPath))
+    .resolve()
+    .entrySet()
+    .asScala
 
-  //TODO: Generate javaOptions from config without having to know keys
-  javaOptions in Universal ++= Seq(
-      s"-Dhost=${conf.getString("es.host")}"
-  )
-
-  println(S3.download.value)
-  println(deployStage)
-  println(configLocation.value)
-  println(conf)
+  confSet.map(entry =>
+      s"-D${entry.getKey()}=${entry.getValue().render()}")
+    .toSeq
 }
+
+javaOptions in Universal ++= configure.value
