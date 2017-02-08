@@ -1,0 +1,34 @@
+machine:
+  timezone: UTC
+  java:
+    version: oraclejdk8
+  services:
+    - docker
+
+# Collect build artifacts
+general:
+  artifacts:
+    - target/docker
+  build_dir: app
+
+dependencies:
+  # Cache the resolution-cache and build streams to speed things up
+  cache_directories:
+    - "~/.sbt"
+    - "target/resolution-cache"
+    - "target/streams"
+    - "project/target/resolution-cache"
+    - "project/target/streams"
+  # Compile all sources
+  override:
+    - sbt test:compile
+
+test:
+  override:
+    - sbt test
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - sbt ecr:push
