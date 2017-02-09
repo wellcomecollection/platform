@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platformapi
+package uk.ac.wellcome.platform.api
 
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
