@@ -51,7 +51,7 @@ resource "aws_autoscaling_group" "platform_asg" {
 }
 
 data "template_file" "cloud_config" {
-  template = "${file("${path.module}/cloud-config.yml")}"
+  template = "${file("${path.root}/cloud-config.yml")}"
 
   vars {
     aws_region         = "${var.aws_region}"
@@ -165,7 +165,7 @@ resource "aws_ecs_cluster" "main" {
 }
 
 data "template_file" "task_definition" {
-  template = "${file("${path.module}/task-definition.json")}"
+  template = "${file("${path.root}/task-definition.json")}"
 
   vars {
     container_name   = "platform_api"
@@ -275,7 +275,7 @@ EOF
 }
 
 data "template_file" "instance_profile" {
-  template = "${file("${path.module}/instance-profile-policy.json")}"
+  template = "${file("${path.root}/instance-profile-policy.json")}"
 
   vars {
     app_log_group_arn = "${aws_cloudwatch_log_group.app.arn}"
