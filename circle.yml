@@ -21,5 +21,4 @@ deployment:
   production:
     branch: master
     commands:
-      - ./terraform apply terraform.plan
-      - ./terraform remote push
+      - aws s3 cp terraform.plan s3://$INFRA_BUCKET/plans/$BUILD_SHA1/terraform.plan

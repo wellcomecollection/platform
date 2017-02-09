@@ -10,5 +10,3 @@ BUILD_SHA1=$5
   --var "admin_cidr_ingress=$ADMIN_CIDR" \
   --var "platform_api_container_url=$CONTAINER_URL" \
   -out=terraform.plan
-
-aws s3 cp terraform.plan s3://$INFRA_BUCKET/plans/$BUILD_SHA1/terraform.plan
