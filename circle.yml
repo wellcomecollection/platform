@@ -21,4 +21,4 @@ deployment:
   production:
     branch: master
     commands:
-      - aws s3 cp terraform.plan s3://$INFRA_BUCKET/plans/$BUILD_SHA1/terraform.plan
+      - aws s3 cp terraform.plan s3://$INFRA_BUCKET/plans/$CIRCLE_SHA1/terraform.plan
