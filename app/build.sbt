@@ -77,7 +77,8 @@ scalacOptions ++= Seq(
 dockerBaseImage := "anapsix/alpine-java"
 
 region           in ecr := Region.getRegion(Regions.EU_WEST_1)
-repositoryName   in ecr := s"${organization.value}/${name.value}:${version.value}"
+repositoryName   in ecr :=
+  s"${organization.value}/${name.value}:${version.value}_${buildEnv.value}"
 localDockerImage in ecr := s"${name.value}:${version.value}"
 
 push in ecr := (push in ecr dependsOn (publishLocal in Docker, login in ecr)).value
