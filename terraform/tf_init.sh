@@ -2,8 +2,6 @@
 
 INFRA_BUCKET=$1
 
-set -e
-
 aws s3 cp s3://$INFRA_BUCKET/terraform_0.8.5_linux_amd64.zip .
 unzip terraform_0.8.5_linux_amd64.zip
 

@@ -15,7 +15,6 @@ dependencies:
 
 test:
   override:
-    - ./layer_config.sh $DEPLOY_ENV $IMAGE_URL
     - ./tf_plan.sh $KEY_NAME $ADMIN_CIDR `cat image.url` $INFRA_BUCKET $CIRCLE_SHA1
 
 deployment:
