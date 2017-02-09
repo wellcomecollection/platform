@@ -182,7 +182,6 @@ resource "aws_ecs_task_definition" "platform_api" {
 resource "aws_ecs_service" "platform" {
   name            = "platform_ecs_service"
   cluster         = "${aws_ecs_cluster.main.id}"
-  ignore_changes  = ["task_definition"]
   task_definition = "${aws_ecs_task_definition.platform_api.arn}"
   desired_count   = 1
   iam_role        = "${aws_iam_role.ecs_service.name}"
@@ -197,6 +196,10 @@ resource "aws_ecs_service" "platform" {
     "aws_iam_role_policy.ecs_service",
     "aws_alb_listener.platform_api_listener",
   ]
+
+  lifecycle {
+    ignore_changes  = ["task_definition"]
+  }
 }
 
 ## IAM
