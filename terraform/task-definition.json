@@ -2,7 +2,7 @@
   {
     "cpu": 256,
     "essential": true,
-    "image": "${image_url}",
+    "image": "anapsix/alpine-java",
     "memory": 512,
     "name": "${container_name}",
     "portMappings": [
