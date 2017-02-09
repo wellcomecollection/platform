@@ -6,8 +6,6 @@ CONTAINER_URL=$3
 INFRA_BUCKET=$4
 BUILD_SHA1=$5
 
-set -e
-
 ./terraform plan \
   --var "key_name=$KEY_NAME" \
   --var "admin_cidr_ingress=$ADMIN_CIDR" \
