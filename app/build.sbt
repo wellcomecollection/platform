@@ -10,8 +10,10 @@ enablePlugins(GitVersioning)
 
 useJGit
 
+
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += "maven.twttr.com" at "https://maven.twttr.com"
+resolvers += "elasticsearch-releases" at "https://artifacts.elastic.co/maven"
 
 Revolver.settings
 
@@ -26,6 +28,7 @@ lazy val versions = new {
   val mockito = "1.9.5"
   val scalatest = "3.0.1"
   val junitInterface = "0.11"
+  val elastic4s = "5.1.5"
 }
 
 libraryDependencies ++= Seq(
@@ -34,8 +37,8 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % versions.logback,
 
   "org.elasticsearch" % "elasticsearch" % "5.1.2",
-  "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.1.5",
-  "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % "5.1.5",
+  "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
+  "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s,
 
   "com.twitter" %% "finatra-http" % versions.finatra % "test",
   "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
