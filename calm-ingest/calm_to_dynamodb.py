@@ -5,12 +5,25 @@ This script ingests records from a Calm XML export, and pushes them into
 DynamoDB with our given schema.
 """
 
+import argparse
 from datetime import datetime
 import json
 import re
+import sys
 import tempfile
 
+import boto3
 from lxml import etree
+
+
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description='A script for ingesting Calm records into DynamoDB.')
+
+    parser.add_argument('calm_export', help='path to the Calm XML export file')
+
+    return parser.parse_args()
 
 
 def find_new_records(path, last_ingest=None):
@@ -38,9 +51,6 @@ def find_new_records(path, last_ingest=None):
     yield from records
 
 
-# TODO: This step incurs a significant performance penalty, because we do
-# a lot of I/O to read and rewrite the document.  It should be possible to
-# stream these bytes directly into etree.iterparse, thereby saving a step.
 def _correct_entities(path):
     """
     Correct the XML entities in the Calm XML export.
@@ -105,7 +115,8 @@ def _retrieve_elements(path):
     #
     # Each record is contained in a single <DScribeRecord> tag, so we're
     # just interested in extracting those.
-    context = etree.iterparse(path, events=('end',), tag='DScribeRecord', resolve_entities=False)
+    context = etree.iterparse(
+        path, events=('end',), tag='DScribeRecord', resolve_entities=False)
     for entry in context:
         yield entry[1]
 
@@ -114,6 +125,11 @@ def _skip_updated_records(records, since_date=None):
     """
     Generate a sequence of Calm records that were updated on or after
     a given date.
+
+    :param records: A generator of ``xml.etree.Element`` instances.
+    :param since_date: (optional) A ``datetime`` object which specifies when
+        the Calm data was last ingested.  If supplied, only records with
+        a modified date on or after this data will be provided.
     """
     # If we don't have a date, return everything
     if since_date is None:
@@ -166,13 +182,7 @@ def _prepare_record_for_dynamodb(records):
 
 
 if __name__ == '__main__':
-    # To help us design the schema, this snippet will print a list of all
-    # the fields on each record (along with their frequency).
-    from collections import Counter
-    from pprint import pprint
-    import sys
-
-    import boto3
+    args = parse_args()
 
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('CalmData')
@@ -191,9 +201,12 @@ if __name__ == '__main__':
         if record['RecordID'] in existing:
             continue
 
+        # Insert the record and check it succeeded
         r = table.put_item(Item=record)
         assert r['ResponseMetadata']['HTTPStatusCode'] == 200
 
-        # Drop a record immediately that we've added this to DynamoDB.
+        # We record that we've saved it immediately -- although not as
+        # efficient, this ensures we have an up-to-date record if we hit
+        # a problem midway through the ingest.
         existing.append(record['RecordID'])
         json.dump(existing, open('existing.json', 'w'))

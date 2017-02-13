@@ -31,3 +31,14 @@ These scripts require Python 3.  To install dependencies:
    $ python3 -m venv env
    $ source env/bin/activate
    $ pip install -r requirements.txt
+
+Usage
+*****
+
+Once you have the requirements installed, the ingest is a two-step process:
+
+1. Given an XML export file from Calm, push the records into DynamoDB:
+
+   .. code-block:: console
+
+      $ python3 calm_to_dynamodb.py /path/to/calm_export.xml
