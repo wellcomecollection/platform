@@ -46,6 +46,9 @@ def _correct_entities(path):
     This function creates a new file that has the syntax-corrected entities,
     and returns a path to the new file.
 
+    We get a substantial performance saving if we define the few fixers we
+    need, rather than letting ``lxml`` run its automatic fixers.
+
     :param path: Path to the Calm XML export file.
     :returns: Path to the corrected Calm XML export file.
     """
@@ -62,7 +65,8 @@ def _correct_entities(path):
         else:
             os.unlink(new_path)
 
-    # Assume it doesn't exist.  Use a temporary file initially so the new path
+    # At this point, the file either never existed or was out-of-date.
+    # Rebuild the XML.  Use a temporary file initially so the new path
     # created atomically.
     _, tmp_path = tempfile.mkstemp(suffix='.xml', prefix='calmexport_')
 
