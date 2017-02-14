@@ -31,7 +31,7 @@ object ElasticClientModule extends TwitterModule {
   private val host = flag("es.host", "localhost", "host name of ES")
   private val port = flag("es.port", 9300, "port no of ES")
   private val sniff = flag("es.sniff", false, "sniff ES nodes")
-  private val clusterName = flag("es.clusterName", "elasticsearch", "cluster name")
+  private val clusterName = flag("es.name", "elasticsearch", "cluster name")
 
   val timeout = flag("es.timeout", 30, "default timeout duration of execution")
 
