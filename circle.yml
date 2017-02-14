@@ -31,4 +31,4 @@ deployment:
   production:
     branch: master
     commands:
-      - sbt -DconfigBucket=$CONFIG_BUCKET -Denv=$DEPLOY_ENV ecr:push
+      - sbt -DconfigBucket=$CONFIG_BUCKET -Denv=$BUILD_ENV ecr:push
