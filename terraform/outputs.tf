@@ -13,3 +13,7 @@ output "asg_name" {
 output "elb_hostname" {
   value = "${aws_alb.main.dns_name}"
 }
+
+output "tools_subnets" {
+  value = "${join(",", aws_subnet.tools.*.id)}"
+}

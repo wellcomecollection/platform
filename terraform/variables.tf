@@ -35,3 +35,7 @@ variable "asg_desired" {
 variable "admin_cidr_ingress" {
   description = "CIDR to allow tcp/22 ingress to EC2 instance"
 }
+
+variable "release_id" {
+  description = "Release tag for platform image"
+}
