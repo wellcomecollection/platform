@@ -2,12 +2,12 @@
   {
     "cpu": 256,
     "essential": true,
-    "image": "anapsix/alpine-java",
+    "image": "${image_uri}",
     "memory": 512,
     "name": "${container_name}",
     "portMappings": [
       {
-        "containerPort": 8080,
+        "containerPort": 8888,
         "hostPort": 0
       }
     ],

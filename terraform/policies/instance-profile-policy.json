@@ -10,7 +10,9 @@
         "ecs:Poll",
         "ecs:RegisterContainerInstance",
         "ecs:Submit*",
-        "ecr:GetAuthorizationToken"
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
       ],
       "Resource": [
         "*"
@@ -24,8 +26,7 @@
         "logs:PutLogEvents"
       ],
       "Resource": [
-        "${app_log_group_arn}",
-        "${ecs_log_group_arn}"
+        "*"
       ]
     }
   ]
