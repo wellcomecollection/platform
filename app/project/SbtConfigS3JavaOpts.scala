@@ -60,7 +60,7 @@ object ConfigS3JavaOpts {
 	.asScala
 
       confSet.map(entry =>
-        s"-D${entry.getKey()}=${entry.getValue().render()}"
+        s"-${entry.getKey()}=${entry.getValue().render()}"
       ).toSeq
 
   }
