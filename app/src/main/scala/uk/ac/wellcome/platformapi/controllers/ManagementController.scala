@@ -22,6 +22,6 @@ class ManagementController @Inject()(
   get("/management/clusterhealth") { request: Request =>
     elasticsearchService.client
       .execute { clusterHealth() }
-      .map { response.ok.json }
+      .map(health => response.ok.json(health.status))
   }
 }
