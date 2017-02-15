@@ -39,13 +39,9 @@ object ElasticClientModule extends TwitterModule {
   @Singleton
   @Provides
   def provideElasticClient(xpackConfig: Option[XPackConfig]): ElasticClient = {
+    info(s"Building clientUri for ${host()}:${port()}")
 
-    val h = host()
-    val p = port()
-
-    info(s"Building clientUri for ${h}:${p}")
-
-    val clientUri = ElasticsearchClientUri(h, p)
+    val clientUri = ElasticsearchClientUri(host(), port())
 
     val defaultSettings = Settings.builder()
       .put("client.transport.sniff", sniff())
