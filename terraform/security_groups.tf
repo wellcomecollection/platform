@@ -32,7 +32,9 @@ resource "aws_security_group" "tools_lb_sg" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      "${var.admin_cidr_ingress}",
+    ]
   }
 
   egress {

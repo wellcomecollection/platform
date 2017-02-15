@@ -1,3 +1,43 @@
+resource "aws_iam_role" "ecs_jenkins_task" {
+  name = "tf_ecs_task_jenkins_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "ecs_jenkins_task" {
+  name = "tf_ecs_task_jenkins_policy"
+  role = "${aws_iam_role.ecs_jenkins_task.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role" "ecs_service" {
   name = "tf_ecs_role"
 
