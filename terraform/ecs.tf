@@ -73,6 +73,7 @@ data "template_file" "jenkins_task_definition" {
 resource "aws_ecs_task_definition" "jenkins" {
   family                = "jenkins_task_definition"
   container_definitions = "${data.template_file.jenkins_task_definition.rendered}"
+  task_role_arn         = "${aws_iam_role.ecs_jenkins_task.arn}"
 
   volume {
     name = "jenkins-home"
