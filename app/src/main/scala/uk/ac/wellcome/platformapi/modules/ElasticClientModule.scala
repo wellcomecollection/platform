@@ -14,9 +14,9 @@ import org.elasticsearch.common.settings.Settings
 case class XPackConfig(user: String, ssl: Boolean)
 
 object XPackConfigModule extends TwitterModule {
-  private val xpackEnabled = flag("es.xpack.enabled", false, "xpack enabled")
-  private val user = flag("es.xpack.user", "", "xpack user:password")
-  private val sslEnabled = flag("es.xpack.sslEnabled", true, "xpack use ssl")
+  private val xpackEnabled = flag[Boolean]("es.xpack.enabled", false, "xpack enabled")
+  private val user = flag[String]("es.xpack.user", "", "xpack user:password")
+  private val sslEnabled = flag[Boolean]("es.xpack.sslEnabled", true, "xpack use ssl")
 
   @Singleton
   @Provides
@@ -29,10 +29,10 @@ object XPackConfigModule extends TwitterModule {
 object ElasticClientModule extends TwitterModule {
   override val modules = Seq(XPackConfigModule)
 
-  private val host = flag("es.host", "localhost", "host name of ES")
-  private val port = flag("es.port", 9300, "port no of ES")
-  private val sniff = flag("es.sniff", false, "sniff ES nodes")
-  private val clusterName = flag("es.name", "elasticsearch", "cluster name")
+  private val host = flag[String]("es.host", "localhost", "host name of ES")
+  private val port = flag[Int]("es.port", 9300, "port no of ES")
+  private val sniff = flag[Boolean]("es.sniff", false, "sniff ES nodes")
+  private val clusterName = flag[String]("es.name", "elasticsearch", "cluster name")
 
   val timeout = flag("es.timeout", 30, "default timeout duration of execution")
 
@@ -48,7 +48,8 @@ object ElasticClientModule extends TwitterModule {
       .put("cluster.name", clusterName())
 
     val settings = xpackConfig.foldLeft(defaultSettings)((defaults, config) => defaults
-      .put("xpack.security.http.ssl.enabled", config.ssl)
+      .put("xpack.security.transport.ssl.enabled", config.ssl)
+      .put("request.headers.X-Found-Cluster", clusterName())
       .put("xpack.security.user", config.user)).build()
 
     XPackElasticClient(settings, clientUri)
