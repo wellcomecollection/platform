@@ -7,6 +7,7 @@ import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.twitter.inject.TwitterModule
+import com.twitter.inject.Logging
 import org.elasticsearch.common.settings.Settings
 
 
@@ -38,7 +39,13 @@ object ElasticClientModule extends TwitterModule {
   @Singleton
   @Provides
   def provideElasticClient(xpackConfig: Option[XPackConfig]): ElasticClient = {
-    val clientUri = ElasticsearchClientUri(host(), port())
+
+    val h = host()
+    val p = port()
+
+    info(s"Building clientUri for ${h}:${p}")
+
+    val clientUri = ElasticsearchClientUri(h, p)
 
     val defaultSettings = Settings.builder()
       .put("client.transport.sniff", sniff())
