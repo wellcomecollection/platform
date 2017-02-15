@@ -59,9 +59,12 @@ object ConfigS3JavaOpts {
 	.entrySet()
 	.asScala
 
-      confSet.map(entry =>
-        s"-${entry.getKey()}=${entry.getValue().render()}"
-      ).toSeq
+      confSet.map(entry => {
+        val key   = entry.getKey()
+        val value = entry.getValue().unwrapped()
+
+        s"-${key}=${value}"
+      }).toSeq
 
   }
 }
