@@ -1,4 +1,8 @@
-resource "aws_efs_file_system" "jenkins" { }
+resource "aws_efs_file_system" "jenkins" {
+  lifecycle {
+    prevent_destroy = true
+  }
+}
 
 resource "aws_efs_mount_target" "jenkins" {
   count           = "${var.az_count}"
