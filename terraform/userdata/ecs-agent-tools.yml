@@ -1,4 +1,7 @@
 #cloud-config
+users:
+  - name: "jenkins"
+  - homedir: "/mnt/efs"
 coreos:
   units:
    - name: rpc-statd.service
