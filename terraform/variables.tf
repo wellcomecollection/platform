@@ -17,6 +17,11 @@ variable "instance_type" {
   description = "AWS instance type"
 }
 
+variable "instance_type_tools_cluster" {
+  default     = "t2.medium"
+  description = "AWS instance type"
+}
+
 variable "asg_min" {
   description = "Min numbers of servers in ASG"
   default     = "1"

@@ -86,7 +86,7 @@ resource "aws_launch_configuration" "tools" {
 
   key_name                    = "${var.key_name}"
   image_id                    = "${data.aws_ami.stable_coreos.id}"
-  instance_type               = "${var.instance_type}"
+  instance_type               = "${var.instance_type_tools_cluster}"
   iam_instance_profile        = "${aws_iam_instance_profile.app.name}"
   user_data                   = "${data.template_file.tools_userdata.rendered}"
   associate_public_ip_address = true
