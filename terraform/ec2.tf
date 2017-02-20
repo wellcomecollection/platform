@@ -1,21 +1,3 @@
-resource "aws_autoscaling_group" "platform_asg" {
-  name                 = "platform_asg"
-  vpc_zone_identifier  = ["${aws_subnet.main.*.id}"]
-  min_size             = "${var.asg_min}"
-  max_size             = "${var.asg_max}"
-  desired_capacity     = "${var.asg_desired}"
-  launch_configuration = "${aws_launch_configuration.platform.name}"
-}
-
-resource "aws_autoscaling_group" "tools_asg" {
-  name                 = "tools_asg"
-  vpc_zone_identifier  = ["${aws_subnet.tools.*.id}"]
-  min_size             = "${var.asg_min}"
-  max_size             = "${var.asg_max}"
-  desired_capacity     = "${var.asg_desired}"
-  launch_configuration = "${aws_launch_configuration.tools.name}"
-}
-
 data "template_file" "platform_userdata" {
   template = "${file("${path.module}/userdata/ecs-agent.yml")}"
 
@@ -39,27 +21,6 @@ data "template_file" "tools_userdata" {
     ecs_log_group_name = "${aws_cloudwatch_log_group.ecs_tools.name}"
     efs_fs_name        = "${aws_efs_file_system.jenkins.id}"
   }
-}
-
-data "aws_ami" "stable_coreos" {
-  most_recent = true
-
-  filter {
-    name   = "description"
-    values = ["CoreOS stable *"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["595879546273"] # CoreOS
 }
 
 resource "aws_launch_configuration" "platform" {
