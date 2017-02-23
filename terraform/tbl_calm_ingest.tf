@@ -42,9 +42,4 @@ resource "aws_dynamodb_table" "calm-dynamodb-table" {
     write_capacity = 5
     projection_type = "ALL"
   }
-  local_secondary_index {
-    name = "Data-index"
-    range_key = "data"
-    projection_type = "ALL"
-  }
 }
