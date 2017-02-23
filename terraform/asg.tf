@@ -1,6 +1,5 @@
-/* Autoscaling groups described as seperate Cloudformation stacks
-   in order that rolling updates are possible. Note: there is an
-   upper limit on the number of Cloudformation stacks. */
+/* Autoscaling groups described as separate Cloudformation stacks
+   in order that rolling updates are possible. */
 
 resource "aws_cloudformation_stack" "tools_cluster_asg" {
   name = "tools-cluster-asg"
