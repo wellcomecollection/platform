@@ -5,5 +5,5 @@ set -o errexit
 
 for project in common api
 do
-    sbt "project $project" test:compile
+    sbt "project $project" compile
 done
