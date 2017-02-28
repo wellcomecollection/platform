@@ -12,8 +12,6 @@ object Common {
     git.baseVersion := "0.0.1",
 
     resolvers += Resolver.sonatypeRepo("releases"),
-    resolvers += "maven.twttr.com" at "https://maven.twttr.com",
-    resolvers += "elasticsearch-releases" at "https://artifacts.elastic.co/maven",
 
     scalacOptions ++= Seq(
       "-deprecation",
@@ -30,3 +28,17 @@ object Common {
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
   )
 }
+
+object Search {
+  val settings: Seq[Def.Setting[_]] = Seq(
+    resolvers += "elasticsearch-releases" at "https://artifacts.elastic.co/maven"
+  )
+}
+
+object Finatra {
+  val settings: Seq[Def.Setting[_]] = Seq(
+    resolvers += "maven.twttr.com" at "https://maven.twttr.com",
+    fork in run := true
+  )
+}
+
