@@ -40,7 +40,7 @@ object Dependencies {
 
   val esDependencies: Seq[ModuleID] = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s
   )
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ esDependencies
