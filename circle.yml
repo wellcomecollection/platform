@@ -20,14 +20,14 @@ dependencies:
     - "project/target/streams"
   # Compile all sources
   override:
-    - ./circle/deps.sh
+    - ./run_circle.sh compile
 
 test:
   override:
-    - ./circle/test.sh
+    - ./run_circle.sh test
 
 deployment:
   production:
     branch: master
     commands:
-      - ./circle/deploy.sh
+      - ./run_circle.sh deploy
