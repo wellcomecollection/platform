@@ -9,7 +9,6 @@ machine:
 general:
   artifacts:
     - target/docker
-  build_dir: app
 
 dependencies:
   # Cache the resolution-cache and build streams to speed things up
