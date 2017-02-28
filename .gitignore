@@ -73,7 +73,7 @@ fabric.properties
 
 # *.iml
 # modules.xml
-# .idea/misc.xml 
+# .idea/misc.xml
 # *.ipr
 
 
@@ -235,3 +235,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Project specific settings
+application.prod.conf

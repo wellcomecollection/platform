@@ -9,7 +9,6 @@ machine:
 general:
   artifacts:
     - target/docker
-  build_dir: app
 
 dependencies:
   # Cache the resolution-cache and build streams to speed things up
@@ -21,14 +20,14 @@ dependencies:
     - "project/target/streams"
   # Compile all sources
   override:
-    - sbt test:compile
+    - ./circle/deps.sh
 
 test:
   override:
-    - sbt test
+    - ./circle/test.sh
 
 deployment:
   production:
     branch: master
     commands:
-      - sbt -DconfigBucket=$CONFIG_BUCKET -Denv=$BUILD_ENV ecr:push
+      - ./circle/deploy.sh
