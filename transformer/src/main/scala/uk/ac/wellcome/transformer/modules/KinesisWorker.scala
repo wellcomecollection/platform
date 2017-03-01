@@ -25,52 +25,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.gu.scanamo.ScanamoFree
 
+import javax.inject.{Inject, Singleton}
+
 import com.twitter.inject.{Injector, TwitterModule}
 
-
-class StreamsRecordProcessor(client: AmazonDynamoDB) extends IRecordProcessor {
-
-  case class ExampleRecord(identifier: String)
-
-  override def initialize(shardId: String) = Unit
-  override def shutdown(checkpointer: IRecordProcessorCheckpointer, reason: ShutdownReason): Unit = {
-    if (reason == ShutdownReason.TERMINATE) {
-      checkpointer.checkpoint()
-    }
-  }
-
-  override def processRecords(records: JList[Record], checkpointer: IRecordProcessorCheckpointer): Unit = {
-    records.asScala.map { record =>
-      if (record.isInstanceOf[RecordAdapter]) {
-        val recordAdapter = record.asInstanceOf[RecordAdapter]
-        val keys = recordAdapter
-          .getInternalObject()
-          .getDynamodb()
-          .getKeys()
-        // TODO: proper pattern matching and map on result
-        val newRecord: ExampleRecord = ScanamoFree.read[ExampleRecord](keys).right.get
-        println(newRecord)
-      }
-    }
-  }
-}
-
-
-class StreamsRecordProcessorFactory() extends IRecordProcessorFactory {
-  override def createProcessor(): IRecordProcessor = {
-    new StreamsRecordProcessor(
-      AmazonDynamoDBClientBuilder
-        .standard()
-        .withRegion("eu-west-1")
-        .build())
-    }
-}
+// import uk.ac.wellcome.platform.transformer.lib._
+// import uk.ac.wellcome.platform.transformer.services._
+import uk.ac.wellcome.platform.transformer.modules._
 
 
 object KinesisWorker extends TwitterModule {
+  override val modules = Seq(StreamsRecordProcessorFactoryModule)
 
   val system = ActorSystem("KinesisWorker")
-
 
   override def singletonStartup(injector: Injector) {
     println("@@ Hello world, I am starting")
@@ -93,7 +60,7 @@ object KinesisWorker extends TwitterModule {
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS),
       new Worker(
-        new StreamsRecordProcessorFactory(),
+        injector.instance[StreamsRecordProcessorFactory],
         kinesisConfig,
         adapter,
         AmazonDynamoDBClientBuilder
