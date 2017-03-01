@@ -37,7 +37,8 @@ import uk.ac.wellcome.platform.transformer.modules._
 object KinesisWorker extends TwitterModule {
   override val modules = Seq(
     StreamsRecordProcessorFactoryModule,
-    KinesisClientLibConfigurationModule)
+    KinesisClientLibConfigurationModule,
+    DynamoConfigModule)
 
   val system = ActorSystem("KinesisWorker")
 
@@ -45,12 +46,14 @@ object KinesisWorker extends TwitterModule {
     println("@@ Hello world, I am starting")
     println("@@ I am very excited to be starting")
 
+    val region = injector.instance[DynamoConfig].region
+
     val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
     // TODO: weird stuff with Region[s]. Understand what's going on.
     // Should be able to do Regions.US_WEST_2
-    adapter.setRegion(RegionUtils.getRegion("eu-west-1"))
+    adapter.setRegion(RegionUtils.getRegion(region))
 
     val kinesisConfig = injector.instance[KinesisClientLibConfiguration].withInitialPositionInStream(InitialPositionInStream.LATEST)
 
@@ -62,11 +65,11 @@ object KinesisWorker extends TwitterModule {
         adapter,
         AmazonDynamoDBClientBuilder
           .standard()
-          .withRegion("eu-west-1")
+          .withRegion(region)
           .build(),
         AmazonCloudWatchClientBuilder
           .standard()
-          .withRegion("eu-west-1")
+          .withRegion(region)
           .build()
       )
     )
