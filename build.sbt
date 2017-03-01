@@ -38,6 +38,6 @@ lazy val transformer = (project in file("transformer")).
   settings(JavaAppPackaging.projectSettings: _*).
   settings(Packager.settings: _*).
   settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.apiDependencies)
+  settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
 lazy val root = (project in file("."))
