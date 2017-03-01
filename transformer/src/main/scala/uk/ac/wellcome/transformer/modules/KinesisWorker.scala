@@ -29,6 +29,8 @@ import javax.inject.{Inject, Singleton}
 
 import com.twitter.inject.{Injector, TwitterModule}
 
+import com.twitter.inject.Logging
+
 // import uk.ac.wellcome.platform.transformer.lib._
 // import uk.ac.wellcome.platform.transformer.services._
 import uk.ac.wellcome.platform.transformer.modules._
@@ -43,8 +45,7 @@ object KinesisWorker extends TwitterModule {
   val system = ActorSystem("KinesisWorker")
 
   override def singletonStartup(injector: Injector) {
-    println("@@ Hello world, I am starting")
-    println("@@ I am very excited to be starting")
+    info("Starting Kinesis worker")
 
     val region = injector.instance[DynamoConfig].region
 
@@ -76,6 +77,7 @@ object KinesisWorker extends TwitterModule {
   }
 
   override def singletonShutdown(injector: Injector) {
-    println("@@ Goodbye cruel world")
+    info("Shutting down Kinesis worker")
+    system.terminate()
   }
 }
