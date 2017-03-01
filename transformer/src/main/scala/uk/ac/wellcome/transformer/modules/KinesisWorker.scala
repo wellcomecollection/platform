@@ -35,7 +35,9 @@ import uk.ac.wellcome.platform.transformer.modules._
 
 
 object KinesisWorker extends TwitterModule {
-  override val modules = Seq(StreamsRecordProcessorFactoryModule)
+  override val modules = Seq(
+    StreamsRecordProcessorFactoryModule,
+    KinesisClientLibConfigurationModule)
 
   val system = ActorSystem("KinesisWorker")
 
@@ -50,12 +52,7 @@ object KinesisWorker extends TwitterModule {
     // Should be able to do Regions.US_WEST_2
     adapter.setRegion(RegionUtils.getRegion("eu-west-1"))
 
-    val kinesisConfig = new KinesisClientLibConfiguration(
-      "thursday-demo-application",
-      "ARN1234",
-      new DefaultAWSCredentialsProviderChain(),
-      "worker-id-1234"
-    ).withInitialPositionInStream(InitialPositionInStream.LATEST)
+    val kinesisConfig = injector.instance[KinesisClientLibConfiguration].withInitialPositionInStream(InitialPositionInStream.LATEST)
 
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS),
