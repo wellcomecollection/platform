@@ -5,9 +5,9 @@ import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 
+import uk.ac.wellcome.finatra.exceptions._
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
-import uk.ac.wellcome.platform.api.exceptions._
 
 object ServerMain extends Server
 
