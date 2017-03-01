@@ -8,7 +8,18 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 
 import com.gu.scanamo.ScanamoFree
 
-case class ExampleRecord(identifier: String)
+case class CleanedRecord(identifier: String)
+
+trait Transformable {
+  def tranform[T]: CleanedRecord
+}
+
+case class ExampleRecord(identifier: String) extends Transformable {
+  def transform[ExampleRecord](): CleanedRecord {
+    // abracadabra goes here
+    CleanedRecord(identifier)
+  }
+}
 
 
 class DynamoCaseClassExtractorActor extends Actor with Logging {
