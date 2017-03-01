@@ -14,9 +14,16 @@ case class ExampleRecord(identifier: String)
 class DynamoCaseClassExtractorActor extends Actor with Logging {
   def receive = {
     case record: RecordMap => {
-      // TODO: Error handling
-      val parsedRecord = ScanamoFree.read[ExampleRecord](record.value).right.get
-      info(s"Parsed DynamoDB record ${parsedRecord}")
+      ScanamoFree.read[ExampleRecord](record.value) match {
+        case Right(rec) => {
+          info(s"Parsed DynamoDB record ${rec}")
+          // Send to next actor
+        }
+        case Left(rec) => {
+          error(s"Unable to parse record ${rec}")
+          // Send to dead letter queue or error
+        }
+      }
     }
     case event => error(s"Received unknown DynamoDB record ${event}")
   }
