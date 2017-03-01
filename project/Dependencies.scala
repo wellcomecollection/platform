@@ -13,6 +13,11 @@ object Dependencies {
     val elastic4s = "5.1.5"
   }
 
+  val esDependencies: Seq[ModuleID] = Seq(
+    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s
+  )
+
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
@@ -36,13 +41,8 @@ object Dependencies {
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  )
+  ) ++ esDependencies
 
-  val esDependencies: Seq[ModuleID] = Seq(
-    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s
-  )
-
-  val apiDependencies: Seq[ModuleID] = commonDependencies ++ esDependencies
+  val apiDependencies: Seq[ModuleID] = commonDependencies
 
 }
