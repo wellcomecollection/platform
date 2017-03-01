@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.exceptions
+package uk.ac.wellcome.finatra.exceptions
 
 import org.elasticsearch.ElasticsearchException
 import com.twitter.finagle.http.{Request, Response}

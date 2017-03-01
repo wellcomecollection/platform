@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.api.controllers
 
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
-import uk.ac.wellcome.platform.api.services._
+
+import uk.ac.wellcome.finatra.services.ElasticsearchService
 
 import javax.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.ElasticDsl._
