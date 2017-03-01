@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import uk.ac.wellcome.finatra.services.ElasticsearchService
 import uk.ac.wellcome.platform.api.models._
 
 
