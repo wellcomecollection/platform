@@ -5,15 +5,10 @@ import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 
-<<<<<<< HEAD
 import uk.ac.wellcome.finatra.exceptions._
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
-=======
-import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.api.controllers._
-import uk.ac.wellcome.platform.api.exceptions._
->>>>>>> Move out ESClient into common lib
+
 
 object ServerMain extends Server
 
