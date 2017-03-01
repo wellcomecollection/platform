@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.modules
+package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 

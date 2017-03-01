@@ -4,14 +4,38 @@ import Keys._
 object Dependencies {
 
   lazy val versions = new {
+    val akka = "2.4.17"
+    val aws = "1.11.95"
     val finatra = "2.7.0"
     val guice = "4.0"
+    val kinesis = "1.7.3"
+    val kinesisDynamoAdapter = "1.1.1"
     val logback = "1.1.8"
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
     val elastic4s = "5.1.5"
+    val scanamo = "0.9.1"
   }
+
+  val akkaDependencies: Seq[ModuleID] = Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka
+  )
+
+  val awsDependencies: Seq[ModuleID] = Seq(
+    "com.amazonaws" % "aws-java-sdk" % versions.aws
+  )
+
+  val dynamoDependencies: Seq[ModuleID] = Seq(
+    "com.amazonaws" % "amazon-kinesis-client" % versions.kinesis,
+    "com.amazonaws" % "dynamodb-streams-kinesis-adapter" % versions.kinesisDynamoAdapter,
+    "com.gu" %% "scanamo" % versions.scanamo
+  )
+
+  val esDependencies: Seq[ModuleID] = Seq(
+    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s
+  )
 
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
@@ -36,13 +60,10 @@ object Dependencies {
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  )
+  ) ++ esDependencies ++ awsDependencies
 
-  val esDependencies: Seq[ModuleID] = Seq(
-    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s
-  )
+  val apiDependencies: Seq[ModuleID] = commonDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies ++ esDependencies
+  val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
 
 }
