@@ -33,6 +33,7 @@ import com.twitter.inject.Logging
 
 // import uk.ac.wellcome.platform.transformer.lib._
 // import uk.ac.wellcome.platform.transformer.services._
+import uk.ac.wellcome.platform.transformer.actors._
 import uk.ac.wellcome.platform.transformer.modules._
 
 
@@ -43,6 +44,7 @@ object KinesisWorker extends TwitterModule {
     DynamoConfigModule)
 
   val system = ActorSystem("KinesisWorker")
+  val actor = system.actorOf(Props[KinesisDynamoRecordExtractorActor], name="kdreactor")
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
@@ -74,6 +76,7 @@ object KinesisWorker extends TwitterModule {
           .build()
       )
     )
+
   }
 
   override def singletonShutdown(injector: Injector) {
