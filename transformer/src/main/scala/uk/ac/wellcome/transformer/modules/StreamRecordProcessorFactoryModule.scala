@@ -51,18 +51,7 @@ class StreamsRecordProcessor(client: AmazonDynamoDB) extends IRecordProcessor {
   }
 
   override def processRecords(records: JList[Record], checkpointer: IRecordProcessorCheckpointer): Unit = {
-    records.asScala.map { record =>
-      if (record.isInstanceOf[RecordAdapter]) {
-        val recordAdapter = record.asInstanceOf[RecordAdapter]
-        val keys = recordAdapter
-          .getInternalObject()
-          .getDynamodb()
-          .getKeys()
-        // TODO: proper pattern matching and map on result
-        val newRecord: ExampleRecord = ScanamoFree.read[ExampleRecord](keys).right.get
-        println(newRecord)
-      }
-    }
+    records.asScala.map { record => KinesisWorker.actor ! record }
   }
 }
 
