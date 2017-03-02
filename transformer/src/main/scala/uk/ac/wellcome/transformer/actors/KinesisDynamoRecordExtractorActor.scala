@@ -1,14 +1,12 @@
 package uk.ac.wellcome.platform.transformer.actors
 
-import akka.actor.{Actor, ActorSystem, Props}
-
-import com.twitter.inject.Logging
-
+import akka.actor.Actor
 import com.amazonaws.services.dynamodbv2.model._
+import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
+import com.twitter.inject.Logging
 
 import uk.ac.wellcome.platform.transformer.modules._
 
-import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 

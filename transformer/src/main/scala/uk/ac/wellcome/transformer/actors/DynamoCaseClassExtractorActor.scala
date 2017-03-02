@@ -1,12 +1,8 @@
 package uk.ac.wellcome.platform.transformer.actors
 
-import akka.actor.{Actor, ActorSystem, Props}
-
-import com.twitter.inject.Logging
-
-import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
-
+import akka.actor.Actor
 import com.gu.scanamo.ScanamoFree
+import com.twitter.inject.Logging
 
 case class ExampleRecord(identifier: String)
 

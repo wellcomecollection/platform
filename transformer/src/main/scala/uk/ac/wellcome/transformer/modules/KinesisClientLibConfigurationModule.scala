@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.transformer.modules
 
-import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
-import com.twitter.inject.TwitterModule
-import javax.inject.{Inject, Singleton}
-import com.google.inject.Provides
+import javax.inject.Singleton
+
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
+import com.google.inject.Provides
+import com.twitter.inject.TwitterModule
 
 
 object KinesisClientLibConfigurationModule extends TwitterModule {

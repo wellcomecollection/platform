@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.transformer.modules
 import javax.inject.Singleton
 
 import com.google.inject.Provides
-
 import com.twitter.inject.TwitterModule
 
 

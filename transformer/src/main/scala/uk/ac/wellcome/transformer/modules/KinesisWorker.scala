@@ -1,38 +1,18 @@
 package uk.ac.wellcome.platform.transformer.modules
 
-import scala.concurrent.duration.Duration
-
 import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
-import akka.actor.{Actor, ActorSystem, Props}
-
-import java.nio.charset.{ Charset => JCharset }
-import java.util.{ List => JList }
-
-import scala.collection.JavaConverters._
-
-import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
+import akka.actor.{ActorSystem, Props}
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.regions._
 import com.amazonaws.services.cloudwatch._
 import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
-import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
-import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
-import com.amazonaws.services.kinesis.model.Record
+import com.twitter.inject.{Injector, Logging, TwitterModule}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-import com.gu.scanamo.ScanamoFree
-
-import javax.inject.{Inject, Singleton}
-
-import com.twitter.inject.{Injector, TwitterModule}
-
-import com.twitter.inject.Logging
-
-// import uk.ac.wellcome.platform.transformer.lib._
-// import uk.ac.wellcome.platform.transformer.services._
 import uk.ac.wellcome.platform.transformer.actors._
 import uk.ac.wellcome.platform.transformer.modules._
 
