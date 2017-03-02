@@ -34,6 +34,9 @@ object KinesisWorker extends TwitterModule {
   val transformActor =
     system.actorOf(Props[TransformActor], name="tactor")
 
+  val stringifyCleanedRecordActor =
+    system.actorOf(Props[StringifyCleanedRecordActor], name="scractor")
+
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
 

@@ -7,6 +7,8 @@ import uk.ac.wellcome.platform.transformer.models._
 import scala.util.Success
 import scala.util.Failure
 
+import uk.ac.wellcome.platform.transformer.modules._
+
 
 class TransformActor extends Actor with Logging {
   def receive = {
@@ -14,11 +16,11 @@ class TransformActor extends Actor with Logging {
       dirtyRecord.transform match {
         case Success(cleanRecord) => {
           info(s"Cleaned record ${cleanRecord}")
-          // Send to next actor
+          KinesisWorker.stringifyCleanedRecordActor ! cleanRecord
         }
         case Failure(e) => {
           // Send to dead letter queue or just error
-          error("Failed to perform transform to clean record",e)
+          error("Failed to perform transform to clean record", e)
         }
       }
     }
