@@ -16,7 +16,7 @@ class KinesisDynamoRecordExtractorActor extends Actor with Logging {
       val keys = record
         .getInternalObject()
         .getDynamodb()
-        .getKeys()
+        .getNewImage()
       info(s"Received record ${keys}")
       KinesisWorker.actor2 ! RecordMap(keys)
     }

@@ -3,14 +3,13 @@ package uk.ac.wellcome.platform.transformer.actors
 import akka.actor.Actor
 import com.gu.scanamo.ScanamoFree
 import com.twitter.inject.Logging
-
-case class ExampleRecord(identifier: String)
+import uk.ac.wellcome.platform.transformer.models.CalmDynamoRecord
 
 
 class DynamoCaseClassExtractorActor extends Actor with Logging {
   def receive = {
     case record: RecordMap => {
-      ScanamoFree.read[ExampleRecord](record.value) match {
+      ScanamoFree.read[CalmDynamoRecord](record.value) match {
         case Right(rec) => {
           info(s"Parsed DynamoDB record ${rec}")
           // Send to next actor
