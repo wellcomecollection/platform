@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.transformer.actors
 import akka.actor.Actor
 import com.gu.scanamo.ScanamoFree
 import com.twitter.inject.Logging
+
 import uk.ac.wellcome.platform.transformer.models.CalmDynamoRecord
 
 
