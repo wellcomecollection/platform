@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "eu-west-1"
-}
-
 resource "aws_dynamodb_table" "calm-dynamodb-table" {
   name = "CalmData"
   read_capacity = 5
