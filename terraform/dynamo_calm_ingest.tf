@@ -8,6 +8,8 @@ resource "aws_dynamodb_table" "calm-dynamodb-table" {
   write_capacity = 5
   hash_key = "RecordID"
   range_key = "RecordType"
+  stream_enabled = true
+  stream_view_type = "NEW_IMAGE"
   attribute {
     name = "RecordID"
     type = "S"
