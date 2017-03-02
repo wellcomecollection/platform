@@ -22,10 +22,6 @@ resource "aws_dynamodb_table" "calm-dynamodb-table" {
     name = "AltRefNo"
     type = "S"
   }
-  attribute {
-    name = "data"
-    type = "S"
-  }
   global_secondary_index = {
     name = "RefNo"
     hash_key = "RefNo"
