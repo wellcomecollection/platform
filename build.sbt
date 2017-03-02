@@ -7,7 +7,10 @@ import com.typesafe.sbt.packager.linux.LinuxPlugin
 lazy val common = (project in file("common-lib")).
   settings(SbtGit.useJGit).
   settings(Common.settings: _*).
-  settings(GitVersioning.buildSettings: _*)
+  settings(Search.settings: _*).
+  settings(Finatra.settings: _*).
+  settings(GitVersioning.buildSettings: _*).
+  settings(libraryDependencies ++= Dependencies.commonDependencies)
 
 lazy val api = (project in file("api")).
   dependsOn(common).
