@@ -1,25 +1,27 @@
 calm-ingest
 ===========
 
-This directory contains Python scripts for ingesting Calm data.
+This directory contains some rudimentary Python scripts to help ingest
+Calm data.
 
 Ingest process
 **************
 
-For the proof-of-concept, we're searching records from the Calm database.
+This diagram displays the current ingest architecture:
 
-.. image:: calm_architecture.png
+.. image:: ingest_architecture.png
 
-The data is provided as an XML dump of the entire database via the native
-export function.  This repo includes a script that pushes every record into a
-DynamoDB table.  We then have a second script that creates an Elasticsearch
-index for the data, which will be used by the API for searching.
+We have a number of data sources (initially just Calm, but we'll add others).
+An adapter ingests all the records into a per-source DynamoDB table, treating
+Dynamo as a mirror of the original source.
 
-Having an intermediate data store in DynamoDB means we can change the
-Elasticsearch mappings without having to re-ingest the entire Calm database.
+A transformer runs on the other side of Dynamo, and parses out the fields we
+want to expose on Elasticsearch.  It pushes JSON objects onto a queue (or sends
+records to a DLQ if they cannot be parsed), which is read by a worker to ingest
+those fields into our Elasticsearch index.  All records are stored in the same
+Elasticsearch index, regardless of source.
 
-Calm presents an API, and we may use this API in a future version and/or
-for updating the data after the initial ingest.
+Our API then queries Elasticsearch directly.
 
 Installation
 ************
