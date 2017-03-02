@@ -16,7 +16,7 @@ class TransformActor extends Actor with Logging {
       dirtyRecord.transform match {
         case Success(cleanRecord) => {
           info(s"Cleaned record ${cleanRecord}")
-          KinesisWorker.stringifyCleanedRecordActor ! cleanRecord
+          KinesisWorker.publishableMessageRecordActor ! cleanRecord
         }
         case Failure(e) => {
           // Send to dead letter queue or just error

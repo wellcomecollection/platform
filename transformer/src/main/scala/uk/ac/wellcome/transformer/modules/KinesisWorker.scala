@@ -34,8 +34,11 @@ object KinesisWorker extends TwitterModule {
   val transformActor =
     system.actorOf(Props[TransformActor], name="tactor")
 
-  val stringifyCleanedRecordActor =
-    system.actorOf(Props[StringifyCleanedRecordActor], name="scractor")
+  val publishableMessageRecordActor =
+    system.actorOf(Props[PublishableMessageRecordActor], name="scractor")
+
+  val publisherActor =
+    system.actorOf(Props[PublisherActor], name="pactor")
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
@@ -45,8 +48,6 @@ object KinesisWorker extends TwitterModule {
     val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
-    // TODO: weird stuff with Region[s]. Understand what's going on.
-    // Should be able to do Regions.US_WEST_2
     adapter.setRegion(RegionUtils.getRegion(region))
 
     val kinesisConfig = injector.instance[KinesisClientLibConfiguration].withInitialPositionInStream(InitialPositionInStream.LATEST)

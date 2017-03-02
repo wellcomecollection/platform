@@ -8,6 +8,7 @@ trait Transformable {
 }
 
 case class CleanedRecord(
+  source: String,
   accessStatus: Option[String]
 )
 
@@ -16,6 +17,7 @@ case class DirtyCalmRecord(
 ) extends Transformable {
   def transform: Try[CleanedRecord] = Try {
     CleanedRecord(
+      "Foo",
       accessStatus = AccessStatus
     )
   }
