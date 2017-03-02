@@ -24,8 +24,12 @@ object KinesisWorker extends TwitterModule {
     DynamoConfigModule)
 
   val system = ActorSystem("KinesisWorker")
-  val actor = system.actorOf(Props[KinesisDynamoRecordExtractorActor], name="kdreactor")
-  val actor2 = system.actorOf(Props[DynamoCaseClassExtractorActor], name="dcceactor")
+
+  val kinesisDynamoRecordExtractorActor =
+    system.actorOf(Props[KinesisDynamoRecordExtractorActor], name="kdreactor")
+
+  val dynamoCaseClassExtractorActor =
+    system.actorOf(Props[DynamoCaseClassExtractorActor], name="dcceactor")
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")

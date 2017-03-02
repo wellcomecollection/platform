@@ -26,7 +26,8 @@ class StreamsRecordProcessor(client: AmazonDynamoDB) extends IRecordProcessor {
   }
 
   override def processRecords(records: JList[Record], checkpointer: IRecordProcessorCheckpointer): Unit = {
-    records.asScala.map { record => KinesisWorker.actor ! record }
+    records.asScala.map { record =>
+      KinesisWorker.kinesisDynamoRecordExtractorActor ! record }
   }
 }
 

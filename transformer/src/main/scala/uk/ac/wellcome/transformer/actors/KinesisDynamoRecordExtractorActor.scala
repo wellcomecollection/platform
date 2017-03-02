@@ -18,7 +18,7 @@ class KinesisDynamoRecordExtractorActor extends Actor with Logging {
         .getDynamodb()
         .getNewImage()
       info(s"Received record ${keys}")
-      KinesisWorker.actor2 ! RecordMap(keys)
+      KinesisWorker.dynamoCaseClassExtractorActor ! RecordMap(keys)
     }
     case event => error(s"Received unknown Kinesis event ${event}")
   }

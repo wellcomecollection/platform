@@ -1,20 +1,37 @@
 package uk.ac.wellcome.platform.transformer.models
 
+import uk.ac.wellcome.utils.JsonUtil
+import scala.util.Try
+
 trait Transformable {
-  def tranform[T]: CleanedRecord
+  def transform: Try[CleanedRecord]
 }
 
+case class CleanedRecord(
+  accessStatus: Option[String]
+)
+
+case class DirtyCalmRecord(
+  AccessStatus: Option[String]
+) extends Transformable {
+  def transform: Try[CleanedRecord] = Try {
+    CleanedRecord(
+      accessStatus = AccessStatus
+    )
+  }
+}
 
 case class CalmDynamoRecord(
   RecordID: String,
   RecordType: String,
-  AltRefNo: Option[String],
-  RefNo: Option[String],
-  data: Option[String]
+  AltRefNo: String,
+  RefNo: String,
+  data: String
 ) extends Transformable {
-  def transform[ExampleRecord](): CleanedRecord {
-    // abracadabra goes here
-    CleanedRecord(identifier)
-  }
+
+  def transform: Try[CleanedRecord] =
+    JsonUtil.fromJson[DirtyCalmRecord](data)
+      .flatMap(_.transform)
+
 }
 
