@@ -8,9 +8,14 @@ import uk.ac.wellcome.platform.transformer.modules.PublishableMessage
 
 import scala.util.Success
 import scala.util.Failure
+import com.google.inject.name.Named
 
 
-class PublisherActor extends Actor with Logging {
+@Named("PublisherActor")
+class PublisherActor()
+  extends Actor
+  with Logging {
+
   def receive = {
     case m: PublishableMessage => m.publish match {
       case Success(publishAttempt) => {

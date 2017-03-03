@@ -60,7 +60,7 @@ object Dependencies {
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  ) ++ esDependencies ++ awsDependencies
+  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies
 

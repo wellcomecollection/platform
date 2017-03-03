@@ -15,11 +15,13 @@ object KinesisClientLibConfigurationModule extends TwitterModule {
   @Singleton
   @Provides
   def provideKinesisClientLibConfiguration(dynamoConfig: DynamoConfig): KinesisClientLibConfiguration = {
+
     new KinesisClientLibConfiguration(
       dynamoConfig.applicationName,
       dynamoConfig.arn,
       new DefaultAWSCredentialsProviderChain(),
       java.util.UUID.randomUUID.toString
     )
+
   }
 }

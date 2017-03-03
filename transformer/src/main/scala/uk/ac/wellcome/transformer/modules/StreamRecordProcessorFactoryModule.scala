@@ -11,45 +11,63 @@ import com.amazonaws.services.kinesis.model.Record
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 
+import akka.actor.ActorRef
 import uk.ac.wellcome.platform.transformer.modules._
 
 
-class StreamsRecordProcessor(client: AmazonDynamoDB) extends IRecordProcessor {
+class StreamsRecordProcessor(
+  client: AmazonDynamoDB,
+  reciever: Option[ActorRef]
+) extends IRecordProcessor {
 
   case class ExampleRecord(identifier: String)
 
   override def initialize(shardId: String) = Unit
-  override def shutdown(checkpointer: IRecordProcessorCheckpointer, reason: ShutdownReason): Unit = {
+  override def shutdown(
+    checkpointer: IRecordProcessorCheckpointer,
+    reason: ShutdownReason
+  ): Unit = {
     if (reason == ShutdownReason.TERMINATE) {
       checkpointer.checkpoint()
     }
   }
 
-  override def processRecords(records: JList[Record], checkpointer: IRecordProcessorCheckpointer): Unit = {
+  override def processRecords(
+    records: JList[Record],
+    checkpointer: IRecordProcessorCheckpointer
+  ): Unit = {
     records.asScala.map { record =>
-      KinesisWorker.kinesisDynamoRecordExtractorActor ! record }
+      reciever.map(_ ! record) }
   }
 }
 
+class StreamsRecordProcessorFactory(
+  dynamoClient: AmazonDynamoDB,
+  actorRegister: ActorRegister
+)
+  extends IRecordProcessorFactory {
 
-
-class StreamsRecordProcessorFactory(dynamoConfig: DynamoConfig) extends IRecordProcessorFactory {
-  override def createProcessor(): IRecordProcessor = {
+  override def createProcessor(): IRecordProcessor =
     new StreamsRecordProcessor(
-      AmazonDynamoDBClientBuilder
-        .standard()
-        .withRegion(dynamoConfig.region)
-        .build())
-    }
+      dynamoClient,
+      actorRegister
+        .actors
+	.get("kinesisDynamoRecordExtractorActor"))
+
 }
 
-
 object StreamsRecordProcessorFactoryModule extends TwitterModule {
-  override val modules = Seq(DynamoConfigModule)
+  override val modules = Seq(
+    ActorRegistryModule,
+    DynamoClientModule)
 
   @Singleton
   @Provides
-  def provideStreamsRecordProcessorFactory(dynamoConfig: DynamoConfig): StreamsRecordProcessorFactory = {
-    new StreamsRecordProcessorFactory(dynamoConfig)
-  }
+  def provideStreamsRecordProcessorFactory(
+    dynamoClient: AmazonDynamoDB,
+    actorRegister: ActorRegister
+  ): StreamsRecordProcessorFactory =
+      new StreamsRecordProcessorFactory(
+        dynamoClient,
+	actorRegister)
 }

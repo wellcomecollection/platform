@@ -13,7 +13,6 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAda
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
-import uk.ac.wellcome.platform.transformer.actors._
 import uk.ac.wellcome.platform.transformer.modules._
 
 
@@ -21,36 +20,23 @@ object KinesisWorker extends TwitterModule {
   override val modules = Seq(
     StreamsRecordProcessorFactoryModule,
     KinesisClientLibConfigurationModule,
-    DynamoConfigModule)
-
-  val system = ActorSystem("KinesisWorker")
-
-  val kinesisDynamoRecordExtractorActor =
-    system.actorOf(Props[KinesisDynamoRecordExtractorActor], name="kdreactor")
-
-  val dynamoCaseClassExtractorActor =
-    system.actorOf(Props[DynamoCaseClassExtractorActor], name="dcceactor")
-
-  val transformActor =
-    system.actorOf(Props[TransformActor], name="tactor")
-
-  val publishableMessageRecordActor =
-    system.actorOf(Props[PublishableMessageRecordActor], name="scractor")
-
-  val publisherActor =
-    system.actorOf(Props[PublisherActor], name="pactor")
+    DynamoConfigModule,
+    AkkaModule)
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
 
     val region = injector.instance[DynamoConfig].region
+    val system = injector.instance[ActorSystem]
 
-    val adapter = new AmazonDynamoDBStreamsAdapterClient(
+   val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
+
     adapter.setRegion(RegionUtils.getRegion(region))
 
-    val kinesisConfig = injector.instance[KinesisClientLibConfiguration].withInitialPositionInStream(InitialPositionInStream.LATEST)
+    val kinesisConfig = injector.instance[KinesisClientLibConfiguration]
+      .withInitialPositionInStream(InitialPositionInStream.LATEST)
 
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS),
@@ -72,7 +58,6 @@ object KinesisWorker extends TwitterModule {
   }
 
   override def singletonShutdown(injector: Injector) {
-    info("Shutting down Kinesis worker")
-    system.terminate()
+    //info("Shutting down Kinesis worker")
   }
 }
