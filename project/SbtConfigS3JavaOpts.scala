@@ -4,7 +4,7 @@ import sbt._, Keys._
 
 import scala.collection.JavaConverters._
 import java.io.{File, InputStream}
-import java.nio.file.Files
+import java.nio.file.{Files, Paths}
 import java.nio.file.StandardCopyOption._
 import com.typesafe.config._
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
@@ -37,6 +37,7 @@ object ConfigS3JavaOptsPlugin extends sbt.AutoPlugin {
 
 object ConfigS3JavaOpts {
   def apply(stage: String, bucket: String): Seq[String] = {
+    if (!Files.exists(Paths.get("conf/"))) return Nil
 
     val key       = s"config/${stage}/platform.conf"
     val localPath = s"conf/application.${stage}.conf"
