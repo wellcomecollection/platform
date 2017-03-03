@@ -18,16 +18,20 @@ object ConfigS3JavaOptsPlugin extends sbt.AutoPlugin {
       "config-s3-stage","Deploy environment.")
     val configS3Bucket   = SettingKey[String](
       "config-s3-bucket","Settings bucket.")
+    val configS3App = SettingKey[String](
+      "config-s3-app","App name")
 
     lazy val baseConfigS3JavaOptsSettings: Seq[Def.Setting[_]] = Seq(
       configS3JavaOpts := {
         ConfigS3JavaOpts(
 	  (configS3Stage in configS3JavaOpts).value,
-	  (configS3Bucket in configS3JavaOpts).value
+	  (configS3Bucket in configS3JavaOpts).value,
+	  (configS3App in configS3JavaOpts).value
         )
       },
       configS3Stage in configS3JavaOpts := "dev",
-      configS3Bucket in configS3JavaOpts := "config-bucket"
+      configS3Bucket in configS3JavaOpts := "config-bucket",
+      configS3App in configS3JavaOpts := "api"
     )
   }
   import autoImport._
@@ -36,10 +40,10 @@ object ConfigS3JavaOptsPlugin extends sbt.AutoPlugin {
 }
 
 object ConfigS3JavaOpts {
-  def apply(stage: String, bucket: String): Seq[String] = {
+  def apply(stage: String, bucket: String, appName: String): Seq[String] = {
     if (!Files.exists(Paths.get("conf/"))) return Nil
 
-    val key       = s"config/${stage}/platform.conf"
+    val key       = s"config/${stage}/${appName}.conf"
     val localPath = s"conf/application.${stage}.conf"
 
     if(stage != "dev") {
