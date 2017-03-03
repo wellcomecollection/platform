@@ -15,6 +15,8 @@ import uk.ac.wellcome.platform.transformer.modules.{
 
 import uk.ac.wellcome.platform.transformer.modules.ActorRegister
 
+import com.amazonaws.services.sns.AmazonSNS
+
 import uk.ac.wellcome.utils.JsonUtil
 import scala.util.Success
 import scala.util.Failure
@@ -24,7 +26,8 @@ import com.google.inject.name.Named
 @Named("PublishableMessageRecordActor")
 class PublishableMessageRecordActor @Inject()(
   actorRegister: ActorRegister,
-  workerConfig: WorkerConfig
+  workerConfig: WorkerConfig,
+  snsClient: AmazonSNS
 )
   extends Actor
   with Logging {
@@ -36,7 +39,8 @@ class PublishableMessageRecordActor @Inject()(
           val message = SNSMessage(
             cleanedRecord.source,
             stringifiedJson,
-            workerConfig.snsTopicArn
+            workerConfig.snsTopicArn,
+	    snsClient
           )
 
           info(s"Publishable message ${message}")

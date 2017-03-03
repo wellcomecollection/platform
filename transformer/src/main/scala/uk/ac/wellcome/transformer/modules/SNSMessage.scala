@@ -17,16 +17,19 @@ trait PublishableMessage {
   def publish(): Try[PublishAttempt]
 }
 
-case class SNSMessage (subject: String, message: String, topic: String)
-  extends TwitterModule with PublishableMessage {
+case class SNSMessage (
+  subject: String,
+  message: String,
+  topic: String,
+  snsClient: AmazonSNS
+)
+  extends PublishableMessage {
 
-  @Inject val snsClient: AmazonSNS = null
-
-  def publish() = Try(
+  def publish() = Try{
     snsClient.publish(
       new PublishRequest(topic, message, subject)
     )
-  ).map(r =>
+  }.map(r =>
     PublishAttempt(r.getMessageId()))
 
 }

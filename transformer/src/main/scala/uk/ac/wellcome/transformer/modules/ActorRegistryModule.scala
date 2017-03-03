@@ -18,7 +18,11 @@ object ActorRegistryModule
   extends TwitterModule {
 
   override val modules = Seq(
-    DynamoConfigModule, AkkaModule, WorkerConfigModule)
+    DynamoConfigModule,
+    AkkaModule,
+    WorkerConfigModule,
+    SNSClientModule
+  )
 
   override def configure() {
     bind[Actor]
