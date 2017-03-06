@@ -13,7 +13,6 @@ import io.swagger.models.{Info, Swagger}
 
 
 object ServerMain extends Server
-
 object ApiSwagger extends Swagger
 
 class Server extends HttpServer {
@@ -26,9 +25,6 @@ class Server extends HttpServer {
       .version("0.0.1")
       .title("The API"))
 
-  val swaggerController =
-    new SwaggerController(swagger = ApiSwagger)
-
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
@@ -36,7 +32,7 @@ class Server extends HttpServer {
       .filter[TraceIdMDCFilter[Request, Response]]
       .add[ManagementController]
       .add[MainController]
-      .add(swaggerController)
+      .add[SwaggerController]
       .exceptionMapper[ElasticsearchExceptionMapper]
   }
 }
