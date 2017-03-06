@@ -27,6 +27,8 @@ object Packager {
 
     configS3Stage in configS3JavaOpts := buildEnv.value.toString,
 
+    configS3App in configS3JavaOpts := name.value.toString,
+
     javaOptions in Universal ++= configS3JavaOpts.value
   )
 }
