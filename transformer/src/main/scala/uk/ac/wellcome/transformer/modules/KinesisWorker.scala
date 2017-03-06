@@ -30,7 +30,7 @@ object KinesisWorker extends TwitterModule {
     val region = injector.instance[DynamoConfig].region
     val system = injector.instance[ActorSystem]
 
-   val adapter = new AmazonDynamoDBStreamsAdapterClient(
+    val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
 
