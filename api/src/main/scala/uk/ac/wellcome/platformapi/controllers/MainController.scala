@@ -16,6 +16,9 @@ import com.twitter.finatra.validation.NotEmpty
 
 import uk.ac.wellcome.platform.api.models._
 
+import uk.ac.wellcome.platform.api.ApiSwagger
+import com.github.xiaodongw.swagger.finatra.SwaggerSupport
+
 
 case class CalmRequest(
   @NotEmpty @QueryParam altRefNo: String
@@ -35,11 +38,32 @@ case class RecordResponse(
 @Singleton
 class MainController @Inject()(
   calmService: CalmService
-) extends Controller {
+)
+  extends Controller
+  with SwaggerSupport {
 
-  val apiBaseUrl = "/api/v0"
+  override implicit protected val swagger = ApiSwagger
 
-  get(s"${apiBaseUrl}/record") { request: CalmRequest =>
+  val apiBaseUrl = s"/api/v0"
+
+  getWithDoc(s"${apiBaseUrl}/record") { o =>
+    o.summary("Read record information")
+      .description("Read the record information!")
+      .produces("application/json")
+      .tag("API")
+      .responseWith[RecordResponse](200, "A Record",
+	example = Some(
+          RecordResponse(
+            "FOO/1/2",
+            Record(
+              "FOO/1/2",
+              "A Title",
+              "Dark matter",
+              None,
+              None),
+            None)))
+      .responseWith[Unit](404, "The Record is not found")
+  } { request: CalmRequest =>
     val recordCollectionPair = for {
       recordOption <- calmService.findRecordByAltRefNo(request.altRefNo)
       collectionOption <- calmService.findParentCollectionByAltRefNo(request.altRefNo)

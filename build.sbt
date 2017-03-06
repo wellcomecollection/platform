@@ -14,6 +14,7 @@ lazy val api = project.
   settings(Common.settings: _*).
   settings(Finatra.settings: _*).
   settings(Search.settings: _*).
+  settings(Swagger.settings: _*).
   settings(Revolver.settings: _*).
   settings(EcrPlugin.projectSettings: _*).
   settings(Packager.settings: _*).

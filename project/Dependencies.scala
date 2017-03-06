@@ -62,7 +62,9 @@ object Dependencies {
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies
+  val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
+    "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
+  )
 
   val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
 
