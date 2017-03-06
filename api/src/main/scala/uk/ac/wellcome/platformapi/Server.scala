@@ -9,25 +9,12 @@ import uk.ac.wellcome.finatra.exceptions._
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
 
-import com.github.xiaodongw.swagger.finatra.{
-  Resolvers,
-  SwaggerController,
-  WebjarsController
-}
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import io.swagger.models.{Info, Swagger}
-import io.swagger.util.Json
 
 
 object ServerMain extends Server
 
-object ApiSwagger extends Swagger {
-  Json.mapper()
-    .setPropertyNamingStrategy(
-      new PropertyNamingStrategy.SnakeCaseStrategy)
-
-  Resolvers.register()
-}
+object ApiSwagger extends Swagger
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
@@ -47,7 +34,6 @@ class Server extends HttpServer {
       .filter[CommonFilters]
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
-      .add[WebjarsController]
       .add[ManagementController]
       .add[MainController]
       .add(swaggerController)

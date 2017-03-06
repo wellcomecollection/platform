@@ -51,18 +51,9 @@ class MainController @Inject()(
       .description("Read the record information!")
       .produces("application/json")
       .tag("API")
-      .responseWith[RecordResponse](200, "A Record",
-	example = Some(
-          RecordResponse(
-            "FOO/1/2",
-            Record(
-              "FOO/1/2",
-              "A Title",
-              "Dark matter",
-              None,
-              None),
-            None)))
-      .responseWith[Unit](404, "The Record is not found")
+      .queryParam[String]("altRefNo", "The record to return", required = true)
+      .responseWith[Object](200, "A Record")
+      .responseWith[Object](404, "The Record is not found")
   } { request: CalmRequest =>
     val recordCollectionPair = for {
       recordOption <- calmService.findRecordByAltRefNo(request.altRefNo)
