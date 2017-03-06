@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.modules
+package uk.ac.wellcome.platform.ingestor.modules
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
@@ -7,8 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.{ActorSystem, Props}
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.twitter.inject.{Injector, Logging, TwitterModule}
-
-import uk.ac.wellcome.platform.transformer.modules._
+import uk.ac.wellcome.finatra.modules.AkkaModule
 
 
 object SQSWorker extends TwitterModule {
@@ -27,7 +26,8 @@ object SQSWorker extends TwitterModule {
   }
 
   override def singletonShutdown(injector: Injector) {
-    info("Shutting down SQS worker")
+    info("Terminating SQS worker")
+
     val system = injector.instance[ActorSystem]
     system.terminate()
   }

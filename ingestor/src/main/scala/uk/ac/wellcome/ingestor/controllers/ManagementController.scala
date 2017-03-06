@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.controllers
+package uk.ac.wellcome.platform.ingestor.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
@@ -6,6 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+
 
 @Singleton
 class ManagementController @Inject()() extends Controller {

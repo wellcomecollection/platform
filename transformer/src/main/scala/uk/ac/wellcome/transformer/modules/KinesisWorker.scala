@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAda
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
+import uk.ac.wellcome.finatra.modules.AkkaModule
 import uk.ac.wellcome.platform.transformer.modules._
 
 
