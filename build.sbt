@@ -32,4 +32,15 @@ lazy val transformer = project.
   enablePlugins(GitVersioning).
   settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
+lazy val ingestor = project.
+  dependsOn(common).
+  settings(Common.settings: _*).
+  settings(Finatra.settings: _*).
+  settings(Revolver.settings: _*).
+  settings(EcrPlugin.projectSettings: _*).
+  settings(Packager.settings: _*).
+  enablePlugins(JavaAppPackaging).
+  enablePlugins(GitVersioning).
+  settings(libraryDependencies ++= Dependencies.ingestorDependencies)
+
 lazy val root = (project in file("."))

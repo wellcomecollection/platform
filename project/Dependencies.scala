@@ -65,5 +65,6 @@ object Dependencies {
   val apiDependencies: Seq[ModuleID] = commonDependencies
 
   val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+  val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
 }
