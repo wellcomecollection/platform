@@ -11,13 +11,21 @@ import scala.util.{Try, Success, Failure}
 import akka.actor.{ActorSystem, Props}
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.twitter.inject.{Injector, Logging, TwitterModule}
+
 import uk.ac.wellcome.finatra.modules.AkkaModule
+import uk.ac.wellcome.finatra.services.ElasticsearchService
+import uk.ac.wellcome.models.UnifiedItem
+
 import com.amazonaws.services.sqs.model.{
   DeleteMessageRequest,
   Message => SQSMessage,
   ReceiveMessageRequest
 }
+
 import com.amazonaws.services.sqs.AmazonSQS
+
+import com.sksamuel.elastic4s.ElasticClient
+import com.sksamuel.elastic4s.ElasticDsl._
 
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -63,17 +71,33 @@ object SQSWorker extends TwitterModule {
   def deleteMessage(client: AmazonSQS, queueUrl: String, message: SQSMessage): Unit =
     client.deleteMessage(new DeleteMessageRequest(queueUrl, message.getReceiptHandle))
 
-  def chooseProcessor(subject: String): Option[String => Future[Unit]] = {
+  def chooseProcessor(subject: String): Option[(String, ElasticsearchService) => Future[Unit]] = {
     PartialFunction.condOpt(subject) {
       case "example" => indexDocument
     }
   }
 
-  def indexDocument(document: String): Future[Unit] =
-    Future(println(document))
+  //TODO: Extract processors out, everything else into a base trait
+  def indexDocument(
+    document: String,
+    elasticsearchService: ElasticsearchService
+  ): Future[Unit] = Future {
+    implicit val jsonMapper = UnifiedItem
+
+    JsonUtil.fromJson[UnifiedItem](document).map(item => {
+        elasticsearchService.client.execute {
+	  //TODO: Push index and type to config?
+          indexInto("records" / "item").doc(item)
+        }.await
+    })
+  }
 
   @tailrec
-  def processMessages(client: AmazonSQS, queueUrl: String): Unit = {
+  def processMessages(
+    client: AmazonSQS,
+    queueUrl: String,
+    elasticsearchService: ElasticsearchService
+  ): Unit = {
     for (msg <- getMessages(
         client = client,
         queueUrl = queueUrl,
@@ -90,14 +114,14 @@ object SQSWorker extends TwitterModule {
           throw new RuntimeException("Failed to process message")
         }))
 
-        _ = processor.apply(message.getBody())
+        _ = processor.apply(message.getBody(), elasticsearchService)
 
       } yield ()
 
       future.onSuccess { case _ => deleteMessage(client, queueUrl, msg) }
     }
 
-    processMessages(client, queueUrl)
+    processMessages(client, queueUrl, elasticsearchService)
   }
 
   override def singletonStartup(injector: Injector) {
@@ -105,12 +129,13 @@ object SQSWorker extends TwitterModule {
 
     val system = injector.instance[ActorSystem]
 
-    val client = injector.instance[AmazonSQS]
+    val sqsClient = injector.instance[AmazonSQS]
     val sqsConfig = injector.instance[SQSConfig]
+    val elasticsearchService = injector.instance[ElasticsearchService]
 
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS)
-    )(processMessages(client, sqsConfig.queueUrl))
+    )(processMessages(sqsClient, sqsConfig.queueUrl, elasticsearchService))
   }
 
   override def singletonShutdown(injector: Injector) {
