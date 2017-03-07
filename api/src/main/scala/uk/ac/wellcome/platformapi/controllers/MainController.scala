@@ -15,8 +15,6 @@ import scala.util.Try
 import com.twitter.finatra.request.QueryParam
 import com.twitter.finatra.validation.NotEmpty
 import uk.ac.wellcome.platform.api.models._
-import uk.ac.wellcome.platform.api.ApiSwagger
-import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.inject.annotations.Flag
 
 
@@ -40,22 +38,11 @@ class MainController @Inject()(
   @Flag("api.prefix") apiPrefix: String,
   calmService: CalmService
 )
-  extends Controller
-  with SwaggerSupport {
-
-  override implicit protected val swagger = ApiSwagger
+  extends Controller {
 
   prefix(apiPrefix) {
 
-    getWithDoc(s"/record") { o =>
-      o.summary("Read record information")
-        .description("Read the record information!")
-        .produces("application/json")
-        .tag("API")
-        .queryParam[String]("altRefNo", "The record to return", required = true)
-        .responseWith[Object](200, "A Record")
-        .responseWith[Object](404, "The Record is not found")
-    } { request: CalmRequest =>
+    get(s"/record") { request: CalmRequest =>
       val recordCollectionPair = for {
         recordOption <- calmService.findRecordByAltRefNo(request.altRefNo)
         collectionOption <- calmService.findParentCollectionByAltRefNo(request.altRefNo)
