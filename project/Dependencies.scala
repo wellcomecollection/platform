@@ -6,7 +6,7 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.4.17"
     val aws = "1.11.95"
-    val finatra = "2.7.0"
+    val finatra = "2.8.0"
     val guice = "4.0"
     val kinesis = "1.7.3"
     val kinesisDynamoAdapter = "1.1.1"
