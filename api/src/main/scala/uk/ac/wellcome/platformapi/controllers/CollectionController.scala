@@ -23,6 +23,8 @@ class CollectionController @Inject()(
       doc.summary("/collections")
         .description("Returns a paginated list of collections")
         .tag("Collections")
+        .queryParam[Int]("page", "The page to return from the result list", required = false)
+        .queryParam[Int]("pageSize", "The number of collections to return per page (default: 10)", required = false)
         .responseWith[Object](200, "ResultList[Collection]")
     } { request: Request =>
       response.notImplemented

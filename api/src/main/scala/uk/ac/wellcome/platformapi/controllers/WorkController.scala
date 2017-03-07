@@ -24,6 +24,8 @@ class WorkController @Inject()(
         .description("Returns a paginated list of works")
         .tag("Works")
         .responseWith[Object](200, "ResultList[Work]")
+        .queryParam[Int]("page", "The page to return from the result list", required = false)
+        .queryParam[Int]("pageSize", "The number of works to return per page (default: 10)", required = false)
     } { request: Request =>
       response.notImplemented
     }

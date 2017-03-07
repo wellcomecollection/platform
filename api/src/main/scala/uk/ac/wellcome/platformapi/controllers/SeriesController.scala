@@ -23,6 +23,8 @@ class SeriesController @Inject()(
       doc.summary("/series")
         .description("Returns a paginated list of series")
         .tag("Series")
+        .queryParam[Int]("page", "The page to return from the result list", required = false)
+        .queryParam[Int]("pageSize", "The number of series to return per page (default: 10)", required = false)
         .responseWith[Object](200, "ResultList[Series]")
     } { request: Request =>
       response.notImplemented
