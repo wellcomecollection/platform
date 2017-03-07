@@ -9,7 +9,7 @@ import uk.ac.wellcome.finatra.exceptions._
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
 
-import io.swagger.models.{Info, Swagger}
+import io.swagger.models.Swagger
 
 
 object ServerMain extends Server
@@ -19,11 +19,9 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(ElasticClientModule)
 
-  ApiSwagger.info(
-    new Info()
-      .description("An API")
-      .version("0.0.1")
-      .title("The API"))
+  private final val apiName = flag(name = "api.name", default = "catalogue", help = "API name path part")
+  private final val apiVersion = flag(name = "api.version", default = "v0", help = "API version path part")
+  flag(name = "api.prefix", default = "/" + apiName() + "/" + apiVersion(), help = "API path prefix")
 
   override def configureHttp(router: HttpRouter) {
     router
