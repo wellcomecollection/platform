@@ -1,8 +1,9 @@
-package uk.ac.wellcome.platform.api
+package uk.ac.wellcome.platform.transformer
 
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.WordSpecFeatureTest
+
 
 class StartupTest extends WordSpecFeatureTest {
 
