@@ -8,7 +8,7 @@
 
 
 # List of projects that sbt knows how to build
-PROJECTS="common api"
+PROJECTS="common api transformer"
 
 
 # Some bash debugging options: tracing, and exit as soon as a build step fails
@@ -39,7 +39,7 @@ then
 
     # Get a list of files that changed between master and the current branch
     # TODO: Err, does this handle added files?
-    changed_files=$(git diff --name-only master "$current_branch")
+    changed_files=$(git diff --name-only master "$current_branch" --)
 fi
 
 
