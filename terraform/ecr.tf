@@ -8,8 +8,8 @@ resource "aws_ecr_repository" "api" {
   }
 }
 
-resource "aws_ecr_repository" "transform" {
-  name = "uk.ac.wellcome/transform"
+resource "aws_ecr_repository" "transformer" {
+  name = "uk.ac.wellcome/transformer"
 
   lifecycle {
     prevent_destroy = true

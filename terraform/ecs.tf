@@ -6,27 +6,8 @@ resource "aws_ecs_cluster" "tools" {
   name = "tools_cluster"
 }
 
-resource "aws_ecs_service" "platform" {
-  name            = "platform_ecs_service"
-  cluster         = "${aws_ecs_cluster.main.id}"
-  task_definition = "${aws_ecs_task_definition.platform_api.arn}"
-  desired_count   = 1
-  iam_role        = "${aws_iam_role.ecs_service.name}"
-
-  load_balancer {
-    target_group_arn = "${aws_alb_target_group.platform.id}"
-    container_name   = "platform_api"
-    container_port   = "8888"
-  }
-
-  depends_on = [
-    "aws_iam_role_policy.ecs_service",
-    "aws_alb_listener.platform_api_listener",
-  ]
-}
-
-data "template_file" "platform_task_definition" {
-  template = "${file("${path.module}/tasks/platform-api.json")}"
+data "template_file" "api_task_definition" {
+  template = "${file("${path.module}/tasks/api.json")}"
 
   vars {
     container_name   = "platform_api"
@@ -38,26 +19,7 @@ data "template_file" "platform_task_definition" {
 
 resource "aws_ecs_task_definition" "platform_api" {
   family                = "platform_task_definition"
-  container_definitions = "${data.template_file.platform_task_definition.rendered}"
-}
-
-resource "aws_ecs_service" "jenkins" {
-  name            = "jenkins_ecs_service"
-  cluster         = "${aws_ecs_cluster.tools.id}"
-  task_definition = "${aws_ecs_task_definition.jenkins.arn}"
-  desired_count   = 1
-  iam_role        = "${aws_iam_role.ecs_service.name}"
-
-  load_balancer {
-    target_group_arn = "${aws_alb_target_group.jenkins.id}"
-    container_name   = "jenkins"
-    container_port   = "8080"
-  }
-
-  depends_on = [
-    "aws_iam_role_policy.ecs_service",
-    "aws_alb_listener.jenkins_listener",
-  ]
+  container_definitions = "${data.template_file.api_task_definition.rendered}"
 }
 
 data "template_file" "jenkins_task_definition" {
