@@ -22,21 +22,6 @@ variable "instance_type_tools_cluster" {
   description = "AWS instance type"
 }
 
-variable "asg_min" {
-  description = "Min numbers of servers in ASG"
-  default     = "1"
-}
-
-variable "asg_max" {
-  description = "Max numbers of servers in ASG"
-  default     = "2"
-}
-
-variable "asg_desired" {
-  description = "Desired numbers of servers in ASG"
-  default     = "1"
-}
-
 variable "admin_cidr_ingress" {
   description = "CIDR to allow tcp/22 ingress to EC2 instance"
 }
