@@ -5,7 +5,7 @@ module "platform_cluster_asg" {
   asg_desired        = "1"
   asg_max            = "2"
   launch_config_name = "${aws_launch_configuration.platform.name}"
-  subnet_list        = ["${aws_subnet.main.*.id}"]
+  subnet_list        = ["${module.vpc_main.subnets}"]
 }
 
 module "tools_cluster_asg" {
@@ -15,5 +15,5 @@ module "tools_cluster_asg" {
   asg_desired        = "1"
   asg_max            = "2"
   launch_config_name = "${aws_launch_configuration.tools.name}"
-  subnet_list        = ["${aws_subnet.tools.*.id}"]
+  subnet_list        = ["${module.vpc_tools.subnets}"]
 }
