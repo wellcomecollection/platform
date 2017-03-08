@@ -1,7 +1,7 @@
 resource "aws_security_group" "lb_sg" {
   description = "controls access to the application ELB"
 
-  vpc_id = "${aws_vpc.main.id}"
+  vpc_id = "${module.vpc_main.vpc_id}"
   name   = "tf-ecs-lbsg"
 
   ingress {
@@ -25,7 +25,7 @@ resource "aws_security_group" "lb_sg" {
 resource "aws_security_group" "tools_lb_sg" {
   description = "controls access to the application ELB"
 
-  vpc_id = "${aws_vpc.tools.id}"
+  vpc_id = "${module.vpc_tools.vpc_id}"
   name   = "tf-ecs-tools-lbsg"
 
   ingress {
@@ -51,7 +51,7 @@ resource "aws_security_group" "tools_lb_sg" {
 
 resource "aws_security_group" "instance_sg" {
   description = "controls direct access to application instances"
-  vpc_id      = "${aws_vpc.main.id}"
+  vpc_id      = "${module.vpc_main.vpc_id}"
   name        = "tf-ecs-instsg"
 
   ingress {
@@ -84,7 +84,7 @@ resource "aws_security_group" "instance_sg" {
 
 resource "aws_security_group" "tools_instance_sg" {
   description = "controls direct access to application instances"
-  vpc_id      = "${aws_vpc.tools.id}"
+  vpc_id      = "${module.vpc_tools.vpc_id}"
   name        = "tf-ecs-tools-instsg"
 
   ingress {
@@ -118,7 +118,7 @@ resource "aws_security_group" "tools_instance_sg" {
 resource "aws_security_group" "efs_mnt_sg" {
   name        = "efs-mnt"
   description = "Allow traffic from instances"
-  vpc_id      = "${aws_vpc.tools.id}"
+  vpc_id      = "${module.vpc_tools.vpc_id}"
 
   ingress {
     from_port = 2049
