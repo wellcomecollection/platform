@@ -1,22 +1,18 @@
 package uk.ac.wellcome.models
 
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.models.UnifiedItem
 import scala.util.Try
 
 trait Transformable {
   def transform: Try[CleanedRecord]
 }
 
-case class CleanedRecord(
-  source: String,
-  accessStatus: Option[String]
-)
-
 case class DirtyCalmRecord(
   AccessStatus: Option[String]
 ) extends Transformable {
-  def transform: Try[CleanedRecord] = Try {
-    CleanedRecord(
+  def transform: Try[UnifiedItem] = Try {
+    UnifiedItem(
       "Foo",
       accessStatus = AccessStatus
     )
