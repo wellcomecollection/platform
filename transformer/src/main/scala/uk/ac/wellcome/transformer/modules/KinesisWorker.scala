@@ -58,6 +58,9 @@ object KinesisWorker extends TwitterModule {
   }
 
   override def singletonShutdown(injector: Injector) {
-    //info("Shutting down Kinesis worker")
+    info("Terminating Kinesis worker")
+
+    val system = injector.instance[ActorSystem]
+    system.terminate()
   }
 }
