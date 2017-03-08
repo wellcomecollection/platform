@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.api
 
 import com.twitter.finagle.http.{Request, Response}
+import com.twitter.finagle.http.filter.CorsFilter
+
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
@@ -21,6 +23,7 @@ class Server extends HttpServer {
 
   private final val apiName = flag(name = "api.name", default = "catalogue", help = "API name path part")
   private final val apiVersion = flag(name = "api.version", default = "v0", help = "API version path part")
+
   flag(name = "api.prefix", default = "/" + apiName() + "/" + apiVersion(), help = "API path prefix")
 
   override def configureHttp(router: HttpRouter) {
@@ -28,6 +31,7 @@ class Server extends HttpServer {
       .filter[CommonFilters]
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
+      .filter(CorsFilter())
       .add[CollectionController]
       .add[ManagementController]
       .add[MainController]
