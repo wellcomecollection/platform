@@ -6,7 +6,7 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.4.17"
     val aws = "1.11.95"
-    val finatra = "2.7.0"
+    val finatra = "2.8.0"
     val guice = "4.0"
     val kinesis = "1.7.3"
     val kinesisDynamoAdapter = "1.1.1"
@@ -62,7 +62,9 @@ object Dependencies {
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies
+  val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
+    "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
+  )
 
   val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
 
