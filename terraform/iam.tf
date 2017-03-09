@@ -1,26 +1,16 @@
-resource "aws_iam_role" "ecs_jenkins_task" {
-  name = "tf_ecs_task_jenkins_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
+module "ecs_main_iam" {
+  source = "./ecs_iam"
+  name   = "main"
 }
-EOF
+
+module "ecs_tools_iam" {
+  source = "./ecs_iam"
+  name   = "tools"
 }
 
 resource "aws_iam_role_policy" "ecs_jenkins_task" {
   name = "tf_ecs_task_jenkins_policy"
-  role = "${aws_iam_role.ecs_jenkins_task.name}"
+  role = "${module.ecs_tools_iam.task_role_name}"
 
   policy = <<EOF
 {
@@ -34,39 +24,4 @@ resource "aws_iam_role_policy" "ecs_jenkins_task" {
   ]
 }
 EOF
-}
-
-resource "aws_iam_instance_profile" "app" {
-  name  = "tf-ecs-instprofile"
-  roles = ["${aws_iam_role.app_instance.name}"]
-}
-
-resource "aws_iam_role" "app_instance" {
-  name = "tf-ecs-example-instance-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-data "template_file" "instance_profile" {
-  template = "${file("${path.module}/policies/instance-profile-policy.json")}"
-}
-
-resource "aws_iam_role_policy" "instance" {
-  name   = "TfEcsInstanceRole"
-  role   = "${aws_iam_role.app_instance.name}"
-  policy = "${data.template_file.instance_profile.rendered}"
 }

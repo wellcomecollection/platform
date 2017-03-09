@@ -31,7 +31,7 @@ resource "aws_launch_configuration" "platform" {
   key_name                    = "${var.key_name}"
   image_id                    = "${data.aws_ami.stable_coreos.id}"
   instance_type               = "${var.instance_type}"
-  iam_instance_profile        = "${aws_iam_instance_profile.app.name}"
+  iam_instance_profile        = "${module.ecs_main_iam.instance_profile_name}"
   user_data                   = "${data.template_file.platform_userdata.rendered}"
   associate_public_ip_address = true
 
@@ -49,6 +49,7 @@ resource "aws_launch_configuration" "tools" {
   image_id                    = "${data.aws_ami.stable_coreos.id}"
   instance_type               = "${var.instance_type_tools_cluster}"
   iam_instance_profile        = "${aws_iam_instance_profile.app.name}"
+  iam_instance_profile        = "${module.ecs_tools_iam.instance_profile_name}"
   user_data                   = "${data.template_file.tools_userdata.rendered}"
   associate_public_ip_address = true
 
