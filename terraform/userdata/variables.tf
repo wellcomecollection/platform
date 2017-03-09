@@ -11,3 +11,8 @@ variable "aws_region" {
   description = "AWS Region"
   default     = "eu-west-1"
 }
+
+variable "efs_fs_name" {
+  description = "If the userdata requires an EFS mount point, this is it"
+  default     = "no_name_set"
+}
