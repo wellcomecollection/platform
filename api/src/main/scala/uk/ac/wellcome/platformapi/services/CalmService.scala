@@ -8,6 +8,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import uk.ac.wellcome.finatra.services.ElasticsearchService
 import uk.ac.wellcome.platform.api.models._
+import uk.ac.wellcome.finatra.services.ElasticsearchService
 
 
 @Singleton
