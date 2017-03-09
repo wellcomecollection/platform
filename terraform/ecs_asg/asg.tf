@@ -1,6 +1,10 @@
 resource "aws_cloudformation_stack" "ecs_asg" {
   name          = "${var.asg_name}"
   template_body = "${data.template_file.cluster_asg.rendered}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 data "template_file" "cluster_asg" {
