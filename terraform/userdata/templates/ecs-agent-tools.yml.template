@@ -1,7 +1,11 @@
 #cloud-config
-users:
-  - name: "jenkins"
-  - homedir: "/mnt/efs"
+write_files:
+  - path: "/etc/nfs.map"
+    permissions: "0644"
+    owner: "root"
+    content: |
+      gid 0 1000
+      uid 0 1000
 coreos:
   units:
    - name: rpc-statd.service
