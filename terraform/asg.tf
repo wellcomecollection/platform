@@ -1,6 +1,6 @@
 module "platform_cluster_asg" {
   source                = "./ecs_asg"
-  asg_name              = "platform-ecs-cluster"
+  asg_name              = "platform-cluster"
   subnet_list           = ["${module.vpc_main.subnets}"]
   key_name              = "${var.key_name}"
   instance_profile_name = "${module.ecs_main_iam.instance_profile_name}"
@@ -10,7 +10,7 @@ module "platform_cluster_asg" {
 
 module "tools_cluster_asg" {
   source                = "./ecs_asg"
-  asg_name              = "tools-ecs-cluster"
+  asg_name              = "tools-cluster"
   subnet_list           = ["${module.vpc_tools.subnets}"]
   key_name              = "${var.key_name}"
   instance_type         = "t2.medium"
