@@ -1,6 +1,7 @@
 resource "aws_cloudformation_stack" "ecs_asg" {
   name          = "${var.asg_name}"
   template_body = "${data.template_file.cluster_asg.rendered}"
+  depends_on    = ["aws_launch_configuration.launch_config"]
 
   lifecycle {
     create_before_destroy = true
