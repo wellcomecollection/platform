@@ -4,7 +4,7 @@
     "essential": true,
     "image": "${image_uri}",
     "memory": 512,
-    "name": "api",
+    "name": "${task_name}",
     "portMappings": [
       {
         "containerPort": 8888,
