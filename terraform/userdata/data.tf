@@ -10,7 +10,3 @@ data "template_file" "template" {
     efs_fs_name        = "${var.efs_fs_name}"
   }
 }
-
-resource "aws_cloudwatch_log_group" "ecs_agent" {
-  name = "platform/ecs-agent-${var.cluster_name}"
-}
