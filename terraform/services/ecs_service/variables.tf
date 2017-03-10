@@ -11,11 +11,11 @@ variable "task_definition_arn" {
 }
 
 variable "container_name" {
-  description = "Container to expose for service"
+  description = "Primary container to expose for service"
 }
 
 variable "container_port" {
-  description = "Container port to expose for service"
+  description = "Port on primary container to expose for service"
   default     = "8888"
 }
 

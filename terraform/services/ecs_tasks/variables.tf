@@ -17,11 +17,11 @@ variable "task_role_arn" {
 }
 
 variable "volume_name" {
-  description = "Name of volume to mount if required"
+  description = "Name of volume to mount (if required)"
   default     = "ephemera"
 }
 
 variable "volume_host_path" {
-  description = "Location of mount point on host path"
+  description = "Location of mount point on host path (if required)"
   default     = "/tmp"
 }
