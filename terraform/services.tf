@@ -25,4 +25,5 @@ module "jenkins" {
   alb_id           = "${aws_alb.tools.id}"
   volume_name      = "jenkins-home"
   volume_host_path = "/mnt/efs"
+  template_name    = "jenkins"
 }

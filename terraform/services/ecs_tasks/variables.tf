@@ -1,5 +1,10 @@
 variable "task_name" {
-  description = "Name of the task (and template) to create"
+  description = "Name of the task to create"
+}
+
+variable "template_name" {
+  description = "Name of the template to use"
+  default     = "default"
 }
 
 variable "image_uri" {

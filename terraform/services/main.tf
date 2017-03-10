@@ -17,4 +17,5 @@ module "task" {
   volume_name      = "${var.volume_name}"
   volume_host_path = "${var.volume_host_path}"
   image_uri        = "${var.image_uri}"
+  template_name    = "${var.template_name}"
 }
