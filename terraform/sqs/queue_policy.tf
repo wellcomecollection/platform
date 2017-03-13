@@ -20,9 +20,7 @@ data "aws_iam_policy_document" "sqs_queue_policy" {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
 
-      values = [
-        "arn:aws:sns:${var.aws_region}:${var.account_id}:${var.topic_name}",
-      ]
+      values = ["${formatlist("arn:aws:sns:%s:%s:%s",var.aws_region, var.account_id, var.topic_names)}"]
     }
   }
 }
