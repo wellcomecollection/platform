@@ -2,8 +2,10 @@ package uk.ac.wellcome.platform.calm_adapter.actors
 
 import java.net.URLEncoder
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.Actor
 import com.twitter.inject.Logging
+
+import uk.ac.wellcome.platform.calm_adapter.modules._
 
 //
 // This actor makes requests against the OAI, then spits out the XML bodies
@@ -43,7 +45,8 @@ class OaiHarvestActor extends Actor with Logging {
       // TODO: We have Finatra and Finagle available.  Use those instead?
       // TODO: Error handling.
       val response = scala.io.Source.fromURL(url).mkString
-      info(s"Response is ${response}")
+
+      CalmAdapterWorker.oaiParserActor ! response
     }
     case unknown => error(s"Received unknown argument ${unknown}")
   }

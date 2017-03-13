@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.{ActorSystem, Props}
 import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions._
+import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
 import com.twitter.inject.{Injector, TwitterModule}
 
 import uk.ac.wellcome.platform.calm_adapter.actors._
@@ -18,8 +19,8 @@ import uk.ac.wellcome.platform.calm_adapter.actors._
 object CalmAdapterWorker extends TwitterModule {
 
   val system = ActorSystem("CalmAdapterWorker")
-  val oaiHarvestActor = system.actorOf(
-    Props[OaiHarvestActor], name="oaiHarvestActor")
+  val oaiHarvestActor = system.actorOf(Props[OaiHarvestActor])
+  val oaiParserActor = system.actorOf(Props[OaiParserActor])
 
   override def singletonStartup(injector: Injector) {
     println("@@ Hello world, I am starting")
@@ -36,14 +37,7 @@ object CalmAdapterWorker extends TwitterModule {
   }
 
   def calmAdapterStart(): Unit = {
-    val x: Map[String, String] = Map("foo" -> "bar")
-    val y: Map[String, String] = Map()
-    oaiHarvestActor ! 27
-    oaiHarvestActor ! x
-    oaiHarvestActor ! 42
-    oaiHarvestActor ! y
-    oaiHarvestActor ! "Hello wekljh"
-    println("Hello I am the Calm Adapter")
+    oaiHarvestActor ! Map[String, String]()
   }
 
   override def singletonShutdown(injector: Injector) {
