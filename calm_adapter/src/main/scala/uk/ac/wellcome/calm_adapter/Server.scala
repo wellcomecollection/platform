@@ -13,7 +13,7 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.calm_adapter CalmAdapter"
   override val modules = Seq(
-    KinesisWorker)
+    CalmAdapterWorker)
 
   override def configureHttp(router: HttpRouter) {
     router
