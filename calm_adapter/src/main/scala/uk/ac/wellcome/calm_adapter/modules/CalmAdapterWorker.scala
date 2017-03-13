@@ -27,6 +27,8 @@ import com.gu.scanamo.ScanamoFree
 
 import com.twitter.inject.{Injector, TwitterModule}
 
+import uk.ac.wellcome.platform.calm_adapter.actors._
+
 
 class StreamsRecordProcessor(client: AmazonDynamoDB) extends IRecordProcessor {
 
@@ -67,10 +69,11 @@ class StreamsRecordProcessorFactory() extends IRecordProcessorFactory {
 }
 
 
-object KinesisWorker extends TwitterModule {
+object CalmAdapterWorker extends TwitterModule {
 
-  val system = ActorSystem("KinesisWorker")
-
+  val system = ActorSystem("CalmAdapterWorker")
+  val oaiHarvestActor = system.actorOf(
+    Props[OaiHarvestActor], name="oaiHarvestActor")
 
   override def singletonStartup(injector: Injector) {
     println("@@ Hello world, I am starting")
@@ -79,33 +82,22 @@ object KinesisWorker extends TwitterModule {
     val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
-    // TODO: weird stuff with Region[s]. Understand what's going on.
-    // Should be able to do Regions.US_WEST_2
-    adapter.setRegion(RegionUtils.getRegion("eu-west-1"))
 
-    val kinesisConfig = new KinesisClientLibConfiguration(
-      "thursday-demo-application",
-      "ARN1234",
-      new DefaultAWSCredentialsProviderChain(),
-      "worker-id-1234"
-    ).withInitialPositionInStream(InitialPositionInStream.LATEST)
-
+    // TODO: Choose whether to do an OAI harvest or import from an S3 file.
     system.scheduler.scheduleOnce(
-      Duration.create(50, TimeUnit.MILLISECONDS),
-      new Worker(
-        new StreamsRecordProcessorFactory(),
-        kinesisConfig,
-        adapter,
-        AmazonDynamoDBClientBuilder
-          .standard()
-          .withRegion("eu-west-1")
-          .build(),
-        AmazonCloudWatchClientBuilder
-          .standard()
-          .withRegion("eu-west-1")
-          .build()
-      )
-    )
+      Duration.create(50, TimeUnit.MILLISECONDS)
+    )(calmAdapterStart())
+  }
+
+  def calmAdapterStart(): Unit = {
+    val x: Map[String, String] = Map("foo" -> "bar")
+    val y: Map[String, String] = Map()
+    oaiHarvestActor ! 27
+    oaiHarvestActor ! x
+    oaiHarvestActor ! 42
+    oaiHarvestActor ! y
+    oaiHarvestActor ! "Hello wekljh"
+    println("Hello I am the Calm Adapter")
   }
 
   override def singletonShutdown(injector: Injector) {
