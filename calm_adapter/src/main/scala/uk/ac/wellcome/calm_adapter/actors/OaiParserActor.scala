@@ -114,6 +114,7 @@ class OaiParserActor extends Actor with Logging {
           currentRecord("RefNo"),
           JsonUtil.toJson(currentRecord).get
         )
+        CalmAdapterWorker.dynamoRecordWriterActor ! currentRecord
         currentRecord = MutableMap()
       } else {
         currentRecord.update(
