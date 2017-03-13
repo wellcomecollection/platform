@@ -19,8 +19,9 @@ import uk.ac.wellcome.platform.calm_adapter.actors._
 object CalmAdapterWorker extends TwitterModule {
 
   val system = ActorSystem("CalmAdapterWorker")
-  val oaiHarvestActor = system.actorOf(Props[OaiHarvestActor])
-  val oaiParserActor = system.actorOf(Props[OaiParserActor])
+  val oaiHarvestActor         = system.actorOf(Props[OaiHarvestActor])
+  val oaiParserActor          = system.actorOf(Props[OaiParserActor])
+  val dynamoRecordWriterActor = system.actorOf(Props[DynamoRecordWriterActor])
 
   override def singletonStartup(injector: Injector) {
     println("@@ Hello world, I am starting")
