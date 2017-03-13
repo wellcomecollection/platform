@@ -16,14 +16,6 @@ class OaiHarvestActor extends Actor with Logging {
   // URL to our OAI installation
   val oaiUrl = "http://archives.wellcomelibrary.org/oai/OAI.aspx"
 
-  val defaultParams: Map[String, String] = Map(
-    // https://www.openarchives.org/OAI/openarchivesprotocol.html#ListRecords
-    "verb" -> "ListRecords",
-
-    // This format is defined in our OAI installation
-    "metadataPrefix" -> "calm_xml"
-  )
-
   // Utility method.  Given a URL and some query parameters, construct
   // the full URL.
   def buildUri(path: String, params: Map[String, String] = Map.empty): String = {
@@ -40,7 +32,7 @@ class OaiHarvestActor extends Actor with Logging {
   def receive = {
     // TODO: Understand and fix the type warning that's coming from here
     case params: Map[String, String] => {
-      val url = buildUri(oaiUrl, defaultParams ++ params)
+      var url = buildUri(oaiUrl, params)
 
       // TODO: We have Finatra and Finagle available.  Use those instead?
       // TODO: Error handling.
