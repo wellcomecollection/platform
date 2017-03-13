@@ -1,11 +1,26 @@
 package uk.ac.wellcome.platform.calm_adapter.actors
 
-import java.net.URLEncoder
+import java.net.{URLDecoder, URLEncoder}
+import scala.collection.mutable.{Map => MutableMap}
 
 import akka.actor.{Actor, ActorSystem, Props}
 import com.twitter.inject.Logging
 
 import uk.ac.wellcome.platform.calm_adapter.modules._
+import uk.ac.wellcome.utils.JsonUtil
+
+
+// TODO: This is ripped out of the transformer project, because what we
+// put in matches exactly what comes out. We should pull this definition
+// into a common lib.
+case class CalmDynamoRecord(
+  RecordID: String,
+  RecordType: String,
+  AltRefNo: String,
+  RefNo: String,
+  data: String
+)
+
 
 //
 // This actor parses the "XML" response returned by the OAI-PMH harvest.
@@ -39,13 +54,72 @@ class OaiParserActor extends Actor with Logging {
     resumptionTokenPattern.findFirstMatchIn(response) match {
       case Some(m) => {
         val token = m.group("token")
+        info(s"Resumption token ${token} in response; spawning new request")
         val params = Map[String, String](
           "verb" -> "ListRecords",
           "resumptionToken" -> token
         )
         CalmAdapterWorker.oaiHarvestActor ! params
       }
-      case None => info(s"No <resumptionToken> in response")
+      case None => {
+        info(s"No <resumptionToken> in response")
+      }
+    }
+  }
+
+  // For annoying reasons, the OAI doesn't actually return XML.  Records
+  // are returned in the form:
+  //
+  //      <record>
+  //        <fieldName urlencoded="URL%20encoded%20field%20value">
+  //          URL encoded field value
+  //        </fieldName>
+  //        ...
+  //      </record>
+  //
+  // where the field value may contain unescaped HTML characters.  This
+  // breaks most XML parsers, which attempt to parse the HTML.
+  //
+  // Rather than trying to distinguish the HTML from XML, we simply pick
+  // out those `urlencoded` values, and feed those into our map.  We stream
+  // over the entire response string, picking out those `urlencoded` fields
+  // for key/value pairs, and look for a `</record>` tag to denote the
+  // end of the record.
+
+  // This regex has to match expressions of the form
+  //
+  //      </record>
+  //
+  // or
+  //
+  //      <fieldName urlencoded="URL%20encoded%20field%20value">
+  //
+  // where the latter may have a closing slash if the value is empty.
+  // In the latter case, we want to capture the field name and value.
+  val streamParserPattern = "<(?:/record|([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?)>".r("name", "value")
+
+  def parseRecords(data: String): Unit = {
+    // Stores the name/value pairs found so far in each record
+    var currentRecord: MutableMap[String, String] = MutableMap()
+
+    for (m <- streamParserPattern.findAllMatchIn(data)) {
+      if (m.matched == "</record>") {
+        // We're at the end of a record -- wrap up any fields we've found in a
+        // CalmDynamoRecord class and send it for further processing.
+        // TODO: Error handling
+        val dynamoRecord = CalmDynamoRecord(
+          currentRecord("RecordID"),
+          currentRecord("RecordType"),
+          currentRecord("AltRefNo"),
+          currentRecord("RefNo"),
+          JsonUtil.toJson(currentRecord).get
+        )
+        currentRecord = MutableMap()
+      } else {
+        currentRecord.update(
+          m.group("name"),
+          URLDecoder.decode(m.group("value"), "UTF-8"))
+      }
     }
   }
 
@@ -53,6 +127,7 @@ class OaiParserActor extends Actor with Logging {
     case response: String => {
       info(s"Parser actor received some data")
       startNextRequest(response)
+      parseRecords(response)
     }
     case unknown => error(s"Received unknown OAI response ${unknown}")
   }
