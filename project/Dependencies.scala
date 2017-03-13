@@ -66,6 +66,8 @@ object Dependencies {
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
   )
 
+  val calmAdapterDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+
   val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
 
 }

@@ -22,7 +22,7 @@ lazy val api = project.
   enablePlugins(GitVersioning).
   settings(libraryDependencies ++= Dependencies.apiDependencies)
 
-lazy val calm_ingestor = project.
+lazy val calm_adapter = project.
   dependsOn(common).
   settings(Common.settings: _*).
   settings(Finatra.settings: _*).
@@ -32,8 +32,7 @@ lazy val calm_ingestor = project.
   settings(Packager.settings: _*).
   enablePlugins(JavaAppPackaging).
   enablePlugins(GitVersioning).
-  settings(libraryDependencies ++= Dependencies.apiDependencies)
-
+  settings(libraryDependencies ++= Dependencies.calmAdapterDependencies)
 
 lazy val transformer = project.
   dependsOn(common).
