@@ -3,7 +3,7 @@ module "platform_cluster_asg" {
   asg_name              = "platform-cluster"
   subnet_list           = ["${module.vpc_main.subnets}"]
   key_name              = "${var.key_name}"
-  instance_profile_name = "${module.ecs_main_iam.instance_profile_name}"
+  instance_profile_name = "${module.ecs_platform_iam.instance_profile_name}"
   user_data             = "${module.platform_userdata.rendered}"
   vpc_id                = "${module.vpc_main.vpc_id}"
 }
