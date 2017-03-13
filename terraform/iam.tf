@@ -1,6 +1,6 @@
-module "ecs_main_iam" {
+module "ecs_platform_iam" {
   source = "./ecs_iam"
-  name   = "main"
+  name   = "platform"
 }
 
 module "ecs_tools_iam" {

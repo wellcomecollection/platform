@@ -3,7 +3,7 @@ module "api" {
   service_name   = "api"
   cluster_id     = "${aws_ecs_cluster.main.id}"
   task_name      = "api"
-  task_role_arn  = "${module.ecs_main_iam.task_role_arn}"
+  task_role_arn  = "${module.ecs_platform_iam.task_role_arn}"
   cert_arn       = "${data.aws_acm_certificate.api.arn}"
   container_name = "api"
   container_port = "8888"
