@@ -27,14 +27,7 @@ class OaiParserActor extends Actor with Logging {
   //                      b9d70a81-2154-40c8-b27c-ee8d8c3f28e7:0
   //     </resumptionToken>
   //
-  val resumptionTokenPattern = (
-    "<resumptionToken " +
-    "expirationDate=\"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\" " +
-    "completeListSize=\"(?:[0-9]+)\" " +
-    "cursor=\"0\">" +
-    "([^>]+)" +
-    "</resumptionToken>"
-  ).r("token")
+  val resumptionTokenPattern = "<resumptionToken[^>]*>([^>]+)</resumptionToken>".r("token")
 
   // An OAI response may be an incomplete list with a resumptionToken
   // value that allows us to make requests for the rest of the list.
@@ -46,7 +39,10 @@ class OaiParserActor extends Actor with Logging {
     resumptionTokenPattern.findFirstMatchIn(response) match {
       case Some(m) => {
         val token = m.group("token")
-        val params = Map[String, String]("resumptionToken" -> token)
+        val params = Map[String, String](
+          "verb" -> "ListRecords",
+          "resumptionToken" -> token
+        )
         CalmAdapterWorker.oaiHarvestActor ! params
       }
       case None => info(s"No <resumptionToken> in response")

@@ -37,7 +37,13 @@ object CalmAdapterWorker extends TwitterModule {
   }
 
   def calmAdapterStart(): Unit = {
-    oaiHarvestActor ! Map[String, String]()
+    oaiHarvestActor ! Map[String, String](
+      // https://www.openarchives.org/OAI/openarchivesprotocol.html#ListRecords
+      "verb" -> "ListRecords",
+
+      // This format is defined in our OAI installation
+      "metadataPrefix" -> "calm_xml"
+    )
   }
 
   override def singletonShutdown(injector: Injector) {
