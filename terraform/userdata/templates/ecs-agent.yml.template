@@ -49,6 +49,8 @@ coreos:
                                      --env=ECS_LOGFILE=/log/ecs-agent.log \
                                      --env=ECS_LOGLEVEL=$${ECS_LOGLEVEL} \
                                      --env=ECS_DATADIR=/data \
+                                     --env=ECS_ENABLE_TASK_IAM_ROLE=true \
+                                     --env=ECS_ENABLE_TASK_IAM_ROLE_NETWORK_HOST=true \
                                      --env=ECS_CLUSTER=$${ECS_CLUSTER} \
                                      --env=ECS_AVAILABLE_LOGGING_DRIVERS='["awslogs"]' \
                                      --log-driver=awslogs \
