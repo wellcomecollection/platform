@@ -12,9 +12,22 @@ import uk.ac.wellcome.platform.calm_adapter.actors._
 //
 class DynamoRecordWriterActor extends Actor with Logging {
 
+  import com.amazonaws.services.dynamodbv2._
+  import com.gu.scanamo._
+  def providesDynamoClient(): AmazonDynamoDB =
+    AmazonDynamoDBClientBuilder
+      .standard()
+      .withRegion("eu-west-1")
+      .build()
+
+  val client = providesDynamoClient()
+
   def receive = {
     case record: CalmDynamoRecord => {
       info(s"Dynamo actor received a record ${record}")
+      val putResult = Scanamo.put(client)("CalmData")(record)
+      info(s"Dynamo put result: ${putResult}")
+
     }
     case unknown => error(s"Received unknown record object ${unknown}")
   }
