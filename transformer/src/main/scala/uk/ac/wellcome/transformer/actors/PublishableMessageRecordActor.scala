@@ -5,7 +5,7 @@ import javax.inject.Inject
 import akka.actor.Actor
 import com.twitter.inject.Logging
 
-import uk.ac.wellcome.platform.transformer.models._
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.transformer.modules.{
   SNSMessage,
   KinesisWorker,

@@ -8,21 +8,9 @@ import com.twitter.inject.Logging
 
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.models.CalmDynamoRecord
 
 
-// TODO: This is ripped out of the transformer project, because what we
-// put in matches exactly what comes out. We should pull this definition
-// into a common lib.
-case class CalmDynamoRecord(
-  RecordID: String,
-  RecordType: String,
-  AltRefNo: String,
-  RefNo: String,
-  data: String
-)
-
-
-//
 // This actor parses the "XML" response returned by the OAI-PMH harvest.
 // It produces Map(String, String) instances of the key/value pairs in
 // the records, and sends them for further processing.  It also starts
@@ -31,7 +19,7 @@ case class CalmDynamoRecord(
 // The OAI intersperses unescaped HTML with the XML, so we can't use
 // an XML parser.  Instead this class is implemented as a combination
 // of regexes and stream parsers.
-//
+
 class OaiParserActor extends Actor with Logging {
 
   // Regex to match a resumption token, which looks something like:

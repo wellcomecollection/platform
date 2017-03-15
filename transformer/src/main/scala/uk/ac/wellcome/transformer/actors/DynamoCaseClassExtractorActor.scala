@@ -5,7 +5,7 @@ import com.gu.scanamo.ScanamoFree
 import com.twitter.inject.Logging
 
 import uk.ac.wellcome.platform.transformer.modules._
-import uk.ac.wellcome.platform.transformer.models.CalmDynamoRecord
+import uk.ac.wellcome.models.CalmDynamoRecord
 
 import javax.inject.Inject
 import uk.ac.wellcome.platform.transformer.modules.ActorRegistryModule
