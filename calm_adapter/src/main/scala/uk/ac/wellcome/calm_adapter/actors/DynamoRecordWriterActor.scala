@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.calm_adapter.actors
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import akka.actor.Actor
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.CalmDynamoRecord
@@ -32,18 +34,22 @@ class DynamoRecordWriterActor @Inject()(
       ScanamoAsync.put(dynamoClient)("CalmData")(record).map { _ =>
 	info(s"Dynamo put successful!")
       } recover {
-	case e: ProvisionedThroughputExceededException => {
-	  error(s"Dynamo put failed!", e)
+  	case e: ProvisionedThroughputExceededException => {
+  	  error(s"Dynamo put failed!", e)
 
-          // Ask Harvester to slow down
-	  actorRegister.actors
-	    .get("OaiHarvestActor")
-	    .map(_ ! SlowDown("Exceeded provisioned throughput!"))
+      // Ask Harvester to slow down
+  	  actorRegister.actors
+  	    .get("OaiHarvestActor")
+  	    .map(_ ! SlowDown("Exceeded provisioned throughput!"))
 
-          // Retry the failed record
-	  self ! record
+      // Retry the failed record
+  	  self ! record
 
-	}
+  	}
+      ScanamoAsync.put(dynamoClient)("CalmData")(record).map {
+        putResult => info(s"putResult = ${putResult}")
+      } recover {
+        case e: Throwable => error(s"error = ${e}")
       }
     }
     case unknown => error(s"Received unknown record object ${unknown}")
