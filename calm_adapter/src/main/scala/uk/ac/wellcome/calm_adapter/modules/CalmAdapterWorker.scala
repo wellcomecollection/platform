@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.calm_adapter.modules
 import java.nio.charset.{ Charset => JCharset }
 import java.util.{ List => JList }
 import java.util.concurrent.TimeUnit
+
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global

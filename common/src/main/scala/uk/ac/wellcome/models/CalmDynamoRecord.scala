@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.models
+package uk.ac.wellcome.models
 
 import uk.ac.wellcome.utils.JsonUtil
 import scala.util.Try
@@ -36,4 +36,3 @@ case class CalmDynamoRecord(
       .flatMap(_.transform)
 
 }
-

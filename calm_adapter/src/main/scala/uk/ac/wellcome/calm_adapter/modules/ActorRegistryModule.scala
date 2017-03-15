@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.modules
+package uk.ac.wellcome.platform.calm_adapter.modules
 
 import javax.inject.Singleton
 import com.google.inject.Provides
@@ -13,6 +13,7 @@ import net.codingwell.scalaguice.ScalaModule
 
 import akka.actor.Actor
 import com.google.inject.name.Names
+
 
 case class ActorRegister(actors: Map[String, ActorRef])
 
