@@ -10,6 +10,8 @@ import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.models.CalmDynamoRecord
 
+import com.google.inject.name.Named
+import javax.inject.Inject
 
 // This actor parses the "XML" response returned by the OAI-PMH harvest.
 // It produces Map(String, String) instances of the key/value pairs in
@@ -20,7 +22,12 @@ import uk.ac.wellcome.models.CalmDynamoRecord
 // an XML parser.  Instead this class is implemented as a combination
 // of regexes and stream parsers.
 
-class OaiParserActor extends Actor with Logging {
+@Named("OaiParserActor")
+class OaiParserActor @Inject()(
+  actorRegister: ActorRegister
+)
+  extends Actor
+  with Logging {
 
   // Regex to match a resumption token, which looks something like:
   //
@@ -43,15 +50,16 @@ class OaiParserActor extends Actor with Logging {
       case Some(m) => {
         val token = m.group("token")
         info(s"Resumption token ${token} in response; spawning new request")
-        val params = Map[String, String](
-          "verb" -> "ListRecords",
-          "resumptionToken" -> token
-        )
-        CalmAdapterWorker.oaiHarvestActor ! params
+
+        actorRegister.actors
+          .get("oaiHarvestActor")
+          .map(_ ! OaiHarvestActorConfig(
+            verb = "ListRecords",
+            token = Some(token))
+          )
+
       }
-      case None => {
-        info(s"No <resumptionToken> in response")
-      }
+      case None => info(s"No <resumptionToken> in response")
     }
   }
 
@@ -102,7 +110,11 @@ class OaiParserActor extends Actor with Logging {
           currentRecord("RefNo"),
           JsonUtil.toJson(currentRecord).get
         )
-        CalmAdapterWorker.dynamoRecordWriterActor ! dynamoRecord
+
+        actorRegister.actors
+          .get("dynamoRecordWriterActor")
+          .map(_ ! dynamoRecord)
+
         currentRecord = MutableMap()
       } else {
         currentRecord.update(

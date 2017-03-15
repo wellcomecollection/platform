@@ -15,39 +15,45 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAda
 import com.twitter.inject.{Injector, TwitterModule}
 
 import uk.ac.wellcome.platform.calm_adapter.actors._
+import uk.ac.wellcome.platform.finatra.modules.AkkaModule
 
+case class OaiHarvestActorConfig(
+  verb: String,
+  metadataPrefix: Option[String] = None,
+  token: Option[String] = None
+) {
+  def toMap = Map("verb" -> verb) ++
+    metadataPrefix.map("metadataPrefix" -> _) ++
+    token.map("resumptionToken" -> _)
+}
 
-object CalmAdapterWorker extends TwitterModule {
+object CalmAdapterWorker
+  extends TwitterModule {
 
-  val system = ActorSystem("CalmAdapterWorker")
-  val oaiHarvestActor         = system.actorOf(Props[OaiHarvestActor])
-  val oaiParserActor          = system.actorOf(Props[OaiParserActor])
-  val dynamoRecordWriterActor = system.actorOf(Props[DynamoRecordWriterActor])
+  override val modules = Seq(
+    ActorRegistryModule,
+    AkkaModule)
 
   override def singletonStartup(injector: Injector) {
     info("Starting Adapter worker")
 
-    val adapter = new AmazonDynamoDBStreamsAdapterClient(
-      new DefaultAWSCredentialsProviderChain()
-    )
-
     val system = injector.instance[ActorSystem]
+    val actorRegister = injector.instance[ActorRegister]
 
-    // TODO: Choose whether to do an OAI harvest or import from an S3 file.
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS)
-    )(calmAdapterStart())
+    )(
+      actorRegister.actors
+        .get("oaiHarvestActor")
+        .map(_ ! oaiHarvestActorConfig)
+      )
   }
 
-  def calmAdapterStart(): Unit = {
-    oaiHarvestActor ! Map[String, String](
-      // https://www.openarchives.org/OAI/openarchivesprotocol.html#ListRecords
-      "verb" -> "ListRecords",
-
-      // This format is defined in our OAI installation
-      "metadataPrefix" -> "calm_xml"
+  val oaiHarvestActorConfig =
+    OaiHarvestActorConfig(
+      verb = "ListRecords",
+      metadataPrefix = Some("calm_xml")
     )
-  }
 
   override def singletonShutdown(injector: Injector) {
     info("Terminating Adapter worker")

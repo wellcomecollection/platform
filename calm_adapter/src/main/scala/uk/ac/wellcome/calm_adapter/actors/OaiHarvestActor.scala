@@ -5,40 +5,40 @@ import java.net.URLEncoder
 import akka.actor.Actor
 import com.twitter.inject.Logging
 
+import com.google.inject.name.Named
+import javax.inject.Inject
+
 import uk.ac.wellcome.platform.calm_adapter.modules._
+import uk.ac.wellcome.platform.calm_adapter.modules.ActorRegister
 
-//
-// This actor makes requests against the OAI, then spits out the XML bodies
-// and sends them to another actor for further processing.
-//
-class OaiHarvestActor extends Actor with Logging {
 
-  // URL to our OAI installation
+@Named("OaiHarvestActor")
+class OaiHarvestActor @Inject()(
+  actorRegister: ActorRegister
+)
+  extends Actor
+  with Logging {
+
   val oaiUrl = "http://archives.wellcomelibrary.org/oai/OAI.aspx"
 
-  // Utility method.  Given a URL and some query parameters, construct
-  // the full URL.
-  def buildUri(path: String, params: Map[String, String] = Map.empty): String = {
-    if (params.isEmpty) {
-      path
-    } else {
-      val param_str = params.map {
-        case (k,v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
-      }.mkString("?", "&", "")
-      path + param_str
-    }
-  }
+  private def urlEncode(s: String) =
+    URLEncoder.encode(s, "UTF-8")
+
+  def buildUri(
+    path: String,
+    params: Map[String, String] = Map.empty
+  ): String = path + params.map {
+      case (k,v) => s"${urlEncode(k)}=${urlEncode(v)}"
+    }.mkString("?", "&", "")
 
   def receive = {
-    // TODO: Understand and fix the type warning that's coming from here
-    case params: Map[String, String] => {
-      var url = buildUri(oaiUrl, params)
-
-      // TODO: We have Finatra and Finagle available.  Use those instead?
-      // TODO: Error handling.
+    case config: OaiHarvestActorConfig => {
+      var url = buildUri(oaiUrl, config.toMap)
       val response = scala.io.Source.fromURL(url).mkString
 
-      CalmAdapterWorker.oaiParserActor ! response
+      actorRegister.actors
+        .get("oaiParserActor")
+        .map(_ ! response)
     }
     case unknown => error(s"Received unknown argument ${unknown}")
   }
