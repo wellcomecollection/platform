@@ -1,0 +1,61 @@
+package uk.ac.wellcome.platform.transformer.modules
+
+import javax.inject.Singleton
+import com.google.inject.Provides
+import com.twitter.inject.TwitterModule
+import akka.actor.{ActorRef, ActorSystem, Props}
+
+import uk.ac.wellcome.platform.finatra.modules._
+import uk.ac.wellcome.platform.calm_adapter.actors._
+
+import uk.ac.wellcome.utils.GuiceAkkaExtension
+import net.codingwell.scalaguice.ScalaModule
+
+import akka.actor.Actor
+import com.google.inject.name.Names
+
+case class ActorRegister(actors: Map[String, ActorRef])
+
+object ActorRegistryModule
+  extends TwitterModule {
+
+  override val modules = Seq(
+    DynamoConfigModule,
+    AkkaModule
+  )
+
+  override def configure() {
+    bind[Actor]
+      .annotatedWith(Names.named("OaiParserActor"))
+      .to[OaiParserActor]
+
+    bind[Actor]
+      .annotatedWith(Names.named("OaiHarvestActor"))
+      .to[OaiHarvestActor]
+
+    bind[Actor]
+      .annotatedWith(Names.named("DynamoRecordWriterActor"))
+      .to[DynamoRecordWriterActor]
+  }
+
+  @Singleton
+  @Provides
+  def provideActorRegistry(system: ActorSystem): ActorRegister  = {
+     ActorRegister(Map(
+
+      "oaiParserActor" ->
+        system.actorOf(GuiceAkkaExtension(system).props(
+          "OaiParserActor")),
+
+      "oaiHarvestActor" ->
+        system.actorOf(GuiceAkkaExtension(system).props(
+          "OaiHarvestActor")),
+
+      "dynamoRecordWriterActor" ->
+        system.actorOf(GuiceAkkaExtension(system).props(
+          "DynamoRecordWriterActor"))
+    ))
+  }
+}
+
+
