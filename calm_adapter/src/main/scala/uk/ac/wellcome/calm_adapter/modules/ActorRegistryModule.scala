@@ -21,6 +21,7 @@ object ActorRegistryModule
   extends TwitterModule {
 
   override val modules = Seq(
+    DynamoClientModule,
     DynamoConfigModule,
     AkkaModule
   )
