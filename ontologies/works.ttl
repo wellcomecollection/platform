@@ -17,7 +17,7 @@ TBC
 
 ww:Work rdf:type owl:Class ;
 	rdfs:label "Work"@en ;
-	rdfs:comment "An individual work such as a text, archive item or picture; or a grouping of individual works (so, for instance, an archive collection counts as a work, as do all the series and individual files within it).  Each work may exist in multiple instances (e.g. copies of the same book).  N.B. this is not synonymous with "work" as that is understood in FRBR but represents something lower down the FRBR hierarchy, namely manifestation. Groups of related items are also included as works because they have similar properties to the individual ones."@en ;
+	rdfs:comment "An individual work such as a text, archive item or picture; or a grouping of individual works (so, for instance, an archive collection counts as a work, as do all the series and individual files within it).  Each work may exist in multiple instances (e.g. copies of the same book).  N.B. this is not synonymous with "work" as that is understood in the International Federation of Library Associations and Institutions' Functional Requirements for Bibliographic Records model (FRBR) but represents something lower down the FRBR hierarchy, namely manifestation. Groups of related items are also included as works because they have similar properties to the individual ones."@en ;
 	rdf:isDefinedBy <TBC/works> .
 	
 ww:Collection rdf:type owl:Class ;
@@ -28,7 +28,7 @@ ww:Collection rdf:type owl:Class ;
 	
 ww:Item rdf:type owl:Class ;
 	rdfs:label "Item"@en ;
-	rdfs:comment "A specific instance of a work: for instance, an individual physical copy with its own location.  This corresponds to the bottom, Instance, layer of FRBR.  Works that are unique - that is, have only one copy - are described in terms of a Work for their intellectual content, linked to an Item describing their phyiscal characteristics."@en ;
+	rdfs:comment "A specific instance of a work: for instance, an individual physical copy with its own location.  This corresponds to the bottom, Instance, layer of FRBR.  Works that are unique - that is, have only one copy - are described in terms of a Work for their intellectual content, linked to an Item describing their physical characteristics."@en ;
 	rdf:isDefinedBy <TBC/works> .	
 	
 ww:Agent rdf:type owl:Class ;
@@ -48,7 +48,7 @@ ww:Location rdf:type owl:Class ;
 	
 ww:Genre rdf:type owl:Class ;
 	rdfs:label "Genre"@en ;
-	rdfs:comment "The genre to which a work belongs: Genre being taken to mean a particular form carrying certain assumptions about content, authorial stance, etc.  Examples might include biography, article, obituary, satire, etc."@en ;
+	rdfs:comment "The genre to which a work belongs: Genre being taken to mean a particular form carrying certain assumptions about content, authorial stance, etc.  Examples might include biography, article, obituary, or satire."@en ;
 	rdf:isDefinedBy <TBC/works> .	
 
 ww:IPRightsStatus rdf:type owl:Class ;
@@ -195,7 +195,7 @@ ww:identifier rdf:type owl:DatatypeProperty ;
 	
 ww:level rdf:type owl:DatatypeProperty ;
 	rdfs:label "level"@en ;
-	rdfs:comment "Indicates the position of a work within a hierarchy of works: for example, Collection, Series, Item etc. Item in CALM descriptions is taken to mean an individual work, which is then manifested in a physical or digital item."@en ;
+	rdfs:comment "Indicates the position of a work within a hierarchy of works: for example, Collection, Series, Item etc. The terminology used here will typically be drawn from external systems and may not necessarily correspond directly to the terminology of this ontology: for instance, in archive catalogues the term Item may be used to describe an entity that combines properties assigned in this ontology to the Work and Item classes."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <TBC/works> .
