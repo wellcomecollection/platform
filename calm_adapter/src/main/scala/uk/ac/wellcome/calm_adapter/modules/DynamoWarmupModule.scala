@@ -8,26 +8,32 @@ import uk.ac.wellcome.utils._
 
 
 object DynamoWarmupModule extends TwitterModule {
-  override val modules = Seq(
-    DynamoClientModule)
+  override val modules = Seq(DynamoClientModule)
 
-  def modifyCapacity(dynamoClient: AmazonDynamoDB, capacity: Long) = try {
+  val writeCapacity =
+    flag(
+      name = "writeCapacity",
+      default = 1L,
+      help = "Dynamo write capacity"
+    )
 
-    val capacityModifier = new DynamoUpdateWriteCapacityCapable {
+  def modifyCapacity(
+    dynamoClient: AmazonDynamoDB,
+    capacity: Long = 1L
+  ) = try {
+
+    (new DynamoUpdateWriteCapacityCapable {
       val client = dynamoClient
-    }
-    info(s"Setting write capacity of CalmData table to ${capacity}")
+    }).updateWriteCapacity("CalmData", capacity)
 
-    capacityModifier.updateWriteCapacity("CalmData", capacity)
+    info(s"Setting write capacity of CalmData table to ${capacity}")
   } catch {
     case e: Throwable => error(s"Error in modifyCapacity(): ${e}")
   }
 
-  override def singletonStartup(injector: Injector) {
-    modifyCapacity(injector.instance[AmazonDynamoDB], 3)
-  }
+  override def singletonStartup(injector: Injector) =
+    modifyCapacity(injector.instance[AmazonDynamoDB], writeCapacity())
 
-  override def singletonShutdown(injector: Injector) {
-    modifyCapacity(injector.instance[AmazonDynamoDB], 1)
-  }
+  override def singletonShutdown(injector: Injector) =
+    modifyCapacity(injector.instance[AmazonDynamoDB])
 }
