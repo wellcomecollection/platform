@@ -34,7 +34,7 @@ class OaiHarvestActor @Inject()(
   private def urlEncode(s: String) =
     URLEncoder.encode(s, "UTF-8")
 
-  def buildUri(
+  private def buildUri(
     path: String,
     params: Map[String, String] = Map.empty
   ): String = path + params.map {
@@ -47,12 +47,21 @@ class OaiHarvestActor @Inject()(
       info(s"*** Waiting for ${throttleMillis}")
       Thread.sleep(RateThrottle.waitMillis)
 
-      var url = buildUri(oaiUrl, config.toMap)
+      val url = buildUri(oaiUrl, config.toMap)
       val response = scala.io.Source.fromURL(url).mkString
 
       actorRegister.actors
         .get("oaiParserActor")
         .map(_ ! response)
+
+      OaiParser.nextResumptionToken(response).map { token =>
+        info(s"Resumption token ${token} in response; spawning new request")
+
+        sender ! OaiHarvestActorConfig(
+          verb = "ListRecords",
+          token = Some(token)
+        )
+      }.getOrElse(info("No <resumptionToken> in response"))
     }
     case SlowDown(m) => {
       info(s"Received SlowDown message: ${m}")
