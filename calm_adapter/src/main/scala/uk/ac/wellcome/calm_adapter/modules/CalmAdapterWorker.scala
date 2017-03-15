@@ -24,12 +24,13 @@ object CalmAdapterWorker extends TwitterModule {
   val dynamoRecordWriterActor = system.actorOf(Props[DynamoRecordWriterActor])
 
   override def singletonStartup(injector: Injector) {
-    println("@@ Hello world, I am starting")
-    println("@@ I am very excited to be starting")
+    info("Starting Adapter worker")
 
     val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
+
+    val system = injector.instance[ActorSystem]
 
     // TODO: Choose whether to do an OAI harvest or import from an S3 file.
     system.scheduler.scheduleOnce(
@@ -48,6 +49,9 @@ object CalmAdapterWorker extends TwitterModule {
   }
 
   override def singletonShutdown(injector: Injector) {
-    println("@@ Goodbye cruel world")
+    info("Terminating Adapter worker")
+
+    val system = injector.instance[ActorSystem]
+    system.terminate()
   }
 }
