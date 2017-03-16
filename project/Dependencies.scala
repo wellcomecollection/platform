@@ -19,7 +19,8 @@ object Dependencies {
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
-    "com.typesafe.akka" %% "akka-actor" % versions.akka
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "com.typesafe.akka" %% "akka-agent" % versions.akka
   )
 
   val awsDependencies: Seq[ModuleID] = Seq(

@@ -18,4 +18,11 @@ object DynamoClientModule extends TwitterModule {
       .withRegion(dynamoConfig.region)
       .build()
 
+  @Singleton
+  @Provides
+  def providesDynamoAsyncClient(dynamoConfig: DynamoConfig): AmazonDynamoDBAsync =
+    AmazonDynamoDBAsyncClientBuilder
+      .standard()
+      .withRegion(dynamoConfig.region)
+      .build()
 }
