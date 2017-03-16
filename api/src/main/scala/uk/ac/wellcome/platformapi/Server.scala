@@ -23,8 +23,9 @@ class Server extends HttpServer {
 
   private final val apiName = flag(name = "api.name", default = "catalogue", help = "API name path part")
   private final val apiVersion = flag(name = "api.version", default = "v0", help = "API version path part")
+  private final val apiPrefix = flag(name = "api.prefix", default = "/" + apiName() + "/" + apiVersion(), help = "API path prefix")
 
-  flag(name = "api.prefix", default = "/" + apiName() + "/" + apiVersion(), help = "API path prefix")
+  flag(name = "api.context", default = apiPrefix() + "/context.json", help = "API JSON-LD context")
 
   override def configureHttp(router: HttpRouter) {
     router
@@ -32,6 +33,7 @@ class Server extends HttpServer {
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
       .filter(CorsFilter())
+      .add[ContextController]
       .add[ManagementController]
       .add[MainController]
       .add[SwaggerController]
