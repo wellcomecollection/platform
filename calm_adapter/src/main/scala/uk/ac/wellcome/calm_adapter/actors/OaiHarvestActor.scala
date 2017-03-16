@@ -8,6 +8,7 @@ import com.google.inject.name.Named
 import javax.inject.Inject
 
 import uk.ac.wellcome.platform.calm_adapter.modules._
+import uk.ac.wellcome.platform.calm_adapter.services._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
