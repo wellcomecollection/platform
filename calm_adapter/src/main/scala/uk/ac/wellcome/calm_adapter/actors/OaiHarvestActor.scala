@@ -38,14 +38,15 @@ trait Throttlable {
 @Named("OaiHarvestActor")
 class OaiHarvestActor @Inject()(
   actorRegister: ActorRegister,
-  actorSystem: ActorSystem
+  actorSystem: ActorSystem,
+  oaiHarvestConfig: OaiHarvestConfig
 )
   extends Actor
   with Logging
   with Throttlable {
 
   val system = actorSystem
-  val oaiUrl = "http://archives.wellcomelibrary.org/oai/OAI.aspx"
+  val oaiUrl = oaiHarvestConfig.oaiUrl
 
   private def urlEncode(s: String) =
     URLEncoder.encode(s, "UTF-8")
