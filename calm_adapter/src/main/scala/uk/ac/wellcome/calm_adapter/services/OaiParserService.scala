@@ -6,8 +6,26 @@ import scala.util.matching.Regex
 import uk.ac.wellcome.models.CalmDynamoRecord
 import uk.ac.wellcome.utils.JsonUtil
 
+case class ParsedOaiResult(
+  result: String,
+  resumptionToken: Option[String]
+)
 
 object OaiParser {
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import uk.ac.wellcome.platform.calm_adapter.modules.OaiHarvestActorConfig
+  import uk.ac.wellcome.utils.UrlUtil
+  import scala.concurrent.Future
+
+  def oaiHarvestRequest(url: String, config: OaiHarvestActorConfig) = Future {
+    //TODO: When this is under DI logging will work
+    //info(s"Making OAI harvest request to: ${url}")
+
+    scala.io.Source.fromURL(
+      UrlUtil.buildUri(url, config.toMap)
+    ).mkString
+  }.map(r => ParsedOaiResult(r,nextResumptionToken(r)))
 
   // Regex to match a resumption token, which looks something like:
   //
