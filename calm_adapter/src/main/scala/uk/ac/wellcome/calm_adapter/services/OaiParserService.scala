@@ -56,6 +56,7 @@ object OaiParser {
 
   def parseRecords(data: String): List[CalmDynamoRecord] = {
     data.split("</record>")
+      .dropRight(1)  // throw away the junk at the end of a response
       .map(streamParserPattern.findAllMatchIn)  // last item?
       .map(matches =>
         matches.foldLeft(Map[String, List[String]]())(
