@@ -32,24 +32,17 @@ class DynamoRecordWriterActor @Inject()(
       info("Dynamo actor received a record.")
 
       ScanamoAsync.put(dynamoClient)("CalmData")(record).map { _ =>
-	info(s"Dynamo put successful!")
+	info(s"Dynamo put successful.")
       } recover {
   	case e: ProvisionedThroughputExceededException => {
   	  error(s"Dynamo put failed!", e)
 
-      // Ask Harvester to slow down
   	  actorRegister.actors
   	    .get("OaiHarvestActor")
   	    .map(_ ! SlowDown("Exceeded provisioned throughput!"))
 
-      // Retry the failed record
   	  self ! record
-
   	}
-      ScanamoAsync.put(dynamoClient)("CalmData")(record).map {
-        putResult => info(s"putResult = ${putResult}")
-      } recover {
-        case e: Throwable => error(s"error = ${e}")
       }
     }
     case unknown => error(s"Received unknown record object ${unknown}")
