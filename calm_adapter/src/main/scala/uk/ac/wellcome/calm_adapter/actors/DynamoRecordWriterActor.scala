@@ -23,6 +23,7 @@ case class SlowDown(message: String)
 class DynamoRecordWriterActor @Inject()(
   actorRegister: ActorRegister,
   dynamoClient: AmazonDynamoDBAsync
+  dynamoConfig: DynamoConfig
 )
   extends Actor
   with Logging {
@@ -31,18 +32,18 @@ class DynamoRecordWriterActor @Inject()(
     case record: CalmDynamoRecord => {
       info("Dynamo actor received a record.")
 
-      ScanamoAsync.put(dynamoClient)("CalmData")(record).map { _ =>
-	info(s"Dynamo put successful.")
+      ScanamoAsync.put(dynamoClient)(dynamoConfig.table)(record).map { _ =>
+	       info(s"Dynamo put successful.")  // todo: record ID
       } recover {
-  	case e: ProvisionedThroughputExceededException => {
-  	  error(s"Dynamo put failed!", e)
+      	case e: ProvisionedThroughputExceededException => {
+      	  error(s"Dynamo put failed!", e)  // todo: record ID
 
-  	  actorRegister.actors
-  	    .get("OaiHarvestActor")
-  	    .map(_ ! SlowDown("Exceeded provisioned throughput!"))
+      	  actorRegister.actors
+      	    .get("oaiHarvestActor")
+      	    .map(_ ! SlowDown("Exceeded provisioned throughput!"))
 
-  	  self ! record
-  	}
+      	  self ! record
+      	}
       }
     }
     case unknown => error(s"Received unknown record object ${unknown}")

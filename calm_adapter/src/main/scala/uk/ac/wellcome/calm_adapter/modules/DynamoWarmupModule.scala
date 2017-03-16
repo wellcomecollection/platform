@@ -8,7 +8,9 @@ import uk.ac.wellcome.utils._
 
 
 object DynamoWarmupModule extends TwitterModule {
-  override val modules = Seq(DynamoClientModule)
+  override val modules = Seq(
+    DynamoClientModule,
+    DynamoConfigModule)
 
   val writeCapacity =
     flag(
@@ -20,13 +22,14 @@ object DynamoWarmupModule extends TwitterModule {
   def modifyCapacity(
     dynamoClient: AmazonDynamoDB,
     capacity: Long = 1L
+    dynamoConfig: DynamoConfig,
   ) = try {
 
     (new DynamoUpdateWriteCapacityCapable {
       val client = dynamoClient
-    }).updateWriteCapacity("CalmData", capacity)
+    }).updateWriteCapacity(config.table, capacity)
 
-    info(s"Setting write capacity of CalmData table to ${capacity}")
+    info(s"Setting write capacity of ${config.table} table to ${capacity}")
   } catch {
     case e: Throwable => error(s"Error in modifyCapacity(): ${e}")
   }
