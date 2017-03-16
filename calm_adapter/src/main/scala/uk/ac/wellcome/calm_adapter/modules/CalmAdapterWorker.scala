@@ -48,7 +48,7 @@ object CalmAdapterWorker
       })
 
     system.scheduler.scheduleOnce(
-      Duration.create(50, TimeUnit.MILLISECONDS)
+      Duration.create(4, TimeUnit.MINUTES)
     )(
       actorRegister.actors
         .get("oaiHarvestActor")
