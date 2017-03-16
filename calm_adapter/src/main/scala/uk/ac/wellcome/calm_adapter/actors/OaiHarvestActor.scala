@@ -19,23 +19,32 @@ import akka.agent.Agent
 import akka.actor.Actor
 
 
+trait Throttlable {
+  val agent = Agent(1)
+  val throttleStep = 10L
+  val throttleRoof = 1000L
+  val system: ActorSystem
+
+  def waitMillis =
+    Math.min(throttleRoof, agent.get * throttleStep)
+
+  def throttle =
+    system.scheduler.scheduleOnce(
+      Duration.create(waitMillis, "millis")
+    )(_)
+}
+
+
 @Named("OaiHarvestActor")
 class OaiHarvestActor @Inject()(
   actorRegister: ActorRegister,
   actorSystem: ActorSystem
 )
   extends Actor
-  with Logging {
+  with Logging
+  with Throttlable {
 
-  object RateThrottle {
-    val agent = Agent(1)
-    val throttleStep = 10L
-    val throttleRoof = 1000L
-
-    def waitMillis =
-      Math.min(throttleRoof, agent.get * throttleStep)
-  }
-
+  val system = actorSystem
   val oaiUrl = "http://archives.wellcomelibrary.org/oai/OAI.aspx"
 
   private def urlEncode(s: String) =
@@ -52,7 +61,7 @@ class OaiHarvestActor @Inject()(
     case config: OaiHarvestActorConfig => {
       val url = buildUri(oaiUrl, config.toMap)
 
-      info(s"Making OIA harvest request to: ${url}")
+      info(s"Making OAI harvest request to: ${url}")
 
       // TODO: Should catch exceptions, maybe use different lib
       val response = Future { scala.io.Source.fromURL(url).mkString }
@@ -65,24 +74,25 @@ class OaiHarvestActor @Inject()(
         OaiParser.nextResumptionToken(r).map { token =>
           info(
             s"Resumption token ${token} found; scheduling new request\n" ++
-            s"Next OAI request scheduled in ${RateThrottle.waitMillis}ms")
+            s"Next OAI request scheduled in ${waitMillis}ms")
 
-          actorSystem.scheduler.scheduleOnce(
-            Duration.create(RateThrottle.waitMillis, "millis")
-          )(self ! OaiHarvestActorConfig(
-              verb = "ListRecords",
-              token = Some(token)
-            ))
+          throttle(self ! OaiHarvestActorConfig(
+            verb = "ListRecords",
+            token = Some(token)
+          ))
 
-        }.getOrElse(info("No <resumptionToken> in response"))
+        }.getOrElse(
+          info("No <resumptionToken> in response")
+          // stooooop
+        )
       })
     }
 
     case SlowDown(m) => {
       info(s"Received SlowDown message: ${m}")
-      info(s"Notifying rate throttle (currently ${RateThrottle.agent.get})")
+      info(s"Notifying rate throttle (currently ${agent.get})")
 
-      RateThrottle.agent alter (_ + 1)
+      agent alter (_ + 1)
     }
     case unknown => error(s"Received unknown argument ${unknown}")
   }
