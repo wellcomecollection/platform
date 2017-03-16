@@ -58,14 +58,12 @@ object OaiParser {
     data.split("</record>")
       .dropRight(1)  // throw away the junk at the end of a response
       .map(streamParserPattern.findAllMatchIn)  // last item?
-      .map(matches =>
-        matches.foldLeft(Map[String, List[String]]())(
-          (memo: Map[String, List[String]], element: Regex.Match) => {
+      .map(_.foldLeft(Map[String, List[String]]())(
+          (memo, element) => {
             val key = element.group("name")
             val value = URLDecoder.decode(element.group("value"), "UTF-8")
-            memo ++ Map[String, List[String]](
-              key -> (memo.getOrElse(key, List[String]()) ++ List[String](value))
-            )
+
+            memo ++ Map(key -> (memo.getOrElse(key, List()) ++ List(value)))
           }
         )
       )
