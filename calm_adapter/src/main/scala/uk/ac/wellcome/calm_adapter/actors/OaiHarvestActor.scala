@@ -45,36 +45,34 @@ class OaiHarvestActor @Inject()(
   with Throttlable {
 
   val system = actorSystem
+
+  // TODO: Push this to ParserService (rename and DI)
   val oaiUrl = oaiHarvestConfig.oaiUrl
 
   def receive = {
     case config: OaiHarvestActorConfig => {
-      val url = UrlUtil.buildUri(oaiUrl, config.toMap)
 
-      info(s"Making OAI harvest request to: ${url}")
+      OaiParser.oaiHarvestRequest(oaiUrl, config).collect {
+        case ParsedOaiResult(result, resumptionToken) => {
+	  // TODO: push calling options of actors to ACtorRegister
+	  actorRegister.actors
+	    .get("oaiParserActor")
+	    .map(_ ! result)
 
-      // TODO: Should catch exceptions, maybe use different lib
-      val response = Future { scala.io.Source.fromURL(url).mkString }
+          if (!resumptionToken.isEmpty) throttle {
+	    info(
+	      s"Resumption token ${resumptionToken} found.\n" ++
+	      s"Next OAI request scheduled in ${waitMillis}ms")
 
-      response.map((r: String) => {
-        actorRegister.actors
-          .get("oaiParserActor")
-          .map(_ ! r)
-
-        OaiParser.nextResumptionToken(r) match {
-          case Some(token) => {
-            info(
-              s"Resumption token ${token} found; scheduling new request\n" ++
-              s"Next OAI request scheduled in ${waitMillis}ms")
-
-            throttle(self ! OaiHarvestActorConfig(
+	    self ! OaiHarvestActorConfig(
               verb = "ListRecords",
-              token = Some(token)
-            ))
-          }
-          case None => info("No <resumptionToken> in response")
-        }
-      })
+              token = resumptionToken)
+          } else {
+	    info("No <resumptionToken> in response")
+            // TODO: Termination logic goes here
+	  }
+	}
+      }
     }
 
     case SlowDown(m) => {
@@ -83,6 +81,7 @@ class OaiHarvestActor @Inject()(
 
       agent alter (_ + 1)
     }
+
     case unknown => error(s"Received unknown argument ${unknown}")
   }
 }
