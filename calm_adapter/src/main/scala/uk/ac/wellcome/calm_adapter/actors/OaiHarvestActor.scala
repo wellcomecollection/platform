@@ -11,11 +11,13 @@ import javax.inject.Inject
 import uk.ac.wellcome.platform.calm_adapter.modules._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import akka.actor.ActorSystem
 import akka.agent.Agent
 
 @Named("OaiHarvestActor")
 class OaiHarvestActor @Inject()(
-  actorRegister: ActorRegister
+  actorRegister: ActorRegister,
+  actorSystem: ActorSystem
 )
   extends Actor
   with Logging {
@@ -49,6 +51,13 @@ class OaiHarvestActor @Inject()(
 
       var url = buildUri(oaiUrl, config.toMap)
       val response = scala.io.Source.fromURL(url).mkString
+
+      // When we have
+      //system.scheduler.scheduleOnce(
+      //  Duration.create(1, RateThrottle.waitMillis)
+      //)(actorRegister.actors
+      //    .get("foo")
+      //    .map(_ ! config))
 
       actorRegister.actors
         .get("oaiParserActor")
