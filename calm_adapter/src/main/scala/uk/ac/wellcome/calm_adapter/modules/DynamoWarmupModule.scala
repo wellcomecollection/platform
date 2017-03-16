@@ -15,28 +15,34 @@ object DynamoWarmupModule extends TwitterModule {
   val writeCapacity =
     flag(
       name = "writeCapacity",
-      default = 1L,
+      default = 600L,
       help = "Dynamo write capacity"
     )
 
   def modifyCapacity(
     dynamoClient: AmazonDynamoDB,
-    capacity: Long = 1L
     dynamoConfig: DynamoConfig,
+    capacity: Long = 1L
   ) = try {
 
     (new DynamoUpdateWriteCapacityCapable {
       val client = dynamoClient
-    }).updateWriteCapacity(config.table, capacity)
+    }).updateWriteCapacity(dynamoConfig.table, capacity)
 
-    info(s"Setting write capacity of ${config.table} table to ${capacity}")
+    info(s"Setting write capacity of ${dynamoConfig.table} table to ${capacity}")
   } catch {
     case e: Throwable => error(s"Error in modifyCapacity(): ${e}")
   }
 
   override def singletonStartup(injector: Injector) =
-    modifyCapacity(injector.instance[AmazonDynamoDB], writeCapacity())
+    modifyCapacity(
+      injector.instance[AmazonDynamoDB],
+      injector.instance[DynamoConfig],
+      writeCapacity())
 
   override def singletonShutdown(injector: Injector) =
-    modifyCapacity(injector.instance[AmazonDynamoDB])
+    modifyCapacity(
+      injector.instance[AmazonDynamoDB],
+      injector.instance[DynamoConfig],
+      1L)
 }

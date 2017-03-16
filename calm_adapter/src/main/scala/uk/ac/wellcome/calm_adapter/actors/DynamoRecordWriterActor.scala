@@ -6,6 +6,7 @@ import akka.actor.Actor
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.CalmDynamoRecord
 import uk.ac.wellcome.platform.calm_adapter.actors._
+import uk.ac.wellcome.platform.finatra.modules._
 
 import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.model._
@@ -22,7 +23,7 @@ case class SlowDown(message: String)
 @Named("DynamoRecordWriterActor")
 class DynamoRecordWriterActor @Inject()(
   actorRegister: ActorRegister,
-  dynamoClient: AmazonDynamoDBAsync
+  dynamoClient: AmazonDynamoDBAsync,
   dynamoConfig: DynamoConfig
 )
   extends Actor
