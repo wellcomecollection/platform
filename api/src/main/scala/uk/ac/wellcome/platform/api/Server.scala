@@ -9,6 +9,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 
 import uk.ac.wellcome.finatra.exceptions._
 import uk.ac.wellcome.finatra.modules._
+
 import uk.ac.wellcome.platform.api.controllers._
 
 import io.swagger.models.Swagger
@@ -25,7 +26,7 @@ class Server extends HttpServer {
   private final val apiVersion = flag(name = "api.version", default = "v0", help = "API version path part")
   private final val apiPrefix = flag(name = "api.prefix", default = "/" + apiName() + "/" + apiVersion(), help = "API path prefix")
 
-  flag(name = "api.context", default = apiPrefix() + "/context.json", help = "API JSON-LD context")
+  flag(name = "api.context", default =  apiPrefix() + "/context.json", help = "API JSON-LD context")
 
   override def configureHttp(router: HttpRouter) {
     router
