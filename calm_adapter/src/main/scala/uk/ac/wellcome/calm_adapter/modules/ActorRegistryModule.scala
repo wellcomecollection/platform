@@ -28,10 +28,6 @@ object ActorRegistryModule
 
   override def configure() {
     bind[Actor]
-      .annotatedWith(Names.named("PipelineWatcherActor"))
-      .to[PipelineWatcherActor]
-
-    bind[Actor]
       .annotatedWith(Names.named("OaiParserActor"))
       .to[OaiParserActor]
 
@@ -49,10 +45,6 @@ object ActorRegistryModule
   def provideActorRegistry(system: ActorSystem): ActorRegister  = {
      ActorRegister(Map(
 
-      "pipelineWatcherActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "PipelineWatcherActor")),
-
       "oaiParserActor" ->
         system.actorOf(GuiceAkkaExtension(system).props(
           "OaiParserActor")),
@@ -63,7 +55,7 @@ object ActorRegistryModule
 
       "dynamoRecordWriterActor" ->
         system.actorOf(GuiceAkkaExtension(system).props(
-          "DynamoRecordWriterActor").withMailbox("bounded-mailbox"))
+          "DynamoRecordWriterActor"))
     ))
   }
 }
