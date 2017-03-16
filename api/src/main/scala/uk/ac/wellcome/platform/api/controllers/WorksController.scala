@@ -8,12 +8,19 @@ import com.twitter.finatra.http.Controller
 
 import javax.inject.{Inject, Singleton}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import uk.ac.wellcome.platform.api.ApiSwagger
+import uk.ac.wellcome.platform.api.responses.ResultResponse
+import uk.ac.wellcome.platform.api.services.CalmService
+import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 
 
 @Singleton
 class WorksController @Inject()(
-  @Flag("api.prefix") apiPrefix: String) extends Controller with SwaggerSupport {
+  @Flag("api.prefix") apiPrefix: String,
+  @Flag("api.context") apiContext: String,
+  calmService: CalmService) extends Controller with SwaggerSupport {
 
   override implicit protected val swagger = ApiSwagger
 
@@ -37,7 +44,10 @@ class WorksController @Inject()(
         .routeParam[String]("id", "The work to return",  required = true)
         .responseWith[Object](200, "Work")
     } { request: Request =>
-      response.notImplemented
+      calmService.findRecordByAltRefNo(request.params("id")).map(resultOption =>
+        resultOption
+          .map(result => response.ok.json(ResultResponse(ApiRequestUtils.hostUrl(request) + apiContext, result)))
+          .getOrElse(response.notFound))
     }
 
   }
