@@ -40,6 +40,9 @@ class OaiHarvestActor @Inject()(
         .get("oaiParserActor")
         .map(_ ! response)
     }
+    case SlowDown(m) => {
+      info(s"Received SlowDown message: ${m}")
+    }
     case unknown => error(s"Received unknown argument ${unknown}")
   }
 }
