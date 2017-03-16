@@ -14,7 +14,8 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.calm_adapter CalmAdapter"
   override val modules = Seq(
     CalmAdapterWorker,
-    DynamoWarmupModule)
+    DynamoWarmupModule,
+    OaiHarvestConfigModule)
 
   override def configureHttp(router: HttpRouter) {
     router
