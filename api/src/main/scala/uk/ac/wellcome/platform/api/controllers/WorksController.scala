@@ -12,6 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.responses.ResultResponse
+import uk.ac.wellcome.platform.api.responses.ResultListResponse
 import uk.ac.wellcome.platform.api.services.CalmService
 import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 
@@ -34,7 +35,9 @@ class WorksController @Inject()(
         .queryParam[Int]("page", "The page to return from the result list", required = false)
         .queryParam[Int]("pageSize", "The number of works to return per page (default: 10)", required = false)
     } { request: Request =>
-      response.notImplemented
+      calmService.findRecords().map(results =>
+        response.ok.json(
+          ResultListResponse(context = ApiRequestUtils.hostUrl(request) + apiContext, results = results)))
     }
 
     getWithDoc("/works/:id") { doc =>
@@ -46,7 +49,8 @@ class WorksController @Inject()(
     } { request: Request =>
       calmService.findRecordByAltRefNo(request.params("id")).map(resultOption =>
         resultOption
-          .map(result => response.ok.json(ResultResponse(ApiRequestUtils.hostUrl(request) + apiContext, result)))
+          .map(result => response.ok.json(
+            ResultResponse(context = ApiRequestUtils.hostUrl(request) + apiContext, result = result)))
           .getOrElse(response.notFound))
     }
 
