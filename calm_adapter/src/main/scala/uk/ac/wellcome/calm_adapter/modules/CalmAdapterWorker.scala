@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorSystem, Props, DeadLetter}
 import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
@@ -39,6 +39,13 @@ object CalmAdapterWorker
 
     val system = injector.instance[ActorSystem]
     val actorRegister = injector.instance[ActorRegister]
+
+    actorRegister.actors
+      .get("pipelineWatcherActor")
+      .map(actorRef => {
+        system.eventStream
+          .subscribe(actorRef, classOf[DeadLetter])
+      })
 
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS)
