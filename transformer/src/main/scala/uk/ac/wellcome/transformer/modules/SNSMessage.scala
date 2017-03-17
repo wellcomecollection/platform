@@ -17,19 +17,18 @@ trait PublishableMessage {
   def publish(): Try[PublishAttempt]
 }
 
-case class SNSMessage (
+case class SNSMessage(
   subject: String,
   message: String,
   topic: String,
   snsClient: AmazonSNS
-)
-  extends PublishableMessage {
+) extends PublishableMessage {
 
-  def publish() = Try{
-    snsClient.publish(
-      new PublishRequest(topic, message, subject)
-    )
-  }.map(r =>
-    PublishAttempt(r.getMessageId()))
+  def publish() =
+    Try {
+      snsClient.publish(
+        new PublishRequest(topic, message, subject)
+      )
+    }.map(r => PublishAttempt(r.getMessageId()))
 
 }

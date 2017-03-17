@@ -11,15 +11,13 @@ import uk.ac.wellcome.platform.transformer.modules.ActorRegistryModule
 import uk.ac.wellcome.platform.transformer.modules.ActorRegister
 import com.google.inject.name.Named
 
-
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 
 @Named("KinesisDynamoRecordExtractorActor")
 class KinesisDynamoRecordExtractorActor @Inject()(
   actorRegister: ActorRegister
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
     case record: RecordAdapter => {

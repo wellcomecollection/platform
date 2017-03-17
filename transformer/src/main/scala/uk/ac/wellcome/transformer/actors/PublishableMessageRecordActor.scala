@@ -22,15 +22,13 @@ import scala.util.Success
 import scala.util.Failure
 import com.google.inject.name.Named
 
-
 @Named("PublishableMessageRecordActor")
 class PublishableMessageRecordActor @Inject()(
   actorRegister: ActorRegister,
   workerConfig: WorkerConfig,
   snsClient: AmazonSNS
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
     case cleanedRecord: CleanedRecord => {
@@ -40,14 +38,14 @@ class PublishableMessageRecordActor @Inject()(
             cleanedRecord.source,
             stringifiedJson,
             workerConfig.snsTopicArn,
-	    snsClient
+            snsClient
           )
 
           info(s"Publishable message ${message}")
 
           actorRegister.actors
-	    .get("publisherActor")
-	    .map(_ ! message)
+            .get("publisherActor")
+            .map(_ ! message)
         }
         case Failure(e) => {
           // Send to dead letter queue or just error

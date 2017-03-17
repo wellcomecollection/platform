@@ -7,7 +7,6 @@ import com.google.inject.Provides
 import com.google.inject.Injector
 import com.twitter.inject.{TwitterModule, InjectorModule}
 
-
 object AkkaModule extends TwitterModule {
   override val modules = Seq(InjectorModule)
 
