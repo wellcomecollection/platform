@@ -8,7 +8,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import uk.ac.wellcome.finatra.services.ElasticsearchService
 import uk.ac.wellcome.platform.api.models._
-import uk.ac.wellcome.finatra.services.ElasticsearchService
 
 
 @Singleton
@@ -28,6 +27,11 @@ class CalmService @Inject()(
         boolQuery().must(matchQuery("AltRefNo.keyword", altRefNo))
       )
     }.map { _.hits.headOption.map { Record(_) }}
+
+  def findRecords(): Future[Array[Record]] =
+    elasticsearchService.client.execute {
+      search("records/item").matchAll().limit(10)
+    }.map { _.hits.map { Record(_) }}
 
   def findCollectionByAltRefNo(altRefNo: String): Future[Option[Collection]] = {
     elasticsearchService.client.execute {
