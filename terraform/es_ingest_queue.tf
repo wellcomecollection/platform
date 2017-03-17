@@ -8,13 +8,11 @@
   for them to work together.
 */
 
-
 /*
   We'll use this to get the account ID later.
   https://www.terraform.io/docs/providers/aws/d/caller_identity.html
 */
-data "aws_caller_identity" "current" { }
-
+data "aws_caller_identity" "current" {}
 
 /*
   Names of the SNS topic and SQS queue, which appear both in the resource
@@ -27,7 +25,6 @@ variable "es_ingest" {
   }
 }
 
-
 /*
   This defines a policy that allows SNS to push messages to the SQS queue.
   Because the policy relies on the SNS/SQS ARNs, which don't exist yet (and
@@ -38,8 +35,8 @@ variable "es_ingest" {
 */
 data "aws_iam_policy_document" "sqs_queue_policy" {
   statement {
-    sid     = "es-sns-to-sqs-policy"
-    effect  = "Allow"
+    sid    = "es-sns-to-sqs-policy"
+    effect = "Allow"
 
     principals {
       type        = "AWS"
@@ -47,24 +44,23 @@ data "aws_iam_policy_document" "sqs_queue_policy" {
     }
 
     actions = [
-      "sqs:SendMessage"
+      "sqs:SendMessage",
     ]
 
     resources = [
-      "arn:aws:sqs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${var.es_ingest["sqs_name"]}"
+      "arn:aws:sqs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${var.es_ingest["sqs_name"]}",
     ]
 
     condition {
-      test      = "ArnEquals"
-      variable  = "aws:SourceArn"
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
 
       values = [
-        "arn:aws:sns:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${var.es_ingest["sns_name"]}"
+        "arn:aws:sns:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${var.es_ingest["sns_name"]}",
       ]
     }
   }
 }
-
 
 /*
   Define the policy.
@@ -73,17 +69,15 @@ resource "aws_sns_topic" "es_ingest_topic" {
   name = "${var.es_ingest["sns_name"]}"
 }
 
-
 /*
   Define the queue.  As a future enhancement, it would be nice to make this
   a FIFO queue, but that's currently not available in eu-west-1.
   http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html
 */
 resource "aws_sqs_queue" "es_ingest_queue" {
-  name    = "${var.es_ingest["sqs_name"]}"
-  policy  = "${data.aws_iam_policy_document.sqs_queue_policy.json}"
+  name   = "${var.es_ingest["sqs_name"]}"
+  policy = "${data.aws_iam_policy_document.sqs_queue_policy.json}"
 }
-
 
 /*
   Finally, we have to create a subscription for the SNS topic to be able

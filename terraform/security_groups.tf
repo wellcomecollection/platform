@@ -29,9 +29,10 @@ resource "aws_security_group" "tools_lb_sg" {
   name   = "tf-ecs-tools-lbsg"
 
   ingress {
-    protocol    = "tcp"
-    from_port   = 443
-    to_port     = 443
+    protocol  = "tcp"
+    from_port = 443
+    to_port   = 443
+
     cidr_blocks = [
       "${var.admin_cidr_ingress}",
     ]
@@ -65,10 +66,11 @@ resource "aws_security_group" "instance_sg" {
 
   ingress {
     from_port = 32768
-    to_port = 61000
-    protocol = "tcp"
+    to_port   = 61000
+    protocol  = "tcp"
+
     security_groups = [
-     "${aws_security_group.lb_sg.id}",
+      "${aws_security_group.lb_sg.id}",
     ]
   }
 
@@ -97,10 +99,11 @@ resource "aws_security_group" "tools_instance_sg" {
 
   ingress {
     from_port = 32768
-    to_port = 61000
-    protocol = "tcp"
+    to_port   = 61000
+    protocol  = "tcp"
+
     security_groups = [
-     "${aws_security_group.tools_lb_sg.id}",
+      "${aws_security_group.tools_lb_sg.id}",
     ]
   }
 
@@ -121,8 +124,9 @@ resource "aws_security_group" "efs_mnt_sg" {
     from_port = 2049
     to_port   = 2049
     protocol  = "tcp"
+
     security_groups = [
-      "${aws_security_group.tools_instance_sg.id}"
+      "${aws_security_group.tools_instance_sg.id}",
     ]
   }
 }
