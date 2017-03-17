@@ -41,10 +41,10 @@ object ConfigS3JavaOptsPlugin extends sbt.AutoPlugin {
 
 object ConfigS3JavaOpts {
   def apply(stage: String, bucket: String, appName: String): Seq[String] = {
-    if (!Files.exists(Paths.get("conf/"))) return Nil
+    if (!Files.exists(Paths.get(s"${appName}/conf/"))) return Nil
 
     val key       = s"config/${stage}/${appName}.conf"
-    val localPath = s"conf/application.${stage}.conf"
+    val localPath = s"${appName}/conf/application.${stage}.conf"
 
     if(stage != "dev") {
       val s3Client = AmazonS3ClientBuilder.defaultClient()
