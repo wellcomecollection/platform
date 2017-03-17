@@ -15,7 +15,8 @@ import uk.ac.wellcome.platform.api.ApiSwagger
 @Singleton
 class SwaggerController @Inject()(
   @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.version") apiVersion: String) extends Controller {
+  @Flag("api.version") apiVersion: String
+) extends Controller {
 
   prefix(apiPrefix) {
 

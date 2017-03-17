@@ -1,0 +1,8 @@
+{
+  "@context": {
+    "@base": "http://id.wellcomecollection.org/",
+    "@vocab": "http://wellcomecollection.org/ontologies/works/",
+    "id": "@id",
+    "type": "@type"
+  }
+}
