@@ -10,21 +10,19 @@ import scala.util.Success
 import scala.util.Failure
 import com.google.inject.name.Named
 
-
 @Named("PublisherActor")
-class PublisherActor()
-  extends Actor
-  with Logging {
+class PublisherActor() extends Actor with Logging {
 
   def receive = {
-    case m: PublishableMessage => m.publish match {
-      case Success(publishAttempt) => {
-        info(s"Published message ${publishAttempt.id}")
+    case m: PublishableMessage =>
+      m.publish match {
+        case Success(publishAttempt) => {
+          info(s"Published message ${publishAttempt.id}")
+        }
+        case Failure(e) => {
+          error("Failed to publish message", e)
+        }
       }
-      case Failure(e) => {
-        error("Failed to publish message", e)
-      }
-    }
     case o => error(s"Received non-message ${o}")
   }
 }

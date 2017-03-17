@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.api.models
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.searches.RichSearchHit
 
-
 case class Record(
   @JsonProperty("type") ontologyType: String = "Work",
   id: String,
@@ -18,8 +17,8 @@ case object Record {
       hit.sourceAsMap.filter(o => o._2 != null)
 
     Record(
-      id=data("AltRefNo").toString,
-      title=data("Title").toString
+      id = data("AltRefNo").toString,
+      title = data("Title").toString
 //      materialType=data("Material").toString,
 //      date=data.get("Date").map(_.toString),
 //      acquisition=data.get("Acquisition").map(_.toString)
