@@ -1,36 +1,21 @@
-/* Autoscaling groups described as separate Cloudformation stacks
-   in order that rolling updates are possible. */
-
-resource "aws_cloudformation_stack" "tools_cluster_asg" {
-  name = "tools-cluster-asg"
-  template_body = "${data.template_file.tools_cluster_asg.rendered}"
+module "platform_cluster_asg" {
+  source                = "./ecs_asg"
+  asg_name              = "platform-cluster"
+  subnet_list           = ["${module.vpc_main.subnets}"]
+  key_name              = "${var.key_name}"
+  instance_profile_name = "${module.ecs_platform_iam.instance_profile_name}"
+  user_data             = "${module.platform_userdata.rendered}"
+  vpc_id                = "${module.vpc_main.vpc_id}"
 }
 
-data "template_file" "tools_cluster_asg" {
-  template = "${file("${path.module}/cloudformation/asg.json.template")}"
-
-  vars {
-    launch_config_name = "${aws_launch_configuration.tools.name}"
-    vpc_zone_identifier = "${jsonencode(aws_subnet.tools.*.id)}"
-    asg_min_size = "${var.asg_min}"
-    asg_desired_size = "${var.asg_desired}"
-    asg_max_size = "${var.asg_max}"
-  }
-}
-
-resource "aws_cloudformation_stack" "platform_cluster_asg" {
-  name = "platform-cluster-asg"
-  template_body = "${data.template_file.platform_cluster_asg.rendered}"
-}
-
-data "template_file" "platform_cluster_asg" {
-  template = "${file("${path.module}/cloudformation/asg.json.template")}"
-
-  vars {
-    launch_config_name = "${aws_launch_configuration.platform.name}"
-    vpc_zone_identifier = "${jsonencode(aws_subnet.main.*.id)}"
-    asg_min_size = "${var.asg_min}"
-    asg_desired_size = "${var.asg_desired}"
-    asg_max_size = "${var.asg_max}"
-  }
+module "tools_cluster_asg" {
+  source                = "./ecs_asg"
+  asg_name              = "tools-cluster"
+  subnet_list           = ["${module.vpc_tools.subnets}"]
+  key_name              = "${var.key_name}"
+  instance_type         = "t2.medium"
+  instance_profile_name = "${module.ecs_tools_iam.instance_profile_name}"
+  user_data             = "${module.tools_userdata.rendered}"
+  vpc_id                = "${module.vpc_tools.vpc_id}"
+  admin_cidr_ingress    = "${var.admin_cidr_ingress}"
 }
