@@ -41,7 +41,6 @@ object Dependencies {
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
     "ch.qos.logback" % "logback-classic" % versions.logback,
-
     "com.twitter" %% "finatra-http" % versions.finatra % "test",
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
     "com.twitter" %% "inject-server" % versions.finatra % "test",
@@ -49,14 +48,12 @@ object Dependencies {
     "com.twitter" %% "inject-core" % versions.finatra % "test",
     "com.twitter" %% "inject-modules" % versions.finatra % "test",
     "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
-
     "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
-
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
@@ -66,6 +63,7 @@ object Dependencies {
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
   )
 
-  val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+  val transformerDependencies
+    : Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
 
 }

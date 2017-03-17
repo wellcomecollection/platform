@@ -13,13 +13,11 @@ import uk.ac.wellcome.platform.transformer.modules.ActorRegister
 
 import com.google.inject.name.Named
 
-
 @Named("DynamoCaseClassExtractorActor")
 class DynamoCaseClassExtractorActor @Inject()(
   actorRegister: ActorRegister
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
     case record: RecordMap => {
@@ -28,8 +26,8 @@ class DynamoCaseClassExtractorActor @Inject()(
           info(s"Parsed DynamoDB record ${o}")
 
           actorRegister.actors
-	    .get("transformActor")
-	    .map(_ ! o)
+            .get("transformActor")
+            .map(_ ! o)
         }
         case Left(o) => {
           error(s"Unable to parse record ${o}")

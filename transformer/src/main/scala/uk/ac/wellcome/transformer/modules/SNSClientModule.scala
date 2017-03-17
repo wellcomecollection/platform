@@ -8,7 +8,6 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 
-
 case class WorkerConfig(snsTopicArn: String)
 
 object WorkerConfigModule extends TwitterModule {
@@ -30,8 +29,7 @@ object SNSClientModule extends TwitterModule {
     AmazonSNSClientBuilder
       .standard()
       .withRegion(region())
-      .withCredentials(
-        new DefaultAWSCredentialsProviderChain())
+      .withCredentials(new DefaultAWSCredentialsProviderChain())
       .build()
 
 }

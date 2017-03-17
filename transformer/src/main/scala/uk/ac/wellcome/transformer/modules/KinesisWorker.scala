@@ -15,13 +15,11 @@ import com.twitter.inject.{Injector, Logging, TwitterModule}
 
 import uk.ac.wellcome.platform.transformer.modules._
 
-
 object KinesisWorker extends TwitterModule {
-  override val modules = Seq(
-    StreamsRecordProcessorFactoryModule,
-    KinesisClientLibConfigurationModule,
-    DynamoConfigModule,
-    AkkaModule)
+  override val modules = Seq(StreamsRecordProcessorFactoryModule,
+                             KinesisClientLibConfigurationModule,
+                             DynamoConfigModule,
+                             AkkaModule)
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
@@ -29,13 +27,14 @@ object KinesisWorker extends TwitterModule {
     val region = injector.instance[DynamoConfig].region
     val system = injector.instance[ActorSystem]
 
-   val adapter = new AmazonDynamoDBStreamsAdapterClient(
+    val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
 
     adapter.setRegion(RegionUtils.getRegion(region))
 
-    val kinesisConfig = injector.instance[KinesisClientLibConfiguration]
+    val kinesisConfig = injector
+      .instance[KinesisClientLibConfiguration]
       .withInitialPositionInStream(InitialPositionInStream.LATEST)
 
     system.scheduler.scheduleOnce(
