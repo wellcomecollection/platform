@@ -14,8 +14,7 @@ import com.google.inject.name.Names
 
 case class ActorRegister(actors: Map[String, ActorRef])
 
-object ActorRegistryModule
-  extends TwitterModule {
+object ActorRegistryModule extends TwitterModule {
 
   override val modules = Seq(
     DynamoConfigModule,
@@ -48,30 +47,22 @@ object ActorRegistryModule
 
   @Singleton
   @Provides
-  def provideActorRegistry(system: ActorSystem): ActorRegister  = {
-     ActorRegister(Map(
-
-      "kinesisDynamoRecordExtractorActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "KinesisDynamoRecordExtractorActor")),
-
-      "dynamoCaseClassExtractorActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "DynamoCaseClassExtractorActor")),
-
-      "transformActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "TransformActor")),
-
-      "publishableMessageRecordActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "PublishableMessageRecordActor")),
-
-      "publisherActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "PublisherActor"))
-    ))
+  def provideActorRegistry(system: ActorSystem): ActorRegister = {
+    ActorRegister(
+      Map(
+        "kinesisDynamoRecordExtractorActor" ->
+          system.actorOf(GuiceAkkaExtension(system).props(
+            "KinesisDynamoRecordExtractorActor")),
+        "dynamoCaseClassExtractorActor" ->
+          system.actorOf(
+            GuiceAkkaExtension(system).props("DynamoCaseClassExtractorActor")),
+        "transformActor" ->
+          system.actorOf(GuiceAkkaExtension(system).props("TransformActor")),
+        "publishableMessageRecordActor" ->
+          system.actorOf(
+            GuiceAkkaExtension(system).props("PublishableMessageRecordActor")),
+        "publisherActor" ->
+          system.actorOf(GuiceAkkaExtension(system).props("PublisherActor"))
+      ))
   }
 }
-
-

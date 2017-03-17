@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.modules
 
-import java.util.{ List => JList }
+import java.util.{List => JList}
 import javax.inject.Singleton
 import scala.collection.JavaConverters._
 
@@ -13,7 +13,6 @@ import com.twitter.inject.TwitterModule
 
 import akka.actor.ActorRef
 import uk.ac.wellcome.platform.transformer.modules._
-
 
 class StreamsRecordProcessor(
   client: AmazonDynamoDB,
@@ -37,29 +36,25 @@ class StreamsRecordProcessor(
     checkpointer: IRecordProcessorCheckpointer
   ): Unit = {
     records.asScala.map { record =>
-      reciever.map(_ ! record) }
+      reciever.map(_ ! record)
+    }
   }
 }
 
 class StreamsRecordProcessorFactory(
   dynamoClient: AmazonDynamoDB,
   actorRegister: ActorRegister
-)
-  extends IRecordProcessorFactory {
+) extends IRecordProcessorFactory {
 
   override def createProcessor(): IRecordProcessor =
-    new StreamsRecordProcessor(
-      dynamoClient,
-      actorRegister
-        .actors
-	.get("kinesisDynamoRecordExtractorActor"))
+    new StreamsRecordProcessor(dynamoClient,
+                               actorRegister.actors
+                                 .get("kinesisDynamoRecordExtractorActor"))
 
 }
 
 object StreamsRecordProcessorFactoryModule extends TwitterModule {
-  override val modules = Seq(
-    ActorRegistryModule,
-    DynamoClientModule)
+  override val modules = Seq(ActorRegistryModule, DynamoClientModule)
 
   @Singleton
   @Provides
@@ -67,7 +62,5 @@ object StreamsRecordProcessorFactoryModule extends TwitterModule {
     dynamoClient: AmazonDynamoDB,
     actorRegister: ActorRegister
   ): StreamsRecordProcessorFactory =
-      new StreamsRecordProcessorFactory(
-        dynamoClient,
-	actorRegister)
+    new StreamsRecordProcessorFactory(dynamoClient, actorRegister)
 }

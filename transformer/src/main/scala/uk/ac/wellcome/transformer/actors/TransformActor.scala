@@ -12,13 +12,11 @@ import uk.ac.wellcome.platform.transformer.modules.ActorRegistryModule
 import uk.ac.wellcome.platform.transformer.modules.ActorRegister
 import com.google.inject.name.Named
 
-
 @Named("TransformActor")
 class TransformActor @Inject()(
   actorRegister: ActorRegister
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
     case dirtyRecord: Transformable => {
@@ -27,8 +25,8 @@ class TransformActor @Inject()(
           info(s"Cleaned record ${cleanRecord}")
 
           actorRegister.actors
-	    .get("publishableMessageRecordActor")
-	    .map(_ ! cleanRecord)
+            .get("publishableMessageRecordActor")
+            .map(_ ! cleanRecord)
         }
         case Failure(e) => {
           // Send to dead letter queue or just error

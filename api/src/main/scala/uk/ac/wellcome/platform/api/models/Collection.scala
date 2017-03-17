@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.api.models
 
 import com.sksamuel.elastic4s.searches.RichSearchHit
 
-
 case class Collection(
   refno: String,
   title: String

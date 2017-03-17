@@ -11,7 +11,6 @@ import javax.inject.{Inject, Singleton}
 
 import uk.ac.wellcome.platform.api.ApiSwagger
 
-
 @Singleton
 class SwaggerController @Inject()(
   @Flag("api.prefix") apiPrefix: String,
@@ -21,10 +20,11 @@ class SwaggerController @Inject()(
   prefix(apiPrefix) {
 
     get("/swagger.json") { request: Request =>
-      ApiSwagger.info(new Info()
-        .description("Search our collections")
-        .version(apiVersion)
-        .title("Catalogue"))
+      ApiSwagger.info(
+        new Info()
+          .description("Search our collections")
+          .version(apiVersion)
+          .title("Catalogue"))
       ApiSwagger.scheme(Scheme.HTTPS)
       ApiSwagger.host(request.host.getOrElse("api.wellcomecollection.org"))
       ApiSwagger.basePath(apiPrefix)
