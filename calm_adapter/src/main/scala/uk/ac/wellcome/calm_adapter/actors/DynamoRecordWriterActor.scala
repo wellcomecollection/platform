@@ -17,7 +17,6 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.models.ActorRegister
 
-
 case class SlowDown(message: String)
 
 @Named("DynamoRecordWriterActor")
@@ -25,25 +24,24 @@ class DynamoRecordWriterActor @Inject()(
   actorRegister: ActorRegister,
   dynamoClient: AmazonDynamoDBAsync,
   dynamoConfig: DynamoConfig
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
     case record: CalmDynamoRecord => {
       info(s"Dynamo actor received a record (${record.RecordID}).")
 
       ScanamoAsync.put(dynamoClient)(dynamoConfig.table)(record).map { _ =>
-	info(s"Dynamo put successful (${record.RecordID}).")  // todo: record ID
+        info(s"Dynamo put successful (${record.RecordID}).") // todo: record ID
       } recover {
-      	case e: ProvisionedThroughputExceededException => {
-      	  error(s"Dynamo put failed (${record.RecordID})!", e)
+        case e: ProvisionedThroughputExceededException => {
+          error(s"Dynamo put failed (${record.RecordID})!", e)
 
-	  val message = SlowDown("Exceeded provisioned throughput!")
+          val message = SlowDown("Exceeded provisioned throughput!")
           actorRegister.send("oaiHarvestActor", message)
 
-      	  self ! record
-      	}
+          self ! record
+        }
         case x => error(s"Unknown error ${x}")
       }
     }

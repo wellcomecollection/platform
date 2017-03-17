@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.calm_adapter.modules
 
-import java.nio.charset.{ Charset => JCharset }
-import java.util.{ List => JList }
+import java.nio.charset.{Charset => JCharset}
+import java.util.{List => JList}
 import java.util.concurrent.TimeUnit
 
 import scala.collection.JavaConverters._
@@ -9,7 +9,11 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import akka.actor.{ActorSystem, Props, DeadLetter}
-import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{
+  AWSCredentials,
+  AWSCredentialsProvider,
+  DefaultAWSCredentialsProviderChain
+}
 import com.amazonaws.regions._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
 import com.twitter.inject.{Injector, TwitterModule}
@@ -19,15 +23,11 @@ import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.platform.finatra.modules.AkkaModule
 
+object CalmAdapterWorker extends TwitterModule {
 
-object CalmAdapterWorker
-  extends TwitterModule {
+  override val modules = Seq(ActorRegistryModule, AkkaModule)
 
-  override val modules = Seq(
-    ActorRegistryModule,
-    AkkaModule)
-
-  val warmupTime  =
+  val warmupTime =
     flag(
       name = "warmupTime",
       default = 1,

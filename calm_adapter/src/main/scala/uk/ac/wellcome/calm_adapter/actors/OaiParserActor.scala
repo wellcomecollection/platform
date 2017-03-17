@@ -11,7 +11,6 @@ import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.platform.calm_adapter.services._
 
-
 // This actor parses the "XML" response returned by the OAI-PMH harvest.
 // It produces Map(String, String) instances of the key/value pairs in
 // the records, and sends them for further processing.  It also starts
@@ -25,13 +24,13 @@ import uk.ac.wellcome.platform.calm_adapter.services._
 class OaiParserActor @Inject()(
   actorRegister: ActorRegister,
   oaiParserService: OaiParserService
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
-  def parseRecords(data: String): Unit = oaiParserService
-    .parseRecords(data)
-    .map(actorRegister.send("dynamoRecordWriterActor", _))
+  def parseRecords(data: String): Unit =
+    oaiParserService
+      .parseRecords(data)
+      .map(actorRegister.send("dynamoRecordWriterActor", _))
 
   def receive = {
     case response: String => {
