@@ -32,7 +32,7 @@ class DynamoRecordWriterActor @Inject()(
       info(s"Dynamo actor received a record (${record.RecordID}).")
 
       ScanamoAsync.put(dynamoClient)(dynamoConfig.table)(record).map { _ =>
-        info(s"Dynamo put successful (${record.RecordID}).") // todo: record ID
+        info(s"Dynamo put successful (${record.RecordID}).")
       } recover {
         case e: ProvisionedThroughputExceededException => {
           error(s"Dynamo put failed (${record.RecordID})!", e)
