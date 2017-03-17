@@ -14,6 +14,8 @@ import com.amazonaws.regions._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
 import com.twitter.inject.{Injector, TwitterModule}
 
+import uk.ac.wellcome.models.ActorRegister
+
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.platform.finatra.modules.AkkaModule
 
@@ -50,10 +52,8 @@ object CalmAdapterWorker
     system.scheduler.scheduleOnce(
       Duration.create(4, TimeUnit.MINUTES)
     )(
-      actorRegister.actors
-        .get("oaiHarvestActor")
-        .map(_ ! oaiHarvestActorConfig)
-      )
+      actorRegister.send("oaiHarvestActor", oaiHarvestActorConfig)
+    )
   }
 
   val oaiHarvestActorConfig =

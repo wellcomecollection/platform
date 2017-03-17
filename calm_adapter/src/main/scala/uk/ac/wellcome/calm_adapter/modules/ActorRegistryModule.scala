@@ -10,12 +10,11 @@ import uk.ac.wellcome.platform.calm_adapter.actors._
 
 import uk.ac.wellcome.utils.GuiceAkkaExtension
 import net.codingwell.scalaguice.ScalaModule
+import uk.ac.wellcome.models.ActorRegister
 
 import akka.actor.Actor
 import com.google.inject.name.Names
 
-
-case class ActorRegister(actors: Map[String, ActorRef])
 
 object ActorRegistryModule
   extends TwitterModule {

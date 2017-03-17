@@ -5,6 +5,8 @@ import com.twitter.inject.Logging
 import com.google.inject.name.Named
 import javax.inject.Inject
 
+import uk.ac.wellcome.models.ActorRegister
+
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.platform.calm_adapter.services._
 import uk.ac.wellcome.utils._
@@ -54,10 +56,7 @@ class OaiHarvestActor @Inject()(
 
       OaiParser.oaiHarvestRequest(oaiUrl, config).collect {
         case ParsedOaiResult(result, resumptionToken) => {
-	  // TODO: push calling options of actors to ACtorRegister
-	  actorRegister.actors
-	    .get("oaiParserActor")
-	    .map(_ ! result)
+	  actorRegister.send("oaiParserActor", result)
 
           if (!resumptionToken.isEmpty) throttle {
 	    info(
