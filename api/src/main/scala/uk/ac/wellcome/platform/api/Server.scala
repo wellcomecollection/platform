@@ -42,9 +42,9 @@ class Server extends HttpServer {
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
       .filter(CorsFilter())
-      .add[ContextController]
       .add[ManagementController]
       .add[MainController]
+      .add[ContextController]
       .add[SwaggerController]
       .add[WorksController]
       .exceptionMapper[ElasticsearchExceptionMapper]
