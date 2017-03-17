@@ -21,7 +21,8 @@ import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 class WorksController @Inject()(
   @Flag("api.prefix") apiPrefix: String,
   @Flag("api.context") apiContext: String,
-  calmService: CalmService) extends Controller with SwaggerSupport {
+  calmService: CalmService
+) extends Controller with SwaggerSupport {
 
   override implicit protected val swagger = ApiSwagger
 
@@ -47,9 +48,8 @@ class WorksController @Inject()(
         .routeParam[String]("id", "The work to return",  required = true)
         .responseWith[Object](200, "Work")
     } { request: Request =>
-      calmService.findRecordByAltRefNo(request.params("id")).map(resultOption =>
-        resultOption
-          .map(result => response.ok.json(
+      calmService.findRecordByAltRefNo(request.params("id")).map(
+        _.map(result => response.ok.json(
             ResultResponse(context = ApiRequestUtils.hostUrl(request) + apiContext, result = result)))
           .getOrElse(response.notFound))
     }

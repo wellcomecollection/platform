@@ -9,7 +9,8 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ContextController @Inject()(
-  @Flag("api.prefix") apiPrefix: String) extends Controller {
+  @Flag("api.prefix") apiPrefix: String
+) extends Controller {
 
   prefix(apiPrefix) {
 
