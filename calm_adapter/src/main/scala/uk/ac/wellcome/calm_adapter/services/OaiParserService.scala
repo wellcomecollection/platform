@@ -1,30 +1,38 @@
 package uk.ac.wellcome.platform.calm_adapter.services
 
+import javax.inject.{Inject, Singleton}
+import com.twitter.inject.TwitterModule
+import com.twitter.inject.Logging
+
 import java.net.URLDecoder
 import scala.util.matching.Regex
 
 import uk.ac.wellcome.models.CalmDynamoRecord
 import uk.ac.wellcome.utils.JsonUtil
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.platform.calm_adapter.modules.OaiHarvestConfig
+import uk.ac.wellcome.platform.calm_adapter.actors.OaiHarvestActorConfig
+import uk.ac.wellcome.utils.UrlUtil
+import scala.concurrent.Future
+
+
 case class ParsedOaiResult(
   result: String,
   resumptionToken: Option[String]
 )
 
-object OaiParser {
+@Singleton
+class OaiParserService @Inject()(
+  oaiHarvestConfig: OaiHarvestConfig
+)
+ extends Logging {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import uk.ac.wellcome.platform.calm_adapter.modules.OaiHarvestActorConfig
-  import uk.ac.wellcome.utils.UrlUtil
-  import scala.concurrent.Future
+  def oaiHarvestRequest(config: OaiHarvestActorConfig) = Future {
+    val url = UrlUtil.buildUri(oaiHarvestConfig.oaiUrl, config.toMap)
+    info(s"Making OAI harvest request to: ${url}")
 
-  def oaiHarvestRequest(url: String, config: OaiHarvestActorConfig) = Future {
-    //TODO: When this is under DI logging will work
-    //info(s"Making OAI harvest request to: ${url}")
-
-    scala.io.Source.fromURL(
-      UrlUtil.buildUri(url, config.toMap)
-    ).mkString
+    scala.io.Source.fromURL(url).mkString
   }.map(r => ParsedOaiResult(r,nextResumptionToken(r)))
 
   // Regex to match a resumption token, which looks something like:
@@ -35,9 +43,11 @@ object OaiParser {
   //                      b9d70a81-2154-40c8-b27c-ee8d8c3f28e7:0
   //     </resumptionToken>
   //
-  val resumptionTokenPattern = "<resumptionToken[^>]*>([^>]+)</resumptionToken>".r("token")
 
-  def nextResumptionToken(data: String): Option[String] = {
+  val resumptionTokenPattern =
+    "<resumptionToken[^>]*>([^>]+)</resumptionToken>".r("token")
+
+  private def nextResumptionToken(data: String): Option[String] = {
     resumptionTokenPattern.findFirstMatchIn(data).map { _.group("token") }
   }
 
@@ -70,7 +80,9 @@ object OaiParser {
   //
   // where the latter may have a closing slash if the value is empty.
   // In the latter case, we want to capture the field name and value.
-  val streamParserPattern = "<([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?>".r("name", "value")
+
+  val streamParserPattern =
+    "<([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?>".r("name", "value")
 
   def parseRecords(data: String): List[CalmDynamoRecord] = {
     data.split("</record>")

@@ -20,6 +20,16 @@ import akka.agent.Agent
 import akka.actor.Actor
 
 
+case class OaiHarvestActorConfig(
+  verb: String,
+  metadataPrefix: Option[String] = None,
+  token: Option[String] = None
+) {
+  def toMap = Map("verb" -> verb) ++
+    metadataPrefix.map("metadataPrefix" -> _) ++
+    token.map("resumptionToken" -> _)
+}
+
 trait Throttlable {
   val agent = Agent(1)
   val throttleStep = 10L
@@ -40,7 +50,7 @@ trait Throttlable {
 class OaiHarvestActor @Inject()(
   actorRegister: ActorRegister,
   actorSystem: ActorSystem,
-  oaiHarvestConfig: OaiHarvestConfig
+  parserService: OaiParserService
 )
   extends Actor
   with Logging
@@ -48,13 +58,10 @@ class OaiHarvestActor @Inject()(
 
   val system = actorSystem
 
-  // TODO: Push this to ParserService (rename and DI)
-  val oaiUrl = oaiHarvestConfig.oaiUrl
-
   def receive = {
     case config: OaiHarvestActorConfig => {
 
-      OaiParser.oaiHarvestRequest(oaiUrl, config).collect {
+      parserService.oaiHarvestRequest(config).collect {
         case ParsedOaiResult(result, resumptionToken) => {
 	  actorRegister.send("oaiParserActor", result)
 
