@@ -7,6 +7,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 
 import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.platform.calm_adapter.actors._
+import uk.ac.wellcome.platform.calm_adapter.services._
 
 import uk.ac.wellcome.utils.GuiceAkkaExtension
 import net.codingwell.scalaguice.ScalaModule

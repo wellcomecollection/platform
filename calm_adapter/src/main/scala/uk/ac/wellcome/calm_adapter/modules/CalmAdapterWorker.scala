@@ -19,15 +19,6 @@ import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.platform.finatra.modules.AkkaModule
 
-case class OaiHarvestActorConfig(
-  verb: String,
-  metadataPrefix: Option[String] = None,
-  token: Option[String] = None
-) {
-  def toMap = Map("verb" -> verb) ++
-    metadataPrefix.map("metadataPrefix" -> _) ++
-    token.map("resumptionToken" -> _)
-}
 
 object CalmAdapterWorker
   extends TwitterModule {
@@ -35,6 +26,13 @@ object CalmAdapterWorker
   override val modules = Seq(
     ActorRegistryModule,
     AkkaModule)
+
+  val warmupTime  =
+    flag(
+      name = "warmupTime",
+      default = 1,
+      help = "Seconds to wait for dynamo scaling to occur, before starting."
+    )
 
   override def singletonStartup(injector: Injector) {
     info("Starting Adapter worker")
@@ -50,7 +48,7 @@ object CalmAdapterWorker
       })
 
     system.scheduler.scheduleOnce(
-      Duration.create(4, TimeUnit.MINUTES)
+      Duration.create(warmupTime(), TimeUnit.SECONDS)
     )(
       actorRegister.send("oaiHarvestActor", oaiHarvestActorConfig)
     )

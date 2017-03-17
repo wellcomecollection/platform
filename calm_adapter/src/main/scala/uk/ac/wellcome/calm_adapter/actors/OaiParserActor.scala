@@ -23,12 +23,13 @@ import uk.ac.wellcome.platform.calm_adapter.services._
 
 @Named("OaiParserActor")
 class OaiParserActor @Inject()(
-  actorRegister: ActorRegister
+  actorRegister: ActorRegister,
+  oaiParserService: OaiParserService
 )
   extends Actor
   with Logging {
 
-  def parseRecords(data: String): Unit = OaiParser
+  def parseRecords(data: String): Unit = oaiParserService
     .parseRecords(data)
     .map(actorRegister.send("dynamoRecordWriterActor", _))
 
