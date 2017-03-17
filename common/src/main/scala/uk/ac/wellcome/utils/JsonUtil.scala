@@ -13,11 +13,8 @@ object JsonUtil {
   mapper.registerModule(DefaultScalaModule)
   mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-  def toJson(value: Map[String, Any]): Try[String] =
-    toJson(value.map { case (k,v) => k -> v})
-
   def toJson(value: Any): Try[String] =
-   Try(mapper.writeValueAsString(value))
+    Try(mapper.writeValueAsString(value))
 
   def toMap[V](json:String)(implicit m: Manifest[V]) =
     fromJson[Map[String,V]](json)
