@@ -76,7 +76,7 @@ resource "aws_ecs_task_definition" "jenkins" {
   task_role_arn         = "${aws_iam_role.ecs_jenkins_task.arn}"
 
   volume {
-    name = "jenkins-home"
+    name      = "jenkins-home"
     host_path = "/mnt/efs"
   }
 }
