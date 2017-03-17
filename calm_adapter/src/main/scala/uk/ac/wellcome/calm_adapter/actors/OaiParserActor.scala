@@ -6,6 +6,8 @@ import akka.actor.Actor
 import com.google.inject.name.Named
 import com.twitter.inject.Logging
 
+import uk.ac.wellcome.models.ActorRegister
+
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.platform.calm_adapter.services._
 
@@ -26,13 +28,9 @@ class OaiParserActor @Inject()(
   extends Actor
   with Logging {
 
-  def parseRecords(data: String): Unit = {
-    OaiParser.parseRecords(data).map(dynamoRecord =>
-      actorRegister.actors
-        .get("dynamoRecordWriterActor")
-        .map(_ ! dynamoRecord)
-    )
-  }
+  def parseRecords(data: String): Unit = OaiParser
+    .parseRecords(data)
+    .map(actorRegister.send("dynamoRecordWriterActor", _))
 
   def receive = {
     case response: String => {

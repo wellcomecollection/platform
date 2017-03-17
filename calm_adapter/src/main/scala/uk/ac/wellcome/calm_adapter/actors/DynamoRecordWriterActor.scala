@@ -14,9 +14,9 @@ import com.gu.scanamo._
 import com.google.inject.name.Named
 import javax.inject.Inject
 
-import uk.ac.wellcome.platform.calm_adapter.modules.ActorRegister
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.models.ActorRegister
+
 
 case class SlowDown(message: String)
 
@@ -34,14 +34,13 @@ class DynamoRecordWriterActor @Inject()(
       info("Dynamo actor received a record.")
 
       ScanamoAsync.put(dynamoClient)(dynamoConfig.table)(record).map { _ =>
-	       info(s"Dynamo put successful.")  // todo: record ID
+	info(s"Dynamo put successful.")  // todo: record ID
       } recover {
       	case e: ProvisionedThroughputExceededException => {
       	  error(s"Dynamo put failed!", e)  // todo: record ID
 
-      	  actorRegister.actors
-      	    .get("oaiHarvestActor")
-      	    .map(_ ! SlowDown("Exceeded provisioned throughput!"))
+	  val message = SlowDown("Exceeded provisioned throughput!")
+          actorRegister.send("oaiHarvestActor", message)
 
       	  self ! record
       	}
