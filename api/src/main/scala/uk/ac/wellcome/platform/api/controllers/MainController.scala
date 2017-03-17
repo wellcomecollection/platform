@@ -17,7 +17,6 @@ import com.twitter.finatra.request.QueryParam
 import com.twitter.finatra.validation.NotEmpty
 import com.twitter.inject.annotations.Flag
 
-
 case class CalmRequest(
   @NotEmpty @QueryParam altRefNo: String
 )
@@ -37,30 +36,32 @@ case class RecordResponse(
 class MainController @Inject()(
   @Flag("api.prefix") apiPrefix: String,
   calmService: CalmService
-)
-  extends Controller {
+) extends Controller {
 
   prefix(apiPrefix) {
 
     get(s"/record") { request: CalmRequest =>
       val recordCollectionPair = for {
         recordOption <- calmService.findRecordByAltRefNo(request.altRefNo)
-        collectionOption <- calmService.findParentCollectionByAltRefNo(request.altRefNo)
+        collectionOption <- calmService.findParentCollectionByAltRefNo(
+          request.altRefNo)
       } yield RecordCollectionPair(recordOption, collectionOption)
 
       recordCollectionPair.map { pair =>
         pair.record
           .map(record =>
-            response.ok.json(RecordResponse(request.altRefNo, record, pair.collection)))
+            response.ok.json(
+              RecordResponse(request.altRefNo, record, pair.collection)))
           .getOrElse(response.notFound)
       }
     }
 
     get(s"/collection") { request: CalmRequest =>
-      calmService.findCollectionByAltRefNo(request.altRefNo).map { collectionOption =>
-        collectionOption
-          .map(response.ok.json)
-          .getOrElse(response.notFound)
+      calmService.findCollectionByAltRefNo(request.altRefNo).map {
+        collectionOption =>
+          collectionOption
+            .map(response.ok.json)
+            .getOrElse(response.notFound)
       }
     }
 

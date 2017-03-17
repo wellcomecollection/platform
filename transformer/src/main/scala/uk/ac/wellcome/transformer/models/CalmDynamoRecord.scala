@@ -32,8 +32,8 @@ case class CalmDynamoRecord(
 ) extends Transformable {
 
   def transform: Try[CleanedRecord] =
-    JsonUtil.fromJson[DirtyCalmRecord](data)
+    JsonUtil
+      .fromJson[DirtyCalmRecord](data)
       .flatMap(_.transform)
 
 }
-

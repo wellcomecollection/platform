@@ -12,9 +12,10 @@ case class ErrorResponse(
 
 @Singleton
 class ElasticsearchExceptionMapper @Inject()(response: ResponseBuilder)
-  extends ExceptionMapper[ElasticsearchException] {
+    extends ExceptionMapper[ElasticsearchException] {
 
-  override def toResponse(request: Request, exception: ElasticsearchException): Response = {
+  override def toResponse(request: Request,
+                          exception: ElasticsearchException): Response = {
     val errorResponse = ErrorResponse(exception.getMessage)
 
     response.internalServerError.json(errorResponse)
