@@ -5,7 +5,6 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 
-
 case class OaiHarvestConfig(oaiUrl: String)
 
 object OaiHarvestConfigModule extends TwitterModule {

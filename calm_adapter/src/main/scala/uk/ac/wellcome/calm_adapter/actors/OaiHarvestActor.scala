@@ -19,15 +19,15 @@ import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.actor.Actor
 
-
 case class OaiHarvestActorConfig(
   verb: String,
   metadataPrefix: Option[String] = None,
   token: Option[String] = None
 ) {
-  def toMap = Map("verb" -> verb) ++
-    metadataPrefix.map("metadataPrefix" -> _) ++
-    token.map("resumptionToken" -> _)
+  def toMap =
+    Map("verb" -> verb) ++
+      metadataPrefix.map("metadataPrefix" -> _) ++
+      token.map("resumptionToken" -> _)
 }
 
 trait Throttlable {
@@ -45,16 +45,14 @@ trait Throttlable {
     )(_)
 }
 
-
 @Named("OaiHarvestActor")
 class OaiHarvestActor @Inject()(
   actorRegister: ActorRegister,
   actorSystem: ActorSystem,
   parserService: OaiParserService
-)
-  extends Actor
-  with Logging
-  with Throttlable {
+) extends Actor
+    with Logging
+    with Throttlable {
 
   val system = actorSystem
 
@@ -63,21 +61,20 @@ class OaiHarvestActor @Inject()(
 
       parserService.oaiHarvestRequest(config).collect {
         case ParsedOaiResult(result, resumptionToken) => {
-	  actorRegister.send("oaiParserActor", result)
+          actorRegister.send("oaiParserActor", result)
 
           if (!resumptionToken.isEmpty) throttle {
-	    info(
-	      s"Resumption token ${resumptionToken} found.\n" ++
-	      s"Next OAI request scheduled in ${waitMillis}ms")
+            info(
+              s"Resumption token ${resumptionToken} found.\n" ++
+                s"Next OAI request scheduled in ${waitMillis}ms")
 
-	    self ! OaiHarvestActorConfig(
-              verb = "ListRecords",
-              token = resumptionToken)
+            self ! OaiHarvestActorConfig(verb = "ListRecords",
+                                         token = resumptionToken)
           } else {
-	    info("No <resumptionToken> in response")
+            info("No <resumptionToken> in response")
             // TODO: Termination logic goes here
-	  }
-	}
+          }
+        }
       }
     }
 

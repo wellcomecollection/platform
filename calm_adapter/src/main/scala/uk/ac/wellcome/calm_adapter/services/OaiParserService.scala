@@ -16,7 +16,6 @@ import uk.ac.wellcome.platform.calm_adapter.actors.OaiHarvestActorConfig
 import uk.ac.wellcome.utils.UrlUtil
 import scala.concurrent.Future
 
-
 case class ParsedOaiResult(
   result: String,
   resumptionToken: Option[String]
@@ -25,15 +24,15 @@ case class ParsedOaiResult(
 @Singleton
 class OaiParserService @Inject()(
   oaiHarvestConfig: OaiHarvestConfig
-)
- extends Logging {
+) extends Logging {
 
-  def oaiHarvestRequest(config: OaiHarvestActorConfig) = Future {
-    val url = UrlUtil.buildUri(oaiHarvestConfig.oaiUrl, config.toMap)
-    info(s"Making OAI harvest request to: ${url}")
+  def oaiHarvestRequest(config: OaiHarvestActorConfig) =
+    Future {
+      val url = UrlUtil.buildUri(oaiHarvestConfig.oaiUrl, config.toMap)
+      info(s"Making OAI harvest request to: ${url}")
 
-    scala.io.Source.fromURL(url).mkString
-  }.map(r => ParsedOaiResult(r,nextResumptionToken(r)))
+      scala.io.Source.fromURL(url).mkString
+    }.map(r => ParsedOaiResult(r, nextResumptionToken(r)))
 
   // Regex to match a resumption token, which looks something like:
   //
@@ -85,24 +84,27 @@ class OaiParserService @Inject()(
     "<([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?>".r("name", "value")
 
   def parseRecords(data: String): List[CalmDynamoRecord] = {
-    data.split("</record>")
-      .dropRight(1)  // throw away the junk at the end of a response
-      .map(streamParserPattern.findAllMatchIn)  // last item?
+    data
+      .split("</record>")
+      .dropRight(1) // throw away the junk at the end of a response
+      .map(streamParserPattern.findAllMatchIn) // last item?
       .map(_.foldLeft(Map[String, List[String]]())(
-          (memo, element) => {
-            val key = element.group("name")
-            val value = URLDecoder.decode(element.group("value"), "UTF-8")
+        (memo, element) => {
+          val key = element.group("name")
+          val value = URLDecoder.decode(element.group("value"), "UTF-8")
 
-            memo ++ Map(key -> (memo.getOrElse(key, List()) ++ List(value)))
-          }
-        )
-      )
-      .map(data => CalmDynamoRecord(
-        data("RecordID").head,
-        data("RecordType").head,
-        data("AltRefNo").head,
-        data("RefNo").head,
-        JsonUtil.toJson(data).get
-      )).toList
+          memo ++ Map(key -> (memo.getOrElse(key, List()) ++ List(value)))
+        }
+      ))
+      .map(
+        data =>
+          CalmDynamoRecord(
+            data("RecordID").head,
+            data("RecordType").head,
+            data("AltRefNo").head,
+            data("RefNo").head,
+            JsonUtil.toJson(data).get
+        ))
+      .toList
   }
 }

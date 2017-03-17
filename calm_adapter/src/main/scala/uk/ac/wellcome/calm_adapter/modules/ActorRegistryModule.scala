@@ -16,9 +16,7 @@ import uk.ac.wellcome.models.ActorRegister
 import akka.actor.Actor
 import com.google.inject.name.Names
 
-
-object ActorRegistryModule
-  extends TwitterModule {
+object ActorRegistryModule extends TwitterModule {
 
   override val modules = Seq(
     DynamoClientModule,
@@ -42,22 +40,16 @@ object ActorRegistryModule
 
   @Singleton
   @Provides
-  def provideActorRegistry(system: ActorSystem): ActorRegister  = {
-     ActorRegister(Map(
-
-      "oaiParserActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "OaiParserActor")),
-
-      "oaiHarvestActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "OaiHarvestActor")),
-
-      "dynamoRecordWriterActor" ->
-        system.actorOf(GuiceAkkaExtension(system).props(
-          "DynamoRecordWriterActor"))
-    ))
+  def provideActorRegistry(system: ActorSystem): ActorRegister = {
+    ActorRegister(
+      Map(
+        "oaiParserActor" ->
+          system.actorOf(GuiceAkkaExtension(system).props("OaiParserActor")),
+        "oaiHarvestActor" ->
+          system.actorOf(GuiceAkkaExtension(system).props("OaiHarvestActor")),
+        "dynamoRecordWriterActor" ->
+          system.actorOf(
+            GuiceAkkaExtension(system).props("DynamoRecordWriterActor"))
+      ))
   }
 }
-
-
