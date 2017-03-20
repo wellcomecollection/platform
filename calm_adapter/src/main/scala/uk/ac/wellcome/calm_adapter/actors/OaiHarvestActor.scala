@@ -15,9 +15,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.Future
 
-import akka.actor.ActorSystem
+import akka.actor.{Actor, ActorSystem, PoisonPill}
 import akka.agent.Agent
-import akka.actor.Actor
 
 case class OaiHarvestActorConfig(
   verb: String,
@@ -72,7 +71,7 @@ class OaiHarvestActor @Inject()(
                                          token = resumptionToken)
           } else {
             info("No <resumptionToken> in response")
-            // TODO: Termination logic goes here
+            self ! PoisonPill
           }
         }
       }
@@ -86,5 +85,10 @@ class OaiHarvestActor @Inject()(
     }
 
     case unknown => error(s"Received unknown argument ${unknown}")
+  }
+
+  override def postStop(): Unit = {
+    info("OAI exhausted; sending PoisonPill to oaiParserActor")
+    actorRegister.send("oaiParserActor", PoisonPill)
   }
 }
