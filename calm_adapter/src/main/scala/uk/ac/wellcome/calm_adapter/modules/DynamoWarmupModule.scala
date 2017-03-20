@@ -23,6 +23,11 @@ object DynamoWarmupModule extends TwitterModule {
   ) =
     try {
 
+      if (dynamoConfig.table == "") {
+        error("DynamoDB table name must not be empty")
+        System.exit(1)
+      }
+
       (new DynamoUpdateWriteCapacityCapable {
         val client = dynamoClient
       }).updateWriteCapacity(dynamoConfig.table, capacity)
