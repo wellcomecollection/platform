@@ -1,12 +1,14 @@
 package uk.ac.wellcome.platform.calm_adapter.actors
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorSystem, PoisonPill}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.CalmDynamoRecord
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.platform.finatra.modules._
+import uk.ac.wellcome.platform.calm_adapter.ServerMain
 
 import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.model._
@@ -23,7 +25,8 @@ case class SlowDown(message: String)
 class DynamoRecordWriterActor @Inject()(
   actorRegister: ActorRegister,
   dynamoClient: AmazonDynamoDBAsync,
-  dynamoConfig: DynamoConfig
+  dynamoConfig: DynamoConfig,
+  system: ActorSystem
 ) extends Actor
     with Logging {
 
@@ -45,6 +48,16 @@ class DynamoRecordWriterActor @Inject()(
         case x => error(s"Unknown error ${x}")
       }
     }
+    case poison: PoisonPillWrapper => {
+      info("Dynamo actor received a PoisonPillWrapper")
+      system.scheduler.scheduleOnce(Duration.create(60, "seconds"))(
+        self ! PoisonPill)
+    }
     case unknown => error(s"Received unknown record object ${unknown}")
+  }
+
+  override def postStop(): Unit = {
+    info("Dynamo actor finished, shutting down")
+    ServerMain.shutdown()
   }
 }

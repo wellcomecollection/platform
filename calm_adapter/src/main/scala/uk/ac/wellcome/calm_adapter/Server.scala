@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.calm_adapter
 
+import java.util.{Timer, TimerTask}
+
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{
@@ -25,5 +27,15 @@ class Server extends HttpServer {
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
       .add[ManagementController]
+  }
+
+  def shutdown(): Unit = {
+    super.close()
+
+    // We wait a few seconds before calling System.exit(), o/w the shutdown
+    // hooks don't run properly.  In particular, this means DynamoWarmupModule
+    // doesn't have time to reset our write capacity.
+    val timer = new Timer()
+    timer.schedule(new TimerTask() { def run = System.exit(0) }, 5000L)
   }
 }
