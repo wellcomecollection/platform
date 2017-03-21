@@ -29,10 +29,6 @@ variable "volume_host_path" {
   default     = "/tmp"
 }
 
-variable "cert_arn" {
-  description = "ARN of ACM cert to use for listener"
-}
-
 variable "container_name" {
   description = "Primary container to expose for service"
 }
@@ -45,11 +41,16 @@ variable "vpc_id" {
   description = "ID of VPC to run service in"
 }
 
-variable "alb_id" {
-  description = "ID of ALB for service"
-}
-
 variable "image_uri" {
   description = "URI of container image for primary container"
   default     = "hello-world"
+}
+
+variable "listener_arn" {
+  description = "ARN of listener for listener rule"
+}
+
+variable "path_pattern" {
+  description = "path pattern to match for listener rule"
+  default     = "/*"
 }

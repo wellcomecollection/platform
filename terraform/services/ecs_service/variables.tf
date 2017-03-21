@@ -23,10 +23,11 @@ variable "vpc_id" {
   description = "ID of VPC to run target_group in"
 }
 
-variable "alb_id" {
-  description = "ID of ALB to attach listener to"
+variable "listener_arn" {
+  description = "ARN of listener for listener rule"
 }
 
-variable "acm_cert_arn" {
-  description = "ARN of ACM cert to use for listener"
+variable "path_pattern" {
+  description = "path pattern to match for listener rule"
+  default     = "/*"
 }

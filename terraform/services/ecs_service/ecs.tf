@@ -13,6 +13,6 @@ resource "aws_ecs_service" "service" {
 
   depends_on = [
     "aws_iam_role_policy.ecs_service",
-    "aws_alb_listener.ecs_service",
+    "aws_alb_target_group.ecs_service",
   ]
 }
