@@ -18,6 +18,10 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.transformer Transformer"
   override val modules = Seq(KinesisWorker)
 
+  private final val servicePrefix = flag(name = "service.prefix",
+                                         default = "/transformer",
+                                         help = "API path prefix")
+
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
