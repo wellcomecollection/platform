@@ -3,13 +3,13 @@ package uk.ac.wellcome.platform.transformer.actors
 import akka.actor.Actor
 import com.twitter.inject.Logging
 
-import uk.ac.wellcome.platform.transformer.models._
+import uk.ac.wellcome.models._
 import scala.util.Success
 import scala.util.Failure
 
 import javax.inject.Inject
 import uk.ac.wellcome.platform.transformer.modules.ActorRegistryModule
-import uk.ac.wellcome.platform.transformer.modules.ActorRegister
+import uk.ac.wellcome.models.ActorRegister
 import com.google.inject.name.Named
 
 @Named("TransformActor")
@@ -23,13 +23,10 @@ class TransformActor @Inject()(
       dirtyRecord.transform match {
         case Success(cleanRecord) => {
           info(s"Cleaned record ${cleanRecord}")
-
-          actorRegister.actors
-            .get("publishableMessageRecordActor")
-            .map(_ ! cleanRecord)
+          actorRegister.send("publishableMessageRecordActor", cleanRecord)
         }
         case Failure(e) => {
-          // Send to dead letter queue or just error
+          // TODO: Send to dead letter queue or just error
           error("Failed to perform transform to clean record", e)
         }
       }
