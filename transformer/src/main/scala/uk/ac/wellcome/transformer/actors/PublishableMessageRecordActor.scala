@@ -31,11 +31,11 @@ class PublishableMessageRecordActor @Inject()(
     with Logging {
 
   def receive = {
-    case cleanedRecord: CleanedRecord => {
-      JsonUtil.toJson(cleanedRecord) match {
+    case unifiedItem: UnifiedItem => {
+      JsonUtil.toJson(unifiedItem) match {
         case Success(stringifiedJson) => {
           val message = SNSMessage(
-            cleanedRecord.source,
+            unifiedItem.source,
             stringifiedJson,
             workerConfig.snsTopicArn,
             snsClient

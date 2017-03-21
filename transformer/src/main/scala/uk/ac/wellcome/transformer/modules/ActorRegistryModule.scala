@@ -5,6 +5,8 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import akka.actor.{ActorRef, ActorSystem, Props}
 
+
+import uk.ac.wellcome.platform.transformer.actors._
 import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.finatra.modules.AkkaModule
 import uk.ac.wellcome.models.ActorRegister
