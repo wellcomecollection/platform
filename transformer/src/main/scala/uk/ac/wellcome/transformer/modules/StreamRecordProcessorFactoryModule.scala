@@ -12,7 +12,9 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 
 import akka.actor.ActorRef
+import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.platform.transformer.modules._
+import uk.ac.wellcome.models.ActorRegister
 
 class StreamsRecordProcessor(
   client: AmazonDynamoDB,

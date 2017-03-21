@@ -4,7 +4,10 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import akka.actor.{ActorRef, ActorSystem, Props}
+
+import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.platform.transformer.actors._
+import uk.ac.wellcome.models.ActorRegister
 
 import uk.ac.wellcome.utils.GuiceAkkaExtension
 import net.codingwell.scalaguice.ScalaModule
@@ -12,7 +15,6 @@ import net.codingwell.scalaguice.ScalaModule
 import akka.actor.Actor
 import com.google.inject.name.Names
 
-case class ActorRegister(actors: Map[String, ActorRef])
 
 object ActorRegistryModule extends TwitterModule {
 

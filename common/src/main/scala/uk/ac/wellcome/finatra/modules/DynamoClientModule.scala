@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.modules
+package uk.ac.wellcome.platform.finatra.modules
 
 import javax.inject.Singleton
 
@@ -18,4 +18,11 @@ object DynamoClientModule extends TwitterModule {
       .withRegion(dynamoConfig.region)
       .build()
 
+  @Singleton
+  @Provides
+  def providesDynamoAsyncClient(dynamoConfig: DynamoConfig): AmazonDynamoDBAsync =
+    AmazonDynamoDBAsyncClientBuilder
+      .standard()
+      .withRegion(dynamoConfig.region)
+      .build()
 }
