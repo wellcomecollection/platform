@@ -3,11 +3,11 @@ module "service" {
   service_name        = "${var.service_name}"
   cluster_id          = "${var.cluster_id}"
   task_definition_arn = "${module.task.arn}"
-  alb_id              = "${var.alb_id}"
   vpc_id              = "${var.vpc_id}"
-  acm_cert_arn        = "${var.cert_arn}"
   container_name      = "${var.container_name}"
   container_port      = "${var.container_port}"
+  listener_arn        = "${var.listener_arn}"
+  path_pattern        = "${var.path_pattern}"
 }
 
 module "task" {

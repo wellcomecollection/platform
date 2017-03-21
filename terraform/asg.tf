@@ -1,11 +1,21 @@
-module "platform_cluster_asg" {
+module "services_cluster_asg" {
   source                = "./ecs_asg"
-  asg_name              = "platform-cluster"
-  subnet_list           = ["${module.vpc_main.subnets}"]
+  asg_name              = "service-cluster"
+  subnet_list           = ["${module.vpc_services.subnets}"]
   key_name              = "${var.key_name}"
-  instance_profile_name = "${module.ecs_platform_iam.instance_profile_name}"
-  user_data             = "${module.platform_userdata.rendered}"
-  vpc_id                = "${module.vpc_main.vpc_id}"
+  instance_profile_name = "${module.ecs_services_iam.instance_profile_name}"
+  user_data             = "${module.services_userdata.rendered}"
+  vpc_id                = "${module.vpc_services.vpc_id}"
+}
+
+module "api_cluster_asg" {
+  source                = "./ecs_asg"
+  asg_name              = "api-cluster"
+  subnet_list           = ["${module.vpc_api.subnets}"]
+  key_name              = "${var.key_name}"
+  instance_profile_name = "${module.ecs_api_iam.instance_profile_name}"
+  user_data             = "${module.api_userdata.rendered}"
+  vpc_id                = "${module.vpc_api.vpc_id}"
 }
 
 module "tools_cluster_asg" {

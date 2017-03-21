@@ -1,16 +1,3 @@
-resource "aws_alb_listener" "ecs_service" {
-  load_balancer_arn = "${var.alb_id}"
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "${var.acm_cert_arn}"
-
-  default_action {
-    target_group_arn = "${aws_alb_target_group.ecs_service.id}"
-    type             = "forward"
-  }
-}
-
 resource "aws_alb_target_group" "ecs_service" {
   name     = "${var.service_name}"
   port     = 80
@@ -19,5 +6,20 @@ resource "aws_alb_target_group" "ecs_service" {
 
   health_check {
     path = "/management/healthcheck"
+  }
+}
+
+resource "aws_alb_listener_rule" "rule" {
+  listener_arn = "${var.listener_arn}"
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_alb_target_group.ecs_service.arn}"
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["${var.path_pattern}"]
   }
 }

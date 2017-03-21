@@ -1,6 +1,11 @@
-module "ecs_platform_iam" {
+module "ecs_services_iam" {
   source = "./ecs_iam"
-  name   = "platform"
+  name   = "services"
+}
+
+module "ecs_api_iam" {
+  source = "./ecs_iam"
+  name   = "api"
 }
 
 module "ecs_tools_iam" {
@@ -15,13 +20,13 @@ resource "aws_iam_role_policy" "ecs_jenkins_task" {
   policy = <<EOF
 {
   "Version": "2012-10-17",
-  "Statement": [
+    "Statement": [
     {
       "Effect": "Allow",
       "Action": "*",
       "Resource": "*"
     }
-  ]
+    ]
 }
 EOF
 }
