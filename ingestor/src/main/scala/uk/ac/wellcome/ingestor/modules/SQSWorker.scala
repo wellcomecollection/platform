@@ -29,7 +29,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 
 import uk.ac.wellcome.utils.JsonUtil
 
-//TODO: Unify with transformer object
+//TODO: Use common-lib model 
 case class SNSMessage(
   Type: String,
   MessageId: String,
