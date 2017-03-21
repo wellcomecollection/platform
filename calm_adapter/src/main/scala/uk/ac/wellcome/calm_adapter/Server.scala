@@ -21,6 +21,10 @@ class Server extends HttpServer {
   override val modules =
     Seq(CalmAdapterWorker, DynamoWarmupModule, OaiHarvestConfigModule)
 
+  private final val servicePrefix = flag(name = "service.prefix",
+                                         default = "/transformer",
+                                         help = "API path prefix")
+
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
