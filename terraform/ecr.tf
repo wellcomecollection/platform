@@ -15,3 +15,11 @@ resource "aws_ecr_repository" "transformer" {
     prevent_destroy = true
   }
 }
+
+resource "aws_ecr_repository" "calm_adapter" {
+  name = "uk.ac.wellcome/calm_adapter"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
