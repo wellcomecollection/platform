@@ -1,3 +1,17 @@
+module "calm_adapter" {
+  source         = "./services"
+  service_name   = "calm_adapter"
+  cluster_id     = "${aws_ecs_cluster.services.id}"
+  task_name      = "calm_adapter"
+  task_role_arn  = "${module.ecs_services_iam.task_role_arn}"
+  container_name = "calm_adapter"
+  container_port = "8888"
+  vpc_id         = "${module.vpc_services.vpc_id}"
+  image_uri      = "${aws_ecr_repository.calm_adapter.repository_url}:${var.release_id}"
+  listener_arn   = "${module.services_alb.listener_arn}"
+  path_pattern   = "/calm_adapter/*"
+}
+
 module "transformer" {
   source         = "./services"
   service_name   = "transformer"
