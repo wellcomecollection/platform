@@ -16,16 +16,23 @@ import com.amazonaws.auth.{
 }
 import com.amazonaws.regions._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
+import com.amazonaws.services.sns._
 import com.twitter.inject.{Injector, TwitterModule}
 
 import uk.ac.wellcome.models.ActorRegister
 
 import uk.ac.wellcome.platform.calm_adapter.actors._
+import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.platform.finatra.modules.AkkaModule
+import uk.ac.wellcome.utils._
 
 object CalmAdapterWorker extends TwitterModule {
 
-  override val modules = Seq(ActorRegistryModule, AkkaModule)
+  override val modules = Seq(
+    ActorRegistryModule,
+    AkkaModule,
+    SNSClientModule,
+    SNSConfigModule)
 
   val warmupTime =
     flag(
@@ -65,5 +72,13 @@ object CalmAdapterWorker extends TwitterModule {
 
     val system = injector.instance[ActorSystem]
     system.terminate()
+
+    val sns = injector.instance[AmazonSNS]
+    val snsConfig = injector.instance[SNSConfig]
+    val snsResponse = sns.publish(
+      snsConfig.topicArn,
+      JsonUtil.toJson(
+        ECSServiceScheduleRequest("service_cluster", "calm_adapter", 0)).get)
+    info(s"Sent SNS shutdown request; received ${snsResponse}")
   }
 }
