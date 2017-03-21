@@ -43,10 +43,7 @@ case class SNSMessage(
 }
 
 object SQSWorker extends TwitterModule {
-  override val modules = Seq(
-    SQSConfigModule,
-    SQSClientModule,
-    AkkaModule)
+  override val modules = Seq(SQSConfigModule, SQSClientModule, AkkaModule)
 
   def extractSNSMessage(sqsMessage: SQSMessage): Option[SNSMessage] =
     JsonUtil.fromJson[SNSMessage](sqsMessage.getBody) match {
@@ -57,21 +54,30 @@ object SQSWorker extends TwitterModule {
       }
     }
 
-    def getMessages(
-      client: AmazonSQS,
-      queueUrl: String,
-      waitTime: Int,
-      maxMessages: Int
-    ): Seq[SQSMessage] = client.receiveMessage(
-      new ReceiveMessageRequest(queueUrl)
-        .withWaitTimeSeconds(waitTime)
-        .withMaxNumberOfMessages(maxMessages)
-    ).getMessages.asScala.toList
+  def getMessages(
+    client: AmazonSQS,
+    queueUrl: String,
+    waitTime: Int,
+    maxMessages: Int
+  ): Seq[SQSMessage] =
+    client
+      .receiveMessage(
+        new ReceiveMessageRequest(queueUrl)
+          .withWaitTimeSeconds(waitTime)
+          .withMaxNumberOfMessages(maxMessages)
+      )
+      .getMessages
+      .asScala
+      .toList
 
-  def deleteMessage(client: AmazonSQS, queueUrl: String, message: SQSMessage): Unit =
-    client.deleteMessage(new DeleteMessageRequest(queueUrl, message.getReceiptHandle))
+  def deleteMessage(client: AmazonSQS,
+                    queueUrl: String,
+                    message: SQSMessage): Unit =
+    client.deleteMessage(
+      new DeleteMessageRequest(queueUrl, message.getReceiptHandle))
 
-  def chooseProcessor(subject: String): Option[(String, ElasticsearchService) => Future[Unit]] = {
+  def chooseProcessor(subject: String)
+    : Option[(String, ElasticsearchService) => Future[Unit]] = {
     PartialFunction.condOpt(subject) {
       case "example" => indexDocument
     }
@@ -84,12 +90,14 @@ object SQSWorker extends TwitterModule {
   ): Future[Unit] = Future {
     implicit val jsonMapper = UnifiedItem
 
-    JsonUtil.fromJson[UnifiedItem](document).map(item => {
+    JsonUtil
+      .fromJson[UnifiedItem](document)
+      .map(item => {
         elasticsearchService.client.execute {
-	  //TODO: Push index and type to config?
+          //TODO: Push index and type to config?
           indexInto("records" / "item").doc(item)
         }.await
-    })
+      })
   }
 
   @tailrec
@@ -98,19 +106,17 @@ object SQSWorker extends TwitterModule {
     queueUrl: String,
     elasticsearchService: ElasticsearchService
   ): Unit = {
-    for (msg <- getMessages(
-        client = client,
-        queueUrl = queueUrl,
-        waitTime = 20,
-        maxMessages = 1)
-    ) {
+    for (msg <- getMessages(client = client,
+                            queueUrl = queueUrl,
+                            waitTime = 20,
+                            maxMessages = 1)) {
       val future = for {
         message <- Future(extractSNSMessage(msg).get)
 
         processorOption = message.getSubject().flatMap(chooseProcessor)
 
         processor <- Future(processorOption.getOrElse({
-	  error(s"Unrecognised message subject ${message.getSubject()}")
+          error(s"Unrecognised message subject ${message.getSubject()}")
           throw new RuntimeException("Failed to process message")
         }))
 

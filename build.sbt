@@ -4,15 +4,16 @@ import com.typesafe.sbt._
 import com.typesafe.sbt.packager.universal.UniversalPlugin
 import com.typesafe.sbt.packager.docker.DockerPlugin
 
-def doSharedSetup(project: Project) = project
-  .dependsOn(common)
-  .settings(Common.settings: _*)
-  .settings(Finatra.settings: _*)
-  .settings(Revolver.settings: _*)
-  .settings(EcrPlugin.projectSettings: _*)
-  .settings(Packager.settings: _*)
-  .enablePlugins(JavaAppPackaging)
-  .enablePlugins(GitVersioning)
+def doSharedSetup(project: Project) =
+  project
+    .dependsOn(common)
+    .settings(Common.settings: _*)
+    .settings(Finatra.settings: _*)
+    .settings(Revolver.settings: _*)
+    .settings(EcrPlugin.projectSettings: _*)
+    .settings(Packager.settings: _*)
+    .enablePlugins(JavaAppPackaging)
+    .enablePlugins(GitVersioning)
 
 lazy val common = project
   .settings(Common.settings: _*)

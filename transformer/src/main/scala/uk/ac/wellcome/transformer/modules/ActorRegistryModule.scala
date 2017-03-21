@@ -15,7 +15,6 @@ import net.codingwell.scalaguice.ScalaModule
 import akka.actor.Actor
 import com.google.inject.name.Names
 
-
 object ActorRegistryModule extends TwitterModule {
 
   override val modules = Seq(

@@ -20,7 +20,8 @@ object DynamoClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesDynamoAsyncClient(dynamoConfig: DynamoConfig): AmazonDynamoDBAsync =
+  def providesDynamoAsyncClient(
+    dynamoConfig: DynamoConfig): AmazonDynamoDBAsync =
     AmazonDynamoDBAsyncClientBuilder
       .standard()
       .withRegion(dynamoConfig.region)

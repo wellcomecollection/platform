@@ -8,8 +8,9 @@ import com.twitter.inject.TwitterModule
 import com.amazonaws.services.sns._
 
 /** Sent to request a change in the desired count of an ECS service. */
-case class ECSServiceScheduleRequest(
-  cluster: String, service: String, desired_count: Long)
+case class ECSServiceScheduleRequest(cluster: String,
+                                     service: String,
+                                     desired_count: Long)
 
 object SNSClientModule extends TwitterModule {
   override val modules = Seq(SNSConfigModule)

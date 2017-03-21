@@ -1,11 +1,10 @@
 package uk.ac.wellcome.models
 
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.models.UnifiedItem
 import scala.util.Try
 
 trait Transformable {
-  def transform: Try[CleanedRecord]
+  def transform: Try[UnifiedItem]
 }
 
 case class DirtyCalmRecord(
@@ -27,7 +26,7 @@ case class CalmDynamoRecord(
   data: String
 ) extends Transformable {
 
-  def transform: Try[CleanedRecord] =
+  def transform: Try[UnifiedItem] =
     JsonUtil
       .fromJson[DirtyCalmRecord](data)
       .flatMap(_.transform)

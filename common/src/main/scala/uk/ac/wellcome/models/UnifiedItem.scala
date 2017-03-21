@@ -3,7 +3,6 @@ package uk.ac.wellcome.models
 import com.sksamuel.elastic4s._
 import uk.ac.wellcome.utils.JsonUtil
 
-
 case class UnifiedItem(
   source: String,
   accessStatus: Option[String]

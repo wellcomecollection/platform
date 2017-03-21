@@ -28,11 +28,8 @@ import uk.ac.wellcome.utils._
 
 object CalmAdapterWorker extends TwitterModule {
 
-  override val modules = Seq(
-    ActorRegistryModule,
-    AkkaModule,
-    SNSClientModule,
-    SNSConfigModule)
+  override val modules =
+    Seq(ActorRegistryModule, AkkaModule, SNSClientModule, SNSConfigModule)
 
   val warmupTime =
     flag(
@@ -77,8 +74,10 @@ object CalmAdapterWorker extends TwitterModule {
     val snsConfig = injector.instance[SNSConfig]
     val snsResponse = sns.publish(
       snsConfig.topicArn,
-      JsonUtil.toJson(
-        ECSServiceScheduleRequest("service_cluster", "calm_adapter", 0)).get)
+      JsonUtil
+        .toJson(
+          ECSServiceScheduleRequest("service_cluster", "calm_adapter", 0))
+        .get)
     info(s"Sent SNS shutdown request; received ${snsResponse}")
   }
 }

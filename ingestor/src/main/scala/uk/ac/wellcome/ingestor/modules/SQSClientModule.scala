@@ -7,7 +7,6 @@ import com.twitter.inject.TwitterModule
 
 import com.amazonaws.services.sqs._
 
-
 object SQSClientModule extends TwitterModule {
   override val modules = Seq(SQSConfigModule)
 
