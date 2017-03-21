@@ -22,16 +22,17 @@ lazy val api = project
   .enablePlugins(GitVersioning)
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
 
-lazy val transformer = project
+lazy val ingestor = project
   .dependsOn(common)
   .settings(Common.settings: _*)
   .settings(Finatra.settings: _*)
+  .settings(Search.settings: _*)
   .settings(Revolver.settings: _*)
   .settings(EcrPlugin.projectSettings: _*)
   .settings(Packager.settings: _*)
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(GitVersioning)
-  .settings(libraryDependencies ++= Dependencies.transformerDependencies)
+  .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
 lazy val calm_adapter = project.
   dependsOn(common).
@@ -44,5 +45,16 @@ lazy val calm_adapter = project.
   enablePlugins(JavaAppPackaging).
   enablePlugins(GitVersioning).
   settings(libraryDependencies ++= Dependencies.calmAdapterDependencies)
+
+lazy val transformer = project
+  .dependsOn(common)
+  .settings(Common.settings: _*)
+  .settings(Finatra.settings: _*)
+  .settings(Revolver.settings: _*)
+  .settings(EcrPlugin.projectSettings: _*)
+  .settings(Packager.settings: _*)
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(GitVersioning)
+  .settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
 lazy val root = (project in file("."))
