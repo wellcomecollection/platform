@@ -58,6 +58,6 @@ class DynamoRecordWriterActor @Inject()(
 
   override def postStop(): Unit = {
     info("Dynamo actor finished, shutting down")
-    ServerMain.shutdown()
+    ServerMain.close()
   }
 }

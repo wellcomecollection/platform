@@ -28,14 +28,4 @@ class Server extends HttpServer {
       .filter[TraceIdMDCFilter[Request, Response]]
       .add[ManagementController]
   }
-
-  def shutdown(): Unit = {
-    super.close()
-
-    // We wait a few seconds before calling System.exit(), o/w the shutdown
-    // hooks don't run properly.  In particular, this means DynamoWarmupModule
-    // doesn't have time to reset our write capacity.
-    val timer = new Timer()
-    timer.schedule(new TimerTask() { def run = System.exit(0) }, 5000L)
-  }
 }
