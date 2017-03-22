@@ -12,7 +12,7 @@ object DynamoWarmupModule extends TwitterModule {
   val writeCapacity =
     flag(
       name = "writeCapacity",
-      default = 600L,
+      default = 5L,
       help = "Dynamo write capacity"
     )
 
