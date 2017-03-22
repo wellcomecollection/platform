@@ -5,7 +5,7 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 
-case class OaiHarvestConfig(oaiUrl: String)
+case class OaiHarvestConfig(oaiUrl: String, oaiDaysToFetch: Long)
 
 object OaiHarvestConfigModule extends TwitterModule {
 
@@ -15,8 +15,15 @@ object OaiHarvestConfigModule extends TwitterModule {
     help = "Base URL for OAI request"
   )
 
+  private val oaiDaysToFetch = flag(
+    name = "oaiDaysToFetch",
+    default = 3L,
+    help = "How many days of records to fetch from the OAI"
+  )
+
   @Singleton
   @Provides
-  def providesOaiHarvestConfig(): OaiHarvestConfig = OaiHarvestConfig(oaiUrl())
+  def providesOaiHarvestConfig(): OaiHarvestConfig = OaiHarvestConfig(
+    oaiUrl(), oaiDaysToFetch())
 
 }
