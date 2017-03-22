@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.calm_adapter.services
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import com.twitter.inject.TwitterModule
 import com.twitter.inject.Logging
@@ -80,6 +82,13 @@ class OaiParserService @Inject()(
     "<([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?>".r("name", "value")
 
   def parseRecords(data: String): List[CalmDynamoRecord] = {
+    // The "Modified" and "Created" fields in Calm are machine-written.
+    // Examples are '14/03/2017' and '18/02/2015'.
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    val today = LocalDate.now()
+    val afterDate = today.minusDays(oaiHarvestConfig.oaiDaysToFetch)
+
     data
       .split("</record>")
       // After the final </record> tag, there are some closing metadata tags
@@ -97,6 +106,13 @@ class OaiParserService @Inject()(
           memo ++ Map(key -> (memo.getOrElse(key, List()) ++ List(value)))
         }
       ))
+      .filter(data => {
+        val lastModified = data.getOrElse("Modified",
+          data.getOrElse("Created", List("1970/01/01"))
+        ).head
+        val lastModifiedDate = LocalDate.parse(lastModified, formatter)
+        lastModifiedDate.compareTo(afterDate) >= 0
+      })
       .map(
         data =>
           CalmDynamoRecord(
