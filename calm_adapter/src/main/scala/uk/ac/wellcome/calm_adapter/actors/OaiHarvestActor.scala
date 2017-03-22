@@ -18,6 +18,20 @@ import scala.concurrent.Future
 import akka.actor.{Actor, ActorSystem, PoisonPill}
 import akka.agent.Agent
 
+/** Configuration for the OAI harvest actor.
+ *
+ *  Parameters correspond to query parameters passed in the HTTP request.
+ *
+ *  @param verb: An OAI-PMH verb.  For a list of valid verbs, see
+ *               https://www.openarchives.org/OAI/openarchivesprotocol.html#ProtocolMessages
+ *  @param metadataPrefix: The metadata format to return. See
+ *               http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces
+ *  @param token: The resumption token, used for fetching multiple pages of
+ *               results.  See http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
+ *
+ *  Note: It is an OAI-PMH error to specify a metadata prefix and a
+ *  resumption token in the same request.
+ */
 case class OaiHarvestActorConfig(
   verb: String,
   metadataPrefix: Option[String] = None,
@@ -29,6 +43,13 @@ case class OaiHarvestActorConfig(
       token.map("resumptionToken" -> _)
 }
 
+/** Trait for recording back pressure on an actor.
+ *
+ *  If an actor is hitting rate limits, it can apply back pressure to
+ *  upstream actors to slow the rate of incoming messages.  This trait
+ *  records how many times a slowdown message has been received, and how long
+ *  the throttled actor should wait before processing its next message.
+ */
 trait Throttlable {
   val agent = Agent(1)
   val throttleStep = 10L
@@ -44,6 +65,12 @@ trait Throttlable {
     )(_)
 }
 
+/** Actor for making HTTP requests to the OAI-PMH
+ *
+ *  This actor does minimal parsing of the responses: it extracts the
+ *  resumptionToken, but then passes the entire response body to the parser
+ *  actor for full parsing.
+ */
 @Named("OaiHarvestActor")
 class OaiHarvestActor @Inject()(
   actorRegister: ActorRegister,
@@ -58,6 +85,11 @@ class OaiHarvestActor @Inject()(
   def receive = {
     case config: OaiHarvestActorConfig => {
 
+      // The OAI-PMH uses a resumptionToken provided in the response to
+      // point to the next page of results.  If we find one, we need to make
+      // another request to the OAI-PMH; if not, we're on the final page
+      // of results.  For more details, see
+      // http://www.openarchives.org/OAI/2.0/guidelines-harvester.htm
       parserService.oaiHarvestRequest(config).collect {
         case ParsedOaiResult(result, resumptionToken) => {
           actorRegister.send("oaiParserActor", result)
@@ -77,6 +109,11 @@ class OaiHarvestActor @Inject()(
       }
     }
 
+    // If the DynamoRecordWriter hits write limits on DynamoDB, it asks
+    // this actor to slow down fetching records from DynamoDB.  The agent
+    // tracks how often we've been asked to slow down.
+    //
+    // This stops us from over-buffering records and running out of memory.
     case SlowDown(m) => {
       info(s"Received SlowDown message: ${m}")
       info(s"Notifying rate throttle (currently ${agent.get})")
