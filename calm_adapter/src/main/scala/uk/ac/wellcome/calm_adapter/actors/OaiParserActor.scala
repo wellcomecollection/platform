@@ -11,17 +11,8 @@ import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.platform.calm_adapter.services._
 
-// This actor parses the "XML" response returned by the OAI-PMH harvest.
-// It produces Map(String, String) instances of the key/value pairs in
-// the records, and sends them for further processing.  It also starts
-// subsequent OAI requests if necessary.
-//
-// The OAI intersperses unescaped HTML with the XML, so we can't use
-// an XML parser.  Instead this class is implemented as a combination
-// of regexes and stream parsers.
 
-/**
- * Tells the dynamoRecordWriterActor that the oaiParserActor is done.
+/** Tells the dynamoRecordWriterActor that the oaiParserActor is done.
  *
  * We don't send an Akka PoisonPill because that immediately drops any
  * messages that arrive after it on the queue.  This is just a signal not
@@ -30,6 +21,7 @@ import uk.ac.wellcome.platform.calm_adapter.services._
 case class PoisonPillWrapper()
 
 
+/** Actor for parsing records from the OAI-PMH responses. */
 @Named("OaiParserActor")
 class OaiParserActor @Inject()(
   actorRegister: ActorRegister,

@@ -21,11 +21,13 @@ case class ParsedOaiResult(
   resumptionToken: Option[String]
 )
 
+/** Service for parsing results from the OAI-PMH. */
 @Singleton
 class OaiParserService @Inject()(
   oaiHarvestConfig: OaiHarvestConfig
 ) extends Logging {
 
+  /** Make an HTTP request against the OAI-PMH. */
   def oaiHarvestRequest(config: OaiHarvestActorConfig) =
     Future {
       val url = UrlUtil.buildUri(oaiHarvestConfig.oaiUrl, config.toMap)
@@ -42,7 +44,6 @@ class OaiParserService @Inject()(
   //                      b9d70a81-2154-40c8-b27c-ee8d8c3f28e7:0
   //     </resumptionToken>
   //
-
   val resumptionTokenPattern =
     "<resumptionToken[^>]*>([^>]+)</resumptionToken>".r("token")
 
@@ -71,23 +72,23 @@ class OaiParserService @Inject()(
 
   // This regex has to match expressions of the form
   //
-  //      </record>
-  //
-  // or
-  //
   //      <fieldName urlencoded="URL%20encoded%20field%20value">
   //
-  // where the latter may have a closing slash if the value is empty.
-  // In the latter case, we want to capture the field name and value.
-
+  // which may have a closing slash if the value is empty.  We want to
+  // capture the field name and the value.
   val streamParserPattern =
     "<([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?>".r("name", "value")
 
   def parseRecords(data: String): List[CalmDynamoRecord] = {
     data
       .split("</record>")
-      .dropRight(1) // throw away the junk at the end of a response
-      .map(streamParserPattern.findAllMatchIn) // last item?
+      // After the final </record> tag, there are some closing metadata tags
+      // on the XML response that we don't care about.  Discard them.
+      .dropRight(1)
+      .map(streamParserPattern.findAllMatchIn)
+      // Although Calm records look like a key-value store, keys are not
+      // necessarily unique!  So we may have to store multiple records for
+      // the same key -- hence List[String].
       .map(_.foldLeft(Map[String, List[String]]())(
         (memo, element) => {
           val key = element.group("name")
