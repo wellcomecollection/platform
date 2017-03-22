@@ -8,7 +8,6 @@ case class UnifiedItem(
   accessStatus: Option[String]
 )
 object UnifiedItem extends Indexable[UnifiedItem] {
-  // TODO: Resolve this try sensibly
   override def json(t: UnifiedItem): String =
     JsonUtil.toJson(t).get
 }
