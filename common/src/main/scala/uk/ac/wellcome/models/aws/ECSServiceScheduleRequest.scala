@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.aws
 
 case class ECSServiceScheduleRequest(cluster: String,
                                      service: String,

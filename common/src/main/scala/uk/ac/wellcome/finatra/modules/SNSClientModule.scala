@@ -4,7 +4,7 @@ import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.SNSConfig
+import uk.ac.wellcome.models.aws.SNSConfig
 
 import com.amazonaws.services.sns._
 

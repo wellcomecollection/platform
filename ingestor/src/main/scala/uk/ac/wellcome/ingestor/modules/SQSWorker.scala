@@ -6,36 +6,26 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
-import scala.util.{Try, Success, Failure}
 
-import akka.actor.{ActorSystem, Props}
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import akka.actor.{ActorSystem}
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
+import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.finatra.modules.{
   AkkaModule,
   SQSClientModule,
   SQSConfigModule
-}
-import uk.ac.wellcome.finatra.services.ElasticsearchService
-import uk.ac.wellcome.models.UnifiedItem
-import uk.ac.wellcome.models.SQSConfig
-
-import com.amazonaws.services.sqs.model.{
-  DeleteMessageRequest,
-  Message => AwsSQSMessage,
-  ReceiveMessageRequest
 }
 
 import com.amazonaws.services.sqs.AmazonSQS
 
 import uk.ac.wellcome.platform.ingestor.services.MessageProcessorService
 
-import com.sksamuel.elastic4s.ElasticClient
-import com.sksamuel.elastic4s.ElasticDsl._
-import uk.ac.wellcome.models.SQSMessage
+import com.amazonaws.services.sqs.model.{
+  Message => AwsSQSMessage,
+  ReceiveMessageRequest
+}
 
-import uk.ac.wellcome.utils.JsonUtil
 
 object SQSWorker extends TwitterModule {
   override val modules = Seq(SQSConfigModule, SQSClientModule, AkkaModule)

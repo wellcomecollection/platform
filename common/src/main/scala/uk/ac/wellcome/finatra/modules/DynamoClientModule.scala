@@ -4,7 +4,7 @@ import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.DynamoConfig
+import uk.ac.wellcome.models.aws.DynamoConfig
 
 import com.amazonaws.services.dynamodbv2._
 

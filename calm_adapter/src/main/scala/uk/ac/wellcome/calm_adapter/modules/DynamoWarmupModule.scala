@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.calm_adapter.modules
 
 import com.amazonaws.services.dynamodbv2._
-import uk.ac.wellcome.models.DynamoConfig
+import uk.ac.wellcome.models.aws.DynamoConfig
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
 import uk.ac.wellcome.finatra.modules.{

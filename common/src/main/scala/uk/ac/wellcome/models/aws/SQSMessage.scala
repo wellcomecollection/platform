@@ -1,5 +1,6 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.aws
 
+import uk.ac.wellcome.models.Message
 import com.fasterxml.jackson.annotation._
 
 case class SQSMessage(

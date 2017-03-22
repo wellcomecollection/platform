@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.models.ECSServiceScheduleRequest
+import uk.ac.wellcome.models.aws.ECSServiceScheduleRequest
 
 import akka.actor.{ActorSystem, Props, DeadLetter}
 import com.amazonaws.auth.{
@@ -28,10 +28,10 @@ import uk.ac.wellcome.finatra.modules.{
   SNSClientModule,
   SNSConfigModule
 }
-import uk.ac.wellcome.models.SNSConfig
+import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.utils._
 import scala.util.{Success, Failure}
-import uk.ac.wellcome.models.SNSMessage
+import uk.ac.wellcome.models.aws.SNSMessage
 
 object CalmAdapterWorker extends TwitterModule {
 

@@ -1,9 +1,8 @@
-package uk.ac.wellcome.aws
+package uk.ac.wellcome.models.aws
 
 import scala.concurrent.Future
 import scala.util.{Try, Success, Failure}
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.models.SQSMessage
 import com.amazonaws.services.sqs.model.{
   DeleteMessageRequest,
   Message => AwsSQSMessage

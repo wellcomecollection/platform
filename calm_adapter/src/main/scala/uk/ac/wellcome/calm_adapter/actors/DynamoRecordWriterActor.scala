@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.models.ActorRegister
-import uk.ac.wellcome.models.DynamoConfig
+import uk.ac.wellcome.models.aws.DynamoConfig
 
 
 /** Used to tell the OaiHarvestActor to slow down.

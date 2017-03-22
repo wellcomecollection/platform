@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import javax.inject.{Inject, Singleton}
 import uk.ac.wellcome.finatra.services.ElasticsearchService
-import uk.ac.wellcome.aws.MessageProcessor
+import uk.ac.wellcome.models.aws.MessageProcessor
 import scala.concurrent.Future
 import uk.ac.wellcome.models.UnifiedItem
 import uk.ac.wellcome.utils.JsonUtil
@@ -13,7 +13,7 @@ import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.models.SQSConfig
+import uk.ac.wellcome.models.aws.SQSConfig
 import com.amazonaws.services.sqs.AmazonSQS
 import scala.concurrent.ExecutionContext.Implicits.global
 
