@@ -1,9 +1,10 @@
-package uk.ac.wellcome.platform.ingestor.modules
+package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.models.SQSConfig
 
 import com.amazonaws.services.sqs._
 

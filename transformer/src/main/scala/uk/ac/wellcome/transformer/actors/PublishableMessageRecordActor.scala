@@ -7,9 +7,7 @@ import com.twitter.inject.Logging
 
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.transformer.modules.{
-  SNSMessage,
   KinesisWorker,
-  WorkerConfig,
   ActorRegistryModule
 }
 
@@ -25,7 +23,7 @@ import com.google.inject.name.Named
 @Named("PublishableMessageRecordActor")
 class PublishableMessageRecordActor @Inject()(
   actorRegister: ActorRegister,
-  workerConfig: WorkerConfig,
+  snsConfig: SNSConfig,
   snsClient: AmazonSNS
 ) extends Actor
     with Logging {
@@ -37,7 +35,7 @@ class PublishableMessageRecordActor @Inject()(
           val message = SNSMessage(
             unifiedItem.source,
             stringifiedJson,
-            workerConfig.snsTopicArn,
+            snsConfig.topicArn,
             snsClient
           )
 

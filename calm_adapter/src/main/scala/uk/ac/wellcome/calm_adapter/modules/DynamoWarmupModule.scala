@@ -1,9 +1,13 @@
 package uk.ac.wellcome.platform.calm_adapter.modules
 
 import com.amazonaws.services.dynamodbv2._
+import uk.ac.wellcome.models.DynamoConfig
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
-import uk.ac.wellcome.platform.finatra.modules._
+import uk.ac.wellcome.finatra.modules.{
+  DynamoClientModule,
+  DynamoConfigModule
+}
 import uk.ac.wellcome.utils._
 
 object DynamoWarmupModule extends TwitterModule {

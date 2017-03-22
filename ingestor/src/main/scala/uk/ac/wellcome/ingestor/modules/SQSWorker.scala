@@ -12,9 +12,14 @@ import akka.actor.{ActorSystem, Props}
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
-import uk.ac.wellcome.finatra.modules.AkkaModule
+import uk.ac.wellcome.finatra.modules.{
+  AkkaModule,
+  SQSClientModule,
+  SQSConfigModule
+}
 import uk.ac.wellcome.finatra.services.ElasticsearchService
 import uk.ac.wellcome.models.UnifiedItem
+import uk.ac.wellcome.models.SQSConfig
 
 import com.amazonaws.services.sqs.model.{
   DeleteMessageRequest,
@@ -29,7 +34,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 
 import uk.ac.wellcome.utils.JsonUtil
 
-//TODO: Use common-lib model 
+//TODO: Use common-lib model
 case class SNSMessage(
   Type: String,
   MessageId: String,

@@ -7,7 +7,6 @@ import akka.actor.{Actor, ActorSystem, PoisonPill}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.CalmDynamoRecord
 import uk.ac.wellcome.platform.calm_adapter.actors._
-import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.platform.calm_adapter.ServerMain
 
 import com.amazonaws.services.dynamodbv2._
@@ -18,6 +17,8 @@ import javax.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.models.ActorRegister
+import uk.ac.wellcome.models.DynamoConfig
+
 
 /** Used to tell the OaiHarvestActor to slow down.
  *

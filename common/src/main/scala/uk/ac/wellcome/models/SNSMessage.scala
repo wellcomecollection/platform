@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.modules
+package uk.ac.wellcome.models
 
 import scala.util.Try
 

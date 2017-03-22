@@ -6,8 +6,13 @@ import com.twitter.inject.TwitterModule
 import akka.actor.{ActorRef, ActorSystem, Props}
 
 import uk.ac.wellcome.platform.transformer.actors._
-import uk.ac.wellcome.platform.finatra.modules._
-import uk.ac.wellcome.finatra.modules.AkkaModule
+import uk.ac.wellcome.finatra.modules.{
+  AkkaModule,
+  DynamoConfigModule,
+  SNSConfigModule,
+  SNSClientModule
+}
+
 import uk.ac.wellcome.models.ActorRegister
 
 import uk.ac.wellcome.utils.GuiceAkkaExtension
@@ -21,7 +26,7 @@ object ActorRegistryModule extends TwitterModule {
   override val modules = Seq(
     DynamoConfigModule,
     AkkaModule,
-    WorkerConfigModule,
+    SNSConfigModule,
     SNSClientModule
   )
 

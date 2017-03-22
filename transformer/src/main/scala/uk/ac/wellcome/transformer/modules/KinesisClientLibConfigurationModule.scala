@@ -7,8 +7,11 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.models.DynamoConfig
 
-import uk.ac.wellcome.platform.finatra.modules._
+import uk.ac.wellcome.finatra.modules.{
+  DynamoConfigModule
+}
 
 object KinesisClientLibConfigurationModule extends TwitterModule {
   override val modules = Seq(DynamoConfigModule)

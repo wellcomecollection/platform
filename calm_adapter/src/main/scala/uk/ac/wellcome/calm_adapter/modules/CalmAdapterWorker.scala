@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.models.ECSServiceScheduleRequest
 
 import akka.actor.{ActorSystem, Props, DeadLetter}
 import com.amazonaws.auth.{
@@ -22,9 +23,14 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.ActorRegister
 
 import uk.ac.wellcome.platform.calm_adapter.actors._
-import uk.ac.wellcome.platform.finatra.modules._
-import uk.ac.wellcome.platform.finatra.modules.AkkaModule
+import uk.ac.wellcome.finatra.modules.{
+  AkkaModule,
+  SNSClientModule,
+  SNSConfigModule
+}
+import uk.ac.wellcome.models.SNSConfig
 import uk.ac.wellcome.utils._
+import scala.util.{Success, Failure}
 
 object CalmAdapterWorker extends TwitterModule {
 
@@ -70,14 +76,25 @@ object CalmAdapterWorker extends TwitterModule {
     val system = injector.instance[ActorSystem]
     system.terminate()
 
+
     val sns = injector.instance[AmazonSNS]
     val snsConfig = injector.instance[SNSConfig]
-    val snsResponse = sns.publish(
-      snsConfig.topicArn,
-      JsonUtil
-        .toJson(
-          ECSServiceScheduleRequest("service_cluster", "calm_adapter", 0))
-        .get)
-    info(s"Sent SNS shutdown request; received ${snsResponse}")
+    val snsMessage = JsonUtil
+      .toJson(
+        ECSServiceScheduleRequest(
+          "service_cluster",
+          "calm_adapter",
+          0
+        )
+      )
+
+    snsMessage match {
+      case Success(m) => {
+        val publishRequest =  sns.publish(snsConfig.topicArn, m)
+        info(s"Sent SNS shutdown request; ${publishRequest}")
+      }
+      case Failure(e) => error("Failed to send ECSServiceScheduleRequest message", e)
+    }
+
   }
 }
