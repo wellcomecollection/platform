@@ -29,6 +29,8 @@ import com.amazonaws.services.sqs.model.{
 
 import com.amazonaws.services.sqs.AmazonSQS
 
+import uk.ac.wellcome.platform.ingestor.services.MessageProcessorService
+
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import uk.ac.wellcome.models.SQSMessage
@@ -38,89 +40,36 @@ import uk.ac.wellcome.utils.JsonUtil
 object SQSWorker extends TwitterModule {
   override val modules = Seq(SQSConfigModule, SQSClientModule, AkkaModule)
 
-  def extractMessage(sqsMessage: AwsSQSMessage): Option[SQSMessage] =
-    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody) match {
-      case Success(m) => Some(m)
-      case Failure(e) => {
-        error("Invalid message structure (not via SNS?)", e)
-        None
-      }
-    }
+  val waitTime = flag("sqs.waitTime", 20, "SQS wait time")
+  val maxMessages = flag("sqs.maxMessages", 1, "Max SQS messages")
+
+  def receiveMessageRequest(queueUrl: String)  =
+    new ReceiveMessageRequest(queueUrl)
+      .withWaitTimeSeconds(waitTime())
+      .withMaxNumberOfMessages(maxMessages())
 
   def getMessages(
     client: AmazonSQS,
-    queueUrl: String,
-    waitTime: Int,
-    maxMessages: Int
+    receiveMessageRequest: ReceiveMessageRequest
   ): Seq[AwsSQSMessage] =
     client
-      .receiveMessage(
-        new ReceiveMessageRequest(queueUrl)
-          .withWaitTimeSeconds(waitTime)
-          .withMaxNumberOfMessages(maxMessages)
-      )
-      .getMessages
-      .asScala
-      .toList
-
-  def deleteMessage(client: AmazonSQS,
-                    queueUrl: String,
-                    message: AwsSQSMessage): Unit =
-    client.deleteMessage(
-      new DeleteMessageRequest(queueUrl, message.getReceiptHandle))
-
-  def chooseProcessor(subject: String)
-    : Option[(String, ElasticsearchService) => Future[Unit]] = {
-    PartialFunction.condOpt(subject) {
-      case "example" => indexDocument
-    }
-  }
-
-  //TODO: Extract processors out, everything else into a base trait
-  def indexDocument(
-    document: String,
-    elasticsearchService: ElasticsearchService
-  ): Future[Unit] = Future {
-    implicit val jsonMapper = UnifiedItem
-
-    JsonUtil
-      .fromJson[UnifiedItem](document)
-      .map(item => {
-        elasticsearchService.client.execute {
-          //TODO: Push index and type to config?
-          indexInto("records" / "item").doc(item)
-        }.await
-      })
-  }
+      .receiveMessage(receiveMessageRequest)
+      .getMessages.asScala.toList
 
   @tailrec
   def processMessages(
-    client: AmazonSQS,
-    queueUrl: String,
-    elasticsearchService: ElasticsearchService
+    sqsClient: AmazonSQS,
+    sqsConfig: SQSConfig,
+    messageProcessorService: MessageProcessorService
   ): Unit = {
-    for (msg <- getMessages(client = client,
-                            queueUrl = queueUrl,
-                            waitTime = 20,
-                            maxMessages = 1)) {
-      val future = for {
-        message <- Future(extractMessage(msg).get)
+    val messageRequest = receiveMessageRequest(sqsConfig.queueUrl)
 
-        processorOption = message.subject.flatMap(chooseProcessor)
+    getMessages(
+      sqsClient,
+      messageRequest
+    ).map(messageProcessorService.processMessage)
 
-        processor <- Future(processorOption.getOrElse({
-          error(s"Unrecognised message subject ${message.subject}")
-          throw new RuntimeException("Failed to process message")
-        }))
-
-        _ = processor.apply(message.body, elasticsearchService)
-
-      } yield ()
-
-      future.onSuccess { case _ => deleteMessage(client, queueUrl, msg) }
-    }
-
-    processMessages(client, queueUrl, elasticsearchService)
+    processMessages(sqsClient, sqsConfig, messageProcessorService)
   }
 
   override def singletonStartup(injector: Injector) {
@@ -130,11 +79,11 @@ object SQSWorker extends TwitterModule {
 
     val sqsClient = injector.instance[AmazonSQS]
     val sqsConfig = injector.instance[SQSConfig]
-    val elasticsearchService = injector.instance[ElasticsearchService]
+    val messageProcessorService = injector.instance[MessageProcessorService]
 
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS)
-    )(processMessages(sqsClient, sqsConfig.queueUrl, elasticsearchService))
+    )(processMessages(sqsClient, sqsConfig, messageProcessorService))
   }
 
   override def singletonShutdown(injector: Injector) {

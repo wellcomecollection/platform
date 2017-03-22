@@ -77,7 +77,6 @@ object CalmAdapterWorker extends TwitterModule {
     val system = injector.instance[ActorSystem]
     system.terminate()
 
-
     val snsClient = injector.instance[AmazonSNS]
     val snsConfig = injector.instance[SNSConfig]
 
