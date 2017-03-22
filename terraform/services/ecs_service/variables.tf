@@ -1,3 +1,13 @@
+variable "alb_priority" {
+  description = "ALB listener rule priority"
+  default     = "100"
+}
+
+variable "desired_count" {
+  description = "Desired task count per service"
+  default     = "1"
+}
+
 variable "service_name" {
   description = "Name of the ECS service to create"
 }

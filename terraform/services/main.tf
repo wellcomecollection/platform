@@ -8,6 +8,8 @@ module "service" {
   container_port      = "${var.container_port}"
   listener_arn        = "${var.listener_arn}"
   path_pattern        = "${var.path_pattern}"
+  alb_priority        = "${var.alb_priority}"
+  desired_count       = "${var.desired_count}"
 }
 
 module "task" {

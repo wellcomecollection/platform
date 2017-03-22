@@ -1,6 +1,6 @@
 module "calm_adapter" {
   source         = "./services"
-  service_name   = "calm_adapter"
+  service_name   = "calm-adapter"
   cluster_id     = "${aws_ecs_cluster.services.id}"
   task_name      = "calm_adapter"
   task_role_arn  = "${module.ecs_services_iam.task_role_arn}"
@@ -10,6 +10,8 @@ module "calm_adapter" {
   image_uri      = "${aws_ecr_repository.calm_adapter.repository_url}:${var.release_id}"
   listener_arn   = "${module.services_alb.listener_arn}"
   path_pattern   = "/calm_adapter/*"
+  alb_priority   = "101"
+  desired_count  = "0"
 }
 
 module "transformer" {
@@ -24,6 +26,7 @@ module "transformer" {
   image_uri      = "${aws_ecr_repository.transformer.repository_url}:${var.release_id}"
   listener_arn   = "${module.services_alb.listener_arn}"
   path_pattern   = "/transformer/*"
+  alb_priority   = "100"
 }
 
 module "api" {
