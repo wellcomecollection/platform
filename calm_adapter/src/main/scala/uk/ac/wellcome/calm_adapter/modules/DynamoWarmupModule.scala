@@ -25,7 +25,6 @@ object DynamoWarmupModule extends TwitterModule {
 
       if (dynamoConfig.table == "") {
         error("DynamoDB table name must not be empty")
-        System.exit(1)
       }
 
       (new DynamoUpdateWriteCapacityCapable {
