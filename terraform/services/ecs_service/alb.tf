@@ -11,7 +11,7 @@ resource "aws_alb_target_group" "ecs_service" {
 
 resource "aws_alb_listener_rule" "rule" {
   listener_arn = "${var.listener_arn}"
-  priority     = 100
+  priority     = "${var.alb_priority}"
 
   action {
     type             = "forward"
