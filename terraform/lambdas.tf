@@ -4,11 +4,17 @@
   This is triggered by updates to an SNS topic.
  */
 
+data "archive_file" "update_ecs_service_size" {
+  type        = "zip"
+  source_file = "../lambdas/update_ecs_service_size.py"
+  output_path = "/tmp/update_ecs_service_size.zip"
+}
+
 module "update_ecs_service_size_lambda" {
   source      = "./lambda"
   name        = "update_ecs_service_size"
   description = "Update the desired count of an ECS service"
-  filename    = "../lambdas/update_ecs_service_size.py.zip"
+  filename    = "${data.archive_file.update_ecs_service_size.output_path}"
 }
 
 resource "aws_iam_role_policy" "update_ecs_service_size_policy" {
@@ -49,11 +55,17 @@ resource "aws_lambda_permission" "with_sns" {
   Lambda for publishing ECS service schedules to an SNS topic.
  */
 
+data "archive_file" "publish_to_sns_lambda" {
+  type        = "zip"
+  source_file = "../lambdas/publish_to_sns_lambda.py"
+  output_path = "/tmp/publish_to_sns_lambda.zip"
+}
+
 module "publish_to_sns_lambda" {
   source      = "./lambda"
   name        = "publish_to_sns"
   description = "Publish an ECS service schedule to SNS"
-  filename    = "../lambdas/publish_to_sns.py.zip"
+  filename    = "${data.archive_file.publish_to_sns.output_path}"
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
