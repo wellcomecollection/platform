@@ -18,7 +18,8 @@ object OaiHarvestConfigModule extends TwitterModule {
   private val oaiDaysToFetch = flag(
     name = "oaiDaysToFetch",
     default = 3L,
-    help = "How many days of records to fetch from the OAI"
+    help = ("How many days of records to fetch from the OAI. " ++
+            "Set to -1 to fetch all records.")
   )
 
   @Singleton

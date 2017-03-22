@@ -87,7 +87,14 @@ class OaiParserService @Inject()(
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     val today = LocalDate.now()
-    val afterDate = today.minusDays(oaiHarvestConfig.oaiDaysToFetch)
+    val afterDate = if (oaiHarvestConfig.oaiDaysToFetch == -1) {
+      LocalDate.MIN
+    } else {
+      today.minusDays(oaiHarvestConfig.oaiDaysToFetch)
+    }
+    if (afterDate != LocalDate.MIN) {
+      info(s"Only fetching records from after ${afterDate}")
+    }
 
     data
       .split("</record>")
