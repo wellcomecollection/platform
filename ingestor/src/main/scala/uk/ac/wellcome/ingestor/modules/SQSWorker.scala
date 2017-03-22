@@ -23,7 +23,7 @@ import uk.ac.wellcome.models.SQSConfig
 
 import com.amazonaws.services.sqs.model.{
   DeleteMessageRequest,
-  Message => SQSMessage,
+  Message => AwsSQSMessage,
   ReceiveMessageRequest
 }
 
@@ -31,27 +31,15 @@ import com.amazonaws.services.sqs.AmazonSQS
 
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
+import uk.ac.wellcome.models.SQSMessage
 
 import uk.ac.wellcome.utils.JsonUtil
-
-//TODO: Use common-lib model
-case class SNSMessage(
-  Type: String,
-  MessageId: String,
-  TopicArn: String,
-  Subject: Option[String],
-  Timestamp: String,
-  Message: String
-) {
-  def getBody(): String = Message
-  def getSubject(): Option[String] = Subject
-}
 
 object SQSWorker extends TwitterModule {
   override val modules = Seq(SQSConfigModule, SQSClientModule, AkkaModule)
 
-  def extractSNSMessage(sqsMessage: SQSMessage): Option[SNSMessage] =
-    JsonUtil.fromJson[SNSMessage](sqsMessage.getBody) match {
+  def extractMessage(sqsMessage: AwsSQSMessage): Option[SQSMessage] =
+    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody) match {
       case Success(m) => Some(m)
       case Failure(e) => {
         error("Invalid message structure (not via SNS?)", e)
@@ -64,7 +52,7 @@ object SQSWorker extends TwitterModule {
     queueUrl: String,
     waitTime: Int,
     maxMessages: Int
-  ): Seq[SQSMessage] =
+  ): Seq[AwsSQSMessage] =
     client
       .receiveMessage(
         new ReceiveMessageRequest(queueUrl)
@@ -77,7 +65,7 @@ object SQSWorker extends TwitterModule {
 
   def deleteMessage(client: AmazonSQS,
                     queueUrl: String,
-                    message: SQSMessage): Unit =
+                    message: AwsSQSMessage): Unit =
     client.deleteMessage(
       new DeleteMessageRequest(queueUrl, message.getReceiptHandle))
 
@@ -116,16 +104,16 @@ object SQSWorker extends TwitterModule {
                             waitTime = 20,
                             maxMessages = 1)) {
       val future = for {
-        message <- Future(extractSNSMessage(msg).get)
+        message <- Future(extractMessage(msg).get)
 
-        processorOption = message.getSubject().flatMap(chooseProcessor)
+        processorOption = message.subject.flatMap(chooseProcessor)
 
         processor <- Future(processorOption.getOrElse({
-          error(s"Unrecognised message subject ${message.getSubject()}")
+          error(s"Unrecognised message subject ${message.subject}")
           throw new RuntimeException("Failed to process message")
         }))
 
-        _ = processor.apply(message.getBody(), elasticsearchService)
+        _ = processor.apply(message.body, elasticsearchService)
 
       } yield ()
 

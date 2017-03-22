@@ -31,6 +31,7 @@ import uk.ac.wellcome.finatra.modules.{
 import uk.ac.wellcome.models.SNSConfig
 import uk.ac.wellcome.utils._
 import scala.util.{Success, Failure}
+import uk.ac.wellcome.models.SNSMessage
 
 object CalmAdapterWorker extends TwitterModule {
 
@@ -77,9 +78,10 @@ object CalmAdapterWorker extends TwitterModule {
     system.terminate()
 
 
-    val sns = injector.instance[AmazonSNS]
+    val snsClient = injector.instance[AmazonSNS]
     val snsConfig = injector.instance[SNSConfig]
-    val snsMessage = JsonUtil
+
+    val messageBody = JsonUtil
       .toJson(
         ECSServiceScheduleRequest(
           "service_cluster",
@@ -88,13 +90,17 @@ object CalmAdapterWorker extends TwitterModule {
         )
       )
 
-    snsMessage match {
-      case Success(m) => {
-        val publishRequest =  sns.publish(snsConfig.topicArn, m)
+    messageBody match {
+      case Success(body) => {
+        val publishRequest = SNSMessage(
+          body = body,
+          topic = snsConfig.topicArn,
+          snsClient = snsClient
+        ).publish
+
         info(s"Sent SNS shutdown request; ${publishRequest}")
       }
       case Failure(e) => error("Failed to send ECSServiceScheduleRequest message", e)
     }
-
   }
 }
