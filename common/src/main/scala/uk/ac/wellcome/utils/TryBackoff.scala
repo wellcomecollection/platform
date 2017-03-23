@@ -17,8 +17,8 @@ import akka.actor.{ActorSystem}
 import com.twitter.inject.Logging
 
 trait TryBackoff extends Logging {
-  val baseWaitMillis = 50
-  val maxAttempts  = 6
+  val baseWaitMillis = 100
+  val maxAttempts  = 75
 
   def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
 
@@ -39,7 +39,7 @@ trait TryBackoff extends Logging {
     if(nextAttempt > maxAttempts)
       throw new RuntimeException("Max retry attempts exceeded")
 
-    val waitTime = pow(baseWaitMillis, (attempt / 2)).toLong
+    val waitTime = pow(baseWaitMillis, (attempt / (baseWaitMillis / 4))).toLong
 
     system.scheduler.scheduleOnce(
       Duration.create(waitTime, TimeUnit.MILLISECONDS)
