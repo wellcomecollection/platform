@@ -13,7 +13,7 @@ import uk.ac.wellcome.models.CalmDynamoRecord
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.platform.calm_adapter.modules.OaiHarvestConfig
+import uk.ac.wellcome.platform.calm_adapter.models.OaiHarvestConfig
 import uk.ac.wellcome.platform.calm_adapter.actors.OaiHarvestActorConfig
 import uk.ac.wellcome.utils.UrlUtil
 import scala.concurrent.Future
