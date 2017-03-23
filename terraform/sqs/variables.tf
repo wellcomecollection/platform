@@ -18,3 +18,8 @@ variable "aws_region" {
 variable "account_id" {
   description = "AWS account id for account to create queue in"
 }
+
+variable "max_recieve_count" {
+  description = "Max recieve count before sending to DLQ"
+  default     = "4"
+}
