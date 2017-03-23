@@ -1,4 +1,6 @@
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
+/* Configures a Cloudwatch trigger for a Lambda */
+
+resource "aws_lambda_permission" "allow_cloudwatch_trigger" {
   statement_id  = "AllowExecutionFromCloudWatch_${var.lambda_function_name}"
   action        = "lambda:InvokeFunction"
   function_name = "${var.lambda_function_name}"
