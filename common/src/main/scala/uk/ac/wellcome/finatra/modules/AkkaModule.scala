@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.finatra.modules
+package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 import uk.ac.wellcome.utils.GuiceAkkaExtension

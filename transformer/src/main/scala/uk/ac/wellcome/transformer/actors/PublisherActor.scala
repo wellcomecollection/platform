@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.actors
 import akka.actor.Actor
 import com.twitter.inject.Logging
 
-import uk.ac.wellcome.platform.transformer.modules.PublishableMessage
+import uk.ac.wellcome.models.PublishableMessage
 
 import scala.util.Success
 import scala.util.Failure

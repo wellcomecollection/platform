@@ -12,9 +12,9 @@ import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.twitter.inject.{Injector, Logging, TwitterModule}
+import uk.ac.wellcome.models.aws.DynamoConfig
 
-import uk.ac.wellcome.platform.finatra.modules._
-import uk.ac.wellcome.platform.transformer.modules._
+import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule}
 
 object KinesisWorker extends TwitterModule {
   override val modules = Seq(StreamsRecordProcessorFactoryModule,

@@ -69,4 +69,7 @@ object Dependencies {
 
   val calmAdapterDependencies
     : Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+
+  val ingestorDependencies: Seq[ModuleID] = commonDependencies
+
 }

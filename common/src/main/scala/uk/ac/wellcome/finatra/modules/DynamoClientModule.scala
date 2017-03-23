@@ -1,9 +1,10 @@
-package uk.ac.wellcome.platform.finatra.modules
+package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.models.aws.DynamoConfig
 
 import com.amazonaws.services.dynamodbv2._
 
@@ -20,7 +21,8 @@ object DynamoClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesDynamoAsyncClient(dynamoConfig: DynamoConfig): AmazonDynamoDBAsync =
+  def providesDynamoAsyncClient(
+    dynamoConfig: DynamoConfig): AmazonDynamoDBAsync =
     AmazonDynamoDBAsyncClientBuilder
       .standard()
       .withRegion(dynamoConfig.region)

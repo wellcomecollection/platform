@@ -19,12 +19,12 @@ object OaiHarvestConfigModule extends TwitterModule {
     name = "oaiDaysToFetch",
     default = 3L,
     help = ("How many days of records to fetch from the OAI. " ++
-            "Set to -1 to fetch all records.")
+      "Set to -1 to fetch all records.")
   )
 
   @Singleton
   @Provides
-  def providesOaiHarvestConfig(): OaiHarvestConfig = OaiHarvestConfig(
-    oaiUrl(), oaiDaysToFetch())
+  def providesOaiHarvestConfig(): OaiHarvestConfig =
+    OaiHarvestConfig(oaiUrl(), oaiDaysToFetch())
 
 }

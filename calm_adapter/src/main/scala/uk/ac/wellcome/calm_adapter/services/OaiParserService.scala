@@ -114,9 +114,9 @@ class OaiParserService @Inject()(
         }
       ))
       .filter(data => {
-        val lastModified = data.getOrElse("Modified",
-          data.getOrElse("Created", List("1970/01/01"))
-        ).head
+        val lastModified = data
+          .getOrElse("Modified", data.getOrElse("Created", List("1970/01/01")))
+          .head
         val lastModifiedDate = LocalDate.parse(lastModified, formatter)
         lastModifiedDate.compareTo(afterDate) >= 0
       })

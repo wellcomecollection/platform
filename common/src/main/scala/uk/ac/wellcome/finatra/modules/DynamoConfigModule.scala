@@ -1,14 +1,10 @@
-package uk.ac.wellcome.platform.finatra.modules
+package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-
-case class DynamoConfig(region: String,
-                        applicationName: String,
-                        arn: String,
-                        table: String)
+import uk.ac.wellcome.models.aws.DynamoConfig
 
 object DynamoConfigModule extends TwitterModule {
   private val region = flag[String]("aws.region", "eu-west-1", "AWS region")
