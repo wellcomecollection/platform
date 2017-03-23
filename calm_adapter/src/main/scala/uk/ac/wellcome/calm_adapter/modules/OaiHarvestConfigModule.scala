@@ -5,7 +5,7 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 
-case class OaiHarvestConfig(oaiUrl: String, oaiDaysToFetch: Long)
+import uk.ac.wellcome.platform.calm_adapter.models.OaiHarvestConfig
 
 object OaiHarvestConfigModule extends TwitterModule {
 
