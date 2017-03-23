@@ -18,12 +18,9 @@ import com.twitter.inject.Logging
 
 trait TryBackoff extends Logging {
   val baseWaitMillis = 50
-  val maxAttempts  = 7
+  val maxAttempts  = 6
 
   def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
-
-    if(attempt > maxAttempts)
-      throw new RuntimeException("Max retry attempts exceeded")
 
     val nextAttemptTry: Try[Int] = Try {
       f(); 0
@@ -38,6 +35,9 @@ trait TryBackoff extends Logging {
       case Success(attempt) => attempt
       case Failure(e) => throw e; 0
     }
+
+    if(nextAttempt > maxAttempts)
+      throw new RuntimeException("Max retry attempts exceeded")
 
     val waitTime = pow(baseWaitMillis, (attempt / 2)).toLong
 
