@@ -19,19 +19,19 @@ import akka.actor.{Actor, ActorSystem, PoisonPill}
 import akka.agent.Agent
 
 /** Configuration for the OAI harvest actor.
- *
- *  Parameters correspond to query parameters passed in the HTTP request.
- *
- *  @param verb: An OAI-PMH verb.  For a list of valid verbs, see
- *               https://www.openarchives.org/OAI/openarchivesprotocol.html#ProtocolMessages
- *  @param metadataPrefix: The metadata format to return. See
- *               http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces
- *  @param token: The resumption token, used for fetching multiple pages of
- *               results.  See http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
- *
- *  Note: It is an OAI-PMH error to specify a metadata prefix and a
- *  resumption token in the same request.
- */
+  *
+  *  Parameters correspond to query parameters passed in the HTTP request.
+  *
+  *  @param verb: An OAI-PMH verb.  For a list of valid verbs, see
+  *               https://www.openarchives.org/OAI/openarchivesprotocol.html#ProtocolMessages
+  *  @param metadataPrefix: The metadata format to return. See
+  *               http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces
+  *  @param token: The resumption token, used for fetching multiple pages of
+  *               results.  See http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
+  *
+  *  Note: It is an OAI-PMH error to specify a metadata prefix and a
+  *  resumption token in the same request.
+  */
 case class OaiHarvestActorConfig(
   verb: String,
   metadataPrefix: Option[String] = None,
@@ -44,12 +44,12 @@ case class OaiHarvestActorConfig(
 }
 
 /** Trait for recording back pressure on an actor.
- *
- *  If an actor is hitting rate limits, it can apply back pressure to
- *  upstream actors to slow the rate of incoming messages.  This trait
- *  records how many times a slowdown message has been received, and how long
- *  the throttled actor should wait before processing its next message.
- */
+  *
+  *  If an actor is hitting rate limits, it can apply back pressure to
+  *  upstream actors to slow the rate of incoming messages.  This trait
+  *  records how many times a slowdown message has been received, and how long
+  *  the throttled actor should wait before processing its next message.
+  */
 trait Throttlable {
   val agent = Agent(1)
   val throttleStep = 10L
@@ -66,11 +66,11 @@ trait Throttlable {
 }
 
 /** Actor for making HTTP requests to the OAI-PMH
- *
- *  This actor does minimal parsing of the responses: it extracts the
- *  resumptionToken, but then passes the entire response body to the parser
- *  actor for full parsing.
- */
+  *
+  *  This actor does minimal parsing of the responses: it extracts the
+  *  resumptionToken, but then passes the entire response body to the parser
+  *  actor for full parsing.
+  */
 @Named("OaiHarvestActor")
 class OaiHarvestActor @Inject()(
   actorRegister: ActorRegister,

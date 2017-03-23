@@ -11,15 +11,13 @@ import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.platform.calm_adapter.services._
 
-
 /** Tells the dynamoRecordWriterActor that the oaiParserActor is done.
- *
- * We don't send an Akka PoisonPill because that immediately drops any
- * messages that arrive after it on the queue.  This is just a signal not
- * to expect anything else to arrive.
- */
+  *
+  * We don't send an Akka PoisonPill because that immediately drops any
+  * messages that arrive after it on the queue.  This is just a signal not
+  * to expect anything else to arrive.
+  */
 case class PoisonPillWrapper()
-
 
 /** Actor for parsing records from the OAI-PMH responses. */
 @Named("OaiParserActor")

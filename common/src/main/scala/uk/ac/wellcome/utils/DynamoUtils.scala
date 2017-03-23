@@ -6,7 +6,6 @@ import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.document._
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput
 
-
 trait DynamoUpdateWriteCapacityCapable {
   val client: AmazonDynamoDB
 
@@ -25,8 +24,12 @@ trait DynamoUpdateWriteCapacityCapable {
     table
       .getDescription()
       .getGlobalSecondaryIndexes()
-      .map { index => table.getIndex(index.getIndexName()) }
-      .map { index => index.updateGSI(newThroughput) }
+      .map { index =>
+        table.getIndex(index.getIndexName())
+      }
+      .map { index =>
+        index.updateGSI(newThroughput)
+      }
 
     table.updateTable(newThroughput)
   }

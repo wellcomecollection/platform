@@ -4,19 +4,14 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.util.Try
 
 trait Transformable {
-  def transform: Try[CleanedRecord]
+  def transform: Try[UnifiedItem]
 }
-
-case class CleanedRecord(
-  source: String,
-  accessStatus: Option[String]
-)
 
 case class DirtyCalmRecord(
   AccessStatus: Option[String]
 ) extends Transformable {
-  def transform: Try[CleanedRecord] = Try {
-    CleanedRecord(
+  def transform: Try[UnifiedItem] = Try {
+    UnifiedItem(
       "Foo",
       accessStatus = AccessStatus
     )
@@ -31,7 +26,7 @@ case class CalmDynamoRecord(
   data: String
 ) extends Transformable {
 
-  def transform: Try[CleanedRecord] =
+  def transform: Try[UnifiedItem] =
     JsonUtil
       .fromJson[DirtyCalmRecord](data)
       .flatMap(_.transform)

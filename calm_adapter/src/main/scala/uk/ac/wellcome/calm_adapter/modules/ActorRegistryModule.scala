@@ -5,7 +5,6 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import akka.actor.{ActorRef, ActorSystem, Props}
 
-import uk.ac.wellcome.platform.finatra.modules._
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.platform.calm_adapter.services._
 
@@ -15,6 +14,12 @@ import uk.ac.wellcome.models.ActorRegister
 
 import akka.actor.Actor
 import com.google.inject.name.Names
+
+import uk.ac.wellcome.finatra.modules.{
+  DynamoClientModule,
+  DynamoConfigModule,
+  AkkaModule
+}
 
 object ActorRegistryModule extends TwitterModule {
 
