@@ -6,6 +6,7 @@ import akka.actor.Actor
 import com.twitter.inject.Logging
 
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.aws._
 import uk.ac.wellcome.platform.transformer.modules.{
   KinesisWorker,
   ActorRegistryModule
@@ -33,7 +34,7 @@ class PublishableMessageRecordActor @Inject()(
       JsonUtil.toJson(unifiedItem) match {
         case Success(stringifiedJson) => {
           val message = SNSMessage(
-            unifiedItem.source,
+            Some(unifiedItem.source),
             stringifiedJson,
             snsConfig.topicArn,
             snsClient
