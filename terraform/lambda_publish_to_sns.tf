@@ -12,10 +12,10 @@ module "update_ecs_service_size_lambda" {
 }
 
 module "update_ecs_service_size_trigger" {
-  source              = "./lambda/trigger_sns"
+  source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.update_ecs_service_size_lambda.function_name}"
-  lambda_function_arn = "${module.update_ecs_service_size_lambda.arn}"
-  sns_trigger_arn     = "${aws_sns_topic.service_scheduler_topic.arn}"
+  lambda_function_arn  = "${module.update_ecs_service_size_lambda.arn}"
+  sns_trigger_arn      = "${aws_sns_topic.service_scheduler_topic.arn}"
 }
 
 resource "aws_iam_role_policy" "update_ecs_service_size_policy" {
