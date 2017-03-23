@@ -10,5 +10,3 @@ case class SQSMessage(
   @JsonProperty("Type") messageType: String,
   @JsonProperty("Timestamp") timestamp: String
 ) extends Message
-
-

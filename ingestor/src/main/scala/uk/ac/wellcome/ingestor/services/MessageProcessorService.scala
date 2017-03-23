@@ -17,7 +17,6 @@ import uk.ac.wellcome.models.aws.SQSConfig
 import com.amazonaws.services.sqs.AmazonSQS
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 @Singleton
 class MessageProcessorService @Inject()(
   @Flag("es.index") esIndex: String,
@@ -30,8 +29,7 @@ class MessageProcessorService @Inject()(
   val client = sqsClient
   val queueUrl = sqsConfig.queueUrl
 
-  def chooseProcessor(subject: String)
-    : Option[(String) => Future[Unit]] = {
+  def chooseProcessor(subject: String): Option[(String) => Future[Unit]] = {
     PartialFunction.condOpt(subject) {
       case "example" => indexDocument
     }

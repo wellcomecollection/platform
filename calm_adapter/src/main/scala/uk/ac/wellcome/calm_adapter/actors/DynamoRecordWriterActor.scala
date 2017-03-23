@@ -19,12 +19,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-
 /** Used to tell the OaiHarvestActor to slow down.
- *
- *  This is sent when we hit write limits in DynamoDB, and we want to avoid
- *  over-buffering records within the application.
- */
+  *
+  *  This is sent when we hit write limits in DynamoDB, and we want to avoid
+  *  over-buffering records within the application.
+  */
 case class SlowDown(message: String)
 
 /** Actor for writing records to DynamoDB. */

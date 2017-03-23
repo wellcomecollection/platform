@@ -21,10 +21,8 @@ trait MessageProcessor extends Logging {
 
   def deleteMessage(message: AwsSQSMessage): Unit =
     client.deleteMessage(
-      new DeleteMessageRequest(
-        queueUrl,
-        message.getReceiptHandle)
-      )
+      new DeleteMessageRequest(queueUrl, message.getReceiptHandle)
+    )
 
   def extractMessage(sqsMessage: AwsSQSMessage): Option[SQSMessage] =
     JsonUtil.fromJson[SQSMessage](sqsMessage.getBody) match {
@@ -38,19 +36,20 @@ trait MessageProcessor extends Logging {
   def getProcessor(message: SQSMessage): Option[Processor] =
     message.subject.flatMap(chooseProcessor)
 
-  def processMessage(message: AwsSQSMessage): Future[Unit] = Future {
+  def processMessage(message: AwsSQSMessage): Future[Unit] =
+    Future {
 
-    val processOption = for {
-      message <- extractMessage(message)
-      processor <- getProcessor(message)
-    } yield processor.apply(message.body)
+      val processOption = for {
+        message <- extractMessage(message)
+        processor <- getProcessor(message)
+      } yield processor.apply(message.body)
 
-    processOption.getOrElse({
-      error(s"Unrecognised message subject.")
-      throw new RuntimeException("Failed to process message")
-    })
+      processOption.getOrElse({
+        error(s"Unrecognised message subject.")
+        throw new RuntimeException("Failed to process message")
+      })
 
-  }.map(_ => deleteMessage(message))
+    }.map(_ => deleteMessage(message))
 
   def chooseProcessor(subject: String): Option[Processor]
 }

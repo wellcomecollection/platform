@@ -99,7 +99,8 @@ object CalmAdapterWorker extends TwitterModule {
 
         info(s"Sent SNS shutdown request; ${publishRequest}")
       }
-      case Failure(e) => error("Failed to send ECSServiceScheduleRequest message", e)
+      case Failure(e) =>
+        error("Failed to send ECSServiceScheduleRequest message", e)
     }
   }
 }

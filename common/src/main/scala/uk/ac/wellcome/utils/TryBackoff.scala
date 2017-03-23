@@ -3,11 +3,7 @@ package uk.ac.wellcome.utils
 import java.util.concurrent.TimeUnit
 
 import scala.math.pow
-import scala.util.{
-  Try,
-  Success,
-  Failure
-}
+import scala.util.{Try, Success, Failure}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -18,7 +14,7 @@ import com.twitter.inject.Logging
 
 trait TryBackoff extends Logging {
   val baseWaitMillis = 100
-  val maxAttempts  = 75
+  val maxAttempts = 75
 
   def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
 
@@ -27,7 +23,7 @@ trait TryBackoff extends Logging {
     } recoverWith {
       case e: Throwable => {
         error(s"Failed to get new messages (attempt: ${attempt})")
-	Try(attempt + 1)
+        Try(attempt + 1)
       }
     }
 
@@ -36,7 +32,7 @@ trait TryBackoff extends Logging {
       case Failure(e) => throw e; 0
     }
 
-    if(nextAttempt > maxAttempts)
+    if (nextAttempt > maxAttempts)
       throw new RuntimeException("Max retry attempts exceeded")
 
     val waitTime = pow(baseWaitMillis, (attempt / (baseWaitMillis / 4))).toLong
@@ -46,5 +42,3 @@ trait TryBackoff extends Logging {
     )(run(f, system, nextAttempt))
   }
 }
-
-

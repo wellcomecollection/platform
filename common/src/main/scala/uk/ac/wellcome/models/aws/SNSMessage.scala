@@ -1,9 +1,6 @@
 package uk.ac.wellcome.models.aws
 
-import uk.ac.wellcome.models.{
-  PublishableMessage,
-  PublishAttempt
-}
+import uk.ac.wellcome.models.{PublishableMessage, PublishAttempt}
 import scala.util.Try
 
 import javax.inject.Inject

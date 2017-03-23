@@ -22,16 +22,13 @@ import com.amazonaws.services.sqs.model.{
   ReceiveMessageRequest
 }
 
-
-object SQSWorker
-  extends TwitterModule
-  with TryBackoff {
+object SQSWorker extends TwitterModule with TryBackoff {
   override val modules = Seq(SQSConfigModule, SQSClientModule, AkkaModule)
 
   val waitTime = flag("sqs.waitTime", 20, "SQS wait time")
   val maxMessages = flag("sqs.maxMessages", 1, "Max SQS messages")
 
-  def receiveMessageRequest(queueUrl: String)  =
+  def receiveMessageRequest(queueUrl: String) =
     new ReceiveMessageRequest(queueUrl)
       .withWaitTimeSeconds(waitTime())
       .withMaxNumberOfMessages(maxMessages())
@@ -42,7 +39,9 @@ object SQSWorker
   ): Seq[AwsSQSMessage] =
     client
       .receiveMessage(receiveMessageRequest)
-      .getMessages.asScala.toList
+      .getMessages
+      .asScala
+      .toList
 
   def processMessages(
     sqsClient: AmazonSQS,
@@ -68,7 +67,8 @@ object SQSWorker
     val sqsConfig = injector.instance[SQSConfig]
     val messageProcessorService = injector.instance[MessageProcessorService]
 
-    def start() = processMessages(sqsClient, sqsConfig, messageProcessorService)
+    def start() =
+      processMessages(sqsClient, sqsConfig, messageProcessorService)
 
     run(start, system)
   }
