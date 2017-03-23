@@ -33,6 +33,7 @@ Temporary Items
 # Terraform - https://terraform.io/
 .terraform
 terraform.tfstate
+terraform.plan
 terraform.tfstate.backup
 *.tfvars
 
