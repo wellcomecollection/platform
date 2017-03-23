@@ -19,7 +19,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "lambda_cloudwatch_logs" {
-  name = "lambda_cloudwatch_logs"
+  name = "${aws_iam_role.iam_role.name}_lambda_cloudwatch_logs"
   role = "${aws_iam_role.iam_role.name}"
 
   policy = <<EOF
