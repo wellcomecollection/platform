@@ -23,3 +23,11 @@ resource "aws_ecr_repository" "calm_adapter" {
     prevent_destroy = true
   }
 }
+
+resource "aws_ecr_repository" "ingestor" {
+  name = "uk.ac.wellcome/ingestor"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}

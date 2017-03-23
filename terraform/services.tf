@@ -14,6 +14,21 @@ module "calm_adapter" {
   desired_count  = "0"
 }
 
+module "ingestor" {
+  source         = "./services"
+  service_name   = "ingestor"
+  cluster_id     = "${aws_ecs_cluster.services.id}"
+  task_name      = "ingestor"
+  task_role_arn  = "${module.ecs_services_iam.task_role_arn}"
+  container_name = "ingestor"
+  container_port = "8888"
+  vpc_id         = "${module.vpc_services.vpc_id}"
+  image_uri      = "${aws_ecr_repository.ingestor.repository_url}:${var.release_id}"
+  listener_arn   = "${module.services_alb.listener_arn}"
+  path_pattern   = "/ingestor/*"
+  alb_priority   = "102"
+}
+
 module "transformer" {
   source         = "./services"
   service_name   = "transformer"
