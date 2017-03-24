@@ -55,10 +55,12 @@ variable "vpc_id" {
 
 variable "nginx_uri" {
   description = "URI of container image for nginx"
+  default     = ""
 }
 
 variable "app_uri" {
   description = "URI of container image for app"
+  default     = ""
 }
 
 variable "listener_arn" {
