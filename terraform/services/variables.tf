@@ -41,19 +41,24 @@ variable "volume_host_path" {
 
 variable "container_name" {
   description = "Primary container to expose for service"
+  default     = "nginx"
 }
 
 variable "container_port" {
   description = "Port on primary container to expose for service"
+  default     = "9000"
 }
 
 variable "vpc_id" {
   description = "ID of VPC to run service in"
 }
 
-variable "image_uri" {
-  description = "URI of container image for primary container"
-  default     = "hello-world"
+variable "nginx_uri" {
+  description = "URI of container image for nginx"
+}
+
+variable "app_uri" {
+  description = "URI of container image for app"
 }
 
 variable "listener_arn" {

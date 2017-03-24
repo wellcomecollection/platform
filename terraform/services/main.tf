@@ -18,6 +18,7 @@ module "task" {
   task_role_arn    = "${var.task_role_arn}"
   volume_name      = "${var.volume_name}"
   volume_host_path = "${var.volume_host_path}"
-  image_uri        = "${var.image_uri}"
+  app_uri          = "${var.app_uri}"
+  nginx_uri        = "${var.nginx_uri}"
   template_name    = "${var.template_name}"
 }
