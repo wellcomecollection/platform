@@ -10,13 +10,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.twitter.inject.annotations.Flag
 
 @Singleton
-class ManagementController @Inject()(
-  @Flag("service.prefix") servicePrefix: String
-) extends Controller {
-
-  prefix(servicePrefix) {
-    get("/management/healthcheck") { request: Request =>
-      response.ok.json(Map("message" -> "ok"))
-    }
+class ManagementController @Inject()() extends Controller {
+  get("/management/healthcheck") { request: Request =>
+    response.ok.json(Map("message" -> "ok"))
   }
 }

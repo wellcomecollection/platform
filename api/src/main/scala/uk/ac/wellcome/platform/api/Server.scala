@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.api
 
 import com.twitter.finagle.http.{Request, Response}
-import com.twitter.finagle.http.filter.CorsFilter
 
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{
@@ -51,7 +50,6 @@ class Server extends HttpServer {
       .filter[CommonFilters]
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
-      .filter(CorsFilter())
       .add[ManagementController]
       .add[MainController]
       .add[ContextController]
