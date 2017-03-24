@@ -7,9 +7,12 @@ variable "template_name" {
   default     = "default"
 }
 
-variable "image_uri" {
-  description = "URI of container image for primary container"
-  default     = "library/hello-world"
+variable "nginx_uri" {
+  description = "URI of container image for nginx"
+}
+
+variable "app_uri" {
+  description = "URI of container image for app"
 }
 
 variable "aws_region" {
