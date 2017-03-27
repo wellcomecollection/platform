@@ -1,15 +1,17 @@
 # transformer
 
-The transformer project takes Calm records from DynamoDB, and transforms
-them ready for being ingested into Elasticsearch.
+The Calm transformer reads Calm records from DynamoDB, and transforms them
+ready for being ingested into Elasticsearch.
 
-![](transformer_architecture.png)
+It's a Finatra web app with the actor model.  This is the architecture:
 
-The project is a Finatra app that uses the actor model internally.  Above is
-a quick sketch of the major actors.
+![](architecture.png)
 
-*   When the adapter pushes new records to DynamoDB, we have our DynamoDB
-    instance configured to send updates to a Kinesis stream.
+## Internal architecture
+
+We have a Kinesis event stream of changes coming from DynamoDB.  The
+transformer receives records from this stream, and passes them through
+five different actors:
 
 *   The `KinesisDynamoRecordExtractorActor` polls this stream for updates, and
     when it spots new updates on the stream it grabs the raw records and pushes
