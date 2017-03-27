@@ -4,8 +4,9 @@ This document contains information for developers working on the platform
 codebases.
 
 * [Repos](#repos)
-* [Tech stack](#tech_stack)
-* [Development workflow](#workflow)
+* [Tech stack](#tech-stack)
+* [Development workflow](#our-development-workflow)
+* [How deployment works](#how-deployment-works)
 
 ## Repos
 
