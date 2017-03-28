@@ -51,13 +51,6 @@ object CalmAdapterWorker extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val actorRegister = injector.instance[ActorRegister]
 
-    actorRegister.actors
-      .get("pipelineWatcherActor")
-      .map(actorRef => {
-        system.eventStream
-          .subscribe(actorRef, classOf[DeadLetter])
-      })
-
     system.scheduler.scheduleOnce(
       Duration.create(warmupTime(), TimeUnit.SECONDS)
     )(
