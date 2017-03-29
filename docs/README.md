@@ -8,6 +8,7 @@ of the API can be found elsewhere (TODO: Link).
 *   [Architecture diagram](architecture.md)
 
 *   **Adapters:**
+    -   [Adapter lifecycle](adapter_lifecycle.md)
     -   [Calm ~> DynamoDB adapter](../calm_adapter/README.md)
 
 *   **Transformers:**
