@@ -18,22 +18,20 @@ module "update_ecs_service_size_trigger" {
   sns_trigger_arn      = "${aws_sns_topic.service_scheduler_topic.arn}"
 }
 
-resource "aws_iam_role_policy" "update_ecs_service_size_policy" {
-  name = "update_ecs_service_size"
-  role = "${module.update_ecs_service_size_lambda.role_name}"
+data "aws_iam_policy_document" "update_ecs_service_size" {
+  statement {
+    actions = [
+      "ecs:UpdateService",
+    ]
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ecs:UpdateService"
-      ],
-      "Resource": "*"
-    }
-  ]
+    resources = [
+      "*",
+    ]
+  }
 }
-EOF
+
+resource "aws_iam_role_policy" "update_ecs_service_size_policy" {
+  name   = "update_ecs_service_size"
+  role   = "${module.update_ecs_service_size_lambda.role_name}"
+  policy = "${data.aws_iam_policy_document.update_ecs_service_size.json}"
 }
