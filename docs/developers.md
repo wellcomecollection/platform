@@ -58,7 +58,8 @@ Install with Homebrew:
 
 ```console
 $ brew cask install java
-$ brew install sbt scala scalafmt
+$ brew install sbt scala
+$ brew install olafurpg/scalafmt/scalafmt
 ```
 
 #### Docker
