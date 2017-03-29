@@ -26,22 +26,20 @@ module "publish_to_sns_trigger" {
 EOF
 }
 
-resource "aws_iam_role_policy" "publish_to_sns_lambda_policy" {
-  name = "publish_to_sns_policy"
-  role = "${module.publish_to_sns_lambda.role_name}"
+data "aws_iam_policy_document" "publish_to_sns" {
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sns:Publish"
-      ],
-      "Resource": "${aws_sns_topic.service_scheduler_topic.arn}"
-    }
-  ]
+    resources = [
+      "${aws_sns_topic.service_scheduler_topic.arn}",
+    ]
+  }
 }
-EOF
+
+resource "aws_iam_role_policy" "publish_to_sns_lambda_policy" {
+  name   = "publish_to_sns_policy"
+  role   = "${module.publish_to_sns_lambda.role_name}"
+  policy = "${data.aws_iam_policy_document.publish_to_sns.json}"
 }
