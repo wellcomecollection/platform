@@ -22,7 +22,7 @@ object Common {
       "-language:postfixOps"
     ),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
-  )
+  ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings
 }
 
 object Swagger {
