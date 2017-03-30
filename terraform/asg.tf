@@ -6,6 +6,8 @@ module "services_cluster_asg" {
   instance_profile_name = "${module.ecs_services_iam.instance_profile_name}"
   user_data             = "${module.services_userdata.rendered}"
   vpc_id                = "${module.vpc_services.vpc_id}"
+  asg_desired           = "2"
+  asg_max               = "4"
 }
 
 module "api_cluster_asg" {
