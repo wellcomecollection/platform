@@ -66,4 +66,5 @@ module "jenkins" {
   volume_host_path = "/mnt/efs"
   template_name    = "jenkins"
   listener_arn     = "${module.tools_alb.listener_arn}"
+  healthcheck_path = "/login"
 }
