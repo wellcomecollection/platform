@@ -90,6 +90,25 @@ data "aws_iam_policy_document" "allow_all_calm_db" {
   }
 }
 
+resource "aws_iam_role_policy" "ecs_transformer_task_dynamo" {
+  name = "ecs_task_jenkins_policy"
+  role = "${module.ecs_transformer_iam.task_role_name}"
+
+  policy = "${data.aws_iam_policy_document.dynamodb_allow_all.json}"
+}
+
+data "aws_iam_policy_document" "dynamodb_allow_all" {
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 /** Allows the transformer app to publish to the ingest topic. */
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   name = "ecs_task_jenkins_policy"
