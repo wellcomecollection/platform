@@ -34,7 +34,7 @@ class PublishableMessageRecordActor @Inject()(
       JsonUtil.toJson(unifiedItem) match {
         case Success(stringifiedJson) => {
           val message = SNSMessage(
-            Some(unifiedItem.source),
+            Some("Foo"),
             stringifiedJson,
             snsConfig.topicArn,
             snsClient
