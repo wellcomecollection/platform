@@ -71,3 +71,8 @@ variable "path_pattern" {
   description = "path pattern to match for listener rule"
   default     = "/*"
 }
+
+variable "healthcheck_path" {
+  description = "path for ECS healthcheck endpoint"
+  default     = "/management/healthcheck"
+}

@@ -10,6 +10,7 @@ module "service" {
   path_pattern        = "${var.path_pattern}"
   alb_priority        = "${var.alb_priority}"
   desired_count       = "${var.desired_count}"
+  healthcheck_path    = "${var.healthcheck_path}"
 }
 
 module "task" {

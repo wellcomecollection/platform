@@ -5,7 +5,7 @@ resource "aws_alb_target_group" "ecs_service" {
   vpc_id   = "${var.vpc_id}"
 
   health_check {
-    path = "/management/healthcheck"
+    path = "${var.healthcheck_path}"
   }
 }
 
