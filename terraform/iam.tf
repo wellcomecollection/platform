@@ -51,3 +51,23 @@ data "aws_iam_policy_document" "read_ingestor_q" {
     ]
   }
 }
+
+resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
+  name = "ecs_task_calm_adapter_policy"
+  role = "${module.calm_adapter.role_name}"
+
+  policy = "${data.aws_iam_policy_document.allow_all_calm_db.json}"
+}
+
+data "aws_iam_policy_document" "allow_all_calm_db" {
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:UpdateTable",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.calm-dynamodb-table.arn}",
+    ]
+  }
+}
