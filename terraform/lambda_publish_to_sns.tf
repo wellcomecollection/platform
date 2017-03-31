@@ -18,7 +18,7 @@ module "schedule_calm_adapter" {
 {
   "topic_arn": "${aws_sns_topic.service_scheduler_topic.arn}",
   "cluster": "${aws_ecs_cluster.services.name}",
-  "service": "calm_adapter",
+  "service": "${module.calm_adapter.service_name}",
   "desired_count": 1
 }
 EOF
