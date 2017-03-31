@@ -8,13 +8,13 @@ trait Transformable {
 }
 
 case class DirtyCalmRecord(
-  AccessStatus: Option[String]
+  AccessStatus: Array[String]
 ) extends Transformable {
   def transform: Try[UnifiedItem] = Try {
     UnifiedItem(
       "id",
       List(Identifier("source", "key", "value")),
-      accessStatus = AccessStatus
+      accessStatus = AccessStatus.headOption
     )
   }
 }
