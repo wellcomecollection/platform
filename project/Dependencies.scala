@@ -19,7 +19,8 @@ object Dependencies {
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
-    "com.typesafe.akka" %% "akka-actor" % versions.akka
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "com.typesafe.akka" %% "akka-agent" % versions.akka
   )
 
   val awsDependencies: Seq[ModuleID] = Seq(
@@ -34,6 +35,7 @@ object Dependencies {
 
   val esDependencies: Seq[ModuleID] = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test",
     "com.sksamuel.elastic4s" %% "elastic4s-xpack-security" % versions.elastic4s
   )
 
@@ -41,7 +43,6 @@ object Dependencies {
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
     "ch.qos.logback" % "logback-classic" % versions.logback,
-
     "com.twitter" %% "finatra-http" % versions.finatra % "test",
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
     "com.twitter" %% "inject-server" % versions.finatra % "test",
@@ -49,14 +50,12 @@ object Dependencies {
     "com.twitter" %% "inject-core" % versions.finatra % "test",
     "com.twitter" %% "inject-modules" % versions.finatra % "test",
     "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
-
     "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
-
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
@@ -66,6 +65,12 @@ object Dependencies {
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
   )
 
-  val transformerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+  val transformerDependencies
+    : Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+
+  val calmAdapterDependencies
+    : Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+
+  val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
 }

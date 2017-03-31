@@ -5,7 +5,6 @@ import com.sksamuel.elastic4s.ElasticClient
 
 import uk.ac.wellcome.finatra.modules.ElasticClientModule
 
-
 @Singleton
 class ElasticsearchService @Inject()(
   elasticClient: ElasticClient

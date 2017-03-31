@@ -5,35 +5,30 @@ import com.gu.scanamo.ScanamoFree
 import com.twitter.inject.Logging
 
 import uk.ac.wellcome.platform.transformer.modules._
-import uk.ac.wellcome.platform.transformer.models.CalmDynamoRecord
+import uk.ac.wellcome.models.CalmDynamoRecord
 
 import javax.inject.Inject
 import uk.ac.wellcome.platform.transformer.modules.ActorRegistryModule
-import uk.ac.wellcome.platform.transformer.modules.ActorRegister
+import uk.ac.wellcome.models.ActorRegister
 
 import com.google.inject.name.Named
-
 
 @Named("DynamoCaseClassExtractorActor")
 class DynamoCaseClassExtractorActor @Inject()(
   actorRegister: ActorRegister
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
     case record: RecordMap => {
       ScanamoFree.read[CalmDynamoRecord](record.value) match {
         case Right(o) => {
           info(s"Parsed DynamoDB record ${o}")
-
-          actorRegister.actors
-	    .get("transformActor")
-	    .map(_ ! o)
+          actorRegister.send("transformActor", o)
         }
         case Left(o) => {
           error(s"Unable to parse record ${o}")
-          // Send to dead letter queue or error
+          // TODO: Send to dead letter queue or error
         }
       }
     }
