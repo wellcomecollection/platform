@@ -77,6 +77,7 @@ resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
 data "aws_iam_policy_document" "allow_all_calm_db" {
   statement {
     actions = [
+      "dynamodb:DescribeTable",
       "dynamodb:PutItem",
       "dynamodb:UpdateTable",
     ]
