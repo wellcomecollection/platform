@@ -34,7 +34,7 @@ def change_desired_count(cluster, service, desired_count):
 
 def main(event, _):
     print('Received event: %r' % event)
-    message = event['Message']
+    message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 
     change_desired_count(
