@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_event_rule" "daily_2am" {
-  name                = "daily_2am"
-  description         = "Fires once a day at 2am"
-  schedule_expression = "cron(0 2 ? * MON-SUN *)"
+resource "aws_cloudwatch_event_rule" "weekdays_at_7am" {
+  name                = "weekdays_at_7am"
+  description         = "Fires at 7am on weekdays"
+  schedule_expression = "cron(0 7 ? * MON-FRI *)"
 }
