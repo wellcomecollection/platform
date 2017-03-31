@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "allow_all_calm_db" {
 }
 
 resource "aws_iam_role_policy" "ecs_transformer_task_dynamo" {
-  name = "ecs_task_jenkins_policy"
+  name = "ecs_task_transformer_task_dynamo_policy"
   role = "${module.ecs_transformer_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.dynamodb_allow_all.json}"
@@ -111,7 +111,7 @@ data "aws_iam_policy_document" "dynamodb_allow_all" {
 
 /** Allows the transformer app to publish to the ingest topic. */
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
-  name = "ecs_task_jenkins_policy"
+  name = "ecs_task_task_sns_policy"
   role = "${module.ecs_transformer_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.publish_to_ingest_sns.json}"
@@ -131,7 +131,7 @@ data "aws_iam_policy_document" "publish_to_ingest_sns" {
 }
 
 resource "aws_iam_role_policy" "ecs_transformer_task_kinesis_stream" {
-  name = "ecs_task_jenkins_policy"
+  name = "ecs_task_kinesis_stream_policy"
   role = "${module.ecs_transformer_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.read_calm_kinesis_stream.json}"
