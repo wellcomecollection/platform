@@ -5,15 +5,14 @@ import javax.inject.Inject
 import akka.actor.Actor
 import com.twitter.inject.Logging
 
-import uk.ac.wellcome.platform.transformer.models._
+import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.aws._
 import uk.ac.wellcome.platform.transformer.modules.{
-  SNSMessage,
   KinesisWorker,
-  WorkerConfig,
   ActorRegistryModule
 }
 
-import uk.ac.wellcome.platform.transformer.modules.ActorRegister
+import uk.ac.wellcome.models.ActorRegister
 
 import com.amazonaws.services.sns.AmazonSNS
 
@@ -22,35 +21,30 @@ import scala.util.Success
 import scala.util.Failure
 import com.google.inject.name.Named
 
-
 @Named("PublishableMessageRecordActor")
 class PublishableMessageRecordActor @Inject()(
   actorRegister: ActorRegister,
-  workerConfig: WorkerConfig,
+  snsConfig: SNSConfig,
   snsClient: AmazonSNS
-)
-  extends Actor
-  with Logging {
+) extends Actor
+    with Logging {
 
   def receive = {
-    case cleanedRecord: CleanedRecord => {
-      JsonUtil.toJson(cleanedRecord) match {
+    case unifiedItem: UnifiedItem => {
+      JsonUtil.toJson(unifiedItem) match {
         case Success(stringifiedJson) => {
           val message = SNSMessage(
-            cleanedRecord.source,
+            Some("Foo"),
             stringifiedJson,
-            workerConfig.snsTopicArn,
-	    snsClient
+            snsConfig.topicArn,
+            snsClient
           )
 
           info(s"Publishable message ${message}")
-
-          actorRegister.actors
-	    .get("publisherActor")
-	    .map(_ ! message)
+          actorRegister.send("publisherActor", message)
         }
         case Failure(e) => {
-          // Send to dead letter queue or just error
+          // TODO: Send to dead letter queue or just error
           error("Failed to convert into publishable message", e)
         }
       }
