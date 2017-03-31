@@ -1,6 +1,4 @@
-/*
-  Lambda for publishing ECS service schedules to an SNS topic.
- */
+/** Lambda for publishing ECS service schedules to an SNS topic. */
 
 module "publish_to_sns_lambda" {
   source      = "./lambda"
@@ -9,12 +7,12 @@ module "publish_to_sns_lambda" {
   filename    = "../lambdas/publish_to_sns.py"
 }
 
-module "publish_to_sns_trigger" {
+module "schedule_calm_adapter" {
   source                  = "./lambda/trigger_cloudwatch"
   lambda_function_name    = "${module.publish_to_sns_lambda.function_name}"
   lambda_function_arn     = "${module.publish_to_sns_lambda.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.once_a_day.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.once_a_day.name}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.daily_2am.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.daily_2am.name}"
 
   input = <<EOF
 {
