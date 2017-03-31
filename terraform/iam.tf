@@ -3,6 +3,21 @@ module "ecs_services_iam" {
   name   = "services"
 }
 
+module "ecs_calm_adapter_iam" {
+  source = "./ecs_iam"
+  name   = "calm_adapter"
+}
+
+module "ecs_transformer_iam" {
+  source = "./ecs_iam"
+  name   = "transformer"
+}
+
+module "ecs_ingestor_iam" {
+  source = "./ecs_iam"
+  name   = "ingestor"
+}
+
 module "ecs_api_iam" {
   source = "./ecs_iam"
   name   = "api"
@@ -34,7 +49,7 @@ data "aws_iam_policy_document" "allow_everything" {
 
 resource "aws_iam_role_policy" "ecs_ingestor_task" {
   name = "ecs_task_ingestor_policy"
-  role = "${module.ingestor.role_name}"
+  role = "${module.ecs_ingestor_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.read_ingestor_q.json}"
 }
@@ -54,7 +69,7 @@ data "aws_iam_policy_document" "read_ingestor_q" {
 
 resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
   name = "ecs_task_calm_adapter_policy"
-  role = "${module.calm_adapter.role_name}"
+  role = "${module.ecs_calm_adapter_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.allow_all_calm_db.json}"
 }
@@ -74,7 +89,7 @@ data "aws_iam_policy_document" "allow_all_calm_db" {
 
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   name = "ecs_task_jenkins_policy"
-  role = "${module.transformer.role_name}"
+  role = "${module.ecs_transformer_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.publish_to_calm_sns.json}"
 }
@@ -93,7 +108,7 @@ data "aws_iam_policy_document" "publish_to_calm_sns" {
 
 resource "aws_iam_role_policy" "ecs_transformer_task_kinesis_stream" {
   name = "ecs_task_jenkins_policy"
-  role = "${module.transformer.role_name}"
+  role = "${module.ecs_transformer_iam.task_role_name}"
 
   policy = "${data.aws_iam_policy_document.read_calm_kinesis_stream.json}"
 }
