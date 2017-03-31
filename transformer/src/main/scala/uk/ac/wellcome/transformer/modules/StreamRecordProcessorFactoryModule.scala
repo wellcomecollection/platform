@@ -16,9 +16,8 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.transformer.modules._
 import uk.ac.wellcome.models.ActorRegister
 
-class StreamsRecordProcessor(
-  client: AmazonDynamoDB,
-  reciever: Option[ActorRef]
+class StreamsRecordProcessor(client: AmazonDynamoDB,
+                             receiver: Option[ActorRef]
 ) extends IRecordProcessor {
 
   case class ExampleRecord(identifier: String)
@@ -37,8 +36,8 @@ class StreamsRecordProcessor(
     records: JList[Record],
     checkpointer: IRecordProcessorCheckpointer
   ): Unit = {
-    records.asScala.map { record =>
-      reciever.map(_ ! record)
+    records.asScala.foreach { record =>
+      receiver.foreach(_ ! record)
     }
   }
 }
