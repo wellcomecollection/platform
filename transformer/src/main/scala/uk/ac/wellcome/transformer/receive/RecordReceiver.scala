@@ -1,16 +1,14 @@
-package uk.ac.wellcome.platform.transformer.actors
+package uk.ac.wellcome.transformer.receive
 
 import javax.inject.Inject
 
-import akka.actor.Actor
-import com.amazonaws.services.dynamodbv2.model._
+import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject.name.Named
 import com.gu.scanamo.ScanamoFree
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.{SNSConfig, SNSMessage}
-import uk.ac.wellcome.models.{ActorRegister, CalmDynamoRecord, Transformable, UnifiedItem}
+import uk.ac.wellcome.models.{CalmDynamoRecord, Transformable, UnifiedItem}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
@@ -18,13 +16,8 @@ import scala.util.{Failure, Success}
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 
-@Named("KinesisDynamoRecordExtractorActor")
-class KinesisDynamoRecordExtractorActor @Inject()(
-  actorRegister: ActorRegister,
-  snsConfig: SNSConfig,
-  snsClient: AmazonSNS
-) extends Actor
-    with Logging {
+class RecordReceiver @Inject()(snsConfig: SNSConfig,
+                               snsClient: AmazonSNS) extends Logging {
 
   def prepareRecordForPublishing(unifiedItem: UnifiedItem): Future[SNSMessage] = {
     Future.fromTry(JsonUtil.toJson(unifiedItem)).transform(stringifiedJson => {
@@ -76,26 +69,25 @@ class KinesisDynamoRecordExtractorActor @Inject()(
     }
   }
 
+  def recordToRecordMap(record: RecordAdapter): Future[RecordMap] = Future {
+    val keys = record
+      .getInternalObject()
+      .getDynamodb()
+      .getNewImage()
 
-
-  def receive = {
-    case record: RecordAdapter => {
-      val keys = record
-        .getInternalObject()
-        .getDynamodb()
-        .getNewImage()
-
-      info(s"Received record ${keys}")
-
-      for {
-        o <- extractDynamoCaseClass(RecordMap(keys))
-        cleanRecord <- transformDynamoRecord(o)
-        snsMessage  <- prepareRecordForPublishing(cleanRecord)
-        _           <- publishMessage(snsMessage)
-      } yield ()
-
-      actorRegister.send("dynamoCaseClassExtractorActor", RecordMap(keys))
-    }
-    case event => error(s"Received unknown Kinesis event ${event}")
+    info(s"Received record ${keys}")
+    RecordMap(keys)
   }
+
+
+  def receiveRecord(record: RecordAdapter): Future[Unit] = {
+    for {
+      recordMap   <- recordToRecordMap(record)
+      o           <- extractDynamoCaseClass(recordMap)
+      cleanRecord <- transformDynamoRecord(o)
+      snsMessage  <- prepareRecordForPublishing(cleanRecord)
+      _           <- publishMessage(snsMessage)
+    } yield ()
+  }
+
 }
