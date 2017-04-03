@@ -36,4 +36,7 @@ lazy val ingestor = doSharedSetup(project)
 lazy val transformer = doSharedSetup(project)
   .settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
+lazy val id_minter = doSharedSetup(project)
+  .settings(libraryDependencies ++= Dependencies.idminterDependencies)
+
 lazy val root = (project in file("."))
