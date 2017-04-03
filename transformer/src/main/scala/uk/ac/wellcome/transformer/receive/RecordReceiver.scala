@@ -21,11 +21,11 @@ class RecordReceiver @Inject()(snsConfig: SNSConfig,
 
   def receiveRecord(record: RecordAdapter): Future[Unit] = {
     for {
-      recordMap   <- recordToRecordMap(record)
-      o           <- extractDynamoCaseClass(recordMap)
-      cleanRecord <- transformDynamoRecord(o)
-      snsMessage  <- prepareRecordForPublishing(cleanRecord)
-      _           <- publishMessage(snsMessage)
+      recordMap           <- recordToRecordMap(record)
+      transformableRecord <- extractTransformableCaseClass(recordMap)
+      cleanRecord         <- transformDynamoRecord(transformableRecord)
+      snsMessage          <- buildSNSMessageFrom(cleanRecord)
+      _                   <- publishMessage(snsMessage)
     } yield ()
   }
 
@@ -39,7 +39,7 @@ class RecordReceiver @Inject()(snsConfig: SNSConfig,
     RecordMap(keys)
   }
 
-  def extractDynamoCaseClass(record: RecordMap): Future[Transformable] = {
+  def extractTransformableCaseClass(record: RecordMap): Future[Transformable] = {
     Future {ScanamoFree.read[CalmDynamoRecord](record.value)}.map {
       case Right(calmDynamoRecord) =>
         info(s"Parsed DynamoDB record $calmDynamoRecord")
@@ -62,7 +62,7 @@ class RecordReceiver @Inject()(snsConfig: SNSConfig,
     }
   }
 
-  def prepareRecordForPublishing(unifiedItem: UnifiedItem): Future[SNSMessage] = {
+  def buildSNSMessageFrom(unifiedItem: UnifiedItem): Future[SNSMessage] = {
     Future{JsonUtil.toJson(unifiedItem)}.map {
       case Success(stringifiedJson) =>
         val message = SNSMessage(
