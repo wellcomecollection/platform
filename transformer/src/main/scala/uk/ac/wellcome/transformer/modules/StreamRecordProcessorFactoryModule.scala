@@ -4,6 +4,7 @@ import java.util.{List => JList}
 import javax.inject.Singleton
 
 import com.amazonaws.services.dynamodbv2._
+import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.amazonaws.services.kinesis.model.Record
@@ -34,8 +35,8 @@ class StreamsRecordProcessor(client: AmazonDynamoDB,
     records: JList[Record],
     checkpointer: IRecordProcessorCheckpointer
   ): Unit = {
-    records.asScala.foreach { record =>
-      receiver.receiveRecord(record)
+    records.asScala.foreach { (record: Record) =>
+      receiver.receiveRecord(record.asInstanceOf[RecordAdapter])
     }
   }
 }
@@ -52,7 +53,7 @@ class StreamsRecordProcessorFactory(
 }
 
 object StreamsRecordProcessorFactoryModule extends TwitterModule {
-  override val modules = Seq(ActorRegistryModule, DynamoClientModule)
+  override val modules = Seq(DynamoClientModule)
 
   @Singleton
   @Provides

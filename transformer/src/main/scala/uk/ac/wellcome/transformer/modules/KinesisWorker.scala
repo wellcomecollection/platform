@@ -1,26 +1,28 @@
 package uk.ac.wellcome.platform.transformer.modules
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.Implicits.global
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.ActorSystem
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.regions._
 import com.amazonaws.services.cloudwatch._
 import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
-import com.twitter.inject.{Injector, Logging, TwitterModule}
+import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule, SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 object KinesisWorker extends TwitterModule {
   override val modules = Seq(StreamsRecordProcessorFactoryModule,
                              KinesisClientLibConfigurationModule,
                              DynamoConfigModule,
-                             AkkaModule)
+                             AkkaModule,
+                             SNSConfigModule,
+                             SNSClientModule)
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
