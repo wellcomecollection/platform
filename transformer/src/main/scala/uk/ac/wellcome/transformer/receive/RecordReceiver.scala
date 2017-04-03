@@ -31,11 +31,11 @@ class RecordReceiver @Inject()(snsConfig: SNSConfig,
 
   def recordToRecordMap(record: RecordAdapter): Future[RecordMap] = Future {
     val keys = record
-      .getInternalObject()
-      .getDynamodb()
-      .getNewImage()
+      .getInternalObject
+      .getDynamodb
+      .getNewImage
 
-    info(s"Received record ${keys}")
+    info(s"Received record $keys")
     RecordMap(keys)
   }
 
