@@ -23,21 +23,3 @@ module "schedule_calm_adapter" {
 }
 EOF
 }
-
-data "aws_iam_policy_document" "publish_to_sns" {
-  statement {
-    actions = [
-      "sns:Publish",
-    ]
-
-    resources = [
-      "${aws_sns_topic.service_scheduler_topic.arn}",
-    ]
-  }
-}
-
-resource "aws_iam_role_policy" "publish_to_sns_lambda_policy" {
-  name   = "publish_to_sns_policy"
-  role   = "${module.publish_to_sns_lambda.role_name}"
-  policy = "${data.aws_iam_policy_document.publish_to_sns.json}"
-}
