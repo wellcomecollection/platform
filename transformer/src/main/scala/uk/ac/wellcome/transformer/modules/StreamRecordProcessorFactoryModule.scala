@@ -2,23 +2,21 @@ package uk.ac.wellcome.platform.transformer.modules
 
 import java.util.{List => JList}
 import javax.inject.Singleton
-import scala.collection.JavaConverters._
 
 import com.amazonaws.services.dynamodbv2._
+import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.amazonaws.services.kinesis.model.Record
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-
-import akka.actor.ActorRef
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.transformer.modules._
-import uk.ac.wellcome.models.ActorRegister
+import uk.ac.wellcome.transformer.receive.RecordReceiver
 
-class StreamsRecordProcessor(
-  client: AmazonDynamoDB,
-  reciever: Option[ActorRef]
+import scala.collection.JavaConverters._
+
+class StreamsRecordProcessor(client: AmazonDynamoDB,
+                             receiver: RecordReceiver
 ) extends IRecordProcessor {
 
   case class ExampleRecord(identifier: String)
@@ -37,32 +35,31 @@ class StreamsRecordProcessor(
     records: JList[Record],
     checkpointer: IRecordProcessorCheckpointer
   ): Unit = {
-    records.asScala.map { record =>
-      reciever.map(_ ! record)
+    records.asScala.foreach { (record: Record) =>
+      receiver.receiveRecord(record.asInstanceOf[RecordAdapter])
     }
   }
 }
 
 class StreamsRecordProcessorFactory(
   dynamoClient: AmazonDynamoDB,
-  actorRegister: ActorRegister
+  recordReceiver: RecordReceiver
 ) extends IRecordProcessorFactory {
 
   override def createProcessor(): IRecordProcessor =
     new StreamsRecordProcessor(dynamoClient,
-                               actorRegister.actors
-                                 .get("kinesisDynamoRecordExtractorActor"))
+                               recordReceiver)
 
 }
 
 object StreamsRecordProcessorFactoryModule extends TwitterModule {
-  override val modules = Seq(ActorRegistryModule, DynamoClientModule)
+  override val modules = Seq(DynamoClientModule)
 
   @Singleton
   @Provides
   def provideStreamsRecordProcessorFactory(
     dynamoClient: AmazonDynamoDB,
-    actorRegister: ActorRegister
+    recordReceiver: RecordReceiver
   ): StreamsRecordProcessorFactory =
-    new StreamsRecordProcessorFactory(dynamoClient, actorRegister)
+    new StreamsRecordProcessorFactory(dynamoClient, recordReceiver)
 }
