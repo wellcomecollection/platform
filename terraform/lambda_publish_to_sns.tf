@@ -11,8 +11,8 @@ module "schedule_calm_adapter" {
   source                  = "./lambda/trigger_cloudwatch"
   lambda_function_name    = "${module.publish_to_sns_lambda.function_name}"
   lambda_function_arn     = "${module.publish_to_sns_lambda.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.daily_2am.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.daily_2am.name}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.weekdays_at_7am.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.weekdays_at_7am.name}"
 
   input = <<EOF
 {
