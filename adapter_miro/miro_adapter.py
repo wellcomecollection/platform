@@ -20,6 +20,8 @@ def parse_args():
     parser.add_argument(
         '--table', help='Name of the DynamoDB table', required=True)
     parser.add_argument(
+        '--collection', help='Name of the Miro collection', required=True)
+    parser.add_argument(
         'EXPORT_PATH', help='Path to the Miro export file')
 
     return parser.parse_args()
@@ -35,7 +37,7 @@ def parse_image_data(xml_string):
         yield elem_to_dict(child)
 
 
-def push_to_dynamodb(table_name, image_data):
+def push_to_dynamodb(table_name, collection_name, image_data):
     """
     Given the name of a Dynamo table and some image data, push it
     into DynamoDB.
@@ -49,6 +51,7 @@ def push_to_dynamodb(table_name, image_data):
             batch.put_item(
                 Item={
                     'MiroID': image['image_no_calc'],
+                    'MiroCollection': collection_name,
                     'data': json.dumps(image, separators=(',', ':'))
                 }
             )
@@ -60,5 +63,6 @@ if __name__ == '__main__':
     image_data = parse_image_data(open(args.EXPORT_PATH, 'rb').read())
     push_to_dynamodb(
         table_name=args.table,
+        collection_name=args.collection,
         image_data=image_data
     )
