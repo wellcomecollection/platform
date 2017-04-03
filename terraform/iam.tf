@@ -67,6 +67,7 @@ data "aws_iam_policy_document" "read_ingestor_q" {
   }
 }
 
+/** Allows the adapter app to write to the CalmData table. */
 resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
   name = "ecs_task_calm_adapter_policy"
   role = "${module.ecs_calm_adapter_iam.task_role_name}"
@@ -74,6 +75,7 @@ resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
   policy = "${data.aws_iam_policy_document.allow_all_calm_db.json}"
 }
 
+/** Allows write access to the CalmData table in DynamoDB. */
 data "aws_iam_policy_document" "allow_all_calm_db" {
   statement {
     actions = [
@@ -88,14 +90,16 @@ data "aws_iam_policy_document" "allow_all_calm_db" {
   }
 }
 
+/** Allows the transformer app to publish to the ingest topic. */
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   name = "ecs_task_jenkins_policy"
   role = "${module.ecs_transformer_iam.task_role_name}"
 
-  policy = "${data.aws_iam_policy_document.publish_to_calm_sns.json}"
+  policy = "${data.aws_iam_policy_document.publish_to_ingest_sns.json}"
 }
 
-data "aws_iam_policy_document" "publish_to_calm_sns" {
+/** Allows publishing to the ingest topic. */
+data "aws_iam_policy_document" "publish_to_ingest_sns" {
   statement {
     actions = [
       "SNS:Publish",
@@ -124,4 +128,35 @@ data "aws_iam_policy_document" "read_calm_kinesis_stream" {
       "${aws_dynamodb_table.calm-dynamodb-table.stream_arn}",
     ]
   }
+}
+
+/** Allows publishing to the service scheduler SNS topic. */
+data "aws_iam_policy_document" "publish_to_sns" {
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      "${aws_sns_topic.service_scheduler_topic.arn}",
+    ]
+  }
+}
+
+/** Allow the "Publish to SNS" Lambda to publish to the service
+  * scheduler topic.
+  */
+resource "aws_iam_role_policy" "publish_to_sns_lambda_policy" {
+  name   = "publish_to_sns_policy"
+  role   = "${module.publish_to_sns_lambda.role_name}"
+  policy = "${data.aws_iam_policy_document.publish_to_sns.json}"
+}
+
+/** Allow the Calm adapter to publish to the service scheduler topic.
+  * This is used when it turns itself off at the end of a run.
+  */
+resource "aws_iam_role_policy" "ecs_calm_adapter_publish_to_sns" {
+  name   = "publish_to_sns_policy"
+  role   = "${module.ecs_calm_adapter_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.publish_to_sns.json}"
 }
