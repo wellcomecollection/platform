@@ -7,7 +7,7 @@ def _render_value(value):
         return None
     else:
         try:
-            return value.strip()
+            return value.strip() or None
         except AttributeError:
             return value
 
@@ -34,6 +34,7 @@ def elem_to_dict(elem):
     res = {}
     for child in elem.iterchildren():
         name = child.tag
+        assert name not in res
 
         # Miro stores lists with <_> keys, so if we spot one, this element
         # should actually be treated as a list.
