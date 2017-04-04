@@ -3,20 +3,25 @@ package uk.ac.wellcome.platform.idminter.modules
 import com.amazonaws.services.sqs.AmazonSQS
 import uk.ac.wellcome.models.aws.SQSConfig
 import com.amazonaws.services.sqs.model.{Message, ReceiveMessageRequest}
-import com.twitter.inject.Logging
+import com.twitter.inject.{Logging, TwitterModule}
 
 import scala.collection.JavaConversions._
+import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class SQSReader(sqsClient:AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration, maxMessages: Int) extends Logging {
 
-  def retrieveMessages(): Seq[Message] = {
-    info("Polling for new messages ...")
-    sqsClient.receiveMessage(
-      new ReceiveMessageRequest(sqsConfig.queueUrl)
-        .withWaitTimeSeconds(waitTime.toSeconds.toInt)
-        .withMaxNumberOfMessages(maxMessages))
-      .getMessages
+class SQSReader(sqsClient:AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration) extends Logging {
+
+  def retrieveMessage(): Future[Option[Message]] = Future {
+    {
+      info("looking for new for new messages ...")
+      sqsClient.receiveMessage(
+        new ReceiveMessageRequest(sqsConfig.queueUrl)
+          .withWaitTimeSeconds(waitTime.toSeconds.toInt)
+          .withMaxNumberOfMessages(1))
+        .getMessages.headOption
+    }
   }
 
 }

@@ -3,30 +3,34 @@ package uk.ac.wellcome.platform.idminter.modules
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.model.{Message, ReceiveMessageRequest, ReceiveMessageResult}
 import org.mockito.Mockito
+import org.mockito.Mockito.{times, verify, when}
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
+
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
-class SQSReaderTest extends FunSpec with MockitoSugar with Matchers{
+class SQSReaderTest extends FunSpec with MockitoSugar with Matchers with ScalaFutures with IntegrationPatience{
 
-  it("should retrieve messages from the sqs client"){
+  it("should retrieve a message from the sqs client"){
     val sqsClient = mock[AmazonSQS]
     val sqsConfig = SQSConfig("eu-west-1", "blah")
-    mockSqsClient(sqsClient, sqsConfig, """["somejson"]""", """["someotherjson"]""")
-    val sqsReader = new SQSReader(sqsClient, sqsConfig, waitTime = 20 seconds, maxMessages = 2)
+    mockSqsClient(sqsClient, sqsConfig, """["somejson"]""")
+    val sqsReader = new SQSReader(sqsClient, sqsConfig, waitTime = 20 seconds)
 
-    val messages = sqsReader.retrieveMessages()
+    val futureMessages = sqsReader.retrieveMessage()
 
-    messages should have size (2)
-    messages.head.getBody should be ("""["somejson"]""")
-    messages.tail.head.getBody should be ("""["someotherjson"]""")
+    whenReady(futureMessages) {messages =>
+      messages.isDefined should be (true)
+      messages.get.getBody should be("""["somejson"]""")
+    }
   }
 
   private def mockSqsClient(sqsClient: AmazonSQS, sqsConfig: SQSConfig, jsonMessages: String*): Any = {
-    Mockito.when(sqsClient.receiveMessage(
-      new ReceiveMessageRequest(sqsConfig.queueUrl).withWaitTimeSeconds(20).withMaxNumberOfMessages(2)))
+    when(sqsClient.receiveMessage(
+      new ReceiveMessageRequest(sqsConfig.queueUrl).withWaitTimeSeconds(20).withMaxNumberOfMessages(1)))
       .thenReturn(createMessageResult(jsonMessages: _*))
   }
 
