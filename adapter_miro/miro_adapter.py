@@ -29,9 +29,19 @@ def parse_args():
 
 def parse_image_data(xml_string):
     """
-    Given an XML string, generate blobs of data from the individual
-    ``<image>`` elements.
+    Given an XML string, generate blobs of data for each image.
     """
+    # Within the Miro XML file, each image is stored inside in the
+    # following format:
+    #
+    #   <image>
+    #     <key1>value1</key1>
+    #     <key2>value1</key2>
+    #     ...
+    #   </image>
+    #
+    # so we want to grab the <image> tags, and export data from their
+    # children attributes.
     root = etree.fromstring(xml_string)
     for child in root.findall('image'):
         yield elem_to_dict(child)
