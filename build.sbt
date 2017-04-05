@@ -12,6 +12,7 @@ def doSharedSetup(project: Project) =
     .settings(Revolver.settings: _*)
     .settings(EcrPlugin.projectSettings: _*)
     .settings(Packager.settings: _*)
+    .settings(DockerCompose.settings: _*)
     .enablePlugins(JavaAppPackaging)
     .enablePlugins(GitVersioning)
 

@@ -5,6 +5,7 @@ import sbtecr.EcrPlugin.autoImport._
 import sbtbuildenv.BuildEnvPlugin.autoImport._
 import sbtconfigs3javaopts.ConfigS3JavaOptsPlugin.autoImport._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
+import com.tapad.docker.DockerComposePlugin.autoImport._
 import com.amazonaws.regions.{Region, Regions}
 import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport._
 
@@ -23,5 +24,11 @@ object Packager {
     configS3Stage in configS3JavaOpts := buildEnv.value.toString,
     configS3App in configS3JavaOpts := name.value.toString,
     javaOptions in Universal ++= configS3JavaOpts.value
+  )
+}
+
+object DockerCompose {
+  val settings: Seq[Def.Setting[_]] = Seq(
+    composeNoBuild := true
   )
 }
