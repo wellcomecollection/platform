@@ -10,7 +10,6 @@ object Dependencies {
     val guice = "4.0"
     val kinesis = "1.7.3"
     val kinesisDynamoAdapter = "1.1.1"
-    val dynamoDbLocal = "1.11.0.1"
     val logback = "1.1.8"
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
@@ -31,8 +30,7 @@ object Dependencies {
   val dynamoDependencies: Seq[ModuleID] = Seq(
     "com.amazonaws" % "amazon-kinesis-client" % versions.kinesis,
     "com.amazonaws" % "dynamodb-streams-kinesis-adapter" % versions.kinesisDynamoAdapter,
-    "com.gu" %% "scanamo" % versions.scanamo,
-    "com.amazonaws" % "DynamoDBLocal" % versions.dynamoDbLocal % "test"
+    "com.gu" %% "scanamo" % versions.scanamo
   )
 
   val esDependencies: Seq[ModuleID] = Seq(
