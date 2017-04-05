@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.utils
 
 import scala.util.Random
 
-trait Identifiable {
+object Identifiable {
   val identifierLength = 8
   val forbiddenLetters = List('o', 'i', 'l', '1')
   val letterRange = ('1' to '9') ++ ('a' to 'z')
