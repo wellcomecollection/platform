@@ -4,3 +4,4 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.9")
 
 addSbtPlugin("com.mintbeans" % "sbt-ecr" % "0.4.0")
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.8.0")
+addSbtPlugin("com.tapad" % "sbt-docker-compose" % "1.0.20")
