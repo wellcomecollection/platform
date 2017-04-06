@@ -2,3 +2,11 @@ dynamodb:
   image: peopleperhour/dynamodb
   ports:
     - "45678:8000"
+sns:
+  image: s12v/sns
+  ports:
+    - "5555:9911"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "4444:9324"

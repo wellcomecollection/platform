@@ -1,12 +1,13 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.platform.idminter
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
+import uk.ac.wellcome.platform.idminter.modules.Id
+
 import scala.collection.JavaConversions._
 
 trait DynamoDBLocal extends Suite with BeforeAndAfterEach with BeforeAndAfterAll{

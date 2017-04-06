@@ -5,6 +5,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{Identifier, UnifiedItem}
 import com.gu.scanamo.syntax._
+import uk.ac.wellcome.platform.idminter.DynamoDBLocal
 
 class IdGeneratorTest extends FunSpec with DynamoDBLocal with ScalaFutures with Matchers with BeforeAndAfterEach with IntegrationPatience{
 

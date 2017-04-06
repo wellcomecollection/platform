@@ -22,20 +22,13 @@ object Common {
       "-language:postfixOps"
     ),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
-  ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings ++ DynamoDBLocal.settings
+  ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings
 }
 
 object Swagger {
   val settings: Seq[Def.Setting[_]] = Seq(
     resolvers +=
       "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/releases/"
-  )
-}
-
-object DynamoDBLocal {
-  val settings: Seq[Def.Setting[_]] = Seq(
-    resolvers +=
-      "DynamoDB Local Release Repository" at "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
   )
 }
 
