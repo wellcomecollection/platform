@@ -10,14 +10,20 @@ import uk.ac.wellcome.models.aws.{SNSConfig, SNSMessage}
 import uk.ac.wellcome.models.{CalmDynamoRecord, Transformable, UnifiedItem}
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 
 class RecordReceiver @Inject()(snsConfig: SNSConfig,
                                snsClient: AmazonSNS) extends Logging {
+
+  // This ensures we have enough threads when running in ECS.  If we use
+  // the implicit global execution context, the application is thread-starved
+  // and records fall into a hole.  See the discussion on
+  // https://github.com/wellcometrust/platform-api/issues/159 for details.
+  implicit val context = ExecutionContext.fromExecutor(
+    new scala.concurrent.forkjoin.ForkJoinPool())
 
   def receiveRecord(record: RecordAdapter): Future[Unit] = {
     for {
