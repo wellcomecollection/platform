@@ -76,8 +76,8 @@ object CalmAdapterWorker extends TwitterModule {
     val messageBody = JsonUtil
       .toJson(
         ECSServiceScheduleRequest(
-          "service_cluster",
-          "calm_adapter",
+          "services_cluster",
+          "calm-adapter",
           0
         )
       )
