@@ -1,9 +1,11 @@
 package uk.ac.wellcome.platform.idminter.modules
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import uk.ac.wellcome.models.IdentifiedUnifiedItem
+import uk.ac.wellcome.utils.JsonUtil
 
-class IdminterCore(sqsReader: SQSReader, unifiedItemExtractor: UnifiedItemExtractor, idGenerator: IdGenerator, itemWrapper: ItemWrapper, sqsWriter: SQSWriter) {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class IdminterCore(sqsReader: SQSReader, unifiedItemExtractor: UnifiedItemExtractor, idGenerator: IdGenerator, snsWriter: SNSWriter) {
   def start() = {
 
    // Poller.runContinuously {
@@ -11,8 +13,7 @@ class IdminterCore(sqsReader: SQSReader, unifiedItemExtractor: UnifiedItemExtrac
       case Some(message) => for {
         unifiedItem <- unifiedItemExtractor.toUnifiedItem(message)
         canonicalId <- idGenerator.generateId(unifiedItem)
-        wrappedItem <- itemWrapper.wrapItem(unifiedItem, canonicalId)
-        _ <- sqsWriter.writeItem(wrappedItem)
+        _ <- snsWriter.writeMessage(JsonUtil.toJson(IdentifiedUnifiedItem(canonicalId,unifiedItem)).get,None)
       } yield ()
       case None =>
     }

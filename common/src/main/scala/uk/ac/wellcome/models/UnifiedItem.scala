@@ -3,6 +3,8 @@ package uk.ac.wellcome.models
 import com.sksamuel.elastic4s._
 import uk.ac.wellcome.utils.JsonUtil
 
+case class IdentifiedUnifiedItem(canonicalId: String, unifiedItem: UnifiedItem)
+
 case class Identifier(source: String, sourceId: String, value: String)
 
 case class UnifiedItem(
