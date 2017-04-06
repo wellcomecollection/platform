@@ -1,15 +1,14 @@
 package uk.ac.wellcome.platform.idminter.modules
 
 import com.amazonaws.services.sqs.AmazonSQS
-import uk.ac.wellcome.models.aws.SQSConfig
 import com.amazonaws.services.sqs.model.{Message, ReceiveMessageRequest}
-import com.twitter.inject.{Logging, TwitterModule}
+import com.twitter.inject.Logging
+import uk.ac.wellcome.models.aws.SQSConfig
 
 import scala.collection.JavaConversions._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class SQSReader(sqsClient:AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration) extends Logging {
 
