@@ -70,7 +70,10 @@ do
     fi
 
     # At this point we know we want to run this project: run the task!
-    if [[ "$TASK" == "compile" || "$TASK" == "test" ]]
+    if [[ "$TASK" == "compile" ]]
+        sbt "project $project" "$TASK"
+    elif [[ "$TASK" == "test" ]]
+        sbt "project $project" "dockerComposeTest"
     then
         sbt "project $project" "$TASK"
     elif [[ "$TASK" == "deploy" ]]
