@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.UnifiedItem
+import uk.ac.wellcome.models.{Identifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,13 +16,17 @@ class IdGenerator(dynamoDBClient: AmazonDynamoDB) extends Logging {
 
   def generateId(unifiedItem: UnifiedItem): Future[String] = Future {
     findMiroID(unifiedItem) match {
-      case Some(identifier) => findMiroIdInDynamo(identifier.value) match {
-        case Right(id) :: Nil => id.CanonicalID
-        case Nil => generateAndSaveCanonicalId(identifier.value)
-        case Right(_) :: tail => logAndThrowError(s"Found more than one record with MiroID ${identifier.value}")
-        case _ =>  logAndThrowError(s"Error in parsing the object with MiroID ${identifier.value}")
-      }
+      case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
       case None => logAndThrowError(s"Item $unifiedItem did not contain a MiroID")
+    }
+  }
+
+  private def retrieveOrGenerateCanonicalId(identifier: Identifier) = {
+    findMiroIdInDynamo(identifier.value) match {
+      case Right(id) :: Nil => id.CanonicalID
+      case Nil => generateAndSaveCanonicalId(identifier.value)
+      case Right(_) :: tail => logAndThrowError(s"Found more than one record with MiroID ${identifier.value}")
+      case _ => logAndThrowError(s"Error in parsing the object with MiroID ${identifier.value}")
     }
   }
 

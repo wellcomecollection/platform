@@ -14,17 +14,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class UnifiedItemExtractor extends Logging {
 
   def toUnifiedItem(message: Message): Future[UnifiedItem] = Future{
-    info(s"Parsing SQSMessage ${message.getBody}")
-    JsonUtil.fromJson[SQSMessage](message.getBody).flatMap {sqsMessage =>
-      info(s"Extracting UnifiedItem from SQSMessage $sqsMessage")
-      JsonUtil.fromJson[UnifiedItem](sqsMessage.body)}
+    tryExtractinUnifiedItem(message)
   }.map {
     case Success(unifiedItem) =>
-      info("Successfully extractedUnified item")
+      info(s"Successfully extracted unified item $unifiedItem")
       unifiedItem
     case Failure(e) =>
-      error("Failed extracting Unified Item from Aws message", e)
+      error("Failed extracting Unified Item from AWS message", e)
       throw e
   }
 
+  private def tryExtractinUnifiedItem(message: Message) = {
+    info(s"Parsing SQSMessage ${message.getBody}")
+    JsonUtil.fromJson[SQSMessage](message.getBody).flatMap { sqsMessage =>
+      info(s"Extracting UnifiedItem from SQSMessage $sqsMessage")
+      JsonUtil.fromJson[UnifiedItem](sqsMessage.body)
+    }
+  }
 }
