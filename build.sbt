@@ -19,7 +19,9 @@ def doSharedSetup(project: Project) =
 
 lazy val common = project
   .settings(Common.settings: _*)
+  .settings(DockerCompose.settings: _*)
   .enablePlugins(GitVersioning)
+  .enablePlugins(DockerComposePlugin)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
 lazy val calm_adapter = doSharedSetup(project)
