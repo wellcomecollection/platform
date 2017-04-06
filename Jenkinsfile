@@ -6,25 +6,41 @@ stage("Checkout") {
 }
 
 node {
-  stage("Compile") {
-    def projects = ["common", "api", "calm_adapter", "transformer", "ingestor"]
+  def stages = ["compile", "test"]
+  def projects = ["common", "api", "calm_adapter", "transformer", "ingestor"]
+
+  stage("Test") {
     def stepsForParallel = [:]
-
-    for (int i = 0; i < projects.size(); i++) {
-      def s = projects.get(i)
-      def compileStep = "${s}"
-      stepsForParallel[compileStep] = transformIntoCompileStep(s)
+    for (projectName in projects) {
+      def projectName = projects.get(i)
+      def compileStep = "${projectName}"
+      stepsForParallel[compileStep] = createBuildStep(projectName, "test")
     }
-
     parallel stepsForParallel
+  }
+
+  if (env.BRANCH_NAME == "master") {
+    stage("Deploy") {
+      def stepsForParallel = [:]
+      for (projectName in projects) {
+        /* The common lib doesn't have a buildable container */
+        if (projectName == "common") {
+          continue
+        }
+
+        def compileStep = "${projectName}"
+        stepsForParallel[compileStep] = createBuildStep(projectName, "deploy")
+      }
+      parallel stepsForParallel
+    }
   }
 }
 
-def transformIntoCompileStep(String project) {
+def createBuildStep(String project, String action) {
   return {
     node {
       unstash 'sources'
-      sh "/usr/bin/sbt ${project}/compile"
+      sh "/usr/bin/sbt ${project}/${action}"
     }
   }
 }
