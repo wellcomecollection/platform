@@ -60,7 +60,7 @@ object ElasticClientModule extends TwitterModule {
         (defaults, config) =>
           defaults
             .put("xpack.security.transport.ssl.enabled", config.ssl)
-            .put("request.headers.X-Found-Cluster", s"${cluster.name}")
+            .put("request.headers.X-Found-Cluster", s"${clusterName}")
             .put("xpack.security.user", config.user))
       .build()
 
