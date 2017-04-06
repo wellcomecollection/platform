@@ -29,6 +29,7 @@ object Packager {
 
 object DockerCompose {
   val settings: Seq[Def.Setting[_]] = Seq(
-    composeNoBuild := true
+    composeNoBuild := true,
+    composeFile := baseDirectory.value.getParent + "/docker-compose.yml"
   )
 }

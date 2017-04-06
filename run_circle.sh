@@ -8,7 +8,7 @@
 
 
 # List of projects that sbt knows how to build
-PROJECTS="common api transformer calm_adapter ingestor"
+PROJECTS="common api transformer calm_adapter ingestor id_minter"
 
 
 # Some bash debugging options: tracing, and exit as soon as a build step fails
