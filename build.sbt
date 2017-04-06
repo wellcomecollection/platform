@@ -14,6 +14,7 @@ def doSharedSetup(project: Project) =
     .settings(Packager.settings: _*)
     .settings(DockerCompose.settings: _*)
     .enablePlugins(JavaAppPackaging)
+    .enablePlugins(DockerComposePlugin)
     .enablePlugins(GitVersioning)
 
 lazy val common = project
