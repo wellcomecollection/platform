@@ -1,4 +1,2 @@
-- Re-arrange files in packages
 - Refactor transformer with SNSWriter
-- Refactor ingester with SQSReader
 - Remove id from UnifiedItem
