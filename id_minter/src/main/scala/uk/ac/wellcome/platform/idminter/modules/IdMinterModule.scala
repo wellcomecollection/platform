@@ -3,6 +3,9 @@ package uk.ac.wellcome.platform.idminter.modules
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.{IdentifiedUnifiedItem, UnifiedItem}
+import uk.ac.wellcome.platform.idminter.steps.{IdGenerator, UnifiedItemExtractor}
+import uk.ac.wellcome.sns.SNSWriter
+import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -6,13 +6,13 @@ import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.twitter.inject.app.TestInjector
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule, SNSConfigModule, SQSConfigModule}
+import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, UnifiedItem}
-import uk.ac.wellcome.platform.idminter.modules.{Id, IdMinterModule, SQSReaderModule}
+import uk.ac.wellcome.models.{Id, IdentifiedUnifiedItem, Identifier, UnifiedItem}
+import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
 import uk.ac.wellcome.utils.JsonUtil
 
-class FunctionalTest extends IntegrationTestBase with Eventually with IntegrationPatience {
+class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with IntegrationPatience {
 
   test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
     val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroID", "1234")), Option("super-secret"))

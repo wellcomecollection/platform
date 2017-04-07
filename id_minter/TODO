@@ -1,4 +1,3 @@
-- Test & fix TryBackoff
 - Re-arrange files in packages
 - Refactor transformer with SNSWriter
 - Refactor ingester with SQSReader

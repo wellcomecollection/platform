@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.platform.idminter.modules.Id
+import uk.ac.wellcome.models.Id
 
 import scala.collection.JavaConversions._
 
