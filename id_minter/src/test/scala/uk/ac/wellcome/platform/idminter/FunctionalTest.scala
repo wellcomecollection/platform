@@ -14,7 +14,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 class FunctionalTest extends IntegrationTestBase with Eventually with IntegrationPatience {
 
-  override val injector =
+  override def injector =
     TestInjector(
       flags =
         Map(
