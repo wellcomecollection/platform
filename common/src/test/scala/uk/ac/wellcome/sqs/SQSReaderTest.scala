@@ -21,7 +21,7 @@ class SQSReaderTest extends FunSpec with MockitoSugar with Matchers with ScalaFu
     mockSqsClient(sqsClient, sqsConfig, """["somejson"]""")
     val sqsReader = new SQSReader(sqsClient, sqsConfig, waitTime = 20 seconds, 1)
 
-    val futureMessages = sqsReader.retrieveMessage()
+    val futureMessages = sqsReader.retrieveMessages()
 
     whenReady(futureMessages) {messages =>
       verifyMockCalled(sqsClient, sqsConfig)
@@ -36,7 +36,7 @@ class SQSReaderTest extends FunSpec with MockitoSugar with Matchers with ScalaFu
     when(sqsClient.receiveMessage(any[ReceiveMessageRequest]())).thenThrow(new RuntimeException("failed to connect to the queue"))
     val sqsReader = new SQSReader(sqsClient, sqsConfig, waitTime = 20 seconds, 1)
 
-    val futureMessages = sqsReader.retrieveMessage()
+    val futureMessages = sqsReader.retrieveMessages()
 
     whenReady(futureMessages.failed) {exception =>
       exception.getMessage should be ("failed to connect to the queue")

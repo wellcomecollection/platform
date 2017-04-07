@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration, maxMessages: Integer) extends Logging {
 
-  def retrieveMessage(): Future[List[Message]] = Future {
+  def retrieveMessages(): Future[List[Message]] = Future {
       info("looking for new messages ...")
       sqsClient.receiveMessage(
         new ReceiveMessageRequest(sqsConfig.queueUrl)

@@ -24,13 +24,14 @@ object IdMinterModule extends TwitterModule with TryBackoff{
 
   private def start(sqsReader: SQSReader, idGenerator: IdGenerator, snsWriter: SNSWriter) = {
 
-    sqsReader.retrieveMessage().map {
-      case Some(message) => for {
-        unifiedItem <- UnifiedItemExtractor.toUnifiedItem(message)
-        canonicalId <- idGenerator.generateId(unifiedItem)
-        _ <- snsWriter.writeMessage(toIdentifiedUnifiedItemJson(unifiedItem, canonicalId),None)
-      } yield ()
-      case None =>
+    sqsReader.retrieveMessages().map {messages =>
+      messages.map {message =>
+        for {
+          unifiedItem <- UnifiedItemExtractor.toUnifiedItem(message)
+          canonicalId <- idGenerator.generateId(unifiedItem)
+          _ <- snsWriter.writeMessage(toIdentifiedUnifiedItemJson(unifiedItem, canonicalId), None)
+        } yield ()
+      }
     }
   }
 
