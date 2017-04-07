@@ -2,15 +2,17 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs.model.{Message, ReceiveMessageRequest}
-import com.twitter.inject.Logging
+import com.google.inject.{Inject, Provides,Singleton}
+import com.twitter.inject.{Logging, TwitterModule}
+import uk.ac.wellcome.finatra.modules.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.models.aws.SQSConfig
 
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, _}
 
-class SQSReader(sqsClient:AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration) extends Logging {
+class SQSReader @Inject()(sqsClient:AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration) extends Logging {
 
   def retrieveMessage(): Future[Option[Message]] = Future {
       info("looking for new messages ...")
@@ -21,4 +23,13 @@ class SQSReader(sqsClient:AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration) e
         .getMessages.headOption
   }
 
+}
+
+object SQSReaderModule extends TwitterModule {
+    val waitime = flag[String]("aws.sqs.wait.seconds", "10", "SQS read wait time in seconds")
+
+  @Singleton
+  @Provides
+  def providesSQSReader(sqsClient:AmazonSQS, sqsConfig: SQSConfig) =
+    new SQSReader(sqsClient,sqsConfig, waitime().toInt seconds)
 }

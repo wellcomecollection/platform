@@ -1,4 +1,3 @@
-- Functional test & Guice injection stuff
 - Test & fix TryBackoff
 - Re-arrange files in packages
 - Refactor transformer with SNSWriter

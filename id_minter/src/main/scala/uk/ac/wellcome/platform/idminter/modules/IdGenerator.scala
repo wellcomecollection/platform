@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.idminter.modules
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
@@ -12,7 +13,9 @@ import scala.concurrent.Future
 
 case class Id(CanonicalID: String, MiroID: String)
 
-class IdGenerator(dynamoDBClient: AmazonDynamoDB) extends Logging {
+class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
+
+  private val identifiersTableName = "Identifiers"
 
   def generateId(unifiedItem: UnifiedItem): Future[String] = Future {
     findMiroID(unifiedItem) match {
@@ -34,12 +37,13 @@ class IdGenerator(dynamoDBClient: AmazonDynamoDB) extends Logging {
     unifiedItem.identifiers.find(identifier => identifier.sourceId == "MiroID")
 
   private def findMiroIdInDynamo(miroId: String) = {
-    Scanamo.queryIndex[Id](dynamoDBClient)("Identifiers", "MiroID")('MiroID -> miroId)
+    Scanamo.queryIndex[Id](dynamoDBClient)(identifiersTableName, "MiroID")('MiroID -> miroId)
   }
 
   private def generateAndSaveCanonicalId(miroId: String) = {
     val canonicalId = Identifiable.generate
-    Scanamo.put(dynamoDBClient)("Identifiers")(Id(canonicalId, miroId))
+    info(s"putting new canonicalId $canonicalId for MiroID $miroId")
+    Scanamo.put(dynamoDBClient)(identifiersTableName)(Id(canonicalId, miroId))
     canonicalId
   }
 

@@ -23,11 +23,13 @@ trait DynamoDBLocal extends Suite with BeforeAndAfterEach with BeforeAndAfterAll
   }
 
   override def beforeAll(): Unit = {
+    super.beforeAll()
     deleteTable()
     createTable()
   }
 
   override def beforeEach(): Unit = {
+    super.beforeEach()
     clearTable()
   }
 
