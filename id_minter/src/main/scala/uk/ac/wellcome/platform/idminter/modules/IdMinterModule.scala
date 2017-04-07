@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.idminter.modules
 
+import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.{IdentifiedUnifiedItem, UnifiedItem}
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object IdMinterModule extends TwitterModule {
+object IdMinterModule extends TwitterModule with TryBackoff{
 
   override def singletonStartup(injector: Injector) {
     info("Starting SQS worker")
@@ -14,12 +15,12 @@ object IdMinterModule extends TwitterModule {
     val sqsReader = injector.instance[SQSReader]
     val idGenerator = injector.instance[IdGenerator]
     val snsWriter = injector.instance[SNSWriter]
-    start(sqsReader, idGenerator,snsWriter)
+    val actorSystem = injector.instance[ActorSystem]
+    run(()=>start(sqsReader, idGenerator,snsWriter),actorSystem)
   }
 
   def start(sqsReader: SQSReader, idGenerator: IdGenerator, snsWriter: SNSWriter) = {
 
-    // Poller.runContinuously {
     sqsReader.retrieveMessage().map {
       case Some(message) => for {
         unifiedItem <- UnifiedItemExtractor.toUnifiedItem(message)
@@ -28,7 +29,6 @@ object IdMinterModule extends TwitterModule {
       } yield ()
       case None =>
     }
-    //  }
   }
 
   private def toIdentifiedUnifiedItemJson(unifiedItem: UnifiedItem, canonicalId: String) = {
