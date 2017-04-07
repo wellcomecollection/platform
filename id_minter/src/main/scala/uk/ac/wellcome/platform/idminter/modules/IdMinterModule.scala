@@ -19,7 +19,7 @@ object IdMinterModule extends TwitterModule with TryBackoff{
     run(()=>start(sqsReader, idGenerator,snsWriter),actorSystem)
   }
 
-  def start(sqsReader: SQSReader, idGenerator: IdGenerator, snsWriter: SNSWriter) = {
+  private def start(sqsReader: SQSReader, idGenerator: IdGenerator, snsWriter: SNSWriter) = {
 
     sqsReader.retrieveMessage().map {
       case Some(message) => for {

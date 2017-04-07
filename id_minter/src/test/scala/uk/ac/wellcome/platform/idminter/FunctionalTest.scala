@@ -27,8 +27,6 @@ class FunctionalTest extends IntegrationTestBase with Eventually with Integratio
       dynamoIdentifiersRecords should have size(1)
       dynamoIdentifiersRecords.head shouldBe a[Right[DynamoReadError,Id]]
       val id = extractId(dynamoIdentifiersRecords)
-      id.MiroID shouldBe "1234"
-
       val messages = listMessagesReceivedFromSNS()
       messages should have size (1)
       JsonUtil.fromJson[IdentifiedUnifiedItem](messages.head.trim).get shouldBe IdentifiedUnifiedItem(id.CanonicalID,unifiedItem)
@@ -53,6 +51,20 @@ class FunctionalTest extends IntegrationTestBase with Eventually with Integratio
 
     eventually {
       Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> secondMiroId) should have size(1)
+    }
+  }
+
+  test("it should keep polling if something fails processing a message"){
+    sqsClient.sendMessage(idMinterQueueUrl, "not a json string")
+
+    IdMinterModule.singletonStartup(injector)
+
+    val miroId = "1234"
+    val sqsMessage = generateSqsMessage(miroId)
+
+    sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(sqsMessage).get)
+    eventually {
+      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> miroId) should have size(1)
     }
 
   }
