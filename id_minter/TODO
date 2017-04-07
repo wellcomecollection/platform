@@ -1,2 +1,4 @@
 - Refactor transformer with SNSWriter
 - Remove id from UnifiedItem
+- create test_common module
+- remove global execution context

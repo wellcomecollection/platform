@@ -91,7 +91,7 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
         Map(
           "aws.region" -> "local",
           "aws.sqs.queue.url" -> idMinterQueueUrl,
-          "aws.sqs.wait.seconds" -> "1",
+          "sqs.waitTime" -> "1",
           "aws.sns.topic.arn" -> ingestTopicArn
         ),
       modules =
