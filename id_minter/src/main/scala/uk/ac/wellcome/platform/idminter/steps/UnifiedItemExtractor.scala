@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.sqs.model.Message
 import com.twitter.inject.Logging
@@ -6,10 +6,9 @@ import uk.ac.wellcome.models.UnifiedItem
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.JsonUtil
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 object UnifiedItemExtractor extends Logging {
 

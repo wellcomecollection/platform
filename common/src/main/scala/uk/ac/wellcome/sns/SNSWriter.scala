@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.sns
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest

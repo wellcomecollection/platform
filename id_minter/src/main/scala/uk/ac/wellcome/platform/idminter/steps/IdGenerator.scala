@@ -1,17 +1,15 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.{Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{Id, Identifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
-case class Id(CanonicalID: String, MiroID: String)
 
 class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
 
