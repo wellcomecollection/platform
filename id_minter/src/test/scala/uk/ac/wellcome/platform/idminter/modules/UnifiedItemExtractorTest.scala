@@ -10,14 +10,12 @@ import uk.ac.wellcome.utils.JsonUtil
 
 class UnifiedItemExtractorTest extends FunSpec with Matchers with ScalaFutures with IntegrationPatience {
 
-  val extractor = new UnifiedItemExtractor()
-
   it("extracts the unified item included in the SQS message"){
     val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroId", "1234")), Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),UnifiedItem.json(unifiedItem), "topic", "messageType", "timestamp")
     val message = new Message().withBody(JsonUtil.toJson(sqsMessage).get)
 
-    val eventualUnifiedItem = extractor.toUnifiedItem(message)
+    val eventualUnifiedItem = UnifiedItemExtractor.toUnifiedItem(message)
 
     whenReady(eventualUnifiedItem) {extractedUnifiedItem =>
       extractedUnifiedItem should be (unifiedItem)
@@ -29,7 +27,7 @@ class UnifiedItemExtractorTest extends FunSpec with Matchers with ScalaFutures w
     val sqsMessage = SQSMessage(Some("subject"),"not a json string", "topic", "messageType", "timestamp")
     val message = new Message().withBody(JsonUtil.toJson(sqsMessage).get)
 
-    val eventualUnifiedItem = extractor.toUnifiedItem(message)
+    val eventualUnifiedItem = UnifiedItemExtractor.toUnifiedItem(message)
 
     whenReady(eventualUnifiedItem.failed){e =>
       e shouldBe a [JsonParseException]

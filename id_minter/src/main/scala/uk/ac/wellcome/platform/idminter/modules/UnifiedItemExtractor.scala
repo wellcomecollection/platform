@@ -11,7 +11,7 @@ import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class UnifiedItemExtractor extends Logging {
+object UnifiedItemExtractor extends Logging {
 
   def toUnifiedItem(message: Message): Future[UnifiedItem] = Future{
     tryExtractinUnifiedItem(message)
