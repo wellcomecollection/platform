@@ -85,7 +85,7 @@ data "aws_iam_policy_document" "allow_all_calm_db" {
     ]
 
     resources = [
-      "${aws_dynamodb_table.calm-dynamodb-table.arn}",
+      "${aws_dynamodb_table.calm_dynamodb_table.arn}",
     ]
   }
 }
@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "read_calm_kinesis_stream" {
     ]
 
     resources = [
-      "${aws_dynamodb_table.calm-dynamodb-table.stream_arn}",
+      "${aws_dynamodb_table.calm_dynamodb_table.stream_arn}",
     ]
   }
 }

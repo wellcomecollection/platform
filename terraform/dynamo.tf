@@ -43,3 +43,23 @@ resource "aws_dynamodb_table" "calm-dynamodb-table" {
     projection_type = "ALL"
   }
 }
+
+resource "aws_dynamodb_table" "miro_table" {
+  name             = "MiroData"
+  read_capacity    = 1
+  write_capacity   = 1
+  hash_key         = "MiroID"
+  range_key        = "MiroCollection"
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
+
+  attribute {
+    name = "MiroID"
+    type = "S"
+  }
+
+  attribute {
+    name = "MiroCollection"
+    type = "S"
+  }
+}
