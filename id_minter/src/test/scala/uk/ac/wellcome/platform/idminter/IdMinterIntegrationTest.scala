@@ -4,12 +4,11 @@ package uk.ac.wellcome.platform.idminter
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
-import com.twitter.inject.app.TestInjector
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{Id, IdentifiedUnifiedItem, Identifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
+import uk.ac.wellcome.test.utils.IntegrationTestBase
 import uk.ac.wellcome.utils.JsonUtil
 
 class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with IntegrationPatience {
@@ -79,30 +78,4 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
     val id = dynamoIdentifiersRecords.head.asInstanceOf[Right[DynamoReadError, Id]].b
     id
   }
-
-  private def listMessagesReceivedFromSNS() = {
-    val string = scala.io.Source.fromURL(localSNSEnpointUrl).mkString
-    string.split('\n').filter(_.contains(":message: ")).map {_.replace(":message: ", "").replace("'","").trim}.toList
-  }
-
-  override def injector =
-    TestInjector(
-      flags =
-        Map(
-          "aws.region" -> "local",
-          "aws.sqs.queue.url" -> idMinterQueueUrl,
-          "sqs.waitTime" -> "1",
-          "aws.sns.topic.arn" -> ingestTopicArn
-        ),
-      modules =
-        Seq(
-          AkkaModule,
-          LocalSNSClient,
-          DynamoDBLocalClientModule,
-          IdMinterModule,
-          SQSReaderModule,
-          SQSLocalClientModule,
-          SNSConfigModule,
-          SQSConfigModule,
-          DynamoConfigModule))
 }

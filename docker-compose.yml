@@ -1,14 +1,12 @@
-version: '2'
-services:
-  dynamodb:
-    image: peopleperhour/dynamodb
-    ports:
-      - "45678:8000"
-  sns:
-    image: feathj/fake-sns
-    ports:
-      - "9292:9292"
-  sqs:
-    image: s12v/elasticmq
-    ports:
-      - "9324:9324"
+dynamodb:
+  image: peopleperhour/dynamodb
+  ports:
+    - "45678:8000"
+sns:
+  image: ruwen/fake_sns
+  ports:
+    - "9292:9292"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"

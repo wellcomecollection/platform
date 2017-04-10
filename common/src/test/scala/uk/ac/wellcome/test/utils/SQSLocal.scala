@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter
+package uk.ac.wellcome.test.utils
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
