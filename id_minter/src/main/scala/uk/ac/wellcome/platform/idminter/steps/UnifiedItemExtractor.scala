@@ -20,7 +20,7 @@ object UnifiedItemExtractor extends Logging {
         info(s"Successfully extracted unified item $unifiedItem")
         unifiedItem
       case Failure(e) =>
-        error("Failed extracting Unified Item from AWS message", e)
+        error("Failed extracting unified item from AWS message", e)
         throw e
     }
 

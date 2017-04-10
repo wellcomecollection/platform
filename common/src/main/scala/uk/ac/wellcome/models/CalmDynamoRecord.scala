@@ -13,7 +13,7 @@ case class DirtyCalmRecord(
   def transform: Try[UnifiedItem] = Try {
     UnifiedItem(
       "id",
-      List(Identifier("source", "key", "value")),
+      List(SourceIdentifier("source", "key", "value")),
       accessStatus = AccessStatus.headOption
     )
   }

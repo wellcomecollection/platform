@@ -5,13 +5,13 @@ import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.{Id, Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{Identifier, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
+class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
 
   private val identifiersTableName = "Identifiers"
 
@@ -23,7 +23,7 @@ class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
     }
   }
 
-  private def retrieveOrGenerateCanonicalId(identifier: Identifier) = {
+  private def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier) = {
     findMiroIdInDynamo(identifier.value) match {
       case Right(id) :: Nil => id.CanonicalID
       case Nil => generateAndSaveCanonicalId(identifier.value)
@@ -40,14 +40,14 @@ class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
     unifiedItem.identifiers.find(identifier => identifier.sourceId == "MiroID")
 
   private def findMiroIdInDynamo(miroId: String) = {
-    Scanamo.queryIndex[Id](dynamoDBClient)(identifiersTableName, "MiroID")(
+    Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName, "MiroID")(
       'MiroID -> miroId)
   }
 
   private def generateAndSaveCanonicalId(miroId: String) = {
     val canonicalId = Identifiable.generate
     info(s"putting new canonicalId $canonicalId for MiroID $miroId")
-    Scanamo.put(dynamoDBClient)(identifiersTableName)(Id(canonicalId, miroId))
+    Scanamo.put(dynamoDBClient)(identifiersTableName)(Identifier(canonicalId, miroId))
     canonicalId
   }
 

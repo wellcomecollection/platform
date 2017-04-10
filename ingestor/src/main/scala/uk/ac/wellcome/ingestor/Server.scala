@@ -26,10 +26,6 @@ class Server extends HttpServer {
   private val esIndex = flag[String]("es.index", "records", "ES index name")
   private val esType = flag[String]("es.type", "item", "ES document type")
 
-  private final val servicePrefix = flag(name = "service.prefix",
-                                         default = "/ingestor",
-                                         help = "API path prefix")
-
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]

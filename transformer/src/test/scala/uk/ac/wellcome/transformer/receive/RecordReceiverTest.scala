@@ -13,7 +13,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -35,7 +35,7 @@ class RecordReceiverTest
 
     whenReady(future) { _ =>
       val unifiedItem = UnifiedItem("id",
-                                    List(Identifier("source", "key", "value")),
+                                    List(SourceIdentifier("source", "key", "value")),
                                     Some("TopSekrit"))
       Mockito
         .verify(mockSNS)

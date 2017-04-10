@@ -6,14 +6,10 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.sqs.SQSReader
 
-import scala.concurrent.duration._
-
 object SQSReaderModule extends TwitterModule {
-  val waitime = flag("sqs.waitTime", 20, "SQS read wait time in seconds")
-  val maxMessages = flag("sqs.maxMessages", 1, "Max SQS messages")
 
   @Singleton
   @Provides
   def providesSQSReader(sqsClient: AmazonSQS, sqsConfig: SQSConfig) =
-    new SQSReader(sqsClient, sqsConfig, waitime() seconds, maxMessages())
+    new SQSReader(sqsClient, sqsConfig)
 }

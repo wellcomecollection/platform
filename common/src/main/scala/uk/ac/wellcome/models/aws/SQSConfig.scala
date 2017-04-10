@@ -1,3 +1,7 @@
 package uk.ac.wellcome.models.aws
 
-case class SQSConfig(region: String, queueUrl: String)
+import scala.concurrent.duration.Duration
+
+case class SQSConfig(region: String, queueUrl: String,
+                     waitTime: Duration,
+                     maxMessages: Integer)
