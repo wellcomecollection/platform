@@ -34,7 +34,9 @@ trait TryBackoff extends Logging {
       throw new RuntimeException("Max retry attempts exceeded")
 
     val exponent = attempt / (baseWaitMillis / 4)
-    val waitTime = if(exponent != 0) pow(baseWaitMillis, exponent).toLong else baseWaitMillis
+    val waitTime =
+      if (exponent != 0) pow(baseWaitMillis, exponent).toLong
+      else baseWaitMillis
 
     system.scheduler.scheduleOnce(
       Duration.create(waitTime, TimeUnit.MILLISECONDS)

@@ -11,12 +11,13 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 object SQSWorker extends TwitterModule with TryBackoff {
 
   def processMessages(
-                       sqsReader: SQSReader,
-                       messageProcessorService: MessageProcessorService
+    sqsReader: SQSReader,
+    messageProcessorService: MessageProcessorService
   ): Unit = {
 
-    sqsReader.retrieveMessages().map(messages =>
-      messages.map(messageProcessorService.processMessage))
+    sqsReader
+      .retrieveMessages()
+      .map(messages => messages.map(messageProcessorService.processMessage))
 
   }
 

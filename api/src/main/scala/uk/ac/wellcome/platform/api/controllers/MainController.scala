@@ -37,9 +37,9 @@ class MainController @Inject()(
     // This is a demo endpoint for the UX team to use when prototyping
     // item pages.
     // TODO: Remove this endpoint.
-    get(s"/demoItem") {
-      request: Request =>
-        response.ok.json(Map(
+    get(s"/demoItem") { request: Request =>
+      response.ok.json(
+        Map(
           "@context" -> "http://id.wellcomecollection.org/",
           "id" -> "cbsx6cvr",
           "type" -> "item",

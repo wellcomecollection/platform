@@ -15,9 +15,8 @@ import uk.ac.wellcome.transformer.receive.RecordReceiver
 
 import scala.collection.JavaConverters._
 
-class StreamsRecordProcessor(client: AmazonDynamoDB,
-                             receiver: RecordReceiver
-) extends IRecordProcessor {
+class StreamsRecordProcessor(client: AmazonDynamoDB, receiver: RecordReceiver)
+    extends IRecordProcessor {
 
   case class ExampleRecord(identifier: String)
 
@@ -47,8 +46,7 @@ class StreamsRecordProcessorFactory(
 ) extends IRecordProcessorFactory {
 
   override def createProcessor(): IRecordProcessor =
-    new StreamsRecordProcessor(dynamoClient,
-                               recordReceiver)
+    new StreamsRecordProcessor(dynamoClient, recordReceiver)
 
 }
 

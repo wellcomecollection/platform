@@ -27,28 +27,26 @@ class RecordReceiver @Inject()(snsWriter: SNSWriter) extends Logging {
   }
 
   def recordToRecordMap(record: RecordAdapter): Future[RecordMap] = Future {
-    val keys = record
-      .getInternalObject
-      .getDynamodb
-      .getNewImage
+    val keys = record.getInternalObject.getDynamodb.getNewImage
 
     info(s"Received record $keys")
     RecordMap(keys)
   }
 
   def extractTransformableCaseClass(record: RecordMap): Future[Transformable] = {
-    Future {ScanamoFree.read[CalmDynamoRecord](record.value)}.map {
+    Future { ScanamoFree.read[CalmDynamoRecord](record.value) }.map {
       case Right(calmDynamoRecord) =>
         info(s"Parsed DynamoDB record $calmDynamoRecord")
         calmDynamoRecord
       case Left(dynamoReadError) =>
         error(s"Unable to parse record ${record.value}")
-        throw new Exception(s"Unable to parse record ${record.value} received $dynamoReadError")
+        throw new Exception(
+          s"Unable to parse record ${record.value} received $dynamoReadError")
     }
   }
 
   def transformDynamoRecord(dirtyRecord: Transformable): Future[UnifiedItem] = {
-    Future{dirtyRecord.transform}.map {
+    Future { dirtyRecord.transform }.map {
       case Success(cleanRecord) =>
         info(s"Cleaned record $cleanRecord")
         cleanRecord

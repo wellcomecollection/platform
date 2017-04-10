@@ -8,6 +8,6 @@ object GlobalExecutionContext {
   // and records fall into a hole.  See the discussion on
   // https://github.com/wellcometrust/platform-api/issues/159 for details
 
-  implicit val context = ExecutionContext.fromExecutor(
-    new scala.concurrent.forkjoin.ForkJoinPool())
+  implicit val context =
+    ExecutionContext.fromExecutor(new scala.concurrent.forkjoin.ForkJoinPool())
 }
