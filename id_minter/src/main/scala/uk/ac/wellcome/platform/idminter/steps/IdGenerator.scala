@@ -18,7 +18,8 @@ class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
   def generateId(unifiedItem: UnifiedItem): Future[String] = Future {
     findMiroID(unifiedItem) match {
       case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
-      case None => logAndThrowError(s"Item $unifiedItem did not contain a MiroID")
+      case None =>
+        logAndThrowError(s"Item $unifiedItem did not contain a MiroID")
     }
   }
 
@@ -26,8 +27,12 @@ class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
     findMiroIdInDynamo(identifier.value) match {
       case Right(id) :: Nil => id.CanonicalID
       case Nil => generateAndSaveCanonicalId(identifier.value)
-      case Right(_) :: tail => logAndThrowError(s"Found more than one record with MiroID ${identifier.value}")
-      case _ => logAndThrowError(s"Error in parsing the object with MiroID ${identifier.value}")
+      case Right(_) :: tail =>
+        logAndThrowError(
+          s"Found more than one record with MiroID ${identifier.value}")
+      case _ =>
+        logAndThrowError(
+          s"Error in parsing the object with MiroID ${identifier.value}")
     }
   }
 
@@ -35,7 +40,8 @@ class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
     unifiedItem.identifiers.find(identifier => identifier.sourceId == "MiroID")
 
   private def findMiroIdInDynamo(miroId: String) = {
-    Scanamo.queryIndex[Id](dynamoDBClient)(identifiersTableName, "MiroID")('MiroID -> miroId)
+    Scanamo.queryIndex[Id](dynamoDBClient)(identifiersTableName, "MiroID")(
+      'MiroID -> miroId)
   }
 
   private def generateAndSaveCanonicalId(miroId: String) = {

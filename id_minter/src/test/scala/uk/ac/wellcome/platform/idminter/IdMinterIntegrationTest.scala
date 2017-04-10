@@ -1,17 +1,24 @@
 package uk.ac.wellcome.platform.idminter
 
-
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{Id, IdentifiedUnifiedItem, Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  Id,
+  IdentifiedUnifiedItem,
+  Identifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
 import uk.ac.wellcome.test.utils.IntegrationTestBase
 import uk.ac.wellcome.utils.JsonUtil
 
-class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with IntegrationPatience {
+class IdMinterIntegrationTest
+    extends IntegrationTestBase
+    with Eventually
+    with IntegrationPatience {
 
   test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
     val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroID", "1234")), Option("super-secret"))
@@ -22,13 +29,17 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
     IdMinterModule.singletonStartup(injector)
 
     eventually {
-      val dynamoIdentifiersRecords = Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> "1234")
-      dynamoIdentifiersRecords should have size(1)
+      val dynamoIdentifiersRecords =
+        Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")(
+          'MiroID -> "1234")
+      dynamoIdentifiersRecords should have size (1)
       val id = extractId(dynamoIdentifiersRecords)
       val messages = listMessagesReceivedFromSNS()
       messages should have size (1)
-      JsonUtil.fromJson[IdentifiedUnifiedItem](messages.head.message).get shouldBe IdentifiedUnifiedItem(id.CanonicalID,unifiedItem)
-      messages.head.subject should be ("identified-item")
+      JsonUtil
+        .fromJson[IdentifiedUnifiedItem](messages.head.message)
+        .get shouldBe IdentifiedUnifiedItem(id.CanonicalID, unifiedItem)
+      messages.head.subject should be("identified-item")
     }
   }
 
@@ -41,19 +52,22 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
     IdMinterModule.singletonStartup(injector)
 
     eventually {
-      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> firstMiroId) should have size(1)
+      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")(
+        'MiroID -> firstMiroId) should have size (1)
     }
 
     val secondMiroId = "5678"
     val secondSqsMessage = generateSqsMessage(secondMiroId)
-    sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(secondSqsMessage).get)
+    sqsClient.sendMessage(idMinterQueueUrl,
+                          JsonUtil.toJson(secondSqsMessage).get)
 
     eventually {
-      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> secondMiroId) should have size(1)
+      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")(
+        'MiroID -> secondMiroId) should have size (1)
     }
   }
 
-  test("it should keep polling if something fails processing a message"){
+  test("it should keep polling if something fails processing a message") {
     sqsClient.sendMessage(idMinterQueueUrl, "not a json string")
 
     IdMinterModule.singletonStartup(injector)
@@ -63,7 +77,8 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
 
     sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(sqsMessage).get)
     eventually {
-      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> miroId) should have size(1)
+      Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")(
+        'MiroID -> miroId) should have size (1)
     }
 
   }
@@ -74,8 +89,10 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
     sqsMessage
   }
 
-  private def extractId(dynamoIdentifiersRecords: List[Either[DynamoReadError, Id]]) = {
-    val id = dynamoIdentifiersRecords.head.asInstanceOf[Right[DynamoReadError, Id]].b
+  private def extractId(
+    dynamoIdentifiersRecords: List[Either[DynamoReadError, Id]]) = {
+    val id =
+      dynamoIdentifiersRecords.head.asInstanceOf[Right[DynamoReadError, Id]].b
     id
   }
 }

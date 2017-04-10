@@ -8,7 +8,11 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{Identifier, UnifiedItem}
 import uk.ac.wellcome.utils.JsonUtil
 
-class UnifiedItemExtractorTest extends FunSpec with Matchers with ScalaFutures with IntegrationPatience {
+class UnifiedItemExtractorTest
+    extends FunSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience {
 
   it("extracts the unified item included in the SQS message"){
     val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroId", "1234")), Option("super-secret"))
@@ -17,20 +21,24 @@ class UnifiedItemExtractorTest extends FunSpec with Matchers with ScalaFutures w
 
     val eventualUnifiedItem = UnifiedItemExtractor.toUnifiedItem(message)
 
-    whenReady(eventualUnifiedItem) {extractedUnifiedItem =>
-      extractedUnifiedItem should be (unifiedItem)
+    whenReady(eventualUnifiedItem) { extractedUnifiedItem =>
+      extractedUnifiedItem should be(unifiedItem)
     }
 
   }
 
-  it("should return a failed future if it fails parsing the message it receives"){
-    val sqsMessage = SQSMessage(Some("subject"),"not a json string", "topic", "messageType", "timestamp")
+  it("should return a failed future if it fails parsing the message it receives") {
+    val sqsMessage = SQSMessage(Some("subject"),
+                                "not a json string",
+                                "topic",
+                                "messageType",
+                                "timestamp")
     val message = new Message().withBody(JsonUtil.toJson(sqsMessage).get)
 
     val eventualUnifiedItem = UnifiedItemExtractor.toUnifiedItem(message)
 
-    whenReady(eventualUnifiedItem.failed){e =>
-      e shouldBe a [JsonParseException]
+    whenReady(eventualUnifiedItem.failed) { e =>
+      e shouldBe a[JsonParseException]
     }
   }
 
