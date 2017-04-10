@@ -13,7 +13,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 object IdMinterModule extends TwitterModule with TryBackoff{
 
   override def singletonStartup(injector: Injector) {
-    info("Starting SQS worker")
+    info("Starting IdMinter module")
 
     val sqsReader = injector.instance[SQSReader]
     val idGenerator = injector.instance[IdGenerator]
