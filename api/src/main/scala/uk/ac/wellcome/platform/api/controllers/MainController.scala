@@ -1,21 +1,14 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.twitter.finagle.http.Request
-import com.twitter.finatra.http.Controller
-import uk.ac.wellcome.platform.api.models._
-import uk.ac.wellcome.platform.api.services._
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.ElasticDsl._
-
-import scala.concurrent.Future
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Try
+import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.QueryParam
 import com.twitter.finatra.validation.NotEmpty
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.platform.api.models._
+import uk.ac.wellcome.platform.api.services._
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 case class CalmRequest(
   @NotEmpty @QueryParam altRefNo: String

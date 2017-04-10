@@ -1,8 +1,13 @@
 package uk.ac.wellcome.utils
 
-/**
-  * Created by caylaa on 4/10/17.
-  */
-object GlobalExecutionContext {
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
+object GlobalExecutionContext {
+  // This ensures we have enough threads when running in ECS.  If we use
+  // the implicit global execution context, the application is thread-starved
+  // and records fall into a hole.  See the discussion on
+  // https://github.com/wellcometrust/platform-api/issues/159 for details
+
+  implicit val context = ExecutionContext.fromExecutor(
+    new scala.concurrent.forkjoin.ForkJoinPool())
 }

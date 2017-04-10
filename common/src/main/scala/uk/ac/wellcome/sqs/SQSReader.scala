@@ -6,11 +6,11 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SQSConfig
 
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
-import scala.collection.JavaConversions._
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig, waitTime: Duration, maxMessages: Integer) extends Logging {
 

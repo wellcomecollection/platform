@@ -2,15 +2,13 @@ package uk.ac.wellcome.utils
 
 import java.util.concurrent.TimeUnit
 
-import scala.math.pow
-import scala.util.{Try, Success, Failure}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-
-import akka.actor.{ActorSystem}
-
+import akka.actor.ActorSystem
 import com.twitter.inject.Logging
+
+import scala.concurrent.duration.Duration
+import scala.math.pow
+import scala.util.{Failure, Success, Try}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 trait TryBackoff extends Logging {
   val baseWaitMillis = 100

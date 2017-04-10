@@ -10,8 +10,8 @@ import uk.ac.wellcome.models.aws.ECSServiceScheduleRequest
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.utils._
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
