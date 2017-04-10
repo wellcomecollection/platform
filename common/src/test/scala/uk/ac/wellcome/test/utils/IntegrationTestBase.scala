@@ -13,14 +13,11 @@ trait IntegrationTestBase
     with SQSLocal
     with DynamoDBLocal
     with SNSLocal {
+  def flags: Map[String, String]
+
   override def injector =
     TestInjector(
-      flags = Map(
-        "aws.region" -> "local",
-        "aws.sqs.queue.url" -> idMinterQueueUrl,
-        "sqs.waitTime" -> "1",
-        "aws.sns.topic.arn" -> ingestTopicArn
-      ),
+      flags,
       modules = Seq(AkkaModule,
                     LocalSNSClient,
                     DynamoDBLocalClientModule,

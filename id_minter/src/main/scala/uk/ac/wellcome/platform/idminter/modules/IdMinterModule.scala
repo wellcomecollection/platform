@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.{IdentifiedUnifiedItem, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.steps.{
-  IdGenerator,
+  IdentifierGenerator,
   UnifiedItemExtractor
 }
 import uk.ac.wellcome.sns.SNSWriter
@@ -19,14 +19,14 @@ object IdMinterModule extends TwitterModule with TryBackoff {
     info("Starting IdMinter module")
 
     val sqsReader = injector.instance[SQSReader]
-    val idGenerator = injector.instance[IdGenerator]
+    val idGenerator = injector.instance[IdentifierGenerator]
     val snsWriter = injector.instance[SNSWriter]
     val actorSystem = injector.instance[ActorSystem]
     run(() => start(sqsReader, idGenerator, snsWriter), actorSystem)
   }
 
   private def start(sqsReader: SQSReader,
-                    idGenerator: IdGenerator,
+                    idGenerator: IdentifierGenerator,
                     snsWriter: SNSWriter) = {
 
     sqsReader.retrieveMessages().map { messages =>

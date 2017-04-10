@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.utils.JsonUtil
 
 class UnifiedItemExtractorTest
@@ -16,7 +16,7 @@ class UnifiedItemExtractorTest
 
   it("extracts the unified item included in the SQS message") {
     val unifiedItem = UnifiedItem("id",
-                                  List(Identifier("Miro", "MiroId", "1234")),
+                                  List(SourceIdentifier("Miro", "MiroId", "1234")),
                                   Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 UnifiedItem.json(unifiedItem),

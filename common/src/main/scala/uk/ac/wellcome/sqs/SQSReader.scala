@@ -12,18 +12,16 @@ import scala.concurrent.duration.Duration
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class SQSReader @Inject()(sqsClient: AmazonSQS,
-                          sqsConfig: SQSConfig,
-                          waitTime: Duration,
-                          maxMessages: Integer)
+                          sqsConfig: SQSConfig)
     extends Logging {
 
   def retrieveMessages(): Future[List[Message]] = Future {
-    info("looking for new messages ...")
+    info(s"Looking for new messages at ${sqsConfig.queueUrl}")
     sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(sqsConfig.queueUrl)
-          .withWaitTimeSeconds(waitTime.toSeconds.toInt)
-          .withMaxNumberOfMessages(maxMessages))
+          .withWaitTimeSeconds(sqsConfig.waitTime.toSeconds.toInt)
+          .withMaxNumberOfMessages(sqsConfig.maxMessages))
       .getMessages
       .toList
   }
