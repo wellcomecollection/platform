@@ -7,7 +7,10 @@ import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.CalmService
 import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

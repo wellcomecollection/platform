@@ -4,7 +4,11 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.finatra.modules.{AkkaModule, SNSClientModule, SNSConfigModule}
+import uk.ac.wellcome.finatra.modules.{
+  AkkaModule,
+  SNSClientModule,
+  SNSConfigModule
+}
 import uk.ac.wellcome.models.ActorRegister
 import uk.ac.wellcome.models.aws.ECSServiceScheduleRequest
 import uk.ac.wellcome.platform.calm_adapter.actors._
@@ -65,7 +69,7 @@ object CalmAdapterWorker extends TwitterModule {
 
     messageBody match {
       case Success(body) => {
-        snsWriter.writeMessage(body,None).map { publishRequest =>
+        snsWriter.writeMessage(body, None).map { publishRequest =>
           info(s"Sent SNS shutdown request; $publishRequest")
         }
       }

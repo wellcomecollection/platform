@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, UnifiedItem}
 import uk.ac.wellcome.platform.api.models.Record
 import uk.ac.wellcome.utils.JsonUtil
 
-class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers{
+class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers {
 
   val elasticSearchService = new ElasticsearchService(client)
   val calmService = new CalmService(elasticSearchService)
@@ -19,7 +19,7 @@ class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers{
 
     val recordsFuture = calmService.findRecords()
 
-    recordsFuture map {records=>
+    recordsFuture map { records =>
       records should have size 1
       records.head shouldBe Record("Work", "id")
     }

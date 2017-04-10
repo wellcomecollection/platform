@@ -1,14 +1,16 @@
 package uk.ac.wellcome.models.aws
 
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.{DeleteMessageRequest, Message => AwsSQSMessage}
+import com.amazonaws.services.sqs.model.{
+  DeleteMessageRequest,
+  Message => AwsSQSMessage
+}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
 
 trait MessageProcessor extends Logging {
   type Processor = (String) => Future[Unit]

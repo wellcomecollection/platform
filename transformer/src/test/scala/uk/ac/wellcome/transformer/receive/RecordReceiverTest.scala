@@ -1,6 +1,10 @@
 package uk.ac.wellcome.transformer.receive
 
-import com.amazonaws.services.dynamodbv2.model.{AttributeValue, Record, StreamRecord}
+import com.amazonaws.services.dynamodbv2.model.{
+  AttributeValue,
+  Record,
+  StreamRecord
+}
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.fasterxml.jackson.databind.JsonMappingException
 import org.mockito.Matchers.{any, anyString}
@@ -34,7 +38,8 @@ class RecordReceiverTest
                                     List(Identifier("source", "key", "value")),
                                     Some("TopSekrit"))
       Mockito
-        .verify(mockSNS).writeMessage(UnifiedItem.json(unifiedItem), Some("Foo"))
+        .verify(mockSNS)
+        .writeMessage(UnifiedItem.json(unifiedItem), Some("Foo"))
     }
   }
 
@@ -71,13 +76,14 @@ class RecordReceiverTest
 
   private def createMockSNS = {
     val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(),any[Option[String]])).thenReturn(Future{PublishAttempt("1234")})
+    when(mockSNS.writeMessage(anyString(), any[Option[String]]))
+      .thenReturn(Future { PublishAttempt("1234") })
     mockSNS
   }
 
   private def mockFailPublishMessage = {
     val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(),any[Option[String]]))
+    when(mockSNS.writeMessage(anyString(), any[Option[String]]))
       .thenThrow(new RuntimeException("Failed publishing message"))
     mockSNS
   }
