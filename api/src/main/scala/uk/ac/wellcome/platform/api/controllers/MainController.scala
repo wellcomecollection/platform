@@ -33,6 +33,24 @@ class MainController @Inject()(
 
   prefix(apiPrefix) {
 
+    // This is a demo endpoint for the UX team to use when prototyping
+    // item pages.
+    // TODO: Remove this endpoint.
+    get(s"/demoItem") {
+      request: Request =>
+        response.ok.json(Map(
+          "@context" -> "http://id.wellcomecollection.org/",
+          "id" -> "cbsx6cvr",
+          "type" -> "item",
+          "title" -> "The natural history of monkeys",
+          "date" -> "1546-04-07",
+          "authors" -> Array("William Jardine"),
+          "description" -> "230 page, color plates : frontispiece (portrait), add. color t.page ; (8vo)",
+          "topics" -> Array("monkeys", "animals"),
+          "media" -> Array("http://wellcomelibrary.org/content/59301/60865")
+        ))
+    }
+
     get(s"/record") { request: CalmRequest =>
       val recordCollectionPair = for {
         recordOption <- calmService.findRecordByAltRefNo(request.altRefNo)
