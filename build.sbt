@@ -6,7 +6,7 @@ import com.typesafe.sbt.packager.docker.DockerPlugin
 
 def doSharedSetup(project: Project) =
   project
-    .dependsOn(common)
+    .dependsOn(common % "compile->compile;test->test")
     .settings(Common.settings: _*)
     .settings(Finatra.settings: _*)
     .settings(Revolver.settings: _*)

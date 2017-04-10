@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter
+package uk.ac.wellcome.test.utils
 
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
@@ -18,4 +18,8 @@ trait SNSLocal extends Suite with BeforeAndAfterEach {
     topic = amazonSNS.createTopic("es_ingest")
   }
 
+  def listMessagesReceivedFromSNS() = {
+    val string = scala.io.Source.fromURL(localSNSEnpointUrl).mkString
+    string.split('\n').filter(_.contains(":message: ")).map {_.replace(":message: ", "").replace("'","").trim}.toList
+  }
 }
