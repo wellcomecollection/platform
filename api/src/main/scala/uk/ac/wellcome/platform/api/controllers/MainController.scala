@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.api.controllers
 
 import javax.inject.{Inject, Singleton}
 
+import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.QueryParam
 import com.twitter.finatra.validation.NotEmpty
