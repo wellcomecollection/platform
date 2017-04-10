@@ -1,37 +1,19 @@
 package uk.ac.wellcome.platform.calm_adapter.modules
 
-import java.nio.charset.{Charset => JCharset}
-import java.util.{List => JList}
 import java.util.concurrent.TimeUnit
 
-import scala.collection.JavaConverters._
-import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.models.aws.ECSServiceScheduleRequest
-
-import akka.actor.{ActorSystem, Props, DeadLetter}
-import com.amazonaws.auth.{
-  AWSCredentials,
-  AWSCredentialsProvider,
-  DefaultAWSCredentialsProviderChain
-}
-import com.amazonaws.regions._
-import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
-import com.amazonaws.services.sns._
+import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-
+import uk.ac.wellcome.finatra.modules.{AkkaModule, SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.models.ActorRegister
-
+import uk.ac.wellcome.models.aws.ECSServiceScheduleRequest
 import uk.ac.wellcome.platform.calm_adapter.actors._
-import uk.ac.wellcome.finatra.modules.{
-  AkkaModule,
-  SNSClientModule,
-  SNSConfigModule
-}
-import uk.ac.wellcome.models.aws.SNSConfig
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.utils._
-import scala.util.{Success, Failure}
-import uk.ac.wellcome.models.aws.SNSMessage
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success}
 
 object CalmAdapterWorker extends TwitterModule {
 
@@ -70,8 +52,7 @@ object CalmAdapterWorker extends TwitterModule {
     val system = injector.instance[ActorSystem]
     system.terminate()
 
-    val snsClient = injector.instance[AmazonSNS]
-    val snsConfig = injector.instance[SNSConfig]
+    val snsWriter = injector.instance[SNSWriter]
 
     val messageBody = JsonUtil
       .toJson(
@@ -84,13 +65,9 @@ object CalmAdapterWorker extends TwitterModule {
 
     messageBody match {
       case Success(body) => {
-        val publishRequest = SNSMessage(
-          body = body,
-          topic = snsConfig.topicArn,
-          snsClient = snsClient
-        ).publish
-
-        info(s"Sent SNS shutdown request; ${publishRequest}")
+        snsWriter.writeMessage(body,None).map { publishRequest =>
+          info(s"Sent SNS shutdown request; $publishRequest")
+        }
       }
       case Failure(e) =>
         error("Failed to send ECSServiceScheduleRequest message", e)

@@ -7,7 +7,6 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.PublishAttempt
 import uk.ac.wellcome.models.aws.SNSConfig
 
 class SNSWriterTest extends FunSpec with MockitoSugar with ScalaFutures with Matchers{
