@@ -8,26 +8,28 @@ import com.twitter.inject.app.TestInjector
 import com.twitter.inject.{IntegrationTest, TwitterModule}
 import uk.ac.wellcome.finatra.modules._
 
-trait IntegrationTestBase extends IntegrationTest with SQSLocal with DynamoDBLocal with SNSLocal {
+trait IntegrationTestBase
+    extends IntegrationTest
+    with SQSLocal
+    with DynamoDBLocal
+    with SNSLocal {
   override def injector =
     TestInjector(
-      flags =
-        Map(
-          "aws.region" -> "local",
-          "aws.sqs.queue.url" -> idMinterQueueUrl,
-          "sqs.waitTime" -> "1",
-          "aws.sns.topic.arn" -> ingestTopicArn
-        ),
-      modules =
-        Seq(
-          AkkaModule,
-          LocalSNSClient,
-          DynamoDBLocalClientModule,
-          SQSReaderModule,
-          SQSLocalClientModule,
-          SNSConfigModule,
-          SQSConfigModule,
-          DynamoConfigModule))
+      flags = Map(
+        "aws.region" -> "local",
+        "aws.sqs.queue.url" -> idMinterQueueUrl,
+        "sqs.waitTime" -> "1",
+        "aws.sns.topic.arn" -> ingestTopicArn
+      ),
+      modules = Seq(AkkaModule,
+                    LocalSNSClient,
+                    DynamoDBLocalClientModule,
+                    SQSReaderModule,
+                    SQSLocalClientModule,
+                    SNSConfigModule,
+                    SQSConfigModule,
+                    DynamoConfigModule)
+    )
 
   object LocalSNSClient extends TwitterModule {
 
@@ -36,14 +38,14 @@ trait IntegrationTestBase extends IntegrationTest with SQSLocal with DynamoDBLoc
     def providesSNSClient: AmazonSNS = amazonSNS
   }
 
-  object DynamoDBLocalClientModule extends TwitterModule  {
+  object DynamoDBLocalClientModule extends TwitterModule {
 
     @Singleton
     @Provides
     def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
   }
 
-  object SQSLocalClientModule extends TwitterModule  {
+  object SQSLocalClientModule extends TwitterModule {
 
     @Singleton
     @Provides

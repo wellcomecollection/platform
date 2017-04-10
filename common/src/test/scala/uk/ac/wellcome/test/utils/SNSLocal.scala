@@ -8,7 +8,11 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 
 trait SNSLocal extends Suite with BeforeAndAfterEach {
   val localSNSEnpointUrl = "http://localhost:9292"
-  val amazonSNS: AmazonSNS = AmazonSNSClientBuilder.standard().withEndpointConfiguration(new EndpointConfiguration(localSNSEnpointUrl, "local")).build()
+  val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
+    .standard()
+    .withEndpointConfiguration(
+      new EndpointConfiguration(localSNSEnpointUrl, "local"))
+    .build()
   private var topic = amazonSNS.createTopic("es_ingest")
   def ingestTopicArn: String = topic.getTopicArn
 
@@ -20,18 +24,27 @@ trait SNSLocal extends Suite with BeforeAndAfterEach {
 
   def listMessagesReceivedFromSNS(): List[MessageInfo] = {
     val string = scala.io.Source.fromURL(localSNSEnpointUrl).mkString
-    string.split("messages:\n-").tail.map{ messageDetails =>
-      val messageLines = messageDetails.split('\n')
-      MessageInfo(getMessageLine(messageLines, ":id: "),
-        getMessageLine(messageLines, ":message: ").replace("'",""),
-        getMessageLine(messageLines, ":subject: "))
-    }.toList
+    string
+      .split("messages:\n-")
+      .tail
+      .map { messageDetails =>
+        val messageLines = messageDetails.split('\n')
+        MessageInfo(
+          getMessageLine(messageLines, ":id: "),
+          getMessageLine(messageLines, ":message: ").replace("'", ""),
+          getMessageLine(messageLines, ":subject: "))
+      }
+      .toList
   }
 
-  private def getMessageLine(messageLines: Array[String], fieldName: String): String = {
-    messageLines.filter(_.contains(fieldName)).map {
-      _.replace(fieldName, "").trim
-    }.head
+  private def getMessageLine(messageLines: Array[String],
+                             fieldName: String): String = {
+    messageLines
+      .filter(_.contains(fieldName))
+      .map {
+        _.replace(fieldName, "").trim
+      }
+      .head
   }
 }
 
