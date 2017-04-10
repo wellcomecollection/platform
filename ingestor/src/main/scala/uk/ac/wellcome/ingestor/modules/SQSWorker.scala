@@ -10,9 +10,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 object SQSWorker extends TwitterModule with TryBackoff {
 
-  val waitTime = flag("sqs.waitTime", 20, "SQS wait time")
-  val maxMessages = flag("sqs.maxMessages", 1, "Max SQS messages")
-
   def processMessages(
                        sqsReader: SQSReader,
                        messageProcessorService: MessageProcessorService
