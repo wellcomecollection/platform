@@ -1,16 +1,11 @@
 package uk.ac.wellcome.sns
 
-import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.PublishRequest
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.test.utils.SNSLocal
 
-class SNSWriterTest extends FunSpec with MockitoSugar with ScalaFutures with Matchers with SNSLocal with IntegrationPatience{
+class SNSWriterTest extends FunSpec with ScalaFutures with Matchers with SNSLocal with IntegrationPatience{
 
   val snsConfig = SNSConfig("eu-west-1", ingestTopicArn)
 
@@ -43,14 +38,12 @@ class SNSWriterTest extends FunSpec with MockitoSugar with ScalaFutures with Mat
   }
 
   it("should return a failed future if it fails to publish the message"){
-    val snsClient = mock[AmazonSNS]
-    when(snsClient.publish(any[PublishRequest])).thenThrow(new RuntimeException("failed to publish message"))
-    val snsWriter = new SNSWriter(snsClient, snsConfig)
+    val snsWriter = new SNSWriter(amazonSNS, SNSConfig("eu-west-1", "not a valid topic"))
 
     val futurePublishAttempt = snsWriter.writeMessage("someMessage", Some("subject"))
 
     whenReady(futurePublishAttempt.failed){exception =>
-      exception.getMessage shouldBe "failed to publish message"
+      exception.getMessage should not be (empty)
     }
   }
 
