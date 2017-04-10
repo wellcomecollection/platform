@@ -6,7 +6,7 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.ingestor.services.MessageProcessorService
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.TryBackoff
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 object SQSWorker extends TwitterModule with TryBackoff {
 

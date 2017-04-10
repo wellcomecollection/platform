@@ -5,8 +5,8 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.UnifiedItem
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 

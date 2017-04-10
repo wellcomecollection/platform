@@ -1,21 +1,17 @@
 package uk.ac.wellcome.platform.calm_adapter.services
 
+import java.net.URLDecoder
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
-import com.twitter.inject.TwitterModule
+
 import com.twitter.inject.Logging
-
-import java.net.URLDecoder
-import scala.util.matching.Regex
-
 import uk.ac.wellcome.models.CalmDynamoRecord
-import uk.ac.wellcome.utils.JsonUtil
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.platform.calm_adapter.models.OaiHarvestConfig
 import uk.ac.wellcome.platform.calm_adapter.actors.OaiHarvestActorConfig
-import uk.ac.wellcome.utils.UrlUtil
+import uk.ac.wellcome.platform.calm_adapter.models.OaiHarvestConfig
+import uk.ac.wellcome.utils.{JsonUtil, UrlUtil}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
 import scala.concurrent.Future
 
 case class ParsedOaiResult(

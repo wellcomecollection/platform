@@ -7,8 +7,8 @@ import uk.ac.wellcome.platform.idminter.steps.{IdGenerator, UnifiedItemExtractor
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object IdMinterModule extends TwitterModule with TryBackoff{
 

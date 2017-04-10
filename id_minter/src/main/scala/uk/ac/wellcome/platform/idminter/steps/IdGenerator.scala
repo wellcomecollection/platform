@@ -7,8 +7,8 @@ import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.{Id, Identifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class IdGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {

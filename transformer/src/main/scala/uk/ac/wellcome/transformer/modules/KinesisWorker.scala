@@ -13,8 +13,8 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule, SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 object KinesisWorker extends TwitterModule {
   override val modules = Seq(StreamsRecordProcessorFactoryModule,
