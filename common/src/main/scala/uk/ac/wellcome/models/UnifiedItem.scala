@@ -10,7 +10,6 @@ case class IdentifiedUnifiedItem(canonicalId: String, unifiedItem: UnifiedItem)
 case class Identifier(source: String, sourceId: String, value: String)
 
 case class UnifiedItem(
-  id: String,
   identifiers: List[Identifier],
   accessStatus: Option[String]
 )

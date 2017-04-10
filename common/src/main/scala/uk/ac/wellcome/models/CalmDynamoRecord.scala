@@ -12,7 +12,6 @@ case class DirtyCalmRecord(
 ) extends Transformable {
   def transform: Try[UnifiedItem] = Try {
     UnifiedItem(
-      "id",
       List(Identifier("source", "key", "value")),
       accessStatus = AccessStatus.headOption
     )
