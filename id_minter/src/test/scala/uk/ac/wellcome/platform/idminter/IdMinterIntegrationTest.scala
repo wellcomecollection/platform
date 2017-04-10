@@ -14,7 +14,7 @@ import uk.ac.wellcome.utils.JsonUtil
 class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with IntegrationPatience {
 
   test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
-    val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroID", "1234")), Option("super-secret"))
+    val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroID", "1234")), Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),UnifiedItem.json(unifiedItem), "topic", "messageType", "timestamp")
 
     sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(sqsMessage).get)
@@ -69,7 +69,7 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
   }
 
   private def generateSqsMessage(MiroID: String) = {
-    val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroID", MiroID)), Option("super-secret"))
+    val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroID", MiroID)), Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"), UnifiedItem.json(unifiedItem), "topic", "messageType", "timestamp")
     sqsMessage
   }

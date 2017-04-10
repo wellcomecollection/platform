@@ -4,8 +4,9 @@ import com.sksamuel.elastic4s.ElasticDsl.indexInto
 import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.scalatest.{AsyncFunSpec, Matchers}
 import uk.ac.wellcome.finatra.services.ElasticsearchService
-import uk.ac.wellcome.models.{Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, UnifiedItem}
 import uk.ac.wellcome.platform.api.models.Record
+import uk.ac.wellcome.utils.JsonUtil
 
 class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers{
 
@@ -14,7 +15,7 @@ class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers{
 
   it("should find records") {
     ensureIndexExists("records")
-    insertIntoElasticSearch(UnifiedItem("id", List(Identifier("Calm", "AltRefNo", "calmid")), None))
+    insertIntoElasticSearch(IdentifiedUnifiedItem("id",UnifiedItem(List(Identifier("Calm", "AltRefNo", "calmid")), None)))
 
     val recordsFuture = calmService.findRecords()
 
@@ -24,8 +25,8 @@ class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers{
     }
   }
 
-  private def insertIntoElasticSearch(unifiedItem: UnifiedItem) = {
-    client.execute(indexInto("records" / "item").doc(UnifiedItem.json(unifiedItem)))
+  private def insertIntoElasticSearch(identifiedUnifiedItem: IdentifiedUnifiedItem) = {
+    client.execute(indexInto("records" / "item").doc(JsonUtil.toJson(identifiedUnifiedItem).get))
     blockUntilCount(1,"records")
   }
 }

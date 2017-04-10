@@ -14,7 +14,7 @@ class IdGeneratorTest extends FunSpec with DynamoDBLocal with ScalaFutures with 
   it("should search the miro id in dynamoDb and return the canonical id if it finds it"){
     Scanamo.put(dynamoDbClient)("Identifiers")(Id("5678","1234"))
 
-    val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroID", "1234")), None)
+    val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroID", "1234")), None)
     val futureId = idGenerator.generateId(unifiedItem)
 
     whenReady(futureId){id =>
@@ -23,7 +23,7 @@ class IdGeneratorTest extends FunSpec with DynamoDBLocal with ScalaFutures with 
   }
 
   it("should generate an id and save it in the database if a record doesn't already exist"){
-    val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroID", "1234")), None)
+    val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroID", "1234")), None)
     val futureId = idGenerator.generateId(unifiedItem)
 
     whenReady(futureId){id =>
@@ -33,7 +33,7 @@ class IdGeneratorTest extends FunSpec with DynamoDBLocal with ScalaFutures with 
   }
 
   it("should reject an item with no miroId in the list of Identifiers"){
-    val unifiedItem = UnifiedItem("id", List(Identifier("NotMiro", "NotMiroID", "1234")), None)
+    val unifiedItem = UnifiedItem(List(Identifier("NotMiro", "NotMiroID", "1234")), None)
     val futureId = idGenerator.generateId(unifiedItem)
 
     whenReady(futureId.failed){exception =>
@@ -46,7 +46,7 @@ class IdGeneratorTest extends FunSpec with DynamoDBLocal with ScalaFutures with 
     Scanamo.put(dynamoDbClient)("Identifiers")(Id("5678",miroId))
     Scanamo.put(dynamoDbClient)("Identifiers")(Id("8765",miroId))
 
-    val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroID", miroId)), None)
+    val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroID", miroId)), None)
     val futureId = idGenerator.generateId(unifiedItem)
 
     whenReady(futureId.failed){exception =>

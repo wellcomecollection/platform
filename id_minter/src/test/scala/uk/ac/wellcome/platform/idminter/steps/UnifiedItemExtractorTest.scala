@@ -11,7 +11,7 @@ import uk.ac.wellcome.utils.JsonUtil
 class UnifiedItemExtractorTest extends FunSpec with Matchers with ScalaFutures with IntegrationPatience {
 
   it("extracts the unified item included in the SQS message"){
-    val unifiedItem = UnifiedItem("id", List(Identifier("Miro", "MiroId", "1234")), Option("super-secret"))
+    val unifiedItem = UnifiedItem(List(Identifier("Miro", "MiroId", "1234")), Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),UnifiedItem.json(unifiedItem), "topic", "messageType", "timestamp")
     val message = new Message().withBody(JsonUtil.toJson(sqsMessage).get)
 

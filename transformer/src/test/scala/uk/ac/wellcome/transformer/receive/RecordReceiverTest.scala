@@ -30,7 +30,7 @@ class RecordReceiverTest
       recordReceiver.receiveRecord(new RecordAdapter(createMockRecord))
 
     whenReady(future) { _ =>
-      val unifiedItem = UnifiedItem("id",
+      val unifiedItem = UnifiedItem(
                                     List(Identifier("source", "key", "value")),
                                     Some("TopSekrit"))
       Mockito
