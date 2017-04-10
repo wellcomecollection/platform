@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.sqs.model.Message
 import com.fasterxml.jackson.core.JsonParseException
@@ -6,7 +6,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{Identifier, UnifiedItem}
-import uk.ac.wellcome.platform.idminter.steps.UnifiedItemExtractor
 import uk.ac.wellcome.utils.JsonUtil
 
 class UnifiedItemExtractorTest extends FunSpec with Matchers with ScalaFutures with IntegrationPatience {

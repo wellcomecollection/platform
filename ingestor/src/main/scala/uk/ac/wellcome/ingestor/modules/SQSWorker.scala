@@ -6,6 +6,7 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.ingestor.services.MessageProcessorService
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.TryBackoff
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object SQSWorker extends TwitterModule with TryBackoff {
 
@@ -27,7 +28,7 @@ object SQSWorker extends TwitterModule with TryBackoff {
 
     val system = injector.instance[ActorSystem]
 
-    val sqsReader = injector[SQSReader]
+    val sqsReader = injector.instance[SQSReader]
     val messageProcessorService = injector.instance[MessageProcessorService]
 
     def start() =
