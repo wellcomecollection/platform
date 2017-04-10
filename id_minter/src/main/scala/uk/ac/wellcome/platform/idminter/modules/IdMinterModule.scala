@@ -11,6 +11,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 
 object IdMinterModule extends TwitterModule with TryBackoff{
+  val snsSubject = "identified-item"
 
   override def singletonStartup(injector: Injector) {
     info("Starting IdMinter module")
@@ -29,7 +30,7 @@ object IdMinterModule extends TwitterModule with TryBackoff{
         for {
           unifiedItem <- UnifiedItemExtractor.toUnifiedItem(message)
           canonicalId <- idGenerator.generateId(unifiedItem)
-          _ <- snsWriter.writeMessage(toIdentifiedUnifiedItemJson(unifiedItem, canonicalId), None)
+          _ <- snsWriter.writeMessage(toIdentifiedUnifiedItemJson(unifiedItem, canonicalId), Some(snsSubject))
         } yield ()
       }
     }
