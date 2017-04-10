@@ -15,13 +15,21 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig) extends Lo
   val defaultSubject = "subject-not-specified"
 
   def writeMessage(message: String, subject: Option[String]): Future[PublishAttempt] = Future {
+
     info(s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
-    snsClient.publish(new PublishRequest(snsConfig.topicArn, message, subject.getOrElse(defaultSubject)))}.map{publishResult =>
-      info(s"Published message ${publishResult.getMessageId}")
-      PublishAttempt(publishResult.getMessageId)
-    }.recover{
-    case e:Throwable=>
+    snsClient.publish(toPublishRequest(message, subject))
+
+  }.map { publishResult =>
+
+    info(s"Published message ${publishResult.getMessageId}")
+    PublishAttempt(publishResult.getMessageId)
+
+  }.recover { case e: Throwable =>
       error("Failed to publish message", e)
       throw e
+  }
+
+  private def toPublishRequest(message: String, subject: Option[String]) = {
+    new PublishRequest(snsConfig.topicArn, message, subject.getOrElse(defaultSubject))
   }
 }

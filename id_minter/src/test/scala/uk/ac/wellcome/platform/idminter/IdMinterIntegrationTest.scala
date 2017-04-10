@@ -24,11 +24,11 @@ class IdMinterIntegrationTest extends IntegrationTestBase with Eventually with I
     eventually {
       val dynamoIdentifiersRecords = Scanamo.queryIndex[Id](dynamoDbClient)("Identifiers", "MiroID")('MiroID -> "1234")
       dynamoIdentifiersRecords should have size(1)
-      dynamoIdentifiersRecords.head shouldBe a[Right[DynamoReadError,Id]]
       val id = extractId(dynamoIdentifiersRecords)
       val messages = listMessagesReceivedFromSNS()
       messages should have size (1)
-      JsonUtil.fromJson[IdentifiedUnifiedItem](messages.head.trim).get shouldBe IdentifiedUnifiedItem(id.CanonicalID,unifiedItem)
+      JsonUtil.fromJson[IdentifiedUnifiedItem](messages.head.message).get shouldBe IdentifiedUnifiedItem(id.CanonicalID,unifiedItem)
+      messages.head.subject should be ("identified-item")
     }
   }
 
