@@ -1,20 +1,19 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.github.xiaodongw.swagger.finatra.SwaggerSupport
-
-import com.twitter.inject.annotations.Flag
-import com.twitter.finagle.http.Request
-import com.twitter.finatra.http.Controller
-
 import javax.inject.{Inject, Singleton}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
+import com.github.xiaodongw.swagger.finatra.SwaggerSupport
+import com.twitter.finagle.http.Request
+import com.twitter.finatra.http.Controller
+import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.ResultResponse
-import uk.ac.wellcome.platform.api.responses.ResultListResponse
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.CalmService
 import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 @Singleton
 class WorksController @Inject()(
