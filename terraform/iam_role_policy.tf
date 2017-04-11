@@ -22,8 +22,8 @@ resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
   policy = "${data.aws_iam_policy_document.allow_calm_db_all.json}"
 }
 
-resource "aws_iam_role_policy" "ecs_calm_adapter_publish_to_sns" {
-  name   = "publish_to_sns_policy"
+resource "aws_iam_role_policy" "ecs_calm_adapter_service_scheduler_sns" {
+  name   = "ecs_task_calm_service_scheduler_sns_policy"
   role   = "${module.ecs_calm_adapter_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.publish_to_scheduler_sns.json}"
 }
@@ -64,8 +64,8 @@ resource "aws_iam_role_policy" "ecs_id_minter_task_read_id_minter_q" {
 
 # Role policies for the Publish to SNS Lambda
 
-resource "aws_iam_role_policy" "publish_to_sns_lambda_policy" {
-  name   = "publish_to_sns_policy"
-  role   = "${module.publish_to_sns_lambda.role_name}"
+resource "aws_iam_role_policy" "lambda_service_scheduler_sns" {
+  name   = "lambda_service_scheduler_sns_policy"
+  role   = "${module.lambda_service_scheduler.role_name}"
   policy = "${data.aws_iam_policy_document.publish_to_scheduler_sns.json}"
 }
