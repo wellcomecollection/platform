@@ -4,17 +4,20 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import com.twitter.inject.Logging
+import com.twitter.inject.{Logging, TwitterModuleFlags}
+import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB)
-    extends Logging {
+class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
+                                    dynamoConfig: DynamoConfig)
+    extends Logging
+    with TwitterModuleFlags {
 
-  private val identifiersTableName = "Identifiers"
+  private val identifiersTableName = dynamoConfig.table
 
   def generateId(unifiedItem: UnifiedItem): Future[String] = Future {
     findMiroID(unifiedItem) match {

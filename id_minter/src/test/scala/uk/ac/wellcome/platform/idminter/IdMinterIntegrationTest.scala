@@ -28,7 +28,8 @@ class IdMinterIntegrationTest
         "aws.region" -> "local",
         "aws.sqs.queue.url" -> idMinterQueueUrl,
         "aws.sqs.waitTime" -> "1",
-        "aws.sns.topic.arn" -> ingestTopicArn
+        "aws.sns.topic.arn" -> ingestTopicArn,
+        "aws.dynamo.tableName" -> identifiersTableName
       ),
       modules = Seq(AkkaModule,
                     LocalSNSClient,
