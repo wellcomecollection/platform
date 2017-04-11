@@ -15,13 +15,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
 
   def retrieveMessages(): Future[List[Message]] = Future {
     info(s"Looking for new messages at ${sqsConfig.queueUrl}")
-    sqsClient
-      .receiveMessage(
-        new ReceiveMessageRequest(sqsConfig.queueUrl)
-          .withWaitTimeSeconds(sqsConfig.waitTime.toSeconds.toInt)
-          .withMaxNumberOfMessages(sqsConfig.maxMessages))
-      .getMessages
-      .toList
+    receiveMessages()
   } map { messages =>
     info(s"Received messages $messages")
     messages
@@ -31,4 +25,13 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       throw exception
   }
 
+  private def receiveMessages() = {
+    sqsClient
+      .receiveMessage(
+        new ReceiveMessageRequest(sqsConfig.queueUrl)
+          .withWaitTimeSeconds(sqsConfig.waitTime.toSeconds.toInt)
+          .withMaxNumberOfMessages(sqsConfig.maxMessages))
+      .getMessages
+      .toList
+  }
 }
