@@ -12,8 +12,10 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB, dynamoConfig: DynamoConfig)
-    extends Logging with TwitterModuleFlags{
+class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
+                                    dynamoConfig: DynamoConfig)
+    extends Logging
+    with TwitterModuleFlags {
 
   private val identifiersTableName = dynamoConfig.table
 

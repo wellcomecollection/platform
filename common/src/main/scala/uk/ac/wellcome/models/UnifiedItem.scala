@@ -3,7 +3,6 @@ package uk.ac.wellcome.models
 import com.sksamuel.elastic4s._
 import uk.ac.wellcome.utils.JsonUtil
 
-
 /** Represents a set of identifiers as stored in DynamoDB */
 case class Identifier(CanonicalID: String, MiroID: String)
 
