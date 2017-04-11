@@ -42,8 +42,7 @@ class IdMinterIntegrationTest
 
   test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
     val unifiedItem =
-      UnifiedItem("id",
-                  List(SourceIdentifier("Miro", "MiroID", "1234")),
+      UnifiedItem(List(SourceIdentifier("Miro", "MiroID", "1234")),
                   Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 UnifiedItem.json(unifiedItem),
@@ -114,7 +113,6 @@ class IdMinterIntegrationTest
 
   private def generateSqsMessage(MiroID: String) = {
     val unifiedItem = UnifiedItem(
-      "id",
       List(SourceIdentifier("Miro", "MiroID", MiroID)),
       Option("super-secret"))
     SQSMessage(Some("subject"),
