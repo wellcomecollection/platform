@@ -59,18 +59,20 @@ object Dependencies {
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies
+  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
   )
 
   val transformerDependencies
-    : Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+    : Seq[ModuleID] = commonDependencies ++ akkaDependencies
 
   val calmAdapterDependencies
-    : Seq[ModuleID] = commonDependencies ++ dynamoDependencies ++ akkaDependencies
+    : Seq[ModuleID] = commonDependencies ++ akkaDependencies
 
   val ingestorDependencies: Seq[ModuleID] = commonDependencies
+
+  val idminterDependencies: Seq[ModuleID] = commonDependencies
 
 }

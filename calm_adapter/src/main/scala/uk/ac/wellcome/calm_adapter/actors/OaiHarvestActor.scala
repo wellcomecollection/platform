@@ -1,22 +1,16 @@
 package uk.ac.wellcome.platform.calm_adapter.actors
 
-import com.twitter.inject.Logging
-
-import com.google.inject.name.Named
 import javax.inject.Inject
-
-import uk.ac.wellcome.models.ActorRegister
-
-import uk.ac.wellcome.platform.calm_adapter.modules._
-import uk.ac.wellcome.platform.calm_adapter.services._
-import uk.ac.wellcome.utils._
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.Future
 
 import akka.actor.{Actor, ActorSystem, PoisonPill}
 import akka.agent.Agent
+import com.google.inject.name.Named
+import com.twitter.inject.Logging
+import uk.ac.wellcome.models.ActorRegister
+import uk.ac.wellcome.platform.calm_adapter.services._
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.duration.Duration
 
 /** Configuration for the OAI harvest actor.
   *

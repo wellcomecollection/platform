@@ -6,17 +6,18 @@ import com.amazonaws.services.dynamodbv2.model.{
   StreamRecord
 }
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
-import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{PublishRequest, PublishResult}
 import com.fasterxml.jackson.databind.JsonMappingException
-import org.mockito.Matchers.any
+import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.aws.SNSConfig
-import uk.ac.wellcome.models.{Identifier, UnifiedItem}
+import uk.ac.wellcome.models.{SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
+import scala.concurrent.Future
 
 class RecordReceiverTest
     extends FunSpec
@@ -25,29 +26,26 @@ class RecordReceiverTest
     with Matchers
     with IntegrationPatience {
 
-  val config = SNSConfig("eu-west-1", "arn:test:test:test:test:test")
   val mockSNS = createMockSNS
 
   it("should receive a message and send it to SNS client") {
-    val recordReceiver = new RecordReceiver(config, mockSNS)
+    val recordReceiver = new RecordReceiver(mockSNS)
     val future =
       recordReceiver.receiveRecord(new RecordAdapter(createMockRecord))
 
     whenReady(future) { _ =>
-      val unifiedItem = UnifiedItem("id",
-                                    List(Identifier("source", "key", "value")),
-                                    Some("TopSekrit"))
+      val unifiedItem =
+        UnifiedItem("id",
+                    List(SourceIdentifier("source", "key", "value")),
+                    Some("TopSekrit"))
       Mockito
         .verify(mockSNS)
-        .publish(
-          new PublishRequest(config.topicArn,
-                             UnifiedItem.json(unifiedItem),
-                             "Foo"))
+        .writeMessage(UnifiedItem.json(unifiedItem), Some("Foo"))
     }
   }
 
   it("should return a failed future if it's unable to parse the dynamo record") {
-    val recordReceiver = new RecordReceiver(config, mockSNS)
+    val recordReceiver = new RecordReceiver(mockSNS)
     val future =
       recordReceiver.receiveRecord(new RecordAdapter(createInvalidRecord))
 
@@ -57,7 +55,7 @@ class RecordReceiverTest
   }
 
   it("should return a failed future if it's unable to transform the parsed record") {
-    val recordReceiver = new RecordReceiver(config, mockSNS)
+    val recordReceiver = new RecordReceiver(mockSNS)
     val future = recordReceiver.receiveRecord(
       new RecordAdapter(createNonTransformableRecord))
 
@@ -68,7 +66,7 @@ class RecordReceiverTest
 
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
-    val recordReceiver = new RecordReceiver(config, mockSNS)
+    val recordReceiver = new RecordReceiver(mockSNS)
     val future =
       recordReceiver.receiveRecord(new RecordAdapter(createMockRecord))
 
@@ -78,16 +76,15 @@ class RecordReceiverTest
   }
 
   private def createMockSNS = {
-    val mockSNS = mock[AmazonSNS]
-    val publishResult = new PublishResult()
-    publishResult.setMessageId("1234")
-    when(mockSNS.publish(any[PublishRequest]())).thenReturn(publishResult)
+    val mockSNS = mock[SNSWriter]
+    when(mockSNS.writeMessage(anyString(), any[Option[String]]))
+      .thenReturn(Future { PublishAttempt("1234") })
     mockSNS
   }
 
   private def mockFailPublishMessage = {
-    val mockSNS = mock[AmazonSNS]
-    when(mockSNS.publish(any[PublishRequest]()))
+    val mockSNS = mock[SNSWriter]
+    when(mockSNS.writeMessage(anyString(), any[Option[String]]))
       .thenThrow(new RuntimeException("Failed publishing message"))
     mockSNS
   }

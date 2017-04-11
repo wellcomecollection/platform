@@ -1,23 +1,19 @@
 package uk.ac.wellcome.platform.calm_adapter.actors
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.Implicits.global
-
-import akka.actor.{Actor, ActorSystem, PoisonPill}
-import com.twitter.inject.Logging
-import uk.ac.wellcome.models.CalmDynamoRecord
-import uk.ac.wellcome.platform.calm_adapter.actors._
-import uk.ac.wellcome.platform.calm_adapter.ServerMain
-
-import com.amazonaws.services.dynamodbv2._
-import com.amazonaws.services.dynamodbv2.model._
-import com.gu.scanamo._
-import com.google.inject.name.Named
 import javax.inject.Inject
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.models.ActorRegister
+import akka.actor.{Actor, ActorSystem, PoisonPill}
+import com.amazonaws.services.dynamodbv2._
+import com.amazonaws.services.dynamodbv2.model._
+import com.google.inject.name.Named
+import com.gu.scanamo._
+import com.twitter.inject.Logging
+import uk.ac.wellcome.models.{ActorRegister, CalmDynamoRecord}
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.calm_adapter.ServerMain
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.duration.Duration
 
 /** Used to tell the OaiHarvestActor to slow down.
   *
