@@ -72,6 +72,26 @@ data "aws_iam_policy_document" "read_ingestor_q" {
   }
 }
 
+resource "aws_iam_role_policy" "ecs_id_minter_task" {
+  name = "ecs_task_id_minter_policy"
+  role = "${module.ecs_id_minter_iam.task_role_name}"
+
+  policy = "${data.aws_iam_policy_document.read_id_minter_q.json}"
+}
+
+data "aws_iam_policy_document" "read_id_minter_q" {
+  statement {
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      "${module.id_minter_queue.q_arn}",
+    ]
+  }
+}
+
 /** Allows the adapter app to write to the CalmData table. */
 resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
   name = "ecs_task_calm_adapter_policy"
