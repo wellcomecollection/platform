@@ -5,14 +5,12 @@ import com.amazonaws.services.sqs.model.{Message, ReceiveMessageRequest}
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SQSConfig
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class SQSReader @Inject()(sqsClient: AmazonSQS,
-                          sqsConfig: SQSConfig)
+class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
 
   def retrieveMessages(): Future[List[Message]] = Future {

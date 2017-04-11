@@ -11,7 +11,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logging {
+class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB)
+    extends Logging {
 
   private val identifiersTableName = "Identifiers"
 
@@ -40,14 +41,15 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB) extends Logg
     unifiedItem.identifiers.find(identifier => identifier.sourceId == "MiroID")
 
   private def findMiroIdInDynamo(miroId: String) = {
-    Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName, "MiroID")(
-      'MiroID -> miroId)
+    Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName,
+                                                   "MiroID")('MiroID -> miroId)
   }
 
   private def generateAndSaveCanonicalId(miroId: String) = {
     val canonicalId = Identifiable.generate
     info(s"putting new canonicalId $canonicalId for MiroID $miroId")
-    Scanamo.put(dynamoDBClient)(identifiersTableName)(Identifier(canonicalId, miroId))
+    Scanamo.put(dynamoDBClient)(identifiersTableName)(
+      Identifier(canonicalId, miroId))
     canonicalId
   }
 

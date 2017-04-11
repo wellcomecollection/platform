@@ -43,7 +43,9 @@ class IdentifierGeneratorTest
 
   it("should reject an item with no miroId in the list of Identifiers") {
     val unifiedItem =
-      UnifiedItem("id", List(SourceIdentifier("NotMiro", "NotMiroID", "1234")), None)
+      UnifiedItem("id",
+                  List(SourceIdentifier("NotMiro", "NotMiroID", "1234")),
+                  None)
     val futureId = identifierGenerator.generateId(unifiedItem)
 
     whenReady(futureId.failed) { exception =>

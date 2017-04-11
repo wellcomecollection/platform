@@ -10,9 +10,9 @@ case class IdentifiedUnifiedItem(canonicalId: String, unifiedItem: UnifiedItem)
 case class SourceIdentifier(source: String, sourceId: String, value: String)
 
 case class UnifiedItem(
-                        id: String,
-                        identifiers: List[SourceIdentifier],
-                        accessStatus: Option[String]
+  id: String,
+  identifiers: List[SourceIdentifier],
+  accessStatus: Option[String]
 )
 object UnifiedItem extends Indexable[UnifiedItem] {
   override def json(t: UnifiedItem): String =

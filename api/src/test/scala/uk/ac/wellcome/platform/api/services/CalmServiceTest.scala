@@ -15,7 +15,9 @@ class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers {
   it("should find records") {
     ensureIndexExists("records")
     insertIntoElasticSearch(
-      UnifiedItem("id", List(SourceIdentifier("Calm", "AltRefNo", "calmid")), None))
+      UnifiedItem("id",
+                  List(SourceIdentifier("Calm", "AltRefNo", "calmid")),
+                  None))
 
     val recordsFuture = calmService.findRecords()
 
