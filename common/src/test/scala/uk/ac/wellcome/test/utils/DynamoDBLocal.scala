@@ -9,7 +9,7 @@ import com.amazonaws.services.dynamodbv2.{
 }
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.Id
+import uk.ac.wellcome.models.Identifier
 
 import scala.collection.JavaConversions._
 
@@ -27,10 +27,7 @@ trait DynamoDBLocal
       new EndpointConfiguration("http://localhost:" + port, "localhost"))
     .build()
 
-  def deleteTable() = {
-    if (!dynamoDbClient.listTables().getTableNames.isEmpty)
-      dynamoDbClient.deleteTable("Identifiers")
-  }
+  private val tableName = "Identifiers"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -44,19 +41,24 @@ trait DynamoDBLocal
   }
 
   private def clearTable() =
-    Scanamo.scan[Id](dynamoDbClient)("Identifiers").map {
+    Scanamo.scan[Identifier](dynamoDbClient)(tableName).map {
       case Right(id) =>
         dynamoDbClient.deleteItem(
-          "Identifiers",
+          tableName,
           Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
       case _ => throw new Exception("Unable to clear the table")
     }
+
+  private def deleteTable() = {
+    if (!dynamoDbClient.listTables().getTableNames.isEmpty)
+      dynamoDbClient.deleteTable(tableName)
+  }
 
   private def createTable(): Unit = {
     //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
     dynamoDbClient.createTable(
       new CreateTableRequest()
-        .withTableName("Identifiers")
+        .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
           .withAttributeName("CanonicalID")
           .withKeyType(KeyType.HASH))

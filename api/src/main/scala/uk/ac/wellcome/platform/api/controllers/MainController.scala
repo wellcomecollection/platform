@@ -48,7 +48,7 @@ class MainController @Inject()(
           "authors" -> Array("William Jardine"),
           "description" -> "230 page, color plates : frontispiece (portrait), add. color t.page ; (8vo)",
           "topics" -> Array("monkeys", "animals"),
-          "media" -> Array("http://wellcomelibrary.org/content/59301/60865")
+          "media" -> Array("https://wellcomelibrary.org/content/59301/60865")
         ))
     }
 

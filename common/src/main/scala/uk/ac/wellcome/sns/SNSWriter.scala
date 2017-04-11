@@ -26,7 +26,6 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     }.map { publishResult =>
         info(s"Published message ${publishResult.getMessageId}")
         PublishAttempt(publishResult.getMessageId)
-
       }
       .recover {
         case e: Throwable =>
