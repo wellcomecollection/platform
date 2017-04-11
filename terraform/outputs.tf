@@ -1,9 +1,9 @@
 output "calm_db_arn" {
-  value = "${aws_dynamodb_table.calm-dynamodb-table.arn}"
+  value = "${aws_dynamodb_table.calm_dynamodb_table.arn}"
 }
 
 output "calm_stream_arn" {
-  value = "${aws_dynamodb_table.calm-dynamodb-table.stream_arn}"
+  value = "${aws_dynamodb_table.calm_dynamodb_table.stream_arn}"
 }
 
 output "ecr_nginx" {
