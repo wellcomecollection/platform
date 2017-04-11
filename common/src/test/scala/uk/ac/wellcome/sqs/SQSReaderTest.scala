@@ -17,27 +17,29 @@ class SQSReaderTest
     with SQSLocal {
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
-    val sqsConfig = SQSConfig("eu-west-1", idMinterQueueUrl)
-    sqsClient.sendMessage(idMinterQueueUrl, "someMessage1")
-    sqsClient.sendMessage(idMinterQueueUrl, "someMessage2")
-    sqsClient.sendMessage(idMinterQueueUrl, "someMessage3")
+    val sqsConfig =
+      SQSConfig("eu-west-1", idMinterQueueUrl, waitTime = 20 seconds, maxMessages = 2)
+    val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
+    messageStrings.foreach(sqsClient.sendMessage(idMinterQueueUrl, _))
     val sqsReader =
-      new SQSReader(sqsClient, sqsConfig, waitTime = 20 seconds, 2)
+      new SQSReader(sqsClient, sqsConfig)
 
     val futureMessages = sqsReader.retrieveMessages()
 
     whenReady(futureMessages) { messages =>
+      // SQS is not a FIFO queue and it only guarantees that a message is sent at least once,
+      // not that it is received exactly once
       messages should have size 2
-      val messageBodies = messages.map { _.getBody }
-      messageBodies should contain("someMessage1")
-      messageBodies should contain("someMessage2")
+      messages.foreach { message =>
+        messageStrings should contain(message.getBody)
+      }
     }
   }
 
-  it("should return a failed future if reading from the sns client fails") {
-    val sqsConfig = SQSConfig("eu-west-1", "not a valid queue url")
-    val sqsReader =
-      new SQSReader(sqsClient, sqsConfig, waitTime = 20 seconds, 1)
+  it("should return a failed future if writing to the SNS topic fails") {
+    val sqsConfig =
+      SQSConfig("eu-west-1", "not a valid queue url", waitTime = 20 seconds, maxMessages = 1)
+    val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
     val futureMessages = sqsReader.retrieveMessages()
 
