@@ -122,7 +122,7 @@ resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   policy = "${data.aws_iam_policy_document.publish_to_id_minter_sns.json}"
 }
 
-/** Allows publishing to the ingest topic. */
+/** Allows publishing to the id_minter topic. */
 data "aws_iam_policy_document" "publish_to_id_minter_sns" {
   statement {
     actions = [
