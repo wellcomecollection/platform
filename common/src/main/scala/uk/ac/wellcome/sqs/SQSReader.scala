@@ -22,6 +22,13 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
           .withMaxNumberOfMessages(sqsConfig.maxMessages))
       .getMessages
       .toList
+  } map { messages =>
+    info(s"Received messages $messages")
+    messages
+  } recover {
+    case exception: Throwable =>
+      error("Error retrieving messages", exception)
+      throw exception
   }
 
 }
