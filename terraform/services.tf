@@ -44,6 +44,21 @@ module "transformer" {
   healthcheck_path = "/transformer/management/healthcheck"
 }
 
+module "id_minter" {
+  source        = "./services"
+  service_name  = "id-minter"
+  cluster_id    = "${aws_ecs_cluster.services.id}"
+  task_name     = "id_minter"
+  task_role_arn = "${module.ecs_transformer_iam.task_role_arn}"
+  vpc_id        = "${module.vpc_services.vpc_id}"
+  app_uri       = "${aws_ecr_repository.id_minter.repository_url}:${var.release_id}"
+  nginx_uri     = "${aws_ecr_repository.nginx.repository_url}:services"
+  listener_arn  = "${module.services_alb.listener_arn}"
+  path_pattern  = "/id_minter/*"
+  alb_priority  = "103"
+  healthcheck_path = "/id_minter/management/healthcheck"
+}
+
 module "api" {
   source        = "./services"
   service_name  = "api"
