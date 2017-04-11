@@ -16,10 +16,16 @@ class IdentifierGeneratorTest
     with BeforeAndAfterEach
     with IntegrationPatience {
 
-  val identifierGenerator = new IdentifierGenerator(dynamoDbClient, DynamoConfig("local", "applicationName", "streamArn", identifiersTableName))
+  val identifierGenerator = new IdentifierGenerator(
+    dynamoDbClient,
+    DynamoConfig("local",
+                 "applicationName",
+                 "streamArn",
+                 identifiersTableName))
 
   it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
-    Scanamo.put(dynamoDbClient)(identifiersTableName)(Identifier("5678", "1234"))
+    Scanamo.put(dynamoDbClient)(identifiersTableName)(
+      Identifier("5678", "1234"))
 
     val unifiedItem =
       UnifiedItem("id", List(SourceIdentifier("Miro", "MiroID", "1234")), None)
@@ -37,7 +43,8 @@ class IdentifierGeneratorTest
 
     whenReady(futureId) { id =>
       id should not be (empty)
-      Scanamo.queryIndex[Identifier](dynamoDbClient)(identifiersTableName, "MiroID")(
+      Scanamo.queryIndex[Identifier](dynamoDbClient)(identifiersTableName,
+                                                     "MiroID")(
         'MiroID -> "1234") shouldBe List(Right(Identifier(id, "1234")))
     }
   }
@@ -56,8 +63,10 @@ class IdentifierGeneratorTest
 
   it("should return an error if it finds more than one record for the same MiroID") {
     val miroId = "1234"
-    Scanamo.put(dynamoDbClient)(identifiersTableName)(Identifier("5678", miroId))
-    Scanamo.put(dynamoDbClient)(identifiersTableName)(Identifier("8765", miroId))
+    Scanamo.put(dynamoDbClient)(identifiersTableName)(
+      Identifier("5678", miroId))
+    Scanamo.put(dynamoDbClient)(identifiersTableName)(
+      Identifier("8765", miroId))
 
     val unifiedItem =
       UnifiedItem("id", List(SourceIdentifier("Miro", "MiroID", miroId)), None)
