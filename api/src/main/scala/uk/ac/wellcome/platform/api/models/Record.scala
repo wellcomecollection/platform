@@ -13,7 +13,7 @@ case object Record {
       hit.sourceAsMap.filter(o => o._2 != null)
 
     Record(
-      id = data("id").toString
+      id = data("canonicalId").toString
     )
   }
 }
