@@ -24,6 +24,14 @@ resource "aws_ecr_repository" "transformer" {
   }
 }
 
+resource "aws_ecr_repository" "id_minter" {
+  name = "uk.ac.wellcome/id_minter"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "aws_ecr_repository" "calm_adapter" {
   name = "uk.ac.wellcome/calm_adapter"
 
