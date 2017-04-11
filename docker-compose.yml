@@ -3,7 +3,7 @@ dynamodb:
   ports:
     - "45678:8000"
 sns:
-  image: ruwen/fake_sns
+  image: alicefuzier/fake-sns
   ports:
     - "9292:9292"
 sqs:
