@@ -1,12 +1,11 @@
 package uk.ac.wellcome.sqs
 
-import com.amazonaws.services.sqs.model.{Message, ReceiveMessageResult}
+import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.utils.SQSLocal
 
-import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 
 class SQSReaderTest
