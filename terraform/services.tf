@@ -55,7 +55,7 @@ module "id_minter" {
   nginx_uri     = "${aws_ecr_repository.nginx.repository_url}:services"
   listener_arn  = "${module.services_alb.listener_arn}"
   path_pattern  = "/id_minter/*"
-  alb_priority  = "100"
+  alb_priority  = "103"
   healthcheck_path = "/id_minter/management/healthcheck"
 }
 
