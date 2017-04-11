@@ -13,20 +13,6 @@ trait IntegrationTestBase
     with SQSLocal
     with DynamoDBLocal
     with SNSLocal {
-  def flags: Map[String, String]
-
-  override def injector =
-    TestInjector(
-      flags,
-      modules = Seq(AkkaModule,
-                    LocalSNSClient,
-                    DynamoDBLocalClientModule,
-                    SQSReaderModule,
-                    SQSLocalClientModule,
-                    SNSConfigModule,
-                    SQSConfigModule,
-                    DynamoConfigModule)
-    )
 
   object LocalSNSClient extends TwitterModule {
 
