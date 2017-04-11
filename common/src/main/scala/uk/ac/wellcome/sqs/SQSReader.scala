@@ -15,6 +15,17 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
 
   def retrieveMessages(): Future[List[Message]] = Future {
     info(s"Looking for new messages at ${sqsConfig.queueUrl}")
+    receiveMessages()
+  } map { messages =>
+    info(s"Received messages $messages")
+    messages
+  } recover {
+    case exception: Throwable =>
+      error("Error retrieving messages", exception)
+      throw exception
+  }
+
+  private def receiveMessages() = {
     sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(sqsConfig.queueUrl)
@@ -23,5 +34,4 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       .getMessages
       .toList
   }
-
 }
