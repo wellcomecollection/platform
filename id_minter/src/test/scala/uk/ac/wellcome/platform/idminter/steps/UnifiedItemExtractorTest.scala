@@ -15,9 +15,10 @@ class UnifiedItemExtractorTest
     with IntegrationPatience {
 
   it("extracts the unified item included in the SQS message") {
-    val unifiedItem = UnifiedItem("id",
-                                  List(SourceIdentifier("Miro", "MiroId", "1234")),
-                                  Option("super-secret"))
+    val unifiedItem =
+      UnifiedItem("id",
+                  List(SourceIdentifier("Miro", "MiroId", "1234")),
+                  Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 UnifiedItem.json(unifiedItem),
                                 "topic",

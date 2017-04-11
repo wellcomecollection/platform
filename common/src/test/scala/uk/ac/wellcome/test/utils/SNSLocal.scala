@@ -10,8 +10,9 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 trait SNSLocal extends Suite with BeforeAndAfterEach {
   val localSNSEndpointUrl = "http://localhost:9292"
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
-    .standard().withCredentials(new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials("access", "secret")))
+    .standard()
+    .withCredentials(new AWSStaticCredentialsProvider(
+      new BasicAWSCredentials("access", "secret")))
     .withEndpointConfiguration(
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
@@ -49,7 +50,8 @@ trait SNSLocal extends Suite with BeforeAndAfterEach {
 
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
     string
-      .substring(string.indexOf("- :id:")+1).split("\n- ")
+      .substring(string.indexOf("- :id:") + 1)
+      .split("\n- ")
       .map { messageDetails =>
         val messageLines = messageDetails.split('\n')
         MessageInfo(

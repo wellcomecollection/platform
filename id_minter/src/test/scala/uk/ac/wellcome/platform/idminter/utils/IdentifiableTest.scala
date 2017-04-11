@@ -10,7 +10,7 @@ class IdentifiableTest extends FunSpec with PropertyChecks with Matchers {
       {
         val id = Identifiable.generate
         id should have size (8)
-        id.toCharArray should contain noneOf ('0','o', 'i', 'l', '1')
+        id.toCharArray should contain noneOf ('0', 'o', 'i', 'l', '1')
         id should fullyMatch regex "[0-9|a-z&&[^oil10]]{8}"
       }
     }

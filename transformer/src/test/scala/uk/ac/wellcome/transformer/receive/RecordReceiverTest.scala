@@ -34,9 +34,10 @@ class RecordReceiverTest
       recordReceiver.receiveRecord(new RecordAdapter(createMockRecord))
 
     whenReady(future) { _ =>
-      val unifiedItem = UnifiedItem("id",
-                                    List(SourceIdentifier("source", "key", "value")),
-                                    Some("TopSekrit"))
+      val unifiedItem =
+        UnifiedItem("id",
+                    List(SourceIdentifier("source", "key", "value")),
+                    Some("TopSekrit"))
       Mockito
         .verify(mockSNS)
         .writeMessage(UnifiedItem.json(unifiedItem), Some("Foo"))

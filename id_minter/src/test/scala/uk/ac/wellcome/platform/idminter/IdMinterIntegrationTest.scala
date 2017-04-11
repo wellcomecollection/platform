@@ -7,7 +7,12 @@ import com.twitter.inject.app.TestInjector
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  IdentifiedUnifiedItem,
+  Identifier,
+  SourceIdentifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
 import uk.ac.wellcome.test.utils.IntegrationTestBase
 import uk.ac.wellcome.utils.JsonUtil
@@ -26,19 +31,20 @@ class IdMinterIntegrationTest
         "aws.sns.topic.arn" -> ingestTopicArn
       ),
       modules = Seq(AkkaModule,
-        LocalSNSClient,
-        DynamoDBLocalClientModule,
-        SQSReaderModule,
-        SQSLocalClientModule,
-        SNSConfigModule,
-        SQSConfigModule,
-        DynamoConfigModule)
+                    LocalSNSClient,
+                    DynamoDBLocalClientModule,
+                    SQSReaderModule,
+                    SQSLocalClientModule,
+                    SNSConfigModule,
+                    SQSConfigModule,
+                    DynamoConfigModule)
     )
 
   test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
-    val unifiedItem = UnifiedItem("id",
-                                  List(SourceIdentifier("Miro", "MiroID", "1234")),
-                                  Option("super-secret"))
+    val unifiedItem =
+      UnifiedItem("id",
+                  List(SourceIdentifier("Miro", "MiroID", "1234")),
+                  Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 UnifiedItem.json(unifiedItem),
                                 "topic",
@@ -51,8 +57,9 @@ class IdMinterIntegrationTest
 
     eventually {
       val dynamoIdentifiersRecords =
-        Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
-          'MiroID -> "1234")
+        Scanamo.queryIndex[Identifier](dynamoDbClient)(
+          "Identifiers",
+          "MiroID")('MiroID -> "1234")
       dynamoIdentifiersRecords should have size (1)
       val id = extractId(dynamoIdentifiersRecords)
       val messages = listMessagesReceivedFromSNS()
@@ -106,18 +113,21 @@ class IdMinterIntegrationTest
   }
 
   private def generateSqsMessage(MiroID: String) = {
-    val unifiedItem = UnifiedItem("id",
-                                  List(SourceIdentifier("Miro", "MiroID", MiroID)),
-                                  Option("super-secret"))
+    val unifiedItem = UnifiedItem(
+      "id",
+      List(SourceIdentifier("Miro", "MiroID", MiroID)),
+      Option("super-secret"))
     SQSMessage(Some("subject"),
-      UnifiedItem.json(unifiedItem),
-      "topic",
-      "messageType",
-      "timestamp")
+               UnifiedItem.json(unifiedItem),
+               "topic",
+               "messageType",
+               "timestamp")
   }
 
   private def extractId(
     dynamoIdentifiersRecords: List[Either[DynamoReadError, Identifier]]) = {
-    dynamoIdentifiersRecords.head.asInstanceOf[Right[DynamoReadError, Identifier]].b
+    dynamoIdentifiersRecords.head
+      .asInstanceOf[Right[DynamoReadError, Identifier]]
+      .b
   }
 }

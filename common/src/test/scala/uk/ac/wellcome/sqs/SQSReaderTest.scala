@@ -17,7 +17,8 @@ class SQSReaderTest
     with SQSLocal {
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
-    val sqsConfig = SQSConfig("eu-west-1", idMinterQueueUrl, waitTime = 20 seconds, 2)
+    val sqsConfig =
+      SQSConfig("eu-west-1", idMinterQueueUrl, waitTime = 20 seconds, 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
     messageStrings.foreach(sqsClient.sendMessage(idMinterQueueUrl, _))
     val sqsReader =
@@ -27,14 +28,16 @@ class SQSReaderTest
 
     whenReady(futureMessages) { messages =>
       messages should have size 2
-      messages.foreach {message =>
-        messageStrings should contain (message.getBody)}
-      messages.head should not be equal (messages.tail.head)
+      messages.foreach { message =>
+        messageStrings should contain(message.getBody)
+      }
+      messages.head should not be equal(messages.tail.head)
     }
   }
 
   it("should return a failed future if writing to the SNS topic fails") {
-    val sqsConfig = SQSConfig("eu-west-1", "not a valid queue url", waitTime = 20 seconds, 1)
+    val sqsConfig =
+      SQSConfig("eu-west-1", "not a valid queue url", waitTime = 20 seconds, 1)
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
