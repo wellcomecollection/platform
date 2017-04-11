@@ -114,7 +114,7 @@ data "aws_iam_policy_document" "dynamodb_allow_all" {
   }
 }
 
-/** Allows the transformer app to publish to the ingest topic. */
+/** Allows the transformer app to publish to the id_minter topic. */
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   name = "ecs_task_task_sns_policy"
   role = "${module.ecs_transformer_iam.task_role_name}"
@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "publish_to_id_minter_sns" {
   }
 }
 
-/** Allows the transformer app to publish to the ingest topic. */
+/** Allows the id_minter app to publish to the ingest topic. */
 resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
   name = "ecs_task_task_sns_policy"
   role = "${module.ecs_id_minter_iam.task_role_name}"
