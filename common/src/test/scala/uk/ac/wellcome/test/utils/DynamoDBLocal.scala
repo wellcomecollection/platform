@@ -27,7 +27,7 @@ trait DynamoDBLocal
       new EndpointConfiguration("http://localhost:" + port, "localhost"))
     .build()
 
-  private val tableName = "Identifiers"
+  protected val identifiersTableName = "Identifiers"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -41,24 +41,24 @@ trait DynamoDBLocal
   }
 
   private def clearTable() =
-    Scanamo.scan[Identifier](dynamoDbClient)(tableName).map {
+    Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
       case Right(id) =>
         dynamoDbClient.deleteItem(
-          tableName,
+          identifiersTableName,
           Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
       case _ => throw new Exception("Unable to clear the table")
     }
 
   private def deleteTable() = {
     if (!dynamoDbClient.listTables().getTableNames.isEmpty)
-      dynamoDbClient.deleteTable(tableName)
+      dynamoDbClient.deleteTable(identifiersTableName)
   }
 
   private def createTable(): Unit = {
     //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
     dynamoDbClient.createTable(
       new CreateTableRequest()
-        .withTableName(tableName)
+        .withTableName(identifiersTableName)
         .withKeySchema(new KeySchemaElement()
           .withAttributeName("CanonicalID")
           .withKeyType(KeyType.HASH))
