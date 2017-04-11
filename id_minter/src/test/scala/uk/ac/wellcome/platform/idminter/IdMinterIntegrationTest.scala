@@ -112,7 +112,8 @@ class IdMinterIntegrationTest
   }
 
   private def generateSqsMessage(MiroID: String) = {
-    val unifiedItem = UnifiedItem(List(SourceIdentifier("Miro", "MiroID", MiroID)),
+    val unifiedItem = UnifiedItem(
+      List(SourceIdentifier("Miro", "MiroID", MiroID)),
       Option("super-secret"))
     SQSMessage(Some("subject"),
                UnifiedItem.json(unifiedItem),
