@@ -20,8 +20,8 @@ trait TryBackoff extends Logging {
       f()
     } match {
       case Success(_) => 0
-      case Failure(e) =>
-        error(s"Failed to get new messages (attempt: ${attempt})")
+      case Failure(_) =>
+        error(s"Failed to get new messages (attempt: $attempt)")
         attempt + 1
     }
 
