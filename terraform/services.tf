@@ -46,7 +46,7 @@ module "transformer" {
 
 module "id_minter" {
   source        = "./services"
-  service_name  = "id_minter"
+  service_name  = "id-minter"
   cluster_id    = "${aws_ecs_cluster.services.id}"
   task_name     = "id_minter"
   task_role_arn = "${module.ecs_transformer_iam.task_role_arn}"
