@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "id_minter_topic" {
-  name = "es_id_minter"
+  name = "id_minter"
 }
 
 resource "aws_sns_topic" "ingest_topic" {

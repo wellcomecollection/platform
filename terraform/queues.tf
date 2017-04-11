@@ -6,9 +6,9 @@ module "ingest_queue" {
   topic_names = ["${aws_sns_topic.ingest_topic.name}"]
 }
 
-module "ingest_queue" {
+module "id_minter_queue" {
   source      = "./sqs"
-  queue_name  = "es_id_minter_queue"
+  queue_name  = "id_minter_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${aws_sns_topic.id_minter_topic.name}"]
