@@ -20,6 +20,7 @@
         "sourceVolume": "jenkins-home",
         "containerPath": "/var/jenkins_home"
       }
-    ]
+    ],
+    "user": "root"
   }
 ]
