@@ -87,6 +87,18 @@ data "aws_iam_policy_document" "read_id_minter_q" {
   }
 }
 
+data "aws_iam_policy_document" "read_write_dynamo_identifiers_table" {
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.identifiers.arn}",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "publish_to_id_minter_sns" {
   statement {
     actions = [
