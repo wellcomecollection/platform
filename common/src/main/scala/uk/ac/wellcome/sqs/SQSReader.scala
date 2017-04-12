@@ -14,10 +14,10 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
 
   def retrieveMessages(): Future[List[Message]] = Future {
-    info(s"Looking for new messages at ${sqsConfig.queueUrl}")
+    debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
     receiveMessages()
   } map { messages =>
-    info(s"Received messages $messages")
+    info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
     messages
   } recover {
     case exception: Throwable =>
