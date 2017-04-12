@@ -95,6 +95,7 @@ data "aws_iam_policy_document" "read_write_dynamo_identifiers_table" {
 
     resources = [
       "${aws_dynamodb_table.identifiers.arn}",
+      "${aws_dynamodb_table.identifiers.arn}/index/*",
     ]
   }
 }
