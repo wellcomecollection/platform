@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Publish a message to SNS.
+Publish a service scheduler to SNS.
 
 This script runs on a fixed schedule to send an SNS notification to start
 one of our adapters.
