@@ -71,7 +71,7 @@ resource "aws_iam_role_policy" "ecs_id_minter_task_read_id_minter_q" {
 resource "aws_iam_role_policy" "ecs_id_minter_task_dynamo_identifiers_table" {
   name   = "ecs_task_id_minter_dynamo_identifiers_policy"
   role   = "${module.ecs_id_minter_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.read_write_dynamo_identifiers_table}"
+  policy = "${data.aws_iam_policy_document.read_write_dynamo_identifiers_table.json}"
 }
 
 # Role policies for the Publish to SNS Lambda
