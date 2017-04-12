@@ -48,6 +48,12 @@ resource "aws_iam_role_policy" "ecs_transformer_task_kinesis_stream" {
   policy = "${data.aws_iam_policy_document.read_calm_kinesis_stream.json}"
 }
 
+resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
+  name   = "ecs_task_cloudwatch_metric_policy"
+  role   = "${module.ecs_transformer_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
 # Role policies for the ID minter
 
 resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
