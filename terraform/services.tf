@@ -49,7 +49,7 @@ module "id_minter" {
   service_name     = "id-minter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_name        = "id_minter"
-  task_role_arn    = "${module.ecs_transformer_iam.task_role_arn}"
+  task_role_arn    = "${module.ecs_id_minter_iam.task_role_arn}"
   vpc_id           = "${module.vpc_services.vpc_id}"
   app_uri          = "${aws_ecr_repository.id_minter.repository_url}:${var.release_id}"
   nginx_uri        = "${aws_ecr_repository.nginx.repository_url}:services"
