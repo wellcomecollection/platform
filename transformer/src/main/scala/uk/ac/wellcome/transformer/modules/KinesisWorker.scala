@@ -22,12 +22,6 @@ import scala.concurrent.duration.Duration
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 object KinesisWorker extends TwitterModule {
-  override val modules = Seq(StreamsRecordProcessorFactoryModule,
-                             KinesisClientLibConfigurationModule,
-                             DynamoConfigModule,
-                             AkkaModule,
-                             SNSConfigModule,
-                             SNSClientModule)
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")

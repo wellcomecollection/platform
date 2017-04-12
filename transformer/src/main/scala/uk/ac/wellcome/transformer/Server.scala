@@ -2,13 +2,9 @@ package uk.ac.wellcome.platform.transformer
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-
+import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule, SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.platform.transformer.controllers._
 import uk.ac.wellcome.platform.transformer.modules._
 
@@ -16,7 +12,13 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.transformer Transformer"
-  override val modules = Seq(KinesisWorker)
+  override val modules = Seq(KinesisWorker,
+    StreamsRecordProcessorFactoryModule,
+    KinesisClientLibConfigurationModule,
+    DynamoConfigModule,
+    AkkaModule,
+    SNSConfigModule,
+    SNSClientModule)
 
   override def configureHttp(router: HttpRouter) {
     router
