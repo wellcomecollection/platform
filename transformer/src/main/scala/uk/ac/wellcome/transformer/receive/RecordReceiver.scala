@@ -52,7 +52,7 @@ class RecordReceiver @Inject()(snsWriter: SNSWriter) extends Logging {
           s"Unable to parse record ${record.value} received $dynamoReadError")
     }.recover {
       case e: Throwable =>
-        error("Error extracting transforable case class", e)
+        error("Error extracting transformable case class", e)
         throw e
     }
   }
