@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.api.services
 import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.scalatest.{AsyncFunSpec, Matchers}
 import uk.ac.wellcome.finatra.services.ElasticsearchService
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  IdentifiedUnifiedItem,
+  SourceIdentifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.api.models.Record
 import uk.ac.wellcome.utils.JsonUtil
 
