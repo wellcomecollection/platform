@@ -18,6 +18,7 @@ case class RecordMap(value: java.util.Map[String, AttributeValue])
 class RecordReceiver @Inject()(snsWriter: SNSWriter) extends Logging {
 
   def receiveRecord(record: RecordAdapter): Future[Unit] = {
+    info(s"Starting to process record $record")
     for {
       recordMap           <- recordToRecordMap(record)
       transformableRecord <- extractTransformableCaseClass(recordMap)
