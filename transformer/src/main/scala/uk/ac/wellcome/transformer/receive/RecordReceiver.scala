@@ -11,31 +11,38 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 
 class RecordReceiver @Inject()(snsWriter: SNSWriter) extends Logging {
 
-  def receiveRecord(record: RecordAdapter): Future[Unit] = {
+  def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
     info(s"Starting to process record $record")
-    for {
-      recordMap           <- recordToRecordMap(record)
+
+    val triedUnifiedItem = for {
+      recordMap <- recordToRecordMap(record)
       transformableRecord <- extractTransformableCaseClass(recordMap)
-      cleanRecord         <- transformDynamoRecord(transformableRecord)
-      _                   <- publishMessage(cleanRecord)
-    } yield ()
+      cleanRecord <- transformDynamoRecord(transformableRecord)
+    } yield cleanRecord
+
+    triedUnifiedItem match {
+      case Success(unifiedItem) => publishMessage(unifiedItem)
+      case Failure(e) =>
+        error("Failed extracting unified item from record", e)
+        throw e
+    }
   }
 
-  def recordToRecordMap(record: RecordAdapter): Future[RecordMap] = Future {
+  def recordToRecordMap(record: RecordAdapter): Try[RecordMap] = Try {
     val keys = record.getInternalObject.getDynamodb.getNewImage
 
     info(s"Received record $keys")
     RecordMap(keys)
   }
 
-  def extractTransformableCaseClass(record: RecordMap): Future[Transformable] = {
-    Future { ScanamoFree.read[CalmDynamoRecord](record.value) }.map {
+  def extractTransformableCaseClass(record: RecordMap): Try[Transformable] = {
+    Try { ScanamoFree.read[CalmDynamoRecord](record.value) }.map {
       case Right(calmDynamoRecord) =>
         info(s"Parsed DynamoDB record $calmDynamoRecord")
         calmDynamoRecord
@@ -43,15 +50,19 @@ class RecordReceiver @Inject()(snsWriter: SNSWriter) extends Logging {
         error(s"Unable to parse record ${record.value}")
         throw new Exception(
           s"Unable to parse record ${record.value} received $dynamoReadError")
+    }.recover {
+      case e: Throwable =>
+        error("Error extracting transforable case class", e)
+        throw e
     }
   }
 
-  def transformDynamoRecord(dirtyRecord: Transformable): Future[UnifiedItem] = {
-    Future { dirtyRecord.transform }.map {
-      case Success(cleanRecord) =>
+  def transformDynamoRecord(dirtyRecord: Transformable): Try[UnifiedItem] = {
+    dirtyRecord.transform map {cleanRecord =>
         info(s"Cleaned record $cleanRecord")
         cleanRecord
-      case Failure(e) =>
+    } recover {
+      case e: Throwable =>
         // TODO: Send to dead letter queue or just error
         error("Failed to perform transform to clean record", e)
         throw e
