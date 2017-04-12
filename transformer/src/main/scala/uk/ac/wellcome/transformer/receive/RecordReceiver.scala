@@ -30,7 +30,7 @@ class RecordReceiver @Inject()(snsWriter: SNSWriter) extends Logging {
       case Success(unifiedItem) => publishMessage(unifiedItem)
       case Failure(e) =>
         error("Failed extracting unified item from record", e)
-        throw e
+        Future.failed(e)
     }
   }
 

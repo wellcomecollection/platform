@@ -84,7 +84,7 @@ class RecordReceiverTest
   private def mockFailPublishMessage = {
     val mockSNS = mock[SNSWriter]
     when(mockSNS.writeMessage(anyString(), any[Option[String]]))
-      .thenThrow(new RuntimeException("Failed publishing message"))
+      .thenReturn(Future.failed(new RuntimeException("Failed publishing message")))
     mockSNS
   }
 
