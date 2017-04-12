@@ -37,6 +37,18 @@ data "aws_iam_policy_document" "allow_calm_db_all" {
   }
 }
 
+data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "read_calm_kinesis_stream" {
   statement {
     actions = [
