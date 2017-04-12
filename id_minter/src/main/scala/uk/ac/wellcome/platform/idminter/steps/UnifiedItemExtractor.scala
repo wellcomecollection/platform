@@ -13,13 +13,13 @@ import scala.util.{Failure, Success}
 object UnifiedItemExtractor extends Logging {
 
   def toUnifiedItem(message: Message): Future[UnifiedItem] =
-    Future {
+    Future.fromTry {
       tryExtractinUnifiedItem(message)
-    }.map {
-      case Success(unifiedItem) =>
-        info(s"Successfully extracted unified item $unifiedItem")
-        unifiedItem
-      case Failure(e) =>
+    }.map { unifiedItem =>
+      info(s"Successfully extracted unified item $unifiedItem")
+      unifiedItem
+    } recover {
+      case e: Throwable =>
         error("Failed extracting unified item from AWS message", e)
         throw e
     }
