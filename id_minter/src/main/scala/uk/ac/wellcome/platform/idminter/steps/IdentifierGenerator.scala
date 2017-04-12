@@ -9,6 +9,7 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import scala.concurrent.blocking
 
 import scala.concurrent.Future
 
@@ -19,20 +20,15 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
 
   private val identifiersTableName = dynamoConfig.table
 
-  def generateId(unifiedItem: UnifiedItem): Future[String] = Future {
+  def generateId(unifiedItem: UnifiedItem): Future[String] =
     findMiroID(unifiedItem) match {
       case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
       case None =>
         logAndThrowError(s"Item $unifiedItem did not contain a MiroID")
     }
-  } recover {
-    case e: Throwable =>
-      error(s"Failed generating id for $unifiedItem", e)
-      throw e
-  }
 
-  private def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier) = {
-    findMiroIdInDynamo(identifier.value) match {
+  private def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier) =
+    findMiroIdInDynamo(identifier.value).map{
       case List(Right(id)) => id.CanonicalID
       case Nil => generateAndSaveCanonicalId(identifier.value)
       case Right(_) :: tail =>
@@ -45,7 +41,7 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
         logAndThrowError(
           s"Error in parsing the object with MiroID ${identifier.value}")
     }
-  }
+
 
   private def findMiroID(unifiedItem: UnifiedItem) = {
     val maybeSourceIdentifier = unifiedItem.identifiers.find(identifier =>
@@ -54,18 +50,26 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
     maybeSourceIdentifier
   }
 
-  private def findMiroIdInDynamo(miroId: String) = {
+  private def findMiroIdInDynamo(miroId: String) = Future {
     info(s"About to search for MiroID $miroId in $identifiersTableName")
-    Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName,
-                                                   "MiroID")('MiroID -> miroId)
+    blocking {
+      Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName,
+        "MiroID")('MiroID -> miroId)
+    }
+  } recover {
+    case e: Throwable =>
+      error(s"Failed getting MiroId $miroId in dynamoDb", e)
+      throw e
   }
 
   private def generateAndSaveCanonicalId(miroId: String) = {
     val canonicalId = Identifiable.generate
     info(s"putting new canonicalId $canonicalId for MiroID $miroId")
-    Scanamo.put(dynamoDBClient)(identifiersTableName)(
-      Identifier(canonicalId, miroId))
-    canonicalId
+    blocking {
+      Scanamo.put(dynamoDBClient)(identifiersTableName)(
+        Identifier(canonicalId, miroId))
+      canonicalId
+    }
   }
 
   private def logAndThrowError(errorMessage: String) = {

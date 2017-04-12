@@ -6,6 +6,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import scala.concurrent.blocking
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -15,8 +16,10 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
 
   def retrieveMessages(): Future[List[Message]] =
     Future {
-      debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
-      receiveMessages()
+      blocking {
+        debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
+        receiveMessages()
+      }
     } map { messages =>
       info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
       messages
