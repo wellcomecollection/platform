@@ -6,6 +6,8 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import scala.concurrent.blocking
+
 
 import scala.concurrent.Future
 
@@ -18,11 +20,11 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
   def writeMessage(message: String,
                    subject: Option[String]): Future[PublishAttempt] =
     Future {
-
-      info(
-        s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
-      snsClient.publish(toPublishRequest(message, subject))
-
+      blocking {
+        info(
+          s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
+        snsClient.publish(toPublishRequest(message, subject))
+      }
     }.map { publishResult =>
         info(s"Published message ${publishResult.getMessageId}")
         PublishAttempt(publishResult.getMessageId)
