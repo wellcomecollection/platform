@@ -51,8 +51,8 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
   }
 
   private def findMiroIdInDynamo(miroId: String) = Future {
-    info(s"About to search for MiroID $miroId in $identifiersTableName")
     blocking {
+      info(s"About to search for MiroID $miroId in $identifiersTableName")
       Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName,
         "MiroID")('MiroID -> miroId)
     }
@@ -64,8 +64,8 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
 
   private def generateAndSaveCanonicalId(miroId: String) = {
     val canonicalId = Identifiable.generate
-    info(s"putting new canonicalId $canonicalId for MiroID $miroId")
     blocking {
+      info(s"putting new canonicalId $canonicalId for MiroID $miroId")
       Scanamo.put(dynamoDBClient)(identifiersTableName)(
         Identifier(canonicalId, miroId))
       canonicalId
