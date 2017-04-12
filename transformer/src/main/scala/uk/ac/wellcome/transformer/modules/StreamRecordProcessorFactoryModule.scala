@@ -9,14 +9,15 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.amazonaws.services.kinesis.model.Record
 import com.google.inject.Provides
-import com.twitter.inject.TwitterModule
+import com.twitter.inject.{Logging, TwitterModule}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.transformer.receive.RecordReceiver
 
 import scala.collection.JavaConverters._
 
 class StreamsRecordProcessor(client: AmazonDynamoDB, receiver: RecordReceiver)
-    extends IRecordProcessor {
+    extends IRecordProcessor
+    with Logging {
 
   case class ExampleRecord(identifier: String)
 
@@ -34,6 +35,7 @@ class StreamsRecordProcessor(client: AmazonDynamoDB, receiver: RecordReceiver)
     records: JList[Record],
     checkpointer: IRecordProcessorCheckpointer
   ): Unit = {
+    info(s"Processing records $records")
     records.asScala.foreach { (record: Record) =>
       receiver.receiveRecord(record.asInstanceOf[RecordAdapter])
     }
