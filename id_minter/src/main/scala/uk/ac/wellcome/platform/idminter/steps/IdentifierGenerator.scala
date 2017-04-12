@@ -25,6 +25,10 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
       case None =>
         logAndThrowError(s"Item $unifiedItem did not contain a MiroID")
     }
+  } recover {
+    case e: Throwable =>
+      error(s"Failed generating id for $unifiedItem", e)
+      throw e
   }
 
   private def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier) = {
