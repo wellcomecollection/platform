@@ -19,3 +19,7 @@ variable "admin_cidr_ingress" {
 variable "release_id" {
   description = "Release tag for platform image"
 }
+
+variable "infra_bucket" {
+  description = "S3 bucket storing our configuration"
+}
