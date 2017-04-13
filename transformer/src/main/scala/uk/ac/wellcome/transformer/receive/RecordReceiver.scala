@@ -14,7 +14,7 @@ import scala.util.{Failure, Success, Try}
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 
-class RecordReceiver @Inject()(snsWriter: SNSWriter, transformableParser: TransformableParser) extends Logging {
+class RecordReceiver @Inject()(snsWriter: SNSWriter, transformableParser: TransformableParser[Transformable]) extends Logging {
 
   def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
     info(s"Starting to process record $record")

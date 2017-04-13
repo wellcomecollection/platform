@@ -7,12 +7,22 @@ trait Transformable {
   def transform: Try[UnifiedItem]
 }
 
+case class MiroTransformableData(image_title: Option[String])
+
+case class MiroTransformable(MiroID: String, MiroCollection: String, data: String) extends Transformable {
+  override def transform: Try[UnifiedItem] =
+    JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
+      UnifiedItem(List(SourceIdentifier("Miro", "MiroID", MiroID)), miroData.image_title, None)
+    }
+}
+
 case class CalmDataTransformable(
   AccessStatus: Array[String]
 ) extends Transformable {
   def transform: Try[UnifiedItem] = Try {
     UnifiedItem(
       List(SourceIdentifier("source", "key", "value")),
+      None,
       accessStatus = AccessStatus.headOption
     )
   }
@@ -33,3 +43,4 @@ case class CalmTransformable(
       .flatMap(_.transform)
 
 }
+

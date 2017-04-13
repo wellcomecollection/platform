@@ -14,6 +14,7 @@ case class IdentifiedUnifiedItem(canonicalId: String, unifiedItem: UnifiedItem)
 /** A representation of an item in our ontology, without a canonical identifier */
 case class UnifiedItem(
   identifiers: List[SourceIdentifier],
+  title: Option[String],
   accessStatus: Option[String]
 )
 

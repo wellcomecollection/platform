@@ -17,6 +17,7 @@ class UnifiedItemExtractorTest
   it("extracts the unified item included in the SQS message") {
     val unifiedItem =
       UnifiedItem(List(SourceIdentifier("Miro", "MiroId", "1234")),
+                  None,
                   Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 UnifiedItem.json(unifiedItem),
