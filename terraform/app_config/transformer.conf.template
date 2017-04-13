@@ -1,0 +1,15 @@
+aws {
+  region = "eu-west-1"
+  dynamo {
+    streams {
+      appName = "dynamodb-streams-app"
+      arn = "${stream_arn}"
+    }
+    tableName = "CalmData"
+  }
+  sns {
+    topic {
+      arn = "${sns_arn}"
+    }
+  }
+}
