@@ -12,6 +12,12 @@ module "calm_adapter" {
   alb_priority     = "101"
   desired_count    = "0"
   healthcheck_path = "/calm_adapter/management/healthcheck"
+  infra_bucket     = "${var.infra_bucket}"
+
+  config_vars = {
+    table_name = "${aws_dynamodb_table.calm_table.name}"
+    sns_arn    = "${aws_sns_topic.service_scheduler_topic.arn}"
+  }
 }
 
 module "ingestor" {
@@ -27,6 +33,17 @@ module "ingestor" {
   path_pattern     = "/ingestor/*"
   alb_priority     = "102"
   healthcheck_path = "/ingestor/management/healthcheck"
+  infra_bucket     = "${var.infra_bucket}"
+
+  config_vars = {
+    es_host         = "${var.es_config["host"]}"
+    es_port         = "${var.es_config["port"]}"
+    es_name         = "${var.es_config["name"]}"
+    es_index        = "${var.es_config["index"]}"
+    es_doc_type     = "${var.es_config["doc_type"]}"
+    es_xpack_user   = "${var.es_config["xpack_user"]}"
+    ingest_queue_id = "${module.ingest_queue.id}"
+  }
 }
 
 module "transformer" {
@@ -42,6 +59,12 @@ module "transformer" {
   path_pattern     = "/transformer/*"
   alb_priority     = "100"
   healthcheck_path = "/transformer/management/healthcheck"
+  infra_bucket     = "${var.infra_bucket}"
+
+  config_vars = {
+    stream_arn = "${aws_dynamodb_table.calm_table.stream_arn}"
+    sns_arn    = "${aws_sns_topic.id_minter_topic.arn}"
+  }
 }
 
 module "id_minter" {
@@ -57,6 +80,13 @@ module "id_minter" {
   path_pattern     = "/id_minter/*"
   alb_priority     = "103"
   healthcheck_path = "/id_minter/management/healthcheck"
+  infra_bucket     = "${var.infra_bucket}"
+
+  config_vars = {
+    id_minter_queue_id  = "${module.id_minter_queue.id}"
+    es_ingest_topic_arn = "${aws_sns_topic.ingest_topic.arn}"
+    table_name          = "${aws_dynamodb_table.identifiers.name}"
+  }
 }
 
 module "api" {
@@ -69,6 +99,14 @@ module "api" {
   app_uri       = "${aws_ecr_repository.api.repository_url}:${var.release_id}"
   nginx_uri     = "${aws_ecr_repository.nginx.repository_url}:api"
   listener_arn  = "${module.api_alb.listener_arn}"
+  infra_bucket  = "${var.infra_bucket}"
+
+  config_vars = {
+    es_host       = "${var.es_config["host"]}"
+    es_port       = "${var.es_config["port"]}"
+    es_name       = "${var.es_config["name"]}"
+    es_xpack_user = "${var.es_config["xpack_user"]}"
+  }
 }
 
 module "jenkins" {
@@ -85,4 +123,5 @@ module "jenkins" {
   template_name    = "jenkins"
   listener_arn     = "${module.tools_alb.listener_arn}"
   healthcheck_path = "/login"
+  infra_bucket     = "${var.infra_bucket}"
 }

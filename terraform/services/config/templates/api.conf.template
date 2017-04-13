@@ -1,0 +1,14 @@
+es {
+  host="${es_host}"
+  port="${es_port}"
+  name="${es_name}"
+  sniff=false
+  xpack {
+    enabled=true
+    user="${es_xpack_user}"
+    sslEnabled=true
+  }
+  transport {
+    compress=true
+  }
+}
