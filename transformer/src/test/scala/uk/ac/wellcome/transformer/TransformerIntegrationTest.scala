@@ -24,9 +24,9 @@ class TransformerIntegrationTest
       flags = Map(
         "aws.region"-> "eu-west-1",
         "aws.dynamo.streams.appName"->"dynamodb-streams-app",
-        "aws.dynamo.streams.arn"-> ,
-        "aws.dynamo.tableName" ->,
-        "aws.sns.topic.arn" -> ,
+        "aws.dynamo.streams.arn"-> miroDataStreamArn,
+        "aws.dynamo.tableName" -> miroDataTableName,
+        "aws.sns.topic.arn" -> idMinterTopicArn,
         "source" -> "Miro"
       ),
       modules = Seq(

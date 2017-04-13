@@ -31,7 +31,11 @@ trait DynamoDBLocal
   protected val miroDataTableName = "MiroData"
 
   deleteTables()
-  createTables()
+  val identifiersTable = createIdentifiersTable()
+  val miroDataTable = createMiroDataTable()
+
+  val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
+
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -51,14 +55,8 @@ trait DynamoDBLocal
     dynamoDbClient.listTables().getTableNames.foreach(tableName => dynamoDbClient.deleteTable(tableName))
   }
 
-
-  private def createTables(): Unit = {
-    //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
-    createIdentifiersTable()
-    createMiroDataTable()
-  }
-
-  private def createMiroDataTable(): Unit = {
+  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
+  private def createMiroDataTable() = {
     dynamoDbClient.createTable(
       new CreateTableRequest().withTableName(miroDataTableName)
       .withKeySchema(new KeySchemaElement().withAttributeName("MiroID").withKeyType(KeyType.HASH))
@@ -73,6 +71,7 @@ trait DynamoDBLocal
     )
   }
 
+  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
   private def createIdentifiersTable() = {
     dynamoDbClient.createTable(
       new CreateTableRequest()
