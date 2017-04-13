@@ -30,29 +30,25 @@ trait DynamoDBLocal
   protected val identifiersTableName = "Identifiers"
   protected val miroDataTableName = "MiroData"
 
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    deleteTable()
-    createTables()
-  }
+  deleteTables()
+  createTables()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearTable()
+    dynamoDbClient.listTables().getTableNames.foreach(tableName => clearTable(tableName))
   }
 
-  private def clearTable() =
-    Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
+  private def clearTable(tableName: String): List[DeleteItemResult] =
+    Scanamo.scan[Identifier](dynamoDbClient)(tableName).map {
       case Right(id) =>
         dynamoDbClient.deleteItem(
-          identifiersTableName,
+          tableName,
           Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
       case _ => throw new Exception("Unable to clear the table")
     }
 
-  private def deleteTable() = {
-    if (!dynamoDbClient.listTables().getTableNames.isEmpty)
-      dynamoDbClient.deleteTable(identifiersTableName)
+  private def deleteTables() = {
+    dynamoDbClient.listTables().getTableNames.foreach(tableName => dynamoDbClient.deleteTable(tableName))
   }
 
 
@@ -63,12 +59,18 @@ trait DynamoDBLocal
   }
 
   private def createMiroDataTable(): Unit = {
-    dynamoDbClient.createTable(new CreateTableRequest().withTableName(miroDataTableName)
+    dynamoDbClient.createTable(
+      new CreateTableRequest().withTableName(miroDataTableName)
       .withKeySchema(new KeySchemaElement().withAttributeName("MiroID").withKeyType(KeyType.HASH))
       .withKeySchema(new KeySchemaElement().withAttributeName("MiroCollection").withKeyType(KeyType.RANGE))
       .withAttributeDefinitions(
         new AttributeDefinition().withAttributeName("MiroID").withAttributeType("S"),
-        new AttributeDefinition().withAttributeName("MiroCollection").withAttributeType("S"))  )
+        new AttributeDefinition().withAttributeName("MiroCollection").withAttributeType("S"))
+      .withProvisionedThroughput(new ProvisionedThroughput()
+        .withReadCapacityUnits(1L)
+        .withWriteCapacityUnits(1L))
+      .withStreamSpecification(new StreamSpecification().withStreamEnabled(true).withStreamViewType(StreamViewType.NEW_IMAGE))
+    )
   }
 
   private def createIdentifiersTable() = {
