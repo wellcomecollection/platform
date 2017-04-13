@@ -3,7 +3,7 @@ output "id" {
   value       = "${aws_sqs_queue.q.id}"
 }
 
-output "q_arn" {
+output "arn" {
   description = "ARN for the created SQS queue"
   value       = "${aws_sqs_queue.q.arn}"
 }

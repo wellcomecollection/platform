@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
     ]
 
     resources = [
-      "*"
+      "*",
     ]
   }
 }
@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "read_ingestor_q" {
     ]
 
     resources = [
-      "${module.ingest_queue.q_arn}",
+      "${module.ingest_queue.arn}",
     ]
   }
 }
@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "read_id_minter_q" {
     ]
 
     resources = [
-      "${module.id_minter_queue.q_arn}",
+      "${module.id_minter_queue.arn}",
     ]
   }
 }
