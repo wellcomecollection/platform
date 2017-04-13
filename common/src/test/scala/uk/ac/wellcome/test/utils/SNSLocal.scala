@@ -19,14 +19,12 @@ trait SNSLocal extends Suite with BeforeAndAfterEach {
 
   private val topicName = "es_ingest"
 
-  //we use this implementation of SNS running in a docker container https://github.com/elruwen/fake_sns
-  //Topic arns are always built in this way by this implementatiom
-  val ingestTopicArn = s"arn:aws:sns:us-east-1:123456789012:$topicName"
+  //we use this implementation of SNS running in a docker container https://github.com/elruwen/fake_sns/tree/feature-fixed-account-id
+  val ingestTopicArn = amazonSNS.createTopic(topicName).getTopicArn
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    new DefaultHttpClient().execute(new HttpDelete(localSNSEndpointUrl))
-    amazonSNS.createTopic(topicName)
+    new DefaultHttpClient().execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
   def listMessagesReceivedFromSNS(): List[MessageInfo] = {
