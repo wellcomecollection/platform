@@ -3,7 +3,8 @@ package uk.ac.wellcome.transformer.parsers
 import com.amazonaws.services.dynamodbv2.model.Record
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.CalmTransformable
-import uk.ac.wellcome.transformer.receive.{CalmRecordUtils, RecordMap}
+import uk.ac.wellcome.transformer.receive.RecordMap
+import uk.ac.wellcome.transformer.utils.CalmRecordUtils
 
 class CalmParserTest extends FunSpec with CalmRecordUtils with Matchers {
 

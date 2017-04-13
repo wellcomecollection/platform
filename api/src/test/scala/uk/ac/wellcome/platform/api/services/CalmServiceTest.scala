@@ -22,6 +22,7 @@ class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers {
       IdentifiedUnifiedItem(
         "id",
         UnifiedItem(List(SourceIdentifier("Calm", "AltRefNo", "calmid")),
+                    None,
                     None)))
 
     val recordsFuture = calmService.findRecords()

@@ -10,6 +10,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{SourceIdentifier, Transformable, UnifiedItem}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
+import uk.ac.wellcome.transformer.utils.CalmRecordUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -32,6 +33,7 @@ class RecordReceiverTest
 
   val unifiedItem = UnifiedItem(
     List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
+    None,
     Some("TopSekrit"))
 
   it("should receive a message and send it to SNS client") {
@@ -95,7 +97,7 @@ class RecordReceiverTest
   }
 
   private def transformableParser(record: Record, unifiedItem: UnifiedItem) = {
-    val transformableParser = mock[TransformableParser]
+    val transformableParser = mock[TransformableParser[Transformable]]
     val recordMap = RecordMap(record.getDynamodb.getNewImage)
     when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
       new Transformable {
@@ -108,7 +110,7 @@ class RecordReceiverTest
   }
 
   private def parserReturningFailingTransformable(record: Record) = {
-    val transformableParser = mock[TransformableParser]
+    val transformableParser = mock[TransformableParser[Transformable]]
     val recordMap = RecordMap(record.getDynamodb.getNewImage)
     when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
       new Transformable {
@@ -121,7 +123,7 @@ class RecordReceiverTest
   }
 
   private def failingParser(record: Record) = {
-    val transformableParser = mock[TransformableParser]
+    val transformableParser = mock[TransformableParser[Transformable]]
     val recordMap = RecordMap(record.getDynamodb.getNewImage)
     when(transformableParser.extractTransformable(recordMap))
       .thenThrow(new RuntimeException("Unable to parse transformable"))

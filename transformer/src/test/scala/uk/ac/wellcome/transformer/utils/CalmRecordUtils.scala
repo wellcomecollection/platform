@@ -1,12 +1,8 @@
-package uk.ac.wellcome.transformer.receive
+package uk.ac.wellcome.transformer.utils
 
-import com.amazonaws.services.dynamodbv2.model.{
-  AttributeValue,
-  Record,
-  StreamRecord
-}
+import com.amazonaws.services.dynamodbv2.model.{AttributeValue, Record, StreamRecord}
 
-trait CalmRecordUtils {
+trait CalmRecordUtils extends RecordUtils {
 
   def createValidCalmRecord(RecordID: String,
                             RecordType: String,
@@ -16,15 +12,6 @@ trait CalmRecordUtils {
     val record = new Record()
     val streamRecord =
       createCalmStreamRecord(RecordID, RecordType, RefNo, AltRefNo, data)
-    record.withDynamodb(streamRecord)
-    record
-  }
-
-  def createInvalidRecord: Record = {
-    val record = new Record()
-    val streamRecord = new StreamRecord()
-    streamRecord.addNewImageEntry("something",
-                                  new AttributeValue("something-else"))
     record.withDynamodb(streamRecord)
     record
   }
