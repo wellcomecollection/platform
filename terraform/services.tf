@@ -36,13 +36,12 @@ module "ingestor" {
   infra_bucket     = "${var.infra_bucket}"
 
   config_vars = {
-    es_host       = "${var.es_config["host"]}"
-    es_port       = "${var.es_config["port"]}"
-    es_name       = "${var.es_config["name"]}"
-    es_index      = "${var.es_config["index"]}"
-    es_doc_type   = "${var.es_config["doc_type"]}"
-    es_xpack_user = "${var.es_config["xpack_user"]}"
-
+    es_host         = "${var.es_config["host"]}"
+    es_port         = "${var.es_config["port"]}"
+    es_name         = "${var.es_config["name"]}"
+    es_index        = "${var.es_config["index"]}"
+    es_doc_type     = "${var.es_config["doc_type"]}"
+    es_xpack_user   = "${var.es_config["xpack_user"]}"
     ingest_queue_id = "${module.ingest_queue.id}"
   }
 }
