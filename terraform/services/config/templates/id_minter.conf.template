@@ -1,0 +1,15 @@
+aws {
+  sqs {
+    queue {
+      url="${id_minter_queue_id}"
+    }
+  }
+  sns {
+    topic {
+      arn = "${es_ingest_topic_arn}"
+    }
+  }
+  dynamo {
+  	tableName = "${table_name}"
+  }
+}
