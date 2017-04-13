@@ -45,31 +45,6 @@ fi
 
 for project in $PROJECTS
 do
-    # Always build everything on master
-    if [[ $current_branch == "master" ]]
-    then
-        run_task=true
-    else
-        # Build everything if common-lib has changed, otherwise only build
-        # projects with changed files.
-        run_task=false
-        for file in $changed_files
-        do
-            # TODO: What's the name for the common-lib directory?
-            if [[ "$file" == "common-lib/"* ]] || [[ "$file" == "$project"/* ]]
-            then
-                run_task=true
-                break
-            fi
-        done
-    fi
-
-    if [[ "$run_task" != "true" ]]
-    then
-        continue
-    fi
-
-    # At this point we know we want to run this project: run the task!
     if [[ "$TASK" == "compile" ]]
     then
         sbt "project $project" "$TASK"
