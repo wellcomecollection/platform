@@ -18,6 +18,7 @@ case class CalmDataTransformable(
   }
 }
 
+//TODO add some tests around transformation
 case class CalmTransformable(
   RecordID: String,
   RecordType: String,

@@ -40,14 +40,14 @@ class RecordReceiver @Inject()(snsWriter: SNSWriter, transformableParser: Transf
     RecordMap(keys)
   }
 
-  def transformDynamoRecord(dirtyRecord: Transformable): Try[UnifiedItem] = {
-    dirtyRecord.transform map {cleanRecord =>
-        info(s"Cleaned record $cleanRecord")
-        cleanRecord
+  def transformDynamoRecord(transformable: Transformable): Try[UnifiedItem] = {
+    transformable.transform map { transformed =>
+        info(s"Transformed record $transformed")
+        transformed
     } recover {
       case e: Throwable =>
         // TODO: Send to dead letter queue or just error
-        error("Failed to perform transform to clean record", e)
+        error("Failed to perform transform to unified item", e)
         throw e
     }
   }
