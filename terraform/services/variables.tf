@@ -76,3 +76,13 @@ variable "healthcheck_path" {
   description = "path for ECS healthcheck endpoint"
   default     = "/management/healthcheck"
 }
+
+variable "infra_bucket" {
+  description = "Name of the S3 infra bucket"
+}
+
+variable "config_vars" {
+  description = "Variables for the config template"
+  type        = "map"
+  default     = {}
+}

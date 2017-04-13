@@ -23,3 +23,10 @@ module "task" {
   nginx_uri        = "${var.nginx_uri}"
   template_name    = "${var.template_name}"
 }
+
+module "config" {
+  source        = "./config"
+  app_name      = "${var.task_name}"
+  infra_bucket  = "${var.infra_bucket}"
+  template_vars = "${var.config_vars}"
+}
