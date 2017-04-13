@@ -8,7 +8,7 @@ import org.apache.http.impl.client.DefaultHttpClient
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
 trait SNSLocal extends Suite with BeforeAndAfterEach {
-  val localSNSEndpointUrl = "http://localhost:9292"
+  private val localSNSEndpointUrl = "http://localhost:9292"
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
     .standard()
     .withCredentials(new AWSStaticCredentialsProvider(
@@ -17,16 +17,17 @@ trait SNSLocal extends Suite with BeforeAndAfterEach {
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  private val topicName = "es_ingest"
+  private val ingestTopicName = "es_ingest"
+  private val idMinterTopicName = "id_minter"
 
   //we use this implementation of SNS running in a docker container https://github.com/elruwen/fake_sns
   //Topic arns are always built in this way by this implementatiom
-  val ingestTopicArn = s"arn:aws:sns:us-east-1:123456789012:$topicName"
+  val ingestTopicArn = amazonSNS.createTopic(ingestTopicName).getTopicArn
+  val idMinterTopicArn = amazonSNS.createTopic(idMinterTopicName).getTopicArn
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    new DefaultHttpClient().execute(new HttpDelete(localSNSEndpointUrl))
-    amazonSNS.createTopic(topicName)
+    new DefaultHttpClient().execute(new HttpDelete(localSNSEndpointUrl+"/messages"))
   }
 
   def listMessagesReceivedFromSNS(): List[MessageInfo] = {
