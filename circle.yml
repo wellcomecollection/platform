@@ -14,11 +14,15 @@ dependencies:
   # Cache the resolution-cache and build streams to speed things up
   cache_directories:
     - "~/.sbt"
-    - "target/resolution-cache"
-    - "target/streams"
+    - "~/.ivy2"
     - "project/target/resolution-cache"
     - "project/target/streams"
-  # Compile all sources
+    - "api/target"
+    - "calm_adapter/target"
+    - "common/target"
+    - "id_minter/target"
+    - "ingestor/target"
+    - "transformer/target"
   override:
     - ./run_circle.sh compile
 
