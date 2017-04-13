@@ -1,12 +1,12 @@
 aws {
-    dynamo {
-        tableName="${table_name}"
+  dynamo {
+    tableName="${table_name}"
+  }
+  sns {
+    topic {
+      arn="${sns_arn}"
     }
-    sns {
-        topic {
-            arn="${sns_arn}"
-        }
-    }
+  }
 }
 
 warmupTime=30
