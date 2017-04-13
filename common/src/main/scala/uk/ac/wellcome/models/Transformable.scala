@@ -7,7 +7,7 @@ trait Transformable {
   def transform: Try[UnifiedItem]
 }
 
-case class DirtyCalmRecord(
+case class CalmDataTransformable(
   AccessStatus: Array[String]
 ) extends Transformable {
   def transform: Try[UnifiedItem] = Try {
@@ -18,7 +18,7 @@ case class DirtyCalmRecord(
   }
 }
 
-case class CalmDynamoRecord(
+case class CalmTransformable(
   RecordID: String,
   RecordType: String,
   AltRefNo: String,
@@ -28,7 +28,7 @@ case class CalmDynamoRecord(
 
   def transform: Try[UnifiedItem] =
     JsonUtil
-      .fromJson[DirtyCalmRecord](data)
+      .fromJson[CalmDataTransformable](data)
       .flatMap(_.transform)
 
 }
