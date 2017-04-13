@@ -6,6 +6,8 @@ set -o verbose
 
 TF_VARS=terraform.tfvars
 
+rm -f $TF_VARS
+
 echo "Getting variables from S3"
 aws s3 cp s3://platform-infra/terraform.tfvars .
 
