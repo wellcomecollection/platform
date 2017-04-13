@@ -53,7 +53,6 @@ class StreamsRecordProcessorFactory(
 }
 
 object StreamsRecordProcessorFactoryModule extends TwitterModule {
-  override val modules = Seq(DynamoClientModule)
 
   @Singleton
   @Provides

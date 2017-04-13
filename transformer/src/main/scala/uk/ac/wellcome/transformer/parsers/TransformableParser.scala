@@ -7,7 +7,7 @@ import uk.ac.wellcome.transformer.receive.RecordMap
 
 import scala.util.Try
 
-trait TransformableParser[T <: Transformable] extends Logging {
+trait TransformableParser[+T <: Transformable] extends Logging {
   final def extractTransformable(recordMap: RecordMap): Try[Transformable] =
     Try { readFromRecord(recordMap) }
       .map {

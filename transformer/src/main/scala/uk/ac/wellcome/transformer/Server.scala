@@ -4,7 +4,7 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule, SNSClientModule, SNSConfigModule}
+import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.transformer.controllers._
 import uk.ac.wellcome.platform.transformer.modules._
 
@@ -18,7 +18,8 @@ class Server extends HttpServer {
     DynamoConfigModule,
     AkkaModule,
     SNSConfigModule,
-    SNSClientModule)
+    SNSClientModule,
+    DynamoClientModule)
 
   override def configureHttp(router: HttpRouter) {
     router
