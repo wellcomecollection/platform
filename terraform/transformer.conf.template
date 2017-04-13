@@ -1,0 +1,15 @@
+aws {
+  region = "eu-west-1"
+  dynamo {
+    streams {
+      appName = "dynamodb-streams-app"
+      arn = "arn:aws:dynamodb:eu-west-1:760097843905:table/CalmData/stream/2017-04-12T13:01:55.719"
+    }
+    tableName = "CalmData"
+  }
+  sns {
+    topic {
+      arn = "arn:aws:sns:eu-west-1:760097843905:id_minter"
+    }
+  }
+}
