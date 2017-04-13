@@ -23,3 +23,9 @@ variable "release_id" {
 variable "infra_bucket" {
   description = "S3 bucket storing our configuration"
 }
+
+variable "es_config" {
+  description = "Elasticcloud config"
+  type        = "map"
+  default     = {}
+}
