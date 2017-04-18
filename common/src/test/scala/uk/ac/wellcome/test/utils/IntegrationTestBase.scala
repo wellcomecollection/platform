@@ -29,21 +29,12 @@ trait IntegrationTestBase
     def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
   }
 
-  object DummyCloudWatchClientModule extends TwitterModule{
-    @Singleton
-    @Provides
-    def providesAmazonCloudWatch: AmazonCloudWatch = {
-      AmazonCloudWatchClientBuilder.standard().build()
-    }
-  }
-
   object LocalKinesisModule extends TwitterModule{
 
     @Provides
     @Singleton
     def provideAmazonKinesis: AmazonKinesis ={
-      val client = new AmazonDynamoDBStreamsAdapterClient(streamsClient)
-      client
+      new AmazonDynamoDBStreamsAdapterClient(streamsClient)
     }
   }
 
