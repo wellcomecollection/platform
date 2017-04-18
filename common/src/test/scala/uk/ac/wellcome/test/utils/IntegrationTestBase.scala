@@ -1,6 +1,5 @@
 package uk.ac.wellcome.test.utils
 
-import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
 import com.amazonaws.services.kinesis.AmazonKinesis
@@ -29,11 +28,11 @@ trait IntegrationTestBase
     def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
   }
 
-  object LocalKinesisModule extends TwitterModule{
+  object LocalKinesisModule extends TwitterModule {
 
     @Provides
     @Singleton
-    def provideAmazonKinesis: AmazonKinesis ={
+    def provideAmazonKinesis: AmazonKinesis = {
       new AmazonDynamoDBStreamsAdapterClient(streamsClient)
     }
   }

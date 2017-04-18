@@ -14,11 +14,16 @@ class MiroParserTest extends FunSpec with MiroRecordUtils with Matchers {
     val MiroID = "1234"
     val MiroCollection = "Images-A"
     val data = """{"image-title": "this is the image title"}"""
-    val triedMiroTransformable = miroParser.extractTransformable(createValidMiroRecord(MiroID, MiroCollection, data))
+    val triedMiroTransformable = miroParser.extractTransformable(
+      createValidMiroRecord(MiroID, MiroCollection, data))
 
     triedMiroTransformable.isSuccess shouldBe true
     triedMiroTransformable.get shouldBe a[MiroTransformable]
-    triedMiroTransformable.get.asInstanceOf[MiroTransformable] shouldBe MiroTransformable(MiroID, MiroCollection, data)
+    triedMiroTransformable.get
+      .asInstanceOf[MiroTransformable] shouldBe MiroTransformable(
+      MiroID,
+      MiroCollection,
+      data)
   }
 
   private implicit def toRecordMap(calmRecord: Record): RecordMap = {

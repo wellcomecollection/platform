@@ -1,6 +1,10 @@
 package uk.ac.wellcome.transformer.utils
 
-import com.amazonaws.services.dynamodbv2.model.{AttributeValue, Record, StreamRecord}
+import com.amazonaws.services.dynamodbv2.model.{
+  AttributeValue,
+  Record,
+  StreamRecord
+}
 
 trait MiroRecordUtils extends RecordUtils {
 
@@ -19,7 +23,8 @@ trait MiroRecordUtils extends RecordUtils {
                                      data: String) = {
     val streamRecord = new StreamRecord()
     streamRecord.addNewImageEntry("MiroID", new AttributeValue(MiroID))
-    streamRecord.addNewImageEntry("MiroCollection", new AttributeValue(MiroCollection))
+    streamRecord.addNewImageEntry("MiroCollection",
+                                  new AttributeValue(MiroCollection))
     streamRecord.addNewImageEntry("data", new AttributeValue(data))
     streamRecord
   }

@@ -8,7 +8,6 @@ import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.blocking
 
-
 import scala.concurrent.Future
 
 case class PublishAttempt(id: String)

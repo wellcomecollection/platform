@@ -25,7 +25,8 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       messages
     } recover {
       case exception: Throwable =>
-        error(s"Error retrieving messages from queue ${sqsConfig.queueUrl}", exception)
+        error(s"Error retrieving messages from queue ${sqsConfig.queueUrl}",
+              exception)
         throw exception
     }
 
