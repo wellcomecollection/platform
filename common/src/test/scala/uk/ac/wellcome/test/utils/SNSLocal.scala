@@ -28,7 +28,7 @@ trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    new DefaultHttpClient().execute(new HttpDelete(localSNSEndpointUrl+"/messages"))
+    new DefaultHttpClient().execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
   def listMessagesReceivedFromSNS(): List[MessageInfo] = {
