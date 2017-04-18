@@ -9,10 +9,15 @@ trait Transformable {
 
 case class MiroTransformableData(image_title: Option[String])
 
-case class MiroTransformable(MiroID: String, MiroCollection: String, data: String) extends Transformable {
+case class MiroTransformable(MiroID: String,
+                             MiroCollection: String,
+                             data: String)
+    extends Transformable {
   override def transform: Try[UnifiedItem] =
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
-      UnifiedItem(List(SourceIdentifier("Miro", "MiroID", MiroID)), miroData.image_title, None)
+      UnifiedItem(List(SourceIdentifier("Miro", "MiroID", MiroID)),
+                  miroData.image_title,
+                  None)
     }
 }
 
@@ -43,4 +48,3 @@ case class CalmTransformable(
       .flatMap(_.transform)
 
 }
-

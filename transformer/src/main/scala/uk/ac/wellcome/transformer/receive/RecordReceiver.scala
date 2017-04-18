@@ -14,14 +14,18 @@ import scala.util.{Failure, Success, Try}
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
 
-class RecordReceiver @Inject()(snsWriter: SNSWriter, transformableParser: TransformableParser[Transformable]) extends Logging {
+class RecordReceiver @Inject()(
+  snsWriter: SNSWriter,
+  transformableParser: TransformableParser[Transformable])
+    extends Logging {
 
   def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
     info(s"Starting to process record $record")
 
     val triedUnifiedItem = for {
       recordMap <- recordToRecordMap(record)
-      transformableRecord <- transformableParser.extractTransformable(recordMap)
+      transformableRecord <- transformableParser.extractTransformable(
+        recordMap)
       cleanRecord <- transformDynamoRecord(transformableRecord)
     } yield cleanRecord
 
@@ -42,8 +46,8 @@ class RecordReceiver @Inject()(snsWriter: SNSWriter, transformableParser: Transf
 
   def transformDynamoRecord(transformable: Transformable): Try[UnifiedItem] = {
     transformable.transform map { transformed =>
-        info(s"Transformed record $transformed")
-        transformed
+      info(s"Transformed record $transformed")
+      transformed
     } recover {
       case e: Throwable =>
         // TODO: Send to dead letter queue or just error

@@ -1,6 +1,10 @@
 package uk.ac.wellcome.transformer.utils
 
-import com.amazonaws.services.dynamodbv2.model.{AttributeValue, Record, StreamRecord}
+import com.amazonaws.services.dynamodbv2.model.{
+  AttributeValue,
+  Record,
+  StreamRecord
+}
 
 trait CalmRecordUtils extends RecordUtils {
 

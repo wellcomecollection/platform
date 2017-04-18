@@ -3,7 +3,11 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreamsClientBuilder}
+import com.amazonaws.services.dynamodbv2.{
+  AmazonDynamoDB,
+  AmazonDynamoDBClientBuilder,
+  AmazonDynamoDBStreamsClientBuilder
+}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.Identifier
@@ -40,13 +44,19 @@ trait DynamoDBLocal
   val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
   val calmDataStreamArn = calmDataTable.getTableDescription.getLatestStreamArn
 
-  val streamsClient = AmazonDynamoDBStreamsClientBuilder.standard()
+  val streamsClient = AmazonDynamoDBStreamsClientBuilder
+    .standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(new EndpointConfiguration(dynamoDBEndPoint, "localhost")).build()
+    .withEndpointConfiguration(
+      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
+    .build()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    dynamoDbClient.listTables().getTableNames.foreach(tableName => clearTable(tableName))
+    dynamoDbClient
+      .listTables()
+      .getTableNames
+      .foreach(tableName => clearTable(tableName))
   }
 
   private def clearTable(tableName: String): List[DeleteItemResult] =
@@ -59,25 +69,64 @@ trait DynamoDBLocal
     }
 
   private def deleteTables() = {
-    dynamoDbClient.listTables().getTableNames.foreach(tableName => dynamoDbClient.deleteTable(tableName))
+    dynamoDbClient
+      .listTables()
+      .getTableNames
+      .foreach(tableName => dynamoDbClient.deleteTable(tableName))
   }
 
   //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
   private def createCalmDataTable() = {
     dynamoDbClient.createTable(
-      new CreateTableRequest().withTableName(calmDataTableName)
-        .withKeySchema(new KeySchemaElement().withAttributeName("RecordID").withKeyType(KeyType.HASH))
-        .withKeySchema(new KeySchemaElement().withAttributeName("RecordType").withKeyType(KeyType.RANGE)).withAttributeDefinitions(
-        new AttributeDefinition().withAttributeName("RecordID").withAttributeType("S"),
-        new AttributeDefinition().withAttributeName("RecordType").withAttributeType("S"),
-        new AttributeDefinition().withAttributeName("RefNo").withAttributeType("S"),
-        new AttributeDefinition().withAttributeName("AltRefNo").withAttributeType("S")
-      ).withProvisionedThroughput(
-        new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L))
-        .withStreamSpecification(new StreamSpecification().withStreamEnabled(true).withStreamViewType(StreamViewType.NEW_IMAGE))
+      new CreateTableRequest()
+        .withTableName(calmDataTableName)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("RecordID")
+          .withKeyType(KeyType.HASH))
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("RecordType")
+          .withKeyType(KeyType.RANGE))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("RecordID")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("RecordType")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("RefNo")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("AltRefNo")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+        .withStreamSpecification(new StreamSpecification()
+          .withStreamEnabled(true)
+          .withStreamViewType(StreamViewType.NEW_IMAGE))
         .withGlobalSecondaryIndexes(
-          new GlobalSecondaryIndex().withIndexName("RefNo").withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L)).withProjection(new Projection().withProjectionType(ProjectionType.ALL)).withKeySchema(new KeySchemaElement().withAttributeName("RefNo").withKeyType(KeyType.HASH)),
-          new GlobalSecondaryIndex().withIndexName("AltRefNo").withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L)).withProjection(new Projection().withProjectionType(ProjectionType.ALL)).withKeySchema(new KeySchemaElement().withAttributeName("AltRefNo").withKeyType(KeyType.HASH))
+          new GlobalSecondaryIndex()
+            .withIndexName("RefNo")
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(new KeySchemaElement()
+              .withAttributeName("RefNo")
+              .withKeyType(KeyType.HASH)),
+          new GlobalSecondaryIndex()
+            .withIndexName("AltRefNo")
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(new KeySchemaElement()
+              .withAttributeName("AltRefNo")
+              .withKeyType(KeyType.HASH))
         )
     )
   }
@@ -85,17 +134,28 @@ trait DynamoDBLocal
   //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
   private def createMiroDataTable() = {
     dynamoDbClient.createTable(
-      new CreateTableRequest().withTableName(miroDataTableName)
-      .withKeySchema(new KeySchemaElement().withAttributeName("MiroID").withKeyType(KeyType.HASH))
-      .withKeySchema(new KeySchemaElement().withAttributeName("MiroCollection").withKeyType(KeyType.RANGE))
-      .withAttributeDefinitions(
-        new AttributeDefinition().withAttributeName("MiroID").withAttributeType("S"),
-        new AttributeDefinition().withAttributeName("MiroCollection").withAttributeType("S"))
-      .withProvisionedThroughput(new ProvisionedThroughput()
-        .withReadCapacityUnits(1L)
-        .withWriteCapacityUnits(1L))
-      .withStreamSpecification(
-        new StreamSpecification().withStreamEnabled(true).withStreamViewType(StreamViewType.NEW_IMAGE))
+      new CreateTableRequest()
+        .withTableName(miroDataTableName)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("MiroID")
+          .withKeyType(KeyType.HASH))
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("MiroCollection")
+          .withKeyType(KeyType.RANGE))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("MiroID")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("MiroCollection")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+        .withStreamSpecification(new StreamSpecification()
+          .withStreamEnabled(true)
+          .withStreamViewType(StreamViewType.NEW_IMAGE))
     )
   }
 

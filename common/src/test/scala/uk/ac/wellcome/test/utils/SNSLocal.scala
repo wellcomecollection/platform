@@ -28,11 +28,12 @@ trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    new DefaultHttpClient().execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
+    new DefaultHttpClient()
+      .execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
   def listMessagesReceivedFromSNS(): List[MessageInfo] = {
-/*
+    /*
 This is a sample returned by the fake-sns implementation:
 ---
 topics:
@@ -49,17 +50,15 @@ messages:
   :structure:
   :target_arn:
   :received_at: 2017-04-18 13:20:45.289912607 +00:00
-*/
+     */
 
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
-    debug(
-      s"""Messages received by fake-sns:
+    debug(s"""Messages received by fake-sns:
          |$string""".stripMargin)
     val indexOfFirstMessage = string.indexOf("- :id:")
-    if(indexOfFirstMessage <0) {
+    if (indexOfFirstMessage < 0) {
       Nil
-    }
-    else {
+    } else {
       string
         .substring(indexOfFirstMessage + 3)
         .split("\n- ")
@@ -67,8 +66,11 @@ messages:
           val messageLines = messageDetails.split("\n\\s*:")
           MessageInfo(
             getMessageLine(messageLines, "id: "),
-            getMessageLine(messageLines, "message: ").replace("'", "").replace("\n   ", ""),
-            getMessageLine(messageLines, "subject: "))
+            getMessageLine(messageLines, "message: ")
+              .replace("'", "")
+              .replace("\n   ", ""),
+            getMessageLine(messageLines, "subject: ")
+          )
         }
         .toList
     }
@@ -81,7 +83,8 @@ messages:
       .map {
         _.replace(fieldName, "").trim
       }
-      .headOption.getOrElse("")
+      .headOption
+      .getOrElse("")
   }
 }
 

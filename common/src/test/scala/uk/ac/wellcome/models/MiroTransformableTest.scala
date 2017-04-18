@@ -20,9 +20,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it("should be able to transform itself into a unified item if the data field is empty") {
     val miroId = "123"
     val miroTransformable =
-      MiroTransformable(miroId,
-                        "Images-A",
-                        """{}""")
+      MiroTransformable(miroId, "Images-A", """{}""")
 
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get shouldBe UnifiedItem(
