@@ -18,18 +18,12 @@ cache:
 
 matrix:
   include:
-    - PROJECT: "common"
-      TASK: "dockerComposeTest"
-    - PROJECT: "api"
-      TASK: "dockerComposeTest"
-    - PROJECT: "transformer"
-      TASK: "dockerComposeTest"
-    - PROJECT: "calm_adapter"
-      TASK: "dockerComposeTest"
-    - PROJECT: "ingestor"
-      TASK: "dockerComposeTest"
-    - PROJECT: "id_minter"
-      TASK: "dockerComposeTest"
+    - env: PROJECT=common
+    - env: PROJECT=api
+    - env: PROJECT=transformer
+    - env: PROJECT=calm_adapter
+    - env: PROJECT=ingestor
+    - env: PROJECT=id_minter
 
 script:
-  - sbt "project $PROJECT" "$TASK"
+  - sbt "project $PROJECT" "dockerComposeTest"
