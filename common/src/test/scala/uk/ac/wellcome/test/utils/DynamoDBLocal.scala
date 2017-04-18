@@ -3,10 +3,7 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{
-  AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder
-}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.Identifier
@@ -18,24 +15,31 @@ trait DynamoDBLocal
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  val port = 45678
+  private val port = 45678
+  private val dynamoDBEndPoint = "http://localhost:" + port
+
+  val dynamoDBLocalCredentialsProvider = new AWSStaticCredentialsProvider(
+    new BasicAWSCredentials("access", "secret"))
+
   val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
     .standard()
-    .withCredentials(new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials("access", "secret")))
+    .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(
-      new EndpointConfiguration("http://localhost:" + port, "localhost"))
+      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
     .build()
 
   protected val identifiersTableName = "Identifiers"
   protected val miroDataTableName = "MiroData"
 
   deleteTables()
-  val identifiersTable = createIdentifiersTable()
-  val miroDataTable = createMiroDataTable()
+  private val identifiersTable = createIdentifiersTable()
+  private val miroDataTable = createMiroDataTable()
 
   val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
 
+  val streamsClient = AmazonDynamoDBStreamsClientBuilder.standard()
+    .withCredentials(dynamoDBLocalCredentialsProvider)
+    .withEndpointConfiguration(new EndpointConfiguration(dynamoDBEndPoint, "localhost")).build()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -67,7 +71,8 @@ trait DynamoDBLocal
       .withProvisionedThroughput(new ProvisionedThroughput()
         .withReadCapacityUnits(1L)
         .withWriteCapacityUnits(1L))
-      .withStreamSpecification(new StreamSpecification().withStreamEnabled(true).withStreamViewType(StreamViewType.NEW_IMAGE))
+      .withStreamSpecification(
+        new StreamSpecification().withStreamEnabled(true).withStreamViewType(StreamViewType.NEW_IMAGE))
     )
   }
 
