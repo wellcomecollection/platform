@@ -7,6 +7,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.transformer.controllers._
 import uk.ac.wellcome.platform.transformer.modules._
+import uk.ac.wellcome.transformer.modules.{AmazonCloudWatchModule, AmazonKinesisModule, TransformableParserModule}
 
 object ServerMain extends Server
 
@@ -15,11 +16,14 @@ class Server extends HttpServer {
   override val modules = Seq(KinesisWorker,
     StreamsRecordProcessorFactoryModule,
     KinesisClientLibConfigurationModule,
+    AmazonKinesisModule,
+    AmazonCloudWatchModule,
     DynamoConfigModule,
     AkkaModule,
     SNSConfigModule,
     SNSClientModule,
-    DynamoClientModule)
+    DynamoClientModule,
+    TransformableParserModule)
 
   override def configureHttp(router: HttpRouter) {
     router
