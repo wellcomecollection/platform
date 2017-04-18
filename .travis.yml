@@ -23,4 +23,4 @@ matrix:
     - env: PROJECT=id_minter
 
 script:
-  - sbt "project $PROJECT" "dockerComposeTest"
+  - "sbt 'project $PROJECT' dockerComposeTest"
