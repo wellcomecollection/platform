@@ -3,19 +3,17 @@ package uk.ac.wellcome.platform.transformer.modules
 import java.util.{List => JList}
 import javax.inject.Singleton
 
-import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.amazonaws.services.kinesis.model.Record
 import com.google.inject.Provides
 import com.twitter.inject.{Logging, TwitterModule}
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.transformer.receive.RecordReceiver
 
 import scala.collection.JavaConverters._
 
-class StreamsRecordProcessor(client: AmazonDynamoDB, receiver: RecordReceiver)
+class StreamsRecordProcessor(receiver: RecordReceiver)
     extends IRecordProcessor
     with Logging {
 
@@ -43,12 +41,11 @@ class StreamsRecordProcessor(client: AmazonDynamoDB, receiver: RecordReceiver)
 }
 
 class StreamsRecordProcessorFactory(
-  dynamoClient: AmazonDynamoDB,
   recordReceiver: RecordReceiver
 ) extends IRecordProcessorFactory {
 
   override def createProcessor(): IRecordProcessor =
-    new StreamsRecordProcessor(dynamoClient, recordReceiver)
+    new StreamsRecordProcessor(recordReceiver)
 
 }
 
@@ -57,8 +54,7 @@ object StreamsRecordProcessorFactoryModule extends TwitterModule {
   @Singleton
   @Provides
   def provideStreamsRecordProcessorFactory(
-    dynamoClient: AmazonDynamoDB,
     recordReceiver: RecordReceiver
   ): StreamsRecordProcessorFactory =
-    new StreamsRecordProcessorFactory(dynamoClient, recordReceiver)
+    new StreamsRecordProcessorFactory(recordReceiver)
 }
