@@ -21,8 +21,6 @@ trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
   private val ingestTopicName = "es_ingest"
   private val idMinterTopicName = "id_minter"
 
-  //we use this implementation of SNS running in a docker container https://github.com/elruwen/fake_sns
-  //Topic arns are always built in this way by this implementatiom
   val ingestTopicArn = amazonSNS.createTopic(ingestTopicName).getTopicArn
   val idMinterTopicArn = amazonSNS.createTopic(idMinterTopicName).getTopicArn
 

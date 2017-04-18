@@ -5,22 +5,10 @@ import com.twitter.inject.Injector
 import com.twitter.inject.app.TestInjector
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.models.{
-  CalmTransformable,
-  MiroTransformable,
-  SourceIdentifier,
-  UnifiedItem
-}
-import uk.ac.wellcome.platform.transformer.modules.{
-  KinesisClientLibConfigurationModule,
-  KinesisWorker,
-  StreamsRecordProcessorFactoryModule
-}
+import uk.ac.wellcome.models.{MiroTransformable, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.platform.transformer.modules.{KinesisClientLibConfigurationModule, KinesisWorker, StreamsRecordProcessorFactoryModule}
 import uk.ac.wellcome.test.utils.{IntegrationTestBase, MessageInfo}
-import uk.ac.wellcome.transformer.modules.{
-  AmazonCloudWatchModule,
-  TransformableParserModule
-}
+import uk.ac.wellcome.transformer.modules.{AmazonCloudWatchModule, TransformableParserModule}
 import uk.ac.wellcome.utils.JsonUtil
 
 class MiroTransformerIntegrationTest
@@ -60,7 +48,7 @@ class MiroTransformerIntegrationTest
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size (1)
+      snsMessages should have size (10)
       assertSNSMessageContains(snsMessages.head, miroId, imageTitle)
     }
 
