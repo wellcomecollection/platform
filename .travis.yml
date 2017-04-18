@@ -1,0 +1,35 @@
+language: scala
+
+scala:
+  - 2.12.1
+
+cache:
+  directories:
+    - "~/.sbt"
+    - "~/.ivy2"
+    - "project/target/resolution-cache"
+    - "project/target/streams"
+    - "api/target"
+    - "calm_adapter/target"
+    - "common/target"
+    - "id_minter/target"
+    - "ingestor/target"
+    - "transformer/target"
+
+matrix:
+  include:
+    - PROJECT: "common"
+      TASK: "dockerComposeTest"
+    - PROJECT: "api"
+      TASK: "dockerComposeTest"
+    - PROJECT: "transformer"
+      TASK: "dockerComposeTest"
+    - PROJECT: "calm_adapter"
+      TASK: "dockerComposeTest"
+    - PROJECT: "ingestor"
+      TASK: "dockerComposeTest"
+    - PROJECT: "id_minter"
+      TASK: "dockerComposeTest"
+
+script:
+  - sbt "project $PROJECT" "$TASK"
