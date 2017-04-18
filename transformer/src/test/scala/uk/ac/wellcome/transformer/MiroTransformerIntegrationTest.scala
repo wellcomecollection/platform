@@ -48,7 +48,7 @@ class MiroTransformerIntegrationTest
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size (10)
+      snsMessages should have size (1)
       assertSNSMessageContains(snsMessages.head, miroId, imageTitle)
     }
 
