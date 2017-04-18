@@ -1,5 +1,10 @@
 language: scala
 
+sudo: required
+
+services:
+  - docker
+
 cache:
   directories:
     - "~/.sbt"
