@@ -30,12 +30,15 @@ trait DynamoDBLocal
 
   protected val identifiersTableName = "Identifiers"
   protected val miroDataTableName = "MiroData"
+  protected val calmDataTableName = "CalmData"
 
   deleteTables()
   private val identifiersTable = createIdentifiersTable()
   private val miroDataTable = createMiroDataTable()
+  private val calmDataTable = createCalmDataTable()
 
   val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
+  val calmDataStreamArn = calmDataTable.getTableDescription.getLatestStreamArn
 
   val streamsClient = AmazonDynamoDBStreamsClientBuilder.standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
@@ -57,6 +60,26 @@ trait DynamoDBLocal
 
   private def deleteTables() = {
     dynamoDbClient.listTables().getTableNames.foreach(tableName => dynamoDbClient.deleteTable(tableName))
+  }
+
+  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
+  private def createCalmDataTable() = {
+    dynamoDbClient.createTable(
+      new CreateTableRequest().withTableName(calmDataTableName)
+        .withKeySchema(new KeySchemaElement().withAttributeName("RecordID").withKeyType(KeyType.HASH))
+        .withKeySchema(new KeySchemaElement().withAttributeName("RecordType").withKeyType(KeyType.RANGE)).withAttributeDefinitions(
+        new AttributeDefinition().withAttributeName("RecordID").withAttributeType("S"),
+        new AttributeDefinition().withAttributeName("RecordType").withAttributeType("S"),
+        new AttributeDefinition().withAttributeName("RefNo").withAttributeType("S"),
+        new AttributeDefinition().withAttributeName("AltRefNo").withAttributeType("S")
+      ).withProvisionedThroughput(
+        new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L))
+        .withStreamSpecification(new StreamSpecification().withStreamEnabled(true).withStreamViewType(StreamViewType.NEW_IMAGE))
+        .withGlobalSecondaryIndexes(
+          new GlobalSecondaryIndex().withIndexName("RefNo").withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L)).withProjection(new Projection().withProjectionType(ProjectionType.ALL)).withKeySchema(new KeySchemaElement().withAttributeName("RefNo").withKeyType(KeyType.HASH)),
+          new GlobalSecondaryIndex().withIndexName("AltRefNo").withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L)).withProjection(new Projection().withProjectionType(ProjectionType.ALL)).withKeySchema(new KeySchemaElement().withAttributeName("AltRefNo").withKeyType(KeyType.HASH))
+        )
+    )
   }
 
   //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
