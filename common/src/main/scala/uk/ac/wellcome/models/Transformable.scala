@@ -15,7 +15,8 @@ case class MiroTransformable(MiroID: String,
     extends Transformable {
   override def transform: Try[UnifiedItem] =
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
-      UnifiedItem(identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
+      UnifiedItem(identifiers =
+                    List(SourceIdentifier("Miro", "MiroID", MiroID)),
                   title = miroData.image_title)
     }
 }

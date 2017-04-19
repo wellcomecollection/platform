@@ -11,9 +11,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.test.utils.IntegrationTestBase
 
-trait TransformerIntegrationTest extends IntegrationTestBase
-  with Eventually
-  with IntegrationPatience {
+trait TransformerIntegrationTest
+    extends IntegrationTestBase
+    with Eventually
+    with IntegrationPatience {
 
   object LocalKinesisModule extends TwitterModule {
 
@@ -27,14 +28,15 @@ trait TransformerIntegrationTest extends IntegrationTestBase
   object LocalKinesisClientLibConfigurationModule extends TwitterModule {
     @Provides
     @Singleton
-    def provideKinesisClientLibConfiguration(dynamoConfig: DynamoConfig): KinesisClientLibConfiguration =
+    def provideKinesisClientLibConfiguration(
+      dynamoConfig: DynamoConfig): KinesisClientLibConfiguration =
       new KinesisClientLibConfiguration(
         dynamoConfig.applicationName,
         dynamoConfig.arn,
         new AWSStaticCredentialsProvider(
           new BasicAWSCredentials("access", "secret")),
         java.util.UUID.randomUUID.toString
-      )//turn of metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
+      ) //turn of metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
         .withMetricsLevel(MetricsLevel.NONE)
   }
 }
