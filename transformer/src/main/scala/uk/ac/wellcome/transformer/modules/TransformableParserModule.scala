@@ -19,7 +19,7 @@ object TransformableParserModule extends TwitterModule {
     dynamoConfig.table match {
       case "MiroData" => new MiroParser
       case "CalmData" => new CalmParser
-      case _ => throw new RuntimeException("Source not recognised")
+      case tableName => throw new RuntimeException(s"$tableName is not a recognised source")
     }
   }
 }

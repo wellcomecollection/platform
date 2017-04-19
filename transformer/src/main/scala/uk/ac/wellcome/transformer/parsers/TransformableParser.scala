@@ -11,9 +11,9 @@ trait TransformableParser[+T <: Transformable] extends Logging {
   final def extractTransformable(recordMap: RecordMap): Try[Transformable] =
     Try { readFromRecord(recordMap) }
       .map {
-        case Right(calmDynamoRecord) =>
-          info(s"Parsed DynamoDB record $calmDynamoRecord")
-          calmDynamoRecord
+        case Right(transformable) =>
+          info(s"Parsed DynamoDB record $transformable")
+          transformable
         case Left(dynamoReadError) =>
           error(s"Unable to parse record ${recordMap.value}")
           throw new Exception(
@@ -21,7 +21,7 @@ trait TransformableParser[+T <: Transformable] extends Logging {
       }
       .recover {
         case e: Throwable =>
-          error("Error extracting transformable case class", e)
+          error("Error extracting Transformable case class", e)
           throw e
       }
 

@@ -1,8 +1,6 @@
 package uk.ac.wellcome.test.utils
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
-import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sqs.AmazonSQS
 import com.google.inject.{Provides, Singleton}
@@ -26,15 +24,6 @@ trait IntegrationTestBase
     @Singleton
     @Provides
     def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
-  }
-
-  object LocalKinesisModule extends TwitterModule {
-
-    @Provides
-    @Singleton
-    def provideAmazonKinesis: AmazonKinesis = {
-      new AmazonDynamoDBStreamsAdapterClient(streamsClient)
-    }
   }
 
   object SQSLocalClientModule extends TwitterModule {

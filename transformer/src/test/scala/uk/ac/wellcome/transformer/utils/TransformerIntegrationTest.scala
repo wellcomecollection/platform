@@ -1,6 +1,8 @@
 package uk.ac.wellcome.transformer.utils
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
+import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
 import com.google.inject.{Provides, Singleton}
@@ -13,6 +15,15 @@ trait TransformerIntegrationTest extends IntegrationTestBase
   with Eventually
   with IntegrationPatience {
 
+  object LocalKinesisModule extends TwitterModule {
+
+    @Provides
+    @Singleton
+    def provideAmazonKinesis: AmazonKinesis = {
+      new AmazonDynamoDBStreamsAdapterClient(streamsClient)
+    }
+  }
+
   object LocalKinesisClientLibConfigurationModule extends TwitterModule {
     @Provides
     @Singleton
@@ -23,6 +34,7 @@ trait TransformerIntegrationTest extends IntegrationTestBase
         new AWSStaticCredentialsProvider(
           new BasicAWSCredentials("access", "secret")),
         java.util.UUID.randomUUID.toString
-      ).withMetricsLevel(MetricsLevel.NONE)
+      )//turn of metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
+        .withMetricsLevel(MetricsLevel.NONE)
   }
 }

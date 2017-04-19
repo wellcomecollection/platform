@@ -22,6 +22,8 @@ object KinesisWorker extends TwitterModule {
     val recordProcessFactory = injector.instance[StreamsRecordProcessorFactory]
     val kinesisConfig = injector
       .instance[KinesisClientLibConfiguration]
+      //InitialPositionInStream.LATEST won't read items added to the stream before the transformer was started,
+      // hence TRIM_HORIZON
       .withInitialPositionInStream(InitialPositionInStream.TRIM_HORIZON)
     val adapter = injector.instance[AmazonKinesis]
     val dynamoDBClient = injector.instance[AmazonDynamoDB]

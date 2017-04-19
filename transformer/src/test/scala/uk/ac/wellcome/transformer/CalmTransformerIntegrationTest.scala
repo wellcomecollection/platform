@@ -17,7 +17,7 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
     TestInjector(
       flags = Map(
         "aws.region" -> "eu-west-1",
-        "aws.dynamo.streams.appName" -> s"transformer-calm",
+        "aws.dynamo.streams.appName" -> "test-transformer-calm",
         "aws.dynamo.streams.arn" -> calmDataStreamArn,
         "aws.dynamo.tableName" -> calmDataTableName,
         "aws.sns.topic.arn" -> idMinterTopicArn
@@ -38,11 +38,11 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
 
   test("it should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     Scanamo.put(dynamoDbClient)(calmDataTableName)(
-      CalmTransformable("RecordID1",
-                        "Collection",
-                        "AltRefNo1",
-                        "RefNo1",
-                        """{"AccessStatus": ["public"]}"""))
+      CalmTransformable(RecordID = "RecordID1",
+        RecordType = "Collection",
+        AltRefNo = "AltRefNo1",
+        RefNo = "RefNo1",
+        data = """{"AccessStatus": ["public"]}"""))
 
     KinesisWorker.singletonStartup(injector)
 
@@ -53,11 +53,11 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
     }
 
     Scanamo.put(dynamoDbClient)(calmDataTableName)(
-      CalmTransformable("RecordID2",
-                        "Collection",
-                        "AltRefNo2",
-                        "RefNo2",
-                        """{"AccessStatus": ["secret"]}"""))
+      CalmTransformable(RecordID = "RecordID2",
+        RecordType = "Collection",
+        AltRefNo = "AltRefNo2",
+        RefNo = "RefNo2",
+        data = """{"AccessStatus": ["restricted"]}"""))
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -65,7 +65,7 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
 
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
       assertSNSMessageContainsCalmDataWith(snsMessages.tail.head,
-                                           Some("secret"))
+                                           Some("restricted"))
     }
   }
 

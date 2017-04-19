@@ -62,7 +62,7 @@ messages:
       Nil
     } else {
       string
-        .substring(indexOfFirstMessage + 3)
+        .substring(indexOfFirstMessage + "- :".size)
         .split("\n- ")
         .map { messageDetails =>
           val messageLines = messageDetails.split("\n\\s*:")
