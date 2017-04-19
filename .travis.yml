@@ -1,0 +1,37 @@
+language: scala
+
+sudo: required
+
+services:
+  - docker
+
+cache:
+  directories:
+    - "~/.sbt"
+    - "~/.ivy2"
+    - "project/target/resolution-cache"
+    - "project/target/streams"
+    - "api/target"
+    - "calm_adapter/target"
+    - "common/target"
+    - "id_minter/target"
+    - "ingestor/target"
+    - "transformer/target"
+
+matrix:
+  include:
+    - scala: 2.12.2
+      env: PROJECT=common
+    - scala: 2.12.2
+      env: PROJECT=api
+    - scala: 2.12.2
+      env: PROJECT=transformer
+    - scala: 2.12.2
+      env: PROJECT=calm_adapter
+    - scala: 2.12.2
+      env: PROJECT=ingestor
+    - scala: 2.12.2
+      env: PROJECT=id_minter
+
+script:
+  - sbt "project $PROJECT" dockerComposeTest
