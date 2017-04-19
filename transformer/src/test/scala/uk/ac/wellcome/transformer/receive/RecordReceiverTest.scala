@@ -36,14 +36,14 @@ class RecordReceiverTest
     accessStatus = Some("restricted"))
 
   it("should receive a message and send it to SNS client") {
-    val sNSWriter = mockSNSWriter
+    val snsWriter = mockSNSWriter
     val recordReceiver =
-      new RecordReceiver(sNSWriter,
+      new RecordReceiver(snsWriter,
                          transformableParser(calmRecord, unifiedItem))
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future) { _ =>
-      verify(sNSWriter).writeMessage(UnifiedItem.json(unifiedItem),
+      verify(snsWriter).writeMessage(UnifiedItem.json(unifiedItem),
                                      Some("Foo"))
     }
   }
