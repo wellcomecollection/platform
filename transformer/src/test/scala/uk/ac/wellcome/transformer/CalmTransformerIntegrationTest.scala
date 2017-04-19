@@ -76,8 +76,7 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
     snsMessage.message shouldBe JsonUtil
       .toJson(
         UnifiedItem(
-          List(SourceIdentifier("source", "key", "value")),
-          None,
+          identifiers = List(SourceIdentifier("source", "key", "value")),
           accessStatus = AccessStatus
         ))
       .get

@@ -31,10 +31,7 @@ class RecordReceiverTest
     "AB/CD/12",
     """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
 
-  val unifiedItem = UnifiedItem(
-    List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
-    None,
-    Some("restricted"))
+  val unifiedItem = UnifiedItem(identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")), accessStatus = Some("restricted"))
 
   it("should receive a message and send it to SNS client") {
     val sNSWriter = mockSNSWriter

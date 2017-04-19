@@ -69,9 +69,8 @@ class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
                                        imageTitle: String) = {
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        UnifiedItem(List(SourceIdentifier("Miro", "MiroID", miroId)),
-                    Some(imageTitle),
-                    None))
+        UnifiedItem(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+                    title = Some(imageTitle)))
       .get
   }
 
