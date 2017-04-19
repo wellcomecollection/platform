@@ -17,7 +17,7 @@ class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
     TestInjector(
       flags = Map(
         "aws.region" -> "eu-west-1",
-        "aws.dynamo.streams.appName" -> s"transformer-miro",
+        "aws.dynamo.streams.appName" -> "test-transformer-miro",
         "aws.dynamo.streams.arn" -> miroDataStreamArn,
         "aws.dynamo.tableName" -> miroDataTableName,
         "aws.sns.topic.arn" -> idMinterTopicArn

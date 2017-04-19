@@ -60,7 +60,7 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
       }
     } recover {
       case e: Throwable =>
-        error(s"Failed getting MiroId $miroId in dynamoDb", e)
+        error(s"Failed getting MiroId $miroId in DynamoDB", e)
         throw e
     }
 

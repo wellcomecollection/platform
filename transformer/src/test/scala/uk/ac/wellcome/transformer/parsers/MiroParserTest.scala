@@ -13,7 +13,7 @@ class MiroParserTest extends FunSpec with MiroRecordUtils with Matchers {
 
     val MiroID = "1234"
     val MiroCollection = "Images-A"
-    val data = """{"image-title": "this is the image title"}"""
+    val data = """{"image_title": "this is the image title"}"""
     val triedMiroTransformable = miroParser.extractTransformable(
       createValidMiroRecord(MiroID, MiroCollection, data))
 
