@@ -3,30 +3,15 @@ package uk.ac.wellcome.transformer
 import com.gu.scanamo.Scanamo
 import com.twitter.inject.Injector
 import com.twitter.inject.app.TestInjector
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.models.{
-  CalmTransformable,
-  MiroTransformable,
-  SourceIdentifier,
-  UnifiedItem
-}
-import uk.ac.wellcome.platform.transformer.modules.{
-  KinesisClientLibConfigurationModule,
-  KinesisWorker,
-  StreamsRecordProcessorFactoryModule
-}
-import uk.ac.wellcome.test.utils.{IntegrationTestBase, MessageInfo}
-import uk.ac.wellcome.transformer.modules.{
-  AmazonCloudWatchModule,
-  TransformableParserModule
-}
+import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.platform.transformer.modules.{KinesisWorker, StreamsRecordProcessorFactoryModule}
+import uk.ac.wellcome.test.utils.MessageInfo
+import uk.ac.wellcome.transformer.modules.{AmazonCloudWatchModule, TransformableParserModule}
+import uk.ac.wellcome.transformer.utils.TransformerIntegrationTest
 import uk.ac.wellcome.utils.JsonUtil
 
-class CalmTransformerIntegrationTest
-    extends IntegrationTestBase
-    with Eventually
-    with IntegrationPatience {
+class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
 
   override def injector: Injector =
     TestInjector(
@@ -39,7 +24,7 @@ class CalmTransformerIntegrationTest
       ),
       modules = Seq(
         StreamsRecordProcessorFactoryModule,
-        KinesisClientLibConfigurationModule,
+        LocalKinesisClientLibConfigurationModule,
         DynamoConfigModule,
         AkkaModule,
         TransformableParserModule,
