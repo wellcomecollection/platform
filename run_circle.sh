@@ -75,7 +75,9 @@ do
         sbt "project $project" "$TASK"
     elif [[ "$TASK" == "test" ]]
     then
-        sbt "project $project" "dockerComposeTest"
+        sbt "project $project" "dockerComposeUp"
+        sbt "project $project" "test"
+        sbt "project $project" "dockerComposeStop"
     elif [[ "$TASK" == "deploy" ]]
     then
         # There isn't a deploy step for the common lib
