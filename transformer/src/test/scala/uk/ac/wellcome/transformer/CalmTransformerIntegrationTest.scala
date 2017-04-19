@@ -5,9 +5,15 @@ import com.twitter.inject.Injector
 import com.twitter.inject.app.TestInjector
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, UnifiedItem}
-import uk.ac.wellcome.platform.transformer.modules.{KinesisWorker, StreamsRecordProcessorFactoryModule}
+import uk.ac.wellcome.platform.transformer.modules.{
+  KinesisWorker,
+  StreamsRecordProcessorFactoryModule
+}
 import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.transformer.modules.{AmazonCloudWatchModule, TransformableParserModule}
+import uk.ac.wellcome.transformer.modules.{
+  AmazonCloudWatchModule,
+  TransformableParserModule
+}
 import uk.ac.wellcome.transformer.utils.TransformerIntegrationTest
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -39,10 +45,10 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
   test("it should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     Scanamo.put(dynamoDbClient)(calmDataTableName)(
       CalmTransformable(RecordID = "RecordID1",
-        RecordType = "Collection",
-        AltRefNo = "AltRefNo1",
-        RefNo = "RefNo1",
-        data = """{"AccessStatus": ["public"]}"""))
+                        RecordType = "Collection",
+                        AltRefNo = "AltRefNo1",
+                        RefNo = "RefNo1",
+                        data = """{"AccessStatus": ["public"]}"""))
 
     KinesisWorker.singletonStartup(injector)
 
@@ -54,10 +60,10 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
 
     Scanamo.put(dynamoDbClient)(calmDataTableName)(
       CalmTransformable(RecordID = "RecordID2",
-        RecordType = "Collection",
-        AltRefNo = "AltRefNo2",
-        RefNo = "RefNo2",
-        data = """{"AccessStatus": ["restricted"]}"""))
+                        RecordType = "Collection",
+                        AltRefNo = "AltRefNo2",
+                        RefNo = "RefNo2",
+                        data = """{"AccessStatus": ["restricted"]}"""))
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()

@@ -5,9 +5,15 @@ import com.twitter.inject.Injector
 import com.twitter.inject.app.TestInjector
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.{MiroTransformable, SourceIdentifier, UnifiedItem}
-import uk.ac.wellcome.platform.transformer.modules.{KinesisWorker, StreamsRecordProcessorFactoryModule}
+import uk.ac.wellcome.platform.transformer.modules.{
+  KinesisWorker,
+  StreamsRecordProcessorFactoryModule
+}
 import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.transformer.modules.{AmazonCloudWatchModule, TransformableParserModule}
+import uk.ac.wellcome.transformer.modules.{
+  AmazonCloudWatchModule,
+  TransformableParserModule
+}
 import uk.ac.wellcome.transformer.utils.TransformerIntegrationTest
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -69,7 +75,8 @@ class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
                                        imageTitle: String) = {
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        UnifiedItem(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+        UnifiedItem(identifiers =
+                      List(SourceIdentifier("Miro", "MiroID", miroId)),
                     title = Some(imageTitle)))
       .get
   }

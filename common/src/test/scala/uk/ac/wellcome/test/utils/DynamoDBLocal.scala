@@ -22,8 +22,9 @@ trait DynamoDBLocal
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
 
-  private val dynamoDBLocalCredentialsProvider = new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials("access", "secret"))
+  private val dynamoDBLocalCredentialsProvider =
+    new AWSStaticCredentialsProvider(
+      new BasicAWSCredentials("access", "secret"))
 
   protected val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
     .standard()
@@ -41,8 +42,10 @@ trait DynamoDBLocal
   private val miroDataTable = createMiroDataTable()
   private val calmDataTable = createCalmDataTable()
 
-  protected val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
-  protected val calmDataStreamArn = calmDataTable.getTableDescription.getLatestStreamArn
+  protected val miroDataStreamArn =
+    miroDataTable.getTableDescription.getLatestStreamArn
+  protected val calmDataStreamArn =
+    calmDataTable.getTableDescription.getLatestStreamArn
 
   protected val streamsClient = AmazonDynamoDBStreamsClientBuilder
     .standard()

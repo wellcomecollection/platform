@@ -30,7 +30,6 @@ trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
       .execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
-
   //TODO this is getting a bit complicated.
   // Try using https://hub.docker.com/r/s12v/sns/ docker image instead of the current one and subscribe a sqs queue to it to check for messages.
   // Couldn't make it work but should retry without proxies in local development machine
