@@ -2,12 +2,19 @@
 
 ![](ingest_architecture.png)
 
-We have a number of data sources (initially just Calm, but we'll add others).
+We have a number of data sources (initially just Calm and Miro but we'll add others).
 An adapter ingests all the records into a per-source DynamoDB table, treating
 Dynamo as a mirror of the original source.
 
 A transformer runs on the other side of each Dynamo table, and parses out the
 fields we want to expose on Elasticsearch.  These parsed records are sent to
 per-source SNS topics, which are in turn coalesced into a single SQS queue.
-A worker pulls entries from the queue into the Elasticsearch index, which is
+
+The id_minter:
+* reads each item from the SQS queue,
+* checks into a dynamoDB table if the item already has an internal id,
+    * if it doesn't, generates an id and saves it into the table
+* sends the original item with the internal id into a SNS topic
+
+A SQS queue is subsribed to the SNS topic. An ingester pulls entries from the queue into the Elasticsearch index, which is
 then queried by our API.
