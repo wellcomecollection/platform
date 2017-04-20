@@ -1,0 +1,57 @@
+language: scala
+
+sudo: required
+
+dist: trusty
+
+install:
+  - curl -sSL "https://get.docker.com/gpg" | sudo -E apt-key add -
+  - echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update
+  - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --assume-yes install docker-engine
+  - docker version
+
+cache:
+  directories:
+    - "~/.sbt"
+    - "~/.ivy2"
+    - "project/target/resolution-cache"
+    - "project/target/streams"
+    - "api/target"
+    - "calm_adapter/target"
+    - "common/target"
+    - "id_minter/target"
+    - "ingestor/target"
+    - "transformer/target"
+
+matrix:
+  include:
+    - scala: 2.12.2
+      env: PROJECT=common
+    - scala: 2.12.2
+      env: PROJECT=api
+    - scala: 2.12.2
+      env: PROJECT=transformer
+    - scala: 2.12.2
+      env: PROJECT=calm_adapter
+    - scala: 2.12.2
+      env: PROJECT=ingestor
+    - scala: 2.12.2
+      env: PROJECT=id_minter
+
+script:
+  # https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+  - sbt "project $PROJECT" dockerComposeTest
+
+after_script:
+  - >
+    if [[ "$BRANCH" == "master" ]];
+    then
+      if [[ "$PROJECT" != "common" ]]; then
+        sbt "project $PROJECT" -DconfigBucket=$CONFIG_BUCKET -Denv=$BUILD_ENV ecr:push;
+      fi;
+    else
+      echo "Not on master; skipping deploy...";
+    fi
