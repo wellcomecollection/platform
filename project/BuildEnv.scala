@@ -26,16 +26,17 @@ object BuildEnvPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     buildEnv := {
-      sys.props.get("env")
-         .orElse(sys.env.get("BUILD_ENV"))
-         .flatMap {
-           case "prod" => Some(BuildEnv.Production)
-           case "stage" => Some(BuildEnv.Stage)
-           case "test" => Some(BuildEnv.Test)
-           case "dev" => Some(BuildEnv.Developement)
-           case _ => None
-         }
-         .getOrElse(BuildEnv.Developement)
+      sys.props
+        .get("env")
+        .orElse(sys.env.get("BUILD_ENV"))
+        .flatMap {
+          case "prod" => Some(BuildEnv.Production)
+          case "stage" => Some(BuildEnv.Stage)
+          case "test" => Some(BuildEnv.Test)
+          case "dev" => Some(BuildEnv.Developement)
+          case _ => None
+        }
+        .getOrElse(BuildEnv.Developement)
     },
     // give feed back
     onLoadMessage := {

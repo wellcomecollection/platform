@@ -8,7 +8,7 @@
 
 
 # List of projects that sbt knows how to build
-PROJECTS="common api transformer"
+PROJECTS="common api transformer calm_adapter ingestor id_minter"
 
 
 # Some bash debugging options: tracing, and exit as soon as a build step fails
@@ -70,9 +70,14 @@ do
     fi
 
     # At this point we know we want to run this project: run the task!
-    if [[ "$TASK" == "compile" || "$TASK" == "test" ]]
+    if [[ "$TASK" == "compile" ]]
     then
         sbt "project $project" "$TASK"
+    elif [[ "$TASK" == "test" ]]
+    then
+        sbt "project $project" "dockerComposeUp"
+        sbt "project $project" "test"
+        sbt "project $project" "dockerComposeStop"
     elif [[ "$TASK" == "deploy" ]]
     then
         # There isn't a deploy step for the common lib
