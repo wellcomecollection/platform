@@ -339,7 +339,7 @@ ww:reproductionConditions rdf:type owl:DatatypeProperty ;
 	
 ww:wellcomeCollectionSection rdf:type owl:DatatypeProperty ;
 	rdfs:label "wellcomeCollectionSection"@en ;
-	rdfs:comment "this relates to works that are reproductions of other Wellcome Collection works, and records the section of the Wellcome Collection within which the original item is to be foundA note of the section of the Wellcome Collection within the original item is to be found."@en ;
+	rdfs:comment "this relates to works that are reproductions of other Wellcome Collection works, and records the section of the Wellcome Collection within which the original item is to be found. A note of the section of the Wellcome Collection within the original item is to be found."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
