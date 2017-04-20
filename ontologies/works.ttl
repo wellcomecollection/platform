@@ -83,13 +83,6 @@ ww:hasIdentifier rdf:type owl:ObjectProperty ;
 	rdfs:range ww:Identifier ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 	
-ww:hasIdentifier rdf:type owl:ObjectProperty ;
-	rdfs:label "hasIdentifier"@en ;
-	rdfs:comment "Relates an entity to a unique system-generated identifier."@en ;
-	rdfs:domain ww:Item ;
-	rdfs:range ww:Identifier ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-	
 ww:isPartOf rdf:type owl:ObjectProperty ;
 	rdfs:label "isPartOf"@en ;
 	rdfs:comment "Relates an entity to one of which it forms a part."@en ;
@@ -332,17 +325,23 @@ ww:restrictionDate rdf:type owl:DatatypeProperty ;
 		
 ww:historicalBackground rdf:type owl:DatatypeProperty ;
 	rdfs:label "historicalBackground"@en ;
-	rdfs:comment "A note of any historical or biographical information which is felt to establish context for the work and to make it more comprehensible for the user."
+	rdfs:comment "A note of any historical or biographical information which is felt to establish context for the work and to make it more comprehensible for the user."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 		
 ww:reproductionConditions rdf:type owl:DatatypeProperty ;
 	rdfs:label "reproductionConditions"@en ;
-	rdfs:comment "A note of the conditions under which this work may be reproduced, including copyright issues, necessity to seek depositor permission, physical fragility, etc."
+	rdfs:comment "A note of the conditions under which this work may be reproduced, including copyright issues, necessity to seek depositor permission, physical fragility, etc."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-
+	
+ww:wellcomeCollectionSection rdf:type owl:DatatypeProperty ;
+	rdfs:label "wellcomeCollectionSection"@en ;
+	rdfs:comment "this relates to works that are reproductions of other Wellcome Collection works, and records the section of the Wellcome Collection within which the original item is to be foundA note of the section of the Wellcome Collection within the original item is to be found."@en ;
+	rdfs:domain ww:Work ;
+	rdfs:range rdf:langString ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 	
 	
