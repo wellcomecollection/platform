@@ -23,11 +23,8 @@ dependencies:
     - "id_minter/target"
     - "ingestor/target"
     - "transformer/target"
-    - "/var/lib/docker"
   override:
-    - docker pull peopleperhour/dynamodb
-    - docker pull alicefuzier/fake-sns
-    - docker pull s12v/elasticmq
+    - ./cache_containers.sh
     - ./run_circle.sh compile
 
 test:
