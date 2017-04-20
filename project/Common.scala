@@ -3,20 +3,17 @@ import Keys._
 
 import com.typesafe.sbt.SbtGit._
 
-
 object Common {
   val settings: Seq[Def.Setting[_]] = Seq(
-
     scalaVersion := "2.11.8",
     organization := "uk.ac.wellcome",
     git.baseVersion := "0.0.1",
-
     resolvers += Resolver.sonatypeRepo("releases"),
-
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
-      "-encoding", "UTF-8",
+      "-encoding",
+      "UTF-8",
       "-Xlint",
       "-Yclosure-elim",
       "-Yinline",
@@ -24,9 +21,8 @@ object Common {
       "-feature",
       "-language:postfixOps"
     ),
-
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
-  )
+    parallelExecution in Test := false
+  ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings
 }
 
 object Swagger {
@@ -48,4 +44,3 @@ object Finatra {
     fork in run := true
   )
 }
-
