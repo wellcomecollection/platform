@@ -47,7 +47,7 @@ for project in $PROJECTS
 do
     if [[ "$TASK" == "compile" ]]
     then
-        sbt "project $project" "$TASK"
+        sbt "project $project" "publishLocal"
     elif [[ "$TASK" == "test" ]]
     then
         sbt "project $project" "dockerComposeTest"
