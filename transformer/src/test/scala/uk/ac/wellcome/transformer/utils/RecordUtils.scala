@@ -11,8 +11,8 @@ trait RecordUtils {
   def createInvalidRecord: Record = {
     val record = new Record()
     val streamRecord = new StreamRecord()
-    streamRecord.addNewImageEntry("something",
-                                  new AttributeValue("something-else"))
+    streamRecord.addNewImageEntry("invalid",
+                                  new AttributeValue("invalid"))
     record.withDynamodb(streamRecord)
     record
   }
