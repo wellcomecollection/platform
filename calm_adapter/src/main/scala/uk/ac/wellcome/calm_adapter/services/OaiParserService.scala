@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.CalmDynamoRecord
+import uk.ac.wellcome.models.CalmTransformable
 import uk.ac.wellcome.platform.calm_adapter.actors.OaiHarvestActorConfig
 import uk.ac.wellcome.platform.calm_adapter.models.OaiHarvestConfig
 import uk.ac.wellcome.utils.{JsonUtil, UrlUtil}
@@ -77,7 +77,7 @@ class OaiParserService @Inject()(
   val streamParserPattern =
     "<([A-Za-z0-9]+) urlencoded=\"([^\"]*)\"/?>".r("name", "value")
 
-  def parseRecords(data: String): List[CalmDynamoRecord] = {
+  def parseRecords(data: String): List[CalmTransformable] = {
     // The "Modified" and "Created" fields in Calm are machine-written.
     // Examples are '14/03/2017' and '18/02/2015'.
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -118,7 +118,7 @@ class OaiParserService @Inject()(
       })
       .map(
         data =>
-          CalmDynamoRecord(
+          CalmTransformable(
             data("RecordID").head,
             data("RecordType").head,
             data("AltRefNo").head,
