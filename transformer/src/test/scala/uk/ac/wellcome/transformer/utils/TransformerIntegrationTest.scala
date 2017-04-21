@@ -36,7 +36,7 @@ trait TransformerIntegrationTest
         new AWSStaticCredentialsProvider(
           new BasicAWSCredentials("access", "secret")),
         java.util.UUID.randomUUID.toString
-      ) //turn of metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
+      ) //turn off metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
         .withMetricsLevel(MetricsLevel.NONE)
   }
 }
