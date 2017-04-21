@@ -196,7 +196,14 @@ ww:createdDate rdf:type owl:DatatypeProperty ;
 	rdfs:domain ww:Work ;
 	rdfs:range xsd:dateTime ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
-
+			
+ww:publicationDate rdf:type owl:DatatypeProperty ;
+	rdfs:label "publicationDate"@en ;
+	rdfs:comment "Relates the publication of a work to a date, when the work has been formally published.  This date is not identical with the property createdDate: for example, a work may be created at a particular time but only published after the author's death, or a work may be published in a modern edition long after first publication.  An extreme example would be the works of Aristotle, all of which are created some centuries BCE but not published in the formal sense for many centuries after this"@en ;
+	rdfs:domain ww:Work ;
+	rdfs:range xsd:dateTime ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
+	
 ww:modifiedDate rdf:type owl:DatatypeProperty ;
 	rdfs:label "modifiedDate"@en ;
 	rdfs:comment "Relates the last recorded modification of a work to a date"@en ;
@@ -339,7 +346,7 @@ ww:reproductionConditions rdf:type owl:DatatypeProperty ;
 	
 ww:wellcomeCollectionSection rdf:type owl:DatatypeProperty ;
 	rdfs:label "wellcomeCollectionSection"@en ;
-	rdfs:comment "this relates to works that are reproductions of other Wellcome Collection works, and records the section of the Wellcome Collection within which the original item is to be found. A note of the section of the Wellcome Collection within the original item is to be found."@en ;
+	rdfs:comment "This relates to works that are reproductions of other Wellcome Collection works, and records the section of the Wellcome Collection within which the original item is to be found."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
