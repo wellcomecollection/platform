@@ -13,9 +13,7 @@ install:
   - pip install --upgrade --user awscli
 
 script:
-  # We don't want Terraform saving to remote state, so this is just
-  # a syntax check
-  - cd terraform; mv terraform.tf terraform.tf.bak; ./plan.sh
+  - cd terraform; ./plan.sh
 
 env:
   matrix:
