@@ -1,6 +1,6 @@
 resource "aws_iam_instance_profile" "instance_profile" {
-  name  = "${var.name}_instance_profile"
-  roles = ["${aws_iam_role.role.name}"]
+  name = "${var.name}_instance_profile"
+  role = "${aws_iam_role.role.name}"
 }
 
 data "aws_iam_policy_document" "instance_policy" {
