@@ -37,6 +37,7 @@ class SQSReaderTest
         messageStrings should contain(message.getBody)
       }
     }
+
     //wait for the visibility period to expire
     Thread.sleep(1500)
     val nextMessages = sqsReader.retrieveAndProcessMessages(identity)
@@ -58,6 +59,37 @@ class SQSReaderTest
 
     whenReady(futureMessages.failed) { exception =>
       exception.getMessage should not be (empty)
+    }
+  }
+
+  it("should return a failed future if rprocessing one of the messages fails and none of the message should be deleted") {
+    val sqsConfig =
+      SQSConfig("eu-west-1",
+        idMinterQueueUrl,
+        waitTime = 20 seconds,
+        maxMessages = 10)
+
+    val failingMessage = "failingMessage"
+    val messageStrings = List("someMessage1", failingMessage, "someMessage3")
+    messageStrings.foreach(sqsClient.sendMessage(idMinterQueueUrl, _))
+    val sqsReader =
+      new SQSReader(sqsClient, sqsConfig)
+
+    val futureMessages = sqsReader.retrieveAndProcessMessages{message =>
+      if(message.getBody == failingMessage) throw new RuntimeException(s"$failingMessage is not valid")
+      else message
+    }
+
+    whenReady(futureMessages.failed){exception =>
+      exception shouldBe a[RuntimeException]
+    }
+
+    //wait for the visibility period to expire
+    Thread.sleep(1500)
+    val nextMessages = sqsReader.retrieveAndProcessMessages(identity)
+    //check that previously read messages are not available
+    whenReady(nextMessages) { messages =>
+      messages should have size 3
     }
   }
 
