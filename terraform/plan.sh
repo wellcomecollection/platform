@@ -28,17 +28,15 @@ then
     fi
 fi
 
+terraform init
+terraform get
+
 # When running in Travis, don't write anything back to the state file.
 # As a result, we don't need to acquire the state lock.
 if [[ ! -z "$TRAVIS" && "$TRAVIS" == "true" ]]
 then
-    terraform init
-    terraform get
     mv terraform.tf terraform.tf.bak
     terraform init -force-copy -lock=false
-else
-    terraform init
-    terraform get
 fi
 
 terraform plan -out terraform.plan
