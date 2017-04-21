@@ -20,13 +20,17 @@ object SQSWorker extends TwitterModule with TryBackoff {
     val sqsReader = injector.instance[SQSReader]
     val messageProcessorService = injector.instance[MessageProcessorService]
 
-    run(()=>processMessages(sqsReader, messageProcessorService), system)
+    run(() => processMessages(sqsReader, messageProcessorService), system)
   }
 
-  private def processMessages(sqsReader: SQSReader, messageProcessorService: MessageProcessorService): Unit = {
-    sqsReader.retrieveAndProcessMessages{message =>
-        extractMessage(message).map{sqsMessage => messageProcessorService.indexDocument(sqsMessage.body)}
+  private def processMessages(
+    sqsReader: SQSReader,
+    messageProcessorService: MessageProcessorService): Unit = {
+    sqsReader.retrieveAndProcessMessages { message =>
+      extractMessage(message).map { sqsMessage =>
+        messageProcessorService.indexUnifiedItem(sqsMessage.body)
       }
+    }
   }
 
   private def extractMessage(sqsMessage: AwsSQSMessage): Option[SQSMessage] =
