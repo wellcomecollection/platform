@@ -4,9 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sqs.AmazonSQS
 import com.google.inject.{Provides, Singleton}
-import com.twitter.inject.app.TestInjector
 import com.twitter.inject.{IntegrationTest, TwitterModule}
-import uk.ac.wellcome.finatra.modules._
 
 trait IntegrationTestBase
     extends IntegrationTest
