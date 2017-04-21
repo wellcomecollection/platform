@@ -42,7 +42,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)))
   }
 
-  it("should fail transforming itself if the data field is not valied json") {
+  it("should fail transforming itself if the data field is not valid json") {
     val miroId = "123"
     val miroTransformable =
       MiroTransformable(miroId, "Images-A", """not a json string""")
