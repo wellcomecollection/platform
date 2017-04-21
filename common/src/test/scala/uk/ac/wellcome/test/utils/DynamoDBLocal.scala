@@ -5,7 +5,8 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.{
   AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder
+  AmazonDynamoDBClientBuilder,
+  AmazonDynamoDBStreamsClientBuilder
 }
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
@@ -18,44 +19,151 @@ trait DynamoDBLocal
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  val port = 45678
-  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
+  private val port = 45678
+  private val dynamoDBEndPoint = "http://localhost:" + port
+
+  private val dynamoDBLocalCredentialsProvider =
+    new AWSStaticCredentialsProvider(
+      new BasicAWSCredentials("access", "secret"))
+
+  protected val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
     .standard()
-    .withCredentials(new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials("access", "secret")))
+    .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(
-      new EndpointConfiguration("http://localhost:" + port, "localhost"))
+      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
     .build()
 
   protected val identifiersTableName = "Identifiers"
+  protected val miroDataTableName = "MiroData"
+  protected val calmDataTableName = "CalmData"
 
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    deleteTable()
-    createTable()
-  }
+  deleteTables()
+  private val identifiersTable = createIdentifiersTable()
+  private val miroDataTable = createMiroDataTable()
+  private val calmDataTable = createCalmDataTable()
+
+  protected val miroDataStreamArn =
+    miroDataTable.getTableDescription.getLatestStreamArn
+  protected val calmDataStreamArn =
+    calmDataTable.getTableDescription.getLatestStreamArn
+
+  protected val streamsClient = AmazonDynamoDBStreamsClientBuilder
+    .standard()
+    .withCredentials(dynamoDBLocalCredentialsProvider)
+    .withEndpointConfiguration(
+      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
+    .build()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearTable()
+    dynamoDbClient
+      .listTables()
+      .getTableNames
+      .foreach(tableName => clearTable(tableName))
   }
 
-  private def clearTable() =
-    Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
+  private def clearTable(tableName: String): List[DeleteItemResult] =
+    Scanamo.scan[Identifier](dynamoDbClient)(tableName).map {
       case Right(id) =>
         dynamoDbClient.deleteItem(
-          identifiersTableName,
+          tableName,
           Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
       case _ => throw new Exception("Unable to clear the table")
     }
 
-  private def deleteTable() = {
-    if (!dynamoDbClient.listTables().getTableNames.isEmpty)
-      dynamoDbClient.deleteTable(identifiersTableName)
+  private def deleteTables() = {
+    dynamoDbClient
+      .listTables()
+      .getTableNames
+      .foreach(tableName => dynamoDbClient.deleteTable(tableName))
   }
 
-  private def createTable(): Unit = {
-    //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
+  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
+  private def createCalmDataTable() = {
+    dynamoDbClient.createTable(
+      new CreateTableRequest()
+        .withTableName(calmDataTableName)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("RecordID")
+          .withKeyType(KeyType.HASH))
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("RecordType")
+          .withKeyType(KeyType.RANGE))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("RecordID")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("RecordType")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("RefNo")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("AltRefNo")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+        .withStreamSpecification(new StreamSpecification()
+          .withStreamEnabled(true)
+          .withStreamViewType(StreamViewType.NEW_IMAGE))
+        .withGlobalSecondaryIndexes(
+          new GlobalSecondaryIndex()
+            .withIndexName("RefNo")
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(new KeySchemaElement()
+              .withAttributeName("RefNo")
+              .withKeyType(KeyType.HASH)),
+          new GlobalSecondaryIndex()
+            .withIndexName("AltRefNo")
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(new KeySchemaElement()
+              .withAttributeName("AltRefNo")
+              .withKeyType(KeyType.HASH))
+        )
+    )
+  }
+
+  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
+  private def createMiroDataTable() = {
+    dynamoDbClient.createTable(
+      new CreateTableRequest()
+        .withTableName(miroDataTableName)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("MiroID")
+          .withKeyType(KeyType.HASH))
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("MiroCollection")
+          .withKeyType(KeyType.RANGE))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("MiroID")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("MiroCollection")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+        .withStreamSpecification(new StreamSpecification()
+          .withStreamEnabled(true)
+          .withStreamViewType(StreamViewType.NEW_IMAGE))
+    )
+  }
+
+  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
+  private def createIdentifiersTable() = {
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(identifiersTableName)
