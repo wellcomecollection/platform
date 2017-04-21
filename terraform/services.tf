@@ -62,7 +62,7 @@ module "transformer" {
   infra_bucket     = "${var.infra_bucket}"
 
   config_vars = {
-    stream_arn = "${aws_dynamodb_table.calm_table.stream_arn}"
+    stream_arn = "${aws_dynamodb_table.miro_table.stream_arn}"
     sns_arn    = "${aws_sns_topic.id_minter_topic.arn}"
   }
 }
