@@ -28,18 +28,17 @@ then
     fi
 fi
 
-terraform init
-terraform get
-
-# When running in Travis, move the config telling us about the remote
-# state file.  Otherwise, Travis will attempt to update the state file,
-# which is:
-#  1) Not something we want to do
-#  2) Not allowed with its IAM permissions
+# When running in Travis, don't write anything back to the state file.
+# As a result, we don't need to acquire the state lock.
 if [[ ! -z "$TRAVIS" && "$TRAVIS" == "true" ]]
 then
+    terraform init
+    terraform get
     mv terraform.tf terraform.tf.bak
-    terraform init -force-copy
+    terraform init -force-copy -lock=false
+else
+    terraform init
+    terraform get
 fi
 
 terraform plan -out terraform.plan
