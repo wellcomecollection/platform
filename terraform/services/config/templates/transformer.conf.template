@@ -2,10 +2,10 @@ aws {
   region = "eu-west-1"
   dynamo {
     streams {
-      appName = "dynamodb-streams-app"
+      appName = "transformer-streams"
       arn = "${stream_arn}"
     }
-    tableName = "CalmData"
+    tableName = "MiroData"
   }
   sns {
     topic {
