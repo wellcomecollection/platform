@@ -58,5 +58,5 @@ data "aws_iam_policy_document" "assume_ec2_role" {
 
 resource "aws_iam_role" "role" {
   name               = "${var.name}_instance_role"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_ec2_role}"
+  assume_role_policy = "${data.aws_iam_policy_document.assume_ec2_role.json}"
 }
