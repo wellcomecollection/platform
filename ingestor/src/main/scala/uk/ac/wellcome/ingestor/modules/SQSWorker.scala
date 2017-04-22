@@ -4,13 +4,15 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.sqs.model.{Message => AwsSQSMessage}
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.ingestor.services.MessageProcessorService
+import uk.ac.wellcome.platform.ingestor.services.IdentifiedUnifiedItemIndexer
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 
 import scala.util.{Failure, Success}
 
 object SQSWorker extends TwitterModule with TryBackoff {
+  private val esIndex = flag[String]("es.index", "records", "ES index name")
+  private val esType = flag[String]("es.type", "item", "ES document type")
 
   override def singletonStartup(injector: Injector) {
     info("Starting SQS worker")
@@ -18,17 +20,17 @@ object SQSWorker extends TwitterModule with TryBackoff {
     val system = injector.instance[ActorSystem]
 
     val sqsReader = injector.instance[SQSReader]
-    val messageProcessorService = injector.instance[MessageProcessorService]
+    val unifiedItemIndexer = injector.instance[IdentifiedUnifiedItemIndexer]
 
-    run(() => processMessages(sqsReader, messageProcessorService), system)
+    run(() => processMessages(sqsReader, unifiedItemIndexer), system)
   }
 
   private def processMessages(
     sqsReader: SQSReader,
-    messageProcessorService: MessageProcessorService): Unit = {
+    unifiedItemIndexer: IdentifiedUnifiedItemIndexer): Unit = {
     sqsReader.retrieveAndProcessMessages { message =>
       extractMessage(message).map { sqsMessage =>
-        messageProcessorService.indexUnifiedItem(sqsMessage.body)
+        unifiedItemIndexer.indexUnifiedItem(sqsMessage.body)
       }
     }
   }

@@ -87,7 +87,7 @@ class SQSReaderTest
     //wait for the visibility period to expire
     Thread.sleep(1500)
     val nextMessages = sqsReader.retrieveAndProcessMessages(identity)
-    //check that previously read messages are not available
+    //check that previously read messages are available
     whenReady(nextMessages) { messages =>
       messages should have size 3
     }

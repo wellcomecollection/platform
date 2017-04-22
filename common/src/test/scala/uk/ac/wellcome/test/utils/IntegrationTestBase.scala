@@ -25,11 +25,11 @@ trait IntegrationTestBase
     @Provides
     def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
   }
-
-  object SQSLocalClientModule extends TwitterModule {
-
-    @Singleton
-    @Provides
-    def providesAmazonSQSClient: AmazonSQS = sqsClient
-  }
+//
+//  object SQSLocalClientModule extends TwitterModule {
+//
+//    @Singleton
+//    @Provides
+//    def providesAmazonSQSClient: AmazonSQS = sqsClient
+//  }
 }

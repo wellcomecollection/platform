@@ -23,9 +23,6 @@ class Server extends HttpServer {
                              SQSWorker,
                              ElasticClientModule)
 
-  private val esIndex = flag[String]("es.index", "records", "ES index name")
-  private val esType = flag[String]("es.type", "item", "ES document type")
-
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
