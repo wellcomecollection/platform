@@ -20,23 +20,19 @@ trait SQSLocal extends Suite with BeforeAndAfterEach {
       new EndpointConfiguration(s"http://localhost:9324", "localhost"))
     .build()
 
-  val idMinterQueue = "id_minter_queue"
-  val ingesterQueue = "es_ingester_queue"
-  val idMinterQueueUrl = sqsClient.createQueue(idMinterQueue).getQueueUrl
-  val ingesterQueueUrl = sqsClient.createQueue(ingesterQueue).getQueueUrl
+  def queueName: String
+  val queueUrl = sqsClient.createQueue(queueName).getQueueUrl
 
   // AWS does not delete a message automatically once it's read.
   // It hides for the number of seconds specified in VisibilityTimeout.
   // After the timeout has passet it will be sent again.
   // Setting 1 second timeout for tests, to be able to test message deletion
-  sqsClient.setQueueAttributes(idMinterQueueUrl, Map("VisibilityTimeout"->"1"))
+  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout"->"1"))
 
   override def beforeEach(): Unit = {
     super.beforeEach()
     sqsClient.purgeQueue(
-      new PurgeQueueRequest().withQueueUrl(idMinterQueueUrl))
-    sqsClient.purgeQueue(
-      new PurgeQueueRequest().withQueueUrl(ingesterQueueUrl))
+      new PurgeQueueRequest().withQueueUrl(queueUrl))
   }
 
 
