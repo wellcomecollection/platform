@@ -1,6 +1,7 @@
 package uk.ac.wellcome.ingestor.services
 
 import com.fasterxml.jackson.core.JsonParseException
+import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl.search
 import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.scalatest.concurrent.ScalaFutures
@@ -10,7 +11,8 @@ import uk.ac.wellcome.platform.ingestor.services.IdentifiedUnifiedItemIndexer
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
-class IdentifiedUnifiedItemIndexerTest extends FunSpec with ElasticSugar with ScalaFutures with Matchers{
+class IdentifiedUnifiedItemIndexerTest extends FunSpec with ScalaFutures with Matchers with ElasticSugar{
+
 
   ensureIndexExists("records")
 
@@ -18,6 +20,7 @@ class IdentifiedUnifiedItemIndexerTest extends FunSpec with ElasticSugar with Sc
     val identifiedUnifiedItemIndexer = new IdentifiedUnifiedItemIndexer("records", "item", client)
     val identifiedUnifiedItemString = JsonUtil.toJson(IdentifiedUnifiedItem(canonicalId = "5678",unifiedItem =UnifiedItem(identifiers =
       List(SourceIdentifier("Miro", "MiroID", "1234"))))).get
+
     val future = identifiedUnifiedItemIndexer.indexUnifiedItem(identifiedUnifiedItemString)
 
     whenReady(future){_ =>

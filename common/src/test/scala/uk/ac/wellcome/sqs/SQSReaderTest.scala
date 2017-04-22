@@ -16,14 +16,16 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
+  override def queueName: String = "id_minter_queue"
+
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
       SQSConfig("eu-west-1",
-                idMinterQueueUrl,
+                queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
-    messageStrings.foreach(sqsClient.sendMessage(idMinterQueueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
@@ -65,13 +67,13 @@ class SQSReaderTest
   it("should return a failed future if rprocessing one of the messages fails and none of the message should be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1",
-        idMinterQueueUrl,
+        queueUrl,
         waitTime = 20 seconds,
         maxMessages = 10)
 
     val failingMessage = "failingMessage"
     val messageStrings = List("someMessage1", failingMessage, "someMessage3")
-    messageStrings.foreach(sqsClient.sendMessage(idMinterQueueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
