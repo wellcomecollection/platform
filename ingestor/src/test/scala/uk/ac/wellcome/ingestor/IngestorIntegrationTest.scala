@@ -19,7 +19,7 @@ class IngestorIntegrationTest
     extends IntegrationTest
     with SQSLocal
     with Eventually
-    with IntegrationPatience {
+    with IntegrationPatience with ElasticSearchUtils {
 
   override def queueName: String = "es_ingestor_queue"
 
@@ -47,8 +47,6 @@ class IngestorIntegrationTest
         ElasticClientModule)
     )
 
-  val elasticClient = injector.instance[ElasticClient]
-  elasticClient.execute(createIndex("records")).await
   test("it should read an identified unified item from the SQS queue and ingest it into elastic search") {
     val identifiedUnifiedItem = JsonUtil
       .toJson(
