@@ -42,8 +42,7 @@ class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
       )
     )
 
-  test(
-    "it should poll the dynamo stream for miro data, transform it into unified items and push them into the id_minter SNS topic") {
+  test("it should poll the dynamo stream for miro data, transform it into unified items and push them into the id_minter SNS topic") {
     val miroId = "1234"
     val imageTitle = "some image title"
     putMiroImageInDynamoDb(miroId, imageTitle)
