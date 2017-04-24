@@ -31,7 +31,7 @@ class IdentifiedUnifiedItemIndexerTest
             identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")))))
       .get
 
-    val future = identifiedUnifiedItemIndexer.indexUnifiedItem(
+    val future = identifiedUnifiedItemIndexer.indexIdentifiedUnifiedItem(
       identifiedUnifiedItemString)
 
     whenReady(future) { _ =>
@@ -50,7 +50,7 @@ class IdentifiedUnifiedItemIndexerTest
   it("should return a failed future if the input string is not an identified unified item") {
     val identifiedUnifiedItemIndexer =
       new IdentifiedUnifiedItemIndexer("records", "item", elasticClient)
-    val future = identifiedUnifiedItemIndexer.indexUnifiedItem("a document")
+    val future = identifiedUnifiedItemIndexer.indexIdentifiedUnifiedItem("a document")
 
     whenReady(future.failed) { exception =>
       exception shouldBe a[JsonParseException]

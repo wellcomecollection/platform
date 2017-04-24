@@ -4,14 +4,14 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
 import org.elasticsearch.common.settings.Settings
-import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Minute, Span}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
 
 trait ElasticSearchLocal
     extends BeforeAndAfterAll
     with BeforeAndAfterEach
     with Eventually
+    with IntegrationPatience
     with Matchers { this: Suite =>
   private val settings = Settings
     .builder()
@@ -43,7 +43,4 @@ trait ElasticSearchLocal
     elasticClient.execute(deleteIn("records").by(matchAllQuery())).await
     super.beforeEach()
   }
-
-  override implicit def patienceConfig =
-    PatienceConfig(scaled(Span(1, Minute)), scaled(Span(200, Millis)))
 }
