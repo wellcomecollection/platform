@@ -11,9 +11,8 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.blocking
 import scala.collection.JavaConversions._
-import scala.concurrent.Future
+import scala.concurrent.{Future, blocking}
 import scala.util.{Failure, Success, Try}
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)

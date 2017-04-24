@@ -20,7 +20,7 @@ class IdentifiedUnifiedItemIndexer @Inject()(
   elasticClient: ElasticClient
 ) extends Logging {
 
-  def indexUnifiedItem(document: String): Future[RichIndexResponse] = {
+  def indexIdentifiedUnifiedItem(document: String): Future[RichIndexResponse] = {
     implicit val jsonMapper = IdentifiedUnifiedItem
 
     Future

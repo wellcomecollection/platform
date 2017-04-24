@@ -1,11 +1,9 @@
 package uk.ac.wellcome.sqs
 
-import com.amazonaws.services.sqs.model.Message
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.utils.SQSLocal
-import scala.collection.JavaConversions._
 
 import scala.concurrent.duration._
 
@@ -13,6 +11,7 @@ class SQSReaderTest
     extends FunSpec
     with Matchers
     with ScalaFutures
+    with Eventually
     with IntegrationPatience
     with SQSLocal {
 
@@ -56,7 +55,7 @@ class SQSReaderTest
     }
   }
 
-  it("should return a failed future if processing one of the messages fails - none of the message should be deleted") {
+  it("should return a failed future if processing one of the messages fails - none of the messages should be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
@@ -83,11 +82,12 @@ class SQSReaderTest
   private def assertNumberOfMessagesAfterVisibilityTimeoutIs(
     expectedNumberOfMessages: Int,
     sqsReader: SQSReader): Any = {
-    //wait for the visibility period to expire
-    Thread.sleep(1500)
-    val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)
-    whenReady(nextMessages) { messages =>
-      messages should have size expectedNumberOfMessages
+    // this should be true after the visibility period expires
+    eventually {
+      val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)
+      whenReady(nextMessages) { messages =>
+        messages should have size expectedNumberOfMessages
+      }
     }
   }
 }
