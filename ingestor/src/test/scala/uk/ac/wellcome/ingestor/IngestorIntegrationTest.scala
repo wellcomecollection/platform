@@ -19,7 +19,7 @@ class IngestorIntegrationTest
     extends IntegrationTest
     with SQSLocal
     with Eventually
-    with IntegrationPatience with ElasticSearchUtils {
+    with IntegrationPatience with ElasticSearchLocal {
 
   override def queueName: String = "es_ingestor_queue"
 
