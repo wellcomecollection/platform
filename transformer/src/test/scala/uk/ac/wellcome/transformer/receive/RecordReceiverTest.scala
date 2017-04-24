@@ -59,8 +59,7 @@ class RecordReceiverTest
     }
   }
 
-  it(
-    "should return a failed future if it's unable to transform the transformable object") {
+  it("should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
       new RecordReceiver(mockSNSWriter,
                          parserReturningFailingTransformable(calmRecord))
@@ -71,8 +70,7 @@ class RecordReceiverTest
     }
   }
 
-  it(
-    "should return a failed future if it's unable to publish the unified item") {
+  it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
       new RecordReceiver(mockSNS, transformableParser(calmRecord, unifiedItem))

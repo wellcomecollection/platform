@@ -48,8 +48,7 @@ class IdMinterIntegrationTest
                     DynamoConfigModule)
     )
 
-  test(
-    "it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
+  test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
     val unifiedItem =
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", "1234")),

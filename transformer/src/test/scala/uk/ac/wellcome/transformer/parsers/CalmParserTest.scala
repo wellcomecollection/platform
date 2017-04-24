@@ -31,8 +31,7 @@ class CalmParserTest extends FunSpec with CalmRecordUtils with Matchers {
                                                                   data)
   }
 
-  it(
-    "should return a failed try if it's unable to transform the parsed record") {
+  it("should return a failed try if it's unable to transform the parsed record") {
     val calmParser = new CalmParser
 
     val triedCalmTransformable =

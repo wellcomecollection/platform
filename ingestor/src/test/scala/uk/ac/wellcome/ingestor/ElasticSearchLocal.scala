@@ -18,17 +18,14 @@ trait ElasticSearchLocal
     .put("xpack.security.user", "elastic:changeme")
     .build()
 
-  var elasticClient =
+  val elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
   override def beforeAll(): Unit = {
     eventually {
-
-      val client = XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
-
-      if(client.execute(
+      elasticClient.execute(
         clusterHealth()
-      ).await.getNumberOfNodes == 1) elasticClient = client
+      ).await.getNumberOfNodes == 1 shouldBe 1
     }
 
     if (!elasticClient.execute(indexExists("records")).await.isExists)
@@ -37,5 +34,5 @@ trait ElasticSearchLocal
     super.beforeAll()
   }
 
-  override  def patienceConfig = PatienceConfig(Span(1, Minute), Span(1, Second))
+  override implicit def patienceConfig = PatienceConfig(Span(1, Minute), Span(1, Second))
 }

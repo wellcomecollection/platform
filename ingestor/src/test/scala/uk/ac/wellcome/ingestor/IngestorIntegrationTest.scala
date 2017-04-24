@@ -48,8 +48,7 @@ class IngestorIntegrationTest
                     ElasticClientModule)
     )
 
-  test(
-    "it should read an identified unified item from the SQS queue and ingest it into elastic search") {
+  test("it should read an identified unified item from the SQS queue and ingest it into elastic search") {
     val identifiedUnifiedItem = JsonUtil
       .toJson(
         IdentifiedUnifiedItem(

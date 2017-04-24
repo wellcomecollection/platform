@@ -18,8 +18,7 @@ class SQSReaderTest
 
   override def queueName: String = "id_minter_queue"
 
-  it(
-    "should get messages from the SQS queue, limited by the maximum number of messages and return them") {
+  it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
       SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
@@ -57,8 +56,7 @@ class SQSReaderTest
     }
   }
 
-  it(
-    "should return a failed future if processing one of the messages fails - none of the message should be deleted") {
+  it("should return a failed future if processing one of the messages fails - none of the message should be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
 

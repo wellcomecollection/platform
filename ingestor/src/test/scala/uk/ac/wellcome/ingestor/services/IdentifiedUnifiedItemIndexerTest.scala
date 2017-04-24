@@ -47,8 +47,7 @@ class IdentifiedUnifiedItemIndexerTest
 
   }
 
-  it(
-    "should return a failed future if the input string is not an identified unified item") {
+  it("should return a failed future if the input string is not an identified unified item") {
     val identifiedUnifiedItemIndexer =
       new IdentifiedUnifiedItemIndexer("records", "item", elasticClient)
     val future = identifiedUnifiedItemIndexer.indexUnifiedItem("a document")
