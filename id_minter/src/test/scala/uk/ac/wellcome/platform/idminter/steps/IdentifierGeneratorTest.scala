@@ -23,7 +23,8 @@ class IdentifierGeneratorTest
                  "streamArn",
                  identifiersTableName))
 
-  it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
+  it(
+    "should search the miro id in dynamoDb and return the canonical id if it finds it") {
     Scanamo.put(dynamoDbClient)(identifiersTableName)(
       Identifier("5678", "1234"))
 
@@ -37,7 +38,8 @@ class IdentifierGeneratorTest
     }
   }
 
-  it("should generate an id and save it in the database if a record doesn't already exist") {
+  it(
+    "should generate an id and save it in the database if a record doesn't already exist") {
     val unifiedItem =
       UnifiedItem(
         identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")))
@@ -62,7 +64,8 @@ class IdentifierGeneratorTest
     }
   }
 
-  it("should return an error if it finds more than one record for the same MiroID") {
+  it(
+    "should return an error if it finds more than one record for the same MiroID") {
     val miroId = "1234"
     Scanamo.put(dynamoDbClient)(identifiersTableName)(
       Identifier("5678", miroId))

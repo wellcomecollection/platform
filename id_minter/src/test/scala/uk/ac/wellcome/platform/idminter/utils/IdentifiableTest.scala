@@ -5,7 +5,8 @@ import org.scalatest.prop.PropertyChecks
 
 class IdentifiableTest extends FunSpec with PropertyChecks with Matchers {
 
-  it("should generate a string with 8 characters, none of which are ambiguous characters") {
+  it(
+    "should generate a string with 8 characters, none of which are ambiguous characters") {
     forAll(minSuccessful(100)) { (a: Int) =>
       {
         val id = Identifiable.generate

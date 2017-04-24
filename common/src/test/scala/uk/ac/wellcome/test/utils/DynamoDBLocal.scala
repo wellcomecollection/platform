@@ -3,7 +3,11 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreamsClientBuilder}
+import com.amazonaws.services.dynamodbv2.{
+  AmazonDynamoDB,
+  AmazonDynamoDBClientBuilder,
+  AmazonDynamoDBStreamsClientBuilder
+}
 import com.google.inject.{Provides, Singleton}
 import com.gu.scanamo.Scanamo
 import com.twitter.inject.TwitterModule

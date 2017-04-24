@@ -5,16 +5,18 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.ingestor.ElasticSearchLocal
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  IdentifiedUnifiedItem,
+  SourceIdentifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.ingestor.services.IdentifiedUnifiedItemIndexer
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
 class IdentifiedUnifiedItemIndexerTest
     extends FunSpec
-    with Eventually
     with ScalaFutures
-    with IntegrationPatience
     with Matchers
     with ElasticSearchLocal {
 
@@ -45,7 +47,8 @@ class IdentifiedUnifiedItemIndexerTest
 
   }
 
-  it("should return a failed future if the input string is not an identified unified item") {
+  it(
+    "should return a failed future if the input string is not an identified unified item") {
     val identifiedUnifiedItemIndexer =
       new IdentifiedUnifiedItemIndexer("records", "item", elasticClient)
     val future = identifiedUnifiedItemIndexer.indexUnifiedItem("a document")

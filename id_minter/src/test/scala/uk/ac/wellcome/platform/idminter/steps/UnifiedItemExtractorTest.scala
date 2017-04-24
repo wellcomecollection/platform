@@ -34,7 +34,8 @@ class UnifiedItemExtractorTest
 
   }
 
-  it("should return a failed future if it fails parsing the message it receives") {
+  it(
+    "should return a failed future if it fails parsing the message it receives") {
     val sqsMessage = SQSMessage(Some("subject"),
                                 "not a json string",
                                 "topic",

@@ -8,7 +8,8 @@ import uk.ac.wellcome.transformer.utils.MiroRecordUtils
 
 class MiroParserTest extends FunSpec with MiroRecordUtils with Matchers {
 
-  it("should parse a record representing Miro Data into a Miro Data transformable") {
+  it(
+    "should parse a record representing Miro Data into a Miro Data transformable") {
     val miroParser = new MiroParser
 
     val MiroID = "1234"

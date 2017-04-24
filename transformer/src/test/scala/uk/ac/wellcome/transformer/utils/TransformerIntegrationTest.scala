@@ -11,7 +11,8 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal}
 
-trait TransformerIntegrationTest extends IntegrationTest
+trait TransformerIntegrationTest
+    extends IntegrationTest
     with SNSLocal
     with DynamoDBLocal
     with Eventually

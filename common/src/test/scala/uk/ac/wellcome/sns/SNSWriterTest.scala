@@ -15,7 +15,8 @@ class SNSWriterTest
   override def topicName: String = "test-topic-name"
   val snsConfig = SNSConfig("eu-west-1", topicArn)
 
-  it("should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
+  it(
+    "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
     val snsWriter = new SNSWriter(amazonSNS, snsConfig)
     val message = "someMessage"
     val subject = "subject"
@@ -30,7 +31,8 @@ class SNSWriterTest
     }
   }
 
-  it("should send a message with no subject to the SNS client with the default subject") {
+  it(
+    "should send a message with no subject to the SNS client with the default subject") {
     val snsWriter = new SNSWriter(amazonSNS, snsConfig)
     val message = "someMessage"
 

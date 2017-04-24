@@ -3,7 +3,10 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClientBuilder}
-import com.amazonaws.services.sqs.model.{PurgeQueueRequest, SetQueueAttributesRequest}
+import com.amazonaws.services.sqs.model.{
+  PurgeQueueRequest,
+  SetQueueAttributesRequest
+}
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import org.scalatest.{BeforeAndAfterEach, Suite}
@@ -27,12 +30,11 @@ trait SQSLocal extends Suite with BeforeAndAfterEach {
   // It hides for the number of seconds specified in VisibilityTimeout.
   // After the timeout has passet it will be sent again.
   // Setting 1 second timeout for tests, to be able to test message deletion
-  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout"->"1"))
+  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    sqsClient.purgeQueue(
-      new PurgeQueueRequest().withQueueUrl(queueUrl))
+    sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl))
   }
 
   object SQSLocalClientModule extends TwitterModule {
