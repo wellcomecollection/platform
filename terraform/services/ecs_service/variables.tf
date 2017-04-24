@@ -45,3 +45,7 @@ variable "path_pattern" {
 variable "healthcheck_path" {
   description = "path for ECS healthcheck endpoint"
 }
+
+variable "infra_bucket" {
+  description = "Name of the AWS Infra bucket"
+}
