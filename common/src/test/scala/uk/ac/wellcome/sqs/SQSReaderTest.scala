@@ -40,6 +40,7 @@ class SQSReaderTest
       }
     }
 
+    // Check that the previous 2 messages have been deleted
     assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
@@ -58,7 +59,7 @@ class SQSReaderTest
     }
   }
 
-  it("should return a failed future if rprocessing one of the messages fails and none of the message should be deleted") {
+  it("should return a failed future if processing one of the messages fails - none of the message should be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1",
         queueUrl,
@@ -80,6 +81,7 @@ class SQSReaderTest
       exception shouldBe a[RuntimeException]
     }
 
+    // Check that the queue still contains all 3 messages
     assertNumberOfMessagesAfterVisibilityTimeoutIs(3, sqsReader)
   }
 

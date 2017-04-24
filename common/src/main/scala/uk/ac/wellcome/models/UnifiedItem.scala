@@ -18,10 +18,6 @@ case class UnifiedItem(
   accessStatus: Option[String] = None
 )
 
-object UnifiedItem extends Indexable[UnifiedItem] {
-  override def json(t: UnifiedItem): String =
-    JsonUtil.toJson(t).get
-}
 object IdentifiedUnifiedItem extends Indexable[IdentifiedUnifiedItem] {
   override def json(t: IdentifiedUnifiedItem): String =
     JsonUtil.toJson(t).get

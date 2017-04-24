@@ -35,8 +35,6 @@ trait SQSLocal extends Suite with BeforeAndAfterEach {
       new PurgeQueueRequest().withQueueUrl(queueUrl))
   }
 
-
-
   object SQSLocalClientModule extends TwitterModule {
 
     @Singleton
