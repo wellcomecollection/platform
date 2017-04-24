@@ -6,3 +6,12 @@ resource "aws_s3_bucket" "miro-data" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket" "infra" {
+  bucket = "${var.infra_bucket}"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
