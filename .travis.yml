@@ -2,6 +2,9 @@ language: scala
 
 sudo: required
 
+before_script:
+  - sudo sysctl -w vm.max_map_count=262144
+
 dist: trusty
 
 # Install Docker on Travis.  Merely exposing Docker through the Travis
