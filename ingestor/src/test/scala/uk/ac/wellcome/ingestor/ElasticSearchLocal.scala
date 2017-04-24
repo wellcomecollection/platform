@@ -25,7 +25,7 @@ trait ElasticSearchLocal
     eventually {
       elasticClient.execute(
         clusterHealth()
-      ).await.getNumberOfNodes == 1 shouldBe 1
+      ).await.getNumberOfNodes shouldBe 1
     }
 
     if (!elasticClient.execute(indexExists("records")).await.isExists)
@@ -34,5 +34,5 @@ trait ElasticSearchLocal
     super.beforeAll()
   }
 
-  override implicit def patienceConfig = PatienceConfig(Span(1, Minute), Span(1, Second))
+  override implicit def patienceConfig = PatienceConfig(scaled(Span(1, Minute)), scaled(Span(200, Millis)))
 }
