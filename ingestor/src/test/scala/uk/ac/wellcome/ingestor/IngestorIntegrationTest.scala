@@ -1,8 +1,10 @@
 package uk.ac.wellcome.ingestor
 
-import com.sksamuel.elastic4s.ElasticClient
+import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri}
+import com.sksamuel.elastic4s.testkit.ElasticSugar
 import com.twitter.inject.app.TestInjector
 import com.twitter.inject.{Injector, IntegrationTest}
+import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -16,10 +18,9 @@ class IngestorIntegrationTest
     extends IntegrationTest
     with SQSLocal
     with Eventually
-    with IntegrationPatience {
+    with IntegrationPatience with ElasticSugar {
 
   override def queueName: String = "es_ingestor_queue"
-  val client: ElasticClient = ???
 
   override def injector: Injector =
     TestInjector(
@@ -28,10 +29,12 @@ class IngestorIntegrationTest
         "aws.sqs.queue.url" -> queueUrl,
         "aws.sqs.waitTime" -> "1",
         "es.host" -> "localhost",
-        "es.port" -> 9200.toString,
-        "es.name" -> "elasticsearch",
+        "es.port" -> 9300.toString,
+        "es.name" -> "wellcome",
         "es.xpack.enabled" -> "true",
         "es.xpack.user" -> "elastic:changeme",
+        "es.xpack.sslEnabled" -> "true",
+        "es.sniff" -> "true",
         "es.index" -> "records",
         "es.type" -> "item"
       ),
@@ -43,7 +46,9 @@ class IngestorIntegrationTest
         ElasticClientModule)
     )
 
-  test("it should read a unified item from the SQS queue and ingest it into elastic search") {
+  override val client = injector.instance[ElasticClient]
+  ensureIndexExists("records")
+  test("it should read an identified unified item from the SQS queue and ingest it into elastic search") {
     val identifiedUnifiedItem = JsonUtil
       .toJson(
         IdentifiedUnifiedItem(
@@ -67,11 +72,10 @@ class IngestorIntegrationTest
     SQSWorker.singletonStartup(injector)
 
     eventually {
-      1 shouldBe 2
-//      val hits =
-//        client.execute(search("records/item").matchAll()).map(_.hits).await
-//      hits should have size 1
-//      hits.head.sourceAsString shouldBe identifiedUnifiedItem
+      val hits =
+        client.execute(search("records/item").matchAll()).map(_.hits).await
+      hits should have size 1
+      hits.head.sourceAsString shouldBe identifiedUnifiedItem
     }
   }
 }

@@ -19,7 +19,7 @@ import scala.util.{Failure, Success, Try}
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
 
-  def retrieveAndProcessMessages[T](process: Message => T): Future[List[T]] =
+  def retrieveAndDeleteMessages[T](process: Message => T): Future[List[T]] =
     Future {
       blocking {
         debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
