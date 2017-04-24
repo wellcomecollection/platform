@@ -18,12 +18,10 @@ class SQSReaderTest
 
   override def queueName: String = "id_minter_queue"
 
-  it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
+  it(
+    "should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-                queueUrl,
-                waitTime = 20 seconds,
-                maxMessages = 2)
+      SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
@@ -59,12 +57,10 @@ class SQSReaderTest
     }
   }
 
-  it("should return a failed future if processing one of the messages fails - none of the message should be deleted") {
+  it(
+    "should return a failed future if processing one of the messages fails - none of the message should be deleted") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-        queueUrl,
-        waitTime = 20 seconds,
-        maxMessages = 10)
+      SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "failingMessage"
     val messageStrings = List("someMessage1", failingMessage, "someMessage3")
@@ -72,12 +68,13 @@ class SQSReaderTest
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndDeleteMessages{ message =>
-      if(message.getBody == failingMessage) throw new RuntimeException(s"$failingMessage is not valid")
+    val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
+      if (message.getBody == failingMessage)
+        throw new RuntimeException(s"$failingMessage is not valid")
       else message
     }
 
-    whenReady(futureMessages.failed){exception =>
+    whenReady(futureMessages.failed) { exception =>
       exception shouldBe a[RuntimeException]
     }
 
@@ -85,7 +82,9 @@ class SQSReaderTest
     assertNumberOfMessagesAfterVisibilityTimeoutIs(3, sqsReader)
   }
 
-  private def assertNumberOfMessagesAfterVisibilityTimeoutIs(expectedNumberOfMessages: Int, sqsReader: SQSReader): Any = {
+  private def assertNumberOfMessagesAfterVisibilityTimeoutIs(
+    expectedNumberOfMessages: Int,
+    sqsReader: SQSReader): Any = {
     //wait for the visibility period to expire
     Thread.sleep(1500)
     val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)

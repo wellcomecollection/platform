@@ -8,7 +8,12 @@ import com.twitter.inject.app.TestInjector
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  IdentifiedUnifiedItem,
+  Identifier,
+  SourceIdentifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
@@ -43,7 +48,8 @@ class IdMinterIntegrationTest
                     DynamoConfigModule)
     )
 
-  test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
+  test(
+    "it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
     val unifiedItem =
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", "1234")),
@@ -89,8 +95,7 @@ class IdMinterIntegrationTest
 
     val secondMiroId = "5678"
     val secondSqsMessage = generateSqsMessage(secondMiroId)
-    sqsClient.sendMessage(queueUrl,
-                          JsonUtil.toJson(secondSqsMessage).get)
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(secondSqsMessage).get)
 
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(

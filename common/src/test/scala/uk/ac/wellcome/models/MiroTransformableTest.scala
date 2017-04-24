@@ -17,7 +17,8 @@ class MiroTransformableTest extends FunSpec with Matchers {
       title = Some(imageTitle))
   }
 
-  it("should be able to transform itself into a unified item if the data fields contains more fields") {
+  it(
+    "should be able to transform itself into a unified item if the data fields contains more fields") {
     val miroId = "123"
     val imageTitle = "some image title"
     val miroTransformable =
@@ -32,7 +33,8 @@ class MiroTransformableTest extends FunSpec with Matchers {
       title = Some(imageTitle))
   }
 
-  it("should be able to transform itself into a unified item if the data field is empty") {
+  it(
+    "should be able to transform itself into a unified item if the data field is empty") {
     val miroId = "123"
     val miroTransformable =
       MiroTransformable(miroId, "Images-A", """{}""")

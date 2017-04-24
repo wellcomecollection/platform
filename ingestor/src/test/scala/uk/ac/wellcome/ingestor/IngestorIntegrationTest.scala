@@ -1,25 +1,26 @@
 package uk.ac.wellcome.ingestor
 
-import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri}
-import com.sksamuel.elastic4s.testkit.ElasticSugar
+import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.inject.app.TestInjector
 import com.twitter.inject.{Injector, IntegrationTest}
-import org.elasticsearch.common.settings.Settings
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.Matchers
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  IdentifiedUnifiedItem,
+  SourceIdentifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.ingestor.modules.SQSWorker
 import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
-import com.sksamuel.elastic4s.ElasticDsl._
 
 class IngestorIntegrationTest
     extends IntegrationTest
     with SQSLocal
-    with Eventually
-    with IntegrationPatience with ElasticSearchLocal {
+    with Matchers
+    with ElasticSearchLocal {
 
   override def queueName: String = "es_ingestor_queue"
 
@@ -40,14 +41,15 @@ class IngestorIntegrationTest
         "es.type" -> "item"
       ),
       modules = Seq(SQSConfigModule,
-        AkkaModule,
-        SQSReaderModule,
-        SQSWorker,
-        SQSLocalClientModule,
-        ElasticClientModule)
+                    AkkaModule,
+                    SQSReaderModule,
+                    SQSWorker,
+                    SQSLocalClientModule,
+                    ElasticClientModule)
     )
 
-  test("it should read an identified unified item from the SQS queue and ingest it into elastic search") {
+  test(
+    "it should read an identified unified item from the SQS queue and ingest it into elastic search") {
     val identifiedUnifiedItem = JsonUtil
       .toJson(
         IdentifiedUnifiedItem(
@@ -72,7 +74,10 @@ class IngestorIntegrationTest
 
     eventually {
       val hits =
-        elasticClient.execute(search("records/item").matchAll()).map(_.hits).await
+        elasticClient
+          .execute(search("records/item").matchAll())
+          .map(_.hits)
+          .await
       hits should have size 1
       hits.head.sourceAsString shouldBe identifiedUnifiedItem
     }
