@@ -29,7 +29,7 @@ class SQSReaderTest
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndProcessMessages(identity)
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(identity)
 
     whenReady(futureMessages) { messages =>
       // SQS is not a FIFO queue and it only guarantees that a message is sent at least once,
@@ -40,13 +40,7 @@ class SQSReaderTest
       }
     }
 
-    //wait for the visibility period to expire
-    Thread.sleep(1500)
-    val nextMessages = sqsReader.retrieveAndProcessMessages(identity)
-    //check that previously read messages are not available
-    whenReady(nextMessages) { messages =>
-      messages should have size 1
-    }
+    assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
   it("should return a failed future if reading from the SQS queue fails") {
@@ -57,7 +51,7 @@ class SQSReaderTest
                 maxMessages = 1)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndProcessMessages(identity)
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(identity)
 
     whenReady(futureMessages.failed) { exception =>
       exception.getMessage should not be (empty)
@@ -77,7 +71,7 @@ class SQSReaderTest
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndProcessMessages{message =>
+    val futureMessages = sqsReader.retrieveAndDeleteMessages{ message =>
       if(message.getBody == failingMessage) throw new RuntimeException(s"$failingMessage is not valid")
       else message
     }
@@ -86,15 +80,15 @@ class SQSReaderTest
       exception shouldBe a[RuntimeException]
     }
 
-    //wait for the visibility period to expire
-    Thread.sleep(1500)
-    val nextMessages = sqsReader.retrieveAndProcessMessages(identity)
-    //check that previously read messages are available
-    whenReady(nextMessages) { messages =>
-      messages should have size 3
-    }
+    assertNumberOfMessagesAfterVisibilityTimeoutIs(3, sqsReader)
   }
 
-  private def createMessage(jsonMessage: String) =
-    new Message().withBody(jsonMessage)
+  private def assertNumberOfMessagesAfterVisibilityTimeoutIs(expectedNumberOfMessages: Int, sqsReader: SQSReader): Any = {
+    //wait for the visibility period to expire
+    Thread.sleep(1500)
+    val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)
+    whenReady(nextMessages) { messages =>
+      messages should have size expectedNumberOfMessages
+    }
+  }
 }

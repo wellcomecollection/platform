@@ -1,8 +1,6 @@
 package uk.ac.wellcome.ingestor.services
 
 import com.fasterxml.jackson.core.JsonParseException
-import com.sksamuel.elastic4s.ElasticClient
-import com.sksamuel.elastic4s.ElasticDsl.search
 import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -12,7 +10,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
 class IdentifiedUnifiedItemIndexerTest extends FunSpec with ScalaFutures with Matchers with ElasticSugar{
-
 
   ensureIndexExists("records")
 

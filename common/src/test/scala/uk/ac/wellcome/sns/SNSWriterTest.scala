@@ -12,7 +12,7 @@ class SNSWriterTest
     with SNSLocal
     with IntegrationPatience {
 
-  override val topicName: String = "test-topic-name"
+  override def topicName: String = "test-topic-name"
   val snsConfig = SNSConfig("eu-west-1", topicArn)
 
   it("should send a message with subject to the SNS client and return a publish attempt with the id of the request") {

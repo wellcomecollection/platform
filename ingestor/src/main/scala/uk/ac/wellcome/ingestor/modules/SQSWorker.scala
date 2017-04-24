@@ -28,7 +28,7 @@ object SQSWorker extends TwitterModule with TryBackoff {
   private def processMessages(
     sqsReader: SQSReader,
     unifiedItemIndexer: IdentifiedUnifiedItemIndexer): Unit = {
-    sqsReader.retrieveAndProcessMessages { message =>
+    sqsReader.retrieveAndDeleteMessages { message =>
       extractMessage(message).map { sqsMessage =>
         unifiedItemIndexer.indexUnifiedItem(sqsMessage.body)
       }
