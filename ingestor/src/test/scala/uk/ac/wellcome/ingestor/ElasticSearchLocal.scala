@@ -7,21 +7,24 @@ import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
 
-trait ElasticSearchUtils extends BeforeAndAfterEach with Eventually with IntegrationPatience with Matchers { this: Suite =>
+trait ElasticSearchLocal extends BeforeAndAfterEach with Eventually with IntegrationPatience with Matchers { this: Suite =>
   private val settings = Settings
     .builder()
     .put("cluster.name", "wellcome")
     .put("xpack.security.user", "elastic:changeme")
     .build()
 
-  val elasticClient =
+  var elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
   override def beforeEach(): Unit = {
     eventually {
-      elasticClient.execute(
+
+      val client = XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
+
+      if(client.execute(
         clusterHealth()
-      ).await.getNumberOfNodes shouldBe 1
+      ).await.getNumberOfNodes == 1) elasticClient = client
     }
 
     if (!elasticClient.execute(indexExists("records")).await.isExists)
