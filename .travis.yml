@@ -41,14 +41,19 @@ script:
   # https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
-  - sbt "project $PROJECT" dockerComposeUp
-  - sbt "project $PROJECT" test
-  - sbt "project $PROJECT" dockerComposeStop
+
+  # Run the commands for the test.  Chaining them together means we don't
+  # have to pay the cost of starting the JVM three times.
+  # http://www.scala-sbt.org/0.12.2/docs/Howto/runningcommands.html
+  - sbt "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
+
   - >
     if [[ "$BRANCH" == "master" ]];
     then
       if [[ "$PROJECT" != "common" ]]; then
         sbt "project $PROJECT" -DconfigBucket=$CONFIG_BUCKET -Denv=$BUILD_ENV ecr:push;
+      else
+        echo "Don't run ecr:push for the common project";
       fi;
     else
       echo "Not on master; skipping deploy...";
@@ -56,4 +61,8 @@ script:
 
 env:
   global:
-    secure: DlAiZ4pqJvutslMRUbI5o4Xk73GLd0ab2e8zko8J0VgMFKu3UGzK17UDzx2qXgMcrHLY3i5wtHHTOO+WpK+GTTRUEEmv9Eg+FHpsqpdN1yMXfGyZaw3oadMsPoVLfq7UlxFdubbYi05jIZt8th4HHIRQz2xIxyOH0lrrjeeFsnPlHQz0P+vSklCKYOHZh3+w4lsmhGwxPRHDsKDYJXMyd4et1Cy5mV3yl620Y0oHmwEPANZt7oX2Fvs7kkBiBAJB4Mt8n22uDjZ78D00ix+yWP9LIGWfNwelv4x+W887I0E6K/r2ncU+hpInShsXmhKhtjS3u6wNgxkzzwBDQ3MMmwVkmwnyGUq0TNZUfde8x4mdHrlK/szL6Q+DLSt9u/Rg2BOvHrrGqasboRl8o44qe+Bk2NsjgEYxlA078ynbbZPOH+5+sf3aZSN01gP8xm9t+lJc5AEVDePENOu910vb53t8fStWQED53FrOjVtt9AnVw+iVlvurvx3jSBFtbo0XrcED5FSW/ysi+JNBB2rXzDGn7aznWSKguu768oEJ06DcikddSmarkxoaxCTE4sYGz/cCgBUebAJBlq5C8aBAYQefZ1Bgh1KdmxDpZbFzWaUOdLxFczyrYS4t7hkQLn+9CeWtlXppuPGQGUFeMulHyptlqJt49bWuAgYPsSxr0yE=
+    - env: BUILD_ENV=prod
+
+    # This secure environment variable contains an encrypted version of
+    # our AWS account credentials for the travis user.
+    - secure: DlAiZ4pqJvutslMRUbI5o4Xk73GLd0ab2e8zko8J0VgMFKu3UGzK17UDzx2qXgMcrHLY3i5wtHHTOO+WpK+GTTRUEEmv9Eg+FHpsqpdN1yMXfGyZaw3oadMsPoVLfq7UlxFdubbYi05jIZt8th4HHIRQz2xIxyOH0lrrjeeFsnPlHQz0P+vSklCKYOHZh3+w4lsmhGwxPRHDsKDYJXMyd4et1Cy5mV3yl620Y0oHmwEPANZt7oX2Fvs7kkBiBAJB4Mt8n22uDjZ78D00ix+yWP9LIGWfNwelv4x+W887I0E6K/r2ncU+hpInShsXmhKhtjS3u6wNgxkzzwBDQ3MMmwVkmwnyGUq0TNZUfde8x4mdHrlK/szL6Q+DLSt9u/Rg2BOvHrrGqasboRl8o44qe+Bk2NsjgEYxlA078ynbbZPOH+5+sf3aZSN01gP8xm9t+lJc5AEVDePENOu910vb53t8fStWQED53FrOjVtt9AnVw+iVlvurvx3jSBFtbo0XrcED5FSW/ysi+JNBB2rXzDGn7aznWSKguu768oEJ06DcikddSmarkxoaxCTE4sYGz/cCgBUebAJBlq5C8aBAYQefZ1Bgh1KdmxDpZbFzWaUOdLxFczyrYS4t7hkQLn+9CeWtlXppuPGQGUFeMulHyptlqJt49bWuAgYPsSxr0yE=
