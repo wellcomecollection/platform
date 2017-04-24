@@ -11,6 +11,7 @@ module "service" {
   alb_priority        = "${var.alb_priority}"
   desired_count       = "${var.desired_count}"
   healthcheck_path    = "${var.healthcheck_path}"
+  infra_bucket        = "${var.infra_bucket}"
 }
 
 module "task" {
