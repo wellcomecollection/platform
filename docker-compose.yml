@@ -16,6 +16,6 @@ elasticsearch:
     - "9200:9200"
     - "9300:9300"
   environment:
-      - http.host=0.0.0.0
-      - transport.host=127.0.0.1
-      - cluster.name=wellcome
+      - "http.host=0.0.0.0"
+      - "transport.host=0.0.0.0"
+      - "cluster.name=wellcome"

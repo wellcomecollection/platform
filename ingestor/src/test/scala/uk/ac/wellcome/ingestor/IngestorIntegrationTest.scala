@@ -13,12 +13,13 @@ import uk.ac.wellcome.platform.ingestor.modules.SQSWorker
 import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+import com.sksamuel.elastic4s.ElasticDsl._
 
 class IngestorIntegrationTest
     extends IntegrationTest
     with SQSLocal
     with Eventually
-    with IntegrationPatience with ElasticSugar {
+    with IntegrationPatience {
 
   override def queueName: String = "es_ingestor_queue"
 
@@ -33,8 +34,8 @@ class IngestorIntegrationTest
         "es.name" -> "wellcome",
         "es.xpack.enabled" -> "true",
         "es.xpack.user" -> "elastic:changeme",
-        "es.xpack.sslEnabled" -> "true",
-        "es.sniff" -> "true",
+        "es.xpack.sslEnabled" -> "false",
+        "es.sniff" -> "false",
         "es.index" -> "records",
         "es.type" -> "item"
       ),
@@ -46,8 +47,8 @@ class IngestorIntegrationTest
         ElasticClientModule)
     )
 
-  override val client = injector.instance[ElasticClient]
-  ensureIndexExists("records")
+  val elasticClient = injector.instance[ElasticClient]
+  elasticClient.execute(createIndex("records")).await
   test("it should read an identified unified item from the SQS queue and ingest it into elastic search") {
     val identifiedUnifiedItem = JsonUtil
       .toJson(
@@ -73,7 +74,7 @@ class IngestorIntegrationTest
 
     eventually {
       val hits =
-        client.execute(search("records/item").matchAll()).map(_.hits).await
+        elasticClient.execute(search("records/item").matchAll()).map(_.hits).await
       hits should have size 1
       hits.head.sourceAsString shouldBe identifiedUnifiedItem
     }
