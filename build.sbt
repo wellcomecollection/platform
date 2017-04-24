@@ -10,17 +10,13 @@ def doSharedSetup(project: Project) =
     .settings(Common.settings: _*)
     .settings(Finatra.settings: _*)
     .settings(Revolver.settings: _*)
-    .settings(EcrPlugin.projectSettings: _*)
-    .settings(Packager.settings: _*)
     .settings(DockerCompose.settings: _*)
-    .enablePlugins(JavaAppPackaging)
     .enablePlugins(DockerComposePlugin)
-    .enablePlugins(GitVersioning)
+    .enablePlugins(JavaAppPackaging)
 
 lazy val common = project
   .settings(Common.settings: _*)
   .settings(DockerCompose.settings: _*)
-  .enablePlugins(GitVersioning)
   .enablePlugins(DockerComposePlugin)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
