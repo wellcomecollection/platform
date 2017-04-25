@@ -2,19 +2,13 @@ package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.scalatest.{AsyncFunSpec, Matchers}
-import uk.ac.wellcome.finatra.services.ElasticsearchService
-import uk.ac.wellcome.models.{
-  IdentifiedUnifiedItem,
-  SourceIdentifier,
-  UnifiedItem
-}
+import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.api.models.Record
 import uk.ac.wellcome.utils.JsonUtil
 
 class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers {
 
-  val elasticSearchService = new ElasticsearchService(client)
-  val calmService = new CalmService(elasticSearchService)
+  val calmService = new CalmService(client)
 
   it("should find records") {
     ensureIndexExists("records")
