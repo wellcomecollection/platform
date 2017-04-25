@@ -17,7 +17,7 @@ object BuildEnvPlugin extends AutoPlugin {
       val Production = Value("prod")
       val Stage = Value("stage")
       val Test = Value("test")
-      val Developement = Value("dev")
+      val Development = Value("dev")
     }
 
     val buildEnv = settingKey[BuildEnv.Value]("the current build environment")
@@ -33,10 +33,10 @@ object BuildEnvPlugin extends AutoPlugin {
           case "prod" => Some(BuildEnv.Production)
           case "stage" => Some(BuildEnv.Stage)
           case "test" => Some(BuildEnv.Test)
-          case "dev" => Some(BuildEnv.Developement)
+          case "dev" => Some(BuildEnv.Development)
           case _ => None
         }
-        .getOrElse(BuildEnv.Developement)
+        .getOrElse(BuildEnv.Development)
     },
     // give feed back
     onLoadMessage := {
