@@ -2,18 +2,19 @@ package uk.ac.wellcome.test.utils
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClientBuilder}
-import com.amazonaws.services.sqs.model.{
-  PurgeQueueRequest,
-  SetQueueAttributesRequest
-}
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
 import scala.collection.JavaConversions._
 
-trait SQSLocal extends Suite with BeforeAndAfterEach {
+trait SQSLocal
+    extends BeforeAndAfterEach
+    with Eventually
+    with IntegrationPatience { this: Suite =>
 
   val sqsClient = AmazonSQSClientBuilder
     .standard()
@@ -24,7 +25,10 @@ trait SQSLocal extends Suite with BeforeAndAfterEach {
     .build()
 
   def queueName: String
-  val queueUrl = sqsClient.createQueue(queueName).getQueueUrl
+
+  val queueUrl = eventually {
+    sqsClient.createQueue(queueName).getQueueUrl
+  }
 
   // AWS does not delete a message automatically once it's read.
   // It hides for the number of seconds specified in VisibilityTimeout.
