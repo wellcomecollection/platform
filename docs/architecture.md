@@ -12,9 +12,9 @@ per-source SNS topics, which are in turn coalesced into a single SQS queue.
 
 The id_minter:
 * reads each item from the SQS queue,
-* checks into a dynamoDB table if the item already has an internal id,
-    * if it doesn't, generates an id and saves it into the table
+* checks into a DynamoDB table if the item already has an canonical ID,
+    * if it doesn't, generates an ID and saves it into the table
 * sends the original item with the internal id into a SNS topic
 
-A SQS queue is subsribed to the SNS topic. An ingester pulls entries from the queue into the Elasticsearch index, which is
+A SQS queue is subsribed to the SNS topic. An ingestor pulls entries from the queue into the Elasticsearch index, which is
 then queried by our API.
