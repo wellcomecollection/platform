@@ -52,7 +52,7 @@ script:
       if [[ "$PROJECT" != "common" ]]; then
         sbt "project $PROJECT" stage;
         export NAME="0.0.1-$(git rev-parse HEAD)_alex";
-        docker build --build-arg project=$PROJECT --build-arg config_bucket=$CONFIG_BUCKET --build-arg build_env=alex --name=$NAME .;
+        docker build --build-arg project=$PROJECT --build-arg config_bucket=$CONFIG_BUCKET --build-arg build_env=alex --name=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT .;
         docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME;
       else
         echo "Not an application (common); skipping deploy";
