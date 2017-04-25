@@ -26,6 +26,7 @@ trait SQSLocal
 
   def queueName: String
 
+  // Use eventually to allow some time for the local SQS to start up. Seems to be needed on CI
   val queueUrl = eventually {
     sqsClient.createQueue(queueName).getQueueUrl
   }
