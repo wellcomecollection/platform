@@ -11,7 +11,6 @@ class SQSReaderTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with Eventually
     with IntegrationPatience
     with SQSLocal {
 
@@ -83,11 +82,11 @@ class SQSReaderTest
     expectedNumberOfMessages: Int,
     sqsReader: SQSReader): Any = {
     // this should be true after the visibility period expires
-    eventually {
-      val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)
-      whenReady(nextMessages) { messages =>
-        messages should have size expectedNumberOfMessages
-      }
+    //wait for the visibility period to expire
+    Thread.sleep(1500)
+    val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)
+    whenReady(nextMessages) { messages =>
+      messages should have size expectedNumberOfMessages
     }
   }
 }
