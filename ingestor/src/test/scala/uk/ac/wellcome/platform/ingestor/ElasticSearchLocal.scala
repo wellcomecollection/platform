@@ -1,4 +1,4 @@
-package uk.ac.wellcome.ingestor
+package uk.ac.wellcome.platform.ingestor
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri

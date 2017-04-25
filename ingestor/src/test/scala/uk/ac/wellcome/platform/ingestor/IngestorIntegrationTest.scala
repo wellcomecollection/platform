@@ -1,4 +1,4 @@
-package uk.ac.wellcome.ingestor
+package uk.ac.wellcome.platform.ingestor
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.inject.app.TestInjector
@@ -6,11 +6,7 @@ import com.twitter.inject.{Injector, IntegrationTest}
 import org.scalatest.Matchers
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedUnifiedItem,
-  SourceIdentifier,
-  UnifiedItem
-}
+import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.ingestor.modules.SQSWorker
 import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
