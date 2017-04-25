@@ -50,9 +50,12 @@ script:
     if [[ "$BRANCH" == "master" ]];
     then
       if [[ "$PROJECT" != "common" ]]; then
-        sbt "project $PROJECT" -DconfigBucket=$CONFIG_BUCKET -Denv=$BUILD_ENV ecr:push;
+        sbt "project $PROJECT" stage;
+        export NAME="0.0.1-$(git rev-parse HEAD)_alex";
+        docker build --build-arg project=$PROJECT --build-arg config_bucket=$CONFIG_BUCKET --build-arg build_env=alex --name=$NAME .;
+        docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME;
       else
-        echo "Don't run ecr:push for the common project";
+        echo "Not an application (common); skipping deploy";
       fi;
     else
       echo "Not on master; skipping deploy...";
@@ -60,8 +63,9 @@ script:
 
 env:
   global:
-    - env: BUILD_ENV=prod
-
     # This secure environment variable contains an encrypted version of
-    # our AWS account credentials for the travis user.
-    - secure: DlAiZ4pqJvutslMRUbI5o4Xk73GLd0ab2e8zko8J0VgMFKu3UGzK17UDzx2qXgMcrHLY3i5wtHHTOO+WpK+GTTRUEEmv9Eg+FHpsqpdN1yMXfGyZaw3oadMsPoVLfq7UlxFdubbYi05jIZt8th4HHIRQz2xIxyOH0lrrjeeFsnPlHQz0P+vSklCKYOHZh3+w4lsmhGwxPRHDsKDYJXMyd4et1Cy5mV3yl620Y0oHmwEPANZt7oX2Fvs7kkBiBAJB4Mt8n22uDjZ78D00ix+yWP9LIGWfNwelv4x+W887I0E6K/r2ncU+hpInShsXmhKhtjS3u6wNgxkzzwBDQ3MMmwVkmwnyGUq0TNZUfde8x4mdHrlK/szL6Q+DLSt9u/Rg2BOvHrrGqasboRl8o44qe+Bk2NsjgEYxlA078ynbbZPOH+5+sf3aZSN01gP8xm9t+lJc5AEVDePENOu910vb53t8fStWQED53FrOjVtt9AnVw+iVlvurvx3jSBFtbo0XrcED5FSW/ysi+JNBB2rXzDGn7aznWSKguu768oEJ06DcikddSmarkxoaxCTE4sYGz/cCgBUebAJBlq5C8aBAYQefZ1Bgh1KdmxDpZbFzWaUOdLxFczyrYS4t7hkQLn+9CeWtlXppuPGQGUFeMulHyptlqJt49bWuAgYPsSxr0yE=
+    # the following environment variables:
+    #  * AWS_ACCESS_KEY_ID
+    #  * AWS_SECRET_ACCESS_KEY
+    #  * AWS_ECR_REPO
+    - secure: vP9+bx78J7n0QXIWzWicoEM74HOfKzuSmAlTGniZUg3qxp5xMEIRsKkaK/yt6JyuejCldHvy6TG4CGkYBdW5wDbXA4PGTV4OrPmBvDrVm8STNX3e22ZVn6/FDAxCS5IdxXygVTlGtjbCh/8WuysFZ0dT/YYv01IMymqfuNVPYrhnnFASQ9zG2I2W+8HmkKy8fnUPRoIKr4hccjR9iGpj7rgF8VGcD2oRn7/jSOnUul1IvJznNvoLUuLH3m3eZ7lR/tFIx+H439pG/EyO9D8wnVCOejR9wQEr/8qRlvlMTPoyAfSVPlpq0PDdtJlr7g0mxJzvxdgGcilo5zyV1IRYMepgpeTKV1y96jxnA0bFmIvxYav0bnh7vIEFUp9QEzNNMkTb/zaNOVrbsvCaIuVfy6qAsP9JL2k5lpvBqeBZ5w0AaMzqzdOztUH2VY2IBJ2yXIC6QPVlkINfau96gam4Q+Wu8W8FNpaw0WYn2+v9Dd8QsPsyKUXMGrxIYZcQGf56aObZ8/HGkjSxhfTClmsngN3oGwuvYtIQGujBDPUgxFFOVGKE/Z4C2nuAUoJPcBb0HVwb7AxvGRZ1xUJCBr+Pf/o5pxugGZuSjmokNNNBAhWdznbyqsLnERlo5CpYQkuLUYZ1NTvS0PS1hlhusOhdvopzkZL8mJM8/Qaf3NptSkA=
