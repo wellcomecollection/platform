@@ -55,7 +55,7 @@ script:
       if [[ "$PROJECT" != "common" ]]; then
         sbt "project $PROJECT" stage;
         export NAME="0.0.1-$(git rev-parse HEAD)_alex";
-        bash $(aws ecr get-login);
+        $(aws ecr get-login);
         docker build --build-arg project=$PROJECT --build-arg config_bucket=$CONFIG_BUCKET --build-arg build_env=alex --tag=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME .;
         docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME;
       else
@@ -67,6 +67,7 @@ script:
 
 env:
   global:
+    - env: AWS_DEFAULT_REGION=eu-west-1
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
     #  * AWS_ACCESS_KEY_ID
