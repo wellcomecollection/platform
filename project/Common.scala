@@ -21,7 +21,7 @@ object Common {
       "-feature",
       "-language:postfixOps"
     ),
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
+    parallelExecution in Test := false
   ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings
 }
 

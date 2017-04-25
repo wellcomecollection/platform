@@ -1,80 +1,86 @@
 package uk.ac.wellcome.transformer.receive
 
-import com.amazonaws.services.dynamodbv2.model.{
-  AttributeValue,
-  Record,
-  StreamRecord
-}
+import com.amazonaws.services.dynamodbv2.model.Record
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
-import com.fasterxml.jackson.databind.JsonMappingException
 import org.mockito.Matchers.{any, anyString}
-import org.mockito.Mockito
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{SourceIdentifier, Transformable, UnifiedItem}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.transformer.parsers.TransformableParser
+import uk.ac.wellcome.transformer.utils.CalmRecordUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
+import scala.util.Try
 
 class RecordReceiverTest
     extends FunSpec
     with MockitoSugar
     with ScalaFutures
     with Matchers
-    with IntegrationPatience {
+    with IntegrationPatience
+    with CalmRecordUtils {
 
-  val mockSNS = createMockSNS
+  val calmRecord = createValidCalmRecord(
+    "abcdef",
+    "collection",
+    "AB/CD/12",
+    "AB/CD/12",
+    """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
+
+  val unifiedItem = UnifiedItem(
+    identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
+    accessStatus = Some("restricted"))
 
   it("should receive a message and send it to SNS client") {
-    val recordReceiver = new RecordReceiver(mockSNS)
-    val future =
-      recordReceiver.receiveRecord(new RecordAdapter(createMockRecord))
+    val snsWriter = mockSNSWriter
+    val recordReceiver =
+      new RecordReceiver(snsWriter,
+                         transformableParser(calmRecord, unifiedItem))
+    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future) { _ =>
-      val unifiedItem =
-        UnifiedItem(List(SourceIdentifier("source", "key", "value")),
-                    Some("TopSekrit"))
-      Mockito
-        .verify(mockSNS)
-        .writeMessage(UnifiedItem.json(unifiedItem), Some("Foo"))
+      verify(snsWriter).writeMessage(UnifiedItem.json(unifiedItem),
+                                     Some("Foo"))
     }
   }
 
   it("should return a failed future if it's unable to parse the dynamo record") {
-    val recordReceiver = new RecordReceiver(mockSNS)
-    val future =
-      recordReceiver.receiveRecord(new RecordAdapter(createInvalidRecord))
+    val recordReceiver =
+      new RecordReceiver(mockSNSWriter, failingParser(calmRecord))
+    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
-      x.getMessage should startWith("Unable to parse record")
+      x.getMessage should startWith("Unable to parse transformable")
     }
   }
 
-  it("should return a failed future if it's unable to transform the parsed record") {
-    val recordReceiver = new RecordReceiver(mockSNS)
-    val future = recordReceiver.receiveRecord(
-      new RecordAdapter(createNonTransformableRecord))
+  it("should return a failed future if it's unable to transform the transformable object") {
+    val recordReceiver =
+      new RecordReceiver(mockSNSWriter,
+                         parserReturningFailingTransformable(calmRecord))
+    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
-      x shouldBe a[JsonMappingException]
+      x.getMessage should startWith("Unable to transform into unified item")
     }
   }
 
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
-    val recordReceiver = new RecordReceiver(mockSNS)
-    val future =
-      recordReceiver.receiveRecord(new RecordAdapter(createMockRecord))
+    val recordReceiver =
+      new RecordReceiver(mockSNS, transformableParser(calmRecord, unifiedItem))
+    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
       x.getMessage should be("Failed publishing message")
     }
   }
 
-  private def createMockSNS = {
+  private def mockSNSWriter = {
     val mockSNS = mock[SNSWriter]
     when(mockSNS.writeMessage(anyString(), any[Option[String]]))
       .thenReturn(Future { PublishAttempt("1234") })
@@ -84,42 +90,42 @@ class RecordReceiverTest
   private def mockFailPublishMessage = {
     val mockSNS = mock[SNSWriter]
     when(mockSNS.writeMessage(anyString(), any[Option[String]]))
-      .thenReturn(Future.failed(new RuntimeException("Failed publishing message")))
+      .thenReturn(
+        Future.failed(new RuntimeException("Failed publishing message")))
     mockSNS
   }
 
-  private def createNonTransformableRecord = {
-    val record = new Record()
-    val streamRecord = createStreamRecord("""{"AccessStatus":"b"}""")
-    record.withDynamodb(streamRecord)
-    record
+  private def transformableParser(record: Record, unifiedItem: UnifiedItem) = {
+    val transformableParser = mock[TransformableParser[Transformable]]
+    val recordMap = RecordMap(record.getDynamodb.getNewImage)
+    when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
+      new Transformable {
+        override def transform: Try[UnifiedItem] = Try {
+          unifiedItem
+        }
+      }
+    })
+    transformableParser
   }
 
-  private def createMockRecord = {
-    val record = new Record()
-    val streamRecord = createStreamRecord(
-      """{"foo": ["bar"], "AccessStatus": ["TopSekrit"]}""")
-    record.withDynamodb(streamRecord)
-    record
+  private def parserReturningFailingTransformable(record: Record) = {
+    val transformableParser = mock[TransformableParser[Transformable]]
+    val recordMap = RecordMap(record.getDynamodb.getNewImage)
+    when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
+      new Transformable {
+        override def transform: Try[UnifiedItem] = Try {
+          throw new RuntimeException("Unable to transform into unified item")
+        }
+      }
+    })
+    transformableParser
   }
 
-  private def createStreamRecord(data: String) = {
-    val streamRecord = new StreamRecord()
-    streamRecord.addNewImageEntry("RecordID", new AttributeValue("abcdef"))
-    streamRecord.addNewImageEntry("RecordType",
-                                  new AttributeValue("collection"))
-    streamRecord.addNewImageEntry("RefNo", new AttributeValue("AB/CD/12"))
-    streamRecord.addNewImageEntry("AltRefNo", new AttributeValue("AB/CD/12"))
-    streamRecord.addNewImageEntry("data", new AttributeValue(data))
-    streamRecord
-  }
-
-  private def createInvalidRecord = {
-    val record = new Record()
-    val streamRecord = new StreamRecord()
-    streamRecord.addNewImageEntry("something",
-                                  new AttributeValue("something-else"))
-    record.withDynamodb(streamRecord)
-    record
+  private def failingParser(record: Record) = {
+    val transformableParser = mock[TransformableParser[Transformable]]
+    val recordMap = RecordMap(record.getDynamodb.getNewImage)
+    when(transformableParser.extractTransformable(recordMap))
+      .thenThrow(new RuntimeException("Unable to parse transformable"))
+    transformableParser
   }
 }
