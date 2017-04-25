@@ -2,16 +2,28 @@
 
 set -o errexit
 set -o nounset
-set -o verbose
 
+# Name of tfvars file
 TF_VARS=terraform.tfvars
 
+# Are we running in Travis?  This environment variable is set to "true"
+# in the Travis environment.
+TRAVIS=${TRAVIS:-false}
+
+
+# Ensure we don't have stale variables from a previous run
 rm -f $TF_VARS
 
 echo "Getting variables from S3"
 aws s3 cp s3://platform-infra/terraform.tfvars .
 
-latest_image_id="$(aws ecr describe-images --repository-name uk.ac.wellcome/api | jq -r '.imageDetails | max_by(.imagePushedAt) | .imageTags[0]')"
+# This uses the ECR API to get the image ID of the most recently pushed
+# image in our ECR repo.  This uses the API repo because every change pushes
+# a new image for _every_ application.
+latest_image_id="$(
+    aws ecr describe-images --repository-name uk.ac.wellcome/api |
+    jq -r '.imageDetails | max_by(.imagePushedAt) | .imageTags[0]')"
+
 if ! grep -q "$latest_image_id" terraform.tfvars
 then
     echo ""
@@ -31,10 +43,9 @@ fi
 terraform init
 terraform get
 
-# When running in Travis, don't write anything back to the state file.
-# As a result, we don't need to acquire the state lock.
-if [[ ! -z "$TRAVIS" && "$TRAVIS" == "true" ]]
+if [[ "$TRAVIS" == "true" ]]
 then
+    echo "Running in Travis, disabling push of remote state."
     mv terraform.tf terraform.tf.bak
     terraform init -force-copy -lock=false
 fi
