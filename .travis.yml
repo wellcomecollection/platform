@@ -50,6 +50,7 @@ script:
   - sbt "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
 
   - >
+    export AWS_DEFAULT_REGION=eu-west-1;
     if [[ "$BRANCH" == "master" ]];
     then
       if [[ "$PROJECT" != "common" ]]; then
@@ -67,7 +68,6 @@ script:
 
 env:
   global:
-    - env: AWS_DEFAULT_REGION=eu-west-1
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
     #  * AWS_ACCESS_KEY_ID
