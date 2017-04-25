@@ -24,11 +24,13 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
     findMiroID(unifiedItem) match {
       case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
       case None =>
-        logAndThrowError(s"Item $unifiedItem did not contain a MiroID")
+        error(s"Item $unifiedItem did not contain a MiroID")
+        Future.failed(
+          new Exception(s"Item $unifiedItem did not contain a MiroID"))
     }
 
   private def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier) =
-    findMiroIdInDynamo(identifier.value).map{
+    findMiroIdInDynamo(identifier.value).map {
       case List(Right(id)) => id.CanonicalID
       case Nil => generateAndSaveCanonicalId(identifier.value)
       case Right(_) :: tail =>
@@ -42,7 +44,6 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
           s"Error in parsing the object with MiroID ${identifier.value}")
     }
 
-
   private def findMiroID(unifiedItem: UnifiedItem) = {
     val maybeSourceIdentifier = unifiedItem.identifiers.find(identifier =>
       identifier.sourceId == "MiroID")
@@ -50,17 +51,19 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
     maybeSourceIdentifier
   }
 
-  private def findMiroIdInDynamo(miroId: String) = Future {
-    blocking {
-      info(s"About to search for MiroID $miroId in $identifiersTableName")
-      Scanamo.queryIndex[Identifier](dynamoDBClient)(identifiersTableName,
-        "MiroID")('MiroID -> miroId)
+  private def findMiroIdInDynamo(miroId: String) =
+    Future {
+      blocking {
+        info(s"About to search for MiroID $miroId in $identifiersTableName")
+        Scanamo.queryIndex[Identifier](dynamoDBClient)(
+          identifiersTableName,
+          "MiroID")('MiroID -> miroId)
+      }
+    } recover {
+      case e: Throwable =>
+        error(s"Failed getting MiroID $miroId in DynamoDB", e)
+        throw e
     }
-  } recover {
-    case e: Throwable =>
-      error(s"Failed getting MiroId $miroId in dynamoDb", e)
-      throw e
-  }
 
   private def generateAndSaveCanonicalId(miroId: String) = {
     val canonicalId = Identifiable.generate

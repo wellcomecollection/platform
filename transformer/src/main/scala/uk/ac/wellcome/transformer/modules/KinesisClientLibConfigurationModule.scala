@@ -12,7 +12,6 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.finatra.modules.{DynamoConfigModule}
 
 object KinesisClientLibConfigurationModule extends TwitterModule {
-  override val modules = Seq(DynamoConfigModule)
 
   @Singleton
   @Provides
