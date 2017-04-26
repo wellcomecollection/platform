@@ -17,6 +17,11 @@ import scala.util.{Failure, Success, Try}
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
+  // After a consumer reads a message from an SQS queue, AWS doesn’t delete the message immediately.
+  // It "hides" the message for a fixed period, until either
+  //  * the consumer tells SQS to delete the message, or
+  //  * the timeout expires
+  // If the timeout expires before the consumer sends a delete request, the message is unhidden and can be read by another consumer.
 
   def retrieveAndDeleteMessages(process: Message => Unit): Future[Unit] =
     Future {
@@ -67,7 +72,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       }
     }.recover {
       case e: Throwable =>
-        error(s"Failed deletintg message $message", e)
+        error(s"Failed deleting message $message", e)
         throw e
     }
 }
