@@ -26,14 +26,13 @@ trait SQSLocal
 
   def queueName: String
 
-  // Use eventually to allow some time for the local SQS to start up. Seems to be needed on CI
+  // Use eventually to allow some time for the local SQS to start up.
+  // If it is not started all suites using this will crash at start up time.
+  // Did not happen locally but seems to be needed on CI
   val queueUrl = eventually {
     sqsClient.createQueue(queueName).getQueueUrl
   }
 
-  // AWS does not delete a message automatically once it's read.
-  // It hides for the number of seconds specified in VisibilityTimeout.
-  // After the timeout has passet it will be sent again.
   // Setting 1 second timeout for tests, to be able to test message deletion
   sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 

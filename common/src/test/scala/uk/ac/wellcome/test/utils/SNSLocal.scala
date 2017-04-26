@@ -9,7 +9,7 @@ import org.apache.http.client.methods.HttpDelete
 import org.apache.http.impl.client.DefaultHttpClient
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
+trait SNSLocal extends BeforeAndAfterEach with Logging {this: Suite =>
 
   def topicName: String
   private val localSNSEndpointUrl = "http://localhost:9292"

@@ -15,7 +15,7 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
-  override def queueName: String = "id_minter_queue"
+  override val queueName: String = "test_queue"
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
@@ -36,9 +36,9 @@ class SQSReaderTest
       receivedMessages.foreach { message =>
         messageStrings should contain(message.getBody)
       }
+      receivedMessages.head should not be equal(receivedMessages.tail.head)
     }
 
-    // Check that the previous 2 messages have been deleted
     assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
@@ -61,8 +61,8 @@ class SQSReaderTest
     val sqsConfig =
       SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
-    val failingMessage = "failingMessage"
-    val messageStrings = List("someMessage1", failingMessage, "someMessage3")
+    val failingMessage = "This message will fail"
+    val messageStrings = List("This is the first message", failingMessage, "This is the final message")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
@@ -77,7 +77,6 @@ class SQSReaderTest
       exception shouldBe a[RuntimeException]
     }
 
-    // Check that the queue still contains all 3 messages
     assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 

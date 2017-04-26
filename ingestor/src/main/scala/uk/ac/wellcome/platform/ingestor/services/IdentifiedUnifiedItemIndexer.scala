@@ -33,7 +33,7 @@ class IdentifiedUnifiedItemIndexer @Inject()(
       })
       .recover {
         case e: Throwable =>
-          error(s"error indexing document $document into elasticsearch", e)
+          error(s"Error indexing document $document into Elasticsearch", e)
           throw e
       }
   }
