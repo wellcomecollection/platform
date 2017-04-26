@@ -48,3 +48,13 @@ module "lambda_stop_running_tasks" {
   description = "Stop all the running instances of a task"
   filename    = "../lambdas/stop_running_tasks.py"
 }
+
+module "trigger_application_restart_on_config_change" {
+  source               = "./lambda/trigger_s3"
+  lambda_function_name = "${module.lambda_stop_running_tasks.function_name}"
+  lambda_function_arn  = "${module.lambda_stop_running_tasks.arn}"
+  s3_bucket_arn        = "${aws_s3_bucket.infra.arn}"
+  s3_bucket_id         = "${aws_s3_bucket.infra.id}"
+  filter_prefix        = "config/prod/"
+  filter_suffix        = ".ini"
+}
