@@ -147,3 +147,18 @@ data "aws_iam_policy_document" "update_ecs_service_size" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "stop_running_tasks" {
+  statement {
+    actions = [
+      "ecs:ListServices",
+      "ecs:ListClusters",
+      "ecs:ListTasks",
+      "ecs:StopTask",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
