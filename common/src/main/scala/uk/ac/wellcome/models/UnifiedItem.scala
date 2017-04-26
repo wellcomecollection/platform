@@ -12,11 +12,9 @@ case class SourceIdentifier(source: String, sourceId: String, value: String)
 case class IdentifiedUnifiedItem(canonicalId: String, unifiedItem: UnifiedItem)
 
 /** A representation of an item in our ontology, without a canonical identifier */
-case class UnifiedItem(
-  identifiers: List[SourceIdentifier],
-  title: Option[String] = None,
-  accessStatus: Option[String] = None
-)
+case class UnifiedItem(identifiers: List[SourceIdentifier],
+                       label: String,
+                       accessStatus: Option[String] = None)
 
 object IdentifiedUnifiedItem extends Indexable[IdentifiedUnifiedItem] {
   override def json(t: IdentifiedUnifiedItem): String =

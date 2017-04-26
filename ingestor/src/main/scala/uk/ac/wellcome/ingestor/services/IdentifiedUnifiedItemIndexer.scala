@@ -7,7 +7,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.indexes.RichIndexResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, UnifiedItem}
+import uk.ac.wellcome.models.IdentifiedUnifiedItem
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 

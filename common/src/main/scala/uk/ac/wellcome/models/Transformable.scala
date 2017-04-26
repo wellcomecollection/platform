@@ -17,7 +17,7 @@ case class MiroTransformable(MiroID: String,
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", MiroID)),
-                  title = miroData.image_title)
+                  label = miroData.image_title)
     }
 }
 
@@ -27,6 +27,7 @@ case class CalmDataTransformable(
   def transform: Try[UnifiedItem] = Try {
     UnifiedItem(
       identifiers = List(SourceIdentifier("source", "key", "value")),
+      label = "calm data label",
       accessStatus = AccessStatus.headOption
     )
   }

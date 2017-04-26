@@ -5,7 +5,8 @@ import com.sksamuel.elastic4s.searches.RichSearchHit
 
 case class Record(
   @JsonProperty("type") ontologyType: String = "Work",
-  id: String
+  id: String,
+  label: String
 )
 case object Record {
   def apply(hit: RichSearchHit): Record = {
@@ -13,7 +14,8 @@ case object Record {
       hit.sourceAsMap.filter(o => o._2 != null)
 
     Record(
-      id = data("canonicalId").toString
+      id = data("canonicalId").toString,
+      label = ""
     )
   }
 }
