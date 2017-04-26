@@ -1,4 +1,4 @@
-/** Lambda for publishing ECS service schedules to an SNS topic. */
+# Lambda for publishing ECS service schedules to an SNS topic
 
 module "lambda_service_scheduler" {
   source      = "./lambda"
@@ -22,4 +22,20 @@ module "schedule_calm_adapter" {
   "desired_count": 1
 }
 EOF
+}
+
+# Lambda for updating ECS service size
+
+module "lambda_update_ecs_service_size" {
+  source      = "./lambda"
+  name        = "update_ecs_service_size"
+  description = "Update the desired count of an ECS service"
+  filename    = "../lambdas/update_ecs_service_size.py"
+}
+
+module "update_ecs_service_size_trigger" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_update_ecs_service_size.function_name}"
+  lambda_function_arn  = "${module.lambda_update_ecs_service_size.arn}"
+  sns_trigger_arn      = "${aws_sns_topic.service_scheduler_topic.arn}"
 }

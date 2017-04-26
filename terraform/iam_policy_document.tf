@@ -135,3 +135,15 @@ data "aws_iam_policy_document" "publish_to_scheduler_sns" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "update_ecs_service_size" {
+  statement {
+    actions = [
+      "ecs:UpdateService",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
