@@ -1,5 +1,6 @@
 package uk.ac.wellcome.sqs
 
+import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
@@ -24,13 +25,15 @@ class SQSReaderTest
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndDeleteMessages(identity)
+    var receivedMessages: List[Message] = Nil
 
-    whenReady(futureMessages) { messages =>
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(message => receivedMessages = message :: receivedMessages)
+
+    whenReady(futureMessages) { _ =>
       // SQS is not a FIFO queue and it only guarantees that a message is sent at least once,
       // not that it is received exactly once
-      messages should have size 2
-      messages.foreach { message =>
+      receivedMessages should have size 2
+      receivedMessages.foreach { message =>
         messageStrings should contain(message.getBody)
       }
     }
@@ -47,14 +50,14 @@ class SQSReaderTest
                 maxMessages = 1)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndDeleteMessages(identity)
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(_ => ())
 
     whenReady(futureMessages.failed) { exception =>
       exception.getMessage should not be (empty)
     }
   }
 
-  it("should return a failed future if processing one of the messages fails - none of the messages should be deleted") {
+  it("should return a failed future if processing one of the messages fails - the failed message should not be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
@@ -75,18 +78,18 @@ class SQSReaderTest
     }
 
     // Check that the queue still contains all 3 messages
-    assertNumberOfMessagesAfterVisibilityTimeoutIs(3, sqsReader)
+    assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
   private def assertNumberOfMessagesAfterVisibilityTimeoutIs(
     expectedNumberOfMessages: Int,
     sqsReader: SQSReader): Any = {
-    // this should be true after the visibility period expires
-    //wait for the visibility period to expire
+    // wait for the visibility period to expire
     Thread.sleep(1500)
-    val nextMessages = sqsReader.retrieveAndDeleteMessages(identity)
-    whenReady(nextMessages) { messages =>
-      messages should have size expectedNumberOfMessages
+    var receivedMessages: List[Message] = Nil
+    val nextMessages = sqsReader.retrieveAndDeleteMessages(message => receivedMessages = message :: receivedMessages)
+    whenReady(nextMessages) { _ =>
+      receivedMessages should have size expectedNumberOfMessages
     }
   }
 }

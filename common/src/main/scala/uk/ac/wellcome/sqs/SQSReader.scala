@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
 
-  def retrieveAndDeleteMessages[T](process: Message => T): Future[List[T]] =
+  def retrieveAndDeleteMessages(process: Message => Unit): Future[Unit] =
     Future {
       blocking {
         debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
@@ -26,7 +26,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       }
     } flatMap { messages =>
       info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
-      processAndDeleteMessages(messages, process)
+      processAndDeleteMessages(messages, process).map {_ => ()}
     } recover {
       case exception: Throwable =>
         error(s"Error retrieving messages from queue ${sqsConfig.queueUrl}",
@@ -44,27 +44,20 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       .toList
   }
 
-  private def processAndDeleteMessages[T](
+  private def processAndDeleteMessages(
     messages: List[Message],
-    process: Message => T): Future[List[T]] = {
-    val triedProcessedMessages = Try {
-      messages.map { message =>
-        process(message)
-      }
-    }
-
-    triedProcessedMessages match {
-      case Success(processedMessages) =>
-        Future.sequence(messages.map(deleteMessage)).map { _ =>
-          processedMessages
-        }
-      case Failure(e) =>
-        error(s"Error processing messages $messages", e)
-        throw e
-    }
+    process: Message => Unit) = {
+      Future.sequence(messages.map { message =>
+        Future.fromTry(Try(process(message))
+          .recover {
+            case e: Throwable =>
+              error(s"Error processing message", e)
+              throw e
+        }).flatMap(_ => deleteMessage(message))
+      })
   }
 
-  private def deleteMessage(message: Message): Future[Unit] =
+  private def deleteMessage(message: Message) =
     Future {
       blocking {
         sqsClient.deleteMessage(
@@ -72,5 +65,9 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
                                    message.getReceiptHandle)
         )
       }
+    }.recover {
+      case e: Throwable =>
+        error(s"Failed deletintg message $message", e)
+        throw e
     }
 }
