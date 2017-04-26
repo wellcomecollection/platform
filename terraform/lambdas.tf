@@ -39,3 +39,12 @@ module "update_ecs_service_size_trigger" {
   lambda_function_arn  = "${module.lambda_update_ecs_service_size.arn}"
   sns_trigger_arn      = "${aws_sns_topic.service_scheduler_topic.arn}"
 }
+
+# Lambda for restarting applications when their config changes
+
+module "lambda_stop_running_tasks" {
+  source      = "./lambda"
+  name        = "stop_running_tasks"
+  description = "Stop all the running instances of a task"
+  filename    = "../lambdas/stop_running_tasks.py"
+}
