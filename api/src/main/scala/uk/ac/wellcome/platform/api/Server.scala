@@ -6,10 +6,9 @@ import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceI
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.json.modules.FinatraJacksonModule
 import com.twitter.finatra.json.utils.CamelCasePropertyNamingStrategy
-import uk.ac.wellcome.finatra.exceptions._
+import io.swagger.models.Swagger
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
-import io.swagger.models.Swagger
 import uk.ac.wellcome.platform.api.finatra.exceptions.ElasticsearchExceptionMapper
 
 object ServerMain extends Server

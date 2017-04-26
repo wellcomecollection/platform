@@ -77,7 +77,7 @@ class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
       .toJson(
         UnifiedItem(identifiers =
                       List(SourceIdentifier("Miro", "MiroID", miroId)),
-                    title = Some(imageTitle)))
+                    label = Some(imageTitle)))
       .get
   }
 

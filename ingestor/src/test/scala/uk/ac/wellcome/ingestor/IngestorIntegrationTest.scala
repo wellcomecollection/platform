@@ -6,13 +6,9 @@ import com.twitter.inject.{Injector, IntegrationTest}
 import org.scalatest.Matchers
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedUnifiedItem,
-  SourceIdentifier,
-  UnifiedItem
-}
+import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.ingestor.modules.SQSWorker
-import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.test.utils.{ElasticSearchLocal, SQSLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 

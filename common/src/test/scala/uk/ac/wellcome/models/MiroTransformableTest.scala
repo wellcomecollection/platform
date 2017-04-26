@@ -14,7 +14,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get shouldBe UnifiedItem(
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
-      title = Some(imageTitle))
+      label = Some(imageTitle))
   }
 
   it("should be able to transform itself into a unified item if the data fields contains more fields") {
@@ -29,7 +29,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get shouldBe UnifiedItem(
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
-      title = Some(imageTitle))
+      label = Some(imageTitle))
   }
 
   it("should be able to transform itself into a unified item if the data field is empty") {
