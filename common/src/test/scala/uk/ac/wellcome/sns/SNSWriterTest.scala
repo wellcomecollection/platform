@@ -12,7 +12,8 @@ class SNSWriterTest
     with SNSLocal
     with IntegrationPatience {
 
-  val snsConfig = SNSConfig("eu-west-1", ingestTopicArn)
+  override def topicName: String = "test-topic-name"
+  val snsConfig = SNSConfig("eu-west-1", topicArn)
 
   it("should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
     val snsWriter = new SNSWriter(amazonSNS, snsConfig)
@@ -53,5 +54,4 @@ class SNSWriterTest
       exception.getMessage should not be (empty)
     }
   }
-
 }

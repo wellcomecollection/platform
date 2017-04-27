@@ -8,7 +8,9 @@ import com.amazonaws.services.dynamodbv2.{
   AmazonDynamoDBClientBuilder,
   AmazonDynamoDBStreamsClientBuilder
 }
+import com.google.inject.{Provides, Singleton}
 import com.gu.scanamo.Scanamo
+import com.twitter.inject.TwitterModule
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.Identifier
 
@@ -192,5 +194,12 @@ trait DynamoDBLocal
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
+  }
+
+  object DynamoDBLocalClientModule extends TwitterModule {
+
+    @Singleton
+    @Provides
+    def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
   }
 }

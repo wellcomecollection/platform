@@ -10,7 +10,7 @@ class StartupTest extends FeatureTest {
   val server = new EmbeddedHttpServer(stage = Stage.PRODUCTION,
                                       twitterServer = new Server)
 
-  test("server") {
+  test("server starts up correctly") {
     server.assertHealthy()
   }
 }

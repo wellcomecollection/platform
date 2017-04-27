@@ -11,7 +11,7 @@ class StartupTest extends FeatureTest {
     twitterServer = new Server,
     flags = Map("aws.dynamo.tableName" -> "MiroData"))
 
-  test("server") {
+  test("server starts up correctly") {
     server.assertHealthy()
   }
 }
