@@ -15,7 +15,7 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
-  override val queueName: String = "test_queue"
+  override def queueName: String = "test_queue"
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
