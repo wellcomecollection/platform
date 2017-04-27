@@ -1,4 +1,4 @@
-package uk.ac.wellcome.ingestor
+package uk.ac.wellcome.platform.ingestor
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.inject.app.TestInjector
@@ -18,7 +18,7 @@ class IngestorIntegrationTest
     with Matchers
     with ElasticSearchLocal {
 
-  override def queueName: String = "es_ingestor_queue"
+  override def queueName: String = "test_es_ingestor_queue"
 
   override def injector: Injector =
     TestInjector(
@@ -27,7 +27,7 @@ class IngestorIntegrationTest
         "aws.sqs.queue.url" -> queueUrl,
         "aws.sqs.waitTime" -> "1",
         "es.host" -> "localhost",
-        "es.port" -> 9300.toString,
+        "es.port" -> "9300",
         "es.name" -> "wellcome",
         "es.xpack.enabled" -> "true",
         "es.xpack.user" -> "elastic:changeme",
