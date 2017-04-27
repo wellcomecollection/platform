@@ -52,6 +52,7 @@ class IdMinterIntegrationTest
     val unifiedItem =
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", "1234")),
+                  label = "some label",
                   accessStatus = Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(unifiedItem).get,
@@ -122,6 +123,7 @@ class IdMinterIntegrationTest
   private def generateSqsMessage(MiroID: String) = {
     val unifiedItem = UnifiedItem(
       identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
+      label = "some label",
       accessStatus = Option("super-secret"))
     SQSMessage(Some("subject"),
                JsonUtil.toJson(unifiedItem).get,

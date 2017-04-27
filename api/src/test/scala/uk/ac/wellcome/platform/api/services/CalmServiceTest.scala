@@ -18,13 +18,13 @@ class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers {
                               identifiers = List(
                                 SourceIdentifier(source = "Calm",
                                                  sourceId = "AltRefNo",
-                                                 value = "calmid")))))
+                                                 value = "calmid")), label = "this is the item label")))
 
     val recordsFuture = calmService.findRecords()
 
     recordsFuture map { records =>
       records should have size 1
-      records.head shouldBe Record("Work", "id")
+      records.head shouldBe Record("Work", "id", "this is the item label")
     }
   }
 
