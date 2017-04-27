@@ -11,15 +11,15 @@ import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
 }
-import uk.ac.wellcome.platform.api.services.CalmService
+import uk.ac.wellcome.platform.api.services.ElasticSearchService
 import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 @Singleton
 class WorksController @Inject()(
-  @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.context") apiContext: String,
-  calmService: CalmService
+                                 @Flag("api.prefix") apiPrefix: String,
+                                 @Flag("api.context") apiContext: String,
+                                 elasticService: ElasticSearchService
 ) extends Controller
     with SwaggerSupport {
 
@@ -58,7 +58,7 @@ class WorksController @Inject()(
           "The number of works to return per page (default: 10)",
           required = false)
     } { request: Request =>
-      calmService
+      elasticService
         .findRecords()
         .map(
           results =>
@@ -76,7 +76,7 @@ class WorksController @Inject()(
         .routeParam[String]("id", "The work to return", required = true)
         .responseWith[Object](200, "Work")
     } { request: Request =>
-      calmService
+      elasticService
         .findRecordByAltRefNo(request.params("id"))
         .map(
           _.map(
