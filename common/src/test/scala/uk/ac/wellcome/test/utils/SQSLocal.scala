@@ -28,7 +28,6 @@ trait SQSLocal
 
   // Use eventually to allow some time for the local SQS to start up.
   // If it is not started all suites using this will crash at start up time.
-  // Did not happen locally but seems to be needed on CI
   val queueUrl = eventually {
     sqsClient.createQueue(queueName).getQueueUrl
   }

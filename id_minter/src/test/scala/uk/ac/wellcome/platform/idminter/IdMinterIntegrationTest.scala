@@ -26,7 +26,7 @@ class IdMinterIntegrationTest
     with Eventually
     with IntegrationPatience {
 
-  override def topicName: String = "test_ingester"
+  override def topicName: String = "test_ingestor"
   override def queueName: String = "test_id_minter"
 
   override val injector =
