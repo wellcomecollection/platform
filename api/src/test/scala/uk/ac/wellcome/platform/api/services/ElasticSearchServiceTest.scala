@@ -19,7 +19,7 @@ class ElasticSearchServiceTest
   val itemType = "item"
   val elasticService = new ElasticSearchService(index, itemType, elasticClient)
 
-  it("should find records") {
+  it("should return the records in Elasticsearch") {
     val firstIdentifiedUnifiedItem =
       identifiedUnifiedItemWith(canonicalId = "1234",
                                 label = "this is the first item label")

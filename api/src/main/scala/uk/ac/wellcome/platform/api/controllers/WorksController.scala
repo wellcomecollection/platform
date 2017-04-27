@@ -16,11 +16,10 @@ import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 @Singleton
-class WorksController @Inject()(
-                                 @Flag("api.prefix") apiPrefix: String,
-                                 @Flag("api.context") apiContext: String,
-                                 elasticService: ElasticSearchService
-) extends Controller
+class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
+                                @Flag("api.context") apiContext: String,
+                                elasticService: ElasticSearchService)
+    extends Controller
     with SwaggerSupport {
 
   override implicit protected val swagger = ApiSwagger
@@ -80,7 +79,8 @@ class WorksController @Inject()(
         .findRecordById(request.params("id"))
         .map {
           case Some(result) =>
-              response.ok.json(ResultResponse(
+            response.ok.json(
+              ResultResponse(
                 context = ApiRequestUtils.hostUrl(request) + apiContext,
                 result = result))
           case None => response.notFound
