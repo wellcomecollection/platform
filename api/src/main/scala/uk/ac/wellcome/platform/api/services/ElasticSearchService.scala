@@ -4,19 +4,22 @@ import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
 @Singleton
-class ElasticSearchService @Inject()(elasticClient: ElasticClient) {
+class ElasticSearchService @Inject()(@Flag("es.index") index: String,
+                                     @Flag("es.type") itemType: String,
+                                     elasticClient: ElasticClient) {
 
-  def findRecordByAltRefNo(altRefNo: String): Future[Option[Record]] =
+  def findRecordById(canonicalId: String): Future[Option[Record]] =
     elasticClient
       .execute {
-        search("records/item").query(
-          boolQuery().must(matchQuery("AltRefNo.keyword", altRefNo))
+        search(s"$index/$itemType").query(
+          boolQuery().must(matchQuery("canonicalId.keyword", canonicalId))
         )
       }
       .map { _.hits.headOption.map { Record(_) } }
@@ -24,7 +27,11 @@ class ElasticSearchService @Inject()(elasticClient: ElasticClient) {
   def findRecords(): Future[Array[Record]] =
     elasticClient
       .execute {
-        search("records/item").matchAll().limit(10)
+        search(s"$index/$itemType")
+          .matchAll()
+          // Sort so that we always have a consistent result that we can assert on
+          .sortBy(fieldSort("canonicalId.keyword"))
+          .limit(10)
       }
       .map { _.hits.map { Record(_) } }
 
