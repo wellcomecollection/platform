@@ -5,6 +5,9 @@ sudo: required
 dist: trusty
 
 install:
+  # This is needed for elasticsearch docker container to start: see https://github.com/travis-ci/travis-ci/issues/6534
+  - sudo sysctl -w vm.max_map_count=262144
+
   # Install Docker on Travis.  Merely exposing Docker through the Travis
   # settings is insufficient, because the docker-compose tests we use are
   # unable to see it in that case.

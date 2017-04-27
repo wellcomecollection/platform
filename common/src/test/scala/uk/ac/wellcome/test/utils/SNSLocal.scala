@@ -3,13 +3,17 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
-import com.twitter.inject.Logging
+import com.google.inject.{Provides, Singleton}
+import com.twitter.inject.{Logging, TwitterModule}
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.impl.client.DefaultHttpClient
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
+trait SNSLocal extends BeforeAndAfterEach with Logging {this: Suite =>
+
+  def topicName: String
   private val localSNSEndpointUrl = "http://localhost:9292"
+
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
     .standard()
     .withCredentials(new AWSStaticCredentialsProvider(
@@ -18,11 +22,7 @@ trait SNSLocal extends Suite with BeforeAndAfterEach with Logging {
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  private val ingestTopicName = "es_ingest"
-  private val idMinterTopicName = "id_minter"
-
-  val ingestTopicArn = amazonSNS.createTopic(ingestTopicName).getTopicArn
-  val idMinterTopicArn = amazonSNS.createTopic(idMinterTopicName).getTopicArn
+  val topicArn = amazonSNS.createTopic(topicName).getTopicArn
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -86,6 +86,13 @@ messages:
       }
       .headOption
       .getOrElse("")
+  }
+
+  object LocalSNSClient extends TwitterModule {
+
+    @Singleton
+    @Provides
+    def providesSNSClient: AmazonSNS = amazonSNS
   }
 }
 

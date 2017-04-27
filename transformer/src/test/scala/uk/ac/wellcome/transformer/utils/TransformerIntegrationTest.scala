@@ -6,15 +6,19 @@ import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
 import com.google.inject.{Provides, Singleton}
-import com.twitter.inject.TwitterModule
+import com.twitter.inject.{IntegrationTest, TwitterModule}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.test.utils.IntegrationTestBase
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal}
 
 trait TransformerIntegrationTest
-    extends IntegrationTestBase
+    extends IntegrationTest
+    with SNSLocal
+    with DynamoDBLocal
     with Eventually
     with IntegrationPatience {
+
+  override def topicName: String = "test_id_minter"
 
   object LocalKinesisModule extends TwitterModule {
 

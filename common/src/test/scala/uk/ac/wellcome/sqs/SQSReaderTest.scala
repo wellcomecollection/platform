@@ -1,7 +1,7 @@
 package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.sqs.model.Message
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.utils.SQSLocal
@@ -15,30 +15,33 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
+  override def queueName: String = "test_queue"
+
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-                idMinterQueueUrl,
-                waitTime = 20 seconds,
-                maxMessages = 2)
+      SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
-    messageStrings.foreach(sqsClient.sendMessage(idMinterQueueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveMessages()
+    var receivedMessages: List[Message] = Nil
 
-    whenReady(futureMessages) { messages =>
-      // SQS is not a FIFO queue and it only guarantees that a message is sent at least once,
-      // not that it is received exactly once
-      messages should have size 2
-      messages.foreach { message =>
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(message =>
+      receivedMessages = message :: receivedMessages)
+
+    whenReady(futureMessages) { _ =>
+      receivedMessages should have size 2
+      receivedMessages.foreach { message =>
         messageStrings should contain(message.getBody)
       }
+      receivedMessages.head should not be equal(receivedMessages.tail.head)
     }
+
+    assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
-  it("should return a failed future if writing to the SNS topic fails") {
+  it("should return a failed future if reading from the SQS queue fails") {
     val sqsConfig =
       SQSConfig("eu-west-1",
                 "not a valid queue url",
@@ -46,13 +49,48 @@ class SQSReaderTest
                 maxMessages = 1)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveMessages()
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(_ => ())
 
     whenReady(futureMessages.failed) { exception =>
       exception.getMessage should not be (empty)
     }
   }
 
-  private def createMessage(jsonMessage: String) =
-    new Message().withBody(jsonMessage)
+  it("should return a failed future if processing one of the messages fails - the failed message should not be deleted") {
+    val sqsConfig =
+      SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
+
+    val failingMessage = "This message will fail"
+    val messageStrings = List("This is the first message",
+                              failingMessage,
+                              "This is the final message")
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+    val sqsReader =
+      new SQSReader(sqsClient, sqsConfig)
+
+    val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
+      if (message.getBody == failingMessage)
+        throw new RuntimeException(s"$failingMessage is not valid")
+      else message
+    }
+
+    whenReady(futureMessages.failed) { exception =>
+      exception shouldBe a[RuntimeException]
+    }
+
+    assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
+  }
+
+  private def assertNumberOfMessagesAfterVisibilityTimeoutIs(
+    expectedNumberOfMessages: Int,
+    sqsReader: SQSReader): Any = {
+    // wait for the visibility period to expire
+    Thread.sleep(1500)
+    var receivedMessages: List[Message] = Nil
+    val nextMessages = sqsReader.retrieveAndDeleteMessages(message =>
+      receivedMessages = message :: receivedMessages)
+    whenReady(nextMessages) { _ =>
+      receivedMessages should have size expectedNumberOfMessages
+    }
+  }
 }

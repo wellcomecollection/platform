@@ -2,15 +2,11 @@ package uk.ac.wellcome.platform.ingestor
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
+import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.ingestor.controllers._
 import uk.ac.wellcome.platform.ingestor.modules._
-import uk.ac.wellcome.finatra.modules._
 
 object ServerMain extends Server
 
@@ -22,9 +18,6 @@ class Server extends HttpServer {
                              SQSReaderModule,
                              SQSWorker,
                              ElasticClientModule)
-
-  private val esIndex = flag[String]("es.index", "records", "ES index name")
-  private val esType = flag[String]("es.type", "item", "ES document type")
 
   override def configureHttp(router: HttpRouter) {
     router

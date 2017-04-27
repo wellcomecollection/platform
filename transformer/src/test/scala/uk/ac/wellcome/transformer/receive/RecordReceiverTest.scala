@@ -12,6 +12,7 @@ import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.utils.CalmRecordUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -43,7 +44,7 @@ class RecordReceiverTest
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future) { _ =>
-      verify(snsWriter).writeMessage(UnifiedItem.json(unifiedItem),
+      verify(snsWriter).writeMessage(JsonUtil.toJson(unifiedItem).get,
                                      Some("Foo"))
     }
   }
