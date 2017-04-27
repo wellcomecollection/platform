@@ -4,5 +4,5 @@
 -es.sniff=false
 -es.xpack.enabled=true
 -es.xpack.user=${es_xpack_user}
--es.sslEnabled=true
+-es.xpack.sslEnabled=true
 -es.transport.compress=true
