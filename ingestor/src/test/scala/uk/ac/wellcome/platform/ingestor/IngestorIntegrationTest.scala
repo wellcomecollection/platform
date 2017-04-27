@@ -19,8 +19,9 @@ class IngestorIntegrationTest
     with ElasticSearchLocal {
 
   override def queueName: String = "test_es_ingestor_queue"
-
-  override def injector: Injector =
+  val index = "records"
+  val itemType = "item"
+  override def injector: Injector = {
     TestInjector(
       flags = Map(
         "aws.region" -> "eu-west-1",
@@ -33,18 +34,19 @@ class IngestorIntegrationTest
         "es.xpack.user" -> "elastic:changeme",
         "es.xpack.sslEnabled" -> "false",
         "es.sniff" -> "false",
-        "es.index" -> "records",
-        "es.type" -> "item"
+        "es.index" -> index,
+        "es.type" -> itemType
       ),
       modules = Seq(SQSConfigModule,
-                    AkkaModule,
-                    SQSReaderModule,
-                    SQSWorker,
-                    SQSLocalClientModule,
-                    ElasticClientModule)
+        AkkaModule,
+        SQSReaderModule,
+        SQSWorker,
+        SQSLocalClientModule,
+        ElasticClientModule)
     )
+  }
 
-  test("it should read an identified unified item from the SQS queue and ingest it into elastic search") {
+  test("it should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
     val identifiedUnifiedItem = JsonUtil
       .toJson(
         IdentifiedUnifiedItem(
@@ -70,7 +72,7 @@ class IngestorIntegrationTest
     eventually {
       val hits =
         elasticClient
-          .execute(search("records/item").matchAll())
+          .execute(search(s"$index/$itemType").matchAll())
           .map(_.hits)
           .await
       hits should have size 1
