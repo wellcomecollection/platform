@@ -15,7 +15,7 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
-  override val queueName: String = "test_queue"
+  override def queueName: String = "test_queue"
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
@@ -27,11 +27,10 @@ class SQSReaderTest
 
     var receivedMessages: List[Message] = Nil
 
-    val futureMessages = sqsReader.retrieveAndDeleteMessages(message => receivedMessages = message :: receivedMessages)
+    val futureMessages = sqsReader.retrieveAndDeleteMessages(message =>
+      receivedMessages = message :: receivedMessages)
 
     whenReady(futureMessages) { _ =>
-      // SQS is not a FIFO queue and it only guarantees that a message is sent at least once,
-      // not that it is received exactly once
       receivedMessages should have size 2
       receivedMessages.foreach { message =>
         messageStrings should contain(message.getBody)
@@ -62,7 +61,9 @@ class SQSReaderTest
       SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail"
-    val messageStrings = List("This is the first message", failingMessage, "This is the final message")
+    val messageStrings = List("This is the first message",
+                              failingMessage,
+                              "This is the final message")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
@@ -86,7 +87,8 @@ class SQSReaderTest
     // wait for the visibility period to expire
     Thread.sleep(1500)
     var receivedMessages: List[Message] = Nil
-    val nextMessages = sqsReader.retrieveAndDeleteMessages(message => receivedMessages = message :: receivedMessages)
+    val nextMessages = sqsReader.retrieveAndDeleteMessages(message =>
+      receivedMessages = message :: receivedMessages)
     whenReady(nextMessages) { _ =>
       receivedMessages should have size expectedNumberOfMessages
     }

@@ -15,9 +15,11 @@ class IdentifiedUnifiedItemIndexerTest
     with Matchers
     with ElasticSearchLocal {
 
-  it("should insert an identified unified item into elastic search") {
+  it("should insert an identified unified item into Elasticsearch") {
+    val index = "records"
+    val itemType = "item"
     val identifiedUnifiedItemIndexer =
-      new IdentifiedUnifiedItemIndexer("records", "item", elasticClient)
+      new IdentifiedUnifiedItemIndexer(index, itemType, elasticClient)
     val identifiedUnifiedItemString = JsonUtil
       .toJson(
         IdentifiedUnifiedItem(
@@ -32,7 +34,7 @@ class IdentifiedUnifiedItemIndexerTest
     whenReady(future) { _ =>
       eventually {
         val hits = elasticClient
-          .execute(search("records/item").matchAll().limit(100))
+          .execute(search(s"$index/$itemType").matchAll().limit(100))
           .map { _.hits }
           .await
         hits should have size 1

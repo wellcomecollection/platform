@@ -17,6 +17,7 @@ import scala.util.{Failure, Success, Try}
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
+  // SQS is not a FIFO queue so the order of arrival of messages does not necessarily reflect the order messages were sent in.
   // After a consumer reads a message from an SQS queue, AWS doesn’t delete the message immediately.
   // It "hides" the message for a fixed period, until either
   //  * the consumer tells SQS to delete the message, or

@@ -18,7 +18,6 @@ object SQSWorker extends TwitterModule with TryBackoff {
     info("Starting SQS worker")
 
     val system = injector.instance[ActorSystem]
-
     val sqsReader = injector.instance[SQSReader]
     val indexer = injector.instance[IdentifiedUnifiedItemIndexer]
 
