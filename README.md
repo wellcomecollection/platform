@@ -1,19 +1,45 @@
 # platform-infra
 
-Infrastructure for Wellcome Digital Platform backend.
+This repo defines the infrastructure for the [Wellcome Digital Platform][api].
 
-We use this infrastructure to deploy [the Wellcome Digital Platform](https://github.com/wellcometrust/platform-api)
+We make heavy use of AWS and Docker.
+Our AWS infrastructure is defined entirely with [Terraform][terraform] files which are kept in this repository, along with a handful of custom Docker images.
 
-## Setup
-- [Install Terraform](https://www.terraform.io/downloads.html)
-- Ensure your AWS credentials are available as default
+[api]: https://github.com/wellcometrust/platform-api
+[terraform]: https://www.terraform.io
+
+## Getting started
+
+1.  Clone the repository:
+
+    ```console
+    $ git clone https://github.com/wellcometrust/platform-infra.git
+    $ cd platform-infra
+    ```
+
+2.  Install Terraform, using [the instructions][terra_install] from the Terraform docs.
+
+3.  Make sure your AWS credentials are [available to Terraform][aws_auth].
+
+[terra_install]: https://www.terraform.io/intro/getting-started/install.html
+[aws_auth]: https://www.terraform.io/docs/providers/aws/index.html#authentication
 
 ## Usage
-```sh
-cd terraform
-./plan.sh
 
-# If your plan looks good then
+First run the plan script:
 
-terraform apply
+```console
+$ cd terraform
+$ ./plan.sh
 ```
+
+This should print the output of a `terraform plan`, telling you what resources will be changed.
+If this looks correct, then you can apply the changes by running:
+
+```console
+$ terraform apply terraform.plan
+```
+
+## License
+
+MIT.
