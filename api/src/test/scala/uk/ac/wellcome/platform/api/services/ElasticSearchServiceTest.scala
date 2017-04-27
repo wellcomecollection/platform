@@ -2,25 +2,33 @@ package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.scalatest.{AsyncFunSpec, Matchers}
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{
+  IdentifiedUnifiedItem,
+  SourceIdentifier,
+  UnifiedItem
+}
 import uk.ac.wellcome.platform.api.models.Record
 import uk.ac.wellcome.utils.JsonUtil
 
-class CalmServiceTest extends AsyncFunSpec with ElasticSugar with Matchers {
+class ElasticSearchServiceTest
+    extends AsyncFunSpec
+    with ElasticSugar
+    with Matchers {
 
-  val calmService = new CalmService(client)
+  val elasticService = new ElasticSearchService(client)
 
   it("should find records") {
     ensureIndexExists("records")
     insertIntoElasticSearch(
-      IdentifiedUnifiedItem("id",
-                            UnifiedItem(
-                              identifiers = List(
-                                SourceIdentifier(source = "Calm",
-                                                 sourceId = "AltRefNo",
-                                                 value = "calmid")), label = "this is the item label")))
+      IdentifiedUnifiedItem(
+        "id",
+        UnifiedItem(identifiers = List(
+                      SourceIdentifier(source = "Calm",
+                                       sourceId = "AltRefNo",
+                                       value = "calmid")),
+                    label = "this is the item label")))
 
-    val recordsFuture = calmService.findRecords()
+    val recordsFuture = elasticService.findRecords()
 
     recordsFuture map { records =>
       records should have size 1

@@ -10,8 +10,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 @Singleton
-class CalmService @Inject()(elasticClient: ElasticClient
-) {
+class ElasticSearchService @Inject()(elasticClient: ElasticClient) {
 
   def findRecordByAltRefNo(altRefNo: String): Future[Option[Record]] =
     elasticClient

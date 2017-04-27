@@ -39,7 +39,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
 
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get shouldBe UnifiedItem(
-      identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)), label = "")
+      identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)), label = "no label found")
   }
 
   it("should fail transforming itself if the data field is not valid json") {
