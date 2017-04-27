@@ -19,7 +19,6 @@ class IngestorIntegrationTest
     with ElasticSearchLocal {
 
   override def queueName: String = "test_es_ingestor_queue"
-  val index = "records"
   val itemType = "item"
   override def injector: Injector = {
     TestInjector(
