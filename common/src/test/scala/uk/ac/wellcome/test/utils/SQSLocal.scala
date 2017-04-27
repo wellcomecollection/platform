@@ -32,7 +32,7 @@ trait SQSLocal
     sqsClient.createQueue(queueName).getQueueUrl
   }
 
-  // Setting 1 second timeout for tests, to be able to test message deletion
+  // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
   sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
   override def beforeEach(): Unit = {
