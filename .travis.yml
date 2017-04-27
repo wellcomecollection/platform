@@ -53,14 +53,16 @@ script:
   - sbt "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
 
   - >
+    export AWS_DEFAULT_REGION=eu-west-1;
     if [[ "$BRANCH" == "master" ]];
     then
       if [[ "$PROJECT" != "common" ]]; then
         sbt "project $PROJECT" stage;
-        export NAME="0.0.1-$(git rev-parse HEAD)_alex";
-        bash $(aws ecr get-login);
-        docker build --build-arg project=$PROJECT --build-arg config_bucket=$CONFIG_BUCKET --build-arg build_env=alex --tag=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME .;
+        export NAME="0.0.1-$(git rev-parse HEAD)_prod";
+        $(aws ecr get-login);
+        docker build --build-arg project=$PROJECT --build-arg config_bucket=$CONFIG_BUCKET --build-arg build_env=prod --tag=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME .;
         docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$NAME;
+        echo "New container image is $NAME"
       else
         echo "Not an application (common); skipping deploy";
       fi;
@@ -75,4 +77,5 @@ env:
     #  * AWS_ACCESS_KEY_ID
     #  * AWS_SECRET_ACCESS_KEY
     #  * AWS_ECR_REPO
-    - secure: vP9+bx78J7n0QXIWzWicoEM74HOfKzuSmAlTGniZUg3qxp5xMEIRsKkaK/yt6JyuejCldHvy6TG4CGkYBdW5wDbXA4PGTV4OrPmBvDrVm8STNX3e22ZVn6/FDAxCS5IdxXygVTlGtjbCh/8WuysFZ0dT/YYv01IMymqfuNVPYrhnnFASQ9zG2I2W+8HmkKy8fnUPRoIKr4hccjR9iGpj7rgF8VGcD2oRn7/jSOnUul1IvJznNvoLUuLH3m3eZ7lR/tFIx+H439pG/EyO9D8wnVCOejR9wQEr/8qRlvlMTPoyAfSVPlpq0PDdtJlr7g0mxJzvxdgGcilo5zyV1IRYMepgpeTKV1y96jxnA0bFmIvxYav0bnh7vIEFUp9QEzNNMkTb/zaNOVrbsvCaIuVfy6qAsP9JL2k5lpvBqeBZ5w0AaMzqzdOztUH2VY2IBJ2yXIC6QPVlkINfau96gam4Q+Wu8W8FNpaw0WYn2+v9Dd8QsPsyKUXMGrxIYZcQGf56aObZ8/HGkjSxhfTClmsngN3oGwuvYtIQGujBDPUgxFFOVGKE/Z4C2nuAUoJPcBb0HVwb7AxvGRZ1xUJCBr+Pf/o5pxugGZuSjmokNNNBAhWdznbyqsLnERlo5CpYQkuLUYZ1NTvS0PS1hlhusOhdvopzkZL8mJM8/Qaf3NptSkA=
+    #  * CONFIG_BUCKET
+    - secure: MHe9bZxr2Ww9yaRxlGN3yXRa1p+YZdIR0lZrqOr6qxL9GDk1R3lthEObThy/w8irMtE+Rha0PAa7oM2QmdQIm/W7DTiDT4YeVhxw+eCOkAyASqPWMPVV03GA3m0HNY2OCBioiga77HQikLvmLxra1tU292+R8fHaxmmhF7g7YvdRRgi4IPtSZQLmGHbpgN8lOJQNHkh9JYNOjzqYo1guNt4zMHWdltMfYzmt/t7gK5nduv+KzBRH8AV+bjn5a9lH/q/hx4Wk2MG6pxKVNP2aJ57S3Y2wC9OxLBQKWP6ZSRR8/g3KN/lDkpoY14u3TE2muLfYdZdL9/Vy9gOiuCVZNCvqj2C0sFbmYX0d/XVkoVTBgv8hDqdjwWHywtC0yjxnLYk4gridYpS8YPuaMXIrY9rLMgPHr62WZXoSALjlq56VjoNOpVCTrxFkJ1wW9/p2kkwrW8fGTqy/wnZlDelxdrkEJe4YfBB79FhLGJDIaBeXfiFC0lajVJX4D6TEwAuVlWcCTsUkZYIYvLHajjzdOJJYcoySbipSU75t3OJ9Qp6t1VEQS7AMa9moBQtM9ha3RNbBh8A+qksU3X+Y2uG0738HhF8h56LWX+1iH1FC0VXLh8UQWKDvtVfvZWnOJGuOfP7Gxvt3btMQvvBM0LoEOvb8a6kMsfR+oQ6uXEHLMBA=

@@ -12,6 +12,8 @@ USER daemon
 
 COPY run.sh /run.sh
 
+EXPOSE 8888
+
 ENV BUILD_ENV $build_env
 ENV CONFIG_BUCKET $config_bucket
 ENV PROJECT $project
