@@ -77,14 +77,14 @@ class WorksController @Inject()(
         .responseWith[Object](200, "Work")
     } { request: Request =>
       elasticService
-        .findRecordByAltRefNo(request.params("id"))
-        .map(
-          _.map(
-            result =>
+        .findRecordById(request.params("id"))
+        .map {
+          case Some(result) =>
               response.ok.json(ResultResponse(
                 context = ApiRequestUtils.hostUrl(request) + apiContext,
-                result = result)))
-            .getOrElse(response.notFound))
+                result = result))
+          case None => response.notFound
+        }
     }
 
   }
