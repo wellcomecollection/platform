@@ -1,12 +1,14 @@
-package uk.ac.wellcome.ingestor.services
+package uk.ac.wellcome.platform.ingestor.services
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.sksamuel.elastic4s.ElasticDsl._
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.ingestor.services.IdentifiedUnifiedItemIndexer
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
+import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.platform.ingestor.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 

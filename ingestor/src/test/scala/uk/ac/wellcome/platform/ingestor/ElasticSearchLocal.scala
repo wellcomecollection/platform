@@ -1,4 +1,4 @@
-package uk.ac.wellcome.ingestor
+package uk.ac.wellcome.platform.ingestor
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
@@ -23,7 +23,7 @@ trait ElasticSearchLocal
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
   override def beforeAll(): Unit = {
-    // Elastic search takes a while to start up so check that it actually started before running tests
+    // Elasticsearch takes a while to start up so check that it actually started before running tests
     eventually {
       elasticClient
         .execute(
