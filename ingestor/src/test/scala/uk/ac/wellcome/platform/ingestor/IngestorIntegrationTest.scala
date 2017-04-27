@@ -50,7 +50,7 @@ class IngestorIntegrationTest
         IdentifiedUnifiedItem(
           canonicalId = "1234",
           unifiedItem = UnifiedItem(
-            identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")))))
+            identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")), label = "some label")))
       .get
 
     sqsClient.sendMessage(

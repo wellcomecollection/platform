@@ -17,7 +17,7 @@ case class MiroTransformable(MiroID: String,
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", MiroID)),
-                  label = miroData.image_title)
+                  label = miroData.image_title.getOrElse("no label found"))
     }
 }
 

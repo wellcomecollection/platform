@@ -34,6 +34,7 @@ class RecordReceiverTest
 
   val unifiedItem = UnifiedItem(
     identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
+    label = "calm data label",
     accessStatus = Some("restricted"))
 
   it("should receive a message and send it to SNS client") {

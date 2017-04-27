@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.api
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import com.sksamuel.elastic4s.ElasticDsl._
 import uk.ac.wellcome.models.{
   IdentifiedUnifiedItem,
@@ -12,6 +11,7 @@ import uk.ac.wellcome.models.{
 }
 import uk.ac.wellcome.platform.api.models.Record
 import uk.ac.wellcome.platform.api.responses.ResultListResponse
+import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil
 
 class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
@@ -36,8 +36,9 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
       unifiedItem =
         UnifiedItem(identifiers =
                       List(SourceIdentifier("Miro", "MiroID", "5678")),
-                    label = Some("this is the image title")))
-    elasticClient.execute(indexInto("records" / "item").doc(identifiedUnifiedItem))
+                    label = "this is the image title"))
+    elasticClient.execute(
+      indexInto("records" / "item").doc(identifiedUnifiedItem))
 
     eventually {
       server.httpGet(
@@ -45,7 +46,8 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
         andExpect = Status.Ok,
         withJsonBody = JsonUtil
           .toJson(ResultListResponse(
-            context = s"http://${server.externalHttpHostAndPort}/catalogue/v0/context.json",
+            context =
+              s"http://${server.externalHttpHostAndPort}/catalogue/v0/context.json",
             ontologyType = "ResultList",
             pageSize = 10,
             results = Array(Record(ontologyType = "Work",
