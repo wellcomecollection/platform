@@ -16,7 +16,6 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 
 trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
-  def topicName: String
   private val localSNSEndpointUrl = "http://localhost:9292"
 
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
@@ -27,7 +26,9 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  val topicArn = amazonSNS.createTopic(topicName).getTopicArn
+  def createTopicAndReturnArn(topicName: String) = {
+    amazonSNS.createTopic(topicName).getTopicArn
+  }
 
   override def beforeEach(): Unit = {
     super.beforeEach()

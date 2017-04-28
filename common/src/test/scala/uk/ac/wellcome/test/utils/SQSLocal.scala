@@ -9,14 +9,12 @@ import com.twitter.inject.TwitterModule
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-import scala.collection.JavaConversions._
-
 trait SQSLocal
     extends BeforeAndAfterEach
     with Eventually
     with IntegrationPatience { this: Suite =>
 
-  val sqsClient = AmazonSQSClientBuilder
+  val sqsClient: AmazonSQS = AmazonSQSClientBuilder
     .standard()
     .withCredentials(
       new AWSStaticCredentialsProvider(new BasicAWSCredentials("x", "x")))
@@ -24,20 +22,21 @@ trait SQSLocal
       new EndpointConfiguration(s"http://localhost:9324", "localhost"))
     .build()
 
-  def queueName: String
+  private var queueUrls: List[String] = Nil
 
-  // Use eventually to allow some time for the local SQS to start up.
-  // If it is not started all suites using this will crash at start up time.
-  val queueUrl = eventually {
-    sqsClient.createQueue(queueName).getQueueUrl
+  def createQueueAndReturnUrl(queueName: String): String = {
+    // Use eventually to allow some time for the local SQS to start up.
+    // If it is not started all suites using this will crash at start up time.
+    val queueUrl = eventually {
+      sqsClient.createQueue(queueName).getQueueUrl
+    }
+    queueUrls = queueUrl :: queueUrls
+    queueUrl
   }
-
-  // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
-  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl))
+    queueUrls.foreach(queueUrl => sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl)))
   }
 
   object SQSLocalClientModule extends TwitterModule {
