@@ -1,11 +1,12 @@
 package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.sqs.model.Message
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.utils.SQSLocal
 
+import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 
 class SQSReaderTest
@@ -15,7 +16,10 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
-  override def queueName: String = "test_queue"
+  val queueUrl = createQueueAndReturnUrl("test_queue")
+
+  // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
+  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
