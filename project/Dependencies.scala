@@ -59,7 +59,7 @@ object Dependencies {
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
-    "com.fasterxml.jackson.dataformat" %% "jackson-dataformat-yaml" % versions.jacksonYamlVersion %" test",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion %" test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies
 
