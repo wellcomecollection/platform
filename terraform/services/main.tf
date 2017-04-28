@@ -27,7 +27,7 @@ module "task" {
 
 module "config" {
   source        = "./config"
-  app_name      = "${var.task_name}"
+  app_name      = "${var.name}"
   infra_bucket  = "${var.infra_bucket}"
   template_vars = "${var.config_vars}"
 }
