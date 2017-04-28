@@ -25,12 +25,7 @@ trait ElasticSearchLocal
   override def beforeAll(): Unit = {
     // Elasticsearch takes a while to start up so check that it actually started before running tests
     eventually {
-      elasticClient
-        .execute(
-          clusterHealth()
-        )
-        .await
-        .getNumberOfNodes shouldBe 1
+      elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
     }
 
     if (!elasticClient.execute(indexExists("records")).await.isExists)
