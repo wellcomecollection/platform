@@ -22,9 +22,18 @@ def identify_cluster_by_app_name(ecs, app_name):
     """
     for cluster in ecs.list_clusters()['clusterArns']:
         for serviceArn in ecs.list_services(cluster=cluster)['serviceArns']:
+
+            # The format of an ECS service ARN is:
+            #
+            #     arn:aws:ecs:{aws_region}:{account_id}:service/{service_name}
+            #
+            # Our ECS cluster is configured so that the name of the ECS cluster
+            # matches the name of the config in S3.
             _, serviceName = serviceArn.split('/')
             if serviceName == app_name:
                 return cluster
+
+    raise RuntimeError('Unable to find ECS cluster for %s' % app_name)
 
 
 def stop_running_tasks(app_name):
