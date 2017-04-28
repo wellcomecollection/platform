@@ -1,8 +1,7 @@
 module "calm_adapter" {
   source           = "./services"
-  service_name     = "calm-adapter"
+  name             = "calm_adapter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
-  task_name        = "calm_adapter"
   task_role_arn    = "${module.ecs_calm_adapter_iam.task_role_arn}"
   vpc_id           = "${module.vpc_services.vpc_id}"
   app_uri          = "${aws_ecr_repository.calm_adapter.repository_url}:${var.release_id}"
@@ -10,9 +9,15 @@ module "calm_adapter" {
   listener_arn     = "${module.services_alb.listener_arn}"
   path_pattern     = "/calm_adapter/*"
   alb_priority     = "101"
-  desired_count    = "0"
   healthcheck_path = "/calm_adapter/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+
+  # The Calm adapter is disabled when not running.  It only runs once a day
+  # because the last_changed date on Calm records has per-day granularity.
+  #
+  # A scheduled Lambda sets the desired count to 1 on weekdays, and the
+  # adapter resets it to zero when it finished running.
+  desired_count = "0"
 
   config_vars = {
     table_name = "${aws_dynamodb_table.calm_table.name}"
@@ -22,9 +27,8 @@ module "calm_adapter" {
 
 module "ingestor" {
   source           = "./services"
-  service_name     = "ingestor"
+  name             = "ingestor"
   cluster_id       = "${aws_ecs_cluster.services.id}"
-  task_name        = "ingestor"
   task_role_arn    = "${module.ecs_ingestor_iam.task_role_arn}"
   vpc_id           = "${module.vpc_services.vpc_id}"
   app_uri          = "${aws_ecr_repository.ingestor.repository_url}:${var.release_id}"
@@ -48,9 +52,8 @@ module "ingestor" {
 
 module "transformer" {
   source           = "./services"
-  service_name     = "transformer"
+  name             = "transformer"
   cluster_id       = "${aws_ecs_cluster.services.id}"
-  task_name        = "transformer"
   task_role_arn    = "${module.ecs_transformer_iam.task_role_arn}"
   vpc_id           = "${module.vpc_services.vpc_id}"
   app_uri          = "${aws_ecr_repository.transformer.repository_url}:${var.release_id}"
@@ -69,9 +72,8 @@ module "transformer" {
 
 module "id_minter" {
   source           = "./services"
-  service_name     = "id-minter"
+  name             = "id_minter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
-  task_name        = "id_minter"
   task_role_arn    = "${module.ecs_id_minter_iam.task_role_arn}"
   vpc_id           = "${module.vpc_services.vpc_id}"
   app_uri          = "${aws_ecr_repository.id_minter.repository_url}:${var.release_id}"
@@ -91,9 +93,8 @@ module "id_minter" {
 
 module "api" {
   source        = "./services"
-  service_name  = "api"
+  name          = "api"
   cluster_id    = "${aws_ecs_cluster.api.id}"
-  task_name     = "api"
   task_role_arn = "${module.ecs_api_iam.task_role_arn}"
   vpc_id        = "${module.vpc_api.vpc_id}"
   app_uri       = "${aws_ecr_repository.api.repository_url}:${var.release_id}"
@@ -111,9 +112,8 @@ module "api" {
 
 module "jenkins" {
   source           = "./services"
-  service_name     = "jenkins"
+  name             = "jenkins"
   cluster_id       = "${aws_ecs_cluster.tools.id}"
-  task_name        = "jenkins"
   task_role_arn    = "${module.ecs_tools_iam.task_role_arn}"
   container_name   = "jenkins"
   container_port   = "8080"
