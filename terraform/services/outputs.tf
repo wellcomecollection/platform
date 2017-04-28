@@ -1,5 +1,5 @@
 output "service_name" {
-  value = "${var.service_name}"
+  value = "${var.name}"
 }
 
 output "target_group_arn" {
