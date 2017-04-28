@@ -1,6 +1,6 @@
 module "service" {
   source              = "./ecs_service"
-  service_name        = "${var.service_name}"
+  service_name        = "${var.name}"
   cluster_id          = "${var.cluster_id}"
   task_definition_arn = "${module.task.arn}"
   vpc_id              = "${var.vpc_id}"
@@ -16,7 +16,7 @@ module "service" {
 
 module "task" {
   source           = "./ecs_tasks"
-  task_name        = "${var.task_name}"
+  task_name        = "${var.name}"
   task_role_arn    = "${var.task_role_arn}"
   volume_name      = "${var.volume_name}"
   volume_host_path = "${var.volume_host_path}"

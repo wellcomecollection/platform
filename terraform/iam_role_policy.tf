@@ -81,3 +81,19 @@ resource "aws_iam_role_policy" "lambda_service_scheduler_sns" {
   role   = "${module.lambda_service_scheduler.role_name}"
   policy = "${data.aws_iam_policy_document.publish_to_scheduler_sns.json}"
 }
+
+# Role policies for the Update ECS Service Size Lambda
+
+resource "aws_iam_role_policy" "update_ecs_service_size_policy" {
+  name   = "lambda_update_ecs_service_size"
+  role   = "${module.lambda_update_ecs_service_size.role_name}"
+  policy = "${data.aws_iam_policy_document.update_ecs_service_size.json}"
+}
+
+# Role policies for the Stop Running Tasks Lambda
+
+resource "aws_iam_role_policy" "stop_running_tasks_policy" {
+  name   = "lambda_stop_running_tasks"
+  role   = "${module.lambda_stop_running_tasks.role_name}"
+  policy = "${data.aws_iam_policy_document.stop_running_tasks.json}"
+}
