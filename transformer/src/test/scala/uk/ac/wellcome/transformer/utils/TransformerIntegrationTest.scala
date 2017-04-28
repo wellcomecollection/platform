@@ -18,7 +18,7 @@ trait TransformerIntegrationTest
     with Eventually
     with IntegrationPatience {
 
-  override def topicName: String = "test_id_minter"
+  val idMinterTopicArn = createTopicAndReturnArn("test_id_minter")
 
   object LocalKinesisModule extends TwitterModule {
 

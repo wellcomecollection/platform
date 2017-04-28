@@ -18,13 +18,13 @@ class IngestorIntegrationTest
     with Matchers
     with ElasticSearchLocal {
 
-  override def queueName: String = "test_es_ingestor_queue"
+  val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
   val itemType = "item"
   override def injector: Injector = {
     TestInjector(
       flags = Map(
         "aws.region" -> "eu-west-1",
-        "aws.sqs.queue.url" -> queueUrl,
+        "aws.sqs.queue.url" -> ingestorQueueUrl,
         "aws.sqs.waitTime" -> "1",
         "es.host" -> "localhost",
         "es.port" -> "9300",
@@ -55,7 +55,7 @@ class IngestorIntegrationTest
       .get
 
     sqsClient.sendMessage(
-      queueUrl,
+      ingestorQueueUrl,
       JsonUtil
         .toJson(
           SQSMessage(Some("identified-item"),

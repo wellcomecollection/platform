@@ -26,16 +26,16 @@ class IdMinterIntegrationTest
     with Eventually
     with IntegrationPatience {
 
-  override def topicName: String = "test_ingestor"
-  override def queueName: String = "test_id_minter"
+  val ingestorTopicArn = createTopicAndReturnArn("test_ingestor")
+  val idMinterQueue = createQueueAndReturnUrl("test_id_minter")
 
   override val injector =
     TestInjector(
       flags = Map(
         "aws.region" -> "local",
-        "aws.sqs.queue.url" -> queueUrl,
+        "aws.sqs.queue.url" -> idMinterQueue,
         "aws.sqs.waitTime" -> "1",
-        "aws.sns.topic.arn" -> topicArn,
+        "aws.sns.topic.arn" -> ingestorTopicArn,
         "aws.dynamo.tableName" -> identifiersTableName
       ),
       modules = Seq(AkkaModule,
@@ -60,7 +60,7 @@ class IdMinterIntegrationTest
                                 "messageType",
                                 "timestamp")
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
 
     IdMinterModule.singletonStartup(injector)
 
@@ -84,7 +84,7 @@ class IdMinterIntegrationTest
     val firstMiroId = "1234"
     val sqsMessage = generateSqsMessage(firstMiroId)
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
 
     IdMinterModule.singletonStartup(injector)
 
@@ -95,7 +95,7 @@ class IdMinterIntegrationTest
 
     val secondMiroId = "5678"
     val secondSqsMessage = generateSqsMessage(secondMiroId)
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(secondSqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(secondSqsMessage).get)
 
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
@@ -105,14 +105,14 @@ class IdMinterIntegrationTest
   }
 
   test("it should keep polling if something fails processing a message") {
-    sqsClient.sendMessage(queueUrl, "not a json string")
+    sqsClient.sendMessage(idMinterQueue, "not a json string")
 
     IdMinterModule.singletonStartup(injector)
 
     val miroId = "1234"
     val sqsMessage = generateSqsMessage(miroId)
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
         'MiroID -> miroId) should have size (1)
