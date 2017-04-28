@@ -9,9 +9,15 @@ module "calm_adapter" {
   listener_arn     = "${module.services_alb.listener_arn}"
   path_pattern     = "/calm_adapter/*"
   alb_priority     = "101"
-  desired_count    = "0"
   healthcheck_path = "/calm_adapter/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+
+  # The Calm adapter is disabled when not running.  It only runs once a day
+  # because the last_changed date on Calm records has per-day granularity.
+  #
+  # A scheduled Lambda sets the desired count to 1 on weekdays, and the
+  # adapter resets it to zero when it finished running.
+  desired_count = "0"
 
   config_vars = {
     table_name = "${aws_dynamodb_table.calm_table.name}"
