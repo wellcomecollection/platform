@@ -1,6 +1,6 @@
 module "calm_adapter" {
   source           = "./services"
-  service_name     = "calm-adapter"
+  service_name     = "calm_adapter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_name        = "calm_adapter"
   task_role_arn    = "${module.ecs_calm_adapter_iam.task_role_arn}"
@@ -69,7 +69,7 @@ module "transformer" {
 
 module "id_minter" {
   source           = "./services"
-  service_name     = "id-minter"
+  service_name     = "id_minter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_name        = "id_minter"
   task_role_arn    = "${module.ecs_id_minter_iam.task_role_arn}"
