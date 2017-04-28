@@ -1,3 +1,7 @@
+variable "name" {
+  description = "Name of the ECS service and task to create"
+}
+
 variable "alb_priority" {
   description = "ALB listener rule priority"
   default     = "100"
@@ -8,16 +12,8 @@ variable "desired_count" {
   default     = "1"
 }
 
-variable "service_name" {
-  description = "Name of the ECS service to create"
-}
-
 variable "cluster_id" {
   description = "ID of the cluster which this service should run in"
-}
-
-variable "task_name" {
-  description = "Name of the task to create"
 }
 
 variable "template_name" {
