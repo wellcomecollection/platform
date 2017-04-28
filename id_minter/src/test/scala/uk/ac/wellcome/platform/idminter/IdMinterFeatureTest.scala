@@ -3,23 +3,20 @@ package uk.ac.wellcome.platform.idminter
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
-import com.twitter.inject.IntegrationTest
-import com.twitter.inject.app.TestInjector
+import com.twitter.finatra.http.EmbeddedHttpServer
+import com.twitter.inject.server.FeatureTestMixin
+import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedUnifiedItem,
-  Identifier,
-  SourceIdentifier,
-  UnifiedItem
-}
+import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
-class IdMinterIntegrationTest
-    extends IntegrationTest
+class IdMinterFeatureTest
+    extends FunSpec
+    with FeatureTestMixin
     with SQSLocal
     with DynamoDBLocal
     with SNSLocal
@@ -29,26 +26,26 @@ class IdMinterIntegrationTest
   val ingestorTopicArn = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue = createQueueAndReturnUrl("test_id_minter")
 
-  override val injector =
-    TestInjector(
-      flags = Map(
-        "aws.region" -> "local",
-        "aws.sqs.queue.url" -> idMinterQueue,
-        "aws.sqs.waitTime" -> "1",
-        "aws.sns.topic.arn" -> ingestorTopicArn,
-        "aws.dynamo.tableName" -> identifiersTableName
-      ),
-      modules = Seq(AkkaModule,
-                    LocalSNSClient,
-                    DynamoDBLocalClientModule,
-                    SQSReaderModule,
-                    SQSLocalClientModule,
-                    SNSConfigModule,
-                    SQSConfigModule,
-                    DynamoConfigModule)
-    )
+  override val server = new EmbeddedHttpServer(new Server(){
+    override val modules = Seq(AkkaModule,
+      LocalSNSClient,
+      DynamoDBLocalClientModule,
+      SQSReaderModule,
+      SQSLocalClientModule,
+      SNSConfigModule,
+      SQSConfigModule,
+      DynamoConfigModule,
+      IdMinterModule)
+  },
+    flags = Map(
+    "aws.region" -> "local",
+    "aws.sqs.queue.url" -> idMinterQueue,
+    "aws.sqs.waitTime" -> "1",
+    "aws.sns.topic.arn" -> ingestorTopicArn,
+    "aws.dynamo.tableName" -> identifiersTableName
+  ))
 
-  test("it should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
+  it("should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
     val unifiedItem =
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", "1234")),
@@ -60,8 +57,6 @@ class IdMinterIntegrationTest
                                 "timestamp")
 
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
-
-    IdMinterModule.singletonStartup(injector)
 
     eventually {
       val dynamoIdentifiersRecords =
@@ -79,13 +74,11 @@ class IdMinterIntegrationTest
     }
   }
 
-  test("it should keep polling the SQS queue for new messages") {
+  it("should keep polling the SQS queue for new messages") {
     val firstMiroId = "1234"
     val sqsMessage = generateSqsMessage(firstMiroId)
 
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
-
-    IdMinterModule.singletonStartup(injector)
 
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
@@ -103,10 +96,8 @@ class IdMinterIntegrationTest
     }
   }
 
-  test("it should keep polling if something fails processing a message") {
+  it("should keep polling if something fails processing a message") {
     sqsClient.sendMessage(idMinterQueue, "not a json string")
-
-    IdMinterModule.singletonStartup(injector)
 
     val miroId = "1234"
     val sqsMessage = generateSqsMessage(miroId)
