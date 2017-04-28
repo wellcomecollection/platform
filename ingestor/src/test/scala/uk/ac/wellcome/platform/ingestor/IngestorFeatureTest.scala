@@ -20,7 +20,7 @@ class IngestorFeatureTest
     with Matchers
     with ElasticSearchLocal with ScalaFutures{
 
-  override def queueName: String = "test_es_ingestor_queue"
+  val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
   val indexName = "records"
   val itemType = "item"
 
@@ -35,7 +35,7 @@ class IngestorFeatureTest
     },
     flags = Map(
       "aws.region" -> "eu-west-1",
-      "aws.sqs.queue.url" -> queueUrl,
+      "aws.sqs.queue.url" -> ingestorQueueUrl,
       "aws.sqs.waitTime" -> "1",
       "es.host" -> "localhost",
       "es.port" -> "9300",
@@ -59,7 +59,7 @@ class IngestorFeatureTest
       .get
 
     sqsClient.sendMessage(
-      queueUrl,
+      ingestorQueueUrl,
       JsonUtil
         .toJson(
           SQSMessage(Some("identified-item"),
