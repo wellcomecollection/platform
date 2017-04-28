@@ -14,7 +14,7 @@ import org.apache.http.client.methods.HttpDelete
 import org.apache.http.impl.client.DefaultHttpClient
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-trait SNSLocal extends BeforeAndAfterEach with Logging {this: Suite =>
+trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
   def topicName: String
   private val localSNSEndpointUrl = "http://localhost:9292"
@@ -76,4 +76,6 @@ messages:
 
 case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
 case class TopicInfo(arn: String, name: String)
-case class MessageInfo(@JsonProperty(":id") messageId: String, @JsonProperty(":message")message: String, @JsonProperty(":subject")subject: String)
+case class MessageInfo(@JsonProperty(":id") messageId: String,
+                       @JsonProperty(":message") message: String,
+                       @JsonProperty(":subject") subject: String)
