@@ -26,7 +26,7 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
         "aws.dynamo.streams.appName" -> "test-transformer-calm",
         "aws.dynamo.streams.arn" -> calmDataStreamArn,
         "aws.dynamo.tableName" -> calmDataTableName,
-        "aws.sns.topic.arn" -> topicArn
+        "aws.sns.topic.arn" -> idMinterTopicArn
       ),
       modules = Seq(
         StreamsRecordProcessorFactoryModule,

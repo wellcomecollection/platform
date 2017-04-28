@@ -26,7 +26,7 @@ class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
         "aws.dynamo.streams.appName" -> "test-transformer-miro",
         "aws.dynamo.streams.arn" -> miroDataStreamArn,
         "aws.dynamo.tableName" -> miroDataTableName,
-        "aws.sns.topic.arn" -> topicArn
+        "aws.sns.topic.arn" -> idMinterTopicArn
       ),
       modules = Seq(
         StreamsRecordProcessorFactoryModule,
