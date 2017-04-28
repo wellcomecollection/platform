@@ -1,53 +1,30 @@
 package uk.ac.wellcome.transformer
 
 import com.gu.scanamo.Scanamo
-import com.twitter.inject.Injector
-import com.twitter.inject.app.TestInjector
-import uk.ac.wellcome.finatra.modules._
+import com.twitter.finatra.http.EmbeddedHttpServer
+import org.scalatest.FunSpec
 import uk.ac.wellcome.models.{MiroTransformable, SourceIdentifier, UnifiedItem}
-import uk.ac.wellcome.platform.transformer.modules.{
-  KinesisWorker,
-  StreamsRecordProcessorFactoryModule
-}
 import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.transformer.modules.{
-  AmazonCloudWatchModule,
-  TransformableParserModule
-}
-import uk.ac.wellcome.transformer.utils.TransformerIntegrationTest
+import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 
-class MiroTransformerIntegrationTest extends TransformerIntegrationTest {
+class MiroTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
 
-  override def injector: Injector =
-    TestInjector(
-      flags = Map(
-        "aws.region" -> "eu-west-1",
-        "aws.dynamo.streams.appName" -> "test-transformer-miro",
-        "aws.dynamo.streams.arn" -> miroDataStreamArn,
-        "aws.dynamo.tableName" -> miroDataTableName,
-        "aws.sns.topic.arn" -> idMinterTopicArn
-      ),
-      modules = Seq(
-        StreamsRecordProcessorFactoryModule,
-        DynamoConfigModule,
-        AkkaModule,
-        TransformableParserModule,
-        SNSConfigModule,
-        AmazonCloudWatchModule,
-        LocalKinesisClientLibConfigurationModule,
-        LocalSNSClient,
-        DynamoDBLocalClientModule,
-        LocalKinesisModule
-      )
+  override val server = new EmbeddedHttpServer(
+    transformerServer,
+    flags = Map(
+      "aws.region" -> "eu-west-1",
+      "aws.dynamo.streams.appName" -> "test-transformer-miro",
+      "aws.dynamo.streams.arn" -> miroDataStreamArn,
+      "aws.dynamo.tableName" -> miroDataTableName,
+      "aws.sns.topic.arn" -> idMinterTopicArn
     )
+  )
 
-  test("it should poll the dynamo stream for miro data, transform it into unified items and push them into the id_minter SNS topic") {
+  it("should poll the dynamo stream for miro data, transform it into unified items and push them into the id_minter SNS topic") {
     val miroId = "1234"
     val imageTitle = "some image title"
     putMiroImageInDynamoDb(miroId, imageTitle)
-
-    KinesisWorker.singletonStartup(injector)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()

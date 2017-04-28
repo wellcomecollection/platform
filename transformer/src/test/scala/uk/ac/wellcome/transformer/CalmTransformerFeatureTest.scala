@@ -1,56 +1,33 @@
 package uk.ac.wellcome.transformer
 
 import com.gu.scanamo.Scanamo
-import com.twitter.inject.Injector
-import com.twitter.inject.app.TestInjector
-import uk.ac.wellcome.finatra.modules._
+import com.twitter.finatra.http.EmbeddedHttpServer
+import org.scalatest.FunSpec
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, UnifiedItem}
-import uk.ac.wellcome.platform.transformer.modules.{
-  KinesisWorker,
-  StreamsRecordProcessorFactoryModule
-}
 import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.transformer.modules.{
-  AmazonCloudWatchModule,
-  TransformableParserModule
-}
-import uk.ac.wellcome.transformer.utils.TransformerIntegrationTest
+import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 
-class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
+class CalmTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
 
-  override def injector: Injector =
-    TestInjector(
-      flags = Map(
-        "aws.region" -> "eu-west-1",
-        "aws.dynamo.streams.appName" -> "test-transformer-calm",
-        "aws.dynamo.streams.arn" -> calmDataStreamArn,
-        "aws.dynamo.tableName" -> calmDataTableName,
-        "aws.sns.topic.arn" -> idMinterTopicArn
-      ),
-      modules = Seq(
-        StreamsRecordProcessorFactoryModule,
-        LocalKinesisClientLibConfigurationModule,
-        DynamoConfigModule,
-        AkkaModule,
-        TransformableParserModule,
-        SNSConfigModule,
-        AmazonCloudWatchModule,
-        LocalSNSClient,
-        DynamoDBLocalClientModule,
-        LocalKinesisModule
-      )
+  override val server = new EmbeddedHttpServer(
+    transformerServer,
+    flags = Map(
+      "aws.region" -> "eu-west-1",
+      "aws.dynamo.streams.appName" -> "test-transformer-calm",
+      "aws.dynamo.streams.arn" -> calmDataStreamArn,
+      "aws.dynamo.tableName" -> calmDataTableName,
+      "aws.sns.topic.arn" -> idMinterTopicArn
     )
+  )
 
-  test("it should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
+  it("should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     Scanamo.put(dynamoDbClient)(calmDataTableName)(
       CalmTransformable(RecordID = "RecordID1",
                         RecordType = "Collection",
                         AltRefNo = "AltRefNo1",
                         RefNo = "RefNo1",
                         data = """{"AccessStatus": ["public"]}"""))
-
-    KinesisWorker.singletonStartup(injector)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
