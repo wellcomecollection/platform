@@ -3,15 +3,19 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Logging, TwitterModule}
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.impl.client.DefaultHttpClient
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-trait SNSLocal extends BeforeAndAfterEach with Logging {this: Suite =>
+trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
-  def topicName: String
   private val localSNSEndpointUrl = "http://localhost:9292"
 
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
@@ -22,7 +26,9 @@ trait SNSLocal extends BeforeAndAfterEach with Logging {this: Suite =>
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  val topicArn = amazonSNS.createTopic(topicName).getTopicArn
+  def createTopicAndReturnArn(topicName: String) = {
+    amazonSNS.createTopic(topicName).getTopicArn
+  }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -30,9 +36,6 @@ trait SNSLocal extends BeforeAndAfterEach with Logging {this: Suite =>
       .execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
-  //TODO this is getting a bit complicated.
-  // Try using https://hub.docker.com/r/s12v/sns/ docker image instead of the current one and subscribe a sqs queue to it to check for messages.
-  // Couldn't make it work but should retry without proxies in local development machine
   def listMessagesReceivedFromSNS(): List[MessageInfo] = {
     /*
 This is a sample returned by the fake-sns implementation:
@@ -54,38 +57,14 @@ messages:
      */
 
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
-    debug(s"""Messages received by fake-sns:
-         |$string""".stripMargin)
-    val indexOfFirstMessage = string.indexOf("- :id:")
-    if (indexOfFirstMessage < 0) {
-      Nil
-    } else {
-      string
-        .substring(indexOfFirstMessage + "- :".size)
-        .split("\n- ")
-        .map { messageDetails =>
-          val messageLines = messageDetails.split("\n\\s*:")
-          MessageInfo(
-            getMessageLine(messageLines, "id: "),
-            getMessageLine(messageLines, "message: ")
-              .replace("'", "")
-              .replace("\n   ", ""),
-            getMessageLine(messageLines, "subject: ")
-          )
-        }
-        .toList
-    }
-  }
 
-  private def getMessageLine(messageLines: Array[String],
-                             fieldName: String): String = {
-    messageLines
-      .filter(_.contains(fieldName))
-      .map {
-        _.replace(fieldName, "").trim
-      }
-      .headOption
-      .getOrElse("")
+    val mapper = new ObjectMapper(new YAMLFactory()) with ScalaObjectMapper
+
+    mapper.registerModule(DefaultScalaModule)
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+    val messages: Messages = mapper.readValue(string, classOf[Messages])
+    messages.messages
   }
 
   object LocalSNSClient extends TwitterModule {
@@ -96,4 +75,8 @@ messages:
   }
 }
 
-case class MessageInfo(messageId: String, message: String, subject: String)
+case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
+case class TopicInfo(arn: String, name: String)
+case class MessageInfo(@JsonProperty(":id") messageId: String,
+                       @JsonProperty(":message") message: String,
+                       @JsonProperty(":subject") subject: String)
