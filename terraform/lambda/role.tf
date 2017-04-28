@@ -25,7 +25,6 @@ resource "aws_iam_role_policy" "cloudwatch_logs" {
 data "aws_iam_policy_document" "cloudwatch_logs" {
   statement {
     actions = [
-      "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
