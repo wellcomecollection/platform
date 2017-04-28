@@ -16,6 +16,7 @@ object Dependencies {
     val junitInterface = "0.11"
     val elastic4s = "5.1.5"
     val scanamo = "0.9.1"
+    val jacksonYamlVersion = "2.8.8"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -58,6 +59,7 @@ object Dependencies {
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion %" test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies
 
