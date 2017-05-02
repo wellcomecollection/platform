@@ -5,9 +5,7 @@ import javax.inject.Inject
 import akka.actor.{Actor, PoisonPill}
 import com.google.inject.name.Named
 import com.twitter.inject.Logging
-
-import uk.ac.wellcome.models.ActorRegister
-
+import uk.ac.wellcome.calm_adapter.models.ActorRegister
 import uk.ac.wellcome.platform.calm_adapter.modules._
 import uk.ac.wellcome.platform.calm_adapter.services._
 

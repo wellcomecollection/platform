@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
-import uk.ac.wellcome.platform.ingestor.ElasticSearchLocal
+import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -25,7 +25,7 @@ class IdentifiedUnifiedItemIndexerTest
         IdentifiedUnifiedItem(
           canonicalId = "5678",
           unifiedItem = UnifiedItem(
-            identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")))))
+            identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")))
       .get
 
     val future = identifiedUnifiedItemIndexer.indexIdentifiedUnifiedItem(

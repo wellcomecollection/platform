@@ -1,10 +1,11 @@
-package uk.ac.wellcome.finatra.exceptions
+package uk.ac.wellcome.platform.api.finatra.exceptions
 
-import org.elasticsearch.ElasticsearchException
-import com.twitter.finagle.http.{Request, Response}
-import com.twitter.finatra.http.response.ResponseBuilder
-import com.twitter.finatra.http.exceptions.ExceptionMapper
 import javax.inject.{Inject, Singleton}
+
+import com.twitter.finagle.http.{Request, Response}
+import com.twitter.finatra.http.exceptions.ExceptionMapper
+import com.twitter.finatra.http.response.ResponseBuilder
+import org.elasticsearch.ElasticsearchException
 
 case class ErrorResponse(
   message: String
