@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.ingestor
+package uk.ac.wellcome.test.utils
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
@@ -22,20 +22,22 @@ trait ElasticSearchLocal
   val elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
+  val index = "records"
+
   override def beforeAll(): Unit = {
     // Elasticsearch takes a while to start up so check that it actually started before running tests
     eventually {
       elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
     }
 
-    if (!elasticClient.execute(indexExists("records")).await.isExists)
-      elasticClient.execute(createIndex("records")).await
+    if (!elasticClient.execute(indexExists(index)).await.isExists)
+      elasticClient.execute(createIndex(index)).await
 
     super.beforeAll()
   }
 
   override def beforeEach(): Unit = {
-    elasticClient.execute(deleteIn("records").by(matchAllQuery())).await
+    elasticClient.execute(deleteIn(index).by(matchAllQuery())).await
     super.beforeEach()
   }
 }

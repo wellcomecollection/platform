@@ -29,7 +29,7 @@ class IdentifierGeneratorTest
 
     val unifiedItem =
       UnifiedItem(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")))
+        identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")
     val futureId = identifierGenerator.generateId(unifiedItem)
 
     whenReady(futureId) { id =>
@@ -40,7 +40,7 @@ class IdentifierGeneratorTest
   it("should generate an id and save it in the database if a record doesn't already exist") {
     val unifiedItem =
       UnifiedItem(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")))
+        identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")
     val futureId = identifierGenerator.generateId(unifiedItem)
 
     whenReady(futureId) { id =>
@@ -54,7 +54,7 @@ class IdentifierGeneratorTest
   it("should reject an item with no miroId in the list of Identifiers") {
     val unifiedItem =
       UnifiedItem(
-        identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")))
+        identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")), label = "some label")
     val futureId = identifierGenerator.generateId(unifiedItem)
 
     whenReady(futureId.failed) { exception =>
@@ -71,7 +71,7 @@ class IdentifierGeneratorTest
 
     val unifiedItem =
       UnifiedItem(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)))
+        identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)), label = "some label")
     val futureId = identifierGenerator.generateId(unifiedItem)
 
     whenReady(futureId.failed) { exception =>

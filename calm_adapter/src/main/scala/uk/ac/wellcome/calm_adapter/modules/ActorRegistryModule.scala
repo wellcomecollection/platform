@@ -1,25 +1,18 @@
 package uk.ac.wellcome.platform.calm_adapter.modules
 
 import javax.inject.Singleton
+
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import akka.actor.{ActorRef, ActorSystem, Props}
-
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.platform.calm_adapter.services._
-
 import uk.ac.wellcome.utils.GuiceAkkaExtension
 import net.codingwell.scalaguice.ScalaModule
-import uk.ac.wellcome.models.ActorRegister
-
 import akka.actor.Actor
 import com.google.inject.name.Names
-
-import uk.ac.wellcome.finatra.modules.{
-  DynamoClientModule,
-  DynamoConfigModule,
-  AkkaModule
-}
+import uk.ac.wellcome.calm_adapter.models.ActorRegister
+import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoClientModule, DynamoConfigModule}
 
 object ActorRegistryModule extends TwitterModule {
 

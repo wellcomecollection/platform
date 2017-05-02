@@ -54,7 +54,7 @@ class MiroTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
       .toJson(
         UnifiedItem(identifiers =
                       List(SourceIdentifier("Miro", "MiroID", miroId)),
-                    title = Some(imageTitle)))
+                    label = imageTitle))
       .get
   }
 
