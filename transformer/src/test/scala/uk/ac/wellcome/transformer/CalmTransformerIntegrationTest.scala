@@ -83,6 +83,7 @@ class CalmTransformerIntegrationTest extends TransformerIntegrationTest {
       .toJson(
         UnifiedItem(
           identifiers = List(SourceIdentifier("source", "key", "value")),
+          label = "calm data label",
           accessStatus = AccessStatus
         ))
       .get

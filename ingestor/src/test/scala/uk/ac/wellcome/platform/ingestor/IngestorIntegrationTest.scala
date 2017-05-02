@@ -8,7 +8,7 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
 import uk.ac.wellcome.platform.ingestor.modules.SQSWorker
-import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.test.utils.{ElasticSearchLocal, SQSLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -19,7 +19,6 @@ class IngestorIntegrationTest
     with ElasticSearchLocal {
 
   val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
-  val index = "records"
   val itemType = "item"
   override def injector: Injector = {
     TestInjector(
@@ -52,7 +51,7 @@ class IngestorIntegrationTest
         IdentifiedUnifiedItem(
           canonicalId = "1234",
           unifiedItem = UnifiedItem(
-            identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")))))
+            identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")), label = "some label")))
       .get
 
     sqsClient.sendMessage(
