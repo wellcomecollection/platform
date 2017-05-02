@@ -18,6 +18,7 @@ class UnifiedItemExtractorTest
     val unifiedItem =
       UnifiedItem(identifiers =
                     List(SourceIdentifier("Miro", "MiroId", "1234")),
+                  label = "this is the item label",
                   accessStatus = Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(unifiedItem).get,

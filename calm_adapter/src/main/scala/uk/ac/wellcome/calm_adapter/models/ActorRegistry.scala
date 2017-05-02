@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.calm_adapter.models
 
 import akka.actor.ActorRef
 
