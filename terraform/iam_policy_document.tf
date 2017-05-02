@@ -64,7 +64,7 @@ data "aws_iam_policy_document" "read_calm_kinesis_stream" {
 data "aws_iam_policy_document" "read_ingestor_q" {
   statement {
     actions = [
-      "sqs:SendMessage",
+      "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
     ]
 
@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "read_ingestor_q" {
 data "aws_iam_policy_document" "read_id_minter_q" {
   statement {
     actions = [
-      "sqs:SendMessage",
+      "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
     ]
 
