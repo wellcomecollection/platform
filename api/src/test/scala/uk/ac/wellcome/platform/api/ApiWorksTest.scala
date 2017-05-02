@@ -33,13 +33,13 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
 
     val firstIdentifiedUnifiedItem =
       identifiedUnifiedItemWith(canonicalId = "1234",
-                                label = "this is the first image title")
+                                label = "this is the first image label")
     val secondIdentifiedUnifiedItem =
       identifiedUnifiedItemWith(canonicalId = "4321",
-                                label = "this is the second image title")
+                                label = "this is the second image label")
     val thirdIdentifiedUnifiedItem =
       identifiedUnifiedItemWith(canonicalId = "9876",
-                                label = "this is the third image title")
+                                label = "this is the third image label")
 
     insertIntoElasticSearch(firstIdentifiedUnifiedItem)
     insertIntoElasticSearch(secondIdentifiedUnifiedItem)
