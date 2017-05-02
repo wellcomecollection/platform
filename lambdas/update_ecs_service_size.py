@@ -28,12 +28,12 @@ def change_desired_count(cluster, service, desired_count):
         service=service,
         desiredCount=desired_count
     )
-    print('ECS response: %r' % resp)
+    print(f'ECS response: {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
 def main(event, _):
-    print('Received event: %r' % event)
+    print(f'Received event: {event!r}')
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 

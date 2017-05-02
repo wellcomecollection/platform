@@ -33,7 +33,7 @@ def identify_cluster_by_app_name(ecs, app_name):
             if serviceName == app_name:
                 return cluster
 
-    raise RuntimeError('Unable to find ECS cluster for %s' % app_name)
+    raise RuntimeError(f'Unable to find ECS cluster for {app_name}')
 
 
 def stop_running_tasks(app_name):
@@ -56,12 +56,12 @@ def stop_running_tasks(app_name):
 
 
 def main(event, _):
-    print('Received event: %r' % event)
+    print(f'Received event: {event!r}')
     records = event['Records']
     assert len(records) == 1
     changed_object_key = records[0]['s3']['object']['key']
     match = re.match(r'^config/prod/(?P<app>[a-z_]+)\.ini', changed_object_key)
     assert match is not None
     app_name = match.group('app')
-    print('Stopping tasks for %s' % app_name)
+    print(f'Stopping tasks for {app_name}')
     stop_running_tasks(app_name=app_name)
