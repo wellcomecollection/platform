@@ -34,17 +34,17 @@ then
   exit 0
 fi
 
-sbt "project $PROJECT" stage;
-export RELEASE_ID="0.0.1-$(git rev-parse HEAD)_prod";
-$(aws ecr get-login);
+sbt "project $PROJECT" stage
+export RELEASE_ID="0.0.1-$(git rev-parse HEAD)_prod"
+$(aws ecr get-login)
 
 docker build  \
         --build-arg project=$PROJECT \
         --build-arg config_bucket=$CONFIG_BUCKET \
         --build-arg build_env=prod \
-        --tag=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID .;
+        --tag=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID .
 
-docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID;
+docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID
 echo "New container image is $RELEASE_ID"
 
 export TARGET_FILE="terraform_$PROJECT.tfvars"
