@@ -1,11 +1,3 @@
-# Role policies for Jenkins
-
-resource "aws_iam_role_policy" "ecs_jenkins_task" {
-  name   = "ecs_task_jenkins_policy"
-  role   = "${module.ecs_tools_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_everything.json}"
-}
-
 # Role policies for the Elasticsearch ingestor
 
 resource "aws_iam_role_policy" "ecs_ingestor_task_read_ingestor_q" {
