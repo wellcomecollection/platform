@@ -162,3 +162,30 @@ data "aws_iam_policy_document" "stop_running_tasks" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "travis_permissions" {
+  statement {
+    actions = [
+      "ecr:*",
+    ]
+
+    resources = [
+      "${aws_ecr_repository.api.arn}",
+      "${aws_ecr_repository.transformer.arn}",
+      "${aws_ecr_repository.ingestor.arn}",
+      "${aws_ecr_repository.id_minter.arn}",
+      "${aws_ecr_repository.calm_adapter.arn}",
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}",
+    ]
+  }
+}
