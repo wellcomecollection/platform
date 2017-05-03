@@ -49,6 +49,6 @@ echo "New container image is $RELEASE_ID"
 
 export TARGET_FILE="terraform_$PROJECT.tfvars"
 echo "release_id_$PROJECT = \"$RELEASE_ID\"" > "$TARGET_FILE"
-aws s3 cp "$TARGET_FILE" "s3://$CONFIG_BUCKET/$TARGET_FILE"
+aws s3 cp "$TARGET_FILE" "s3://$CONFIG_BUCKET/releases/$TARGET_FILE"
 
 exit 0
