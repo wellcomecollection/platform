@@ -6,7 +6,7 @@ ARG project
 
 RUN apk update && apk add python3 && pip3 install awscli && rm -rf /var/cache/apk
 
-ADD $project/target/docker/stage/opt /opt
+ADD $project/target/universal/stage /opt/docker
 RUN chown -R daemon:daemon /opt/docker
 USER daemon
 
