@@ -47,8 +47,6 @@ docker build  \
 docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID
 echo "New container image is $RELEASE_ID"
 
-export TARGET_FILE="terraform_$PROJECT.tfvars"
-echo "release_id_$PROJECT = \"$RELEASE_ID\"" > "$TARGET_FILE"
-aws s3 cp "$TARGET_FILE" "s3://$CONFIG_BUCKET/releases/$TARGET_FILE"
+echo "$RELEASE_ID" | aws s3 cp - "s3://$CONFIG_BUCKET/releases/$PROJECT"
 
 exit 0
