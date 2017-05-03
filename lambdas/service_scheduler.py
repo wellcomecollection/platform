@@ -29,12 +29,12 @@ def publish_sns_message(topic_arn, cluster, service, desired_count):
             })
         })
     )
-    print('SNS response: %r' % resp)
+    print(f'SNS response: {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
 def main(event, _):
-    print('Received event: %r' % event)
+    print(f'Received event: {event!r}')
     publish_sns_message(
         topic_arn=event['topic_arn'],
         cluster=event['cluster'],
