@@ -3,23 +3,16 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{
-  AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder,
-  AmazonDynamoDBStreamsClientBuilder
-}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreamsClientBuilder}
 import com.google.inject.{Provides, Singleton}
 import com.gu.scanamo.Scanamo
 import com.twitter.inject.TwitterModule
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
+import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.Identifier
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal
-    extends Suite
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll {
+trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
@@ -44,10 +37,8 @@ trait DynamoDBLocal
   private val miroDataTable = createMiroDataTable()
   private val calmDataTable = createCalmDataTable()
 
-  protected val miroDataStreamArn =
-    miroDataTable.getTableDescription.getLatestStreamArn
-  protected val calmDataStreamArn =
-    calmDataTable.getTableDescription.getLatestStreamArn
+  protected val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
+  protected val calmDataStreamArn = calmDataTable.getTableDescription.getLatestStreamArn
 
   protected val streamsClient = AmazonDynamoDBStreamsClientBuilder
     .standard()
@@ -58,9 +49,7 @@ trait DynamoDBLocal
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    dynamoDbClient
-      .listTables()
-      .getTableNames
+      List(identifiersTableName, miroDataTableName, calmDataTableName)
       .foreach(tableName => clearTable(tableName))
   }
 
@@ -70,7 +59,7 @@ trait DynamoDBLocal
         dynamoDbClient.deleteItem(
           tableName,
           Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
-      case _ => throw new Exception("Unable to clear the table")
+      case _ => throw new Exception(s"Unable to clear the table $tableName")
     }
 
   private def deleteTables() = {
