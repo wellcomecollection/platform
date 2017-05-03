@@ -27,8 +27,3 @@ module "ecs_api_iam" {
   source = "./ecs_iam"
   name   = "api"
 }
-
-module "ecs_tools_iam" {
-  source = "./ecs_iam"
-  name   = "tools"
-}

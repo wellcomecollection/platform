@@ -109,19 +109,3 @@ module "api" {
     es_xpack_user = "${var.es_config["xpack_user"]}"
   }
 }
-
-module "jenkins" {
-  source           = "./services"
-  name             = "jenkins"
-  cluster_id       = "${aws_ecs_cluster.tools.id}"
-  task_role_arn    = "${module.ecs_tools_iam.task_role_arn}"
-  container_name   = "jenkins"
-  container_port   = "8080"
-  vpc_id           = "${module.vpc_tools.vpc_id}"
-  volume_name      = "jenkins-home"
-  volume_host_path = "/mnt/efs"
-  template_name    = "jenkins"
-  listener_arn     = "${module.tools_alb.listener_arn}"
-  healthcheck_path = "/login"
-  infra_bucket     = "${var.infra_bucket}"
-}
