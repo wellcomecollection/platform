@@ -6,19 +6,41 @@ import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
 import com.google.inject.{Provides, Singleton}
-import com.twitter.inject.{IntegrationTest, TwitterModule}
+import com.twitter.inject.TwitterModule
+import com.twitter.inject.server.FeatureTestMixin
+import org.scalatest.Suite
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoConfigModule, SNSConfigModule}
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.transformer.Server
+import uk.ac.wellcome.platform.transformer.modules.{KinesisWorker, StreamsRecordProcessorFactoryModule}
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal}
+import uk.ac.wellcome.transformer.modules.{AmazonCloudWatchModule, TransformableParserModule}
 
-trait TransformerIntegrationTest
-    extends IntegrationTest
+trait TransformerFeatureTest
+    extends FeatureTestMixin
     with SNSLocal
     with DynamoDBLocal
     with Eventually
-    with IntegrationPatience {
+    with IntegrationPatience { this: Suite =>
 
   val idMinterTopicArn = createTopicAndReturnArn("test_id_minter")
+
+  val transformerServer = new Server(){
+    override val modules = Seq(
+      StreamsRecordProcessorFactoryModule,
+      DynamoConfigModule,
+      AkkaModule,
+      TransformableParserModule,
+      SNSConfigModule,
+      AmazonCloudWatchModule,
+      LocalKinesisClientLibConfigurationModule,
+      LocalSNSClient,
+      DynamoDBLocalClientModule,
+      LocalKinesisModule,
+      KinesisWorker
+    )
+  }
 
   object LocalKinesisModule extends TwitterModule {
 
