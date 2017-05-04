@@ -16,14 +16,9 @@ class IdentifiableTest extends FunSpec with PropertyChecks with Matchers {
     }
   }
 
-  // We have a rule that identifiers can't start with a number, as this
-  // makes them awkward to use as a string in certain contexts.
   it("should never generate an identifier that starts with a number") {
     forAll(minSuccessful(100)) { (_: Int) =>
-      {
-        val id = Identifiable.generate
-        assert(!id.head.isDigit)
-      }
+      Identifiable.generate should not (startWith regex "[0-9]")
     }
   }
 
