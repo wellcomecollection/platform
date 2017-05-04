@@ -2,10 +2,10 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, UnifiedItem}
+import uk.ac.wellcome.models.{IdentifiedWork, Work}
 import uk.ac.wellcome.platform.idminter.steps.{
   IdentifierGenerator,
-  UnifiedItemExtractor
+  WorkExtractor
 }
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
@@ -31,17 +31,17 @@ object IdMinterModule extends TwitterModule with TryBackoff {
 
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
-        unifiedItem <- UnifiedItemExtractor.toUnifiedItem(message)
-        canonicalId <- idGenerator.generateId(unifiedItem)
+        work <- WorkExtractor.toWork(message)
+        canonicalId <- idGenerator.generateId(work)
         _ <- snsWriter.writeMessage(
-          toIdentifiedUnifiedItemJson(unifiedItem, canonicalId),
+          toIdentifiedWorkJson(work, canonicalId),
           Some(snsSubject))
       } yield ()
     }
   }
 
-  private def toIdentifiedUnifiedItemJson(unifiedItem: UnifiedItem,
+  private def toIdentifiedWorkJson(work: Work,
                                           canonicalId: String) = {
-    JsonUtil.toJson(IdentifiedUnifiedItem(canonicalId, unifiedItem)).get
+    JsonUtil.toJson(IdentifiedWork(canonicalId, work)).get
   }
 }

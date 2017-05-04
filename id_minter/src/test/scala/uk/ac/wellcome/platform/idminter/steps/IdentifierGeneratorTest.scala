@@ -5,7 +5,7 @@ import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{Identifier, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.DynamoDBLocal
 
 class IdentifierGeneratorTest
@@ -27,10 +27,10 @@ class IdentifierGeneratorTest
     Scanamo.put(dynamoDbClient)(identifiersTableName)(
       Identifier("5678", "1234"))
 
-    val unifiedItem =
-      UnifiedItem(
+    val work =
+      Work(
         identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")
-    val futureId = identifierGenerator.generateId(unifiedItem)
+    val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
       id shouldBe "5678"
@@ -38,10 +38,10 @@ class IdentifierGeneratorTest
   }
 
   it("should generate an id and save it in the database if a record doesn't already exist") {
-    val unifiedItem =
-      UnifiedItem(
+    val work =
+      Work(
         identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")
-    val futureId = identifierGenerator.generateId(unifiedItem)
+    val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
       id should not be (empty)
@@ -52,13 +52,13 @@ class IdentifierGeneratorTest
   }
 
   it("should reject an item with no miroId in the list of Identifiers") {
-    val unifiedItem =
-      UnifiedItem(
+    val work =
+      Work(
         identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")), label = "some label")
-    val futureId = identifierGenerator.generateId(unifiedItem)
+    val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId.failed) { exception =>
-      exception.getMessage shouldBe s"Item $unifiedItem did not contain a MiroID"
+      exception.getMessage shouldBe s"Item $work did not contain a MiroID"
     }
   }
 
@@ -69,10 +69,10 @@ class IdentifierGeneratorTest
     Scanamo.put(dynamoDbClient)(identifiersTableName)(
       Identifier("8765", miroId))
 
-    val unifiedItem =
-      UnifiedItem(
+    val work =
+      Work(
         identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)), label = "some label")
-    val futureId = identifierGenerator.generateId(unifiedItem)
+    val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId.failed) { exception =>
       exception.getMessage shouldBe s"Found more than one record with MiroID $miroId"

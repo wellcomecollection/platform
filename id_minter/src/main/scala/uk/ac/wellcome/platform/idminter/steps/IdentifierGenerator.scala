@@ -6,7 +6,7 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{Identifier, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.blocking
@@ -20,13 +20,13 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
 
   private val identifiersTableName = dynamoConfig.table
 
-  def generateId(unifiedItem: UnifiedItem): Future[String] =
-    findMiroID(unifiedItem) match {
+  def generateId(work: Work): Future[String] =
+    findMiroID(work) match {
       case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
       case None =>
-        error(s"Item $unifiedItem did not contain a MiroID")
+        error(s"Item $work did not contain a MiroID")
         Future.failed(
-          new Exception(s"Item $unifiedItem did not contain a MiroID"))
+          new Exception(s"Item $work did not contain a MiroID"))
     }
 
   private def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier) =
@@ -44,8 +44,8 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
           s"Error in parsing the object with MiroID ${identifier.value}")
     }
 
-  private def findMiroID(unifiedItem: UnifiedItem) = {
-    val maybeSourceIdentifier = unifiedItem.identifiers.find(identifier =>
+  private def findMiroID(work: Work) = {
+    val maybeSourceIdentifier = work.identifiers.find(identifier =>
       identifier.sourceId == "MiroID")
     info(s"SourceIdentifier: $maybeSourceIdentifier")
     maybeSourceIdentifier
