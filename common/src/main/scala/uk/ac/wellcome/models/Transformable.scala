@@ -35,7 +35,7 @@ case class MiroTransformable(MiroID: String,
   private def transformImagesA(miroData: MiroTransformableData): Work =
     Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
-      label = miroData.title.getOrElse("no label found"),
+      label = miroData.title.get,
       description = miroData.imageDesc,
       lettering = miroData.suppLettering,
       hasCreatedDate = None,
