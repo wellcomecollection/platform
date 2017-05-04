@@ -22,6 +22,8 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(ElasticClientModule)
 
+  private final val apiHost =
+    flag(name = "api.host", default = "localhost:8888", help = "API hostname")
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
   private final val apiVersion =
