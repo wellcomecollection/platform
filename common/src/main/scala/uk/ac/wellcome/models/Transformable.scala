@@ -15,10 +15,25 @@ case class MiroTransformable(MiroID: String,
     extends Transformable {
   override def transform: Try[Work] =
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
-      Work(identifiers =
-                    List(SourceIdentifier("Miro", "MiroID", MiroID)),
-                  label = miroData.image_title.getOrElse("no label found"))
+      MiroCollection match {
+        case "Images-A" => transform_imagesA(miroData)
+        case _ => throw new Exception(s"Unable to transform unknown collection $MiroCollection")
+      }
     }
+
+  // The mapping of Miro fields to UnifiedItem fields is quite rough,
+  // and based on a cursory expection of the Miro data.
+  // TODO: Get a proper mapping of fields.
+
+  private def transform_imagesA(miroData: MiroTransformableData): Try[UnifiedItem] =
+    UnifiedItem(
+      identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
+      label = miroData.image_title.getOrElse("<no label found>"),
+      description = miroData.image_image_desc.getOrElse("<no description found>"),
+      lettering = miroData.image_supp_lettering.getOrElse("<no lettering found>"),
+      hasCreatedDate = None,
+      hasCreator = List()
+    )
 }
 
 case class CalmDataTransformable(
