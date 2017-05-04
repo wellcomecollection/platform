@@ -7,3 +7,9 @@
 - [ ] Tests?
 - [ ] Docs?
 - [ ] Spoken to the right people?
+
+---
+
+<!-- Remove this section if you don't have Terraform changes -->
+
+- [ ] Run `terraform apply`.
