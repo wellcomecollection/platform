@@ -18,11 +18,15 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                                 @Flag("api.context") apiContext: String,
+                                @Flag("api.host") apiHost: String,
                                 elasticService: ElasticSearchService)
     extends Controller
-    with SwaggerSupport {
+    with SwaggerSupport
+    with ApiRequestUtils {
 
   override implicit protected val swagger = ApiSwagger
+
+  override val hostName = apiHost
 
   prefix(apiPrefix) {
     // This is a demo endpoint for the UX team to use when prototyping
@@ -63,7 +67,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           results =>
             response.ok.json(
               ResultListResponse(
-                context = ApiRequestUtils.hostUrl(request) + apiContext,
+                context = hostUrl(request) + apiContext,
                 results = results)))
     }
 
@@ -81,7 +85,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           case Some(result) =>
             response.ok.json(
               ResultResponse(
-                context = ApiRequestUtils.hostUrl(request) + apiContext,
+                context = hostUrl(request) + apiContext,
                 result = result))
           case None => response.notFound
         }
