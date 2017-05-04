@@ -51,7 +51,7 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
         andExpect = Status.Ok,
         withJsonBody = s"""
             |{
-            |  "@context": "http://${server.externalHttpHostAndPort}/catalogue/v0/context.json",
+            |  "@context": "http://localhost:8888/catalogue/v0/context.json",
             |  "type": "ResultList",
             |  "pageSize": 10,
             |  "results": [
@@ -89,7 +89,7 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
         andExpect = Status.Ok,
         withJsonBody = s"""
             |{
-            | "@context": "http://${server.externalHttpHostAndPort}/catalogue/v0/context.json",
+            | "@context": "http://localhost:8888/catalogue/v0/context.json",
             | "type": "Work",
             | "id": "1234",
             | "label": "this is the first image title"
