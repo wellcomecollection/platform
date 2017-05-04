@@ -28,7 +28,7 @@ class IdentifiedUnifiedItemIndexer @Inject()(
       .flatMap(item => {
         info(s"Indexing item $item")
         elasticClient.execute {
-          indexInto(esIndex / esType).doc(item)
+          indexInto(esIndex / esType).id(item.canonicalId).doc(item)
         }
       })
       .recover {
