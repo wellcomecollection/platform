@@ -58,7 +58,7 @@ object CalmAdapterWorker extends TwitterModule {
       .toJson(
         ECSServiceScheduleRequest(
           "services_cluster",
-          "calm-adapter",
+          "calm_adapter",
           0
         )
       )
