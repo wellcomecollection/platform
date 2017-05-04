@@ -30,6 +30,11 @@ variable "infra_bucket" {
   default     = "platform-infra"
 }
 
+variable "api_host" {
+  description = "hostname to use for api"
+  default     = "api.wellcomecollection.org"
+}
+
 variable "es_config" {
   description = "Elasticcloud config"
   type        = "map"
