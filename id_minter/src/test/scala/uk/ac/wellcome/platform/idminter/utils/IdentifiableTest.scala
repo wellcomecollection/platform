@@ -16,4 +16,10 @@ class IdentifiableTest extends FunSpec with PropertyChecks with Matchers {
     }
   }
 
+  it("should never generate an identifier that starts with a number") {
+    forAll(minSuccessful(100)) { (_: Int) =>
+      Identifiable.generate should not (startWith regex "[0-9]")
+    }
+  }
+
 }
