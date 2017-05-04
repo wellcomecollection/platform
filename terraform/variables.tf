@@ -20,6 +20,11 @@ variable "release_id" {
   description = "Release tag for platform image"
 }
 
+variable "release_ids" {
+  description = "Release tags for platform apps"
+  type        = "map"
+}
+
 variable "infra_bucket" {
   description = "S3 bucket storing our configuration"
   default     = "platform-infra"
