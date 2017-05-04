@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "sqs_queue_policy" {
+data "aws_iam_policy_document" "write_to_queue" {
   statement {
     sid    = "es-sns-to-sqs-policy"
     effect = "Allow"
@@ -22,5 +22,18 @@ data "aws_iam_policy_document" "sqs_queue_policy" {
 
       values = ["${formatlist("arn:aws:sns:%s:%s:%s",var.aws_region, var.account_id, var.topic_names)}"]
     }
+  }
+}
+
+data "aws_iam_policy_document" "read_from_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      "${aws_sqs_queue.q.arn}",
+    ]
   }
 }

@@ -21,7 +21,7 @@ module "calm_adapter" {
 
   config_vars = {
     table_name = "${aws_dynamodb_table.calm_table.name}"
-    sns_arn    = "${aws_sns_topic.service_scheduler_topic.arn}"
+    sns_arn    = "${module.service_scheduler_topic.arn}"
   }
 }
 
@@ -66,7 +66,7 @@ module "transformer" {
 
   config_vars = {
     stream_arn = "${aws_dynamodb_table.miro_table.stream_arn}"
-    sns_arn    = "${aws_sns_topic.id_minter_topic.arn}"
+    sns_arn    = "${module.id_minter_topic.arn}"
   }
 }
 
@@ -86,7 +86,7 @@ module "id_minter" {
 
   config_vars = {
     id_minter_queue_id  = "${module.id_minter_queue.id}"
-    es_ingest_topic_arn = "${aws_sns_topic.ingest_topic.arn}"
+    es_ingest_topic_arn = "${module.ingest_topic.arn}"
     table_name          = "${aws_dynamodb_table.identifiers.name}"
   }
 }

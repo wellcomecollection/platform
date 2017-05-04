@@ -16,7 +16,7 @@ module "schedule_calm_adapter" {
 
   input = <<EOF
 {
-  "topic_arn": "${aws_sns_topic.service_scheduler_topic.arn}",
+  "topic_arn": "${module.service_scheduler_topic.arn}",
   "cluster": "${aws_ecs_cluster.services.name}",
   "service": "${module.calm_adapter.service_name}",
   "desired_count": 1
@@ -37,7 +37,7 @@ module "update_ecs_service_size_trigger" {
   source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.lambda_update_ecs_service_size.function_name}"
   lambda_function_arn  = "${module.lambda_update_ecs_service_size.arn}"
-  sns_trigger_arn      = "${aws_sns_topic.service_scheduler_topic.arn}"
+  sns_trigger_arn      = "${module.service_scheduler_topic.arn}"
 }
 
 # Lambda for restarting applications when their config changes
