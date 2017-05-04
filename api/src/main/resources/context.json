@@ -1,26 +1,28 @@
-[
-  {
-    "@context": {
-      "@base": "http://id.wellcomecollection.org/",
-      "@vocab": "http://wellcomecollection.org/ontologies/works/",
-      "id": "@id",
-      "type": "@type",
-      "hasCreator": {
-        "@container": "@list"
+{
+  "@context": [
+    {
+      "@context": {
+        "@base": "http://id.wellcomecollection.org/",
+        "@vocab": "http://wellcomecollection.org/ontologies/works/",
+        "id": "@id",
+        "type": "@type",
+        "hasCreator": {
+          "@container": "@list"
+        }
+      }
+    },
+    {
+      "@context": {
+        "wa": "http://wellcomecollection.org/ontologies/api/",
+        "ResultList": "wa:ResultList",
+        "pageSize": "wa:pageSize",
+        "totalPages": "wa:totalPages",
+        "totalResults": "wa:totalResults",
+        "results": {
+          "@type": "wa:results",
+          "@container": "@list"
+        }
       }
     }
-  },
-  {
-    "@context": {
-      "wa": "http://wellcomecollection.org/ontologies/api/",
-      "ResultList": "wa:ResultList",
-      "pageSize": "wa:pageSize",
-      "totalPages": "wa:totalPages",
-      "totalResults": "wa:totalResults",
-      "results": {
-        "@type": "wa:results",
-        "@container": "@list"
-      }
-    }
-  }
-]
+  ]
+}
