@@ -46,7 +46,7 @@ module "ingestor" {
     es_index        = "${var.es_config["index"]}"
     es_doc_type     = "${var.es_config["doc_type"]}"
     es_xpack_user   = "${var.es_config["xpack_user"]}"
-    ingest_queue_id = "${module.ingest_queue.id}"
+    ingest_queue_id = "${module.es_ingest_queue.id}"
   }
 }
 
@@ -86,7 +86,7 @@ module "id_minter" {
 
   config_vars = {
     id_minter_queue_id  = "${module.id_minter_queue.id}"
-    es_ingest_topic_arn = "${module.ingest_topic.arn}"
+    es_ingest_topic_arn = "${module.es_ingest_topic.arn}"
     table_name          = "${aws_dynamodb_table.identifiers.name}"
   }
 }
