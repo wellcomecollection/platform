@@ -1,3 +1,5 @@
+# Release IDs that are downloaded from S3 when you run 'plan.sh'
+terraform/releases
 
 # Created by https://www.gitignore.io/api/osx,terraform,textmate,vim
 
