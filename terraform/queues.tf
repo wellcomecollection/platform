@@ -3,7 +3,7 @@ module "ingest_queue" {
   queue_name  = "es_ingest_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${aws_sns_topic.ingest_topic.name}"]
+  topic_names = ["${module.ingest_topic.name}"]
 }
 
 module "id_minter_queue" {
@@ -11,5 +11,5 @@ module "id_minter_queue" {
   queue_name  = "id_minter_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${aws_sns_topic.id_minter_topic.name}"]
+  topic_names = ["${module.id_minter_topic.name}"]
 }
