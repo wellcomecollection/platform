@@ -1,6 +1,7 @@
 package uk.ac.wellcome.models
 
-import com.sksamuel.elastic4s._
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.sksamuel.elastic4s.Indexable
 import uk.ac.wellcome.utils.JsonUtil
 
 /** Represents a set of identifiers as stored in DynamoDB */
@@ -12,9 +13,13 @@ case class SourceIdentifier(source: String, sourceId: String, value: String)
 case class IdentifiedWork(canonicalId: String, work: Work)
 
 /** A representation of an item in our ontology, without a canonical identifier */
-case class Work(identifiers: List[SourceIdentifier],
-                       label: String,
-                       accessStatus: Option[String] = None)
+case class Work(
+  identifiers: List[SourceIdentifier],
+  label: String,
+  accessStatus: Option[String] = None
+) {
+  @JsonProperty("type") val ldType: String = "Work"
+}
 
 object IdentifiedWork extends Indexable[IdentifiedWork] {
   override def json(t: IdentifiedWork): String =
