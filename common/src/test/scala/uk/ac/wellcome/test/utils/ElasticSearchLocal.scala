@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
 import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
+import uk.ac.wellcome.lib.elasticsearch.mappings.RecordsIndex
 
 trait ElasticSearchLocal
     extends BeforeAndAfterAll
@@ -30,9 +31,10 @@ trait ElasticSearchLocal
       elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
     }
 
-    if (!elasticClient.execute(indexExists(index)).await.isExists)
-      elasticClient.execute(createIndex(index)).await
-
+    if (elasticClient.execute(indexExists(index)).await.isExists){
+      elasticClient.execute(deleteIndex(index)).await
+    }
+    new RecordsIndex(elasticClient, index).create.await
     super.beforeAll()
   }
 

@@ -1,20 +1,21 @@
-PUT record_new
+PUT records
 {
     "mappings": {
       "item": {
+        "dynamic": "strict",
         "properties": {
           "canonicalId": {
-            "type": "keyword",
+            "type": "keyword"
           },
-          "unifiedItem": {
+          "work": {
             "properties": {
               "identifiers": {
                 "properties": {
                   "source": {
-                    "type": "keyword",
+                    "type": "keyword"
                   },
                   "sourceId": {
-                    "type": "keyword",
+                    "type": "keyword"
                   },
                   "value": {
                     "type": "keyword"
@@ -47,8 +48,7 @@ PUT record_new
                     "analyzer": "english"
                   }
                 }
-              },
-
+              }
             }
           }
         }

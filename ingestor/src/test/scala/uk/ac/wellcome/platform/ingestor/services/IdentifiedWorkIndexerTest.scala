@@ -74,7 +74,7 @@ class IdentifiedWorkIndexerTest
 
   }
 
-  it("should return a failed future if the input string is not an identified unified item") {
+  it("should return a failed future if the input string is not an identified work") {
     val future = identifiedWorkIndexer.indexIdentifiedWork("a document")
 
     whenReady(future.failed) { exception =>
