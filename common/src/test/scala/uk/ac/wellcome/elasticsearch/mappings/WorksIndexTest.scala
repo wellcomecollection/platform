@@ -29,7 +29,7 @@ class WorksIndexTest
   }
 
   it("should create an index where it's possible to insert and retrieve a valid Work json") {
-    createIndexAndEnsureCreated
+    createAndWaitIndexIsCreated
 
     val workJson = JsonUtil
       .toJson(
@@ -57,7 +57,7 @@ class WorksIndexTest
   }
 
   it("it should create an index where inserting a document that does not match the mapping of a work fails") {
-    createIndexAndEnsureCreated
+    createAndWaitIndexIsCreated
 
     val eventualIndexResponse = client.execute(
       indexInto(indexName / itemType)
@@ -85,7 +85,7 @@ class WorksIndexTest
 
   }
 
-  private def createIndexAndEnsureCreated = {
+  private def createAndWaitIndexIsCreated = {
     worksIndex.create.await
 
     eventually {
