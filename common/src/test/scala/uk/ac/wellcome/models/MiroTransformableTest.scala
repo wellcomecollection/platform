@@ -12,7 +12,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
                         s"""{"image_title": "$imageTitle"}""")
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get shouldBe UnifiedItem(
+    miroTransformable.transform.get shouldBe Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
       label = imageTitle)
   }
@@ -27,7 +27,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
         s"""{"image_title": "$imageTitle", "image_web_thumb_height": "84", "image_web_thumb_width": "56"}""")
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get shouldBe UnifiedItem(
+    miroTransformable.transform.get shouldBe Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
       label = imageTitle)
   }
@@ -38,7 +38,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
       MiroTransformable(miroId, "Images-A", """{}""")
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get shouldBe UnifiedItem(
+    miroTransformable.transform.get shouldBe Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)), label = "no label found")
   }
 

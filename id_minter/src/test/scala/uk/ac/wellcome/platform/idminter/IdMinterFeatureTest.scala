@@ -9,7 +9,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, Identifier, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
@@ -46,13 +46,13 @@ class IdMinterFeatureTest
   ))
 
   it("should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
-    val unifiedItem =
-      UnifiedItem(identifiers =
+    val work =
+      Work(identifiers =
                     List(SourceIdentifier("Miro", "MiroID", "1234")),
                   label = "some label",
                   accessStatus = Option("super-secret"))
     val sqsMessage = SQSMessage(Some("subject"),
-                                JsonUtil.toJson(unifiedItem).get,
+                                JsonUtil.toJson(work).get,
                                 "topic",
                                 "messageType",
                                 "timestamp")
@@ -69,8 +69,8 @@ class IdMinterFeatureTest
       val messages = listMessagesReceivedFromSNS()
       messages should have size (1)
       JsonUtil
-        .fromJson[IdentifiedUnifiedItem](messages.head.message)
-        .get shouldBe IdentifiedUnifiedItem(id.CanonicalID, unifiedItem)
+        .fromJson[IdentifiedWork](messages.head.message)
+        .get shouldBe IdentifiedWork(id.CanonicalID, work)
       messages.head.subject should be("identified-item")
     }
   }
@@ -112,12 +112,12 @@ class IdMinterFeatureTest
   }
 
   private def generateSqsMessage(MiroID: String) = {
-    val unifiedItem = UnifiedItem(
+    val work = Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
       label = "some label",
       accessStatus = Option("super-secret"))
     SQSMessage(Some("subject"),
-               JsonUtil.toJson(unifiedItem).get,
+               JsonUtil.toJson(work).get,
                "topic",
                "messageType",
                "timestamp")

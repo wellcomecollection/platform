@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
-import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
@@ -58,7 +58,7 @@ class CalmTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
     //currently for calm data we only output hardcoded sample values
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        UnifiedItem(
+        Work(
           identifiers = List(SourceIdentifier("source", "key", "value")),
           label = "calm data label",
           accessStatus = AccessStatus

@@ -5,15 +5,15 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
 import uk.ac.wellcome.models.{
-  IdentifiedUnifiedItem,
+  IdentifiedWork,
   SourceIdentifier,
-  UnifiedItem
+  Work
 }
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
 
 class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
 
-  implicit val jsonMapper = IdentifiedUnifiedItem
+  implicit val jsonMapper = IdentifiedWork
   override val server =
     new EmbeddedHttpServer(
       new Server,
@@ -31,19 +31,19 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
 
   test("it should return a list of works") {
 
-    val firstIdentifiedUnifiedItem =
-      identifiedUnifiedItemWith(canonicalId = "1234",
+    val firstIdentifiedWork =
+      identifiedWorkWith(canonicalId = "1234",
                                 label = "this is the first image label")
-    val secondIdentifiedUnifiedItem =
-      identifiedUnifiedItemWith(canonicalId = "4321",
+    val secondIdentifiedWork =
+      identifiedWorkWith(canonicalId = "4321",
                                 label = "this is the second image label")
-    val thirdIdentifiedUnifiedItem =
-      identifiedUnifiedItemWith(canonicalId = "9876",
+    val thirdIdentifiedWork =
+      identifiedWorkWith(canonicalId = "9876",
                                 label = "this is the third image label")
 
-    insertIntoElasticSearch(firstIdentifiedUnifiedItem)
-    insertIntoElasticSearch(secondIdentifiedUnifiedItem)
-    insertIntoElasticSearch(thirdIdentifiedUnifiedItem)
+    insertIntoElasticSearch(firstIdentifiedWork)
+    insertIntoElasticSearch(secondIdentifiedWork)
+    insertIntoElasticSearch(thirdIdentifiedWork)
 
     eventually {
       server.httpGet(
@@ -57,18 +57,18 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
             |  "results": [
             |   {
             |     "type": "Work",
-            |     "id": "${firstIdentifiedUnifiedItem.canonicalId}",
-            |     "label": "${firstIdentifiedUnifiedItem.unifiedItem.label}"
+            |     "id": "${firstIdentifiedWork.canonicalId}",
+            |     "label": "${firstIdentifiedWork.work.label}"
             |   },
             |   {
             |     "type": "Work",
-            |     "id": "${secondIdentifiedUnifiedItem.canonicalId}",
-            |     "label": "${secondIdentifiedUnifiedItem.unifiedItem.label}"
+            |     "id": "${secondIdentifiedWork.canonicalId}",
+            |     "label": "${secondIdentifiedWork.work.label}"
             |   },
             |   {
             |     "type": "Work",
-            |     "id": "${thirdIdentifiedUnifiedItem.canonicalId}",
-            |     "label": "${thirdIdentifiedUnifiedItem.unifiedItem.label}"
+            |     "id": "${thirdIdentifiedWork.canonicalId}",
+            |     "label": "${thirdIdentifiedWork.work.label}"
             |   }
             |  ]
             |}
@@ -78,10 +78,10 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
   }
 
   test("it should return a single work when requested with id") {
-    val identifiedUnifiedItem =
-      identifiedUnifiedItemWith(canonicalId = "1234",
+    val identifiedWork =
+      identifiedWorkWith(canonicalId = "1234",
                                 label = "this is the first image title")
-    insertIntoElasticSearch(identifiedUnifiedItem)
+    insertIntoElasticSearch(identifiedWork)
 
     eventually {
       server.httpGet(
@@ -108,14 +108,14 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
   }
 
   private def insertIntoElasticSearch(
-    identifiedUnifiedItem: IdentifiedUnifiedItem): Any = {
+    identifiedWork: IdentifiedWork): Any = {
     elasticClient.execute(
-      indexInto(index / itemType).doc(identifiedUnifiedItem))
+      indexInto(index / itemType).doc(identifiedWork))
   }
 
-  private def identifiedUnifiedItemWith(canonicalId: String, label: String) = {
-    IdentifiedUnifiedItem(canonicalId = canonicalId,
-                          unifiedItem = UnifiedItem(
+  private def identifiedWorkWith(canonicalId: String, label: String) = {
+    IdentifiedWork(canonicalId = canonicalId,
+                          work = Work(
                             identifiers =
                               List(SourceIdentifier("Miro", "MiroID", "5678")),
                             label = label))

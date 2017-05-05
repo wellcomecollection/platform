@@ -7,7 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.ingestor.modules.SQSWorker
 import uk.ac.wellcome.test.utils.{ElasticSearchLocal, SQSLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -50,11 +50,11 @@ class IngestorFeatureTest
   )
 
   it("should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
-    val identifiedUnifiedItem = JsonUtil
+    val identifiedWork = JsonUtil
       .toJson(
-        IdentifiedUnifiedItem(
+        IdentifiedWork(
           canonicalId = "1234",
-          unifiedItem = UnifiedItem(
+          work = Work(
             identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")), label = "some label")))
       .get
 
@@ -63,7 +63,7 @@ class IngestorFeatureTest
       JsonUtil
         .toJson(
           SQSMessage(Some("identified-item"),
-                     identifiedUnifiedItem,
+                     identifiedWork,
                      "ingester",
                      "messageType",
                      "timestamp"))
@@ -74,7 +74,7 @@ class IngestorFeatureTest
       val hitsFuture = elasticClient.execute(search(s"$indexName/$itemType").matchAll()).map(_.hits)
       whenReady(hitsFuture) { hits =>
         hits should have size 1
-        hits.head.sourceAsString shouldBe identifiedUnifiedItem
+        hits.head.sourceAsString shouldBe identifiedWork
       }
     }
   }
