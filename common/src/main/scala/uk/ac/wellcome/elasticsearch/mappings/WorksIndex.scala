@@ -11,6 +11,7 @@ class WorksIndex(client: ElasticClient, indexName: String, itemType: String) {
       mapping(itemType).dynamic(DynamicMapping.Strict).as(
         keywordField("canonicalId"),
         objectField("work").as(
+          keywordField("type"),
           objectField("identifiers").as(keywordField("source"),
             keywordField("sourceId"),
             keywordField("value")),
