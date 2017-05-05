@@ -42,7 +42,7 @@ class IngestorFeatureTest
       "es.xpack.user" -> "elastic:changeme",
       "es.xpack.sslEnabled" -> "false",
       "es.sniff" -> "false",
-      "es.index" -> index,
+      "es.index" -> indexName,
       "es.type" -> itemType
     )
   )
@@ -69,7 +69,7 @@ class IngestorFeatureTest
     )
 
     eventually {
-      val hitsFuture = elasticClient.execute(search(s"$index/$itemType").matchAll()).map(_.hits)
+      val hitsFuture = elasticClient.execute(search(s"$indexName/$itemType").matchAll()).map(_.hits)
       whenReady(hitsFuture) { hits =>
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWork

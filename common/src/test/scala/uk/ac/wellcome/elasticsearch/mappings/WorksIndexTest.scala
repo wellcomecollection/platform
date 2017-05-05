@@ -1,46 +1,95 @@
 package uk.ac.wellcome.elasticsearch.mappings
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.testkit.ElasticSugar
 import org.elasticsearch.transport.RemoteTransportException
-import org.scalatest.FunSpec
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
-class WorksIndexTest extends FunSpec with ElasticSearchLocal with ScalaFutures{
-  // RecordsIndex is actually used in ElasticSearchLocal to create the index.
-  // This tests class is to assert what can and cannot be done on an elasticsearch
-  // node with the index mappings defined as in RecordIndex
+import scala.collection.JavaConversions._
 
-  it("should be possible to index and retrieve a valid Work json") {
-    val workJson = JsonUtil.toJson(IdentifiedWork(
-      canonicalId = "1234",
-      work = Work(identifiers = List(
-        SourceIdentifier(source = "Miro",
-          sourceId = "MiroID",
-          value = "4321")),
-        label = "this is the miro image label",
-        accessStatus = None)
-    )).get
+class WorksIndexTest
+    extends FunSpec
+    with ElasticSugar
+    with ScalaFutures
+    with Eventually
+    with IntegrationPatience
+    with Matchers
+    with BeforeAndAfterEach {
 
-    elasticClient.execute(
-      indexInto(index / itemType).doc(workJson))
+  val indexName = "records"
+  val itemType = "item"
+
+  val worksIndex = new WorksIndex(client, indexName, itemType)
+
+  override def beforeEach(): Unit = {
+    deleteIndex(indexName)
+  }
+
+  it("should create an index where it's possible to insert and retrieve a valid Work json") {
+    createIndexAndEnsureCreated
+
+    val workJson = JsonUtil
+      .toJson(
+        IdentifiedWork(
+          canonicalId = "1234",
+          work = Work(identifiers = List(
+                        SourceIdentifier(source = "Miro",
+                                         sourceId = "MiroID",
+                                         value = "4321")),
+                      label = "this is the miro image label",
+                      accessStatus = None)
+        ))
+      .get
+
+    client.execute(indexInto(indexName / itemType).doc(workJson))
 
     eventually {
-      val hits = elasticClient.execute(search(s"$index/$itemType").matchAll()).map { _.hits }.await
+      val hits = client
+        .execute(search(s"$indexName/$itemType").matchAll())
+        .map { _.hits }
+        .await
       hits should have size 1
       hits.head.sourceAsString shouldBe workJson
     }
   }
 
-  it("it should fail inserting a document that does not match the mapping of a work") {
-    val eventualIndexResponse = elasticClient.execute(
-      indexInto(index / itemType).doc("""{"json":"json not matching the index structure"}"""))
+  it("it should create an index where inserting a document that does not match the mapping of a work fails") {
+    createIndexAndEnsureCreated
+
+    val eventualIndexResponse = client.execute(
+      indexInto(indexName / itemType)
+        .doc("""{"json":"json not matching the index structure"}"""))
 
     whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a [RemoteTransportException]
+      exception shouldBe a[RemoteTransportException]
+    }
+  }
+
+  it("should update an already existing index with the mapping") {
+    ensureIndexExists(indexName)
+
+    worksIndex.create.await
+
+    eventually {
+      val mappings = client
+        .execute(getMapping(indexName / itemType))
+        .await
+        .mappingFor(indexName / itemType)
+        .getSourceAsMap
+        .toMap
+      mappings should contain("dynamic" -> "strict")
+    }
+
+  }
+
+  private def createIndexAndEnsureCreated = {
+    worksIndex.create.await
+
+    eventually {
+      doesIndexExists(indexName) shouldBe true
     }
   }
 }
