@@ -80,7 +80,7 @@ class WorksIndexTest
         .mappingFor(indexName / itemType)
         .getSourceAsMap
         .toMap
-      mappings should contain("dynamic" -> "strict")
+      mappings should contain ("dynamic" -> "strict")
     }
 
   }
