@@ -23,7 +23,7 @@ trait ElasticSearchLocal
   val elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
-  val index = "records"
+  val indexName = "records"
   val itemType = "item"
 
   override def beforeAll(): Unit = {
@@ -32,15 +32,15 @@ trait ElasticSearchLocal
       elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
     }
 
-    if (elasticClient.execute(indexExists(index)).await.isExists){
-      elasticClient.execute(deleteIndex(index)).await
+    if (elasticClient.execute(indexExists(indexName)).await.isExists){
+      elasticClient.execute(deleteIndex(indexName)).await
     }
-    new WorksIndex(elasticClient, index, itemType).create.await
+    new WorksIndex(elasticClient, indexName, itemType).create.await
     super.beforeAll()
   }
 
   override def beforeEach(): Unit = {
-    elasticClient.execute(deleteIn(index).by(matchAllQuery())).await
+    elasticClient.execute(deleteIn(indexName).by(matchAllQuery())).await
     super.beforeEach()
   }
 }

@@ -18,7 +18,7 @@ class IdentifiedWorkIndexerTest
     with ElasticSearchLocal {
 
   val identifiedWorkIndexer =
-    new IdentifiedWorkIndexer(index, itemType, elasticClient)
+    new IdentifiedWorkIndexer(indexName, itemType, elasticClient)
 
   def identifiedWorkJson(canonicalId: String, sourceId: String, label: String): String = {
     JsonUtil.toJson(
@@ -40,7 +40,7 @@ class IdentifiedWorkIndexerTest
     whenReady(future) { _ =>
       eventually {
         val hits = elasticClient
-          .execute(search(s"$index/$itemType").matchAll().limit(100))
+          .execute(search(s"$indexName/$itemType").matchAll().limit(100))
           .map { _.hits }
           .await
         hits should have size 1
@@ -62,7 +62,7 @@ class IdentifiedWorkIndexerTest
     whenReady(future) { _ =>
       eventually {
         val hits = elasticClient
-          .execute(search(s"$index/$itemType").matchAll().limit(100))
+          .execute(search(s"$indexName/$itemType").matchAll().limit(100))
           .map { _.hits }
           .await
         hits should have size 1
