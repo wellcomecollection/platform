@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.api.services
 
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.{ElasticClient, TcpClient}
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.TcpClient
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

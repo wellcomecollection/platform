@@ -3,10 +3,9 @@ package uk.ac.wellcome.finatra.modules
 import javax.inject.Singleton
 
 import com.google.inject.Provides
-import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri, TcpClient}
 import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
+import com.sksamuel.elastic4s.{ElasticsearchClientUri, TcpClient}
 import com.twitter.inject.TwitterModule
-import com.twitter.inject.Logging
 import org.elasticsearch.common.settings.Settings
 
 import scala.collection.JavaConverters._
