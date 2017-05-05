@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
 import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
+import uk.ac.wellcome.elasticsearch.mappings.WorksIndex
 
 trait ElasticSearchLocal
     extends BeforeAndAfterAll
@@ -22,7 +23,8 @@ trait ElasticSearchLocal
   val elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
-  val index = "records"
+  val indexName = "records"
+  val itemType = "item"
 
   override def beforeAll(): Unit = {
     // Elasticsearch takes a while to start up so check that it actually started before running tests
@@ -30,14 +32,15 @@ trait ElasticSearchLocal
       elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
     }
 
-    if (!elasticClient.execute(indexExists(index)).await.isExists)
-      elasticClient.execute(createIndex(index)).await
-
+    if (elasticClient.execute(indexExists(indexName)).await.isExists){
+      elasticClient.execute(deleteIndex(indexName)).await
+    }
+    new WorksIndex(elasticClient, indexName, itemType).create.await
     super.beforeAll()
   }
 
   override def beforeEach(): Unit = {
-    elasticClient.execute(deleteIn(index).by(matchAllQuery())).await
+    elasticClient.execute(deleteIn(indexName).by(matchAllQuery())).await
     super.beforeEach()
   }
 }
