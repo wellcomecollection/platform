@@ -71,7 +71,7 @@ class IngestorFeatureTest
     )
 
     eventually {
-      val hitsFuture = elasticClient.execute(search(s"$indexName/$itemType").matchAll()).map(_.hits)
+      val hitsFuture = elasticClient.execute(search(s"$indexName/$itemType").matchAllQuery()).map(_.hits)
       whenReady(hitsFuture) { hits =>
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWork

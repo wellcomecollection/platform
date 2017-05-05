@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.services
 
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.ElasticClient
+import com.sksamuel.elastic4s.{ElasticClient, TcpClient}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models._
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 @Singleton
 class ElasticSearchService @Inject()(@Flag("es.index") index: String,
                                      @Flag("es.type") itemType: String,
-                                     elasticClient: ElasticClient) {
+                                     elasticClient: TcpClient) {
 
   def findRecordById(canonicalId: String): Future[Option[Record]] =
     elasticClient
@@ -28,7 +28,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
     elasticClient
       .execute {
         search(s"$index/$itemType")
-          .matchAll()
+          .matchAllQuery()
           // Sort so that we always have a consistent result that we can assert on
           .sortBy(fieldSort("canonicalId.keyword"))
           .limit(10)

@@ -67,7 +67,7 @@ class ElasticSearchServiceTest
     eventually {
       elasticClient
         .execute {
-          search(index).matchAll()
+          search(index).matchAllQuery()
         }
         .await
         .hits should have size identifiedWorks.size
