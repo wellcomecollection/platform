@@ -16,7 +16,10 @@ class WorkTest extends FunSpec with Matchers {
 
     jsonString.contains("""type":"Work"""") should be (true)
   }
+}
 
+
+class JsonUtilTest extends FunSpec with Matchers {
   it("should not include fields where the value is empty or None") {
     val work = Work(
       identifiers=List(),
