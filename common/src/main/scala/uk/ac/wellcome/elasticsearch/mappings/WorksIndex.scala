@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s._
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.mappings.DynamicMapping
 
-class RecordsIndex(client: ElasticClient, indexName: String, itemType: String) {
+class WorksIndex(client: ElasticClient, indexName: String, itemType: String) {
   def create = client.execute {
     createIndex(indexName).mappings(
       mapping(itemType).dynamic(DynamicMapping.Strict).as(

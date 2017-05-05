@@ -9,7 +9,7 @@ import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
-class RecordsIndexTest extends FunSpec with ElasticSearchLocal with ScalaFutures{
+class WorksIndexTest extends FunSpec with ElasticSearchLocal with ScalaFutures{
   // RecordsIndex is actually used in ElasticSearchLocal to create the index.
   // This tests class is to assert what can and cannot be done on an elasticsearch
   // node with the index mappings defined as in RecordIndex
