@@ -16,7 +16,6 @@ class ElasticSearchServiceTest
     with ElasticSearchLocal
     with Matchers {
 
-  val itemType = "item"
   val elasticService = new ElasticSearchService(index, itemType, elasticClient)
 
   it("should return the records in Elasticsearch") {

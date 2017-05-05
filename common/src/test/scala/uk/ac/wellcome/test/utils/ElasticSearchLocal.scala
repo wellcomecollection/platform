@@ -24,6 +24,7 @@ trait ElasticSearchLocal
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
   val index = "records"
+  val itemType = "item"
 
   override def beforeAll(): Unit = {
     // Elasticsearch takes a while to start up so check that it actually started before running tests
@@ -34,7 +35,7 @@ trait ElasticSearchLocal
     if (elasticClient.execute(indexExists(index)).await.isExists){
       elasticClient.execute(deleteIndex(index)).await
     }
-    new RecordsIndex(elasticClient, index).create.await
+    new RecordsIndex(elasticClient, index, itemType).create.await
     super.beforeAll()
   }
 
