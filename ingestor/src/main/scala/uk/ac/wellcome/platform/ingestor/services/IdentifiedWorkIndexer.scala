@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.indexes.RichIndexResponse
+import com.sksamuel.elastic4s.TcpClient
+import com.sksamuel.elastic4s.index.RichIndexResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.models.IdentifiedWork
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class IdentifiedWorkIndexer @Inject()(
   @Flag("es.index") esIndex: String,
   @Flag("es.type") esType: String,
-  elasticClient: ElasticClient
+  elasticClient: TcpClient
 ) extends Logging {
 
   def indexIdentifiedWork(document: String): Future[RichIndexResponse] = {

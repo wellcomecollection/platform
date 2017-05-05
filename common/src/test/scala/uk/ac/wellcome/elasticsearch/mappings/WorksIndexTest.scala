@@ -1,7 +1,7 @@
 package uk.ac.wellcome.elasticsearch.mappings
 
 import com.sksamuel.elastic4s.testkit.ElasticSugar
-import org.elasticsearch.transport.RemoteTransportException
+import org.elasticsearch.index.mapper.StrictDynamicMappingException
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
@@ -64,7 +64,7 @@ class WorksIndexTest
         .doc("""{"json":"json not matching the index structure"}"""))
 
     whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a[RemoteTransportException]
+      exception shouldBe a[StrictDynamicMappingException]
     }
   }
 
