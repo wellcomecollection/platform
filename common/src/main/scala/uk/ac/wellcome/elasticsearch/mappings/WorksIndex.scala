@@ -3,11 +3,11 @@ package uk.ac.wellcome.elasticsearch.mappings
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s._
 import com.sksamuel.elastic4s.analyzers._
-import com.sksamuel.elastic4s.mappings.DynamicMapping
+import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.ResourceAlreadyExistsException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class WorksIndex(client: ElasticClient, indexName: String, itemType: String) {
+class WorksIndex(client: TcpClient, indexName: String, itemType: String) {
 
   def create =
     client
@@ -19,9 +19,9 @@ class WorksIndex(client: ElasticClient, indexName: String, itemType: String) {
             .dynamic(DynamicMapping.Strict)
             .as(
               keywordField("canonicalId"),
-              objectField("work").as(
+              objectField("work").fields(
                 keywordField("type"),
-                objectField("identifiers").as(keywordField("source"),
+                objectField("identifiers").fields(keywordField("source"),
                                               keywordField("sourceId"),
                                               keywordField("value")),
                 textField("label").fields(
@@ -30,11 +30,11 @@ class WorksIndex(client: ElasticClient, indexName: String, itemType: String) {
                   textField("english").analyzer(EnglishLanguageAnalyzer)),
                 textField("lettering").fields(
                   textField("english").analyzer(EnglishLanguageAnalyzer)),
-                objectField("hasCreatedDate").as(
+                objectField("hasCreatedDate").fields(
                   textField("label"),
                   keywordField("type")
                 ),
-                nestedField("hasCreator").as(
+                nestedField("hasCreator").fields(
                   textField("label"),
                   keywordField("type")
                 )
