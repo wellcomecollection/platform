@@ -37,7 +37,7 @@ class RecordsIndexTest extends FunSpec with ElasticSearchLocal with ScalaFutures
 
   it("it should fail inserting a document that does not match the mapping of a work") {
     val eventualIndexResponse = elasticClient.execute(
-      indexInto(index / itemType).doc("""{"json":"json not matching the wor structure"}"""))
+      indexInto(index / itemType).doc("""{"json":"json not matching the index structure"}"""))
 
     whenReady(eventualIndexResponse.failed) { exception =>
       exception shouldBe a [RemoteTransportException]
