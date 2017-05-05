@@ -21,8 +21,6 @@ class IngestorFeatureTest
     with ElasticSearchLocal with ScalaFutures{
 
   val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
-  val indexName = "records"
-  val itemType = "item"
 
   override val server = new EmbeddedHttpServer(
     new Server() {

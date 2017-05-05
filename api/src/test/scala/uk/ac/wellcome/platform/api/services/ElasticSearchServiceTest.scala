@@ -16,8 +16,7 @@ class ElasticSearchServiceTest
     with ElasticSearchLocal
     with Matchers {
 
-  val itemType = "item"
-  val elasticService = new ElasticSearchService(index, itemType, elasticClient)
+  val elasticService = new ElasticSearchService(indexName, itemType, elasticClient)
 
   it("should return the records in Elasticsearch") {
     val firstIdentifiedWork =
@@ -61,13 +60,13 @@ class ElasticSearchServiceTest
     identifiedWorks: IdentifiedWork*) = {
     identifiedWorks.foreach { identifiedWork =>
       elasticClient.execute(
-        indexInto(index / itemType)
+        indexInto(indexName / itemType)
           .doc(JsonUtil.toJson(identifiedWork).get))
     }
     eventually {
       elasticClient
         .execute {
-          search(index).matchAllQuery()
+          search(indexName).matchAllQuery()
         }
         .await
         .hits should have size identifiedWorks.size

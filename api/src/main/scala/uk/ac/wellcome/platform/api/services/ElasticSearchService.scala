@@ -19,7 +19,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
     elasticClient
       .execute {
         search(s"$index/$itemType").query(
-          boolQuery().must(matchQuery("canonicalId.keyword", canonicalId))
+          boolQuery().must(matchQuery("canonicalId", canonicalId))
         )
       }
       .map { _.hits.headOption.map { Record(_) } }
@@ -30,7 +30,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
         search(s"$index/$itemType")
           .matchAllQuery()
           // Sort so that we always have a consistent result that we can assert on
-          .sortBy(fieldSort("canonicalId.keyword"))
+          .sortBy(fieldSort("canonicalId"))
           .limit(10)
       }
       .map { _.hits.map { Record(_) } }

@@ -17,10 +17,8 @@ class IdentifiedWorkIndexerTest
     with Matchers
     with ElasticSearchLocal {
 
-  val itemType = "item"
-
   val identifiedWorkIndexer =
-    new IdentifiedWorkIndexer(index, itemType, elasticClient)
+    new IdentifiedWorkIndexer(indexName, itemType, elasticClient)
 
   def identifiedWorkJson(canonicalId: String, sourceId: String, label: String): String = {
     JsonUtil.toJson(
@@ -42,7 +40,7 @@ class IdentifiedWorkIndexerTest
     whenReady(future) { _ =>
       eventually {
         val hits = elasticClient
-          .execute(search(s"$index/$itemType").matchAllQuery().limit(100))
+          .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
           .map { _.hits }
           .await
         hits should have size 1
@@ -64,7 +62,7 @@ class IdentifiedWorkIndexerTest
     whenReady(future) { _ =>
       eventually {
         val hits = elasticClient
-          .execute(search(s"$index/$itemType").matchAllQuery().limit(100))
+          .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
           .map { _.hits }
           .await
         hits should have size 1
@@ -74,7 +72,7 @@ class IdentifiedWorkIndexerTest
 
   }
 
-  it("should return a failed future if the input string is not an identified unified item") {
+  it("should return a failed future if the input string is not an identified work") {
     val future = identifiedWorkIndexer.indexIdentifiedWork("a document")
 
     whenReady(future.failed) { exception =>
