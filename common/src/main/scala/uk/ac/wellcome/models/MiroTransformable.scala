@@ -34,7 +34,7 @@ case class MiroTransformable(MiroID: String,
       label = miroData.title.get,
       description = miroData.imageDesc,
       lettering = miroData.suppLettering,
-      hasCreatedDate = None,
-      hasCreator = List()
+      hasCreatedDate = Some(Period("early 20th century")),
+      hasCreator = List(Agent("Henry Wellcome"))
     )
 }
