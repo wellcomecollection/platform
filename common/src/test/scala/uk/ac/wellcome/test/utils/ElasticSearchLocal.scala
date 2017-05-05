@@ -6,7 +6,7 @@ import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
 import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
-import uk.ac.wellcome.lib.elasticsearch.mappings.RecordsIndex
+import uk.ac.wellcome.elasticsearch.mappings.RecordsIndex
 
 trait ElasticSearchLocal
     extends BeforeAndAfterAll
