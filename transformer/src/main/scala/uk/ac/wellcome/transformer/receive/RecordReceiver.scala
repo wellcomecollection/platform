@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.{Transformable, UnifiedItem}
+import uk.ac.wellcome.models.{Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.utils.JsonUtil
@@ -22,15 +22,15 @@ class RecordReceiver @Inject()(
   def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
     info(s"Starting to process record $record")
 
-    val triedUnifiedItem = for {
+    val triedWork = for {
       recordMap <- recordToRecordMap(record)
       transformableRecord <- transformableParser.extractTransformable(
         recordMap)
       cleanRecord <- transformDynamoRecord(transformableRecord)
     } yield cleanRecord
 
-    triedUnifiedItem match {
-      case Success(unifiedItem) => publishMessage(unifiedItem)
+    triedWork match {
+      case Success(work) => publishMessage(work)
       case Failure(e) =>
         error("Failed extracting unified item from record", e)
         Future.failed(e)
@@ -44,7 +44,7 @@ class RecordReceiver @Inject()(
     RecordMap(keys)
   }
 
-  def transformDynamoRecord(transformable: Transformable): Try[UnifiedItem] = {
+  def transformDynamoRecord(transformable: Transformable): Try[Work] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")
       transformed
@@ -56,6 +56,6 @@ class RecordReceiver @Inject()(
     }
   }
 
-  def publishMessage(unifiedItem: UnifiedItem): Future[PublishAttempt] =
-    snsWriter.writeMessage(JsonUtil.toJson(unifiedItem).get, Some("Foo"))
+  def publishMessage(work: Work): Future[PublishAttempt] =
+    snsWriter.writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
 }

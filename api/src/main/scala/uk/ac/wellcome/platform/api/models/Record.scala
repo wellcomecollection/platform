@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.searches.RichSearchHit
-import uk.ac.wellcome.models.{IdentifiedUnifiedItem, UnifiedItem}
+import uk.ac.wellcome.models.{IdentifiedWork, Work}
 import uk.ac.wellcome.utils.JsonUtil
 
 case class Record(
@@ -12,12 +12,12 @@ case class Record(
 )
 case object Record {
   def apply(hit: RichSearchHit): Record = {
-    val identifiedUnifiedItem =
-      JsonUtil.fromJson[IdentifiedUnifiedItem](hit.sourceAsString).get
+    val identifiedWork =
+      JsonUtil.fromJson[IdentifiedWork](hit.sourceAsString).get
 
     Record(
-      id = identifiedUnifiedItem.canonicalId,
-      label = identifiedUnifiedItem.unifiedItem.label
+      id = identifiedWork.canonicalId,
+      label = identifiedWork.work.label
     )
   }
 }

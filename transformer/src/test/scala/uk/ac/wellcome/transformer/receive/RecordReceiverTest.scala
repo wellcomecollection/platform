@@ -7,7 +7,7 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{SourceIdentifier, Transformable, UnifiedItem}
+import uk.ac.wellcome.models.{SourceIdentifier, Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.utils.CalmRecordUtils
@@ -32,7 +32,7 @@ class RecordReceiverTest
     "AB/CD/12",
     """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
 
-  val unifiedItem = UnifiedItem(
+  val work = Work(
     identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
     label = "calm data label",
     accessStatus = Some("restricted"))
@@ -41,11 +41,11 @@ class RecordReceiverTest
     val snsWriter = mockSNSWriter
     val recordReceiver =
       new RecordReceiver(snsWriter,
-                         transformableParser(calmRecord, unifiedItem))
+                         transformableParser(calmRecord, work))
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future) { _ =>
-      verify(snsWriter).writeMessage(JsonUtil.toJson(unifiedItem).get,
+      verify(snsWriter).writeMessage(JsonUtil.toJson(work).get,
                                      Some("Foo"))
     }
   }
@@ -74,7 +74,7 @@ class RecordReceiverTest
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new RecordReceiver(mockSNS, transformableParser(calmRecord, unifiedItem))
+      new RecordReceiver(mockSNS, transformableParser(calmRecord, work))
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
@@ -97,13 +97,13 @@ class RecordReceiverTest
     mockSNS
   }
 
-  private def transformableParser(record: Record, unifiedItem: UnifiedItem) = {
+  private def transformableParser(record: Record, work: Work) = {
     val transformableParser = mock[TransformableParser[Transformable]]
     val recordMap = RecordMap(record.getDynamodb.getNewImage)
     when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
       new Transformable {
-        override def transform: Try[UnifiedItem] = Try {
-          unifiedItem
+        override def transform: Try[Work] = Try {
+          work
         }
       }
     })
@@ -115,7 +115,7 @@ class RecordReceiverTest
     val recordMap = RecordMap(record.getDynamodb.getNewImage)
     when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
       new Transformable {
-        override def transform: Try[UnifiedItem] = Try {
+        override def transform: Try[Work] = Try {
           throw new RuntimeException("Unable to transform into unified item")
         }
       }

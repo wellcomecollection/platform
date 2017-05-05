@@ -9,14 +9,14 @@ case class Identifier(CanonicalID: String, MiroID: String)
 /** An identifier received from one of the original sources */
 case class SourceIdentifier(source: String, sourceId: String, value: String)
 
-case class IdentifiedUnifiedItem(canonicalId: String, unifiedItem: UnifiedItem)
+case class IdentifiedWork(canonicalId: String, work: Work)
 
 /** A representation of an item in our ontology, without a canonical identifier */
-case class UnifiedItem(identifiers: List[SourceIdentifier],
+case class Work(identifiers: List[SourceIdentifier],
                        label: String,
                        accessStatus: Option[String] = None)
 
-object IdentifiedUnifiedItem extends Indexable[IdentifiedUnifiedItem] {
-  override def json(t: IdentifiedUnifiedItem): String =
+object IdentifiedWork extends Indexable[IdentifiedWork] {
+  override def json(t: IdentifiedWork): String =
     JsonUtil.toJson(t).get
 }
