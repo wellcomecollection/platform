@@ -27,7 +27,6 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
         "es.sniff" -> "false"
       )
     )
-  val itemType = "item"
 
   test("it should return a list of works") {
 
@@ -110,7 +109,7 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
   private def insertIntoElasticSearch(
     identifiedWork: IdentifiedWork): Any = {
     elasticClient.execute(
-      indexInto(index / itemType).doc(identifiedWork))
+      indexInto(indexName / itemType).doc(identifiedWork))
   }
 
   private def identifiedWorkWith(canonicalId: String, label: String) = {
