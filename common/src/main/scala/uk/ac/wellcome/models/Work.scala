@@ -20,8 +20,8 @@ case class Work(
   label: String,
   description: Option[String] = None,
   lettering: Option[String] = None,
-  hasCreatedDate: Option[String] = None,
-  hasCreator: List[String] = List(),
+  hasCreatedDate: Option[Period] = None,
+  hasCreator: List[Agent] = List(),
 
   // TODO: Remove this field?
   accessStatus: Option[String] = None

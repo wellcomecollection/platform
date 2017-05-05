@@ -38,7 +38,9 @@ class MiroTransformableTest extends FunSpec with Matchers {
       data = """{"image_title": "A picture of a parrot"}""",
       expectedWork = Work(
         identifiers = List(SourceIdentifier("Miro", "MiroID", "M0000001")),
-        label = "A picture of a parrot"
+        label = "A picture of a parrot",
+        hasCreatedDate = Some(Period("early 20th century")),
+        hasCreator = List(Agent("Henry Wellcome"))
       )
     )
   }
@@ -50,7 +52,9 @@ class MiroTransformableTest extends FunSpec with Matchers {
       data = s"""{"image_title": "A cartoon of a cat", "foo": "bar", "baz": "bat"}""",
       expectedWork = Work(
         identifiers = List(SourceIdentifier("Miro", "MiroID", "M0000002")),
-        label = "A cartoon of a cat"
+        label = "A cartoon of a cat",
+        hasCreatedDate = Some(Period("early 20th century")),
+        hasCreator = List(Agent("Henry Wellcome"))
       )
     )
   }
