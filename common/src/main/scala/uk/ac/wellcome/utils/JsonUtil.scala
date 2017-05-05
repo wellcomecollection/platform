@@ -1,5 +1,7 @@
 package uk.ac.wellcome.utils
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -11,6 +13,7 @@ object JsonUtil {
 
   mapper.registerModule(DefaultScalaModule)
   mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
 
   def toJson(value: Any): Try[String] =
     Try(mapper.writeValueAsString(value))
