@@ -29,7 +29,15 @@ class WorksIndex(client: ElasticClient, indexName: String, itemType: String) {
                 textField("description").fields(
                   textField("english").analyzer(EnglishLanguageAnalyzer)),
                 textField("lettering").fields(
-                  textField("english").analyzer(EnglishLanguageAnalyzer))
+                  textField("english").analyzer(EnglishLanguageAnalyzer)),
+                objectField("hasCreatedDate").as(
+                  textField("label"),
+                  keywordField("type")
+                ),
+                nestedField("hasCreator").as(
+                  textField("label"),
+                  keywordField("type")
+                )
               )
             )
         }
