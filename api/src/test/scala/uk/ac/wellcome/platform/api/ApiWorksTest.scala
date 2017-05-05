@@ -27,7 +27,6 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
         "es.sniff" -> "false"
       )
     )
-  val itemType = "item"
 
   test("it should return a list of works") {
 

@@ -21,8 +21,6 @@ class IngestorFeatureTest
     with ElasticSearchLocal with ScalaFutures{
 
   val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
-  val indexName = "records"
-  val itemType = "item"
 
   override val server = new EmbeddedHttpServer(
     new Server() {
@@ -44,7 +42,7 @@ class IngestorFeatureTest
       "es.xpack.user" -> "elastic:changeme",
       "es.xpack.sslEnabled" -> "false",
       "es.sniff" -> "false",
-      "es.index" -> indexName,
+      "es.index" -> index,
       "es.type" -> itemType
     )
   )
@@ -71,7 +69,7 @@ class IngestorFeatureTest
     )
 
     eventually {
-      val hitsFuture = elasticClient.execute(search(s"$indexName/$itemType").matchAll()).map(_.hits)
+      val hitsFuture = elasticClient.execute(search(s"$index/$itemType").matchAll()).map(_.hits)
       whenReady(hitsFuture) { hits =>
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWork

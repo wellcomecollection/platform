@@ -17,8 +17,6 @@ class IdentifiedWorkIndexerTest
     with Matchers
     with ElasticSearchLocal {
 
-  val itemType = "item"
-
   val identifiedWorkIndexer =
     new IdentifiedWorkIndexer(index, itemType, elasticClient)
 
