@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.sqs.model.{Message => AwsSQSMessage}
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.ingestor.services.IdentifiedUnifiedItemIndexer
+import uk.ac.wellcome.platform.ingestor.services.IdentifiedWorkIndexer
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 
@@ -19,17 +19,17 @@ object SQSWorker extends TwitterModule with TryBackoff {
 
     val system = injector.instance[ActorSystem]
     val sqsReader = injector.instance[SQSReader]
-    val indexer = injector.instance[IdentifiedUnifiedItemIndexer]
+    val indexer = injector.instance[IdentifiedWorkIndexer]
 
     run(() => processMessages(sqsReader, indexer), system)
   }
 
   private def processMessages(
     sqsReader: SQSReader,
-    indexer: IdentifiedUnifiedItemIndexer): Unit = {
+    indexer: IdentifiedWorkIndexer): Unit = {
     sqsReader.retrieveAndDeleteMessages { message =>
       extractMessage(message).map { sqsMessage =>
-        indexer.indexIdentifiedUnifiedItem(sqsMessage.body)
+        indexer.indexIdentifiedWork(sqsMessage.body)
       }
     }
   }

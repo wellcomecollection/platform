@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
-import uk.ac.wellcome.models.{MiroTransformable, SourceIdentifier, UnifiedItem}
+import uk.ac.wellcome.models.{MiroTransformable, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
@@ -52,7 +52,7 @@ class MiroTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
                                        imageTitle: String) = {
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        UnifiedItem(identifiers =
+        Work(identifiers =
                       List(SourceIdentifier("Miro", "MiroID", miroId)),
                     label = imageTitle))
       .get
