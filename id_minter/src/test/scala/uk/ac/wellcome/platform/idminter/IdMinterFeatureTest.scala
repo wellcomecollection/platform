@@ -45,8 +45,7 @@ class IdMinterFeatureTest
     .bind[AmazonSNS](amazonSNS)
     .bind[AmazonDynamoDB](dynamoDbClient)
 
-  it(
-    "should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
+  it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
     val label = "A limerick about a lion"
     val accessStatus = Option("open access")
