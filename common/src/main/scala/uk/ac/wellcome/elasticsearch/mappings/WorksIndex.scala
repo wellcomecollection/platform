@@ -1,13 +1,17 @@
 package uk.ac.wellcome.elasticsearch.mappings
 
+import com.google.inject.Inject
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s._
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
+import com.twitter.inject.annotations.Flag
 import org.elasticsearch.ResourceAlreadyExistsException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class WorksIndex(client: TcpClient, indexName: String, itemType: String) {
+class WorksIndex @Inject()(client: TcpClient,
+                 @Flag("es.index") indexName: String,
+                 @Flag("es.type") itemType: String) {
 
   def create =
     client
@@ -22,8 +26,8 @@ class WorksIndex(client: TcpClient, indexName: String, itemType: String) {
               objectField("work").fields(
                 keywordField("type"),
                 objectField("identifiers").fields(keywordField("source"),
-                                              keywordField("sourceId"),
-                                              keywordField("value")),
+                                                  keywordField("sourceId"),
+                                                  keywordField("value")),
                 textField("label").fields(
                   textField("english").analyzer(EnglishLanguageAnalyzer)),
                 textField("description").fields(
@@ -34,7 +38,7 @@ class WorksIndex(client: TcpClient, indexName: String, itemType: String) {
                   textField("label"),
                   keywordField("type")
                 ),
-                nestedField("hasCreator").fields(
+                objectField("hasCreator").fields(
                   textField("label"),
                   keywordField("type")
                 )
