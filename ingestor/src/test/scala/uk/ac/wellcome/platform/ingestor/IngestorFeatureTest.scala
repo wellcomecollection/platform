@@ -2,14 +2,13 @@ package uk.ac.wellcome.platform.ingestor
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.ingestor.modules.{SQSWorker, WorksIndexModule}
-import uk.ac.wellcome.test.utils.{ElasticSearchLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{SQSLocal, IndexedElasticSearchLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -17,10 +16,10 @@ class IngestorFeatureTest
     extends FunSpec
     with SQSLocal
     with Matchers
-    with ElasticSearchLocal
+    with IndexedElasticSearchLocal
     with ScalaFutures {
 
-  val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
+  val ingestorQueueUrl: String = createQueueAndReturnUrl("test_es_ingestor_queue")
 
   private def createServer = {
     new EmbeddedHttpServer(
