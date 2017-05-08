@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.ingestor
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sqs.AmazonSQS
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
@@ -20,17 +23,10 @@ class IngestorFeatureTest
     with Matchers
     with ElasticSearchLocal with ScalaFutures{
 
-  val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
+  val ingestorQueueUrl: String = createQueueAndReturnUrl("test_es_ingestor_queue")
 
-  override val server = new EmbeddedHttpServer(
-    new Server() {
-      override val modules = Seq(SQSConfigModule,
-                                 AkkaModule,
-                                 SQSReaderModule,
-                                 SQSWorker,
-                                 SQSLocalClientModule,
-                                 ElasticClientModule)
-    },
+  override val server: EmbeddedHttpServer = new EmbeddedHttpServer(
+    new Server(),
     flags = Map(
       "aws.region" -> "eu-west-1",
       "aws.sqs.queue.url" -> ingestorQueueUrl,
@@ -45,7 +41,7 @@ class IngestorFeatureTest
       "es.index" -> indexName,
       "es.type" -> itemType
     )
-  )
+  ).bind[AmazonSQS](sqsClient)
 
   it("should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
     val identifiedWork = JsonUtil

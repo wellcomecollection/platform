@@ -66,13 +66,6 @@ messages:
     val messages: Messages = mapper.readValue(string, classOf[Messages])
     messages.messages
   }
-
-  object LocalSNSClient extends TwitterModule {
-
-    @Singleton
-    @Provides
-    def providesSNSClient: AmazonSNS = amazonSNS
-  }
 }
 
 case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
