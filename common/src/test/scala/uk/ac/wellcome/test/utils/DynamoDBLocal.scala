@@ -184,11 +184,4 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
   }
-
-  object DynamoDBLocalClientModule extends TwitterModule {
-
-    @Singleton
-    @Provides
-    def providesDynamoDbClient: AmazonDynamoDB = dynamoDbClient
-  }
 }
