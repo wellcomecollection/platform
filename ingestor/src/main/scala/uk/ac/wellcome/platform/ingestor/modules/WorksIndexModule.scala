@@ -9,10 +9,8 @@ object WorksIndexModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {
     info("Creating/Updating Elasticsearch index")
 
-    val indexName = flag[String]("es.index", "records", "ES index name")
-    val itemType = flag[String]("es.type", "item", "ES document type")
-    val elasticClient = injector.instance[TcpClient]
+    val indexCreator = injector.instance[WorksIndex]
 
-    new WorksIndex(elasticClient, indexName(), itemType()).create
+    indexCreator.create
   }
 }
