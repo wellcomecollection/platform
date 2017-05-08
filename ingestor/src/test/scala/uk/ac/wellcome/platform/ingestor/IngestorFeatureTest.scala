@@ -7,9 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{ElasticSearchLocal, SQSLocal}
-import uk.ac.wellcome.platform.ingestor.modules.{SQSWorker, WorksIndexModule}
-import uk.ac.wellcome.test.utils.{SQSLocal, IndexedElasticSearchLocal}
+import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, SQSLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
