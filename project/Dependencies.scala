@@ -14,7 +14,7 @@ object Dependencies {
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
-    val elastic4s = "5.3.2"
+    val elastic4s = "5.4.1"
     val scanamo = "0.9.1"
     val jacksonYamlVersion = "2.8.8"
   }
