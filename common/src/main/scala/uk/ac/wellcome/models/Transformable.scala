@@ -1,24 +1,13 @@
 package uk.ac.wellcome.models
 
-import uk.ac.wellcome.utils.JsonUtil
 import scala.util.Try
+
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import uk.ac.wellcome.utils.JsonUtil
 
 trait Transformable {
   def transform: Try[Work]
-}
-
-case class MiroTransformableData(image_title: Option[String])
-
-case class MiroTransformable(MiroID: String,
-                             MiroCollection: String,
-                             data: String)
-    extends Transformable {
-  override def transform: Try[Work] =
-    JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
-      Work(identifiers =
-                    List(SourceIdentifier("Miro", "MiroID", MiroID)),
-                  label = miroData.image_title.getOrElse("no label found"))
-    }
 }
 
 case class CalmDataTransformable(

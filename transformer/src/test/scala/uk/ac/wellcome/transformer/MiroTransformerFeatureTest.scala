@@ -21,46 +21,43 @@ class MiroTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
     )
   )
 
-  it("should poll the dynamo stream for miro data, transform it into unified items and push them into the id_minter SNS topic") {
-    val miroId = "1234"
-    val imageTitle = "some image title"
-    putMiroImageInDynamoDb(miroId, imageTitle)
+  it("should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
+    val miroID = "M0000001"
+    val label = "A guide for a giraffe"
+    putMiroImageInDynamoDb(miroID, label)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size (1)
-      assertSNSMessageContains(snsMessages.head, miroId, imageTitle)
+      assertSNSMessageContains(snsMessages.head, miroID, label)
     }
 
-    val secondMiroId = "5678"
-    val secondImageTitle = "some other image title"
-    putMiroImageInDynamoDb(secondMiroId, secondImageTitle)
+    val secondMiroID = "M0000002"
+    val secondLabel = "A song about a snake"
+    putMiroImageInDynamoDb(secondMiroID, secondLabel)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size (2)
 
-      assertSNSMessageContains(snsMessages.head, miroId, imageTitle)
+      assertSNSMessageContains(snsMessages.head, miroID, label)
       assertSNSMessageContains(snsMessages.tail.head,
-                               secondMiroId,
-                               secondImageTitle)
+                               secondMiroID,
+                               secondLabel)
     }
   }
 
   private def assertSNSMessageContains(snsMessage: MessageInfo,
-                                       miroId: String,
+                                       miroID: String,
                                        imageTitle: String) = {
-    snsMessage.message shouldBe JsonUtil
-      .toJson(
-        Work(identifiers =
-                      List(SourceIdentifier("Miro", "MiroID", miroId)),
-                    label = imageTitle))
-      .get
+    val parsedWork = JsonUtil.fromJson[Work](snsMessage.message).get
+    parsedWork.identifiers.head.value shouldBe miroID
+    parsedWork.label shouldBe imageTitle
   }
 
-  private def putMiroImageInDynamoDb(miroId: String, imageTitle: String) = {
+  private def putMiroImageInDynamoDb(miroID: String, imageTitle: String) = {
     Scanamo.put(dynamoDbClient)(miroDataTableName)(
-      MiroTransformable(miroId,
+      MiroTransformable(miroID,
                         "Images-A",
                         s"""{"image_title": "$imageTitle"}"""))
   }
