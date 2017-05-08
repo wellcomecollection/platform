@@ -24,45 +24,16 @@ trait TransformerFeatureTest
     with Eventually
     with IntegrationPatience { this: Suite =>
 
-  val idMinterTopicArn = createTopicAndReturnArn("test_id_minter")
+  val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
 
-  val transformerServer = new Server(){
-    override val modules = Seq(
-      StreamsRecordProcessorFactoryModule,
-      DynamoConfigModule,
-      AkkaModule,
-      TransformableParserModule,
-      SNSConfigModule,
-      AmazonCloudWatchModule,
-      LocalKinesisClientLibConfigurationModule,
-      LocalSNSClient,
-      DynamoDBLocalClientModule,
-      LocalKinesisModule,
-      KinesisWorker
-    )
-  }
-
-  object LocalKinesisModule extends TwitterModule {
-
-    @Provides
-    @Singleton
-    def provideAmazonKinesis: AmazonKinesis = {
-      new AmazonDynamoDBStreamsAdapterClient(streamsClient)
-    }
-  }
-
-  object LocalKinesisClientLibConfigurationModule extends TwitterModule {
-    @Provides
-    @Singleton
-    def provideKinesisClientLibConfiguration(
-      dynamoConfig: DynamoConfig): KinesisClientLibConfiguration =
-      new KinesisClientLibConfiguration(
-        dynamoConfig.applicationName,
-        dynamoConfig.arn,
-        new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials("access", "secret")),
-        java.util.UUID.randomUUID.toString
-      ) //turn off metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
-        .withMetricsLevel(MetricsLevel.NONE)
-  }
+  def kinesisClientLibConfiguration(
+                                     applicationName : String, streamArn: String): KinesisClientLibConfiguration =
+    new KinesisClientLibConfiguration(
+      applicationName,
+      streamArn,
+      new AWSStaticCredentialsProvider(
+        new BasicAWSCredentials("access", "secret")),
+      java.util.UUID.randomUUID.toString
+    ) //turn off metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
+      .withMetricsLevel(MetricsLevel.NONE)
 }

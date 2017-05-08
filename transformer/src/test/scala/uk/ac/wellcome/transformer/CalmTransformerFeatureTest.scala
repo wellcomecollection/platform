@@ -1,25 +1,37 @@
 package uk.ac.wellcome.transformer
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
+import com.amazonaws.services.kinesis.AmazonKinesis
+import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
+import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sqs.AmazonSQS
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, Work}
+import uk.ac.wellcome.platform.transformer.Server
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 
 class CalmTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
 
-  override val server = new EmbeddedHttpServer(
-    transformerServer,
+  private val appName = "test-transformer-calm"
+  override val server: EmbeddedHttpServer = new EmbeddedHttpServer(
+    new Server(),
     flags = Map(
       "aws.region" -> "eu-west-1",
-      "aws.dynamo.streams.appName" -> "test-transformer-calm",
+      "aws.dynamo.streams.appName" -> appName,
       "aws.dynamo.streams.arn" -> calmDataStreamArn,
       "aws.dynamo.tableName" -> calmDataTableName,
       "aws.sns.topic.arn" -> idMinterTopicArn
     )
   )
+    .bind[AmazonSNS](amazonSNS)
+    .bind[AmazonDynamoDB](dynamoDbClient)
+    .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(streamsClient))
+    .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration(appName, calmDataStreamArn))
 
   it("should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     Scanamo.put(dynamoDbClient)(calmDataTableName)(

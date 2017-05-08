@@ -38,11 +38,4 @@ trait SQSLocal
     super.beforeEach()
     queueUrls.foreach(queueUrl => sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl)))
   }
-
-  object SQSLocalClientModule extends TwitterModule {
-
-    @Singleton
-    @Provides
-    def providesAmazonSQSClient: AmazonSQS = sqsClient
-  }
 }
