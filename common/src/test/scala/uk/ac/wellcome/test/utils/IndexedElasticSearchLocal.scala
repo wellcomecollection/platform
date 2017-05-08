@@ -18,9 +18,12 @@ trait IndexedElasticSearchLocal
   override def beforeAll(): Unit = {
     super.beforeAll()
 
-    if (elasticClient.execute(indexExists(indexName)).await.isExists){
-      elasticClient.execute(deleteIndex(indexName)).await
-    }
+    elasticClient
+      .execute(indexExists(indexName))
+      .map { result =>
+        if (result.isExists) elasticClient.execute(deleteIndex(indexName))
+      }
+      .await
     new WorksIndex(elasticClient, indexName, itemType).create.await
   }
 
