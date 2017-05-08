@@ -34,12 +34,15 @@ class WorksIndexTest
       .map { result =>
         if (result.isExists) elasticClient.execute(deleteIndex(indexName))
       }
-      .await
+
+    eventually {
+      elasticClient
+        .execute(indexExists(indexName)).await.isExists should be (false)
+    }
     super.beforeEach()
   }
 
-  it(
-    "should create an index where it's possible to insert and retrieve a valid Work json") {
+  it("should create an index where it's possible to insert and retrieve a valid Work json") {
     createAndWaitIndexIsCreated()
 
     val workJson = JsonUtil
@@ -67,10 +70,11 @@ class WorksIndexTest
     }
   }
 
-  it(
-    "it should create an index where inserting a document that does not match the mapping of a work fails") {
+  it("it should create an index where inserting a document that does not match the mapping of a work fails") {
+    println("creating index")
     createAndWaitIndexIsCreated()
 
+    println("index created")
     val eventualIndexResponse = elasticClient.execute(
       indexInto(indexName / itemType)
         .doc("""{"json":"json not matching the index structure"}"""))
@@ -103,7 +107,8 @@ class WorksIndexTest
     val futureIndexWithDocument =
       for {
         _ <- elasticClient.execute(createIndex(indexName))
-        _ <- elasticClient.execute(putMapping(indexName / itemType).dynamic(DynamicMapping.Strict).as(keywordField("canonicalId")))
+        _ <- elasticClient.execute(putMapping(indexName / itemType)
+          .dynamic(DynamicMapping.Strict).as(keywordField("canonicalId")))
         _ <- elasticClient.execute(indexInto(indexName / itemType).doc(
           """
             |{
@@ -116,10 +121,12 @@ class WorksIndexTest
   }
 
   private def createAndWaitIndexIsCreated() = {
-    worksIndex.create.await
+    val createIndexFuture = worksIndex.create
 
-    eventually {
-      elasticClient.execute(index exists indexName).await.isExists should be (true)
+    whenReady(createIndexFuture) { _ =>
+      eventually {
+        elasticClient.execute(indexExists(indexName)).await.isExists should be(true)
+      }
     }
   }
 }

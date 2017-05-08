@@ -8,10 +8,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterAll, Matchers, Suite}
 
 trait ElasticSearchLocal
-    extends BeforeAndAfterAll
-    with Eventually
+    extends Eventually
     with IntegrationPatience
     with Matchers { this: Suite =>
+
   private val settings = Settings
     .builder()
     .put("cluster.name", "wellcome")
@@ -21,11 +21,8 @@ trait ElasticSearchLocal
   val elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
-  override def beforeAll(): Unit = {
-    // Elasticsearch takes a while to start up so check that it actually started before running tests
-    eventually {
-      elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
-    }
-    super.beforeAll()
+  // Elasticsearch takes a while to start up so check that it actually started before running tests
+  eventually {
+    elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
   }
 }
