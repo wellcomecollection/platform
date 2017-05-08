@@ -4,6 +4,10 @@ sudo: required
 
 dist: trusty
 
+branches:
+  only:
+    - master
+
 install:
   - ./.travis/install.sh
 
