@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.idminter
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sqs.AmazonSQS
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
@@ -7,10 +10,13 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.modules.IdMinterModule
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  Identifier,
+  SourceIdentifier,
+  Work
+}
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -23,29 +29,23 @@ class IdMinterFeatureTest
     with Eventually
     with IntegrationPatience {
 
-  val ingestorTopicArn = createTopicAndReturnArn("test_ingestor")
-  val idMinterQueue = createQueueAndReturnUrl("test_id_minter")
+  val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
+  val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
 
-  override val server = new EmbeddedHttpServer(new Server(){
-    override val modules = Seq(AkkaModule,
-      LocalSNSClient,
-      DynamoDBLocalClientModule,
-      SQSReaderModule,
-      SQSLocalClientModule,
-      SNSConfigModule,
-      SQSConfigModule,
-      DynamoConfigModule,
-      IdMinterModule)
-  },
+  override val server: EmbeddedHttpServer = new EmbeddedHttpServer(
+    new Server(),
     flags = Map(
-    "aws.region" -> "local",
-    "aws.sqs.queue.url" -> idMinterQueue,
-    "aws.sqs.waitTime" -> "1",
-    "aws.sns.topic.arn" -> ingestorTopicArn,
-    "aws.dynamo.tableName" -> identifiersTableName
-  ))
+      "aws.region" -> "local",
+      "aws.sqs.queue.url" -> idMinterQueue,
+      "aws.sqs.waitTime" -> "1",
+      "aws.sns.topic.arn" -> ingestorTopicArn,
+      "aws.dynamo.tableName" -> identifiersTableName
+    )
+  ).bind[AmazonSQS](sqsClient)
+    .bind[AmazonSNS](amazonSNS)
+    .bind[AmazonDynamoDB](dynamoDbClient)
 
-  it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
+  it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
     val label = "A limerick about a lion"
     val accessStatus = Option("open access")
@@ -123,10 +123,10 @@ class IdMinterFeatureTest
   }
 
   private def generateSqsMessage(MiroID: String) = {
-    val work = Work(
-      identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
-      label = "some label",
-      accessStatus = Option("super-secret"))
+    val work = Work(identifiers =
+                      List(SourceIdentifier("Miro", "MiroID", MiroID)),
+                    label = "some label",
+                    accessStatus = Option("super-secret"))
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,
                "topic",
