@@ -14,12 +14,17 @@ class WorkExtractorTest
     with ScalaFutures
     with IntegrationPatience {
 
-  it("extracts the unified item included in the SQS message") {
-    val work =
-      Work(identifiers =
-                    List(SourceIdentifier("Miro", "MiroId", "1234")),
-                  label = "this is the item label",
-                  accessStatus = Option("super-secret"))
+  it("extracts the work included in the SQS message") {
+
+    val miroID = "M0000001"
+    val label = "A note about a narwhal"
+    val accessStatus = Option("open access")
+
+    val work = Work(
+      identifiers = List(SourceIdentifier("Miro", "MiroId", miroID)),
+      label = label,
+      accessStatus = accessStatus
+    )
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
                                 "topic",
@@ -29,10 +34,12 @@ class WorkExtractorTest
 
     val eventualWork = WorkExtractor.toWork(message)
 
-    whenReady(eventualWork) { extractedWork =>
-      extractedWork should be(work)
-    }
 
+    whenReady(eventualWork) { extractedWork =>
+      extractedWork.identifiers.head.value shouldBe miroID
+      extractedWork.label shouldBe label
+      extractedWork.accessStatus shouldBe accessStatus
+    }
   }
 
   it("should return a failed future if it fails parsing the message it receives") {

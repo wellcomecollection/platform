@@ -67,7 +67,7 @@ class RecordReceiverTest
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
-      x.getMessage should startWith("Unable to transform into unified item")
+      x.getMessage should startWith("Unable to transform into Work")
     }
   }
 
@@ -116,7 +116,7 @@ class RecordReceiverTest
     when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
       new Transformable {
         override def transform: Try[Work] = Try {
-          throw new RuntimeException("Unable to transform into unified item")
+          throw new RuntimeException("Unable to transform into Work")
         }
       }
     })
