@@ -45,12 +45,16 @@ class IdMinterFeatureTest
     "aws.dynamo.tableName" -> identifiersTableName
   ))
 
-  it("should read a unified item from the SQS queue, generate a canonical id, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
-    val work =
-      Work(identifiers =
-                    List(SourceIdentifier("Miro", "MiroID", "1234")),
-                  label = "some label",
-                  accessStatus = Option("super-secret"))
+  it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original unified item and the id") {
+    val miroID = "M0001234"
+    val label = "A limerick about a lion"
+    val accessStatus = Option("open access")
+
+    val work = Work(
+      identifiers = List(SourceIdentifier("Miro", "MiroID", miroID)),
+      label = label,
+      accessStatus = accessStatus
+    )
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
                                 "topic",
@@ -63,14 +67,21 @@ class IdMinterFeatureTest
       val dynamoIdentifiersRecords =
         Scanamo.queryIndex[Identifier](dynamoDbClient)(
           "Identifiers",
-          "MiroID")('MiroID -> "1234")
+          "MiroID")('MiroID -> miroID)
       dynamoIdentifiersRecords should have size (1)
       val id = extractId(dynamoIdentifiersRecords)
       val messages = listMessagesReceivedFromSNS()
       messages should have size (1)
-      JsonUtil
+
+      val parsedIdentifiedWork = JsonUtil
         .fromJson[IdentifiedWork](messages.head.message)
-        .get shouldBe IdentifiedWork(id.CanonicalID, work)
+        .get
+
+      parsedIdentifiedWork.canonicalId shouldBe id.CanonicalID
+      parsedIdentifiedWork.work.identifiers.head.value shouldBe miroID
+      parsedIdentifiedWork.work.label shouldBe label
+      parsedIdentifiedWork.work.accessStatus shouldBe accessStatus
+
       messages.head.subject should be("identified-item")
     }
   }
