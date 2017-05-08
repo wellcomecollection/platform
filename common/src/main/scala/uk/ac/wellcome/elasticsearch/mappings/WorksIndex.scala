@@ -34,7 +34,7 @@ class WorksIndex(client: TcpClient, indexName: String, itemType: String) {
                   textField("label"),
                   keywordField("type")
                 ),
-                nestedField("hasCreator").fields(
+                objectField("hasCreator").fields(
                   textField("label"),
                   keywordField("type")
                 )
