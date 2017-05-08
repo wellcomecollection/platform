@@ -17,8 +17,10 @@ class Server extends HttpServer {
                              AkkaModule,
                              SQSReaderModule,
                              SQSWorker,
-                             ElasticClientModule)
-
+                             ElasticClientModule,
+                             WorksIndexModule)
+  flag[String]("es.index", "records", "ES index name")
+  flag[String]("es.type", "item", "ES document type")
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
