@@ -12,10 +12,18 @@ case class SourceIdentifier(source: String, sourceId: String, value: String)
 
 case class IdentifiedWork(canonicalId: String, work: Work)
 
-/** A representation of an item in our ontology, without a canonical identifier */
+/** A representation of a work in our ontology, without a
+ *  canonical identifier.
+ */
 case class Work(
   identifiers: List[SourceIdentifier],
   label: String,
+  description: Option[String] = None,
+  lettering: Option[String] = None,
+  hasCreatedDate: Option[Period] = None,
+  hasCreator: List[Agent] = List(),
+
+  // TODO: Remove this field?
   accessStatus: Option[String] = None
 ) {
   @JsonProperty("type") val ldType: String = "Work"
