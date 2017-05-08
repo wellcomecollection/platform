@@ -29,7 +29,9 @@ class WorksIndexTest
   val worksIndex = new WorksIndex(elasticClient, indexName, itemType)
 
   override def beforeEach(): Unit = {
-    elasticClient.execute(deleteIndex(indexName)).await
+    if (elasticClient.execute(indexExists(indexName)).await.isExists){
+      elasticClient.execute(deleteIndex(indexName)).await
+    }
     super.beforeEach()
   }
 
