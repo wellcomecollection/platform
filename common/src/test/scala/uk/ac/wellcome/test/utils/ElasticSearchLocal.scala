@@ -49,9 +49,4 @@ trait ElasticSearchLocal
     if (indexExistResponse.isExists) elasticClient.execute(deleteIndex(indexName))
     else Future.successful(())
   }
-
-//  implicit override val patienceConfig = PatienceConfig(
-//    timeout = scaled(Span(30, Seconds)),
-//    interval = scaled(Span(200, Millis))
-//  )
 }

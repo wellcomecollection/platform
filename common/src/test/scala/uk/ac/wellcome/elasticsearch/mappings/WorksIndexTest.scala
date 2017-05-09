@@ -4,6 +4,7 @@ import java.util
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
+import org.elasticsearch.index.mapper.StrictDynamicMappingException
 import org.elasticsearch.transport.RemoteTransportException
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
@@ -69,6 +70,7 @@ class WorksIndexTest
 
     whenReady(eventualIndexResponse.failed) { exception =>
       exception shouldBe a[RemoteTransportException]
+      exception.getCause shouldBe a[StrictDynamicMappingException]
     }
   }
 
