@@ -34,8 +34,7 @@ class RecordReceiverTest
 
   val work = Work(
     identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
-    label = "calm data label",
-    accessStatus = Some("restricted"))
+    label = "calm data label")
 
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter

@@ -16,8 +16,7 @@ case class CalmDataTransformable(
   def transform: Try[Work] = Try {
     Work(
       identifiers = List(SourceIdentifier("source", "key", "value")),
-      label = "calm data label",
-      accessStatus = AccessStatus.headOption
+      label = "calm data label"
     )
   }
 }

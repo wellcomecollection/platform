@@ -21,10 +21,7 @@ case class Work(
   description: Option[String] = None,
   lettering: Option[String] = None,
   hasCreatedDate: Option[Period] = None,
-  hasCreator: List[Agent] = List(),
-
-  // TODO: Remove this field?
-  accessStatus: Option[String] = None
+  hasCreator: List[Agent] = List()
 ) {
   @JsonProperty("type") val ldType: String = "Work"
 }
