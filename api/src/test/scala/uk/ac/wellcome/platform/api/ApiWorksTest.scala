@@ -94,8 +94,7 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
     }
   }
 
-  test(
-    "it should return a not found error when requesting a single work with a non existing id") {
+  test("it should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = "/catalogue/v0/works/non-existing-id",
       andExpect = Status.NotFound,

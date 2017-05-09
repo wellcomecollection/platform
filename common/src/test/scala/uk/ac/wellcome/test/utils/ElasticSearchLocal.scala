@@ -3,9 +3,13 @@ package uk.ac.wellcome.test.utils
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
 import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import org.scalatest.{BeforeAndAfterAll, Matchers, Suite}
+import org.scalatest.{Matchers, Suite}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
+import scala.concurrent.Future
 
 trait ElasticSearchLocal
     extends Eventually
@@ -25,4 +29,29 @@ trait ElasticSearchLocal
   eventually {
     elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
   }
+
+  def ensureIndexDeleted(indexName: String): Unit = {
+    val future = for {
+      indexExistQuery <- elasticClient.execute(indexExists(indexName))
+      _ <- deleteIndexIfExists(indexName, indexExistQuery)
+    } yield waitForIndexDeleted(indexName)
+    future.await
+  }
+
+  private def waitForIndexDeleted(indexName: String) = {
+    eventually {
+      elasticClient
+        .execute(indexExists(indexName)).await.isExists should be(false)
+    }
+  }
+
+  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndicesExistsResponse) = {
+    if (indexExistResponse.isExists) elasticClient.execute(deleteIndex(indexName))
+    else Future.successful(())
+  }
+
+//  implicit override val patienceConfig = PatienceConfig(
+//    timeout = scaled(Span(30, Seconds)),
+//    interval = scaled(Span(200, Millis))
+//  )
 }

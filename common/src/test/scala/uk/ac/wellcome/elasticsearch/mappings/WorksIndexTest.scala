@@ -29,17 +29,7 @@ class WorksIndexTest
   val worksIndex = new WorksIndex(elasticClient, indexName, itemType)
 
   override def beforeEach(): Unit = {
-    elasticClient
-      .execute(indexExists(indexName))
-      .map { result =>
-        if (result.isExists) elasticClient.execute(deleteIndex(indexName))
-      }
-
-    eventually {
-      elasticClient
-        .execute(indexExists(indexName)).await.isExists should be (false)
-    }
-    super.beforeEach()
+    ensureIndexDeleted(indexName)
   }
 
   it("should create an index where it's possible to insert and retrieve a valid Work json") {
@@ -71,10 +61,8 @@ class WorksIndexTest
   }
 
   it("it should create an index where inserting a document that does not match the mapping of a work fails") {
-    println("creating index")
     createAndWaitIndexIsCreated()
 
-    println("index created")
     val eventualIndexResponse = elasticClient.execute(
       indexInto(indexName / itemType)
         .doc("""{"json":"json not matching the index structure"}"""))
