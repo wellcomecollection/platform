@@ -1,5 +1,6 @@
 .idea
 *.iml
+ElasticConnectTest.scala
 
 # Created by https://www.gitignore.io/api/java,scala,intellij,linux,vim,osx,python
 

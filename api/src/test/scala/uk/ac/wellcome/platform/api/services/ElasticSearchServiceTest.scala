@@ -4,12 +4,12 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import org.scalatest.{AsyncFunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.api.models.Record
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
+import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil
 
 class ElasticSearchServiceTest
     extends AsyncFunSpec
-    with ElasticSearchLocal
+    with IndexedElasticSearchLocal
     with Matchers {
 
   val elasticService =

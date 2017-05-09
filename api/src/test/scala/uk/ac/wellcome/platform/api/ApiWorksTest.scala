@@ -4,14 +4,10 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  SourceIdentifier,
-  Work
-}
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
+import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
-class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
+class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
 
   implicit val jsonMapper = IdentifiedWork
   override val server =
@@ -32,13 +28,13 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
 
     val firstIdentifiedWork =
       identifiedWorkWith(canonicalId = "1234",
-                                label = "this is the first image label")
+                         label = "this is the first image label")
     val secondIdentifiedWork =
       identifiedWorkWith(canonicalId = "4321",
-                                label = "this is the second image label")
+                         label = "this is the second image label")
     val thirdIdentifiedWork =
       identifiedWorkWith(canonicalId = "9876",
-                                label = "this is the third image label")
+                         label = "this is the third image label")
 
     insertIntoElasticSearch(firstIdentifiedWork)
     insertIntoElasticSearch(secondIdentifiedWork)
@@ -79,7 +75,7 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
   test("it should return a single work when requested with id") {
     val identifiedWork =
       identifiedWorkWith(canonicalId = "1234",
-                                label = "this is the first image title")
+                         label = "this is the first image title")
     insertIntoElasticSearch(identifiedWork)
 
     eventually {
@@ -106,17 +102,15 @@ class ApiWorksTest extends FeatureTest with ElasticSearchLocal {
     )
   }
 
-  private def insertIntoElasticSearch(
-    identifiedWork: IdentifiedWork): Any = {
-    elasticClient.execute(
-      indexInto(indexName / itemType).doc(identifiedWork))
+  private def insertIntoElasticSearch(identifiedWork: IdentifiedWork): Any = {
+    elasticClient.execute(indexInto(indexName / itemType).doc(identifiedWork))
   }
 
   private def identifiedWorkWith(canonicalId: String, label: String) = {
     IdentifiedWork(canonicalId = canonicalId,
-                          work = Work(
-                            identifiers =
-                              List(SourceIdentifier("Miro", "MiroID", "5678")),
-                            label = label))
+                   work =
+                     Work(identifiers =
+                            List(SourceIdentifier("Miro", "MiroID", "5678")),
+                          label = label))
   }
 }

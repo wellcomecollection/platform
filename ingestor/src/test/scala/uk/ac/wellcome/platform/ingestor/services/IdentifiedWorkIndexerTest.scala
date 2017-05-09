@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
+import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -15,7 +15,7 @@ class IdentifiedWorkIndexerTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with ElasticSearchLocal {
+    with IndexedElasticSearchLocal {
 
   val identifiedWorkIndexer =
     new IdentifiedWorkIndexer(indexName, itemType, elasticClient)
