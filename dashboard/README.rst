@@ -24,6 +24,17 @@ Installation
 
 This script requires Python 3 (``brew install python3``) and some dependencies (``pip install -r requirements.txt``).
 
+Alternatively, this directory includes a Dockerfile:
+
+.. code-block:: console
+
+   $ cd platform-infra/dashboard
+   $ docker build -t wellcome/dashboard .
+   $ docker run -v ~/.aws:/root/.aws wellcome/dashboard
+
+(If you get an ``InvalidSignatureException`` from boto3, the clock inside your Docker container has drifted.
+You should restart Docker.)
+
 Usage
 *****
 
