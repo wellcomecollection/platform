@@ -13,7 +13,7 @@ case class Record(
   description: Option[String] = None,
   lettering: Option[String] = None,
   hasCreatedDate: Option[Period] = None,
-  hasCreator: List[Agent] = Nil
+  hasCreator: List[Agent] = List()
 )
 case object Record {
   def apply(hit: RichSearchHit): Record = {
@@ -34,7 +34,8 @@ case object Record {
       description = identifiedWork.work.description,
       lettering = identifiedWork.work.lettering,
       hasCreatedDate = identifiedWork.work.hasCreatedDate,
-      hasCreator = identifiedWork.work.hasCreator
+      // Wrapping this in Option to catch null value from Jackson
+      hasCreator = Option(identifiedWork.work.hasCreator).getOrElse(Nil)
     )
   }
 }
