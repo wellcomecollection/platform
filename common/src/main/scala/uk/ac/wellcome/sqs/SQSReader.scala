@@ -1,11 +1,7 @@
 package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.{
-  DeleteMessageRequest,
-  Message,
-  ReceiveMessageRequest
-}
+import com.amazonaws.services.sqs.model.{DeleteMessageRequest, Message, ReceiveMessageRequest}
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SQSConfig
@@ -13,7 +9,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
@@ -31,7 +27,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
         receiveMessages()
       }
     } flatMap { messages =>
-      info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
+      if(messages.nonEmpty) info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
       processAndDeleteMessages(messages, process).map {_ => ()}
     } recover {
       case exception: Throwable =>
