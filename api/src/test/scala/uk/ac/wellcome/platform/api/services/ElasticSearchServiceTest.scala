@@ -37,7 +37,7 @@ class ElasticSearchServiceTest
     }
   }
 
-  it("should find a record by id") {
+  it("should get a record by id") {
     insertIntoElasticSearch(
       identifiedWorkWith(canonicalId = "1234",
                          label = "this is the item label"))
@@ -50,10 +50,18 @@ class ElasticSearchServiceTest
     }
   }
 
+  it("should return a future of None if it cannot get arecord by id") {
+    val recordsFuture = elasticService.findRecordById("1234")
+
+    recordsFuture map { record =>
+      record shouldBe None
+    }
+  }
+
   private def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*) = {
     identifiedWorks.foreach { identifiedWork =>
       elasticClient.execute(
-        indexInto(indexName / itemType)
+        indexInto(indexName / itemType).id(identifiedWork.canonicalId)
           .doc(JsonUtil.toJson(identifiedWork).get))
     }
     eventually {

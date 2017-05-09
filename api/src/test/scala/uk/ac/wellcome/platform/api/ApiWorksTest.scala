@@ -103,7 +103,10 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
   }
 
   private def insertIntoElasticSearch(identifiedWork: IdentifiedWork): Any = {
-    elasticClient.execute(indexInto(indexName / itemType).doc(identifiedWork))
+    elasticClient.execute(
+      indexInto(indexName / itemType)
+        .id(identifiedWork.canonicalId)
+        .doc(identifiedWork))
   }
 
   private def identifiedWorkWith(canonicalId: String, label: String) = {

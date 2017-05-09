@@ -18,11 +18,11 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
   def findRecordById(canonicalId: String): Future[Option[Record]] =
     elasticClient
       .execute {
-        search(s"$index/$itemType").query(
-          boolQuery().must(matchQuery("canonicalId", canonicalId))
-        )
+        get(canonicalId).from(s"$index/$itemType")
       }
-      .map { _.hits.headOption.map { Record(_) } }
+      .map { result =>
+        if (result.exists) Some(Record(result.original)) else None
+      }
 
   def findRecords(): Future[Array[Record]] =
     elasticClient
