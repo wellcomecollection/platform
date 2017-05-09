@@ -23,8 +23,7 @@ class JsonUtilTest extends FunSpec with Matchers {
   it("should not include fields where the value is empty or None") {
     val work = Work(
       identifiers=List(),
-      label="A haiku about a heron",
-      accessStatus=None
+      label="A haiku about a heron"
     )
     val jsonString = JsonUtil.toJson(work).get
 

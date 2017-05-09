@@ -18,12 +18,10 @@ class WorkExtractorTest
 
     val miroID = "M0000001"
     val label = "A note about a narwhal"
-    val accessStatus = Option("open access")
 
     val work = Work(
       identifiers = List(SourceIdentifier("Miro", "MiroId", miroID)),
-      label = label,
-      accessStatus = accessStatus
+      label = label
     )
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
@@ -38,7 +36,6 @@ class WorkExtractorTest
     whenReady(eventualWork) { extractedWork =>
       extractedWork.identifiers.head.value shouldBe miroID
       extractedWork.label shouldBe label
-      extractedWork.accessStatus shouldBe accessStatus
     }
   }
 
