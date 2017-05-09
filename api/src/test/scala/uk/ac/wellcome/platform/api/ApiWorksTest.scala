@@ -24,29 +24,17 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
       )
     )
 
-  ignore("it should return a list of works") {
+  test("it should return a list of works") {
 
     val firstIdentifiedWork =
       identifiedWorkWith(canonicalId = "1234",
-                         label = "this is the first image label",
-                         description = "",
-                         lettering = "",
-                         createdDate = Period(""),
-                         creator = Agent(""))
+                         label = "this is the first image label")
     val secondIdentifiedWork =
       identifiedWorkWith(canonicalId = "4321",
-                         label = "this is the second image label",
-                         description = "",
-                         lettering = "",
-                         createdDate = Period(""),
-                         creator = Agent(""))
+                         label = "this is the second image label")
     val thirdIdentifiedWork =
       identifiedWorkWith(canonicalId = "9876",
-                         label = "this is the third image label",
-                         description = "",
-                         lettering = "",
-                         createdDate = Period(""),
-                         creator = Agent(""))
+                         label = "this is the third image label")
 
     insertIntoElasticSearch(firstIdentifiedWork)
     insertIntoElasticSearch(secondIdentifiedWork)
@@ -65,17 +53,20 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
             |   {
             |     "type": "Work",
             |     "id": "${firstIdentifiedWork.canonicalId}",
-            |     "label": "${firstIdentifiedWork.work.label}"
+            |     "label": "${firstIdentifiedWork.work.label}",
+            |     "hasCreator":[]
             |   },
             |   {
             |     "type": "Work",
             |     "id": "${secondIdentifiedWork.canonicalId}",
-            |     "label": "${secondIdentifiedWork.work.label}"
+            |     "label": "${secondIdentifiedWork.work.label}",
+            |     "hasCreator":[]
             |   },
             |   {
             |     "type": "Work",
             |     "id": "${thirdIdentifiedWork.canonicalId}",
-            |     "label": "${thirdIdentifiedWork.work.label}"
+            |     "label": "${thirdIdentifiedWork.work.label}",
+            |     "hasCreator":[]
             |   }
             |  ]
             |}
@@ -145,7 +136,13 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
         .id(identifiedWork.canonicalId)
         .doc(identifiedWork))
   }
+  private def identifiedWorkWith(canonicalId: String, label: String) = {
+    IdentifiedWork(canonicalId,
+                   Work(identifiers =
+                          List(SourceIdentifier("Miro", "MiroID", "5678")),
+                        label = label))
 
+  }
   private def identifiedWorkWith(canonicalId: String,
                                  label: String,
                                  description: String,

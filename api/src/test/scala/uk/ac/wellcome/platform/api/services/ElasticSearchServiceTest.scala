@@ -47,7 +47,10 @@ class ElasticSearchServiceTest
 
     recordsFuture map { records =>
       records.isDefined shouldBe true
-      records.get shouldBe Record("Work", "1234", "this is the item label", None)
+      records.get shouldBe Record("Work",
+                                  "1234",
+                                  "this is the item label",
+                                  None)
     }
   }
 
