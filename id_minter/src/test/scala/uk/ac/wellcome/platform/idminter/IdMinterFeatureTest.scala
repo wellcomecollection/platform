@@ -43,13 +43,10 @@ class IdMinterFeatureTest
   it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
     val label = "A limerick about a lion"
-    val accessStatus = Option("open access")
 
     val work = Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", miroID)),
-      label = label,
-      accessStatus = accessStatus
-    )
+      label = label)
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
                                 "topic",
@@ -75,7 +72,6 @@ class IdMinterFeatureTest
       parsedIdentifiedWork.canonicalId shouldBe id.CanonicalID
       parsedIdentifiedWork.work.identifiers.head.value shouldBe miroID
       parsedIdentifiedWork.work.label shouldBe label
-      parsedIdentifiedWork.work.accessStatus shouldBe accessStatus
 
       messages.head.subject should be("identified-item")
     }
@@ -120,8 +116,7 @@ class IdMinterFeatureTest
   private def generateSqsMessage(MiroID: String) = {
     val work = Work(identifiers =
                       List(SourceIdentifier("Miro", "MiroID", MiroID)),
-                    label = "some label",
-                    accessStatus = Option("super-secret"))
+                    label = "some label")
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,
                "topic",

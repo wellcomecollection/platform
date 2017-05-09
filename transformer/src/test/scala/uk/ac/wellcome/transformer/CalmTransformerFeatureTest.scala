@@ -5,7 +5,6 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAda
 import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sqs.AmazonSQS
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
@@ -72,8 +71,7 @@ class CalmTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
       .toJson(
         Work(
           identifiers = List(SourceIdentifier("source", "key", "value")),
-          label = "calm data label",
-          accessStatus = AccessStatus
+          label = "calm data label"
         ))
       .get
   }
