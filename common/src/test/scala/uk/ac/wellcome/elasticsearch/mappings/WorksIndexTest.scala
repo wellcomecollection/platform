@@ -1,10 +1,14 @@
 package uk.ac.wellcome.elasticsearch.mappings
 
-import com.sksamuel.elastic4s.testkit.ElasticSugar
-import org.elasticsearch.index.mapper.StrictDynamicMappingException
+import java.util
+
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
+import org.elasticsearch.transport.RemoteTransportException
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -12,7 +16,7 @@ import scala.collection.JavaConversions._
 
 class WorksIndexTest
     extends FunSpec
-    with ElasticSugar
+    with ElasticSearchLocal
     with ScalaFutures
     with Eventually
     with IntegrationPatience
@@ -22,14 +26,14 @@ class WorksIndexTest
   val indexName = "records"
   val itemType = "item"
 
-  val worksIndex = new WorksIndex(client, indexName, itemType)
+  val worksIndex = new WorksIndex(elasticClient, indexName, itemType)
 
   override def beforeEach(): Unit = {
-    deleteIndex(indexName)
+    ensureIndexDeleted(indexName)
   }
 
   it("should create an index where it's possible to insert and retrieve a valid Work json") {
-    createAndWaitIndexIsCreated
+    createAndWaitIndexIsCreated()
 
     val workJson = JsonUtil
       .toJson(
@@ -44,11 +48,11 @@ class WorksIndexTest
         ))
       .get
 
-    client.execute(indexInto(indexName / itemType).doc(workJson))
+    elasticClient.execute(indexInto(indexName / itemType).doc(workJson))
 
     eventually {
-      val hits = client
-        .execute(search(s"$indexName/$itemType").matchAll())
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery())
         .map { _.hits }
         .await
       hits should have size 1
@@ -57,39 +61,60 @@ class WorksIndexTest
   }
 
   it("it should create an index where inserting a document that does not match the mapping of a work fails") {
-    createAndWaitIndexIsCreated
+    createAndWaitIndexIsCreated()
 
-    val eventualIndexResponse = client.execute(
+    val eventualIndexResponse = elasticClient.execute(
       indexInto(indexName / itemType)
         .doc("""{"json":"json not matching the index structure"}"""))
 
     whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a[StrictDynamicMappingException]
+      exception shouldBe a[RemoteTransportException]
     }
   }
 
   it("should update an already existing index with the mapping") {
-    ensureIndexExists(indexName)
+    createIndexAndInsertDocument()
 
-    worksIndex.create.await
+    worksIndex.create
 
     eventually {
-      val mappings = client
+      val mappings: Map[String, AnyRef] = elasticClient
         .execute(getMapping(indexName / itemType))
         .await
         .mappingFor(indexName / itemType)
         .getSourceAsMap
         .toMap
-      mappings should contain ("dynamic" -> "strict")
+      mappings("properties")
+        .asInstanceOf[util.Map[String, AnyRef]]
+        .keys should contain("work")
     }
 
   }
 
-  private def createAndWaitIndexIsCreated = {
-    worksIndex.create.await
+  private def createIndexAndInsertDocument() = {
+    val futureIndexWithDocument =
+      for {
+        _ <- elasticClient.execute(createIndex(indexName))
+        _ <- elasticClient.execute(putMapping(indexName / itemType)
+          .dynamic(DynamicMapping.Strict).as(keywordField("canonicalId")))
+        _ <- elasticClient.execute(indexInto(indexName / itemType).doc(
+          """
+            |{
+            | "canonicalId": "1234"
+            |}
+          """.stripMargin))
+      } yield ()
 
-    eventually {
-      doesIndexExists(indexName) shouldBe true
+    futureIndexWithDocument.await
+  }
+
+  private def createAndWaitIndexIsCreated() = {
+    val createIndexFuture = worksIndex.create
+
+    whenReady(createIndexFuture) { _ =>
+      eventually {
+        elasticClient.execute(indexExists(indexName)).await.isExists should be(true)
+      }
     }
   }
 }

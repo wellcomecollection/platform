@@ -39,8 +39,6 @@ object ElasticClientModule extends TwitterModule {
   private val clusterName =
     flag[String]("es.name", "elasticsearch", "cluster name")
 
-  val timeout = flag("es.timeout", 30, "default timeout duration of execution")
-
   @Singleton
   @Provides
   def provideElasticClient(xpackConfig: Option[XPackConfig]): TcpClient = {
@@ -63,8 +61,8 @@ object ElasticClientModule extends TwitterModule {
             .put("xpack.security.user", config.user))
       .build()
 
-    settings.getAsMap.asScala.map {
-      case (k, v) => info(s"ElasticClient setting: ${k}=${v}")
+    settings.getAsMap.asScala.foreach {
+      case (k, v) => info(s"ElasticClient setting: $k=$v")
     }
 
     XPackElasticClient(settings, clientUri)

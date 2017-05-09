@@ -11,12 +11,7 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  Identifier,
-  SourceIdentifier,
-  Work
-}
+import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 

@@ -3,17 +3,19 @@ package uk.ac.wellcome.test.utils
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
 import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.mappings.WorksIndex
+import org.scalatest.{Matchers, Suite}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
+import scala.concurrent.Future
 
 trait ElasticSearchLocal
-    extends BeforeAndAfterAll
-    with BeforeAndAfterEach
-    with Eventually
+    extends Eventually
     with IntegrationPatience
     with Matchers { this: Suite =>
+
   private val settings = Settings
     .builder()
     .put("cluster.name", "wellcome")
@@ -23,24 +25,33 @@ trait ElasticSearchLocal
   val elasticClient =
     XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
 
-  val indexName = "records"
-  val itemType = "item"
+  // Elasticsearch takes a while to start up so check that it actually started before running tests
+  eventually {
+    elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
+  }
 
-  override def beforeAll(): Unit = {
-    // Elasticsearch takes a while to start up so check that it actually started before running tests
+  def ensureIndexDeleted(indexName: String): Unit = {
+    val future = for {
+      indexExistQuery <- elasticClient.execute(indexExists(indexName))
+      _ <- deleteIndexIfExists(indexName, indexExistQuery)
+    } yield waitForIndexDeleted(indexName)
+    future.await
+  }
+
+  private def waitForIndexDeleted(indexName: String) = {
     eventually {
-      elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
+      elasticClient
+        .execute(indexExists(indexName)).await.isExists should be(false)
     }
-
-    if (elasticClient.execute(indexExists(indexName)).await.isExists){
-      elasticClient.execute(deleteIndex(indexName)).await
-    }
-    new WorksIndex(elasticClient, indexName, itemType).create.await
-    super.beforeAll()
   }
 
-  override def beforeEach(): Unit = {
-    elasticClient.execute(deleteIn(indexName).by(matchAllQuery())).await
-    super.beforeEach()
+  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndicesExistsResponse) = {
+    if (indexExistResponse.isExists) elasticClient.execute(deleteIndex(indexName))
+    else Future.successful(())
   }
+
+//  implicit override val patienceConfig = PatienceConfig(
+//    timeout = scaled(Span(30, Seconds)),
+//    interval = scaled(Span(200, Millis))
+//  )
 }
