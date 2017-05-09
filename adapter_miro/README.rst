@@ -15,7 +15,7 @@ These scripts require Python 3 and dependencies:
 .. code-block:: console
 
    $ brew install python3
-   $ pip3 install boto3 lxml
+   $ pip3 install -r requirements.txt
 
 Usage
 -----
