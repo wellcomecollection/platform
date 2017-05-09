@@ -19,6 +19,10 @@ Here's an example of the output:
    ingestor     0.0.1-b55ca1cefeba77576e2cc8ef7bff55d107bdb8ab_prod  2017-05-08 14:43:08
    id_minter    0.0.1-b55ca1cefeba77576e2cc8ef7bff55d107bdb8ab_prod  2017-05-08 14:50:40
 
+Here we see that the ``api`` and ``transformer`` service both have two containers: a container for the new release which has just been started, and a container running the old release that will be stopped shortly.
+
+This allows us to see how far the new release has propagated.
+
 Installation
 ************
 
