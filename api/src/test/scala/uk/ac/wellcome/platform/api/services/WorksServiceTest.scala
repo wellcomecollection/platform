@@ -7,14 +7,17 @@ import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ElasticSearchServiceTest
+class WorksServiceTest
     extends FunSpec
     with IndexedElasticSearchLocal
     with Matchers
     with ScalaFutures {
 
-  val elasticService =
+  val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)
+
+  val worksService =
+    new WorksService(searchService)
 
   it("should return the records in Elasticsearch") {
     val firstIdentifiedWork =
@@ -25,7 +28,7 @@ class ElasticSearchServiceTest
                          label = "this is the second item label")
     insertIntoElasticSearch(firstIdentifiedWork, secondIdentifiedWork)
 
-    val displayWorksFuture = elasticService.findWork()
+    val displayWorksFuture = worksService.findWorks()
 
     displayWorksFuture map { displayWork =>
       displayWork should have size 2
@@ -44,7 +47,7 @@ class ElasticSearchServiceTest
       identifiedWorkWith(canonicalId = "1234",
                          label = "this is the item label"))
 
-    val recordsFuture = elasticService.findWorkById("1234")
+    val recordsFuture = worksService.findWorkById("1234")
 
     whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
@@ -64,14 +67,16 @@ class ElasticSearchServiceTest
       canonicalId = "5678",
       label = "A mezzotint of a mouse"
     )
+
     insertIntoElasticSearch(workDodo, workMouse)
 
-    val searchForCat = elasticService.fullTextSearchWorks("cat")
+    val searchForCat = worksService.searchWorks("cat")
+
     whenReady(searchForCat) { works =>
       works should have size 0
     }
 
-    val searchForDodo = elasticService.fullTextSearchWorks("dodo")
+    val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works should have size 1
       works.head shouldBe DisplayWork("Work",
@@ -81,7 +86,7 @@ class ElasticSearchServiceTest
   }
 
   it("should return a future of None if it cannot get arecord by id") {
-    val recordsFuture = elasticService.findWorkById("1234")
+    val recordsFuture = worksService.findWorkById("1234")
 
     whenReady(recordsFuture) { record =>
       record shouldBe None
@@ -95,7 +100,7 @@ class ElasticSearchServiceTest
     )
     insertIntoElasticSearch(workEmu)
 
-    val searchForEmu = elasticService.fullTextSearchWorks(
+    val searchForEmu = worksService.searchWorks(
       "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
     )
 
