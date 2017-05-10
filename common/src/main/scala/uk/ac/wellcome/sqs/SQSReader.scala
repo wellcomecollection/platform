@@ -28,6 +28,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       }
     } flatMap { messages =>
       if(messages.nonEmpty) info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
+      else debug(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
       processAndDeleteMessages(messages, process).map {_ => ()}
     } recover {
       case exception: Throwable =>
