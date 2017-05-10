@@ -7,32 +7,41 @@ import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibC
 import com.amazonaws.services.sns.AmazonSNS
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.FunSpec
-import uk.ac.wellcome.models.{MiroTransformable, SourceIdentifier, Work}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.{MiroTransformable, Work}
 import uk.ac.wellcome.platform.transformer.Server
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 
-class MiroTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
+class MiroTransformerFeatureTest
+    extends FunSpec
+    with TransformerFeatureTest
+    with Eventually
+    with IntegrationPatience
+    with Matchers {
 
   private val appName = "test-transformer-miro"
-  override val server = new EmbeddedHttpServer(
-    new Server(),
-    flags = Map(
-      "aws.region" -> "eu-west-1",
-      "aws.dynamo.streams.appName" -> appName,
-      "aws.dynamo.streams.arn" -> miroDataStreamArn,
-      "aws.dynamo.tableName" -> miroDataTableName,
-      "aws.sns.topic.arn" -> idMinterTopicArn
-    )
-  )
-    .bind[AmazonSNS](amazonSNS)
-    .bind[AmazonDynamoDB](dynamoDbClient)
-    .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(streamsClient))
-    .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration(appName, miroDataStreamArn))
+  def server: EmbeddedHttpServer =
+    new EmbeddedHttpServer(
+      new Server(),
+      flags = Map(
+        "aws.region" -> "eu-west-1",
+        "aws.dynamo.streams.appName" -> appName,
+        "aws.dynamo.streams.arn" -> miroDataStreamArn,
+        "aws.dynamo.tableName" -> miroDataTableName,
+        "aws.sns.topic.arn" -> idMinterTopicArn
+      )
+    ).bind[AmazonSNS](amazonSNS)
+      .bind[AmazonDynamoDB](dynamoDbClient)
+      .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
+        streamsClient))
+      .bind[KinesisClientLibConfiguration](
+        kinesisClientLibConfiguration(appName, miroDataStreamArn))
 
   it("should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
+    server.start()
     val miroID = "M0000001"
     val label = "A guide for a giraffe"
     putMiroImageInDynamoDb(miroID, label)
@@ -56,6 +65,7 @@ class MiroTransformerFeatureTest extends FunSpec with TransformerFeatureTest {
                                secondMiroID,
                                secondLabel)
     }
+    server.close()
   }
 
   private def assertSNSMessageContains(snsMessage: MessageInfo,
