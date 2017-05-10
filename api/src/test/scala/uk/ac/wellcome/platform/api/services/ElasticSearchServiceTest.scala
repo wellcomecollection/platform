@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.ElasticDsl._
+import org.junit.Test
 import org.scalatest.{AsyncFunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.api.models.Record
@@ -46,7 +47,10 @@ class ElasticSearchServiceTest
 
     recordsFuture map { records =>
       records.isDefined shouldBe true
-      records.get shouldBe Record("Work", "1234", "this is the item label")
+      records.get shouldBe Record("Work",
+                                  "1234",
+                                  "this is the item label",
+                                  None)
     }
   }
 
@@ -61,7 +65,8 @@ class ElasticSearchServiceTest
   private def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*) = {
     identifiedWorks.foreach { identifiedWork =>
       elasticClient.execute(
-        indexInto(indexName / itemType).id(identifiedWork.canonicalId)
+        indexInto(indexName / itemType)
+          .id(identifiedWork.canonicalId)
           .doc(JsonUtil.toJson(identifiedWork).get))
     }
     eventually {
