@@ -1,13 +1,13 @@
 package uk.ac.wellcome.platform.api
 
-import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTest
+import com.twitter.inject.server.FeatureTestMixin
+import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
-class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
+class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSearchLocal {
 
   implicit val jsonMapper = IdentifiedWork
   override val server =
@@ -32,7 +32,7 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
   val period = Period("the past")
   val agent = Agent("a person")
 
-  test("it should return a list of works") {
+  it("should return a list of works") {
 
     val works = (1 to 3).map(
       (idx: Int) =>
@@ -111,7 +111,7 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
     }
   }
 
-  test("it should return a single work when requested with id") {
+  it("should return a single work when requested with id") {
     val identifiedWork =
       identifiedWorkWith(
         canonicalId = canonicalId,
@@ -149,8 +149,7 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
     }
   }
 
-  test(
-    "it should return a not found error when requesting a single work with a non existing id") {
+  it("should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = "/catalogue/v0/works/non-existing-id",
       andExpect = Status.NotFound,
