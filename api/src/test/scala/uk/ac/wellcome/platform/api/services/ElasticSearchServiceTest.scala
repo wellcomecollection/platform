@@ -1,17 +1,17 @@
 package uk.ac.wellcome.platform.api.services
 
-import com.sksamuel.elastic4s.ElasticDsl._
-import org.junit.Test
-import org.scalatest.{AsyncFunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
-import uk.ac.wellcome.utils.JsonUtil
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ElasticSearchServiceTest
-    extends AsyncFunSpec
+    extends FunSpec
     with IndexedElasticSearchLocal
-    with Matchers {
+    with Matchers
+    with ScalaFutures {
 
   val elasticService =
     new ElasticSearchService(indexName, itemType, elasticClient)
@@ -30,11 +30,12 @@ class ElasticSearchServiceTest
     displayWorksFuture map { displayWork =>
       displayWork should have size 2
       displayWork.head shouldBe DisplayWork("Work",
-                                   firstIdentifiedWork.canonicalId,
-                                   firstIdentifiedWork.work.label)
-      displayWork.tail.head shouldBe DisplayWork("Work",
-                                        secondIdentifiedWork.canonicalId,
-                                        secondIdentifiedWork.work.label)
+                                            firstIdentifiedWork.canonicalId,
+                                            firstIdentifiedWork.work.label)
+      displayWork.tail.head shouldBe DisplayWork(
+        "Work",
+        secondIdentifiedWork.canonicalId,
+        secondIdentifiedWork.work.label)
     }
   }
 
@@ -45,37 +46,45 @@ class ElasticSearchServiceTest
 
     val recordsFuture = elasticService.findWorkById("1234")
 
-    recordsFuture map { records =>
+    whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
       records.get shouldBe DisplayWork("Work",
-                                  "1234",
-                                  "this is the item label",
-                                  None)
+                                       "1234",
+                                       "this is the item label",
+                                       None)
+    }
+  }
+
+  it("should only find results that match a query if doing a full-text search") {
+    val workDodo = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A drawing of a dodo"
+    )
+    val workMouse = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "A mezzotint of a mouse"
+    )
+    insertIntoElasticSearch(workDodo, workMouse)
+
+    val searchForCat = elasticService.fullTextSearchWorks("cat")
+    whenReady(searchForCat) { works =>
+      works should have size 0
+    }
+
+    val searchForDodo = elasticService.fullTextSearchWorks("dodo")
+    whenReady(searchForDodo) { works =>
+      works should have size 1
+      works.head shouldBe DisplayWork("Work",
+                                      workDodo.canonicalId,
+                                      workDodo.work.label)
     }
   }
 
   it("should return a future of None if it cannot get arecord by id") {
     val recordsFuture = elasticService.findWorkById("1234")
 
-    recordsFuture map { record =>
+    whenReady(recordsFuture) { record =>
       record shouldBe None
-    }
-  }
-
-  private def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*) = {
-    identifiedWorks.foreach { identifiedWork =>
-      elasticClient.execute(
-        indexInto(indexName / itemType)
-          .id(identifiedWork.canonicalId)
-          .doc(JsonUtil.toJson(identifiedWork).get))
-    }
-    eventually {
-      elasticClient
-        .execute {
-          search(indexName).matchAllQuery()
-        }
-        .await
-        .hits should have size identifiedWorks.size
     }
   }
 
