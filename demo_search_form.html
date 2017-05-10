@@ -1,0 +1,56 @@
+<html>
+
+<head>
+  <style>
+    input, button {
+      font-size: 1.1em;
+    }
+    body {
+      padding-top: 1em;
+      max-width: 800px;
+      margin-left:  auto;
+      margin-right: auto;
+    }
+    li {
+      line-height: 1.4em;
+      margin-bottom: 8px;
+    }
+  </style>
+  <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+</head>
+
+<body>
+
+  <h1>Platform search demo</h1>
+
+  <input type="text" size="40" id="search_box">
+  <button onclick="script:doASearch()">Search!</button>
+
+  <p id="search_url"></p>
+  <ul id="results"></ul>
+
+  <script>
+
+    doASearch = function() {
+      var searchQuery = $('#search_box')[0].value;
+      var searchUrl = 'https://api.wellcomecollection.org/catalogue/v0/works?' + $.param({query: searchQuery});
+
+      $('#search_url')[0].innerHTML = "Fetching API response from <a href=" + searchUrl + ">" + searchUrl + "</a>:";
+      $('#results')[0].innerHTML = "";
+      $.ajax({
+        url: searchUrl,
+        success: function(response) {
+          var results = response.results;
+          for (var i = 0; i < results.length; i++) {
+            var result = results[i];
+            console.log(result);
+            $('#results')[0].innerHTML += "<li><strong>ID:</strong> " + result.id + "<br><strong>Label: </strong>" + result.label + "<br><strong>Description: </strong>" + result.description + "</li>";
+          }
+        },
+      });
+    };
+  </script>
+
+</body>
+
+</html>
