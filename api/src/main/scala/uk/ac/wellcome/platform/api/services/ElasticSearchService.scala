@@ -15,16 +15,16 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
                                      @Flag("es.type") itemType: String,
                                      elasticClient: TcpClient) {
 
-  def findRecordById(canonicalId: String): Future[Option[Record]] =
+  def findWorkById(canonicalId: String): Future[Option[DisplayWork]] =
     elasticClient
       .execute {
         get(canonicalId).from(s"$index/$itemType")
       }
       .map { result =>
-        if (result.exists) Some(Record(result.original)) else None
+        if (result.exists) Some(DisplayWork(result.original)) else None
       }
 
-  def findRecords(): Future[Array[Record]] =
+  def findWork(): Future[Array[DisplayWork]] =
     elasticClient
       .execute {
         search(s"$index/$itemType")
@@ -33,6 +33,6 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
           .sortBy(fieldSort("canonicalId"))
           .limit(10)
       }
-      .map { _.hits.map { Record(_) } }
+      .map { _.hits.map { DisplayWork(_) } }
 
 }

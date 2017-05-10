@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import org.junit.Test
 import org.scalatest.{AsyncFunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
-import uk.ac.wellcome.platform.api.models.Record
+import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -25,29 +25,29 @@ class ElasticSearchServiceTest
                          label = "this is the second item label")
     insertIntoElasticSearch(firstIdentifiedWork, secondIdentifiedWork)
 
-    val recordsFuture = elasticService.findRecords()
+    val displayWorksFuture = elasticService.findWork()
 
-    recordsFuture map { records =>
-      records should have size 2
-      records.head shouldBe Record("Work",
+    displayWorksFuture map { displayWork =>
+      displayWork should have size 2
+      displayWork.head shouldBe DisplayWork("Work",
                                    firstIdentifiedWork.canonicalId,
                                    firstIdentifiedWork.work.label)
-      records.tail.head shouldBe Record("Work",
+      displayWork.tail.head shouldBe DisplayWork("Work",
                                         secondIdentifiedWork.canonicalId,
                                         secondIdentifiedWork.work.label)
     }
   }
 
-  it("should get a record by id") {
+  it("should get a DisplayWork by id") {
     insertIntoElasticSearch(
       identifiedWorkWith(canonicalId = "1234",
                          label = "this is the item label"))
 
-    val recordsFuture = elasticService.findRecordById("1234")
+    val recordsFuture = elasticService.findWorkById("1234")
 
     recordsFuture map { records =>
       records.isDefined shouldBe true
-      records.get shouldBe Record("Work",
+      records.get shouldBe DisplayWork("Work",
                                   "1234",
                                   "this is the item label",
                                   None)
@@ -55,7 +55,7 @@ class ElasticSearchServiceTest
   }
 
   it("should return a future of None if it cannot get arecord by id") {
-    val recordsFuture = elasticService.findRecordById("1234")
+    val recordsFuture = elasticService.findWorkById("1234")
 
     recordsFuture map { record =>
       record shouldBe None
