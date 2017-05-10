@@ -1,17 +1,18 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import org.junit.Test
-import org.scalatest.{AsyncFunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil
 
 class ElasticSearchServiceTest
-    extends AsyncFunSpec
+    extends FunSpec
     with IndexedElasticSearchLocal
-    with Matchers {
+    with Matchers
+    with ScalaFutures {
 
   val elasticService =
     new ElasticSearchService(indexName, itemType, elasticClient)
@@ -45,7 +46,7 @@ class ElasticSearchServiceTest
 
     val recordsFuture = elasticService.findWorkById("1234")
 
-    recordsFuture map { records =>
+    whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
       records.get shouldBe DisplayWork("Work",
                                   "1234",
@@ -57,7 +58,7 @@ class ElasticSearchServiceTest
   it("should return a future of None if it cannot get arecord by id") {
     val recordsFuture = elasticService.findWorkById("1234")
 
-    recordsFuture map { record =>
+    whenReady(recordsFuture) { record =>
       record shouldBe None
     }
   }
