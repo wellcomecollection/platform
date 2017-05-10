@@ -157,7 +157,59 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
     )
   }
 
+  it("should return matching results if doing a full-text search") {
+    val work1 = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A drawing of a dodo"
+    )
+    val work2 = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "A mezzotint of a mouse"
+    )
+    insertIntoElasticSearch(work1, work2)
+
+    eventually {
+      server.httpGet(
+        path = "/catalogue/v0/works?query=cat",
+        andExpect = Status.Ok,
+        withJsonBody =
+          s"""
+          |{
+          |  "@context": "http://localhost:8888/catalogue/v0/context.json",
+          |  "type": "ResultList",
+          |  "pageSize": 10,
+          |  "totalPages": 10,
+          |  "totalResults": 100,
+          |  "results": []
+          |}""".stripMargin
+      )
+    }
+
+    eventually {
+      server.httpGet(
+        path = "/catalogue/v0/works?query=dodo",
+        andExpect = Status.Ok,
+        withJsonBody =
+          s"""
+             |{
+             |  "@context": "http://localhost:8888/catalogue/v0/context.json",
+             |  "type": "ResultList",
+             |  "pageSize": 10,
+             |  "totalPages": 10,
+             |  "totalResults": 100,
+             |  "results": [
+             |   {
+             |     "type": "Work",
+             |     "id": "${work1.canonicalId}",
+             |     "label": "${work1.work.label}",
+             |     "hasCreator": []
+             |   }
+             |  ]
+             |}""".stripMargin
+      )
+    }
   }
+
   private def identifiedWorkWith(canonicalId: String, label: String) = {
     IdentifiedWork(canonicalId,
                    Work(identifiers =

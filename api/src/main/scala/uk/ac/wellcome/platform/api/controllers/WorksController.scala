@@ -7,10 +7,7 @@ import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.ElasticSearchService
 import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -42,9 +39,16 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           "pageSize",
           "The number of works to return per page (default: 10)",
           required = false)
+        .queryParam[String](
+          "query",
+          "Full-text search query",
+          required = false)
     } { request: Request =>
-      elasticService
-        .findWork()
+      val works = request.params.get("query") match {
+        case Some(queryString) => elasticService.fullTextSearchWorks(queryString)
+        case None => elasticService.findWork()
+      }
+      works
         .map(
           results =>
             response.ok.json(
