@@ -10,10 +10,14 @@
       max-width: 800px;
       margin-left:  auto;
       margin-right: auto;
+      padding: 15px;
     }
     li {
       line-height: 1.4em;
       margin-bottom: 8px;
+    }
+    input {
+      width: 70%;
     }
   </style>
   <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -23,7 +27,7 @@
 
   <h1>Platform search demo</h1>
 
-  <input type="text" size="40" id="search_box">
+  <input type="text" id="search_box">
   <button onclick="script:doASearch()">Search!</button>
 
   <p id="search_url"></p>
