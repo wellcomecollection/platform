@@ -23,7 +23,7 @@ class MiroTransformerFeatureTest
     with Matchers {
 
   private val appName = "test-transformer-miro"
-  def server: EmbeddedHttpServer =
+  val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
@@ -41,7 +41,6 @@ class MiroTransformerFeatureTest
         kinesisClientLibConfiguration(appName, miroDataStreamArn))
 
   it("should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
-    server.start()
     val miroID = "M0000001"
     val label = "A guide for a giraffe"
     putMiroImageInDynamoDb(miroID, label)
@@ -65,7 +64,6 @@ class MiroTransformerFeatureTest
                                secondMiroID,
                                secondLabel)
     }
-    server.close()
   }
 
   private def assertSNSMessageContains(snsMessage: MessageInfo,

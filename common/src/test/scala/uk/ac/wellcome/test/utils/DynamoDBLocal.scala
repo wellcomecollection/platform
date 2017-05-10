@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.Identifier
+import uk.ac.wellcome.models.{CalmTransformable, Identifier, MiroTransformable}
 
 import scala.collection.JavaConversions._
 
@@ -19,7 +19,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
     new AWSStaticCredentialsProvider(
       new BasicAWSCredentials("access", "secret"))
 
-  protected val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
+  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
     .standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(
@@ -30,14 +30,15 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
 
+  deleteTables()
+  createIdentifiersTable()
+  private val miroDataTable: CreateTableResult = createMiroDataTable()
+  private val calmDataTable: CreateTableResult = createCalmDataTable()
 
-  private var miroDataTable: Option[CreateTableResult] = None
-  private var calmDataTable: Option[CreateTableResult] = None
+  val miroDataStreamArn: String = miroDataTable.getTableDescription.getLatestStreamArn
+  val calmDataStreamArn: String = calmDataTable.getTableDescription.getLatestStreamArn
 
-  def miroDataStreamArn: String = miroDataTable.get.getTableDescription.getLatestStreamArn
-  def calmDataStreamArn: String = calmDataTable.get.getTableDescription.getLatestStreamArn
-
-  protected val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
+  val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
     .standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(
@@ -46,22 +47,40 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    deleteTables()
-    createIdentifiersTable()
-    miroDataTable = Some(createMiroDataTable())
-    calmDataTable = Some(createCalmDataTable())
-//    List(identifiersTableName, miroDataTableName, calmDataTableName)
-//      .foreach(tableName => clearTable(tableName))
-
+    clearIdentifiersTable()
+    clearMiroTable()
+    clearCalmTable()
   }
 
-  private def clearTable(tableName: String): List[DeleteItemResult] =
-    Scanamo.scan[Identifier](dynamoDbClient)(tableName).map {
+  private def clearIdentifiersTable(): List[DeleteItemResult] =
+    Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
       case Right(id) =>
         dynamoDbClient.deleteItem(
-          tableName,
+          identifiersTableName,
           Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
-      case _ => throw new Exception(s"Unable to clear the table $tableName")
+      case a => throw new Exception(s"Unable to clear the table $identifiersTableName error $a")
+    }
+
+  private def clearMiroTable(): List[DeleteItemResult] =
+    Scanamo.scan[MiroTransformable](dynamoDbClient)(miroDataTableName).map {
+      case Right(id) =>
+        dynamoDbClient.deleteItem(
+          miroDataTableName,
+          Map("MiroID" -> new AttributeValue(id.MiroID),
+          "MiroCollection" -> new AttributeValue(id.MiroCollection)))
+      case a => throw new Exception(s"Unable to clear the table $miroDataTableName error $a")
+    }
+
+  private def clearCalmTable(): List[DeleteItemResult] =
+    Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName).map {
+      case Right(id) =>
+        dynamoDbClient.deleteItem(
+          calmDataTableName,
+          Map(
+            "RecordID" -> new AttributeValue(id.RecordID),
+            "RecordType" -> new AttributeValue(id.RecordType)
+          ))
+      case a => throw new Exception(s"Unable to clear the table $calmDataTableName error $a")
     }
 
   private def deleteTables() = {
