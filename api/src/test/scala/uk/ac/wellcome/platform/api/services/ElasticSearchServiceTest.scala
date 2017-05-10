@@ -86,23 +86,6 @@ class ElasticSearchServiceTest
     }
   }
 
-  private def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*) = {
-    identifiedWorks.foreach { identifiedWork =>
-      elasticClient.execute(
-        indexInto(indexName / itemType)
-          .id(identifiedWork.canonicalId)
-          .doc(JsonUtil.toJson(identifiedWork).get))
-    }
-    eventually {
-      elasticClient
-        .execute {
-          search(indexName).matchAllQuery()
-        }
-        .await
-        .hits should have size identifiedWorks.size
-    }
-  }
-
   private def identifiedWorkWith(canonicalId: String, label: String) = {
     IdentifiedWork(canonicalId,
                    Work(identifiers = List(
