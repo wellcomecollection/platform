@@ -6,7 +6,7 @@ import org.elasticsearch.action.get.GetResponse
 import uk.ac.wellcome.models.{Agent, IdentifiedWork, Period, Work}
 import uk.ac.wellcome.utils.JsonUtil
 
-case class Record(
+case class DisplayWork(
   @JsonProperty("type") ontologyType: String = "Work",
   id: String,
   label: String,
@@ -15,12 +15,12 @@ case class Record(
   hasCreatedDate: Option[Period] = None,
   hasCreator: List[Agent] = List()
 )
-case object Record {
-  def apply(hit: RichSearchHit): Record = {
+case object DisplayWork {
+  def apply(hit: RichSearchHit): DisplayWork = {
     toRecord(hit.sourceAsString)
   }
 
-  def apply(got: GetResponse): Record = {
+  def apply(got: GetResponse): DisplayWork = {
     toRecord(got.getSourceAsString)
   }
 
@@ -28,7 +28,7 @@ case object Record {
     val identifiedWork =
       JsonUtil.fromJson[IdentifiedWork](document).get
 
-    Record(
+    DisplayWork(
       id = identifiedWork.canonicalId,
       label = identifiedWork.work.label,
       description = identifiedWork.work.description,

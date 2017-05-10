@@ -44,7 +44,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           required = false)
     } { request: Request =>
       elasticService
-        .findRecords()
+        .findWork()
         .map(
           results =>
             response.ok.json(
@@ -62,7 +62,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .responseWith[Object](200, "Work")
     } { request: Request =>
       elasticService
-        .findRecordById(request.params("id"))
+        .findWorkById(request.params("id"))
         .map {
           case Some(result) =>
             response.ok.json(
