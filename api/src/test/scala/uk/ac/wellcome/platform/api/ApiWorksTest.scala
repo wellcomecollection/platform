@@ -61,11 +61,11 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
             |     "type": "Work",
             |     "id": "${works(0).canonicalId}",
             |     "label": "${works(0).work.label}",
-            |     "description": "${works(0).work.description}",
-            |     "lettering": "${works(0).work.lettering}",
+            |     "description": "${works(0).work.description.get}",
+            |     "lettering": "${works(0).work.lettering.get}",
             |     "hasCreatedDate": {
             |       "type": "Period",
-            |       "label": "${works(0).work.hasCreatedDate}"
+            |       "label": "${works(0).work.hasCreatedDate.get.label}"
             |     },
             |     "hasCreator": [{
             |       "type": "Agent",
@@ -76,26 +76,26 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
             |     "type": "Work",
             |     "id": "${works(1).canonicalId}",
             |     "label": "${works(1).work.label}",
-            |     "description": "${works(1).work.description}",
-            |     "lettering": "${works(1).work.lettering}",
+            |     "description": "${works(1).work.description.get}",
+            |     "lettering": "${works(1).work.lettering.get}",
             |     "hasCreatedDate": {
             |       "type": "Period",
-            |       "label": "${works(1).work.hasCreatedDate}"
+            |       "label": "${works(1).work.hasCreatedDate.get.label}"
             |     },
             |     "hasCreator": [{
             |       "type": "Agent",
-            |       "label": "${works(1).work.hasCreator(1).label}"
+            |       "label": "${works(1).work.hasCreator(0).label}"
             |     }]
             |   },
             |   {
             |     "type": "Work",
             |     "id": "${works(2).canonicalId}",
             |     "label": "${works(2).work.label}",
-            |     "description": "${works(2).work.description}",
-            |     "lettering": "${works(2).work.lettering}",
+            |     "description": "${works(2).work.description.get}",
+            |     "lettering": "${works(2).work.lettering.get}",
             |     "hasCreatedDate": {
             |       "type": "Period",
-            |       "label": "${works(2).work.hasCreatedDate}"
+            |       "label": "${works(2).work.hasCreatedDate.get.label}"
             |     },
             |     "hasCreator": [{
             |       "type": "Agent",
