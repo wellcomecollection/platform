@@ -45,7 +45,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
           creator = agent.copy(label = s"${idx}-${agent.label}")
       ))
 
-    works.map(insertIntoElasticSearch)
+    insertIntoElasticSearch(works: _*)
 
     eventually {
       server.httpGet(
@@ -157,11 +157,6 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
     )
   }
 
-  private def insertIntoElasticSearch(identifiedWork: IdentifiedWork): Any = {
-    elasticClient.execute(
-      indexInto(indexName / itemType)
-        .id(identifiedWork.canonicalId)
-        .doc(identifiedWork))
   }
   private def identifiedWorkWith(canonicalId: String, label: String) = {
     IdentifiedWork(canonicalId,
