@@ -56,6 +56,8 @@ class ApiWorksTest extends FeatureTest with IndexedElasticSearchLocal {
             |  "@context": "http://localhost:8888/catalogue/v0/context.json",
             |  "type": "ResultList",
             |  "pageSize": 10,
+            |  "totalPages": 10,
+            |  "totalResults": 100,
             |  "results": [
             |   {
             |     "type": "Work",
