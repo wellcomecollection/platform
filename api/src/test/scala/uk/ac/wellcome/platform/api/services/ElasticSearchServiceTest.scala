@@ -88,7 +88,7 @@ class ElasticSearchServiceTest
     }
   }
 
-  it("should correctly handle an invalid query string") {
+  it("should not throw an exception if passed an invalid query string for full-text search") {
     val workEmu = identifiedWorkWith(
       canonicalId = "1234",
       label = "An etching of an emu"
