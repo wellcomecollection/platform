@@ -8,10 +8,9 @@ import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.google.inject.{Provides, Singleton}
-import com.twitter.inject.{Logging, TwitterModule}
+import com.twitter.inject.Logging
 import org.apache.http.client.methods.HttpDelete
-import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.client.HttpClientBuilder
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
 trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
@@ -26,13 +25,13 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  def createTopicAndReturnArn(topicName: String) = {
+  def createTopicAndReturnArn(topicName: String): String = {
     amazonSNS.createTopic(topicName).getTopicArn
   }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    new DefaultHttpClient()
+    HttpClientBuilder.create().build()
       .execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
