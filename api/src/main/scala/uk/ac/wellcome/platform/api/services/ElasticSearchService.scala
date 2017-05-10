@@ -35,4 +35,13 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
       }
       .map { _.hits.map { DisplayWork(_) } }
 
+  def fullTextSearchWorks(queryString: String): Future[Array[DisplayWork]] =
+    elasticClient
+      .execute {
+        search(s"$index/$itemType")
+          .query(queryString)
+          .limit(10)
+      }
+      .map { _.hits.map { DisplayWork(_) } }
+
 }

@@ -55,6 +55,29 @@ class ElasticSearchServiceTest
     }
   }
 
+  it("should only find results that match a query if doing a full-text search") {
+    val workDodo = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A drawing of a dodo"
+    )
+    val workMouse = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "A mezzotint of a mouse"
+    )
+    insertIntoElasticSearch(workDodo, workMouse)
+
+    val searchForCat = elasticService.fullTextSearchWorks("cat")
+    whenReady(searchForCat) { works =>
+      works should have size 0
+    }
+
+    val searchForDodo = elasticService.fullTextSearchWorks("dodo")
+    whenReady(searchForDodo) { works =>
+      works should have size 1
+      works.head shouldBe DisplayWork("Work", workDodo.canonicalId, workDodo.work.label)
+    }
+  }
+
   it("should return a future of None if it cannot get arecord by id") {
     val recordsFuture = elasticService.findWorkById("1234")
 
