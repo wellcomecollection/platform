@@ -88,6 +88,25 @@ class ElasticSearchServiceTest
     }
   }
 
+  it("should correctly handle an invalid query string") {
+    val workEmu = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "An etching of an emu"
+    )
+    insertIntoElasticSearch(workEmu)
+
+    val searchForEmu = elasticService.fullTextSearchWorks(
+      "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
+    )
+
+    whenReady(searchForEmu) { works =>
+      works should have size 1
+      works.head shouldBe DisplayWork("Work",
+                                      workEmu.canonicalId,
+                                      workEmu.work.label)
+    }
+  }
+
   private def identifiedWorkWith(canonicalId: String, label: String) = {
     IdentifiedWork(canonicalId,
                    Work(identifiers = List(
