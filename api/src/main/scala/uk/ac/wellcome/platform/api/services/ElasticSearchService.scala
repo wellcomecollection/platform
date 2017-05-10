@@ -4,6 +4,9 @@ import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.TcpClient
+import com.sksamuel.elastic4s.get.RichGetResponse
+import com.sksamuel.elastic4s.searches.RichSearchResponse
+import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -15,33 +18,28 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
                                      @Flag("es.type") itemType: String,
                                      elasticClient: TcpClient) {
 
-  def findWorkById(canonicalId: String): Future[Option[DisplayWork]] =
+  def findResultById(id: String): Future[RichGetResponse] =
     elasticClient
       .execute {
-        get(canonicalId).from(s"$index/$itemType")
-      }
-      .map { result =>
-        if (result.exists) Some(DisplayWork(result.original)) else None
+        get(id).from(s"$index/$itemType")
       }
 
-  def findWork(): Future[Array[DisplayWork]] =
+  def findResults(sortByField: String, limit: Int = 10): Future[RichSearchResponse] =
     elasticClient
       .execute {
         search(s"$index/$itemType")
           .matchAllQuery()
-          // Sort so that we always have a consistent result that we can assert on
-          .sortBy(fieldSort("canonicalId"))
-          .limit(10)
+          .sortBy(fieldSort(sortByField))
+          .limit(limit)
       }
-      .map { _.hits.map { DisplayWork(_) } }
 
-  def fullTextSearchWorks(queryString: String): Future[Array[DisplayWork]] =
+  def simpleStringQueryResults(queryString: String): Future[RichSearchResponse] =
     elasticClient
       .execute {
         search(s"$index/$itemType")
           .query(simpleStringQuery(queryString))
           .limit(10)
       }
-      .map { _.hits.map { DisplayWork(_) } }
 
 }
+

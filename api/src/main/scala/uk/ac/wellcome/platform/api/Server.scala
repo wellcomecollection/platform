@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.api
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.json.modules.FinatraJacksonModule
 import com.twitter.finatra.json.utils.CamelCasePropertyNamingStrategy
@@ -10,6 +14,7 @@ import io.swagger.models.Swagger
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.ElasticsearchExceptionMapper
+import uk.ac.wellcome.platform.api.finatra.modules.ElasticSearchServiceModule.ElasticSearchServiceModule.flag
 
 object ServerMain extends Server
 object ApiSwagger extends Swagger
@@ -22,8 +27,8 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(ElasticClientModule)
 
-  private final val apiHost =
-    flag(name = "api.host", default = "localhost:8888", help = "API hostname")
+  flag(name = "api.host", default = "localhost:8888", help = "API hostname")
+  
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
   private final val apiVersion =
@@ -32,6 +37,7 @@ class Server extends HttpServer {
     name = "api.prefix",
     default = "/" + apiName() + "/" + apiVersion(),
     help = "API path prefix")
+
   flag[String](name = "es.index", default = "records", help = "ES index name")
   flag[String](name = "es.type", default = "item", help = "ES document type")
   flag(name = "api.context",
