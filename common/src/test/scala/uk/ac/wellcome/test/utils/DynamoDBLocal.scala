@@ -3,12 +3,7 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{
-  AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder,
-  AmazonDynamoDBStreams,
-  AmazonDynamoDBStreamsClientBuilder
-}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.Identifier
@@ -31,32 +26,33 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
       new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
     .build()
 
-  protected val identifiersTableName = "Identifiers"
-  protected val miroDataTableName = "MiroData"
-  protected val calmDataTableName = "CalmData"
+  val identifiersTableName = "Identifiers"
+  val miroDataTableName = "MiroData"
+  val calmDataTableName = "CalmData"
 
-  deleteTables()
-  createIdentifiersTable()
-  private val miroDataTable = createMiroDataTable()
-  private val calmDataTable = createCalmDataTable()
 
-  protected val miroDataStreamArn: String =
-    miroDataTable.getTableDescription.getLatestStreamArn
-  protected val calmDataStreamArn: String =
-    calmDataTable.getTableDescription.getLatestStreamArn
+  private var miroDataTable: Option[CreateTableResult] = None
+  private var calmDataTable: Option[CreateTableResult] = None
 
-  protected val streamsClient: AmazonDynamoDBStreams =
-    AmazonDynamoDBStreamsClientBuilder
-      .standard()
-      .withCredentials(dynamoDBLocalCredentialsProvider)
-      .withEndpointConfiguration(
-        new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-      .build()
+  def miroDataStreamArn: String = miroDataTable.get.getTableDescription.getLatestStreamArn
+  def calmDataStreamArn: String = calmDataTable.get.getTableDescription.getLatestStreamArn
+
+  protected val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
+    .standard()
+    .withCredentials(dynamoDBLocalCredentialsProvider)
+    .withEndpointConfiguration(
+      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
+    .build()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    List(identifiersTableName, miroDataTableName, calmDataTableName)
-      .foreach(tableName => clearTable(tableName))
+    deleteTables()
+    createIdentifiersTable()
+    miroDataTable = Some(createMiroDataTable())
+    calmDataTable = Some(createCalmDataTable())
+//    List(identifiersTableName, miroDataTableName, calmDataTableName)
+//      .foreach(tableName => clearTable(tableName))
+
   }
 
   private def clearTable(tableName: String): List[DeleteItemResult] =
