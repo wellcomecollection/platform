@@ -1,12 +1,11 @@
 package uk.ac.wellcome.platform.api.services
 
-import com.sksamuel.elastic4s.ElasticDsl._
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
-import uk.ac.wellcome.utils.JsonUtil
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ElasticSearchServiceTest
     extends FunSpec
@@ -31,11 +30,12 @@ class ElasticSearchServiceTest
     displayWorksFuture map { displayWork =>
       displayWork should have size 2
       displayWork.head shouldBe DisplayWork("Work",
-                                   firstIdentifiedWork.canonicalId,
-                                   firstIdentifiedWork.work.label)
-      displayWork.tail.head shouldBe DisplayWork("Work",
-                                        secondIdentifiedWork.canonicalId,
-                                        secondIdentifiedWork.work.label)
+                                            firstIdentifiedWork.canonicalId,
+                                            firstIdentifiedWork.work.label)
+      displayWork.tail.head shouldBe DisplayWork(
+        "Work",
+        secondIdentifiedWork.canonicalId,
+        secondIdentifiedWork.work.label)
     }
   }
 
@@ -49,9 +49,9 @@ class ElasticSearchServiceTest
     whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
       records.get shouldBe DisplayWork("Work",
-                                  "1234",
-                                  "this is the item label",
-                                  None)
+                                       "1234",
+                                       "this is the item label",
+                                       None)
     }
   }
 
@@ -74,7 +74,9 @@ class ElasticSearchServiceTest
     val searchForDodo = elasticService.fullTextSearchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works should have size 1
-      works.head shouldBe DisplayWork("Work", workDodo.canonicalId, workDodo.work.label)
+      works.head shouldBe DisplayWork("Work",
+                                      workDodo.canonicalId,
+                                      workDodo.work.label)
     }
   }
 
