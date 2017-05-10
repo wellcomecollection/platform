@@ -3,10 +3,13 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreamsClientBuilder}
-import com.google.inject.{Provides, Singleton}
+import com.amazonaws.services.dynamodbv2.{
+  AmazonDynamoDB,
+  AmazonDynamoDBClientBuilder,
+  AmazonDynamoDBStreams,
+  AmazonDynamoDBStreamsClientBuilder
+}
 import com.gu.scanamo.Scanamo
-import com.twitter.inject.TwitterModule
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.Identifier
 
@@ -33,23 +36,26 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   protected val calmDataTableName = "CalmData"
 
   deleteTables()
-  private val identifiersTable = createIdentifiersTable()
+  createIdentifiersTable()
   private val miroDataTable = createMiroDataTable()
   private val calmDataTable = createCalmDataTable()
 
-  protected val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
-  protected val calmDataStreamArn = calmDataTable.getTableDescription.getLatestStreamArn
+  protected val miroDataStreamArn: String =
+    miroDataTable.getTableDescription.getLatestStreamArn
+  protected val calmDataStreamArn: String =
+    calmDataTable.getTableDescription.getLatestStreamArn
 
-  protected val streamsClient = AmazonDynamoDBStreamsClientBuilder
-    .standard()
-    .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
+  protected val streamsClient: AmazonDynamoDBStreams =
+    AmazonDynamoDBStreamsClientBuilder
+      .standard()
+      .withCredentials(dynamoDBLocalCredentialsProvider)
+      .withEndpointConfiguration(
+        new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
+      .build()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-      List(identifiersTableName, miroDataTableName, calmDataTableName)
+    List(identifiersTableName, miroDataTableName, calmDataTableName)
       .foreach(tableName => clearTable(tableName))
   }
 
