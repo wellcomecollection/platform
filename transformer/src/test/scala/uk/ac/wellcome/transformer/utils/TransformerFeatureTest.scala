@@ -3,11 +3,13 @@ package uk.ac.wellcome.transformer.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
+import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.Suite
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal}
 
 trait TransformerFeatureTest
-    extends SNSLocal
+    extends FeatureTestMixin
+    with SNSLocal
     with DynamoDBLocal { this: Suite =>
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
