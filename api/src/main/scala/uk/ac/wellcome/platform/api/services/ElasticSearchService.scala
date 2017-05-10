@@ -39,7 +39,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
     elasticClient
       .execute {
         search(s"$index/$itemType")
-          .query(queryString)
+          .query(simpleStringQuery(queryString))
           .limit(10)
       }
       .map { _.hits.map { DisplayWork(_) } }
