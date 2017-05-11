@@ -16,6 +16,36 @@ class ElasticsearchServiceTest
   val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)
 
+  it("should sort results from Elasticsearch in the correct order") {
+    val work1 = identifiedWorkWith(
+      canonicalId = "000Z",
+      label = "Amid an Aegean"
+    )
+    val work2 = identifiedWorkWith(
+      canonicalId = "000Y",
+      label = "Before a Bengal"
+    )
+    val work3 = identifiedWorkWith(
+      canonicalId = "000X",
+      label = "Circling a Cheetah"
+    )
+
+    insertIntoElasticSearch(work1, work2, work3)
+
+    val sortedSearchResultByCanonicalId = searchService.findResults(
+      sortByField = "canonicalId"
+    )
+    whenReady(sortedSearchResultByCanonicalId) { result =>
+      val works = result.hits.map { DisplayWork(_) }
+      works.head shouldBe DisplayWork("Work", work3.canonicalId, work3.work.label)
+      works.last shouldBe DisplayWork("Work", work1.canonicalId, work1.work.label)
+    }
+
+    // TODO: canonicalID is the only user-defined field that we can sort on.
+    // When we have other fields we can sort on, we should extend this test
+    // for different sort orders.
+  }
+
   it("should return the correct number of results from Elasticsearch") {
     val work1 = identifiedWorkWith(
       canonicalId = "0001",
