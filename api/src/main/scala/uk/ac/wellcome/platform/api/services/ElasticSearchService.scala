@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.TcpClient
 import com.sksamuel.elastic4s.get.RichGetResponse
-import com.sksamuel.elastic4s.searches.RichSearchResponse
+import com.sksamuel.elastic4s.searches.{RichSearchResponse, SearchDefinition}
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models._
@@ -24,23 +24,34 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
         get(id).from(s"$index/$itemType")
       }
 
-  def findResults(sortByField: String, limit: Int = 10, from: Int = 0): Future[RichSearchResponse] =
+  private def executeSearch(searchDefinition: SearchDefinition, limit: Int, from: Int): Future[RichSearchResponse] =
     elasticClient
       .execute {
-        search(s"$index/$itemType")
-          .matchAllQuery()
-          .sortBy(fieldSort(sortByField))
+        searchDefinition
           .limit(limit)
           .from(from)
       }
 
-  def simpleStringQueryResults(queryString: String): Future[RichSearchResponse] =
-    elasticClient
-      .execute {
-        search(s"$index/$itemType")
-          .query(simpleStringQuery(queryString))
-          .limit(10)
-      }
+  def findResults(sortByField: String, limit: Int = 10, from: Int = 0): Future[RichSearchResponse] = {
+    val searchDefinition = search(s"$index/$itemType")
+      .matchAllQuery()
+      .sortBy(fieldSort(sortByField))
+    executeSearch(
+      searchDefinition = searchDefinition,
+      limit = limit,
+      from = from
+    )
+  }
+
+  def simpleStringQueryResults(queryString: String, limit: Int = 10, from: Int = 0): Future[RichSearchResponse] = {
+    val searchDefinition = search(s"$index/$itemType")
+      .query(simpleStringQuery(queryString))
+    executeSearch(
+      searchDefinition = searchDefinition,
+      limit = limit,
+      from = from
+    )
+  }
 
 }
 
