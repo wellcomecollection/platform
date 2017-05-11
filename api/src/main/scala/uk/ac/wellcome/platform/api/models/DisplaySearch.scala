@@ -14,7 +14,7 @@ case object DisplaySearch {
     DisplaySearch(
       results = searchResponse.hits.map { DisplayWork(_) },
       pageSize = pageSize,
-      totalPages = Math.ceil(searchResponse.totalHits.toInt / pageSize).toInt,
+      totalPages = Math.ceil(searchResponse.totalHits.toDouble / pageSize.toDouble).toInt,
       totalResults = searchResponse.totalHits.toInt
     )
   }
