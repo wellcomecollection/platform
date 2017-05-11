@@ -47,9 +47,9 @@ class ElasticsearchServiceTest
   }
 
   it("should return the correct number of results from Elasticsearch") {
-    val works: List[IdentifiedWork] = (0 to 9) { x =>
+    val works: List[IdentifiedWork] = (0 to 9).map { x =>
       identifiedWorkWith(canonicalId = s"ID-$x", label=s"Work number $x")
-    }
+    }.toList
     val displayWorks = works.map { work: IdentifiedWork =>
       DisplayWork("Work", work.canonicalId, work.work.label)
     }
