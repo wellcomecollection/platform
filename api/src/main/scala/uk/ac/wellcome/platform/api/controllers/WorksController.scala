@@ -55,9 +55,15 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .map(
           results =>
             response.ok.json(
-              ResultListResponse(context = hostUrl(request) + apiContext,
-                                 results = results)))
-
+              ResultListResponse(
+                context = hostUrl(request) + apiContext,
+                results = results.results,
+                pageSize = results.pageSize,
+                totalPages = results.totalPages,
+                totalResults = results.totalResults
+              )
+            )
+          )
     }
 
     getWithDoc("/works/:id") { doc =>
