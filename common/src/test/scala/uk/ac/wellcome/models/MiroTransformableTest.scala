@@ -58,4 +58,17 @@ class MiroTransformableTest extends FunSpec with Matchers {
     )
     work.hasCreator shouldBe List(Agent(creator1), Agent(creator2), Agent(creator3))
   }
+
+  it("should have no description if no image_image_desc field is present") {
+    val work = transformMiroRecord(data = s"""{"image_title": "A line of lions"}""")
+    work.description shouldBe None
+  }
+
+  it("should pass through the value of the description field") {
+    val description = "A new novel about northern narwhals in November"
+    val work = transformMiroRecord(
+      data = s"""{"image_title": "A note on narwhals", "image_image_desc": "$description"}"""
+    )
+    work.description shouldBe Some(description)
+  }
 }
