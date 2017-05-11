@@ -7,10 +7,6 @@ set -o nounset
 TF_VARS=terraform.tfvars
 RELEASE_IDS_FILE="release_ids.tfvars"
 
-# Are we running in Travis?  This environment variable is set to "true"
-# in the Travis environment.
-TRAVIS=${TRAVIS:-false}
-
 
 # Ensure we don't have stale variables from a previous run
 rm -f $TF_VARS
@@ -35,13 +31,6 @@ echo "}" >> "$RELEASE_IDS_FILE"
 
 terraform init
 terraform get
-
-if [[ "$TRAVIS" == "true" ]]
-then
-    echo "Running in Travis, disabling push of remote state."
-    mv terraform.tf terraform.tf.bak
-    terraform init -force-copy -lock=false
-fi
 
 terraform plan -var-file="$RELEASE_IDS_FILE" -out terraform.plan
 
