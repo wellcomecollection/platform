@@ -24,36 +24,28 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
         get(id).from(s"$index/$itemType")
       }
 
-  private def executeSearch(searchDefinition: SearchDefinition, limit: Int, from: Int): Future[RichSearchResponse] =
+  def listResults(sortByField: String,
+                  limit: Int = 10,
+                  from: Int = 0): Future[RichSearchResponse] =
     elasticClient
       .execute {
-        searchDefinition
+        search(s"$index/$itemType")
+          .matchAllQuery()
+          .sortBy(fieldSort(sortByField))
           .limit(limit)
           .from(from)
       }
 
-  def listResults(sortByField: String,
-                  limit: Int = 10,
-                  from: Int = 0): Future[RichSearchResponse] = {
-    val searchDefinition = search(s"$index/$itemType")
-      .matchAllQuery()
-      .sortBy(fieldSort(sortByField))
-    executeSearch(
-      searchDefinition = searchDefinition,
-      limit = limit,
-      from = from
-    )
-  }
-
-  def simpleStringQueryResults(queryString: String, limit: Int = 10, from: Int = 0): Future[RichSearchResponse] = {
-    val searchDefinition = search(s"$index/$itemType")
-      .query(simpleStringQuery(queryString))
-    executeSearch(
-      searchDefinition = searchDefinition,
-      limit = limit,
-      from = from
-    )
-  }
+  def simpleStringQueryResults(queryString: String,
+                               limit: Int = 10,
+                               from: Int = 0): Future[RichSearchResponse] =
+    elasticClient
+      .execute {
+        search(s"$index/$itemType")
+          .query(simpleStringQuery(queryString))
+          .limit(limit)
+          .from(from)
+      }
 
 }
 
