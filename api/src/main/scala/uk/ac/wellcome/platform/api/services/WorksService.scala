@@ -22,7 +22,7 @@ class WorksService @Inject()(
 
   def findWorks(): Future[Array[DisplayWork]] =
     searchService
-      .findResults(sortByField = "canonicalId")
+      .listResults(sortByField = "canonicalId")
       .map { _.hits.map { DisplayWork(_) } }
 
   def searchWorks(query: String): Future[Array[DisplayWork]] =
