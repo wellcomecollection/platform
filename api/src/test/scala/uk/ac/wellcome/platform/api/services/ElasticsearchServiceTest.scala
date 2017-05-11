@@ -46,53 +46,66 @@ class ElasticsearchServiceTest
     // for different sort orders.
   }
 
-  it("should return the correct number of results from Elasticsearch") {
+  /** Populate the test index with some works, and return the corresponding
+   *  `DisplayWork` instances.
+   */
+  private def populateElasticsearch(count: Int = 10): List[DisplayWork] = {
     val works: List[IdentifiedWork] = (0 to 9).map { x =>
       identifiedWorkWith(canonicalId = s"ID-$x", label=s"Work number $x")
     }.toList
-    val displayWorks = works.map { work: IdentifiedWork =>
-      DisplayWork("Work", work.canonicalId, work.work.label)
-    }
-
     insertIntoElasticSearch(works: _*)
 
-    // Get everything
+    works.map { work: IdentifiedWork =>
+      DisplayWork("Work", work.canonicalId, work.work.label)
+    }
+  }
+
+  it("should return everything if we ask for a limit > result size") {
+    val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
       searchService,
-      limit = displayWorks.length,
+      limit = displayWorks.length + 1,
       from = 0,
       expectedWorks = displayWorks
     )
+  }
 
-    // Take a slice that starts at the beginning
+  it("should return a page from the beginning of the result set") {
+    val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
       searchService,
       limit = 4,
       from = 0,
       expectedWorks = displayWorks.slice(0, 4)
     )
+  }
 
-    // Take a slice that starts midway through the result set
+  it("should return a page from halfway through the result set") {
+    val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
       searchService,
       limit = 4,
       from = 3,
       expectedWorks = displayWorks.slice(3, 7)
     )
+  }
 
-    // Take a slice that goes off the end of the results set
+  it("should return a page from the end of the result set") {
+    val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
       searchService,
       limit = 7,
       from = 5,
       expectedWorks = displayWorks.slice(5, 10)
     )
+  }
 
-    // Take a slice that is beyond all our results
+  it("should return an empty page if asked for a limit > result size") {
+    val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
       searchService,
       limit = 10,
-      from = 50,
+      from = displayWorks.length * 2,
       expectedWorks = List()
     )
   }
@@ -103,7 +116,6 @@ class ElasticsearchServiceTest
     from: Int,
     expectedWorks: List[DisplayWork]
   ) = {
-    println(s"Testing with limit = $limit and from = $from")
     val searchResultFuture = searchService.listResults(
       sortByField = "canonicalId",
       limit = limit,
