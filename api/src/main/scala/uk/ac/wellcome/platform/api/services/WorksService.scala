@@ -2,14 +2,18 @@ package uk.ac.wellcome.platform.api.services
 
 import javax.inject.{Inject, Singleton}
 
+import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.api.models.DisplayWork
+import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork}
+import uk.ac.wellcome.platform.api.responses.ResultListResponse
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
 @Singleton
 class WorksService @Inject()(
+  @Flag("api.pageSize") defaultPageSize: Int,
   searchService: ElasticSearchService
 ) {
 
@@ -20,13 +24,25 @@ class WorksService @Inject()(
         if (result.exists) Some(DisplayWork(result.original)) else None
       }
 
-  def findWorks(): Future[Array[DisplayWork]] =
+  def listWorks(pageSize: Int = defaultPageSize,
+                pageNumber: Int = 1): Future[DisplaySearch] =
     searchService
-      .listResults(sortByField = "canonicalId")
-      .map { _.hits.map { DisplayWork(_) } }
+      .listResults(
+        sortByField = "canonicalId",
+        limit = pageSize,
+        from = (pageNumber - 1) * pageSize
+      )
+      .map { DisplaySearch(_, pageSize) }
 
-  def searchWorks(query: String): Future[Array[DisplayWork]] =
+  def searchWorks(query: String,
+                  pageSize: Int = defaultPageSize,
+                  pageNumber: Int = 1): Future[DisplaySearch] =
     searchService
-      .simpleStringQueryResults(query)
-      .map { _.hits.map { DisplayWork(_) } }
+      .simpleStringQueryResults(
+        query,
+        limit = pageSize,
+        from = (pageNumber - 1) * pageSize
+      )
+      .map { DisplaySearch(_, pageSize) }
+
 }

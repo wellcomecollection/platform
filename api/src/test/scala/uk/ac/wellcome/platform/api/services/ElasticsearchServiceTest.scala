@@ -3,15 +3,18 @@ package uk.ac.wellcome.platform.api.services
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ElasticsearchServiceTest
     extends FunSpec
     with IndexedElasticSearchLocal
     with Matchers
-    with ScalaFutures {
+    with ScalaFutures
+    with WorksUtil{
 
   val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)
@@ -46,22 +49,9 @@ class ElasticsearchServiceTest
     // for different sort orders.
   }
 
-  /** Populate the test index with some works, and return the corresponding
-   *  `DisplayWork` instances.
-   */
-  private def populateElasticsearch(count: Int = 10): List[DisplayWork] = {
-    val works: List[IdentifiedWork] = (0 to 9).map { x =>
-      identifiedWorkWith(canonicalId = s"ID-$x", label=s"Work number $x")
-    }.toList
-    insertIntoElasticSearch(works: _*)
-
-    works.map { work: IdentifiedWork =>
-      DisplayWork("Work", work.canonicalId, work.work.label)
-    }
-  }
-
   it("should return everything if we ask for a limit > result size") {
     val displayWorks = populateElasticsearch()
+
     assertSliceIsCorrect(
       limit = displayWorks.length + 1,
       from = 0,
@@ -105,6 +95,13 @@ class ElasticsearchServiceTest
     )
   }
 
+  private def populateElasticsearch(): List[DisplayWork] = {
+    val works = createIdentifiedWorks(10)
+    insertIntoElasticSearch(works: _*)
+
+    works.map(convertWorkToDisplayWork).sortBy(_.id).toList
+  }
+
   private def assertSliceIsCorrect(
     limit: Int,
     from: Int,
@@ -118,16 +115,7 @@ class ElasticsearchServiceTest
     whenReady(searchResultFuture) { result =>
       result.hits should have size expectedWorks.length
       val returnedWorks = result.hits.map { DisplayWork(_) }
-      returnedWorks shouldBe expectedWorks
+      returnedWorks.toList shouldBe expectedWorks
     }
-  }
-
-  private def identifiedWorkWith(canonicalId: String, label: String) = {
-    IdentifiedWork(canonicalId,
-                   Work(identifiers = List(
-                          SourceIdentifier(source = "Calm",
-                                           sourceId = "AltRefNo",
-                                           value = "calmid")),
-                        label = label))
   }
 }

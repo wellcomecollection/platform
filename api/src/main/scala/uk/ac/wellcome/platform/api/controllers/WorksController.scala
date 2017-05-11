@@ -5,28 +5,35 @@ import javax.inject.{Inject, Singleton}
 import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
-import com.twitter.finatra.http.response.ResponseBuilder
+import com.twitter.finatra.request.QueryParam
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
-import uk.ac.wellcome.platform.api.utils.ApiRequestUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import com.twitter.finatra.validation._
 
-import scala.concurrent.Future
+case class UsersRequest(@QueryParam page: Int = 1,
+                        @Max(100) @QueryParam pageSize: Option[Int],
+                        @QueryParam query: Option[String]) {
+}
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                                 @Flag("api.context") apiContext: String,
                                 @Flag("api.host") apiHost: String,
+                                @Flag("api.scheme") apiScheme: String,
+                                @Flag("api.pageSize") defaultPageSize: Int,
                                 worksService: WorksService)
     extends Controller
-    with SwaggerSupport
-    with ApiRequestUtils {
+    with SwaggerSupport {
 
   override implicit protected val swagger = ApiSwagger
 
-  override val hostName: String = apiHost
+  val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
   prefix(apiPrefix) {
     getWithDoc("/works") { doc =>
@@ -45,19 +52,36 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .queryParam[String]("query",
                             "Full-text search query",
                             required = false)
-    } { request: Request =>
-      val works = request.params.get("query") match {
-        case Some(queryString) => worksService.searchWorks(queryString)
-        case None => worksService.findWorks()
+    } { request: UsersRequest =>
+      val pageSize = request.pageSize.getOrElse((defaultPageSize))
+
+      val works = request.query match {
+        case Some(queryString) =>
+          worksService.searchWorks(
+            queryString,
+            pageSize = pageSize,
+            pageNumber = request.page
+          )
+        case None =>
+          worksService.listWorks(
+            pageSize = pageSize,
+            pageNumber = request.page
+          )
       }
 
       works
         .map(
           results =>
             response.ok.json(
-              ResultListResponse(context = hostUrl(request) + apiContext,
-                                 results = results)))
-
+              ResultListResponse(
+                context = contextUri,
+                results = results.results,
+                pageSize = results.pageSize,
+                totalPages = results.totalPages,
+                totalResults = results.totalResults
+              )
+          )
+        )
     }
 
     getWithDoc("/works/:id") { doc =>
@@ -73,7 +97,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .map {
           case Some(result) =>
             response.ok.json(
-              ResultResponse(context = hostUrl(request) + apiContext,
+              ResultResponse(context = contextUri,
                              result = result))
           case None => response.notFound
         }
