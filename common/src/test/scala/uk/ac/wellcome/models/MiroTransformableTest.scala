@@ -64,7 +64,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it("should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
     val work = transformMiroRecord(
-      data = s"""{"image_title": "Samples of a shark", "image_secondary_creator": ["$secondaryCreator "]}"""
+      data = s"""{"image_title": "Samples of a shark", "image_secondary_creator": ["$secondaryCreator"]}"""
     )
     work.hasCreator shouldBe List(Agent(secondaryCreator))
   }
