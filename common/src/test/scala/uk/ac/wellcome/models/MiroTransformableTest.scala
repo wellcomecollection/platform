@@ -4,19 +4,8 @@ import org.scalatest.{FunSpec, Matchers}
 
 class MiroTransformableTest extends FunSpec with Matchers {
 
-  private def transformMiroRecord(
-    miroID: String = "M0000001",
-    miroCollection: String = "TestCollection",
-    data: String = """{"image_title": "A test tome about a tapir"}"""
-  ): Work = {
-    val miroTransformable = MiroTransformable(
-      MiroID = miroID,
-      MiroCollection = miroCollection,
-      data = data
-    )
-
-    miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get
+  it("should throw an error if there isn't a title field") {
+    assertTransformMiroRecordFails(data="""{}""")
   }
 
   it("should pass through the Miro identifier") {
@@ -75,7 +64,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it("should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
     val work = transformMiroRecord(
-      data = s"""{"image_title": "Samples of a shark", "image_secondary_creator": ["$secondaryCreator"]}"""
+      data = s"""{"image_title": "Samples of a shark", "image_secondary_creator": ["$secondaryCreator "]}"""
     )
     work.hasCreator shouldBe List(Agent(secondaryCreator))
   }
@@ -96,5 +85,34 @@ class MiroTransformableTest extends FunSpec with Matchers {
       data = s"""{"image_title": "Musings on mice", "image_creator": ["$creator"], "image_secondary_creator": ["$secondaryCreator"]}"""
     )
     work.hasCreator shouldBe List(Agent(creator), Agent(secondaryCreator))
+  }
+
+  private def assertTransformMiroRecordFails(
+    miroID: String = "M0000001",
+    miroCollection: String = "TestCollection",
+    data: String = """{"image_title": "A test tome about a tapir"}"""
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = miroID,
+      MiroCollection = miroCollection,
+      data = data
+    )
+
+    miroTransformable.transform.isSuccess shouldBe false
+  }
+
+  private def transformMiroRecord(
+    miroID: String = "M0000001",
+    miroCollection: String = "TestCollection",
+    data: String = """{"image_title": "A test tome about a tapir"}"""
+  ): Work = {
+    val miroTransformable = MiroTransformable(
+      MiroID = miroID,
+      MiroCollection = miroCollection,
+      data = data
+    )
+
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get
   }
 }
