@@ -13,6 +13,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.duration.Duration
 
 object KinesisWorker extends TwitterModule {
+  private var maybeWorker: Option[Worker] = None
 
   override def singletonStartup(injector: Injector) {
     info("Starting Kinesis worker")
@@ -30,14 +31,18 @@ object KinesisWorker extends TwitterModule {
     val cloudWatchClient = injector.instance[AmazonCloudWatch]
 
     system.scheduler.scheduleOnce(
-      Duration.create(50, TimeUnit.MILLISECONDS),
-      new Worker(
-        recordProcessFactory,
-        kinesisConfig,
-        adapter,
-        dynamoDBClient,
-        cloudWatchClient
-      )
+      Duration.create(50, TimeUnit.MILLISECONDS), {
+        val worker = new Worker(
+
+          recordProcessFactory,
+          kinesisConfig,
+          adapter,
+          dynamoDBClient,
+          cloudWatchClient
+        )
+        maybeWorker = Some(worker)
+        worker
+      }
     )
 
   }
@@ -46,6 +51,7 @@ object KinesisWorker extends TwitterModule {
     info("Terminating Kinesis worker")
 
     val system = injector.instance[ActorSystem]
+    maybeWorker.fold(())(worker => worker.shutdown())
     system.terminate()
   }
 }
