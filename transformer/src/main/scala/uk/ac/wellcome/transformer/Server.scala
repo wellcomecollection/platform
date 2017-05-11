@@ -23,7 +23,6 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.transformer Transformer"
   override val modules = Seq(
     KinesisWorker,
-    StreamsRecordProcessorFactoryModule,
     KinesisClientLibConfigurationModule,
     AmazonKinesisModule,
     AmazonCloudWatchModule,

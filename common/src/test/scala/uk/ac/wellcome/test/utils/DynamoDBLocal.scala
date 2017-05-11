@@ -3,12 +3,10 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreamsClientBuilder}
-import com.google.inject.{Provides, Singleton}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
-import com.twitter.inject.TwitterModule
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.Identifier
+import uk.ac.wellcome.models.{CalmTransformable, Identifier, MiroTransformable}
 
 import scala.collection.JavaConversions._
 
@@ -21,26 +19,26 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
     new AWSStaticCredentialsProvider(
       new BasicAWSCredentials("access", "secret"))
 
-  protected val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
+  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
     .standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(
       new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
     .build()
 
-  protected val identifiersTableName = "Identifiers"
-  protected val miroDataTableName = "MiroData"
-  protected val calmDataTableName = "CalmData"
+  val identifiersTableName = "Identifiers"
+  val miroDataTableName = "MiroData"
+  val calmDataTableName = "CalmData"
 
   deleteTables()
-  private val identifiersTable = createIdentifiersTable()
-  private val miroDataTable = createMiroDataTable()
-  private val calmDataTable = createCalmDataTable()
+  createIdentifiersTable()
+  private val miroDataTable: CreateTableResult = createMiroDataTable()
+  private val calmDataTable: CreateTableResult = createCalmDataTable()
 
-  protected val miroDataStreamArn = miroDataTable.getTableDescription.getLatestStreamArn
-  protected val calmDataStreamArn = calmDataTable.getTableDescription.getLatestStreamArn
+  val miroDataStreamArn: String = miroDataTable.getTableDescription.getLatestStreamArn
+  val calmDataStreamArn: String = calmDataTable.getTableDescription.getLatestStreamArn
 
-  protected val streamsClient = AmazonDynamoDBStreamsClientBuilder
+  val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
     .standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(
@@ -49,17 +47,40 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-      List(identifiersTableName, miroDataTableName, calmDataTableName)
-      .foreach(tableName => clearTable(tableName))
+    clearIdentifiersTable()
+    clearMiroTable()
+    clearCalmTable()
   }
 
-  private def clearTable(tableName: String): List[DeleteItemResult] =
-    Scanamo.scan[Identifier](dynamoDbClient)(tableName).map {
-      case Right(id) =>
+  private def clearIdentifiersTable(): List[DeleteItemResult] =
+    Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
+      case Right(identifier) =>
         dynamoDbClient.deleteItem(
-          tableName,
-          Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
-      case _ => throw new Exception(s"Unable to clear the table $tableName")
+          identifiersTableName,
+          Map("CanonicalID" -> new AttributeValue(identifier.CanonicalID)))
+      case a => throw new Exception(s"Unable to clear the table $identifiersTableName error $a")
+    }
+
+  private def clearMiroTable(): List[DeleteItemResult] =
+    Scanamo.scan[MiroTransformable](dynamoDbClient)(miroDataTableName).map {
+      case Right(miroTransformable) =>
+        dynamoDbClient.deleteItem(
+          miroDataTableName,
+          Map("MiroID" -> new AttributeValue(miroTransformable.MiroID),
+          "MiroCollection" -> new AttributeValue(miroTransformable.MiroCollection)))
+      case a => throw new Exception(s"Unable to clear the table $miroDataTableName error $a")
+    }
+
+  private def clearCalmTable(): List[DeleteItemResult] =
+    Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName).map {
+      case Right(calmTransformable) =>
+        dynamoDbClient.deleteItem(
+          calmDataTableName,
+          Map(
+            "RecordID" -> new AttributeValue(calmTransformable.RecordID),
+            "RecordType" -> new AttributeValue(calmTransformable.RecordType)
+          ))
+      case a => throw new Exception(s"Unable to clear the table $calmDataTableName error $a")
     }
 
   private def deleteTables() = {

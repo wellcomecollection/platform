@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.transformer.modules
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Cancellable}
 import com.amazonaws.services.cloudwatch._
 import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.kinesis.AmazonKinesis
