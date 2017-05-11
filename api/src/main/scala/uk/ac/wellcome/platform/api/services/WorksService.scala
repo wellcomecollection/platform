@@ -27,7 +27,7 @@ class WorksService @Inject()(
   def listWorks(pageSize: Int = defaultPageSize,
                 pageNumber: Int = 1): Future[DisplaySearch] =
     searchService
-      .findResults(
+      .listResults(
         sortByField = "canonicalId",
         limit = pageSize,
         from = (pageNumber - 1) * pageSize

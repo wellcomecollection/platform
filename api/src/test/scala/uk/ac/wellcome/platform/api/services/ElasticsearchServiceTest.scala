@@ -3,15 +3,18 @@ package uk.ac.wellcome.platform.api.services
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ElasticsearchServiceTest
     extends FunSpec
     with IndexedElasticSearchLocal
     with Matchers
-    with ScalaFutures {
+    with ScalaFutures
+    with WorksUtil{
 
   val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)
@@ -32,7 +35,7 @@ class ElasticsearchServiceTest
 
     insertIntoElasticSearch(work1, work2, work3)
 
-    val sortedSearchResultByCanonicalId = searchService.findResults(
+    val sortedSearchResultByCanonicalId = searchService.listResults(
       sortByField = "canonicalId"
     )
     whenReady(sortedSearchResultByCanonicalId) { result =>
@@ -46,83 +49,73 @@ class ElasticsearchServiceTest
     // for different sort orders.
   }
 
+  it("should return everything if we ask for a limit > result size") {
+    val displayWorks = populateElasticsearch()
 
-
-  it("should return the correct number of results from Elasticsearch") {
-    val work1 = identifiedWorkWith(
-      canonicalId = "0001",
-      label = "The first flounder"
+    assertSliceIsCorrect(
+      limit = displayWorks.length + 1,
+      from = 0,
+      expectedWorks = displayWorks
     )
-    val work2 = identifiedWorkWith(
-      canonicalId = "0002",
-      label = "The second salmon"
-    )
-    val work3 = identifiedWorkWith(
-      canonicalId = "0003",
-      label = "The third trout"
-    )
-    val work4 = identifiedWorkWith(
-      canonicalId = "0004",
-      label = "The fourth flagtail"
-    )
-    val work5 = identifiedWorkWith(
-      canonicalId = "0005",
-      label = "The fifth flagfin"
-    )
-
-    insertIntoElasticSearch(work1, work2, work3, work4, work5)
-
-    val searchResultFuture = searchService.findResults(
-      sortByField = "canonicalId",
-      limit = 4
-    )
-    whenReady(searchResultFuture) { _.hits should have size 4 }
-
-    val searchResultFutureWithLargeLimit = searchService.findResults(
-      sortByField = "canonicalId",
-      limit = 10
-    )
-    whenReady(searchResultFutureWithLargeLimit) { _.hits should have size 5 }
   }
 
-  it("should be able to fetch from midway through the Elasticsearch results") {
-    val work1 = identifiedWorkWith(
-      canonicalId = "0001",
-      label = "Ascending the Alps"
+  it("should return a page from the beginning of the result set") {
+    val displayWorks = populateElasticsearch()
+    assertSliceIsCorrect(
+      limit = 4,
+      from = 0,
+      expectedWorks = displayWorks.slice(0, 4)
     )
-    val work2 = identifiedWorkWith(
-      canonicalId = "0002",
-      label = "Braving the Black Hills"
-    )
-    val work3 = identifiedWorkWith(
-      canonicalId = "0003",
-      label = "Climbing the Cairngorms"
-    )
-    val work4 = identifiedWorkWith(
-      canonicalId = "0004",
-      label = "Daring on Drakensberg"
-    )
+  }
 
-    insertIntoElasticSearch(work1, work2, work3, work4)
+  it("should return a page from halfway through the result set") {
+    val displayWorks = populateElasticsearch()
+    assertSliceIsCorrect(
+      limit = 4,
+      from = 3,
+      expectedWorks = displayWorks.slice(3, 7)
+    )
+  }
 
-    val sortedSearchResultByCanonicalId = searchService.findResults(
+  it("should return a page from the end of the result set") {
+    val displayWorks = populateElasticsearch()
+    assertSliceIsCorrect(
+      limit = 7,
+      from = 5,
+      expectedWorks = displayWorks.slice(5, 10)
+    )
+  }
+
+  it("should return an empty page if asked for a limit > result size") {
+    val displayWorks = populateElasticsearch()
+    assertSliceIsCorrect(
+      limit = 10,
+      from = displayWorks.length * 2,
+      expectedWorks = List()
+    )
+  }
+
+  private def populateElasticsearch(): List[DisplayWork] = {
+    val works = createIdentifiedWorks(10)
+    insertIntoElasticSearch(works: _*)
+
+    works.map(convertWorkToDisplayWork).toList
+  }
+
+  private def assertSliceIsCorrect(
+    limit: Int,
+    from: Int,
+    expectedWorks: List[DisplayWork]
+  ) = {
+    val searchResultFuture = searchService.listResults(
       sortByField = "canonicalId",
-      from = 2
+      limit = limit,
+      from = from
     )
-    whenReady(sortedSearchResultByCanonicalId) { result =>
-      result.hits should have size 2
-      val works = result.hits.map { DisplayWork(_) }
-      works.head shouldBe DisplayWork("Work", work3.canonicalId, work3.work.label)
-      works.last shouldBe DisplayWork("Work", work4.canonicalId, work4.work.label)
+    whenReady(searchResultFuture) { result =>
+      result.hits should have size expectedWorks.length
+      val returnedWorks = result.hits.map { DisplayWork(_) }
+      returnedWorks.toList shouldBe expectedWorks
     }
-  }
-
-  private def identifiedWorkWith(canonicalId: String, label: String) = {
-    IdentifiedWork(canonicalId,
-                   Work(identifiers = List(
-                          SourceIdentifier(source = "Calm",
-                                           sourceId = "AltRefNo",
-                                           value = "calmid")),
-                        label = label))
   }
 }
