@@ -7,7 +7,7 @@ import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibC
 import com.amazonaws.services.sns.AmazonSNS
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{MiroTransformable, Work}
 import uk.ac.wellcome.platform.transformer.Server
@@ -19,7 +19,6 @@ class MiroTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
     with Eventually
-    with IntegrationPatience
     with Matchers {
 
   private val appName = "test-transformer-miro"
