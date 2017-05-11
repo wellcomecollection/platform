@@ -28,7 +28,7 @@ class WorksServiceTest
                          label = "this is the second item label")
     insertIntoElasticSearch(firstIdentifiedWork, secondIdentifiedWork)
 
-    val displayWorksFuture = worksService.findWorks()
+    val displayWorksFuture = worksService.listWorks()
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2

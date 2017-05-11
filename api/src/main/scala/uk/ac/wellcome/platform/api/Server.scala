@@ -28,6 +28,7 @@ class Server extends HttpServer {
   override val modules = Seq(ElasticClientModule)
 
   flag(name = "api.host", default = "localhost:8888", help = "API hostname")
+  flag(name = "api.scheme", default = "https", help = "API prototocol scheme")
   
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
