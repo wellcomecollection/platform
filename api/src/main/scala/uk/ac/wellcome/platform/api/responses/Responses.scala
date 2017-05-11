@@ -1,8 +1,13 @@
 package uk.ac.wellcome.platform.api.responses
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
+import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
 import scala.language.existentials
+
+
+case class ResultResponse(
+  @JsonProperty("@context") context: String,
+  @JsonUnwrapped result: Any
+)
 
 case class ResultListResponse(
   @JsonProperty("@context") context: String,
