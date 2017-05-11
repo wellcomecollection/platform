@@ -28,23 +28,31 @@ class WorksService @Inject()(
         if (result.exists) Some(DisplayWork(result.original)) else None
       }
 
-  private def paginatedResult(searchResponse: RichSearchResponse): PaginatedWorksResult =
+  private def paginatedResult(searchResponse: RichSearchResponse, pageSize: Int): PaginatedWorksResult =
     PaginatedWorksResult(
       results = searchResponse.hits.map { DisplayWork(_) },
-      pageSize = 10,
+      pageSize = pageSize,
       // TODO: This arithmetic is distinctly dodgy
-      totalPages = ((searchResponse.totalHits + 10L) / 10L).toInt,
-      totalResults = (searchResponse.totalHits).toInt
+      totalPages = (searchResponse.totalHits.toInt + pageSize) / pageSize,
+      totalResults = searchResponse.totalHits.toInt
     )
 
-  def findWorks(): Future[PaginatedWorksResult] =
+  def findWorks(pageSize: Int, pageNumber: Int): Future[PaginatedWorksResult] =
     searchService
-      .findResults(sortByField = "canonicalId", limit = 10)
-      .map { paginatedResult(_) }
+      .findResults(
+        sortByField = "canonicalId",
+        limit = pageSize,
+        from = (pageNumber - 1) * pageSize
+      )
+      .map { paginatedResult(_, pageSize = pageSize) }
 
-  def searchWorks(query: String): Future[PaginatedWorksResult] =
+  def searchWorks(query: String, pageSize: Int, pageNumber: Int): Future[PaginatedWorksResult] =
     searchService
-      .simpleStringQueryResults(query)
-      .map { paginatedResult(_) }
+      .simpleStringQueryResults(
+        query,
+        limit = pageSize,
+        from = (pageNumber - 1) * pageSize
+      )
+      .map { paginatedResult(_, pageSize = pageSize) }
 
 }

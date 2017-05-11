@@ -46,9 +46,27 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                             "Full-text search query",
                             required = false)
     } { request: Request =>
+
+      val pageNumber: Int = request.params.get("page") match {
+        case Some(page) => page.toInt
+        case None => 1
+      }
+
+      val pageSize: Int = request.params.get("pageSize") match {
+        case Some(page) => page.toInt
+        case None => 10
+      }
+
       val works = request.params.get("query") match {
-        case Some(queryString) => worksService.searchWorks(queryString)
-        case None => worksService.findWorks()
+        case Some(queryString) => worksService.searchWorks(
+          queryString,
+          pageSize = pageSize,
+          pageNumber = pageNumber
+        )
+        case None => worksService.findWorks(
+          pageSize = pageSize,
+          pageNumber = pageNumber
+        )
       }
 
       works
