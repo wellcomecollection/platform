@@ -31,11 +31,11 @@ class WorksServiceTest
     val displayWorksFuture = worksService.findWorks()
 
     displayWorksFuture map { displayWork =>
-      displayWork should have size 2
-      displayWork.head shouldBe DisplayWork("Work",
+      displayWork.results should have size 2
+      displayWork.results.head shouldBe DisplayWork("Work",
                                             firstIdentifiedWork.canonicalId,
                                             firstIdentifiedWork.work.label)
-      displayWork.tail.head shouldBe DisplayWork(
+      displayWork.results.tail.head shouldBe DisplayWork(
         "Work",
         secondIdentifiedWork.canonicalId,
         secondIdentifiedWork.work.label)
@@ -73,13 +73,13 @@ class WorksServiceTest
     val searchForCat = worksService.searchWorks("cat")
 
     whenReady(searchForCat) { works =>
-      works should have size 0
+      works.results should have size 0
     }
 
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
-      works should have size 1
-      works.head shouldBe DisplayWork("Work",
+      works.results should have size 1
+      works.results.head shouldBe DisplayWork("Work",
                                       workDodo.canonicalId,
                                       workDodo.work.label)
     }
@@ -105,8 +105,8 @@ class WorksServiceTest
     )
 
     whenReady(searchForEmu) { works =>
-      works should have size 1
-      works.head shouldBe DisplayWork("Work",
+      works.results should have size 1
+      works.results.head shouldBe DisplayWork("Work",
                                       workEmu.canonicalId,
                                       workEmu.work.label)
     }

@@ -21,6 +21,9 @@ class WorksService @Inject()(
   searchService: ElasticSearchService
 ) {
 
+  val defaultPageSize = 10
+  val defaultStartPage = 1
+
   def findWorkById(canonicalId: String): Future[Option[DisplayWork]] =
     searchService
       .findResultById(canonicalId)
@@ -28,7 +31,8 @@ class WorksService @Inject()(
         if (result.exists) Some(DisplayWork(result.original)) else None
       }
 
-  private def paginatedResult(searchResponse: RichSearchResponse, pageSize: Int): PaginatedWorksResult =
+  private def paginatedResult(searchResponse: RichSearchResponse,
+                              pageSize: Int): PaginatedWorksResult =
     PaginatedWorksResult(
       results = searchResponse.hits.map { DisplayWork(_) },
       pageSize = pageSize,
@@ -37,7 +41,9 @@ class WorksService @Inject()(
       totalResults = searchResponse.totalHits.toInt
     )
 
-  def findWorks(pageSize: Int, pageNumber: Int): Future[PaginatedWorksResult] =
+  def findWorks(
+    pageSize: Int = defaultPageSize,
+    pageNumber: Int = defaultStartPage): Future[PaginatedWorksResult] =
     searchService
       .findResults(
         sortByField = "canonicalId",
@@ -46,7 +52,10 @@ class WorksService @Inject()(
       )
       .map { paginatedResult(_, pageSize = pageSize) }
 
-  def searchWorks(query: String, pageSize: Int, pageNumber: Int): Future[PaginatedWorksResult] =
+  def searchWorks(
+    query: String,
+    pageSize: Int = defaultPageSize,
+    pageNumber: Int = defaultStartPage): Future[PaginatedWorksResult] =
     searchService
       .simpleStringQueryResults(
         query,
