@@ -5,9 +5,9 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, WorksUtil}
 
-class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSearchLocal {
+class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSearchLocal with WorksUtil {
 
   implicit val jsonMapper = IdentifiedWork
   override val server =
@@ -32,18 +32,20 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
   val period = Period("the past")
   val agent = Agent("a person")
 
+  def createWorks(count: Int) = (1 to count).map(
+    (idx: Int) =>
+      identifiedWorkWith(
+        canonicalId = s"${idx}-${canonicalId}",
+        label = s"${idx}-${label}",
+        description = s"${idx}-${description}",
+        lettering = s"${idx}-${lettering}",
+        createdDate = period.copy(label = s"${idx}-${period.label}"),
+        creator = agent.copy(label = s"${idx}-${agent.label}")
+      ))
+
   it("should return a list of works") {
 
-    val works = (1 to 3).map(
-      (idx: Int) =>
-        identifiedWorkWith(
-          canonicalId = s"${idx}-${canonicalId}",
-          label = s"${idx}-${label}",
-          description = s"${idx}-${description}",
-          lettering = s"${idx}-${lettering}",
-          createdDate = period.copy(label = s"${idx}-${period.label}"),
-          creator = agent.copy(label = s"${idx}-${agent.label}")
-      ))
+    val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
 
@@ -149,6 +151,45 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
     }
   }
 
+  it("should return the requested page of results when requested with page & pageSize")  {
+    val works = createWorks(3)
+
+    insertIntoElasticSearch(works: _*)
+    eventually {
+      server.httpGet(
+        path = "/catalogue/v0/works?page=2&pageSize=1",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  "@context": "https://localhost:8888/catalogue/v0/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 1,
+                          |  "totalPages": 3,
+                          |  "totalResults": 3,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${works(1).canonicalId}",
+                          |     "label": "${works(1).work.label}",
+                          |     "description": "${works(1).work.description.get}",
+                          |     "lettering": "${works(1).work.lettering.get}",
+                          |     "hasCreatedDate": {
+                          |       "type": "Period",
+                          |       "label": "${works(1).work.hasCreatedDate.get.label}"
+                          |     },
+                          |     "hasCreator": [{
+                          |       "type": "Agent",
+                          |       "label": "${works(1).work.hasCreator(0).label}"
+                          |     }]
+                          |   }]
+                          |   }
+                          |  ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
   it("should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = "/catalogue/v0/works/non-existing-id",
@@ -208,32 +249,5 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
              |}""".stripMargin
       )
     }
-  }
-
-  private def identifiedWorkWith(canonicalId: String, label: String) = {
-    IdentifiedWork(canonicalId,
-                   Work(identifiers =
-                          List(SourceIdentifier("Miro", "MiroID", "5678")),
-                        label = label))
-
-  }
-  private def identifiedWorkWith(canonicalId: String,
-                                 label: String,
-                                 description: String,
-                                 lettering: String,
-                                 createdDate: Period,
-                                 creator: Agent) = {
-
-    IdentifiedWork(
-      canonicalId = canonicalId,
-      work = Work(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")),
-        label = label,
-        description = Some(description),
-        lettering = Some(lettering),
-        hasCreatedDate = Some(createdDate),
-        hasCreator = List(creator)
-      )
-    )
   }
 }

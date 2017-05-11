@@ -4,20 +4,22 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.api.models.DisplayWork
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, WorksUtil}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class WorksServiceTest
     extends FunSpec
     with IndexedElasticSearchLocal
     with Matchers
-    with ScalaFutures {
+    with ScalaFutures
+    with WorksUtil {
 
   val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)
 
   val worksService =
-    new WorksService(searchService)
+    new WorksService(10, searchService)
 
   it("should return the records in Elasticsearch") {
     val firstIdentifiedWork =
@@ -32,9 +34,10 @@ class WorksServiceTest
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
-      displayWork.results.head shouldBe DisplayWork("Work",
-                                            firstIdentifiedWork.canonicalId,
-                                            firstIdentifiedWork.work.label)
+      displayWork.results.head shouldBe DisplayWork(
+        "Work",
+        firstIdentifiedWork.canonicalId,
+        firstIdentifiedWork.work.label)
       displayWork.results.tail.head shouldBe DisplayWork(
         "Work",
         secondIdentifiedWork.canonicalId,
@@ -80,8 +83,8 @@ class WorksServiceTest
     whenReady(searchForDodo) { works =>
       works.results should have size 1
       works.results.head shouldBe DisplayWork("Work",
-                                      workDodo.canonicalId,
-                                      workDodo.work.label)
+                                              workDodo.canonicalId,
+                                              workDodo.work.label)
     }
   }
 
@@ -93,7 +96,28 @@ class WorksServiceTest
     }
   }
 
-  it("should not throw an exception if passed an invalid query string for full-text search") {
+  it(
+    "should return the correct number of pages for the number of results and pageSize") {
+    val workDodo = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A drawing of a dodo"
+    )
+    val workMouse = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "A mezzotint of a mouse"
+    )
+
+    insertIntoElasticSearch(workDodo, workMouse)
+
+    val displayWorksFuture = worksService.listWorks(pageSize = 1)
+
+    whenReady(displayWorksFuture) { works =>
+      works.totalPages shouldBe 2
+    }
+  }
+
+  it(
+    "should not throw an exception if passed an invalid query string for full-text search") {
     val workEmu = identifiedWorkWith(
       canonicalId = "1234",
       label = "An etching of an emu"
@@ -107,17 +131,8 @@ class WorksServiceTest
     whenReady(searchForEmu) { works =>
       works.results should have size 1
       works.results.head shouldBe DisplayWork("Work",
-                                      workEmu.canonicalId,
-                                      workEmu.work.label)
+                                              workEmu.canonicalId,
+                                              workEmu.work.label)
     }
-  }
-
-  private def identifiedWorkWith(canonicalId: String, label: String) = {
-    IdentifiedWork(canonicalId,
-                   Work(identifiers = List(
-                          SourceIdentifier(source = "Calm",
-                                           sourceId = "AltRefNo",
-                                           value = "calmid")),
-                        label = label))
   }
 }

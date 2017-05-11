@@ -46,6 +46,8 @@ class ElasticsearchServiceTest
     // for different sort orders.
   }
 
+
+
   it("should return the correct number of results from Elasticsearch") {
     val work1 = identifiedWorkWith(
       canonicalId = "0001",
