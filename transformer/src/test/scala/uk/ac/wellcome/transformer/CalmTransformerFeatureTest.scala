@@ -41,34 +41,34 @@ class CalmTransformerFeatureTest
         kinesisClientLibConfiguration(appName, calmDataStreamArn))
 
   it("should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
-      Scanamo.put(dynamoDbClient)(calmDataTableName)(
-        CalmTransformable(RecordID = "RecordID1",
-          RecordType = "Collection",
-          AltRefNo = "AltRefNo1",
-          RefNo = "RefNo1",
-          data = """{"AccessStatus": ["public"]}"""))
+    Scanamo.put(dynamoDbClient)(calmDataTableName)(
+      CalmTransformable(RecordID = "RecordID1",
+                        RecordType = "Collection",
+                        AltRefNo = "AltRefNo1",
+                        RefNo = "RefNo1",
+                        data = """{"AccessStatus": ["public"]}"""))
 
-      eventually {
-        val snsMessages = listMessagesReceivedFromSNS()
-        snsMessages should have size (1)
-        assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
-      }
+    eventually {
+      val snsMessages = listMessagesReceivedFromSNS()
+      snsMessages should have size (1)
+      assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
+    }
 
-      Scanamo.put(dynamoDbClient)(calmDataTableName)(
-        CalmTransformable(RecordID = "RecordID2",
-          RecordType = "Collection",
-          AltRefNo = "AltRefNo2",
-          RefNo = "RefNo2",
-          data = """{"AccessStatus": ["restricted"]}"""))
+    Scanamo.put(dynamoDbClient)(calmDataTableName)(
+      CalmTransformable(RecordID = "RecordID2",
+                        RecordType = "Collection",
+                        AltRefNo = "AltRefNo2",
+                        RefNo = "RefNo2",
+                        data = """{"AccessStatus": ["restricted"]}"""))
 
-      eventually {
-        val snsMessages = listMessagesReceivedFromSNS()
-        snsMessages should have size (2)
+    eventually {
+      val snsMessages = listMessagesReceivedFromSNS()
+      snsMessages should have size (2)
 
-        assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
-        assertSNSMessageContainsCalmDataWith(snsMessages.tail.head,
-          Some("restricted"))
-      }
+      assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
+      assertSNSMessageContainsCalmDataWith(snsMessages.tail.head,
+                                           Some("restricted"))
+    }
   }
 
   private def assertSNSMessageContainsCalmDataWith(
