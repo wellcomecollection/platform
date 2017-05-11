@@ -5,10 +5,13 @@ import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibC
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.Suite
+import org.scalatest.concurrent.PatienceConfiguration
+import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal}
 
 trait TransformerFeatureTest
     extends FeatureTestMixin
+    with PatienceConfiguration
     with SNSLocal
     with DynamoDBLocal { this: Suite =>
 
@@ -25,4 +28,9 @@ trait TransformerFeatureTest
       java.util.UUID.randomUUID.toString)
     //turn off metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
       .withMetricsLevel(MetricsLevel.NONE)
+
+  override implicit val patienceConfig = PatienceConfig(
+    timeout = scaled(Span(40, Seconds)),
+    interval = scaled(Span(150, Millis))
+  )
 }
