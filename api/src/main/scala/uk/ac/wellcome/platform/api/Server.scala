@@ -29,7 +29,8 @@ class Server extends HttpServer {
 
   flag(name = "api.host", default = "localhost:8888", help = "API hostname")
   flag(name = "api.scheme", default = "https", help = "API prototocol scheme")
-  
+  flag(name = "api.pageSize", default = 10, help = "API default page size")
+
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
   private final val apiVersion =

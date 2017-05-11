@@ -17,14 +17,16 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import com.twitter.finatra.validation._
 
 case class UsersRequest(@QueryParam page: Int = 1,
-                        @Max(100) @QueryParam pageSize: Int = 10,
-                        @QueryParam query: Option[String])
+                        @Max(100) @QueryParam pageSize: Option[Int],
+                        @QueryParam query: Option[String]) {
+}
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                                 @Flag("api.context") apiContext: String,
                                 @Flag("api.host") apiHost: String,
                                 @Flag("api.scheme") apiScheme: String,
+                                @Flag("api.pageSize") defaultPageSize: Int,
                                 worksService: WorksService)
     extends Controller
     with SwaggerSupport {
@@ -51,16 +53,18 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                             "Full-text search query",
                             required = false)
     } { request: UsersRequest =>
+      val pageSize = request.pageSize.getOrElse((defaultPageSize))
+
       val works = request.query match {
         case Some(queryString) =>
           worksService.searchWorks(
             queryString,
-            pageSize = request.pageSize,
+            pageSize = pageSize,
             pageNumber = request.page
           )
         case None =>
           worksService.listWorks(
-            pageSize = request.pageSize,
+            pageSize = pageSize,
             pageNumber = request.page
           )
       }
