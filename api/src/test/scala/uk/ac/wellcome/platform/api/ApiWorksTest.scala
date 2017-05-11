@@ -56,8 +56,8 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
             |  "@context": "http://localhost:8888/catalogue/v0/context.json",
             |  "type": "ResultList",
             |  "pageSize": 10,
-            |  "totalPages": 10,
-            |  "totalResults": 100,
+            |  "totalPages": 1,
+            |  "totalResults": 3,
             |  "results": [
             |   {
             |     "type": "Work",
@@ -178,8 +178,8 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
           |  "@context": "http://localhost:8888/catalogue/v0/context.json",
           |  "type": "ResultList",
           |  "pageSize": 10,
-          |  "totalPages": 10,
-          |  "totalResults": 100,
+          |  "totalPages": 1,
+          |  "totalResults": 0,
           |  "results": []
           |}""".stripMargin
       )
@@ -195,8 +195,8 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
              |  "@context": "http://localhost:8888/catalogue/v0/context.json",
              |  "type": "ResultList",
              |  "pageSize": 10,
-             |  "totalPages": 10,
-             |  "totalResults": 100,
+             |  "totalPages": 1,
+             |  "totalResults": 1,
              |  "results": [
              |   {
              |     "type": "Work",
