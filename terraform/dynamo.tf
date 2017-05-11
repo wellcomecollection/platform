@@ -42,6 +42,10 @@ resource "aws_dynamodb_table" "calm_table" {
     write_capacity  = 1
     projection_type = "ALL"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_dynamodb_table" "miro_table" {
@@ -86,5 +90,9 @@ resource "aws_dynamodb_table" "identifiers" {
     read_capacity   = 5
     write_capacity  = 5
     projection_type = "ALL"
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
