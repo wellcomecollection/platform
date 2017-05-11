@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.TcpClient
 import com.sksamuel.elastic4s.get.RichGetResponse
-import com.sksamuel.elastic4s.searches.{RichSearchResponse, SearchDefinition}
+import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models._
