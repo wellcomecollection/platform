@@ -4,8 +4,8 @@ import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.api.models.DisplayWork
-import uk.ac.wellcome.platform.api.responses.PaginatedWorksResult
+import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork}
+import uk.ac.wellcome.platform.api.responses.ResultListResponse
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -26,37 +26,28 @@ class WorksService @Inject()(
         if (result.exists) Some(DisplayWork(result.original)) else None
       }
 
-  private def paginatedResult(searchResponse: RichSearchResponse,
-                              pageSize: Int): PaginatedWorksResult =
-    PaginatedWorksResult(
-      results = searchResponse.hits.map { DisplayWork(_) },
-      pageSize = pageSize,
-      // TODO: This arithmetic is distinctly dodgy
-      totalPages = (searchResponse.totalHits.toInt + pageSize) / pageSize,
-      totalResults = searchResponse.totalHits.toInt
-    )
 
-  def findWorks(
+  def listWorks(
     pageSize: Int = defaultPageSize,
-    pageNumber: Int = defaultStartPage): Future[PaginatedWorksResult] =
+    pageNumber: Int = defaultStartPage): Future[DisplaySearch] =
     searchService
       .findResults(
         sortByField = "canonicalId",
         limit = pageSize,
         from = (pageNumber - 1) * pageSize
       )
-      .map { paginatedResult(_, pageSize = pageSize) }
+      .map { DisplaySearch(_, pageSize) }
 
   def searchWorks(
     query: String,
     pageSize: Int = defaultPageSize,
-    pageNumber: Int = defaultStartPage): Future[PaginatedWorksResult] =
+    pageNumber: Int = defaultStartPage): Future[DisplaySearch] =
     searchService
       .simpleStringQueryResults(
         query,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize
       )
-      .map { paginatedResult(_, pageSize = pageSize) }
+      .map { DisplaySearch(_, pageSize) }
 
 }

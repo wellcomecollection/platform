@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.sksamuel.elastic4s.searches.RichSearchHit
+import com.sksamuel.elastic4s.searches.{RichSearchHit, RichSearchResponse}
 import org.elasticsearch.action.get.GetResponse
 import uk.ac.wellcome.models.{Agent, IdentifiedWork, Period, Work}
 import uk.ac.wellcome.utils.JsonUtil
+
 
 case class DisplayWork(
   @JsonProperty("type") ontologyType: String = "Work",

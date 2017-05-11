@@ -53,7 +53,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
         andExpect = Status.Ok,
         withJsonBody = s"""
             |{
-            |  "@context": "http://localhost:8888/catalogue/v0/context.json",
+            |  "@context": "https://localhost:8888/catalogue/v0/context.json",
             |  "type": "ResultList",
             |  "pageSize": 10,
             |  "totalPages": 1,
@@ -129,7 +129,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
         andExpect = Status.Ok,
         withJsonBody = s"""
             |{
-            | "@context": "http://localhost:8888/catalogue/v0/context.json",
+            | "@context": "https://localhost:8888/catalogue/v0/context.json",
             | "type": "Work",
             | "id": "$canonicalId",
             | "label": "$label",
@@ -175,7 +175,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
         withJsonBody =
           s"""
           |{
-          |  "@context": "http://localhost:8888/catalogue/v0/context.json",
+          |  "@context": "https://localhost:8888/catalogue/v0/context.json",
           |  "type": "ResultList",
           |  "pageSize": 10,
           |  "totalPages": 1,
@@ -192,7 +192,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
         withJsonBody =
           s"""
              |{
-             |  "@context": "http://localhost:8888/catalogue/v0/context.json",
+             |  "@context": "https://localhost:8888/catalogue/v0/context.json",
              |  "type": "ResultList",
              |  "pageSize": 10,
              |  "totalPages": 1,

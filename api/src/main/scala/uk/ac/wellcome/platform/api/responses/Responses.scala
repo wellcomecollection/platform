@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
-import uk.ac.wellcome.platform.api.models.DisplayWork
+import scala.language.existentials
+
 
 case class ResultResponse(
   @JsonProperty("@context") context: String,
@@ -15,11 +16,4 @@ case class ResultListResponse(
   totalPages: Int = 10,
   totalResults: Int = 100,
   results: Array[_ <: Any]
-)
-
-case class PaginatedWorksResult(
-  pageSize: Int,
-  totalPages: Int,
-  totalResults: Int,
-  results: Array[DisplayWork]
 )
