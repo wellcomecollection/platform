@@ -90,7 +90,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   private def assertTransformMiroRecordFails(
     miroID: String = "M0000001",
     miroCollection: String = "TestCollection",
-    data: String = """{"image_title": "A test tome about a tapir"}"""
+    data: String = """{"image_title": "A failed fumble in the fire"}"""
   ) = {
     val miroTransformable = MiroTransformable(
       MiroID = miroID,
@@ -104,7 +104,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   private def transformMiroRecord(
     miroID: String = "M0000001",
     miroCollection: String = "TestCollection",
-    data: String = """{"image_title": "A test tome about a tapir"}"""
+    data: String = """{"image_title": "A test tome telling tales about a tapir"}"""
   ): Work = {
     val miroTransformable = MiroTransformable(
       MiroID = miroID,
