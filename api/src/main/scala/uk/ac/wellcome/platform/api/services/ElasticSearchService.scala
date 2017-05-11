@@ -32,7 +32,9 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
           .from(from)
       }
 
-  def findResults(sortByField: String, limit: Int = 10, from: Int = 0): Future[RichSearchResponse] = {
+  def listResults(sortByField: String,
+                  limit: Int = 10,
+                  from: Int = 0): Future[RichSearchResponse] = {
     val searchDefinition = search(s"$index/$itemType")
       .matchAllQuery()
       .sortBy(fieldSort(sortByField))

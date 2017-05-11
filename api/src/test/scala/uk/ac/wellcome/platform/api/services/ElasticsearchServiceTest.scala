@@ -32,7 +32,7 @@ class ElasticsearchServiceTest
 
     insertIntoElasticSearch(work1, work2, work3)
 
-    val sortedSearchResultByCanonicalId = searchService.findResults(
+    val sortedSearchResultByCanonicalId = searchService.listResults(
       sortByField = "canonicalId"
     )
     whenReady(sortedSearchResultByCanonicalId) { result =>
@@ -103,7 +103,7 @@ class ElasticsearchServiceTest
 
     insertIntoElasticSearch(work1, work2, work3, work4)
 
-    val sortedSearchResultByCanonicalId = searchService.findResults(
+    val sortedSearchResultByCanonicalId = searchService.listResults(
       sortByField = "canonicalId",
       from = 2
     )
