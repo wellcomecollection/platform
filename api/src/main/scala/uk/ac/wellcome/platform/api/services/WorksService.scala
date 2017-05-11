@@ -5,16 +5,11 @@ import javax.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.api.models.DisplayWork
+import uk.ac.wellcome.platform.api.responses.PaginatedWorksResult
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-case class PaginatedWorksResult(
-  results: Array[DisplayWork],
-  pageSize: Int,
-  totalPages: Int,
-  totalResults: Int
-)
 
 @Singleton
 class WorksService @Inject()(
