@@ -5,9 +5,13 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, WorksUtil}
+import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
-class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSearchLocal with WorksUtil {
+class ApiWorksTest
+    extends FunSpec
+    with FeatureTestMixin
+    with IndexedElasticSearchLocal
+    with WorksUtil {
 
   implicit val jsonMapper = IdentifiedWork
   override val server =
@@ -24,28 +28,19 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
       )
     )
 
-  val canonicalId = "1234"
-  val label = "this is the first image title"
-  val description = "this is a description"
-  val lettering = "some lettering"
-
-  val period = Period("the past")
-  val agent = Agent("a person")
-
-  def createWorks(count: Int) = (1 to count).map(
-    (idx: Int) =>
-      identifiedWorkWith(
-        canonicalId = s"${idx}-${canonicalId}",
-        label = s"${idx}-${label}",
-        description = s"${idx}-${description}",
-        lettering = s"${idx}-${lettering}",
-        createdDate = period.copy(label = s"${idx}-${period.label}"),
-        creator = agent.copy(label = s"${idx}-${agent.label}")
-      ))
+  val emptyJsonResult = s"""
+                                 |{
+                                 |  "@context": "https://localhost:8888/catalogue/v0/context.json",
+                                 |  "type": "ResultList",
+                                 |  "pageSize": 10,
+                                 |  "totalPages": 0,
+                                 |  "totalResults": 0,
+                                 |  "results": []
+                                 |}""".stripMargin
 
   it("should return a list of works") {
 
-    val works = createWorks(3)
+    val works = createIdentifiedWorks(3)
 
     insertIntoElasticSearch(works: _*)
 
@@ -151,8 +146,9 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
     }
   }
 
-  it("should return the requested page of results when requested with page & pageSize")  {
-    val works = createWorks(3)
+  it(
+    "should return the requested page of results when requested with page & pageSize") {
+    val works = createIdentifiedWorks(3)
 
     insertIntoElasticSearch(works: _*)
     eventually {
@@ -179,7 +175,9 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
                           |     },
                           |     "hasCreator": [{
                           |       "type": "Agent",
-                          |       "label": "${works(1).work.hasCreator(0).label}"
+                          |       "label": "${works(1).work
+                            .hasCreator(0)
+                            .label}"
                           |     }]
                           |   }]
                           |   }
@@ -190,7 +188,31 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
     }
   }
 
-  it("should return a not found error when requesting a single work with a non existing id") {
+  it(
+    "should return a BadRequest when malformed query parameters are presented") {
+    server.httpGet(
+      path = "/catalogue/v0/works?pageSize=penguin",
+      andExpect = Status.BadRequest,
+      withJsonBody = """
+          |{
+          |  "errors" : [
+          |    "pageSize: 'penguin' is not a valid Integer"
+          |  ]
+          |}
+        """.stripMargin
+    )
+  }
+
+  it("should ignore parameters that are unused when making an api request") {
+    server.httpGet(
+      path = "/catalogue/v0/works?foo=bar",
+      andExpect = Status.Ok,
+      withJsonBody = emptyJsonResult
+    )
+  }
+
+  it(
+    "should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = "/catalogue/v0/works/non-existing-id",
       andExpect = Status.NotFound,
@@ -213,16 +235,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
       server.httpGet(
         path = "/catalogue/v0/works?query=cat",
         andExpect = Status.Ok,
-        withJsonBody =
-          s"""
-          |{
-          |  "@context": "https://localhost:8888/catalogue/v0/context.json",
-          |  "type": "ResultList",
-          |  "pageSize": 10,
-          |  "totalPages": 1,
-          |  "totalResults": 0,
-          |  "results": []
-          |}""".stripMargin
+        withJsonBody = emptyJsonResult
       )
     }
 
@@ -230,8 +243,7 @@ class ApiWorksTest extends FunSpec with FeatureTestMixin with IndexedElasticSear
       server.httpGet(
         path = "/catalogue/v0/works?query=dodo",
         andExpect = Status.Ok,
-        withJsonBody =
-          s"""
+        withJsonBody = s"""
              |{
              |  "@context": "https://localhost:8888/catalogue/v0/context.json",
              |  "type": "ResultList",
