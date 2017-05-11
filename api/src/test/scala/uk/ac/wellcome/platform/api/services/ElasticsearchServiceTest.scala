@@ -47,40 +47,64 @@ class ElasticsearchServiceTest
   }
 
   it("should return the correct number of results from Elasticsearch") {
-    val work1 = identifiedWorkWith(
-      canonicalId = "0001",
-      label = "The first flounder"
-    )
-    val work2 = identifiedWorkWith(
-      canonicalId = "0002",
-      label = "The second salmon"
-    )
-    val work3 = identifiedWorkWith(
-      canonicalId = "0003",
-      label = "The third trout"
-    )
-    val work4 = identifiedWorkWith(
-      canonicalId = "0004",
-      label = "The fourth flagtail"
-    )
-    val work5 = identifiedWorkWith(
-      canonicalId = "0005",
-      label = "The fifth flagfin"
+    val works: List[IdentifiedWork] = (0 to 9) { x =>
+      identifiedWorkWith(canonicalId = s"ID-$x", label=s"Work number $x")
+    }
+    val displayWorks = works.map { work: IdentifiedWork =>
+      DisplayWork("Work", work.canonicalId, work.work.label)
+    }
+
+    works.map { insertIntoElasticSearch(_) }
+
+    // Take a slice that starts at the beginning
+    assertSliceIsCorrect(
+      searchService,
+      limit = 4,
+      from = 0,
+      expectedWorks = displayWorks.slice(0, 4)
     )
 
-    insertIntoElasticSearch(work1, work2, work3, work4, work5)
+    // Take a slice that starts midway through the result set
+    assertSliceIsCorrect(
+      searchService,
+      limit = 4,
+      from = 3,
+      expectedWorks = displayWorks.slice(3, 7)
+    )
 
-    val searchResultFuture = searchService.findResults(
+    // Take a slice that goes off the end of the results set
+    assertSliceIsCorrect(
+      searchService,
+      limit = 7,
+      from = 5,
+      expectedWorks = displayWorks.slice(5, 10)
+    )
+
+    // Take a slice that is beyond all our results
+    assertSliceIsCorrect(
+      searchService,
+      limit = 10,
+      from = 50,
+      expectedWorks = List()
+    )
+  }
+
+  private def assertSliceIsCorrect(
+    searchService: ElasticSearchService,
+    limit: Int,
+    from: Int,
+    expectedWorks: List[DisplayWork]
+  ) = {
+    val searchResultFuture = searchService.listResults(
       sortByField = "canonicalId",
-      limit = 4
+      limit = limit,
+      from = from
     )
-    whenReady(searchResultFuture) { _.hits should have size 4 }
-
-    val searchResultFutureWithLargeLimit = searchService.findResults(
-      sortByField = "canonicalId",
-      limit = 10
-    )
-    whenReady(searchResultFutureWithLargeLimit) { _.hits should have size 5 }
+    whenReady(searchResultFuture) { result =>
+      result.hits should have size expectedWorks.length
+      val returnedWorks = result.hits.map { DisplayWork(_) }
+      returnedWorks shouldBe expectedWorks
+    }
   }
 
   it("should be able to fetch from midway through the Elasticsearch results") {
