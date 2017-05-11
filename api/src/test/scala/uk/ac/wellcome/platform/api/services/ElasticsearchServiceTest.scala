@@ -83,6 +83,38 @@ class ElasticsearchServiceTest
     whenReady(searchResultFutureWithLargeLimit) { _.hits should have size 5 }
   }
 
+  it("should be able to fetch from midway through the Elasticsearch results") {
+    val work1 = identifiedWorkWith(
+      canonicalId = "0001",
+      label = "Ascending the Alps"
+    )
+    val work2 = identifiedWorkWith(
+      canonicalId = "0002",
+      label = "Braving the Black Hills"
+    )
+    val work3 = identifiedWorkWith(
+      canonicalId = "0003",
+      label = "Climbing the Cairngorms"
+    )
+    val work4 = identifiedWorkWith(
+      canonicalId = "0004",
+      label = "Daring on Drakensberg"
+    )
+
+    insertIntoElasticSearch(work1, work2, work3, work4)
+
+    val sortedSearchResultByCanonicalId = searchService.findResults(
+      sortByField = "canonicalId",
+      from = 2
+    )
+    whenReady(sortedSearchResultByCanonicalId) { result =>
+      result.hits should have size 2
+      val works = result.hits.map { DisplayWork(_) }
+      works.head shouldBe DisplayWork("Work", work3.canonicalId, work3.work.label)
+      works.last shouldBe DisplayWork("Work", work4.canonicalId, work4.work.label)
+    }
+  }
+
   private def identifiedWorkWith(canonicalId: String, label: String) = {
     IdentifiedWork(canonicalId,
                    Work(identifiers = List(
