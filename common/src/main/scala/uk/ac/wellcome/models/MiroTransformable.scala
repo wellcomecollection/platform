@@ -8,8 +8,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
-  @JsonProperty("image_image_desc") imageDesc: Option[String],
-  @JsonProperty("image_supp_lettering") suppLettering: Option[String]
+  @JsonProperty("image_creator") creator: Option[List[String]]
 )
 
 case class MiroTransformable(MiroID: String,
@@ -18,23 +17,25 @@ case class MiroTransformable(MiroID: String,
     extends Transformable {
   override def transform: Try[Work] =
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
-      MiroCollection match {
-        case "Images-A" => transformImagesA(miroData)
-        case _ => throw new Exception(s"Unable to transform unknown collection $MiroCollection")
+
+      // Identifier is passed straight through
+      val identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID))
+
+      // In the Miro XML dumps, <image_title> is the Short Description.
+      // This maps to our data property "label".
+      val label = miroData.title.get
+
+      // In the Miro XML dumps, <image_creator> is the Creator, which
+      // maps to our object property "hasCreator"
+      val creators: List[Agent] = miroData.creator match {
+        case Some(c) => c.map { Agent(_) }
+        case None => List()
       }
+
+      Work(
+        identifiers = identifiers,
+        label = label,
+        hasCreator = creators
+      )
     }
-
-  // The mapping of Miro fields to UnifiedItem fields is quite rough,
-  // and based on a cursory expection of the Miro data.
-  // TODO: Get a proper mapping of fields.
-
-  private def transformImagesA(miroData: MiroTransformableData): Work =
-    Work(
-      identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID)),
-      label = miroData.title.get,
-      description = miroData.imageDesc,
-      lettering = miroData.suppLettering,
-      hasCreatedDate = Some(Period("early 20th century")),
-      hasCreator = List(Agent("Henry Wellcome"))
-    )
 }
