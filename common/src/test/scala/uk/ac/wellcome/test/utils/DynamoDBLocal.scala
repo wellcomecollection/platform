@@ -54,31 +54,31 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
   private def clearIdentifiersTable(): List[DeleteItemResult] =
     Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
-      case Right(id) =>
+      case Right(identifier) =>
         dynamoDbClient.deleteItem(
           identifiersTableName,
-          Map("CanonicalID" -> new AttributeValue(id.CanonicalID)))
+          Map("CanonicalID" -> new AttributeValue(identifier.CanonicalID)))
       case a => throw new Exception(s"Unable to clear the table $identifiersTableName error $a")
     }
 
   private def clearMiroTable(): List[DeleteItemResult] =
     Scanamo.scan[MiroTransformable](dynamoDbClient)(miroDataTableName).map {
-      case Right(id) =>
+      case Right(miroTransformable) =>
         dynamoDbClient.deleteItem(
           miroDataTableName,
-          Map("MiroID" -> new AttributeValue(id.MiroID),
-          "MiroCollection" -> new AttributeValue(id.MiroCollection)))
+          Map("MiroID" -> new AttributeValue(miroTransformable.MiroID),
+          "MiroCollection" -> new AttributeValue(miroTransformable.MiroCollection)))
       case a => throw new Exception(s"Unable to clear the table $miroDataTableName error $a")
     }
 
   private def clearCalmTable(): List[DeleteItemResult] =
     Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName).map {
-      case Right(id) =>
+      case Right(calmTransformable) =>
         dynamoDbClient.deleteItem(
           calmDataTableName,
           Map(
-            "RecordID" -> new AttributeValue(id.RecordID),
-            "RecordType" -> new AttributeValue(id.RecordType)
+            "RecordID" -> new AttributeValue(calmTransformable.RecordID),
+            "RecordType" -> new AttributeValue(calmTransformable.RecordType)
           ))
       case a => throw new Exception(s"Unable to clear the table $calmDataTableName error $a")
     }
