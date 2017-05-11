@@ -9,7 +9,8 @@ import uk.ac.wellcome.utils.JsonUtil
 case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
   @JsonProperty("image_creator") creator: Option[List[String]],
-  @JsonProperty("image_image_desc") description: Option[String]
+  @JsonProperty("image_image_desc") description: Option[String],
+  @JsonProperty("image_secondary_creator") secondaryCreator: Option[List[String]]
 )
 
 case class MiroTransformable(MiroID: String,
@@ -38,11 +39,18 @@ case class MiroTransformable(MiroID: String,
         case None => List()
       }
 
+      // <image_secondary_creator>: what MIRO calls Secondary Creator, which
+      // will also just have to map to our object property "hasCreator"
+      val secondaryCreators: List[Agent] = miroData.secondaryCreator match {
+        case Some(c) => c.map { Agent(_) }
+        case None => List()
+      }
+
       Work(
         identifiers = identifiers,
         label = label,
         description = description,
-        hasCreator = creators
+        hasCreator = creators ++ secondaryCreators
       )
     }
 }
