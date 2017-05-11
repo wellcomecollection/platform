@@ -54,7 +54,15 @@ class ElasticsearchServiceTest
       DisplayWork("Work", work.canonicalId, work.work.label)
     }
 
-    works.map { insertIntoElasticSearch(_) }
+    insertIntoElasticSearch(works: _*)
+
+    // Get everything
+    assertSliceIsCorrect(
+      searchService,
+      limit = displayWorks.length,
+      from = 0,
+      expectedWorks = displayWorks
+    )
 
     // Take a slice that starts at the beginning
     assertSliceIsCorrect(
@@ -95,6 +103,7 @@ class ElasticsearchServiceTest
     from: Int,
     expectedWorks: List[DisplayWork]
   ) = {
+    println(s"Testing with limit = $limit and from = $from")
     val searchResultFuture = searchService.listResults(
       sortByField = "canonicalId",
       limit = limit,
