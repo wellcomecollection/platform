@@ -24,21 +24,27 @@ class ElasticSearchService @Inject()(@Flag("es.index") index: String,
         get(id).from(s"$index/$itemType")
       }
 
-  def findResults(sortByField: String, limit: Int = 10): Future[RichSearchResponse] =
+  def listResults(sortByField: String,
+                  limit: Int = 10,
+                  from: Int = 0): Future[RichSearchResponse] =
     elasticClient
       .execute {
         search(s"$index/$itemType")
           .matchAllQuery()
           .sortBy(fieldSort(sortByField))
           .limit(limit)
+          .from(from)
       }
 
-  def simpleStringQueryResults(queryString: String): Future[RichSearchResponse] =
+  def simpleStringQueryResults(queryString: String,
+                               limit: Int = 10,
+                               from: Int = 0): Future[RichSearchResponse] =
     elasticClient
       .execute {
         search(s"$index/$itemType")
           .query(simpleStringQuery(queryString))
-          .limit(10)
+          .limit(limit)
+          .from(from)
       }
 
 }
