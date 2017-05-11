@@ -63,7 +63,6 @@ class ElasticsearchServiceTest
   it("should return everything if we ask for a limit > result size") {
     val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
-      searchService,
       limit = displayWorks.length + 1,
       from = 0,
       expectedWorks = displayWorks
@@ -73,7 +72,6 @@ class ElasticsearchServiceTest
   it("should return a page from the beginning of the result set") {
     val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
-      searchService,
       limit = 4,
       from = 0,
       expectedWorks = displayWorks.slice(0, 4)
@@ -83,7 +81,6 @@ class ElasticsearchServiceTest
   it("should return a page from halfway through the result set") {
     val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
-      searchService,
       limit = 4,
       from = 3,
       expectedWorks = displayWorks.slice(3, 7)
@@ -93,7 +90,6 @@ class ElasticsearchServiceTest
   it("should return a page from the end of the result set") {
     val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
-      searchService,
       limit = 7,
       from = 5,
       expectedWorks = displayWorks.slice(5, 10)
@@ -103,7 +99,6 @@ class ElasticsearchServiceTest
   it("should return an empty page if asked for a limit > result size") {
     val displayWorks = populateElasticsearch()
     assertSliceIsCorrect(
-      searchService,
       limit = 10,
       from = displayWorks.length * 2,
       expectedWorks = List()
@@ -111,7 +106,6 @@ class ElasticsearchServiceTest
   }
 
   private def assertSliceIsCorrect(
-    searchService: ElasticSearchService,
     limit: Int,
     from: Int,
     expectedWorks: List[DisplayWork]
