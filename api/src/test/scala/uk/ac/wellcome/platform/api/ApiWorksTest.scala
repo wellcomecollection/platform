@@ -28,9 +28,11 @@ class ApiWorksTest
       )
     )
 
+  val apiPrefix = "catalogue/v0"
+
   val emptyJsonResult = s"""
                                  |{
-                                 |  "@context": "https://localhost:8888/catalogue/v0/context.json",
+                                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
                                  |  "type": "ResultList",
                                  |  "pageSize": 10,
                                  |  "totalPages": 0,
@@ -46,11 +48,11 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = "/catalogue/v0/works",
+        path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
         withJsonBody = s"""
             |{
-            |  "@context": "https://localhost:8888/catalogue/v0/context.json",
+            |  "@context": "https://localhost:8888/$apiPrefix/context.json",
             |  "type": "ResultList",
             |  "pageSize": 10,
             |  "totalPages": 1,
@@ -122,11 +124,11 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/catalogue/v0/works/$canonicalId",
+        path = s"/$apiPrefix/works/$canonicalId",
         andExpect = Status.Ok,
         withJsonBody = s"""
             |{
-            | "@context": "https://localhost:8888/catalogue/v0/context.json",
+            | "@context": "https://localhost:8888/$apiPrefix/context.json",
             | "type": "Work",
             | "id": "$canonicalId",
             | "label": "$label",
@@ -153,11 +155,11 @@ class ApiWorksTest
     insertIntoElasticSearch(works: _*)
     eventually {
       server.httpGet(
-        path = "/catalogue/v0/works?page=2&pageSize=1",
+        path = s"/$apiPrefix/works?page=2&pageSize=1",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/catalogue/v0/context.json",
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
                           |  "type": "ResultList",
                           |  "pageSize": 1,
                           |  "totalPages": 3,
@@ -191,7 +193,7 @@ class ApiWorksTest
   it(
     "should return a BadRequest when malformed query parameters are presented") {
     server.httpGet(
-      path = "/catalogue/v0/works?pageSize=penguin",
+      path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
       withJsonBody = """
           |{
@@ -205,7 +207,7 @@ class ApiWorksTest
 
   it("should ignore parameters that are unused when making an api request") {
     server.httpGet(
-      path = "/catalogue/v0/works?foo=bar",
+      path = s"/$apiPrefix/works?foo=bar",
       andExpect = Status.Ok,
       withJsonBody = emptyJsonResult
     )
@@ -214,7 +216,7 @@ class ApiWorksTest
   it(
     "should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
-      path = "/catalogue/v0/works/non-existing-id",
+      path = s"/$apiPrefix/works/non-existing-id",
       andExpect = Status.NotFound,
       withJsonBody = ""
     )
@@ -223,7 +225,7 @@ class ApiWorksTest
   it("should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
-      path = s"/catalogue/v0/works?pageSize=$pageSize",
+      path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
       withJsonBody = s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
     )
@@ -232,7 +234,7 @@ class ApiWorksTest
   it("should return an HTTP Bad Request error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
-      path = s"/catalogue/v0/works?pageSize=$pageSize",
+      path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
       withJsonBody = s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
     )
@@ -240,7 +242,7 @@ class ApiWorksTest
 
   it("should return an HTTP Bad Request error if the user asks for zero-length pages") {
     server.httpGet(
-      path = "/catalogue/v0/works?pageSize=0",
+      path = s"/$apiPrefix/works?pageSize=0",
       andExpect = Status.BadRequest,
       withJsonBody = s"""{"errors":["pageSize: [0] is not greater than or equal to 1"]}"""
     )
@@ -248,7 +250,7 @@ class ApiWorksTest
 
   it("should return an HTTP Bad Request error if the user asks for a negative page size") {
     server.httpGet(
-      path = s"/catalogue/v0/works?pageSize=-50",
+      path = s"/$apiPrefix/works?pageSize=-50",
       andExpect = Status.BadRequest,
       withJsonBody = s"""{"errors":["pageSize: [-50] is not greater than or equal to 1"]}"""
     )
@@ -256,7 +258,7 @@ class ApiWorksTest
 
   it("should return an HTTP Bad Request error if the user asks for page 0") {
     server.httpGet(
-      path = "/catalogue/v0/works?page=0",
+      path = s"/$apiPrefix/works?page=0",
       andExpect = Status.BadRequest,
       withJsonBody = s"""{"errors":["page: [0] is not greater than or equal to 1"]}"""
     )
@@ -264,7 +266,7 @@ class ApiWorksTest
 
   it("should return an HTTP Bad Request error if the user asks for a page before 0") {
     server.httpGet(
-      path = "/catalogue/v0/works?page=-50",
+      path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
       withJsonBody = s"""{"errors":["page: [-50] is not greater than or equal to 1"]}"""
     )
@@ -283,7 +285,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = "/catalogue/v0/works?query=cat",
+        path = s"/$apiPrefix/works?query=cat",
         andExpect = Status.Ok,
         withJsonBody = emptyJsonResult
       )
@@ -291,11 +293,11 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = "/catalogue/v0/works?query=dodo",
+        path = s"/$apiPrefix/works?query=dodo",
         andExpect = Status.Ok,
         withJsonBody = s"""
              |{
-             |  "@context": "https://localhost:8888/catalogue/v0/context.json",
+             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
              |  "type": "ResultList",
              |  "pageSize": 10,
              |  "totalPages": 1,
