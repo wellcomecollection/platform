@@ -45,7 +45,7 @@ object SQSWorker extends TwitterModule with TryBackoff {
 
   override def singletonShutdown(injector: Injector) {
     info("Terminating SQS worker")
-
+    cancelRun()
     val system = injector.instance[ActorSystem]
     system.terminate()
   }

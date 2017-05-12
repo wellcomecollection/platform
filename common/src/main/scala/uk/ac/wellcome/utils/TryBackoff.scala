@@ -1,18 +1,17 @@
 package uk.ac.wellcome.utils
 
-import java.util.concurrent.TimeUnit
-
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Cancellable}
 import com.twitter.inject.Logging
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 trait TryBackoff extends Logging {
   val baseWaitMillis = 100
   val maxAttempts = 75
+  private var maybeCancellable: Option[Cancellable] = None
 
   def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
 
@@ -33,9 +32,13 @@ trait TryBackoff extends Logging {
       if (attempt > 0) increaseWaitTimeExponentially(attempt)
       else baseWaitMillis
 
-    system.scheduler.scheduleOnce(
-      Duration.create(waitTime, TimeUnit.MILLISECONDS)
-    )(run(f, system, numberOfAttempts))
+    val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
+      run(f, system, numberOfAttempts))
+    maybeCancellable = Some(cancellable)
+  }
+
+  def cancelRun(): Unit = {
+    maybeCancellable.fold(())(cancellable => cancellable.cancel())
   }
 
   private def increaseWaitTimeExponentially(attempt: Int) = {

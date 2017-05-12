@@ -33,15 +33,20 @@ object IdMinterModule extends TwitterModule with TryBackoff {
       for {
         work <- WorkExtractor.toWork(message)
         canonicalId <- idGenerator.generateId(work)
-        _ <- snsWriter.writeMessage(
-          toIdentifiedWorkJson(work, canonicalId),
-          Some(snsSubject))
+        _ <- snsWriter.writeMessage(toIdentifiedWorkJson(work, canonicalId),
+                                    Some(snsSubject))
       } yield ()
     }
   }
 
-  private def toIdentifiedWorkJson(work: Work,
-                                          canonicalId: String) = {
+  private def toIdentifiedWorkJson(work: Work, canonicalId: String) = {
     JsonUtil.toJson(IdentifiedWork(canonicalId, work)).get
+  }
+
+  override def singletonShutdown(injector: Injector) {
+    info("Terminating IdMinterModule")
+    cancelRun()
+    val system = injector.instance[ActorSystem]
+    system.terminate()
   }
 }
