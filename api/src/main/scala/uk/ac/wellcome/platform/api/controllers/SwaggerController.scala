@@ -13,9 +13,17 @@ import uk.ac.wellcome.platform.api.ApiSwagger
 
 @Singleton
 class SwaggerController @Inject()(
+  @Flag("api.scheme") apiScheme: String,
   @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.version") apiVersion: String
+  @Flag("api.version") apiVersion: String,
+  @Flag("api.host") apiHost: String
 ) extends Controller {
+
+
+  val scheme = apiScheme match {
+    case "https" => Scheme.HTTPS
+    case _ => Scheme.HTTP
+  }
 
   prefix(apiPrefix) {
 
@@ -25,8 +33,8 @@ class SwaggerController @Inject()(
           .description("Search our collections")
           .version(apiVersion)
           .title("Catalogue"))
-      ApiSwagger.scheme(Scheme.HTTPS)
-      ApiSwagger.host(request.host.getOrElse("api.wellcomecollection.org"))
+      ApiSwagger.scheme(scheme)
+      ApiSwagger.host(apiHost)
       ApiSwagger.basePath(apiPrefix)
       ApiSwagger.produces("application/json")
       ApiSwagger.produces("application/ld+json")
