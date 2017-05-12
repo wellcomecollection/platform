@@ -13,6 +13,7 @@ install:
 
 cache:
   directories:
+    - "~/.cache/docker"
     - "~/.sbt"
     - "~/.ivy2"
     - "project/target/resolution-cache"
@@ -35,6 +36,13 @@ matrix:
 
 script:
   - ./.travis/run.sh
+
+before_cache:
+  - mkdir -p ~/.cache/docker
+  - docker save peopleperhour/dynamodb --output=~/.docker/cache/dynamodb.tar
+  - docker save alicefuzier/fake-sns --output=~/.docker/cache/fake_sns.tar
+  - docker save s12v/elasticmq --output=~/.docker/cache/elasticmq.tar
+  - docker save docker.elastic.co/elasticsearch/elasticsearch --output=~/.docker/cache/elasticsearch.tar
 
 env:
   global:

@@ -19,3 +19,7 @@ docker version
 
 # Install the AWS tools so we can log in to ECR
 pip install --upgrade --user awscli
+
+# Load any Docker images from the cache
+mkdir -p ~/.cache/docker
+find ~/.cache/docker -name '*.tar' -exec docker load --input "{}" \;
