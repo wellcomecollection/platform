@@ -6,7 +6,7 @@ The new Wellcome Collection digital platform, exploring approaches to building a
 ## What's the "Wellcome digital platform"?
 
 > Wellcome are developing a new digital platform for Wellcome Collection, that will enable us to improve the experience we offer to readers and researchers. We also want to make it easier for third-party developers to build things with our data and collections.
-
+>
 > This means providing programmatic access to our digital assets, metadata and web content by developing a simple, unified and coherent set of APIs.
 
 ### User led development
