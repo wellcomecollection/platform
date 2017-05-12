@@ -220,6 +220,15 @@ class ApiWorksTest
     )
   }
 
+  it("should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
+    val pageSize = 101
+    server.httpGet(
+      path = s"/catalogue/v0/works?pageSize=$pageSize",
+      andExpect = Status.BadRequest,
+      withJsonBody = s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
+    )
+  }
+
   it("should return an HTTP Bad Request error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
