@@ -245,6 +245,22 @@ class ApiWorksTest
     )
   }
 
+  it("should return an HTTP Bad Request error if the user asks for page 0") {
+    server.httpGet(
+      path = "/catalogue/v0/works?page=0",
+      andExpect = Status.BadRequest,
+      withJsonBody = s"""{"errors":["page: [0] is not greater than or equal to 1"]}"""
+    )
+  }
+
+  it("should return an HTTP Bad Request error if the user asks for a page before 0") {
+    server.httpGet(
+      path = "/catalogue/v0/works?page=-50",
+      andExpect = Status.BadRequest,
+      withJsonBody = s"""{"errors":["page: [-50] is not greater than or equal to 1"]}"""
+    )
+  }
+
   it("should return matching results if doing a full-text search") {
     val work1 = identifiedWorkWith(
       canonicalId = "1234",
