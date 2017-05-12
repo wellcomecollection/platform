@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 trait ElasticSearchLocal
     extends Eventually
-    with IntegrationPatience
+    with ExtendedPatience
     with Matchers { this: Suite =>
 
   private val settings = Settings
