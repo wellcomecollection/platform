@@ -94,5 +94,6 @@ class IngestorFeatureTest
         result.isExists should be(true)
       }
     }
+    server.close()
   }
 }
