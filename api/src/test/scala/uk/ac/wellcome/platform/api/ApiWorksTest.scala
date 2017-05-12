@@ -229,6 +229,22 @@ class ApiWorksTest
     )
   }
 
+  it("should return an HTTP Bad Request error if the user asks for zero-length pages") {
+    server.httpGet(
+      path = "/catalogue/v0/works?pageSize=0",
+      andExpect = Status.BadRequest,
+      withJsonBody = s"""{"errors":["pageSize: [0] is not greater than or equal to 1"]}"""
+    )
+  }
+
+  it("should return an HTTP Bad Request error if the user asks for a negative page size") {
+    server.httpGet(
+      path = s"/catalogue/v0/works?pageSize=-50",
+      andExpect = Status.BadRequest,
+      withJsonBody = s"""{"errors":["pageSize: [-50] is not greater than or equal to 1"]}"""
+    )
+  }
+
   it("should return matching results if doing a full-text search") {
     val work1 = identifiedWorkWith(
       canonicalId = "1234",
