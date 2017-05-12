@@ -16,16 +16,15 @@ class SQSReaderTest
     with IntegrationPatience
     with SQSLocal {
 
-  val queueUrl = createQueueAndReturnUrl("test_queue")
-
+  val queuesInfo = createQueueAndDlqReturnUrls("test_queue")
   // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
-  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+  sqsClient.setQueueAttributes(queuesInfo.queueUrl, Map("VisibilityTimeout" -> "1"))
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
-      SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 2)
+      SQSConfig("eu-west-1", queuesInfo.queueUrl, waitTime = 20 seconds, maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
-    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queuesInfo.queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
@@ -62,13 +61,13 @@ class SQSReaderTest
 
   it("should return a failed future if processing one of the messages fails - the failed message should not be deleted") {
     val sqsConfig =
-      SQSConfig("eu-west-1", queueUrl, waitTime = 20 seconds, maxMessages = 10)
+      SQSConfig("eu-west-1", queuesInfo.queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail"
     val messageStrings = List("This is the first message",
                               failingMessage,
                               "This is the final message")
-    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queuesInfo.queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 

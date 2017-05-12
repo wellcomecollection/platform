@@ -1,49 +1,26 @@
 package uk.ac.wellcome.platform.ingestor
 
-import com.amazonaws.services.sqs.AmazonSQS
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
+import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, SQSLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+import scala.collection.JavaConversions._
 
 class IngestorFeatureTest
     extends FunSpec
-    with SQSLocal
+    with IngestorUtils
+    with FeatureTestMixin
     with Matchers
-    with IndexedElasticSearchLocal
     with ScalaFutures {
 
-  val ingestorQueueUrl: String = createQueueAndReturnUrl("test_es_ingestor_queue")
-
-  private def createServer = {
-    new EmbeddedHttpServer(
-      new Server(),
-      flags = Map(
-        "aws.region" -> "eu-west-1",
-        "aws.sqs.queue.url" -> ingestorQueueUrl,
-        "aws.sqs.waitTime" -> "1",
-        "es.host" -> "localhost",
-        "es.port" -> "9300",
-        "es.name" -> "wellcome",
-        "es.xpack.enabled" -> "true",
-        "es.xpack.user" -> "elastic:changeme",
-        "es.xpack.sslEnabled" -> "false",
-        "es.sniff" -> "false",
-        "es.index" -> indexName,
-        "es.type" -> itemType
-      )
-    ).bind[AmazonSQS](sqsClient)
-  }
+  override val server: EmbeddedHttpServer = createServer
 
   it("should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
-    val server = createServer
-    server.start()
-
     val identifiedWork = JsonUtil
       .toJson(
         IdentifiedWork(
@@ -53,7 +30,7 @@ class IngestorFeatureTest
       .get
 
     sqsClient.sendMessage(
-      ingestorQueueUrl,
+      ingestorQueueInfo.queueUrl,
       JsonUtil
         .toJson(
           SQSMessage(Some("identified-item"),
@@ -71,29 +48,26 @@ class IngestorFeatureTest
         hits.head.sourceAsString shouldBe identifiedWork
       }
     }
-
-    server.close()
   }
 
-  it("should create the index at startup in elasticsearch if it doesn't already exist") {
-    elasticClient.execute(deleteIndex(indexName))
+  it("should not delete a message from the sqs queue if it fails processing it") {
+    val invalidMessage = JsonUtil
+      .toJson(
+        SQSMessage(Some("identified-item"),
+          "not a json string - this will fail parsing",
+          "ingester",
+          "messageType",
+          "timestamp"))
+      .get
+    sqsClient.sendMessage(
+      ingestorQueueInfo.queueUrl,
+      invalidMessage
+    )
 
     eventually {
-      val future = elasticClient.execute(index exists indexName)
-      whenReady(future) { result =>
-        result.isExists should be(false)
-      }
+      val messages = sqsClient.receiveMessage(ingestorQueueInfo.deadLetterQueueUrl).getMessages
+      messages should have size (1)
+      messages.head.getBody should be (invalidMessage)
     }
-
-    val server = createServer
-    server.start()
-
-    eventually {
-      val future = elasticClient.execute(index exists indexName)
-      whenReady(future) { result =>
-        result.isExists should be(true)
-      }
-    }
-    server.close()
   }
 }
