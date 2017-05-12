@@ -16,7 +16,7 @@ import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import com.twitter.finatra.validation._
 
-case class UsersRequest(@QueryParam page: Int = 1,
+case class UsersRequest(@Min(1) @QueryParam page: Int = 1,
                         @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
                         @QueryParam query: Option[String]) {
 }
