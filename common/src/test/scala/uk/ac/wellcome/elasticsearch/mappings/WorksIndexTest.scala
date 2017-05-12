@@ -6,7 +6,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.index.mapper.StrictDynamicMappingException
 import org.elasticsearch.transport.RemoteTransportException
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
@@ -20,7 +20,6 @@ class WorksIndexTest
     with ElasticSearchLocal
     with ScalaFutures
     with Eventually
-    with IntegrationPatience
     with Matchers
     with BeforeAndAfterEach {
 
