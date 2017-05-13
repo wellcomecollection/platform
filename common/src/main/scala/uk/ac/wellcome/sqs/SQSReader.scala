@@ -9,7 +9,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
-import scala.util.Try
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
@@ -20,16 +19,21 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
   //  * the timeout expires
   // If the timeout expires before the consumer sends a delete request, the message is unhidden and can be read by another consumer.
 
-  def retrieveAndDeleteMessages(process: Message => Unit): Future[Unit] =
+  def retrieveAndDeleteMessages(
+    process: Message => Future[Unit]): Future[Unit] =
     Future {
       blocking {
         debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
         receiveMessages()
       }
     } flatMap { messages =>
-      if(messages.nonEmpty) info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
-      else debug(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
-      processAndDeleteMessages(messages, process).map {_ => ()}
+      if (messages.nonEmpty)
+        info(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
+      else
+        debug(s"Received messages $messages from queue ${sqsConfig.queueUrl}")
+      processAndDeleteMessages(messages, process).map { _ =>
+        ()
+      }
     } recover {
       case exception: Throwable =>
         error(s"Error retrieving messages from queue ${sqsConfig.queueUrl}",
@@ -47,18 +51,19 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       .toList
   }
 
-  private def processAndDeleteMessages(
-    messages: List[Message],
-    process: Message => Unit) = {
-      Future.sequence(messages.map { message =>
-        Future.fromTry(Try(process(message))
-          .recover {
-            case e: Throwable =>
-              error(s"Error processing message", e)
-              throw e
-        }).flatMap(_ => deleteMessage(message))
-      })
-  }
+  private def processAndDeleteMessages(messages: List[Message],
+                                       process: Message => Future[Unit]) =
+    Future.sequence(messages.map { message =>
+      Future
+        .successful()
+        .flatMap(_ => process(message))
+        .recover {
+          case e: Throwable =>
+            error(s"Error processing message", e)
+            throw e
+        }
+        .flatMap(_ => deleteMessage(message))
+    })
 
   private def deleteMessage(message: Message) =
     Future {
