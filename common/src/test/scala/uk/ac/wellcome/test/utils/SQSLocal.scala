@@ -4,7 +4,7 @@ import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs.model.{ListQueuesResult, PurgeQueueRequest}
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClientBuilder}
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
 
 import scala.collection.JavaConversions._
@@ -12,7 +12,7 @@ import scala.collection.JavaConversions._
 trait SQSLocal
     extends BeforeAndAfterEach
     with Eventually
-    with IntegrationPatience
+    with ExtendedPatience
     with Matchers { this: Suite =>
 
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder

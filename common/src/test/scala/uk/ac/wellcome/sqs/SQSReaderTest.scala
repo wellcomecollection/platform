@@ -1,7 +1,7 @@
 package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.sqs.model.Message
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.utils.SQSLocal
@@ -13,7 +13,6 @@ class SQSReaderTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with IntegrationPatience
     with SQSLocal {
 
   val queuesInfo = createQueueAndDlqReturnUrls("test_queue")

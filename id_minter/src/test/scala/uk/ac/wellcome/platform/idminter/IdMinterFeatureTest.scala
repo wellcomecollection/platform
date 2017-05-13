@@ -9,7 +9,7 @@ import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
@@ -21,8 +21,7 @@ class IdMinterFeatureTest
     with SQSLocal
     with DynamoDBLocal
     with SNSLocal
-    with Eventually
-    with IntegrationPatience {
+    with Eventually {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueueInfo = createQueueAndDlqReturnUrls("test_id_minter")
