@@ -25,6 +25,28 @@ module "calm_adapter" {
   }
 }
 
+module "miro_reindexer" {
+  source           = "./services"
+  name             = "miro_reindexer"
+  cluster_id       = "${aws_ecs_cluster.services.id}"
+  task_role_arn    = "${module.ecs_miro_reindexer_iam.task_role_arn}"
+  vpc_id           = "${module.vpc_services.vpc_id}"
+  app_uri          = "${aws_ecr_repository.calm_adapter.repository_url}:${var.release_ids["reindexer"]}"
+  nginx_uri        = "${aws_ecr_repository.nginx.repository_url}:services"
+  listener_arn     = "${module.services_alb.listener_arn}"
+  path_pattern     = "/miro_reindexer/*"
+  alb_priority     = "104"
+  healthcheck_path = "/miro_reindexer/management/healthcheck"
+  infra_bucket     = "${var.infra_bucket}"
+
+  desired_count = "0"
+
+  config_vars = {
+    miro_table_name    = "${aws_dynamodb_table.miro_table.name}"
+    reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
+  }
+}
+
 module "ingestor" {
   source           = "./services"
   name             = "ingestor"

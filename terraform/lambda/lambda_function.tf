@@ -1,6 +1,6 @@
 data "archive_file" "lambda_zip_file" {
   type        = "zip"
-  source_file = "${var.filename}"
+  source_dir  = "${var.source_dir}"
   output_path = "/tmp/${var.name}.zip"
 }
 
@@ -11,4 +11,8 @@ resource "aws_lambda_function" "lambda_function" {
   role          = "${aws_iam_role.iam_role.arn}"
   handler       = "${var.name}.main"
   runtime       = "python3.6"
+
+  environment {
+    variables = "${var.environment_variables}"
+  }
 }
