@@ -11,4 +11,8 @@ resource "aws_lambda_function" "lambda_function" {
   role          = "${aws_iam_role.iam_role.arn}"
   handler       = "${var.name}.main"
   runtime       = "python3.6"
+
+  environment {
+    variables = "${var.environment_variables}"
+  }
 }
