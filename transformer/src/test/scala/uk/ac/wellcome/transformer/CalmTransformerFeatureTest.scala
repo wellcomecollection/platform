@@ -18,7 +18,6 @@ import uk.ac.wellcome.utils.JsonUtil
 class CalmTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
-    with Eventually
     with Matchers {
 
   private val appName = "test-transformer-calm"

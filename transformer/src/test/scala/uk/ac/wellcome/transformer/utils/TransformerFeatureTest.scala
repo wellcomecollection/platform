@@ -5,14 +5,17 @@ import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibC
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.Suite
+import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, SNSLocal}
 
 trait TransformerFeatureTest
     extends FeatureTestMixin
     with ExtendedPatience
+    with Eventually
     with SNSLocal
     with DynamoDBLocal { this: Suite =>
 
+  patienceConfig
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
 
   def kinesisClientLibConfiguration(
