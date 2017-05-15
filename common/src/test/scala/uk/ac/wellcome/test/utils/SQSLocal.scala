@@ -4,15 +4,13 @@ import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClientBuilder}
-import com.google.inject.{Provides, Singleton}
-import com.twitter.inject.TwitterModule
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
 trait SQSLocal
     extends BeforeAndAfterEach
     with Eventually
-    with IntegrationPatience { this: Suite =>
+    with ExtendedPatience { this: Suite =>
 
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder
     .standard()
