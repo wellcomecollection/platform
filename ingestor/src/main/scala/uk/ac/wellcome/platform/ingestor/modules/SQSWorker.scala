@@ -6,9 +6,11 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.ingestor.services.IdentifiedWorkIndexer
 import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
+import scala.util.Try
 
 object SQSWorker extends TwitterModule with TryBackoff {
   private val esIndex = flag[String]("es.index", "records", "ES index name")
@@ -28,20 +30,19 @@ object SQSWorker extends TwitterModule with TryBackoff {
     sqsReader: SQSReader,
     indexer: IdentifiedWorkIndexer): Unit = {
     sqsReader.retrieveAndDeleteMessages { message =>
-      extractMessage(message).map { sqsMessage =>
-        indexer.indexIdentifiedWork(sqsMessage.body)
+      Future.fromTry(extractMessage(message)).flatMap { sqsMessage =>
+        indexer.indexIdentifiedWork(sqsMessage.body).map(_=>())
       }
     }
   }
 
-  private def extractMessage(sqsMessage: AwsSQSMessage): Option[SQSMessage] =
-    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody) match {
-      case Success(m) => Some(m)
-      case Failure(e) => {
+  private def extractMessage(sqsMessage: AwsSQSMessage): Try[SQSMessage] =
+    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover{
+      case e: Throwable =>
         error("Invalid message structure (not via SNS?)", e)
-        None
-      }
+        throw e
     }
+
 
   override def singletonShutdown(injector: Injector) {
     info("Terminating SQS worker")
