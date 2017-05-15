@@ -9,3 +9,9 @@ variable "description" {
 variable "source_dir" {
   description = "Path to the directory containing the Lambda source code"
 }
+
+variable "environment_variables" {
+  description = "Environment variables to pass to the Lambda"
+  type        = "map"
+  default     = {}
+}

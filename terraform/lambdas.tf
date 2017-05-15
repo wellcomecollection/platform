@@ -66,13 +66,19 @@ module "lambda_schedule_reindexer" {
   name        = "schedule_reindexer"
   description = "Schedules the reindexer based on the ReindexerTracker table"
   source_dir  = "../lambdas/schedule_reindexer"
+
+  environment_variables = {
+    TOPIC_ARN    = "${module.service_scheduler_topic.arn}"
+    CLUSTER_NAME = "${aws_ecs_cluster.services.name}"
+    REINDEXERS   = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
+  }
 }
 
 module "trigger_reindexer_lambda" {
   source            = "./lambda/trigger_dynamo"
   stream_arn        = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
   function_arn      = "${module.lambda_schedule_reindexer.arn}"
-  function_role     = "${module.lambda_schedule_reindexer.function_name}"
+  function_role     = "${module.lambda_schedule_reindexer.role_name}"
   batch_size        = 1
   starting_position = "LATEST"
 }
