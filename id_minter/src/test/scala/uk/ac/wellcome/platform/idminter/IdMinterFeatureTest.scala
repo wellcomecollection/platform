@@ -24,13 +24,13 @@ class IdMinterFeatureTest
     with Eventually {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
-  val idMinterQueueUrl = createQueueAndReturnUrl("test_id_minter")
+  val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
 
   override val server: EmbeddedHttpServer = new EmbeddedHttpServer(
     new Server(),
     flags = Map(
       "aws.region" -> "local",
-      "aws.sqs.queue.url" -> idMinterQueueUrl,
+      "aws.sqs.queue.url" -> idMinterQueue,
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn,
       "aws.dynamo.tableName" -> identifiersTableName
@@ -52,7 +52,7 @@ class IdMinterFeatureTest
                                 "messageType",
                                 "timestamp")
 
-    sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
       val dynamoIdentifiersRecords =
@@ -80,7 +80,7 @@ class IdMinterFeatureTest
     val firstMiroId = "1234"
     val sqsMessage = generateSqsMessage(firstMiroId)
 
-    sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
@@ -89,7 +89,7 @@ class IdMinterFeatureTest
 
     val secondMiroId = "5678"
     val secondSqsMessage = generateSqsMessage(secondMiroId)
-    sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(secondSqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(secondSqsMessage).get)
 
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
@@ -99,12 +99,12 @@ class IdMinterFeatureTest
   }
 
   it("should keep polling if something fails processing a message") {
-    sqsClient.sendMessage(idMinterQueueUrl, "not a json string")
+    sqsClient.sendMessage(idMinterQueue, "not a json string")
 
     val miroId = "1234"
     val sqsMessage = generateSqsMessage(miroId)
 
-    sqsClient.sendMessage(idMinterQueueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
     eventually {
       Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
         'MiroID -> miroId) should have size (1)
