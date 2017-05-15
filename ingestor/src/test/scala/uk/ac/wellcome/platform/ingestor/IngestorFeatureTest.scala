@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor
 
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
@@ -9,6 +10,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+
 import scala.collection.JavaConversions._
 
 class IngestorFeatureTest
@@ -20,13 +22,19 @@ class IngestorFeatureTest
 
   override val server: EmbeddedHttpServer = createServer
 
-  it("should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
+  // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
+  sqsClient.setQueueAttributes(ingestorQueueUrl,
+    Map("VisibilityTimeout" -> "1"))
+
+  it(
+    "should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
     val identifiedWork = JsonUtil
       .toJson(
         IdentifiedWork(
           canonicalId = "1234",
-          work = Work(
-            identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")), label = "some label")))
+          work = Work(identifiers =
+                        List(SourceIdentifier("Miro", "MiroID", "5678")),
+                      label = "some label")))
       .get
 
     sqsClient.sendMessage(
@@ -42,11 +50,43 @@ class IngestorFeatureTest
     )
 
     eventually {
-      val hitsFuture = elasticClient.execute(search(s"$indexName/$itemType").matchAllQuery()).map(_.hits)
+      val hitsFuture = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery())
+        .map(_.hits)
       whenReady(hitsFuture) { hits =>
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWork
       }
+    }
+  }
+
+  it("should not delete a message from the sqs queue if it fails processing it") {
+    val invalidMessage = JsonUtil
+      .toJson(
+        SQSMessage(Some("identified-item"),
+                   "not a json string - this will fail parsing",
+                   "ingester",
+                   "messageType",
+                   "timestamp"))
+      .get
+    sqsClient.sendMessage(
+      ingestorQueueUrl,
+      invalidMessage
+    )
+
+    // After a message is read, it stays invisible for 1 second and then it gets sent again.
+    // So we wait for longer than the visibility timeout and then we assert that it has become
+    // invisible again, which means that the ingestor picked it up again,
+    // and so it wasn't deleted as part of the first run.
+    // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
+    Thread.sleep(2000)
+
+    eventually {
+      sqsClient
+        .getQueueAttributes(ingestorQueueUrl,
+                            List("ApproximateNumberOfMessagesNotVisible"))
+        .getAttributes
+        .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
     }
   }
 }
