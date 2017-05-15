@@ -96,11 +96,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${aws_ecr_repository.api.arn}",
-      "${aws_ecr_repository.transformer.arn}",
-      "${aws_ecr_repository.ingestor.arn}",
-      "${aws_ecr_repository.id_minter.arn}",
-      "${aws_ecr_repository.calm_adapter.arn}",
+      "*",
     ]
   }
 

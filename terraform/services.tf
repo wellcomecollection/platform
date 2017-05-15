@@ -42,8 +42,8 @@ module "miro_reindexer" {
   desired_count = "0"
 
   config_vars = {
-    table_name = "${aws_dynamodb_table.miro_table.name}"
-    table_name = "${aws_dynamodb_table.reindex_table.name}"
+    miro_table_name = "${aws_dynamodb_table.miro_table.name}"
+    reindex_table_name = "${aws_dynamodb_table.reindex_table.name}"
   }
 }
 
