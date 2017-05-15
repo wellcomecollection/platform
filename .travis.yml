@@ -32,6 +32,7 @@ matrix:
     - env: PROJECT=calm_adapter
     - env: PROJECT=ingestor
     - env: PROJECT=id_minter
+    - env: PROJECT=reindexer
 
 script:
   - ./.travis/run.sh
