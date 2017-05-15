@@ -96,3 +96,19 @@ resource "aws_dynamodb_table" "identifiers" {
     prevent_destroy = true
   }
 }
+
+resource "aws_dynamodb_table" "reindex_tracker" {
+  name           = "ReindexTracker"
+  read_capacity  = 1
+  write_capacity = 1
+  hash_key       = "TableName"
+
+  attribute {
+    name = "TableName"
+    type = "S"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
