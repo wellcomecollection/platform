@@ -58,3 +58,21 @@ module "trigger_application_restart_on_config_change" {
   filter_prefix        = "config/prod/"
   filter_suffix        = ".ini"
 }
+
+# Lambda for sheduling the reindexer
+
+module "lambda_schedule_reindexer" {
+  source      = "./lambda"
+  name        = "schedule_reindexer"
+  description = "Schedules the reindexer based on the ReindexerTracker table"
+  source_dir  = "../lambdas/schedule_reindexer"
+}
+
+module "trigger_reindexer_lambda" {
+  source            = "./lambda/trigger_dynamo"
+  stream_arn        = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
+  function_arn      = "${module.lambda_schedule_reindexer.arn}"
+  function_role     = "${module.lambda_schedule_reindexer.function_name}"
+  batch_size        = 1
+  starting_position = "LATEST"
+}
