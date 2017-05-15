@@ -13,5 +13,7 @@ variable "source_dir" {
 variable "environment_variables" {
   description = "Environment variables to pass to the Lambda"
   type        = "map"
-  default     = {}
+
+  # environment cannot be emtpy so we need to pass at least one value
+  default     = {EMPTY_VARIABLE = ""}
 }
