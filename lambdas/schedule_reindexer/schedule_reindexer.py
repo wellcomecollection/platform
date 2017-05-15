@@ -25,7 +25,7 @@ def main(event, _):
     publish_sns_message(
         topic_arn=os.environ["TOPIC_ARN"],
         cluster=os.environ["CLUSTER_NAME"],
-        service=get_service_name(os.environ["REINDEXERS"]),
+        service=get_service_name(os.environ["REINDEXERS"], table_name),
         desired_count=desired_count
     )
     print(f"desired_count: {desired_count}")
