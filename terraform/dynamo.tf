@@ -98,10 +98,10 @@ resource "aws_dynamodb_table" "identifiers" {
 }
 
 resource "aws_dynamodb_table" "reindex_tracker" {
-  name           = "ReindexTracker"
-  read_capacity  = 1
-  write_capacity = 1
-  hash_key       = "TableName"
+  name             = "ReindexTracker"
+  read_capacity    = 1
+  write_capacity   = 1
+  hash_key         = "TableName"
   stream_enabled   = true
   stream_view_type = "NEW_IMAGE"
 
