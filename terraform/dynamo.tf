@@ -66,6 +66,47 @@ resource "aws_dynamodb_table" "miro_table" {
     name = "MiroCollection"
     type = "S"
   }
+
+  global_secondary_index = {
+    name            = "reindex"
+    hash_key        = "ReindexShard"
+    range_key       = "ReindexVersion"
+    read_capacity   = 5
+    write_capacity  = 5
+    projection_type = "ALL"
+  }
+
+  attribute {
+    name = "ReindexShard"
+    type = "S"
+  }
+
+  attribute {
+    name = "ReindexVersion"
+    type = "N"
+  }
+}
+
+resource "aws_dynamo_table" "reindex_table" {
+  name           = "Reindexer"
+  read_capacity  = 5
+  write_capacity = 5
+  hash_key       = "TableName"
+
+  attribute {
+    name = "TableName"
+    type = "S"
+  }
+
+  attribute {
+    name = "CurrentVersion"
+    type = "N"
+  }
+
+  attribute {
+    name = "RequestedVersion"
+    type = "N"
+  }
 }
 
 resource "aws_dynamodb_table" "identifiers" {
