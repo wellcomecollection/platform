@@ -15,7 +15,6 @@ trait TransformerFeatureTest
     with SNSLocal
     with DynamoDBLocal { this: Suite =>
 
-  patienceConfig
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
 
   def kinesisClientLibConfiguration(
