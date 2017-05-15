@@ -77,4 +77,5 @@ object Dependencies {
 
   val idminterDependencies: Seq[ModuleID] = commonDependencies
 
+  val reindexerDependencies: Seq[ModuleID] = commonDependencies
 }

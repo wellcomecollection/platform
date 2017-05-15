@@ -39,4 +39,7 @@ lazy val transformer = doSharedSetup(project)
 lazy val id_minter = doSharedSetup(project)
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
+lazy val reindexer = doSharedSetup(project)
+  .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
+
 lazy val root = (project in file("."))
