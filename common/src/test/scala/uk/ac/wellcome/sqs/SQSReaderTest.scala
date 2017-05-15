@@ -18,19 +18,19 @@ class SQSReaderTest
     with ScalaFutures
     with SQSLocal {
 
-  val queuesInfo = createQueueAndDlqReturnUrls("test_queue")
+  val queueUrl = createQueueAndReturnUrl("test_queue")
   // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
-  sqsClient.setQueueAttributes(queuesInfo.queueUrl,
+  sqsClient.setQueueAttributes(queueUrl,
                                Map("VisibilityTimeout" -> "1"))
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
       SQSConfig("eu-west-1",
-                queuesInfo.queueUrl,
+                queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
-    messageStrings.foreach(sqsClient.sendMessage(queuesInfo.queueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
@@ -70,7 +70,7 @@ class SQSReaderTest
   it("should return a failed future if processing one of the messages throws an exception - the failed message should not be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1",
-                queuesInfo.queueUrl,
+                queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 10)
 
@@ -78,7 +78,7 @@ class SQSReaderTest
     val messageStrings = List("This is the first message",
                               failingMessage,
                               "This is the final message")
-    messageStrings.foreach(sqsClient.sendMessage(queuesInfo.queueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 
@@ -98,7 +98,7 @@ class SQSReaderTest
   it("should return a failed future if processing one of the messages returns a failed future - the failed message should not be deleted") {
     val sqsConfig =
       SQSConfig("eu-west-1",
-                queuesInfo.queueUrl,
+                queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 10)
 
@@ -106,7 +106,7 @@ class SQSReaderTest
     val messageStrings = List("This is the first message",
                               failingMessage,
                               "This is the final message")
-    messageStrings.foreach(sqsClient.sendMessage(queuesInfo.queueUrl, _))
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
 

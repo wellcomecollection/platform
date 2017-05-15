@@ -30,7 +30,7 @@ class IngestorFeatureTest
       .get
 
     sqsClient.sendMessage(
-      ingestorQueueInfo.queueUrl,
+      ingestorQueueUrl,
       JsonUtil
         .toJson(
           SQSMessage(Some("identified-item"),
@@ -47,27 +47,6 @@ class IngestorFeatureTest
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWork
       }
-    }
-  }
-
-  it("should not delete a message from the sqs queue if it fails processing it") {
-    val invalidMessage = JsonUtil
-      .toJson(
-        SQSMessage(Some("identified-item"),
-          "not a json string - this will fail parsing",
-          "ingester",
-          "messageType",
-          "timestamp"))
-      .get
-    sqsClient.sendMessage(
-      ingestorQueueInfo.queueUrl,
-      invalidMessage
-    )
-
-    eventually {
-      val messages = sqsClient.receiveMessage(ingestorQueueInfo.deadLetterQueueUrl).getMessages
-      messages should have size (1)
-      messages.head.getBody should be (invalidMessage)
     }
   }
 }
