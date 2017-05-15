@@ -4,7 +4,7 @@ module "lambda_service_scheduler" {
   source      = "./lambda"
   name        = "service_scheduler"
   description = "Publish an ECS service schedule to SNS"
-  filename    = "../lambdas/service_scheduler.py"
+  source_dir  = "../lambdas/service_scheduler"
 }
 
 module "schedule_calm_adapter" {
@@ -30,7 +30,7 @@ module "lambda_update_ecs_service_size" {
   source      = "./lambda"
   name        = "update_ecs_service_size"
   description = "Update the desired count of an ECS service"
-  filename    = "../lambdas/update_ecs_service_size.py"
+  source_dir  = "../lambdas/update_ecs_service_size"
 }
 
 module "update_ecs_service_size_trigger" {
@@ -46,7 +46,7 @@ module "lambda_stop_running_tasks" {
   source      = "./lambda"
   name        = "stop_running_tasks"
   description = "Stop all the running instances of a task"
-  filename    = "../lambdas/stop_running_tasks.py"
+  source_dir  = "../lambdas/stop_running_tasks"
 }
 
 module "trigger_application_restart_on_config_change" {

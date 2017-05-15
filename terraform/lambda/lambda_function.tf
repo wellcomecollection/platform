@@ -1,6 +1,6 @@
 data "archive_file" "lambda_zip_file" {
   type        = "zip"
-  source_file = "${var.filename}"
+  source_dir  = "${var.source_dir}"
   output_path = "/tmp/${var.name}.zip"
 }
 
