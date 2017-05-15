@@ -8,6 +8,11 @@ module "ecs_calm_adapter_iam" {
   name   = "calm_adapter"
 }
 
+module "ecs_miro_reindexer_iam" {
+  source = "./ecs_iam"
+  name   = "miro_reindexer"
+}
+
 module "ecs_transformer_iam" {
   source = "./ecs_iam"
   name   = "transformer"

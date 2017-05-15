@@ -47,3 +47,11 @@ resource "aws_ecr_repository" "ingestor" {
     prevent_destroy = true
   }
 }
+
+resource "aws_ecr_repository" "reindexer" {
+  name = "uk.ac.wellcome/reindexer"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
