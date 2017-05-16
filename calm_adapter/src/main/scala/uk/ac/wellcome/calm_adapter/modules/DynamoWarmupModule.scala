@@ -7,7 +7,7 @@ import com.twitter.inject.{Injector, Logging, TwitterModule}
 import uk.ac.wellcome.finatra.modules.{
   AWSConfigModule,
   DynamoClientModule,
-  DynamoConfigModule
+  CalmTableDynamoConfigModule
 }
 import uk.ac.wellcome.utils._
 
@@ -26,7 +26,10 @@ import uk.ac.wellcome.utils._
   * a high write capacity for as short a period as possible.
   */
 object DynamoWarmupModule extends TwitterModule {
-  override val modules = Seq(AWSConfigModule, DynamoClientModule, DynamoConfigModule)
+  override val modules = Seq(
+    AWSConfigModule,
+    DynamoClientModule,
+    CalmTableDynamoConfigModule)
 
   val writeCapacity =
     flag(
