@@ -22,13 +22,16 @@ def main(event, _):
         desired_count = 0
     else:
         desired_count = 1
+    topic_arn = os.environ["TOPIC_ARN"]
+    cluster = os.environ["CLUSTER_NAME"]
+    service = get_service_name(os.environ["REINDEXERS"], table_name)
+    print(f"desired_count: {desired_count}, topic_arn: {topic_arn}, cluster: {cluster}, service: {service}")
     publish_sns_message(
-        topic_arn=os.environ["TOPIC_ARN"],
-        cluster=os.environ["CLUSTER_NAME"],
-        service=get_service_name(os.environ["REINDEXERS"], table_name),
+        topic_arn=topic_arn,
+        cluster=cluster,
+        service=service,
         desired_count=desired_count
     )
-    print(f"desired_count: {desired_count}")
 
 
 def get_service_name(reindexers, table_name):
