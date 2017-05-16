@@ -2,7 +2,7 @@
 
 set -o errexit
 set -o nounset
-set -o verbose
+set -o xtrace
 
 # https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
 if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]
@@ -14,39 +14,32 @@ fi
 
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST, BRANCH=$BRANCH"
 
-# Run the commands for the test.  Chaining them together means we don't
-# have to pay the cost of starting the JVM three times.
-# http://www.scala-sbt.org/0.12.2/docs/Howto/runningcommands.html
-sbt "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
+# Run the tests themselves.
 
-# If we're on master, build a Docker image and push it to ECR
-export AWS_DEFAULT_REGION=eu-west-1
+./scripts/run_tests.sh
+
+# If we're on the master branch and in an application project, we should
+# build a new Docker image and push it to ECR.
 
 if [[ "$BRANCH" != "master" ]]
 then
-  echo "Not on master; skipping deploy..."
+  echo "Not on master (BRANCH=$BRANCH); skipping deploy..."
   exit 0
 fi
 
-if [[ "$BRANCH" == "master" && "$PROJECT" == "common" ]]
+if [[ "$PROJECT" == "common" ]]
 then
-  echo "Not an application (common); skipping deploy"
+  echo "Common lib doesn't have a Docker container; skipping deploy..."
   exit 0
 fi
 
-sbt "project $PROJECT" stage
-export RELEASE_ID="0.0.1-$(git rev-parse HEAD)_prod"
-$(aws ecr get-login)
+export VERSION="0.0.1"
+export BUILD_ENV="prod"
+export RELEASE_ID="$VERSION-$(git rev-parse HEAD)_$BUILD_ENV"
+export TAG="$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID"
 
-docker build  \
-        --build-arg project=$PROJECT \
-        --build-arg config_bucket=$CONFIG_BUCKET \
-        --build-arg build_env=prod \
-        --tag=$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID .
+./scripts/build_docker_image.sh
 
-docker push $AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID
-echo "New container image is $RELEASE_ID"
+export AWS_DEFAULT_REGION=eu-west-1
 
-echo "$RELEASE_ID" | aws s3 cp - "s3://$CONFIG_BUCKET/releases/$PROJECT"
-
-exit 0
+./scripts/push_docker_image_to_ecr.sh
