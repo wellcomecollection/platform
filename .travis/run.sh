@@ -14,10 +14,9 @@ fi
 
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST, BRANCH=$BRANCH"
 
-# Run the commands for the test.  Chaining them together means we don't
-# have to pay the cost of starting the JVM three times.
-# http://www.scala-sbt.org/0.12.2/docs/Howto/runningcommands.html
-sbt "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
+# Run the tests themselves.
+
+./scripts/run_tests.sh
 
 # If we're on the master branch and in an application project, we should
 # build a new Docker image and push it to ECR.
