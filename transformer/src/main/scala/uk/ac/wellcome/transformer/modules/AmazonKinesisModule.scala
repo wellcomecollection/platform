@@ -6,17 +6,17 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAda
 import com.amazonaws.services.kinesis.AmazonKinesis
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.aws.AWSConfig
 
 object AmazonKinesisModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def providesAmazonKinesis(dynamoConfig: DynamoConfig): AmazonKinesis = {
+  def providesAmazonKinesis(awsConfig: AWSConfig): AmazonKinesis = {
     val adapter = new AmazonDynamoDBStreamsAdapterClient(
       new DefaultAWSCredentialsProviderChain()
     )
-    adapter.setRegion(RegionUtils.getRegion(dynamoConfig.region))
+    adapter.setRegion(RegionUtils.getRegion(awsConfig.region))
     adapter
   }
 }
