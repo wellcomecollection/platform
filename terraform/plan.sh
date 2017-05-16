@@ -16,6 +16,10 @@ rm -rf releases
 echo "Getting variables from S3"
 aws s3 cp s3://platform-infra/terraform.tfvars .
 
+# Check if any of our Lambda packages have changed and need to be tainted.
+# Annoyingly there doesn't seem to be a way for Terraform to do this for us.
+python taint_lambdas.py
+
 # Download releases from S3
 mkdir releases
 aws s3 cp s3://platform-infra/releases releases --recursive

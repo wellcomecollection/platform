@@ -1,3 +1,5 @@
+.lambda_hashes.json
+
 # Release IDs that are downloaded from S3 when you run 'plan.sh'
 terraform/releases
 
