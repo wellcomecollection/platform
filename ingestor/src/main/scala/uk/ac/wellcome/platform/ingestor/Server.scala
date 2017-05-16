@@ -12,7 +12,8 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.ingestor Ingestor"
-  override val modules = Seq(SQSConfigModule,
+  override val modules = Seq(AWSConfigModule,
+                             SQSConfigModule,
                              SQSClientModule,
                              AkkaModule,
                              SQSReaderModule,

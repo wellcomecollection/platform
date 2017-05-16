@@ -13,7 +13,7 @@ class SNSWriterTest
     with IntegrationPatience {
 
   val topicArn = createTopicAndReturnArn("test-topic-name")
-  val snsConfig = SNSConfig("eu-west-1", topicArn)
+  val snsConfig = SNSConfig(topicArn)
 
   it("should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
     val snsWriter = new SNSWriter(amazonSNS, snsConfig)
@@ -45,7 +45,7 @@ class SNSWriterTest
 
   it("should return a failed future if it fails to publish the message") {
     val snsWriter =
-      new SNSWriter(amazonSNS, SNSConfig("eu-west-1", "not a valid topic"))
+      new SNSWriter(amazonSNS, SNSConfig("not a valid topic"))
 
     val futurePublishAttempt =
       snsWriter.writeMessage("someMessage", Some("subject"))

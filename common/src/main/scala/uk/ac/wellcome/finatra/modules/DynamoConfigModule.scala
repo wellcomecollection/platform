@@ -7,7 +7,6 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 
 object DynamoConfigModule extends TwitterModule {
-  private val region = flag[String]("aws.region", "eu-west-1", "AWS region")
   private val applicationName = flag[String]("aws.dynamo.streams.appName",
                                              "dynamodb-streams-app",
                                              "Name of the Kinesis app")
@@ -19,5 +18,5 @@ object DynamoConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(region(), applicationName(), arn(), table())
+    DynamoConfig(applicationName(), arn(), table())
 }

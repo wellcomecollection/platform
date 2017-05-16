@@ -25,8 +25,7 @@ class SQSReaderTest
 
   it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-                queueUrl,
+      SQSConfig(queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
@@ -54,8 +53,7 @@ class SQSReaderTest
 
   it("should return a failed future if reading from the SQS queue fails") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-                "not a valid queue url",
+      SQSConfig("not a valid queue url",
                 waitTime = 20 seconds,
                 maxMessages = 1)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
@@ -69,8 +67,7 @@ class SQSReaderTest
 
   it("should return a failed future if processing one of the messages throws an exception - the failed message should not be deleted") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-                queueUrl,
+      SQSConfig(queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 10)
 
@@ -97,8 +94,7 @@ class SQSReaderTest
 
   it("should return a failed future if processing one of the messages returns a failed future - the failed message should not be deleted") {
     val sqsConfig =
-      SQSConfig("eu-west-1",
-                queueUrl,
+      SQSConfig(queueUrl,
                 waitTime = 20 seconds,
                 maxMessages = 10)
 
