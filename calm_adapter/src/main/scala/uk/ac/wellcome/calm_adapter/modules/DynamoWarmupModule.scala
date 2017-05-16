@@ -4,7 +4,11 @@ import com.amazonaws.services.dynamodbv2._
 import uk.ac.wellcome.models.aws.DynamoConfig
 import com.twitter.inject.{Injector, Logging, TwitterModule}
 
-import uk.ac.wellcome.finatra.modules.{DynamoClientModule, DynamoConfigModule}
+import uk.ac.wellcome.finatra.modules.{
+  AWSConfigModule,
+  DynamoClientModule,
+  DynamoConfigModule
+}
 import uk.ac.wellcome.utils._
 
 /** Scale up/down Dynamo write capacity while the adapter is running.
@@ -22,7 +26,7 @@ import uk.ac.wellcome.utils._
   * a high write capacity for as short a period as possible.
   */
 object DynamoWarmupModule extends TwitterModule {
-  override val modules = Seq(DynamoClientModule, DynamoConfigModule)
+  override val modules = Seq(AWSConfigModule, DynamoClientModule, DynamoConfigModule)
 
   val writeCapacity =
     flag(

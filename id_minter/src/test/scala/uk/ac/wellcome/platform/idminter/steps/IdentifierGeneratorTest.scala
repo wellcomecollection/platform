@@ -18,8 +18,7 @@ class IdentifierGeneratorTest
 
   val identifierGenerator = new IdentifierGenerator(
     dynamoDbClient,
-    DynamoConfig("local",
-                 "applicationName",
+    DynamoConfig("applicationName",
                  "streamArn",
                  identifiersTableName))
 

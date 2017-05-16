@@ -6,16 +6,16 @@ import com.amazonaws.services.cloudwatch.{
 }
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.aws.AWSConfig
 
 object AmazonCloudWatchModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def providesAmazonCloudWatch(dynamoConfig: DynamoConfig): AmazonCloudWatch = {
+  def providesAmazonCloudWatch(awsConfig: AWSConfig): AmazonCloudWatch = {
     AmazonCloudWatchClientBuilder
       .standard()
-      .withRegion(dynamoConfig.region)
+      .withRegion(awsConfig.region)
       .build()
   }
 }

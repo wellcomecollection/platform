@@ -1,6 +1,5 @@
 package uk.ac.wellcome.models.aws
 
-case class DynamoConfig(region: String,
-                        applicationName: String,
+case class DynamoConfig(applicationName: String,
                         arn: String,
                         table: String)

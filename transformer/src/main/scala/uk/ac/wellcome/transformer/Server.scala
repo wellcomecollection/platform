@@ -26,6 +26,7 @@ class Server extends HttpServer {
     KinesisClientLibConfigurationModule,
     AmazonKinesisModule,
     AmazonCloudWatchModule,
+    AWSConfigModule,
     DynamoConfigModule,
     AkkaModule,
     SNSConfigModule,
