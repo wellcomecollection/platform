@@ -1,9 +1,13 @@
-## What is this PR trying to achieve?
+### What is this PR trying to achieve?
 
-## Who is this change for?
+### Who is this change for?
 
-## Have the following been considered/are they needed?
+### Have the following been considered/are they needed?
 
-- [ ] Tests?
-- [ ] Docs?
-- [ ] Spoken to the right people?
+<!-- Delete bullets if they don't apply to this patch -->
+
+<!-- If you're making public API changes -->
+- [ ] Reviewed by @jtweed
+- [ ] Updated the Swagger documentation
+<!-- If you're making application changes -->
+- [ ] Deployed new versions
