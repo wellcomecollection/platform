@@ -19,7 +19,8 @@ class MiroTransformerFeatureTest
     "aws.dynamo.streams.appName" -> appName,
     "aws.dynamo.streams.arn" -> miroDataStreamArn,
     "aws.dynamo.tableName" -> miroDataTableName,
-    "aws.sns.topic.arn" -> idMinterTopicArn
+    "aws.sns.topic.arn" -> idMinterTopicArn,
+    "aws.metrics.namespace" -> "miro-transformer"
   )
   override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
     kinesisClientLibConfiguration(appName, miroDataStreamArn)

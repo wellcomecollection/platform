@@ -20,7 +20,8 @@ class CalmTransformerFeatureTest
     "aws.dynamo.streams.appName" -> appName,
     "aws.dynamo.streams.arn" -> calmDataStreamArn,
     "aws.dynamo.tableName" -> calmDataTableName,
-    "aws.sns.topic.arn" -> idMinterTopicArn
+    "aws.sns.topic.arn" -> idMinterTopicArn,
+    "aws.metrics.namespace" -> "calm-transformer"
   )
   override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
     kinesisClientLibConfiguration(appName, calmDataStreamArn)

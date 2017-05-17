@@ -34,6 +34,8 @@ class Server extends HttpServer {
     TransformableParserModule
   )
 
+  flag[String]("aws.metrics.namespace", "", "Namespace for cloudwatch metrics")
+
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
