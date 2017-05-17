@@ -55,7 +55,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
                                        process: Message => Future[Unit]) =
     Future.sequence(messages.map { message =>
       Future
-        .successful()
+        .successful(())
         .flatMap(_ => process(message))
         .recover {
           case e: Throwable =>
