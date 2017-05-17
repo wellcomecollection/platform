@@ -34,7 +34,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
         incrementCount("failure")
         sendTime("ingest-time",
           (end.getTime - start.getTime) milliseconds,
-          Map("success" -> "true"))
+          Map("success" -> "false"))
     }
     future
   }
