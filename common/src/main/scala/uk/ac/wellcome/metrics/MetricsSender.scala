@@ -28,7 +28,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
 
       case Failure(_) =>
         val end = new Date()
-        incrementCount("failures")
+        incrementCount("failure")
         sendTime("ingest-time",
           (end.getTime - start.getTime) milliseconds,
           Map("success" -> "true"))
