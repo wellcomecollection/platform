@@ -5,6 +5,7 @@ import java.util.Date
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
+import com.twitter.inject.TwitterModuleFlags
 import com.twitter.inject.annotations.Flag
 
 import scala.collection.JavaConversions._
@@ -13,7 +14,9 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
-                              amazonCloudWatch: AmazonCloudWatch) {
+                              amazonCloudWatch: AmazonCloudWatch) extends TwitterModuleFlags {
+
+  flag[String]("aws.metrics.namespace", "", "Namespace for cloudwatch metrics")
 
   def timeAndCount[T](metricName: String, fun: () => Future[T]): Future[T] = {
     val start = new Date()
