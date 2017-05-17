@@ -7,6 +7,7 @@ import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
 import com.twitter.inject.TwitterModuleFlags
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -18,9 +19,9 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
 
   flag[String]("aws.metrics.namespace", "", "Namespace for cloudwatch metrics")
 
-  def timeAndCount[T](metricName: String, fun: () => Future[T]): Future[T] = {
+  def timeAndCount[T](metricName: String, fun: Unit => Future[T]): Future[T] = {
     val start = new Date()
-    val future = Future.successful(()).flatMap(fun(_))
+    val future = Future.successful(()).flatMap(fun)
     future.onComplete {
       case Success(_) =>
         val end = new Date()
