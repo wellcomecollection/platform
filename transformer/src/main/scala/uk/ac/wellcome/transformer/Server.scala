@@ -12,7 +12,6 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.transformer.controllers._
 import uk.ac.wellcome.platform.transformer.modules._
 import uk.ac.wellcome.transformer.modules.{
-  AmazonCloudWatchModule,
   AmazonKinesisModule,
   TransformableParserModule
 }
