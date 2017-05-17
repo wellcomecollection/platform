@@ -8,6 +8,7 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
@@ -37,13 +38,13 @@ class RecordReceiverTest
     identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
     label = "calm data label")
 
-  val amazonCloudWatch: AmazonCloudWatch = mock[AmazonCloudWatch]
+  val metricsSender: MetricsSender = mock[MetricsSender]
 
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter
     val recordReceiver =
       new RecordReceiver(snsWriter,
-                         transformableParser(calmRecord, work), amazonCloudWatch)
+                         transformableParser(calmRecord, work), metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future) { _ =>
@@ -54,7 +55,7 @@ class RecordReceiverTest
 
   it("should return a failed future if it's unable to parse the dynamo record") {
     val recordReceiver =
-      new RecordReceiver(mockSNSWriter, failingParser(calmRecord), amazonCloudWatch)
+      new RecordReceiver(mockSNSWriter, failingParser(calmRecord), metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
@@ -65,7 +66,7 @@ class RecordReceiverTest
   it("should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
       new RecordReceiver(mockSNSWriter,
-                         parserReturningFailingTransformable(calmRecord), amazonCloudWatch)
+                         parserReturningFailingTransformable(calmRecord), metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
@@ -76,7 +77,7 @@ class RecordReceiverTest
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new RecordReceiver(mockSNS, transformableParser(calmRecord, work), amazonCloudWatch)
+      new RecordReceiver(mockSNS, transformableParser(calmRecord, work), metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>

@@ -8,6 +8,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
@@ -15,6 +17,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 case class RecordMap(value: java.util.Map[String, AttributeValue])
@@ -22,7 +25,7 @@ case class RecordMap(value: java.util.Map[String, AttributeValue])
 class RecordReceiver @Inject()(
   snsWriter: SNSWriter,
   transformableParser: TransformableParser[Transformable],
-  amazonCloudWatch: AmazonCloudWatch)
+  metricsSender: MetricsSender)
     extends Logging {
 
   def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
@@ -46,57 +49,13 @@ class RecordReceiver @Inject()(
     future.onComplete {
       case Success(publishAttempt) =>
         val end = new Date()
-
-        amazonCloudWatch.putMetricData(
-          new PutMetricDataRequest()
-            .withNamespace("transformer")
-            .withMetricData(
-              new MetricDatum()
-                .withMetricName("success")
-                .withValue(1.0)
-                .withUnit(StandardUnit.Count)
-                .withTimestamp(new Date())))
-
-        amazonCloudWatch.putMetricData(
-          new PutMetricDataRequest()
-            .withNamespace("transformer")
-            .withMetricData(
-              new MetricDatum()
-                .withMetricName("ingest-time")
-                .withDimensions(
-                  new Dimension().withName("success").withValue("true"))
-                .withValue((end.getTime - start.getTime).toDouble)
-                .withUnit(StandardUnit.Milliseconds)
-                .withTimestamp(new Date())))
+        metricsSender.incrementCount("success")
+        metricsSender.sendTime("ingest-time", (end.getTime - start.getTime) milliseconds, Map("success"-> "true"))
 
       case Failure(exception) =>
         val end = new Date()
-        amazonCloudWatch.putMetricData(
-          new PutMetricDataRequest()
-            .withNamespace("transformer")
-            .withMetricData(
-              new MetricDatum()
-                .withMetricName("failures")
-                .withValue(1.0)
-                .withUnit(StandardUnit.Count)
-                .withTimestamp(new Date())))
-//        amazonCloudWatch.putMetricAlarm(
-//          new PutMetricAlarmRequest()
-//            .withAlarmName("transformer")
-//            .withNamespace("failures")
-//            .withAlarmName("failure"))
-        amazonCloudWatch.putMetricData(
-          new PutMetricDataRequest()
-            .withNamespace("transformer")
-            .withMetricData(
-              new MetricDatum()
-                .withMetricName("ingest-time")
-                .withDimensions(
-                  new Dimension().withName("success").withValue("false"))
-                .withValue((end.getTime - start.getTime).toDouble)
-                .withUnit(StandardUnit.Milliseconds)
-                .withTimestamp(new Date())))
-
+        metricsSender.incrementCount("failures")
+        metricsSender.sendTime("ingest-time", (end.getTime - start.getTime) milliseconds, Map("success"-> "true"))
     }
     future
   }
@@ -123,3 +82,4 @@ class RecordReceiver @Inject()(
   def publishMessage(work: Work): Future[PublishAttempt] =
     snsWriter.writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
 }
+

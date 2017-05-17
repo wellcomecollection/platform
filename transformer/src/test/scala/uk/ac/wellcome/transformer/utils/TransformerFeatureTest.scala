@@ -34,7 +34,7 @@ trait TransformerFeatureTest
       flags
     ).bind[AmazonSNS](amazonSNS)
       .bind[AmazonDynamoDB](dynamoDbClient)
-      .bind[AmazonCloudWatch](amazonCloudWatch)
+//      .bind[AmazonCloudWatch](amazonCloudWatch)
       .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(streamsClient))
       .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
 
