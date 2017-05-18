@@ -16,8 +16,12 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.reindexer Reindexer"
-  override val modules =
-    Seq(DynamoConfigModule, DynamoClientModule, ReindexModule, AkkaModule)
+  override val modules = Seq(
+    MiroTableDynamoConfigModule,
+    CalmTableDynamoConfigModule,
+    DynamoClientModule,
+    ReindexModule,
+    AkkaModule)
 
   override def configureHttp(router: HttpRouter) {
     router
