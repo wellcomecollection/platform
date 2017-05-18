@@ -7,16 +7,15 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces._
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.finatra.annotations.{CalmDynamoConfig, MiroDynamoConfig}
 import uk.ac.wellcome.models.aws.DynamoConfig
-
-import uk.ac.wellcome.finatra.modules.{DynamoConfigModule}
 
 object KinesisClientLibConfigurationModule extends TwitterModule {
 
   @Singleton
   @Provides
   def provideKinesisClientLibConfiguration(
-    dynamoConfig: DynamoConfig): KinesisClientLibConfiguration = {
+    @CalmDynamoConfig dynamoConfig: DynamoConfig): KinesisClientLibConfiguration = {
 
     new KinesisClientLibConfiguration(
       dynamoConfig.applicationName,
