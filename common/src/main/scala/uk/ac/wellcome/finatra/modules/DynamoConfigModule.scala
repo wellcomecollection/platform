@@ -20,7 +20,7 @@ trait DynamoConfigModule extends TwitterModule {
   def providesDynamoConfig(): DynamoConfig =
     DynamoConfig(applicationName(), arn(), table())
 
-  val applicationNameTpl:String  = "aws.dynamo.%s.streams.appName"
+  val applicationNameTpl: String  = "aws.dynamo.%s.streams.appName"
   val arnTpl: String = "aws.dynamo.%s.streams.arn"
   val tableTpl: String = "aws.dynamo.%s.tableName"
 
@@ -33,7 +33,7 @@ object MiroTableDynamoConfigModule extends DynamoConfigModule {
   val tableName = "miroData"
 
   val applicationName = flag[String](appNameFlagId, "", "Name of the Kinesis app")
-  val arn  = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
+  val arn = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
   val table = flag[String](tableFlagId, "", "Name of the DynamoDB table")
 }
 
@@ -41,7 +41,7 @@ object IdentifierTableDynamoConfigModule extends DynamoConfigModule {
   val tableName = "identifiers"
 
   val applicationName = flag[String](appNameFlagId, "", "Name of the Kinesis app")
-  val arn  = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
+  val arn = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
   val table = flag[String](tableFlagId, "", "Name of the DynamoDB table")
 }
 
@@ -49,7 +49,7 @@ object CalmTableDynamoConfigModule extends DynamoConfigModule {
   val tableName = "calmData"
 
   val applicationName = flag[String](appNameFlagId, "", "Name of the Kinesis app")
-  val arn  = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
+  val arn = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
   val table = flag[String](tableFlagId, "", "Name of the DynamoDB table")
 }
 
