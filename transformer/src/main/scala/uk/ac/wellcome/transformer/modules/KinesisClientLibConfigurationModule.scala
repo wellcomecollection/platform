@@ -9,13 +9,35 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.finatra.annotations.{CalmDynamoConfig, MiroDynamoConfig}
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.transformer.annotations.{
+  CalmKinesisClientLibConfiguration,
+  MiroKinesisClientLibConfiguration
+}
 
 object KinesisClientLibConfigurationModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def provideKinesisClientLibConfiguration(
-    @CalmDynamoConfig dynamoConfig: DynamoConfig): KinesisClientLibConfiguration = {
+  @CalmKinesisClientLibConfiguration
+  def provideCalmKinesisClientLibConfiguration(
+    @CalmDynamoConfig dynamoConfig: DynamoConfig)
+    : KinesisClientLibConfiguration = {
+
+    new KinesisClientLibConfiguration(
+      dynamoConfig.applicationName,
+      dynamoConfig.arn,
+      new DefaultAWSCredentialsProviderChain(),
+      java.util.UUID.randomUUID.toString
+    )
+
+  }
+
+  @Singleton
+  @Provides
+  @MiroKinesisClientLibConfiguration
+  def provideMiroKinesisClientLibConfiguration(
+    @MiroDynamoConfig dynamoConfig: DynamoConfig)
+    : KinesisClientLibConfiguration = {
 
     new KinesisClientLibConfiguration(
       dynamoConfig.applicationName,
