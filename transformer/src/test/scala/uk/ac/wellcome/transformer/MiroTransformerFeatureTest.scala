@@ -26,9 +26,9 @@ class MiroTransformerFeatureTest
       new Server(),
       flags = Map(
         "aws.region" -> "eu-west-1",
-        "aws.dynamo.streams.appName" -> appName,
-        "aws.dynamo.streams.arn" -> miroDataStreamArn,
-        "aws.dynamo.tableName" -> miroDataTableName,
+        "aws.dynamo.miroData.streams.appName" -> appName,
+        "aws.dynamo.miroData.streams.arn" -> miroDataStreamArn,
+        "aws.dynamo.miroData.tableName" -> miroDataTableName,
         "aws.sns.topic.arn" -> idMinterTopicArn
       )
     ).bind[AmazonSNS](amazonSNS)
