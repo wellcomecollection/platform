@@ -36,7 +36,7 @@ class IdMinterFeatureTest
       "aws.sqs.queue.url" -> idMinterQueue,
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn,
-      "aws.dynamo.tableName" -> identifiersTableName
+      "aws.dynamo.identifiers.tableName" -> identifiersTableName
     )
   ).bind[AmazonSQS](sqsClient)
     .bind[AmazonSNS](amazonSNS)
