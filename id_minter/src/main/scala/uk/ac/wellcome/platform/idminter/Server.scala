@@ -22,7 +22,7 @@ class Server extends HttpServer {
                              SQSClientModule,
                              SQSConfigModule,
                              SQSReaderModule,
-                             DynamoConfigModule,
+                             IdentifierTableDynamoConfigModule,
                              DynamoClientModule,
                              SNSConfigModule,
                              SNSClientModule)
