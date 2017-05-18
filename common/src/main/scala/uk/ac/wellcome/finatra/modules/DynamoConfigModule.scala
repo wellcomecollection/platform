@@ -5,80 +5,53 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.app.Flag
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.finatra.annotations.{CalmDynamoConfig, MiroDynamoConfig, IdentifiersDynamoConfig}
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-import com.google.inject.BindingAnnotation
-import java.lang.annotation.Target
-import java.lang.annotation.Retention
-import java.lang.annotation.ElementType.PARAMETER
-import java.lang.annotation.RetentionPolicy.RUNTIME
-
-@BindingAnnotation
-@Target(Array(PARAMETER))
-@Retention(RUNTIME) class MiroDynamoConfig {}
-
-@BindingAnnotation
-@Target(Array(PARAMETER))
-@Retention(RUNTIME) class IdentifierDynamoConfig {}
-
-@BindingAnnotation
-@Target(Array(PARAMETER))
-@Retention(RUNTIME) class CalmDynamoConfig {}
-
-trait DynamoConfigModule extends TwitterModule {
-  val tableName: String
-
-  val applicationName: Flag[String]
-  val arn: Flag[String]
-  val table: Flag[String]
-
+object DynamoConfigModule extends TwitterModule {
   val applicationNameTpl: String = "aws.dynamo.%s.streams.appName"
   val arnTpl: String = "aws.dynamo.%s.streams.arn"
   val tableTpl: String = "aws.dynamo.%s.tableName"
 
-  def appNameFlagId = applicationNameTpl.format(tableName)
-  def arnFlagId = arnTpl.format(tableName)
-  def tableFlagId = tableTpl.format(tableName)
-}
+  def appNameFlagId(tableName: String): String = applicationNameTpl.format(tableName)
+  def arnFlagId(tableName: String): String = arnTpl.format(tableName)
+  def tableFlagId(tableName: String): String = tableTpl.format(tableName)
 
-object MiroTableDynamoConfigModule extends DynamoConfigModule {
-  val tableName = "miroData"
+  val miroTableName = "miroData"
 
-  val applicationName =
-    flag[String](appNameFlagId, "", "Name of the Kinesis app")
-  val arn = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
-  val table = flag[String](tableFlagId, "", "Name of the DynamoDB table")
+  val miroApplicationName: Flag[String] = flag[String](appNameFlagId(miroTableName), "", "Name of the Kinesis app")
+  val miroArn: Flag[String] = flag[String](arnFlagId(miroTableName), "", "ARN of the DynamoDB stream")
+  val miroTable: Flag[String] = flag[String](tableFlagId(miroTableName), "", "Name of the DynamoDB table")
 
   @Singleton
   @Provides
   @MiroDynamoConfig
-  def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(applicationName(), arn(), table())
-}
+  def providesMiroDynamoConfig(): DynamoConfig =
+    DynamoConfig(miroApplicationName(), miroArn(), miroTable())
 
-object IdentifierTableDynamoConfigModule extends DynamoConfigModule {
-  val tableName = "identifiers"
+  val identifiersTableName = "identifiers"
 
-  val applicationName =
-    flag[String](appNameFlagId, "", "Name of the Kinesis app")
-  val arn = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
-  val table = flag[String](tableFlagId, "", "Name of the DynamoDB table")
+  val identifiersApplicationName: Flag[String] =
+    flag[String](appNameFlagId(identifiersTableName), "", "Name of the Kinesis app")
+  val identifiersArn: Flag[String] = flag[String](arnFlagId(identifiersTableName), "", "ARN of the DynamoDB stream")
+  val identifiersTable: Flag[String] = flag[String](tableFlagId(identifiersTableName), "", "Name of the DynamoDB table")
 
   @Singleton
   @Provides
-  @IdentifierDynamoConfig
-  def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(applicationName(), arn(), table())
-}
+  @IdentifiersDynamoConfig
+  def providesIdentifierDynamoConfig(): DynamoConfig =
+    DynamoConfig(identifiersApplicationName(), identifiersArn(), identifiersTable())
 
-object CalmTableDynamoConfigModule extends DynamoConfigModule {
-  val tableName = "calmData"
+  val calmTableName = "calmData"
+
+  val calmApplicationName: Flag[String] =
+    flag[String](appNameFlagId(calmTableName), "", "Name of the Kinesis app")
+  val calmArn: Flag[String] = flag[String](arnFlagId(calmTableName), "", "ARN of the DynamoDB stream")
+  val calmTable: Flag[String] = flag[String](tableFlagId(calmTableName), "", "Name of the DynamoDB table")
 
   @Singleton
   @Provides
   @CalmDynamoConfig
-  val applicationName =
-    flag[String](appNameFlagId, "", "Name of the Kinesis app")
-  val arn = flag[String](arnFlagId, "", "ARN of the DynamoDB stream")
-  val table = flag[String](tableFlagId, "", "Name of the DynamoDB table")
+  def providesCalmDynamoConfig(): DynamoConfig =
+    DynamoConfig(calmApplicationName(), calmArn(), calmTable())
 }
