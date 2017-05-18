@@ -26,9 +26,9 @@ class CalmTransformerFeatureTest
       new Server(),
       flags = Map(
         "aws.region" -> "eu-west-1",
-        "aws.dynamo.streams.appName" -> appName,
-        "aws.dynamo.streams.arn" -> calmDataStreamArn,
-        "aws.dynamo.tableName" -> calmDataTableName,
+        "aws.dynamo.calmData.streams.appName" -> appName,
+        "aws.dynamo.calmData.streams.arn" -> calmDataStreamArn,
+        "aws.dynamo.calmData.tableName" -> calmDataTableName,
         "aws.sns.topic.arn" -> idMinterTopicArn
       )
     ).bind[AmazonSNS](amazonSNS)
