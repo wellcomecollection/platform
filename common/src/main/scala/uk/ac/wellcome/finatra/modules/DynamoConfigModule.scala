@@ -31,5 +31,5 @@ object MiroTableDynamoConfigModule extends DynamoConfigModule {
 }
 
 object IdentifierTableDynamoConfigModule extends DynamoConfigModule {
-  val tableFlag = "miroData"
+  val tableFlag = "identifiers"
 }
