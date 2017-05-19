@@ -2,7 +2,6 @@ package uk.ac.wellcome.transformer.modules
 
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.annotations.{CalmDynamoConfig, MiroDynamoConfig}
 import uk.ac.wellcome.models.Transformable
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.transformer.parsers.{
@@ -16,12 +15,10 @@ object TransformableParserModule extends TwitterModule {
   @Singleton
   @Provides
   def providesTransformableParser(
-    @CalmDynamoConfig calmDynamoConfig: DynamoConfig,
-    @MiroDynamoConfig miroDynamoConfig: DynamoConfig)
-    : TransformableParser[Transformable] = {
+    dynamoConfigs: Map[String, DynamoConfig]): TransformableParser[Transformable] = {
 
     val dynamoConfig =
-      DynamoConfig.findWithTable(List(calmDynamoConfig, miroDynamoConfig))
+      DynamoConfig.findWithTable(dynamoConfigs.values.toList)
 
     dynamoConfig.table match {
       case "MiroData" => new MiroParser
