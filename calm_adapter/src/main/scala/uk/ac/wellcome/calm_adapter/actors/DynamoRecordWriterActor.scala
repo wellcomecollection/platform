@@ -9,6 +9,7 @@ import com.google.inject.name.Named
 import com.gu.scanamo._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.calm_adapter.models.ActorRegister
+import uk.ac.wellcome.finatra.annotations.CalmDynamoConfig
 import uk.ac.wellcome.models.CalmTransformable
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.calm_adapter.ServerMain
@@ -28,7 +29,7 @@ case class SlowDown(message: String)
 class DynamoRecordWriterActor @Inject()(
   actorRegister: ActorRegister,
   dynamoClient: AmazonDynamoDBAsync,
-  dynamoConfig: DynamoConfig,
+  @CalmDynamoConfig dynamoConfig: DynamoConfig,
   system: ActorSystem
 ) extends Actor
     with Logging {
