@@ -1,3 +1,12 @@
+data "template_file" "es_cluster_host" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config["name"]}"
+    region = "${var.es_config["region"]}"
+  }
+}
+
 module "calm_adapter" {
   source           = "./services"
   name             = "calm_adapter"
@@ -62,7 +71,7 @@ module "ingestor" {
   infra_bucket     = "${var.infra_bucket}"
 
   config_vars = {
-    es_host         = "${var.es_config["host"]}"
+    es_host         = "${data.template_file.es_cluster_host.rendered}"
     es_port         = "${var.es_config["port"]}"
     es_name         = "${var.es_config["name"]}"
     es_index        = "${var.es_config["index"]}"
@@ -126,7 +135,7 @@ module "api" {
 
   config_vars = {
     api_host      = "${var.api_host}"
-    es_host       = "${var.es_config["host"]}"
+    es_host       = "${data.template_file.es_cluster_host.rendered}"
     es_port       = "${var.es_config["port"]}"
     es_name       = "${var.es_config["name"]}"
     es_xpack_user = "${var.es_config["xpack_user"]}"
