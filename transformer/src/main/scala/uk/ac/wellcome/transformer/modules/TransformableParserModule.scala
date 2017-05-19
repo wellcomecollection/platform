@@ -5,14 +5,26 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.finatra.annotations.{CalmDynamoConfig, MiroDynamoConfig}
 import uk.ac.wellcome.models.Transformable
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.transformer.parsers.{CalmParser, MiroParser, TransformableParser}
+import uk.ac.wellcome.transformer.parsers.{
+  CalmParser,
+  MiroParser,
+  TransformableParser
+}
 
 object TransformableParserModule extends TwitterModule {
 
   @Singleton
   @Provides
   def providesTransformableParser(
-  @CalmDynamoConfig dynamoConfig: DynamoConfig): TransformableParser[Transformable] = {
+    @CalmDynamoConfig calmDynamoConfig: DynamoConfig,
+    @MiroDynamoConfig miroDynamoConfig: DynamoConfig)
+    : TransformableParser[Transformable] = {
+
+    val dynamoConfig = List(calmDynamoConfig, miroDynamoConfig)
+      .find(_.table.nonEmpty)
+      .getOrElse(
+        throw new RuntimeException("No configured dynamo tables found"))
+
     dynamoConfig.table match {
       case "MiroData" => new MiroParser
       case "CalmData" => new CalmParser
