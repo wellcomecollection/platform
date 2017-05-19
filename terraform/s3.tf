@@ -12,6 +12,11 @@ resource "aws_s3_bucket" "miro-images-sync" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket" "miro_images_public" {
+  bucket = "miro-images-public"
+  acl    = "public-read"
+}
+
 resource "aws_s3_bucket" "infra" {
   bucket = "${var.infra_bucket}"
   acl    = "private"
