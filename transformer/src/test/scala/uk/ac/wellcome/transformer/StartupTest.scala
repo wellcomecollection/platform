@@ -10,7 +10,12 @@ class StartupTest extends FeatureTest with StartupLogbackOverride {
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
-    flags = Map("aws.dynamo.miroData.tableName" -> "MiroData"))
+    flags = Map(
+      "aws.dynamo.miroData.streams.appName" -> "miro",
+      "aws.dynamo.miroData.streams.arn" -> "miro",
+      "aws.dynamo.miroData.tableName" -> "MiroData"
+    )
+  )
 
   test("server starts up correctly") {
     server.assertHealthy()

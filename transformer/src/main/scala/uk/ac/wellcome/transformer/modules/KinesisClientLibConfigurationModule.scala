@@ -18,26 +18,13 @@ object KinesisClientLibConfigurationModule extends TwitterModule {
 
   @Singleton
   @Provides
-  @CalmKinesisClientLibConfiguration
-  def provideCalmKinesisClientLibConfiguration(
-    @CalmDynamoConfig dynamoConfig: DynamoConfig)
+  def provideKinesisClientLibConfiguration(
+    @CalmDynamoConfig calmDynamoConfig: DynamoConfig,
+    @MiroDynamoConfig miroDynamoConfig: DynamoConfig)
     : KinesisClientLibConfiguration = {
 
-    new KinesisClientLibConfiguration(
-      dynamoConfig.applicationName,
-      dynamoConfig.arn,
-      new DefaultAWSCredentialsProviderChain(),
-      java.util.UUID.randomUUID.toString
-    )
-
-  }
-
-  @Singleton
-  @Provides
-  @MiroKinesisClientLibConfiguration
-  def provideMiroKinesisClientLibConfiguration(
-    @MiroDynamoConfig dynamoConfig: DynamoConfig)
-    : KinesisClientLibConfiguration = {
+    val dynamoConfig =
+      DynamoConfig.findWithTable(List(calmDynamoConfig, miroDynamoConfig))
 
     new KinesisClientLibConfiguration(
       dynamoConfig.applicationName,

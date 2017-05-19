@@ -20,10 +20,8 @@ object TransformableParserModule extends TwitterModule {
     @MiroDynamoConfig miroDynamoConfig: DynamoConfig)
     : TransformableParser[Transformable] = {
 
-    val dynamoConfig = List(calmDynamoConfig, miroDynamoConfig)
-      .find(_.table.nonEmpty)
-      .getOrElse(
-        throw new RuntimeException("No configured dynamo tables found"))
+    val dynamoConfig =
+      DynamoConfig.findWithTable(List(calmDynamoConfig, miroDynamoConfig))
 
     dynamoConfig.table match {
       case "MiroData" => new MiroParser

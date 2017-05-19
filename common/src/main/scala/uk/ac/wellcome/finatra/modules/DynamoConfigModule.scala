@@ -17,6 +17,7 @@ object DynamoConfigModule extends TwitterModule {
   def arnFlagId(tableName: String): String = arnTpl.format(tableName)
   def tableFlagId(tableName: String): String = tableTpl.format(tableName)
 
+
   val miroTableName = "miroData"
 
   val miroApplicationName: Flag[String] = flag[String](appNameFlagId(miroTableName), "", "Name of the Kinesis app")
