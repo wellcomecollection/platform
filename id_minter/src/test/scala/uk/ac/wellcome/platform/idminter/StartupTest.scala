@@ -7,9 +7,12 @@ import com.twitter.finagle.http.Status._
 import uk.ac.wellcome.test.utils.StartupLogbackOverride
 
 class StartupTest extends FeatureTest with StartupLogbackOverride {
-
-  val server = new EmbeddedHttpServer(stage = Stage.PRODUCTION,
-                                      twitterServer = new Server)
+  val server = new EmbeddedHttpServer(
+    new Server(),
+    flags = Map(
+      "aws.dynamo.identifiers.tableName" -> "identifiers"
+    )
+  )
 
   test("server starts up correctly") {
     server.assertHealthy()

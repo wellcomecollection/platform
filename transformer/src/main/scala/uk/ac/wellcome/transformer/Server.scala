@@ -27,7 +27,7 @@ class Server extends HttpServer {
     AmazonKinesisModule,
     AmazonCloudWatchModule,
     AWSConfigModule,
-    DynamoConfigModule,
+    PlatformDynamoConfigModule,
     AkkaModule,
     SNSConfigModule,
     SNSClientModule,
