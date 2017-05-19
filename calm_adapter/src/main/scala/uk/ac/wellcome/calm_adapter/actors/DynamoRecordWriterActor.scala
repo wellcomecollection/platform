@@ -29,7 +29,7 @@ case class SlowDown(message: String)
 class DynamoRecordWriterActor @Inject()(
   actorRegister: ActorRegister,
   dynamoClient: AmazonDynamoDBAsync,
-  @CalmDynamoConfig dynamoConfig: DynamoConfig,
+  dynamoConfig: DynamoConfig,
   system: ActorSystem
 ) extends Actor
     with Logging {
