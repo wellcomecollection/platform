@@ -2,10 +2,8 @@ package uk.ac.wellcome.platform.calm_adapter.modules
 
 import com.amazonaws.services.dynamodbv2._
 import com.twitter.app.Flag
-import uk.ac.wellcome.models.aws.DynamoConfig
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.finatra.annotations.CalmDynamoConfig
-import uk.ac.wellcome.finatra.modules.{AWSConfigModule, DynamoClientModule, PlatformDynamoConfigModule}
+import uk.ac.wellcome.finatra.modules.{AWSConfigModule, DynamoClientModule}
 import uk.ac.wellcome.utils._
 
 /** Scale up/down Dynamo write capacity while the adapter is running.
