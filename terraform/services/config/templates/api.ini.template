@@ -2,6 +2,8 @@
 -es.host=${es_host}
 -es.port=${es_port}
 -es.name=${es_name}
+-es.index=${es_index}
+-es.type=${es_doc_type}
 -es.sniff=false
 -es.xpack.enabled=true
 -es.xpack.user=${es_xpack_user}
