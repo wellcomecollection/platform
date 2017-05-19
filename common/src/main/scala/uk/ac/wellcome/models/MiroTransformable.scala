@@ -10,7 +10,8 @@ case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
   @JsonProperty("image_creator") creator: Option[List[String]],
   @JsonProperty("image_image_desc") description: Option[String],
-  @JsonProperty("image_secondary_creator") secondaryCreator: Option[List[String]]
+  @JsonProperty("image_secondary_creator") secondaryCreator: Option[List[String]],
+  @JsonProperty("image_artwork_date") artworkDate: Option[String]
 )
 
 case class MiroTransformable(MiroID: String,
@@ -46,10 +47,18 @@ case class MiroTransformable(MiroID: String,
         case None => List()
       }
 
+      // Determining the creation date depends on several factors, so we do
+      // it on a per-collection basis.
+      val createdDate: Option[Period] = MiroCollection match {
+        case "Images-V" => miroData.artworkDate.map { Period(_) }
+        case _ => None
+      }
+
       Work(
         identifiers = identifiers,
         label = label,
         description = description,
+        hasCreatedDate = createdDate,
         hasCreator = creators ++ secondaryCreators
       )
     }
