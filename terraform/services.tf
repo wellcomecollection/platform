@@ -139,5 +139,7 @@ module "api" {
     es_port       = "${var.es_config["port"]}"
     es_name       = "${var.es_config["name"]}"
     es_xpack_user = "${var.es_config["xpack_user"]}"
+    es_index      = "${var.es_config["index"]}"
+    es_doc_type   = "${var.es_config["doc_type"]}"
   }
 }
