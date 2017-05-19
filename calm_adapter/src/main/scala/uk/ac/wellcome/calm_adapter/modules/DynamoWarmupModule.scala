@@ -26,14 +26,14 @@ object DynamoWarmupModule extends TwitterModule {
 
   val writeCapacity: Flag[Long] =
     flag(
-      name = "writeCapacity",
+      name = "aws.dynamo.warmup.writeCapacity",
       default = 5L,
       help = "Dynamo write capacity"
     )
 
   val tableToWarm: Flag[String] =
     flag(
-      name = "warmupTable",
+      name = "aws.dynamo.warmup.tableName",
       default = "CalmData",
       help = "Dynamo table to target with write capacity increase"
     )
