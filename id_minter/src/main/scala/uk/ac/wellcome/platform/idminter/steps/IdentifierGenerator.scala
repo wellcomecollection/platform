@@ -5,16 +5,17 @@ import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.inject.{Logging, TwitterModuleFlags}
+import uk.ac.wellcome.finatra.annotations.IdentifiersDynamoConfig
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import scala.concurrent.blocking
 
+import scala.concurrent.blocking
 import scala.concurrent.Future
 
 class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
-                                    dynamoConfig: DynamoConfig)
+                                    @IdentifiersDynamoConfig dynamoConfig: DynamoConfig)
     extends Logging
     with TwitterModuleFlags {
 

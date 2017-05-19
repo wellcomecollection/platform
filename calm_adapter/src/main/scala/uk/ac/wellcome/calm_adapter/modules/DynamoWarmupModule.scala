@@ -1,9 +1,10 @@
 package uk.ac.wellcome.platform.calm_adapter.modules
 
 import com.amazonaws.services.dynamodbv2._
+import com.twitter.app.Flag
 import uk.ac.wellcome.models.aws.DynamoConfig
-import com.twitter.inject.{Injector, Logging, TwitterModule}
-
+import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.finatra.annotations.CalmDynamoConfig
 import uk.ac.wellcome.finatra.modules.{
   AWSConfigModule,
   DynamoClientModule,
@@ -26,12 +27,10 @@ import uk.ac.wellcome.utils._
   * a high write capacity for as short a period as possible.
   */
 object DynamoWarmupModule extends TwitterModule {
-  override val modules = Seq(
-    AWSConfigModule,
-    DynamoClientModule,
-    DynamoConfigModule)
+  override val modules =
+    Seq(AWSConfigModule, DynamoClientModule, DynamoConfigModule)
 
-  val writeCapacity =
+  val writeCapacity: Flag[Long] =
     flag(
       name = "writeCapacity",
       default = 5L,
@@ -42,30 +41,32 @@ object DynamoWarmupModule extends TwitterModule {
     dynamoClient: AmazonDynamoDB,
     dynamoConfig: DynamoConfig,
     capacity: Long = 1L
-  ) =
+  ): Unit =
     try {
 
       if (dynamoConfig.table == "") {
         error("DynamoDB table name must not be empty")
       }
 
-      (new DynamoUpdateWriteCapacityCapable {
-        val client = dynamoClient
-      }).updateWriteCapacity(dynamoConfig.table, capacity)
+      new DynamoUpdateWriteCapacityCapable {
+        val client: AmazonDynamoDB = dynamoClient
+      }.updateWriteCapacity(dynamoConfig.table, capacity)
 
       info(
-        s"Setting write capacity of ${dynamoConfig.table} table to ${capacity}")
+        s"Setting write capacity of ${dynamoConfig.table} table to $capacity")
     } catch {
-      case e: Throwable => error(s"Error in modifyCapacity(): ${e}")
+      case e: Throwable => error(s"Error in modifyCapacity(): $e")
     }
 
-  override def singletonStartup(injector: Injector) =
+  override def singletonStartup(injector: Injector): Unit = {
     modifyCapacity(injector.instance[AmazonDynamoDB],
-                   injector.instance[DynamoConfig],
+                   injector.instance[DynamoConfig, CalmDynamoConfig],
                    writeCapacity())
 
-  override def singletonShutdown(injector: Injector) =
+  }
+
+  override def singletonShutdown(injector: Injector): Unit =
     modifyCapacity(injector.instance[AmazonDynamoDB],
-                   injector.instance[DynamoConfig],
+                   injector.instance[DynamoConfig, CalmDynamoConfig],
                    1L)
 }
