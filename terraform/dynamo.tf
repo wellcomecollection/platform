@@ -27,19 +27,6 @@ resource "aws_dynamodb_table" "calm_table" {
     type = "S"
   }
 
-  attribute {
-    name = "ReindexVersion"
-    type = "N"
-  }
-
-  global_secondary_index = {
-    name            = "ReindexVersion"
-    hash_key        = "ReindexVersion"
-    read_capacity   = 1
-    write_capacity  = 1
-    projection_type = "ALL"
-  }
-
   global_secondary_index = {
     name            = "RefNo"
     hash_key        = "RefNo"
@@ -51,6 +38,25 @@ resource "aws_dynamodb_table" "calm_table" {
   global_secondary_index = {
     name            = "AltRefNo"
     hash_key        = "AltRefNo"
+    read_capacity   = 1
+    write_capacity  = 1
+    projection_type = "ALL"
+  }
+
+  attribute {
+    name = "ReindexShard"
+    type = "S"
+  }
+
+  attribute {
+    name = "ReindexVersion"
+    type = "N"
+  }
+
+  global_secondary_index = {
+    name            = "ReindexTracker"
+    hash_key        = "ReindexShard"
+    range_key       = "ReindexVersion"
     read_capacity   = 1
     write_capacity  = 1
     projection_type = "ALL"
@@ -81,13 +87,19 @@ resource "aws_dynamodb_table" "miro_table" {
   }
 
   attribute {
+    name = "ReindexShard"
+    type = "S"
+  }
+
+  attribute {
     name = "ReindexVersion"
     type = "N"
   }
 
   global_secondary_index = {
-    name            = "ReindexVersion"
-    hash_key        = "ReindexVersion"
+    name            = "ReindexTracker"
+    hash_key        = "ReindexShard"
+    range_key       = "ReindexVersion"
     read_capacity   = 1
     write_capacity  = 1
     projection_type = "ALL"
