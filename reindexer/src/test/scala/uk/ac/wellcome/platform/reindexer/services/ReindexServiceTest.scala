@@ -57,7 +57,6 @@ class ReindexServiceTest
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
   ) {
-
     true should be(false)
   }
 
