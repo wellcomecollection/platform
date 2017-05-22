@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.{CalmTransformable, Identifier, MiroTransformable}
+import uk.ac.wellcome.models.{CalmTransformable, Identifier, MiroTransformable, Reindex}
 
 import scala.collection.JavaConversions._
 
@@ -29,9 +29,11 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   val identifiersTableName = "Identifiers"
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
+  val reindexTableName = "ReindexTracker"
 
   deleteTables()
   createIdentifiersTable()
+  createReindexTable()
   private val miroDataTable: CreateTableResult = createMiroDataTable()
   private val calmDataTable: CreateTableResult = createCalmDataTable()
 
@@ -50,7 +52,17 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
     clearIdentifiersTable()
     clearMiroTable()
     clearCalmTable()
+    clearReindexTable()
   }
+
+  private def clearReindexTable(): List[DeleteItemResult] =
+    Scanamo.scan[Reindex](dynamoDbClient)(reindexTableName).map {
+      case Right(reindex) =>
+        dynamoDbClient.deleteItem(
+          reindexTableName,
+          Map("TableName" -> new AttributeValue(reindex.TableName)))
+      case a => throw new Exception(s"Unable to clear the table $reindexTableName error $a")
+    }
 
   private def clearIdentifiersTable(): List[DeleteItemResult] =
     Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
@@ -199,6 +211,23 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
             .withAttributeType("S"),
           new AttributeDefinition()
             .withAttributeName("MiroID")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L)))
+  }
+
+  private def createReindexTable() = {
+    dynamoDbClient.createTable(
+      new CreateTableRequest()
+        .withTableName(reindexTableName)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("TableName")
+          .withKeyType(KeyType.HASH))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("TableName")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
