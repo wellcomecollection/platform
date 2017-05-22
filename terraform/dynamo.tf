@@ -27,6 +27,19 @@ resource "aws_dynamodb_table" "calm_table" {
     type = "S"
   }
 
+  attribute {
+    name = "ReindexVersion"
+    type = "N"
+  }
+
+  global_secondary_index = {
+    name            = "ReindexVersion"
+    hash_key        = "ReindexVersion"
+    read_capacity   = 1
+    write_capacity  = 1
+    projection_type = "ALL"
+  }
+
   global_secondary_index = {
     name            = "RefNo"
     hash_key        = "RefNo"
@@ -65,6 +78,19 @@ resource "aws_dynamodb_table" "miro_table" {
   attribute {
     name = "MiroCollection"
     type = "S"
+  }
+
+  attribute {
+    name = "ReindexVersion"
+    type = "N"
+  }
+
+  global_secondary_index = {
+    name            = "ReindexVersion"
+    hash_key        = "ReindexVersion"
+    read_capacity   = 1
+    write_capacity  = 1
+    projection_type = "ALL"
   }
 }
 
