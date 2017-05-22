@@ -9,7 +9,7 @@ trait Transformable {
   val reindexVersion: Option[Int] = None
 }
 
-case class CalmDataTransformable(
+case class CalmTransformableData(
   AccessStatus: Array[String]
 ) extends Transformable {
   def transform: Try[Work] = Try {
@@ -31,7 +31,7 @@ case class CalmTransformable(
 
   def transform: Try[Work] =
     JsonUtil
-      .fromJson[CalmDataTransformable](data)
+      .fromJson[CalmTransformableData](data)
       .flatMap(_.transform)
 
 }
