@@ -1,13 +1,12 @@
 package uk.ac.wellcome.models
 
-import scala.util.Try
-
-import com.fasterxml.jackson.annotation.JsonProperty
-
 import uk.ac.wellcome.utils.JsonUtil
+
+import scala.util.Try
 
 trait Transformable {
   def transform: Try[Work]
+  val reindexVersion: Option[Int] = None
 }
 
 case class CalmDataTransformable(
