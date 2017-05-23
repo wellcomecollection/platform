@@ -3,8 +3,7 @@ package uk.ac.wellcome.platform.reindexer.services
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
-import com.gu.scanamo.query.Query
-import com.gu.scanamo.query.KeyEquals
+import com.gu.scanamo.query._
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -22,9 +21,12 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
 
 
   def runReindex(reindex: Reindex) = {
-    getRowsWithOldReindexVersion(reindex)
+    val rowsFuture = getRowsWithOldReindexVersion(reindex)
     // todo: more steps!
+
+    rowsFuture
   }
+
   def getRowsWithOldReindexVersion(reindex: Reindex) = Future {
     val query = reindex match {
       case Reindex("MiroData", _, _) => Scanamo.queryIndex[MiroTransformable](dynamoDBClient) _
@@ -32,9 +34,13 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       case _ => throw new RuntimeException("nope")
     }
 
-    //todo: This query must perform a comparison on the range key!
      query(reindex.TableName, gsiName)(
-      Query(KeyEquals('ReindexShard, "default")))
+      Query(
+        AndQueryCondition(
+          KeyEquals('ReindexShard, "default"),
+          KeyIs('ReindexVersion, LT, reindex.requestedVersion)
+        )
+      ))
   }
 
   def getIndicesForReindex = getIndices.filter {
