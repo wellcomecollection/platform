@@ -22,16 +22,29 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   lazy val miroTable = Table[MiroTransformable]("MiroData")
   lazy val calmTable = Table[CalmTransformable]("CalmData")
 
-  def runAllIndicesReindex: Future[Map[Reindex, List[Reindexable[String]]]] =
-    Future.sequence(getIndicesForReindex.map(runReindex)).map(_.toMap)
+  case class ReindexAttempt(reindex: Reindex, successful: List[Reindexable[String]], attempt: Int)
 
-  def runReindex(reindex: Reindex) =
+  def run: Future[List[ReindexAttempt]] = for {
+      indices <- getIndicesForReindex
+      attempts = indices.map(ReindexAttempt(_, Nil, 0))
+      completions <- Future.sequence(attempts.map(processReindexAttempt))
+    } yield completions
+
+  private def processReindexAttempt(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] = (reindexAttempt match {
+    case ReindexAttempt(_, _, 0) => runReindex(reindexAttempt) // First attempt.
+      // Loops forever \/ Here!
+    case ReindexAttempt(_, Nil, attempt) => Future.successful(reindexAttempt) // Stop: done!
+    case ReindexAttempt(_, _, attempt) if attempt > 2 => Future.failed(new RuntimeException(s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
+    case _ => runReindex(reindexAttempt) // Carry on.
+  }).flatMap(processReindexAttempt)
+
+  def runReindex(reindexAttempt: ReindexAttempt) =
     for {
-      rows <- getRowsWithOldReindexVersion(reindex)
+      rows <- getRowsWithOldReindexVersion(reindexAttempt.reindex)
       filteredRows <- logAndFilterLeft(rows)
-      updateOps <- updateRows(reindex, filteredRows.map(_.getReindexItem))
+      updateOps <- updateRows(reindexAttempt.reindex, filteredRows.map(_.getReindexItem))
       updatedRows <- logAndFilterLeft(updateOps)
-    } yield reindex -> updatedRows
+    } yield reindexAttempt.copy(successful = updatedRows, attempt = reindexAttempt.attempt + 1)
 
   def logAndFilterLeft(
     rows: List[Either[DynamoReadError, Reindexable[String]]]) = Future {
@@ -44,7 +57,6 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   }
 
   def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
-
     val updateTable = reindex match {
       case Reindex("MiroData", _, _) => miroTable
       case Reindex("CalmData", _, _) => calmTable
@@ -80,12 +92,12 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       ))
   }
 
-  def getIndicesForReindex = getIndices.filter {
+  def getIndicesForReindex: Future[List[Reindex]] = getIndices.map(_.filter {
     case Reindex(_, requested, current) if requested > current => true
     case _ => false
-  }
+  })
 
-  def getIndices: List[Reindex] = {
+  def getIndices: Future[List[Reindex]] = Future {
     Scanamo.scan[Reindex](dynamoDBClient)(dynamoConfig.table).map {
       case Right(reindexes) => reindexes
       case _ => throw new RuntimeException("nope")

@@ -30,9 +30,11 @@ class ReindexServiceTest
 
     val reindexService = createReindexService
 
-    val indices = reindexService.getIndices
+    val op = reindexService.getIndices
 
-    expectedReindexList should contain theSameElementsAs indices
+    whenReady(op) { indices =>
+      expectedReindexList should contain theSameElementsAs indices
+    }
   }
 
   it(
@@ -51,9 +53,11 @@ class ReindexServiceTest
 
     val reindexService = createReindexService
 
-    val indices = reindexService.getIndicesForReindex
+    val op = reindexService.getIndicesForReindex
 
-    expectedReindexList should contain theSameElementsAs indices
+    whenReady(op) { indices =>
+      expectedReindexList should contain theSameElementsAs indices
+    }
   }
 
   it(
@@ -88,12 +92,11 @@ class ReindexServiceTest
 
     val reindexService = createReindexService
 
-    val op = reindexService.runAllIndicesReindex
+    val op = reindexService.run
 
     whenReady(op) { _ =>
       Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName) shouldBe expectedCalmTransformableList
     }
-
   }
 
   it("should return the rows of a table with an 'old' reindex version") {
