@@ -73,8 +73,9 @@ class ReindexServiceTest
         ReindexVersion = currentVersion
       ))
 
-    val expectedCalmTransformableList = calmTransformableList.map(
-      _.copy(ReindexVersion = requestedVersion)).map(Right(_))
+    val expectedCalmTransformableList = calmTransformableList
+      .map(_.copy(ReindexVersion = requestedVersion))
+      .map(Right(_))
 
     val reindexList = List(
       Reindex(calmDataTableName, requestedVersion, currentVersion)
@@ -112,17 +113,18 @@ class ReindexServiceTest
 
     val inDateCalmTransferrableList = List(
       CalmTransformable(
-      RecordID = "RecordID2",
-      RecordType = "Collection",
-      AltRefNo = "AltRefNo2",
-      RefNo = "RefNo2",
-      data = """{"AccessStatus": ["public"]}""",
-      ReindexVersion = 2
-    ))
+        RecordID = "RecordID2",
+        RecordType = "Collection",
+        AltRefNo = "AltRefNo2",
+        RefNo = "RefNo2",
+        data = """{"AccessStatus": ["public"]}""",
+        ReindexVersion = 2
+      ))
 
     val calmTransformableList = outOfdateCalmTransformableList ++ inDateCalmTransferrableList
 
-    val expectedCalmTransformableList = outOfdateCalmTransformableList.map(Right(_))
+    val expectedCalmTransformableList =
+      outOfdateCalmTransformableList.map(Right(_))
 
     val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
 

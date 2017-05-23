@@ -25,7 +25,12 @@ case class CalmTransformable(
   ReindexShard: String = "default",
   ReindexVersion: Int = 0
 ) extends Transformable
-    with Reindexable {
+    with Reindexable[String] {
+
+  val id: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("RecordID", RecordID),
+    RangeKey("RecordType", RecordType)
+  )
 
   def transform: Try[Work] =
     JsonUtil

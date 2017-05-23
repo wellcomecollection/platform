@@ -21,7 +21,13 @@ case class MiroTransformable(MiroID: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
     extends Transformable
-    with Reindexable {
+    with Reindexable[String] {
+
+  val id: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("MiroID", MiroID),
+    RangeKey("MiroCollection", MiroCollection)
+  )
+
   override def transform: Try[Work] =
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
       // Identifier is passed straight through
