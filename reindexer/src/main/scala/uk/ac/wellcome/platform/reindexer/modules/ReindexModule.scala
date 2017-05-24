@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.reindexer.services.ReindexService
 import uk.ac.wellcome.utils.TryBackoff
+import uk.ac.wellcome.platform.reindexer.ServerMain
 
 object ReindexModule extends TwitterModule  with TryBackoff {
 
@@ -14,6 +15,8 @@ object ReindexModule extends TwitterModule  with TryBackoff {
     val reindexService = injector.instance[ReindexService]
 
     run(() => reindexService.run, actorSystem)
+
+    ServerMain.close()
   }
 
   override def singletonShutdown(injector: Injector) {
