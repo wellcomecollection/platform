@@ -28,15 +28,14 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       indices <- getIndicesForReindex
       attempts = indices.map(ReindexAttempt(_, Nil, 0))
       completions <- Future.sequence(attempts.map(processReindexAttempt))
+      
     } yield completions
 
-  private def processReindexAttempt(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] = (reindexAttempt match {
-    case ReindexAttempt(_, _, 0) => runReindex(reindexAttempt) // First attempt.
-      // Loops forever \/ Here!
-    case ReindexAttempt(_, Nil, attempt) => Future.successful(reindexAttempt) // Stop: done!
+  private def processReindexAttempt(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] = reindexAttempt match {
     case ReindexAttempt(_, _, attempt) if attempt > 2 => Future.failed(new RuntimeException(s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
-    case _ => runReindex(reindexAttempt) // Carry on.
-  }).flatMap(processReindexAttempt)
+    case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 => Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!
+    case _ => runReindex(reindexAttempt).flatMap(processReindexAttempt) // Carry on.
+  }
 
   def runReindex(reindexAttempt: ReindexAttempt) =
     for {
