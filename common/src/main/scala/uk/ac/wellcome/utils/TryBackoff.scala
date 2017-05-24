@@ -20,7 +20,7 @@ trait TryBackoff extends Logging {
     } match {
       case Success(_) => 0
       case Failure(_) =>
-        error(s"Failed to get new messages (attempt: $attempt)")
+        error(s"Failed to run (attempt: $attempt)")
         attempt + 1
     }
 

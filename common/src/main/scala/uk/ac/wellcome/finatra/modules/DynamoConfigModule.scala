@@ -25,6 +25,7 @@ object PlatformDynamoConfigModule
   val (miroAppName, miroArn, miroTable) = flags("miroData")
   val (identAppName, identArn, identTable) = flags("identifiers")
   val (calmAppName, calmArn, calmTable) = flags("calmData")
+  val (reindexAppName, reindexArn, reindexTable) = flags("reindexTracker")
 
   @Singleton
   @Provides
@@ -32,7 +33,8 @@ object PlatformDynamoConfigModule
     Map(
       "calm" -> DynamoConfig(calmAppName(), calmArn(), calmTable()),
       "identifiers" -> DynamoConfig(identAppName(), identArn(), identTable()),
-      "miro" -> DynamoConfig(miroAppName(), miroArn(), miroTable())
+      "miro" -> DynamoConfig(miroAppName(), miroArn(), miroTable()),
+      "reindex" -> DynamoConfig(reindexAppName(), reindexArn(), reindexTable())
     ).filterNot {
       case (_, v) => v.table.isEmpty
     }
