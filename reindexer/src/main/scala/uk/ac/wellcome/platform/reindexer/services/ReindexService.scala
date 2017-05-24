@@ -14,7 +14,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                               dynamoConfig: DynamoConfig) extends Logging {
+                               dynamoConfig: DynamoConfig)
+    extends Logging {
 
   val tableName = dynamoConfig.table
   val gsiName = "ReindexTracker"
@@ -22,31 +23,53 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   lazy val miroTable = Table[MiroTransformable]("MiroData")
   lazy val calmTable = Table[CalmTransformable]("CalmData")
 
-  case class ReindexAttempt(reindex: Reindex, successful: List[Reindexable[String]], attempt: Int)
+  case class ReindexAttempt(reindex: Reindex,
+                            successful: List[Reindexable[String]],
+                            attempt: Int)
 
-  def run: Future[List[ReindexAttempt]] = for {
+  def run = (for {
       indices <- getIndicesForReindex
       attempts = indices.map(ReindexAttempt(_, Nil, 0))
       completions <- Future.sequence(attempts.map(processReindexAttempt))
-      
-    } yield completions
+      updates <- Future.sequence(completions.map(updateReindex))
+    } yield updates).recover {
+      case e => error("Some reindexes failed to complete.", e)
+    }
 
-  private def processReindexAttempt(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] = reindexAttempt match {
-    case ReindexAttempt(_, _, attempt) if attempt > 2 => Future.failed(new RuntimeException(s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
-    case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 => Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!
-    case _ => runReindex(reindexAttempt).flatMap(processReindexAttempt) // Carry on.
+
+  private def processReindexAttempt(
+    reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
+    reindexAttempt match {
+      case ReindexAttempt(_, _, attempt) if attempt > 2 =>
+        Future.failed(
+          new RuntimeException(
+            s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
+      case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 =>
+        Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!
+      case _ =>
+        runReindex(reindexAttempt).flatMap(processReindexAttempt) // Carry on.
+    }
+
+  def updateReindex(reindexAttempt: ReindexAttempt) = Future {
+    val updatedReindex = reindexAttempt.reindex.copy(
+      currentVersion = reindexAttempt.reindex.requestedVersion)
+
+    Scanamo.put[Reindex](dynamoDBClient)(tableName)(updatedReindex)
   }
 
   def runReindex(reindexAttempt: ReindexAttempt) =
     for {
       rows <- getRowsWithOldReindexVersion(reindexAttempt.reindex)
-      filteredRows <- logAndFilterLeft(rows)
-      updateOps <- updateRows(reindexAttempt.reindex, filteredRows.map(_.getReindexItem))
-      updatedRows <- logAndFilterLeft(updateOps)
-    } yield reindexAttempt.copy(successful = updatedRows, attempt = reindexAttempt.attempt + 1)
+      filteredRows <- logAndFilterLeft[Reindexable[String]](rows)
+      updateOps <- updateRows(reindexAttempt.reindex,
+                              filteredRows.map(_.getReindexItem))
+      updatedRows <- logAndFilterLeft[Reindexable[String]](updateOps)
+    } yield
+      reindexAttempt.copy(successful = updatedRows,
+                          attempt = reindexAttempt.attempt + 1)
 
-  def logAndFilterLeft(
-    rows: List[Either[DynamoReadError, Reindexable[String]]]) = Future {
+  def logAndFilterLeft[T](
+    rows: List[Either[DynamoReadError, T]]) = Future {
     rows
       .flatMap(_ match {
         case Left(e: DynamoReadError) => error(e.toString); None
@@ -91,10 +114,11 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       ))
   }
 
-  def getIndicesForReindex: Future[List[Reindex]] = getIndices.map(_.filter {
-    case Reindex(_, requested, current) if requested > current => true
-    case _ => false
-  })
+  def getIndicesForReindex: Future[List[Reindex]] =
+    getIndices.map(_.filter {
+      case Reindex(_, requested, current) if requested > current => true
+      case _ => false
+    })
 
   def getIndices: Future[List[Reindex]] = Future {
     Scanamo.scan[Reindex](dynamoDBClient)(dynamoConfig.table).map {
