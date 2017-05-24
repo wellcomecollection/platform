@@ -92,10 +92,7 @@ class ReindexServiceTest
 
     val reindexService = createReindexService
 
-    val op = reindexService.run
-
-    whenReady(op) { o =>
-      println(o)
+    whenReady(reindexService.run) { _ =>
       Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName) shouldBe expectedCalmTransformableList
     }
   }
