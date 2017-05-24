@@ -42,17 +42,17 @@ module "update_ecs_service_size_trigger" {
 
 # Lambda for restarting applications when their config changes
 
-module "lambda_stop_running_tasks" {
+module "lambda_update_task_for_config_change" {
   source      = "./lambda"
-  name        = "stop_running_tasks"
-  description = "Stop all the running instances of a task"
-  source_dir  = "../lambdas/stop_running_tasks"
+  name        = "update_task_for_config_change"
+  description = "Trigger a task definition change and restart on config change."
+  source_dir  = "../lambdas/update_task_for_config_change"
 }
 
 module "trigger_application_restart_on_config_change" {
   source               = "./lambda/trigger_s3"
-  lambda_function_name = "${module.lambda_stop_running_tasks.function_name}"
-  lambda_function_arn  = "${module.lambda_stop_running_tasks.arn}"
+  lambda_function_name = "${module.lambda_update_task_for_config_change.function_name}"
+  lambda_function_arn  = "${module.lambda_update_task_for_config_change.arn}"
   s3_bucket_arn        = "${aws_s3_bucket.infra.arn}"
   s3_bucket_id         = "${aws_s3_bucket.infra.id}"
   filter_prefix        = "config/prod/"

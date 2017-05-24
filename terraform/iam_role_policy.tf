@@ -88,10 +88,10 @@ resource "aws_iam_role_policy" "update_ecs_service_size_policy" {
   policy = "${data.aws_iam_policy_document.update_ecs_service_size.json}"
 }
 
-# Role policies for the Stop Running Tasks Lambda
+# Role policies for the Lambda which updates running tasks when the
+# config changes.
 
-resource "aws_iam_role_policy" "stop_running_tasks_policy" {
-  name   = "lambda_stop_running_tasks"
-  role   = "${module.lambda_stop_running_tasks.role_name}"
+resource "aws_iam_role_policy" "update_tasks_for_config_change_policy" {
+  role   = "${module.lambda_update_task_for_config_change.role_name}"
   policy = "${data.aws_iam_policy_document.stop_running_tasks.json}"
 }
