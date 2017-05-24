@@ -4,7 +4,7 @@
 set -o errexit
 set -o nounset
 
-$(aws ecr get-login)
+$(aws ecr get-login --no-include-email)
 docker push "$TAG"
 echo "New container image is $RELEASE_ID"
 
