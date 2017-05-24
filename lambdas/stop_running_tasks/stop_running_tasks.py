@@ -14,26 +14,7 @@ import re
 
 import boto3
 
-
-def identify_cluster_by_app_name(ecs, app_name):
-    """
-    Given the name of one of our applications (e.g. api, calm_adapter),
-    return the ARN of the cluster the task runs on.
-    """
-    for cluster in ecs.list_clusters()['clusterArns']:
-        for serviceArn in ecs.list_services(cluster=cluster)['serviceArns']:
-
-            # The format of an ECS service ARN is:
-            #
-            #     arn:aws:ecs:{aws_region}:{account_id}:service/{service_name}
-            #
-            # Our ECS cluster is configured so that the name of the ECS cluster
-            # matches the name of the config in S3.
-            _, serviceName = serviceArn.split('/')
-            if serviceName == app_name:
-                return cluster
-
-    raise RuntimeError(f'Unable to find ECS cluster for {app_name}')
+from ecs_utils import identify_cluster_by_app_name
 
 
 def stop_running_tasks(app_name):
@@ -41,14 +22,14 @@ def stop_running_tasks(app_name):
     Given the name of one of our applications (e.g. api, calm_adapter),
     stop all the running instances of this application.
     """
-    ecs = boto3.client('ecs')
-    cluster = identify_cluster_by_app_name(ecs=ecs, app_name=app_name)
-    taskArns = ecs.list_tasks(
+    client = boto3.client('ecs')
+    cluster = identify_cluster_by_app_name(client=client, app_name=app_name)
+    taskArns = client.list_tasks(
         cluster=cluster,
         serviceName=app_name
     )['taskArns']
     for task in taskArns:
-        ecs.stop_task(
+        client.stop_task(
             cluster=cluster,
             task=task,
             reason='Restarting to pick up new configuration'
