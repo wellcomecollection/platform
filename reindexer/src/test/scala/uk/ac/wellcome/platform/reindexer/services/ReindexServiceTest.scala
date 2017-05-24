@@ -17,7 +17,7 @@ class ReindexServiceTest
   def createReindexService =
     new ReindexService(
       dynamoDbClient,
-      DynamoConfig("applicationName", "streamArn", reindexTableName))
+      Map("reindex" -> DynamoConfig("applicationName", "streamArn", reindexTableName)))
 
   it(
     "should return a list of indexes with their current and requested versions") {

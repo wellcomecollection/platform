@@ -14,10 +14,15 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                               dynamoConfig: DynamoConfig)
+                               dynamoConfig: Map[String, DynamoConfig])
     extends Logging {
 
-  val tableName = dynamoConfig.table
+  val tableName = dynamoConfig
+    .get("reindex")
+    .getOrElse(
+      throw new RuntimeException("reindex dynamo config not available"))
+    .table
+
   val gsiName = "ReindexTracker"
 
   lazy val miroTable = Table[MiroTransformable]("MiroData")
@@ -27,7 +32,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
                             successful: List[Reindexable[String]],
                             attempt: Int)
 
-  def run = (for {
+  def run =
+    (for {
       indices <- getIndicesForReindex
       attempts = indices.map(ReindexAttempt(_, Nil, 0))
       completions <- Future.sequence(attempts.map(processReindexAttempt))
@@ -35,7 +41,6 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     } yield updates).recover {
       case e => error("Some reindexes failed to complete.", e)
     }
-
 
   private def processReindexAttempt(
     reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
@@ -68,8 +73,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       reindexAttempt.copy(successful = updatedRows,
                           attempt = reindexAttempt.attempt + 1)
 
-  def logAndFilterLeft[T](
-    rows: List[Either[DynamoReadError, T]]) = Future {
+  def logAndFilterLeft[T](rows: List[Either[DynamoReadError, T]]) = Future {
     rows
       .flatMap(_ match {
         case Left(e: DynamoReadError) => error(e.toString); None
@@ -121,7 +125,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     })
 
   def getIndices: Future[List[Reindex]] = Future {
-    Scanamo.scan[Reindex](dynamoDBClient)(dynamoConfig.table).map {
+    Scanamo.scan[Reindex](dynamoDBClient)(tableName).map {
       case Right(reindexes) => reindexes
       case _ => throw new RuntimeException("nope")
     }

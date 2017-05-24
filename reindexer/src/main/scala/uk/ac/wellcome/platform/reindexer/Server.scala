@@ -20,6 +20,7 @@ class Server extends HttpServer {
   override val modules = Seq(
     PlatformDynamoConfigModule,
     DynamoClientModule,
+    PlatformDynamoConfigModule,
     ReindexModule,
     AkkaModule)
 
