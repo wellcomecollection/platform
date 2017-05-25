@@ -140,5 +140,4 @@ class ReindexServiceTest
       rows shouldBe expectedCalmTransformableList
     }
   }
-
 }

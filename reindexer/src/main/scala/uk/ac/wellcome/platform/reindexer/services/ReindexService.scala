@@ -110,7 +110,9 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
         Scanamo.queryIndex[MiroTransformable](dynamoDBClient) _
       case Reindex("CalmData", _, _) =>
         Scanamo.queryIndex[CalmTransformable](dynamoDBClient) _
-      case _ => throw new RuntimeException("nope")
+      case _ =>
+        throw new RuntimeException(
+          s"getRowsWithOldReindexVersion called with unknown table: $reindex")
     }
 
     query(reindex.TableName, gsiName)(
@@ -131,7 +133,9 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   def getIndices: Future[List[Reindex]] = Future {
     Scanamo.scan[Reindex](dynamoDBClient)(tableName).map {
       case Right(reindexes) => reindexes
-      case _ => throw new RuntimeException("nope")
+      case Left(dynamoReadError) =>
+        throw new RuntimeException(
+          s"Unable to read row from $tableName: $dynamoReadError")
     }
   }
 }
