@@ -6,19 +6,11 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.models.MiroTransformable
-import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.platform.reindexer.lib.ReindexService
 
-class MiroReindexService @Inject()(
-  reindexTrackerService: ReindexTrackerService,
+class MiroReindexTargetService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
-  dynamoConfigs: Map[String, DynamoConfig],
   @Flag("reindex.target.tableName") reindexTargetTableName: String)
-    extends ReindexService[MiroTransformable](reindexTrackerService,
-                                              dynamoDBClient,
-                                              dynamoConfigs,
-                                              reindexTargetTableName,
-                                              "miro") {
+    extends ReindexTargetService[MiroTransformable](dynamoDBClient) {
 
   override val transformableTable: Table[MiroTransformable] =
     Table[MiroTransformable](reindexTargetTableName)
