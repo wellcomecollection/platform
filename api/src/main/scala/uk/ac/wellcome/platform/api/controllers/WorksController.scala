@@ -5,21 +5,21 @@ import javax.inject.{Inject, Singleton}
 import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
-import com.twitter.finatra.request.QueryParam
+import com.twitter.finatra.request.{QueryParam, RouteParam}
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import com.twitter.finatra.validation._
 
 case class UsersRequest(@Min(1) @QueryParam page: Int = 1,
                         @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
-                        @QueryParam query: Option[String]) {
-}
+                        @QueryParam includes: Option[String],
+                        @QueryParam query: Option[String])
+
+case class SingleWorkRequest(@RouteParam id: String,
+                             @QueryParam includes: Option[String])
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
@@ -91,9 +91,12 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .tag("Works")
         .routeParam[String]("id", "The work to return", required = true)
         .responseWith[Object](200, "Work")
-    } { request: Request =>
+        .queryParam[String]("includes",
+                            "A comma-separated list of extra fields to include",
+                            required = false)
+    } { request: SingleWorkRequest =>
       worksService
-        .findWorkById(request.params("id"))
+        .findWorkById(request.id, request.includes.getOrElse("").split(",").toList)
         .map {
           case Some(result) =>
             response.ok.json(

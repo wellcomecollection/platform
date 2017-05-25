@@ -1,10 +1,14 @@
 package uk.ac.wellcome.platform.api.services
 
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.api.WorksUtil
-import uk.ac.wellcome.platform.api.models.DisplayWork
+import uk.ac.wellcome.platform.api.models.{
+  DisplayIdentifier,
+  DisplaySource,
+  DisplayWork
+}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,11 +35,9 @@ class WorksServiceTest
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
-      displayWork.results.head shouldBe DisplayWork("Work",
-                                                    works(0).canonicalId,
+      displayWork.results.head shouldBe DisplayWork(works(0).canonicalId,
                                                     works(0).work.label)
-      displayWork.results.tail.head shouldBe DisplayWork("Work",
-                                                         works(1).canonicalId,
+      displayWork.results.tail.head shouldBe DisplayWork(works(1).canonicalId,
                                                          works(1).work.label)
     }
   }
@@ -74,8 +76,7 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork("Work",
-                                              workDodo.canonicalId,
+      works.results.head shouldBe DisplayWork(workDodo.canonicalId,
                                               workDodo.work.label)
     }
   }
@@ -126,19 +127,22 @@ class WorksServiceTest
 
     insertIntoElasticSearch(works: _*)
 
-    val displayWorksFuture = worksService.listWorks(pageSize = 1, pageNumber = 2)
+    val displayWorksFuture =
+      worksService.listWorks(pageSize = 1, pageNumber = 2)
 
     whenReady(displayWorksFuture) { receivedWorks =>
       receivedWorks.results.head shouldBe convertWorkToDisplayWork(works(1))
     }
   }
 
-  it("should return an empty result set when asked for a page that does not exist") {
+  it(
+    "should return an empty result set when asked for a page that does not exist") {
     val works = createIdentifiedWorks(3)
 
     insertIntoElasticSearch(works: _*)
 
-    val displayWorksFuture = worksService.listWorks(pageSize = 1, pageNumber = 4)
+    val displayWorksFuture =
+      worksService.listWorks(pageSize = 1, pageNumber = 4)
 
     whenReady(displayWorksFuture) { receivedWorks =>
       receivedWorks.results shouldBe empty
@@ -159,9 +163,35 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork("Work",
-                                              workEmu.canonicalId,
+      works.results.head shouldBe DisplayWork(workEmu.canonicalId,
                                               workEmu.work.label)
+    }
+  }
+
+  it("should return identifiers if specified in the includes") {
+    val canonicalId = "1234"
+
+    val label = "image label"
+    val miroId = "abcdef"
+    val sourceName = "Miro"
+    val sourceId = "MiroID"
+    val work = identifiedWorkWith(canonicalId,
+                                  label,
+                                  identifiers = List(
+                                    SourceIdentifier(source = sourceName,
+                                                     sourceId = sourceId,
+                                                     value = miroId)))
+    insertIntoElasticSearch(work)
+
+    val getByIdResult =
+      worksService.findWorkById(canonicalId, includes = List("hasIdentifier"))
+
+    whenReady(getByIdResult) { maybeDisplayWork =>
+      maybeDisplayWork.isDefined shouldBe true
+      maybeDisplayWork.get.hasIdentifier shouldBe List(
+        DisplayIdentifier(source = DisplaySource(sourceName, sourceId),
+                          miroId))
+
     }
   }
 }
