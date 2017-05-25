@@ -1,27 +1,18 @@
-package uk.ac.wellcome.platform.reindexer.lib
+package uk.ac.wellcome.platform.reindexer.services
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
-import com.twitter.inject.Logging
 import uk.ac.wellcome.models.{Reindex, ReindexItem, Reindexable, Transformable}
-import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-import uk.ac.wellcome.platform.reindexer.services.ReindexTrackerService
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-abstract class ReindexService[T <: Transformable with Reindexable[String]](
-  reindexTrackerService: ReindexTrackerService,
-  dynamoDBClient: AmazonDynamoDB,
-  dynamoConfigs: Map[String, DynamoConfig],
-  reindexTargetTableName: String,
-  reindexTargetTableConfigId: String)
-    extends Logging {
-
+abstract class ReindexTargetService[T <: Transformable with Reindexable[
+  String]](dynamoDBClient: AmazonDynamoDB) {
   import uk.ac.wellcome.utils.ScanamoUtils._
 
   type ScanamoQuery =
@@ -32,33 +23,7 @@ abstract class ReindexService[T <: Transformable with Reindexable[String]](
 
   private val gsiName = "ReindexTracker"
 
-  private val reindexTargetConfig = dynamoConfigs.getOrElse(
-    reindexTargetTableConfigId,
-    throw new RuntimeException(
-      s"ReindexTarget ($reindexTargetTableConfigId) dynamo config not available!"))
-
-  def run =
-    for {
-      indices <- reindexTrackerService.getIndicesForReindex
-      attempt = indices.map(ReindexAttempt(_, Nil, 0))
-      _ <- attempt.map(processReindexAttempt).get
-      updates <- reindexTrackerService.updateReindex(attempt.get)
-    } yield updates
-
-  private def processReindexAttempt(
-    reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
-    reindexAttempt match {
-      case ReindexAttempt(_, _, attempt) if attempt > 2 =>
-        Future.failed(
-          new RuntimeException(
-            s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
-      case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 =>
-        Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!
-      case _ =>
-        runReindex(reindexAttempt).flatMap(processReindexAttempt) // Carry on.
-    }
-
-  def runReindex(reindexAttempt: ReindexAttempt) =
+  def runReindex(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
     for {
       rows <- getRowsWithOldReindexVersion(reindexAttempt.reindex)
       filteredRows = logAndFilterLeft(rows)
