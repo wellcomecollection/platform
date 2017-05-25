@@ -4,11 +4,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.api.WorksUtil
-import uk.ac.wellcome.platform.api.models.{
-  DisplayIdentifier,
-  DisplaySource,
-  DisplayWork
-}
+import uk.ac.wellcome.platform.api.models.{DisplayIdentifier, DisplaySearch, DisplaySource, DisplayWork}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -168,7 +164,7 @@ class WorksServiceTest
     }
   }
 
-  it("should return identifiers if specified in the includes") {
+  it("should return identifiers if specified in the includes for findWorkById") {
     val canonicalId = "1234"
 
     val label = "image label"
@@ -188,9 +184,60 @@ class WorksServiceTest
 
     whenReady(getByIdResult) { maybeDisplayWork =>
       maybeDisplayWork.isDefined shouldBe true
-      maybeDisplayWork.get.hasIdentifier shouldBe List(
+      maybeDisplayWork.get.hasIdentifier.isDefined shouldBe true
+      maybeDisplayWork.get.hasIdentifier.get shouldBe List(
         DisplayIdentifier(source = DisplaySource(sourceName, sourceId),
                           miroId))
+
+    }
+  }
+
+  it("should return identifiers if specified in the includes for listWorks") {
+    val canonicalId = "1234"
+
+    val label = "image label"
+    val miroId = "abcdef"
+    val sourceName = "Miro"
+    val sourceId = "MiroID"
+    val work = identifiedWorkWith(canonicalId,
+      label,
+      identifiers = List(
+        SourceIdentifier(source = sourceName,
+          sourceId = sourceId,
+          value = miroId)))
+    insertIntoElasticSearch(work)
+
+    val listWorksResult = worksService.listWorks(includes = List("hasIdentifier"))
+
+    whenReady(listWorksResult) { (displayWork: DisplaySearch) =>
+      displayWork.results.head.hasIdentifier.get shouldBe List(
+        DisplayIdentifier(source = DisplaySource(sourceName, sourceId),
+          miroId))
+
+    }
+  }
+
+  it("should return identifiers if specified in the includes for searchWorks") {
+    val canonicalId = "1234"
+
+    val label = "A search for a snail"
+    val miroId = "abcdef"
+    val sourceName = "Miro"
+    val sourceId = "MiroID"
+    val work = identifiedWorkWith(canonicalId,
+      label,
+      identifiers = List(
+        SourceIdentifier(source = sourceName,
+          sourceId = sourceId,
+          value = miroId)))
+    insertIntoElasticSearch(work)
+
+    val searchWorksResult = worksService.searchWorks(query = "snail", includes = List("hasIdentifier"))
+
+    whenReady(searchWorksResult) { (displayWork: DisplaySearch) =>
+      displayWork.results.head.hasIdentifier.get shouldBe List(
+        DisplayIdentifier(source = DisplaySource(sourceName, sourceId),
+          miroId))
 
     }
   }
