@@ -65,21 +65,25 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   def runReindex(reindexAttempt: ReindexAttempt) =
     for {
       rows <- getRowsWithOldReindexVersion(reindexAttempt.reindex)
-      filteredRows <- logAndFilterLeft[Reindexable[String]](rows)
+      filteredRows <- Future.successful(
+        logAndFilterLeft[Reindexable[String]](rows))
       updateOps <- updateRows(reindexAttempt.reindex,
                               filteredRows.map(_.getReindexItem))
-      updatedRows <- logAndFilterLeft[Reindexable[String]](updateOps)
+      updatedRows <- Future.successful(
+        logAndFilterLeft[Reindexable[String]](updateOps))
     } yield
       reindexAttempt.copy(successful = updatedRows,
                           attempt = reindexAttempt.attempt + 1)
 
-  def logAndFilterLeft[T](rows: List[Either[DynamoReadError, T]]) = Future {
+  def logAndFilterLeft[T](rows: List[Either[DynamoReadError, T]]) = {
+    rows.foreach {
+      case Left(e: DynamoReadError) => error(e.toString)
+      case _ => Unit
+    }
+
     rows
-      .flatMap(_ match {
-        case Left(e: DynamoReadError) => error(e.toString); None
-        case a => Some(a)
-      })
-      .map(_.right.get)
+      .filter { case Right(_) => true }
+      .flatMap(_.right.toOption)
   }
 
   def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
