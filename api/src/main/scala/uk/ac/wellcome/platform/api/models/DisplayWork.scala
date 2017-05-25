@@ -17,8 +17,11 @@ case class DisplayWork(id: String,
   val ontologyType: String = "Work"
 }
 case object DisplayWork {
-  def apply(hit: RichSearchHit): DisplayWork = {
-    jsonToDisplayWork(hit.sourceAsString, Nil)
+
+  def apply(hit: RichSearchHit): DisplayWork = apply(hit, includes = List())
+
+  def apply(hit: RichSearchHit, includes: List[String]): DisplayWork = {
+    jsonToDisplayWork(hit.sourceAsString, includes)
   }
 
   def apply(got: GetResponse, includes: List[String]): DisplayWork = {

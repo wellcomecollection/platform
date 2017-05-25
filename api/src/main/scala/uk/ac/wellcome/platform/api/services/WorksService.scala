@@ -24,24 +24,26 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
       }
 
   def listWorks(pageSize: Int = defaultPageSize,
-                pageNumber: Int = 1): Future[DisplaySearch] =
+                pageNumber: Int = 1,
+                includes: List[String] = Nil): Future[DisplaySearch] =
     searchService
       .listResults(
         sortByField = "canonicalId",
         limit = pageSize,
         from = (pageNumber - 1) * pageSize
       )
-      .map { DisplaySearch(_, pageSize) }
+      .map { DisplaySearch(_, pageSize, includes) }
 
   def searchWorks(query: String,
                   pageSize: Int = defaultPageSize,
-                  pageNumber: Int = 1): Future[DisplaySearch] =
+                  pageNumber: Int = 1,
+                  includes: List[String] = Nil): Future[DisplaySearch] =
     searchService
       .simpleStringQueryResults(
         query,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize
       )
-      .map { DisplaySearch(_, pageSize) }
+      .map { DisplaySearch(_, pageSize, includes) }
 
 }

@@ -13,10 +13,11 @@ import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import com.twitter.finatra.validation._
 
-case class UsersRequest(@Min(1) @QueryParam page: Int = 1,
-                        @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
-                        @QueryParam includes: Option[String],
-                        @QueryParam query: Option[String])
+case class MultipleResultsRequest(@Min(1) @QueryParam page: Int = 1,
+                                  @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
+                                  @QueryParam includes: Option[String],
+                                  @RouteParam id: Option[String],
+                                  @QueryParam query: Option[String])
 
 case class SingleWorkRequest(@RouteParam id: String,
                              @QueryParam includes: Option[String])
@@ -52,20 +53,23 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .queryParam[String]("query",
                             "Full-text search query",
                             required = false)
-    } { request: UsersRequest =>
+    } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
+      val includes = request.includes.getOrElse("").split(",").toList
 
       val works = request.query match {
         case Some(queryString) =>
           worksService.searchWorks(
             queryString,
             pageSize = pageSize,
-            pageNumber = request.page
+            pageNumber = request.page,
+            includes = includes
           )
         case None =>
           worksService.listWorks(
             pageSize = pageSize,
-            pageNumber = request.page
+            pageNumber = request.page,
+            includes = includes
           )
       }
 
