@@ -4,7 +4,10 @@ import akka.actor.ActorSystem
 import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.reindexer.ServerMain
-import uk.ac.wellcome.platform.reindexer.services.{CalmReindexService, MiroReindexService}
+import uk.ac.wellcome.platform.reindexer.services.{
+  CalmReindexService,
+  MiroReindexService
+}
 import uk.ac.wellcome.utils.TryBackoff
 
 object ReindexModule extends TwitterModule with TryBackoff {

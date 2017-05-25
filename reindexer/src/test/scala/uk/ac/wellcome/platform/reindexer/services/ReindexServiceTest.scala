@@ -14,61 +14,27 @@ class ReindexServiceTest
     with DynamoDBLocal
     with ExtendedPatience {
 
+  val dynamoConfigs = Map(
+    "reindex" -> DynamoConfig("applicationName",
+      "streamArn",
+      reindexTableName),
+    "calm" -> DynamoConfig("applicationName",
+      "streamArn",
+      calmDataTableName)
+  )
+
   def createReindexService =
     new CalmReindexService(
-      dynamoDbClient,
-      Map(
-        "reindex" -> DynamoConfig("applicationName",
-                                         "streamArn",
-                                         reindexTableName),
-        "calm" -> DynamoConfig("applicationName",
-                                   "streamArn",
-                                   calmDataTableName)
+      new ReindexTrackerService(
+        dynamoDbClient,
+        dynamoConfigs,
+        "CalmData"
       ),
+      dynamoDbClient,
+      dynamoConfigs
+      ,
       "CalmData"
     )
-
-  it("should return the correct index with current and requested versions") {
-    val expectedReindex = Reindex("CalmData", 2, 1)
-    val reindexList = List(
-      expectedReindex,
-      Reindex("MiroData", 1, 1)
-    )
-
-    reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
-
-    val reindexService = createReindexService
-
-    val op = reindexService.getIndices
-
-    whenReady(op) { reindex =>
-      expectedReindex shouldBe reindex
-    }
-  }
-
-  it(
-    "should return the index in need of reindexing"
-  ) {
-    val expectedReindex = Reindex("CalmData", 2, 1)
-    val reindexList = List(
-      expectedReindex,
-      Reindex("MiroData", 1, 1)
-    )
-
-    val expectedReindexList = List(
-      Reindex("foo", 2, 1)
-    )
-
-    reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
-
-    val reindexService = createReindexService
-
-    val op = reindexService.getIndicesForReindex
-
-    whenReady(op) { reindex =>
-      Some(expectedReindex) shouldBe reindex
-    }
-  }
 
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
