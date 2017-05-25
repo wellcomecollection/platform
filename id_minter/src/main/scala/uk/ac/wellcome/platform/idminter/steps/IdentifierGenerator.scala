@@ -9,8 +9,8 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import scala.concurrent.blocking
 
+import scala.concurrent.blocking
 import scala.concurrent.Future
 
 class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,

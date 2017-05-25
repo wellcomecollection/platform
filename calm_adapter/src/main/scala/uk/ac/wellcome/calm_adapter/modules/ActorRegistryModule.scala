@@ -12,13 +12,16 @@ import net.codingwell.scalaguice.ScalaModule
 import akka.actor.Actor
 import com.google.inject.name.Names
 import uk.ac.wellcome.calm_adapter.models.ActorRegister
-import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoClientModule, DynamoConfigModule}
+import uk.ac.wellcome.calm_adapter.modules.CalmAdapterDynamoConfigModule
+import uk.ac.wellcome.finatra.modules.{AkkaModule, DynamoClientModule}
+
+
 
 object ActorRegistryModule extends TwitterModule {
 
   override val modules = Seq(
+    CalmAdapterDynamoConfigModule,
     DynamoClientModule,
-    DynamoConfigModule,
     AkkaModule
   )
 

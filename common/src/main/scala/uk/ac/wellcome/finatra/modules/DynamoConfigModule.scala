@@ -6,17 +6,34 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-object DynamoConfigModule extends TwitterModule {
-  private val applicationName = flag[String]("aws.dynamo.streams.appName",
-                                             "dynamodb-streams-app",
-                                             "Name of the Kinesis app")
-  private val arn =
-    flag[String]("aws.dynamo.streams.arn", "", "ARN of the DynamoDB stream")
-  private val table =
-    flag[String]("aws.dynamo.tableName", "", "Name of the DynamoDB table")
+
+trait DynamoConfigModule extends TwitterModule {
+  val appNameTpl: String = "aws.dynamo.%s.streams.appName"
+  val arnTpl: String = "aws.dynamo.%s.streams.arn"
+  val tableTpl: String = "aws.dynamo.%s.tableName"
+
+  def flags(tableName: String) = (
+    flag[String](appNameTpl.format(tableName), "", "Name of the Kinesis app"),
+    flag[String](arnTpl.format(tableName),"", "ARN of the DynamoDB stream"),
+    flag[String](tableTpl.format(tableName),"","Name of the DynamoDB table")
+  )
+}
+
+object PlatformDynamoConfigModule
+    extends DynamoConfigModule {
+
+  val (miroAppName, miroArn, miroTable) = flags("miroData")
+  val (identAppName, identArn, identTable) = flags("identifiers")
+  val (calmAppName, calmArn, calmTable) = flags("calmData")
 
   @Singleton
   @Provides
-  def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(applicationName(), arn(), table())
+  def providesDynamoConfig(): Map[String, DynamoConfig] =
+    Map(
+      "calm" -> DynamoConfig(calmAppName(), calmArn(), calmTable()),
+      "identifiers" -> DynamoConfig(identAppName(), identArn(), identTable()),
+      "miro" -> DynamoConfig(miroAppName(), miroArn(), miroTable())
+    ).filterNot {
+      case (_, v) => v.table.isEmpty
+    }
 }

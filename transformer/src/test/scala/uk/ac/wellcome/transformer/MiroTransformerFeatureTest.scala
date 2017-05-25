@@ -16,9 +16,9 @@ class MiroTransformerFeatureTest
   private val appName = "test-transformer-miro"
   override val flags: Map[String, String] = Map(
     "aws.region" -> "eu-west-1",
-    "aws.dynamo.streams.appName" -> appName,
-    "aws.dynamo.streams.arn" -> miroDataStreamArn,
-    "aws.dynamo.tableName" -> miroDataTableName,
+    "aws.dynamo.miroData.streams.appName" -> appName,
+    "aws.dynamo.miroData.streams.arn" -> miroDataStreamArn,
+    "aws.dynamo.miroData.tableName" -> miroDataTableName,
     "aws.sns.topic.arn" -> idMinterTopicArn,
     "aws.metrics.namespace" -> "miro-transformer"
   )

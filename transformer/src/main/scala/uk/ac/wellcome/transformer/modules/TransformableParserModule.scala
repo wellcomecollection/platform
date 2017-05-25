@@ -15,7 +15,11 @@ object TransformableParserModule extends TwitterModule {
   @Singleton
   @Provides
   def providesTransformableParser(
-    dynamoConfig: DynamoConfig): TransformableParser[Transformable] = {
+    dynamoConfigs: Map[String, DynamoConfig]): TransformableParser[Transformable] = {
+
+    val dynamoConfig =
+      DynamoConfig.findWithTable(dynamoConfigs.values.toList)
+
     dynamoConfig.table match {
       case "MiroData" => new MiroParser
       case "CalmData" => new CalmParser

@@ -3,6 +3,13 @@
 
 set -o nounset
 
+TRAVIS=${TRAVIS:-false}
+
+if [[ "$TRAVIS" == "true" ]]
+then
+  set -o errexit
+fi
+
 ALL_PROJECTS="api common id_minter ingestor miro_adapter reindexer transformer"
 
 

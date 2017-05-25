@@ -15,7 +15,6 @@ trait WorksUtil {
 
 
   def convertWorkToDisplayWork(work: IdentifiedWork) = DisplayWork(
-    "Work",
     work.canonicalId,
     work.work.label,
     work.work.description,
