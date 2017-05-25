@@ -31,11 +31,9 @@ class WorksServiceTest
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
-      displayWork.results.head shouldBe DisplayWork("Work",
-                                                    works(0).canonicalId,
+      displayWork.results.head shouldBe DisplayWork(works(0).canonicalId,
                                                     works(0).work.label)
-      displayWork.results.tail.head shouldBe DisplayWork("Work",
-                                                         works(1).canonicalId,
+      displayWork.results.tail.head shouldBe DisplayWork(works(1).canonicalId,
                                                          works(1).work.label)
     }
   }
@@ -74,13 +72,12 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork("Work",
-                                              workDodo.canonicalId,
+      works.results.head shouldBe DisplayWork(workDodo.canonicalId,
                                               workDodo.work.label)
     }
   }
 
-  it("should return a future of None if it cannot get arecord by id") {
+  it("should return a future of None if it cannot get a record by id") {
     val recordsFuture = worksService.findWorkById("1234")
 
     whenReady(recordsFuture) { record =>
@@ -159,8 +156,7 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork("Work",
-                                              workEmu.canonicalId,
+      works.results.head shouldBe DisplayWork(workEmu.canonicalId,
                                               workEmu.work.label)
     }
   }
