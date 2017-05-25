@@ -7,28 +7,10 @@ Exits with code 0 if there are changes that require a rebuild, 1 if not.
 """
 
 import os
-import subprocess
 import sys
 
 from should_rerun_tests import should_retest_project
-
-
-def modified_files():
-    """Returns a set of changed files since the last master build."""
-    # Travis has an environment variable $TRAVIS_COMMIT_RANGE which tells us
-    # the range of commits that this push is testing.  By inspecting its
-    # value and passing it to `git diff`, we can determine which files
-    # have changed.
-    commit_range = os.environ['TRAVIS_COMMIT_RANGE']
-
-    files = set()
-    command = ['git', 'diff', '--name-only', commit_range]
-    diff_output = subprocess.check_output(command).decode('ascii')
-    for line in diff_output.splitlines():
-        filepath = line.strip()
-        if filepath:
-            files.add(filepath)
-    return files
+import tooling
 
 
 def should_rebuild_project(changed_files, project):
@@ -47,7 +29,13 @@ def should_rebuild_project(changed_files, project):
 
 
 if __name__ == '__main__':
-    changed_files = modified_files()
+
+    # Travis has an environment variable $TRAVIS_COMMIT_RANGE which tells us
+    # the range of commits that this push is testing.  By inspecting its
+    # value and passing it to `git diff`, we can determine which files
+    # have changed.
+    changed_files = modified_files([os.environ['TRAVIS_COMMIT_RANGE']])
+
     should_rebuild = should_rebuild_project(
         changed_files=changed_files,
         project=os.environ['PROJECT']
