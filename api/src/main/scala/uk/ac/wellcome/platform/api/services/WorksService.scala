@@ -11,37 +11,38 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 @Singleton
-class WorksService @Inject()(
-  @Flag("api.pageSize") defaultPageSize: Int,
-  searchService: ElasticSearchService
-) {
+class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
+                             searchService: ElasticSearchService) {
 
-  def findWorkById(canonicalId: String): Future[Option[DisplayWork]] =
+  def findWorkById(canonicalId: String,
+                   includes: List[String] = Nil): Future[Option[DisplayWork]] =
     searchService
       .findResultById(canonicalId)
       .map { result =>
-        if (result.exists) Some(DisplayWork(result.original)) else None
+        if (result.exists) Some(DisplayWork(result.original, includes)) else None
       }
 
   def listWorks(pageSize: Int = defaultPageSize,
-                pageNumber: Int = 1): Future[DisplaySearch] =
+                pageNumber: Int = 1,
+                includes: List[String] = Nil): Future[DisplaySearch] =
     searchService
       .listResults(
         sortByField = "canonicalId",
         limit = pageSize,
         from = (pageNumber - 1) * pageSize
       )
-      .map { DisplaySearch(_, pageSize) }
+      .map { DisplaySearch(_, pageSize, includes) }
 
   def searchWorks(query: String,
                   pageSize: Int = defaultPageSize,
-                  pageNumber: Int = 1): Future[DisplaySearch] =
+                  pageNumber: Int = 1,
+                  includes: List[String] = Nil): Future[DisplaySearch] =
     searchService
       .simpleStringQueryResults(
         query,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize
       )
-      .map { DisplaySearch(_, pageSize) }
+      .map { DisplaySearch(_, pageSize, includes) }
 
 }

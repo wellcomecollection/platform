@@ -10,9 +10,9 @@ case class DisplaySearch(
   results: Array[DisplayWork]
 )
 case object DisplaySearch {
-  def apply(searchResponse: RichSearchResponse, pageSize: Int): DisplaySearch = {
+  def apply(searchResponse: RichSearchResponse, pageSize: Int, includes: List[String]): DisplaySearch = {
     DisplaySearch(
-      results = searchResponse.hits.map { DisplayWork(_) },
+      results = searchResponse.hits.map { DisplayWork(_, includes) },
       pageSize = pageSize,
       totalPages = Math.ceil(searchResponse.totalHits.toDouble / pageSize.toDouble).toInt,
       totalResults = searchResponse.totalHits.toInt
