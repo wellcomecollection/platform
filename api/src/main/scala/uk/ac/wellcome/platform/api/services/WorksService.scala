@@ -6,7 +6,6 @@ import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork}
-import uk.ac.wellcome.platform.api.responses.ResultListResponse
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
