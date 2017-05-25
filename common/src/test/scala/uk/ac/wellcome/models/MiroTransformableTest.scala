@@ -61,6 +61,24 @@ class MiroTransformableTest extends FunSpec with Matchers {
     work.description shouldBe Some(description)
   }
 
+  it("should pass through the value of the creation date on V records") {
+    val date = "1820-1848"
+    val work = transformMiroRecord(
+      data = s"""{"image_title": "A description of a dalmation", "image_artwork_date": "$date"}""",
+      miroCollection = "Images-V"
+    )
+    work.hasCreatedDate shouldBe Some(Period(date))
+  }
+
+  it("should not pass through the value of the creation date on non-V records") {
+    val date = "1820-1848"
+    val work = transformMiroRecord(
+      data = s"""{"image_title": "A diary about a dodo", "image_artwork_date": "$date"}""",
+      miroCollection = "Images-A"
+    )
+    work.hasCreatedDate shouldBe None
+  }
+
   it("should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
     val work = transformMiroRecord(

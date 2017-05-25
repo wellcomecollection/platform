@@ -8,14 +8,16 @@ import uk.ac.wellcome.utils.JsonUtil
 
 
 case class DisplayWork(
-  @JsonProperty("type") ontologyType: String = "Work",
   id: String,
   label: String,
   description: Option[String] = None,
   lettering: Option[String] = None,
   hasCreatedDate: Option[Period] = None,
   hasCreator: List[Agent] = List()
-)
+) {
+  @JsonProperty("type") val ontologyType: String = "Work"
+}
+
 case object DisplayWork {
   def apply(hit: RichSearchHit): DisplayWork = {
     toRecord(hit.sourceAsString)
