@@ -178,21 +178,21 @@ ww:hasShelfmark rdf:type owl:ObjectProperty ;
 	
 ww:startDate rdf:type owl:DatatypeProperty ;
 	rdfs:label "startDate"@en ;
-	rdfs:comment "Relates the creation of a work to a start date, when the date of creation covers a range.   When the work is an image of another work, then the creationDate is the date at which the content being imaged was created, not the date on which the image was made"@en ;
+	rdfs:comment "Relates the creation of a work to a start date, when the date of creation covers a range"@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range xsd:dateTime ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
 	
 ww:endDate rdf:type owl:DatatypeProperty ;
 	rdfs:label "endDate"@en ;
-	rdfs:comment "Relates the creation of a work to an end date, when the date of creation covers a range.   When the work is an image of another work, then the creationDate is the date at which the content being imaged was created, not the date on which the image was made"@en ;
+	rdfs:comment "Relates the creation of a work to an end date, when the date of creation covers a range"@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range xsd:dateTime ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .		
 			
 ww:createdDate rdf:type owl:DatatypeProperty ;
 	rdfs:label "createdDate"@en ;
-	rdfs:comment "Relates the creation of a work to a date, when the date of creation does not cover a range.  When the work is an image of another work, then the creationDate is the date at which the content being imaged was created, not the date on which the image was made"@en ;
+	rdfs:comment "Relates the creation of a work to a date, when the date of creation does not cover a range"@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range xsd:dateTime ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
