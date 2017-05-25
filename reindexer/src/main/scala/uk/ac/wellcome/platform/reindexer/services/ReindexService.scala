@@ -1,46 +1,92 @@
 package uk.ac.wellcome.platform.reindexer.services
 
+import javax.inject.Inject
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.google.inject.Inject
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query.{KeyEquals, _}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                               dynamoConfig: Map[String, DynamoConfig])
+class MiroReindexService @Inject()(
+  dynamoDBClient: AmazonDynamoDB,
+  dynamoConfigs: Map[String, DynamoConfig],
+  @Flag("reindex.target.tableName") reindexTargetTableName: String)
+    extends ReindexService[MiroTransformable](dynamoDBClient,
+                                              dynamoConfigs,
+                                              reindexTargetTableName, "miro") {
+
+  override val transformableTable: Table[MiroTransformable] =
+    Table[MiroTransformable](reindexTargetTableName)
+
+  override val scanamoQuery: ScanamoQuery =
+    Scanamo.queryIndex[MiroTransformable](dynamoDBClient) _
+}
+
+class CalmReindexService @Inject()(
+  dynamoDBClient: AmazonDynamoDB,
+  dynamoConfigs: Map[String, DynamoConfig],
+  @Flag("reindex.target.tableName") reindexTargetTableName: String)
+    extends ReindexService[CalmTransformable](dynamoDBClient,
+                                              dynamoConfigs,
+                                              reindexTargetTableName,
+    "calm") {
+
+  override val transformableTable: Table[CalmTransformable] =
+    Table[CalmTransformable](reindexTargetTableName)
+
+  override val scanamoQuery: ScanamoQuery =
+    Scanamo.queryIndex[CalmTransformable](dynamoDBClient) _
+}
+
+abstract class ReindexService[T <: Transformable with Reindexable[String]](
+  dynamoDBClient: AmazonDynamoDB,
+  dynamoConfigs: Map[String, DynamoConfig],
+  reindexTargetTableName: String,
+  reindexTargetTableConfigId: String                                                       )
     extends Logging {
 
-  val tableName = dynamoConfig
-    .get("reindex")
-    .getOrElse(
-      throw new RuntimeException("reindex dynamo config not available"))
-    .table
+  type ScanamoQuery =
+    (String, String) => (Query[_]) => List[Either[DynamoReadError, T]]
 
-  val gsiName = "ReindexTracker"
+  val transformableTable: Table[T]
+  val scanamoQuery: ScanamoQuery
 
-  lazy val miroTable = Table[MiroTransformable]("MiroData")
-  lazy val calmTable = Table[CalmTransformable]("CalmData")
+  private val reindexTrackerTableConfigId = "reindex"
+  private val gsiName = "ReindexTracker"
+
+  private val reindexTrackerConfig = dynamoConfigs.getOrElse(
+    reindexTrackerTableConfigId,
+    throw new RuntimeException(
+      s"ReindexTracker ($reindexTrackerTableConfigId) dynamo config not available!"))
+
+  private val reindexTrackerTableName = reindexTrackerConfig.table
+
+  private val reindexTargetConfig = dynamoConfigs.getOrElse(
+    reindexTargetTableConfigId,
+    throw new RuntimeException(
+      s"ReindexTarget ($reindexTargetTableConfigId) dynamo config not available!"))
+
+  private val reindexTable = Table[Reindex](reindexTrackerTableName)
 
   case class ReindexAttempt(reindex: Reindex,
                             successful: List[Reindexable[String]],
                             attempt: Int)
 
   def run =
-    (for {
+    for {
       indices <- getIndicesForReindex
-      attempts = indices.map(ReindexAttempt(_, Nil, 0))
-      completions <- Future.sequence(attempts.map(processReindexAttempt))
-      updates <- Future.sequence(completions.map(updateReindex))
-    } yield updates).recover {
-      case e => error("Some reindexes failed to complete.", e)
-    }
+      attempt = indices.map(ReindexAttempt(_, Nil, 0))
+      _ <- attempt.map(processReindexAttempt).get
+      updates <- updateReindex(attempt.get)
+    } yield updates
 
   private def processReindexAttempt(
     reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
@@ -59,63 +105,47 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     val updatedReindex = reindexAttempt.reindex.copy(
       currentVersion = reindexAttempt.reindex.requestedVersion)
 
-    Scanamo.put[Reindex](dynamoDBClient)(tableName)(updatedReindex)
+    Scanamo.put[Reindex](dynamoDBClient)(reindexTrackerTableName)(
+      updatedReindex)
   }
 
   def runReindex(reindexAttempt: ReindexAttempt) =
     for {
       rows <- getRowsWithOldReindexVersion(reindexAttempt.reindex)
-      filteredRows <- Future.successful(
-        logAndFilterLeft[Reindexable[String]](rows))
+      filteredRows = logAndFilterLeft(rows)
       updateOps <- updateRows(reindexAttempt.reindex,
                               filteredRows.map(_.getReindexItem))
-      updatedRows <- Future.successful(
-        logAndFilterLeft[Reindexable[String]](updateOps))
+      updatedRows = logAndFilterLeft(updateOps)
     } yield
       reindexAttempt.copy(successful = updatedRows,
                           attempt = reindexAttempt.attempt + 1)
 
-  def logAndFilterLeft[T](rows: List[Either[DynamoReadError, T]]) = {
+  def logAndFilterLeft[Y](rows: List[Either[DynamoReadError, Y]]) = {
     rows.foreach {
       case Left(e: DynamoReadError) => error(e.toString)
       case _ => Unit
     }
 
     rows
-      .filter { case Right(_) => true }
+      .filter {
+        case Right(_) => true
+        case Left(_) => false
+      }
       .flatMap(_.right.toOption)
   }
 
   def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
-    val updateTable = reindex match {
-      case Reindex("MiroData", _, _) => miroTable
-      case Reindex("CalmData", _, _) => calmTable
-      case _ =>
-        throw new RuntimeException(
-          s"Attempting to update unidentified table ${reindex.TableName}")
-    }
-
     val ops = rows.map(reindexItem => {
       val uniqueKey = reindexItem.hashKey and reindexItem.rangeKey
-      updateTable.update(uniqueKey,
-                         set('ReindexVersion -> reindex.requestedVersion))
+      transformableTable
+        .update(uniqueKey, set('ReindexVersion -> reindex.requestedVersion))
     })
 
     Future(ops.map(Scanamo.exec(dynamoDBClient)(_)))
   }
 
   def getRowsWithOldReindexVersion(reindex: Reindex) = Future {
-    val query = reindex match {
-      case Reindex("MiroData", _, _) =>
-        Scanamo.queryIndex[MiroTransformable](dynamoDBClient) _
-      case Reindex("CalmData", _, _) =>
-        Scanamo.queryIndex[CalmTransformable](dynamoDBClient) _
-      case _ =>
-        throw new RuntimeException(
-          s"getRowsWithOldReindexVersion called with unknown table: $reindex")
-    }
-
-    query(reindex.TableName, gsiName)(
+    scanamoQuery(reindex.TableName, gsiName)(
       Query(
         AndQueryCondition(
           KeyEquals('ReindexShard, "default"),
@@ -124,18 +154,23 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       ))
   }
 
-  def getIndicesForReindex: Future[List[Reindex]] =
-    getIndices.map(_.filter {
-      case Reindex(_, requested, current) if requested > current => true
-      case _ => false
-    })
+  def getIndicesForReindex: Future[Option[Reindex]] =
+    getIndices.map {
+      case Reindex(tableName, requested, current) if requested > current =>
+        Some(Reindex(tableName, requested, current))
+      case _ => None
+    }
 
-  def getIndices: Future[List[Reindex]] = Future {
-    Scanamo.scan[Reindex](dynamoDBClient)(tableName).map {
-      case Right(reindexes) => reindexes
-      case Left(dynamoReadError) =>
+  def getIndices: Future[Reindex] = Future {
+    Scanamo.exec(dynamoDBClient)(
+      reindexTable.get('TableName -> reindexTargetTableName)) match {
+      case Some(Right(reindex)) => reindex
+      case Some(Left(dynamoReadError)) =>
         throw new RuntimeException(
-          s"Unable to read row from $tableName: $dynamoReadError")
+          s"Unable to read from $reindexTrackerTableName: $dynamoReadError")
+      case None =>
+        throw new RuntimeException(
+          s"No table matching $reindexTargetTableName found")
     }
   }
 }

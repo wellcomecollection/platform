@@ -15,34 +15,44 @@ class ReindexServiceTest
     with ExtendedPatience {
 
   def createReindexService =
-    new ReindexService(
+    new CalmReindexService(
       dynamoDbClient,
-      Map("reindex" -> DynamoConfig("applicationName", "streamArn", reindexTableName)))
-
-  it(
-    "should return a list of indexes with their current and requested versions") {
-    val expectedReindexList = List(
-      Reindex("foo", 2, 1),
-      Reindex("bar", 1, 1)
+      Map(
+        "reindex" -> DynamoConfig("applicationName",
+                                         "streamArn",
+                                         reindexTableName),
+        "calm" -> DynamoConfig("applicationName",
+                                   "streamArn",
+                                   calmDataTableName)
+      ),
+      "CalmData"
     )
 
-    expectedReindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
+  it("should return the correct index with current and requested versions") {
+    val expectedReindex = Reindex("CalmData", 2, 1)
+    val reindexList = List(
+      expectedReindex,
+      Reindex("MiroData", 1, 1)
+    )
+
+    reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
 
     val reindexService = createReindexService
 
     val op = reindexService.getIndices
 
-    whenReady(op) { indices =>
-      expectedReindexList should contain theSameElementsAs indices
+    whenReady(op) { reindex =>
+      expectedReindex shouldBe reindex
     }
   }
 
   it(
-    "should return a list of indexes in need of reindexing"
+    "should return the index in need of reindexing"
   ) {
+    val expectedReindex = Reindex("CalmData", 2, 1)
     val reindexList = List(
-      Reindex("foo", 2, 1),
-      Reindex("bar", 1, 1)
+      expectedReindex,
+      Reindex("MiroData", 1, 1)
     )
 
     val expectedReindexList = List(
@@ -55,8 +65,8 @@ class ReindexServiceTest
 
     val op = reindexService.getIndicesForReindex
 
-    whenReady(op) { indices =>
-      expectedReindexList should contain theSameElementsAs indices
+    whenReady(op) { reindex =>
+      Some(expectedReindex) shouldBe reindex
     }
   }
 
