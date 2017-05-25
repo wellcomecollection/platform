@@ -11,9 +11,10 @@ case class ResultResponse(
 
 case class ResultListResponse(
   @JsonProperty("@context") context: String,
-  @JsonProperty("type") ontologyType: String = "ResultList",
   pageSize: Int = 10,
   totalPages: Int = 10,
   totalResults: Int = 100,
   results: Array[_ <: Any]
-)
+) {
+  @JsonProperty("type") val ontologyType: String = "ResultList"
+}
