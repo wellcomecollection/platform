@@ -213,8 +213,7 @@ class ApiWorksTest
     )
   }
 
-  it(
-    "should return a not found error when requesting a single work with a non existing id") {
+  it("should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = s"/$apiPrefix/works/non-existing-id",
       andExpect = Status.NotFound,
@@ -227,7 +226,8 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
+      withJsonBody =
+        s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
     )
   }
 
@@ -236,7 +236,8 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
+      withJsonBody =
+        s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
     )
   }
 
@@ -244,15 +245,18 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=0",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""{"errors":["pageSize: [0] is not greater than or equal to 1"]}"""
+      withJsonBody =
+        s"""{"errors":["pageSize: [0] is not greater than or equal to 1"]}"""
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for a negative page size") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for a negative page size") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=-50",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""{"errors":["pageSize: [-50] is not greater than or equal to 1"]}"""
+      withJsonBody =
+        s"""{"errors":["pageSize: [-50] is not greater than or equal to 1"]}"""
     )
   }
 
@@ -260,15 +264,18 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?page=0",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""{"errors":["page: [0] is not greater than or equal to 1"]}"""
+      withJsonBody =
+        s"""{"errors":["page: [0] is not greater than or equal to 1"]}"""
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for a page before 0") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for a page before 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""{"errors":["page: [-50] is not greater than or equal to 1"]}"""
+      withJsonBody =
+        s"""{"errors":["page: [-50] is not greater than or equal to 1"]}"""
     )
   }
 
@@ -311,6 +318,46 @@ class ApiWorksTest
              |   }
              |  ]
              |}""".stripMargin
+      )
+    }
+  }
+
+  it("should include a list of identifiers if we pass ?includes=hasIdentifier") {
+    val identifier = SourceIdentifier(
+      source = "TestSource",
+      sourceId = "The ID field within the TestSource",
+      value = "Test1234"
+    )
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "An image of an iguana",
+      identifiers = List(identifier)
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=hasIdentifier",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.canonicalId}",
+                          | "label": "${work.work.label}",
+                          | "hasCreator": [ ],
+                          | "hasIdentifier": [
+                          |   {
+                          |     "type": "Identifier",
+                          |     "source": {
+                          |       "name": "${identifier.source}",
+                          |       "value": "${identifier.sourceId}"
+                          |     },
+                          |     "value": "${identifier.value}"
+                          |   }
+                          | ]
+                          |}
+          """.stripMargin
       )
     }
   }
