@@ -6,16 +6,17 @@ import org.elasticsearch.action.get.GetResponse
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 
-case class DisplayWork(id: String,
-                       label: String,
-                       description: Option[String] = None,
-                       lettering: Option[String] = None,
-                       hasCreatedDate: Option[Period] = None,
-                       hasCreator: List[Agent] = List(),
-                       hasIdentifier: Option[List[DisplayIdentifier]] = None) {
-  @JsonProperty("type")
-  val ontologyType: String = "Work"
+case class DisplayWork(
+  id: String,
+  label: String,
+  description: Option[String] = None,
+  lettering: Option[String] = None,
+  hasCreatedDate: Option[Period] = None,
+  hasCreator: List[Agent] = List(),
+  hasIdentifier: Option[List[DisplayIdentifier]] = None) {
+  @JsonProperty("type") val ontologyType: String = "Work"
 }
+
 case object DisplayWork {
 
   def apply(hit: RichSearchHit): DisplayWork = apply(hit, includes = List())

@@ -77,7 +77,7 @@ class WorksServiceTest
     }
   }
 
-  it("should return a future of None if it cannot get arecord by id") {
+  it("should return a future of None if it cannot get a record by id") {
     val recordsFuture = worksService.findWorkById("1234")
 
     whenReady(recordsFuture) { record =>
