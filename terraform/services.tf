@@ -96,8 +96,9 @@ module "transformer" {
   infra_bucket     = "${var.infra_bucket}"
 
   config_vars = {
-    stream_arn = "${aws_dynamodb_table.miro_table.stream_arn}"
-    sns_arn    = "${module.id_minter_topic.arn}"
+    stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
+    sns_arn           = "${module.id_minter_topic.arn}"
+    metrics_namespace = "miro-transformer"
   }
 }
 
