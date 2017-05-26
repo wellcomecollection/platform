@@ -44,6 +44,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
           s"${targetTableName()} is not a recognised reindexable table.")
     }
 
+    // Wait 30 seconds before starting to ensure healthcheck registers ok
     actorSystem.scheduler.scheduleOnce(30 seconds)(
       reindexService.run.onComplete(_ => {
         agent.send("done") }))
