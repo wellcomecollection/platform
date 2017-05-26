@@ -15,5 +15,7 @@ variable "environment_variables" {
   type        = "map"
 
   # environment cannot be emtpy so we need to pass at least one value
-  default     = {EMPTY_VARIABLE = ""}
+  default = {
+    EMPTY_VARIABLE = ""
+  }
 }
