@@ -19,6 +19,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
                                      help = "Reindex target table name")
 
   val agent = Agent("working")
+  val healthCheckWaitTime = 30 seconds
 
   @Singleton
   @Provides
@@ -45,7 +46,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
     }
 
     // Wait 30 seconds before starting to ensure healthcheck registers ok
-    actorSystem.scheduler.scheduleOnce(30 seconds)(
+    actorSystem.scheduler.scheduleOnce(healthCheckWaitTime)(
       reindexService.run.onComplete(_ => {
         agent.send("done") }))
   }
