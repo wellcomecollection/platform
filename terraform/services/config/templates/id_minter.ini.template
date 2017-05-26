@@ -1,3 +1,3 @@
 -aws.sqs.queue.url=${id_minter_queue_id}
 -aws.sns.topic.arn=${es_ingest_topic_arn}
--aws.dynamo.tableName=${table_name}
+-aws.dynamo.identifiers.tableName=${table_name}

@@ -1,5 +1,5 @@
 -aws.region=eu-west-1
--aws.dynamo.streams.appName=transformer-streams
--aws.dynamo.streams.arn=${stream_arn}
--aws.dynamo.tableName=MiroData
+-aws.dynamo.miroData.streams.appName=transformer-streams
+-aws.dynamo.miroData.streams.arn=${stream_arn}
+-aws.dynamo.miroData.tableName=MiroData
 -aws.sns.topic.arn=${sns_arn}
