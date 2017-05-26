@@ -1,17 +1,17 @@
 package uk.ac.wellcome.platform.reindexer.services
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
-import uk.ac.wellcome.models.{Reindex, ReindexItem, Reindexable, Transformable}
+import com.gu.scanamo.{Scanamo, Table}
+import uk.ac.wellcome.models.{Reindex, ReindexItem, Reindexable}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-
-import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-abstract class ReindexTargetService[T <: Transformable with Reindexable[
+import scala.concurrent.Future
+
+abstract class ReindexTargetService[T <: Reindexable[
   String]](dynamoDBClient: AmazonDynamoDB) {
   import uk.ac.wellcome.utils.ScanamoUtils._
 
@@ -34,7 +34,7 @@ abstract class ReindexTargetService[T <: Transformable with Reindexable[
       reindexAttempt.copy(successful = updatedRows,
                           attempt = reindexAttempt.attempt + 1)
 
-  def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
+  private def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
     val ops = rows.map(reindexItem => {
       val uniqueKey = reindexItem.hashKey and reindexItem.rangeKey
       transformableTable
@@ -44,7 +44,7 @@ abstract class ReindexTargetService[T <: Transformable with Reindexable[
     Future(ops.map(Scanamo.exec(dynamoDBClient)(_)))
   }
 
-  def getRowsWithOldReindexVersion(reindex: Reindex) = Future {
+  private def getRowsWithOldReindexVersion(reindex: Reindex) = Future {
     scanamoQuery(reindex.TableName, gsiName)(
       Query(
         AndQueryCondition(
