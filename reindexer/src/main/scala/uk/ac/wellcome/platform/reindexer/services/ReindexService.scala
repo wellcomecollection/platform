@@ -19,7 +19,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
     for {
       indices <- reindexTrackerService.getIndexForReindex
       attempt = indices.map(ReindexAttempt(_, Nil, 0))
-      _ <- attempt.map(processReindexAttempt).get
+      _ <- attempt.map(processReindexAttempt).getOrElse(Future.successful())
       updates <- reindexTrackerService.updateReindex(attempt.get)
     } yield updates
 
