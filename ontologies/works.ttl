@@ -27,7 +27,7 @@ ww:Item rdf:type owl:Class ;
 	
 ww:Identifier rdf:type owl:Class ;
 	rdfs:label "Identifier"@en ;
-	rdfs:comment "A unique system-generated identifier for entities as described within this ontology, that will be used to ensure that appropriate pieces of data in different systems can be related to each other."@en ;
+	rdfs:comment "An identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .		
 
 ww:WorkType rdf:type owl:Class ;
@@ -78,7 +78,7 @@ ww:hasItem rdf:type owl:ObjectProperty ;
 	
 ww:hasIdentifier rdf:type owl:ObjectProperty ;
 	rdfs:label "hasIdentifier"@en ;
-	rdfs:comment "Relates an entity to a unique system-generated identifier."@en ;
+	rdfs:comment "Relates the work to an identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range ww:Identifier ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
@@ -231,13 +231,6 @@ ww:description rdf:type owl:DatatypeProperty ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
-	
-ww:preferredPublicIdentifier rdf:type owl:DatatypeProperty ;
-	rdfs:label "preferredPublicIdentifier"@en ;
-	rdfs:comment "Relates the work to an identifier that is preferred for the purposes of human citation, such as a manuscript number to be cited in footnotes.  This does not refer to unique system-generated identifiers."@en ;
-	rdfs:domain ww:Work ;
-	rdfs:range rdf:langString ; 
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 	
 ww:alternativeIdentifier rdf:type owl:DatatypeProperty ;
 	rdfs:label "alternativeIdentifier"@en ;
