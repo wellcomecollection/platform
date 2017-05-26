@@ -42,7 +42,7 @@ if __name__ == '__main__':
     # the range of commits that this push is testing.  By inspecting its
     # value and passing it to `git diff`, we can determine which files
     # have changed.
-    changed_files = tooling.modified_files([os.environ['TRAVIS_COMMIT_RANGE']])
+    changed_files = tooling.changed_files([os.environ['TRAVIS_COMMIT_RANGE']])
 
     should_rebuild = should_rebuild_project(
         changed_files=changed_files,
