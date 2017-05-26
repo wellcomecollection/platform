@@ -37,7 +37,7 @@
 
     doASearch = function() {
       var searchQuery = $('#search_box')[0].value;
-      var searchUrl = 'https://api.wellcomecollection.org/catalogue/v0/works?' + $.param({query: searchQuery});
+      var searchUrl = 'https://api.wellcomecollection.org/catalogue/v0/works?includes=hasIdentifier&' + $.param({query: searchQuery});
 
       $('#search_url')[0].innerHTML = "Fetching API response from <a href=" + searchUrl + ">" + searchUrl + "</a>:";
       $('#results')[0].innerHTML = "";
@@ -48,7 +48,10 @@
           for (var i = 0; i < results.length; i++) {
             var result = results[i];
             console.log(result);
-            $('#results')[0].innerHTML += "<li><strong>ID:</strong> " + result.id + "<br><strong>Label: </strong>" + result.label + "<br><strong>Description: </strong>" + result.description + "</li>";
+            var miroID = result.hasIdentifier[0].value;
+            var miroFolder = miroID.slice(0, 5) + "000";
+            var imgLink = "http://s3-eu-west-1.amazonaws.com/miro-images-public/" + miroFolder + "/" + miroID + ".jpg";
+            $('#results')[0].innerHTML += "<li><strong>ID:</strong> " + result.id + "<br><strong>Label: </strong>" + result.label + "<br><strong>Description: </strong>" + result.description + "<p><a href=" + imgLink + "><img style=\"max-width: 250px\" src=" + imgLink + "></a></p></li>";
           }
         },
       });
