@@ -10,16 +10,15 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable}
 import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
+
 import scala.concurrent.duration._
 
-object ReindexModule extends TwitterModule with TryBackoff {
+object ReindexModule extends TwitterModule {
 
   val targetTableName = flag[String](name = "reindex.target.tableName",
                                      help = "Reindex target table name")
 
   val agent = Agent("working")
-  val healthCheckWaitTime = 30 seconds
 
   @Singleton
   @Provides
@@ -45,8 +44,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
           s"${targetTableName()} is not a recognised reindexable table.")
     }
 
-    // Wait 30 seconds before starting to ensure healthcheck registers ok
-    actorSystem.scheduler.scheduleOnce(healthCheckWaitTime)(
+    actorSystem.scheduler.scheduleOnce(0 millis)(
       reindexService.run.onComplete(_ => {
         agent.send("done") }))
   }

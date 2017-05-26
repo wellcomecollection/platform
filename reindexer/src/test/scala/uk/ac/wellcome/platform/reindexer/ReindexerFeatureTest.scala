@@ -4,8 +4,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.Scanamo
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.Eventually
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
 
@@ -29,18 +29,6 @@ class ReindexerFeatureTest
         "reindex.target.tableName" -> "CalmData"
       )
     ).bind[AmazonDynamoDB](dynamoDbClient)
-
-  it(
-    "should report 201 when done"
-  ) {
-    server.start()
-
-    eventually {
-      server.httpGet(path = "/management/healthcheck",
-        andExpect = Created,
-        withJsonBody = """{"message": "done"}""")
-    }
-  }
 
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
@@ -76,6 +64,10 @@ class ReindexerFeatureTest
 
     eventually {
       Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName) shouldBe expectedCalmTransformableList
+
+      server.httpGet(path = "/management/healthcheck",
+        andExpect = Created,
+        withJsonBody = """{"message": "done"}""")
     }
   }
 }
