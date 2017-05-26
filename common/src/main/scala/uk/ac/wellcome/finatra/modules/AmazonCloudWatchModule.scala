@@ -1,9 +1,6 @@
-package uk.ac.wellcome.transformer.modules
+package uk.ac.wellcome.finatra.modules
 
-import com.amazonaws.services.cloudwatch.{
-  AmazonCloudWatch,
-  AmazonCloudWatchClientBuilder
-}
+import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.AWSConfig
