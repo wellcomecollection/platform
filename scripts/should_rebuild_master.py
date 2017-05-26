@@ -3,7 +3,7 @@
 """
 Decide whether we should re-build tests for a project on master.
 
-Exits with code 0 if there are changes that require a rebuild, 1 if not.
+Exits with code 1 if there are changes that require a rebuild, 0 if not.
 """
 
 import os
@@ -27,7 +27,7 @@ def should_rebuild_project(changed_files, project):
 
     elif 'run.sh' in changed_files:
         print("*** Changes to run.sh mean we should rebuild")
-        retrun True
+        return True
 
     elif any(f.startswith('scripts/') for f in changed_files):
         print("*** Changes to the scripts directory mean we should rebuild")
@@ -49,6 +49,6 @@ if __name__ == '__main__':
         project=os.environ['PROJECT']
     )
     if should_rebuild:
-        sys.exit(0)
-    else:
         sys.exit(1)
+    else:
+        sys.exit(0)

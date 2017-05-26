@@ -3,7 +3,7 @@
 """
 Decide whether we should re-run tests for a project on a pull request.
 
-Exits with code 0 if there are changes that require a retest, 1 if not.
+Exits with code 1 if there are changes that require a retest, 0 if not.
 """
 
 import os
@@ -40,6 +40,6 @@ if __name__ == '__main__':
         project=os.environ['PROJECT']
     )
     if should_retest:
-        sys.exit(0)
-    else:
         sys.exit(1)
+    else:
+        sys.exit(0)
