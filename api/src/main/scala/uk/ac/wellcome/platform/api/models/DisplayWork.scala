@@ -6,14 +6,13 @@ import org.elasticsearch.action.get.GetResponse
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 
-case class DisplayWork(
-  id: String,
-  label: String,
-  description: Option[String] = None,
-  lettering: Option[String] = None,
-  hasCreatedDate: Option[Period] = None,
-  hasCreator: List[Agent] = List(),
-  hasIdentifier: Option[List[DisplayIdentifier]] = None) {
+case class DisplayWork(id: String,
+                       label: String,
+                       description: Option[String] = None,
+                       lettering: Option[String] = None,
+                       hasCreatedDate: Option[Period] = None,
+                       hasCreator: List[Agent] = List(),
+                       hasIdentifier: Option[List[DisplayIdentifier]] = None) {
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 
@@ -49,17 +48,14 @@ case object DisplayWork {
   }
 }
 
-case class DisplayIdentifier(source: DisplaySource, value: String) {
+case class DisplayIdentifier(source: String, name: String, value: String) {
   @JsonProperty("type")
   val ontologyType: String = "Identifier"
 }
 
 object DisplayIdentifier {
   def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifier =
-    DisplayIdentifier(source =
-                        DisplaySource(name = sourceIdentifier.source,
-                                      value = sourceIdentifier.sourceId),
+    DisplayIdentifier(source = sourceIdentifier.source,
+                      name = sourceIdentifier.sourceId,
                       value = sourceIdentifier.value)
 }
-
-case class DisplaySource(name: String, value: String)

@@ -369,10 +369,8 @@ class ApiWorksTest
                           |     "hasIdentifier": [
                           |       {
                           |         "type": "Identifier",
-                          |         "source": {
-                          |           "name": "${identifier1.source}",
-                          |           "value": "${identifier1.sourceId}"
-                          |         },
+                          |         "source": "${identifier1.source}",
+                          |         "name": "${identifier1.sourceId}",
                           |         "value": "${identifier1.value}"
                           |       }
                           |     ]
@@ -385,10 +383,8 @@ class ApiWorksTest
                           |     "hasIdentifier": [
                           |       {
                           |         "type": "Identifier",
-                          |         "source": {
-                          |           "name": "${identifier2.source}",
-                          |           "value": "${identifier2.sourceId}"
-                          |         },
+                          |         "source": "${identifier2.source}",
+                          |         "name": "${identifier2.sourceId}",
                           |         "value": "${identifier2.value}"
                           |       }
                           |     ]
@@ -428,10 +424,8 @@ class ApiWorksTest
                           | "hasIdentifier": [
                           |   {
                           |     "type": "Identifier",
-                          |     "source": {
-                          |       "name": "${identifier.source}",
-                          |       "value": "${identifier.sourceId}"
-                          |     },
+                          |     "source": "${identifier.source}",
+                          |     "name": "${identifier.sourceId}",
                           |     "value": "${identifier.value}"
                           |   }
                           | ]
