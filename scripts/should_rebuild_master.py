@@ -25,6 +25,14 @@ def should_rebuild_project(changed_files, project):
         print("*** Changes to Dockerfile mean we should rebuild")
         return True
 
+    elif 'run.sh' in changed_files:
+        print("*** Changes to run.sh mean we should rebuild")
+        retrun True
+
+    elif any(f.startswith('scripts/') for f in changed_files):
+        print("*** Changes to the scripts directory mean we should rebuild")
+        return True
+
     return False
 
 
@@ -34,7 +42,7 @@ if __name__ == '__main__':
     # the range of commits that this push is testing.  By inspecting its
     # value and passing it to `git diff`, we can determine which files
     # have changed.
-    changed_files = modified_files([os.environ['TRAVIS_COMMIT_RANGE']])
+    changed_files = tooling.modified_files([os.environ['TRAVIS_COMMIT_RANGE']])
 
     should_rebuild = should_rebuild_project(
         changed_files=changed_files,
