@@ -20,11 +20,7 @@ class ReindexerFeatureTest
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
-        "aws.dynamo.reindexTracker.streams.appName" -> "not_used",
-        "aws.dynamo.reindexTracker.streams.arn" -> "not_used",
         "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
-        "aws.dynamo.miroData.streams.appName" -> "not_used",
-        "aws.dynamo.miroData.streams.arn" -> "not_used",
         "aws.dynamo.miroData.tableName" -> "CalmData",
         "reindex.target.tableName" -> "CalmData"
       )
