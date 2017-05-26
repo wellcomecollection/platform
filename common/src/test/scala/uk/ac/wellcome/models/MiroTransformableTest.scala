@@ -65,7 +65,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val date = "1820-1848"
     val work = transformMiroRecord(
       data = s"""{"image_title": "A description of a dalmation", "image_artwork_date": "$date"}""",
-      miroCollection = "Images-V"
+      miroCollection = "Images_V"
     )
     work.hasCreatedDate shouldBe Some(Period(date))
   }
