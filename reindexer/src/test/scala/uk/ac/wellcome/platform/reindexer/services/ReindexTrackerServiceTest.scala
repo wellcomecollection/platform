@@ -41,7 +41,7 @@ class ReindexTrackerServiceTest
       "CalmData"
     )
 
-    val op = reindexTrackerService.getIndicesForReindex
+    val op = reindexTrackerService.getIndexForReindex
 
     whenReady(op) { (reindex: Option[Reindex]) =>
       Some(expectedReindex) shouldBe reindex

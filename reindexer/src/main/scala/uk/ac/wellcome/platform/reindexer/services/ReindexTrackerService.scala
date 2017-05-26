@@ -37,7 +37,7 @@ class ReindexTrackerService @Inject()(
       updatedReindex)
   }
 
-  def getIndicesForReindex: Future[Option[Reindex]] =
+  def getIndexForReindex: Future[Option[Reindex]] =
     getIndices.map {
       case Reindex(tableName, requested, current) if requested > current =>
         Some(Reindex(tableName, requested, current))
