@@ -10,17 +10,26 @@ case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
   @JsonProperty("image_creator") creator: Option[List[String]],
   @JsonProperty("image_image_desc") description: Option[String],
-  @JsonProperty("image_secondary_creator") secondaryCreator: Option[List[String]],
+  @JsonProperty("image_secondary_creator") secondaryCreator: Option[
+    List[String]],
   @JsonProperty("image_artwork_date") artworkDate: Option[String]
 )
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
-                             data: String)
-    extends Transformable {
+                             data: String,
+                             ReindexShard: String = "default",
+                             ReindexVersion: Int = 0)
+    extends Transformable
+    with Reindexable[String] {
+
+  val id: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("MiroID", MiroID),
+    RangeKey("MiroCollection", MiroCollection)
+  )
+
   override def transform: Try[Work] =
     JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
-
       // Identifier is passed straight through
       val identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID))
 

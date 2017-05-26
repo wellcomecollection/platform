@@ -3,10 +3,20 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
+import com.amazonaws.services.dynamodbv2.{
+  AmazonDynamoDB,
+  AmazonDynamoDBClientBuilder,
+  AmazonDynamoDBStreams,
+  AmazonDynamoDBStreamsClientBuilder
+}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.{CalmTransformable, Identifier, MiroTransformable}
+import uk.ac.wellcome.models.{
+  CalmTransformable,
+  Identifier,
+  MiroTransformable,
+  Reindex
+}
 
 import scala.collection.JavaConversions._
 
@@ -29,14 +39,18 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   val identifiersTableName = "Identifiers"
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
+  val reindexTableName = "ReindexTracker"
 
   deleteTables()
   createIdentifiersTable()
+  createReindexTable()
   private val miroDataTable: CreateTableResult = createMiroDataTable()
   private val calmDataTable: CreateTableResult = createCalmDataTable()
 
-  val miroDataStreamArn: String = miroDataTable.getTableDescription.getLatestStreamArn
-  val calmDataStreamArn: String = calmDataTable.getTableDescription.getLatestStreamArn
+  val miroDataStreamArn: String =
+    miroDataTable.getTableDescription.getLatestStreamArn
+  val calmDataStreamArn: String =
+    calmDataTable.getTableDescription.getLatestStreamArn
 
   val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
     .standard()
@@ -50,7 +64,19 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
     clearIdentifiersTable()
     clearMiroTable()
     clearCalmTable()
+    clearReindexTable()
   }
+
+  private def clearReindexTable(): List[DeleteItemResult] =
+    Scanamo.scan[Reindex](dynamoDbClient)(reindexTableName).map {
+      case Right(reindex) =>
+        dynamoDbClient.deleteItem(
+          reindexTableName,
+          Map("TableName" -> new AttributeValue(reindex.TableName)))
+      case a =>
+        throw new Exception(
+          s"Unable to clear the table $reindexTableName error $a")
+    }
 
   private def clearIdentifiersTable(): List[DeleteItemResult] =
     Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
@@ -58,7 +84,9 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
         dynamoDbClient.deleteItem(
           identifiersTableName,
           Map("CanonicalID" -> new AttributeValue(identifier.CanonicalID)))
-      case a => throw new Exception(s"Unable to clear the table $identifiersTableName error $a")
+      case a =>
+        throw new Exception(
+          s"Unable to clear the table $identifiersTableName error $a")
     }
 
   private def clearMiroTable(): List[DeleteItemResult] =
@@ -67,8 +95,11 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
         dynamoDbClient.deleteItem(
           miroDataTableName,
           Map("MiroID" -> new AttributeValue(miroTransformable.MiroID),
-          "MiroCollection" -> new AttributeValue(miroTransformable.MiroCollection)))
-      case a => throw new Exception(s"Unable to clear the table $miroDataTableName error $a")
+              "MiroCollection" -> new AttributeValue(
+                miroTransformable.MiroCollection)))
+      case a =>
+        throw new Exception(
+          s"Unable to clear the table $miroDataTableName error $a")
     }
 
   private def clearCalmTable(): List[DeleteItemResult] =
@@ -80,7 +111,9 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
             "RecordID" -> new AttributeValue(calmTransformable.RecordID),
             "RecordType" -> new AttributeValue(calmTransformable.RecordType)
           ))
-      case a => throw new Exception(s"Unable to clear the table $calmDataTableName error $a")
+      case a =>
+        throw new Exception(
+          s"Unable to clear the table $calmDataTableName error $a")
     }
 
   private def deleteTables() = {
@@ -89,6 +122,31 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
       .getTableNames
       .foreach(tableName => dynamoDbClient.deleteTable(tableName))
   }
+
+  private def reindexShardDef =
+    new AttributeDefinition()
+      .withAttributeName("ReindexShard")
+      .withAttributeType("S")
+
+  private def reindexVersionDef =
+    new AttributeDefinition()
+      .withAttributeName("ReindexVersion")
+      .withAttributeType("N")
+
+  private def reindexGSI() =
+    new GlobalSecondaryIndex()
+      .withIndexName("ReindexTracker")
+      .withProvisionedThroughput(
+        new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+      .withProjection(new Projection().withProjectionType(ProjectionType.ALL))
+      .withKeySchema(new KeySchemaElement()
+        .withAttributeName("ReindexShard")
+        .withKeyType(KeyType.HASH))
+      .withKeySchema(new KeySchemaElement()
+        .withAttributeName("ReindexVersion")
+        .withKeyType(KeyType.RANGE))
 
   //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
   private def createCalmDataTable() = {
@@ -113,7 +171,9 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
             .withAttributeType("S"),
           new AttributeDefinition()
             .withAttributeName("AltRefNo")
-            .withAttributeType("S")
+            .withAttributeType("S"),
+          reindexShardDef,
+          reindexVersionDef
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
@@ -141,7 +201,8 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
               new Projection().withProjectionType(ProjectionType.ALL))
             .withKeySchema(new KeySchemaElement()
               .withAttributeName("AltRefNo")
-              .withKeyType(KeyType.HASH))
+              .withKeyType(KeyType.HASH)),
+          reindexGSI()
         )
     )
   }
@@ -163,7 +224,9 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
             .withAttributeType("S"),
           new AttributeDefinition()
             .withAttributeName("MiroCollection")
-            .withAttributeType("S")
+            .withAttributeType("S"),
+          reindexShardDef,
+          reindexVersionDef
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
@@ -171,6 +234,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
         .withStreamSpecification(new StreamSpecification()
           .withStreamEnabled(true)
           .withStreamViewType(StreamViewType.NEW_IMAGE))
+        .withGlobalSecondaryIndexes(reindexGSI())
     )
   }
 
@@ -199,6 +263,23 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
             .withAttributeType("S"),
           new AttributeDefinition()
             .withAttributeName("MiroID")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L)))
+  }
+
+  private def createReindexTable() = {
+    dynamoDbClient.createTable(
+      new CreateTableRequest()
+        .withTableName(reindexTableName)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("TableName")
+          .withKeyType(KeyType.HASH))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("TableName")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
