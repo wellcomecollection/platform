@@ -1,16 +1,9 @@
 package uk.ac.wellcome.transformer
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAdapterClient
-import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
-import com.amazonaws.services.sns.AmazonSNS
 import com.gu.scanamo.Scanamo
-import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, Work}
-import uk.ac.wellcome.platform.transformer.Server
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
@@ -21,22 +14,17 @@ class CalmTransformerFeatureTest
     with Matchers {
 
   private val appName = "test-transformer-calm"
-  val server: EmbeddedHttpServer =
-    new EmbeddedHttpServer(
-      new Server(),
-      flags = Map(
-        "aws.region" -> "eu-west-1",
-        "aws.dynamo.calmData.streams.appName" -> appName,
-        "aws.dynamo.calmData.streams.arn" -> calmDataStreamArn,
-        "aws.dynamo.calmData.tableName" -> calmDataTableName,
-        "aws.sns.topic.arn" -> idMinterTopicArn
-      )
-    ).bind[AmazonSNS](amazonSNS)
-      .bind[AmazonDynamoDB](dynamoDbClient)
-      .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
-        streamsClient))
-      .bind[KinesisClientLibConfiguration](
-        kinesisClientLibConfiguration(appName, calmDataStreamArn))
+
+  override val flags: Map[String, String] = Map(
+    "aws.region" -> "eu-west-1",
+    "aws.dynamo.calmData.streams.appName" -> appName,
+    "aws.dynamo.calmData.streams.arn" -> calmDataStreamArn,
+    "aws.dynamo.calmData.tableName" -> calmDataTableName,
+    "aws.sns.topic.arn" -> idMinterTopicArn,
+    "aws.metrics.namespace" -> "calm-transformer"
+  )
+  override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
+    kinesisClientLibConfiguration(appName, calmDataStreamArn)
 
   it("should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     Scanamo.put(dynamoDbClient)(calmDataTableName)(

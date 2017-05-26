@@ -1,5 +1,6 @@
 package uk.ac.wellcome.transformer.receive
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.dynamodbv2.model.Record
 import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
 import org.mockito.Matchers.{any, anyString}
@@ -7,6 +8,7 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
@@ -25,33 +27,39 @@ class RecordReceiverTest
     with IntegrationPatience
     with CalmRecordUtils {
 
-  val calmRecord = createValidCalmRecord(
+  val calmRecord: Record = createValidCalmRecord(
     "abcdef",
     "collection",
     "AB/CD/12",
     "AB/CD/12",
     """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
 
-  val work = Work(
-    identifiers = List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
-    label = "calm data label")
+  val work = Work(identifiers =
+                    List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
+                  label = "calm data label")
+
+  val metricsSender: MetricsSender = new MetricsSender(
+    namespace = "record-receiver-tests",
+    mock[AmazonCloudWatch])
 
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter
     val recordReceiver =
       new RecordReceiver(snsWriter,
-                         transformableParser(calmRecord, work))
+                         transformableParser(calmRecord, work),
+                         metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future) { _ =>
-      verify(snsWriter).writeMessage(JsonUtil.toJson(work).get,
-                                     Some("Foo"))
+      verify(snsWriter).writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
     }
   }
 
   it("should return a failed future if it's unable to parse the dynamo record") {
     val recordReceiver =
-      new RecordReceiver(mockSNSWriter, failingParser(calmRecord))
+      new RecordReceiver(mockSNSWriter,
+                         failingParser(calmRecord),
+                         metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
@@ -59,10 +67,12 @@ class RecordReceiverTest
     }
   }
 
-  it("should return a failed future if it's unable to transform the transformable object") {
+  it(
+    "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
       new RecordReceiver(mockSNSWriter,
-                         parserReturningFailingTransformable(calmRecord))
+                         parserReturningFailingTransformable(calmRecord),
+                         metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
@@ -70,10 +80,13 @@ class RecordReceiverTest
     }
   }
 
-  it("should return a failed future if it's unable to publish the unified item") {
+  it(
+    "should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new RecordReceiver(mockSNS, transformableParser(calmRecord, work))
+      new RecordReceiver(mockSNS,
+                         transformableParser(calmRecord, work),
+                         metricsSender)
     val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
 
     whenReady(future.failed) { x =>
