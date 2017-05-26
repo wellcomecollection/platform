@@ -3,3 +3,4 @@
 -aws.dynamo.miroData.streams.arn=${stream_arn}
 -aws.dynamo.miroData.tableName=MiroData
 -aws.sns.topic.arn=${sns_arn}
+-aws.metrics.namespace=${metrics_namespace}
