@@ -17,7 +17,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
 
   def run: Future[PutItemResult] =
     for {
-      indices <- reindexTrackerService.getIndicesForReindex
+      indices <- reindexTrackerService.getIndexForReindex
       attempt = indices.map(ReindexAttempt(_, Nil, 0))
       _ <- attempt.map(processReindexAttempt).get
       updates <- reindexTrackerService.updateReindex(attempt.get)
