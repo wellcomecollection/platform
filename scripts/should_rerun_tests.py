@@ -7,26 +7,9 @@ Exits with code 0 if there are changes that require a retest, 1 if not.
 """
 
 import os
-import subprocess
 import sys
 
-
-def modified_files(a, b):
-    """Returns a set of changed files between ``a`` and ``b``.
-
-    >>> modified_files('HEAD', '^HEAD')
-    >>> modified_files('ab27a1f', '8cae231')
-    >>> modified_files('master', 'feature-branch')
-
-    """
-    files = set()
-    command = ['git', 'diff', '--name-only', a, b]
-    diff_output = subprocess.check_output(command).decode('ascii')
-    for line in diff_output.splitlines():
-        filepath = line.strip()
-        if filepath:
-            files.add(filepath)
-    return files
+import tooling
 
 
 def should_retest_project(changed_files, project):
@@ -51,7 +34,7 @@ def should_retest_project(changed_files, project):
 
 
 if __name__ == '__main__':
-    changed_files = modified_files('HEAD', 'master')
+    changed_files = tooling.changed_files(['HEAD', 'master'])
     should_retest = should_retest_project(
         changed_files=changed_files,
         project=os.environ['PROJECT']

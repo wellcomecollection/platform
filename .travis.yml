@@ -9,6 +9,8 @@ branches:
     - master
 
 before_install:
+  - git fetch origin
+
   # If this is a pull request branch, we only do anything if there are
   # interesting changes between this branch and master.
   #
@@ -17,10 +19,21 @@ before_install:
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]
     then
-      git fetch origin
       if ! python ./scripts/should_rerun_tests.py
       then
         echo "No changes that require us to re-run tests, skipping to the end"
+        exit 0
+      fi
+    fi
+
+  # If this is a push branch (i.e. a build on master), we only do anything
+  # if there are interesting changes since the last time we built.
+  - |
+    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
+    then
+      if ! python ./scripts/should_rebuild_master.py
+      then
+        echo "No changes that require us to re-build, skipping to the end"
         exit 0
       fi
     fi
