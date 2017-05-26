@@ -34,3 +34,4 @@ trait DynamoUpdateWriteCapacityCapable {
     table.updateTable(newThroughput)
   }
 }
+
