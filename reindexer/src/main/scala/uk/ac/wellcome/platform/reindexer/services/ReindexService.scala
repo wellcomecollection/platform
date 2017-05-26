@@ -4,14 +4,13 @@ import javax.inject.Inject
 
 import com.amazonaws.services.dynamodbv2.model.PutItemResult
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.{Reindexable, Transformable}
+import uk.ac.wellcome.models.Reindexable
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ReindexService[T <: Transformable with Reindexable[
-  String]] @Inject()(
+class ReindexService[T <: Reindexable[String]] @Inject()(
   reindexTrackerService: ReindexTrackerService,
   reindexTargetService: ReindexTargetService[T])
     extends Logging {

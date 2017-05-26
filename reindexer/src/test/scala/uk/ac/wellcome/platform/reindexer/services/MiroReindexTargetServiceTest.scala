@@ -3,57 +3,65 @@ package uk.ac.wellcome.platform.reindexer.services
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{CalmTransformable, Reindex}
+import uk.ac.wellcome.models.{MiroTransformable, Reindex}
+import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
 
 class MiroReindexTargetServiceTest
-  extends FunSpec
+    extends FunSpec
     with ScalaFutures
     with Matchers
     with DynamoDBLocal
     with ExtendedPatience {
 
-    it("should return the rows of a table with an 'old' reindex version for calm data") {
+  it("should update the correct index to the requested version") {
 
-      val currentVersion = 1
-      val requestedVersion = 2
+    val currentVersion = 1
+    val requestedVersion = 2
 
-      val outOfdateCalmTransformableList = List(
-        CalmTransformable(
-          RecordID = "RecordID1",
-          RecordType = "Collection",
-          AltRefNo = "AltRefNo1",
-          RefNo = "RefNo1",
-          data = """{"AccessStatus": ["public"]}""",
-          ReindexVersion = 1
-        ))
+    val outOfdateMiroTransformableList = List(
+      MiroTransformable(
+        MiroID = "Image1",
+        MiroCollection = "Images-A",
+        data = s"""{"image_title": "title"}""",
+        ReindexVersion = 1
+      )
+    )
 
-      val inDateCalmTransferrableList = List(
-        CalmTransformable(
-          RecordID = "RecordID2",
-          RecordType = "Collection",
-          AltRefNo = "AltRefNo2",
-          RefNo = "RefNo2",
-          data = """{"AccessStatus": ["public"]}""",
-          ReindexVersion = 2
-        ))
+    val inDateMiroTransferrableList = List(
+      MiroTransformable(
+        MiroID = "Image2",
+        MiroCollection = "Images-A",
+        data = s"""{"image_title": "title"}""",
+        ReindexVersion = 2
+      )
+    )
 
-      val calmTransformableList = outOfdateCalmTransformableList ++ inDateCalmTransferrableList
+    val miroTransformableList = outOfdateMiroTransformableList ++ inDateMiroTransferrableList
 
-      val expectedCalmTransformableList =
-        outOfdateCalmTransformableList.map(Right(_))
+    val expectedMiroTransformableList =
+      outOfdateMiroTransformableList.map(_.copy(ReindexVersion = 2))
 
-      val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
+    val reindex = Reindex(miroDataTableName, requestedVersion, currentVersion)
+    val reindexAttempt = ReindexAttempt(reindex)
+    val expectedReindexAttempt = reindexAttempt.copy(
+      reindex = reindex,
+      successful = expectedMiroTransformableList,
+      attempt = 1
+    )
 
-      calmTransformableList.foreach(
-        Scanamo.put(dynamoDbClient)(calmDataTableName))
+    miroTransformableList.foreach(
+      Scanamo.put(dynamoDbClient)(miroDataTableName))
 
-      Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
+    Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
-      val reindexTargetService = new CalmReindexTargetService(dynamoDbClient, "CalmData")
+    val reindexTargetService =
+      new MiroReindexTargetService(dynamoDbClient, "MiroData")
 
-      whenReady(reindexTargetService.getRowsWithOldReindexVersion(reindex)) { rows =>
-        rows shouldBe expectedCalmTransformableList
-      }
+    whenReady(reindexTargetService.runReindex(reindexAttempt)) {
+      reindexAttempt =>
+        reindexAttempt shouldBe expectedReindexAttempt
     }
+
+  }
 }
