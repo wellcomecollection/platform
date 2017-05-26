@@ -8,16 +8,20 @@ import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.{QueryParam, RouteParam}
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import com.twitter.finatra.validation._
 
-case class MultipleResultsRequest(@Min(1) @QueryParam page: Int = 1,
-                                  @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
-                                  @QueryParam includes: Option[String],
-                                  @RouteParam id: Option[String],
-                                  @QueryParam query: Option[String])
+case class MultipleResultsRequest(
+  @Min(1) @QueryParam page: Int = 1,
+  @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
+  @QueryParam includes: Option[String],
+  @RouteParam id: Option[String],
+  @QueryParam query: Option[String])
 
 case class SingleWorkRequest(@RouteParam id: String,
                              @QueryParam includes: Option[String])
@@ -53,6 +57,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .queryParam[String]("query",
                             "Full-text search query",
                             required = false)
+        .queryParam[String](
+          "includes",
+          "A comma-separated list of extra fields to include",
+          required = false)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
       val includes = request.includes.getOrElse("").split(",").toList
@@ -95,17 +103,18 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .tag("Works")
         .routeParam[String]("id", "The work to return", required = true)
         .responseWith[Object](200, "Work")
-        .queryParam[String]("includes",
-                            "A comma-separated list of extra fields to include",
-                            required = false)
+        .queryParam[String](
+          "includes",
+          "A comma-separated list of extra fields to include",
+          required = false)
     } { request: SingleWorkRequest =>
       worksService
-        .findWorkById(request.id, request.includes.getOrElse("").split(",").toList)
+        .findWorkById(request.id,
+                      request.includes.getOrElse("").split(",").toList)
         .map {
           case Some(result) =>
             response.ok.json(
-              ResultResponse(context = contextUri,
-                             result = result))
+              ResultResponse(context = contextUri, result = result))
           case None => response.notFound
         }
     }
