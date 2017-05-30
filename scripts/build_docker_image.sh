@@ -3,13 +3,10 @@
 
 set -o errexit
 set -o nounset
+set -o xtrace
 
 sbt "project $PROJECT" stage
 
-docker build \
-  --build-arg project="$PROJECT" \
-  --build-arg config_bucket="$CONFIG_BUCKET" \
-  --build-arg build_env="$BUILD_ENV" \
-  --tag="$TAG" .
+docker build --build-arg project="$PROJECT" --tag="$TAG" .
 
 exit 0
