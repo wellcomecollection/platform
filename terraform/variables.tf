@@ -36,3 +36,8 @@ variable "es_config" {
   type        = "map"
   default     = {}
 }
+
+variable "build_env" {
+  description = "Build environment (prod, dev, stage, ...)"
+  default     = "prod"
+}
