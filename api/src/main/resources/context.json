@@ -6,14 +6,11 @@
       "id": "@id",
       "type": "@type",
       "creators": {
-        "@type": "wa:agent",
+        "@id": "hasCreator",
         "@container": "@list"
       },
-      "createdDate": {
-        "@type": "wa:period"
-      },
       "identifiers": {
-        "@type": "wa:identifier",
+        "@id": "hasIdentifier",
         "@container": "@list"
       }
     },
