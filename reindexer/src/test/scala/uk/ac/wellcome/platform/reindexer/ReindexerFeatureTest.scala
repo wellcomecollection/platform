@@ -63,7 +63,7 @@ class ReindexerFeatureTest
 
       server.httpGet(path = "/management/healthcheck",
         andExpect = Created,
-        withJsonBody = """{"message": "done"}""")
+        withJsonBody = """{"message": "success"}""")
     }
   }
 }

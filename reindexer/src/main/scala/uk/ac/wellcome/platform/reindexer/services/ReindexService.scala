@@ -15,13 +15,20 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
   reindexTargetService: ReindexTargetService[T])
     extends Logging {
 
-  def run: Future[PutItemResult] =
-    for {
+  def run: Future[PutItemResult] = {
+    info("ReindexService started.")
+
+    val result = for {
       indices <- reindexTrackerService.getIndexForReindex
       attempt = indices.map(ReindexAttempt(_, Nil, 0))
       _ <- attempt.map(processReindexAttempt).getOrElse(Future.successful())
       updates <- reindexTrackerService.updateReindex(attempt.get)
     } yield updates
+
+    info("ReindexService finished.")
+
+    result
+  }
 
   private def processReindexAttempt(
     reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
@@ -30,11 +37,16 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
         Future.failed(
           new RuntimeException(
             s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
-      case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 =>
+      case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 => {
+        info(s"Finshed reindexing $reindex successfully.")
         Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!
-      case _ =>
+      }
+      case _ => {
+        info(s"ReindexService continuing to process $reindexAttempt")
+
         reindexTargetService
           .runReindex(reindexAttempt)
           .flatMap(processReindexAttempt) // Carry on.
+      }
     }
 }

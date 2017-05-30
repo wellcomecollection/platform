@@ -12,6 +12,7 @@ import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 object ReindexModule extends TwitterModule {
 
@@ -33,20 +34,33 @@ object ReindexModule extends TwitterModule {
     new CalmReindexTargetService(dynamoDBClient, targetTableName())
 
   override def singletonStartup(injector: Injector) {
-    info("Starting Reindexer module")
+    val tableName = targetTableName()
+
+    info(s"Starting Reindexer module for $tableName")
 
     val actorSystem = injector.instance[ActorSystem]
-    val reindexService = targetTableName() match {
+    val reindexService = tableName match {
       case "MiroData" => injector.instance[ReindexService[MiroTransformable]]
       case "CalmData" => injector.instance[ReindexService[CalmTransformable]]
       case _ =>
         throw new RuntimeException(
-          s"${targetTableName()} is not a recognised reindexable table.")
+          s"${tableName} is not a recognised reindexable table.")
     }
 
-    actorSystem.scheduler.scheduleOnce(0 millis)(
-      reindexService.run.onComplete(_ => {
-        agent.send("done") }))
+    val reindexJob = () => {
+      reindexService.run.onComplete {
+        case Success(_) => {
+          info(s"ReindexModule job completed successfully.")
+          agent.send("success")
+        }
+        case Failure(e) => {
+          error(s"ReindexModule job failed!", e)
+          agent.send("failure")
+        }
+      }
+    }
+
+    actorSystem.scheduler.scheduleOnce(0 millis)(reindexJob())
   }
 
   override def singletonShutdown(injector: Injector) {
