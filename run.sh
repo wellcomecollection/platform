@@ -2,12 +2,13 @@
 
 set -o errexit
 set -o nounset
+set -o xtrace
 
 echo "Running project $PROJECT"
 
 echo "Fetching config from AWS..."
-aws s3 ls s3://$CONFIG_BUCKET/config/$BUILD_ENV/$PROJECT.ini
-aws s3 cp s3://$CONFIG_BUCKET/config/$BUILD_ENV/$PROJECT.ini /opt/docker/conf/application.ini
+aws s3 ls s3://$INFRA_BUCKET/$CONFIG_KEY
+aws s3 cp s3://$INFRA_BUCKET/$CONFIG_KEY /opt/docker/conf/application.ini
 
 echo "=== config ==="
 cat /opt/docker/conf/application.ini
