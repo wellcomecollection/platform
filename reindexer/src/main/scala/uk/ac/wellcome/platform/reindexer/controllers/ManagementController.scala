@@ -11,7 +11,8 @@ class ManagementController @Inject()() extends Controller {
   get("/management/healthcheck") { request: Request =>
     ReindexModule.agent.get() match {
       case "working" => response.ok.json(Map("message" -> "ok"))
-      case "done" => response.created.json(Map("message" -> "done"))
+      case "success" => response.created.json(Map("message" -> "success"))
+      case "failure" => response.internalServerError.json(Map("message" -> "failure"))
       case state => response.internalServerError(s"Unknown ReindexModule state: $state")
     }
   }

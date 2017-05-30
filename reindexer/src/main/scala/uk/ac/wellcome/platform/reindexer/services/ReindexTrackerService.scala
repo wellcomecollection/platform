@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.syntax._
-
+import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.models.Reindex
 import uk.ac.wellcome.models.aws.DynamoConfig
@@ -17,7 +17,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 class ReindexTrackerService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   dynamoConfigs: Map[String, DynamoConfig],
-  @Flag("reindex.target.tableName") reindexTargetTableName: String) {
+  @Flag("reindex.target.tableName") reindexTargetTableName: String)
+    extends Logging {
 
   private val reindexTrackerTableConfigId = "reindex"
 
@@ -33,21 +34,33 @@ class ReindexTrackerService @Inject()(
     val updatedReindex = reindexAttempt.reindex.copy(
       currentVersion = reindexAttempt.reindex.requestedVersion)
 
+    info(
+      s"Attempting to update ReindexTracker record: $reindexAttempt -> $updatedReindex")
+
     Scanamo.put[Reindex](dynamoDBClient)(reindexTrackerTableName)(
       updatedReindex)
   }
 
   def getIndexForReindex: Future[Option[Reindex]] =
     getIndices.map {
-      case Reindex(tableName, requested, current) if requested > current =>
+      case Reindex(tableName, requested, current) if requested > current => {
+        info(
+          s"ReindexTracker found out of sync table: $tableName, ($requested > $current)")
         Some(Reindex(tableName, requested, current))
-      case _ => None
+      }
+      case _ => {
+        info(s"ReindexTracker found no out of sync tables.")
+        None
+      }
     }
 
   private def getIndices: Future[Reindex] = Future {
     Scanamo.exec(dynamoDBClient)(
       reindexTable.get('TableName -> reindexTargetTableName)) match {
-      case Some(Right(reindex)) => reindex
+      case Some(Right(reindex)) => {
+        info(s"ReindexTracker found $reindex matching $reindexTargetTableName")
+        reindex
+      }
       case Some(Left(dynamoReadError)) =>
         throw new RuntimeException(
           s"Unable to read from $reindexTrackerTableName: $dynamoReadError")
