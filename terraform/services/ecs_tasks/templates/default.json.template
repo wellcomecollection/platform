@@ -19,6 +19,10 @@
     "image": "${app_uri}",
     "memory": 512,
     "name": "app",
+    "environment": [
+      { "name" : "infra_bucket", "value" : "${infra_bucket}" },
+      { "name" : "config_key", "value" : "${config_key}" },
+    ],
     "portMappings": [
       {
         "containerPort": 8888,

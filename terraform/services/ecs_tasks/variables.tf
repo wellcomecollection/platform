@@ -33,3 +33,11 @@ variable "volume_host_path" {
   description = "Location of mount point on host path (if required)"
   default     = "/tmp"
 }
+
+variable "config_key" {
+  description = "Location of config file within S3"
+}
+
+variable "infra_bucket" {
+  description = "Location of infra bucket in S3"
+}

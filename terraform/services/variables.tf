@@ -77,6 +77,10 @@ variable "infra_bucket" {
   description = "Name of the S3 infra bucket"
 }
 
+variable "config_key" {
+  description = "Location of config file within S3"
+}
+
 variable "config_vars" {
   description = "Variables for the config template"
   type        = "map"
