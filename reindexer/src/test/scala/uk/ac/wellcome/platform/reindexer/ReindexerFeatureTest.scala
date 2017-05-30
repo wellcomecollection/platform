@@ -6,13 +6,15 @@ import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, MetricsSenderLocal}
 
 class ReindexerFeatureTest
     extends FunSpec
     with DynamoDBLocal
     with Matchers
+    with MetricsSenderLocal
     with Eventually
     with ExtendedPatience {
 
@@ -25,6 +27,7 @@ class ReindexerFeatureTest
         "reindex.target.tableName" -> "CalmData"
       )
     ).bind[AmazonDynamoDB](dynamoDbClient)
+      .bind[MetricsSender](metricsSender)
 
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
@@ -62,8 +65,8 @@ class ReindexerFeatureTest
       Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName) shouldBe expectedCalmTransformableList
 
       server.httpGet(path = "/management/healthcheck",
-        andExpect = Created,
-        withJsonBody = """{"message": "success"}""")
+                     andExpect = Created,
+                     withJsonBody = """{"message": "success"}""")
     }
   }
 }
