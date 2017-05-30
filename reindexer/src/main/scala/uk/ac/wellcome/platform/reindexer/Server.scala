@@ -25,6 +25,8 @@ class Server extends HttpServer {
                              ReindexModule,
                              AkkaModule)
 
+  flag[String]("aws.metrics.namespace", "", "Namespace for cloudwatch metrics")
+
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
