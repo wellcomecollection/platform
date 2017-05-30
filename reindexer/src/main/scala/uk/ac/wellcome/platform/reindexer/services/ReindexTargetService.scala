@@ -42,12 +42,12 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   private def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
     info(
-      s"ReindexTargetService updating ${rows.length} rows to ReindexVersion: ${reindex.requestedVersion}")
+      s"ReindexTargetService updating ${rows.length} rows to ReindexVersion: ${reindex.RequestedVersion}")
 
     val ops = rows.map(reindexItem => {
       val uniqueKey = reindexItem.hashKey and reindexItem.rangeKey
       transformableTable
-        .update(uniqueKey, set('ReindexVersion -> reindex.requestedVersion))
+        .update(uniqueKey, set('ReindexVersion -> reindex.RequestedVersion))
     })
 
     Future(ops.map(Scanamo.exec(dynamoDBClient)(_)))
@@ -55,13 +55,13 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   private def getRowsWithOldReindexVersion(reindex: Reindex) = Future {
     info(
-      s"ReindexTargetService querying ${reindex.TableName} for ReindexVersion: ${reindex.requestedVersion}")
+      s"ReindexTargetService querying ${reindex.TableName} for ReindexVersion: ${reindex.RequestedVersion}")
 
     scanamoQuery(reindex.TableName, gsiName)(
       Query(
         AndQueryCondition(
           KeyEquals('ReindexShard, "default"),
-          KeyIs('ReindexVersion, LT, reindex.requestedVersion)
+          KeyIs('ReindexVersion, LT, reindex.RequestedVersion)
         )
       ))
   }
