@@ -177,9 +177,7 @@ class ApiWorksTest
                           |     },
                           |     "creators": [{
                           |       "type": "Agent",
-                          |       "label": "${works(1).work
-                            .creators(0)
-                            .label}"
+                          |       "label": "${works(1).work.creators(0).label}"
                           |     }]
                           |   }]
                           |   }

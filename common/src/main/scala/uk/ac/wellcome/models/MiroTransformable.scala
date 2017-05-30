@@ -67,8 +67,8 @@ case class MiroTransformable(MiroID: String,
         identifiers = identifiers,
         label = label,
         description = description,
-        hasCreatedDate = createdDate,
-        hasCreator = creators ++ secondaryCreators
+        createdDate = createdDate,
+        creators = creators ++ secondaryCreators
       )
     }
 }
