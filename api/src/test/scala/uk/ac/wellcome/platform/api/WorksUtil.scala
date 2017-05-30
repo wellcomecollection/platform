@@ -18,8 +18,8 @@ trait WorksUtil {
     work.work.label,
     work.work.description,
     work.work.lettering,
-    work.work.hasCreatedDate,
-    work.work.hasCreator
+    work.work.createdDate,
+    work.work.creators
   )
 
   def createIdentifiedWorks(count: Int): Seq[IdentifiedWork] =
@@ -57,8 +57,8 @@ trait WorksUtil {
       label = label,
       description = Some(description),
       lettering = Some(lettering),
-      hasCreatedDate = Some(createdDate),
-      hasCreator = List(creator)
+      createdDate = Some(createdDate),
+      creators = List(creator)
     )
   )
 }

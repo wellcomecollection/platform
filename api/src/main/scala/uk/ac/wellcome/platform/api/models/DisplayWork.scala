@@ -10,9 +10,9 @@ case class DisplayWork(id: String,
                        label: String,
                        description: Option[String] = None,
                        lettering: Option[String] = None,
-                       hasCreatedDate: Option[Period] = None,
-                       hasCreator: List[Agent] = List(),
-                       hasIdentifier: Option[List[DisplayIdentifier]] = None) {
+                       createdDate: Option[Period] = None,
+                       creators: List[Agent] = List(),
+                       identifiers: Option[List[DisplayIdentifier]] = None) {
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 
@@ -37,11 +37,11 @@ case object DisplayWork {
       label = identifiedWork.work.label,
       description = identifiedWork.work.description,
       lettering = identifiedWork.work.lettering,
-      hasCreatedDate = identifiedWork.work.hasCreatedDate,
+      createdDate = identifiedWork.work.createdDate,
       // Wrapping this in Option to catch null value from Jackson
-      hasCreator = Option(identifiedWork.work.hasCreator).getOrElse(Nil),
-      hasIdentifier =
-        if (includes.contains("hasIdentifier"))
+      creators = Option(identifiedWork.work.creators).getOrElse(Nil),
+      identifiers =
+        if (includes.contains("identifiers"))
           Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
         else None
     )

@@ -22,12 +22,12 @@ class MiroTransformableTest extends FunSpec with Matchers {
 
   it("should have an empty list if no image_creator field is present") {
     val work = transformMiroRecord(data = s"""{"image_title": "A guide to giraffes"}""")
-    work.hasCreator shouldBe List[Agent]()
+    work.creators shouldBe List[Agent]()
   }
 
   it("should have an empty list if the image_creator field is empty") {
     val work = transformMiroRecord(data = s"""{"image_title": "A box of beavers", "image_creator": []}""")
-    work.hasCreator shouldBe List[Agent]()
+    work.creators shouldBe List[Agent]()
   }
 
   it("should pass through a single value in the image_creator field") {
@@ -35,7 +35,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{"image_title": "A radio for a racoon", "image_creator": ["$creator"]}"""
     )
-    work.hasCreator shouldBe List(Agent(creator))
+    work.creators shouldBe List(Agent(creator))
   }
 
   it("should pass through multiple values in the image_creator field") {
@@ -45,7 +45,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{"image_title": "A book about badgers", "image_creator": ["$creator1", "$creator2", "$creator3"]}"""
     )
-    work.hasCreator shouldBe List(Agent(creator1), Agent(creator2), Agent(creator3))
+    work.creators shouldBe List(Agent(creator1), Agent(creator2), Agent(creator3))
   }
 
   it("should have no description if no image_image_desc field is present") {
@@ -67,7 +67,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
       data = s"""{"image_title": "A description of a dalmation", "image_artwork_date": "$date"}""",
       miroCollection = "Images-V"
     )
-    work.hasCreatedDate shouldBe Some(Period(date))
+    work.createdDate shouldBe Some(Period(date))
   }
 
   it("should not pass through the value of the creation date on non-V records") {
@@ -76,7 +76,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
       data = s"""{"image_title": "A diary about a dodo", "image_artwork_date": "$date"}""",
       miroCollection = "Images-A"
     )
-    work.hasCreatedDate shouldBe None
+    work.createdDate shouldBe None
   }
 
   it("should use the image_creator_secondary field if image_creator is not present") {
@@ -84,7 +84,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{"image_title": "Samples of a shark", "image_secondary_creator": ["$secondaryCreator"]}"""
     )
-    work.hasCreator shouldBe List(Agent(secondaryCreator))
+    work.creators shouldBe List(Agent(secondaryCreator))
   }
 
   it("should use all the values in the image_creator_secondary field if image_creator is not present") {
@@ -93,7 +93,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{"image_title": "Verdant and vivid", "image_secondary_creator": ["$secondaryCreator1", "$secondaryCreator2"]}"""
     )
-    work.hasCreator shouldBe List(Agent(secondaryCreator1), Agent(secondaryCreator2))
+    work.creators shouldBe List(Agent(secondaryCreator1), Agent(secondaryCreator2))
   }
 
   it("should combine the values in the image_creator and image_secondary_creator fields if both present") {
@@ -102,7 +102,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{"image_title": "Musings on mice", "image_creator": ["$creator"], "image_secondary_creator": ["$secondaryCreator"]}"""
     )
-    work.hasCreator shouldBe List(Agent(creator), Agent(secondaryCreator))
+    work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
   private def assertTransformMiroRecordFails(
