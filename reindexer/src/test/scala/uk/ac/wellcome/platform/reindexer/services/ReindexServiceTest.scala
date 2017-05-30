@@ -3,14 +3,15 @@ package uk.ac.wellcome.platform.reindexer.services
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{CalmTransformable, Reindex}
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
+import uk.ac.wellcome.models.{CalmTransformable, Reindex}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, MetricsSenderLocal}
 
 class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
+    with MetricsSenderLocal
     with DynamoDBLocal
     with ExtendedPatience {
 
@@ -28,7 +29,8 @@ class ReindexServiceTest
         dynamoConfigs,
         "CalmData"
       ),
-      new CalmReindexTargetService(dynamoDbClient, "CalmData")
+      new CalmReindexTargetService(dynamoDbClient, "CalmData"),
+      metricsSender
     )
 
   it(
