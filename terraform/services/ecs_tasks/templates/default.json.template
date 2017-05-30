@@ -21,7 +21,7 @@
     "name": "app",
     "environment": [
       { "name" : "infra_bucket", "value" : "${infra_bucket}" },
-      { "name" : "config_key", "value" : "${config_key}" },
+      { "name" : "config_key", "value" : "${config_key}" }
     ],
     "portMappings": [
       {
