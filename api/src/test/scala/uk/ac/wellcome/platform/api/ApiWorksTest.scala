@@ -64,13 +64,13 @@ class ApiWorksTest
             |     "label": "${works(0).work.label}",
             |     "description": "${works(0).work.description.get}",
             |     "lettering": "${works(0).work.lettering.get}",
-            |     "hasCreatedDate": {
+            |     "createdDate": {
             |       "type": "Period",
-            |       "label": "${works(0).work.hasCreatedDate.get.label}"
+            |       "label": "${works(0).work.createdDate.get.label}"
             |     },
-            |     "hasCreator": [{
+            |     "creators": [{
             |       "type": "Agent",
-            |       "label": "${works(0).work.hasCreator(0).label}"
+            |       "label": "${works(0).work.creators(0).label}"
             |     }]
             |   },
             |   {
@@ -79,13 +79,13 @@ class ApiWorksTest
             |     "label": "${works(1).work.label}",
             |     "description": "${works(1).work.description.get}",
             |     "lettering": "${works(1).work.lettering.get}",
-            |     "hasCreatedDate": {
+            |     "createdDate": {
             |       "type": "Period",
-            |       "label": "${works(1).work.hasCreatedDate.get.label}"
+            |       "label": "${works(1).work.createdDate.get.label}"
             |     },
-            |     "hasCreator": [{
+            |     "creators": [{
             |       "type": "Agent",
-            |       "label": "${works(1).work.hasCreator(0).label}"
+            |       "label": "${works(1).work.creators(0).label}"
             |     }]
             |   },
             |   {
@@ -94,13 +94,13 @@ class ApiWorksTest
             |     "label": "${works(2).work.label}",
             |     "description": "${works(2).work.description.get}",
             |     "lettering": "${works(2).work.lettering.get}",
-            |     "hasCreatedDate": {
+            |     "createdDate": {
             |       "type": "Period",
-            |       "label": "${works(2).work.hasCreatedDate.get.label}"
+            |       "label": "${works(2).work.createdDate.get.label}"
             |     },
-            |     "hasCreator": [{
+            |     "creators": [{
             |       "type": "Agent",
-            |       "label": "${works(2).work.hasCreator(0).label}"
+            |       "label": "${works(2).work.creators(0).label}"
             |     }]
             |   }
             |  ]
@@ -134,11 +134,11 @@ class ApiWorksTest
             | "label": "$label",
             | "description": "$description",
             | "lettering": "$lettering",
-            | "hasCreatedDate": {
+            | "createdDate": {
             |   "type": "Period",
             |   "label": "${period.label}"
             | },
-            | "hasCreator": [{
+            | "creators": [{
             |   "type": "Agent",
             |   "label": "${agent.label}"
             | }]
@@ -171,14 +171,14 @@ class ApiWorksTest
                           |     "label": "${works(1).work.label}",
                           |     "description": "${works(1).work.description.get}",
                           |     "lettering": "${works(1).work.lettering.get}",
-                          |     "hasCreatedDate": {
+                          |     "createdDate": {
                           |       "type": "Period",
-                          |       "label": "${works(1).work.hasCreatedDate.get.label}"
+                          |       "label": "${works(1).work.createdDate.get.label}"
                           |     },
-                          |     "hasCreator": [{
+                          |     "creators": [{
                           |       "type": "Agent",
                           |       "label": "${works(1).work
-                            .hasCreator(0)
+                            .creators(0)
                             .label}"
                           |     }]
                           |   }]
@@ -314,7 +314,7 @@ class ApiWorksTest
              |     "type": "Work",
              |     "id": "${work1.canonicalId}",
              |     "label": "${work1.work.label}",
-             |     "hasCreator": []
+             |     "creators": []
              |   }
              |  ]
              |}""".stripMargin
@@ -322,7 +322,7 @@ class ApiWorksTest
     }
   }
 
-  it("should include a list of identifiers on a list endpoint if we pass ?includes=hasIdentifier") {
+  it("should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       source = "TestSource",
       sourceId = "The ID field within the TestSource",
@@ -351,7 +351,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works?includes=hasIdentifier",
+        path = s"/$apiPrefix/works?includes=identifiers",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
@@ -365,8 +365,8 @@ class ApiWorksTest
                           |     "type": "Work",
                           |     "id": "${work1.canonicalId}",
                           |     "label": "${work1.work.label}",
-                          |     "hasCreator": [ ],
-                          |     "hasIdentifier": [
+                          |     "creators": [ ],
+                          |     "identifiers": [
                           |       {
                           |         "type": "Identifier",
                           |         "source": "${identifier1.source}",
@@ -379,8 +379,8 @@ class ApiWorksTest
                           |     "type": "Work",
                           |     "id": "${work2.canonicalId}",
                           |     "label": "${work2.work.label}",
-                          |     "hasCreator": [ ],
-                          |     "hasIdentifier": [
+                          |     "creators": [ ],
+                          |     "identifiers": [
                           |       {
                           |         "type": "Identifier",
                           |         "source": "${identifier2.source}",
@@ -397,7 +397,7 @@ class ApiWorksTest
   }
 
 
-  it("should include a list of identifiers on a single work endpoint if we pass ?includes=hasIdentifier") {
+  it("should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val identifier = SourceIdentifier(
       source = "TestSource",
       sourceId = "The ID field within the TestSource",
@@ -412,7 +412,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId}?includes=hasIdentifier",
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
@@ -420,8 +420,8 @@ class ApiWorksTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "label": "${work.work.label}",
-                          | "hasCreator": [ ],
-                          | "hasIdentifier": [
+                          | "creators": [ ],
+                          | "identifiers": [
                           |   {
                           |     "type": "Identifier",
                           |     "source": "${identifier.source}",
