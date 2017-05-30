@@ -20,8 +20,8 @@
     "memory": 512,
     "name": "app",
     "environment": [
-      { "name" : "infra_bucket", "value" : "${infra_bucket}" },
-      { "name" : "config_key", "value" : "${config_key}" }
+      { "name" : "INFRA_BUCKET", "value" : "${infra_bucket}" },
+      { "name" : "CONFIG_KEY", "value" : "${config_key}" }
     ],
     "portMappings": [
       {
