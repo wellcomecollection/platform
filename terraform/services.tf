@@ -20,7 +20,7 @@ module "calm_adapter" {
   alb_priority     = "101"
   healthcheck_path = "/calm_adapter/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
-  config_key       = "config/prod/calm_adapter.ini"
+  config_key       = "config/${var.build_env}/calm_adapter.ini"
 
   # The Calm adapter is disabled when not running.  It only runs once a day
   # because the last_changed date on Calm records has per-day granularity.
@@ -48,7 +48,7 @@ module "miro_reindexer" {
   alb_priority     = "104"
   healthcheck_path = "/miro_reindexer/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
-  config_key       = "config/prod/miro_reindexer.ini"
+  config_key       = "config/${var.build_env}/miro_reindexer.ini"
 
   desired_count = "0"
 
@@ -71,7 +71,7 @@ module "ingestor" {
   alb_priority     = "102"
   healthcheck_path = "/ingestor/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
-  config_key       = "config/prod/ingestor.ini"
+  config_key       = "config/${var.build_env}/ingestor.ini"
 
   config_vars = {
     es_host         = "${data.template_file.es_cluster_host.rendered}"
@@ -97,7 +97,7 @@ module "transformer" {
   alb_priority     = "100"
   healthcheck_path = "/transformer/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
-  config_key       = "config/prod/transformer.ini"
+  config_key       = "config/${var.build_env}/transformer.ini"
 
   config_vars = {
     stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
@@ -119,7 +119,7 @@ module "id_minter" {
   alb_priority     = "103"
   healthcheck_path = "/id_minter/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
-  config_key       = "config/prod/id_minter.ini"
+  config_key       = "config/${var.build_env}/id_minter.ini"
 
   config_vars = {
     id_minter_queue_id  = "${module.id_minter_queue.id}"
@@ -138,7 +138,7 @@ module "api" {
   nginx_uri     = "${aws_ecr_repository.nginx.repository_url}:api"
   listener_arn  = "${module.api_alb.listener_arn}"
   infra_bucket  = "${var.infra_bucket}"
-  config_key    = "config/prod/api.ini"
+  config_key    = "config/${var.build_env}/api.ini"
 
   config_vars = {
     api_host      = "${var.api_host}"
