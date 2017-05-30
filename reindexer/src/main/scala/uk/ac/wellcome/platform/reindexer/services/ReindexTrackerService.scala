@@ -32,7 +32,7 @@ class ReindexTrackerService @Inject()(
 
   def updateReindex(reindexAttempt: ReindexAttempt) = Future {
     val updatedReindex = reindexAttempt.reindex.copy(
-      currentVersion = reindexAttempt.reindex.requestedVersion)
+      CurrentVersion = reindexAttempt.reindex.RequestedVersion)
 
     info(
       s"Attempting to update ReindexTracker record: $reindexAttempt -> $updatedReindex")
