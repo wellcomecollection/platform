@@ -5,7 +5,15 @@
       "@vocab": "http://wellcomecollection.org/ontologies/works/",
       "id": "@id",
       "type": "@type",
-      "hasCreator": {
+      "creators": {
+        "@type": "wa:agent",
+        "@container": "@list"
+      },
+      "createdDate": {
+        "@type": "wa:period"
+      },
+      "identifiers": {
+        "@type": "wa:identifier",
         "@container": "@list"
       }
     },
