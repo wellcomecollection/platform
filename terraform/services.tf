@@ -55,6 +55,7 @@ module "miro_reindexer" {
   config_vars = {
     miro_table_name    = "${aws_dynamodb_table.miro_table.name}"
     reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
+    metrics_namespace  = "miro-reindexer"
   }
 }
 
