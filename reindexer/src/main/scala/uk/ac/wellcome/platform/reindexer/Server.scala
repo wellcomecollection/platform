@@ -10,6 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules.{
   AkkaModule,
+  AmazonCloudWatchModule,
   DynamoClientModule,
   PlatformDynamoConfigModule
 }
@@ -21,6 +22,7 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.reindexer Reindexer"
   override val modules = Seq(PlatformDynamoConfigModule,
+                             AmazonCloudWatchModule,
                              DynamoClientModule,
                              ReindexModule,
                              AkkaModule)
