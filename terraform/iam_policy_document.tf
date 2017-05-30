@@ -25,6 +25,30 @@ data "aws_iam_policy_document" "allow_calm_db_all" {
   }
 }
 
+data "aws_iam_policy_document" "reindex_tracker_table" {
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.reindex_tracker.arn}",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "reindex_target_miro" {
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.miro_table.arn}/index/ReindexTracker",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   statement {
     actions = [
