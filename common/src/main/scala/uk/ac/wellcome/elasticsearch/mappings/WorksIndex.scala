@@ -34,11 +34,11 @@ class WorksIndex @Inject()(client: TcpClient,
           textField("english").analyzer(EnglishLanguageAnalyzer)),
         textField("lettering").fields(
           textField("english").analyzer(EnglishLanguageAnalyzer)),
-        objectField("hasCreatedDate").fields(
+        objectField("createdDate").fields(
           textField("label"),
           keywordField("type")
         ),
-        objectField("hasCreator").fields(
+        objectField("creators").fields(
           textField("label"),
           keywordField("type")
         )
