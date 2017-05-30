@@ -184,12 +184,12 @@ class WorksServiceTest
     insertIntoElasticSearch(work)
 
     val getByIdResult =
-      worksService.findWorkById(canonicalId, includes = List("hasIdentifier"))
+      worksService.findWorkById(canonicalId, includes = List("identifiers"))
 
     whenReady(getByIdResult) { maybeDisplayWork =>
       maybeDisplayWork.isDefined shouldBe true
-      maybeDisplayWork.get.hasIdentifier.isDefined shouldBe true
-      maybeDisplayWork.get.hasIdentifier.get shouldBe List(
+      maybeDisplayWork.get.identifiers.isDefined shouldBe true
+      maybeDisplayWork.get.identifiers.get shouldBe List(
         DisplayIdentifier(source = sourceName,
                           name = sourceId,
                           value = miroId))
@@ -213,10 +213,10 @@ class WorksServiceTest
     insertIntoElasticSearch(work)
 
     val listWorksResult =
-      worksService.listWorks(includes = List("hasIdentifier"))
+      worksService.listWorks(includes = List("identifiers"))
 
     whenReady(listWorksResult) { (displayWork: DisplaySearch) =>
-      displayWork.results.head.hasIdentifier.get shouldBe List(
+      displayWork.results.head.identifiers.get shouldBe List(
         DisplayIdentifier(source = sourceName,
                           name = sourceId,
                           value = miroId))
@@ -241,10 +241,10 @@ class WorksServiceTest
 
     val searchWorksResult = worksService.searchWorks(query = "snail",
                                                      includes =
-                                                       List("hasIdentifier"))
+                                                       List("identifiers"))
 
     whenReady(searchWorksResult) { (displayWork: DisplaySearch) =>
-      displayWork.results.head.hasIdentifier.get shouldBe List(
+      displayWork.results.head.identifiers.get shouldBe List(
         DisplayIdentifier(source = sourceName,
                           name = sourceId,
                           value = miroId))
