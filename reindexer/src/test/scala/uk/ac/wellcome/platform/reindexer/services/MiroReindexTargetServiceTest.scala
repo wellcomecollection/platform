@@ -1,22 +1,21 @@
 package uk.ac.wellcome.platform.reindexer.services
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{MiroTransformable, Reindex}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-import uk.ac.wellcome.test.utils.{
-  DynamoDBLocal,
-  ExtendedPatience,
-  MetricsSenderLocal
-}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
 
 class MiroReindexTargetServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
     with DynamoDBLocal
-    with MetricsSenderLocal
+    with MockitoSugar
     with ExtendedPatience {
 
   it("should update the correct index to the requested version") {
@@ -59,6 +58,9 @@ class MiroReindexTargetServiceTest
       Scanamo.put(dynamoDbClient)(miroDataTableName))
 
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
+
+    val metricsSender: MetricsSender =
+      new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
     val reindexTargetService =
       new MiroReindexTargetService(dynamoDbClient, "MiroData", metricsSender)

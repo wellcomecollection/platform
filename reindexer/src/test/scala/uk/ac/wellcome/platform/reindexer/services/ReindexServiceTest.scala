@@ -25,6 +25,10 @@ class ReindexServiceTest
     "calm" -> DynamoConfig("applicationName", "streamArn", calmDataTableName)
   )
 
+  val metricsSender: MetricsSender = new MetricsSender(
+    namespace = "reindexer-tests",
+    mock[AmazonCloudWatch])
+
   def createReindexService =
     new ReindexService(
       new ReindexTrackerService(
