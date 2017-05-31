@@ -19,11 +19,13 @@ class StartupTest
       "aws.dynamo.reindexTracker.tableName" -> "not-real-reindexer-table-name",
       "aws.dynamo.miroData.tableName" -> "not-real-table-name",
       "reindex.target.tableName" -> "MiroData",
-      "aws.metrics.namespace" -> "reindexer-startup-tests"
+      // use a fake endpoint in tests so that we don't send metrics to the real AWS
+      "aws.cloudWatch.endpoint" -> "http://localhost:6789"
     )
   )
 
   test("server starts up correctly") {
     server.assertHealthy()
+    Thread.sleep(2000)
   }
 }

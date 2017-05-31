@@ -21,7 +21,9 @@ class CalmTransformerFeatureTest
     "aws.dynamo.calmData.streams.arn" -> calmDataStreamArn,
     "aws.dynamo.calmData.tableName" -> calmDataTableName,
     "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "calm-transformer"
+    "aws.metrics.namespace" -> "calm-transformer",
+    // use a fake endpoint in tests so that we don't send metrics to the real AWS
+    "aws.cloudWatch.endpoint" -> "http://localhost:6789"
   )
   override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
     kinesisClientLibConfiguration(appName, calmDataStreamArn)

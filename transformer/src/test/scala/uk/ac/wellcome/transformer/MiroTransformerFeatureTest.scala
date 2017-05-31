@@ -20,7 +20,9 @@ class MiroTransformerFeatureTest
     "aws.dynamo.miroData.streams.arn" -> miroDataStreamArn,
     "aws.dynamo.miroData.tableName" -> miroDataTableName,
     "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "miro-transformer"
+    "aws.metrics.namespace" -> "miro-transformer",
+    // use a fake endpoint in tests so that we don't send metrics to the real AWS
+    "aws.cloudWatch.endpoint" -> "http://localhost:6789"
   )
   override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
     kinesisClientLibConfiguration(appName, miroDataStreamArn)

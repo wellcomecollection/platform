@@ -8,17 +8,12 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchLocal,
-  DynamoDBLocal,
-  ExtendedPatience
-}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
 
 class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with AmazonCloudWatchLocal
     with DynamoDBLocal
     with ExtendedPatience
     with MockitoSugar {
