@@ -18,7 +18,6 @@ import org.scalatest.Suite
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.platform.transformer.Server
 import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchLocal,
   DynamoDBLocal,
   ExtendedPatience,
   SNSLocal
@@ -29,8 +28,7 @@ trait TransformerFeatureTest
     with ExtendedPatience
     with Eventually
     with SNSLocal
-    with DynamoDBLocal
-    with AmazonCloudWatchLocal { this: Suite =>
+    with DynamoDBLocal { this: Suite =>
   val flags: Map[String, String]
   val kinesisClientLibConfiguration: KinesisClientLibConfiguration
 
@@ -40,7 +38,6 @@ trait TransformerFeatureTest
       flags
     ).bind[AmazonSNS](amazonSNS)
       .bind[AmazonDynamoDB](dynamoDbClient)
-      .bind[AmazonCloudWatch](amazonCloudWatch)
       .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
         streamsClient))
       .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
