@@ -5,7 +5,8 @@ import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.AWSConfig
 
-object AmazonCloudWatchModule extends TwitterModule {
+object
+AmazonCloudWatchModule extends TwitterModule {
 
   @Provides
   @Singleton
