@@ -25,7 +25,7 @@ trait IngestorUtils extends IndexedElasticSearchLocal with SQSLocal {
         "es.sniff" -> "false",
         "es.index" -> indexName,
         "es.type" -> itemType
-      )
-    ).bind[AmazonSQS](sqsClient)
+      ) ++ sqsLocalFlags
+    )
   }
 }

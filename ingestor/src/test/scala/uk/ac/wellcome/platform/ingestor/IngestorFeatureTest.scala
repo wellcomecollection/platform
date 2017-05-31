@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor
 
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin

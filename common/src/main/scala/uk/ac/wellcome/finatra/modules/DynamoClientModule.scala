@@ -2,28 +2,61 @@ package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.AWSConfig
-
 import com.amazonaws.services.dynamodbv2._
 
 object DynamoClientModule extends TwitterModule {
   override val modules = Seq(AWSConfigModule)
+  private val dynamoDbEndpoint = flag[String](
+    "aws.dynamoDb.endpoint",
+    "",
+    "Endpoint of AWS DynamoDB. if not present it will use the region")
 
   @Singleton
   @Provides
-  def providesDynamoClient(awsConfig: AWSConfig): AmazonDynamoDB =
-    AmazonDynamoDBClientBuilder
-      .standard()
-      .withRegion(awsConfig.region)
-      .build()
+  def providesDynamoClient(awsConfig: AWSConfig): AmazonDynamoDB = {
+    val standardDynamoDBClientBuilder = AmazonDynamoDBClientBuilder.standard
+    createAwsClient(awsConfig, standardDynamoDBClientBuilder)
+  }
 
   @Singleton
   @Provides
-  def providesDynamoAsyncClient(awsConfig: AWSConfig): AmazonDynamoDBAsync =
-    AmazonDynamoDBAsyncClientBuilder
+  def providesDynamoStreamsClient(
+    awsConfig: AWSConfig): AmazonDynamoDBStreams = {
+    val standardDynamoStreamsClientBuilder = AmazonDynamoDBStreamsClientBuilder
       .standard()
-      .withRegion(awsConfig.region)
-      .build()
+    createAwsClient(awsConfig, standardDynamoStreamsClientBuilder)
+  }
+
+  @Singleton
+  @Provides
+  def providesDynamoAsyncClient(awsConfig: AWSConfig): AmazonDynamoDBAsync = {
+    val standardDynamoDbAsyncClientBuilder = AmazonDynamoDBAsyncClientBuilder
+      .standard()
+    createAwsClient(awsConfig, standardDynamoDbAsyncClientBuilder)
+  }
+
+  private def createAwsClient[T <: AwsClientBuilder[_, _], J](
+    awsConfig: AWSConfig,
+    awsClientBuilder: AwsClientBuilder[T, J]): J = {
+    if (dynamoDbEndpoint().isEmpty) {
+      awsClientBuilder
+        .setRegion(awsConfig.region)
+      awsClientBuilder.build()
+    } else {
+      awsClientBuilder
+        .setEndpointConfiguration(
+          new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
+      awsClientBuilder.withCredentials(
+        new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(awsConfig.accessKey.get,
+                                  awsConfig.secretKey.get)))
+      awsClientBuilder.build()
+    }
+  }
 }

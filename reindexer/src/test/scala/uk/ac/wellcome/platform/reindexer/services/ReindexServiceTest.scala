@@ -1,19 +1,22 @@
 package uk.ac.wellcome.platform.reindexer.services
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, MetricsSenderLocal}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
 
 class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with MetricsSenderLocal
     with DynamoDBLocal
-    with ExtendedPatience {
+    with ExtendedPatience
+    with MockitoSugar {
 
   val dynamoConfigs = Map(
     "reindex" -> DynamoConfig("applicationName",
@@ -30,7 +33,7 @@ class ReindexServiceTest
         "CalmData"
       ),
       new CalmReindexTargetService(dynamoDbClient, "CalmData", metricsSender),
-      metricsSender,
+      new MetricsSender("reindexer-tests", mock[AmazonCloudWatch]),
       3
     )
 

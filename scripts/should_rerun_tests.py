@@ -29,6 +29,10 @@ def should_retest_project(changed_files, project):
         print("*** Changes to the project dir mean we should rebuild")
         return True
 
+    elif 'scripts/run_tests.sh' in changed_files:
+        print("*** Changes to the test runner mean we should retest")
+        return True
+
     else:
         return False
 
