@@ -14,7 +14,7 @@ class ServerTest
     new Server(),
     flags = Map(
       "aws.dynamo.identifiers.tableName" -> "identifiers"
-    ) ++ snsLocalEndpointFlags ++ dynamoDbTestEndpointFlags ++ sqsLocalFlags
+    ) ++ snsLocalEndpointFlags ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
   )
 
   test("it should show the healthcheck message") {
