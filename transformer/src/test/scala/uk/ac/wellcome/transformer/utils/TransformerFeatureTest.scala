@@ -11,14 +11,15 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.Suite
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.platform.transformer.Server
-import uk.ac.wellcome.test.utils.{ExtendedPatience, SNSLocal, TestFlags}
+import uk.ac.wellcome.test.utils._
 
 trait TransformerFeatureTest
     extends FeatureTestMixin
     with ExtendedPatience
     with Eventually
     with SNSLocal
-    with TestFlags { this: Suite =>
+    with DynamoDBLocal
+    with AmazonCloudWatchFlag { this: Suite =>
   val flags: Map[String, String]
   val kinesisClientLibConfiguration: KinesisClientLibConfiguration
 

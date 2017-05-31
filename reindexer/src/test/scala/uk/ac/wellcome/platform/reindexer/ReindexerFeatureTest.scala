@@ -6,13 +6,13 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{ExtendedPatience, TestFlags}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, DynamoDBLocal, ExtendedPatience}
 
 class ReindexerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
-    with ExtendedPatience with TestFlags {
+    with ExtendedPatience with DynamoDBLocal with AmazonCloudWatchFlag {
 
   val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(

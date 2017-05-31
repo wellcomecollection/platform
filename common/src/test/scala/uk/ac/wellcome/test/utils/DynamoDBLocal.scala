@@ -20,10 +20,13 @@ import uk.ac.wellcome.models.{
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
+trait DynamoDBLocal extends BeforeAndAfterEach with TestFlagsProvider { this: Suite =>
+
+  override def testFlags: Map[String, String] =
+    Map("aws.dynamoDb.endpoint" -> dynamoDBEndPoint) ++ super.testFlags
 
   private val port = 45678
-  val dynamoDBEndPoint = "http://localhost:" + port
+  private val dynamoDBEndPoint = "http://localhost:" + port
 
   private val dynamoDBLocalCredentialsProvider =
     new AWSStaticCredentialsProvider(
