@@ -50,14 +50,4 @@ object DynamoClientModule extends TwitterModule {
           new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
         .build()
   }
-
-
-
-  @Singleton
-  @Provides
-  def providesDynamoAsyncClient(awsConfig: AWSConfig): AmazonDynamoDBAsync =
-    AmazonDynamoDBAsyncClientBuilder
-      .standard()
-      .withRegion(awsConfig.region)
-      .build()
 }
