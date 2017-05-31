@@ -57,7 +57,7 @@ def main():
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('MiroData')
 
-    api_ids = list(api_items())
+    api_ids = list(api_miro_ids())
     dynamodb_records = [t['MiroID'] for t in get_records(table)]
 
     missing = set(dynamodb_records) - set(api_ids)
