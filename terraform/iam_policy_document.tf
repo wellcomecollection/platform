@@ -44,6 +44,7 @@ data "aws_iam_policy_document" "reindex_target_miro" {
     ]
 
     resources = [
+      "${aws_dynamodb_table.miro_table.arn}",
       "${aws_dynamodb_table.miro_table.arn}/index/ReindexTracker",
     ]
   }
