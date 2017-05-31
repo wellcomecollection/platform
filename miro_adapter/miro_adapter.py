@@ -62,6 +62,8 @@ def push_to_dynamodb(table_name, collection_name, image_data):
                 Item={
                     'MiroID': image['image_no_calc'],
                     'MiroCollection': collection_name,
+                    'ReindexShard': 'default',
+                    'ReindexVersion': 0,
                     'data': json.dumps(image, separators=(',', ':'))
                 }
             )
