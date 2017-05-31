@@ -50,4 +50,22 @@ object DynamoClientModule extends TwitterModule {
           new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
         .build()
   }
+
+  @Singleton
+  @Provides
+  def providesDynamoAsyncClient(awsConfig: AWSConfig): AmazonDynamoDBAsync = {
+    val standardDynamoDbAsyncClientBuilder = AmazonDynamoDBAsyncClientBuilder
+      .standard()
+    if (dynamoDbEndpoint().isEmpty)
+      standardDynamoDbAsyncClientBuilder
+        .withRegion(awsConfig.region)
+        .build()
+    else
+      standardDynamoDbAsyncClientBuilder
+        .withEndpointConfiguration(
+          new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
+        .withCredentials(new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
+        .build()
+  }
 }
