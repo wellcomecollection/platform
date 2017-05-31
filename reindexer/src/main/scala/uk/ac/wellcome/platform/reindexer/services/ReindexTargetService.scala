@@ -8,7 +8,7 @@ import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{Reindex, ReindexItem, Reindexable}
-import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
+import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexStatus}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -71,11 +71,12 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
           val result = groupOps.map(Scanamo.exec(dynamoDBClient)(_))
 
           val updateCount = groupOps.length * (i + 1)
-          val percentComplete =
-            "%1.0f".format((updateCount.toFloat / rows.length.toFloat) * 100)
+          val percentComplete = (updateCount.toFloat / rows.length.toFloat) * 100
+
+          ReindexStatus.work(percentComplete)
 
           info(
-            s"ReindexTargetService completed ${updateCount} updates: ${percentComplete}% complete")
+            s"ReindexTargetService completed $updateCount updates: ${"%1.0f".format(percentComplete)}% complete")
 
           metricsSender.incrementCount("reindex-updated-items", updateCount.toDouble)
 

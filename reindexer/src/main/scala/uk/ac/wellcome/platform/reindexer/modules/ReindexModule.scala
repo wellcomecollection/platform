@@ -3,12 +3,13 @@ package uk.ac.wellcome.platform.reindexer.modules
 import javax.inject.Singleton
 
 import akka.actor.ActorSystem
-import akka.agent.Agent
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Provides
+import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable}
+import uk.ac.wellcome.platform.reindexer.models._
 import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -17,24 +18,27 @@ import scala.util.{Failure, Success}
 
 object ReindexModule extends TwitterModule {
 
-  val targetTableName = flag[String](name = "reindex.target.tableName",
-                                     help = "Reindex target table name")
-
-  val agent = Agent("working")
+  val targetTableName: Flag[String] = flag[String](
+    name = "reindex.target.tableName",
+    help = "Reindex target table name")
 
   @Singleton
   @Provides
   def providesMiroReindexTargetService(
     dynamoDBClient: AmazonDynamoDB,
     metricsSender: MetricsSender): ReindexTargetService[MiroTransformable] =
-    new MiroReindexTargetService(dynamoDBClient, targetTableName(), metricsSender)
+    new MiroReindexTargetService(dynamoDBClient,
+                                 targetTableName(),
+                                 metricsSender)
 
   @Singleton
   @Provides
   def providesCalmReindexTargetService(
     dynamoDBClient: AmazonDynamoDB,
     metricsSender: MetricsSender): ReindexTargetService[CalmTransformable] =
-    new CalmReindexTargetService(dynamoDBClient, targetTableName(), metricsSender)
+    new CalmReindexTargetService(dynamoDBClient,
+                                 targetTableName(),
+                                 metricsSender)
 
   override def singletonStartup(injector: Injector) {
     val tableName = targetTableName()
@@ -47,19 +51,17 @@ object ReindexModule extends TwitterModule {
       case "CalmData" => injector.instance[ReindexService[CalmTransformable]]
       case _ =>
         throw new RuntimeException(
-          s"${tableName} is not a recognised reindexable table.")
+          s"$tableName is not a recognised reindexable table.")
     }
 
     val reindexJob = () => {
       reindexService.run.onComplete {
-        case Success(_) => {
+        case Success(_) =>
           info(s"ReindexModule job completed successfully.")
-          agent.send("success")
-        }
-        case Failure(e) => {
+          ReindexStatus.succeed()
+        case Failure(e) =>
           error(s"ReindexModule job failed!", e)
-          agent.send("failure")
-        }
+          ReindexStatus.fail()
       }
     }
 
