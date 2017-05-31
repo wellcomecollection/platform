@@ -16,11 +16,18 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
   private val localSNSEndpointUrl = "http://localhost:9292"
+  private val accessKey = "access"
+  private val secretKey = "secret"
+  val snsLocalEndpointFlags: Map[String, String] =
+    Map("aws.sns.endpoint" -> localSNSEndpointUrl,
+        "aws.accessKey" -> accessKey,
+        "aws.secretKey" -> secretKey,
+        "aws.region" -> "localhost")
 
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
     .standard()
     .withCredentials(new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials("access", "secret")))
+      new BasicAWSCredentials(accessKey, secretKey)))
     .withEndpointConfiguration(
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
@@ -31,7 +38,9 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    HttpClientBuilder.create().build()
+    HttpClientBuilder
+      .create()
+      .build()
       .execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 

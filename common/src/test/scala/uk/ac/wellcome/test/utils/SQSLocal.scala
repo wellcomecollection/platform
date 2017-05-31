@@ -12,12 +12,22 @@ trait SQSLocal
     with Eventually
     with ExtendedPatience { this: Suite =>
 
+  private val sqsEndpointUrl = s"http://localhost:9324"
+  private val accessKey = "access"
+  private val secretKey = "secret"
+  val sqsLocalFlags = Map(
+    "aws.sqs.endpoint" -> sqsEndpointUrl,
+    "aws.accessKey" -> accessKey,
+    "aws.secretKey" -> secretKey,
+    "aws.region" -> "localhost"
+  )
+
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder
     .standard()
     .withCredentials(
-      new AWSStaticCredentialsProvider(new BasicAWSCredentials("x", "x")))
+      new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
     .withEndpointConfiguration(
-      new EndpointConfiguration(s"http://localhost:9324", "localhost"))
+      new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
 
   private var queueUrls: List[String] = Nil
