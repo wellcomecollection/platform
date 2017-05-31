@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.reindexer
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.Scanamo
 import com.twitter.finagle.http.Status._
@@ -8,13 +9,13 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, MetricsSenderLocal}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchLocal, DynamoDBLocal, ExtendedPatience}
 
 class ReindexerFeatureTest
     extends FunSpec
     with DynamoDBLocal
     with Matchers
-    with MetricsSenderLocal
+    with AmazonCloudWatchLocal
     with Eventually
     with ExtendedPatience {
 
@@ -27,7 +28,7 @@ class ReindexerFeatureTest
         "reindex.target.tableName" -> "CalmData"
       )
     ).bind[AmazonDynamoDB](dynamoDbClient)
-      .bind[MetricsSender](metricsSender)
+      .bind[AmazonCloudWatch](amazonCloudWatch)
 
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"

@@ -17,14 +17,20 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.Suite
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.platform.transformer.Server
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, SNSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchLocal,
+  DynamoDBLocal,
+  ExtendedPatience,
+  SNSLocal
+}
 
 trait TransformerFeatureTest
     extends FeatureTestMixin
     with ExtendedPatience
     with Eventually
     with SNSLocal
-    with DynamoDBLocal { this: Suite =>
+    with DynamoDBLocal
+    with AmazonCloudWatchLocal { this: Suite =>
   val flags: Map[String, String]
   val kinesisClientLibConfiguration: KinesisClientLibConfiguration
 
@@ -35,7 +41,8 @@ trait TransformerFeatureTest
     ).bind[AmazonSNS](amazonSNS)
       .bind[AmazonDynamoDB](dynamoDbClient)
       .bind[AmazonCloudWatch](amazonCloudWatch)
-      .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(streamsClient))
+      .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
+        streamsClient))
       .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
@@ -52,10 +59,4 @@ trait TransformerFeatureTest
     //turn off metric logging in tests so we don't see error logs about not being able to publish to cloudwatch
       .withMetricsLevel(MetricsLevel.NONE)
 
-  private val amazonCloudWatch = AmazonCloudWatchClientBuilder
-    .standard()
-    .withEndpointConfiguration(
-      // use a fake endpoind in tests so that we don't send metrics to the real AWS
-      new EndpointConfiguration("http://localhost:6789", "local"))
-    .build()
 }
