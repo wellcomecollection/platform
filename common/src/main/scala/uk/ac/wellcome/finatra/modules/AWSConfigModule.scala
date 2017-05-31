@@ -8,8 +8,18 @@ import uk.ac.wellcome.models.aws.AWSConfig
 
 object AWSConfigModule extends TwitterModule {
   private val region = flag[String]("aws.region", "eu-west-1", "AWS region")
-
+  private val awsAccessKey = flag[String](
+    "aws.accessKey",
+    "",
+    "Access Key for AWS service. Needed if an endpoint for a service is specified")
+  private val awsSecretKey = flag[String](
+    "aws.secretKey",
+    "",
+    "Secret Key for AWS service. Needed if an endpoint for a service is specified")
   @Singleton
   @Provides
-  def providesAWSConfig(): AWSConfig = AWSConfig(region())
+  def providesAWSConfig(): AWSConfig =
+    AWSConfig(region(),
+              if (awsAccessKey().isEmpty) None else Some(awsAccessKey()),
+              if (awsSecretKey().isEmpty) None else Some(awsSecretKey()))
 }

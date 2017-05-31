@@ -1,33 +1,30 @@
 package uk.ac.wellcome.platform.reindexer
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.Scanamo
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, MetricsSenderLocal}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, DynamoDBLocal, ExtendedPatience}
 
 class ReindexerFeatureTest
     extends FunSpec
-    with DynamoDBLocal
     with Matchers
-    with MetricsSenderLocal
     with Eventually
-    with ExtendedPatience {
+    with ExtendedPatience
+    with DynamoDBLocal
+    with AmazonCloudWatchFlag {
 
   val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
         "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
-        "aws.dynamo.miroData.tableName" -> "CalmData",
+        "aws.dynamo.calmData.tableName" -> "CalmData",
         "reindex.target.tableName" -> "CalmData"
-      )
-    ).bind[AmazonDynamoDB](dynamoDbClient)
-      .bind[MetricsSender](metricsSender)
+      ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+    )
 
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
