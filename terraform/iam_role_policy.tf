@@ -105,3 +105,8 @@ resource "aws_iam_role_policy" "reindexer_target_miro" {
   role   = "${module.ecs_miro_reindexer_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.reindex_target_miro.json}"
 }
+
+resource "aws_iam_role_policy" "reindexer_cloudwatch" {
+  role   = "${module.ecs_miro_reindexer_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
