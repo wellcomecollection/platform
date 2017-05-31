@@ -26,9 +26,10 @@ object DynamoClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesDynamoStreamsClient(awsConfig: AWSConfig): AmazonDynamoDBStreams = {
+  def providesDynamoStreamsClient(
+    awsConfig: AWSConfig): AmazonDynamoDBStreams = {
     val standardDynamoStreamsClientBuilder = AmazonDynamoDBStreamsClientBuilder
-        .standard()
+      .standard()
     createAwsClient(awsConfig, standardDynamoStreamsClientBuilder)
   }
 
@@ -40,18 +41,21 @@ object DynamoClientModule extends TwitterModule {
     createAwsClient(awsConfig, standardDynamoDbAsyncClientBuilder)
   }
 
-  private def createAwsClient[T,J](awsConfig: AWSConfig, awsClientBuilder: AwsClientBuilder[T,J]) :J = {
-    if (dynamoDbEndpoint().isEmpty){
+  private def createAwsClient[T <: AwsClientBuilder[_, _], J](
+    awsConfig: AWSConfig,
+    awsClientBuilder: AwsClientBuilder[T, J]): J = {
+    if (dynamoDbEndpoint().isEmpty) {
       awsClientBuilder
         .setRegion(awsConfig.region)
       awsClientBuilder.build()
-    }
-    else {
+    } else {
       awsClientBuilder
         .setEndpointConfiguration(
           new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
-      awsClientBuilder.withCredentials(new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
+      awsClientBuilder.withCredentials(
+        new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(awsConfig.accessKey.get,
+                                  awsConfig.secretKey.get)))
       awsClientBuilder.build()
     }
   }
