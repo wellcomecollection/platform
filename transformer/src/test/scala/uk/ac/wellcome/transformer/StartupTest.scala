@@ -24,7 +24,7 @@ class StartupTest
       "aws.dynamo.miroData.streams.appName" -> "miro",
       "aws.dynamo.miroData.streams.arn" -> "miro",
       "aws.dynamo.miroData.tableName" -> "MiroData"
-    ) ++ testFlags
+    ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbTestEndpointFlags ++ snsLocalEndpointFlags
   )
 
   test("server starts up correctly") {

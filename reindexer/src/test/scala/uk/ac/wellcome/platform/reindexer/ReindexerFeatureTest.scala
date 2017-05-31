@@ -12,16 +12,18 @@ class ReindexerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
-    with ExtendedPatience with DynamoDBLocal with AmazonCloudWatchFlag {
+    with ExtendedPatience
+    with DynamoDBLocal
+    with AmazonCloudWatchFlag {
 
   val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
         "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
-        "aws.dynamo.miroData.tableName" -> "CalmData",
+        "aws.dynamo.calmData.tableName" -> "CalmData",
         "reindex.target.tableName" -> "CalmData"
-      ) ++ testFlags
+      ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbTestEndpointFlags
     )
 
   it(

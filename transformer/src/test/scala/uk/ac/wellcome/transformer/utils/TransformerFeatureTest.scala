@@ -5,7 +5,6 @@ import com.amazonaws.services.dynamodbv2.streamsadapter.AmazonDynamoDBStreamsAda
 import com.amazonaws.services.kinesis.AmazonKinesis
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel
-import com.amazonaws.services.sns.AmazonSNS
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.Suite
@@ -26,10 +25,9 @@ trait TransformerFeatureTest
   lazy val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
-      flags ++ testFlags
-    )
-      .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
-        streamsClient))
+      flags ++ snsLocalEndpointFlags ++ dynamoDbTestEndpointFlags ++ cloudWatchLocalEndpointFlag
+    ).bind[AmazonKinesis](
+        new AmazonDynamoDBStreamsAdapterClient(streamsClient))
       .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")

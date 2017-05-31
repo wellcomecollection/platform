@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.idminter
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sqs.AmazonSQS
 import com.gu.scanamo.Scanamo
@@ -31,12 +32,12 @@ class IdMinterFeatureTest
   override val server: EmbeddedHttpServer = new EmbeddedHttpServer(
     new Server(),
     flags = Map(
-      "aws.region" -> "local",
+      "aws.region" -> "localhost",
       "aws.sqs.queue.url" -> idMinterQueue,
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn,
       "aws.dynamo.identifiers.tableName" -> identifiersTableName
-    ) ++ testFlags
+    ) ++ snsLocalEndpointFlags ++ dynamoDbTestEndpointFlags
   ).bind[AmazonSQS](sqsClient)
 
   it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {

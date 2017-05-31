@@ -13,12 +13,14 @@ import org.apache.http.client.methods.HttpDelete
 import org.apache.http.impl.client.HttpClientBuilder
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-trait SNSLocal extends BeforeAndAfterEach with Logging with TestFlagsProvider {
-  this: Suite =>
-  override def testFlags: Map[String, String] =
-    Map("aws.sns.endpoint" -> localSNSEndpointUrl) ++ super.testFlags
+trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
   private val localSNSEndpointUrl = "http://localhost:9292"
+
+  val snsLocalEndpointFlags: Map[String, String] =
+    Map("aws.sns.endpoint" -> localSNSEndpointUrl,
+        "aws.accessKey" -> "access",
+        "aws.secretKey" -> "secret")
 
   val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
     .standard()

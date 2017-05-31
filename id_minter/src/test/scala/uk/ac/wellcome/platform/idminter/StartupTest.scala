@@ -17,7 +17,7 @@ class StartupTest
     new Server(),
     flags = Map(
       "aws.dynamo.identifiers.tableName" -> "identifiers"
-    )
+    ) ++ snsLocalEndpointFlags ++ dynamoDbTestEndpointFlags
   )
 
   test("server starts up correctly") {
