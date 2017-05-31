@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.idminter
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sqs.AmazonSQS
 import com.gu.scanamo.Scanamo
@@ -12,7 +11,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal, TestFlagsProvider}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
@@ -39,7 +38,6 @@ class IdMinterFeatureTest
       "aws.dynamo.identifiers.tableName" -> identifiersTableName
     ) ++ testFlags
   ).bind[AmazonSQS](sqsClient)
-    .bind[AmazonSNS](amazonSNS)
 
   it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"

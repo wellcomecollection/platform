@@ -6,6 +6,7 @@ import com.twitter.inject.server.FeatureTest
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   DynamoDBLocal,
+  SNSLocal,
   StartupLogbackOverride
 }
 
@@ -13,7 +14,8 @@ class StartupTest
     extends FeatureTest
     with StartupLogbackOverride
     with AmazonCloudWatchFlag
-    with DynamoDBLocal {
+    with DynamoDBLocal
+    with SNSLocal {
 
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,

@@ -2,8 +2,9 @@ package uk.ac.wellcome.platform.idminter
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal}
 
-class ServerTest extends FeatureTest {
+class ServerTest extends FeatureTest with SNSLocal with DynamoDBLocal {
 
   val server = new EmbeddedHttpServer(
     new Server(),
