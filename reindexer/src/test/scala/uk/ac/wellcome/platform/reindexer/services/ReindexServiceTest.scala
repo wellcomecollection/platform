@@ -30,7 +30,8 @@ class ReindexServiceTest
         "CalmData"
       ),
       new CalmReindexTargetService(dynamoDbClient, "CalmData", metricsSender),
-      metricsSender
+      metricsSender,
+      3
     )
 
   it(

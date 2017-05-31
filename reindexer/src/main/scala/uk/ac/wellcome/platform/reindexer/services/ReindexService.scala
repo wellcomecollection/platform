@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import com.amazonaws.services.dynamodbv2.model.PutItemResult
 import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Reindexable
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
@@ -14,10 +15,9 @@ import scala.concurrent.Future
 class ReindexService[T <: Reindexable[String]] @Inject()(
   reindexTrackerService: ReindexTrackerService,
   reindexTargetService: ReindexTargetService[T],
-  metricsSender: MetricsSender)
+  metricsSender: MetricsSender,
+  @Flag("reindex.maxAttempts") maxAttempts: Int)
     extends Logging {
-
-  val maxAttempts: Int = 3
 
   def run: Future[PutItemResult] = {
     info("ReindexService started.")
@@ -39,7 +39,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
   private def processReindexAttempt(
     reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
     reindexAttempt match {
-      case ReindexAttempt(_, _, attempt) if attempt > maxAttempts =>
+      case ReindexAttempt(_, _, attempt) if attempt > (maxAttempts + 1) =>
         Future.failed(
           new RuntimeException(
             s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!

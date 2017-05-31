@@ -52,11 +52,18 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
         .update(uniqueKey, set('ReindexVersion -> reindex.RequestedVersion))
     })
 
-    val updateGroupSize = Math.ceil((rows.length + 0.1) * 0.1).toInt
-    val updateGroups = ops.grouped(updateGroupSize).zipWithIndex
+    // If no rows then updateGroups should be Nil
+    val updateGroups = ops match {
+      case Nil => Nil
+      case _ =>  {
+        // Group size is 10% of total length
+        val updateGroupSize = Math.ceil(rows.length * 0.1).toInt
+        ops.grouped(updateGroupSize).zipWithIndex
+      }
+    }
 
     info(
-      s"ReindexTargetService updating ${rows.length} rows in batches of $updateGroupSize")
+      s"ReindexTargetService updating ${rows.length} rows.")
 
     Future {
       updateGroups.flatMap {
