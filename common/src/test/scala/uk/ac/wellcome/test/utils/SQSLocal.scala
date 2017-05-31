@@ -17,7 +17,8 @@ trait SQSLocal
   val sqsLocalFlags = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.accessKey" -> "access",
-    "aws.secretKey" -> "secret"
+    "aws.secretKey" -> "secret",
+    "aws.region" -> "localhost"
   )
 
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder

@@ -37,7 +37,7 @@ class IdMinterFeatureTest
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn,
       "aws.dynamo.identifiers.tableName" -> identifiersTableName
-    ) ++ snsLocalEndpointFlags ++ dynamoDbTestEndpointFlags ++ sqsLocalFlags
+    ) ++ snsLocalEndpointFlags ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
   )
 
   it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {

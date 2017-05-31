@@ -25,10 +25,9 @@ trait TransformerFeatureTest
   lazy val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
-      flags ++ snsLocalEndpointFlags ++ dynamoDbTestEndpointFlags ++ cloudWatchLocalEndpointFlag
-    ).bind[AmazonKinesis](
-        new AmazonDynamoDBStreamsAdapterClient(streamsClient))
-      .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
+      flags ++ snsLocalEndpointFlags ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag
+    )
+        .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
 

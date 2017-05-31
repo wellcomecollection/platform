@@ -25,11 +25,14 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
 
-  val dynamoDbTestEndpointFlags: Map[String, String] =
-    Map("aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
-        "aws.region" -> "localhost",
-        "aws.accessKey" -> "access",
-        "aws.secretKey" -> "secret")
+  val dynamoDbLocalEndpointFlags: Map[String, String] =
+    Map(
+      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
+      "aws.dynamoDb.streams.endpoint" -> dynamoDBEndPoint,
+      "aws.region" -> "localhost",
+      "aws.accessKey" -> "access",
+      "aws.secretKey" -> "secret"
+    )
 
   private val dynamoDBLocalCredentialsProvider =
     new AWSStaticCredentialsProvider(

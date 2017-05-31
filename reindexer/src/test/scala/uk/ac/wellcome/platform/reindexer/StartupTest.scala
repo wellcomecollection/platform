@@ -22,7 +22,7 @@ class StartupTest
       "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
       "aws.dynamo.miroData.tableName" -> "MiroData",
       "reindex.target.tableName" -> "MiroData"
-    ) ++ dynamoDbTestEndpointFlags ++ cloudWatchLocalEndpointFlag
+    ) ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag
   )
 
   test("server starts up correctly") {

@@ -23,7 +23,7 @@ class ReindexerFeatureTest
         "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
         "aws.dynamo.calmData.tableName" -> "CalmData",
         "reindex.target.tableName" -> "CalmData"
-      ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbTestEndpointFlags
+      ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
     )
 
   it(
