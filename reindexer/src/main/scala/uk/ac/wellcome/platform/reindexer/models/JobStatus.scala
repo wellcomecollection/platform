@@ -15,7 +15,8 @@ object JobStatus extends Enumeration {
 case class ReindexStatus(state: JobStatus.Value,
                          percentComplete: Option[Float]) {
   def toMap =
-    Map("state" -> state.toString, "percent" -> percentComplete.getOrElse(0F))
+    Map("state" -> state.toString,
+        "percent" -> percentComplete.getOrElse(0F).toString)
 
 }
 object ReindexStatus {
