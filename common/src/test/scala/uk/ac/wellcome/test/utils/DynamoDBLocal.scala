@@ -30,7 +30,6 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   val dynamoDbLocalEndpointFlags: Map[String, String] =
     Map(
       "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
-      "aws.dynamoDb.streams.endpoint" -> dynamoDBEndPoint,
       "aws.region" -> "localhost",
       "aws.accessKey" -> accessKey,
       "aws.secretKey" -> secretKey
