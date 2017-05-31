@@ -20,7 +20,8 @@ import uk.ac.wellcome.platform.transformer.Server
 import uk.ac.wellcome.test.utils.{
   DynamoDBLocal,
   ExtendedPatience,
-  SNSLocal
+  SNSLocal,
+  TestFlags
 }
 
 trait TransformerFeatureTest
@@ -28,14 +29,15 @@ trait TransformerFeatureTest
     with ExtendedPatience
     with Eventually
     with SNSLocal
-    with DynamoDBLocal { this: Suite =>
+    with DynamoDBLocal
+    with TestFlags { this: Suite =>
   val flags: Map[String, String]
   val kinesisClientLibConfiguration: KinesisClientLibConfiguration
 
   lazy val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
-      flags
+      flags ++ testFlags
     ).bind[AmazonSNS](amazonSNS)
       .bind[AmazonDynamoDB](dynamoDbClient)
       .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
