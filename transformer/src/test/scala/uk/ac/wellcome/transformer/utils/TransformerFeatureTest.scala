@@ -27,7 +27,7 @@ trait TransformerFeatureTest
     new EmbeddedHttpServer(
       new Server(),
       flags ++ testFlags
-    ).bind[AmazonSNS](amazonSNS)
+    )
       .bind[AmazonKinesis](new AmazonDynamoDBStreamsAdapterClient(
         streamsClient))
       .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)

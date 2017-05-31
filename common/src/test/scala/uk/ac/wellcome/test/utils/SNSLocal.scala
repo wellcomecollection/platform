@@ -13,7 +13,10 @@ import org.apache.http.client.methods.HttpDelete
 import org.apache.http.impl.client.HttpClientBuilder
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
-trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
+trait SNSLocal extends BeforeAndAfterEach with Logging with TestFlagsProvider {
+  this: Suite =>
+  override def testFlags: Map[String, String] =
+    Map("aws.sns.endpoint" -> localSNSEndpointUrl) ++ super.testFlags
 
   private val localSNSEndpointUrl = "http://localhost:9292"
 
@@ -31,7 +34,9 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    HttpClientBuilder.create().build()
+    HttpClientBuilder
+      .create()
+      .build()
       .execute(new HttpDelete(s"$localSNSEndpointUrl/messages"))
   }
 
