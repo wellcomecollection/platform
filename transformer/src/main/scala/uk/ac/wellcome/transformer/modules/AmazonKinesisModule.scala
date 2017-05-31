@@ -18,7 +18,7 @@ object AmazonKinesisModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def providesAmazonKinesis(awsConfig: AWSConfig): AmazonKinesis = {
+    def providesAmazonKinesis(awsConfig: AWSConfig): AmazonKinesis = {
     if (dynamoDbStreamsEndpoint().isEmpty) {
       val adapter = new AmazonDynamoDBStreamsAdapterClient(
         new DefaultAWSCredentialsProviderChain()
