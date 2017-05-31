@@ -2,6 +2,7 @@ package uk.ac.wellcome.finatra.modules
 
 import javax.inject.Singleton
 
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
@@ -19,14 +20,16 @@ object DynamoClientModule extends TwitterModule {
   @Provides
   def providesDynamoClient(awsConfig: AWSConfig): AmazonDynamoDB = {
     val standardDynamoDBClientBuilder = AmazonDynamoDBClientBuilder.standard
-    if (dynamoDbEndpoint().isEmpty) {
+    if (dynamoDbEndpoint().isEmpty)
       standardDynamoDBClientBuilder
         .withRegion(awsConfig.region)
         .build()
-    } else
+    else
       standardDynamoDBClientBuilder
         .withEndpointConfiguration(
           new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
+        .withCredentials(new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
         .build()
   }
 
