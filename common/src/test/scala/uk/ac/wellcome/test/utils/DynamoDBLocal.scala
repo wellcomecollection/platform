@@ -23,7 +23,7 @@ import scala.collection.JavaConversions._
 trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
   private val port = 45678
-  private val dynamoDBEndPoint = "http://localhost:" + port
+  val dynamoDBEndPoint = "http://localhost:" + port
 
   private val dynamoDBLocalCredentialsProvider =
     new AWSStaticCredentialsProvider(
