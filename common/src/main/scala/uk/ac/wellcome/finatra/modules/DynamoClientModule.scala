@@ -3,6 +3,7 @@ package uk.ac.wellcome.finatra.modules
 import javax.inject.Singleton
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
@@ -20,17 +21,7 @@ object DynamoClientModule extends TwitterModule {
   @Provides
   def providesDynamoClient(awsConfig: AWSConfig): AmazonDynamoDB = {
     val standardDynamoDBClientBuilder = AmazonDynamoDBClientBuilder.standard
-    if (dynamoDbEndpoint().isEmpty)
-      standardDynamoDBClientBuilder
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardDynamoDBClientBuilder
-        .withEndpointConfiguration(
-          new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
-        .build()
+    createAwsClient(awsConfig, standardDynamoDBClientBuilder)
   }
 
   @Singleton
@@ -38,17 +29,7 @@ object DynamoClientModule extends TwitterModule {
   def providesDynamoStreamsClient(awsConfig: AWSConfig): AmazonDynamoDBStreams = {
     val standardDynamoStreamsClientBuilder = AmazonDynamoDBStreamsClientBuilder
         .standard()
-    if (dynamoDbEndpoint().isEmpty)
-      standardDynamoStreamsClientBuilder
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardDynamoStreamsClientBuilder
-        .withEndpointConfiguration(
-          new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
-        .build()
+    createAwsClient(awsConfig, standardDynamoStreamsClientBuilder)
   }
 
   @Singleton
@@ -56,16 +37,22 @@ object DynamoClientModule extends TwitterModule {
   def providesDynamoAsyncClient(awsConfig: AWSConfig): AmazonDynamoDBAsync = {
     val standardDynamoDbAsyncClientBuilder = AmazonDynamoDBAsyncClientBuilder
       .standard()
-    if (dynamoDbEndpoint().isEmpty)
-      standardDynamoDbAsyncClientBuilder
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardDynamoDbAsyncClientBuilder
-        .withEndpointConfiguration(
+    createAwsClient(awsConfig, standardDynamoDbAsyncClientBuilder)
+  }
+
+  private def createAwsClient[T,J](awsConfig: AWSConfig, awsClientBuilder: AwsClientBuilder[T,J]) :J = {
+    if (dynamoDbEndpoint().isEmpty){
+      awsClientBuilder
+        .setRegion(awsConfig.region)
+      awsClientBuilder.build()
+    }
+    else {
+      awsClientBuilder
+        .setEndpointConfiguration(
           new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
-        .build()
+      awsClientBuilder.withCredentials(new AWSStaticCredentialsProvider(
+        new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
+      awsClientBuilder.build()
+    }
   }
 }
