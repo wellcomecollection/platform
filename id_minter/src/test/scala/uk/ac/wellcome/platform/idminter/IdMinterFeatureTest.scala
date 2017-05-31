@@ -12,7 +12,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal, TestFlags}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal, TestFlagsProvider}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
@@ -22,7 +22,7 @@ class IdMinterFeatureTest
     with FeatureTestMixin
     with SQSLocal
     with SNSLocal
-    with Eventually with TestFlags {
+    with Eventually with DynamoDBLocal {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")

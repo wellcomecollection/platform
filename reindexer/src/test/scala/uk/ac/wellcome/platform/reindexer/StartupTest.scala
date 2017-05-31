@@ -3,22 +3,24 @@ package uk.ac.wellcome.platform.reindexer
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.test.utils.{StartupLogbackOverride, TestFlags}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  DynamoDBLocal,
+  StartupLogbackOverride
+}
 
 class StartupTest
     extends FeatureTest
     with StartupLogbackOverride
-    with TestFlags {
+    with DynamoDBLocal
+    with AmazonCloudWatchFlag {
 
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
     flags = Map(
-      // because StartupTests use real clients that connect to our AWS instances,
-      // we cannot give them real values to prevent them to pollute our real AWS instances
-      // TODO use real values once we switch to use enpoinds from flags in real client modules
-      "aws.dynamo.reindexTracker.tableName" -> "not-real-reindexer-table-name",
-      "aws.dynamo.miroData.tableName" -> "not-real-table-name",
+      "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
+      "aws.dynamo.miroData.tableName" -> "MiroData",
       "reindex.target.tableName" -> "MiroData"
     ) ++ testFlags
   )
