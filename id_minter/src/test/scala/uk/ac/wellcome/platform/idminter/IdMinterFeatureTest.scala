@@ -12,17 +12,17 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal, TestFlags}
 import uk.ac.wellcome.utils.JsonUtil
+
 import scala.collection.JavaConversions._
 
 class IdMinterFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with SQSLocal
-    with DynamoDBLocal
     with SNSLocal
-    with Eventually {
+    with Eventually with TestFlags {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
@@ -37,10 +37,9 @@ class IdMinterFeatureTest
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn,
       "aws.dynamo.identifiers.tableName" -> identifiersTableName
-    )
+    ) ++ testFlags
   ).bind[AmazonSQS](sqsClient)
     .bind[AmazonSNS](amazonSNS)
-    .bind[AmazonDynamoDB](dynamoDbClient)
 
   it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
