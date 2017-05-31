@@ -17,6 +17,8 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
   metricsSender: MetricsSender)
     extends Logging {
 
+  val maxAttempts: Int = 3
+
   def run: Future[PutItemResult] = {
     info("ReindexService started.")
 
@@ -37,7 +39,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
   private def processReindexAttempt(
     reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
     reindexAttempt match {
-      case ReindexAttempt(_, _, attempt) if attempt > 2 =>
+      case ReindexAttempt(_, _, attempt) if attempt > maxAttempts =>
         Future.failed(
           new RuntimeException(
             s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
@@ -46,7 +48,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
         Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!
       }
       case _ => {
-        info(s"ReindexService continuing to process $reindexAttempt")
+        info(s"ReindexService continuing at attempt ${reindexAttempt.attempt}, ")
 
         reindexTargetService
           .runReindex(reindexAttempt)

@@ -5,13 +5,18 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{MiroTransformable, Reindex}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
+import uk.ac.wellcome.test.utils.{
+  DynamoDBLocal,
+  ExtendedPatience,
+  MetricsSenderLocal
+}
 
 class MiroReindexTargetServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
     with DynamoDBLocal
+    with MetricsSenderLocal
     with ExtendedPatience {
 
   it("should update the correct index to the requested version") {
@@ -56,7 +61,7 @@ class MiroReindexTargetServiceTest
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexTargetService =
-      new MiroReindexTargetService(dynamoDbClient, "MiroData")
+      new MiroReindexTargetService(dynamoDbClient, "MiroData", metricsSender)
 
     whenReady(reindexTargetService.runReindex(reindexAttempt)) {
       reindexAttempt =>

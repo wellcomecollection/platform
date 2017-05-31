@@ -29,7 +29,7 @@ class ReindexServiceTest
         dynamoConfigs,
         "CalmData"
       ),
-      new CalmReindexTargetService(dynamoDbClient, "CalmData"),
+      new CalmReindexTargetService(dynamoDbClient, "CalmData", metricsSender),
       metricsSender
     )
 

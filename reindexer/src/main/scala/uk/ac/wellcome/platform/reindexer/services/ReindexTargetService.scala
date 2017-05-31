@@ -6,6 +6,7 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{Reindex, ReindexItem, Reindexable}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -13,7 +14,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 abstract class ReindexTargetService[T <: Reindexable[String]](
-  dynamoDBClient: AmazonDynamoDB)
+  dynamoDBClient: AmazonDynamoDB,
+  metricsSender: MetricsSender)
     extends Logging {
   import uk.ac.wellcome.utils.ScanamoUtils._
 
@@ -42,7 +44,7 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   private def updateRows(reindex: Reindex, rows: List[ReindexItem[String]]) = {
     info(
-      s"ReindexTargetService updating ${rows.length} rows to ReindexVersion: ${reindex.RequestedVersion}")
+      s"ReindexTargetService updating to ReindexVersion: ${reindex.RequestedVersion}")
 
     val ops = rows.map(reindexItem => {
       val uniqueKey = reindexItem.hashKey and reindexItem.rangeKey
@@ -50,7 +52,31 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
         .update(uniqueKey, set('ReindexVersion -> reindex.RequestedVersion))
     })
 
-    Future(ops.map(Scanamo.exec(dynamoDBClient)(_)))
+    val updateGroupSize = Math.ceil((rows.length + 0.1) * 0.1).toInt
+    val updateGroups = ops.grouped(updateGroupSize).zipWithIndex
+
+    info(
+      s"ReindexTargetService updating ${rows.length} rows in batches of $updateGroupSize")
+
+    Future {
+      updateGroups.flatMap {
+        case (groupOps, i) => {
+          val result = groupOps.map(Scanamo.exec(dynamoDBClient)(_))
+
+          val updateCount = groupOps.length * (i + 1)
+          val percentComplete =
+            "%1.0f".format((updateCount.toFloat / rows.length.toFloat) * 100)
+
+          info(
+            s"ReindexTargetService completed ${updateCount} updates: ${percentComplete}% complete")
+
+          metricsSender.incrementCount("reindex-updated-items", updateCount.toDouble)
+
+          result
+        }
+      }.toList
+
+    }
   }
 
   private def getRowsWithOldReindexVersion(reindex: Reindex) = Future {

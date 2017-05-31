@@ -7,6 +7,7 @@ import akka.agent.Agent
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable}
 import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -24,14 +25,16 @@ object ReindexModule extends TwitterModule {
   @Singleton
   @Provides
   def providesMiroReindexTargetService(
-    dynamoDBClient: AmazonDynamoDB): ReindexTargetService[MiroTransformable] =
-    new MiroReindexTargetService(dynamoDBClient, targetTableName())
+    dynamoDBClient: AmazonDynamoDB,
+    metricsSender: MetricsSender): ReindexTargetService[MiroTransformable] =
+    new MiroReindexTargetService(dynamoDBClient, targetTableName(), metricsSender)
 
   @Singleton
   @Provides
   def providesCalmReindexTargetService(
-    dynamoDBClient: AmazonDynamoDB): ReindexTargetService[CalmTransformable] =
-    new CalmReindexTargetService(dynamoDBClient, targetTableName())
+    dynamoDBClient: AmazonDynamoDB,
+    metricsSender: MetricsSender): ReindexTargetService[CalmTransformable] =
+    new CalmReindexTargetService(dynamoDBClient, targetTableName(), metricsSender)
 
   override def singletonStartup(injector: Injector) {
     val tableName = targetTableName()

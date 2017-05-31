@@ -3,19 +3,19 @@ package uk.ac.wellcome.platform.reindexer.services
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable, Reindex}
+import uk.ac.wellcome.models.{CalmTransformable, Reindex}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience, MetricsSenderLocal}
 
 class CalmReindexTargetServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
     with DynamoDBLocal
+    with MetricsSenderLocal
     with ExtendedPatience {
 
-  it(
-    "should update the correct index to the requested version") {
+  it("should update the correct index to the requested version") {
 
     val currentVersion = 1
     val requestedVersion = 2
@@ -53,7 +53,7 @@ class CalmReindexTargetServiceTest
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexTargetService =
-      new CalmReindexTargetService(dynamoDbClient, "CalmData")
+      new CalmReindexTargetService(dynamoDbClient, "CalmData", metricsSender)
     val reindexAttempt = ReindexAttempt(reindex)
     val expectedReindexAttempt = reindexAttempt.copy(
       reindex = reindex,

@@ -37,14 +37,14 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
     future
   }
 
-  def incrementCount(metricName: String): PutMetricDataResult = {
+  def incrementCount(metricName: String, count: Double = 1.0): PutMetricDataResult = {
     amazonCloudWatch.putMetricData(
       new PutMetricDataRequest()
         .withNamespace(namespace)
         .withMetricData(
           new MetricDatum()
             .withMetricName(metricName)
-            .withValue(1.0)
+            .withValue(count)
             .withUnit(StandardUnit.Count)
             .withTimestamp(new Date())))
   }
