@@ -61,9 +61,14 @@ class MiroTransformerFeatureTest
 
   private def putMiroImageInDynamoDb(miroID: String, imageTitle: String) = {
     Scanamo.put(dynamoDbClient)(miroDataTableName)(
-      MiroTransformable(miroID,
-                        "Images-A",
-                        s"""{"image_title": "$imageTitle"}"""))
+      MiroTransformable(
+        miroID,
+        "Images-A",
+        s"""{
+          "image_title": "$imageTitle",
+          "image_cleared": "Y",
+          "image_copyright_cleared": "Y"
+        }"""))
   }
 
 }
