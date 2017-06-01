@@ -7,6 +7,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
+import scala.util.control.Breaks.break
 
 /** This trait implements an exponential backoff algorithm.  This is useful
  *  for wrapping an operation that is known to be flakey/unreliable.
@@ -91,24 +92,25 @@ trait TryBackoff extends Logging {
    *  to know how many attempts to try for internal bookkeeping, but the
    *  calculation is abstracted away from the caller.
    */
-  private def maximumAttemptsToTry() {
+  private def maximumAttemptsToTry(): Int = {
     var totalMillis: Long = 0
     var attempt = 0
-    while true {
-      totalMillis += timeToWaitOnAttempt(attempt)
-      if totalMillis > totalWaitMillis {
-        return attempt
+    while (true) {
+      totalMillis = totalMillis + timeToWaitOnAttempt(attempt)
+      if (totalMillis > totalWaitMillis) {
+        break
       } else {
         attempt += 1
       }
     }
+    attempt
   }
 
   /** Returns the time to wait after the nth failure.
    *
    *  @param attempt which attempt has just failed (zero-indexed)
    */
-  private def timeToWaitOnAttempt(attempt: Int) {
+  private def timeToWaitOnAttempt(attempt: Int): Long = {
     // This choice of exponent is somewhat arbitrary.  All we require is
     // that later attempts wait longer than earlier attempts.
     val exponent = attempt / (baseWaitMillis / 4)
