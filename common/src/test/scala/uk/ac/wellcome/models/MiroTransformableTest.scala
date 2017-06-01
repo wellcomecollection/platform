@@ -105,6 +105,42 @@ class MiroTransformableTest extends FunSpec with Matchers {
     work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
+  it("should not pass through records with a missing image_cleared field") {
+    assertTransformMiroRecordFails(data="""{
+      "image_title": "Missives on museums",
+      "image_copyright_cleared": "Y"
+    }""")
+  }
+
+  it("should not pass through records with a missing image_copyright_cleared field") {
+    assertTransformMiroRecordFails(data="""{
+      "image_title": "A caricature of cats",
+      "image_cleared": "Y"
+    }""")
+  }
+
+  it("should not pass through records with missing image_cleared and missing image_copyright_cleared field") {
+    assertTransformMiroRecordFails(data="""{
+      "image_title": "Drawings of dromedaries"
+    }""")
+  }
+
+  it("should not pass through records with an image_cleared value that isn't 'Y'") {
+    assertTransformMiroRecordFails(data="""{
+      "image_title": "Confidential colourings of crododiles",
+      "image_cleared": "N",
+      "image_copyright_cleared": "Y"
+    }""")
+  }
+
+  it("should not pass through records with image_copyright_cleared field that isn't 'Y'") {
+    assertTransformMiroRecordFails(data="""{
+      "image_title": "Proprietary poetry about porcupines",
+      "image_cleared": "Y",
+      "image_copyright_cleared": "N"
+    }""")
+  }
+
   private def assertTransformMiroRecordFails(
     miroID: String = "M0000001",
     miroCollection: String = "TestCollection",
