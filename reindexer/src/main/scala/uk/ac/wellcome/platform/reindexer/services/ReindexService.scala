@@ -9,15 +9,15 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Reindexable
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.TryBackoff
 
 import scala.concurrent.Future
 
 class ReindexService[T <: Reindexable[String]] @Inject()(
   reindexTrackerService: ReindexTrackerService,
   reindexTargetService: ReindexTargetService[T],
-  metricsSender: MetricsSender,
-  @Flag("reindex.maxAttempts") maxAttempts: Int)
-    extends Logging {
+  metricsSender: MetricsSender)
+    extends Logging with TryBackoff{
 
   def run: Future[PutItemResult] = {
     info("ReindexService started.")
@@ -39,10 +39,6 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
   private def processReindexAttempt(
     reindexAttempt: ReindexAttempt): Future[ReindexAttempt] =
     reindexAttempt match {
-      case ReindexAttempt(_, _, attempt) if attempt > (maxAttempts + 1) =>
-        Future.failed(
-          new RuntimeException(
-            s"Giving up on $reindexAttempt, tried too many times.")) // Stop: give up!
       case ReindexAttempt(reindex, Nil, attempt) if attempt != 0 => {
         info(s"Finshed reindexing $reindex successfully.")
         Future.successful(ReindexAttempt(reindex, Nil, attempt)) // Stop: done!

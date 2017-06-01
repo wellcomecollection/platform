@@ -15,9 +15,9 @@ class CalmReindexTargetService @Inject()(
     extends ReindexTargetService[CalmTransformable](dynamoDBClient,
                                                     metricsSender) {
 
-  override val transformableTable: Table[CalmTransformable] =
+  protected override val transformableTable: Table[CalmTransformable] =
     Table[CalmTransformable](reindexTargetTableName)
 
-  override val scanamoQuery: ScanamoQuery =
+  protected override val scanamoQuery: ScanamoQuery =
     Scanamo.queryIndex[CalmTransformable](dynamoDBClient) _
 }
