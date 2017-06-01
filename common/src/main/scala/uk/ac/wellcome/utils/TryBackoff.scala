@@ -7,6 +7,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
+import scala.util.control.Breaks.break
 
 /** This trait implements an exponential backoff algorithm.  This is useful
   * for wrapping an operation that is known to be flakey/unreliable.
@@ -26,6 +27,13 @@ import scala.util.{Failure, Success, Try}
   *     @param totalWaitMillis how many milliseconds should we wait before
   *                            giving up on the operation
   *
+  * Additionally, the operation can run again after it succeeds (reverting
+  * to the base wait time), or give up after the first success.  This is
+  * controlled by a third attribute:
+  *
+  *     @param continuous      true if the operation should repeat, false
+  *                            if it should return after the first success
+  *
   * For example, to wait 1 second after the first failure and give up after
   * five minutes, we would set
   *
@@ -37,7 +45,8 @@ import scala.util.{Failure, Success, Try}
   */
 trait TryBackoff extends Logging {
   val baseWaitMillis = 100
-  val totalWaitMillis = 30 * 60 * 1000  // half an hour
+  val totalWaitMillis = 30 * 60 * 1000 // half an hour
+  val continuous = true
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
@@ -53,6 +62,12 @@ trait TryBackoff extends Logging {
       case Failure(e) =>
         error(s"Failed to run (attempt: $attempt)", e)
         attempt + 1
+    }
+
+    // If we're in non-continuous mode and the last attempt succeeded,
+    // we should return immediately.
+    if (numberOfAttempts == 0 && !continuous) {
+      return
     }
 
     if (numberOfAttempts > maxAttempts) {
@@ -77,24 +92,25 @@ trait TryBackoff extends Logging {
     * to know how many attempts to try for internal bookkeeping, but the
     * calculation is abstracted away from the caller.
     */
-  private def maximumAttemptsToTry() {
+  private def maximumAttemptsToTry(): Int = {
     var totalMillis: Long = 0
     var attempt = 0
-    while true {
-      totalMillis += timeToWaitOnAttempt(attempt)
-      if totalMillis > totalWaitMillis {
-        return attempt
+    while (true) {
+      totalMillis = totalMillis + timeToWaitOnAttempt(attempt)
+      if (totalMillis > totalWaitMillis) {
+        break
       } else {
         attempt += 1
       }
     }
+    attempt
   }
 
   /** Returns the time to wait after the nth failure.
     *
     * @param attempt which attempt has just failed (zero-indexed)
     */
-  private def timeToWaitOnAttempt(attempt: Int) {
+  private def timeToWaitOnAttempt(attempt: Int): Long = {
     // This choice of exponent is somewhat arbitrary.  All we require is
     // that later attempts wait longer than earlier attempts.
     val exponent = attempt / (baseWaitMillis / 4)
