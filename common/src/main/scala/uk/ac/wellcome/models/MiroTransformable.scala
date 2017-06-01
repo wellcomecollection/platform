@@ -59,7 +59,7 @@ case class MiroTransformable(MiroID: String,
       // Determining the creation date depends on several factors, so we do
       // it on a per-collection basis.
       val createdDate: Option[Period] = MiroCollection match {
-        case "Images-V" => miroData.artworkDate.map { Period(_) }
+        case "Images_V" => miroData.artworkDate.map { Period(_) }
         case _ => None
       }
 
