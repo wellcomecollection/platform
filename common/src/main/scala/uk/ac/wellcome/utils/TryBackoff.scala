@@ -50,8 +50,8 @@ trait TryBackoff extends Logging {
       f()
     } match {
       case Success(_) => 0
-      case Failure(_) =>
-        error(s"Failed to run (attempt: $attempt)")
+      case Failure(e) =>
+        error(s"Failed to run (attempt: $attempt)", e)
         attempt + 1
     }
 
