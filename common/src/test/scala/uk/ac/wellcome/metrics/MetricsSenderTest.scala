@@ -1,10 +1,7 @@
 package uk.ac.wellcome.metrics
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.cloudwatch.model.{
-  MetricDatum,
-  PutMetricDataRequest
-}
+import com.amazonaws.services.cloudwatch.model.PutMetricDataRequest
 import org.mockito.ArgumentCaptor
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -41,13 +38,15 @@ class MetricsSenderTest
 
         verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
-        capture.getValue.getMetricData.exists { item: MetricDatum =>
-          (item.getValue == 1.0) && item.getMetricName == metricName
-        }
+        capture.getAllValues.exists { request: PutMetricDataRequest =>
+          val item = request.getMetricData()
+          (item.head.getValue == 1.0) && item.head.getMetricName == "success"
+        } shouldBe true
 
-        capture.getValue.getMetricData.exists { item: MetricDatum =>
-          (item.getValue > 100) && (item.getMetricName == "success")
-        }
+        capture.getAllValues.exists { request: PutMetricDataRequest =>
+          val item = request.getMetricData()
+          (item.head.getValue > 100) && (item.head.getMetricName == "bar")
+        } shouldBe true
       }
     }
 
@@ -64,13 +63,14 @@ class MetricsSenderTest
       whenReady(future.failed) { _ =>
         verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
-        capture.getValue.getMetricData.exists { item: MetricDatum =>
-          (item.getValue == 1.0) && item.getMetricName == metricName
-        }
+        capture.getAllValues.exists { request: PutMetricDataRequest =>
+          val item = request.getMetricData
+          (item.head.getValue == 1.0) && item.head.getMetricName == "failure"
+        } shouldBe true
 
-        capture.getValue.getMetricData.exists { item: MetricDatum =>
-          (item.getValue > 100) && (item.getMetricName == "success")
-        }
+        capture.getAllValues.exists { request: PutMetricDataRequest =>
+          request.getMetricData.head.getMetricName == "bar"
+        } shouldBe true
       }
     }
   }
