@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.reindexer.services
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.amazonaws.services.dynamodbv2.model.PutItemResult
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Mockito._
@@ -130,5 +131,15 @@ class ReindexServiceTest
     }
 
   }
-  
+
+  it("should report successful when there is no work to do") {
+    val reindex = Reindex(calmDataTableName, currentVersion, currentVersion)
+    Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
+
+    val reindexService = createReindexService
+
+    whenReady(reindexService.run) { _ =>
+      // Future does not fail
+    }
+  }
 }
