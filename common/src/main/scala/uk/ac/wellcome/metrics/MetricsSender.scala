@@ -42,27 +42,36 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
     future
   }
 
-  def incrementCount(metricName: String, count: Double = 1.0) = {
-    try {
+  def incrementCount(metricName: String,
+                     count: Double = 1.0): Future[PutMetricDataResult] = {
+    val f = Future {
+
       amazonCloudWatch.putMetricData(
         new PutMetricDataRequest()
           .withNamespace(namespace)
           .withMetricData(
             new MetricDatum()
               .withMetricName(metricName)
-              .withValue(1.0)
+              .withValue(count)
               .withUnit(StandardUnit.Count)
               .withTimestamp(new Date())))
-    } catch {
-      case e: RuntimeException =>
-        error("Failed to send incrementCount metric!", e)
     }
+
+    f.onFailure {
+      case e: Exception => {
+        error("Failed to send incrementCount metric!", e)
+      }
+    }
+
+    f
   }
 
-  def sendTime(metricName: String,
-               time: Duration,
-               dimensions: Map[String, String] = Map()) = {
-    try {
+  def sendTime(
+    metricName: String,
+    time: Duration,
+    dimensions: Map[String, String] = Map()): Future[PutMetricDataResult] = {
+
+    val f = Future {
       amazonCloudWatch.putMetricData(
         new PutMetricDataRequest()
           .withNamespace(namespace)
@@ -78,8 +87,15 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
               .withValue(time.toMillis.toDouble)
               .withUnit(StandardUnit.Milliseconds)
               .withTimestamp(new Date())))
-    } catch {
-      case e: RuntimeException => error("Failed to send sendTime metric!", e)
     }
+
+    f.onFailure {
+      case e: Exception => {
+        error("Failed to send sendTime metric!", e)
+      }
+    }
+
+    f
+
   }
 }
