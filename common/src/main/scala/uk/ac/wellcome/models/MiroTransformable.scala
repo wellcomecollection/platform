@@ -12,8 +12,12 @@ case class MiroTransformableData(
   @JsonProperty("image_image_desc") description: Option[String],
   @JsonProperty("image_secondary_creator") secondaryCreator: Option[
     List[String]],
-  @JsonProperty("image_artwork_date") artworkDate: Option[String]
+  @JsonProperty("image_artwork_date") artworkDate: Option[String],
+  @JsonProperty("image_cleared") cleared: Option[String],
+  @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String]
 )
+
+case class shouldNotTransformException(message: String) extends Exception(message)
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
@@ -34,6 +38,17 @@ case class MiroTransformable(MiroID: String,
       val identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID))
 
       // XML tags refer to fields within the Miro XML dumps.
+
+      // If the <image_cleared> or <image_copyright_cleared> fields are
+      // missing or don't have have the value 'Y', then we shouldn't expose
+      // this image in the public API.
+      // See https://github.com/wellcometrust/platform-api/issues/356
+      if (miroData.cleared.getOrElse("N") != "Y") {
+        throw new shouldNotTransformException("image_cleared field is not Y")
+      }
+      if (miroData.copyright_cleared.getOrElse("N") != "Y") {
+        throw new shouldNotTransformException("image_copyright_cleared field is not Y")
+      }
 
       // <image_title>: the Short Description.  This maps to our property
       // "label".
