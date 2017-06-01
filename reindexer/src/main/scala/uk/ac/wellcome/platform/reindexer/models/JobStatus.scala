@@ -21,8 +21,7 @@ case class ReindexStatus(state: JobStatus.Value,
 }
 object ReindexStatus {
   private val initState = ReindexStatus(JobStatus.Init, None)
-
-  val agent: Agent[ReindexStatus] = Agent[ReindexStatus](initState)
+  private val agent: Agent[ReindexStatus] = Agent[ReindexStatus](initState)
 
   def currentStatus: ReindexStatus = agent.get()
 
