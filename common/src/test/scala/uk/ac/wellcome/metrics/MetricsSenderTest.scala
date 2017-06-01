@@ -83,11 +83,12 @@ class MetricsSenderTest
 
       val expectedValue = 3.0F
 
-      metricsSender.incrementCount("foo", expectedValue)
+      val metricFuture = metricsSender.incrementCount("foo", expectedValue)
 
-      verify(amazonCloudWatch).putMetricData(capture.capture())
-
-      capture.getValue.getMetricData.head.getValue shouldBe expectedValue
+      whenReady(metricFuture) { _ =>
+        verify(amazonCloudWatch).putMetricData(capture.capture())
+        capture.getValue.getMetricData.head.getValue shouldBe expectedValue
+      }
     }
 
     it(
@@ -115,11 +116,12 @@ class MetricsSenderTest
 
       val expectedValue = 5 millis
 
-      metricsSender.sendTime("foo", expectedValue)
+      val metricFuture = metricsSender.sendTime("foo", expectedValue)
 
-      verify(amazonCloudWatch).putMetricData(capture.capture())
-
-      capture.getValue.getMetricData.head.getValue shouldBe expectedValue.length
+      whenReady(metricFuture) { _ =>
+        verify(amazonCloudWatch).putMetricData(capture.capture())
+        capture.getValue.getMetricData.head.getValue shouldBe expectedValue.length
+      }
     }
 
     it(
