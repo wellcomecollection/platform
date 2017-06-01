@@ -26,6 +26,13 @@ import scala.util.{Failure, Success, Try}
  *      @param totalWaitMillis how many milliseconds should we wait before
  *                             giving up on the operation
  *
+ *  Additionally, the operation can run again after it succeeds (reverting
+ *  to the base wait time), or give up after the first success.  This is
+ *  controlled by a third attribute:
+ *
+ *      @param continuous      true if the operation should repeat, false
+ *                             if it should return after the first success
+ *
  *  For example, to wait 1 second after the first failure and give up after
  *  five minutes, we would set
  *
@@ -38,6 +45,7 @@ import scala.util.{Failure, Success, Try}
 trait TryBackoff extends Logging {
   val baseWaitMillis = 100
   val totalWaitMillis = 30 * 60 * 1000  // half an hour
+  val continuous = true
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
@@ -53,6 +61,12 @@ trait TryBackoff extends Logging {
       case Failure(e) =>
         error(s"Failed to run (attempt: $attempt)", e)
         attempt + 1
+    }
+
+    // If we're in non-continuous mode and the last attempt succeeded,
+    // we should return immediately.
+    if (numberOfAttempts == 0 && !continuous) {
+      return
     }
 
     if (numberOfAttempts > maxAttempts) {
