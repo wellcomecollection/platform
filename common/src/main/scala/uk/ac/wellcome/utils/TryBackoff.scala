@@ -89,10 +89,10 @@ trait TryBackoff extends Logging {
     @tailrec
     def go(attempt: Int, totalMillis: Long): Int = {
       val newTotalMillis = totalMillis + timeToWaitOnAttempt(attempt)
-      if (newTotalMillis > totalWaitMillis) attempt
+      if (newTotalMillis > totalWait.toMillis) attempt
       else go(attempt + 1, newTotalMillis)
     }
-    go(attempt = 0, totalMillis = totalWait.toMillis)
+    go(attempt = 0, totalMillis = 0)
   }
 
   /** Returns the time to wait after the nth failure.
