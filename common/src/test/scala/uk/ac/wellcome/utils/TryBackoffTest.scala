@@ -5,6 +5,7 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 
@@ -28,8 +29,9 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   it("should always call a function that succeeds") {
-    def alwaysSucceeds(): Unit = {
+    def alwaysSucceeds(): Future[Unit] = {
       calls = 0 :: calls
+      Future.successful(())
     }
 
     tryBackoff.run(alwaysSucceeds, system)
@@ -39,12 +41,13 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   it("should recall a function after it fails on the first attempt") {
-    def succeedsOnThirdAttempt(): Unit = {
+    def succeedsOnThirdAttempt(): Future[Unit] = {
       if (calls.length < 2) {
         calls = 0 :: calls
-        throw new Exception("Not ready yet")
+        Future.failed(new Exception("Not ready yet"))
       } else {
         calls = 1 :: calls
+        Future.successful(())
       }
     }
 
@@ -55,9 +58,9 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   it("should eventually give up on a function that always fails") {
-    def alwaysFails(): Unit = {
+    def alwaysFails(): Future[Unit] = {
       calls = 0 :: calls
-      throw new Exception("I will always fail")
+      Future.failed(new Exception("I will always fail"))
     }
 
     tryBackoff.run(alwaysFails, system)
@@ -69,8 +72,9 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   it("should stop after the first success if continuous is false") {
-    def alwaysSucceeds(): Unit = {
+    def alwaysSucceeds(): Future[Unit] = {
       calls = 0 :: calls
+      Future.successful(())
     }
 
     discontinuousTryBackoff.run(alwaysSucceeds, system)
@@ -82,12 +86,13 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   it("should recall a failing function function if continuous is false") {
-    def succeedsOnThirdAttempt(): Unit = {
+    def succeedsOnThirdAttempt(): Future[Unit] = {
       if (calls.length < 2) {
         calls = 0 :: calls
-        throw new Exception("Not ready yet")
+        Future.failed(new Exception("Not ready yet"))
       } else {
         calls = 1 :: calls
+        Future.successful(())
       }
     }
 
@@ -98,9 +103,9 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   it("should wait progressively longer between failed attempts") {
-    def alwaysFails(): Unit = {
-      calls = System.currentTimeMillis().toInt :: calls
-      throw new Exception("Failure is inevitable")
+    def alwaysFails(): Future[Unit] = {
+      calls = 0 :: calls
+      Future.failed(new Exception("I will always fail"))
     }
 
     system.scheduler.scheduleOnce(5 milliseconds)(println("hello world"))
