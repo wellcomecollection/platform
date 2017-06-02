@@ -54,7 +54,7 @@ trait TryBackoff extends Logging {
 
   def run(f: (() => Future[Unit]), system: ActorSystem, attempt: Int = 0): Unit = {
 
-    Future.successful().flatMap(_ => f()).onComplete { tried =>
+    Future.successful(()).flatMap(_ => f()).onComplete { tried =>
       val attempted = tried match {
         case Success(_) => Right((): Unit)
         case Failure(e) =>
@@ -67,13 +67,13 @@ trait TryBackoff extends Logging {
         right => 0
       )
 
-      if (numberOfAttempts > maxAttempts) {
-        throw new RuntimeException("Max retry attempts exceeded")
-      }
+      val shouldReschedule = if (numberOfAttempts > maxAttempts) {
+        error("Max retry attempts exceeded")
+        false
+      } else continuous || attempted.isLeft
 
-      val waitTime = timeToWaitOnAttempt(attempt)
-
-      if (continuous || attempted.isLeft) {
+      if (shouldReschedule) {
+        val waitTime = timeToWaitOnAttempt(attempt)
         val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
           run(f, system, attempt = numberOfAttempts))
         maybeCancellable = Some(cancellable)
