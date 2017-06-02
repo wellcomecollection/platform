@@ -44,8 +44,8 @@ import scala.util.{Failure, Success, Try}
   */
 trait TryBackoff extends Logging {
   lazy val continuous = true
-  lazy val baseWait = 100 millis
-  lazy val totalWait = 12 seconds
+  lazy val baseWait: Duration = 100 millis
+  lazy val totalWait: Duration = 12 seconds
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
@@ -56,7 +56,7 @@ trait TryBackoff extends Logging {
 
     Future.successful().flatMap(_ => f()).onComplete { tried =>
       val attempted = tried match {
-        case Success(_) => Right()
+        case Success(_) => Right((): Unit)
         case Failure(e) =>
           error(s"Failed to run (attempt: $attempt)", e)
           Left(e)
