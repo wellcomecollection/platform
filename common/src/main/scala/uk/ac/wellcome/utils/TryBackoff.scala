@@ -41,9 +41,9 @@ import scala.util.{Failure, Success, Try}
  *
  */
 trait TryBackoff extends Logging {
-  val baseWait = 100 millis
-  val totalWait = 30 minutes
   val continuous = true
+  def baseWait: FiniteDuration = 100 millis
+  def totalWait: FiniteDuration = 12 seconds
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
