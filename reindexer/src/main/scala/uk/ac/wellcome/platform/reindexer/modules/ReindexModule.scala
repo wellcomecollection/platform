@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 
 object ReindexModule extends TwitterModule with TryBackoff {
 
-  override val continuous: Boolean = false
+  override lazy val continuous: Boolean = false
 
   val targetTableName: Flag[String] = flag[String](
     name = "reindex.target.tableName",
