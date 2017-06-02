@@ -106,7 +106,7 @@ trait TryBackoff extends Logging {
   private def timeToWaitOnAttempt(attempt: Int): Long = {
     // This choice of exponent is somewhat arbitrary.  All we require is
     // that later attempts wait longer than earlier attempts.
-    val exponent = attempt / (baseWait.toMillis / 4)
+    val exponent = attempt.toFloat / (baseWait.toMillis / 4)
     pow(baseWait.toMillis, 1 + exponent).toLong
   }
 }
