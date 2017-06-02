@@ -5,81 +5,76 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.annotation.tailrec
-import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
 
 /** This trait implements an exponential backoff algorithm.  This is useful
-  *  for wrapping an operation that is known to be flakey/unreliable.
+  * for wrapping an operation that is known to be flakey/unreliable.
   *
-  *  If the operation fails, we try again, but we wait an increasing amount
-  *  of time between failed attempts.  This means we don't:
+  * If the operation fails, we try again, but we wait an increasing amount
+  * of time between failed attempts.  This means we don't:
   *
-  *    - Overwhelm an underlying service which might be overwhelmed -- and
-  *      thus make the problem worse
-  *    - Waste our own resources trying to repeat an operation that is likely
-  *      to fail
+  *   - Overwhelm an underlying service which might be overwhelmed -- and
+  *     thus make the problem worse
+  *   - Waste our own resources trying to repeat an operation that is likely
+  *     to fail
   *
-  *  How quickly we back off is controlled by two attributes:
+  * How quickly we back off is controlled by two attributes:
   *
-  *      @param baseWait   how long should we wait after the first failure
-  *      @param totalWait  how long should we wait before giving up
+  *     @param baseWait   how long should we wait after the first failure
+  *     @param totalWait  how long should we wait before giving up
   *
-  *  Additionally, the operation can run again after it succeeds (reverting
-  *  to the base wait time), or give up after the first success.  This is
-  *  controlled by a third attribute:
+  * Additionally, the operation can run again after it succeeds (reverting
+  * to the base wait time), or give up after the first success.  This is
+  * controlled by a third attribute:
   *
-  *      @param continuous      true if the operation should repeat, false
-  *                             if it should return after the first success
+  *     @param continuous      true if the operation should repeat, false
+  *                            if it should return after the first success
   *
-  *  For example, to wait 1 second after the first failure and give up after
-  *  five minutes, we would set
+  * For example, to wait 1 second after the first failure and give up after
+  * five minutes, we would set
   *
-  *      baseWait = 1 second
-  *      totalWait = 5 minutes
+  *     baseWait = 1 second
+  *     totalWait = 5 minutes
   *
-  *  Reference: https://en.wikipedia.org/wiki/Exponential_backoff
+  * Reference: https://en.wikipedia.org/wiki/Exponential_backoff
   *
   */
 trait TryBackoff extends Logging {
-  def baseWait = 100 millis
-  def totalWait = 12 seconds
-  def continuous = true
+  lazy val continuous = true
+  lazy val baseWait = 100 millis
+  lazy val totalWait = 12 seconds
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
 
   private var maybeCancellable: Option[Cancellable] = None
 
-  def run(f: (() => Future[Unit]),
-          system: ActorSystem,
-          attempt: Int = 0): Unit = {
+  def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
 
-    Future.successful(()).flatMap(_ => f()).onComplete { triedUnit =>
-      val attempted = triedUnit match {
-        case Success(_) => Right()
-        case Failure(e) =>
-          error(s"Failed to run (attempt: $attempt)", e)
-          Left(e)
-      }
+    val attempted = Try { f() } match {
+      case Success(_) => Right()
+      case Failure(e) =>
+        error(s"Failed to run (attempt: $attempt)", e)
+        Left(e)
+    }
 
-      val numberOfAttempts = attempted.fold(
-        left => attempt + 1,
-        right => 0
-      )
+    val numberOfAttempts = attempted.fold(
+      left => attempt + 1,
+      right => 0
+    )
 
-      if (numberOfAttempts > maxAttempts) {
-        throw new RuntimeException("Max retry attempts exceeded")
-      }
+    if (numberOfAttempts > maxAttempts) {
+      throw new RuntimeException("Max retry attempts exceeded")
+    }
 
-      val waitTime = timeToWaitOnAttempt(attempt)
+    val waitTime = timeToWaitOnAttempt(attempt)
 
-      if (continuous || attempted.isLeft) {
-        val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
-          run(f, system, attempt = numberOfAttempts))
-        maybeCancellable = Some(cancellable)
-      }
+    if (continuous || attempted.isLeft) {
+      val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
+        run(f, system, attempt = numberOfAttempts))
+      maybeCancellable = Some(cancellable)
     }
   }
 
@@ -89,10 +84,10 @@ trait TryBackoff extends Logging {
 
   /** Returns the maximum number of attempts we should try.
     *
-    *  In general, the exact number of attempts is less important than how
-    *  long we should wait before writing the operation off as failed.  We need
-    *  to know how many attempts to try for internal bookkeeping, but the
-    *  calculation is abstracted away from the caller.
+    * In general, the exact number of attempts is less important than how
+    * long we should wait before writing the operation off as failed.  We need
+    * to know how many attempts to try for internal bookkeeping, but the
+    * calculation is abstracted away from the caller.
     */
   private def maximumAttemptsToTry(): Int = {
     @tailrec
@@ -106,7 +101,7 @@ trait TryBackoff extends Logging {
 
   /** Returns the time to wait after the nth failure.
     *
-    *  @param attempt which attempt has just failed (zero-indexed)
+    * @param attempt which attempt has just failed (zero-indexed)
     */
   private def timeToWaitOnAttempt(attempt: Int): Long = {
     // This choice of exponent is somewhat arbitrary.  All we require is
