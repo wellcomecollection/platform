@@ -3,13 +3,9 @@ package uk.ac.wellcome.utils
 import akka.actor.ActorSystem
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.duration._
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
 
 
 class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually with IntegrationPatience with Matchers {
