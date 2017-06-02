@@ -54,9 +54,9 @@ trait TryBackoff extends Logging {
 
   def run(f: (() => Future[Unit]), system: ActorSystem, attempt: Int = 0): Unit = {
 
-    Future.successful(()).flatMap(_ => f()).onComplete { tryied =>
-      val attempted = tryied match {
-        case Success(_) => Right()
+    Future.successful(()).flatMap(_ => f()).onComplete { tried =>
+      val attempted = tried match {
+        case Success(_) => Right((): Unit)
         case Failure(e) =>
           error(s"Failed to run (attempt: $attempt)", e)
           Left(e)
