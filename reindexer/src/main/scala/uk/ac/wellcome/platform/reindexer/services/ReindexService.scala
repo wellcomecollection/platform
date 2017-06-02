@@ -23,7 +23,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
     metricsSender.timeAndCount("reindex-total-time", () => {
       val attempt: Future[Option[ReindexAttempt]] = for {
         indices <- reindexTrackerService.getIndexForReindex
-        attempt: Option[ReindexAttempt] = indices.map(ReindexAttempt(_, Nil, 0))
+        attempt = indices.map(ReindexAttempt(_, Nil, 0))
         _ <- attempt.map(processReindexAttempt).getOrElse(Future.successful(()))
       } yield attempt
 

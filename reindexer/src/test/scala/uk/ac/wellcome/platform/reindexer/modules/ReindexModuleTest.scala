@@ -81,11 +81,6 @@ class ReindexModuleTest
         ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
       ).bind[ReindexService[CalmTransformable]](reindexService)
 
-    val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
-    val reindexAttempt = ReindexAttempt(reindex, Nil, 0)
-
-    Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
-
     when(reindexService.run).thenReturn(Future.successful(()))
 
     server.start()
