@@ -4,10 +4,10 @@ import akka.actor.{ActorSystem, Cancellable}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+import scala.annotation.tailrec
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
-import scala.util.control.Breaks.break
 
 /** This trait implements an exponential backoff algorithm.  This is useful
   * for wrapping an operation that is known to be flakey/unreliable.
@@ -87,17 +87,13 @@ trait TryBackoff extends Logging {
     * calculation is abstracted away from the caller.
     */
   private def maximumAttemptsToTry(): Int = {
-    var totalMillis: Long = 0
-    var attempt = 0
-    while (true) {
-      totalMillis = totalMillis + timeToWaitOnAttempt(attempt)
-      if (totalMillis > totalWait.toMillis) {
-        break
-      } else {
-        attempt += 1
-      }
+    @tailrec
+    def go(attempt: Int, totalMillis: Long): Int = {
+      val newTotalMillis = totalMillis + timeToWaitOnAttempt(attempt)
+      if (newTotalMillis > totalWait.toMillis) attempt
+      else go(attempt + 1, newTotalMillis)
     }
-    attempt
+    go(attempt = 0, totalMillis = 0)
   }
 
   /** Returns the time to wait after the nth failure.
