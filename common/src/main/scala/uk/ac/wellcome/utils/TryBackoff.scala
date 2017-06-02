@@ -4,6 +4,7 @@ import akka.actor.{ActorSystem, Cancellable}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+import scala.annotation.tailrec
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
