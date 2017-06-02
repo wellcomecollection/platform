@@ -85,6 +85,22 @@ class TryBackoffTest
     calls.length shouldBe 1
   }
 
+  it("should recall a failing function function if continuous is false") {
+    def succeedsOnThirdAttempt(): Unit = {
+      if (calls.length < 2) {
+        calls = 0 :: calls
+        throw new Exception("Not ready yet")
+      } else {
+        calls = 1 :: calls
+      }
+    }
+
+    discontinuousTryBackoff.run(succeedsOnThirdAttempt, system)
+
+    Thread.sleep(2000)
+    calls.length shouldBe 3
+  }
+
   it("should wait progressively longer between failed attempts") {
     def alwaysFails(): Unit = {
       calls = System.currentTimeMillis().toInt :: calls
