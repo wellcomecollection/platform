@@ -15,9 +15,9 @@ class MiroReindexTargetService @Inject()(
     extends ReindexTargetService[MiroTransformable](dynamoDBClient,
                                                     metricsSender) {
 
-  override val transformableTable: Table[MiroTransformable] =
+  protected override val transformableTable: Table[MiroTransformable] =
     Table[MiroTransformable](reindexTargetTableName)
 
-  override val scanamoQuery: ScanamoQuery =
+  protected override val scanamoQuery: ScanamoQuery =
     Scanamo.queryIndex[MiroTransformable](dynamoDBClient) _
 }

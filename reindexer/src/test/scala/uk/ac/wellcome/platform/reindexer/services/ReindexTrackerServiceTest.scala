@@ -29,10 +29,6 @@ class ReindexTrackerServiceTest
       Reindex("MiroData", 1, 1)
     )
 
-    val expectedReindexList = List(
-      Reindex("foo", 2, 1)
-    )
-
     reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
 
     val reindexTrackerService = new ReindexTrackerService(
