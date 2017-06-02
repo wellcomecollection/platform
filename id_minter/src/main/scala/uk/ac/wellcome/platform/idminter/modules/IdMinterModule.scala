@@ -3,14 +3,13 @@ package uk.ac.wellcome.platform.idminter.modules
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.{IdentifiedWork, Work}
-import uk.ac.wellcome.platform.idminter.steps.{
-  IdentifierGenerator,
-  WorkExtractor
-}
+import uk.ac.wellcome.platform.idminter.steps.{IdentifierGenerator, WorkExtractor}
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
+import scala.concurrent.Future
 
 object IdMinterModule extends TwitterModule with TryBackoff {
   val snsSubject = "identified-item"
@@ -27,7 +26,7 @@ object IdMinterModule extends TwitterModule with TryBackoff {
 
   private def start(sqsReader: SQSReader,
                     idGenerator: IdentifierGenerator,
-                    snsWriter: SNSWriter) = {
+                    snsWriter: SNSWriter): Future[Unit] = {
 
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
