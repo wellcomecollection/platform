@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scala.concurrent.duration._
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.TryBackoff
 
 
@@ -78,5 +79,33 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
     }
     Thread.sleep(1000)
     calls.length shouldBe 1
+  }
+
+  it("should wait progressively longer between failed attempts") {
+    def alwaysFails(): Unit = {
+      calls = System.currentTimeMillis().toInt :: calls
+      throw new Exception("Failure is inevitable")
+    }
+
+    system.scheduler.scheduleOnce(5 milliseconds)(println("hello world"))
+    Thread.sleep(25)
+
+    tryBackoff.run(alwaysFails, system)
+    Thread.sleep(10000)
+    calls = calls.reverse
+
+    val differences = calls.sliding(2).toList.map(ts => ts(1) - ts(0))
+
+    // When we run this test in isolation in IntelliJ, there's a warmup
+    // penalty -- the second invocation takes an unusually long time to run.
+    // We see differences of the form:
+    //
+    //     244, 112, 144, 158, ...
+    //
+    // We don't see the warmup penalty if we run the whole suite.
+    //
+    // For now, we just drop the first difference -- the patttern is more
+    // important than an individual element.
+    differences.tail shouldBe sorted
   }
 }
