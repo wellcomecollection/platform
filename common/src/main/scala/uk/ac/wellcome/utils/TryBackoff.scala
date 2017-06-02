@@ -5,6 +5,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.annotation.tailrec
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
@@ -42,39 +43,42 @@ import scala.util.{Failure, Success, Try}
   *
   */
 trait TryBackoff extends Logging {
-  lazy val continuous = true
-  lazy val baseWait = 100 millis
-  lazy val totalWait = 12 seconds
+  lazy val continuous: Boolean = true
+  lazy val baseWait: Duration = 100 millis
+  lazy val totalWait: Duration = 12 seconds
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
 
   private var maybeCancellable: Option[Cancellable] = None
 
-  def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
+  def run(f: (() => Future[Unit]), system: ActorSystem, attempt: Int = 0): Unit = {
 
-    val attempted = Try { f() } match {
-      case Success(_) => Right()
-      case Failure(e) =>
-        error(s"Failed to run (attempt: $attempt)", e)
-        Left(e)
-    }
+    val eventualUnit = Future.successful(()).flatMap(_ => f())
+    eventualUnit.onComplete { tryied =>
+      val attempted = tryied match {
+        case Success(_) => Right()
+        case Failure(e) =>
+          error(s"Failed to run (attempt: $attempt)", e)
+          Left(e)
+      }
 
-    val numberOfAttempts = attempted.fold(
-      left => attempt + 1,
-      right => 0
-    )
+      val numberOfAttempts = attempted.fold(
+        left => attempt + 1,
+        right => 0
+      )
 
-    if (numberOfAttempts > maxAttempts) {
-      throw new RuntimeException("Max retry attempts exceeded")
-    }
+      if (numberOfAttempts > maxAttempts) {
+        throw new RuntimeException("Max retry attempts exceeded")
+      }
 
-    val waitTime = timeToWaitOnAttempt(attempt)
+      val waitTime = timeToWaitOnAttempt(attempt)
 
-    if (continuous || attempted.isLeft) {
-      val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
-        run(f, system, attempt = numberOfAttempts))
-      maybeCancellable = Some(cancellable)
+      if (continuous || attempted.isLeft) {
+        val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
+          run(f, system, attempt = numberOfAttempts))
+        maybeCancellable = Some(cancellable)
+      }
     }
   }
 

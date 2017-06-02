@@ -3,9 +3,8 @@ package uk.ac.wellcome.utils
 import akka.actor.ActorSystem
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
 
 class TryBackoffTest
     extends FunSpec
@@ -14,17 +13,12 @@ class TryBackoffTest
     with IntegrationPatience
     with Matchers {
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
+  val system: ActorSystem = ActorSystem.create("TestActorSystem")
 
-
-class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually with IntegrationPatience with Matchers {
-  val system = ActorSystem.create("TestActorSystem")
-
-  var calls = List[Int]()
+  var calls: List[Int] = List[Int]()
 
   val tryBackoff = new TryBackoff {
-    override lazy val totalWait = 6 seconds
+    override lazy val totalWait: Duration = 6 seconds
   }
 
   val discontinuousTryBackoff = new TryBackoff {
@@ -83,7 +77,7 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
     val differences = calls.reverse
       .sliding(2)
       .toList
-      .map(ts => ts(1) - ts(0))
+      .map(ts => ts(1) - ts.head)
 
     // When we run this test in isolation in IntelliJ, there's a warmup
     // penalty -- the second invocation takes an unusually long time to run.
