@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.common
+package uk.ac.wellcome.utils
 
 import akka.actor.ActorSystem
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
