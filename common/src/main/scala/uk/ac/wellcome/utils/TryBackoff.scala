@@ -42,9 +42,9 @@ import scala.util.{Failure, Success, Try}
  *
  */
 trait TryBackoff extends Logging {
-  val continuous = true
-  def baseWait: FiniteDuration = 100 millis
-  def totalWait: FiniteDuration = 12 seconds
+  def baseWait = 100 millis
+  def totalWait = 12 seconds
+  def continuous = true
 
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
@@ -53,14 +53,14 @@ trait TryBackoff extends Logging {
 
   def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
 
-    val numberOfAttempts = Try {
-      f()
-    } match {
-      case Success(_) => 0
+    val succeeded = Try { f() } match {
+      case Success(_) => true
       case Failure(e) =>
         error(s"Failed to run (attempt: $attempt)", e)
-        attempt + 1
+        false
     }
+
+    val numberOfAttempts = if (succeeded) 0 else attempt + 1
 
     if (numberOfAttempts > maxAttempts) {
       throw new RuntimeException("Max retry attempts exceeded")
@@ -68,7 +68,7 @@ trait TryBackoff extends Logging {
 
     val waitTime = timeToWaitOnAttempt(attempt)
 
-    if (numberOfAttempts == 0 || continuous) {
+    if (continuous || !succeeded) {
       val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
         run(f, system, attempt = numberOfAttempts))
       maybeCancellable = Some(cancellable)

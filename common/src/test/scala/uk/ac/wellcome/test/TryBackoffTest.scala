@@ -13,12 +13,17 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   var calls = List[Int]()
 
   val tryBackoff = new TryBackoff {
-    override def totalWait: FiniteDuration = 6 seconds
+    override def totalWait = 6 seconds
+  }
+
+  val discontinuousTryBackoff = new TryBackoff {
+    override def continuous = false
   }
 
   override def afterEach(): Unit = {
     calls = List()
     tryBackoff.cancelRun()
+    discontinuousTryBackoff.cancelRun()
   }
 
   it("should always call a function that succeeds") {
@@ -60,5 +65,18 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
     val finalLength = calls.length
     Thread.sleep(5000)
     calls.length shouldBe finalLength
+  }
+
+  it("should stop after the first success if continuous is false") {
+    def alwaysSucceeds(): Unit = {
+      calls = 0 :: calls
+    }
+
+    discontinuousTryBackoff.run(alwaysSucceeds, system)
+    eventually {
+      calls.length shouldBe 1
+    }
+    Thread.sleep(1000)
+    calls.length shouldBe 1
   }
 }
