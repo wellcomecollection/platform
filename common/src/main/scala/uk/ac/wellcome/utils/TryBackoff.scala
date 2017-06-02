@@ -22,10 +22,8 @@ import scala.util.control.Breaks.break
  *
  *  How quickly we back off is controlled by two attributes:
  *
- *      @param baseWaitMillis  how many milliseconds should we wait after
- *                             the first failure
- *      @param totalWaitMillis how many milliseconds should we wait before
- *                             giving up on the operation
+ *      @param baseWait   how long should we wait after the first failure
+ *      @param totalWait  how long should we wait before giving up
  *
  *  Additionally, the operation can run again after it succeeds (reverting
  *  to the base wait time), or give up after the first success.  This is
@@ -38,7 +36,7 @@ import scala.util.control.Breaks.break
  *  five minutes, we would set
  *
  *      baseWait = 1 second
- *      totalWaitMillis = 5 minutes
+ *      totalWait = 5 minutes
  *
  *  Reference: https://en.wikipedia.org/wiki/Exponential_backoff
  *
