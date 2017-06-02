@@ -67,7 +67,7 @@ trait TryBackoff extends Logging {
 
     val waitTime = timeToWaitOnAttempt(attempt)
 
-    if (numberOfAttempts != 0 || continuous) {
+    if (numberOfAttempts == 0 || continuous) {
       val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
         run(f, system, attempt = numberOfAttempts))
       maybeCancellable = Some(cancellable)
