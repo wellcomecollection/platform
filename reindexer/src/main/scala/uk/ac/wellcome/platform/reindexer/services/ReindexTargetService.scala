@@ -22,8 +22,8 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
   type ScanamoQuery =
     (String, String) => (Query[_]) => List[Either[DynamoReadError, T]]
 
-  val transformableTable: Table[T]
-  val scanamoQuery: ScanamoQuery
+  protected val transformableTable: Table[T]
+  protected val scanamoQuery: ScanamoQuery
 
   private val gsiName = "ReindexTracker"
 
