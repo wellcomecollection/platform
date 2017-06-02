@@ -3,9 +3,9 @@ package uk.ac.wellcome.utils
 import akka.actor.ActorSystem
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import scala.concurrent.duration._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
+
+import scala.concurrent.duration._
 
 
 class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually with IntegrationPatience with Matchers {
@@ -18,7 +18,7 @@ class TryBackoffTest extends FunSpec with BeforeAndAfterEach with Eventually wit
   }
 
   val discontinuousTryBackoff = new TryBackoff {
-    override def continuous = false
+    override val continuous = false
   }
 
   override def afterEach(): Unit = {

@@ -37,6 +37,7 @@ class ReindexModuleTest
   )
 
   it("should retry if the target service returns a failed future") {
+
     val reindexTargetService = mock[CalmReindexTargetService]
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
