@@ -57,7 +57,8 @@ object ReindexModule extends TwitterModule with TryBackoff {
     }
 
     val reindexJob = () => {
-      reindexService.run.onComplete {
+      val future = reindexService.run
+      future.onComplete {
         case Success(_) =>
           info(s"ReindexModule job completed successfully.")
           ReindexStatus.succeed()
@@ -65,6 +66,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
           error(s"ReindexModule job failed!", e)
           ReindexStatus.fail()
       }
+      future
     }
 
     run(() => reindexJob(), actorSystem)
