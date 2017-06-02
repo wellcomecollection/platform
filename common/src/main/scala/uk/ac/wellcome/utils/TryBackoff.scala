@@ -64,9 +64,7 @@ trait TryBackoff extends Logging {
 
     // If we're in non-continuous mode and the last attempt succeeded,
     // we should return immediately.
-    if (numberOfAttempts == 0 && !continuous) {
-      return
-    }
+    val shouldContinue = numberOfAttempts != 0 || continuous
 
     if (numberOfAttempts > maxAttempts) {
       throw new RuntimeException("Max retry attempts exceeded")
@@ -74,9 +72,11 @@ trait TryBackoff extends Logging {
 
     val waitTime = timeToWaitOnAttempt(attempt)
 
-    val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
-      run(f, system, attempt = numberOfAttempts))
-    maybeCancellable = Some(cancellable)
+    if (shouldContinue) {
+      val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
+        run(f, system, attempt = numberOfAttempts))
+      maybeCancellable = Some(cancellable)
+    }
   }
 
   def cancelRun(): Unit = {
