@@ -37,15 +37,15 @@ import scala.util.control.Breaks.break
  *  For example, to wait 1 second after the first failure and give up after
  *  five minutes, we would set
  *
- *      baseWaitMillis = 1000
- *      totalWaitMillis = 5 * 60 * 1000
+ *      baseWait = 1 second
+ *      totalWaitMillis = 5 minutes
  *
  *  Reference: https://en.wikipedia.org/wiki/Exponential_backoff
  *
  */
 trait TryBackoff extends Logging {
-  val baseWaitMillis = 100
-  val totalWaitMillis = 30 * 60 * 1000  // half an hour
+  val baseWait = 100 millis
+  val totalWait = 30 minutes
   val continuous = true
 
   // This value is cached to save us repeating the calculation.
@@ -97,7 +97,7 @@ trait TryBackoff extends Logging {
     var attempt = 0
     while (true) {
       totalMillis = totalMillis + timeToWaitOnAttempt(attempt)
-      if (totalMillis > totalWaitMillis) {
+      if (totalMillis > totalWait.toMillis) {
         break
       } else {
         attempt += 1
@@ -113,7 +113,7 @@ trait TryBackoff extends Logging {
   private def timeToWaitOnAttempt(attempt: Int): Long = {
     // This choice of exponent is somewhat arbitrary.  All we require is
     // that later attempts wait longer than earlier attempts.
-    val exponent = attempt / (baseWaitMillis / 4)
-    pow(baseWaitMillis, 1 + exponent).toLong
+    val exponent = attempt / (baseWait.toMillis / 4)
+    pow(baseWait.toMillis, 1 + exponent).toLong
   }
 }
