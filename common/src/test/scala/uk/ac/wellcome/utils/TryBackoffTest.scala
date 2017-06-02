@@ -32,10 +32,6 @@ class TryBackoffTest
   }
 
   it("should always call a function that succeeds") {
-    def alwaysSucceeds(): Unit = {
-      calls = 0 :: calls
-    }
-
     tryBackoff.run(alwaysSucceeds, system)
     eventually {
       calls shouldBe List(0)
@@ -43,15 +39,6 @@ class TryBackoffTest
   }
 
   it("should recall a function after it fails on the first attempt") {
-    def succeedsOnThirdAttempt(): Unit = {
-      if (calls.length < 2) {
-        calls = 0 :: calls
-        throw new Exception("Not ready yet")
-      } else {
-        calls = 1 :: calls
-      }
-    }
-
     tryBackoff.run(succeedsOnThirdAttempt, system)
     eventually {
       calls.length should be > 1
@@ -59,11 +46,6 @@ class TryBackoffTest
   }
 
   it("should eventually give up on a function that always fails") {
-    def alwaysFails(): Unit = {
-      calls = 0 :: calls
-      throw new Exception("I will always fail")
-    }
-
     tryBackoff.run(alwaysFails, system)
 
     Thread.sleep(10000)
@@ -73,10 +55,6 @@ class TryBackoffTest
   }
 
   it("should stop after the first success if continuous is false") {
-    def alwaysSucceeds(): Unit = {
-      calls = 0 :: calls
-    }
-
     discontinuousTryBackoff.run(alwaysSucceeds, system)
     eventually {
       calls.length shouldBe 1
@@ -86,15 +64,6 @@ class TryBackoffTest
   }
 
   it("should recall a failing function function if continuous is false") {
-    def succeedsOnThirdAttempt(): Unit = {
-      if (calls.length < 2) {
-        calls = 0 :: calls
-        throw new Exception("Not ready yet")
-      } else {
-        calls = 1 :: calls
-      }
-    }
-
     discontinuousTryBackoff.run(succeedsOnThirdAttempt, system)
 
     Thread.sleep(2000)
@@ -102,19 +71,13 @@ class TryBackoffTest
   }
 
   it("should wait progressively longer between failed attempts") {
-    def alwaysFails(): Unit = {
-      calls = System.currentTimeMillis().toInt :: calls
-      throw new Exception("Failure is inevitable")
-    }
-
-    system.scheduler.scheduleOnce(5 milliseconds)(println("hello world"))
-    Thread.sleep(25)
-
     tryBackoff.run(alwaysFails, system)
     Thread.sleep(10000)
-    calls = calls.reverse
 
-    val differences = calls.sliding(2).toList.map(ts => ts(1) - ts(0))
+    val differences = calls.reverse
+      .sliding(2)
+      .toList
+      .map(ts => ts(1) - ts(0))
 
     // When we run this test in isolation in IntelliJ, there's a warmup
     // penalty -- the second invocation takes an unusually long time to run.
@@ -127,5 +90,25 @@ class TryBackoffTest
     // For now, we just drop the first difference -- the patttern is more
     // important than an individual element.
     differences.tail shouldBe sorted
+  }
+
+  // Methods passed to the TryBackoff.
+
+  def alwaysSucceeds(): Unit = {
+    calls = 0 :: calls
+  }
+
+  def alwaysFails(): Unit = {
+    calls = System.currentTimeMillis().toInt :: calls
+    throw new Exception("I will always fail")
+  }
+
+  def succeedsOnThirdAttempt(): Unit = {
+    if (calls.length < 2) {
+      calls = 0 :: calls
+      throw new Exception("Not ready yet")
+    } else {
+      calls = 1 :: calls
+    }
   }
 }
