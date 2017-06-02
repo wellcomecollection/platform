@@ -3,9 +3,9 @@ package uk.ac.wellcome.utils
 import akka.actor.ActorSystem
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
 
 class TryBackoffTest
     extends FunSpec
@@ -94,21 +94,23 @@ class TryBackoffTest
 
   // Methods passed to the TryBackoff.
 
-  def alwaysSucceeds(): Unit = {
+  def alwaysSucceeds(): Future[Unit] = {
     calls = 0 :: calls
+    Future.successful(())
   }
 
-  def alwaysFails(): Unit = {
+  def alwaysFails(): Future[Unit] = {
     calls = System.currentTimeMillis().toInt :: calls
-    throw new Exception("I will always fail")
+    Future.failed(new Exception("I will always fail"))
   }
 
-  def succeedsOnThirdAttempt(): Unit = {
+  def succeedsOnThirdAttempt(): Future[Unit] = {
     if (calls.length < 2) {
       calls = 0 :: calls
-      throw new Exception("Not ready yet")
+      Future.failed(new Exception("Not ready yet"))
     } else {
       calls = 1 :: calls
+      Future.successful(())
     }
   }
 }
