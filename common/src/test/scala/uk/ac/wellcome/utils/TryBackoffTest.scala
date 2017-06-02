@@ -20,9 +20,14 @@ class TryBackoffTest
     override lazy val totalWait = 6 seconds
   }
 
+  val discontinuousTryBackoff = new TryBackoff {
+    override lazy val continuous = false
+  }
+
   override def afterEach(): Unit = {
     calls = List()
     tryBackoff.cancelRun()
+    discontinuousTryBackoff.cancelRun()
   }
 
   it("should always call a function that succeeds") {
@@ -64,5 +69,18 @@ class TryBackoffTest
     val finalLength = calls.length
     Thread.sleep(5000)
     calls.length shouldBe finalLength
+  }
+
+  it("should stop after the first success if continuous is false") {
+    def alwaysSucceeds(): Unit = {
+      calls = 0 :: calls
+    }
+
+    discontinuousTryBackoff.run(alwaysSucceeds, system)
+    eventually {
+      calls.length shouldBe 1
+    }
+    Thread.sleep(1000)
+    calls.length shouldBe 1
   }
 }
