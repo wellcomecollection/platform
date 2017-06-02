@@ -7,7 +7,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.duration._
 import scala.math.pow
 import scala.util.{Failure, Success, Try}
-import scala.util.control.Breaks.break
 
 /** This trait implements an exponential backoff algorithm.  This is useful
  *  for wrapping an operation that is known to be flakey/unreliable.
