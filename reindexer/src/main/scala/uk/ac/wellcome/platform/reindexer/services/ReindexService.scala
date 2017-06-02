@@ -24,7 +24,7 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
       val attempt: Future[Option[ReindexAttempt]] = for {
         indices <- reindexTrackerService.getIndexForReindex
         attempt = indices.map(ReindexAttempt(_, Nil, 0))
-        _ <- attempt.map(processReindexAttempt).getOrElse(Future.successful((): Unit))
+        _ <- attempt.map(processReindexAttempt).getOrElse(Future.successful(()))
       } yield attempt
 
       attempt.map {
