@@ -53,14 +53,17 @@ trait TryBackoff extends Logging {
 
   def run(f: (() => Unit), system: ActorSystem, attempt: Int = 0): Unit = {
 
-    val succeeded = Try { f() } match {
-      case Success(_) => true
+    val attempted = Try { f() } match {
+      case Success(_) => Right()
       case Failure(e) =>
         error(s"Failed to run (attempt: $attempt)", e)
-        false
+        Left(e)
     }
 
-    val numberOfAttempts = if (succeeded) 0 else attempt + 1
+    val numberOfAttempts = attempted.fold(
+      left => attempt + 1,
+      right => 0
+    )
 
     if (numberOfAttempts > maxAttempts) {
       throw new RuntimeException("Max retry attempts exceeded")
@@ -68,7 +71,7 @@ trait TryBackoff extends Logging {
 
     val waitTime = timeToWaitOnAttempt(attempt)
 
-    if (continuous || !succeeded) {
+    if (continuous || attempted.isLeft) {
       val cancellable = system.scheduler.scheduleOnce(waitTime milliseconds)(
         run(f, system, attempt = numberOfAttempts))
       maybeCancellable = Some(cancellable)
