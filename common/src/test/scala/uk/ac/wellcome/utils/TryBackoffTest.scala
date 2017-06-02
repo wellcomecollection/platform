@@ -15,7 +15,7 @@ class TryBackoffTest
     with Matchers {
   val system = ActorSystem.create("TestActorSystem")
 
-  var calls = List[Int]()
+  private var calls = List[Int]()
 
   val tryBackoff = new TryBackoff {
     override lazy val totalWait = 6 seconds
@@ -50,7 +50,10 @@ class TryBackoffTest
 
     Thread.sleep(10000)
     val finalLength = calls.length
+    println(finalLength)
+    println(calls.length)
     Thread.sleep(5000)
+    println(calls.length)
     calls.length shouldBe finalLength
   }
 
