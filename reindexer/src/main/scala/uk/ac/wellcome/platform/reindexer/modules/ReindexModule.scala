@@ -14,10 +14,11 @@ import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.TryBackoff
 
-import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 object ReindexModule extends TwitterModule with TryBackoff {
+
+  override lazy val continuous: Boolean = false
 
   val targetTableName: Flag[String] = flag[String](
     name = "reindex.target.tableName",
@@ -56,7 +57,8 @@ object ReindexModule extends TwitterModule with TryBackoff {
     }
 
     val reindexJob = () => {
-      reindexService.run.onComplete {
+      val future = reindexService.run
+      future.onComplete {
         case Success(_) =>
           info(s"ReindexModule job completed successfully.")
           ReindexStatus.succeed()
@@ -64,6 +66,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
           error(s"ReindexModule job failed!", e)
           ReindexStatus.fail()
       }
+      future
     }
 
     run(() => reindexJob(), actorSystem)
