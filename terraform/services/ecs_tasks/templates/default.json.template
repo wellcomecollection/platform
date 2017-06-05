@@ -14,10 +14,10 @@
     "links": ["app"]
   },
   {
-    "cpu": 256,
+    "cpu": 512,
     "essential": true,
     "image": "${app_uri}",
-    "memory": 512,
+    "memory": 2048,
     "name": "app",
     "environment": [
       { "name" : "INFRA_BUCKET", "value" : "${infra_bucket}" },
