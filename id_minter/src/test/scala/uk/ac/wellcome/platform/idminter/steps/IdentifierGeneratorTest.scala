@@ -1,34 +1,36 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import scalikejdbc._
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.DynamoDBLocal
+import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
+import uk.ac.wellcome.test.utils.MysqlLocal
 
 class IdentifierGeneratorTest
     extends FunSpec
-    with DynamoDBLocal
+    with MysqlLocal
     with ScalaFutures
     with Matchers
     with BeforeAndAfterEach
     with IntegrationPatience {
 
   val identifierGenerator = new IdentifierGenerator(
-    dynamoDbClient,
-    DynamoConfig("applicationName",
-                 "streamArn",
-                 identifiersTableName))
+    DB.connect(),
+    null,
+    DynamoConfig("applicationName", "streamArn", identifiersTableName))
 
   it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
-    Scanamo.put(dynamoDbClient)(identifiersTableName)(
-      Identifier("5678", "1234"))
+    withSQL {
+      insert
+        .into(Identifiers)
+        .namedValues(Identifiers.column.CanonicalID -> "5678",
+                     Identifiers.column.MiroID -> "1234")
+    }.update().apply()
 
     val work =
-      Work(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")
+      Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
+           label = "some label")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
@@ -38,43 +40,31 @@ class IdentifierGeneratorTest
 
   it("should generate an id and save it in the database if a record doesn't already exist") {
     val work =
-      Work(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")), label = "some label")
+      Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
+           label = "some label")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
       id should not be (empty)
-      Scanamo.queryIndex[Identifier](dynamoDbClient)(identifiersTableName,
-                                                     "MiroID")(
-        'MiroID -> "1234") shouldBe List(Right(Identifier(id, "1234")))
+
+      val i = Identifiers.syntax("i")
+      val maybeIdentifier = withSQL {
+        select.from(Identifiers as i).where.eq(i.MiroID, "1234")
+      }.map(Identifiers(i)).single.apply()
+      maybeIdentifier shouldBe defined
+      maybeIdentifier.get shouldBe Identifier(id, "1234")
     }
   }
 
   it("should reject an item with no miroId in the list of Identifiers") {
     val work =
       Work(
-        identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")), label = "some label")
+        identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")),
+        label = "some label")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId.failed) { exception =>
       exception.getMessage shouldBe s"Item $work did not contain a MiroID"
-    }
-  }
-
-  it("should return an error if it finds more than one record for the same MiroID") {
-    val miroId = "1234"
-    Scanamo.put(dynamoDbClient)(identifiersTableName)(
-      Identifier("5678", miroId))
-    Scanamo.put(dynamoDbClient)(identifiersTableName)(
-      Identifier("8765", miroId))
-
-    val work =
-      Work(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)), label = "some label")
-    val futureId = identifierGenerator.generateId(work)
-
-    whenReady(futureId.failed) { exception =>
-      exception.getMessage shouldBe s"Found more than one record with MiroID $miroId"
     }
   }
 }

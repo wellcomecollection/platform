@@ -34,6 +34,10 @@ object Dependencies {
     "com.gu" %% "scanamo" % versions.scanamo
   )
 
+  val mysqlDependencies: Seq[ModuleID] = Seq(
+    "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
+    "mysql" % "mysql-connector-java" % "6.0.6"
+  )
   val esDependencies: Seq[ModuleID] = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test",
@@ -59,9 +63,9 @@ object Dependencies {
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion %" test",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies
+  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ mysqlDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
