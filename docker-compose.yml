@@ -2,6 +2,12 @@ dynamodb:
   image: peopleperhour/dynamodb
   ports:
     - "45678:8000"
+mysql:
+  image: library/mysql:5.6
+  ports:
+    - "3306:3306"
+  environment:
+      - "MYSQL_ROOT_PASSWORD=password"
 sns:
   image: alicefuzier/fake-sns
   ports:
