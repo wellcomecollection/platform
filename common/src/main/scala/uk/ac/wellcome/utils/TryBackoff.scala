@@ -2,13 +2,13 @@ package uk.ac.wellcome.utils
 
 import akka.actor.{ActorSystem, Cancellable}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.annotation.tailrec
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.math.pow
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 /** This trait implements an exponential backoff algorithm.  This is useful
   * for wrapping an operation that is known to be flakey/unreliable.
@@ -81,8 +81,8 @@ trait TryBackoff extends Logging {
     }
   }
 
-  def cancelRun(): Unit = {
-    maybeCancellable.fold(())(cancellable => cancellable.cancel())
+  def cancelRun(): Boolean = {
+    maybeCancellable.fold(true)(cancellable => cancellable.cancel())
   }
 
   /** Returns the maximum number of attempts we should try.
