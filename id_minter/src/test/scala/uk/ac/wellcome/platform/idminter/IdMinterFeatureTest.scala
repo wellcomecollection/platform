@@ -12,7 +12,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{DynamoDBLocal, MysqlLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._

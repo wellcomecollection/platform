@@ -3,17 +3,19 @@ package uk.ac.wellcome.platform.idminter.steps
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.twitter.inject.{Logging, TwitterModuleFlags}
+import scalikejdbc.DB
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.blocking
-import scala.concurrent.Future
+import scala.concurrent.{Future, blocking}
 
-class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
+class IdentifierGenerator @Inject()(db: DB,
+                                    dynamoDBClient: AmazonDynamoDB,
                                     dynamoConfig: DynamoConfig)
     extends Logging
     with TwitterModuleFlags {
@@ -51,7 +53,7 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
     maybeSourceIdentifier
   }
 
-  private def findMiroIdInDynamo(miroId: String) =
+  private def findMiroIdInDynamo(miroId: String): Future[List[Either[DynamoReadError, Identifier]]] =
     Future {
       blocking {
         info(s"About to search for MiroID $miroId in $identifiersTableName")
@@ -69,8 +71,8 @@ class IdentifierGenerator @Inject()(dynamoDBClient: AmazonDynamoDB,
     val canonicalId = Identifiable.generate
     blocking {
       info(s"putting new canonicalId $canonicalId for MiroID $miroId")
-      Scanamo.put(dynamoDBClient)(identifiersTableName)(
-        Identifier(canonicalId, miroId))
+//      Scanamo.put(dynamoDBClient)(identifiersTableName)(
+//        Identifier(canonicalId, miroId))
       canonicalId
     }
   }
