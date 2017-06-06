@@ -18,7 +18,8 @@ class IdMinterFeatureTest
     with FeatureTestMixin
     with SQSLocal
     with SNSLocal
-    with Eventually with MysqlLocal {
+    with Eventually
+    with MysqlLocal {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
@@ -31,18 +32,20 @@ class IdMinterFeatureTest
       "aws.region" -> "localhost",
       "aws.sqs.queue.url" -> idMinterQueue,
       "aws.sqs.waitTime" -> "1",
-      "aws.sns.topic.arn" -> ingestorTopicArn,
-      "aws.dynamo.identifiers.tableName" -> identifiersTableName
-    ) ++ snsLocalEndpointFlags ++ sqsLocalFlags
+      "aws.sns.topic.arn" -> ingestorTopicArn
+//      "aws.rds.identifiers.schema" -> "identifiers",
+//      "aws.rds.identifiers.tableName" -> identifiersTableName
+    ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ mySqlLocalEndpointFlags
   )
 
-  it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
+  it(
+    "should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
     val label = "A limerick about a lion"
 
-    val work = Work(
-      identifiers = List(SourceIdentifier("Miro", "MiroID", miroID)),
-      label = label)
+    val work = Work(identifiers =
+                      List(SourceIdentifier("Miro", "MiroID", miroID)),
+                    label = label)
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
                                 "topic",
@@ -112,7 +115,8 @@ class IdMinterFeatureTest
     }
   }
 
-  it("should not delete a message from the sqs queue if it fails processing it") {
+  it(
+    "should not delete a message from the sqs queue if it fails processing it") {
     sqsClient.sendMessage(idMinterQueue, "not a json string")
 
     // After a message is read, it stays invisible for 1 second and then it gets sent again.
@@ -125,7 +129,7 @@ class IdMinterFeatureTest
     eventually {
       sqsClient
         .getQueueAttributes(idMinterQueue,
-          List("ApproximateNumberOfMessagesNotVisible"))
+                            List("ApproximateNumberOfMessagesNotVisible"))
         .getAttributes
         .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
     }

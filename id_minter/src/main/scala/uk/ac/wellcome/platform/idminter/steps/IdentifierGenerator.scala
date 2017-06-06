@@ -4,19 +4,17 @@ import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import scalikejdbc.{DB, select, _}
 import uk.ac.wellcome.models.Identifiers.i
-import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
 
-class IdentifierGenerator @Inject()(db: DB,
-                                    dynamoConfig: DynamoConfig)
+class IdentifierGenerator @Inject()(db: DB)
     extends Logging
     with TwitterModuleFlags {
 
-  private val identifiersTableName = dynamoConfig.table
+//  private val identifiersTableName = dynamoConfig.table
   implicit val session = AutoSession(db.settingsProvider)
 
   def generateId(work: Work): Future[String] =
@@ -44,7 +42,7 @@ class IdentifierGenerator @Inject()(db: DB,
   private def findMiroIdInDb(miroId: String): Future[Option[Identifier]] =
     Future {
       blocking {
-        info(s"About to search for MiroID $miroId in $identifiersTableName")
+        info(s"About to search for MiroID $miroId in Identifiers")
         withSQL {
           select.from(Identifiers as i).where.eq(i.MiroID, miroId)
         }.map(Identifiers(i)).single.apply()
