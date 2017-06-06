@@ -17,6 +17,7 @@ class IdentifierGenerator @Inject()(db: DB,
     with TwitterModuleFlags {
 
   private val identifiersTableName = dynamoConfig.table
+  implicit val session = AutoSession(db.settingsProvider)
 
   def generateId(work: Work): Future[String] =
     findMiroID(work) match {
@@ -43,7 +44,6 @@ class IdentifierGenerator @Inject()(db: DB,
   private def findMiroIdInDb(miroId: String): Future[Option[Identifier]] =
     Future {
       blocking {
-        implicit val session = AutoSession(db.settingsProvider)
         info(s"About to search for MiroID $miroId in $identifiersTableName")
         withSQL {
           select.from(Identifiers as i).where.eq(i.MiroID, miroId)
@@ -59,7 +59,6 @@ class IdentifierGenerator @Inject()(db: DB,
     val canonicalId = Identifiable.generate
     val insertIntoDbFuture = Future {
       blocking {
-        implicit val session = AutoSession(db.settingsProvider)
         info(s"putting new canonicalId $canonicalId for MiroID $miroId")
         withSQL {
           insert
