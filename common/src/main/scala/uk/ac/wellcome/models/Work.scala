@@ -15,6 +15,7 @@ object Identifiers extends SQLSyntaxSupport[Identifier] {
   def apply(p: SyntaxProvider[Identifier])(rs: WrappedResultSet) =
     Identifier(rs.string(p.resultName.CanonicalID),
                                      rs.string(p.resultName.MiroID))
+  val i = Identifiers.syntax("i")
 }
 
 /** An identifier received from one of the original sources */

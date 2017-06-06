@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.idminter.steps
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
+import uk.ac.wellcome.models.Identifiers.i
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.MysqlLocal
@@ -47,7 +48,6 @@ class IdentifierGeneratorTest
     whenReady(futureId) { id =>
       id should not be (empty)
 
-      val i = Identifiers.syntax("i")
       val maybeIdentifier = withSQL {
         select.from(Identifiers as i).where.eq(i.MiroID, "1234")
       }.map(Identifiers(i)).single.apply()
