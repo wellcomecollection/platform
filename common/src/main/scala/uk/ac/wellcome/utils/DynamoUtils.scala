@@ -1,10 +1,10 @@
 package uk.ac.wellcome.utils
 
-import scala.collection.JavaConversions._
-
 import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.document._
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput
+
+import scala.collection.JavaConversions._
 
 trait DynamoUpdateWriteCapacityCapable {
   val client: AmazonDynamoDB
@@ -34,3 +34,4 @@ trait DynamoUpdateWriteCapacityCapable {
     table.updateTable(newThroughput)
   }
 }
+
