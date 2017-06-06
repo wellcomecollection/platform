@@ -1,18 +1,14 @@
 package uk.ac.wellcome.platform.idminter
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sqs.AmazonSQS
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
+import scalikejdbc.{select, _}
+import uk.ac.wellcome.models.Identifiers.i
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, Identifier, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, MysqlLocal, SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{MysqlLocal, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
@@ -22,7 +18,7 @@ class IdMinterFeatureTest
     with FeatureTestMixin
     with SQSLocal
     with SNSLocal
-    with Eventually with DynamoDBLocal {
+    with Eventually with MysqlLocal {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
@@ -37,7 +33,7 @@ class IdMinterFeatureTest
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn,
       "aws.dynamo.identifiers.tableName" -> identifiersTableName
-    ) ++ snsLocalEndpointFlags ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
+    ) ++ snsLocalEndpointFlags ++ sqsLocalFlags
   )
 
   it("should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
@@ -56,12 +52,11 @@ class IdMinterFeatureTest
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
-      val dynamoIdentifiersRecords =
-        Scanamo.queryIndex[Identifier](dynamoDbClient)(
-          "Identifiers",
-          "MiroID")('MiroID -> miroID)
-      dynamoIdentifiersRecords should have size (1)
-      val id = extractId(dynamoIdentifiersRecords)
+      val maybeIdentifier = withSQL {
+        select.from(Identifiers as i).where.eq(i.MiroID, miroID)
+      }.map(Identifiers(i)).single.apply()
+
+      maybeIdentifier shouldBe defined
       val messages = listMessagesReceivedFromSNS()
       messages should have size (1)
 
@@ -69,7 +64,7 @@ class IdMinterFeatureTest
         .fromJson[IdentifiedWork](messages.head.message)
         .get
 
-      parsedIdentifiedWork.canonicalId shouldBe id.CanonicalID
+      parsedIdentifiedWork.canonicalId shouldBe maybeIdentifier.get.CanonicalID
       parsedIdentifiedWork.work.identifiers.head.value shouldBe miroID
       parsedIdentifiedWork.work.label shouldBe label
 
@@ -84,8 +79,9 @@ class IdMinterFeatureTest
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
-      Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
-        'MiroID -> firstMiroId) should have size (1)
+      withSQL {
+        select.from(Identifiers as i).where.eq(i.MiroID, firstMiroId)
+      }.map(Identifiers(i)).single.apply() shouldBe defined
     }
 
     val secondMiroId = "5678"
@@ -93,9 +89,12 @@ class IdMinterFeatureTest
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(secondSqsMessage).get)
 
     eventually {
-      Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
-        'MiroID -> secondMiroId) should have size (1)
-      Scanamo.scan[Identifier](dynamoDbClient)("Identifiers") should have size (2)
+      withSQL {
+        select.from(Identifiers as i).where.eq(i.MiroID, secondMiroId)
+      }.map(Identifiers(i)).single.apply() shouldBe defined
+      withSQL {
+        select.from(Identifiers as i)
+      }.map(Identifiers(i)).list.apply() should have size (2)
     }
   }
 
@@ -107,12 +106,11 @@ class IdMinterFeatureTest
 
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
     eventually {
-      Scanamo.queryIndex[Identifier](dynamoDbClient)("Identifiers", "MiroID")(
-        'MiroID -> miroId) should have size (1)
+      withSQL {
+        select.from(Identifiers as i).where.eq(i.MiroID, miroId)
+      }.map(Identifiers(i)).single.apply() shouldBe defined
     }
-
   }
-
 
   it("should not delete a message from the sqs queue if it fails processing it") {
     sqsClient.sendMessage(idMinterQueue, "not a json string")
@@ -142,12 +140,5 @@ class IdMinterFeatureTest
                "topic",
                "messageType",
                "timestamp")
-  }
-
-  private def extractId(
-    dynamoIdentifiersRecords: List[Either[DynamoReadError, Identifier]]) = {
-    dynamoIdentifiersRecords.head
-      .asInstanceOf[Right[DynamoReadError, Identifier]]
-      .b
   }
 }
