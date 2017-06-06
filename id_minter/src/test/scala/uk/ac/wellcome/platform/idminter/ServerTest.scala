@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.idminter
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.test.utils.{MysqlLocal, SNSLocal, SQSLocal}
+import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
+import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
 
 class ServerTest
     extends FeatureTest
@@ -12,9 +13,7 @@ class ServerTest
 
   val server = new EmbeddedHttpServer(
     new Server(),
-    flags = Map(
-     // "aws.dynamo.identifiers.tableName" -> "identifiers"
-    ) ++ snsLocalEndpointFlags ++ mySqlLocalEndpointFlags ++ sqsLocalFlags
+    flags = snsLocalEndpointFlags ++ mySqlLocalEndpointFlags ++ sqsLocalFlags
   )
 
   test("it should show the healthcheck message") {

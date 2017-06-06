@@ -65,7 +65,7 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ mysqlDependencies
+  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
@@ -79,7 +79,7 @@ object Dependencies {
 
   val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
-  val idminterDependencies: Seq[ModuleID] = commonDependencies
+  val idminterDependencies: Seq[ModuleID] = commonDependencies ++ mysqlDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 }

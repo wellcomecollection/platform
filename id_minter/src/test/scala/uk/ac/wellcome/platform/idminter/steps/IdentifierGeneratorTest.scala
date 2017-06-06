@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.idminter.steps
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.models.Identifiers.i
-import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.MysqlLocal
+import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
+import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
 
 class IdentifierGeneratorTest
     extends FunSpec
@@ -15,14 +15,14 @@ class IdentifierGeneratorTest
     with BeforeAndAfterEach
     with IntegrationPatience {
 
-  val identifierGenerator = new IdentifierGenerator(DB.connect())
+  val identifierGenerator = new IdentifierGenerator(DB.connect(), identifiersTable)
 
   it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
     withSQL {
       insert
-        .into(Identifiers)
-        .namedValues(Identifiers.column.CanonicalID -> "5678",
-                     Identifiers.column.MiroID -> "1234")
+        .into(identifiersTable)
+        .namedValues(identifiersTable.column.CanonicalID -> "5678",
+                     identifiersTable.column.MiroID -> "1234")
     }.update().apply()
 
     val work =
@@ -43,10 +43,10 @@ class IdentifierGeneratorTest
 
     whenReady(futureId) { id =>
       id should not be (empty)
-
+      val i = identifiersTable.i
       val maybeIdentifier = withSQL {
-        select.from(Identifiers as i).where.eq(i.MiroID, "1234")
-      }.map(Identifiers(i)).single.apply()
+        select.from(identifiersTable as i).where.eq(i.MiroID, "1234")
+      }.map(Identifier(i)).single.apply()
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe Identifier(id, "1234")
     }
