@@ -2,20 +2,17 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
-import scalikejdbc.{DB, select, _}
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
+import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
+
+import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.{Future, blocking}
-
-class IdentifierGenerator @Inject()(db: DB, identifiers: IdentifiersTable)
+class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
     extends Logging
     with TwitterModuleFlags {
-
-//  private val identifiersTableName = dynamoConfig.table
-  implicit val session = AutoSession(db.settingsProvider)
 
   def generateId(work: Work): Future[String] =
     findMiroID(work) match {
@@ -27,7 +24,7 @@ class IdentifierGenerator @Inject()(db: DB, identifiers: IdentifiersTable)
 
   private def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier): Future[String] =
-    findMiroIdInDb(identifier.value).flatMap {
+    identifiersDao.findMiroIdInDb(identifier.value).flatMap {
       case Some(id) => Future.successful(id.CanonicalID)
       case None => generateAndSaveCanonicalId(identifier.value)
     }
@@ -39,44 +36,12 @@ class IdentifierGenerator @Inject()(db: DB, identifiers: IdentifiersTable)
     maybeSourceIdentifier
   }
 
-  private def findMiroIdInDb(miroId: String): Future[Option[Identifier]] =
-    Future {
-      blocking {
-        info(s"About to search for MiroID $miroId in Identifiers")
-        val i = identifiers.i
-        withSQL {
-          select.from(identifiers as i).where.eq(i.MiroID, miroId)
-        }.map(Identifier(i)).single.apply()
-      }
-    } recover {
-      case e: Throwable =>
-        error(s"Failed getting MiroID $miroId in DynamoDB", e)
-        throw e
-    }
-
   private def generateAndSaveCanonicalId(miroId: String): Future[String] = {
     val canonicalId = Identifiable.generate
-    val insertIntoDbFuture = Future {
-      blocking {
-        info(s"putting new canonicalId $canonicalId for MiroID $miroId")
-        withSQL {
-          insert
-            .into(identifiers)
-            .namedValues(identifiers.column.CanonicalID -> canonicalId,
-                         identifiers.column.MiroID -> miroId)
-        }.update().apply()
-
+    identifiersDao
+      .saveCanonicalId(Identifier(MiroID = miroId, CanonicalID = canonicalId))
+      .map { _ =>
+        canonicalId
       }
-    }
-    insertIntoDbFuture.onFailure {
-      case e: Exception =>
-        error(
-          s"Failed inserting record in database for miroId: $miroId and canonicalId: $canonicalId",
-          e)
-    }
-    insertIntoDbFuture.map { _ =>
-      canonicalId
-    }
-
   }
 }

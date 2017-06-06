@@ -4,7 +4,8 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
+import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
 
 class IdentifierGeneratorTest
@@ -15,9 +16,10 @@ class IdentifierGeneratorTest
     with BeforeAndAfterEach
     with IntegrationPatience {
 
-  val identifierGenerator = new IdentifierGenerator(DB.connect(), identifiersTable)
+  val identifierGenerator = new IdentifierGenerator(
+    new IdentifiersDao(DB.connect(), identifiersTable))
 
-  it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
+  it("should search the miro id in the database and return the canonical id if it finds it") {
     withSQL {
       insert
         .into(identifiersTable)
