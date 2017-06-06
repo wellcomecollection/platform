@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import scalikejdbc.{DB, select, _}
@@ -13,7 +12,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.{Future, blocking}
 
 class IdentifierGenerator @Inject()(db: DB,
-                                    dynamoDBClient: AmazonDynamoDB,
                                     dynamoConfig: DynamoConfig)
     extends Logging
     with TwitterModuleFlags {

@@ -18,7 +18,6 @@ class IdentifierGeneratorTest
 
   val identifierGenerator = new IdentifierGenerator(
     DB.connect(),
-    null,
     DynamoConfig("applicationName", "streamArn", identifiersTableName))
 
   it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
