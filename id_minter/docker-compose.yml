@@ -1,0 +1,14 @@
+mysql:
+  image: library/mysql:5.6
+  ports:
+    - "3306:3306"
+  environment:
+      - "MYSQL_ROOT_PASSWORD=password"
+sns:
+  image: alicefuzier/fake-sns
+  ports:
+    - "9292:9292"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"
