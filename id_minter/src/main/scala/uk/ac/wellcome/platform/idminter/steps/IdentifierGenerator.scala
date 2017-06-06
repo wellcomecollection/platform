@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import scalikejdbc.{DB, select, _}
+import uk.ac.wellcome.models.Identifiers.i
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
@@ -46,7 +47,6 @@ class IdentifierGenerator @Inject()(db: DB,
       blocking {
         implicit val session = AutoSession(db.settingsProvider)
         info(s"About to search for MiroID $miroId in $identifiersTableName")
-        val i = Identifiers.syntax("i")
         withSQL {
           select.from(Identifiers as i).where.eq(i.MiroID, miroId)
         }.map(Identifiers(i)).single.apply()
