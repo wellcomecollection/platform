@@ -14,16 +14,15 @@ trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
   ConnectionPool.singleton(s"jdbc:mysql://$host:$port", userName, password)
   implicit val session = AutoSession
 
-  private val identifiersTableName = "Identifiers"
-  private val identifiersDatabase = "identifiers"
+  private val identifiersDatabase = SQLSyntax.createUnsafely("identifiers")
+  private val identifiersTableName = SQLSyntax.createUnsafely("Identifiers")
 
   val identifiersTable =
     new IdentifiersTable(identifiersDatabase, identifiersTableName)
-
   DB localTx { implicit session =>
-    sql"DROP DATABASE IF EXISTS identifiers".execute().apply()
-    sql"CREATE DATABASE identifiers;".execute().apply()
-    sql"""CREATE TABLE identifiers.Identifiers (
+    sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
+    sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
+    sql"""CREATE TABLE $identifiersDatabase.$identifiersTableName (
        CanonicalID varchar(255),
        MiroID varchar(255),
        PRIMARY KEY (CanonicalID),
@@ -44,6 +43,6 @@ trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    sql"TRUNCATE TABLE identifiers.Identifiers".execute().apply()
+    sql"TRUNCATE TABLE $identifiersDatabase.$identifiersTableName".execute().apply()
   }
 }
