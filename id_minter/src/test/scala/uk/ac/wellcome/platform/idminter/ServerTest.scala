@@ -13,7 +13,7 @@ class ServerTest
   val server = new EmbeddedHttpServer(
     new Server(),
     flags = Map(
-      "aws.dynamo.identifiers.tableName" -> "identifiers"
+     // "aws.dynamo.identifiers.tableName" -> "identifiers"
     ) ++ snsLocalEndpointFlags ++ mySqlLocalEndpointFlags ++ sqsLocalFlags
   )
 
