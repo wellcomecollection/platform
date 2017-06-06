@@ -4,7 +4,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.Identifiers.i
-import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.MysqlLocal
 
@@ -16,9 +15,7 @@ class IdentifierGeneratorTest
     with BeforeAndAfterEach
     with IntegrationPatience {
 
-  val identifierGenerator = new IdentifierGenerator(
-    DB.connect(),
-    DynamoConfig("applicationName", "streamArn", identifiersTableName))
+  val identifierGenerator = new IdentifierGenerator(DB.connect())
 
   it("should search the miro id in dynamoDb and return the canonical id if it finds it") {
     withSQL {
