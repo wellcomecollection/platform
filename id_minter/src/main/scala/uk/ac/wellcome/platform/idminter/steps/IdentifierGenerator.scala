@@ -3,14 +3,14 @@ package uk.ac.wellcome.platform.idminter.steps
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import scalikejdbc.{DB, select, _}
-import uk.ac.wellcome.models.Identifiers.i
-import uk.ac.wellcome.models.{Identifier, Identifiers, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
 
-class IdentifierGenerator @Inject()(db: DB)
+class IdentifierGenerator @Inject()(db: DB, identifiers: IdentifiersTable)
     extends Logging
     with TwitterModuleFlags {
 
@@ -43,9 +43,10 @@ class IdentifierGenerator @Inject()(db: DB)
     Future {
       blocking {
         info(s"About to search for MiroID $miroId in Identifiers")
+        val i = identifiers.i
         withSQL {
-          select.from(Identifiers as i).where.eq(i.MiroID, miroId)
-        }.map(Identifiers(i)).single.apply()
+          select.from(identifiers as i).where.eq(i.MiroID, miroId)
+        }.map(Identifier(i)).single.apply()
       }
     } recover {
       case e: Throwable =>
@@ -60,9 +61,9 @@ class IdentifierGenerator @Inject()(db: DB)
         info(s"putting new canonicalId $canonicalId for MiroID $miroId")
         withSQL {
           insert
-            .into(Identifiers)
-            .namedValues(Identifiers.column.CanonicalID -> canonicalId,
-                         Identifiers.column.MiroID -> miroId)
+            .into(identifiers)
+            .namedValues(identifiers.column.CanonicalID -> canonicalId,
+                         identifiers.column.MiroID -> miroId)
         }.update().apply()
 
       }

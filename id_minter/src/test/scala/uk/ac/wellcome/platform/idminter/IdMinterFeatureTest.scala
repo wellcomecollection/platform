@@ -5,10 +5,11 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import scalikejdbc.{select, _}
-import uk.ac.wellcome.models.Identifiers.i
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{MysqlLocal, SNSLocal, SQSLocal}
+import uk.ac.wellcome.platform.idminter.model.Identifier
+import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
+import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
@@ -33,11 +34,10 @@ class IdMinterFeatureTest
       "aws.sqs.queue.url" -> idMinterQueue,
       "aws.sqs.waitTime" -> "1",
       "aws.sns.topic.arn" -> ingestorTopicArn
-//      "aws.rds.identifiers.schema" -> "identifiers",
-//      "aws.rds.identifiers.tableName" -> identifiersTableName
     ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ mySqlLocalEndpointFlags
   )
 
+  private val i = identifiersTable.i
   it(
     "should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
@@ -56,8 +56,8 @@ class IdMinterFeatureTest
 
     eventually {
       val maybeIdentifier = withSQL {
-        select.from(Identifiers as i).where.eq(i.MiroID, miroID)
-      }.map(Identifiers(i)).single.apply()
+        select.from(identifiersTable as i).where.eq(i.MiroID, miroID)
+      }.map(Identifier(i)).single.apply()
 
       maybeIdentifier shouldBe defined
       val messages = listMessagesReceivedFromSNS()
@@ -83,8 +83,8 @@ class IdMinterFeatureTest
 
     eventually {
       withSQL {
-        select.from(Identifiers as i).where.eq(i.MiroID, firstMiroId)
-      }.map(Identifiers(i)).single.apply() shouldBe defined
+        select.from(identifiersTable as i).where.eq(i.MiroID, firstMiroId)
+      }.map(Identifier(i)).single.apply() shouldBe defined
     }
 
     val secondMiroId = "5678"
@@ -93,11 +93,11 @@ class IdMinterFeatureTest
 
     eventually {
       withSQL {
-        select.from(Identifiers as i).where.eq(i.MiroID, secondMiroId)
-      }.map(Identifiers(i)).single.apply() shouldBe defined
+        select.from(identifiersTable as i).where.eq(i.MiroID, secondMiroId)
+      }.map(Identifier(i)).single.apply() shouldBe defined
       withSQL {
-        select.from(Identifiers as i)
-      }.map(Identifiers(i)).list.apply() should have size (2)
+        select.from(identifiersTable as i)
+      }.map(Identifier(i)).list.apply() should have size (2)
     }
   }
 
@@ -110,8 +110,8 @@ class IdMinterFeatureTest
     sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
     eventually {
       withSQL {
-        select.from(Identifiers as i).where.eq(i.MiroID, miroId)
-      }.map(Identifiers(i)).single.apply() shouldBe defined
+        select.from(identifiersTable as i).where.eq(i.MiroID, miroId)
+      }.map(Identifier(i)).single.apply() shouldBe defined
     }
   }
 

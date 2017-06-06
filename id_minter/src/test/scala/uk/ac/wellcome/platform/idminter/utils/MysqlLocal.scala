@@ -1,7 +1,8 @@
-package uk.ac.wellcome.test.utils
-import scalikejdbc._
+package uk.ac.wellcome.platform.idminter.utils
 
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import scalikejdbc._
+import uk.ac.wellcome.platform.idminter.model.IdentifiersTable
 
 trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
   private val host = "localhost"
@@ -13,7 +14,12 @@ trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
   ConnectionPool.singleton(s"jdbc:mysql://$host:$port", userName, password)
   implicit val session = AutoSession
 
-  val identifiersTableName = "Identifiers"
+  private val identifiersTableName = "Identifiers"
+  private val identifiersDatabase = "identifiers"
+
+  val identifiersTable =
+    new IdentifiersTable(identifiersDatabase, identifiersTableName)
+
   DB localTx { implicit session =>
     sql"DROP DATABASE IF EXISTS identifiers".execute().apply()
     sql"CREATE DATABASE identifiers;".execute().apply()
@@ -31,7 +37,9 @@ trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
       "aws.rds.host" -> host,
       "aws.rds.port" -> port,
       "aws.rds.userName" -> userName,
-      "aws.rds.password" -> password
+      "aws.rds.password" -> password,
+      "aws.rds.identifiers.database" -> identifiersDatabase,
+      "aws.rds.identifiers.table" -> identifiersTableName
     )
 
   override def beforeEach(): Unit = {
