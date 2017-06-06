@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.Indexable
 import uk.ac.wellcome.utils.JsonUtil
 import scalikejdbc.{SQLSyntaxSupport, SyntaxProvider, WrappedResultSet}
 
-/** Represents a set of identifiers as stored in DynamoDB */
+/** Represents a set of identifiers as stored in MySQL */
 case class Identifier(CanonicalID: String, MiroID: String)
 object Identifiers extends SQLSyntaxSupport[Identifier] {
   override val schemaName = Some("identifiers")
