@@ -27,6 +27,8 @@ object ScanamoUtils {
   }
 }
 
+// This code is mostly cribbed from https://github.com/guardian/scanamo/blob/v0.9.4/src/main/scala/com/gu/scanamo/DynamoResultStream.scala#L13
+// We need access to the results in batches to prevent OOM while processing large results sets, so the source is modified to allow this.
 object ScanamoQueryStream {
   type EvaluationKey = java.util.Map[String, AttributeValue]
 
@@ -52,6 +54,7 @@ object ScanamoQueryStream {
       for {
         queryResult <- exec(lastKey.foldLeft(req)(withExclusiveStartKey(_, _)))
         results = items(queryResult).asScala.map(ScanamoFree.read[T]).toList
+        // This is where we hook into the batch of results
         processedResults = f(results)
         resultList <- Option(lastEvaluatedKey(queryResult)).foldLeft(
           Free.pure[ScanamoOpsA, List[Y]](processedResults)
