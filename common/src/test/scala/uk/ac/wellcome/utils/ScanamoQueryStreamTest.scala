@@ -4,11 +4,12 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
-import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.MiroTransformable
 import uk.ac.wellcome.test.utils.DynamoDBLocal
+
+import scala.collection.mutable.ListBuffer
 
 class ScanamoQueryStreamTest
     extends FunSpec
@@ -18,13 +19,20 @@ class ScanamoQueryStreamTest
     with DynamoDBLocal
     with Matchers {
 
+  final val maxDynamoItemSizeinKb = 400000
+  final val maxDynamoQueryResultSizeInKb = 1000000
 
-  // TODO: Find a better way of doing this!!
-  val bigString = (1 to 400).map(_ => "a").foldLeft("")(_ + _)
+  val bigString = "_" * maxDynamoItemSizeinKb
 
-  it("run a given function for each row") {
+  it("run a given function for each batch from the query provided") {
 
-    (1 to 10)
+    type ResultGroup = List[Either[DynamoReadError, MiroTransformable]]
+    var resultGroups: ListBuffer[ResultGroup] = new ListBuffer[ResultGroup]()
+
+    val expectedBatchCount = 4
+    val numberofRequiredPuts = (expectedBatchCount * maxDynamoQueryResultSizeInKb) / maxDynamoItemSizeinKb
+
+    val itemsToPut = (1 to numberofRequiredPuts)
       .map(
         i =>
           MiroTransformable(
@@ -33,23 +41,12 @@ class ScanamoQueryStreamTest
             data = bigString,
             ReindexVersion = 1
         ))
-      .par.foreach(
-        Scanamo.put(dynamoDbClient)(miroDataTableName)
-      )
 
-    val result = run
+    itemsToPut.par.foreach(
+      Scanamo.put(dynamoDbClient)(miroDataTableName)
+    )
 
-    val currentState = Scanamo.scan[MiroTransformable](dynamoDbClient)("MiroData")
-
-    println(result)
-    println(currentState)
-
-    true shouldBe false
-  }
-
-
-
-  def run: List[Either[DynamoReadError, MiroTransformable]] = {
+    val expectedItemsStored = itemsToPut.map(Right(_))
 
     val scanamoQueryRequest = ScanamoQueryRequest(
       miroDataTableName,
@@ -66,20 +63,13 @@ class ScanamoQueryStreamTest
       resultGroup: List[Either[DynamoReadError, MiroTransformable]])
       : List[Either[DynamoReadError, MiroTransformable]] = {
 
-      resultGroup.map {
-        case Left(e) => Left(e)
-        case Right(miroTransformable) => {
-          val reindexItem = miroTransformable.getReindexItem
+      resultGroups += resultGroup
 
-          Scanamo.update[MiroTransformable](dynamoDbClient)("MiroData")(
-            reindexItem.hashKey and reindexItem.rangeKey,
-            set('ReindexVersion -> (reindexItem.ReindexVersion + 1)))
-
-          Right(miroTransformable)
-        }
-      }
-
+      resultGroup
     }
+
+    val currentState =
+      Scanamo.scan[MiroTransformable](dynamoDbClient)("MiroData")
 
     val ops = ScanamoQueryStream
       .run[MiroTransformable, Either[DynamoReadError, MiroTransformable]](
@@ -87,6 +77,10 @@ class ScanamoQueryStreamTest
         updateVersion)
 
     Scanamo.exec(dynamoDbClient)(ops)
-  }
 
+    val actualItemsStored: ResultGroup = resultGroups.toList.flatten
+
+    resultGroups.length shouldBe expectedBatchCount
+    actualItemsStored should contain theSameElementsAs expectedItemsStored
+  }
 }
