@@ -18,20 +18,26 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
                                      @Flag("es.type") documentType: String,
                                      elasticClient: TcpClient) {
 
+  private def getIndex(queryParam: Option[String]): String =
+    queryParam match {
+      case Some(index) => index
+      case None => defaultIndex
+    }
+
   def findResultById(id: String,
-                     index: String = defaultIndex): Future[RichGetResponse] =
+                     index: Option[String] = None): Future[RichGetResponse] =
     elasticClient
       .execute {
-        get(id).from(s"$index/$documentType")
+        get(id).from(s"${getIndex(index)}/$documentType")
       }
 
   def listResults(sortByField: String,
                   limit: Int = 10,
                   from: Int = 0,
-                  index: String = defaultIndex): Future[RichSearchResponse] =
+                  index: Option[String] = None): Future[RichSearchResponse] =
     elasticClient
       .execute {
-        search(s"$index/$documentType")
+        search(s"${getIndex(index)}/$documentType")
           .matchAllQuery()
           .sortBy(fieldSort(sortByField))
           .limit(limit)
@@ -42,10 +48,10 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
     queryString: String,
     limit: Int = 10,
     from: Int = 0,
-    index: String = defaultIndex): Future[RichSearchResponse] =
+    index: Option[String] = None): Future[RichSearchResponse] =
     elasticClient
       .execute {
-        search(s"$index/$documentType")
+        search(s"${getIndex(index)}/$documentType")
           .query(simpleStringQuery(queryString))
           .limit(limit)
           .from(from)
