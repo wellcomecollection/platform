@@ -11,7 +11,6 @@ import scala.concurrent.{Future, blocking}
 
 class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable) extends Logging {
 
-  //  private val identifiersTableName = dynamoConfig.table
   implicit val session = AutoSession(db.settingsProvider)
 
   def findSourceIdInDb(miroId: String): Future[Option[Identifier]] =
