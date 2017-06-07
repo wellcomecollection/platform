@@ -211,7 +211,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return a not found error when requesting a single work with a non existing id") {
+  it(
+    "should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = s"/$apiPrefix/works/non-existing-id",
       andExpect = Status.NotFound,
@@ -219,7 +220,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -229,7 +231,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for an overly large page size") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -239,7 +242,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for zero-length pages") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for zero-length pages") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=0",
       andExpect = Status.BadRequest,
@@ -320,7 +324,8 @@ class ApiWorksTest
     }
   }
 
-  it("should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+  it(
+    "should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       source = "TestSource",
       sourceId = "The ID field within the TestSource",
@@ -394,8 +399,8 @@ class ApiWorksTest
     }
   }
 
-
-  it("should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+  it(
+    "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val identifier = SourceIdentifier(
       source = "TestSource",
       sourceId = "The ID field within the TestSource",
@@ -433,7 +438,8 @@ class ApiWorksTest
     }
   }
 
-  it("should be able to look at different Elasticsearch indices based on the ?index query parameter") {
+  it(
+    "should be able to look at different Elasticsearch indices based on the ?index query parameter") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       label = "A whale on a wave"
@@ -464,7 +470,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work_alt.canonicalId}?index=alt_records",
+        path = s"/$apiPrefix/works/${work_alt.canonicalId}?_index=alt_records",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
