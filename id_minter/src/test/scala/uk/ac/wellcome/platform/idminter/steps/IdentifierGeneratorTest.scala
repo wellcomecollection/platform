@@ -13,8 +13,7 @@ class IdentifierGeneratorTest
     with MysqlLocal
     with ScalaFutures
     with Matchers
-    with BeforeAndAfterEach
-    with IntegrationPatience {
+    with BeforeAndAfterEach {
 
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable))

@@ -1,10 +1,12 @@
 package uk.ac.wellcome.platform.idminter.utils
 
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.model.IdentifiersTable
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
-trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
+trait MysqlLocal extends BeforeAndAfterEach with ExtendedPatience with Eventually  { this: Suite =>
   private val host = "localhost"
   private val port = "3306"
   private val userName = "root"
@@ -19,16 +21,20 @@ trait MysqlLocal extends BeforeAndAfterEach { this: Suite =>
 
   val identifiersTable =
     new IdentifiersTable(identifiersDatabase, identifiersTableName)
-  DB localTx { implicit session =>
-    sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
-    sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
-    sql"""CREATE TABLE $identifiersDatabase.$identifiersTableName (
+
+  // Wait for mysql server to start
+  eventually {
+    DB localTx { implicit session =>
+      sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
+      sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
+      sql"""CREATE TABLE $identifiersDatabase.$identifiersTableName (
        CanonicalID varchar(255),
        MiroID varchar(255),
        PRIMARY KEY (CanonicalID),
        CONSTRAINT Unique_miro UNIQUE (MiroID));"""
-      .execute()
-      .apply()
+        .execute()
+        .apply()
+    }
   }
 
   val mySqlLocalEndpointFlags: Map[String, String] =
