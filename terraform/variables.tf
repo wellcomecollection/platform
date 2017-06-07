@@ -41,3 +41,11 @@ variable "build_env" {
   description = "Build environment (prod, dev, stage, ...)"
   default     = "prod"
 }
+
+variable "rds_username" {
+  description = "Username for the RDS instance"
+}
+
+variable "rds_password" {
+  description = "Password7 for the RDS database"
+}
