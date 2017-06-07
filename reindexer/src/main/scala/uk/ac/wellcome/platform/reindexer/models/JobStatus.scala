@@ -13,26 +13,39 @@ object JobStatus extends Enumeration {
 }
 
 case class ReindexStatus(state: JobStatus.Value,
-                         percentComplete: Option[Float]) {
+                         recordsProcessed: Option[Int] = None,
+                         batch: Option[Int] = None
+                        ) {
   def toMap =
     Map("state" -> state.toString,
-        "percent" -> percentComplete.getOrElse(0F).toString)
+        "recordsProcessed" -> recordsProcessed.getOrElse(0).toString,
+        "batch" -> batch.getOrElse(1).toString
+    )
 
 }
 object ReindexStatus {
-  private val initState = ReindexStatus(JobStatus.Init, None)
+  private val initState = ReindexStatus(JobStatus.Init)
   private val agent: Agent[ReindexStatus] = Agent[ReindexStatus](initState)
 
   def currentStatus: ReindexStatus = agent.get()
 
-  def init(): Unit = agent.send(ReindexStatus(JobStatus.Init, None))
+  def init(): Unit = agent.send(ReindexStatus(JobStatus.Init))
 
-  def work(percent: Float): Unit =
-    agent.send(ReindexStatus(JobStatus.Working, Some(percent)))
+  private def zeroIsNone(n: Int): Option[Int] = n match {
+    case i if i > 0 => Some(i)
+    case _ => None
+  }
+
+  def progress(units: Int, batch: Int = 0): Unit = {
+    val currentCount = zeroIsNone(currentStatus.recordsProcessed.getOrElse(0) + units)
+    val currentBatch = zeroIsNone(currentStatus.batch.getOrElse(0) + batch)
+
+    agent.send(ReindexStatus(JobStatus.Working,  currentCount, currentBatch))
+  }
 
   def succeed(): Unit =
-    agent.send(ReindexStatus(JobStatus.Success, currentStatus.percentComplete))
+    agent.send(ReindexStatus(JobStatus.Success, currentStatus.recordsProcessed, currentStatus.batch))
 
   def fail(): Unit =
-    agent.send(ReindexStatus(JobStatus.Failure, currentStatus.percentComplete))
+    agent.send(ReindexStatus(JobStatus.Failure, currentStatus.recordsProcessed, currentStatus.batch))
 }
