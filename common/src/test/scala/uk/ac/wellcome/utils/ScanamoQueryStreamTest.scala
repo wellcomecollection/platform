@@ -24,10 +24,10 @@ class ScanamoQueryStreamTest
 
   val bigString = "_" * maxDynamoItemSizeinKb
 
-  it("run a given function for each batch from the query provided") {
+  it("should run a given function for each batch from the query provided") {
 
     type ResultGroup = List[Either[DynamoReadError, MiroTransformable]]
-    var resultGroups: ListBuffer[ResultGroup] = new ListBuffer[ResultGroup]()
+    val resultGroups: ListBuffer[ResultGroup] = new ListBuffer[ResultGroup]()
 
     val expectedBatchCount = 4
     val numberofRequiredPuts = (expectedBatchCount * maxDynamoQueryResultSizeInKb) / maxDynamoItemSizeinKb
@@ -42,7 +42,7 @@ class ScanamoQueryStreamTest
             ReindexVersion = 1
         ))
 
-    itemsToPut.par.foreach(
+    itemsToPut.foreach(
       Scanamo.put(dynamoDbClient)(miroDataTableName)
     )
 
@@ -59,17 +59,10 @@ class ScanamoQueryStreamTest
       ScanamoQueryOptions.default
     )
 
-    def updateVersion(
-      resultGroup: List[Either[DynamoReadError, MiroTransformable]])
-      : List[Either[DynamoReadError, MiroTransformable]] = {
-
+    def updateVersion(resultGroup: ResultGroup): ResultGroup = {
       resultGroups += resultGroup
-
       resultGroup
     }
-
-    val currentState =
-      Scanamo.scan[MiroTransformable](dynamoDbClient)("MiroData")
 
     val ops = ScanamoQueryStream
       .run[MiroTransformable, Either[DynamoReadError, MiroTransformable]](
