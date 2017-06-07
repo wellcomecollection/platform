@@ -19,7 +19,6 @@ class IdMinterFeatureTest
     with FeatureTestMixin
     with SQSLocal
     with SNSLocal
-    with Eventually
     with MysqlLocal {
 
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
