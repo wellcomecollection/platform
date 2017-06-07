@@ -432,4 +432,51 @@ class ApiWorksTest
       )
     }
   }
+
+  it("should be able to look at different Elasticsearch indices based on the ?index query parameter") {
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A whale on a wave"
+    )
+    insertIntoElasticSearch(work)
+
+    val work_alt = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "An impostor in an igloo"
+    )
+    insertIntoElasticSearchWithIndex("alt_records", work_alt)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId}",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.canonicalId}",
+                          | "label": "${work.work.label}",
+                          | "creators": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work_alt.canonicalId}?index=alt_records",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work_alt.canonicalId}",
+                          | "label": "${work_alt.work.label}",
+                          | "creators": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
 }
