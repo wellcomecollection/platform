@@ -11,7 +11,6 @@ import com.gu.scanamo.request.ScanamoQueryRequest
 
 import scala.collection.JavaConverters._
 
-
 object ScanamoUtils {
   def logAndFilterLeft[Y](rows: List[Either[DynamoReadError, Y]]) = {
     rows.foreach {
@@ -32,28 +31,26 @@ object ScanamoQueryStream {
   type EvaluationKey = java.util.Map[String, AttributeValue]
 
   private def items(
-                     res: QueryResult): util.List[util.Map[String, AttributeValue]] =
+    res: QueryResult): util.List[util.Map[String, AttributeValue]] =
     res.getItems
   private def lastEvaluatedKey(
-                                res: QueryResult): util.Map[String, AttributeValue] =
+    res: QueryResult): util.Map[String, AttributeValue] =
     res.getLastEvaluatedKey
   private def withExclusiveStartKey(
-                                     req: ScanamoQueryRequest,
-                                     key: util.Map[String, AttributeValue]): ScanamoQueryRequest =
-    req.copy(options =
-      req.options.copy(exclusiveStartKey = Some(key.asScala.toMap)))
+    req: ScanamoQueryRequest,
+    key: util.Map[String, AttributeValue]): ScanamoQueryRequest =
+    req.copy(
+      options = req.options.copy(exclusiveStartKey = Some(key.asScala.toMap)))
 
   private def exec(req: ScanamoQueryRequest): ScanamoOps[QueryResult] =
     ScanamoOps.query(req)
 
   def run[T: DynamoFormat, Y](
-                               req: ScanamoQueryRequest,
-                               f: (List[Either[DynamoReadError, T]]) => List[Y])
-  : ScanamoOps[List[Y]] = {
+    req: ScanamoQueryRequest,
+    f: (List[Either[DynamoReadError, T]]) => List[Y]): ScanamoOps[List[Y]] = {
     def runMore(lastKey: Option[EvaluationKey]): ScanamoOps[List[Y]] = {
       for {
-        queryResult <- exec(
-          lastKey.foldLeft(req)(withExclusiveStartKey(_, _)))
+        queryResult <- exec(lastKey.foldLeft(req)(withExclusiveStartKey(_, _)))
         results = items(queryResult).asScala.map(ScanamoFree.read[T]).toList
         processedResults = f(results)
         resultList <- Option(lastEvaluatedKey(queryResult)).foldLeft(
