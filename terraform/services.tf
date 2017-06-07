@@ -123,6 +123,11 @@ module "id_minter" {
   config_key       = "config/${var.build_env}/id_minter.ini"
 
   config_vars = {
+    rds_database_name   = "${module.identifiers_rds_cluster.database_name}"
+    rds_host            = "${module.identifiers_rds_cluster.host}"
+    rds_port            = "${module.identifiers_rds_cluster.port}"
+    rds_username        = "${module.identifiers_rds_cluster.username}"
+    rds_password        = "${module.identifiers_rds_cluster.password}"
     id_minter_queue_id  = "${module.id_minter_queue.id}"
     es_ingest_topic_arn = "${module.es_ingest_topic.arn}"
     table_name          = "${aws_dynamodb_table.identifiers.name}"
