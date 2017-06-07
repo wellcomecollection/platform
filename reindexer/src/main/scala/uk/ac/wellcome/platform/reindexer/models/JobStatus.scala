@@ -13,13 +13,12 @@ object JobStatus extends Enumeration {
 }
 
 case class ReindexStatus(state: JobStatus.Value,
-                         recordsProcessed: Option[Int] = None,
-                         batch: Option[Int] = None
-                        ) {
+                         recordsProcessed: Int = 0,
+                         batch: Int = 0) {
   def toMap =
     Map("state" -> state.toString,
-        "recordsProcessed" -> recordsProcessed.getOrElse(0).toString,
-        "batch" -> batch.getOrElse(1).toString
+        "recordsProcessed" -> s"$recordsProcessed",
+        "batch" -> s"$batch"
     )
 
 }
@@ -31,14 +30,9 @@ object ReindexStatus {
 
   def init(): Unit = agent.send(ReindexStatus(JobStatus.Init))
 
-  private def zeroIsNone(n: Int): Option[Int] = n match {
-    case i if i > 0 => Some(i)
-    case _ => None
-  }
-
   def progress(units: Int, batch: Int = 0): Unit = {
-    val currentCount = zeroIsNone(currentStatus.recordsProcessed.getOrElse(0) + units)
-    val currentBatch = zeroIsNone(currentStatus.batch.getOrElse(0) + batch)
+    val currentCount = currentStatus.recordsProcessed + units
+    val currentBatch = currentStatus.batch + batch
 
     agent.send(ReindexStatus(JobStatus.Working,  currentCount, currentBatch))
   }
