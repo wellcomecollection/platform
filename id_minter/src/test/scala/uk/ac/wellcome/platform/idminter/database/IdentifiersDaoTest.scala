@@ -16,7 +16,7 @@ class IdentifiersDaoTest
 
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-  describe("findMiroIdInDb") {
+  describe("findSourceIdInDb") {
 
     it("should return a future of some if the requested miroId is in the database") {
       val miroId = "1234"
@@ -28,24 +28,24 @@ class IdentifiersDaoTest
                        identifiersTable.column.MiroID -> miroId)
       }.update().apply()
 
-      whenReady(identifiersDao.findMiroIdInDb(miroId)) { maybeIdentifier =>
+      whenReady(identifiersDao.findSourceIdInDb(miroId)) { maybeIdentifier =>
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe Identifier(canonicalId, miroId)
       }
     }
 
     it("should return a future of none if the requested miroId is not in the database") {
-      whenReady(identifiersDao.findMiroIdInDb("abcdef")) { maybeIdentifier =>
+      whenReady(identifiersDao.findSourceIdInDb("abcdef")) { maybeIdentifier =>
         maybeIdentifier shouldNot be(defined)
       }
     }
   }
 
-  describe("saveCanonicalId") {
+  describe("saveIdentifier") {
 
     it("should insert the provided identifier into the database") {
       val identifier = Identifier(CanonicalID = "5678", MiroID = "1234")
-      val future = identifiersDao.saveCanonicalId(identifier)
+      val future = identifiersDao.saveIdentifier(identifier)
 
       whenReady(future) { _ =>
         val maybeIdentifier = withSQL {
@@ -71,7 +71,7 @@ class IdentifiersDaoTest
             identifiersTable.column.MiroID -> identifier.MiroID)
       }.update().apply()
 
-      val saveCanonicalId = identifiersDao.saveCanonicalId(identifier.copy(CanonicalID = "0987"))
+      val saveCanonicalId = identifiersDao.saveIdentifier(identifier.copy(CanonicalID = "0987"))
       whenReady(saveCanonicalId.failed){ exception =>
         exception shouldBe a[SQLIntegrityConstraintViolationException]
       }

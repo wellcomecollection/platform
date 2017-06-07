@@ -14,7 +14,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable) extends Lo
   //  private val identifiersTableName = dynamoConfig.table
   implicit val session = AutoSession(db.settingsProvider)
 
-  def findMiroIdInDb(miroId: String): Future[Option[Identifier]] =
+  def findSourceIdInDb(miroId: String): Future[Option[Identifier]] =
     Future {
       blocking {
         info(s"About to search for MiroID $miroId in Identifiers")
@@ -29,7 +29,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable) extends Lo
         throw e
     }
 
-  def saveCanonicalId(identifier: Identifier): Future[Unit] = {
+  def saveIdentifier(identifier: Identifier): Future[Unit] = {
     val insertIntoDbFuture = Future {
       blocking {
         info(s"putting new identifier $identifier")
