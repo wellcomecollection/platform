@@ -24,7 +24,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
 
   private def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier): Future[String] =
-    identifiersDao.findMiroIdInDb(identifier.value).flatMap {
+    identifiersDao.findSourceIdInDb(identifier.value).flatMap {
       case Some(id) => Future.successful(id.CanonicalID)
       case None => generateAndSaveCanonicalId(identifier.value)
     }
@@ -39,7 +39,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
   private def generateAndSaveCanonicalId(miroId: String): Future[String] = {
     val canonicalId = Identifiable.generate
     identifiersDao
-      .saveCanonicalId(Identifier(MiroID = miroId, CanonicalID = canonicalId))
+      .saveIdentifier(Identifier(MiroID = miroId, CanonicalID = canonicalId))
       .map { _ =>
         canonicalId
       }
