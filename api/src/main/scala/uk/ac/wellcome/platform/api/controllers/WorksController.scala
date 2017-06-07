@@ -3,18 +3,14 @@ package uk.ac.wellcome.platform.api.controllers
 import javax.inject.{Inject, Singleton}
 
 import com.github.xiaodongw.swagger.finatra.SwaggerSupport
-import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.{QueryParam, RouteParam}
+import com.twitter.finatra.validation._
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import com.twitter.finatra.validation._
 
 case class MultipleResultsRequest(
   @Min(1) @QueryParam page: Int = 1,
@@ -22,7 +18,7 @@ case class MultipleResultsRequest(
   @QueryParam includes: Option[String],
   @RouteParam id: Option[String],
   @QueryParam query: Option[String],
-  @QueryParam index: Option[String]
+  @QueryParam _index: Option[String]
 )
 
 case class SingleWorkRequest(
@@ -82,14 +78,14 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
             pageSize = pageSize,
             pageNumber = request.page,
             includes = includes,
-            index = request.index
+            index = request._index
           )
         case None =>
           worksService.listWorks(
             pageSize = pageSize,
             pageNumber = request.page,
             includes = includes,
-            index = request.index
+            index = request._index
           )
       }
 
