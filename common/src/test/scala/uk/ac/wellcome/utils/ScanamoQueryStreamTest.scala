@@ -11,8 +11,6 @@ import uk.ac.wellcome.test.utils.DynamoDBLocal
 
 import scala.collection.mutable.ListBuffer
 
-
-
 class ScanamoQueryStreamTest
     extends FunSpec
     with BeforeAndAfterEach
@@ -65,6 +63,7 @@ class ScanamoQueryStreamTest
     val actualItemsStored: ResultGroup = resultGroups.toList.flatten
 
     resultGroups.length shouldBe expectedBatchCount
-      actualItemsStored should contain theSameElementsAs expectedItemsStored
+    actualItemsStored should contain theSameElementsAs expectedItemsStored
+
   }
 }
