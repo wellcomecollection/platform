@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
@@ -8,12 +11,15 @@ import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
 
+import scala.concurrent.Future
+
 class IdentifierGeneratorTest
     extends FunSpec
     with MysqlLocal
     with ScalaFutures
     with Matchers
-    with BeforeAndAfterEach {
+    with BeforeAndAfterEach
+    with MockitoSugar {
 
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable))
@@ -63,5 +69,23 @@ class IdentifierGeneratorTest
     whenReady(futureId.failed) { exception =>
       exception.getMessage shouldBe s"Item $work did not contain a MiroID"
     }
+  }
+
+  it("should return a failed future if it fails inserting the identifier in the database") {
+    val miroId = "1234"
+    val work =
+      Work(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+        label = "some label")
+    val identifiersDao = mock[IdentifiersDao]
+    val identifierGenerator = new IdentifierGenerator(identifiersDao)
+
+    when(identifiersDao.findSourceIdInDb(miroId)).thenReturn(Future.successful(None))
+    val expectedException = new Exception("Noooo")
+    when(identifiersDao.saveIdentifier(any[Identifier]())).thenReturn(Future.failed(expectedException))
+
+    whenReady(identifierGenerator.generateId(work).failed) { exception =>
+      exception shouldBe expectedException
+    }
+
   }
 }
