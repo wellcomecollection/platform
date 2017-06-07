@@ -8,7 +8,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 trait MysqlLocal extends BeforeAndAfterEach with ExtendedPatience with Eventually  { this: Suite =>
   private val host = "localhost"
-  private val port = "3306"
+  private val port = "3307"
   private val userName = "root"
   private val password = "password"
 
