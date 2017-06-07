@@ -15,12 +15,11 @@ import scala.concurrent.Future
 
 @Singleton
 class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
-                                     @Flag("es.type") defaultType: String,
+                                     @Flag("es.type") documentType: String,
                                      elasticClient: TcpClient) {
 
   def findResultById(id: String,
-                     index: String = defaultIndex,
-                     documentType: String = defaultType): Future[RichGetResponse] =
+                     index: String = defaultIndex): Future[RichGetResponse] =
     elasticClient
       .execute {
         get(id).from(s"$index/$documentType")
@@ -29,8 +28,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
   def listResults(sortByField: String,
                   limit: Int = 10,
                   from: Int = 0,
-                  index: String = defaultIndex,
-                  documentType: String = defaultType): Future[RichSearchResponse] =
+                  index: String = defaultIndex): Future[RichSearchResponse] =
     elasticClient
       .execute {
         search(s"$index/$documentType")
@@ -44,8 +42,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
     queryString: String,
     limit: Int = 10,
     from: Int = 0,
-    index: String = defaultIndex,
-    documentType: String = defaultType): Future[RichSearchResponse] =
+    index: String = defaultIndex): Future[RichSearchResponse] =
     elasticClient
       .execute {
         search(s"$index/$documentType")

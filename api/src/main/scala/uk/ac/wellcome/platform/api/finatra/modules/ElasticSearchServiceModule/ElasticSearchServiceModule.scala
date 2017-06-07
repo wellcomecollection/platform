@@ -19,7 +19,7 @@ object ElasticSearchServiceModule extends TwitterModule {
   def providesElasticSearchService(
     elasticClient: TcpClient): ElasticSearchService =
     new ElasticSearchService(defaultIndex = defaultIndex(),
-                             defaultType = documentType(),
+                             documentType = documentType(),
                              elasticClient = elasticClient)
 
 }
