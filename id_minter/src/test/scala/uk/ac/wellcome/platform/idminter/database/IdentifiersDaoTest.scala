@@ -2,15 +2,15 @@ package uk.ac.wellcome.platform.idminter.database
 
 import java.sql.SQLIntegrityConstraintViolationException
 
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.model.Identifier
-import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
+import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
 class IdentifiersDaoTest
     extends FunSpec
-    with MysqlLocal
+    with IdentifiersMysqlLocal
     with ScalaFutures
     with Matchers {
 

@@ -9,13 +9,13 @@ import scalikejdbc._
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
-import uk.ac.wellcome.platform.idminter.utils.MysqlLocal
+import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
 import scala.concurrent.Future
 
 class IdentifierGeneratorTest
     extends FunSpec
-    with MysqlLocal
+    with IdentifiersMysqlLocal
     with ScalaFutures
     with Matchers
     with BeforeAndAfterEach
