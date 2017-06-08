@@ -11,6 +11,12 @@ resource "aws_ecs_service" "service" {
     container_port   = "${var.container_port}"
   }
 
+  lifecycle {
+    ignore_changes = [
+      "desired_count"
+    ]
+  }
+
   depends_on = [
     "aws_iam_role_policy.ecs_service",
     "aws_alb_target_group.ecs_service",

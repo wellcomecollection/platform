@@ -64,6 +64,10 @@ resource "aws_dynamodb_table" "calm_table" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      "read_capacity",
+      "write_capacity",
+    ]
   }
 }
 
@@ -104,6 +108,14 @@ resource "aws_dynamodb_table" "miro_table" {
     write_capacity  = 1
     projection_type = "ALL"
   }
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      "read_capacity",
+      "write_capacity",
+    ]
+  }
 }
 
 resource "aws_dynamodb_table" "identifiers" {
@@ -132,6 +144,10 @@ resource "aws_dynamodb_table" "identifiers" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      "read_capacity",
+      "write_capacity",
+    ]
   }
 }
 
@@ -150,5 +166,9 @@ resource "aws_dynamodb_table" "reindex_tracker" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      "read_capacity",
+      "write_capacity",
+    ]
   }
 }
