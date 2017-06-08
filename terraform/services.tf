@@ -20,6 +20,7 @@ module "calm_adapter" {
   alb_priority     = "101"
   healthcheck_path = "/calm_adapter/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+  config_key       = "config/${var.build_env}/calm_adapter.ini"
 
   # The Calm adapter is disabled when not running.  It only runs once a day
   # because the last_changed date on Calm records has per-day granularity.
@@ -40,19 +41,21 @@ module "miro_reindexer" {
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_role_arn    = "${module.ecs_miro_reindexer_iam.task_role_arn}"
   vpc_id           = "${module.vpc_services.vpc_id}"
-  app_uri          = "${aws_ecr_repository.calm_adapter.repository_url}:${var.release_ids["reindexer"]}"
+  app_uri          = "${aws_ecr_repository.reindexer.repository_url}:${var.release_ids["reindexer"]}"
   nginx_uri        = "${aws_ecr_repository.nginx.repository_url}:services"
   listener_arn     = "${module.services_alb.listener_arn}"
   path_pattern     = "/miro_reindexer/*"
   alb_priority     = "104"
   healthcheck_path = "/miro_reindexer/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+  config_key       = "config/${var.build_env}/miro_reindexer.ini"
 
   desired_count = "0"
 
   config_vars = {
     miro_table_name    = "${aws_dynamodb_table.miro_table.name}"
     reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
+    metrics_namespace  = "miro-reindexer"
   }
 }
 
@@ -69,6 +72,7 @@ module "ingestor" {
   alb_priority     = "102"
   healthcheck_path = "/ingestor/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+  config_key       = "config/${var.build_env}/ingestor.ini"
 
   config_vars = {
     es_host         = "${data.template_file.es_cluster_host.rendered}"
@@ -94,6 +98,7 @@ module "transformer" {
   alb_priority     = "100"
   healthcheck_path = "/transformer/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+  config_key       = "config/${var.build_env}/transformer.ini"
 
   config_vars = {
     stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
@@ -115,8 +120,14 @@ module "id_minter" {
   alb_priority     = "103"
   healthcheck_path = "/id_minter/management/healthcheck"
   infra_bucket     = "${var.infra_bucket}"
+  config_key       = "config/${var.build_env}/id_minter.ini"
 
   config_vars = {
+    rds_database_name   = "${module.identifiers_rds_cluster.database_name}"
+    rds_host            = "${module.identifiers_rds_cluster.host}"
+    rds_port            = "${module.identifiers_rds_cluster.port}"
+    rds_username        = "${module.identifiers_rds_cluster.username}"
+    rds_password        = "${module.identifiers_rds_cluster.password}"
     id_minter_queue_id  = "${module.id_minter_queue.id}"
     es_ingest_topic_arn = "${module.es_ingest_topic.arn}"
     table_name          = "${aws_dynamodb_table.identifiers.name}"
@@ -133,6 +144,7 @@ module "api" {
   nginx_uri     = "${aws_ecr_repository.nginx.repository_url}:api"
   listener_arn  = "${module.api_alb.listener_arn}"
   infra_bucket  = "${var.infra_bucket}"
+  config_key    = "config/${var.build_env}/api.ini"
 
   config_vars = {
     api_host      = "${var.api_host}"
