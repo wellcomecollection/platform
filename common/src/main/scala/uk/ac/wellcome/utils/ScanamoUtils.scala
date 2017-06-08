@@ -49,20 +49,20 @@ object ScanamoQueryStream {
 
   def run[T: DynamoFormat, Y](
     req: ScanamoQueryRequest,
-    f: (List[Either[DynamoReadError, T]]) => List[Y]): ScanamoOps[List[Y]] = {
+    f: (List[Either[DynamoReadError, T]]) => Y): ScanamoOps[List[Y]] = {
     def runMore(lastKey: Option[EvaluationKey]): ScanamoOps[List[Y]] = {
       for {
         queryResult <- exec(lastKey.foldLeft(req)(withExclusiveStartKey(_, _)))
         results = items(queryResult).asScala.map(ScanamoFree.read[T]).toList
         // This is where we hook into the batch of results
-        processedResults = f(results)
+        processedResult = f(results)
         resultList <- Option(lastEvaluatedKey(queryResult)).foldLeft(
-          Free.pure[ScanamoOpsA, List[Y]](processedResults)
+          Free.pure[ScanamoOpsA, List[Y]](List(processedResult))
         )((rs, k) =>
           for {
-            items <- rs
+            item <- rs
             more <- runMore(Some(k))
-          } yield items ::: more)
+          } yield item ::: more)
       } yield resultList
     }
     runMore(None)
