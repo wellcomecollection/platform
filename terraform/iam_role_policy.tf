@@ -6,6 +6,12 @@ resource "aws_iam_role_policy" "ecs_ingestor_task_read_ingestor_q" {
   policy = "${module.es_ingest_queue.read_policy}"
 }
 
+resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {
+  name   = "ecs_task_cloudwatch_metric_policy"
+  role   = "${module.ecs_ingestor_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
 # Role policies for the Calm adapter
 
 resource "aws_iam_role_policy" "ecs_calm_adapter_task" {
