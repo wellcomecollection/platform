@@ -56,6 +56,7 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
     if(updatedResults.length > 0) {
       info(s"ReindexTargetService completed batch of ${updatedResults.length}")
+      metricsSender.incrementCount("reindex-updated-items", updatedResults.length)
       ReindexStatus.progress(updatedResults.length, 1)
     }
 
