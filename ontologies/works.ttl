@@ -22,7 +22,7 @@ ww:Work rdf:type owl:Class ;
 	
 ww:Item rdf:type owl:Class ;
 	rdfs:label "Item"@en ;
-	rdfs:comment "A specific instance of a work: for instance, an individual physical copy with its own location.  This corresponds to the bottom, Instance, layer of FRBR.  Works that are unique - that is, have only one copy - are described in terms of a Work for their intellectual content, linked to an Item describing their physical characteristics."@en ;
+	rdfs:comment "A specific instance of a work: for instance, an individual physical copy with its own location.  This corresponds to the bottom, Instance, layer of FRBR.  Works that are unique - that is, have only one copy - are described in terms of a Work for their intellectual content, linked to an Item describing their local (usually physical) characteristics."@en ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
 	
 ww:Identifier rdf:type owl:Class ;
@@ -59,13 +59,7 @@ ww:Subject rdf:type owl:Class ;
 	rdfs:label "Subject"@en ;
 	rdfs:comment "A broad concept that forms part of a thesaurus-based classification of human knowledge."@en ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
-			
-ww:Shelfmark rdf:type owl:Class ;
-	rdfs:label "Shelfmark"@en ;
-	rdfs:comment "A code that relates a work to a location within library storage, often but not always relating to a subject-based scheme of library classification and arrangement such as Dewey or Barnard."@en ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
-	
-	
+				
 #######  Object properties ##### 
 	
 
