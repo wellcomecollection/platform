@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.idminter.utils
 
+import org.scalatest.Suite
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterEach, Suite}
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.model.IdentifiersTable
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-trait MysqlLocal extends BeforeAndAfterEach with ExtendedPatience with Eventually  { this: Suite =>
+trait MysqlLocal extends ExtendedPatience with Eventually  { this: Suite =>
   private val host = "localhost"
   private val port = "3307"
   private val userName = "root"
@@ -16,26 +16,7 @@ trait MysqlLocal extends BeforeAndAfterEach with ExtendedPatience with Eventuall
   ConnectionPool.singleton(s"jdbc:mysql://$host:$port", userName, password)
   implicit val session = AutoSession
 
-  private val identifiersDatabase = SQLSyntax.createUnsafely("identifiers")
-  private val identifiersTableName = SQLSyntax.createUnsafely("Identifiers")
-
-  val identifiersTable =
-    new IdentifiersTable(identifiersDatabase, identifiersTableName)
-
-  // Wait for mysql server to start
-  eventually {
-    DB localTx { implicit session =>
-      sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
-      sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
-      sql"""CREATE TABLE $identifiersDatabase.$identifiersTableName (
-       CanonicalID varchar(255),
-       MiroID varchar(255),
-       PRIMARY KEY (CanonicalID),
-       CONSTRAINT Unique_miro UNIQUE (MiroID));"""
-        .execute()
-        .apply()
-    }
-  }
+  val identifiersDatabase: SQLSyntax = SQLSyntax.createUnsafely("identifiers")
 
   val mySqlLocalEndpointFlags: Map[String, String] =
     Map(
@@ -43,12 +24,25 @@ trait MysqlLocal extends BeforeAndAfterEach with ExtendedPatience with Eventuall
       "aws.rds.port" -> port,
       "aws.rds.userName" -> userName,
       "aws.rds.password" -> password,
-      "aws.rds.identifiers.database" -> identifiersDatabase,
-      "aws.rds.identifiers.table" -> identifiersTableName
+      "aws.rds.identifiers.database" -> identifiersDatabase
     )
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    sql"TRUNCATE TABLE $identifiersDatabase.$identifiersTableName".execute().apply()
-  }
+  // Wait for mysql server to start
+    eventually {
+      DB localTx { implicit session =>
+        sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
+        sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
+      }
+    }
+
+}
+
+trait IdentifiersTableInfo { this: MysqlLocal =>
+  val identifiersTableName: SQLSyntax = SQLSyntax.createUnsafely("Identifiers")
+
+  val identifiersTable =
+    new IdentifiersTable(identifiersDatabase, identifiersTableName)
+
+  val identifiersMySqlLocalFlags: Map[String, String] =
+    mySqlLocalEndpointFlags + ("aws.rds.identifiers.table" -> identifiersTableName)
 }
