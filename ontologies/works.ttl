@@ -160,13 +160,6 @@ ww:hasFormat rdf:type owl:ObjectProperty ;
 	rdfs:domain ww:Work ;
 	rdfs:range ww:WorkType ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-					
-ww:hasShelfmark rdf:type owl:ObjectProperty ;
-	rdfs:label "hasShelfmark"@en ;
-	rdfs:comment "A shelfmark is a code that relates a work to a location within library storage, often but not always relating to a subject-based scheme of library classification and arrangement such as Dewey or Barnard."@en ;
-	rdfs:domain ww:Item ;
-	rdfs:range ww:Shelfmark ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
 	
 #######  Data properties #####  
 	
