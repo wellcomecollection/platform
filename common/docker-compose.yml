@@ -1,3 +1,7 @@
+dynamodb:
+  image: peopleperhour/dynamodb
+  ports:
+    - "45678:8000"
 sns:
   image: alicefuzier/fake-sns
   ports:
