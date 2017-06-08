@@ -28,7 +28,6 @@ class Server extends HttpServer {
                              AkkaModule)
 
   flag[Int]("reindex.maxAttempts", 3, "Maximum number of times to retry a reindex operation")
-  flag[String]("aws.metrics.namespace", "", "Namespace for cloudwatch metrics")
 
   override def configureHttp(router: HttpRouter) {
     router

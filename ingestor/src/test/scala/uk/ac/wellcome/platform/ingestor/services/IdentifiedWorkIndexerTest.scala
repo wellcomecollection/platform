@@ -1,9 +1,12 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.fasterxml.jackson.core.JsonParseException
 import com.sksamuel.elastic4s.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -15,10 +18,14 @@ class IdentifiedWorkIndexerTest
     extends FunSpec
     with ScalaFutures
     with Matchers
+    with MockitoSugar
     with IndexedElasticSearchLocal {
 
+  val metricsSender: MetricsSender =
+    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
+
   val identifiedWorkIndexer =
-    new IdentifiedWorkIndexer(indexName, itemType, elasticClient)
+    new IdentifiedWorkIndexer(indexName, itemType, elasticClient, metricsSender)
 
   def identifiedWorkJson(canonicalId: String, sourceId: String, label: String): String = {
     JsonUtil.toJson(

@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.ingestor
 
-import com.amazonaws.services.sqs.AmazonSQS
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, IndexedElasticSearchLocal, SQSLocal}
 
-trait IngestorUtils extends IndexedElasticSearchLocal with SQSLocal {
+trait IngestorUtils extends IndexedElasticSearchLocal with SQSLocal with AmazonCloudWatchFlag {
   this: Suite =>
   val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
 
@@ -25,7 +24,7 @@ trait IngestorUtils extends IndexedElasticSearchLocal with SQSLocal {
         "es.sniff" -> "false",
         "es.index" -> indexName,
         "es.type" -> itemType
-      ) ++ sqsLocalFlags
+      ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
     )
   }
 }

@@ -10,11 +10,14 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object AmazonCloudWatchModule extends TwitterModule {
-
-  val awsEndpoint = flag[String](
+  private val awsNamespace = flag[String]("aws.metrics.namespace",
+                                          "",
+                                          "Namespace for cloudwatch metrics")
+  private val awsEndpoint = flag[String](
     "aws.cloudWatch.endpoint",
     "",
     "Endpoint of AWS CloudWatch. If not set, it will use the region")
+
   @Provides
   @Singleton
   def providesAmazonCloudWatch(awsConfig: AWSConfig): AmazonCloudWatch = {
