@@ -5,8 +5,12 @@ import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{CalmTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, DynamoDBLocal, ExtendedPatience}
+import uk.ac.wellcome.models.{MiroTransformable, Reindex}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  DynamoDBLocal,
+  ExtendedPatience
+}
 
 class ReindexerFeatureTest
     extends FunSpec
@@ -21,50 +25,46 @@ class ReindexerFeatureTest
       new Server(),
       flags = Map(
         "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
-        "aws.dynamo.calmData.tableName" -> "CalmData",
-        "reindex.target.tableName" -> "CalmData"
+        "aws.dynamo.calmData.tableName" -> "MiroData",
+        "reindex.target.tableName" -> "MiroData"
       ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
     )
+
+  val currentVersion = 1
+  val requestedVersion = 2
 
   it(
     "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
   ) {
 
-    val currentVersion = 1
-    val requestedVersion = 2
+    val numberOfbatches = 4
+    val itemsToPut =
+      generateMiroTransformablesInBatches(numberOfbatches, currentVersion)
 
-    val calmTransformableList = List(
-      CalmTransformable(
-        RecordID = "RecordID1",
-        RecordType = "Collection",
-        AltRefNo = "AltRefNo1",
-        RefNo = "RefNo1",
-        data = """{"AccessStatus": ["public"]}""",
-        ReindexVersion = currentVersion
-      ))
-
-    val expectedCalmTransformableList = calmTransformableList
-      .map(_.copy(ReindexVersion = requestedVersion))
-      .map(Right(_))
+    val expectedMiroTransformableList = itemsToPut.map(item => {
+      Right(item.copy(ReindexVersion = requestedVersion))
+    })
 
     val reindexList = List(
-      Reindex(calmDataTableName, requestedVersion, currentVersion)
+      Reindex(miroDataTableName, requestedVersion, currentVersion)
     )
 
-    calmTransformableList.foreach(
-      Scanamo.put(dynamoDbClient)(calmDataTableName))
-
+    itemsToPut.foreach(Scanamo.put(dynamoDbClient)(miroDataTableName))
     reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
 
     server.start()
 
     eventually {
-      Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName) shouldBe expectedCalmTransformableList
+      Scanamo.scan[MiroTransformable](dynamoDbClient)(miroDataTableName) should contain theSameElementsAs expectedMiroTransformableList
 
-      server.httpGet(path = "/management/healthcheck",
-                     andExpect = Created,
-                     withJsonBody =
-                       """{"percent" : "100.0","state" : "success"}""")
+      server.httpGet(
+        path = "/management/healthcheck",
+        andExpect = Created,
+        withJsonBody =
+          s"""{"recordsProcessed" : "${itemsToPut.length}","state" : "success","batch" : "$numberOfbatches"}"""
+      )
     }
+
+    server.close()
   }
 }
