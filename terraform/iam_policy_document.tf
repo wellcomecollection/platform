@@ -74,19 +74,6 @@ data "aws_iam_policy_document" "read_calm_kinesis_stream" {
   }
 }
 
-data "aws_iam_policy_document" "read_write_dynamo_identifiers_table" {
-  statement {
-    actions = [
-      "dynamodb:*",
-    ]
-
-    resources = [
-      "${aws_dynamodb_table.identifiers.arn}",
-      "${aws_dynamodb_table.identifiers.arn}/index/*",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "update_ecs_service_size" {
   statement {
     actions = [
