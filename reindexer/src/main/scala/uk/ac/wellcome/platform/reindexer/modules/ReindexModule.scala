@@ -47,6 +47,8 @@ object ReindexModule extends TwitterModule with TryBackoff {
 
     info(s"Starting Reindexer module for $tableName")
 
+    ReindexStatus.init()
+
     val actorSystem = injector.instance[ActorSystem]
     val reindexService = tableName match {
       case "MiroData" => injector.instance[ReindexService[MiroTransformable]]

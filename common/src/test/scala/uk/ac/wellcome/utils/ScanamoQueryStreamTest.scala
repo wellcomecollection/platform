@@ -19,8 +19,7 @@ class ScanamoQueryStreamTest
     with DynamoDBLocal
     with Matchers {
 
-  final val maxDynamoItemSizeinKb = 400000
-  final val maxDynamoQueryResultSizeInKb = 1000000
+  import uk.ac.wellcome.test.utils.DynamoConstants._
 
   val bigString = "_" * maxDynamoItemSizeinKb
 
@@ -30,17 +29,7 @@ class ScanamoQueryStreamTest
     val resultGroups: ListBuffer[ResultGroup] = new ListBuffer[ResultGroup]()
 
     val expectedBatchCount = 4
-    val numberofRequiredPuts = (expectedBatchCount * maxDynamoQueryResultSizeInKb) / maxDynamoItemSizeinKb
-
-    val itemsToPut = (1 to numberofRequiredPuts)
-      .map(
-        i =>
-          MiroTransformable(
-            MiroID = s"Image$i",
-            MiroCollection = "Collection",
-            data = bigString,
-            ReindexVersion = 1
-        ))
+    val itemsToPut = generateMiroTransformablesInBatches(expectedBatchCount)
 
     itemsToPut.foreach(
       Scanamo.put(dynamoDbClient)(miroDataTableName)
@@ -75,5 +64,6 @@ class ScanamoQueryStreamTest
 
     resultGroups.length shouldBe expectedBatchCount
     actualItemsStored should contain theSameElementsAs expectedItemsStored
+
   }
 }
