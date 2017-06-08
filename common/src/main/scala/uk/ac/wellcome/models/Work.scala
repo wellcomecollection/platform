@@ -4,17 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.Indexable
 import uk.ac.wellcome.utils.JsonUtil
 
-/** Represents a set of identifiers as stored in DynamoDB */
-case class Identifier(CanonicalID: String, MiroID: String)
-
 /** An identifier received from one of the original sources */
 case class SourceIdentifier(source: String, sourceId: String, value: String)
 
 case class IdentifiedWork(canonicalId: String, work: Work)
 
 /** A representation of a work in our ontology, without a
- *  canonical identifier.
- */
+  *  canonical identifier.
+  */
 case class Work(
   identifiers: List[SourceIdentifier],
   label: String,
