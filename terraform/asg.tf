@@ -19,4 +19,5 @@ module "api_cluster_asg" {
   instance_profile_name = "${module.ecs_api_iam.instance_profile_name}"
   user_data             = "${module.api_userdata.rendered}"
   vpc_id                = "${module.vpc_api.vpc_id}"
+  instance_type         = "t2.large"
 }
