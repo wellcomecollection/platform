@@ -211,7 +211,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return a not found error when requesting a single work with a non existing id") {
+  it(
+    "should return a not found error when requesting a single work with a non existing id") {
     server.httpGet(
       path = s"/$apiPrefix/works/non-existing-id",
       andExpect = Status.NotFound,
@@ -219,7 +220,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -229,7 +231,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for an overly large page size") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -239,7 +242,8 @@ class ApiWorksTest
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for zero-length pages") {
+  it(
+    "should return an HTTP Bad Request error if the user asks for zero-length pages") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=0",
       andExpect = Status.BadRequest,
@@ -320,7 +324,8 @@ class ApiWorksTest
     }
   }
 
-  it("should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+  it(
+    "should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       source = "TestSource",
       sourceId = "The ID field within the TestSource",
@@ -394,8 +399,8 @@ class ApiWorksTest
     }
   }
 
-
-  it("should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+  it(
+    "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val identifier = SourceIdentifier(
       source = "TestSource",
       sourceId = "The ID field within the TestSource",
@@ -427,6 +432,116 @@ class ApiWorksTest
                           |     "value": "${identifier.value}"
                           |   }
                           | ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it(
+    "should be able to look at different Elasticsearch indices based on the ?index query parameter") {
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A whale on a wave"
+    )
+    insertIntoElasticSearch(work)
+
+    val work_alt = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "An impostor in an igloo"
+    )
+    insertIntoElasticSearchWithIndex("alt_records", work_alt)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId}",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.canonicalId}",
+                          | "label": "${work.work.label}",
+                          | "creators": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work_alt.canonicalId}?_index=alt_records",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work_alt.canonicalId}",
+                          | "label": "${work_alt.work.label}",
+                          | "creators": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it(
+    "should be able to search different Elasticsearch indices based on the ?index query parameter") {
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A whale on a wave"
+    )
+    insertIntoElasticSearch(work)
+
+    val work_alt = identifiedWorkWith(
+      canonicalId = "5678",
+      label = "An impostor in an igloo"
+    )
+    insertIntoElasticSearchWithIndex("alt_records", work_alt)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?query=whale",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 1,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${work.canonicalId}",
+                          |     "label": "${work.work.label}",
+                          |     "creators": [ ]
+                          |   }
+                          |  ]
+                          |}
+          """.stripMargin
+      )
+    }
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?query=igloo&_index=alt_records",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 1,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${work_alt.canonicalId}",
+                          |     "label": "${work_alt.work.label}",
+                          |     "creators": [ ]
+                          |   }
+                          |  ]
                           |}
           """.stripMargin
       )

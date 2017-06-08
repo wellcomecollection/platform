@@ -14,17 +14,24 @@ trait IndexedElasticSearchLocal
   val indexName = "records"
   val itemType = "item"
 
-  override def beforeEach(): Unit = {
-    ensureIndexDeleted(indexName)
-    new WorksIndex(elasticClient, indexName, itemType).create.map { _ =>
-      elasticClient.execute(indexExists(indexName)).await.isExists should be(true)
+  private def createIndex(index: String) = {
+    ensureIndexDeleted(index)
+    new WorksIndex(elasticClient, index, itemType).create.map { _ =>
+      elasticClient.execute(indexExists(index)).await.isExists should be(true)
     }.await
   }
 
-  def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*): Unit = {
+  override def beforeEach() {
+    createIndex(indexName)
+  }
+
+  def insertIntoElasticSearchWithIndex(index: String, identifiedWorks: IdentifiedWork*) = {
+    if (index != indexName) {
+      createIndex(index)
+    }
     identifiedWorks.foreach { identifiedWork =>
       elasticClient.execute(
-        indexInto(indexName / itemType)
+        indexInto(index / itemType)
           .id(identifiedWork.canonicalId)
           .doc(JsonUtil.toJson(identifiedWork).get)
       )
@@ -32,10 +39,13 @@ trait IndexedElasticSearchLocal
     eventually {
       elasticClient
         .execute {
-          search(indexName).matchAllQuery()
+          search(index).matchAllQuery()
         }
         .await
         .hits should have size identifiedWorks.size
     }
   }
+
+  def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*): Unit =
+    insertIntoElasticSearchWithIndex(indexName, identifiedWorks: _*)
 }
