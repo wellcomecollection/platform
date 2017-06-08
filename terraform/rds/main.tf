@@ -5,7 +5,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   cluster_identifier   = "${aws_rds_cluster.default.id}"
   instance_class       = "db.t2.small"
   db_subnet_group_name = "${aws_db_subnet_group.default.name}"
-  publicly_accessible = true
+  publicly_accessible  = true
 }
 
 resource "aws_db_subnet_group" "default" {
