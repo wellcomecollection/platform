@@ -7,10 +7,10 @@ import uk.ac.wellcome.platform.idminter.model.IdentifiersTable
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 trait MysqlLocal extends ExtendedPatience with Eventually  { this: Suite =>
-  private val host = "localhost"
-  private val port = "3307"
-  private val userName = "root"
-  private val password = "password"
+  val host = "localhost"
+  val port = "3307"
+  val userName = "root"
+  val password = "password"
 
   Class.forName("com.mysql.jdbc.Driver")
   ConnectionPool.singleton(s"jdbc:mysql://$host:$port", userName, password)
