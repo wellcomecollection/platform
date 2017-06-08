@@ -8,6 +8,7 @@ data "aws_iam_policy_document" "instance_policy" {
     sid = "ecsInstanceRole"
 
     actions = [
+      "ecs:StartTelemetrySession",
       "ecs:DeregisterContainerInstance",
       "ecs:DiscoverPollEndpoint",
       "ecs:Poll",
