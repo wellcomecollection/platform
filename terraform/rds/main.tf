@@ -5,6 +5,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   cluster_identifier   = "${aws_rds_cluster.default.id}"
   instance_class       = "db.t2.small"
   db_subnet_group_name = "${aws_db_subnet_group.default.name}"
+  publicly_accessible  = true
 }
 
 resource "aws_db_subnet_group" "default" {
@@ -17,5 +18,5 @@ resource "aws_rds_cluster" "default" {
   database_name          = "${var.database_name}"
   master_username        = "${var.username}"
   master_password        = "${var.password}"
-  vpc_security_group_ids = ["${var.vpc_security_group_ids}"]
+  vpc_security_group_ids = ["${aws_security_group.database_sg.id}"]
 }
