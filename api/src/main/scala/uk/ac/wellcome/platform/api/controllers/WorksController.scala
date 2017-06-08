@@ -24,7 +24,7 @@ case class MultipleResultsRequest(
 case class SingleWorkRequest(
   @RouteParam id: String,
   @QueryParam includes: Option[String],
-  @QueryParam index: Option[String]
+  @QueryParam _index: Option[String]
 )
 
 @Singleton
@@ -120,7 +120,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
       worksService
         .findWorkById(request.id,
                       request.includes.getOrElse("").split(",").toList,
-                      index = request.index)
+                      index = request._index)
         .map {
           case Some(result) =>
             response.ok.json(
