@@ -41,7 +41,8 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   protected val scanamoQueryStreamFunction: ScanamoQueryStreamFunction
 
-  private def updateVersion(newReindexVersion: Int, resultGroup: List[ScanamoQueryResult]): Boolean = {
+  private def updateVersion(newReindexVersion: Int,
+                            resultGroup: List[ScanamoQueryResult]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(miroTransformable) => {
@@ -56,7 +57,8 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
     if (performedUpdates) {
       info(s"ReindexTargetService completed batch of ${updatedResults.length}")
-      metricsSender.incrementCount("reindex-updated-items", updatedResults.length)
+      metricsSender.incrementCount("reindex-updated-items",
+                                   updatedResults.length)
       ReindexStatus.progress(updatedResults.length, 1)
     }
 
@@ -82,7 +84,9 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
     val scanamoQueryRequest: ScanamoQueryRequest = createScanamoQueryRequest(
       reindexAttempt.reindex.RequestedVersion)
 
-    val ops = scanamoQueryStreamFunction(scanamoQueryRequest, updateVersion(reindexAttempt.reindex.RequestedVersion, _))
+    val ops = scanamoQueryStreamFunction(
+      scanamoQueryRequest,
+      updateVersion(reindexAttempt.reindex.RequestedVersion, _))
 
     Future(Scanamo.exec(dynamoDBClient)(ops)).map(r => {
       reindexAttempt.copy(successful = !r.contains(false),
