@@ -21,7 +21,7 @@ class MiroReindexTargetServiceTest
   it("should update the correct index to the requested version") {
 
     val currentVersion = 1
-    val requestedVersion = 2
+    val requestedVersion = 3
 
     val outOfdateMiroTransformableList = List(
       MiroTransformable(
@@ -37,14 +37,11 @@ class MiroReindexTargetServiceTest
         MiroID = "Image2",
         MiroCollection = "Images-A",
         data = s"""{"image_title": "title"}""",
-        ReindexVersion = 2
+        ReindexVersion = requestedVersion
       )
     )
 
     val miroTransformableList = outOfdateMiroTransformableList ++ inDateMiroTransferrableList
-
-    val expectedMiroTransformableList =
-      outOfdateMiroTransformableList.map(_.copy(ReindexVersion = 2))
 
     val reindex = Reindex(miroDataTableName, requestedVersion, currentVersion)
     val reindexAttempt = ReindexAttempt(reindex)
@@ -68,6 +65,11 @@ class MiroReindexTargetServiceTest
     whenReady(reindexTargetService.runReindex(reindexAttempt)) {
       reindexAttempt =>
         reindexAttempt shouldBe expectedReindexAttempt
+        Scanamo
+          .scan[MiroTransformable](dynamoDbClient)(miroDataTableName)
+          .map {
+            case Right(miroTranformable) => miroTranformable.ReindexVersion
+          } should contain only requestedVersion
     }
 
   }
