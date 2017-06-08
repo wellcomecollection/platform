@@ -10,3 +10,7 @@ variable "template_vars" {
   description = "Variables for the template file"
   type        = "map"
 }
+
+variable "config_key" {
+  description = "Location of config file within S3"
+}
