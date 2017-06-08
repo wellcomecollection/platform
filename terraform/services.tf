@@ -130,7 +130,6 @@ module "id_minter" {
     rds_password        = "${module.identifiers_rds_cluster.password}"
     id_minter_queue_id  = "${module.id_minter_queue.id}"
     es_ingest_topic_arn = "${module.es_ingest_topic.arn}"
-    table_name          = "${aws_dynamodb_table.identifiers.name}"
   }
 }
 
