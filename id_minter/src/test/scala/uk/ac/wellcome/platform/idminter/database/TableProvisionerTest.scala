@@ -10,20 +10,27 @@ case class FieldDescription(field: String,
                             nullable: String,
                             key: String)
 
-class TableProvisionerTest extends FunSpec with MysqlLocal with Matchers with BeforeAndAfterEach{
+class TableProvisionerTest
+    extends FunSpec
+    with MysqlLocal
+    with Matchers
+    with BeforeAndAfterEach {
+
+  val tableName: SQLSyntax = SQLSyntax.createUnsafely("Identifiers")
 
   override def beforeEach(): Unit = {
-    sql"drop table if exists identifiers.schema_version".execute().apply()
+    super.beforeEach()
+    sql"drop table if exists $identifiersDatabase.schema_version".execute().apply()
+    sql"drop table if exists $identifiersDatabase.$tableName".execute().apply()
   }
 
   it("should create the Identifiers table") {
-    val database = SQLSyntax.createUnsafely("identifiers")
-    val tableName = SQLSyntax.createUnsafely("Identifiers")
-    new TableProvisioner(host, port, userName, password).provision(database, tableName)
+    new TableProvisioner(host, port, userName, password)
+      .provision(identifiersDatabase, tableName)
 
     eventually {
       val fields = DB readOnly { implicit session =>
-        sql"DESCRIBE $database.$tableName"
+        sql"DESCRIBE $identifiersDatabase.$tableName"
           .map(
             rs =>
               FieldDescription(rs.string("Field"),

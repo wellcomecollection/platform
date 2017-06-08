@@ -15,8 +15,14 @@ class IdMinterFeatureTest
     with FeatureTestMixin with IdMinterTestUtils {
 
   override val server: EmbeddedHttpServer = defineServer
-
   private val i = identifiersTable.i
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    sql"TRUNCATE TABLE $identifiersDatabase.$identifiersTableName"
+      .execute()
+      .apply()
+  }
 
   it(
     "should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
