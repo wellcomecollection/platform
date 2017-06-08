@@ -3,21 +3,26 @@ package uk.ac.wellcome.platform.reindexer.services
 import javax.inject.Inject
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.gu.scanamo.{Scanamo, Table}
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.MiroTransformable
+import uk.ac.wellcome.utils.ScanamoQueryStream
 
 class MiroReindexTargetService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   @Flag("reindex.target.tableName") reindexTargetTableName: String,
   metricsSender: MetricsSender)
     extends ReindexTargetService[MiroTransformable](dynamoDBClient,
-                                                    metricsSender) {
+                                                    metricsSender,
+                                                    reindexTargetTableName) {
 
-  protected override val transformableTable: Table[MiroTransformable] =
-    Table[MiroTransformable](reindexTargetTableName)
+  protected val scanamoUpdate: ScanamoUpdate =
+    Scanamo.update[MiroTransformable](dynamoDBClient)(reindexTargetTableName)
 
-  protected override val scanamoQuery: ScanamoQuery =
-    Scanamo.queryIndex[MiroTransformable](dynamoDBClient) _
+  protected val scanamoQueryStreamFunction: ScanamoQueryStreamFunction =
+    ScanamoQueryStream
+      .run[MiroTransformable, Either[DynamoReadError, MiroTransformable]]
+
 }

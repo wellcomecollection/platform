@@ -4,14 +4,14 @@ import java.util
 
 import cats.free.Free
 import com.amazonaws.services.dynamodbv2.model.{AttributeValue, QueryResult}
-import com.gu.scanamo.{DynamoFormat, ScanamoFree}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.ops.{ScanamoOps, ScanamoOpsA}
 import com.gu.scanamo.request.ScanamoQueryRequest
-
+import com.gu.scanamo.{DynamoFormat, ScanamoFree}
+import com.twitter.inject.Logging
 import scala.collection.JavaConverters._
 
-object ScanamoUtils {
+object ScanamoUtils extends Logging {
   def logAndFilterLeft[Y](rows: List[Either[DynamoReadError, Y]]) = {
     rows.foreach {
       case Left(e: DynamoReadError) => error(e.toString)
