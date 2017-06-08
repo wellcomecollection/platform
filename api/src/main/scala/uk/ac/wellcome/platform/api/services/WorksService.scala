@@ -15,33 +15,38 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
 
   def findWorkById(canonicalId: String,
-                   includes: List[String] = Nil): Future[Option[DisplayWork]] =
+                   includes: List[String] = Nil,
+                   index: Option[String] = None): Future[Option[DisplayWork]] =
     searchService
-      .findResultById(canonicalId)
+      .findResultById(canonicalId, index = index)
       .map { result =>
         if (result.exists) Some(DisplayWork(result.original, includes)) else None
       }
 
   def listWorks(pageSize: Int = defaultPageSize,
                 pageNumber: Int = 1,
-                includes: List[String] = Nil): Future[DisplaySearch] =
+                includes: List[String] = Nil,
+                index: Option[String] = None): Future[DisplaySearch] =
     searchService
       .listResults(
         sortByField = "canonicalId",
         limit = pageSize,
-        from = (pageNumber - 1) * pageSize
+        from = (pageNumber - 1) * pageSize,
+        index = index
       )
       .map { DisplaySearch(_, pageSize, includes) }
 
   def searchWorks(query: String,
                   pageSize: Int = defaultPageSize,
                   pageNumber: Int = 1,
-                  includes: List[String] = Nil): Future[DisplaySearch] =
+                  includes: List[String] = Nil,
+                  index: Option[String] = None): Future[DisplaySearch] =
     searchService
       .simpleStringQueryResults(
         query,
         limit = pageSize,
-        from = (pageNumber - 1) * pageSize
+        from = (pageNumber - 1) * pageSize,
+        index = index
       )
       .map { DisplaySearch(_, pageSize, includes) }
 
