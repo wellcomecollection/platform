@@ -58,11 +58,11 @@ class ReindexModuleTest
     val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
-    when(reindexTargetService.runReindex(ReindexAttempt(reindex, Nil, 0)))
+    when(reindexTargetService.runReindex(ReindexAttempt(reindex, false, 0)))
       .thenReturn(Future.failed(new Exception("boom!")))
       .thenReturn(Future.failed(new Exception("boom!")))
       .thenReturn(Future.failed(new Exception("boom!")))
-      .thenReturn(Future.successful(ReindexAttempt(reindex, Nil, 1)))
+      .thenReturn(Future.successful(ReindexAttempt(reindex, true, 1)))
 
     server.start()
 

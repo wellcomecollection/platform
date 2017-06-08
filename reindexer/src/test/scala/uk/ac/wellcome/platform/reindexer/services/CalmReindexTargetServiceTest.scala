@@ -61,10 +61,11 @@ class CalmReindexTargetServiceTest
 
     val reindexTargetService =
       new CalmReindexTargetService(dynamoDbClient, "CalmData", metricsSender)
+
     val reindexAttempt = ReindexAttempt(reindex)
     val expectedReindexAttempt = reindexAttempt.copy(
       reindex = reindex,
-      successful = expectedCalmTransformableList,
+      successful = true,
       attempt = 1
     )
 

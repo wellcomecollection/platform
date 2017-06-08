@@ -4,7 +4,6 @@ import javax.inject.Inject
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.Scanamo
-import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.CalmTransformable
@@ -23,5 +22,5 @@ class CalmReindexTargetService @Inject()(
 
   protected val scanamoQueryStreamFunction: ScanamoQueryStreamFunction =
     ScanamoQueryStream
-      .run[CalmTransformable, Either[DynamoReadError, CalmTransformable]]
+      .run[CalmTransformable, Boolean]
 }

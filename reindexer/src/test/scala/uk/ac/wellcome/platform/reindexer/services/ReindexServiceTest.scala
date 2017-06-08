@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.reindexer.services
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.dynamodbv2.model.PutItemResult
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Mockito._
@@ -99,20 +98,20 @@ class ReindexServiceTest
 
     when(calmReindexTargetService.runReindex(ReindexAttempt(reindex)))
       .thenReturn(
-        Future.successful(ReindexAttempt(reindex, calmTransformableList, 1)))
+        Future.successful(ReindexAttempt(reindex, true, 1)))
 
     (1 to 4).foreach { x =>
       when(
         calmReindexTargetService.runReindex(
-          ReindexAttempt(reindex, calmTransformableList, x)))
+          ReindexAttempt(reindex, true, x)))
         .thenReturn(Future.successful(
-          ReindexAttempt(reindex, calmTransformableList, x + 1)))
+          ReindexAttempt(reindex, false, x + 1)))
     }
 
     when(
       calmReindexTargetService.runReindex(
-        ReindexAttempt(reindex, calmTransformableList, 5)))
-      .thenReturn(Future.successful(ReindexAttempt(reindex, Nil, 6)))
+        ReindexAttempt(reindex, false, 5)))
+      .thenReturn(Future.successful(ReindexAttempt(reindex, true, 6)))
 
     val reindexService = new ReindexService(
       new ReindexTrackerService(

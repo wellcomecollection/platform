@@ -22,19 +22,17 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
   targetTableName: String)
     extends Logging {
 
-  import uk.ac.wellcome.utils.ScanamoUtils._
-
   type ScanamoQueryResult = Either[DynamoReadError, T]
 
   type ScanamoUpdate =
     (UniqueKey[_], UpdateExpression) => Either[DynamoReadError, T]
 
   type ScanamoQueryResultFunction =
-    (List[ScanamoQueryResult]) => List[ScanamoQueryResult]
+    (List[ScanamoQueryResult]) => Boolean
 
   type ScanamoQueryStreamFunction = (
     ScanamoQueryRequest,
-    ScanamoQueryResultFunction) => ScanamoOps[List[ScanamoQueryResult]]
+    ScanamoQueryResultFunction) => ScanamoOps[List[Boolean]]
 
   private val gsiName = "ReindexTracker"
 
@@ -43,7 +41,7 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   protected val scanamoQueryStreamFunction: ScanamoQueryStreamFunction
 
-  private def updateVersion(resultGroup: List[ScanamoQueryResult]) = {
+  private def updateVersion(resultGroup: List[ScanamoQueryResult]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(miroTransformable) => {
@@ -54,13 +52,15 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
       }
     }
 
-    if(updatedResults.length > 0) {
+    val performedUpdates = updatedResults.nonEmpty
+
+    if (performedUpdates) {
       info(s"ReindexTargetService completed batch of ${updatedResults.length}")
       metricsSender.incrementCount("reindex-updated-items", updatedResults.length)
       ReindexStatus.progress(updatedResults.length, 1)
     }
 
-    updatedResults
+    performedUpdates
   }
 
   private def createScanamoQueryRequest(
@@ -84,11 +84,9 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
     val ops = scanamoQueryStreamFunction(scanamoQueryRequest, updateVersion)
 
-    for {
-      result <- Future(Scanamo.exec(dynamoDBClient)(ops))
-      updatedRows = logAndFilterLeft(result)
-    } yield
-      reindexAttempt.copy(successful = updatedRows,
+    Future(Scanamo.exec(dynamoDBClient)(ops)).map(r => {
+      reindexAttempt.copy(successful = !r.contains(false),
                           attempt = reindexAttempt.attempt + 1)
+    })
   }
 }
