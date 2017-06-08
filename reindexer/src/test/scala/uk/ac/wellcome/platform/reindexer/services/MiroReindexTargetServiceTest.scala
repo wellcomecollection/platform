@@ -50,7 +50,7 @@ class MiroReindexTargetServiceTest
     val reindexAttempt = ReindexAttempt(reindex)
     val expectedReindexAttempt = reindexAttempt.copy(
       reindex = reindex,
-      successful = expectedMiroTransformableList,
+      successful = true,
       attempt = 1
     )
 

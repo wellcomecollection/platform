@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindexer.models
 
-import uk.ac.wellcome.models.{Reindex, Reindexable}
+import uk.ac.wellcome.models.Reindex
 
 case class ReindexAttempt(reindex: Reindex,
-                          successful: List[Reindexable[String]] = Nil,
+                          successful: Boolean = false,
                           attempt: Int = 0)

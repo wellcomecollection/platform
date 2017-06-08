@@ -50,11 +50,12 @@ class ScanamoQueryStreamTest
 
     def updateVersion(resultGroup: ResultGroup): ResultGroup = {
       resultGroups += resultGroup
+
       resultGroup
     }
 
     val ops = ScanamoQueryStream
-      .run[MiroTransformable, Either[DynamoReadError, MiroTransformable]](
+      .run[MiroTransformable, List[Either[DynamoReadError, MiroTransformable]]](
         scanamoQueryRequest,
         updateVersion)
 
