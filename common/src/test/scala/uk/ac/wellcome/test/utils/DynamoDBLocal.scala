@@ -13,7 +13,6 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.{
   CalmTransformable,
-  Identifier,
   MiroTransformable,
   Reindex
 }
@@ -46,13 +45,11 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
       new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
     .build()
 
-  val identifiersTableName = "Identifiers"
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
   val reindexTableName = "ReindexTracker"
 
   deleteTables()
-  createIdentifiersTable()
   createReindexTable()
   private val miroDataTable: CreateTableResult = createMiroDataTable()
   private val calmDataTable: CreateTableResult = createCalmDataTable()
@@ -71,7 +68,6 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearIdentifiersTable()
     clearMiroTable()
     clearCalmTable()
     clearReindexTable()
@@ -106,17 +102,6 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
       case a =>
         throw new Exception(
           s"Unable to clear the table $reindexTableName error $a")
-    }
-
-  private def clearIdentifiersTable(): List[DeleteItemResult] =
-    Scanamo.scan[Identifier](dynamoDbClient)(identifiersTableName).map {
-      case Right(identifier) =>
-        dynamoDbClient.deleteItem(
-          identifiersTableName,
-          Map("CanonicalID" -> new AttributeValue(identifier.CanonicalID)))
-      case a =>
-        throw new Exception(
-          s"Unable to clear the table $identifiersTableName error $a")
     }
 
   private def clearMiroTable(): List[DeleteItemResult] =
@@ -266,38 +251,6 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
           .withStreamViewType(StreamViewType.NEW_IMAGE))
         .withGlobalSecondaryIndexes(reindexGSI())
     )
-  }
-
-  //TODO delete and use terraform apply once this issue is fixed: https://github.com/hashicorp/terraform/issues/11926
-  private def createIdentifiersTable() = {
-    dynamoDbClient.createTable(
-      new CreateTableRequest()
-        .withTableName(identifiersTableName)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName("CanonicalID")
-          .withKeyType(KeyType.HASH))
-        .withGlobalSecondaryIndexes(
-          new GlobalSecondaryIndex()
-            .withIndexName("MiroID")
-            .withProvisionedThroughput(new ProvisionedThroughput()
-              .withReadCapacityUnits(1L)
-              .withWriteCapacityUnits(1L))
-            .withProjection(new Projection()
-              .withProjectionType(ProjectionType.ALL))
-            .withKeySchema(new KeySchemaElement()
-              .withAttributeName("MiroID")
-              .withKeyType(KeyType.HASH)))
-        .withAttributeDefinitions(
-          new AttributeDefinition()
-            .withAttributeName("CanonicalID")
-            .withAttributeType("S"),
-          new AttributeDefinition()
-            .withAttributeName("MiroID")
-            .withAttributeType("S")
-        )
-        .withProvisionedThroughput(new ProvisionedThroughput()
-          .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L)))
   }
 
   private def createReindexTable() = {
