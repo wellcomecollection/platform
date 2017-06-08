@@ -14,6 +14,7 @@ trait IdMinterTestUtils
     extends SQSLocal
     with SNSLocal
     with MysqlLocal
+    with IdentifiersTableInfo
     with Matchers { this: Suite =>
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
@@ -29,7 +30,7 @@ trait IdMinterTestUtils
         "aws.sqs.queue.url" -> idMinterQueue,
         "aws.sqs.waitTime" -> "1",
         "aws.sns.topic.arn" -> ingestorTopicArn
-      ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ mySqlLocalEndpointFlags
+      ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags
     )
   }
 
