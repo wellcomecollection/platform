@@ -73,6 +73,26 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
     clearReindexTable()
   }
 
+  def generateMiroTransformablesInBatches(
+    numberOfBatches: Int,
+    reindexVersion: Int = 1): List[MiroTransformable] = {
+    import DynamoConstants._
+
+    val bigString = "_" * maxDynamoItemSizeinKb
+    val numberofRequiredPuts = (numberOfBatches * maxDynamoQueryResultSizeInKb) / maxDynamoItemSizeinKb
+
+    (1 to numberofRequiredPuts)
+      .map(
+        i =>
+          MiroTransformable(
+            MiroID = s"Image$i",
+            MiroCollection = "Collection",
+            data = bigString,
+            ReindexVersion = reindexVersion
+        ))
+      .toList
+  }
+
   private def clearReindexTable(): List[DeleteItemResult] =
     Scanamo.scan[Reindex](dynamoDbClient)(reindexTableName).map {
       case Right(reindex) =>

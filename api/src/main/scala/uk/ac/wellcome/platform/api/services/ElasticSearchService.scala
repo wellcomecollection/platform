@@ -14,38 +14,47 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 @Singleton
-class ElasticSearchService @Inject()(@Flag("es.index") index: String,
-                                     @Flag("es.type") itemType: String,
+class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
+                                     @Flag("es.type") documentType: String,
                                      elasticClient: TcpClient) {
 
-  def findResultById(id: String): Future[RichGetResponse] =
+  private def getIndex(queryParam: Option[String]): String =
+    queryParam match {
+      case Some(index) => index
+      case None => defaultIndex
+    }
+
+  def findResultById(id: String,
+                     index: Option[String] = None): Future[RichGetResponse] =
     elasticClient
       .execute {
-        get(id).from(s"$index/$itemType")
+        get(id).from(s"${getIndex(index)}/$documentType")
       }
 
   def listResults(sortByField: String,
                   limit: Int = 10,
-                  from: Int = 0): Future[RichSearchResponse] =
+                  from: Int = 0,
+                  index: Option[String] = None): Future[RichSearchResponse] =
     elasticClient
       .execute {
-        search(s"$index/$itemType")
+        search(s"${getIndex(index)}/$documentType")
           .matchAllQuery()
           .sortBy(fieldSort(sortByField))
           .limit(limit)
           .from(from)
       }
 
-  def simpleStringQueryResults(queryString: String,
-                               limit: Int = 10,
-                               from: Int = 0): Future[RichSearchResponse] =
+  def simpleStringQueryResults(
+    queryString: String,
+    limit: Int = 10,
+    from: Int = 0,
+    index: Option[String] = None): Future[RichSearchResponse] =
     elasticClient
       .execute {
-        search(s"$index/$itemType")
+        search(s"${getIndex(index)}/$documentType")
           .query(simpleStringQuery(queryString))
           .limit(limit)
           .from(from)
       }
 
 }
-
