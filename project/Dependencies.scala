@@ -36,7 +36,8 @@ object Dependencies {
 
   val mysqlDependencies: Seq[ModuleID] = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
-    "mysql" % "mysql-connector-java" % "6.0.6"
+    "mysql" % "mysql-connector-java" % "6.0.6",
+    "org.flywaydb" % "flyway-core" % "4.2.0"
   )
   val esDependencies: Seq[ModuleID] = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
