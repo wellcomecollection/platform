@@ -19,14 +19,23 @@ def main(event, _):
     requested_version = new_image["RequestedVersion"]["N"]
     if current_version == requested_version:
         desired_count = 0
+        desired_capacity = 1
     else:
         desired_count = 1
-    topic_arn = os.environ["TOPIC_ARN"]
+        desired_capacity = int(os.environ["DYNAMO_DESIRED_CAPACITY"])
+
+    scheduler_topic_arn = os.environ["SCHEDULER_TOPIC_ARN"]
     cluster = os.environ["CLUSTER_NAME"]
     service = get_service_name(os.environ["REINDEXERS"], table_name)
     message = {'cluster': cluster, 'service': service, 'desired_count': desired_count}
-    print(f"desired_count: {desired_count}, topic_arn: {topic_arn}, cluster: {cluster}, service: {service}")
-    publish_sns_message(topic_arn=topic_arn, message=message)
+    print(f"desired_count: {desired_count}, scheduler_topic_arn: {scheduler_topic_arn}, cluster: {cluster}, service: {service}")
+    publish_sns_message(topic_arn=scheduler_topic_arn, message=message)
+
+    dynamo_topic_arn = os.environ["DYNAMO_TOPIC_ARN"]
+    dynamo_table_arn = os.environ["DYNAMO_TABLE_ARN"]
+    message = {'dynamo_table_arn': dynamo_table_arn, 'desired_capacity': desired_capacity}
+    print(f"dynamo_topic_arn: {dynamo_topic_arn}, dynamo_table_arn: {dynamo_table_arn}, desired_capacity: {desired_capacity}")
+    publish_sns_message(topic_arn=dynamo_topic_arn, message=message)
 
 
 def get_service_name(reindexers, table_name):
