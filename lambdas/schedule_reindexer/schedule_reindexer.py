@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Publish a service scheduler to SNS.
+Publish a service schedule request for the reindexer to SNS.
 
-This script runs on a fixed schedule to send an SNS notification to start
-one of our adapters.
+This script is triggered by updates to the reindexer DynamoDB table.
 """
 
 import os
@@ -25,13 +24,9 @@ def main(event, _):
     topic_arn = os.environ["TOPIC_ARN"]
     cluster = os.environ["CLUSTER_NAME"]
     service = get_service_name(os.environ["REINDEXERS"], table_name)
+    message = {'cluster': cluster, 'service': service, 'desired_count': desired_count}
     print(f"desired_count: {desired_count}, topic_arn: {topic_arn}, cluster: {cluster}, service: {service}")
-    publish_sns_message(
-        topic_arn=topic_arn,
-        cluster=cluster,
-        service=service,
-        desired_count=desired_count
-    )
+    publish_sns_message(topic_arn=topic_arn, message=message)
 
 
 def get_service_name(reindexers, table_name):
