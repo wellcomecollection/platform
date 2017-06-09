@@ -4,13 +4,20 @@
 Publish a service scheduler to SNS.
 
 This script runs on a fixed schedule to send an SNS notification to start
-one of our adapters.
+one of our adapters.  It receives a blob of JSON from a CloudWatch timed
+event, and publishes that to the service scheduler topic.
 """
+
+import pprint
 
 from sns_utils import publish_sns_message
 
 
 def main(event, _):
-    print(f'Received event: {event!r}')
-    message = {'cluster': event['cluster'], 'service': event['service'], 'desired_count': event['desired_count']}
+    print(f'Received event: {pprint.pformat(event)}')
+    message = {
+        'cluster': event['cluster'],
+        'service': event['service'],
+        'desired_count': event['desired_count'],
+    }
     publish_sns_message(topic_arn=event['topic_arn'], message=message)

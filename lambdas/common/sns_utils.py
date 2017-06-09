@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 import json
+import pprint
 
 import boto3
 
@@ -18,5 +19,5 @@ def publish_sns_message(topic_arn, message):
             'default': json.dumps(message)
         })
     )
-    print(f'SNS response: {resp!r}')
+    print(f'SNS response: {pprint.pformat(resp)}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
