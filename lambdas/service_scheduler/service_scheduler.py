@@ -14,7 +14,7 @@ from sns_utils import publish_sns_message
 
 
 def main(event, _):
-    print(f'Received event: {pprint.pformat(event)}')
+    print(f'Received event:\n{pprint.pformat(event)}')
     message = {
         'cluster': event['cluster'],
         'service': event['service'],
