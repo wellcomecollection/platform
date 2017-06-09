@@ -85,6 +85,11 @@ resource "aws_iam_role_policy" "lambda_schedule_reindexer_dynamo_sns" {
   policy = "${module.dynamo_capacity_topic.publish_policy}"
 }
 
+resource "aws_iam_role_policy" "lambda_update_dynamo_capacity_table_access" {
+  role   = "${module.lambda_update_dynamo_capacity.role_name}"
+  policy = "${data.aws_iam_policy_document.allow_table_capacity_changes.json}"
+}
+
 # Role policies for the Update ECS Service Size Lambda
 
 resource "aws_iam_role_policy" "update_ecs_service_size_policy" {

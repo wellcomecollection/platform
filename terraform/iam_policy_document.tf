@@ -25,6 +25,19 @@ data "aws_iam_policy_document" "allow_calm_db_all" {
   }
 }
 
+data "aws_iam_policy_document" "allow_table_capacity_changes" {
+  statement {
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:UpdateTable",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "reindex_tracker_table" {
   statement {
     actions = [

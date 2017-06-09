@@ -7,7 +7,7 @@ module "lambda_service_scheduler" {
   source_dir  = "../lambdas/service_scheduler"
 }
 
-module "schedule_calm_adapter" {
+module "trigger_calm_adapter" {
   source                  = "./lambda/trigger_cloudwatch"
   lambda_function_name    = "${module.lambda_service_scheduler.function_name}"
   lambda_function_arn     = "${module.lambda_service_scheduler.arn}"
@@ -33,7 +33,7 @@ module "lambda_update_ecs_service_size" {
   source_dir  = "../lambdas/update_ecs_service_size"
 }
 
-module "update_ecs_service_size_trigger" {
+module "trigger_update_ecs_service_size" {
   source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.lambda_update_ecs_service_size.function_name}"
   lambda_function_arn  = "${module.lambda_update_ecs_service_size.arn}"
@@ -69,7 +69,7 @@ module "lambda_schedule_reindexer" {
 
   environment_variables = {
     SCHEDULER_TOPIC_ARN    = "${module.service_scheduler_topic.arn}"
-    DYNAMO_TABLE_ARN    = "${aws_dynamodb_table.miro_table.arn}"
+    DYNAMO_TABLE_NAME    = "${aws_dynamodb_table.miro_table.name}"
     DYNAMO_TOPIC_ARN    = "${module.dynamo_capacity_topic.arn}"
     DYNAMO_DESIRED_CAPACITY = "20"
     CLUSTER_NAME = "${aws_ecs_cluster.services.name}"
@@ -84,4 +84,20 @@ module "trigger_reindexer_lambda" {
   function_role     = "${module.lambda_schedule_reindexer.role_name}"
   batch_size        = 1
   starting_position = "LATEST"
+}
+
+# Lambda for updating the capacity of a DynamoDB table
+
+module "lambda_update_dynamo_capacity" {
+  source      = "./lambda"
+  name        = "update_dynamo_capacity"
+  description = "Update the capacity of a DynamoDB table"
+  source_dir  = "../lambdas/update_dynamo_capacity"
+}
+
+module "trigger_update_dynamo_capacity" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_update_dynamo_capacity.function_name}"
+  lambda_function_arn  = "${module.lambda_update_dynamo_capacity.arn}"
+  sns_trigger_arn      = "${module.dynamo_capacity_topic.arn}"
 }
