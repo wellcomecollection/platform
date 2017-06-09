@@ -18,7 +18,10 @@ class StartupTest
     with SQSLocal {
   val server = new EmbeddedHttpServer(
     new Server(),
-    flags = snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags
+    flags = snsLocalEndpointFlags ++
+      sqsLocalFlags ++
+      identifiersMySqlLocalFlags ++
+      cloudWatchLocalEndpointFlag
   )
 
   test("server starts up correctly") {
