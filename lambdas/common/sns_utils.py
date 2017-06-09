@@ -5,7 +5,7 @@ import json
 import boto3
 
 
-def publish_sns_message(topic_arn, cluster, service, desired_count):
+def publish_sns_message(topic_arn, message):
     """
     Given a topic ARN and a series of key-value pairs, publish the key-value
     data to the SNS topic.
@@ -15,11 +15,7 @@ def publish_sns_message(topic_arn, cluster, service, desired_count):
         TopicArn=topic_arn,
         MessageStructure='json',
         Message=json.dumps({
-            'default': json.dumps({
-                'cluster': cluster,
-                'service': service,
-                'desired_count': desired_count
-            })
+            'default': json.dumps(message)
         })
     )
     print(f'SNS response: {resp!r}')
