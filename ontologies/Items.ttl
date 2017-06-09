@@ -1,0 +1,161 @@
+
+@prefix wi: <http://www.wellcomecollection.org/ontologies/items> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+TBC
+    rdf:type owl:Ontology ;
+    dcterms:title "Items"@en ;
+    dcterms:created "2017-02-13"^^xsd:date ;
+    dcterms:description "Ontology describing the properties of items"@en .
+	
+
+#######  Classes ##### 	
+	
+wi:Item rdf:type owl:Class ;
+	rdfs:label "Item"@en ;
+	rdfs:comment "A specific instance of a work: for instance, an individual physical copy with its own location.  This corresponds to the bottom, Instance, layer of FRBR.  Works that are unique - that is, have only one copy - are described in terms of a Work for their intellectual content, linked to an Item describing their individual (often physical) characteristics."@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+	
+wi:Work rdf:type owl:Class ;
+	rdfs:label "Work"@en ;
+	rdfs:comment "An individual work such as a text, archive item or picture; or a grouping of individual works (so, for instance, an archive collection counts as a work, as do all the series and individual files within it).  Each work may exist in multiple instances (e.g. copies of the same book).  N.B. this is not synonymous with "work" as that is understood in the International Federation of Library Associations and Institutions' Functional Requirements for Bibliographic Records model (FRBR) but represents something lower down the FRBR hierarchy, namely manifestation. Groups of related items are also included as works because they have similar properties to the individual ones."@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:Identifier rdf:type owl:Class ;
+	rdfs:label "Identifier"@en ;
+	rdfs:comment "An identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;"@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .		
+	
+wi:Classmark rdf:type owl:Class ;
+	rdfs:label "Classmark"@en ;
+	rdfs:comment "A code that relates an item to a classification of library holdings, often but not always relating to a subject-based scheme of classification and arrangement such as Barnard or the National Library of Medicine classification."@en ;
+ 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+	
+wi:FileFormat rdf:type owl:Class ;
+	rdfs:label "FileFormat"@en ;
+	rdfs:comment "The file format of an item that comprises a digital object."@en ;
+ 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:Location rdf:type owl:Class ;
+	rdfs:label "Location"@en ;
+	rdfs:comment "The broad division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material."@en ;
+ 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:RequestStatus rdf:type owl:Class ;
+	rdfs:label "RequestStatus"@en ;
+	rdfs:comment "."@en ;
+ 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+	
+#######  Object properties ##### 
+  
+wi:hasIdentifier rdf:type owl:DatatypeProperty ;
+	rdfs:label "identifier"@en ;
+	rdfs:comment "Relates the item to an identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range wi:Identifier ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:hasClassmark rdf:type owl:ObjectProperty ;
+	rdfs:label "hasClassmark"@en ;
+	rdfs:comment "This relates an item to a classmark, the latter being a code that relates a work to a classification of Library holdings, often but not always relating to a subject-based scheme of library classification and arrangement such as Barnard or the National Library of Medicine classification."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range wi:Classmark ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+  
+wi:hasLocation rdf:type owl:ObjectProperty ;
+	rdfs:label "hasLocation"@en ;
+	rdfs:comment "This relates an item to a broad division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range wi:Classmark ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+	
+wi:hasFileFormat rdf:type owl:Class ;
+	rdfs:label "hasFileFormat"@en ;
+	rdfs:comment "This relates an item to its file format when the item comprises a digital object."@en ;
+ 	rdfs:domain wi:Item ;
+	rdfs:range wi:FileFormat ;
+  rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+  
+  
+#######  Data properties #####  
+	
+wi:identifier rdf:type owl:DatatypeProperty ;
+	rdfs:label "identifier"@en ;
+	rdfs:comment "Relates the item to an identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .		
+  
+wi:barcode rdf:type owl:DatatypeProperty ;
+	rdfs:label "barcode"@en ;
+	rdfs:comment "Relates the item to a number string encoded on physical items by a barcode and used for the purposes of movement control."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+
+wi:barcode rdf:type owl:DatatypeProperty ;
+	rdfs:label "barcode"@en ;
+	rdfs:comment "Relates the item to a number string encoded on physical items by a barcode and used for the purposes of movement control."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+  
+wi:boxNumber rdf:type owl:DatatypeProperty ;
+	rdfs:label "boxNumber"@en ;
+	rdfs:comment "Relates the item (generally an archive item) to a number identifying the box within which it is stored."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+  
+wi:outsizeItemNumber rdf:type owl:DatatypeProperty ;
+	rdfs:label "boxNumber"@en ;
+	rdfs:comment "Relates the item (generally an archive item) to a number identifying its storage location when the item is too large to fit into a standard Library box."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+  
+wi:physicalDescription rdf:type owl:DatatypeProperty ;
+	rdfs:label "physicalDescription"@en ;
+	rdfs:comment "A description of specific physical characteristics of the item - condition, dimensions, details of cover or binding, etc. - or, in the case of digital objects, any notes relating to this digital manifestation over and above notes of file format."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:sheetSize rdf:type owl:DatatypeProperty ;
+	rdfs:label "sheetSize"@en ;
+	rdfs:comment "A note of the width and length dimensions of a flat artwork."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+   
+wi:acquisitionDetails rdf:type owl:DatatypeProperty ;
+	rdfs:label "acquisitionDetails"@en ;
+	rdfs:comment "A note of how this item was acquired by the Wellcome Library: source, price if one was paid, date of acquisition, and any other pertinent details."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:accessionNumber rdf:type owl:DatatypeProperty ;
+	rdfs:label "accessionNumber"@en ;
+	rdfs:comment "A number that relates the acquisition of this item to a record of that transaction in the Library's phyiscal or digital accession documentation."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+  
+wi:provenance rdf:type owl:DatatypeProperty ;
+	rdfs:label "provenance"@en ;
+	rdfs:comment "A note of anything that may be known about the custodial history of this item before its acquisition by the Wellcome Library."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+    
+wi:itemNote rdf:type owl:DatatypeProperty ;
+	rdfs:label "itemNote"@en ;
+	rdfs:comment "A A space in which a cataloguer may have recorded anything they feel to be pertinent about this particular item that does not fit into other defined properties."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range rdf:langString ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
