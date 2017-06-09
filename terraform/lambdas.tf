@@ -71,7 +71,7 @@ module "lambda_schedule_reindexer" {
     SCHEDULER_TOPIC_ARN    = "${module.service_scheduler_topic.arn}"
     DYNAMO_TABLE_NAME    = "${aws_dynamodb_table.miro_table.name}"
     DYNAMO_TOPIC_ARN    = "${module.dynamo_capacity_topic.arn}"
-    DYNAMO_DESIRED_CAPACITY = "20"
+    DYNAMO_DESIRED_CAPACITY = "300"
     CLUSTER_NAME = "${aws_ecs_cluster.services.name}"
     REINDEXERS   = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
   }
