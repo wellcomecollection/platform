@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
@@ -10,17 +11,22 @@ import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
+class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
+                                    metricsSender: MetricsSender)
+
     extends Logging
     with TwitterModuleFlags {
 
-  def generateId(work: Work): Future[String] =
-    findMiroID(work) match {
-      case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
-      case None =>
-        error(s"Item $work did not contain a MiroID")
-        Future.failed(new Exception(s"Item $work did not contain a MiroID"))
-    }
+  def generateId(work: Work): Future[String] = {
+    metricsSender.timeAndCount("generate-id", () =>
+      findMiroID(work) match {
+        case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
+        case None =>
+          error(s"Item $work did not contain a MiroID")
+          Future.failed(new Exception(s"Item $work did not contain a MiroID"))
+      }
+    )
+  }
 
   private def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier): Future[String] =
