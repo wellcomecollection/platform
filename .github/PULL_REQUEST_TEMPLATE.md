@@ -11,3 +11,5 @@
 - [ ] Updated the Swagger documentation
 <!-- If you're making application changes -->
 - [ ] Deployed new versions
+<!-- Remove this section if you don't have Terraform changes -->
+- [ ] Run `terraform apply`.
