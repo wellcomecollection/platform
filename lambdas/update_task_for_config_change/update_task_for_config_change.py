@@ -42,7 +42,7 @@ def clone_latest_task_definition(client, cluster, service):
         service=service,
         taskDefinition=cloned_task
     )
-    print(f'ECS response: {pprint.pformat(response)}')
+    print(f'ECS response:\n{pprint.pformat(response)}')
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
@@ -74,7 +74,7 @@ def parse_s3_event(event):
 
 
 def main(event, _):
-    print(f'Received event: {pprint.pformat(event)}')
+    print(f'Received event:\n{pprint.pformat(event)}')
     app_name = parse_s3_event(event=event)
     trigger_config_update(app_name=app_name)
 

@@ -19,5 +19,5 @@ def publish_sns_message(topic_arn, message):
             'default': json.dumps(message)
         })
     )
-    print(f'SNS response: {pprint.pformat(resp)}')
+    print(f'SNS response:\n{pprint.pformat(resp)}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
