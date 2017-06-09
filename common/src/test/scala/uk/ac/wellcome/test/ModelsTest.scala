@@ -30,4 +30,12 @@ class JsonUtilTest extends FunSpec with Matchers {
     jsonString.contains(""""accessStatus":null""") should be (false)
     jsonString.contains(""""identifiers":[]""") should be (false)
   }
+
+  it("should round-trip an empty list back to an empty list") {
+    val jsonString = """{"accessStatus": [], "label": "A doodle of a dog"}"""
+    val parsedWork = JsonUtil.fromJson[Work](jsonString).get
+    val extrapolatedString = JsonUtil.toJson(parsedWork).get
+
+    jsonString.contains(""""accessStatus": []""") shouldBe true
+  }
 }
