@@ -70,10 +70,10 @@ def taint_lambda(lambda_name):
     be uploaded on the new plan.
     """
     print('Tainting Lambda %s' % lambda_name)
-    subprocess.check_call([
+    subprocess.Popen([
         'terraform', 'taint', '-module', 'lambda_%s' % lambda_name,
         'aws_lambda_function.lambda_function'
-    ])
+    ]).communicate()
 
 
 def has_lambda_dir_changed(lambda_name, hashes):

@@ -32,9 +32,9 @@ def main(event, _):
     publish_sns_message(topic_arn=scheduler_topic_arn, message=message)
 
     dynamo_topic_arn = os.environ["DYNAMO_TOPIC_ARN"]
-    dynamo_table_arn = os.environ["DYNAMO_TABLE_ARN"]
-    message = {'dynamo_table_arn': dynamo_table_arn, 'desired_capacity': desired_capacity}
-    print(f"dynamo_topic_arn: {dynamo_topic_arn}, dynamo_table_arn: {dynamo_table_arn}, desired_capacity: {desired_capacity}")
+    dynamo_table_name = os.environ["DYNAMO_TABLE_NAME"]
+    message = {'dynamo_table_name': dynamo_table_name, 'desired_capacity': desired_capacity}
+    print(f"dynamo_topic_arn: {dynamo_topic_arn}, dynamo_table_name: {dynamo_table_name}, desired_capacity: {desired_capacity}")
     publish_sns_message(topic_arn=dynamo_topic_arn, message=message)
 
 
