@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+import pprint
+
 import boto3
 
 
@@ -34,5 +36,5 @@ def change_dynamo_capacity(table_name, desired_capacity):
         },
         GlobalSecondaryIndexUpdates=gsi_updates
     )
-    print(f'DynamoDB response: {resp!r}')
+    print(f'DynamoDB response: {pprint.pformat(resp)}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
