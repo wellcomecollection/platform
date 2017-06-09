@@ -13,17 +13,19 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
                                     metricsSender: MetricsSender)
-
     extends Logging
     with TwitterModuleFlags {
 
   def generateId(work: Work): Future[String] = {
-    metricsSender.timeAndCount("generate-id", () =>
-      findMiroID(work) match {
-        case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
-        case None =>
-          error(s"Item $work did not contain a MiroID")
-          Future.failed(new Exception(s"Item $work did not contain a MiroID"))
+    metricsSender.timeAndCount(
+      "generate-id",
+      () =>
+        findMiroID(work) match {
+          case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
+          case None =>
+            error(s"Item $work did not contain a MiroID")
+            Future.failed(
+              new Exception(s"Item $work did not contain a MiroID"))
       }
     )
   }
@@ -31,8 +33,17 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
   private def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier): Future[String] =
     identifiersDao.findSourceIdInDb(identifier.value).flatMap {
-      case Some(id) => Future.successful(id.CanonicalID)
-      case None => generateAndSaveCanonicalId(identifier.value)
+      case Some(id) => {
+        metricsSender.incrementCount("found-old-id")
+        Future.successful(id.CanonicalID)
+      }
+      case None => {
+        val result = generateAndSaveCanonicalId(identifier.value)
+
+        metricsSender.incrementCount("generated-new-id")
+
+        result
+      }
     }
 
   private def findMiroID(work: Work) = {
