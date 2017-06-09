@@ -41,15 +41,15 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   protected val scanamoQueryStreamFunction: ScanamoQueryStreamFunction
 
-  private def updateVersion(newReindexVersion: Int,
-                            resultGroup: List[ScanamoQueryResult]): Boolean = {
+  private def updateVersion(requestedVersion: Int)(
+    resultGroup: List[ScanamoQueryResult]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(miroTransformable) => {
         val reindexItem = miroTransformable.getReindexItem
 
         scanamoUpdate(reindexItem.hashKey and reindexItem.rangeKey,
-                      set('ReindexVersion -> newReindexVersion))
+                      set('ReindexVersion -> requestedVersion))
       }
     }
 
@@ -79,14 +79,15 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
     )
 
   def runReindex(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] = {
+    val requestedVersion = reindexAttempt.reindex.RequestedVersion
+
     info(s"ReindexTargetService running $reindexAttempt")
 
-    val scanamoQueryRequest: ScanamoQueryRequest = createScanamoQueryRequest(
-      reindexAttempt.reindex.RequestedVersion)
+    val scanamoQueryRequest: ScanamoQueryRequest =
+      createScanamoQueryRequest(requestedVersion)
 
-    val ops = scanamoQueryStreamFunction(
-      scanamoQueryRequest,
-      updateVersion(reindexAttempt.reindex.RequestedVersion, _))
+    val ops = scanamoQueryStreamFunction(scanamoQueryRequest,
+                                         updateVersion(requestedVersion))
 
     Future(Scanamo.exec(dynamoDBClient)(ops)).map(r => {
       reindexAttempt.copy(successful = !r.contains(false),
