@@ -1,6 +1,13 @@
 # -*- encoding: utf-8 -*-
 
-import pprint
+import pprint{'MessageId': '648b4d2b-1dd1-580c-bdca-1c9f546e2a29',
+ 'ResponseMetadata': {'HTTPHeaders': {'content-length': '294',
+                                      'content-type': 'text/xml',
+                                      'date': 'Fri, 09 Jun 2017 07:00:14 GMT',
+                                      'x-amzn-requestid': '33719136-0980-51f3-81a3-c082403ff3d6'},
+                      'HTTPStatusCode': 200,
+                      'RequestId': '33719136-0980-51f3-81a3-c082403ff3d6',
+                      'RetryAttempts': 0}}
 
 import boto3
 
@@ -36,5 +43,5 @@ def change_dynamo_capacity(table_name, desired_capacity):
         },
         GlobalSecondaryIndexUpdates=gsi_updates
     )
-    print(f'DynamoDB response: {pprint.pformat(resp)}')
+    print(f'DynamoDB response:\n{pprint.pformat(resp)}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200

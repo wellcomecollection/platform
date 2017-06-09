@@ -8,12 +8,13 @@ message should be a JSON string that includes "dynamo_table_name" and "desired_c
 """
 
 import json
+import pprint
 
 from dynamo_utils import change_dynamo_capacity
 
 
 def main(event, _):
-    print(f'Received event: {event!r}')
+    print(f'Received event:\n{pprint.pformat(event)}')
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 
