@@ -5,7 +5,7 @@ import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.Server
-import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
@@ -15,6 +15,7 @@ trait IdMinterTestUtils
     with SNSLocal
     with MysqlLocal
     with IdentifiersTableInfo
+    with AmazonCloudWatchFlag
     with Matchers { this: Suite =>
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
@@ -30,7 +31,7 @@ trait IdMinterTestUtils
         "aws.sqs.queue.url" -> idMinterQueue,
         "aws.sqs.waitTime" -> "1",
         "aws.sns.topic.arn" -> ingestorTopicArn
-      ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags
+      ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags ++ cloudWatchLocalEndpointFlag
     )
   }
 

@@ -1,11 +1,13 @@
 package uk.ac.wellcome.platform.idminter.steps
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
@@ -21,8 +23,11 @@ class IdentifierGeneratorTest
     with BeforeAndAfterEach
     with MockitoSugar {
 
+  private val metricsSender =
+    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
   val identifierGenerator = new IdentifierGenerator(
-    new IdentifiersDao(DB.connect(), identifiersTable))
+    new IdentifiersDao(DB.connect(), identifiersTable),
+    metricsSender)
 
   it("should search the miro id in the database and return the canonical id if it finds it") {
     withSQL {
@@ -75,13 +80,16 @@ class IdentifierGeneratorTest
     val miroId = "1234"
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
-        label = "some label")
+           label = "some label")
     val identifiersDao = mock[IdentifiersDao]
-    val identifierGenerator = new IdentifierGenerator(identifiersDao)
+    val identifierGenerator =
+      new IdentifierGenerator(identifiersDao, metricsSender)
 
-    when(identifiersDao.findSourceIdInDb(miroId)).thenReturn(Future.successful(None))
+    when(identifiersDao.findSourceIdInDb(miroId))
+      .thenReturn(Future.successful(None))
     val expectedException = new Exception("Noooo")
-    when(identifiersDao.saveIdentifier(any[Identifier]())).thenReturn(Future.failed(expectedException))
+    when(identifiersDao.saveIdentifier(any[Identifier]()))
+      .thenReturn(Future.failed(expectedException))
 
     whenReady(identifierGenerator.generateId(work).failed) { exception =>
       exception shouldBe expectedException
