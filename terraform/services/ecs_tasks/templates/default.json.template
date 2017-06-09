@@ -1,0 +1,40 @@
+[
+  {
+    "name": "nginx",
+    "image": "${nginx_uri}",
+    "memory": 256,
+    "cpu": 128,
+    "portMappings": [
+      {
+        "containerPort": 9000,
+        "hostPort": 0,
+        "protocol": "tcp"
+      }
+    ],
+    "links": ["app"]
+  },
+  {
+    "cpu": 512,
+    "essential": true,
+    "image": "${app_uri}",
+    "memory": 2048,
+    "name": "app",
+    "environment": [
+      { "name" : "INFRA_BUCKET", "value" : "${infra_bucket}" },
+      { "name" : "CONFIG_KEY", "value" : "${config_key}" }
+    ],
+    "portMappings": [
+      {
+        "containerPort": 8888,
+        "hostPort": 0
+      }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "${log_group_name}",
+            "awslogs-region": "${log_group_region}"
+        }
+    }
+  }
+]
