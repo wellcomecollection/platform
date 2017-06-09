@@ -18,7 +18,10 @@ class ServerTest
 
   val server = new EmbeddedHttpServer(
     new Server(),
-    flags = snsLocalEndpointFlags ++ identifiersMySqlLocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
+    flags = snsLocalEndpointFlags ++
+      sqsLocalFlags ++
+      identifiersMySqlLocalFlags ++
+      cloudWatchLocalEndpointFlag
   )
 
   test("it should show the healthcheck message") {
