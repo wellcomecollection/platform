@@ -27,9 +27,19 @@ wi:Work rdf:type owl:Class ;
   
 wi:Identifier rdf:type owl:Class ;
 	rdfs:label "Identifier"@en ;
-	rdfs:comment "An identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;"@en ;
+	rdfs:comment "A unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .		
-	
+
+wi:SourceIdentifier rdf:type owl:Class ;
+	rdfs:label "SourceIdentifier"@en ;
+	rdfs:comment "An identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .    
+
+wi:SourceIdentifierAuthority rdf:type owl:Class;
+	rdfs:label "SourceIdentifierAuthority"
+	rdfs:comment "An indication of the origin of SourceIdentifiers: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+
 wi:Classmark rdf:type owl:Class ;
 	rdfs:label "Classmark"@en ;
 	rdfs:comment "A code that relates an item to a classification of library holdings, often but not always relating to a subject-based scheme of classification and arrangement such as Barnard or the National Library of Medicine classification."@en ;
@@ -52,13 +62,27 @@ wi:RequestStatus rdf:type owl:Class ;
 	
 #######  Object properties ##### 
   
-wi:hasIdentifier rdf:type owl:DatatypeProperty ;
+wi:hasIdentifier rdf:type owl:ObjectProperty ;
 	rdfs:label "hasIdentifier"@en ;
-	rdfs:comment "Relates the item to an identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
+	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ; 
 	rdfs:domain wi:Item ;
 	rdfs:range wi:Identifier ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
-  
+
+wi:hasSourceIdentifier rdf:type owl:ObjectProperty ;
+	rdfs:label "hasSourceIdentifier"@en ;
+	rdfs:comment "Relates an item to an identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@
+	rdfs:domain wi:Item
+	rdfs:range wi:SourceIdentifier
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+
+wi:hasSourceIdentifierAuthority rdf:type owl:ObjectProperty ;
+	rdfs:label "hasSourceIdentifierAuthority" @en ;
+	rdfs:comment "Relates a SourceIdentifier to a particular authoritative source of such identifiers: for example, if the SourceIdentifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;
+	rdfs:domain wi:SourceIdentifier
+	rdfs:range wi:SourceIdentifierAuthority
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+
 wi:hasClassmark rdf:type owl:ObjectProperty ;
 	rdfs:label "hasClassmark"@en ;
 	rdfs:comment "This relates an item to a classmark, the latter being a code that relates a work to a classification of Library holdings, often but not always relating to a subject-based scheme of library classification and arrangement such as Barnard or the National Library of Medicine classification."@en ;
@@ -83,13 +107,6 @@ wi:hasFileFormat rdf:type owl:Class ;
   
 #######  Data properties #####  
 	
-wi:identifier rdf:type owl:DatatypeProperty ;
-	rdfs:label "identifier"@en ;
-	rdfs:comment "Relates the item to an identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
-	rdfs:domain wi:Item ;
-	rdfs:range rdf:langString ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .		
-  
 wi:barcode rdf:type owl:DatatypeProperty ;
 	rdfs:label "barcode"@en ;
 	rdfs:comment "Relates the item to a number string encoded on physical items by a barcode and used for the purposes of movement control."@en ;
