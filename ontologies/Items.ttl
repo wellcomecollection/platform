@@ -47,7 +47,7 @@ wi:Location rdf:type owl:Class ;
   
 wi:RequestStatus rdf:type owl:Class ;
 	rdfs:label "RequestStatus"@en ;
-	rdfs:comment "."@en ;
+	rdfs:comment "A note of whether the item in question is on open shelves in the Wellcome Library, or must be ordered from closed stacks, or is not orderable for reasons such as closure under Data Protection legislation."@en ;
  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 	
 #######  Object properties ##### 
