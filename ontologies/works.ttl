@@ -25,10 +25,20 @@ ww:Item rdf:type owl:Class ;
 	rdfs:comment "A specific instance of a work: for instance, an individual physical copy with its own location.  This corresponds to the bottom, Instance, layer of FRBR.  Works that are unique - that is, have only one copy - are described in terms of a Work for their intellectual content, linked to an Item describing their local (usually physical) characteristics."@en ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
 	
-ww:Identifier rdf:type owl:Class ;
-	rdfs:label "Identifier"@en ;
-	rdfs:comment "An identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .		
+ww:Identifier rdf:type owl:Class ; 
+	rdfs:label "Identifier"@en ; 
+	rdfs:comment "A unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .  
+
+ww:SourceIdentifier rdf:type owl:Class ; 
+	rdfs:label "SourceIdentifier"@en ; 
+	rdfs:comment "An identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@en ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .    
+
+ww:SourceIdentifierAuthority rdf:type owl:Class; 
+	rdfs:label "SourceIdentifierAuthority" 
+	rdfs:comment "An indication of the origin of SourceIdentifiers: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ; 
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 
 ww:WorkType rdf:type owl:Class ;
 	rdfs:label "WorkType"@en ;
@@ -70,13 +80,27 @@ ww:hasItem rdf:type owl:ObjectProperty ;
 	rdfs:range ww:Item ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 	
-ww:hasIdentifier rdf:type owl:ObjectProperty ;
-	rdfs:label "hasIdentifier"@en ;
-	rdfs:comment "Relates the work to an identifier that is preferred, either a unique system-generated identifier that governs interaction between systems, or one used for human citation, such as a manuscript number to be cited in footnotes."@en ;
+ww:hasIdentifier rdf:type owl:ObjectProperty ;  
+	rdfs:label "hasIdentifier"@en ;  
+	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ;   rdfs:domain ww:Item ;  rdfs:range ww:Identifier ;  rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .     ww:hasSourceIdentifier rdf:type owl:ObjectProperty ;  rdfs:label "hasSourceIdentifier"@en ;  rdfs:comment "Relates an item to an identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@  rdfs:domain ww:Item  rdfs:range ww:SourceIdentifier  rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .    ww:hasSourceIdentifierAuthority rdf:type owl:ObjectProperty ;  rdfs:label "hasSourceIdentifierAuthority" @en ;  rdfs:comment "Relates a SourceIdentifier to a particular authoritative source of such identifiers: for example, if the SourceIdentifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;  
+	rdfs:domain ww:Work ; 
+	rdfs:range ww:Identifier ;  
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> . 
+
+ww:hasSourceIdentifier rdf:type owl:ObjectProperty ;  
+	rdfs:label "hasSourceIdentifier"@en ;  
+	rdfs:comment "Relates an item to an identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@en ;
 	rdfs:domain ww:Work ;
-	rdfs:range ww:Identifier ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-	
+	rdfs:range ww:SourceIdentifier
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
+
+ww:hasSourceIdentifierAuthority rdf:type owl:ObjectProperty ;
+	rdfs:label "hasSourceIdentifierAuthority" @en ;  
+	rdfs:comment "Relates a SourceIdentifier to a particular authoritative source of such identifiers: for example, if the SourceIdentifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;  
+	rdfs:domain ww:SourceIdentifier  
+	rdfs:range ww:SourceIdentifierAuthority  
+	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> . 
+
 ww:isPartOf rdf:type owl:ObjectProperty ;
 	rdfs:label "isPartOf"@en ;
 	rdfs:comment "Relates an entity to one of which it forms a part."@en ;
