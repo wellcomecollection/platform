@@ -1,3 +1,13 @@
+# Lambda for publishing ECS service status summary to S3
+module "lambda_update_service_list" {
+  source      = "./lambda"
+  name        = "update_service_list"
+  description = "Publish ECS service status summary to S3"
+  source_dir  = "../lambdas/update_service_list"
+}
+
+# TODO: Add trigger ...
+
 # Lambda for publishing ECS service schedules to an SNS topic
 
 module "lambda_service_scheduler" {
