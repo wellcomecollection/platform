@@ -8,26 +8,13 @@ message should be a JSON string that includes "dynamo_table_name" and "desired_c
 """
 
 import json
+import pprint
 
-import boto3
-
-
-def change_dynamo_capacity(table_name, desired_capacity):
-    client = boto3.client('dynamodb')
-    response = client.describe_table(TableName=table_name)
-    gsi = [x['IndexName'] for x in response['Table']['GlobalSecondaryIndexes']]
-    gsi_updates = [
-        {'Update': {'IndexName': x, 'ProvisionedThroughput': {'ReadCapacityUnits': desired_capacity, 'WriteCapacityUnits': desired_capacity} }}
-        for x in gsi
-    ]
-
-    resp = client.update_table(TableName=table_name, GlobalSecondaryIndexUpdates=gsi_updates, ProvisionedThroughput={'ReadCapacityUnits':desired_capacity, 'WriteCapacityUnits':desired_capacity} )
-    print(f'DynamoDB response: {resp!r}')
-    assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
+from dynamo_utils import change_dynamo_capacity
 
 
 def main(event, _):
-    print(f'Received event: {event!r}')
+    print(f'Received event:\n{pprint.pformat(event)}')
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 
