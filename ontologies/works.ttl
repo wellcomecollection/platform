@@ -82,7 +82,7 @@ ww:hasItem rdf:type owl:ObjectProperty ;
 	
 ww:hasIdentifier rdf:type owl:ObjectProperty ;  
 	rdfs:label "hasIdentifier"@en ;  
-	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ;   rdfs:domain ww:Item ;  rdfs:range ww:Identifier ;  rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .     ww:hasSourceIdentifier rdf:type owl:ObjectProperty ;  rdfs:label "hasSourceIdentifier"@en ;  rdfs:comment "Relates an item to an identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@  rdfs:domain ww:Item  rdfs:range ww:SourceIdentifier  rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .    ww:hasSourceIdentifierAuthority rdf:type owl:ObjectProperty ;  rdfs:label "hasSourceIdentifierAuthority" @en ;  rdfs:comment "Relates a SourceIdentifier to a particular authoritative source of such identifiers: for example, if the SourceIdentifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;  
+	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ;   
 	rdfs:domain ww:Work ; 
 	rdfs:range ww:Identifier ;  
 	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> . 
