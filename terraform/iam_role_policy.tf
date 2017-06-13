@@ -66,6 +66,11 @@ resource "aws_iam_role_policy" "ecs_id_minter_task_read_id_minter_q" {
   policy = "${module.id_minter_queue.read_policy}"
 }
 
+resource "aws_iam_role_policy" "id_minter_cloudwatch" {
+  role   = "${module.ecs_id_minter_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
 # Role policies for the Publish to SNS Lambda
 
 resource "aws_iam_role_policy" "lambda_service_scheduler_sns" {
@@ -106,6 +111,20 @@ resource "aws_iam_role_policy" "update_tasks_for_config_change_policy" {
   policy = "${data.aws_iam_policy_document.stop_running_tasks.json}"
 }
 
+# Role policies for update_service_list lambda
+
+resource "aws_iam_role_policy" "update_service_list_describe_services" {
+  role   = "${module.lambda_update_service_list.role_name}"
+  policy = "${data.aws_iam_policy_document.describe_services.json}"
+}
+
+resource "aws_iam_role_policy" "update_service_list_push_to_s3" {
+  role   = "${module.lambda_update_service_list.role_name}"
+  policy = "${data.aws_iam_policy_document.s3_put_infra_status.json}"
+}
+
+# Role policies for the miro_reindexer service
+
 resource "aws_iam_role_policy" "reindexer_tracker_table" {
   role   = "${module.ecs_miro_reindexer_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
@@ -118,10 +137,5 @@ resource "aws_iam_role_policy" "reindexer_target_miro" {
 
 resource "aws_iam_role_policy" "reindexer_cloudwatch" {
   role   = "${module.ecs_miro_reindexer_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
-}
-
-resource "aws_iam_role_policy" "id_minter_cloudwatch" {
-  role   = "${module.ecs_id_minter_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }

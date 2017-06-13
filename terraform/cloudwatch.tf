@@ -19,5 +19,3 @@ resource "aws_cloudwatch_event_rule" "ecs_task_state_change" {
 }
 PATTERN
 }
-
-

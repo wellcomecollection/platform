@@ -16,4 +16,5 @@ variable "cloudwatch_trigger_name" {
 
 variable "input" {
   description = "Input to the Cloudwatch trigger"
+  default     = "{}"
 }

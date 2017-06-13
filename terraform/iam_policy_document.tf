@@ -117,6 +117,21 @@ data "aws_iam_policy_document" "stop_running_tasks" {
   }
 }
 
+data "aws_iam_policy_document" "describe_services" {
+  statement {
+    actions = [
+      "ecs:DescribeServices",
+      "ecs:DescribeTaskDefinition",
+      "ecs:ListClusters",
+      "ecs:ListServices",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "travis_permissions" {
   statement {
     actions = [
@@ -172,6 +187,18 @@ data "aws_iam_policy_document" "miro_images_sync" {
 
     resources = [
       "arn:aws:s3:::*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "s3_put_infra_status" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}/status/*",
     ]
   }
 }
