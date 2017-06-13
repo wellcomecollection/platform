@@ -6,7 +6,17 @@ module "lambda_update_service_list" {
   source_dir  = "../lambdas/update_service_list"
 }
 
-# TODO: Add trigger ...
+module "trigger_update_service_list" {
+  source                  = "./lambda/trigger_cloudwatch"
+  lambda_function_name    = "${module.lambda_update_service_list.function_name}"
+  lambda_function_arn     = "${module.lambda_update_service_list.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_task_state_change.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_task_state_change.name}"
+
+
+  #TODO: Work out how to pass environment variables
+
+}
 
 # Lambda for publishing ECS service schedules to an SNS topic
 
