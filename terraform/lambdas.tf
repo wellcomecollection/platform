@@ -1,3 +1,24 @@
+# Lambda for publishing ECS service status summary to S3
+module "lambda_update_service_list" {
+  source      = "./lambda"
+  name        = "update_service_list"
+  description = "Publish ECS service status summary to S3"
+  source_dir  = "../lambdas/update_service_list"
+
+  environment_variables = {
+    BUCKET_NAME = "${aws_s3_bucket.infra.id}"
+    OBJECT_KEY  = "status/services.json"
+  }
+}
+
+module "trigger_update_service_list" {
+  source                  = "./lambda/trigger_cloudwatch"
+  lambda_function_name    = "${module.lambda_update_service_list.function_name}"
+  lambda_function_arn     = "${module.lambda_update_service_list.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_task_state_change.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_task_state_change.name}"
+}
+
 # Lambda for publishing ECS service schedules to an SNS topic
 
 module "lambda_service_scheduler" {
@@ -68,12 +89,12 @@ module "lambda_schedule_reindexer" {
   source_dir  = "../lambdas/schedule_reindexer"
 
   environment_variables = {
-    SCHEDULER_TOPIC_ARN    = "${module.service_scheduler_topic.arn}"
-    DYNAMO_TABLE_NAME    = "${aws_dynamodb_table.miro_table.name}"
-    DYNAMO_TOPIC_ARN    = "${module.dynamo_capacity_topic.arn}"
+    SCHEDULER_TOPIC_ARN     = "${module.service_scheduler_topic.arn}"
+    DYNAMO_TABLE_NAME       = "${aws_dynamodb_table.miro_table.name}"
+    DYNAMO_TOPIC_ARN        = "${module.dynamo_capacity_topic.arn}"
     DYNAMO_DESIRED_CAPACITY = "300"
-    CLUSTER_NAME = "${aws_ecs_cluster.services.name}"
-    REINDEXERS   = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
+    CLUSTER_NAME            = "${aws_ecs_cluster.services.name}"
+    REINDEXERS              = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
   }
 }
 
