@@ -1,8 +1,9 @@
 package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.sksamuel.elastic4s.searches.RichSearchHit
-import org.elasticsearch.action.get.GetResponse
+
+import com.sksamuel.elastic4s.http.search.SearchHit
+import com.sksamuel.elastic4s.http.get.GetResponse
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -18,14 +19,14 @@ case class DisplayWork(id: String,
 
 case object DisplayWork {
 
-  def apply(hit: RichSearchHit): DisplayWork = apply(hit, includes = List())
+  def apply(hit: SearchHit): DisplayWork = apply(hit, includes = List())
 
-  def apply(hit: RichSearchHit, includes: List[String]): DisplayWork = {
+  def apply(hit: SearchHit, includes: List[String]): DisplayWork = {
     jsonToDisplayWork(hit.sourceAsString, includes)
   }
 
   def apply(got: GetResponse, includes: List[String]): DisplayWork = {
-    jsonToDisplayWork(got.getSourceAsString, includes)
+    jsonToDisplayWork(got.sourceAsString, includes)
   }
 
   private def jsonToDisplayWork(document: String, includes: List[String]) = {
