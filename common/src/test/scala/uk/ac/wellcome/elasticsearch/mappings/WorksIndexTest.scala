@@ -76,22 +76,21 @@ class WorksIndexTest
 
     worksIndex.create
 
-    // eventually {
-    //   val mappings: Map[String, AnyRef] = elasticClient
-    //     .execute(getMapping(indexName / itemType))
-    //     .await
-    //     .head
-    //     .mappings
-    //     .get(indexName)
-    //     .get(itemType)
-    //     // .mappingFor(indexName / itemType)
-    //     // .getSourceAsMap
-    //     // .toMap
-    //   mappings("properties")
-    //     .asInstanceOf[util.Map[String, AnyRef]]
-    //     .keys should contain("work")
-    // }
-
+    eventually {
+      val mappings: Map[String, AnyRef] = elasticClient
+        .execute(getMapping(indexName / itemType))
+        .await
+        .head
+        .mappings
+        .get(indexName)
+        .get(itemType)
+        // .mappingFor(indexName / itemType)
+        // .getSourceAsMap
+        // .toMap
+      mappings("properties")
+        .asInstanceOf[util.Map[String, AnyRef]]
+        .keys should contain("work")
+    }
   }
 
   private def createIndexAndInsertDocument() = {
