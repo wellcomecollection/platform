@@ -4,8 +4,7 @@ import java.util
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import org.elasticsearch.index.mapper.StrictDynamicMappingException
-import org.elasticsearch.transport.RemoteTransportException
+import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
