@@ -17,7 +17,7 @@ function placeholderReducer(placeholder: string, action: Action): string {
   }
 }
 
-function servicesReducer(services: ?Services, action: Action): ?Services {
+function servicesReducer(services: Services, action: Action): Services {
   switch (action.type) {
     case REQUEST_SERVICES:
       return services;
@@ -28,7 +28,7 @@ function servicesReducer(services: ?Services, action: Action): ?Services {
   }
 }
 
-function rootReducer(state: AppState = { placeholder: "init", services: null }, action: Action): AppState {
+function rootReducer(state: AppState = { placeholder: "init", services: [] }, action: Action): AppState {
   return {
     placeholder: placeholderReducer(state.placeholder, action),
     services: servicesReducer(state.services, action)
