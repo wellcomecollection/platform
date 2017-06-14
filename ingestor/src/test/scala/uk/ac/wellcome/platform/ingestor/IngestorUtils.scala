@@ -16,7 +16,7 @@ trait IngestorUtils extends IndexedElasticSearchLocal with SQSLocal with AmazonC
         "aws.sqs.queue.url" -> ingestorQueueUrl,
         "aws.sqs.waitTime" -> "1",
         "es.host" -> "localhost",
-        "es.port" -> "9300",
+        "es.port" -> "9200",
         "es.name" -> "wellcome",
         "es.xpack.enabled" -> "true",
         "es.xpack.user" -> "elastic:changeme",
