@@ -98,11 +98,7 @@ def get_cluster_arns(client):
     """
     response = client.list_clusters()
 
-    cluster_arns = []
-
-    [cluster_arns.append(cluster_arn) for cluster_arn in response['clusterArns']]
-
-    return cluster_arns
+    return [cluster_arn for cluster_arn in response['clusterArns']]
 
 
 def _name_from_arn(arn):
