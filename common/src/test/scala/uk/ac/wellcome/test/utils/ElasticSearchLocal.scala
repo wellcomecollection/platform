@@ -3,7 +3,7 @@ package uk.ac.wellcome.test.utils
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.http.HttpClient
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
+import com.sksamuel.elastic4s.http.index.admin.IndexExistsResponse
 import org.elasticsearch.common.settings.Settings
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{Matchers, Suite}
@@ -22,11 +22,11 @@ trait ElasticSearchLocal
     .put("xpack.security.user", "elastic:changeme")
     .build()
 
-  val elasticClient = HttpClient(ElasticsearchClientUri("localhost", 9300))
+  val elasticClient = HttpClient(ElasticsearchClientUri("localhost", 9200))
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {
-    elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
+    elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
   def ensureIndexDeleted(indexName: String): Unit = {
@@ -44,7 +44,7 @@ trait ElasticSearchLocal
     }
   }
 
-  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndicesExistsResponse) = {
+  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndexExistsResponse) = {
     if (indexExistResponse.isExists) elasticClient.execute(deleteIndex(indexName))
     else Future.successful(())
   }

@@ -48,7 +48,7 @@ class IdentifiedWorkIndexerTest
       eventually {
         val hits = elasticClient
           .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-          .map { _.hits }
+          .map { _.hits.hits }
           .await
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWorkString
@@ -70,7 +70,7 @@ class IdentifiedWorkIndexerTest
       eventually {
         val hits = elasticClient
           .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-          .map { _.hits }
+          .map { _.hits.hits }
           .await
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWorkString
