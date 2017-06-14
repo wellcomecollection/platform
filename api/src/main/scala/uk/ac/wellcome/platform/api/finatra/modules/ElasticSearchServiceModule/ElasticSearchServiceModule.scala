@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.finatra.modules.ElasticSearchServiceModule
 
 import com.google.inject.Provides
-import com.sksamuel.elastic4s.TcpClient
+import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.platform.api.services.ElasticSearchService
@@ -17,7 +17,7 @@ object ElasticSearchServiceModule extends TwitterModule {
 
   @Provides
   def providesElasticSearchService(
-    elasticClient: TcpClient): ElasticSearchService =
+    elasticClient: HttpClient): ElasticSearchService =
     new ElasticSearchService(defaultIndex = defaultIndex(),
                              documentType = documentType(),
                              elasticClient = elasticClient)

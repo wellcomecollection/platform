@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.services
 import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.TcpClient
+import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.get.RichGetResponse
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
@@ -16,7 +16,7 @@ import scala.concurrent.Future
 @Singleton
 class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
                                      @Flag("es.type") documentType: String,
-                                     elasticClient: TcpClient) {
+                                     elasticClient: HttpClient) {
 
   private def getIndex(queryParam: Option[String]): String =
     queryParam match {
