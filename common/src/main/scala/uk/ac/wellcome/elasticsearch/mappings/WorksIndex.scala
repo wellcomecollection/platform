@@ -1,7 +1,7 @@
 package uk.ac.wellcome.elasticsearch.mappings
 
 import com.google.inject.Inject
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping

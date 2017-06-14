@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.index.RichIndexResponse
 import com.twitter.inject.Logging
