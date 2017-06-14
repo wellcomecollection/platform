@@ -19,7 +19,7 @@ class ApiWorksTest
       new Server,
       flags = Map(
         "es.host" -> "localhost",
-        "es.port" -> 9200.toString,
+        "es.port" -> 9300.toString,
         "es.name" -> "wellcome",
         "es.xpack.enabled" -> "true",
         "es.xpack.user" -> "elastic:changeme",
