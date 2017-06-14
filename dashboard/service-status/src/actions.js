@@ -2,15 +2,13 @@
 
 import type {Services} from './models'
 
-export type Action  = { type: string, payload: ?Services }
+export type Action  = { type: string, payload: Services }
 
 function requestServices(): Action {
-  return { type: REQUEST_SERVICES, payload: null};
+  return { type: REQUEST_SERVICES, payload: []};
 }
 
 function receiveServices(json: Services): Action {
-  console.log(json);
-
   const services = json
 
   return { type: RECEIVE_SERVICES, payload: services };
