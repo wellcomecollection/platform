@@ -2,7 +2,7 @@ package uk.ac.wellcome.elasticsearch.mappings
 
 import java.util
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.index.mapper.StrictDynamicMappingException
 import org.elasticsearch.transport.RemoteTransportException

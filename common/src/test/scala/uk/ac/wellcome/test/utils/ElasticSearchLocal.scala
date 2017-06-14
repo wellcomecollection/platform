@@ -1,6 +1,6 @@
 package uk.ac.wellcome.test.utils
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
