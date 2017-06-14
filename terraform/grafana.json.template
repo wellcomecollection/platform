@@ -1,0 +1,30 @@
+[
+  {
+    "cpu": 128,
+    "essential": true,
+    "image": "grafana/grafana",
+    "memory": 1024,
+    "name": "grafana",
+    "environment": [
+      { "name" : "INFRA_BUCKET", "value" : "${infra_bucket}" },
+      { "name" : "CONFIG_KEY", "value" : "${config_key}" }
+    ],
+    "portMappings": [
+      {
+        "containerPort": 8888,
+        "hostPort": 0
+      },
+      {
+        "containerPort": 3000,
+        "hostPort": 3000
+      }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "${log_group_name}",
+            "awslogs-region": "${log_group_region}"
+        }
+    }
+  }
+]

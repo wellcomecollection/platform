@@ -37,3 +37,8 @@ module "ecs_api_iam" {
   source = "./ecs_iam"
   name   = "api"
 }
+
+module "ecs_grafana_iam" {
+  source = "./ecs_iam"
+  name   = "grafana"
+}
