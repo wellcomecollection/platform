@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import VisibleService from './VisibleService';
+import VisibleServiceList from './VisibleServiceList';
 import './App.css';
 
 class App extends Component {
@@ -7,9 +7,9 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <h2>Welcome to Zombocom</h2>
+          <h2>Service List</h2>
         </div>
-        <VisibleService />
+        <VisibleServiceList />
       </div>
     );
   }
