@@ -50,8 +50,9 @@ object ElasticClientModule extends TwitterModule {
   override val modules = Seq(XPackConfigModule)
 
   private val host = flag[String]("es.host", "localhost", "host name of ES")
-  private val port = flag[Int]("es.port", 9300, "port no of ES")
+  private val port = flag[Int]("es.port", 9200, "port no of ES")
   private val sniff = flag[Boolean]("es.sniff", false, "sniff ES nodes")
+  private val protocol = flag[String]("es.protocol", "http", "protocol for talking to ES")
   private val compress =
     flag[Boolean]("es.transport.compress", false, "compress transport")
   private val clusterName =
@@ -84,7 +85,7 @@ object ElasticClientModule extends TwitterModule {
     // }
 
     val restClient = RestClient
-      .builder(new HttpHost(host(), port(), "http"))
+      .builder(new HttpHost(host(), port(), protocol()))
       .setHttpClientConfigCallback(new ElasticCredentials())
       .build()
 
