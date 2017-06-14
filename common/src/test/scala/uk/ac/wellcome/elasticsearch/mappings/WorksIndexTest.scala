@@ -67,8 +67,8 @@ class WorksIndexTest
         .doc("""{"json":"json not matching the index structure"}"""))
 
     whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a[RemoteTransportException]
-      exception.getCause shouldBe a[StrictDynamicMappingException]
+      exception shouldBe a[ResponseException]
+      // TODO: this should be more specific
     }
   }
 
