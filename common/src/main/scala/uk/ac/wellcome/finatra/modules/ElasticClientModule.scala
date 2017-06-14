@@ -3,8 +3,8 @@ package uk.ac.wellcome.finatra.modules
 import javax.inject.Singleton
 
 import com.google.inject.Provides
-import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
-import com.sksamuel.elastic4s.{ElasticsearchClientUri, TcpClient}
+import com.sksamuel.elastic4s.ElasticsearchClientUri
+import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.TwitterModule
 import org.elasticsearch.common.settings.Settings
 
@@ -41,7 +41,7 @@ object ElasticClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def provideElasticClient(xpackConfig: Option[XPackConfig]): TcpClient = {
+  def provideElasticClient(xpackConfig: Option[XPackConfig]): HttpClient = {
     info(s"Building clientUri for ${host()}:${port()}")
 
     val clientUri = ElasticsearchClientUri(host(), port())
@@ -65,6 +65,6 @@ object ElasticClientModule extends TwitterModule {
       case (k, v) => info(s"ElasticClient setting: $k=$v")
     }
 
-    XPackElasticClient(settings, clientUri)
+    HttpClient(clientUri)
   }
 }
