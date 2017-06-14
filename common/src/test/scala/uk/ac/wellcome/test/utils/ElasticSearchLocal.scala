@@ -35,7 +35,7 @@ trait ElasticSearchLocal
     .build()
 
   val restClient = RestClient
-    .builder(new HttpHost("localhost", 9300, "http"))
+    .builder(new HttpHost("localhost", 9200, "http"))
     .setHttpClientConfigCallback(new ElasticCredentials())
     .build()
 
