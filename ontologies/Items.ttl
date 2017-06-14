@@ -52,12 +52,12 @@ wi:FileFormat rdf:type owl:Class ;
   
 wi:Location rdf:type owl:Class ;
 	rdfs:label "Location"@en ;
-	rdfs:comment "The broad division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material."@en ;
+	rdfs:comment "The broad intellectual division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material."@en ;
  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
   
-wi:RequestStatus rdf:type owl:Class ;
-	rdfs:label "RequestStatus"@en ;
-	rdfs:comment "A note of whether the item in question is on open shelves in the Wellcome Library, or must be ordered from closed stacks, or is not orderable for reasons such as closure under Data Protection legislation."@en ;
+wi:Status rdf:type owl:Class ;
+	rdfs:label "Status"@en ;
+	rdfs:comment "A description of broad considerations that affect how the item may be consulted: whether it is on open shelves, requires ordering from closed stack, is closed for consultation due to considerations such as data protection legislation, or is missing."@en ;
  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 	
 #######  Object properties ##### 
