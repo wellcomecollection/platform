@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.index.RichIndexResponse
+import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
@@ -22,10 +22,10 @@ class IdentifiedWorkIndexer @Inject()(
   metricsSender: MetricsSender
 ) extends Logging {
 
-  def indexIdentifiedWork(document: String): Future[RichIndexResponse] = {
+  def indexIdentifiedWork(document: String): Future[IndexResponse] = {
     implicit val jsonMapper = IdentifiedWork
 
-    metricsSender.timeAndCount[RichIndexResponse]("ingestor-index-work", () => {
+    metricsSender.timeAndCount[IndexResponse]("ingestor-index-work", () => {
       Future
         .fromTry(JsonUtil.fromJson[IdentifiedWork](document))
         .flatMap(item => {
