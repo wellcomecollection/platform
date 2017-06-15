@@ -7,7 +7,8 @@ import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{
   DisplayIdentifier,
   DisplaySearch,
-  DisplayWork
+  DisplayWork,
+  WorksIncludes
 }
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
@@ -183,8 +184,10 @@ class WorksServiceTest
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
-    val getByIdResult =
-      worksService.findWorkById(canonicalId, includes = List("identifiers"))
+    val getByIdResult = worksService.findWorkById(
+      canonicalId,
+      includes = WorksIncludes(identifiers = true)
+    )
 
     whenReady(getByIdResult) { maybeDisplayWork =>
       maybeDisplayWork.isDefined shouldBe true
@@ -213,7 +216,7 @@ class WorksServiceTest
     insertIntoElasticSearch(work)
 
     val listWorksResult =
-      worksService.listWorks(includes = List("identifiers"))
+      worksService.listWorks(includes = WorksIncludes(identifiers = true))
 
     whenReady(listWorksResult) { (displayWork: DisplaySearch) =>
       displayWork.results.head.identifiers.get shouldBe List(
@@ -239,9 +242,10 @@ class WorksServiceTest
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
-    val searchWorksResult = worksService.searchWorks(query = "snail",
-                                                     includes =
-                                                       List("identifiers"))
+    val searchWorksResult = worksService.searchWorks(
+      query = "snail",
+      includes = WorksIncludes(identifiers = true)
+    )
 
     whenReady(searchWorksResult) { (displayWork: DisplaySearch) =>
       displayWork.results.head.identifiers.get shouldBe List(
