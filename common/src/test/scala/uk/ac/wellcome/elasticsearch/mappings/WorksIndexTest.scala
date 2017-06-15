@@ -2,10 +2,9 @@ package uk.ac.wellcome.elasticsearch.mappings
 
 import java.util
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import org.elasticsearch.index.mapper.StrictDynamicMappingException
-import org.elasticsearch.transport.RemoteTransportException
+import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
@@ -52,7 +51,7 @@ class WorksIndexTest
     eventually {
       val hits = elasticClient
         .execute(search(s"$indexName/$itemType").matchAllQuery())
-        .map { _.hits }
+        .map { _.hits.hits }
         .await
       hits should have size 1
       hits.head.sourceAsString shouldBe workJson
@@ -67,8 +66,8 @@ class WorksIndexTest
         .doc("""{"json":"json not matching the index structure"}"""))
 
     whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a[RemoteTransportException]
-      exception.getCause shouldBe a[StrictDynamicMappingException]
+      exception shouldBe a[ResponseException]
+      // TODO: this should be more specific
     }
   }
 
@@ -77,18 +76,14 @@ class WorksIndexTest
 
     worksIndex.create
 
+    // Check that the mapping wasn't found.  We get a 404 error from
+    // Elasticsearch if we try to look up a non-existent mapping, which
+    // causes the `eventually` to fail.
     eventually {
-      val mappings: Map[String, AnyRef] = elasticClient
-        .execute(getMapping(indexName / itemType))
+      elasticClient
+        .execute(getMapping(indexName))
         .await
-        .mappingFor(indexName / itemType)
-        .getSourceAsMap
-        .toMap
-      mappings("properties")
-        .asInstanceOf[util.Map[String, AnyRef]]
-        .keys should contain("work")
     }
-
   }
 
   private def createIndexAndInsertDocument() = {

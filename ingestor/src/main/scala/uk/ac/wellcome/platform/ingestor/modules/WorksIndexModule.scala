@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor.modules
 
-import com.sksamuel.elastic4s.TcpClient
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.elasticsearch.mappings.WorksIndex
 

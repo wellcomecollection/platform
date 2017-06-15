@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.api.services
 
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork}
@@ -20,7 +19,7 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
     searchService
       .findResultById(canonicalId, index = index)
       .map { result =>
-        if (result.exists) Some(DisplayWork(result.original, includes)) else None
+        if (result.exists) Some(DisplayWork(result, includes)) else None
       }
 
   def listWorks(pageSize: Int = defaultPageSize,

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.models
 
-import com.sksamuel.elastic4s.searches.RichSearchResponse
+import com.sksamuel.elastic4s.http.search.SearchResponse
 
 
 case class DisplaySearch(
@@ -10,9 +10,9 @@ case class DisplaySearch(
   results: Array[DisplayWork]
 )
 case object DisplaySearch {
-  def apply(searchResponse: RichSearchResponse, pageSize: Int, includes: List[String]): DisplaySearch = {
+  def apply(searchResponse: SearchResponse, pageSize: Int, includes: List[String]): DisplaySearch = {
     DisplaySearch(
-      results = searchResponse.hits.map { DisplayWork(_, includes) },
+      results = searchResponse.hits.hits.map { DisplayWork(_, includes) },
       pageSize = pageSize,
       totalPages = Math.ceil(searchResponse.totalHits.toDouble / pageSize.toDouble).toInt,
       totalResults = searchResponse.totalHits.toInt
