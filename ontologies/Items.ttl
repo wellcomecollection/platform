@@ -144,7 +144,7 @@ wi:sheetSize rdf:type owl:DatatypeProperty ;
    
 wi:acquisitionDetails rdf:type owl:DatatypeProperty ;
 	rdfs:label "acquisitionDetails"@en ;
-	rdfs:comment "A note of how this item was acquired by the Wellcome Library: source, price if one was paid, date of acquisition, and any other pertinent details."@en ;
+	rdfs:comment "A note of how this item was acquired by the Wellcome Library: source, date of acquisition, and any other pertinent details."@en ;
 	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
