@@ -26,6 +26,11 @@ variable "infra_bucket" {
   default     = "platform-infra"
 }
 
+variable "dash_bucket" {
+  description = "S3 bucket hosting our dashboard"
+  default     = "wellcome-platform-dash"
+}
+
 variable "api_host" {
   description = "hostname to use for api"
   default     = "api.wellcomecollection.org"
