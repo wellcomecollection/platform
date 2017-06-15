@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import type { Services } from './models'
 import ServiceBox from './ServiceBox'
-
+import './ServiceList.css';
 
 class ServiceList extends Component {
   props: {
@@ -12,9 +12,9 @@ class ServiceList extends Component {
 
   render() {
     return (
-      <div className="Services">
+      <div className='ServiceList'>
         {this.props.services.map(service =>
-          <ServiceBox
+          <ServiceBox key={service.serviceName}
           {...service}
           />
         )}

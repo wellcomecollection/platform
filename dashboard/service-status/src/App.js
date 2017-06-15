@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import VisibleServiceList from './VisibleServiceList';
+import VisibleLastUpdated from './VisibleLastUpdated'
 import './App.css';
 
 class App extends Component {
@@ -7,9 +8,10 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <h2>Service List</h2>
+          <h2>Service Status</h2>
         </div>
         <VisibleServiceList />
+        <VisibleLastUpdated />
       </div>
     );
   }

@@ -3,6 +3,6 @@
 import type { Services } from './models'
 
 export type AppState = {
-  placeholder: string,
+  time: string,
   services: Services
 }
