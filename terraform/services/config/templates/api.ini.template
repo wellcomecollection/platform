@@ -4,8 +4,3 @@
 -es.name=${es_name}
 -es.index=${es_index}
 -es.type=${es_doc_type}
--es.sniff=false
--es.xpack.enabled=true
--es.xpack.user=${es_xpack_user}
--es.xpack.sslEnabled=true
--es.transport.compress=true
