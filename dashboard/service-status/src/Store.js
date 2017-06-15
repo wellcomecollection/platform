@@ -3,6 +3,7 @@
 import type { Services } from './models'
 
 export type AppState = {
-  time: string,
-  services: Services
+  time: Date,
+  services: Services,
+  error: ?Error
 }
