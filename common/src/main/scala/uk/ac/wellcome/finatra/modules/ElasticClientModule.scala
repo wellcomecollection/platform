@@ -12,11 +12,8 @@ import org.apache.http.HttpHost
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
 
-class ElasticCredentials extends HttpClientConfigCallback with TwitterModule {
-  private val username = flag[String]("es.username", "elastic", "ES username")
-  private val password = flag[String]("es.username", "changeme", "ES password")
-
-  val credentials = new UsernamePasswordCredentials(username(), password())
+class ElasticCredentials (username: String, password: String) extends HttpClientConfigCallback {
+  val credentials = new UsernamePasswordCredentials(username, password)
   val credentialsProvider = new BasicCredentialsProvider()
   credentialsProvider.setCredentials(AuthScope.ANY, credentials)
 
@@ -30,6 +27,8 @@ object ElasticClientModule extends TwitterModule {
   private val port = flag[Int]("es.port", 9200, "port no of ES")
   private val protocol = flag[String]("es.protocol", "http", "protocol for talking to ES")
   private val clusterName = flag[String]("es.name", "elasticsearch", "cluster name")
+  private val username = flag[String]("es.username", "elastic", "ES username")
+  private val password = flag[String]("es.password", "changeme", "ES username")
 
   @Singleton
   @Provides
@@ -38,7 +37,7 @@ object ElasticClientModule extends TwitterModule {
 
     val restClient = RestClient
       .builder(new HttpHost(host(), port(), protocol()))
-      .setHttpClientConfigCallback(new ElasticCredentials())
+      .setHttpClientConfigCallback(new ElasticCredentials(username(), password()))
       .build()
 
     HttpClient.fromRestClient(restClient)
