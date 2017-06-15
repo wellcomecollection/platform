@@ -208,14 +208,14 @@ data "aws_iam_policy_document" "miro_images_sync" {
   }
 }
 
-data "aws_iam_policy_document" "s3_put_infra_status" {
+data "aws_iam_policy_document" "s3_put_dashboard_status" {
   statement {
     actions = [
       "s3:PutObject",
     ]
 
     resources = [
-      "${aws_s3_bucket.infra.arn}/status/*",
+      "${aws_s3_bucket.dashboard.arn}/data/*",
     ]
   }
 }
