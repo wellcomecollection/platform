@@ -42,6 +42,7 @@ def send_service_list_to_s3(ecs_client, s3_client, bucket_name, object_key):
     pprint.pprint(json_service_list)
 
     return s3_client.put_object(
+        ACL='public-read',
         Bucket=bucket_name,
         Key=object_key,
         Body=json.dumps(json_service_list),
