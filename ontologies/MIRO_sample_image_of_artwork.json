@@ -38,7 +38,8 @@
       }
     ],
   "placeOfPublication": 
-     {
+     [
+       {
         "label": "[London] (St. James's Street)",
         "type": "Place"
       }
