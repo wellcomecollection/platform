@@ -24,7 +24,7 @@ trait ElasticSearchLocal
 
   val restClient = RestClient
     .builder(new HttpHost("localhost", 9200, "http"))
-    .setHttpClientConfigCallback(new ElasticCredentials())
+    .setHttpClientConfigCallback(new ElasticCredentials("elastic", "changeme"))
     .build()
 
   val elasticClient = HttpClient.fromRestClient(restClient)
