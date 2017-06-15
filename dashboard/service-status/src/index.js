@@ -33,6 +33,7 @@ ReactDOM.render(
 );
 registerServiceWorker();
 
+Store.dispatch({ type: "UPDATE" })
 Store.dispatch(fetchServices('reactjs'))
 
 function doWork(callback) {

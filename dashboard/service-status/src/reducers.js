@@ -8,12 +8,12 @@ import type { Services } from './models'
 
 import type { Action } from './actions'
 
-function placeholderReducer(placeholder: string, action: Action): string {
+function timeReducer(time: string, action: Action): string {
   switch (action.type) {
     case "UPDATE":
-      return Date.now().toString()
+      return Date.now();
     default:
-      return placeholder;
+      return time;
   }
 }
 
@@ -28,9 +28,9 @@ function servicesReducer(services: Services, action: Action): Services {
   }
 }
 
-function rootReducer(state: AppState = { placeholder: "init", services: [] }, action: Action): AppState {
+function rootReducer(state: AppState = { time: "init", services: [] }, action: Action): AppState {
   return {
-    placeholder: placeholderReducer(state.placeholder, action),
+    time: timeReducer(state.time, action),
     services: servicesReducer(state.services, action)
   }
 }
