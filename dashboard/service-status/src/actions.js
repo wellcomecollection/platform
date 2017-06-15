@@ -1,6 +1,7 @@
 // @flow
 
 import type {Services} from './models'
+import AppConfig from './config'
 
 export type Action  = { type: string, payload: Services }
 
@@ -17,7 +18,7 @@ function receiveServices(json: Services): Action {
 function fetchServices() {
   return (dispatch: Function) => {
     dispatch(requestServices());
-    return fetch(`https://s3-eu-west-1.amazonaws.com/muh-bukkit/status/services.json`)
+    return fetch(AppConfig.serviceListLocation)
       .then(response => response.json())
       .then(json => dispatch(receiveServices(json)));
   }

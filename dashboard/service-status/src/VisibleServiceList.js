@@ -8,7 +8,6 @@ function getProps(statePart) {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state.services)
   return getProps(state.services)
 }
 

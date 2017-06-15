@@ -9,3 +9,7 @@ export type Service = {
 }
 
 export type Services = Array<Service>
+
+export type Config = {
+  serviceListLocation: string
+}
