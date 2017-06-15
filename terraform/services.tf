@@ -80,7 +80,6 @@ module "ingestor" {
     es_name           = "${var.es_config["name"]}"
     es_index          = "${var.es_config["index"]}"
     es_doc_type       = "${var.es_config["doc_type"]}"
-    es_xpack_user     = "${var.es_config["xpack_user"]}"
     ingest_queue_id   = "${module.es_ingest_queue.id}"
     metrics_namespace = "ingestor"
   }
@@ -152,7 +151,6 @@ module "api" {
     es_host       = "${data.template_file.es_cluster_host.rendered}"
     es_port       = "${var.es_config["port"]}"
     es_name       = "${var.es_config["name"]}"
-    es_xpack_user = "${var.es_config["xpack_user"]}"
     es_index      = "${var.es_config["index"]}"
     es_doc_type   = "${var.es_config["doc_type"]}"
   }

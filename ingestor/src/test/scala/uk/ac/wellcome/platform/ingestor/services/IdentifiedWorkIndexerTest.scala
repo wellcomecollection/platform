@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.fasterxml.jackson.core.JsonParseException
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -48,7 +48,7 @@ class IdentifiedWorkIndexerTest
       eventually {
         val hits = elasticClient
           .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-          .map { _.hits }
+          .map { _.hits.hits }
           .await
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWorkString
@@ -70,7 +70,7 @@ class IdentifiedWorkIndexerTest
       eventually {
         val hits = elasticClient
           .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-          .map { _.hits }
+          .map { _.hits.hits }
           .await
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWorkString

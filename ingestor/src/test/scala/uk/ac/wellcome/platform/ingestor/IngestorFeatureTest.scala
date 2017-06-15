@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.ScalaFutures
@@ -51,7 +51,7 @@ class IngestorFeatureTest
     eventually {
       val hitsFuture = elasticClient
         .execute(search(s"$indexName/$itemType").matchAllQuery())
-        .map(_.hits)
+        .map { _.hits.hits }
       whenReady(hitsFuture) { hits =>
         hits should have size 1
         hits.head.sourceAsString shouldBe identifiedWork
