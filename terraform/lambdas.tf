@@ -6,8 +6,8 @@ module "lambda_update_service_list" {
   source_dir  = "../lambdas/update_service_list"
 
   environment_variables = {
-    BUCKET_NAME = "${aws_s3_bucket.infra.id}"
-    OBJECT_KEY  = "status/services.json"
+    BUCKET_NAME = "${aws_s3_bucket.dashboard.id}"
+    OBJECT_KEY  = "data/services.json"
   }
 }
 
