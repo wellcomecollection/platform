@@ -97,12 +97,12 @@ wi:hasLocation rdf:type owl:ObjectProperty ;
 	rdfs:range wi:Classmark ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
 	
-wi:hasFileFormat rdf:type owl:Class ;
+wi:hasFileFormat rdf:type owl:ObjectProperty ;
 	rdfs:label "hasFileFormat"@en ;
 	rdfs:comment "This relates an item to its file format when the item comprises a digital object."@en ;
  	rdfs:domain wi:Item ;
 	rdfs:range wi:FileFormat ;
-  rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
+  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
   
   
 #######  Data properties #####  
