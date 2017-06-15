@@ -18,10 +18,6 @@ trait IngestorUtils extends IndexedElasticSearchLocal with SQSLocal with AmazonC
         "es.host" -> "localhost",
         "es.port" -> "9200",
         "es.name" -> "wellcome",
-        "es.xpack.enabled" -> "true",
-        "es.xpack.user" -> "elastic:changeme",
-        "es.xpack.sslEnabled" -> "false",
-        "es.sniff" -> "false",
         "es.index" -> indexName,
         "es.type" -> itemType
       ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag

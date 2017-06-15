@@ -20,11 +20,7 @@ class ApiWorksTest
       flags = Map(
         "es.host" -> "localhost",
         "es.port" -> 9200.toString,
-        "es.name" -> "wellcome",
-        "es.xpack.enabled" -> "true",
-        "es.xpack.user" -> "elastic:changeme",
-        "es.xpack.sslEnabled" -> "false",
-        "es.sniff" -> "false"
+        "es.name" -> "wellcome"
       )
     )
 
