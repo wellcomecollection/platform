@@ -76,20 +76,13 @@ class WorksIndexTest
 
     worksIndex.create
 
+    // Check that the mapping wasn't found.  We get a 404 error from
+    // Elasticsearch if we try to look up a non-existent mapping, which
+    // causes the `eventually` to fail.
     eventually {
-      val mappings: Map[String, AnyRef] = elasticClient
-        .execute(getMapping(indexName / itemType))
+      elasticClient
+        .execute(getMapping(indexName))
         .await
-        .head
-        .mappings
-        .get(indexName)
-        .get(itemType)
-        // .mappingFor(indexName / itemType)
-        // .getSourceAsMap
-        // .toMap
-      mappings("properties")
-        .asInstanceOf[util.Map[String, AnyRef]]
-        .keys should contain("work")
     }
   }
 
