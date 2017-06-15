@@ -7,11 +7,7 @@ A simple dashboard displaying AWS ECS service status.
 To run:
 
 ```sh
-cd ./service-status
-
 npm install
-
-# To run locally
 npm start
 ```
 
@@ -48,10 +44,5 @@ Serving a file of the format:
 To deploy:
 
 ```sh
-cd ./service-status
-
-npm install
-npm run build
-
-# Follow the instructions for deployment as you wish
+./deploy.sh my-bucket https://s3-eu-west-1.amazonaws.com/my-bucket
 ```

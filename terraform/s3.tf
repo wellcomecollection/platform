@@ -25,3 +25,13 @@ resource "aws_s3_bucket" "infra" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket" "dashboard" {
+  bucket = "${var.dash_bucket}"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
