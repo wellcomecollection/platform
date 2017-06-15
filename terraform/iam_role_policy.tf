@@ -120,7 +120,7 @@ resource "aws_iam_role_policy" "update_service_list_describe_services" {
 
 resource "aws_iam_role_policy" "update_service_list_push_to_s3" {
   role   = "${module.lambda_update_service_list.role_name}"
-  policy = "${data.aws_iam_policy_document.s3_put_infra_status.json}"
+  policy = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
 }
 
 # Role policies for the miro_reindexer service
