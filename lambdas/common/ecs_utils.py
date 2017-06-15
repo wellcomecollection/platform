@@ -9,8 +9,7 @@ def identify_cluster_by_app_name(client, app_name):
     return the ARN of the cluster the task runs on.
     """
     for cluster_arn in get_cluster_arns(client):
-        for serviceArn in get_service_arns(client, cluster_arn=cluster_arn)
-
+        for serviceArn in get_service_arns(client, cluster_arn=cluster_arn):
             # The format of an ECS service ARN is:
             #
             #     arn:aws:ecs:{aws_region}:{account_id}:service/{service_name}
