@@ -11,17 +11,20 @@ class TaskCounter extends Component {
   }
 
   render() {
-    const nonZero = this.props.count > 0
-    const happyState = (nonZero && !this.props.shouldBeZero) || (!nonZero && this.props.shouldBeZero)
-    const notifyState = happyState && nonZero
+    const isZero = this.props.count === 0;
+    const shouldBeZero = this.props.shouldBeZero;
+    const notifyState = isZero && shouldBeZero;
+    const correctState = notifyState || (!isZero && !shouldBeZero);
 
     const stateModifier = (() => {
-      if(happyState && notifyState) {
-        return 'Safe'
-      } else if (!happyState && notifyState) {
-        return 'Warn'
+      if(!notifyState) {
+        if(correctState){
+          return 'Safe';
+        } else {
+          return 'Warn';
+        }
       } else {
-        return 'Ignore'
+        return 'Ignore';
       }
     })()
 
