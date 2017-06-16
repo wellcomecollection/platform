@@ -10,6 +10,7 @@ branches:
 
 before_install:
   - git fetch origin
+  - which pip3
 
   # If this is a pull request branch, we only do anything if there are
   # interesting changes between this branch and master.
