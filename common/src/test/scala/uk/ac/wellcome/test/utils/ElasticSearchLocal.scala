@@ -1,12 +1,18 @@
 package uk.ac.wellcome.test.utils
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.ElasticsearchClientUri
-import com.sksamuel.elastic4s.xpack.security.XPackElasticClient
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
-import org.elasticsearch.common.settings.Settings
+import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.index.admin.IndexExistsResponse
+import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
+import org.apache.http.HttpHost
+import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import org.elasticsearch.client.RestClient
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{Matchers, Suite}
+import uk.ac.wellcome.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -16,18 +22,16 @@ trait ElasticSearchLocal
     with ExtendedPatience
     with Matchers { this: Suite =>
 
-  private val settings = Settings
-    .builder()
-    .put("cluster.name", "wellcome")
-    .put("xpack.security.user", "elastic:changeme")
+  val restClient = RestClient
+    .builder(new HttpHost("localhost", 9200, "http"))
+    .setHttpClientConfigCallback(new ElasticCredentials("elastic", "changeme"))
     .build()
 
-  val elasticClient =
-    XPackElasticClient(settings, ElasticsearchClientUri("localhost", 9300))
+  val elasticClient = HttpClient.fromRestClient(restClient)
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {
-    elasticClient.execute(clusterHealth()).await.getNumberOfNodes shouldBe 1
+    elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
   def ensureIndexDeleted(indexName: String): Unit = {
@@ -45,7 +49,7 @@ trait ElasticSearchLocal
     }
   }
 
-  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndicesExistsResponse) = {
+  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndexExistsResponse) = {
     if (indexExistResponse.isExists) elasticClient.execute(deleteIndex(indexName))
     else Future.successful(())
   }

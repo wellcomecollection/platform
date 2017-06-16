@@ -1,6 +1,6 @@
 package uk.ac.wellcome.test.utils
 
-import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.mappings.WorksIndex
 import uk.ac.wellcome.models.IdentifiedWork

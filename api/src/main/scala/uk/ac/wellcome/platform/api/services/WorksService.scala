@@ -2,10 +2,9 @@ package uk.ac.wellcome.platform.api.services
 
 import javax.inject.{Inject, Singleton}
 
-import com.sksamuel.elastic4s.searches.RichSearchResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork}
+import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -15,17 +14,17 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
 
   def findWorkById(canonicalId: String,
-                   includes: List[String] = Nil,
+                   includes: WorksIncludes = WorksIncludes(),
                    index: Option[String] = None): Future[Option[DisplayWork]] =
     searchService
       .findResultById(canonicalId, index = index)
       .map { result =>
-        if (result.exists) Some(DisplayWork(result.original, includes)) else None
+        if (result.exists) Some(DisplayWork(result, includes)) else None
       }
 
   def listWorks(pageSize: Int = defaultPageSize,
                 pageNumber: Int = 1,
-                includes: List[String] = Nil,
+                includes: WorksIncludes = WorksIncludes(),
                 index: Option[String] = None): Future[DisplaySearch] =
     searchService
       .listResults(
@@ -39,7 +38,7 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
   def searchWorks(query: String,
                   pageSize: Int = defaultPageSize,
                   pageNumber: Int = 1,
-                  includes: List[String] = Nil,
+                  includes: WorksIncludes = WorksIncludes(),
                   index: Option[String] = None): Future[DisplaySearch] =
     searchService
       .simpleStringQueryResults(

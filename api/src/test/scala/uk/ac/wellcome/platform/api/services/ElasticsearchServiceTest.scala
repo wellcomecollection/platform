@@ -39,7 +39,7 @@ class ElasticsearchServiceTest
       sortByField = "canonicalId"
     )
     whenReady(sortedSearchResultByCanonicalId) { result =>
-      val works = result.hits.map { DisplayWork(_) }
+      val works = result.hits.hits.map { DisplayWork(_) }
       works.head shouldBe DisplayWork(work3.canonicalId, work3.work.label)
       works.last shouldBe DisplayWork(work1.canonicalId, work1.work.label)
     }
@@ -114,7 +114,7 @@ class ElasticsearchServiceTest
     )
     whenReady(searchResultFuture) { result =>
       result.hits should have size expectedWorks.length
-      val returnedWorks = result.hits.map { DisplayWork(_) }
+      val returnedWorks = result.hits.hits.map { DisplayWork(_) }
       returnedWorks.toList shouldBe expectedWorks
     }
   }
