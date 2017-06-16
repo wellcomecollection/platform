@@ -8,7 +8,6 @@ data "template_file" "definition" {
   vars {
     log_group_region = "${var.aws_region}"
     log_group_name   = "${aws_cloudwatch_log_group.task.name}"
-    infra_bucket     = "${var.infra_bucket}"
   }
 }
 
@@ -49,8 +48,6 @@ resource "aws_ecs_service" "service" {
 }
 
 resource "aws_alb_target_group" "ecs_service" {
-  # We use snake case in a lot of places, but ALB Target Group names can
-  # only contain alphanumerics and hyphens.
   name = "grafana"
 
   port     = 80

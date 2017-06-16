@@ -6,8 +6,6 @@
     "memory": 1024,
     "name": "grafana",
     "environment": [
-      { "name" : "INFRA_BUCKET", "value" : "${infra_bucket}" },
-      { "name" : "CONFIG_KEY", "value" : "${config_key}" }
     ],
     "portMappings": [
       {
