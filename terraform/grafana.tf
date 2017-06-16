@@ -17,8 +17,8 @@ resource "aws_ecs_task_definition" "task" {
   task_role_arn         = "${module.ecs_grafana_iam.task_role_arn}"
 
   volume {
-    name      = "ephemera"
-    host_path = "/tmp"
+    name = "grafana"
+    host_path = "/ecs/grafana"
   }
 }
 

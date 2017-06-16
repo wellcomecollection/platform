@@ -19,6 +19,12 @@
             "awslogs-group": "${log_group_name}",
             "awslogs-region": "${log_group_region}"
         }
-    }
+    },
+    "mountPoints": [
+      {
+        "sourceVolume": "grafana",
+        "containerPath": "/var/lib/grafana"
+      }
+    ]
   }
 ]

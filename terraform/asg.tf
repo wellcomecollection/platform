@@ -20,6 +20,11 @@ module "monitoring_cluster_asg" {
   user_data             = "${module.monitoring_userdata.rendered}"
   vpc_id                = "${module.vpc_monitoring.vpc_id}"
   instance_type         = "t2.medium"
+  # Grafana containers persist information about configured dashboards on a volume exposed by the EC2
+  # instance they are running on. Mounted volumes are not syncrnized across different EC2 instances of an
+  # ECS cluster. If we have more than one EC2 instance we cannot guarantee that the files will be where
+  # they need to be or that they will be up to date
+  asg_max = "1"
 }
 
 module "api_cluster_asg" {
