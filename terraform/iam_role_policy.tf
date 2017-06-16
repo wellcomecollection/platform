@@ -139,3 +139,11 @@ resource "aws_iam_role_policy" "reindexer_cloudwatch" {
   role   = "${module.ecs_miro_reindexer_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
+
+# grafana policies
+
+resource "aws_iam_role_policy" "ecs_grafana_task_cloudwatch_read" {
+  name   = "ecs_grafana_task_cloudwatch_read"
+  role   = "${module.ecs_grafana_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_read_metrics.json}"
+}
