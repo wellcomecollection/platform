@@ -52,12 +52,12 @@ wi:FileFormat rdf:type owl:Class ;
   
 wi:Location rdf:type owl:Class ;
 	rdfs:label "Location"@en ;
-	rdfs:comment "The broad intellectual division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material."@en ;
+	rdfs:comment "The broad intellectual division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material. Although driven by intellectual divisions rather than physical, it will usually have implications for physical location."@en ;
  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
   
 wi:Status rdf:type owl:Class ;
 	rdfs:label "Status"@en ;
-	rdfs:comment "A description of broad considerations that affect how the item may be consulted: whether it is on open shelves, requires ordering from closed stack, is closed for consultation due to considerations such as data protection legislation, or is missing."@en ;
+	rdfs:comment "A description of broad considerations that affect how the item may be consulted: whether it is on open shelves, requires ordering from closed stack, is closed for consultation due to considerations such as data protection legislation or fragility, or is missing."@en ;
  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 	
 #######  Object properties ##### 
@@ -92,7 +92,7 @@ wi:hasClassmark rdf:type owl:ObjectProperty ;
   
 wi:hasLocation rdf:type owl:ObjectProperty ;
 	rdfs:label "hasLocation"@en ;
-	rdfs:comment "This relates an item to a broad division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material."@en ;
+	rdfs:comment "This relates an item to a broad intellectual division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material.  Although driven by intellectual divisions rather than physical, it will usually have implications for physical location."@en ;
 	rdfs:domain wi:Item ;
 	rdfs:range wi:Classmark ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
@@ -103,7 +103,13 @@ wi:hasFileFormat rdf:type owl:ObjectProperty ;
  	rdfs:domain wi:Item ;
 	rdfs:range wi:FileFormat ;
   	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
-  
+
+wi:hasStatus rdf:type owl:ObjectProperty ;
+	rdfs:label "hasStatus"@en ;
+	rdfs:comment "This relates an item to a broad statement that summarises conditions affecting how the item may be consulted: whether it is on open shelves, requires ordering from closed stack, is closed for consultation due to considerations such as data protection legislation or fragility, or is missing."@en ;
+ 	rdfs:domain wi:Item ;
+	rdfs:range wi:Status ;
+  	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
   
 #######  Data properties #####  
 	
