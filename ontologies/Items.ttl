@@ -115,21 +115,21 @@ wi:hasStatus rdf:type owl:ObjectProperty ;
 	
 wi:wellcomeBarcode rdf:type owl:DatatypeProperty ;
 	rdfs:label "wellcomeBarcode"@en ;
-	rdfs:comment "Relates the item to a number and/or string encoded on physical items by a barcode and used for the purposes of movement control by the Wellcome Library."@en ;
+	rdfs:comment "A number and/or string encoded on physical items by a barcode and used for the purposes of movement control by the Wellcome Library."@en ;
 	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
   
 wi:boxNumber rdf:type owl:DatatypeProperty ;
 	rdfs:label "boxNumber"@en ;
-	rdfs:comment "Relates the item (generally an archive item) to a number identifying the box within which it is stored."@en ;
+	rdfs:comment "A number identifying the box within which the item is stored."@en ;
 	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
   
 wi:outsizeItemNumber rdf:type owl:DatatypeProperty ;
 	rdfs:label "boxNumber"@en ;
-	rdfs:comment "Relates the item (generally an archive item) to a number identifying its storage location when the item is too large to fit into a standard Library box."@en ;
+	rdfs:comment "A number identifying an item's storage location when the item is too large to fit into a standard Library box."@en ;
 	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
