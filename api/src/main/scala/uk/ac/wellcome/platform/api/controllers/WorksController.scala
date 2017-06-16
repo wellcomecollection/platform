@@ -8,6 +8,7 @@ import com.twitter.finatra.request.{QueryParam, RouteParam}
 import com.twitter.finatra.validation._
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
+import uk.ac.wellcome.platform.api.models.WorksIncludes
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -69,7 +70,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         // in the public docs.
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
-      val includes = request.includes.getOrElse("").split(",").toList
+      val includes = parseIncludes(request.includes)
 
       val works = request.query match {
         case Some(queryString) =>
@@ -117,9 +118,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           required = false)
         // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
+      val includes = parseIncludes(request.includes)
       worksService
         .findWorkById(request.id,
-                      request.includes.getOrElse("").split(",").toList,
+                      includes,
                       index = request._index)
         .map {
           case Some(result) =>
@@ -129,5 +131,15 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         }
     }
 
+  }
+
+  /// Parse a comma-separated ?includes query parameter.
+  ///
+  /// TODO: Throw an exception if we get an unrecognised include.
+  private def parseIncludes(includesString: Option[String]): WorksIncludes = {
+    val includesList = includesString.getOrElse("").split(",").toList
+    WorksIncludes(
+      identifiers = includesList.contains("identifiers")
+    )
   }
 }
