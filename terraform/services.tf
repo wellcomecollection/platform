@@ -80,6 +80,8 @@ module "ingestor" {
     es_name           = "${var.es_config["name"]}"
     es_index          = "${var.es_config["index"]}"
     es_doc_type       = "${var.es_config["doc_type"]}"
+    es_username       = "${var.es_config["username"]}"
+    es_password       = "${var.es_config["password"]}"
     ingest_queue_id   = "${module.es_ingest_queue.id}"
     metrics_namespace = "ingestor"
   }
@@ -147,11 +149,13 @@ module "api" {
   config_key    = "config/${var.build_env}/api.ini"
 
   config_vars = {
-    api_host      = "${var.api_host}"
-    es_host       = "${data.template_file.es_cluster_host.rendered}"
-    es_port       = "${var.es_config["port"]}"
-    es_name       = "${var.es_config["name"]}"
-    es_index      = "${var.es_config["index"]}"
-    es_doc_type   = "${var.es_config["doc_type"]}"
+    api_host    = "${var.api_host}"
+    es_host     = "${data.template_file.es_cluster_host.rendered}"
+    es_port     = "${var.es_config["port"]}"
+    es_name     = "${var.es_config["name"]}"
+    es_index    = "${var.es_config["index"]}"
+    es_doc_type = "${var.es_config["doc_type"]}"
+    es_username = "${var.es_config["username"]}"
+    es_password = "${var.es_config["password"]}"
   }
 }

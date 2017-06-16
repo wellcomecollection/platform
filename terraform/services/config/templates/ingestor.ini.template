@@ -5,3 +5,5 @@
 -es.type=${es_doc_type}
 -aws.sqs.queue.url=${ingest_queue_id}
 -aws.metrics.namespace=${metrics_namespace}
+-es.username=${es_username}
+-es.password=${es_password}
