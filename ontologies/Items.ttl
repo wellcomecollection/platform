@@ -113,7 +113,7 @@ wi:hasStatus rdf:type owl:ObjectProperty ;
   
 #######  Data properties #####  
 	
-wi:barcode rdf:type owl:DatatypeProperty ;
+wi:wellcomeBarcode rdf:type owl:DatatypeProperty ;
 	rdfs:label "wellcomeBarcode"@en ;
 	rdfs:comment "Relates the item to a number and/or string encoded on physical items by a barcode and used for the purposes of movement control by the Wellcome Library."@en ;
 	rdfs:domain wi:Item ;
