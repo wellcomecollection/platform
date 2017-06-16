@@ -7,3 +7,4 @@
 -aws.metrics.namespace=${metrics_namespace}
 -es.username=${es_username}
 -es.password=${es_password}
+-es.protocol=${es_protocol}

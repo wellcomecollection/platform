@@ -82,6 +82,7 @@ module "ingestor" {
     es_doc_type       = "${var.es_config["doc_type"]}"
     es_username       = "${var.es_config["username"]}"
     es_password       = "${var.es_config["password"]}"
+    es_protocol       = "${var.es_config["protocol"]}"
     ingest_queue_id   = "${module.es_ingest_queue.id}"
     metrics_namespace = "ingestor"
   }
@@ -157,5 +158,6 @@ module "api" {
     es_doc_type = "${var.es_config["doc_type"]}"
     es_username = "${var.es_config["username"]}"
     es_password = "${var.es_config["password"]}"
+    es_protocol       = "${var.es_config["protocol"]}"
   }
 }

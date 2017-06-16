@@ -6,3 +6,4 @@
 -es.type=${es_doc_type}
 -es.username=${es_username}
 -es.password=${es_password}
+-es.protocol=${es_protocol}
