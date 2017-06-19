@@ -7,3 +7,8 @@ data "aws_acm_certificate" "services" {
   domain   = "services.wellcomecollection.org"
   statuses = ["ISSUED"]
 }
+
+data "aws_acm_certificate" "monitoring" {
+  domain   = "monitoring.wellcomecollection.org"
+  statuses = ["ISSUED"]
+}
