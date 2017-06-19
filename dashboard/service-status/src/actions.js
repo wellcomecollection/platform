@@ -9,11 +9,8 @@ function requestServices(): Action {
   return { type: REQUEST_SERVICES, payload: { services: [] }, error: null };
 }
 
-function receiveServices(json: Array<Service>): Action {
-  const services = json;
-  const lastUpdated = new Date();
-
-  return { type: RECEIVE_SERVICES, payload: { services: services, lastUpdated: lastUpdated }, error: null };
+function receiveServices(services: Services): Action {
+  return { type: RECEIVE_SERVICES, payload: services, error: null };
 }
 
 function failedNetwork(reason: Error): Action {
