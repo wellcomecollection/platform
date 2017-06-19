@@ -4,11 +4,11 @@ import { connect } from 'react-redux'
 import LastUpdated from './LastUpdated'
 
 function getProps(statePart) {
-  return {time: statePart};
+  return {time: statePart.lastUpdated};
 }
 
 const mapStateToProps = (state) => {
-  return getProps(state.time)
+  return getProps(state.services);
 }
 
 const VisibleLastUpdated = connect(
