@@ -7,6 +7,7 @@ This script runs when triggered from an ECS task state change stream.
 It does not use the event data from the event.
 """
 
+import datetime
 import json
 import os
 import pprint
@@ -38,14 +39,19 @@ def get_service_list(ecs_client):
 
 
 def send_service_list_to_s3(ecs_client, s3_client, bucket_name, object_key):
-    json_service_list = get_service_list(ecs_client)
-    pprint.pprint(json_service_list)
+    service_list = get_service_list(ecs_client)
+    service_snapshot = {
+        'services': service_list,
+        'lastUpdated': str(datetime.datetime.utcnow())
+    }
+
+    pprint.pprint(service_snapshot)
 
     return s3_client.put_object(
         ACL='public-read',
         Bucket=bucket_name,
         Key=object_key,
-        Body=json.dumps(json_service_list),
+        Body=json.dumps(service_snapshot),
         ContentType='application/json'
     )
 
