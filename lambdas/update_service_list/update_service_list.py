@@ -14,8 +14,15 @@ import pprint
 
 import boto3
 
-from ecs_utils import get_cluster_arns, get_service_arns, describe_service
+from ecs_utils import get_cluster_arns, get_service_arns, describe_service, describe_cluster
 
+def _create_cluster_dict(cluster, service_list):
+    return {
+        'clusterName': cluster['clusterName'],
+        'status': cluster['status'],
+        'instanceCount': cluster['registeredContainerInstancesCount'],
+        'serviceList': service_list
+    }
 
 def _create_service_dict(service):
     return {
@@ -27,15 +34,25 @@ def _create_service_dict(service):
     }
 
 
-def get_service_list(ecs_client):
+def get_service_list(ecs_client, cluster_arn):
     service_list = []
 
-    for cluster_arn in get_cluster_arns(ecs_client):
-        for service_arn in get_service_arns(ecs_client, cluster_arn):
-            service = describe_service(ecs_client, cluster_arn, service_arn)
-            service_list.append(_create_service_dict(service))
+    for service_arn in get_service_arns(ecs_client, cluster_arn):
+        service = describe_service(ecs_client, cluster_arn, service_arn)
+        service_list.append(_create_service_dict(service))
 
     return service_list
+
+
+def get_cluster_list(ecs_client):
+    cluster_list = []
+
+    for cluster_arn in get_cluster_arns(ecs_client):
+        cluster = describe_cluster(ecs_client, cluster_arn)
+        service_list = get_service_list(ecs_client, cluster_arn)
+        cluster_list = _create_cluster_dict(cluster, service_list)
+
+    return cluster_list
 
 
 def send_service_list_to_s3(ecs_client, s3_client, bucket_name, object_key):
