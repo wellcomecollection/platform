@@ -367,4 +367,12 @@ ww:generalNote rdf:type owl:DatatypeProperty ;
 	rdfs:comment "A note of any aspect of this work the cataloguer thought important to record but which does not map to any other more-defined property in this ontology."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
+	
+ww:isbn rdf:type owl:DatatypeProperty ;
+	rdfs:label "isbn"@en ;
+	rdfs:comment "The ISBN / ISSN number of a modern published work."@en ;
+	rdfs:domain ww:Work ;
+	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
+
