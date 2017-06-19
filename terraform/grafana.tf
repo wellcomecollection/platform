@@ -8,6 +8,10 @@ data "template_file" "definition" {
   vars {
     log_group_region = "${var.aws_region}"
     log_group_name   = "${aws_cloudwatch_log_group.task.name}"
+    anonymous_enabled = "${var.grafana_anonymous_enabled}"
+    anonymous_role = "${var.grafana_anonymous_role}"
+    admin_user = "${var.grafana_admin_user}"
+    admin_password = "${var.grafana_admin_password}"
   }
 }
 

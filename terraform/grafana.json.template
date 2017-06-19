@@ -6,6 +6,10 @@
     "memory": 1024,
     "name": "grafana",
     "environment": [
+        {"name": "GF_AUTH_ANONYMOUS_ENABLED", "value": "${anonymous_enabled}"},
+        {"name": "GF_AUTH_ANONYMOUS_ORG_ROLE", "value": "${anonymous_role}"},
+        {"name": "GF_SECURITY_ADMIN_USER", "value": "${admin_user}"},
+        {"name": "GF_SECURITY_ADMIN_PASSWORD", "value": "${admin_password}"}
     ],
     "portMappings": [
       {
