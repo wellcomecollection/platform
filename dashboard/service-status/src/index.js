@@ -9,9 +9,7 @@ import { fetchServices } from './actions'
 import rootReducer from './reducers'
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-
 import { createStore, applyMiddleware } from 'redux'
-
 
 const loggerMiddleware = createLogger()
 
@@ -31,13 +29,9 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-Store.dispatch({ type: "UPDATE" })
-Store.dispatch(fetchServices('reactjs'))
-
 function doWork(callback) {
   setTimeout(function() {
-    Store.dispatch({ type: "UPDATE" })
-    Store.dispatch(fetchServices('reactjs'))
+    Store.dispatch(fetchServices())
     doWork();
   }, 5000);
 }

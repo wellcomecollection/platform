@@ -8,7 +8,10 @@ export type Service = {
   status: string
 }
 
-export type Services = Array<Service>
+export type Services = {
+  services: Array<Service>,
+  lastUpdated: ?Date
+}
 
 export type Config = {
   serviceListLocation: string

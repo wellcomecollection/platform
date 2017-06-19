@@ -18,7 +18,7 @@ class ServiceList extends Component {
         return <ErrorBox error={this.props.error}/>
       } else {
         return <div className='ServiceList'>
-          {this.props.services.map(service =>
+          {this.props.services.services.map(service =>
             <ServiceBox key={service.serviceName}
             {...service}
             />
