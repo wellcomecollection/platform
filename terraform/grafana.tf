@@ -118,3 +118,39 @@ data "aws_iam_policy_document" "ecs_service" {
     ]
   }
 }
+
+resource "aws_efs_file_system" "grafana_efs" {
+  creation_token = "grafana_efs"
+}
+
+resource "aws_efs_mount_target" "grafana" {
+  count = "${length(module.vpc_monitoring.subnets)}"
+  file_system_id = "${aws_efs_file_system.grafana_efs.id}"
+  subnet_id      = "${module.vpc_monitoring.subnets[count.index]}"
+  security_groups = ["${aws_security_group.efs_mnt.id}"]
+}
+
+resource "aws_security_group" "efs_mnt" {
+  description = "security groupt for efs mounts"
+  vpc_id      = "${module.vpc_monitoring.vpc_id}"
+  name        = "efs_sg"
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 2049
+    to_port   = 2049
+
+    security_groups = [
+      "${module.monitoring_cluster_asg.instance_sg_id}"
+    ]
+  }
+}
+
+resource "aws_security_group_rule" "monitoring_out_efs" {
+  type = "egress"
+  from_port   = 2049
+  to_port     = 2049
+  protocol    = "tcp"
+  security_group_id = "${module.monitoring_cluster_asg.instance_sg_id}"
+  source_security_group_id = "${aws_security_group.efs_mnt.id}"
+}
