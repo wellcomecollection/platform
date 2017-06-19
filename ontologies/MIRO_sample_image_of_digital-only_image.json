@@ -1,0 +1,65 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "ghdke34",
+  "type": "Work",
+  "identifiers": 
+    [
+      {
+        "label": "A0000584",
+        "authority": "MIRO"
+      }
+      {
+         "label": "Contributor Reference VET 43 (17)"
+        "authority": "MIRO contributor"
+; Comment: this is a non-standard reference, provided by the organisation that provided the image.  I assume here that we
+; would be able to set up something where if the label began "Contributor Reference" and the data is from MIRO, we could supply
+; "MIRO contributor" as an authority
+      }
+    ]
+  "licence": "CC-BY-NC",
+  "label": "A very frightened horse.",
+  "description": "A very frightened horse.",
+  "ipRightsStatement": "Royal Veterinary College"
+; Comment: the ipRightsStatement here picks up on the MIRO credit line and reproduces it unchanged.  We might alternatively choose
+; to precede it with some standard text along the lines of "image courtesy of..."  
+  "subjects": 
+; Comment: I've not yet set up the Subjects ontology but am assuming that each subject will have a note of its label
+; and its source authority.  NB In MIRO there are keywords that don't come from any external thesaurus
+    [
+      {
+        "label": "ROYAL VETERINARY COLLEGE",
+        "authority": "MIRO keywords" 
+      }
+      {
+        "label": "PHYSICAL RESTRAINT ON HORSES",
+        "authority": "MIRO keywords"
+      }
+      {
+        "label": "NERVOUS",
+        "authority": "MIRO keywords"
+      }
+      {
+        "label": "EQUINE",
+        "authority": "MIRO keywords"
+      }
+    ]  
+    
+  "items": 
+    [
+      {
+        "id": "no819h6",
+        "type": "item",
+        "identifiers": 
+          [
+            {
+              "label": "A0000584",
+              "authority": "MIRO"
+            }
+          ]
+      }
+    ]
+    "status": "Open"
+; Comment: the status Open (ie can be shown on the web) is generated within MIRO by the combination of five factors:
+; <all_web_publish>, <image_general_use> and <image_copyright_cleared> have Y, <image_title> has content, and 
+; "cataloguing is complete" - will follow up with users whether there is a flag for this
+}
