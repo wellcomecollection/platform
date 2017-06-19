@@ -57,7 +57,7 @@ variable "grafana_anonymous_enabled" {
 
 variable "grafana_anonymous_role" {
   description = "Specify role for anonymous users. Valid values are Viewer, Editor and Admin"
-  default = "Viewer"
+  default = "Editor"
 }
 
 variable "grafana_admin_user" {
