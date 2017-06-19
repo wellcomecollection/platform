@@ -355,4 +355,9 @@ ww:wellcomeCollectionSection rdf:type owl:DatatypeProperty ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 	
-	
+ww:edition rdf:type owl:DatatypeProperty ;
+	rdfs:label "edition"@en ;
+	rdfs:comment "Where the work described is a published work that has existed in various editions, this specifies the edition (and, if relevant, the impression)."@en ;
+	rdfs:domain ww:Work ;
+	rdfs:range rdf:langString ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
