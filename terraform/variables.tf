@@ -52,17 +52,17 @@ variable "rds_password" {
 
 variable "grafana_anonymous_enabled" {
   description = "Enable grafana anonymous access"
-  default = "true"
+  default     = "true"
 }
 
 variable "grafana_anonymous_role" {
   description = "Specify role for anonymous users. Valid values are Viewer, Editor and Admin"
-  default = "Editor"
+  default     = "Editor"
 }
 
 variable "grafana_admin_user" {
   description = "The name of the default Grafana admin user"
-  default = "admin"
+  default     = "admin"
 }
 
 variable "grafana_admin_password" {

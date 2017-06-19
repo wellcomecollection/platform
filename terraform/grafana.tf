@@ -6,12 +6,12 @@ data "template_file" "definition" {
   template = "${file("grafana.json.template")}"
 
   vars {
-    log_group_region = "${var.aws_region}"
-    log_group_name   = "${aws_cloudwatch_log_group.task.name}"
+    log_group_region  = "${var.aws_region}"
+    log_group_name    = "${aws_cloudwatch_log_group.task.name}"
     anonymous_enabled = "${var.grafana_anonymous_enabled}"
-    anonymous_role = "${var.grafana_anonymous_role}"
-    admin_user = "${var.grafana_admin_user}"
-    admin_password = "${var.grafana_admin_password}"
+    anonymous_role    = "${var.grafana_anonymous_role}"
+    admin_user        = "${var.grafana_admin_user}"
+    admin_password    = "${var.grafana_admin_password}"
   }
 }
 
@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "task" {
   task_role_arn         = "${module.ecs_grafana_iam.task_role_arn}"
 
   volume {
-    name = "grafana"
+    name      = "grafana"
     host_path = "/ecs/grafana"
   }
 }
@@ -41,7 +41,7 @@ resource "aws_ecs_service" "service" {
 
   lifecycle {
     ignore_changes = [
-      "desired_count"
+      "desired_count",
     ]
   }
 
