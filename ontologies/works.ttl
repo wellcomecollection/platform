@@ -361,3 +361,10 @@ ww:edition rdf:type owl:DatatypeProperty ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
+	
+ww:generalNote rdf:type owl:DatatypeProperty ;
+	rdfs:label "generalNote"@en ;
+	rdfs:comment "A note of any aspect of this work the cataloguer thought important to record but which does not map to any other more-defined property in this ontology."@en ;
+	rdfs:domain ww:Work ;
+	rdfs:range rdf:langString ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .	
