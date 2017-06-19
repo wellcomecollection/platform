@@ -6,17 +6,18 @@ import AppConfig from './config'
 export type Action  = { type: string, payload: Services, error: ?Error}
 
 function requestServices(): Action {
-  return { type: REQUEST_SERVICES, payload: [], error: null };
+  return { type: REQUEST_SERVICES, payload: { services: [] }, error: null };
 }
 
-function receiveServices(json: Services): Action {
-  const services = json
+function receiveServices(json: Array<Service>): Action {
+  const services = json;
+  const lastUpdated = new Date();
 
-  return { type: RECEIVE_SERVICES, payload: services, error: null };
+  return { type: RECEIVE_SERVICES, payload: { services: services, lastUpdated: lastUpdated }, error: null };
 }
 
 function failedNetwork(reason: Error): Action {
-  return { type: FAILED_NETWORK, payload: [], error: reason };
+  return { type: FAILED_NETWORK, payload: { services: [] }, error: reason };
 }
 
 function fetchServices() {
