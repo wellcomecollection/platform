@@ -26,7 +26,7 @@ module "monitoring_cluster_asg" {
   # Grafana containers persist information about configured dashboards on a volume exposed by the EC2
   # instance they are running on. Mounted volumes are not synchronized across different EC2 instances of an
   # ECS cluster. If we have more than one EC2 instance we cannot guarantee that the files will be where
-  # they need to be or that they will be up to date
+  # they need to be or that they will be up to date.
   asg_max = "1"
 }
 
