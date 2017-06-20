@@ -7,7 +7,7 @@ module "lambda_update_service_list" {
 
   environment_variables = {
     BUCKET_NAME = "${aws_s3_bucket.dashboard.id}"
-    OBJECT_KEY  = "data/services.json"
+    OBJECT_KEY  = "data/ecs_status.json"
   }
 }
 

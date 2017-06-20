@@ -67,14 +67,14 @@ def get_cluster_list(ecs_client):
     for cluster_arn in get_cluster_arns(ecs_client):
         cluster = describe_cluster(ecs_client, cluster_arn)
         service_list = get_service_list(ecs_client, cluster_arn)
-        cluster_list = _create_cluster_dict(cluster, service_list)
+        cluster_list.append(_create_cluster_dict(cluster, service_list))
 
     return cluster_list
 
 def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
     cluster_list = get_cluster_list(ecs_client)
     service_snapshot = {
-        'cluster_list': cluster_list,
+        'clusterList': cluster_list,
         'lastUpdated': str(datetime.datetime.utcnow())
     }
 
@@ -90,7 +90,6 @@ def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
 
 
 def main(event, _):
-
     pprint.pprint(event)
 
     ecs_client = boto3.client('ecs')
