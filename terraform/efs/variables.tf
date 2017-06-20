@@ -8,7 +8,7 @@ variable "subnets" {
 }
 
 variable "vpc_id" {
-  description = "ID of VPC to run service in"
+  description = "ID of VPC to to create EFS mount in"
 }
 
 variable "efs_access_security_group_id" {
