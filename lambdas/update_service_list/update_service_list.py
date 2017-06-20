@@ -33,6 +33,7 @@ def _create_cluster_dict(cluster, service_list):
 
 def _create_service_dict(service):
     deployments = [ _create_deployment_dict(d) for d in service['deployments'] ]
+    # Grab just the last few events to keep the file size down
     events = [ _create_event_dict(e) for e in service['events'][:5] ]
 
     return {
