@@ -1,7 +1,7 @@
 
 .ClusterList {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 2fr);
   grid-gap: 10px;
   grid-auto-rows: minmax(100px, auto);
   margin: 10px
