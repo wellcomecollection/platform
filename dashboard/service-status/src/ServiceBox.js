@@ -1,9 +1,10 @@
 // @flow
 
 import React, { Component } from 'react';
-import TaskCounter from './TaskCounter'
-import type { Event } from './models'
-import './ServiceBox.css'
+import TaskCounter from './TaskCounter';
+import type { Event } from './models';
+import EventBox from './EventBox';
+import './ServiceBox.css';
 
 class ServiceBox extends Component {
   props: {
@@ -30,14 +31,7 @@ class ServiceBox extends Component {
             <TaskCounter type="Pending" count={this.props.pendingCount} shouldBeZero={true}/>
           </div>
           <div className="ServiceBox--Status ">{this.props.status}</div>
-          <div className="EventBox">
-            <div className="EventList">
-              {this.props.events.reverse().map(event => {
-                return <div className="EventList--Event" key={event.timestamp}>&gt; {event.message}</div>
-              })}
-              <div className="EventList--Event">&gt;</div>
-            </div>
-          </div>
+          <EventBox events={this.props.events}/>
         </div>
       </div>
     );
