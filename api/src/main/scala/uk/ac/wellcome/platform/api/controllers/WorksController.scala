@@ -6,6 +6,7 @@ import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.{QueryParam, RouteParam}
 import com.twitter.finatra.validation._
+import com.twitter.finatra.validation.ValidationResult.{Invalid, Valid}
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.WorksIncludes
@@ -20,13 +21,35 @@ case class MultipleResultsRequest(
   @RouteParam id: Option[String],
   @QueryParam query: Option[String],
   @QueryParam _index: Option[String]
-)
+) {
+
+  @MethodValidation
+  def validateIncludes = IncludesValidation.validateIncludes(includes)
+}
 
 case class SingleWorkRequest(
   @RouteParam id: String,
   @QueryParam includes: Option[String],
   @QueryParam _index: Option[String]
-)
+) {
+
+  @MethodValidation
+  def validateIncludes = IncludesValidation.validateIncludes(includes)
+}
+
+object IncludesValidation {
+
+  /// Check if the provided ?includes parameters contain fields we recognise.
+  def validateIncludes(queryParam: Option[String]): ValidationResult =
+    WorksIncludes.validate(queryParam) match {
+      case Left(_) => Valid
+      case Right(badIncludes) =>
+        badIncludes.length match {
+          case 1 => Invalid(s"includes: '${badIncludes.head}' is not a valid include")
+          case _ => Invalid(s"includes: ${badIncludes.mkString("'", "', '", "'")} are not valid includes")
+        }
+    }
+}
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
