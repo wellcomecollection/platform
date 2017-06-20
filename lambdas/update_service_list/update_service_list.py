@@ -30,8 +30,23 @@ def _create_cluster_dict(cluster, service_list):
         'serviceList': service_list
     }
 
+def _create_event_dict(event):
+    return {
+        'timestamp': event['createdAt'].timestamp(),
+        'message': event['message']
+    }
+
+def _create_cluster_dict(cluster, service_list):
+    return {
+        'clusterName': cluster['clusterName'],
+        'status': cluster['status'],
+        'instanceCount': cluster['registeredContainerInstancesCount'],
+        'serviceList': service_list
+    }
+
 def _create_service_dict(service):
     deployments = [ _create_deployment_dict(d) for d in service['deployments'] ]
+    # Grab just the last few events to keep the file size down
     events = [ _create_event_dict(e) for e in service['events'][:5] ]
 
     return {
