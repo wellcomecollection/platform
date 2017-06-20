@@ -100,3 +100,7 @@ variable "environment_vars" {
   description = "Environment variables to pass to the container"
   default = ""
 }
+
+variable "managed_config" {
+  default = true
+}

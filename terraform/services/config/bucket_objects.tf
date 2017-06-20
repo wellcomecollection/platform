@@ -3,4 +3,5 @@ resource "aws_s3_bucket_object" "config_file" {
   acl     = "private"
   key     = "${var.config_key}"
   content = "${data.template_file.config.rendered}"
+  count = "${var.managed_config}"
 }

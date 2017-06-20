@@ -38,4 +38,5 @@ module "config" {
   infra_bucket  = "${var.infra_bucket}"
   config_key    = "${var.config_key}"
   template_vars = "${var.config_vars}"
+  managed_config = "${var.managed_config}"
 }

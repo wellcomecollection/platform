@@ -14,3 +14,7 @@ variable "template_vars" {
 variable "config_key" {
   description = "Location of config file within S3"
 }
+
+variable "managed_config" {
+  default = true
+}

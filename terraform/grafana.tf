@@ -28,6 +28,7 @@ module "grafana" {
   volume_name = "grafana"
   config_key = ""
   infra_bucket = ""
+  managed_config = false
 }
 
 module "grafana_efs" {
