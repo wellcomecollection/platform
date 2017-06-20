@@ -86,3 +86,17 @@ variable "config_vars" {
   type        = "map"
   default     = {}
 }
+
+variable "docker_image" {
+  description = "Name of the docker image to run"
+  default = ""
+}
+variable "container_path" {
+  description = "Path of the mounted volume in the docker container"
+  default = ""
+}
+
+variable "environment_vars" {
+  description = "Environment variables to pass to the container"
+  default = ""
+}

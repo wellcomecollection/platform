@@ -11,7 +11,7 @@ data "template_file" "definition" {
     infra_bucket     = "${var.infra_bucket}"
 
     docker_image = "${var.docker_image}"
-    name = "${var.name}"
+    name = "${var.task_name}"
     container_port = "${var.container_port}"
     volume_name = "${var.volume_name}"
     container_path = "${var.container_path}"

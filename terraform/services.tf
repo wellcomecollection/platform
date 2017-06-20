@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host" {
 }
 
 module "calm_adapter" {
-  source           = "platform-services"
+  source           = "./services"
   name             = "calm_adapter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_role_arn    = "${module.ecs_calm_adapter_iam.task_role_arn}"
@@ -36,7 +36,7 @@ module "calm_adapter" {
 }
 
 module "miro_reindexer" {
-  source           = "platform-services"
+  source           = "./services"
   name             = "miro_reindexer"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_role_arn    = "${module.ecs_miro_reindexer_iam.task_role_arn}"
@@ -60,7 +60,7 @@ module "miro_reindexer" {
 }
 
 module "ingestor" {
-  source           = "platform-services"
+  source           = "./services"
   name             = "ingestor"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_role_arn    = "${module.ecs_ingestor_iam.task_role_arn}"
@@ -89,7 +89,7 @@ module "ingestor" {
 }
 
 module "transformer" {
-  source           = "platform-services"
+  source           = "./services"
   name             = "transformer"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_role_arn    = "${module.ecs_transformer_iam.task_role_arn}"
@@ -111,7 +111,7 @@ module "transformer" {
 }
 
 module "id_minter" {
-  source           = "platform-services"
+  source           = "./services"
   name             = "id_minter"
   cluster_id       = "${aws_ecs_cluster.services.id}"
   task_role_arn    = "${module.ecs_id_minter_iam.task_role_arn}"
@@ -138,7 +138,7 @@ module "id_minter" {
 }
 
 module "api" {
-  source        = "platform-services"
+  source        = "./services"
   name          = "api"
   cluster_id    = "${aws_ecs_cluster.api.id}"
   task_role_arn = "${module.ecs_api_iam.task_role_arn}"
