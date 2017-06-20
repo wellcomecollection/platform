@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "task" {
 
   volume {
     name      = "grafana"
-    host_path = "/mnt/efs/grafana"
+    host_path = "${module.monitoring_userdata.efs_mount_directory}/grafana"
   }
 }
 
