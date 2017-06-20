@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import type { Event } from './models'
-import ServiceBox from './ServiceBox'
 import './EventBox.css';
 
 class EventBox extends Component {

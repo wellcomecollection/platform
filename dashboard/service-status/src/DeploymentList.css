@@ -1,0 +1,58 @@
+.DeploymentList {
+  background-repeat: repeat-x;
+  border-color: #9acfea;
+  background-color: #f5f5f5;
+  padding:10px;
+  margin-top: 10px;
+  font-weight: lighter;
+  font-size: 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+}
+
+.DeploymentList__Deploying {
+  animation: pulse 5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #9acfea;
+  }
+  100% {
+    background-color: orange;
+  }
+}
+
+.Deployment {
+  padding: 6px 12px;
+  margin-bottom: 0;
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.Deployment--Status {
+  min-width: 10px;
+  padding: 3px 7px;
+  margin-left: 10px;
+  color: black;
+  text-align: center;
+  background-color: white;
+  border-radius: 10px
+}
+
+.Deployment__Primary {
+  background-color: #add8e6;
+}
+
+.Deployment__Active {
+  background-color: #18d412;
+}
+
+.Deployment__Inactive {
+  background-color: #ddd;
+}

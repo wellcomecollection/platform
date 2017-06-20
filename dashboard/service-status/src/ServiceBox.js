@@ -2,8 +2,9 @@
 
 import React, { Component } from 'react';
 import TaskCounter from './TaskCounter';
-import type { Event } from './models';
+import type { Event, Deployment } from './models';
 import EventBox from './EventBox';
+import DeploymentList from './DeploymentList'
 import './ServiceBox.css';
 
 class ServiceBox extends Component {
@@ -13,6 +14,7 @@ class ServiceBox extends Component {
     pendingCount: number,
     runningCount: number,
     events: Array<Event>,
+    deployments: Array<Deployment>,
     status: string
   }
 
@@ -30,7 +32,7 @@ class ServiceBox extends Component {
             <TaskCounter type="Running" count={this.props.runningCount} shouldBeZero={false}/>
             <TaskCounter type="Pending" count={this.props.pendingCount} shouldBeZero={true}/>
           </div>
-          <div className="ServiceBox--Status ">{this.props.status}</div>
+          <DeploymentList deployments={this.props.deployments}/>
           <EventBox events={this.props.events}/>
         </div>
       </div>

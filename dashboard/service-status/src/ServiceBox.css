@@ -1,7 +1,6 @@
 .ServiceBox {
   text-align: center;
 
-  margin-bottom: 20px;
   background-color: #fff;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -12,7 +11,7 @@
 
 .ServiceBox--Header {
   background-color: #f5f5f5;
-  padding: 10px 15px;
+  padding: 5px;
   border-bottom: 1px solid transparent;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
@@ -43,47 +42,9 @@
   color: rgb(50, 50, 50);
 }
 
-.ServiceBox--Status {
-  background-color: #f5f5f5;
-
-  background-repeat: repeat-x;
-  border-color: #9acfea;
-  padding:10px;
-  margin-top: 10px;
-  font-weight: lighter;
-  font-size: 10px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-}
-
 .TaskCounterHolder {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 10px;
-  grid-auto-rows: minmax(50px, 70px);
-}
-
-.EventBox {
-  background-color: #f5f5f5;
-  margin-top: 10px;
-  padding: 3px 3px 3px 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  height: 100px;
-  position: relative;
-  overflow: hidden;
-}
-
-.EventList {
-  color: #2B8539;
-  font-family: monospace;
-  font-size: x-small;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  max-width: 100%;
-}
-
-.EventList--Event {
-  text-align: left;
+  grid-auto-rows: minmax(50px, 50px);
 }

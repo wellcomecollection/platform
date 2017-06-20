@@ -9,8 +9,6 @@ class ErrorBox extends Component {
   }
 
   render() {
-
-    console.log(this.props);
     return (
       <div className='ErrorMessage'>
         <em>Something went wrong:</em> <strong>{this.props.error.message}</strong>
