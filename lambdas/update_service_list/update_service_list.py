@@ -16,6 +16,19 @@ import boto3
 
 from ecs_utils import get_cluster_arns, get_service_arns, describe_service, describe_cluster
 
+def _create_event_dict(event):
+    return {
+        'timestamp': event['createdAt'].timestamp(),
+        'message': event['message']
+    }
+
+def _create_cluster_dict(cluster, service_list):
+    return {
+        'clusterName': cluster['clusterName'],
+        'status': cluster['status'],
+        'instanceCount': cluster['registeredContainerInstancesCount'],
+        'serviceList': service_list
+    }
 
 def _create_event_dict(event):
     return {
