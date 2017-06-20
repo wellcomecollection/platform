@@ -70,7 +70,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         // in the public docs.
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
-      val includes = parseIncludes(request.includes)
+      val includes = WorksIncludes(request.includes)
 
       val works = request.query match {
         case Some(queryString) =>
@@ -118,7 +118,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           required = false)
         // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
-      val includes = parseIncludes(request.includes)
+      val includes = WorksIncludes(request.includes)
       worksService
         .findWorkById(request.id,
                       includes,
@@ -131,15 +131,5 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         }
     }
 
-  }
-
-  /// Parse a comma-separated ?includes query parameter.
-  ///
-  /// TODO: Throw an exception if we get an unrecognised include.
-  private def parseIncludes(includesString: Option[String]): WorksIncludes = {
-    val includesList = includesString.getOrElse("").split(",").toList
-    WorksIncludes(
-      identifiers = includesList.contains("identifiers")
-    )
   }
 }
