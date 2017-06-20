@@ -14,13 +14,16 @@ import io.swagger.models.Swagger
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.ElasticsearchExceptionMapper
-import uk.ac.wellcome.platform.api.finatra.modules.ElasticSearchServiceModule.ElasticSearchServiceModule.flag
+import uk.ac.wellcome.platform.api.models.WorksIncludesDeserializerModule
 
 object ServerMain extends Server
 object ApiSwagger extends Swagger
 
 object ApiJacksonModule extends FinatraJacksonModule {
   override val propertyNamingStrategy = CamelCasePropertyNamingStrategy
+  override val additionalJacksonModules = Seq(
+    new WorksIncludesDeserializerModule
+  )
 }
 
 class Server extends HttpServer {
