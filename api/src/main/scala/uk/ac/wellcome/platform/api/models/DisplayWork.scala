@@ -6,8 +6,6 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 
-case class WorksIncludes(identifiers: Boolean = false)
-
 case class DisplayWork(id: String,
                        label: String,
                        description: Option[String] = None,
