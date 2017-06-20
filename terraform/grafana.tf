@@ -14,7 +14,7 @@ module "grafana_container_definition" {
     {"name" : "GF_SECURITY_ADMIN_PASSWORD", "value" : "${var.grafana_admin_password}"}
   ]
   EOF
-  task_name = "grafana"
+  name = "grafana"
   volume_name = "grafana"
 }
 
@@ -28,6 +28,9 @@ module "grafana" {
   healthcheck_path = "/api/health"
   container_definitions = "${module.grafana_container_definition.rendered}"
   volume_name = "${module.grafana_container_definition.volume_name}"
+  volume_host_path = "${module.monitoring_userdata.efs_mount_directory}/grafana"
+  container_name = "${module.grafana_container_definition.name}"
+  container_port = "3000"
 }
 
 module "grafana_efs" {

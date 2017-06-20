@@ -3,7 +3,7 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "task_name" {
+variable "name" {
   description = "Name of the task to create"
 }
 
