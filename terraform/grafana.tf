@@ -13,8 +13,6 @@ module "grafana" {
 
   template_name = "single_image_with_volume"
   docker_image = "grafana/grafana"
-
-  container_port = "3000"
   container_path = "/var/lib/grafana"
 
   environment_vars = <<EOF
@@ -25,10 +23,9 @@ module "grafana" {
     {"name" : "GF_SECURITY_ADMIN_PASSWORD", "value" : "${var.grafana_admin_password}"}
   ]
   EOF
-  volume_name = "grafana"
   config_key = ""
   infra_bucket = ""
-  managed_config = false
+  is_config_managed = false
 }
 
 module "grafana_efs" {
