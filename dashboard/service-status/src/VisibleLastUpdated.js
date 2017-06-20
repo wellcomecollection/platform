@@ -8,7 +8,7 @@ function getProps(statePart) {
 }
 
 const mapStateToProps = (state) => {
-  return getProps(state.services);
+  return getProps(state.ecsStatus);
 }
 
 const VisibleLastUpdated = connect(
