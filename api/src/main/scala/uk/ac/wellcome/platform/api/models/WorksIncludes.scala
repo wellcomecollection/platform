@@ -1,6 +1,12 @@
 package uk.ac.wellcome.platform.api.models
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonMappingException}
+
 case class WorksIncludes(identifiers: Boolean = false)
+
+class IncludesParsingException(msg: String) extends JsonMappingException(msg: String)
 
 case object WorksIncludes {
 
@@ -10,6 +16,7 @@ case object WorksIncludes {
   ///
   /// In this method, any unrecognised includes are simply ignored.
   def apply(queryParam: String): WorksIncludes = {
+    throw new IncludesParsingException("I haz a very sad")
     val includesList = queryParam.split(",").toList
     WorksIncludes(
       identifiers = includesList.contains("identifiers")
@@ -44,4 +51,14 @@ case object WorksIncludes {
       case None => Right(WorksIncludes())
     }
   }
+}
+
+class WorksIncludesDeserializer extends JsonDeserializer[WorksIncludes] {
+  override def deserialize(p: JsonParser, ctxt: DeserializationContext): WorksIncludes = {
+    WorksIncludes(p.getText())
+  }
+}
+
+class WorksIncludesDeserializerModule extends SimpleModule {
+  addDeserializer(classOf[WorksIncludes], new WorksIncludesDeserializer())
 }
