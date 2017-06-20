@@ -3,9 +3,9 @@ output "service_name" {
 }
 
 output "target_group_arn" {
-  value = "${module.service.target_group_arn}"
+  value = "${module.service-tasks.target_group_arn}"
 }
 
 output "role_name" {
-  value = "${module.service.role_name}"
+  value = "${module.service-tasks.role_name}"
 }
