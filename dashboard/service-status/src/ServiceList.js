@@ -1,31 +1,24 @@
 // @flow
 
 import React, { Component } from 'react';
-import type { Services } from './models'
+import type { Service } from './models'
 import ServiceBox from './ServiceBox'
-import ErrorBox from './ErrorBox'
 import './ServiceList.css';
 
 class ServiceList extends Component {
   props: {
-    services: Services,
-    isError: boolean,
-    error: ?Error
+    serviceList: Array<Service>
   }
 
   render() {
-      if(this.props.isError) {
-        return <ErrorBox error={this.props.error}/>
-      } else {
-        return <div className='ServiceList'>
-          {this.props.services.services.map(service =>
+      return <div className='ServiceList'>
+          {this.props.serviceList.map(service =>
             <ServiceBox key={service.serviceName}
             {...service}
             />
           )}
-        </div>
+      </div>
     }
-  }
 }
 
 

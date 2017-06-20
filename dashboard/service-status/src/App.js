@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import VisibleServiceList from './VisibleServiceList';
+import VisibleClusterList from './VisibleClusterList';
 import VisibleLastUpdated from './VisibleLastUpdated'
 import './App.css';
 
@@ -10,7 +10,7 @@ class App extends Component {
         <div className="App-header">
           <h2>Service Status</h2>
         </div>
-        <VisibleServiceList />
+        <VisibleClusterList />
         <VisibleLastUpdated />
       </div>
     );
