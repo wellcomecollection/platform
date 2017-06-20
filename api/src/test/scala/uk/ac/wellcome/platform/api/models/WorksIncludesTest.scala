@@ -18,4 +18,19 @@ class WorksIncludesTest extends FunSpec with Matchers {
     val includes = WorksIncludes("identifiers")
     includes.identifiers shouldBe true
   }
+
+  it("should successfully validate a correct string") {
+    val result = WorksIncludes.validate(queryParam = "identifiers")
+    result.isLeft shouldBe true
+  }
+
+  it("should successfully validate if no query parameter is provided") {
+    val result = WorksIncludes.validate(queryParam = None)
+    result.isLeft shouldBe true
+  }
+
+  it("should successfully reject an correct string") {
+    val result = WorksIncludes.validate(queryParam = "foo,bar")
+    result shouldBe Right(List("foo", "bar"))
+  }
 }
