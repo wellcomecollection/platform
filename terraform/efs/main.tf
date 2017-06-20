@@ -24,12 +24,3 @@ resource "aws_security_group" "efs_mnt" {
     ]
   }
 }
-
-resource "aws_security_group_rule" "monitoring_out_efs" {
-  type = "egress"
-  from_port   = 2049
-  to_port     = 2049
-  protocol    = "tcp"
-  security_group_id = "${var.efs_access_security_group_id}"
-  source_security_group_id = "${aws_security_group.efs_mnt.id}"
-}
