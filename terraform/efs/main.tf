@@ -3,9 +3,9 @@ resource "aws_efs_file_system" "efs" {
 }
 
 resource "aws_efs_mount_target" "mount_target" {
-  count = "${length(var.subnets)}"
-  file_system_id = "${aws_efs_file_system.efs.id}"
-  subnet_id      = "${var.subnets[count.index]}"
+  count           = "${length(var.subnets)}"
+  file_system_id  = "${aws_efs_file_system.efs.id}"
+  subnet_id       = "${var.subnets[count.index]}"
   security_groups = ["${aws_security_group.efs_mnt.id}"]
 }
 
@@ -20,7 +20,7 @@ resource "aws_security_group" "efs_mnt" {
     to_port   = 2049
 
     security_groups = [
-      "${var.efs_access_security_group_id}"
+      "${var.efs_access_security_group_id}",
     ]
   }
 }
