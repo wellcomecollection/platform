@@ -16,6 +16,12 @@ import boto3
 
 from ecs_utils import get_cluster_arns, get_service_arns, describe_service, describe_cluster
 
+def _create_event_dict(event):
+    return {
+        'timestamp': event['createdAt'].timestamp(),
+        'message': event['message']
+    }
+
 def _create_cluster_dict(cluster, service_list):
     return {
         'clusterName': cluster['clusterName'],
@@ -25,14 +31,25 @@ def _create_cluster_dict(cluster, service_list):
     }
 
 def _create_service_dict(service):
+    deployments = [ _create_deployment_dict(d) for d in service['deployments'] ]
+    events = [ _create_event_dict(e) for e in service['events'][:5] ]
+
     return {
         'serviceName': service['serviceName'],
         'desiredCount': service['desiredCount'],
         'pendingCount': service['pendingCount'],
         'runningCount': service['runningCount'],
+        'deployments': deployments,
+        'events' : events,
         'status': service['status']
     }
 
+def _create_deployment_dict(deployment):
+    return {
+        'id': deployment['id'],
+        'taskDefinition': deployment['taskDefinition'],
+        'status': deployment['status']
+    }
 
 def get_service_list(ecs_client, cluster_arn):
     service_list = []
@@ -54,11 +71,10 @@ def get_cluster_list(ecs_client):
 
     return cluster_list
 
-
-def send_service_list_to_s3(ecs_client, s3_client, bucket_name, object_key):
-    service_list = get_service_list(ecs_client)
+def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
+    cluster_list = get_cluster_list(ecs_client)
     service_snapshot = {
-        'services': service_list,
+        'cluster_list': cluster_list,
         'lastUpdated': str(datetime.datetime.utcnow())
     }
 
@@ -74,6 +90,7 @@ def send_service_list_to_s3(ecs_client, s3_client, bucket_name, object_key):
 
 
 def main(event, _):
+
     pprint.pprint(event)
 
     ecs_client = boto3.client('ecs')
@@ -82,4 +99,4 @@ def main(event, _):
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
 
-    send_service_list_to_s3(ecs_client, s3_client, bucket_name, object_key)
+    send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key)
