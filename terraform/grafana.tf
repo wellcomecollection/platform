@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "task" {
 
   volume {
     name      = "grafana"
-    host_path = "/ecs/grafana"
+    host_path = "/mnt/efs/grafana"
   }
 }
 

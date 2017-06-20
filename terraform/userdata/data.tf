@@ -7,6 +7,6 @@ data "template_file" "template" {
     ecs_log_level      = "info"
     ecs_agent_version  = "latest"
     ecs_log_group_name = "${aws_cloudwatch_log_group.ecs_agent.name}"
-    efs_fs_name        = "${var.efs_fs_name}"
+    efs_filesystem_id        = "${var.efs_filesystem_id}"
   }
 }
