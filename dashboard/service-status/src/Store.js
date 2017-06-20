@@ -1,8 +1,8 @@
 // @flow
 
-import type { Services } from './models'
+import type { ECSStatus } from './models'
 
 export type AppState = {
-  services: Services,
+  ecsStatus: ECSStatus,
   error: ?Error
 }
