@@ -41,12 +41,13 @@ object IncludesValidation {
 
   /// Check if the provided ?includes parameters contain fields we recognise.
   def validateIncludes(queryParam: Option[String]): ValidationResult =
-    WorksIncludes.validate(queryParam) match {
-      case Left(_) => Valid
-      case Right(badIncludes) =>
-        badIncludes.length match {
-          case 1 => Invalid(s"includes: '${badIncludes.head}' is not a valid include")
-          case _ => Invalid(s"includes: ${badIncludes.mkString("'", "', '", "'")} are not valid includes")
+    WorksIncludes.create(queryParam) match {
+      case Right(_) => Valid
+      case Left(badIncludes) =>
+        if (badIncludes.length == 1) {
+          Invalid(s"includes: '${badIncludes.head}' is not a valid include")
+        } else {
+          Invalid(s"includes: ${badIncludes.mkString("'", "', '", "'")} are not valid includes")
         }
     }
 }

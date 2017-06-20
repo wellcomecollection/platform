@@ -23,25 +23,25 @@ case object WorksIncludes {
     }
   }
 
-  /// Validate an ?includes query-parameter string.
+  /// Validate and create an ?includes query-parameter string.
   ///
-  /// Specifically, this checks that every element in the query parameter
-  /// is a known include.  Returns a Left if this is true, or a Right
-  /// containing a list of any unrecognised includes.
-  def validate(queryParam: String): Either[Unit, List[String]] = {
+  /// This checks that every element in the query parameter is a known
+  /// include before creating it.
+  def create(queryParam: String): Either[List[String], WorksIncludes] = {
     val includesList = queryParam.split(",").toList
     val unrecognisedIncludes = includesList
       .filterNot(recognisedIncludes.contains)
-    unrecognisedIncludes.length match {
-      case 0 => Left(Unit)
-      case _ => Right(unrecognisedIncludes)
+    if (unrecognisedIncludes.length == 0) {
+      Right(WorksIncludes(queryParam))
+    } else {
+      Left(unrecognisedIncludes)
     }
   }
 
-  def validate(queryParam: Option[String]): Either[Unit, List[String]] = {
+  def create(queryParam: Option[String]): Either[List[String], WorksIncludes] = {
     queryParam match {
-      case Some(s) => validate(s)
-      case None => Left(Unit)
+      case Some(s) => create(s)
+      case None => Right(WorksIncludes())
     }
   }
 }
