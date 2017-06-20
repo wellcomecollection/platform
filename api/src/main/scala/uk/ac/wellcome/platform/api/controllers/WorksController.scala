@@ -21,36 +21,13 @@ case class MultipleResultsRequest(
   @RouteParam id: Option[String],
   @QueryParam query: Option[String],
   @QueryParam _index: Option[String]
-) {
-
-  // @MethodValidation
-  // def validateIncludes = IncludesValidation.validateIncludes(includes)
-}
+)
 
 case class SingleWorkRequest(
   @RouteParam id: String,
   @QueryParam includes: Option[WorksIncludes],
   @QueryParam _index: Option[String]
-) {
-
-  // @MethodValidation
-  // def validateIncludes = IncludesValidation.validateIncludes(includes)
-}
-
-object IncludesValidation {
-
-  /// Check if the provided ?includes parameters contain fields we recognise.
-  def validateIncludes(queryParam: Option[String]): ValidationResult =
-    WorksIncludes.create(queryParam) match {
-      case Right(_) => Valid
-      case Left(badIncludes) =>
-        if (badIncludes.length == 1) {
-          Invalid(s"includes: '${badIncludes.head}' is not a valid include")
-        } else {
-          Invalid(s"includes: ${badIncludes.mkString("'", "', '", "'")} are not valid includes")
-        }
-    }
-}
+)
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
