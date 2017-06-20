@@ -1,0 +1,30 @@
+[
+  {
+    "cpu": 128,
+    "essential": true,
+    "image": "${docker_image}",
+    "memory": 1024,
+    "name": "${task_name}",
+    "environment": ${environment_vars}
+    ,
+    "portMappings": [
+      {
+        "containerPort": ${container_port},
+        "hostPort": 0
+      }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "${log_group_name}",
+            "awslogs-region": "${log_group_region}"
+        }
+    },
+    "mountPoints": [
+      {
+        "sourceVolume": "${volume_name}",
+        "containerPath": "${container_path}"
+      }
+    ]
+  }
+]
