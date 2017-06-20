@@ -89,19 +89,20 @@ variable "config_vars" {
 
 variable "docker_image" {
   description = "Name of the docker image to run"
-  default = ""
+  default     = ""
 }
+
 variable "container_path" {
   description = "Path of the mounted volume in the docker container"
-  default = ""
+  default     = ""
 }
 
 variable "environment_vars" {
   description = "Environment variables to pass to the container"
-  default = ""
+  default     = ""
 }
 
 variable "is_config_managed" {
   description = "Flag to tell whether the config should be generated using templates and put in S3"
-  default = true
+  default     = true
 }

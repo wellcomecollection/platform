@@ -44,20 +44,20 @@ variable "infra_bucket" {
 
 variable "docker_image" {
   description = "Name of the docker image to run"
-  default = ""
+  default     = ""
 }
 
 variable "container_port" {
   description = "Port exposed by the container"
-  default = ""
+  default     = ""
 }
 
 variable "container_path" {
   description = "Path of the mounted volume in the docker container"
-  default = ""
+  default     = ""
 }
 
 variable "environment_vars" {
   description = "Environment variables to pass to the container"
-  default = ""
+  default     = ""
 }

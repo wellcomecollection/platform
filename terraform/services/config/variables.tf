@@ -17,5 +17,5 @@ variable "config_key" {
 
 variable "is_config_managed" {
   description = "Flag to tell whether the config should be generated using templates and put in S3"
-  default = true
+  default     = true
 }
