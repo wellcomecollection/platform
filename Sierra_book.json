@@ -37,7 +37,7 @@
       "type": "Period"
     },
   "edition": "1st American ed.",
-  "isbn": "0670824917"
+  "isbn": "0670824917",
   "physicalDescription": "xii, 672 pages.  Other physical details: illustrations, map.  Dimensions: 25 cm",
   "workType": "Books",
   "subjects": 
@@ -86,10 +86,10 @@
             "authority": "Sierra"
           }
         ],
-       "status": "Available"
-       "classmark": "ZDF.05"
-       "wellcomeBarcode": "22200214921"
-       "location": "History of Medicine"
+       "status": "Available",
+       "classmark": "ZDF.05",
+       "wellcomeBarcode": "22200214921",
+       "location": "History of Medicine",
        "acquisitionDetails": "Supplier/Donor: Dillons"
       }
     ]
