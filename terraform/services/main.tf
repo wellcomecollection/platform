@@ -25,12 +25,18 @@ module "task" {
   template_name    = "${var.template_name}"
   infra_bucket     = "${var.infra_bucket}"
   config_key       = "${var.config_key}"
+
+  docker_image     = "${var.docker_image}"
+  container_port   = "${var.container_port}"
+  container_path   = "${var.container_path}"
+  environment_vars = "${var.environment_vars}"
 }
 
 module "config" {
-  source        = "./config"
-  app_name      = "${var.name}"
-  infra_bucket  = "${var.infra_bucket}"
-  config_key    = "${var.config_key}"
-  template_vars = "${var.config_vars}"
+  source            = "./config"
+  app_name          = "${var.name}"
+  infra_bucket      = "${var.infra_bucket}"
+  config_key        = "${var.config_key}"
+  template_vars     = "${var.config_vars}"
+  is_config_managed = "${var.is_config_managed}"
 }
