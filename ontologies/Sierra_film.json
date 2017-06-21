@@ -1,0 +1,180 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "8rm28aw",
+  "type": "Work",
+  "identifiers": [
+    {
+      "label": "b24993207",
+      "authority": "Sierra"
+    }
+  ],
+  "label": "Are health tests a good idea? An Horizon special",
+  "creators": [
+    {
+      "label": "Davies, Serena, television producer, television director",
+      "type": "Agent"
+    },
+    {
+      "label": "Mosley, Michael, television presenter",
+      "type": "Agent"
+    },
+    {
+      "label": "Levy, Daniel, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Jenkins, Paul, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Dymond, Duncan, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Dweck, Marc, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Wilson, Robin, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Heath, Iona, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Welch, H. Gilbert, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Ablin, Richard J., 1940-, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Gnanapragasam, Vincent, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Vance, Maggie, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Birney, Ewan, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Timmons, Jamie, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "Elwood, Peter, contributor",
+      "type": "Agent"
+    },
+    {
+      "label": "BBC Science, producer",
+      "type": "Agent"
+    }
+  ],
+  "isPartOf": [
+    {
+      "label": "Horizon",
+      "type": "Work"
+    }
+  ],
+  "publicationDate": {
+    "label": "2015",
+    "type": "Period"
+  },
+  "physicalDescription": "1 DVD (60 min.). sound, colour, PAL. 12 cm.",
+  "workType": "Videorecordings",
+  "format": [
+    {
+      "label": "Digital: optical: stereo"
+    },
+    {
+      "label": "PAL"
+    },
+    {
+      "label": "video file: DVD video: region 2"
+    },
+    {
+      "label": "two-dimensional moving image: content"
+    },
+    {
+      "label": "video: media"
+    },
+    {
+      "label": "videodisc: carrier"
+    }
+  ],
+  "subjects": [
+    {
+      "label": "Multiphasic health screening",
+      "authority": "LCSH"
+    },
+    {
+      "label": "Heart Diseases",
+      "authority": "MeSH"
+    },
+    {
+      "label": "Tomography, Emission-Computed",
+      "authority": "MeSH"
+    },
+    {
+      "label": "Early Detection of Cancer",
+      "authority": "MeSH"
+    },
+    {
+      "label": "Breast Neoplasms",
+      "authority": "MeSH"
+    },
+    {
+      "label": "Prostatic Neoplasms",
+      "authority": "MeSH"
+    },
+    {
+      "label": "Colonic Neoplasms",
+      "authority": "MeSH"
+    },
+    {
+      "label": "Genetic Testing",
+      "authority": "MeSH"
+    }
+  ],
+  "generalNotes": [
+    {
+      "label": "Originally broadcast on 12 August 2015 on BBC2."
+    },
+    {
+      "label": "Produced & Directed by Serena Davies."
+    },
+    {
+      "label": "Presented by Michael Mosley."
+    },
+    {
+      "label": "This Horizon special explores whether attending health tests prior to developing symptoms, such as private health checks and NHS screening programmes, are an act of medical prudence or do more harm than good. Presenter Michael Mosley looks first into pre-emptive tests for heart disease. He undergoes an NHS cardiac assessment, which calculates an individual’s chances of developing heart disease based on various risk factors. Cardiologist Professor Daniel Levy discusses the impact of the Framingham Heart Study on our understanding of heart disease risk factors. Mosley explains the role of plaques in heart disease. He then undergoes a cardiac CT scan under private medical care, with Medical Director Dr Paul Jenkins. Dr Duncan Dymond analyses the results of the scan. Mosley visits cardiovascular imaging expert Dr Mark Dweck, who exhibits a plaque extracted from a patient who suffered a stroke. Mosley next explores tests for cancer. Dr Robin Wilson and Former President, Royal College of GPs Dr Iona Heath discuss the advantages and disadvantages of screening for breast cancer, leaning on the results of The Marmot Report. Heath discusses The Mamography Wars. Mosley moves on to NHS-funded tests for prostate cancer. Professor H Gilbert Welch explains the disadvantages of using the PSA blood test as a screening test for prostate cancer in the USA. Clips are shown of Professor Richard Ablin, creator of the test, criticising the decision to make it a routine medical test. Mosley interviews a group of men who have been diagnosed with prostate cancer, but have chosen not to undergo treatment. Dr Vincent Gnanapragasam discusses the Active Monitoring Programme for prostate cancer patients at Addenbrooke’s Hospital. Mosley undergoes an NHS-funded Bowel Scope with Consultant Nurse Maggie Vance. He then explores do-it-yourself genetic health tests with Dr Ewan Birney of the European Bioinformatics Institute. Mosley undergoes a test developed by Professor Jamie Timmons, which examines gene expression and analyses a person’s likelihood of developing age-related illnesses. Welch and Heath discuss the implications of the breadth of information health screenings give individuals. Mosley interviews Professor Peter Elwood about his ongoing study of ageing, The Caerphilly Study."
+    },
+    {
+      "label": "BBC Science Production"
+    },
+    {
+      "label": "Distributed Educational Programme"
+    }
+  ],
+  "items": [
+    {
+      "id": "7a4thh3",
+      "type": "item",
+      "identifiers": [
+        {
+          "label": "i18797556",
+          "authority": "Sierra"
+        }
+      ],
+      "status": "Available",
+      "classmark": "5618D",
+      "wellcomeBarcode": "22503369413",
+      "location": "Closed stores Moving image and sound collections"
+    }
+  ]
+}
