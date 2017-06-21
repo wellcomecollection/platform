@@ -20,21 +20,23 @@ class DeploymentList extends Component {
 
         const classModifier = (() => { switch(deployment.status) {
           case "ACTIVE":
-            return "Active";
+            return ongoingDeployment ? "Blue" : "Red";
           case "PRIMARY":
-            return "Primary";
+            return ongoingDeployment ? "Green" : "Blue";
           case "INACTIVE":
             return "Inactive";
           default:
-            return "Unknown";
+            return "Red";
         }})()
 
         const deploymentClassName = 'Deployment__' + classModifier;
 
         return <div className={'Deployment ' + deploymentClassName}  key={deployment.id}>
-          {deployment.status}<span className="Deployment--Status">
+          <div className="Deployment--Details">
+          {deployment.status} <span className="Deployment--Status">
             {taskVersion}
           </span>
+          </div>
         </div>
       })}
     </div>

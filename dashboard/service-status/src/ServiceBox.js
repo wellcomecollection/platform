@@ -20,11 +20,25 @@ class ServiceBox extends Component {
 
   render() {
     const isStable = (this.props.desiredCount === this.props.runningCount) && this.props.pendingCount === 0
+    const isUnderProvisioned = this.props.desiredCount > this.props.runningCount
+
+    const classModifier = (() => {
+      if(isUnderProvisioned) {
+        return "Bad";
+      } else {
+        if(isStable) {
+          return "Stable";
+        } else {
+          return "NotStable";
+        }
+      }
+    })();
 
     return (
-      <div className={'ServiceBox ' + (isStable ? 'ServiceBox__Stable' : 'ServiceBox__NotStable')}>
+      <div className={'ServiceBox ServiceBox__' + classModifier }>
         <div className="ServiceBox--Header">
-          {this.props.serviceName}
+          <a className="ServiceBox--Header__Name">{this.props.serviceName}</a>
+          <EventBox events={this.props.events}/>
 	      </div>
         <div className="ServiceBox--Body">
           <div className="TaskCounterHolder">
@@ -33,7 +47,6 @@ class ServiceBox extends Component {
             <TaskCounter type="Pending" count={this.props.pendingCount} shouldBeZero={true}/>
           </div>
           <DeploymentList deployments={this.props.deployments}/>
-          <EventBox events={this.props.events}/>
         </div>
       </div>
     );
