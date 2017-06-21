@@ -2,8 +2,9 @@
 
 import React, { Component } from 'react';
 import TaskCounter from './TaskCounter';
-import type { Event } from './models';
+import type { Event, Deployment } from './models';
 import EventBox from './EventBox';
+import DeploymentList from './DeploymentList'
 import './ServiceBox.css';
 
 class ServiceBox extends Component {
@@ -13,16 +14,31 @@ class ServiceBox extends Component {
     pendingCount: number,
     runningCount: number,
     events: Array<Event>,
+    deployments: Array<Deployment>,
     status: string
   }
 
   render() {
     const isStable = (this.props.desiredCount === this.props.runningCount) && this.props.pendingCount === 0
+    const isUnderProvisioned = this.props.desiredCount > this.props.runningCount
+
+    const classModifier = (() => {
+      if(isUnderProvisioned) {
+        return "Bad";
+      } else {
+        if(isStable) {
+          return "Stable";
+        } else {
+          return "NotStable";
+        }
+      }
+    })();
 
     return (
-      <div className={'ServiceBox ' + (isStable ? 'ServiceBox__Stable' : 'ServiceBox__NotStable')}>
+      <div className={'ServiceBox ServiceBox__' + classModifier }>
         <div className="ServiceBox--Header">
-          {this.props.serviceName}
+          <a className="ServiceBox--Header__Name">{this.props.serviceName}</a>
+          <EventBox events={this.props.events}/>
 	      </div>
         <div className="ServiceBox--Body">
           <div className="TaskCounterHolder">
@@ -30,8 +46,7 @@ class ServiceBox extends Component {
             <TaskCounter type="Running" count={this.props.runningCount} shouldBeZero={false}/>
             <TaskCounter type="Pending" count={this.props.pendingCount} shouldBeZero={true}/>
           </div>
-          <div className="ServiceBox--Status ">{this.props.status}</div>
-          <EventBox events={this.props.events}/>
+          <DeploymentList deployments={this.props.deployments}/>
         </div>
       </div>
     );
