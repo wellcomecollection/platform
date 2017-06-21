@@ -15,11 +15,11 @@
 }
 
 .TaskCounter--Type {
-  font-weight: bolder;
+  font-size: small;
   color: rgb(50, 50, 50);
   padding: 5px 5px 2px 5px;
 }
 
 .TaskCounter--Count {
-  font-size: 30px;
+  font-size: large;
 }
