@@ -1,0 +1,96 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "25bbk4m",
+  "type": "Work",
+  "identifiers": 
+    [
+      {
+        "label": "b12141471",
+        "authority": "Sierra"
+      }
+    ],
+  "label": "The Arctic grail: the quest for the North West Passage and the North Pole, 1818-1909",
+  "creators": 
+    [
+      {
+        "label": "Berton, Pierre (1920-2004)",
+        "type": "Agent"
+      }
+    ],
+  "publishers": 
+    [
+      {
+        "label": "Viking",
+        "type": "Agent"
+      }
+    ],
+  "placeOfPublication": 
+     [
+       {
+        "label": "New York",
+        "type": "Place"
+      }
+    ],
+  "publicationDate": 
+    {
+      "label": "1988",
+      "type": "Period"
+    },
+  "edition": "1st American ed.",
+  "isbn": "0670824917",
+  "physicalDescription": "xii, 672 pages.  Other physical details: illustrations, map.  Dimensions: 25 cm",
+  "workType": "Books",
+  "subjects": 
+    [
+     {
+        "label": "Northwest Passage",
+        "authority": "LCSH" 
+      },
+; Comment: Source is identified as LCSH by the second indicator 0.  NB use of MARC $651 indicates this (and the next two subjects) is a geographic subject:
+; the distinction between topical subjects and geographic subjects does not yet exist in the Works ontology but should?
+     {
+        "label": "North Pole",
+        "authority": "LCSH"
+      },
+      {
+        "label": "Arctic regions",
+        "authority": "LCSH"
+      },
+      {
+        "label": "Discoveries in geography",
+        "authority": "fast"
+      },
+; Comment: Use of MARC field 650 identifies this as a topical subject not geographic.  Source is identified as "fast" by the second
+; indicator 7 which directs the reader to the subfield 2 which holds the string "fast".  FAST is a simplified recasting of LCSH 
+    ],
+  "generalNotes":
+    [
+      {
+      "label": "Includes index"
+      }
+      {
+      "label": "Bibliography: p. 641-660."
+      }
+; Comment: MARC note fields (those numbered 5xx) are nuanced: the first of these generalNotes is MARC 500, general notes, whilst
+; the second is MARC 504, bibliography note.  Do we want to distinguish these by making them explicitly different types?
+    ]
+  "items":
+    [
+      {
+       "id": "4kfi923",
+       "type": "item",
+       "identifiers": 
+        [
+          {
+            "label": "i12381044",
+            "authority": "Sierra"
+          }
+        ],
+       "status": "Available",
+       "classmark": "ZDF.05",
+       "wellcomeBarcode": "22200214921",
+       "location": "History of Medicine",
+       "acquisitionDetails": "Supplier/Donor: Dillons"
+      }
+    ]
+}
