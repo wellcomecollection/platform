@@ -1,5 +1,5 @@
 module "test_blue_green_cluster_asg" {
-  source                = "./ecs_asg"
+  source                = "./ecs_asg_play"
   asg_name              = "test-blue-green-cluster"
   subnet_list           = ["${module.vpc_test_blue_green.subnets}"]
   key_name              = "${var.key_name}"
