@@ -17,6 +17,6 @@ I've not yet set up the Subjects ontology but am assuming that each subject will
 Comment, line 53
 The status Open (ie can be shown on the web) is generated within MIRO by the combination of five factors: 
 
-* <all_web_publish>, <image_general_use> and <image_copyright_cleared> have Y, 
-* <image_title> has content, and 
+* `<all_web_publish>`, `<image_general_use>` and `<image_copyright_cleared>` have Y, 
+* `<image_title>` has content, and 
 * "cataloguing is complete" - will follow up with MIRO users whether there is a flag for this
