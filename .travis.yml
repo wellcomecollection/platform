@@ -59,13 +59,27 @@ cache:
 
 matrix:
   include:
-    - env: PROJECT=common
-    - env: PROJECT=api
-    - env: PROJECT=transformer
-    - env: PROJECT=calm_adapter
-    - env: PROJECT=ingestor
-    - env: PROJECT=id_minter
-    - env: PROJECT=reindexer
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=common
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=api
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=transformer
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=calm_adapter
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=ingestor
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=id_minter
+    - env:
+        - BUILD_TYPE=sbt
+        - PROJECT=reindexer
 
 script:
   - ./.travis/run.sh
