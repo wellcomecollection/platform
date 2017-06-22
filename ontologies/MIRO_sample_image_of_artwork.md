@@ -14,6 +14,6 @@ describing the source, nonetheless they do provide search targets and we might w
 NB: the square brackets and weird spacing mirror the way that the data has been entered into MIRO.
 
 Comment, line 97: the status Open (ie can be shown on the web) is generated within MIRO by the combination of five factors: 
-* <all_web_publish>, <image_general_use> and <image_copyright_cleared> have Y, 
-* <image_title> has content, and 
+* `<all_web_publish>`, `<image_general_use>` and `<image_copyright_cleared>` have Y, 
+* `<image_title>` has content, and 
 * "cataloguing is complete" - will follow up with MIRO users whether there is a flag for this
