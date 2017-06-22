@@ -8,6 +8,8 @@ module "test_blue_green_cluster_asg" {
   vpc_id                = "${module.vpc_test_blue_green.vpc_id}"
   instance_type         = "t2.medium"
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
+  sns_topic_arn = "${module.ec2_terminating_topic.arn}"
+  publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
 }
 
 module "vpc_test_blue_green" {

@@ -17,3 +17,8 @@ module "dynamo_capacity_topic" {
   source = "./sns"
   name   = "dynamo_capacity_requests"
 }
+
+module "ec2_terminating_topic" {
+  source = "./sns"
+  name = "ec2_terminating_topic"
+}
