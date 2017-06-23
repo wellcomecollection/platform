@@ -222,3 +222,18 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "write_ec2_tags" {
+  statement {
+    actions = [
+      "tag:addResourceTags",
+      "tag:removeResourceTags",
+      "tag:tagResources",
+      "tag:untagResources",
+    ]
+
+    resources = [
+      "arn:aws:ec2:*",
+    ]
+  }
+}

@@ -1,3 +1,19 @@
+# Lambda for tagging EC2 instances with ECS cluster/container instance id
+module "lambda_ecs_ec2_instance_tagger" {
+  source      = "./lambda"
+  name        = "ecs_ec2_instance_tagger"
+  description = "Tag an EC2 instances with ECS cluster/container instance id"
+  source_dir  = "../lambdas/ecs_ec2_instance_tagger"
+}
+
+module "trigger_ecs_ec2_instance_tagger" {
+  source                  = "./lambda/trigger_cloudwatch"
+  lambda_function_name    = "${module.lambda_ecs_ec2_instance_tagger.function_name}"
+  lambda_function_arn     = "${module.lambda_ecs_ec2_instance_tagger.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.name}"
+}
+
 # Lambda for publishing ECS service status summary to S3
 module "lambda_update_service_list" {
   source      = "./lambda"
