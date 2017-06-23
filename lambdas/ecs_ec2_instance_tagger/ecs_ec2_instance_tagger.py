@@ -45,11 +45,13 @@ def create_tags(ec2_client, ec2_instance_id, event_detail):
 
 
 def main(event, _):
-    pprint.pprint(event)
+    print(f'Received event:\n{pprint.pformat(event)}')
+
     ec2_client = boto3.client('ec2')
 
     ec2_instance_id = event['detail']['ec2InstanceId']
 
     response = create_tags(ec2_client, ec2_instance_id, event['detail'])
 
-    pprint.pprint(response)
+    print(f'Received response:\n{pprint.pformat(response)}')
+
