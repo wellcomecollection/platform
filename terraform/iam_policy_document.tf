@@ -230,6 +230,7 @@ data "aws_iam_policy_document" "write_ec2_tags" {
       "tag:removeResourceTags",
       "tag:tagResources",
       "tag:untagResources",
+      "tag:createTag",
     ]
 
     resources = [
