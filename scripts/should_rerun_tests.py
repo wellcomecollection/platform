@@ -33,6 +33,10 @@ def should_retest_project(changed_files, project):
         print("*** Changes to the test runner mean we should retest")
         return True
 
+    elif any(f.startswith('.travis') for f in changed_files):
+        print("*** Changes to the Travis config mean we should rerun")
+        return True
+
     else:
         return False
 
