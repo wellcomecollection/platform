@@ -19,3 +19,20 @@ resource "aws_cloudwatch_event_rule" "ecs_task_state_change" {
 }
 PATTERN
 }
+
+resource "aws_cloudwatch_event_rule" "ecs_container_instance_state_change" {
+  name        = "ecs_container_instance_state_change"
+  description = "Capture any ECS Container Instance state change"
+
+  event_pattern = <<PATTERN
+{
+  "source": [
+    "aws.ecs"
+  ],
+  "detail-type": [
+    "ECS Container Instance State Change"
+  ]
+}
+PATTERN
+}
+
