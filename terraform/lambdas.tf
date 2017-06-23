@@ -1,3 +1,46 @@
+# Lambda for publishing out of date deployments to SNS
+
+module "lambda_notify_old_deploys" {
+  source      = "./lambda"
+  name        = "notify_old_deploys"
+  description = "For publishing out of date deployments to SNS"
+  source_dir  = "../lambdas/service_scheduler"
+
+  environment_variables = {
+    TABLE_NAME = "${aws_dynamodb_table.deployments.name}"
+    TOPIC_ARN = "${module.old_deployments.arn}"
+    AGE_BOUNDARY_MINS = "5"
+  }
+}
+
+module "trigger_notify_old_deploys" {
+  source                  = "./lambda/trigger_cloudwatch"
+  lambda_function_name    = "${module.lambda_notify_old_deploys.function_name}"
+  lambda_function_arn     = "${module.lambda_notify_old_deploys.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_5_minutes.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
+}
+
+# Lambda for tracking deployment status in dynamo db
+module "lambda_service_deployment_status" {
+  source      = "./lambda"
+  name        = "service_deployment_status"
+  description = "Lambda for tracking deployment status in dynamo db"
+  source_dir  = "../lambdas/service_deployment_status"
+
+  environment_variables = {
+    TABLE_NAME = "${aws_dynamodb_table.deployments.name}"
+  }
+}
+
+module "trigger_service_deployment_status" {
+  source                  = "./lambda/trigger_cloudwatch"
+  lambda_function_name    = "${module.lambda_service_deployment_status.function_name}"
+  lambda_function_arn     = "${module.lambda_service_deployment_status.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.name}"
+}
+
 # Lambda for tagging EC2 instances with ECS cluster/container instance id
 module "lambda_ecs_ec2_instance_tagger" {
   source      = "./lambda"
