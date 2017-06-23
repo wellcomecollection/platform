@@ -6,8 +6,10 @@ import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.request.{QueryParam, RouteParam}
 import com.twitter.finatra.validation._
+import com.twitter.finatra.validation.ValidationResult.{Invalid, Valid}
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
+import uk.ac.wellcome.platform.api.models.WorksIncludes
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -15,7 +17,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 case class MultipleResultsRequest(
   @Min(1) @QueryParam page: Int = 1,
   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
-  @QueryParam includes: Option[String],
+  @QueryParam includes: Option[WorksIncludes],
   @RouteParam id: Option[String],
   @QueryParam query: Option[String],
   @QueryParam _index: Option[String]
@@ -23,7 +25,7 @@ case class MultipleResultsRequest(
 
 case class SingleWorkRequest(
   @RouteParam id: String,
-  @QueryParam includes: Option[String],
+  @QueryParam includes: Option[WorksIncludes],
   @QueryParam _index: Option[String]
 )
 
@@ -69,7 +71,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         // in the public docs.
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
-      val includes = request.includes.getOrElse("").split(",").toList
+      // val includes = WorksIncludes(request.includes)
 
       val works = request.query match {
         case Some(queryString) =>
@@ -77,14 +79,14 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
             queryString,
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = includes,
+            includes = request.includes.getOrElse(WorksIncludes()),
             index = request._index
           )
         case None =>
           worksService.listWorks(
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = includes,
+            includes = request.includes.getOrElse(WorksIncludes()),
             index = request._index
           )
       }
@@ -117,9 +119,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           required = false)
         // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
+      // val includes = WorksIncludes(request.includes)
       worksService
         .findWorkById(request.id,
-                      request.includes.getOrElse("").split(",").toList,
+                      request.includes.getOrElse(WorksIncludes()),
                       index = request._index)
         .map {
           case Some(result) =>

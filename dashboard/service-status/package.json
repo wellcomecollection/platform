@@ -1,0 +1,28 @@
+{
+  "name": "service-status",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13",
+    "react": "^15.6.0",
+    "react-dom": "^15.6.0",
+    "react-moment": "^0.2.4",
+    "react-redux": "^5.0.5",
+    "redux": "^3.6.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.48.0",
+    "react-scripts": "1.0.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "flow": "flow"
+  },
+  "homepage": "https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash"
+}

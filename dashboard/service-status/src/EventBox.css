@@ -1,0 +1,25 @@
+.EventBox {
+  background-color: #f5f5f5;
+  margin-top: 10px;
+  padding: 3px 3px 3px 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+  display: none;
+}
+
+.EventList {
+  color: #2B8539;
+  font-family: monospace;
+  font-size: x-small;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  max-width: 100%;
+}
+
+.EventList--Event {
+  text-align: left;
+}

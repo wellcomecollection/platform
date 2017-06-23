@@ -1,0 +1,64 @@
+.ServiceBox {
+  text-align: center;
+
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  border-color: #ddd;
+  max-width: 400px;
+  position: relative;
+}
+
+.ServiceBox--Header {
+  background-color: #f5f5f5;
+  padding: 5px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.ServiceBox--Body {
+  padding: 15px;
+}
+
+.ServiceBox__NotStable {
+  background-color: #fcf8e3;
+}
+
+.ServiceBox__NotStable .ServiceBox--Header {
+  color: #fff;
+  background-color: #BAAA58;
+}
+
+.ServiceBox__Bad {
+  background-color: #BA715C;
+}
+
+.ServiceBox__Bad .ServiceBox--Header {
+  color: #fff;
+  background-color: #BA5537;
+}
+
+.ServiceBox ul {
+  list-style: none;
+  padding: 0px;
+}
+
+.ServiceBox h3 {
+  font-size: 30px;
+  padding: 0px;
+  margin: 0 10px 10px 10px;
+  color: rgb(50, 50, 50);
+}
+
+.TaskCounterHolder {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: minmax(50px, 50px);
+}
+
+a.ServiceBox--Header__Name:hover + .EventBox {
+    display: block;
+}

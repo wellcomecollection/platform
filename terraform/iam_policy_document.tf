@@ -75,6 +75,23 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   }
 }
 
+data "aws_iam_policy_document" "allow_cloudwatch_read_metrics" {
+  statement {
+    actions = [
+      "cloudwatch:DescribeAlarmHistory",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:DescribeAlarmsForMetric",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "read_calm_kinesis_stream" {
   statement {
     actions = [
@@ -121,6 +138,7 @@ data "aws_iam_policy_document" "describe_services" {
   statement {
     actions = [
       "ecs:DescribeServices",
+      "ecs:DescribeClusters",
       "ecs:DescribeTaskDefinition",
       "ecs:ListClusters",
       "ecs:ListServices",
@@ -191,14 +209,16 @@ data "aws_iam_policy_document" "miro_images_sync" {
   }
 }
 
-data "aws_iam_policy_document" "s3_put_infra_status" {
+data "aws_iam_policy_document" "s3_put_dashboard_status" {
   statement {
     actions = [
       "s3:PutObject",
+      "s3:GetObjectACL",
+      "s3:PutObjectACL",
     ]
 
     resources = [
-      "${aws_s3_bucket.infra.arn}/status/*",
+      "${aws_s3_bucket.dashboard.arn}/data/*",
     ]
   }
 }

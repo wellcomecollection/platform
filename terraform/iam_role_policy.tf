@@ -120,7 +120,7 @@ resource "aws_iam_role_policy" "update_service_list_describe_services" {
 
 resource "aws_iam_role_policy" "update_service_list_push_to_s3" {
   role   = "${module.lambda_update_service_list.role_name}"
-  policy = "${data.aws_iam_policy_document.s3_put_infra_status.json}"
+  policy = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
 }
 
 # Role policies for the miro_reindexer service
@@ -138,4 +138,18 @@ resource "aws_iam_role_policy" "reindexer_target_miro" {
 resource "aws_iam_role_policy" "reindexer_cloudwatch" {
   role   = "${module.ecs_miro_reindexer_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
+# grafana policies
+
+resource "aws_iam_role_policy" "ecs_grafana_task_cloudwatch_read" {
+  name = "ecs_grafana_task_cloudwatch_read"
+
+  # Unfortunately grafana seems to assume the role of the ec2 instance the container is running into.
+  # This used to be a bug in grafana which was fixed in version 4.3.0: https://github.com/grafana/grafana/pull/7892
+  # Unfortunately we are still seeing this behaviour from the official grafana docker image
+  # TODO change to role = "${module.ecs_grafana_iam.task_role_name}"
+  role = "${module.ecs_monitoring_iam.instance_role_name}"
+
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_read_metrics.json}"
 }

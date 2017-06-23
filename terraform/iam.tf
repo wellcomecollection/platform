@@ -3,6 +3,11 @@ module "ecs_services_iam" {
   name   = "services"
 }
 
+module "ecs_monitoring_iam" {
+  source = "./ecs_iam"
+  name   = "monitoring"
+}
+
 module "ecs_calm_adapter_iam" {
   source = "./ecs_iam"
   name   = "calm_adapter"
@@ -31,4 +36,9 @@ module "ecs_ingestor_iam" {
 module "ecs_api_iam" {
   source = "./ecs_iam"
   name   = "api"
+}
+
+module "ecs_grafana_iam" {
+  source = "./ecs_iam"
+  name   = "grafana"
 }

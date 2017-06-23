@@ -19,12 +19,8 @@ class ApiWorksTest
       new Server,
       flags = Map(
         "es.host" -> "localhost",
-        "es.port" -> 9300.toString,
-        "es.name" -> "wellcome",
-        "es.xpack.enabled" -> "true",
-        "es.xpack.user" -> "elastic:changeme",
-        "es.xpack.sslEnabled" -> "false",
-        "es.sniff" -> "false"
+        "es.port" -> 9200.toString,
+        "es.name" -> "wellcome"
       )
     )
 
@@ -278,6 +274,21 @@ class ApiWorksTest
       andExpect = Status.BadRequest,
       withJsonBody =
         s"""{"errors":["page: [-50] is not greater than or equal to 1"]}"""
+    )
+  }
+
+  it("should return multiple errors if there's more than one invalid parameter") {
+    server.httpGet(
+      path = s"/$apiPrefix/works?pageSize=-60&page=-50",
+      andExpect = Status.BadRequest,
+      withJsonBody = s"""
+        |{
+        |  "errors": [
+        |    "page: [-50] is not greater than or equal to 1",
+        |    "pageSize: [-60] is not greater than or equal to 1"
+        |  ]
+        |}
+      """.stripMargin
     )
   }
 
@@ -544,6 +555,52 @@ class ApiWorksTest
                           |  ]
                           |}
           """.stripMargin
+      )
+    }
+  }
+
+  it("should return a Bad Request error if asked for an invalid include") {
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?includes=foo",
+        andExpect = Status.BadRequest,
+        withJsonBody = """{"errors" : ["includes: 'foo' is not a valid include"]}"""
+      )
+    }
+  }
+
+  it("should return a Bad Request error if asked for more than one invalid include") {
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?includes=foo,bar",
+        andExpect = Status.BadRequest,
+        withJsonBody = """{"errors" : ["includes: 'foo', 'bar' are not valid includes"]}"""
+      )
+    }
+  }
+
+  it("should return a Bad Request error if asked for a mixture of valid and invalid includes") {
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
+        andExpect = Status.BadRequest,
+        withJsonBody = """{"errors" : ["includes: 'foo', 'bar' are not valid includes"]}"""
+      )
+    }
+  }
+
+  it("should return a Bad Request error if asked for an invalid include on an individual work") {
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      label = "A emu and an elephant"
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=foo",
+        andExpect = Status.BadRequest,
+        withJsonBody = """{"errors" : ["includes: 'foo' is not a valid include"]}"""
       )
     }
   }

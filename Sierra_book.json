@@ -1,0 +1,90 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "25bbk4m",
+  "type": "Work",
+  "identifiers": 
+    [
+      {
+        "label": "b12141471",
+        "authority": "Sierra"
+      }
+    ],
+  "label": "The Arctic grail: the quest for the North West Passage and the North Pole, 1818-1909",
+  "creators": 
+    [
+      {
+        "label": "Berton, Pierre (1920-2004)",
+        "type": "Agent"
+      }
+    ],
+  "publishers": 
+    [
+      {
+        "label": "Viking",
+        "type": "Agent"
+      }
+    ],
+  "placeOfPublication": 
+     [
+       {
+        "label": "New York",
+        "type": "Place"
+      }
+    ],
+  "publicationDate": 
+    {
+      "label": "1988",
+      "type": "Period"
+    },
+  "edition": "1st American ed.",
+  "isbn": "0670824917",
+  "physicalDescription": "xii, 672 pages.  Other physical details: illustrations, map.  Dimensions: 25 cm",
+  "workType": "Books",
+  "subjects": 
+    [
+     {
+        "label": "Northwest Passage",
+        "authority": "LCSH" 
+      },
+      {
+        "label": "North Pole",
+        "authority": "LCSH"
+      },
+      {
+        "label": "Arctic regions",
+        "authority": "LCSH"
+      },
+      {
+        "label": "Discoveries in geography",
+        "authority": "fast"
+      }
+    ],
+  "generalNotes":
+    [
+      {
+      "label": "Includes index"
+      },
+      {
+      "label": "Bibliography: p. 641-660."
+      }
+    ],
+  "items":
+    [
+      {
+       "id": "4kfi923",
+       "type": "item",
+       "identifiers": 
+        [
+          {
+            "label": "i12381044",
+            "authority": "Sierra"
+          }
+        ],
+       "status": "Available",
+       "classmark": "ZDF.05",
+       "wellcomeBarcode": "22200214921",
+       "location": "History of Medicine",
+       "acquisitionDetails": "Supplier/Donor: Dillons"
+      }
+    ]
+}
