@@ -18,3 +18,8 @@ variable "input" {
   description = "Input to the Cloudwatch trigger"
   default     = "{}"
 }
+
+variable "custom_input" {
+  description = "Use custom input or match event"
+  default = true
+}
