@@ -123,6 +123,13 @@ resource "aws_iam_role_policy" "update_service_list_push_to_s3" {
   policy = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
 }
 
+# Role policies for ecs_ec2_instance_tagger lambda
+
+resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_thing" {
+  role   = "${module.lambda_ecs_ec2_instance_tagger.role_name}"
+  policy = "${data.aws_iam_policy_document.write_ec2_tags.json}"
+}
+
 # Role policies for the miro_reindexer service
 
 resource "aws_iam_role_policy" "reindexer_tracker_table" {
