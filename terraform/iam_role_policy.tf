@@ -143,6 +143,19 @@ resource "aws_iam_role_policy" "service_deployment_status_deployments_table" {
   policy = "${data.aws_iam_policy_document.deployments_table.json}"
 }
 
+# Role policies for notify_old_deploys lambda
+
+resource "aws_iam_role_policy" "notify_old_deploys_sns_publish" {
+  role   = "${module.lambda_notify_old_deploys.role_name}"
+  policy = "${data.aws_iam_policy_document.old_deployment_sns.json}"
+}
+
+resource "aws_iam_role_policy" "notify_old_deploys_deployments_table" {
+  role   = "${module.lambda_notify_old_deploys.role_name}"
+  policy = "${data.aws_iam_policy_document.deployments_table.json}"
+}
+
+old_deployment_sns
 
 # Role policies for the miro_reindexer service
 
