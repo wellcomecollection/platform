@@ -4,9 +4,7 @@ set -o errexit
 set -o nounset
 set -o verbose
 
-# This is needed for the Elasticsearch docker container to start.
-# See https://github.com/travis-ci/travis-ci/issues/6534
-sudo sysctl -w vm.max_map_count=262144
-
-# Install the AWS tools so we can log in to ECR
-pip install --upgrade --user awscli
+if [[ "$BUILD_TYPE" == "sbt" ]]
+then
+  ./.travis/install_sbt.sh
+fi
