@@ -226,15 +226,44 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
 data "aws_iam_policy_document" "write_ec2_tags" {
   statement {
     actions = [
-      "tag:addResourceTags",
-      "tag:removeResourceTags",
-      "tag:tagResources",
-      "tag:untagResources",
-      "tag:createTags",
+      "ec2:createTags",
     ]
 
     resources = [
-      "arn:aws:ec2:*",
+      "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "complete_lifecycle_hook" {
+  statement {
+    actions = ["autoscaling:CompleteLifecycleAction"]
+    resources = [
+      "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "ecs_list_container_tasks" {
+  statement {
+    actions = [
+      "ecs:UpdateContainerInstancesState",
+      "ecs:ListTasks",
+      "ecs:DescribeContainerInstances"
+    ]
+    resources = [
+      "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "ec2_describe_instances" {
+  statement {
+    actions = [
+      "ec2:DescribeInstances"
+    ]
+    resources = [
+      "*",
     ]
   }
 }

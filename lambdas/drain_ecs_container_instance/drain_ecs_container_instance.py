@@ -15,14 +15,13 @@ def set_container_instance_to_draining(cluster_arn, ecs_client, ecs_container_in
 
 
 def continue_lifecycle_action(asg_group_name, ec2_instance_id, lifecycle_hook_name):
-    asg_client = boto3.client("asg")
+    asg_client = boto3.client("autoscaling")
     response = asg_client.complete_lifecycle_action(
         LifecycleHookName=lifecycle_hook_name,
         AutoScalingGroupName=asg_group_name,
         LifecycleActionResult='CONTINUE',
         InstanceId=ec2_instance_id)
     pprint.pprint(response)
-
 
 
 def main(event, _):
@@ -44,10 +43,11 @@ def main(event, _):
         cluster_arn = [x['Value'] for x in tags if x['Key'] == 'clusterArn'][0]
         ecs_client = boto3.client('ecs')
         running_tasks = ecs_client.list_tasks(cluster=cluster_arn,containerInstance=ecs_container_instance_arn)
-        if not running_tasks:
+        print(running_tasks['taskArns'])
+        if not running_tasks['taskArns']:
             continue_lifecycle_action(asg_group_name, ec2_instance_id, lifecycle_hook_name)
         else:
             container_instance_info = ecs_client.describe_container_instances(cluster=cluster_arn,containerInstances=[ecs_container_instance_arn])
             if container_instance_info['containerInstances'][0]['status'] != 'DRAINING':
                 set_container_instance_to_draining(cluster_arn, ecs_client, ecs_container_instance_arn)
-            publish_sns_message(topic_arn, message)
+            publish_sns_message(topic_arn, message_data)

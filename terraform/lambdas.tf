@@ -139,3 +139,17 @@ module "trigger_update_dynamo_capacity" {
   lambda_function_arn  = "${module.lambda_update_dynamo_capacity.arn}"
   sns_trigger_arn      = "${module.dynamo_capacity_topic.arn}"
 }
+
+module "lambda_drain_ecs_container_instance" {
+  source = "./lambda"
+  name = "drain_ecs_container_instance"
+  description = "Drain ECS container instance when the corresponding EC2 instance is being terminated"
+  source_dir = "../lambdas/drain_ecs_container_instance"
+}
+
+module "trigger_drain_ecs_container_instance" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_drain_ecs_container_instance.function_name}"
+  lambda_function_arn  = "${module.lambda_drain_ecs_container_instance.arn}"
+  sns_trigger_arn      = "${module.ec2_terminating_topic.arn}"
+}
