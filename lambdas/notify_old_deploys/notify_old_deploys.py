@@ -27,7 +27,7 @@ DeploymentKey = collections.namedtuple('Deployment', 'id service_arn')
 
 def _create_deployment_tuple_from_item(item):
     return Deployment(
-        DeploymentKey(item['deployment_id'],item['service_name']),
+        DeploymentKey(item['deployment_id'],item['service_arn']),
         item['deployment_status'],
         item['color'],
         dateutil.parser.parse(item['created_at'],""),
@@ -40,7 +40,7 @@ def get_deployments_from_dynamo(table):
     return [_create_deployment_tuple_from_item(d) for d in response['Items']]
 
 def _old_deployment(age_boundary_mins, deployment):
-    age_boundary = datetime.now(timezone.utc) - timedelta(minutes = 5)
+    age_boundary = datetime.now(timezone.utc) - timedelta(minutes = age_boundary_mins)
 
     return (deployment.created_at < age_boundary) and deployment.color == "green"
 
@@ -49,8 +49,8 @@ def filter_old_deployments(deployments, age_boundary_mins):
     return list(filter(filter_func, deployments))
 
 def publish_deployments(topic_arn, deployments):
-    if(len(old_deployments) > 0):
-        publish_sns_message(topic_arn, old_deployments)
+    if(len(deployments) > 0):
+        publish_sns_message(topic_arn, deployments)
 
 def main(event, _):
     print(f'Received event:\n{pprint.pformat(event)}')

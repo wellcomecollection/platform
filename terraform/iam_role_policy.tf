@@ -155,8 +155,6 @@ resource "aws_iam_role_policy" "notify_old_deploys_deployments_table" {
   policy = "${data.aws_iam_policy_document.deployments_table.json}"
 }
 
-old_deployment_sns
-
 # Role policies for the miro_reindexer service
 
 resource "aws_iam_role_policy" "reindexer_tracker_table" {

@@ -7,7 +7,7 @@ resource "aws_cloudwatch_event_rule" "weekdays_at_7am" {
 resource "aws_cloudwatch_event_rule" "every_5_minutes" {
   name                = "every_5_minutes"
   description         = "Fires every 5 minutes"
-  schedule_expression = "cron(*/5 * * * *)"
+  schedule_expression = "rate(5 minutes)"
 }
 
 

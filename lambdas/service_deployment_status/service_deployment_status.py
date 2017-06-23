@@ -158,4 +158,3 @@ def main(event, _):
     ops = run_operations(operations, table)
 
     print(f'Run dynamo ops:\n{pprint.pformat(ops)}')
-    
