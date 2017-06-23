@@ -8,6 +8,8 @@ resource "aws_lambda_permission" "allow_cloudwatch_trigger" {
   source_arn    = "${var.cloudwatch_trigger_arn}"
 }
 
+# The count here is substituting for the availability of an if statement in terraform
+# See https://blog.gruntwork.io/terraform-tips-tricks-loops-if-statements-and-gotchas-f739bbae55f9
 resource "aws_cloudwatch_event_target" "event_trigger" {
   count = "${var.custom_input}"
 
