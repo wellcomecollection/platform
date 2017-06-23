@@ -1,0 +1,54 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "ghdke34",
+  "type": "Work",
+  "identifiers": 
+    [
+      {
+        "label": "A0000584",
+        "authority": "MIRO"
+      },
+      {
+         "label": "Contributor Reference VET 43 (17)",
+        "authority": "MIRO contributor"
+      }
+    ],
+  "licence": "CC-BY-NC",
+  "label": "A very frightened horse.",
+  "description": "A very frightened horse.",
+  "ipRightsStatement": "Royal Veterinary College",
+  "subjects": 
+    [
+      {
+        "label": "ROYAL VETERINARY COLLEGE",
+        "authority": "MIRO keywords" 
+      },
+      {
+        "label": "PHYSICAL RESTRAINT ON HORSES",
+        "authority": "MIRO keywords"
+      },
+      {
+        "label": "NERVOUS",
+        "authority": "MIRO keywords"
+      },
+      {
+        "label": "EQUINE",
+        "authority": "MIRO keywords"
+      }
+    ],  
+  "items": 
+    [
+      {
+        "id": "no819h6",
+        "type": "item",
+        "identifiers": 
+          [
+            {
+              "label": "A0000584",
+              "authority": "MIRO"
+            }
+          ]
+      }
+    ],
+    "status": "Open"
+}
