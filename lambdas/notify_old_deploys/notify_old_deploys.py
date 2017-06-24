@@ -4,7 +4,7 @@
 Checks the DynamoDB deployments table for deployments with a createdAt date
 older than the given AGE_BOUNDARY_MINS.
 
-Publishes a message to  given SNS topic if any out of date deployments are
+Publishes a message to a given SNS topic if any out of date deployments are
 found.
 
 This lambda is intended to be run on a repeated schedule of some period less
