@@ -11,8 +11,6 @@ This lambda is intended to be run on a repeated schedule of some period less
 than AGE_BOUNDARY_MINS.
 """
 
-import collections
-import dateutil.parser
 from datetime import datetime, timedelta, timezone
 from functools import partial
 import os
@@ -20,24 +18,9 @@ import pprint
 
 import boto3
 
+from deployment_utils import get_deployments_from_dynamo
 from sns_utils import publish_sns_message
 
-Deployment = collections.namedtuple('Deployment', 'deployment_key deployment_status color created_at task_definition')
-DeploymentKey = collections.namedtuple('Deployment', 'id service_arn')
-
-def _create_deployment_tuple_from_item(item):
-    return Deployment(
-        DeploymentKey(item['deployment_id'],item['service_arn']),
-        item['deployment_status'],
-        item['color'],
-        dateutil.parser.parse(item['created_at'],""),
-        item['task_definition']
-    )
-
-def get_deployments_from_dynamo(table):
-    response = table.scan()
-
-    return [_create_deployment_tuple_from_item(d) for d in response['Items']]
 
 def _old_deployment(age_boundary_mins, deployment):
     age_boundary = datetime.now(timezone.utc) - timedelta(minutes = age_boundary_mins)
