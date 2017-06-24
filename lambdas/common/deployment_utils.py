@@ -22,7 +22,6 @@ def _create_deployment_tuple_from_item(item):
         item['task_definition']
     )
 
-
 def _create_deployment_tuple_from_ecs(service, deployment):
     deployment_status = deployment['status']
     ongoing_deployment = len(service['deployments']) > 1
