@@ -13,6 +13,8 @@ import pprint
 
 import boto3
 
+from sns_utils import publish_sns_message
+
 
 def set_container_instance_to_draining(cluster_arn, ecs_container_instance_arn, ecs_client):
     ecs_client.update_container_instances_state(
@@ -91,3 +93,4 @@ def main(event, _):
             )
             if container_instance_info['containerInstances'][0]['status'] != 'DRAINING':
                 set_container_instance_to_draining(cluster_arn, ecs_container_instance_arn, ecs_client)
+            publish_sns_message(topic_arn, message_data)
