@@ -38,7 +38,7 @@
       "Properties" : {
         "AutoScalingGroupName" : { "Ref" : "AutoScalingGroup" } ,
         "DefaultResult": "ABANDON",
-        "HeartbeatTimeout": "900",
+        "HeartbeatTimeout": "1800",
         "LifecycleTransition" : "autoscaling:EC2_INSTANCE_TERMINATING",
         "NotificationTargetARN" : "${sns_topic_arn}",
         "RoleARN" : "${sns_publish_role_arn}"
