@@ -184,3 +184,9 @@ resource "aws_iam_role_policy" "drain_ecs_container_instance_ec2_describe"{
   role = "${module.lambda_drain_ecs_container_instance.role_name}"
   policy = "${data.aws_iam_policy_document.ec2_describe_instances.json}"
 }
+
+resource "aws_iam_role_policy" "drain_ecs_container_send_asg_heartbeat"{
+  name = "drain_ecs_container_instance_send_asg_heartbeat"
+  role = "${module.lambda_drain_ecs_container_instance.role_name}"
+  policy = "${data.aws_iam_policy_document.send_asg_heartbeat.json}"
+}

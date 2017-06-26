@@ -267,3 +267,14 @@ data "aws_iam_policy_document" "ec2_describe_instances" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "send_asg_heartbeat" {
+  statement {
+    actions = [
+      "autoscaling:RecordLifecycleActionHeartbeat"
+    ]
+    resources = [
+      "*",
+    ]
+  }
+}
