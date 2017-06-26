@@ -223,6 +223,19 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
   }
 }
 
+data "aws_iam_policy_document" "s3_read_miro_images" {
+	statement {
+		actions = [
+			"s3:Get*",
+			"s3:List*",
+		]
+
+		resources = [
+			"${aws_s3_bucket.miro_images_public.arn}",
+		]
+	}
+}
+
 data "aws_iam_policy_document" "write_ec2_tags" {
   statement {
     actions = [
