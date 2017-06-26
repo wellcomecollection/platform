@@ -5,7 +5,7 @@ Shared library to help surface ECS deployment information.
 """
 
 import collections
-import dateutil.parser
+import datetime
 
 from ecs_utils import get_cluster_arns, get_service_arns, describe_service
 
@@ -17,22 +17,27 @@ Deployment = collections.namedtuple(
 DeploymentKey = collections.namedtuple('DeploymentKey', 'id service_arn')
 
 
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
 def _create_deployment_tuple_from_item(item):
+    item_date = datetime.datetime.strptime(item['created_at'], DATE_FORMAT)
+
     return Deployment(
         DeploymentKey(item['deployment_id'], item['service_arn']),
         item['deployment_status'],
         item['color'],
-        dateutil.parser.parse(item['created_at'], ""),
+        item_date,
         item['task_definition']
     )
 
 
 def _create_deployment_tuple_from_ecs(service, deployment):
+    """Takes am AWS ECS API Service & Deployment, returns a namedtuple."""
     deployment_status = deployment['status']
     ongoing_deployment = len(service['deployments']) > 1
 
     color = "blue"
-    if(ongoing_deployment):
+    if ongoing_deployment:
         color = "green" if(deployment_status == "PRIMARY") else "blue"
 
     return Deployment(
@@ -51,6 +56,53 @@ def _get_service_deployments(ecs_client, cluster_arn, service_arn):
             for deployment in service['deployments']]
 
 
+def _get_date_string(date):
+    return date.strftime(DATE_FORMAT)
+
+
+def delete_deployment_in_dynamo(table, deployment):
+    return table.delete_item(
+        Key={
+            'deployment_id': deployment.deployment_key.id,
+            'service_arn': deployment.deployment_key.service_arn
+        }
+    )
+
+
+def put_deployment_in_dynamo(table, deployment):
+    return table.put_item(
+        Item={
+            'deployment_id': deployment.deployment_key.id,
+            'service_arn': deployment.deployment_key.service_arn,
+            'deployment_status': deployment.deployment_status,
+            'color': deployment.color,
+            'created_at': _get_date_string(deployment.created_at),
+            'task_definition': deployment.task_definition
+        }
+    )
+
+
+def update_deployment_in_dynamo(table, deployment):
+    return table.update_item(
+        Key={
+            'deployment_id': deployment.deployment_key.id,
+            'service_name': deployment.deployment_key.service_arn
+        },
+        UpdateExpression="""
+            SET deployment_status = :deployment_status,
+                color = :color,
+                created_at = :created_at,
+                task_definition = :task_definition
+        """,
+        ExpressionAttributeValues={
+            ':deployment_status': deployment.deployment_status,
+            ':color': deployment.color,
+            ':created_at': _get_date_string(deployment.created_at),
+            ':task_definition': deployment.task_definition
+        }
+    )
+
+
 def get_deployments_from_dynamo(table):
     response = table.scan()
 
@@ -60,10 +112,8 @@ def get_deployments_from_dynamo(table):
 def get_deployments_from_ecs(ecs_client):
     deployments = []
 
-    cluster_arns = get_cluster_arns(ecs_client)
-    for cluster_arn in cluster_arns:
-        service_arns = get_service_arns(ecs_client, cluster_arn)
-        for service_arn in service_arns:
+    for cluster_arn in get_cluster_arns(ecs_client):
+        for service_arn in get_service_arns(ecs_client, cluster_arn):
             service_deployments = _get_service_deployments(
                 ecs_client, cluster_arn, service_arn)
             deployments += service_deployments

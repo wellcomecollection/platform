@@ -13,61 +13,23 @@ import pprint
 import boto3
 
 from deployment_utils import \
+    get_deployments_from_ecs, \
     get_deployments_from_dynamo,\
-    get_deployments_from_ecs
+    put_deployment_in_dynamo, \
+    delete_deployment_in_dynamo, \
+    update_deployment_in_dynamo
 
 
 def _find_in_deployments(deployment_list, key):
     return [d for d in deployment_list if d.deployment_key == key][0]
 
 
-def delete_deployment_in_dynamo(table, deployment):
-    return table.delete_item(
-        Key={
-            'deployment_id': deployment.deployment_key.id,
-            'service_arn': deployment.deployment_key.service_arn
-        }
-    )
-
-
-def put_deployment_in_dynamo(table, deployment):
-    return table.put_item(
-        Item={
-            'deployment_id': deployment.deployment_key.id,
-            'service_arn': deployment.deployment_key.service_arn,
-            'deployment_status': deployment.deployment_status,
-            'color': deployment.color,
-            'created_at': str(deployment.created_at),
-            'task_definition': deployment.task_definition
-        }
-    )
-
-
-def update_deployment_in_dynamo(table, deployment):
-    return table.update_item(
-        Key={
-            'deployment_id': deployment.deployment_key.id,
-            'service_name': deployment.deployment_key.service_arn
-        },
-        UpdateExpression="""
-            SET deployment_status = :deployment_status,
-                color = :color,
-                created_at = :created_at,
-                task_definition = :task_definition
-        """,
-        ExpressionAttributeValues={
-            ':deployment_status': deployment.deployment_status,
-            ':color': deployment.color,
-            ':created_at': str(deployment.created_at),
-            ':task_definition': deployment.task_definition
-        }
-    )
-
-
 def compare_deployments(current_deployments, last_deployments):
     current_deployments_keys = set(
-        [current_deployment[0] for current_deployment in current_deployments])
-    last_deployments_keys = set([last_deployment[0]
+        [current_deployment.deployment_key
+         for current_deployment in current_deployments])
+
+    last_deployments_keys = set([last_deployment.deployment_key
                                  for last_deployment in last_deployments])
 
     deletions_keys = last_deployments_keys - current_deployments_keys
