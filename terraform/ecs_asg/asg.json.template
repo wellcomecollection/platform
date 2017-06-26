@@ -32,6 +32,17 @@
           "PauseTime": "PT0S"
         }
       }
+    },
+    "LifecycleHook": {
+      "Type" : "AWS::AutoScaling::LifecycleHook",
+      "Properties" : {
+        "AutoScalingGroupName" : { "Ref" : "AutoScalingGroup" } ,
+        "DefaultResult": "ABANDON",
+        "HeartbeatTimeout": "1800",
+        "LifecycleTransition" : "autoscaling:EC2_INSTANCE_TERMINATING",
+        "NotificationTargetARN" : "${sns_topic_arn}",
+        "RoleARN" : "${sns_publish_role_arn}"
+      }
     }
   },
   "Outputs": {

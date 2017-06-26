@@ -17,6 +17,8 @@ data "template_file" "cluster_asg" {
     asg_min_size        = "${var.asg_min}"
     asg_desired_size    = "${var.asg_desired}"
     asg_max_size        = "${var.asg_max}"
+    sns_topic_arn = "${var.sns_topic_arn}"
+    sns_publish_role_arn = "${aws_iam_role.role.arn}"
   }
 }
 

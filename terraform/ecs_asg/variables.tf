@@ -51,3 +51,10 @@ variable "admin_cidr_ingress" {
   default     = "0.0.0.0/0"
   description = "CIDR for SSH access to EC2 instances"
 }
+
+variable "sns_topic_arn" {
+  description = "ARN of the topic where to push notifications when an EC2 instance is set to terminating state"
+}
+variable "publish_to_sns_policy" {
+  description = "Policy document to publish to the sns topic"
+}

@@ -10,6 +10,8 @@ module "services_cluster_asg" {
   asg_desired           = "3"
   asg_max               = "4"
   instance_type         = "t2.large"
+  sns_topic_arn = "${module.ec2_terminating_topic.arn}"
+  publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
 }
 
 module "monitoring_cluster_asg" {
@@ -22,6 +24,8 @@ module "monitoring_cluster_asg" {
   vpc_id                = "${module.vpc_monitoring.vpc_id}"
   instance_type         = "t2.medium"
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
+  sns_topic_arn = "${module.ec2_terminating_topic.arn}"
+  publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
 }
 
 module "api_cluster_asg" {
@@ -33,4 +37,6 @@ module "api_cluster_asg" {
   user_data             = "${module.api_userdata.rendered}"
   vpc_id                = "${module.vpc_api.vpc_id}"
   instance_type         = "t2.large"
+  sns_topic_arn = "${module.ec2_terminating_topic.arn}"
+  publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
 }
