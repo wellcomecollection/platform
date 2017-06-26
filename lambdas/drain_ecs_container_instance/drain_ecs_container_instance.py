@@ -1,6 +1,18 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+"""
+This lambda is triggered by messages in the ec2_terminating_topic.
+Messages are sent to this topic by the auto scaling group when it's terminating one instance.
+This lambda checks if the EC2 instance being terminated is a container instance of an ECS cluster.
+If it is, it checks if it has tasks running and puts it in draining state if it has.
+It then resends the same message to the topic so that it triggers itself again until there are no ore tasks,
+ in which case it continues the lifecycle hook allowing the EC2 instance to terminate
+"""
 import json
 import pprint
+
 import boto3
+
 from sns_utils import publish_sns_message
 
 
