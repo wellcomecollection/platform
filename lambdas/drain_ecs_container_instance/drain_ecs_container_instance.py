@@ -54,10 +54,13 @@ def main(event, _):
     asg_client = boto3.client("autoscaling")
     ec2_client = boto3.client("ec2")
     ecs_client = boto3.client('ecs')
+
     print(f'Received event:\n{pprint.pformat(event)}')
+
     topic_arn = event['Records'][0]['Sns']['TopicArn']
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
+
     ec2_instance_id = message_data['EC2InstanceId']
     asg_group_name = message_data['AutoScalingGroupName']
     lifecycle_hook_name = message_data['LifecycleHookName']
@@ -88,11 +91,13 @@ def main(event, _):
                 LifecycleActionToken=lifecycle_action_token,
                 InstanceId=ec2_instance_id,
             )
+
             container_instance_info = ecs_client.describe_container_instances(
                 cluster=cluster_arn,
                 containerInstances=[ecs_container_instance_arn],
             )
             if container_instance_info['containerInstances'][0]['status'] != 'DRAINING':
                 set_container_instance_to_draining(cluster_arn, ecs_container_instance_arn, ecs_client)
+
             time.sleep(30)
             publish_sns_message(topic_arn, message_data)
