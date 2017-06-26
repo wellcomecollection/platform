@@ -20,5 +20,5 @@ module "dynamo_capacity_topic" {
 
 module "ec2_terminating_topic" {
   source = "./sns"
-  name = "ec2_terminating_topic"
+  name   = "ec2_terminating_topic"
 }

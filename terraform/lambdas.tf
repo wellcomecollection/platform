@@ -141,11 +141,11 @@ module "trigger_update_dynamo_capacity" {
 }
 
 module "lambda_drain_ecs_container_instance" {
-  source = "./lambda"
-  name = "drain_ecs_container_instance"
+  source      = "./lambda"
+  name        = "drain_ecs_container_instance"
   description = "Drain ECS container instance when the corresponding EC2 instance is being terminated"
-  source_dir = "../lambdas/drain_ecs_container_instance"
-  timeout = 60
+  source_dir  = "../lambdas/drain_ecs_container_instance"
+  timeout     = 60
 }
 
 module "trigger_drain_ecs_container_instance" {

@@ -35,4 +35,3 @@ resource "aws_cloudwatch_event_rule" "ecs_container_instance_state_change" {
 }
 PATTERN
 }
-

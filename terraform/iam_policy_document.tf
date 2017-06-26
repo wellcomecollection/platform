@@ -238,6 +238,7 @@ data "aws_iam_policy_document" "write_ec2_tags" {
 data "aws_iam_policy_document" "complete_lifecycle_hook" {
   statement {
     actions = ["autoscaling:CompleteLifecycleAction"]
+
     resources = [
       "*",
     ]
@@ -249,8 +250,9 @@ data "aws_iam_policy_document" "ecs_list_container_tasks" {
     actions = [
       "ecs:UpdateContainerInstancesState",
       "ecs:ListTasks",
-      "ecs:DescribeContainerInstances"
+      "ecs:DescribeContainerInstances",
     ]
+
     resources = [
       "*",
     ]
@@ -260,8 +262,9 @@ data "aws_iam_policy_document" "ecs_list_container_tasks" {
 data "aws_iam_policy_document" "ec2_describe_instances" {
   statement {
     actions = [
-      "ec2:DescribeInstances"
+      "ec2:DescribeInstances",
     ]
+
     resources = [
       "*",
     ]
@@ -271,8 +274,9 @@ data "aws_iam_policy_document" "ec2_describe_instances" {
 data "aws_iam_policy_document" "send_asg_heartbeat" {
   statement {
     actions = [
-      "autoscaling:RecordLifecycleActionHeartbeat"
+      "autoscaling:RecordLifecycleActionHeartbeat",
     ]
+
     resources = [
       "*",
     ]
