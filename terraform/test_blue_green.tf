@@ -30,8 +30,8 @@ resource "aws_ecs_cluster" "test_blue_green" {
 module "test_blue_green_userdata" {
   source            = "./userdata"
   cluster_name      = "${aws_ecs_cluster.test_blue_green.name}"
-  template_name = "ecs-agent-with-efs"
-  efs_filesystem_id = "${module.test_blue_green_efs.efs_id}"
+//  template_name = "ecs-agent-with-efs"
+//  efs_filesystem_id = "${module.test_blue_green_efs.efs_id}"
 }
 
 module "test_blue_green_efs" {

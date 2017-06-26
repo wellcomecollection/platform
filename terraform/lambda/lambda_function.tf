@@ -12,6 +12,7 @@ resource "aws_lambda_function" "lambda_function" {
   handler          = "${var.name}.main"
   runtime          = "python3.6"
   source_code_hash = "${data.archive_file.lambda_zip_file.output_base64sha256}"
+  timeout = "${var.timeout}"
 
   environment {
     variables = "${var.environment_variables}"

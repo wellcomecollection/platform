@@ -10,6 +10,7 @@ It then resends the same message to the topic so that it triggers itself until t
 """
 import json
 import pprint
+import time
 
 import boto3
 
@@ -93,4 +94,5 @@ def main(event, _):
             )
             if container_instance_info['containerInstances'][0]['status'] != 'DRAINING':
                 set_container_instance_to_draining(cluster_arn, ecs_container_instance_arn, ecs_client)
+            time.sleep(30)
             publish_sns_message(topic_arn, message_data)
