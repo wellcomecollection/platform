@@ -4,7 +4,7 @@ module "lambda_notify_old_deploys" {
   source      = "./lambda"
   name        = "notify_old_deploys"
   description = "For publishing out of date deployments to SNS"
-  source_dir  = "../lambdas/service_scheduler"
+  source_dir  = "../lambdas/notify_old_deploys"
 
   environment_variables = {
     TABLE_NAME = "${aws_dynamodb_table.deployments.name}"

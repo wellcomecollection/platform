@@ -246,3 +246,15 @@ data "aws_iam_policy_document" "deployments_table" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "old_deployment_sns" {
+  statement {
+    actions = [
+      "SNS:Publish",
+    ]
+
+    resources = [
+      "${module.old_deployments.arn}",
+    ]
+  }
+}
