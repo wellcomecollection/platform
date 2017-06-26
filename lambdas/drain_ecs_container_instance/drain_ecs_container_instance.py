@@ -42,12 +42,18 @@ def main(event, _):
             ec2_instance_id,
         ],)
         tags = ec2_instance_info['Reservations'][0]['Instances'][0]['Tags']
-        ecs_container_instance_arn = [x['Value'] for x in tags if x['Key'] == 'containerInstanceArn'][0]
-        cluster_arn = [x['Value'] for x in tags if x['Key'] == 'clusterArn'][0]
-        print(f"containerInstanceArn: {ecs_container_instance_arn}, clusterArn: {cluster_arn}")
-        running_tasks = ecs_client.list_tasks(cluster=cluster_arn,containerInstance=ecs_container_instance_arn)
-        print(running_tasks)
-        print(running_tasks['taskArns'])
+        ecs_container_instance_arns = [x['Value'] for x in tags if x['Key'] == 'containerInstanceArn']
+        cluster_arns = [x['Value'] for x in tags if x['Key'] == 'clusterArn']
+        print(f"containerInstanceArns: {ecs_container_instance_arns}, clusterArns: {cluster_arns}")
+
+        if not cluster_arns and not ecs_container_instance_arns:
+            continue_lifecycle_action(asg_group_name, ec2_instance_id, lifecycle_hook_name, asg_client)
+            return
+
+        cluster_arn=cluster_arns[0]
+        ecs_container_instance_arn=ecs_container_instance_arns[0]
+        running_tasks = ecs_client.list_tasks(cluster=cluster_arns[0],containerInstance=ecs_container_instance_arns[0])
+        print(f"running tasks: {running_tasks['taskArns']}")
 
         if not running_tasks['taskArns']:
             continue_lifecycle_action(asg_group_name, ec2_instance_id, lifecycle_hook_name, asg_client)
