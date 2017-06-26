@@ -30,7 +30,18 @@ resource "aws_ecs_cluster" "test_blue_green" {
 module "test_blue_green_userdata" {
   source            = "./userdata"
   cluster_name      = "${aws_ecs_cluster.test_blue_green.name}"
+  template_name = "ecs-agent-with-efs"
+  efs_filesystem_id = "${module.test_blue_green_efs.efs_id}"
 }
+
+module "test_blue_green_efs" {
+  name                         = "test-blue-green"
+  source                       = "./efs"
+  vpc_id                       = "${module.vpc_test_blue_green.vpc_id}"
+  subnets                      = "${module.vpc_test_blue_green.subnets}"
+  efs_access_security_group_id = "${module.test_blue_green_cluster_asg.instance_sg_id}"
+}
+
 
 module "hello_world" {
   source           = "./services"
