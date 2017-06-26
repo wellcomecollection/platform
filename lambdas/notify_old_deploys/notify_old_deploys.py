@@ -23,17 +23,22 @@ from sns_utils import publish_sns_message
 
 
 def _old_deployment(age_boundary_mins, deployment):
-    age_boundary = datetime.now(timezone.utc) - timedelta(minutes = age_boundary_mins)
+    age_boundary = datetime.now(timezone.utc) - \
+        timedelta(minutes=age_boundary_mins)
 
-    return (deployment.created_at < age_boundary) and deployment.color == "green"
+    return \
+        (deployment.created_at < age_boundary) and deployment.color == "green"
+
 
 def filter_old_deployments(deployments, age_boundary_mins):
     filter_func = partial(_old_deployment, age_boundary_mins)
     return list(filter(filter_func, deployments))
 
+
 def publish_deployments(topic_arn, deployments):
     if(len(deployments) > 0):
         publish_sns_message(topic_arn, deployments)
+
 
 def main(event, _):
     print(f'Received event:\n{pprint.pformat(event)}')

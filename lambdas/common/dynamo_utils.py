@@ -32,7 +32,7 @@ def change_dynamo_capacity(table_name, desired_capacity):
         TableName=table_name,
         ProvisionedThroughput={
             'ReadCapacityUnits': desired_capacity,
-            'WriteCapacityUnits':desired_capacity
+            'WriteCapacityUnits': desired_capacity
         },
         GlobalSecondaryIndexUpdates=gsi_updates
     )

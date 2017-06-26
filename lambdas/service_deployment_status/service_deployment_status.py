@@ -12,11 +12,14 @@ import pprint
 
 import boto3
 
-from deployment_utils import get_deployments_from_dynamo, get_deployments_from_ecs
+from deployment_utils import \
+    get_deployments_from_dynamo,\
+    get_deployments_from_ecs
 
 
 def _find_in_deployments(deployment_list, key):
-    return [deployment for deployment in deployment_list if deployment[0] == key][0]
+    return [d for d in deployment_list if d.deployment_key == key][0]
+
 
 def delete_deployment_in_dynamo(table, deployment):
     return table.delete_item(
@@ -25,6 +28,7 @@ def delete_deployment_in_dynamo(table, deployment):
             'service_arn': deployment.deployment_key.service_arn
         }
     )
+
 
 def put_deployment_in_dynamo(table, deployment):
     return table.put_item(
@@ -38,6 +42,7 @@ def put_deployment_in_dynamo(table, deployment):
         }
     )
 
+
 def update_deployment_in_dynamo(table, deployment):
     return table.update_item(
         Key={
@@ -45,8 +50,8 @@ def update_deployment_in_dynamo(table, deployment):
             'service_name': deployment.deployment_key.service_arn
         },
         UpdateExpression="""
-            SET deployment_status = :deployment_status, 
-                color = :color, 
+            SET deployment_status = :deployment_status,
+                color = :color,
                 created_at = :created_at,
                 task_definition = :task_definition
         """,
@@ -58,9 +63,12 @@ def update_deployment_in_dynamo(table, deployment):
         }
     )
 
+
 def compare_deployments(current_deployments, last_deployments):
-    current_deployments_keys = set([current_deployment[0] for current_deployment in current_deployments])
-    last_deployments_keys = set([last_deployment[0] for last_deployment in last_deployments])
+    current_deployments_keys = set(
+        [current_deployment[0] for current_deployment in current_deployments])
+    last_deployments_keys = set([last_deployment[0]
+                                 for last_deployment in last_deployments])
 
     deletions_keys = last_deployments_keys - current_deployments_keys
     additions_keys = current_deployments_keys - last_deployments_keys
@@ -68,11 +76,20 @@ def compare_deployments(current_deployments, last_deployments):
 
     unchanged_deployments = set(current_deployments) & set(last_deployments)
 
-    deleted_deployments = [_find_in_deployments(last_deployments, deletion_key) for deletion_key in deletions_keys]
-    added_deployments = [_find_in_deployments(current_deployments, additions_key) for additions_key in additions_keys]
-    maybe_updated_deployments = [_find_in_deployments(current_deployments, remaining_key) for remaining_key in remaining_keys]
+    deleted_deployments = \
+        [_find_in_deployments(last_deployments, deletion_key)
+         for deletion_key in deletions_keys]
 
-    updated_deployments = list(set(maybe_updated_deployments) - unchanged_deployments)
+    added_deployments = \
+        [_find_in_deployments(current_deployments, additions_key)
+         for additions_key in additions_keys]
+
+    maybe_updated_deployments = \
+        [_find_in_deployments(current_deployments, remaining_key)
+         for remaining_key in remaining_keys]
+
+    updated_deployments = list(
+        set(maybe_updated_deployments) - unchanged_deployments)
 
     return {
         'deletions': deleted_deployments,
@@ -80,12 +97,17 @@ def compare_deployments(current_deployments, last_deployments):
         'updates': updated_deployments
     }
 
+
 def run_operations(operations, table):
     return {
-        "delete_results": [delete_deployment_in_dynamo(table, deployment) for deployment in operations["deletions"]],
-        "put_results": [put_deployment_in_dynamo(table, deployment) for deployment in operations["additions"]],
-        "update_results":[update_deployment_in_dynamo(table, deployment) for deployment in operations["updates"]]
+        "delete_results": [delete_deployment_in_dynamo(table, deployment)
+                           for deployment in operations["deletions"]],
+        "put_results": [put_deployment_in_dynamo(table, deployment)
+                        for deployment in operations["additions"]],
+        "update_results": [update_deployment_in_dynamo(table, deployment)
+                           for deployment in operations["updates"]]
     }
+
 
 def main(event, _):
     print(f'Received event:\n{pprint.pformat(event)}')

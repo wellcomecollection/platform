@@ -9,7 +9,7 @@ def identify_cluster_by_app_name(client, app_name):
     return the ARN of the cluster the task runs on.
     """
     for cluster_arn in get_cluster_arns(client):
-        for serviceArn in get_service_arns(client, cluster_arn=cluster_arn):
+        for service_arn in get_service_arns(client, cluster_arn=cluster_arn):
             # The format of an ECS service ARN is:
             #
             #     arn:aws:ecs:{aws_region}:{account_id}:service/{service_name}
@@ -20,7 +20,7 @@ def identify_cluster_by_app_name(client, app_name):
             # calls on our API quota so we skip it.
             _, service_name = service_arn.split('/')
             if service_name == app_name:
-                return cluster
+                return cluster_arn
 
     raise RuntimeError(f'Unable to find ECS cluster for {app_name}')
 
@@ -116,15 +116,17 @@ def get_service_arns(client, cluster_arn):
 
     return response['serviceArns']
 
+
 def describe_cluster(ecs_client, cluster_arn):
     """
     Given a cluster ARN attempts to find a matching cluster description.
 
     Returns a cluster description.
     """
-    response = ecs_client.describe_clusters(clusters = [cluster_arn])
+    response = ecs_client.describe_clusters(clusters=[cluster_arn])
 
     return response['clusters'][0]
+
 
 def describe_service(ecs_client, cluster_arn, service_arn):
     """
