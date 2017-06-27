@@ -1,5 +1,8 @@
 FROM alpine
 
+COPY install_loris.sh /install_loris.sh
+RUN /install_loris.sh
+
 RUN apk update
 
 RUN apk add nginx python supervisor uwsgi uwsgi-python
