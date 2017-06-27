@@ -1,9 +1,9 @@
 resource "aws_sns_topic" "topic" {
-  name = "ec2_instance_wait_to_terminate_alarm"
+  name = "ec2_instance_terminating_for_too_long_alarm"
 }
 
-resource "aws_cloudwatch_metric_alarm" "ec2_instance_wait_to_terminate" {
-  alarm_name          = "${aws_cloudformation_stack.ecs_asg.outputs["AsgName"]}_instance_wait_to_terminate"
+resource "aws_cloudwatch_metric_alarm" "ec2_instance_terminating_for_too_long" {
+  alarm_name          = "${aws_cloudformation_stack.ecs_asg.outputs["AsgName"]}_instance_terminating_for_too_long"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "GroupTerminatingInstances"
