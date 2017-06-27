@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Change the read and write capacity of a DynamoDB Table and any global secondary index
+Change the read and write capacity of a DynamoDB Table and any global
+secondary index.
 
 The script is triggered by notifications to an SNS topic, in which the
-message should be a JSON string that includes "dynamo_table_name" and "desired_capacity"
+message should be a JSON string that includes "dynamo_table_name"
+and "desired_capacity".
 """
 
 import json
