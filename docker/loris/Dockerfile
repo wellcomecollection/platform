@@ -25,3 +25,27 @@ RUN apt-get install -y python-pip
 
 RUN pip install configobj
 RUN python setup.py install
+
+COPY loris2.wsgi /var/www/loris2/loris2.wsgi
+
+RUN apt-get install -y nginx
+
+EXPOSE 80
+RUN mkdir -p /etc/nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+RUN rm -f /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+RUN apt-get install -y supervisor
+RUN apt-get install -y libpcre3 libpcre3-dev
+RUN pip install uwsgi
+
+RUN useradd -s /sbin/false nginx
+
+COPY uwsgi.ini /etc/uwsgi/
+
+COPY loris2.conf /opt/loris/etc/loris2.conf
+
+CMD ["/usr/bin/supervisord"]
