@@ -30,6 +30,10 @@ COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 
 RUN apt-get install -y nginx
 
+RUN apt-get install -y supervisor
+RUN apt-get install -y libpcre3 libpcre3-dev
+RUN pip install uwsgi
+
 EXPOSE 80
 RUN mkdir -p /etc/nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
@@ -37,10 +41,6 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-RUN apt-get install -y supervisor
-RUN apt-get install -y libpcre3 libpcre3-dev
-RUN pip install uwsgi
 
 RUN useradd -s /sbin/false nginx
 
