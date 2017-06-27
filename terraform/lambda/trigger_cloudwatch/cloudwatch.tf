@@ -21,6 +21,6 @@ resource "aws_cloudwatch_event_target" "event_trigger_custom" {
 resource "aws_cloudwatch_event_target" "event_trigger" {
   count = "${1 - var.custom_input}"
 
-  rule  = "${var.cloudwatch_trigger_name}"
-  arn   = "${var.lambda_function_arn}"
+  rule = "${var.cloudwatch_trigger_name}"
+  arn  = "${var.lambda_function_arn}"
 }

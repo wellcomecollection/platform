@@ -239,15 +239,23 @@ data "aws_iam_policy_document" "s3_read_miro_images" {
 data "aws_iam_policy_document" "write_ec2_tags" {
   statement {
     actions = [
-      "tag:addResourceTags",
-      "tag:removeResourceTags",
-      "tag:tagResources",
-      "tag:untagResources",
-      "tag:createTags",
+      "ec2:createTags",
     ]
 
     resources = [
-      "arn:aws:ec2:*",
+      "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "deployments_table" {
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.deployments.arn}",
     ]
   }
 }
