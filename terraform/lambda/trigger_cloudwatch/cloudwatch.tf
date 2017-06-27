@@ -12,7 +12,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_trigger" {
 # See https://blog.gruntwork.io/terraform-tips-tricks-loops-if-statements-and-gotchas-f739bbae55f9
 resource "aws_cloudwatch_event_target" "event_trigger_custom" {
   count = "${var.custom_input}"
-
   rule  = "${var.cloudwatch_trigger_name}"
   arn   = "${var.lambda_function_arn}"
   input = "${var.input}"
@@ -20,7 +19,6 @@ resource "aws_cloudwatch_event_target" "event_trigger_custom" {
 
 resource "aws_cloudwatch_event_target" "event_trigger" {
   count = "${1 - var.custom_input}"
-
   rule = "${var.cloudwatch_trigger_name}"
   arn  = "${var.lambda_function_arn}"
 }
