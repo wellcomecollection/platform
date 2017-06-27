@@ -57,5 +57,5 @@ variable "sns_topic_arn" {
 }
 
 variable "publish_to_sns_policy" {
-  description = "Policy document to publish to the sns topic"
+  description = "Policy document to give permission to publish to the sns topic"
 }
