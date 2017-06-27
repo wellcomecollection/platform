@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "topic" {
-  name = "ec2_instance_terminating_for_too_long_alarm"
+  name = "${aws_cloudformation_stack.ecs_asg.outputs["AsgName"]}_instance_terminating_for_too_long_alarm"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ec2_instance_terminating_for_too_long" {
