@@ -34,18 +34,14 @@ def continue_lifecycle_action(asg_client, asg_group_name, ec2_instance_id, lifec
     pprint.pprint(response)
 
 
-def get_ecs_info_from_tags(ec2_client, ec2_instance_id):
+def get_ec2_tags(ec2_client, ec2_instance_id):
     ec2_instance_info = ec2_client.describe_instances(InstanceIds=[
         ec2_instance_id,
     ])
     tags = ec2_instance_info['Reservations'][0]['Instances'][0]['Tags']
-    ecs_container_instance_arns = [x['Value'] for x in tags if x['Key'] == 'containerInstanceArn']
-    cluster_arns = [x['Value'] for x in tags if x['Key'] == 'clusterArn']
-    print(f"containerInstanceArns: {ecs_container_instance_arns}, clusterArns: {cluster_arns}")
-    return {
-        'cluster_arns': cluster_arns,
-        'ecs_container_instance_arns': ecs_container_instance_arns
-    }
+    tag_dict = {t['Key']: t['Value'] for t in tags}
+    print(f"tag_dict: {tag_dict}")
+    return tag_dict
 
 
 def main(event, _):
@@ -65,17 +61,18 @@ def main(event, _):
     lifecycle_action_token = message_data['LifecycleActionToken']
 
     if lifecycle_transition == 'autoscaling:EC2_INSTANCE_TERMINATING':
-        ecs_info = get_ecs_info_from_tags(ec2_client, ec2_instance_id)
+        tags_dict = get_ec2_tags(ec2_client, ec2_instance_id)
 
-        if not ecs_info['cluster_arns'] and not ecs_info['ecs_container_instance_arns']:
+        try:
+            cluster_arn = tags_dict['clusterArn']
+            ecs_container_instance_arn = tags_dict['containerInstanceArn']
+        except KeyError as e:
             continue_lifecycle_action(asg_client, asg_group_name, ec2_instance_id, lifecycle_hook_name)
             return
 
-        cluster_arn = ecs_info['cluster_arns'][0]
-        ecs_container_instance_arn = ecs_info['ecs_container_instance_arns'][0]
         running_tasks = ecs_client.list_tasks(
-            cluster=ecs_info['cluster_arns'][0],
-            containerInstance=ecs_info['ecs_container_instance_arns'][0]
+            cluster=cluster_arn,
+            containerInstance=ecs_container_instance_arn
         )
         print(f"running tasks: {running_tasks['taskArns']}")
 
