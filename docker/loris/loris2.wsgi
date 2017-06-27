@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-from loris.webapp import create_app
+# from loris.webapp import create_app
 
 # application = create_app(
 # 	debug=False,
