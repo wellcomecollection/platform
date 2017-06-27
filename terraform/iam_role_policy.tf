@@ -130,6 +130,30 @@ resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_thing" {
   policy = "${data.aws_iam_policy_document.write_ec2_tags.json}"
 }
 
+# Role policies for service_deployment_status lambda
+
+resource "aws_iam_role_policy" "service_deployment_status_describe_services" {
+  role   = "${module.lambda_service_deployment_status.role_name}"
+  policy = "${data.aws_iam_policy_document.describe_services.json}"
+}
+
+resource "aws_iam_role_policy" "service_deployment_status_deployments_table" {
+  role   = "${module.lambda_service_deployment_status.role_name}"
+  policy = "${data.aws_iam_policy_document.deployments_table.json}"
+}
+
+# Role policies for notify_old_deploys lambda
+
+resource "aws_iam_role_policy" "notify_old_deploys_sns_publish" {
+  role   = "${module.lambda_notify_old_deploys.role_name}"
+  policy = "${module.old_deployments.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "notify_old_deploys_deployments_table" {
+  role   = "${module.lambda_notify_old_deploys.role_name}"
+  policy = "${data.aws_iam_policy_document.deployments_table.json}"
+}
+
 # Role policies for the miro_reindexer service
 
 resource "aws_iam_role_policy" "reindexer_tracker_table" {

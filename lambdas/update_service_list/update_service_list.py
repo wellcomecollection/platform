@@ -14,7 +14,11 @@ import pprint
 
 import boto3
 
-from ecs_utils import get_cluster_arns, get_service_arns, describe_service, describe_cluster
+from ecs_utils import \
+    get_cluster_arns, \
+    get_service_arns, \
+    describe_service, \
+    describe_cluster
 
 
 def _create_event_dict(event):
@@ -22,6 +26,7 @@ def _create_event_dict(event):
         'timestamp': event['createdAt'].timestamp(),
         'message': event['message']
     }
+
 
 def _create_cluster_dict(cluster, service_list):
     return {
@@ -31,24 +36,11 @@ def _create_cluster_dict(cluster, service_list):
         'serviceList': service_list
     }
 
-def _create_event_dict(event):
-    return {
-        'timestamp': event['createdAt'].timestamp(),
-        'message': event['message']
-    }
-
-def _create_cluster_dict(cluster, service_list):
-    return {
-        'clusterName': cluster['clusterName'],
-        'status': cluster['status'],
-        'instanceCount': cluster['registeredContainerInstancesCount'],
-        'serviceList': service_list
-    }
 
 def _create_service_dict(service):
-    deployments = [ _create_deployment_dict(d) for d in service['deployments'] ]
+    deployments = [_create_deployment_dict(d) for d in service['deployments']]
     # Grab just the last few events to keep the file size down
-    events = [ _create_event_dict(e) for e in service['events'][:5] ]
+    events = [_create_event_dict(e) for e in service['events'][:5]]
 
     return {
         'serviceName': service['serviceName'],
@@ -56,9 +48,10 @@ def _create_service_dict(service):
         'pendingCount': service['pendingCount'],
         'runningCount': service['runningCount'],
         'deployments': deployments,
-        'events' : events,
+        'events': events,
         'status': service['status']
     }
+
 
 def _create_deployment_dict(deployment):
     return {
@@ -66,6 +59,7 @@ def _create_deployment_dict(deployment):
         'taskDefinition': deployment['taskDefinition'],
         'status': deployment['status']
     }
+
 
 def get_service_list(ecs_client, cluster_arn):
     service_list = []
@@ -86,6 +80,7 @@ def get_cluster_list(ecs_client):
         cluster_list.append(_create_cluster_dict(cluster, service_list))
 
     return cluster_list
+
 
 def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
     cluster_list = get_cluster_list(ecs_client)

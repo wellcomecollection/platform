@@ -37,7 +37,7 @@ def create_tags(ec2_client, ec2_instance_id, event_detail):
         Tags=[{
             "Key": "clusterArn",
             "Value": event_detail['clusterArn']
-        },{
+        }, {
             "Key": "containerInstanceArn",
             "Value": event_detail['containerInstanceArn']
         }]
@@ -54,4 +54,3 @@ def main(event, _):
     response = create_tags(ec2_client, ec2_instance_id, event['detail'])
 
     print(f'Received response:\n{pprint.pformat(response)}')
-

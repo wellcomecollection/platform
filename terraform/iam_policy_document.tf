@@ -295,3 +295,15 @@ data "aws_iam_policy_document" "send_asg_heartbeat" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "deployments_table" {
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.deployments.arn}",
+    ]
+  }
+}
