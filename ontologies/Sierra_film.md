@@ -4,7 +4,7 @@ Comment at lines 90-109: these various notes relating to the format of the item 
 * Do we want to preserve these differences? 
 * If not, would we prefer to concatenate all this into one note?
 
-Comment at line 113: Source is identified as LCSH by the second indicator 0.  
+Comment at line 113: Source is identified as LCSH by the second indicator 0 of 650 MARC field.  
 
 Comment at line 117 and subsequent occurrences of `"authority": "MeSH"`
 
