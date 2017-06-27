@@ -22,4 +22,3 @@ module "old_deployments" {
   source = "./sns"
   name   = "old_deployments"
 }
-

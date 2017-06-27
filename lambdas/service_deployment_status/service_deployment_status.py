@@ -12,12 +12,13 @@ import pprint
 
 import boto3
 
-from deployment_utils import \
-    get_deployments_from_ecs, \
-    get_deployments_from_dynamo,\
-    put_deployment_in_dynamo, \
-    delete_deployment_in_dynamo, \
+from deployment_utils import (
+    get_deployments_from_ecs,
+    get_deployments_from_dynamo,
+    put_deployment_in_dynamo,
+    delete_deployment_in_dynamo,
     update_deployment_in_dynamo
+)
 
 
 def _find_in_deployments(deployment_list, key):
@@ -38,20 +39,21 @@ def compare_deployments(current_deployments, last_deployments):
 
     unchanged_deployments = set(current_deployments) & set(last_deployments)
 
-    deleted_deployments = \
-        [_find_in_deployments(last_deployments, deletion_key)
+    deleted_deployments = [
+        _find_in_deployments(last_deployments, deletion_key)
          for deletion_key in deletions_keys]
 
-    added_deployments = \
-        [_find_in_deployments(current_deployments, additions_key)
+    added_deployments = [
+        _find_in_deployments(current_deployments, additions_key)
          for additions_key in additions_keys]
 
-    maybe_updated_deployments = \
-        [_find_in_deployments(current_deployments, remaining_key)
+    maybe_updated_deployments = [
+        _find_in_deployments(current_deployments, remaining_key)
          for remaining_key in remaining_keys]
 
     updated_deployments = list(
-        set(maybe_updated_deployments) - unchanged_deployments)
+        set(maybe_updated_deployments) - unchanged_deployments
+    )
 
     return {
         'deletions': deleted_deployments,

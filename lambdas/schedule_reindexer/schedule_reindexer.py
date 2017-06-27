@@ -14,7 +14,7 @@ from sns_utils import publish_sns_message
 
 def get_service_name(reindexers, table_name):
     table_service_dict = dict([line.split("=")
-                               for line in (reindexers.splitlines())])
+                               for line in reindexers.splitlines()])
     return table_service_dict[table_name]
 
 

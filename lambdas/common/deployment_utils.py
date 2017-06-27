@@ -32,13 +32,14 @@ def _create_deployment_tuple_from_item(item):
 
 
 def _create_deployment_tuple_from_ecs(service, deployment):
-    """Takes am AWS ECS API Service & Deployment, returns a namedtuple."""
+    """Takes am AWS ECS API Service & Deployment, returns a Deployment namedtuple."""
     deployment_status = deployment['status']
     ongoing_deployment = len(service['deployments']) > 1
 
-    color = "blue"
-    if ongoing_deployment:
-        color = "green" if(deployment_status == "PRIMARY") else "blue"
+    if ongoing_deployment and (deployment_status == "PRIMARY")
+        color = "green"
+    else:
+        color = "blue"
 
     return Deployment(
         DeploymentKey(deployment['id'], service['serviceArn']),

@@ -162,4 +162,3 @@ resource "aws_dynamodb_table" "deployments" {
     type = "S"
   }
 }
-

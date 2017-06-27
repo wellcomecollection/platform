@@ -7,8 +7,8 @@ module "lambda_notify_old_deploys" {
   source_dir  = "../lambdas/notify_old_deploys"
 
   environment_variables = {
-    TABLE_NAME = "${aws_dynamodb_table.deployments.name}"
-    TOPIC_ARN = "${module.old_deployments.arn}"
+    TABLE_NAME        = "${aws_dynamodb_table.deployments.name}"
+    TOPIC_ARN         = "${module.old_deployments.arn}"
     AGE_BOUNDARY_MINS = "5"
   }
 }

@@ -21,5 +21,5 @@ variable "input" {
 
 variable "custom_input" {
   description = "Use custom input or match event"
-  default = true
+  default     = true
 }

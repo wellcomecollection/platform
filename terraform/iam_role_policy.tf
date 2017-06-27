@@ -130,7 +130,6 @@ resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_thing" {
   policy = "${data.aws_iam_policy_document.write_ec2_tags.json}"
 }
 
-
 # Role policies for service_deployment_status lambda
 
 resource "aws_iam_role_policy" "service_deployment_status_describe_services" {
@@ -147,7 +146,7 @@ resource "aws_iam_role_policy" "service_deployment_status_deployments_table" {
 
 resource "aws_iam_role_policy" "notify_old_deploys_sns_publish" {
   role   = "${module.lambda_notify_old_deploys.role_name}"
-  policy = "${data.aws_iam_policy_document.old_deployment_sns.json}"
+  policy = "${module.old_deployments.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "notify_old_deploys_deployments_table" {
