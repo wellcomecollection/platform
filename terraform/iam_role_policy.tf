@@ -161,6 +161,8 @@ resource "aws_iam_role_policy" "ecs_grafana_task_cloudwatch_read" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_read_metrics.json}"
 }
 
+# Policies for Lamdba that drains ECS container instances when the underlying EC2 instance is terminating
+
 resource "aws_iam_role_policy" "drain_ecs_container_instance_sns" {
   name   = "drain_ecs_container_instance_publish_to_sns"
   role   = "${module.lambda_drain_ecs_container_instance.role_name}"
