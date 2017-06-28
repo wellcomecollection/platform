@@ -34,3 +34,8 @@ module "ecr_repository_reindexer" {
   source = "./ecr"
   name   = "reindexer"
 }
+
+module "ecr_repository_loris" {
+  source = "./ecr"
+  name   = "loris"
+}
