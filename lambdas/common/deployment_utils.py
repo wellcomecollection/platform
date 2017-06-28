@@ -19,6 +19,7 @@ DeploymentKey = collections.namedtuple('DeploymentKey', 'id service_arn')
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
+
 def _create_deployment_tuple_from_item(item):
     item_date = datetime.datetime.strptime(item['created_at'], DATE_FORMAT)
 
@@ -32,11 +33,11 @@ def _create_deployment_tuple_from_item(item):
 
 
 def _create_deployment_tuple_from_ecs(service, deployment):
-    """Takes am AWS ECS API Service & Deployment, returns a Deployment namedtuple."""
+    """Takes AWS ECS API Service & Deployment, return Deployment namedtuple."""
     deployment_status = deployment['status']
     ongoing_deployment = len(service['deployments']) > 1
 
-    if ongoing_deployment and (deployment_status == "PRIMARY")
+    if ongoing_deployment and (deployment_status == "PRIMARY"):
         color = "green"
     else:
         color = "blue"

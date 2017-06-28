@@ -10,11 +10,14 @@ def change_dynamo_capacity(table_name, desired_capacity):
     Given the name of a DynamoDB table and a desired capacity, update the
     read/write capacity of the table and every secondary index.
     """
+
     client = boto3.client('dynamodb')
     response = client.describe_table(TableName=table_name)
+
     gsi_names = [
         idx['IndexName'] for idx in response['Table']['GlobalSecondaryIndexes']
     ]
+
     gsi_updates = [
         {
             'Update': {
@@ -36,5 +39,6 @@ def change_dynamo_capacity(table_name, desired_capacity):
         },
         GlobalSecondaryIndexUpdates=gsi_updates
     )
+
     print(f'DynamoDB response:\n{pprint.pformat(resp)}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
