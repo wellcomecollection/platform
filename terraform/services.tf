@@ -148,6 +148,7 @@ module "api" {
   listener_arn  = "${module.api_alb.listener_arn}"
   infra_bucket  = "${var.infra_bucket}"
   config_key    = "config/${var.build_env}/api.ini"
+  alb_priority  = "110"
 
   config_vars = {
     api_host    = "${var.api_host}"
@@ -163,17 +164,19 @@ module "api" {
 }
 
 module "loris" {
-  source        = "./services"
-  name          = "loris"
-  cluster_id    = "${aws_ecs_cluster.api.id}"
-  task_role_arn = "${module.ecs_loris_iam.task_role_arn}"
-  vpc_id        = "${module.vpc_api.vpc_id}"
-  app_uri       = "${module.ecr_repository_loris.repository_url}:latest"
-  nginx_uri     = "${module.ecr_repository_nginx.repository_url}:api"
-  listener_arn  = "${module.api_alb.listener_arn}"
-  infra_bucket  = "${var.infra_bucket}"
-  config_key    = "config/${var.build_env}/loris.ini"
-  alb_priority  = "108"
+  source           = "./services"
+  name             = "loris"
+  cluster_id       = "${aws_ecs_cluster.api.id}"
+  task_role_arn    = "${module.ecs_loris_iam.task_role_arn}"
+  vpc_id           = "${module.vpc_api.vpc_id}"
+  app_uri          = "${module.ecr_repository_loris.repository_url}:latest"
+  nginx_uri        = "${module.ecr_repository_nginx.repository_url}:services"
+  listener_arn     = "${module.api_alb.listener_arn}"
+  infra_bucket     = "${var.infra_bucket}"
+  config_key       = "config/${var.build_env}/loris.ini"
+  path_pattern     = "/iiif/*"
+  healthcheck_path = "/iiif/"
+  alb_priority     = "108"
 }
 
 module "grafana" {
