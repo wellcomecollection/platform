@@ -145,10 +145,11 @@ class ApiWorksTest
   }
 
   it(
-    "should return the requested page of results when requested with page & pageSize") {
+    "should return the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
     val works = createIdentifiedWorks(3)
 
     insertIntoElasticSearch(works: _*)
+
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?page=2&pageSize=1",
@@ -160,6 +161,8 @@ class ApiWorksTest
                           |  "pageSize": 1,
                           |  "totalPages": 3,
                           |  "totalResults": 3,
+                          |  "prev": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
+                          |  "next": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -174,6 +177,72 @@ class ApiWorksTest
                           |     "creators": [{
                           |       "type": "Agent",
                           |       "label": "${works(1).work.creators(0).label}"
+                          |     }]
+                          |   }]
+                          |   }
+                          |  ]
+                          |}
+          """.stripMargin
+      )
+
+      server.httpGet(
+        path = s"/$apiPrefix/works?page=1&pageSize=1",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 1,
+                          |  "totalPages": 3,
+                          |  "totalResults": 3,
+                          |  "next": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${works(0).canonicalId}",
+                          |     "label": "${works(0).work.label}",
+                          |     "description": "${works(0).work.description.get}",
+                          |     "lettering": "${works(0).work.lettering.get}",
+                          |     "createdDate": {
+                          |       "type": "Period",
+                          |       "label": "${works(0).work.createdDate.get.label}"
+                          |     },
+                          |     "creators": [{
+                          |       "type": "Agent",
+                          |       "label": "${works(0).work.creators(0).label}"
+                          |     }]
+                          |   }]
+                          |   }
+                          |  ]
+                          |}
+          """.stripMargin
+      )
+
+      server.httpGet(
+        path = s"/$apiPrefix/works?page=3&pageSize=1",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 1,
+                          |  "totalPages": 3,
+                          |  "totalResults": 3,
+                          |  "prev": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${works(2).canonicalId}",
+                          |     "label": "${works(2).work.label}",
+                          |     "description": "${works(2).work.description.get}",
+                          |     "lettering": "${works(2).work.lettering.get}",
+                          |     "createdDate": {
+                          |       "type": "Period",
+                          |       "label": "${works(2).work.createdDate.get.label}"
+                          |     },
+                          |     "creators": [{
+                          |       "type": "Agent",
+                          |       "label": "${works(2).work.creators(0).label}"
                           |     }]
                           |   }]
                           |   }
