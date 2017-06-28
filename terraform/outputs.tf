@@ -1,5 +1,5 @@
 output "ecr_nginx" {
-  value = "${aws_ecr_repository.nginx.repository_url}"
+  value = "${module.ecr_repository_nginx.repository_url}"
 }
 
 output "miro_readonly_key_id" {
