@@ -11,7 +11,7 @@ This lambda is intended to be run on a repeated schedule of some period less
 than AGE_BOUNDARY_MINS.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import os
 import pprint
 
@@ -23,7 +23,7 @@ from sns_utils import publish_sns_message
 
 def _old_deployment(age_boundary_mins, deployment):
     age_boundary = (
-        datetime.now(timezone.utc) - timedelta(minutes=age_boundary_mins)
+        datetime.now() - timedelta(minutes=age_boundary_mins)
     )
 
     return (
