@@ -1,9 +1,8 @@
 package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
-import com.twitter.finagle.http.ParamMap
-import uk.ac.wellcome.platform.api.requests.{ApiRequest, MultipleResultsRequest}
 import uk.ac.wellcome.platform.api.models.DisplaySearch
+import uk.ac.wellcome.platform.api.requests.{ApiRequest, MultipleResultsRequest}
 
 import scala.language.existentials
 
@@ -26,29 +25,17 @@ case class ResultListResponse(
 }
 
 object ResultListResponse {
+  private def createApiLink(
+                             requestBaseUri: String,
+                             apiRequest: ApiRequest
+                           )(
+    updateMap: Map[String, Any]
+  ): String = {
 
-  private def getParamMapFromCustomCCRequestParams(cc: ApiRequest): ParamMap =
-    ParamMap((Map[String, String]() /: cc.getClass.getDeclaredFields) {(a, f) =>
-      f.setAccessible(true)
+    val baseUrl = s"$requestBaseUri${apiRequest.request.path}"
+    val queryString = (apiRequest.request.params ++ updateMap).toString()
 
-      if(f.getName != "request") {
-        f.get(cc) match {
-          case None => a
-          case Some(o) => a + (f.getName -> o.toString)
-          case o => a + (f.getName -> o.toString)
-        }
-      } else {
-        a
-      }
-    })
-
-  private def apiLink(
-                       requestBaseUri: String,
-                       apiRequest: ApiRequest
-                     ): String = {
-
-    val customRequestParamMap = getParamMapFromCustomCCRequestParams(apiRequest)
-    s"${requestBaseUri}${apiRequest.request.path}${customRequestParamMap.toString()}"
+    s"$baseUrl$queryString"
   }
 
   def create(
@@ -58,15 +45,15 @@ object ResultListResponse {
               requestBaseUri: String
             ): ResultListResponse = {
 
-    val isLastPage = displaySearch.totalPages == multipleResultsRequest.page
-    val isFirstPage = multipleResultsRequest.page == 1
+    val currentPage = multipleResultsRequest.page
+    val isLastPage = displaySearch.totalPages == currentPage
+    val isFirstPage = currentPage == 1
     val isOnlyPage = displaySearch.totalPages <= 1
 
-    val prevPageRequest = multipleResultsRequest.copy(page = multipleResultsRequest.page - 1)
-    val nextPageRequest = multipleResultsRequest.copy(page = multipleResultsRequest.page + 1)
+    val apiLink = createApiLink(requestBaseUri, multipleResultsRequest) _
 
-    val prevLink = if(!isFirstPage && !isOnlyPage) Some(apiLink(requestBaseUri, prevPageRequest)) else None
-    val nextLink = if(!isLastPage && !isOnlyPage) Some(apiLink(requestBaseUri, nextPageRequest)) else None
+    val prevLink = if(!isFirstPage && !isOnlyPage) Some(apiLink(Map("page" -> (currentPage - 1) ))) else None
+    val nextLink = if(!isLastPage && !isOnlyPage) Some(apiLink(Map("page" -> (currentPage + 1) ))) else None
 
     ResultListResponse(
       context = contextUri,
