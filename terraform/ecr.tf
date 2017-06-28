@@ -1,57 +1,36 @@
 # One repository per application (see http://stackoverflow.com/a/37543992 and https://github.com/docker/docker/blob/master/image/spec/v1.2.md)
 
-resource "aws_ecr_repository" "nginx" {
-  name = "uk.ac.wellcome/nginx"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_nginx" {
+  source = "./ecr"
+  name   = "nginx"
 }
 
-resource "aws_ecr_repository" "api" {
-  name = "uk.ac.wellcome/api"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_api" {
+  source = "./ecr"
+  name   = "api"
 }
 
-resource "aws_ecr_repository" "transformer" {
-  name = "uk.ac.wellcome/transformer"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_transformer" {
+  source = "./ecr"
+  name   = "transformer"
 }
 
-resource "aws_ecr_repository" "id_minter" {
-  name = "uk.ac.wellcome/id_minter"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_id_minter" {
+  source = "./ecr"
+  name   = "id_minter"
 }
 
-resource "aws_ecr_repository" "calm_adapter" {
-  name = "uk.ac.wellcome/calm_adapter"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_calm_adapter" {
+  source = "./ecr"
+  name   = "calm_adapter"
 }
 
-resource "aws_ecr_repository" "ingestor" {
-  name = "uk.ac.wellcome/ingestor"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_ingestor" {
+  source = "./ecr"
+  name   = "ingestor"
 }
 
-resource "aws_ecr_repository" "reindexer" {
-  name = "uk.ac.wellcome/reindexer"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+module "ecr_repository_reindexer" {
+  source = "./ecr"
+  name   = "reindexer"
 }
