@@ -106,3 +106,13 @@ variable "is_config_managed" {
   description = "Flag to tell whether the config should be generated using templates and put in S3"
   default     = true
 }
+
+variable "use_host_condition" {
+  description = "Boolean value to tell whether we should add a host condition"
+  default = false
+}
+
+variable "host_name" {
+  description = "Hostname to be matched in the host condition"
+  default = ""
+}

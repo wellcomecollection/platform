@@ -49,3 +49,13 @@ variable "healthcheck_path" {
 variable "infra_bucket" {
   description = "Name of the AWS Infra bucket"
 }
+
+variable "use_host_condition" {
+  description = "Boolean value to tell whether we should add a host condition"
+  default     = false
+}
+
+variable "host_name" {
+  description = "Hostname to be matched in the host condition"
+  default     = ""
+}

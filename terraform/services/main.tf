@@ -12,6 +12,8 @@ module "service" {
   desired_count       = "${var.desired_count}"
   healthcheck_path    = "${var.healthcheck_path}"
   infra_bucket        = "${var.infra_bucket}"
+  use_host_condition  = "${var.use_host_condition}"
+  host_name           = "${var.host_name}"
 }
 
 module "task" {
