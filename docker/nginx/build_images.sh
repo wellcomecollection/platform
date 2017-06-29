@@ -20,9 +20,11 @@ cd "$DIR"
 # Log in to ECR so that we can do 'docker push'
 $(aws ecr get-login)
 
-for variant in api services; do
+for conf_file in *.nginx.conf; do
+    variant="$(echo "$conf_file" | tr '.' ' ' | awk '{print $1}')"
+    echo $variant
     echo "Building nginx image for $variant..."
-    docker build --build-arg variant="$variant" --tag nginx_image .
+    docker build --build-arg conf_file="$conf_file" --tag nginx_image .
     docker tag $(docker images -q nginx_image) "$ECR_URI/uk.ac.wellcome/nginx:$variant"
     docker push "$ECR_URI/uk.ac.wellcome/nginx:$variant"
 done
