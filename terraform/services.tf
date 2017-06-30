@@ -170,7 +170,7 @@ module "loris" {
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
   app_uri            = "${module.ecr_repository_loris.repository_url}:latest"
-  nginx_uri          = "${module.ecr_repository_nginx.repository_url}:services"
+  nginx_uri          = "${module.ecr_repository_nginx.repository_url}:loris"
   listener_arn       = "${module.api_alb.listener_arn}"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/loris.ini"
