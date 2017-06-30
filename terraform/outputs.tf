@@ -3,9 +3,9 @@ output "ecr_nginx" {
 }
 
 output "miro_readonly_key_id" {
-	value = "${aws_iam_access_key.miro_images_readonly.id}"
+  value = "${aws_iam_access_key.miro_images_readonly.id}"
 }
 
 output "miro_readonly_key_secret" {
-	value = "${aws_iam_access_key.miro_images_readonly.secret}"
+  value = "${aws_iam_access_key.miro_images_readonly.secret}"
 }
