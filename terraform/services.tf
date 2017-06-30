@@ -149,6 +149,7 @@ module "api" {
   infra_bucket  = "${var.infra_bucket}"
   config_key    = "config/${var.build_env}/api.ini"
   alb_priority  = "110"
+  host_name     = "api.wellcomecollection.org"
 
   config_vars = {
     api_host    = "${var.api_host}"
