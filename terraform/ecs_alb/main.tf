@@ -10,8 +10,8 @@ resource "aws_alb" "ecs_service" {
 
 resource "aws_alb_listener" "ecs_service" {
   load_balancer_arn = "${aws_alb.ecs_service.id}"
-  port              = "${var.listener_port}"
-  protocol          = "${var.listener_protocol}"
+  port              = "443"
+  protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
   certificate_arn   = "${data.aws_acm_certificate.certificate.arn}"
 
@@ -23,7 +23,7 @@ resource "aws_alb_listener" "ecs_service" {
 
 resource "aws_alb_target_group" "ecs_service_default" {
   name     = "${var.name}-default-target-group"
-  port     = "${var.target_group_port}"
+  port     = 80
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
 
