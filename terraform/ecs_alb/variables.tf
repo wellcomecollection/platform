@@ -22,9 +22,8 @@ variable "listener_protocol" {
   description = "Protocol for listener"
 }
 
-variable "certificate_arn" {
-  default     = ""
-  description = "ARN of cert to use for HTTPS (if specified)"
+variable "certificate_domain" {
+  description = "Domain name of the associated ACM certificate"
 }
 
 variable "target_group_port" {
