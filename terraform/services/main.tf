@@ -7,6 +7,7 @@ module "service" {
   container_name      = "${var.container_name}"
   container_port      = "${var.container_port}"
   listener_arn        = "${var.listener_arn}"
+  listener_http_arn   = "${var.listener_http_arn}"
   path_pattern        = "${var.path_pattern}"
   alb_priority        = "${var.alb_priority}"
   desired_count       = "${var.desired_count}"
