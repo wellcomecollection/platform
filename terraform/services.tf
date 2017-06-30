@@ -176,7 +176,7 @@ module "loris" {
   config_key         = "config/${var.build_env}/loris.ini"
   path_pattern       = "/image/*"
   healthcheck_path   = "/image/"
-  alb_priority       = "108"
+  alb_priority       = "109"
   host_name          = "iiif.wellcomecollection.org"
 }
 
