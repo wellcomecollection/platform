@@ -4,30 +4,14 @@ import javax.inject.{Inject, Singleton}
 
 import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
-import com.twitter.finatra.request.{QueryParam, RouteParam}
-import com.twitter.finatra.validation._
-import com.twitter.finatra.validation.ValidationResult.{Invalid, Valid}
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.WorksIncludes
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.api.requests._
 
-case class MultipleResultsRequest(
-  @Min(1) @QueryParam page: Int = 1,
-  @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
-  @QueryParam includes: Option[WorksIncludes],
-  @RouteParam id: Option[String],
-  @QueryParam query: Option[String],
-  @QueryParam _index: Option[String]
-)
-
-case class SingleWorkRequest(
-  @RouteParam id: String,
-  @QueryParam includes: Option[WorksIncludes],
-  @QueryParam _index: Option[String]
-)
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
@@ -44,9 +28,12 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
   prefix(apiPrefix) {
-    getWithDoc("/works") { doc =>
+
+    val endpointSuffix = "/works"
+
+    getWithDoc(endpointSuffix) { doc =>
       doc
-        .summary("/works")
+        .summary(endpointSuffix)
         .description("Returns a paginated list of works")
         .tag("Works")
         .responseWith[Object](200, "ResultList[Work]")
@@ -69,9 +56,9 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         // useful for us to try out transformer changes, different index
         // weighting, etc., but we don't want to advertise its existence
         // in the public docs.
+
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
-      // val includes = WorksIncludes(request.includes)
 
       val works = request.query match {
         case Some(queryString) =>
@@ -93,16 +80,14 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
 
       works
         .map(
-          results =>
-            response.ok.json(
-              ResultListResponse(
-                context = contextUri,
-                results = results.results,
-                pageSize = results.pageSize,
-                totalPages = results.totalPages,
-                totalResults = results.totalResults
-              )
-          )
+          displaySearch => {
+            ResultListResponse.create(
+              contextUri,
+              displaySearch,
+              request,
+              s"${apiScheme}://${apiHost}"
+            )
+          }
         )
     }
 
