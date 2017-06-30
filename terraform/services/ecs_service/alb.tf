@@ -12,7 +12,8 @@ resource "aws_alb_target_group" "ecs_service" {
   }
 }
 
-resource "aws_alb_listener_rule" "rule" {
+resource "aws_alb_listener_rule" "path_rule" {
+  count        = "${1 - var.use_host_condition}"
   listener_arn = "${var.listener_arn}"
   priority     = "${var.alb_priority}"
 
@@ -24,5 +25,26 @@ resource "aws_alb_listener_rule" "rule" {
   condition {
     field  = "path-pattern"
     values = ["${var.path_pattern}"]
+  }
+}
+
+resource "aws_alb_listener_rule" "path_host_rule" {
+  count        = "${var.use_host_condition}"
+  listener_arn = "${var.listener_arn}"
+  priority     = "${var.alb_priority}"
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_alb_target_group.ecs_service.arn}"
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["${var.path_pattern}"]
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.host_name}"]
   }
 }
