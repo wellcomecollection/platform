@@ -13,7 +13,7 @@ resource "aws_alb_listener" "ecs_service" {
   port              = "${var.listener_port}"
   protocol          = "${var.listener_protocol}"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "${var.certificate_arn}"
+  certificate_arn   = "${data.aws_acm_certificate.certificate.arn}"
 
   default_action {
     target_group_arn = "${aws_alb_target_group.ecs_service_default.arn}"
