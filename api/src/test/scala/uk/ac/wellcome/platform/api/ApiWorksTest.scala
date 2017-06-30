@@ -161,8 +161,8 @@ class ApiWorksTest
                           |  "pageSize": 1,
                           |  "totalPages": 3,
                           |  "totalResults": 3,
-                          |  "prev": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
-                          |  "next": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
+                          |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
+                          |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -195,7 +195,7 @@ class ApiWorksTest
                           |  "pageSize": 1,
                           |  "totalPages": 3,
                           |  "totalResults": 3,
-                          |  "next": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
+                          |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -228,7 +228,7 @@ class ApiWorksTest
                           |  "pageSize": 1,
                           |  "totalPages": 3,
                           |  "totalResults": 3,
-                          |  "prev": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
+                          |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
                           |     "type": "Work",

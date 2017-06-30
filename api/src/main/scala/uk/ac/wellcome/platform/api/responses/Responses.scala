@@ -18,8 +18,8 @@ case class ResultListResponse(
   totalPages: Int = 10,
   totalResults: Int = 100,
   results: Array[_ <: Any],
-  prev: Option[String] = None,
-  next: Option[String] = None
+  prevPage: Option[String] = None,
+  nextPage: Option[String] = None
 ) {
   @JsonProperty("type") val ontologyType: String = "ResultList"
 }
@@ -61,8 +61,8 @@ object ResultListResponse {
       pageSize = displaySearch.pageSize,
       totalPages = displaySearch.totalPages,
       totalResults = displaySearch.totalResults,
-      prev = prevLink,
-      next = nextLink
+      prevPage = prevLink,
+      nextPage = nextLink
     )
   }
 }
