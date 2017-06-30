@@ -49,3 +49,8 @@ variable "healthcheck_path" {
 variable "infra_bucket" {
   description = "Name of the AWS Infra bucket"
 }
+
+variable "host_name" {
+  description = "Hostname to be matched in the host condition"
+  default     = ""
+}
