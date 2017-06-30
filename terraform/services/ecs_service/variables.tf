@@ -37,6 +37,10 @@ variable "listener_arn" {
   description = "ARN of listener for listener rule"
 }
 
+variable "listener_http_arn" {
+  description = "ARN of listener for HTTP listener rule"
+}
+
 variable "path_pattern" {
   description = "path pattern to match for listener rule"
   default     = "/*"

@@ -52,3 +52,40 @@ resource "aws_alb_listener_rule" "path_host_rule" {
     values = ["${var.host_name}"]
   }
 }
+
+resource "aws_alb_listener_rule" "path_rule_http" {
+  count        = "${var.host_name == "" ? 1 : 0}"
+  listener_arn = "${var.listener_http_arn}"
+  priority     = "${var.alb_priority}"
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_alb_target_group.ecs_service.arn}"
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["${var.path_pattern}"]
+  }
+}
+
+resource "aws_alb_listener_rule" "path_host_rule_http" {
+  count        = "${var.host_name != "" ? 1 : 0}"
+  listener_arn = "${var.listener_http_arn}"
+  priority     = "${var.alb_priority}"
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_alb_target_group.ecs_service.arn}"
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["${var.path_pattern}"]
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.host_name}"]
+  }
+}
