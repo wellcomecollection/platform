@@ -1,4 +1,4 @@
-resource "aws_sns_topic" "topic" {
+resource "aws_sns_topic" "alarm_topic" {
   name = "${aws_sqs_queue.dlq.name}_alarm"
 }
 
@@ -16,5 +16,5 @@ resource "aws_cloudwatch_metric_alarm" "dlq_not_empty" {
     QueueName = "${aws_sqs_queue.dlq.name}"
   }
 
-  alarm_actions = ["${aws_sns_topic.topic.arn}"]
+  alarm_actions = ["${aws_sns_topic.alarm_topic.arn}"]
 }

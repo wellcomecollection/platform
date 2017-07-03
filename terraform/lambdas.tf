@@ -197,3 +197,21 @@ module "trigger_drain_ecs_container_instance" {
   lambda_function_arn  = "${module.lambda_drain_ecs_container_instance.arn}"
   sns_trigger_arn      = "${module.ec2_terminating_topic.arn}"
 }
+# Lambda for posting on slack when an alarm is triggered
+
+module "lambda_post_to_slack" {
+  source      = "./lambda"
+  name        = "post_to_slack"
+  description = "post_to_slack"
+  source_dir  = "../lambdas/post_to_slack"
+  environment_variables = {
+    SLACK_INCOMING_WEBHOOK = "${var.slack_webhook}"
+  }
+}
+
+module "trigger_post_to_slack" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
+  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
+  sns_trigger_arn      = "${module.id_minter_queue.alarm_topic_arn}"
+}
