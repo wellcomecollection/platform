@@ -14,6 +14,8 @@ fi
 
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST, BRANCH=$BRANCH"
 
+BUILD_TYPE=${BUILD_TYPE:-make}
+
 if [[ "$BUILD_TYPE" == "sbt" ]]; then
   ./.travis/run_sbt.sh
 fi
