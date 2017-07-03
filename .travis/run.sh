@@ -14,7 +14,8 @@ fi
 
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST, BRANCH=$BRANCH"
 
-if [[ "$BUILD_TYPE" == "sbt" ]]
-then
+if [[ "$BUILD_TYPE" == "sbt" ]]; then
   ./.travis/run_sbt.sh
+elif [[ "$BUILD_TYPE" == "python" ]]; then
+  ./.travis/run_python.sh
 fi
