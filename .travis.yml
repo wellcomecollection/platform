@@ -81,10 +81,10 @@ matrix:
         - BUILD_TYPE=sbt
         - PROJECT=reindexer
     - env:
-        - BUILD_TYPE=python
+        - TASK=lint-lambdas
         - PROJECT=lambdas
     - env:
-        - BUILD_TYPE=jslint
+        - TASK=lint-ontologies
         - PROJECT=ontologies
 
 script:
