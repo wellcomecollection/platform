@@ -33,6 +33,10 @@ def should_rebuild_project(changed_files, project):
         print("*** Changes to the scripts directory mean we should rebuild")
         return True
 
+    elif any(f.startswith('.travis') for f in changed_files):
+        print("*** Changes to the Travis config mean we should rebuild")
+        return True
+
     return False
 
 

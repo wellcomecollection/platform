@@ -80,6 +80,9 @@ matrix:
     - env:
         - BUILD_TYPE=sbt
         - PROJECT=reindexer
+    - env:
+        - BUILD_TYPE=python
+        - PROJECT=lambdas
 
 script:
   - ./.travis/run.sh
