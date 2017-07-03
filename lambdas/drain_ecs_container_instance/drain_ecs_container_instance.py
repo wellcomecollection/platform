@@ -3,8 +3,9 @@
 """
 This task tries to ensure graceful termination of ECS container instances.
 
-The SNS topic "ec2_terminating" receives messages telling us about terminating EC2 instances.
-If the terminating instance is part of an ECS cluster, it drains the ECS tasks on the instance.
+The SNS topic "ec2_terminating" receives messages telling us about terminating
+EC2 instances. If the terminating instance is part of an ECS cluster, it
+drains the ECS tasks on the instance.
 """
 import json
 import pprint
@@ -15,7 +16,11 @@ import boto3
 from sns_utils import publish_sns_message
 
 
-def set_container_instance_to_draining(ecs_client, cluster_arn, ecs_container_instance_arn):
+def set_container_instance_to_draining(
+        ecs_client,
+        cluster_arn,
+        ecs_container_instance_arn):
+
     ecs_client.update_container_instances_state(
         cluster=cluster_arn,
         containerInstances=[
@@ -25,7 +30,12 @@ def set_container_instance_to_draining(ecs_client, cluster_arn, ecs_container_in
     )
 
 
-def continue_lifecycle_action(asg_client, asg_group_name, ec2_instance_id, lifecycle_hook_name):
+def continue_lifecycle_action(
+        asg_client,
+        asg_group_name,
+        ec2_instance_id,
+        lifecycle_hook_name):
+
     response = asg_client.complete_lifecycle_action(
         LifecycleHookName=lifecycle_hook_name,
         AutoScalingGroupName=asg_group_name,
@@ -67,7 +77,12 @@ def main(event, _):
             cluster_arn = tags_dict['clusterArn']
             ecs_container_instance_arn = tags_dict['containerInstanceArn']
         except KeyError as e:
-            continue_lifecycle_action(asg_client, asg_group_name, ec2_instance_id, lifecycle_hook_name)
+            continue_lifecycle_action(
+                asg_client,
+                asg_group_name,
+                ec2_instance_id,
+                lifecycle_hook_name
+            )
             return
 
         running_tasks = ecs_client.list_tasks(
@@ -77,7 +92,12 @@ def main(event, _):
         print(f"running tasks: {running_tasks['taskArns']}")
 
         if not running_tasks['taskArns']:
-            continue_lifecycle_action(asg_client, asg_group_name, ec2_instance_id, lifecycle_hook_name)
+            continue_lifecycle_action(
+                asg_client,
+                asg_group_name,
+                ec2_instance_id,
+                lifecycle_hook_name
+            )
         else:
             asg_client.record_lifecycle_action_heartbeat(
                 LifecycleHookName=lifecycle_hook_name,
@@ -90,8 +110,14 @@ def main(event, _):
                 cluster=cluster_arn,
                 containerInstances=[ecs_container_instance_arn],
             )
-            if container_instance_info['containerInstances'][0]['status'] != 'DRAINING':
-                set_container_instance_to_draining(ecs_client, cluster_arn, ecs_container_instance_arn)
+
+            status = container_instance_info['containerInstances'][0]['status']
+
+            if status != 'DRAINING':
+                set_container_instance_to_draining(
+                    ecs_client,
+                    cluster_arn,
+                    ecs_container_instance_arn)
 
             time.sleep(30)
             publish_sns_message(topic_arn, message_data)

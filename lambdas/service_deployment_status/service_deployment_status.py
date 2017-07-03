@@ -41,15 +41,18 @@ def compare_deployments(current_deployments, last_deployments):
 
     deleted_deployments = [
         _find_in_deployments(last_deployments, deletion_key)
-         for deletion_key in deletions_keys]
+        for deletion_key in deletions_keys
+    ]
 
     added_deployments = [
         _find_in_deployments(current_deployments, additions_key)
-         for additions_key in additions_keys]
+        for additions_key in additions_keys
+    ]
 
     maybe_updated_deployments = [
         _find_in_deployments(current_deployments, remaining_key)
-         for remaining_key in remaining_keys]
+        for remaining_key in remaining_keys
+    ]
 
     updated_deployments = list(
         set(maybe_updated_deployments) - unchanged_deployments
