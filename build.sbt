@@ -1,8 +1,4 @@
 import sbt.Keys._
-import com.amazonaws.regions.{Region, Regions}
-import com.typesafe.sbt._
-import com.typesafe.sbt.packager.universal.UniversalPlugin
-import com.typesafe.sbt.packager.docker.DockerPlugin
 
 def doSharedSetup(project: Project) =
   project
@@ -43,3 +39,4 @@ lazy val reindexer = doSharedSetup(project)
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
 lazy val root = (project in file("."))
+  .aggregate(common, calm_adapter, api, ingestor, transformer, id_minter, reindexer)
