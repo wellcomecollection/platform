@@ -19,8 +19,8 @@ then
   exit 0
 fi
 
-export VERSION="0.0.1"
-export BUILD_ENV="prod"
+export VERSION="${VERSION:-0.0.1}"
+export BUILD_ENV="${BUILD_ENV:-dev}"
 export RELEASE_ID="$VERSION-$(git rev-parse HEAD)_$BUILD_ENV"
 export TAG="$AWS_ECR_REPO/uk.ac.wellcome/$PROJECT:$RELEASE_ID"
 
