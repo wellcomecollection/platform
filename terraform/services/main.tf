@@ -6,7 +6,7 @@ module "service" {
   vpc_id              = "${var.vpc_id}"
   container_name      = "${var.container_name}"
   container_port      = "${var.container_port}"
-  listener_arn        = "${var.listener_arn}"
+  listener_https_arn  = "${var.listener_https_arn}"
   listener_http_arn   = "${var.listener_http_arn}"
   path_pattern        = "${var.path_pattern}"
   alb_priority        = "${var.alb_priority}"
