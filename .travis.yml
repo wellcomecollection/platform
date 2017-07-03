@@ -83,6 +83,9 @@ matrix:
     - env:
         - BUILD_TYPE=python
         - PROJECT=lambdas
+    - env:
+        - BUILD_TYPE=jslint
+        - PROJECT=ontologies
 
 script:
   - ./.travis/run.sh
