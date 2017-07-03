@@ -14,31 +14,38 @@ def main(event, _):
     print(f'Received event:\n{pprint.pformat(event)}')
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
-    webhook_url = os.environ["SLACK_INCOMING_WEBHOOK"]
+    alarm_name = message_data['AlarmName']
+    namespace = message_data['Trigger']['Namespace']
+    metric_name = message_data['Trigger']['MetricName']
+    dimensions = message_data['Trigger']['Dimensions']
+    state_reason = message_data['NewStateReason']
 
-    slack_data = {'username': 'cloudwatch-alert', "icon_emoji": ":slack:", "attachments": [{
-        'color': 'danger',
-        'fallback': message_data['AlarmName'],
-        "title": message_data['AlarmName'],
-        "fields": [
-            {
-                "title": "Metric",
-                "value": f"{message_data['Trigger']['Namespace']}/{message_data['Trigger']['MetricName']}"
-            },
-            {
-                "title": "Dimensions",
-                "value": f"{pprint.pformat(message_data['Trigger']['Dimensions'])}"
-            },
-            {
-                "title": "Reason",
-                "value": message_data['NewStateReason']
-            }
-        ]
+    slack_data = {'username': 'cloudwatch-alert',
+                  "icon_emoji": ":slack:",
+                  "attachments": [{
+                      'color': 'danger',
+                      'fallback': alarm_name,
+                      "title": alarm_name,
+                      "fields": [
+                          {
+                              "title": "Metric",
+                              "value": f"{namespace}/{metric_name}"
+                          },
+                          {
+                              "title": "Dimensions",
+                              "value": f"{pprint.pformat(dimensions)}"
+                          },
+                          {
+                              "title": "Reason",
+                              "value": state_reason
+                          }
+                      ]
     }
     ]}
 
     response = requests.post(
-        webhook_url, data=json.dumps(slack_data),
+        os.environ["SLACK_INCOMING_WEBHOOK"],
+        data=json.dumps(slack_data),
         headers={'Content-Type': 'application/json'}
     )
     if response.status_code != 200:
