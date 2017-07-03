@@ -15,7 +15,7 @@ resource "aws_alb_target_group" "ecs_service" {
 module "listener_rule_https" {
   source           = "./listener_rule"
   host_name        = "${var.host_name}"
-  listener_arn     = "${var.listener_arn}"
+  listener_arn     = "${var.listener_https_arn}"
   alb_priority     = "${var.alb_priority}"
   target_group_arn = "${aws_alb_target_group.ecs_service.arn}"
   path_pattern     = "${var.path_pattern}"

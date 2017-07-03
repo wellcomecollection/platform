@@ -59,8 +59,8 @@ variable "app_uri" {
   default     = ""
 }
 
-variable "listener_arn" {
-  description = "ARN of listener for listener rule"
+variable "listener_https_arn" {
+  description = "ARN of listener for HTTPS listener rule"
 }
 
 variable "listener_http_arn" {
