@@ -4,15 +4,6 @@ set -o errexit
 set -o nounset
 set -o verbose
 
-# If we're on the master branch and in an application project, we should
-# build a new Docker image and push it to ECR.
-
-if [[ "$BRANCH" != "master" ]]
-then
-  echo "Not on master (BRANCH=$BRANCH); skipping deploy..."
-  exit 0
-fi
-
 if [[ "$PROJECT" == "common" ]]
 then
   echo "Common lib doesn't have a Docker container; skipping deploy..."
