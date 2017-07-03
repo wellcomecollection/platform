@@ -18,4 +18,6 @@ if [[ "$BUILD_TYPE" == "sbt" ]]; then
   ./.travis/run_sbt.sh
 elif [[ "$BUILD_TYPE" == "python" ]]; then
   ./.travis/run_python.sh
+elif [[ "$BUILD_TYPE" == "js" ]]; then
+  ./.travis/run_js.sh
 fi
