@@ -12,22 +12,8 @@ variable "loadbalancer_security_groups" {
   description = "Load balancer security group ID"
 }
 
-variable "listener_port" {
-  default     = "443"
-  description = "Port for listener"
-}
-
-variable "listener_protocol" {
-  default     = "HTTPS"
-  description = "Protocol for listener"
-}
-
 variable "certificate_domain" {
   description = "Domain name of the associated ACM certificate"
-}
-
-variable "target_group_port" {
-  default = "80"
 }
 
 variable "health_check_path" {
