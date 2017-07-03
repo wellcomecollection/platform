@@ -22,6 +22,6 @@ fi
 # check if the TASK variable is defined in Travi, and use make if so.
 # Eventually, we'll be able to get rid of this check and call make directly
 # from .travis.yml.
-if [[ -z "$TASK" ]]; then
+if ! [[ -z "${TASK+x}" ]]; then
   make "$TASK"
 fi
