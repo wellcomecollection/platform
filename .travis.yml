@@ -84,7 +84,7 @@ matrix:
         - BUILD_TYPE=python
         - PROJECT=lambdas
     - env:
-        - BUILD_TYPE=js
+        - BUILD_TYPE=jslint
         - PROJECT=ontologies
 
 script:
