@@ -1,9 +1,8 @@
-FROM alpine:3.3
+FROM node:alpine
 
 VOLUME ["/data"]
 
-RUN apk add --no-cache --virtual .run-deps nodejs \
- && npm install -g jshint
+RUN npm install -g jshint
 
 COPY run.sh /app/run.sh
 

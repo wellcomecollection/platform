@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -o errexit
 set -o nounset
 set -o verbose
 
-
-jshint /data/**/*.js*
+find /data/*.js* | xargs jshint
