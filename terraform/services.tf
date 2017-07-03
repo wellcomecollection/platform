@@ -175,7 +175,7 @@ module "loris" {
   listener_arn       = "${module.api_alb.listener_arn}"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/loris.ini"
-  path_pattern       = "/image/*"
+  path_pattern       = "/image*"
   healthcheck_path   = "/image/"
   alb_priority       = "109"
   host_name          = "iiif.wellcomecollection.org"
