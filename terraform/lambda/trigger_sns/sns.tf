@@ -1,7 +1,7 @@
 /* Configures an SNS trigger for a Lambda */
 resource "random_id" "statement_id" {
   keepers = {
-    # Generate a new id each time we switch to a new AMI id
+    # Generate a new id each time we switch to a new topic subscription
     aws_sns_topic_subscription = "${aws_sns_topic_subscription.topic_lambda.id}"
   }
 
