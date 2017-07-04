@@ -8,6 +8,18 @@ docker-build-jslint:
 docker-build-flake8:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
+## Build the images for the nginx proxies
+docker-build-nginx:
+	./docker/nginx/manage_images.sh BUILD
+
+
+
+# Tasks for pushing images to ECR #
+
+## Push images for the nginx proxies to ECR
+docker-deploy-nginx:
+	./docker/nginx/manage_images.sh DEPLOY
+
 
 
 # Tasks for running linting #
