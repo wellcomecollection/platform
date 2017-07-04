@@ -1,11 +1,11 @@
 # Tasks for building Docker images #
 
 ## Build the image used for jslint
-docker_jslint:
+docker-build-jslint:
 	docker build ./docker/jslint_ci --tag jslint_ci
 
 ## Build the image used for flake8 linting
-docker_flake8:
+docker-build-flake8:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
 
@@ -13,11 +13,11 @@ docker_flake8:
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
-lint-ontologies: docker_jslint
+lint-ontologies: docker-build-jslint
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
 ## Run flake8 linting over our Lambda code
-lint-lambdas: docker_flake8
+lint-lambdas: docker-build-flake8
 	docker run -v $$(pwd)/lambdas:/data python3.6_ci:latest
 
 
