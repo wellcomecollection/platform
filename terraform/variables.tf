@@ -75,5 +75,6 @@ variable "grafana_admin_password" {
 }
 
 variable "slack_webhook" {
+  description = "Incoming Webhook URL to send slack notifications"
   default = ""
 }
