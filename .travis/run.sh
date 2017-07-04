@@ -25,5 +25,10 @@ fi
 # Eventually, we'll be able to get rid of this check and call make directly
 # from .travis.yml.
 if ! [[ -z "${TASK+x}" ]]; then
+
+  if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]; then
+    TASK="${TASK/build/deploy}"
+  fi
+
   make "$TASK"
 fi
