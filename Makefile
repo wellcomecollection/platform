@@ -1,5 +1,4 @@
-INFRA_BUCKET = platform-infra
-
+# Tasks for building Docker images #
 
 ## Build the image used for jslint
 docker-build-jslint:
@@ -9,42 +8,25 @@ docker-build-jslint:
 docker-build-flake8:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
+## Build the images for the nginx proxies
+docker-build-nginx:
+	./docker/nginx/manage_images.sh BUILD
 
+docker-build-terraform:
+	docker build ./docker/terraform_ci --tag terraform_ci
 
-nginx-build-deps:
-	pip3 install --upgrade boto3 docker docopt
+# Tasks for running terraform
+terraform-plan: docker-build-terraform
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
 
-nginx-build-api: nginx-build-deps
-	./scripts/build_nginx_image.py --variant=api
+terraform-apply: docker-build-terraform
+		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
-nginx-build-loris: nginx-build-deps
-	./scripts/build_nginx_image.py --variant=loris
+# Tasks for pushing images to ECR #
 
-nginx-build-services: nginx-build-deps
-	./scripts/build_nginx_image.py --variant=services
-
-## Build images for all of our nginx proxies
-nginx-build:	\
-	nginx-build-api \
-	nginx-build-loris \
-	nginx-build-services
-
-
-
-nginx-deploy-api: nginx-build-api
-	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
-
-nginx-deploy-loris: nginx-build-loris
-	./scripts/deploy_docker_to_aws.py --project=nginx_loris --infra-bucket=$(INFRA_BUCKET)
-
-nginx-deploy-services: nginx-build-services
-	./scripts/deploy_docker_to_aws.py --project=nginx_services --infra-bucket=$(INFRA_BUCKET)
-
-## Push images for all of our nginx proxies
-nginx-deploy:	\
-	nginx-deploy-api \
-	nginx-deploy-loris \
-	nginx-deploy-services
+## Push images for the nginx proxies to ECR
+docker-deploy-nginx:
+	./docker/nginx/manage_images.sh DEPLOY
 
 
 
@@ -75,5 +57,5 @@ help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383
 			printf "\033[1;31m%-" width "s\033[0m %s\n", $$1, helpMsg;  \
 	}                                                                   \
 	{ helpMsg = $$0 }'                                                  \
-	width=30                                                            \
+	width=20                                                            \
 	$(MAKEFILE_LIST)
