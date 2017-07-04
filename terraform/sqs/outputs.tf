@@ -12,7 +12,3 @@ output "read_policy" {
   description = "Policy that allows reading from the created SQS queue"
   value       = "${data.aws_iam_policy_document.read_from_queue.json}"
 }
-
-output "alarm_topic_arn" {
-  value = "${aws_sns_topic.alarm_topic.arn}"
-}

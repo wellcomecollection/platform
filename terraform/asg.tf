@@ -12,6 +12,7 @@ module "services_cluster_asg" {
   instance_type         = "t2.large"
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
+  alarm_topic_arn = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
 }
 
 module "monitoring_cluster_asg" {
@@ -26,6 +27,7 @@ module "monitoring_cluster_asg" {
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
+  alarm_topic_arn = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
 }
 
 module "api_cluster_asg" {
@@ -39,4 +41,5 @@ module "api_cluster_asg" {
   instance_type         = "t2.large"
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
+  alarm_topic_arn = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
 }

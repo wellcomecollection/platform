@@ -209,16 +209,16 @@ module "lambda_post_to_slack" {
   }
 }
 
-module "trigger_post_to_slack_id_minter" {
+module "trigger_post_to_slack_dlqs_not_empty" {
   source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${module.id_minter_queue.alarm_topic_arn}"
+  sns_trigger_arn      = "${module.dlq_alarm.arn}"
 }
 
-module "trigger_post_to_slack_ingestor" {
+module "trigger_post_to_slack_esg_not_terminating" {
   source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${module.es_ingest_queue.alarm_topic_arn}"
+  sns_trigger_arn      = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
 }
