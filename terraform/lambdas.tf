@@ -215,3 +215,10 @@ module "trigger_post_to_slack_id_minter" {
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
   sns_trigger_arn      = "${module.id_minter_queue.alarm_topic_arn}"
 }
+
+module "trigger_post_to_slack_ingestor" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
+  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
+  sns_trigger_arn      = "${module.es_ingest_queue.alarm_topic_arn}"
+}
