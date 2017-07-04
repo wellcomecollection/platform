@@ -25,5 +25,5 @@ variable "max_receive_count" {
 }
 
 variable "alarm_topic_arn" {
-  description  = "ARN of the topic where to send notification for DLQs not being empty"
+  description = "ARN of the topic where to send notification for DLQs not being empty"
 }
