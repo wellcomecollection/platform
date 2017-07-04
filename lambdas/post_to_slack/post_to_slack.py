@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-
+Sends slack notifications for alarms events
 """
 
 import json
 import pprint
 import os
+
 from botocore.vendored import requests
 
 
