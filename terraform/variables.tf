@@ -73,3 +73,7 @@ variable "grafana_admin_user" {
 variable "grafana_admin_password" {
   description = "The password of the default Grafana admin"
 }
+
+variable "slack_webhook" {
+  description = "Incoming Webhook URL to send slack notifications"
+}
