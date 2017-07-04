@@ -1,7 +1,3 @@
-resource "aws_sns_topic" "topic" {
-  name = "${aws_sqs_queue.dlq.name}_alarm"
-}
-
 resource "aws_cloudwatch_metric_alarm" "dlq_not_empty" {
   alarm_name          = "${aws_sqs_queue.dlq.name}_not_empty"
   comparison_operator = "GreaterThanThreshold"
@@ -16,5 +12,5 @@ resource "aws_cloudwatch_metric_alarm" "dlq_not_empty" {
     QueueName = "${aws_sqs_queue.dlq.name}"
   }
 
-  alarm_actions = ["${aws_sns_topic.topic.arn}"]
+  alarm_actions = ["${var.alarm_topic_arn}"]
 }
