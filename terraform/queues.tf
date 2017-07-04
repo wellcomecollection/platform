@@ -4,6 +4,7 @@ module "es_ingest_queue" {
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.es_ingest_topic.name}"]
+  alarm_topic_arn = "${module.dlq_alarm.arn}"
 }
 
 module "id_minter_queue" {
@@ -12,4 +13,5 @@ module "id_minter_queue" {
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.id_minter_topic.name}"]
+  alarm_topic_arn = "${module.dlq_alarm.arn}"
 }

@@ -23,3 +23,7 @@ variable "max_receive_count" {
   description = "Max receive count before sending to DLQ"
   default     = "4"
 }
+
+variable "alarm_topic_arn" {
+  default = ""
+}
