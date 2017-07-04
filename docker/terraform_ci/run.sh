@@ -5,6 +5,9 @@ set -o nounset
 
 export OP="${OP:-plan}"
 
+echo "Running terraform operation: $OP"
+echo "Terraform version: $(terraform version)"
+
 if [[ "$OP" == "plan" ]]
 then
   echo "Running plan operation."
