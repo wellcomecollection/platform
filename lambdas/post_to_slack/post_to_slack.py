@@ -40,8 +40,7 @@ def main(event, _):
                               "value": state_reason
                           }
                       ]
-    }
-    ]}
+                  }]}
 
     response = requests.post(
         os.environ["SLACK_INCOMING_WEBHOOK"],
