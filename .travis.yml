@@ -60,25 +60,25 @@ cache:
 matrix:
   include:
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-common
         - PROJECT=common
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-api
         - PROJECT=api
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-transformer
         - PROJECT=transformer
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-calm_adapter
         - PROJECT=calm_adapter
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-ingestor
         - PROJECT=ingestor
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-id_minter
         - PROJECT=id_minter
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-reindexer
         - PROJECT=reindexer
     - env:
         - TASK=lint-lambdas
