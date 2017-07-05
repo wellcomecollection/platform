@@ -1,4 +1,5 @@
-# Tasks for building Docker images #
+INFRA_BUCKET = platform-infra
+
 
 ## Build the image used for jslint
 docker-build-jslint:
@@ -8,15 +9,12 @@ docker-build-jslint:
 docker-build-flake8:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
-## Build the images for the nginx proxies
-docker-build-nginx:
-	./docker/nginx/manage_images.sh BUILD
-
 ## Build the image for terraform
 docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
 
-# Tasks for pushing images to ECR #
+
+
 install-docker-build-deps:
 	pip3 install --upgrade boto3 docker docopt
 
@@ -52,9 +50,7 @@ nginx-deploy:	\
 	nginx-deploy-loris \
 	nginx-deploy-services
 
-## Push images for the nginx proxies to ECR
-docker-deploy-nginx:
-	./docker/nginx/manage_images.sh DEPLOY
+
 
 sbt-test-common:
 	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
@@ -155,6 +151,18 @@ sbt-deploy: \
 
 
 
+# Tasks for running terraform #
+
+## Run a plan
+terraform-plan: docker-build-terraform
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
+
+## Run an apply
+terraform-apply: docker-build-terraform
+		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
+
+
+
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
@@ -165,15 +173,6 @@ lint-ontologies: docker-build-jslint
 lint-lambdas: docker-build-flake8
 	docker run -v $$(pwd)/lambdas:/data python3.6_ci:latest
 
-# Tasks for running terraform #
-
-## Run a plan
-terraform-plan: docker-build-terraform
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
-
-## Run an apply
-terraform-apply: docker-build-terraform
-		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 .PHONY: help
@@ -191,5 +190,5 @@ help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383
 			printf "\033[1;31m%-" width "s\033[0m %s\n", $$1, helpMsg;  \
 	}                                                                   \
 	{ helpMsg = $$0 }'                                                  \
-	width=20                                                            \
+	width=30                                                            \
 	$(MAKEFILE_LIST)
