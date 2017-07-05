@@ -48,6 +48,49 @@ nginx-deploy:	\
 
 
 
+sbt-test-common:
+	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-api:
+	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-calm_adapter:
+	sbt 'project calm_adapter' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-id_minter:
+	sbt 'project id_minter' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-ingestor:
+	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-miro_adapter:
+	sbt 'project miro_adapter' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-reindexer:
+	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
+
+
+
+sbt-build-api:
+	./scripts/build_sbt_image.py --project=api
+
+sbt-build-calm_adapter:
+	./scripts/build_sbt_image.py --project=calm_adapter
+
+sbt-build-id_minter:
+	./scripts/build_sbt_image.py --project=id_minter
+
+sbt-build-ingestor:
+	./scripts/build_sbt_image.py --project=ingestor
+
+sbt-build-miro_adapter:
+	./scripts/build_sbt_image.py --project=miro_adapter
+
+sbt-build-reindexer:
+	./scripts/build_sbt_image.py --project=reindexer
+
+
+
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
