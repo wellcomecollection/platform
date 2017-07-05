@@ -39,7 +39,7 @@ do
   echo "*** Building nginx image for $variant..."
 
   # Construct the tag used for the image
-  TAG="$ECR_URI:$variant"
+  TAG="$ECR_URI:$variant-$(git rev-parse HEAD)"
   echo "*** Image will be tagged $TAG"
 
   # Actually build the image
