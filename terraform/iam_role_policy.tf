@@ -217,6 +217,8 @@ resource "aws_iam_role_policy" "drain_ecs_container_send_asg_heartbeat" {
   policy = "${data.aws_iam_policy_document.send_asg_heartbeat.json}"
 }
 
+# Policies for dynamo_to_sns lambda to publish to sns topics
+
 resource "aws_iam_role_policy" "dynamo_to_miro_sns" {
   role   = "${module.lambda_dynamo_to_sns.role_name}"
   policy = "${module.miro_transformer_topic.publish_policy}"

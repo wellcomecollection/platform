@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-
+Receives DynamoDB events and publishes the new image from the event to an SNS topic
 """
 import json
 import os
