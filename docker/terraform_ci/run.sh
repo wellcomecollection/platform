@@ -11,7 +11,7 @@ echo "Terraform version: $(terraform version)"
 if [[ "$OP" == "plan" ]]
 then
   echo "Running plan operation."
-  ./plan.sh
+  /app/plan.sh
 elif [[ "$OP" == "apply" ]]
 then
   if [ -e terraform.plan ]

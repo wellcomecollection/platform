@@ -12,23 +12,15 @@ docker-build-flake8:
 docker-build-nginx:
 	./docker/nginx/manage_images.sh BUILD
 
+## Build the image for terraform
 docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
-
-# Tasks for running terraform
-terraform-plan: docker-build-terraform
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
-
-terraform-apply: docker-build-terraform
-		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 # Tasks for pushing images to ECR #
 
 ## Push images for the nginx proxies to ECR
 docker-deploy-nginx:
 	./docker/nginx/manage_images.sh DEPLOY
-
-
 
 # Tasks for running linting #
 
@@ -40,6 +32,15 @@ lint-ontologies: docker-build-jslint
 lint-lambdas: docker-build-flake8
 	docker run -v $$(pwd)/lambdas:/data python3.6_ci:latest
 
+# Tasks for running terraform #
+
+## Run a plan
+terraform-plan: docker-build-terraform
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
+
+## Run an apply
+terraform-apply: docker-build-terraform
+		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 .PHONY: help
