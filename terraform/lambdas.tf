@@ -224,3 +224,10 @@ module "trigger_post_to_slack_esg_not_terminating" {
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
   sns_trigger_arn      = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
 }
+
+module "trigger_post_to_slack_alb" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
+  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
+  sns_trigger_arn      = "${module.alb_alarm.arn}"
+}

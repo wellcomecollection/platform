@@ -39,3 +39,8 @@ module "ec2_instance_terminating_for_too_long_alarm" {
   source = "./sns"
   name   = "ec2_instance_terminating_for_too_long_alarm"
 }
+
+module "alb_alarm" {
+  source = "./sns"
+  name   = "alb_alarm"
+}
