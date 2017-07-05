@@ -22,7 +22,7 @@ class Server extends HttpServer {
                              SQSClientModule,
                              AkkaModule,
                              SQSReaderModule,
-                             SQSWorker,
+                             IngestorWorker,
                              ElasticClientModule,
                              WorksIndexModule)
   flag[String]("es.index", "records", "ES index name")
