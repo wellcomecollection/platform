@@ -48,6 +48,105 @@ nginx-deploy:	\
 
 
 
+sbt-test-common:
+	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-api:
+	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-calm_adapter:
+	sbt 'project calm_adapter' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-id_minter:
+	sbt 'project id_minter' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-ingestor:
+	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-miro_adapter:
+	sbt 'project miro_adapter' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-reindexer:
+	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test-transformer:
+	sbt 'project transformer' ';dockerComposeUp;test;dockerComposeStop'
+
+sbt-test: \
+	sbt-test-api	\
+	sbt-test-calm_adapter	\
+	sbt-test-id_minter \
+	sbt-test-ingestor   \
+	sbt-test-miro_adapter \
+	sbt-test-reindexer	\
+	sbt-test-transformer
+
+
+
+sbt-build-api:
+	./scripts/build_sbt_image.py --project=api
+
+sbt-build-calm_adapter:
+	./scripts/build_sbt_image.py --project=calm_adapter
+
+sbt-build-id_minter:
+	./scripts/build_sbt_image.py --project=id_minter
+
+sbt-build-ingestor:
+	./scripts/build_sbt_image.py --project=ingestor
+
+sbt-build-miro_adapter:
+	./scripts/build_sbt_image.py --project=miro_adapter
+
+sbt-build-reindexer:
+	./scripts/build_sbt_image.py --project=reindexer
+
+sbt-build-transformer:
+	./scripts/build_sbt_image.py --project=reindexer
+
+sbt-build: \
+	sbt-build-api	\
+	sbt-build-calm_adapter	\
+	sbt-build-id_minter \
+	sbt-build-ingestor   \
+	sbt-build-miro_adapter \
+	sbt-build-reindexer	\
+	sbt-build-transformer
+
+
+
+sbt-deploy-api:
+	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-calm_adapter:
+	./scripts/deploy_docker_to_aws.py --project=calm_adapter --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-id_minter:
+	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-ingestor:
+	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-miro_adapter:
+	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-reindexer:
+	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-transformer:
+	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy: \
+	sbt-deploy-api	\
+	sbt-deploy-calm_adapter	\
+	sbt-deploy-id_minter \
+	sbt-deploy-ingestor   \
+	sbt-deploy-miro_adapter \
+	sbt-deploy-reindexer	\
+	sbt-deploy-transformer
+
+
+
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
