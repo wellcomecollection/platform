@@ -42,3 +42,12 @@ resource "aws_s3_bucket" "dashboard" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket" "mets-ingest" {
+  bucket = "mets-ingest"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
