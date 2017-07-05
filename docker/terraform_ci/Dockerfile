@@ -1,4 +1,4 @@
-FROM hashicorp/terraform:0.9.8
+FROM hashicorp/terraform
 
 VOLUME ["/data"]
 
