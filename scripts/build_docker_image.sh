@@ -9,4 +9,7 @@ sbt "project $PROJECT" stage
 
 docker build --build-arg project="$PROJECT" --tag="$TAG" .
 
+mkdir -p .releases
+echo "$RELEASE_ID" >> ".releases/$PROJECT"
+
 exit 0
