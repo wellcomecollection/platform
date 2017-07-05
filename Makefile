@@ -115,25 +115,25 @@ sbt-build: \
 
 
 
-sbt-deploy-api:
+sbt-deploy-api: sbt-build-api
 	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-calm_adapter:
+sbt-deploy-calm_adapter: sbt-build-calm_adapter
 	./scripts/deploy_docker_to_aws.py --project=calm_adapter --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-id_minter:
+sbt-deploy-id_minter: sbt-build-id_minter
 	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-ingestor:
+sbt-deploy-ingestor: sbt-build-ingestor
 	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-miro_adapter:
+sbt-deploy-miro_adapter: sbt-build-miro_adapter
 	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-reindexer:
+sbt-deploy-reindexer: sbt-build-reindexer
 	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-transformer:
+sbt-deploy-transformer: sbt-build-transformer
 	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
 
 sbt-deploy: \
