@@ -216,3 +216,13 @@ resource "aws_iam_role_policy" "drain_ecs_container_send_asg_heartbeat" {
   role   = "${module.lambda_drain_ecs_container_instance.role_name}"
   policy = "${data.aws_iam_policy_document.send_asg_heartbeat.json}"
 }
+
+resource "aws_iam_role_policy" "dynamo_to_miro_sns" {
+  role   = "${module.lambda_dynamo_to_sns.role_name}"
+  policy = "${module.miro_transformer_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "dynamo_to_calm_sns" {
+  role   = "${module.lambda_dynamo_to_sns.role_name}"
+  policy = "${module.calm_transformer_topic.publish_policy}"
+}
