@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Receives DynamoDB events and publishes the new image from the event to an SNS topic
+Receives DynamoDB events and publishes the new image from
+the event to an SNS topic
 """
 import json
 import os
@@ -14,4 +15,4 @@ def main(event, _):
     stream_topic_map = json.loads(os.environ["STREAM_TOPIC_MAP"])
     new_image = event['Records'][0]['dynamodb']['NewImage']
     topic_arn = stream_topic_map[event['Records'][0]['eventSourceARN']]
-    publish_sns_message(topic_arn,new_image)
+    publish_sns_message(topic_arn, new_image)
