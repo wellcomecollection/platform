@@ -11,10 +11,6 @@ branches:
   only:
     - master
 
-env:
-  global:
-    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
-
 before_install:
   - git fetch origin
 
@@ -124,6 +120,7 @@ script:
 env:
   global:
     - AWS_REGION=eu-west-1
+    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
 
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
