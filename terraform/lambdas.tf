@@ -163,8 +163,6 @@ module "trigger_reindexer_lambda" {
   stream_arn        = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
   function_arn      = "${module.lambda_schedule_reindexer.arn}"
   function_role     = "${module.lambda_schedule_reindexer.role_name}"
-  batch_size        = 1
-  starting_position = "LATEST"
 }
 
 # Lambda for updating the capacity of a DynamoDB table
@@ -237,4 +235,36 @@ module "trigger_post_to_slack_client_error_alb" {
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
   sns_trigger_arn      = "${module.alb_client_error_alarm.arn}"
+}
+
+# Lambda for pushing updates to dynamo tables into sqs queues
+
+module "lambda_dynamo_to_sns" {
+  source      = "./lambda"
+  name        = "dynamo_to_sns"
+  description = "Push new images form DynamoDB updates to SNS"
+  source_dir  = "../lambdas/dynamo_to_sns"
+
+  environment_variables = {
+    STREAM_TOPIC_MAP = <<EOF
+      {
+        "${aws_dynamodb_table.miro_table.stream_arn}": "${module.miro_transformer_topic.arn}",
+        "${aws_dynamodb_table.calm_table.stream_arn}": "${module.calm_transformer_topic.arn}"
+      }
+      EOF
+  }
+}
+
+module "trigger_dynamo_to_sns_miro" {
+  source            = "./lambda/trigger_dynamo"
+  stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
+  function_arn      = "${module.lambda_dynamo_to_sns.arn}"
+  function_role     = "${module.lambda_dynamo_to_sns.role_name}"
+}
+
+module "trigger_dynamo_to_sns_calm" {
+  source            = "./lambda/trigger_dynamo"
+  stream_arn        = "${aws_dynamodb_table.calm_table.stream_arn}"
+  function_arn      = "${module.lambda_dynamo_to_sns.arn}"
+  function_role     = "${module.lambda_dynamo_to_sns.role_name}"
 }
