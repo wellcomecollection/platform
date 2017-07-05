@@ -83,26 +83,26 @@ sbt-test: \
 
 
 
-sbt-build-api: install-docker-build-deps
+sbt-build-api: install-docker-build-deps sbt-test-api
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-calm_adapter: install-docker-build-deps
+sbt-build-calm_adapter: install-docker-build-deps sbt-test-calm_adapter
 	./scripts/build_sbt_image.py --project=calm_adapter
 
-sbt-build-id_minter: install-docker-build-deps
+sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: install-docker-build-deps
+sbt-build-ingestor: install-docker-build-deps sbt-test-ingestor
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: install-docker-build-deps
+sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: install-docker-build-deps
+sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: install-docker-build-deps
-	./scripts/build_sbt_image.py --project=reindexer
+sbt-build-transformer: install-docker-build-deps sbt-test-transformwe
+	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
 	sbt-build-api	\
