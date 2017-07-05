@@ -15,6 +15,5 @@ fi
 # isn't always defined.  This sets a default value if it doesn't exist.
 if [[ "${TASK:-not-docker-build-nginx}" == "docker-build-nginx" ]]
 then
-  # Install the AWS tools so we can log in to ECR
-  pip install --upgrade --user awscli
+  pip3 install --upgrade boto3 docker docopt
 fi
