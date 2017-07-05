@@ -9,6 +9,7 @@ This script is triggered by updates to the reindexer DynamoDB table.
 import os
 import pprint
 
+from dynamo_utils import DynamoEvent
 from sns_utils import publish_sns_message
 
 
@@ -21,10 +22,10 @@ def get_service_name(reindexers, table_name):
 def main(event, _):
     print(f'Received event:\n{pprint.pformat(event)}')
 
-    new_image = event["Records"][0]["dynamodb"]["NewImage"]
-    table_name = new_image["TableName"]["S"]
-    current_version = new_image["CurrentVersion"]["N"]
-    requested_version = new_image["RequestedVersion"]["N"]
+    dynamo_event = DynamoEvent(event)
+    table_name = dynamo_event.new_image["TableName"]["S"]
+    current_version = dynamo_event.new_image["CurrentVersion"]["N"]
+    requested_version = dynamo_event.new_image["RequestedVersion"]["N"]
 
     if current_version == requested_version:
         desired_count = 0
