@@ -42,7 +42,9 @@ before_install:
     fi
 
 install:
-  - ./.travis/install.sh
+  # We need this for the Elasticsearch Docker container to start
+  # See https://github.com/travis-ci/travis-ci/issues/6534
+  - sudo sysctl -w vm.max_map_count=262144
 
 cache:
   directories:
