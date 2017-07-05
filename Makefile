@@ -11,16 +11,16 @@ docker-build-flake8:
 
 
 
-nginx-build-deps:
+install-docker-build-deps:
 	pip3 install --upgrade boto3 docker docopt
 
-nginx-build-api: nginx-build-deps
+nginx-build-api: install-docker-build-deps
 	./scripts/build_nginx_image.py --variant=api
 
-nginx-build-loris: nginx-build-deps
+nginx-build-loris: install-docker-build-deps
 	./scripts/build_nginx_image.py --variant=loris
 
-nginx-build-services: nginx-build-deps
+nginx-build-services: install-docker-build-deps
 	./scripts/build_nginx_image.py --variant=services
 
 ## Build images for all of our nginx proxies
@@ -83,25 +83,25 @@ sbt-test: \
 
 
 
-sbt-build-api:
+sbt-build-api: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-calm_adapter:
+sbt-build-calm_adapter: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=calm_adapter
 
-sbt-build-id_minter:
+sbt-build-id_minter: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor:
+sbt-build-ingestor: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter:
+sbt-build-miro_adapter: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer:
+sbt-build-reindexer: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer:
+sbt-build-transformer: install-docker-build-deps
 	./scripts/build_sbt_image.py --project=reindexer
 
 sbt-build: \
