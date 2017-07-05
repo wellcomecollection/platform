@@ -35,10 +35,10 @@ nginx-deploy-api: nginx-build-api
 	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
 
 nginx-deploy-loris: nginx-build-loris
-	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+	./scripts/deploy_docker_to_aws.py --project=nginx_loris --infra-bucket=$(INFRA_BUCKET)
 
 nginx-deploy-services: nginx-build-services
-	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+	./scripts/deploy_docker_to_aws.py --project=nginx_services --infra-bucket=$(INFRA_BUCKET)
 
 ## Push images for all of our nginx proxies
 nginx-deploy:	\
