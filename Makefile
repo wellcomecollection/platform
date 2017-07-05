@@ -69,13 +69,17 @@ sbt-test-miro_adapter:
 sbt-test-reindexer:
 	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
 
+sbt-test-transformer:
+	sbt 'project transformer' ';dockerComposeUp;test;dockerComposeStop'
+
 sbt-test: \
 	sbt-test-api	\
 	sbt-test-calm_adapter	\
 	sbt-test-id_minter \
 	sbt-test-ingestor   \
 	sbt-test-miro_adapter \
-	sbt-test-reindexer
+	sbt-test-reindexer	\
+	sbt-test-transformer
 
 
 
@@ -97,13 +101,17 @@ sbt-build-miro_adapter:
 sbt-build-reindexer:
 	./scripts/build_sbt_image.py --project=reindexer
 
+sbt-build-transformer:
+	./scripts/build_sbt_image.py --project=reindexer
+
 sbt-build: \
 	sbt-build-api	\
 	sbt-build-calm_adapter	\
 	sbt-build-id_minter \
 	sbt-build-ingestor   \
 	sbt-build-miro_adapter \
-	sbt-build-reindexer
+	sbt-build-reindexer	\
+	sbt-build-transformer
 
 
 
@@ -125,13 +133,17 @@ sbt-deploy-miro_adapter:
 sbt-deploy-reindexer:
 	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
 
+sbt-deploy-transformer:
+	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
+
 sbt-deploy: \
 	sbt-deploy-api	\
 	sbt-deploy-calm_adapter	\
 	sbt-deploy-id_minter \
 	sbt-deploy-ingestor   \
 	sbt-deploy-miro_adapter \
-	sbt-deploy-reindexer
+	sbt-deploy-reindexer	\
+	sbt-deploy-transformer
 
 
 
