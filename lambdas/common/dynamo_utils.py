@@ -5,6 +5,19 @@ import pprint
 import boto3
 
 
+class DynamoEvent:
+    def __init__(self, event):
+        self.event = event
+
+    @property
+    def new_image(self):
+        return self.event['Records'][0]['dynamodb']['NewImage']
+
+    @property
+    def source_arn(self):
+        return self.event['Records'][0]['eventSourceARN']
+
+
 def change_dynamo_capacity(table_name, desired_capacity):
     """
     Given the name of a DynamoDB table and a desired capacity, update the
