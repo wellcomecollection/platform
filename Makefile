@@ -1,8 +1,6 @@
 INFRA_BUCKET = platform-infra
 
 
-# Tasks for building Docker images #
-
 ## Build the image used for jslint
 docker-build-jslint:
 	docker build ./docker/jslint_ci --tag jslint_ci
@@ -13,13 +11,16 @@ docker-build-flake8:
 
 
 
-nginx-build-api:
+nginx-build-deps:
+	pip3 install --upgrade boto3 docker docopt
+
+nginx-build-api: nginx-build-deps
 	./scripts/build_nginx_image.py --variant=api
 
-nginx-build-loris:
+nginx-build-loris: nginx-build-deps
 	./scripts/build_nginx_image.py --variant=loris
 
-nginx-build-services:
+nginx-build-services: nginx-build-deps
 	./scripts/build_nginx_image.py --variant=services
 
 ## Build images for all of our nginx proxies
