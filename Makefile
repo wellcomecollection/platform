@@ -12,6 +12,29 @@ docker-build-flake8:
 docker-build-nginx:
 	./docker/nginx/manage_images.sh BUILD
 
+## Build the images for the scala services
+
+docker-build-api:
+	PROJECT=api ./docker/scala_service/build.sh
+
+docker-build-ingestor:
+	PROJECT=ingestor ./docker/scala_service/build.sh
+
+docker-build-transformer:
+	PROJECT=transformer ./docker/scala_service/build.sh
+
+docker-build-id_minter:
+	PROJECT=id_minter ./docker/scala_service/build.sh
+	
+docker-build-reindexer:
+	PROJECT=reindexer ./docker/scala_service/build.sh
+
+docker-build-services: \
+	docker-build-api \
+	docker-build-ingestor \
+	docker-build-id_minter \
+	docker-build-transformer \
+	docker-build-reindexer
 
 
 # Tasks for pushing images to ECR #
@@ -19,7 +42,6 @@ docker-build-nginx:
 ## Push images for the nginx proxies to ECR
 docker-deploy-nginx:
 	./docker/nginx/manage_images.sh DEPLOY
-
 
 
 # Tasks for running linting #
