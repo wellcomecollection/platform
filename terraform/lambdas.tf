@@ -163,8 +163,6 @@ module "trigger_reindexer_lambda" {
   stream_arn        = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
   function_arn      = "${module.lambda_schedule_reindexer.arn}"
   function_role     = "${module.lambda_schedule_reindexer.role_name}"
-  batch_size        = 1
-  starting_position = "LATEST"
 }
 
 # Lambda for updating the capacity of a DynamoDB table
@@ -262,8 +260,6 @@ module "trigger_dynamo_to_sns_miro" {
   stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
   function_arn      = "${module.lambda_dynamo_to_sns.arn}"
   function_role     = "${module.lambda_dynamo_to_sns.role_name}"
-  batch_size        = 1
-  starting_position = "LATEST"
 }
 
 module "trigger_dynamo_to_sns_calm" {
@@ -271,6 +267,4 @@ module "trigger_dynamo_to_sns_calm" {
   stream_arn        = "${aws_dynamodb_table.calm_table.stream_arn}"
   function_arn      = "${module.lambda_dynamo_to_sns.arn}"
   function_role     = "${module.lambda_dynamo_to_sns.role_name}"
-  batch_size        = 1
-  starting_position = "LATEST"
 }
