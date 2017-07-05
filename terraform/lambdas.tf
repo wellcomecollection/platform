@@ -227,27 +227,35 @@ module "trigger_post_to_slack_esg_not_terminating" {
 
 # Lambda for pushing updates to dynamo tables into sqs queues
 
-module "lambda_dynamo_to_sqs" {
+module "lambda_dynamo_to_sns" {
   source = "./lambda"
-  name = "dynamo_to_sqs"
+  name = "dynamo_to_sns"
   description = ""
-  source_dir = "../lambdas/dynamo_to_sqs"
+  source_dir = "../lambdas/dynamo_to_sns"
+  environment_variables = {
+    STREAM_TOPIC_MAP = <<EOF
+{
+  "${aws_dynamodb_table.miro_table.stream_arn}": "${module.miro_transformer_topic.arn}",
+  "${aws_dynamodb_table.calm_table.stream_arn}": "${module.calm_transformer_topic.arn}",
+}
+EOF
+  }
 }
 
-module "trigger_dynamo_to_sqs_miro" {
+module "trigger_dynamo_to_sns_miro" {
   source            = "./lambda/trigger_dynamo"
   stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
-  function_arn      = "${module.lambda_dynamo_to_sqs.arn}"
-  function_role     = "${module.lambda_dynamo_to_sqs.role_name}"
+  function_arn      = "${module.lambda_dynamo_to_sns.arn}"
+  function_role     = "${module.lambda_dynamo_to_sns.role_name}"
   batch_size        = 1
   starting_position = "LATEST"
 }
 
-module "trigger_dynamo_to_sqs_calm" {
+module "trigger_dynamo_to_sns_calm" {
   source            = "./lambda/trigger_dynamo"
   stream_arn        = "${aws_dynamodb_table.calm_table.stream_arn}"
-  function_arn      = "${module.lambda_dynamo_to_sqs.arn}"
-  function_role     = "${module.lambda_dynamo_to_sqs.role_name}"
+  function_arn      = "${module.lambda_dynamo_to_sns.arn}"
+  function_role     = "${module.lambda_dynamo_to_sns.role_name}"
   batch_size        = 1
   starting_position = "LATEST"
 }
