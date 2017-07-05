@@ -69,6 +69,14 @@ sbt-test-miro_adapter:
 sbt-test-reindexer:
 	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
 
+sbt-test: \
+	sbt-test-api	\
+	sbt-test-calm_adapter	\
+	sbt-test-id_minter \
+	sbt-test-ingestor   \
+	sbt-test-miro_adapter \
+	sbt-test-reindexer
+
 
 
 sbt-build-api:
@@ -88,6 +96,14 @@ sbt-build-miro_adapter:
 
 sbt-build-reindexer:
 	./scripts/build_sbt_image.py --project=reindexer
+
+sbt-build: \
+	sbt-build-api	\
+	sbt-build-calm_adapter	\
+	sbt-build-id_minter \
+	sbt-build-ingestor   \
+	sbt-build-miro_adapter \
+	sbt-build-reindexer
 
 
 
