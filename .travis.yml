@@ -87,7 +87,7 @@ matrix:
         - TASK=lint-ontologies
         - PROJECT=ontologies
     - env:
-        - TASK=docker-build-nginx
+        - TASK=nginx-build
         - PROJECT=docker/nginx
 
 script:
