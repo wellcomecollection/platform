@@ -50,7 +50,7 @@ do
   docker build --build-arg conf_file="$conf_file" --tag "$TAG" .
 
   mkdir -p "$ROOT/.releases"
-  echo "$RELEASE_ID" >> "$ROOT/.releases/nginx_$variant"
+  echo "$RELEASE_ID" > "$ROOT/.releases/nginx_$variant"
 
   if [[ "$TASK" == "DEPLOY" ]]
   then
