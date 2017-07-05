@@ -244,7 +244,7 @@ module "trigger_post_to_slack_client_error_alb" {
 module "lambda_dynamo_to_sns" {
   source      = "./lambda"
   name        = "dynamo_to_sns"
-  description = ""
+  description = "Push new images form DynamoDB updates to SNS"
   source_dir  = "../lambdas/dynamo_to_sns"
 
   environment_variables = {
