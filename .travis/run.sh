@@ -17,7 +17,7 @@ echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST, BRANCH=$BRANCH"
 BUILD_TYPE=${BUILD_TYPE:-make}
 
 if [[ "$BUILD_TYPE" == "sbt" ]]; then
-  ./.travis/run_sbt.sh
+  make docker-build-"$PROJECT"
 fi
 
 # While we're transitioning from build scripts to make tasks, we need to
