@@ -102,7 +102,7 @@ script:
         TASK="${TASK/test/deploy}"
       fi
     fi
-  - make "$TASK"
+    make "$TASK"
 
 env:
   global:
