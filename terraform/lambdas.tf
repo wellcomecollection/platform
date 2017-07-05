@@ -224,3 +224,30 @@ module "trigger_post_to_slack_esg_not_terminating" {
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
   sns_trigger_arn      = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
 }
+
+# Lambda for pushing updates to dynamo tables into sqs queues
+
+module "lambda_dynamo_to_sqs" {
+  source = "./lambda"
+  name = "dynamo_to_sqs"
+  description = ""
+  source_dir = "../lambdas/dynamo_to_sqs"
+}
+
+module "trigger_dynamo_to_sqs_miro" {
+  source            = "./lambda/trigger_dynamo"
+  stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
+  function_arn      = "${module.lambda_dynamo_to_sqs.arn}"
+  function_role     = "${module.lambda_dynamo_to_sqs.role_name}"
+  batch_size        = 1
+  starting_position = "LATEST"
+}
+
+module "trigger_dynamo_to_sqs_calm" {
+  source            = "./lambda/trigger_dynamo"
+  stream_arn        = "${aws_dynamodb_table.calm_table.stream_arn}"
+  function_arn      = "${module.lambda_dynamo_to_sqs.arn}"
+  function_role     = "${module.lambda_dynamo_to_sqs.role_name}"
+  batch_size        = 1
+  starting_position = "LATEST"
+}
