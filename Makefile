@@ -1,3 +1,6 @@
+INFRA_BUCKET = platform-infra
+
+
 # Tasks for building Docker images #
 
 ## Build the image used for jslint
@@ -8,17 +11,47 @@ docker-build-jslint:
 docker-build-flake8:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
-## Build the images for the nginx proxies
-docker-build-nginx:
-	./docker/nginx/manage_images.sh BUILD
+
+
+## Build the image for the API proxy
+nginx-build-api:
+	./scripts/build_nginx_image.py --variant=api
+
+## Build the image for the Loris proxy
+nginx-build-loris:
+	./scripts/build_nginx_image.py --variant=loris
+
+## Build the image for the services proxy
+nginx-build-services:
+	./scripts/build_nginx_image.py --variant=services
+
+## Build images for all of our nginx proxies
+nginx-build:	\
+	nginx-build-api \
+	nginx-build-loris \
+	nginx-build-services
 
 
 
 # Tasks for pushing images to ECR #
 
-## Push images for the nginx proxies to ECR
-docker-deploy-nginx:
-	./docker/nginx/manage_images.sh DEPLOY
+## Push the image for the API proxy
+nginx-deploy-api: nginx-build-api
+	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+
+## Push the image for the Loris proxy
+nginx-deploy-loris: nginx-build-loris
+	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+
+## Push the image for the services proxy
+nginx-deploy-services: nginx-build-services
+	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+
+## Push images for all of our nginx proxies
+nginx-deploy:	\
+	nginx-deploy-api \
+	nginx-deploy-loris \
+	nginx-deploy-services
 
 
 
@@ -49,5 +82,5 @@ help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383
 			printf "\033[1;31m%-" width "s\033[0m %s\n", $$1, helpMsg;  \
 	}                                                                   \
 	{ helpMsg = $$0 }'                                                  \
-	width=20                                                            \
+	width=30                                                            \
 	$(MAKEFILE_LIST)
