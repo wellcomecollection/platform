@@ -13,15 +13,12 @@ docker-build-flake8:
 
 
 
-## Build the image for the API proxy
 nginx-build-api:
 	./scripts/build_nginx_image.py --variant=api
 
-## Build the image for the Loris proxy
 nginx-build-loris:
 	./scripts/build_nginx_image.py --variant=loris
 
-## Build the image for the services proxy
 nginx-build-services:
 	./scripts/build_nginx_image.py --variant=services
 
@@ -33,17 +30,12 @@ nginx-build:	\
 
 
 
-# Tasks for pushing images to ECR #
-
-## Push the image for the API proxy
 nginx-deploy-api: nginx-build-api
 	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
 
-## Push the image for the Loris proxy
 nginx-deploy-loris: nginx-build-loris
 	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
 
-## Push the image for the services proxy
 nginx-deploy-services: nginx-build-services
 	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
 
