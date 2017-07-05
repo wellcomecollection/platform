@@ -7,6 +7,7 @@ terraform/releases
 terraform.tfvars
 release_ids.tfvars
 terraform.tfstate.backup
+.releases
 
 # Created by https://www.gitignore.io/api/osx,vim,java,linux,scala,python,textmate,intellij
 

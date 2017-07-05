@@ -14,6 +14,9 @@ export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+# Root of the repository
+ROOT="$(git rev-parse HEAD)"
+
 # Log in to ECR so that we can do 'docker push'
 if [[ "$TASK" == "DEPLOY" ]]
 then
@@ -39,11 +42,15 @@ do
   fi
 
   # Construct the tag used for the image
-  TAG="$ECR_URI:$(git rev-parse HEAD)"
+  RELEASE_ID="$(git rev-parse HEAD)"
+  TAG="$ECR_URI:$RELEASE_ID"
   echo "*** Image will be tagged $TAG"
 
   # Actually build the image
   docker build --build-arg conf_file="$conf_file" --tag "$TAG" .
+
+  mkdir -p "$ROOT/.releases"
+  echo "$RELEASE_ID" >> "$ROOT/.releases/nginx_$variant"
 
   if [[ "$TASK" == "DEPLOY" ]]
   then
