@@ -17,4 +17,3 @@ output "mets_ingest_read_write_key_id" {
 output "mets_ingest_read_write_key_secret" {
   value = "${aws_iam_access_key.mets_ingest_read_write.secret}"
 }
-
