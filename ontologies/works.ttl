@@ -150,13 +150,6 @@ ww:hasCreationLocation rdf:type owl:ObjectProperty ;
 	rdfs:range ww:Place ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
 	
-ww:hasLicence rdf:type owl:ObjectProperty ;
-	rdfs:label "hasLicence"@en ;
-	rdfs:comment "Relates a work to the specific licence under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise licence to which a link can be made."@en ;
-	rdfs:domain ww:Work ;
-	rdfs:range ww:Licence ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-	
 ww:hasSubject rdf:type owl:ObjectProperty ;
 	rdfs:label "hasSubject"@en ;
 	rdfs:comment "Relates a work to the general thesaurus-based concept that describes the work's content."@en ;
@@ -260,20 +253,6 @@ ww:alternativeTitle rdf:type owl:DatatypeProperty ;
 ww:lettering rdf:type owl:DatatypeProperty ;
 	rdfs:label "lettering"@en ;
 	rdfs:comment "Recording written text on a (usually visual) work."@en ;
-	rdfs:domain ww:Work ;
-	rdfs:range rdf:langString ; 
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-	
-ww:accessRightsStatement rdf:type owl:DatatypeProperty ;
-	rdfs:label "accessRightsStatement"@en ;
-	rdfs:comment "A statement recording the conditions that apply to a researcher seeking access to the work: whether it is open or closed, or requires certain conditions to be met such as obtaining the permission of a depositor."@en ;
-	rdfs:domain ww:Work ;
-	rdfs:range rdf:langString ; 
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
-	
-ww:accessStatus rdf:type owl:DatatypeProperty ;
-	rdfs:label "accessStatus"@en ;
-	rdfs:comment "A statement of whether a work may be used by researchers or not, relating this to one of a set of defined options such as Open, Closed, Restricted Access etc."@en ;
 	rdfs:domain ww:Work ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .

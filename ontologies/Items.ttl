@@ -110,6 +110,13 @@ wi:hasStatus rdf:type owl:ObjectProperty ;
  	rdfs:domain wi:Item ;
 	rdfs:range wi:Status ;
   	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+
+ww:hasLicence rdf:type owl:ObjectProperty ;
+	rdfs:label "hasLicence"@en ;
+	rdfs:comment "Relates an item to the specific licence under which the item in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise licence to which a link can be made."@en ;
+	rdfs:domain ww:Item ;
+	rdfs:range ww:Licence ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
   
 #######  Data properties #####  
 	
@@ -175,3 +182,18 @@ wi:itemNote rdf:type owl:DatatypeProperty ;
 	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+
+ww:accessRightsStatement rdf:type owl:DatatypeProperty ;
+	rdfs:label "accessRightsStatement"@en ;
+	rdfs:comment "A statement recording the conditions that apply to a researcher seeking access to the item: whether it is open or closed, or requires certain conditions to be met such as obtaining the permission of a depositor."@en ;
+	rdfs:domain ww:Item ;
+	rdfs:range rdf:langString ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+	
+ww:accessStatus rdf:type owl:DatatypeProperty ;
+	rdfs:label "accessStatus"@en ;
+	rdfs:comment "A statement of whether an item may be used by researchers or not, relating this to one of a set of defined options such as Open, Closed, Restricted Access etc."@en ;
+	rdfs:domain ww:Item ;
+	rdfs:range rdf:langString ; 
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+	
