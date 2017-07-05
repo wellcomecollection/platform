@@ -86,6 +86,9 @@ matrix:
     - env:
         - TASK=lint-ontologies
         - PROJECT=ontologies
+    - env:
+        - TASK=docker-build-nginx
+        - PROJECT=docker/nginx
 
 script:
   - ./.travis/run.sh
