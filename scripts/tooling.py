@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import base64
 import os
 import subprocess
 
@@ -48,8 +49,13 @@ def authenticate_for_ecr_pushes(ecr_client, docker_client, repo_uri):
     """
     resp = ecr_client.get_authorization_token()
     token = resp['authorizationData'][0]['authorizationToken']
+    username, password = base64.b64decode(token).decode().split(':')
 
-    docker_client.login(username='AWS', password=token, registry=repo_uri)
+    docker_client.login(
+        username=username,
+        password=password,
+        registry=repo_uri
+    )
 
 
 def write_release_id(project, release_id):
