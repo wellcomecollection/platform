@@ -22,7 +22,7 @@ before_install:
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]
     then
-      if python ./scripts/should_rerun_tests.py
+      if python3 ./scripts/should_rerun_tests.py
       then
         echo "No changes that require us to re-run tests, skipping to the end"
         exit 0
@@ -34,7 +34,7 @@ before_install:
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
     then
-      if python ./scripts/should_rebuild_master.py
+      if python3 ./scripts/should_rebuild_master.py
       then
         echo "No changes that require us to re-build, skipping to the end"
         exit 0
@@ -102,6 +102,7 @@ script:
         TASK="${TASK/test/deploy}"
       fi
     fi
+    echo "Task is $TASK"
     make "$TASK"
 
 env:
