@@ -250,7 +250,7 @@ module "lambda_dynamo_to_sns" {
     STREAM_TOPIC_MAP = <<EOF
 {
   "${aws_dynamodb_table.miro_table.stream_arn}": "${module.miro_transformer_topic.arn}",
-  "${aws_dynamodb_table.calm_table.stream_arn}": "${module.calm_transformer_topic.arn}",
+  "${aws_dynamodb_table.calm_table.stream_arn}": "${module.calm_transformer_topic.arn}"
 }
 EOF
   }
