@@ -6,7 +6,7 @@ set -o errexit
 set -o nounset
 
 TASK=${1:-BUILD}
-echo "Task is $TASK"
+echo "*** Task is $TASK"
 
 export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
 
@@ -15,11 +15,11 @@ export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
 ECR_URI=$(
   aws ecr describe-repositories --repository-name uk.ac.wellcome/nginx | \
   jq -r '.repositories[0].repositoryUri')
-echo "ECR_URI is $ECR_URI"
+echo "*** ECR_URI is $ECR_URI"
 
 if [[ "$ECR_URI" == "" ]]
 then
-  echo "Failed to read ECR repo information" >&2
+  echo "*** Failed to read ECR repo information" >&2
   exit 1
 fi
 
@@ -36,7 +36,7 @@ fi
 for conf_file in *.nginx.conf
 do
   variant="$(echo "$conf_file" | tr '.' ' ' | awk '{print $1}')"
-  echo "Building nginx image for $variant..."
+  echo "*** Building nginx image for $variant..."
 
   docker build --build-arg conf_file="$conf_file" --tag nginx_image .
   docker tag $(docker images -q nginx_image) "$ECR_URI:$variant"
