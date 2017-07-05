@@ -8,6 +8,16 @@ module "es_ingest_topic" {
   name   = "es_ingest"
 }
 
+module "miro_transformer_topic" {
+  source = "./sns"
+  name   = "miro_transformer"
+}
+
+module "calm_transformer_topic" {
+  source = "./sns"
+  name   = "calm_transformer"
+}
+
 module "service_scheduler_topic" {
   source = "./sns"
   name   = "service_scheduler"
@@ -33,6 +43,11 @@ module "old_deployments" {
 module "dlq_alarm" {
   source = "./sns"
   name   = "dlq_alarm"
+}
+
+module "transformer_dlq_alarm" {
+  source = "./sns"
+  name   = "transformer_dlq_alarm"
 }
 
 module "ec2_instance_terminating_for_too_long_alarm" {
