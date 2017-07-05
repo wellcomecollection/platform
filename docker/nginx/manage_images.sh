@@ -38,11 +38,15 @@ do
   variant="$(echo "$conf_file" | tr '.' ' ' | awk '{print $1}')"
   echo "*** Building nginx image for $variant..."
 
-  docker build --build-arg conf_file="$conf_file" --tag nginx_image .
-  docker tag $(docker images -q nginx_image) "$ECR_URI:$variant"
+  # Construct the tag used for the image
+  TAG="$ECR_URI:$variant"
+  echo "*** Image will be tagged $TAG"
+
+  # Actually build the image
+  docker build --build-arg conf_file="$conf_file" --tag "$TAG" .
 
   if [[ "$TASK" == "DEPLOY" ]]
   then
-    docker push "$ECR_URI:$variant"
+    docker push "$TAG"
   fi
 done
