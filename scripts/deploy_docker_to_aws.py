@@ -4,14 +4,18 @@
 Push a Docker image to ECR and upload a release ID to S3.
 
 Usage:
-  deploy_docker_to_aws.py --docker-image=<name> --infra-bucket=<bucket>
+  deploy_docker_to_aws.py --project=<name> --infra-bucket=<bucket>
   deploy_docker_to_aws.py -h | --help
 
 Options:
   -h --help                Show this screen.
-  --docker-image=<image>   Tag of the docker image to push to ECR
-                           (e.g. nginx:83a21169d2bfdac703c4fce0bcc565b3a3816abf)
+  --project=<project>      Name of the project (e.g. api, loris).  Assumes
+                           there's a Docker image of the same name.
   --infra-bucket=<bucket>  Name of the infra bucket for storing release IDs.
+
+This script looks up the release ID (which it assumes is the Docker tag)
+from the .releases directory in the root of the repo.
+
 """
 
 import os
@@ -31,13 +35,13 @@ if __name__ == '__main__':
     ecr_client = boto3.client('ecr')
     docker_client = docker.from_env()
 
-    # Parse the ID of the Docker image.  This is of the form:
-    #
-    #      {project}:{tag}
-    #
-    docker_image = args['--docker-image']
-    project, tag = docker_image.split(':')
-    print(f'*** Pushing {docker_image!r} to AWS')
+    project = args['--project']
+    print(f'*** Pushing {project!r} to AWS')
+
+    # Get the release ID (which is the image tag)
+    release_file = os.path.join(ROOT, '.releases', project)
+    tag = open(release_file).read().strip()
+    docker_image = f'{project}:{tag}'
 
     # Look up the URI of our ECR repo -- this is needed for authentication
     # and for pushing.
@@ -65,7 +69,4 @@ if __name__ == '__main__':
 
     # Finally, upload the release ID string to S3.
     print(f'*** Uploading release ID to S3')
-    bucket.upload_file(
-        Filename=os.path.join(ROOT, '.releases', project),
-        Key=f'releases/{project}'
-    )
+    bucket.upload_file(Filename=release_file, Key=f'releases/{project}')

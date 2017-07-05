@@ -57,7 +57,7 @@ do
 
   if [[ "$TASK" == "DEPLOY" ]]
   then
-    $ROOT/scripts/deploy_docker_to_aws.py --docker-image="$TAG" --infra-bucket="$CONFIG_BUCKET"
+    $ROOT/scripts/deploy_docker_to_aws.py --project="nginx_$variant" --infra-bucket="$CONFIG_BUCKET"
   fi
   echo
 done
