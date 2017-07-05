@@ -10,19 +10,6 @@ echo "*** Task is $TASK"
 
 export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
 
-# All out nginx containers have a dedicated repository in ECR.  We need the
-# URI for pushing the containers.
-ECR_URI=$(
-  aws ecr describe-repositories --repository-name uk.ac.wellcome/nginx | \
-  jq -r '.repositories[0].repositoryUri')
-echo "*** ECR_URI is $ECR_URI"
-
-if [[ "$ECR_URI" == "" ]]
-then
-  echo "*** Failed to read ECR repo information" >&2
-  exit 1
-fi
-
 # Directory name of the script itself
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
@@ -38,8 +25,21 @@ do
   variant="$(echo "$conf_file" | tr '.' ' ' | awk '{print $1}')"
   echo "*** Building nginx image for $variant..."
 
+  # All out nginx containers have a dedicated repository in ECR.  We need the
+  # URI for pushing the containers.
+  export ECR_URI=$(
+    aws ecr describe-repositories --repository-name "uk.ac.wellcome/nginx_$variant" | \
+    jq -r '.repositories[0].repositoryUri')
+  echo "*** ECR_URI is $ECR_URI"
+
+  if [[ "$ECR_URI" == "" ]]
+  then
+    echo "*** Failed to read ECR repo information" >&2
+    exit 1
+  fi
+
   # Construct the tag used for the image
-  TAG="$ECR_URI:$variant-$(git rev-parse HEAD)"
+  TAG="$ECR_URI:$(git rev-parse HEAD)"
   echo "*** Image will be tagged $TAG"
 
   # Actually build the image
