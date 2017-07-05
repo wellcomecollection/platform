@@ -8,11 +8,20 @@ set -o nounset
 TASK=${1:-BUILD}
 echo "Task is $TASK"
 
+export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
+
 # All out nginx containers have a dedicated repository in ECR.  We need the
 # URI for pushing the containers.
 ECR_URI=$(
   aws ecr describe-repositories --repository-name uk.ac.wellcome/nginx | \
   jq -r '.repositories[0].repositoryUri')
+echo "ECR_URI is $ECR_URI"
+
+if [[ "$ECR_URI" == "" ]]
+then
+  echo "Failed to read ECR repo information" >&2
+  exit 1
+fi
 
 # Directory name of the script itself
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
