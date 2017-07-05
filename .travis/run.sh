@@ -25,5 +25,12 @@ fi
 # Eventually, we'll be able to get rid of this check and call make directly
 # from .travis.yml.
 if ! [[ -z "${TASK+x}" ]]; then
+
+  # On master, we run a different variant of our make tasks that do deployments
+  # instead of builds.  Use bash string replacement to change the task name.
+  if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]; then
+    TASK="${TASK/build/deploy}"
+  fi
+
   make "$TASK"
 fi
