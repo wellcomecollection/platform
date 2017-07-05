@@ -242,10 +242,11 @@ module "trigger_post_to_slack_client_error_alb" {
 # Lambda for pushing updates to dynamo tables into sqs queues
 
 module "lambda_dynamo_to_sns" {
-  source = "./lambda"
-  name = "dynamo_to_sns"
+  source      = "./lambda"
+  name        = "dynamo_to_sns"
   description = ""
-  source_dir = "../lambdas/dynamo_to_sns"
+  source_dir  = "../lambdas/dynamo_to_sns"
+
   environment_variables = {
     STREAM_TOPIC_MAP = <<EOF
 {

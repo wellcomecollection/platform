@@ -25,7 +25,6 @@ module "miro_transformer_queue" {
   alarm_topic_arn = "${module.transformer_dlq_alarm.arn}"
 }
 
-
 module "calm_transformer_queue" {
   source          = "./sqs"
   queue_name      = "calm_transformer_queue"
