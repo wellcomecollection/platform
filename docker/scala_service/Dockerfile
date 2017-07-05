@@ -1,10 +1,11 @@
 FROM anapsix/alpine-java
 
 ARG project
+ARG target
 
 RUN apk update && apk add python3 && pip3 install awscli && rm -rf /var/cache/apk
 
-ADD $project/target/universal/stage /opt/docker
+ADD $target /opt/docker
 RUN chown -R daemon:daemon /opt/docker
 USER daemon
 
