@@ -10,6 +10,9 @@ module "services_alb" {
 
   certificate_domain = "services.wellcomecollection.org"
   vpc_id             = "${module.vpc_services.vpc_id}"
+
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
 }
 
 module "monitoring_alb" {
@@ -24,6 +27,9 @@ module "monitoring_alb" {
 
   certificate_domain = "monitoring.wellcomecollection.org"
   vpc_id             = "${module.vpc_monitoring.vpc_id}"
+
+  server_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
 }
 
 module "api_alb" {
@@ -38,4 +44,7 @@ module "api_alb" {
 
   certificate_domain = "api.wellcomecollection.org"
   vpc_id             = "${module.vpc_api.vpc_id}"
+
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
 }
