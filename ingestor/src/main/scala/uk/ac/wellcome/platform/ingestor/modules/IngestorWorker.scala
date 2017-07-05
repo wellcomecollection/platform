@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor.modules
 
-import com.amazonaws.services.sqs.model.{Message => AwsSQSMessage}
 import com.twitter.inject.Injector
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.ingestor.services.IdentifiedWorkIndexer
