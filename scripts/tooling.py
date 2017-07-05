@@ -49,7 +49,7 @@ def authenticate_for_ecr_pushes(ecr_client, docker_client, repo_uri):
     resp = ecr_client.get_authorization_token()
     token = resp['authorizationData'][0]['authorizationToken']
 
-    docker_client.login(username='AWS', password='token', registry=repo_uri)
+    docker_client.login(username='AWS', password=token, registry=repo_uri)
 
 
 def write_release_id(project, release_id):
