@@ -9,6 +9,10 @@ TASK=${1:-BUILD}
 echo "*** Task is $TASK"
 
 export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
+export CONFIG_BUCKET=${CONFIG_BUCKET:-platform-infra}
+
+# Root of the repository
+ROOT=$(git rev-parse --show-toplevel)
 
 # Directory name of the script itself
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -42,8 +46,8 @@ do
   fi
 
   # Construct the tag used for the image
-  RELEASE_ID="$(git rev-parse HEAD)"
   TAG="$ECR_URI:$RELEASE_ID"
+  TAG="nginx:$RELEASE_ID"
   echo "*** Image will be tagged $TAG"
 
   # Actually build the image
@@ -54,6 +58,7 @@ do
 
   if [[ "$TASK" == "DEPLOY" ]]
   then
-    docker push "$TAG"
+    $ROOT/scripts/deploy_docker_image.sh "uk.ac.wellcome/nginx" "$TAG" "$CONFIG_BUCKET" "nginx_$variant" "$(git rev-parse HEAD)"
   fi
+  echo
 done
