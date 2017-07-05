@@ -12,10 +12,10 @@ variable "function_role" {
 
 variable "batch_size" {
   description = "Maximum batch size to retrieve from the stream"
-  default = 1
+  default     = 1
 }
 
 variable "starting_position" {
   description = "Position in the stream where AWS Lambda should start reading"
-  default = "LATEST"
+  default     = "LATEST"
 }
