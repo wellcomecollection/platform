@@ -46,11 +46,10 @@ do
   fi
 
   # Construct the tag used for the image
-  TAG="$ECR_URI:$RELEASE_ID"
+  RELEASE_ID="$(git rev-parse HEAD)"
   TAG="nginx:$RELEASE_ID"
   echo "*** Image will be tagged $TAG"
 
-  # Actually build the image
   docker build --build-arg conf_file="$conf_file" --tag "$TAG" .
 
   mkdir -p "$ROOT/.releases"
@@ -58,7 +57,7 @@ do
 
   if [[ "$TASK" == "DEPLOY" ]]
   then
-    $ROOT/scripts/deploy_docker_image.sh "uk.ac.wellcome/nginx" "$TAG" "$CONFIG_BUCKET" "nginx_$variant" "$(git rev-parse HEAD)"
+    $ROOT/scripts/deploy_docker_to_aws.py --docker-image="$TAG" --infra-bucket="$CONFIG_BUCKET"
   fi
   echo
 done

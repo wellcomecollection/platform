@@ -19,4 +19,4 @@ export TAG="$PROJECT:$RELEASE_ID"
 
 export AWS_DEFAULT_REGION=eu-west-1
 
-./scripts/deploy_docker_image.sh "uk.ac.wellcome/$PROJECT" "$TAG" "$CONFIG_BUCKET" "$PROJECT" "$RELEASE_ID"
+./scripts/deploy_docker_to_aws.py --docker-image="$TAG" --infra-bucket="$CONFIG_BUCKET"

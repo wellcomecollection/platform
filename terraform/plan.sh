@@ -9,7 +9,7 @@ RELEASE_IDS_FILE="release_ids.tfvars"
 
 
 # Check if we're up-to-date with the current state of master.
-python is_up_to_date_with_master.py
+python3 is_up_to_date_with_master.py
 
 
 # Ensure we don't have stale variables from a previous run
