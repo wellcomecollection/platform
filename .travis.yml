@@ -121,6 +121,7 @@ env:
   global:
     - AWS_REGION=eu-west-1
     - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
+    - AWS_DEFAULT_REGION=eu-west-1
 
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
