@@ -107,6 +107,34 @@ sbt-build: \
 
 
 
+sbt-deploy-api:
+	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-calm_adapter:
+	./scripts/deploy_docker_to_aws.py --project=calm_adapter --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-id_minter:
+	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-ingestor:
+	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-miro_adapter:
+	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy-reindexer:
+	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
+
+sbt-deploy: \
+	sbt-deploy-api	\
+	sbt-deploy-calm_adapter	\
+	sbt-deploy-id_minter \
+	sbt-deploy-ingestor   \
+	sbt-deploy-miro_adapter \
+	sbt-deploy-reindexer
+
+
+
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
