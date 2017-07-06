@@ -19,6 +19,7 @@ import subprocess
 
 import docker
 import docopt
+import os
 
 from tooling import write_release_id, CURRENT_COMMIT, ROOT
 
@@ -46,9 +47,15 @@ if __name__ == '__main__':
     print(f'*** Building the Scala binaries')
     subprocess.check_call(['sbt', f'project {project}', 'stage'])
 
+    # Construct the path to required build artifacts
+    target = f'{project}/target/universal/stage'
+    print(f'*** Build target is {target}')
+
     print('*** Building the new Docker image')
+    dockerfile = os.path.join(ROOT, 'docker', 'scala_service')
+    print(f'*** Dockerfile is at {dockerfile}')
     client = docker.from_env()
-    client.images.build(path=ROOT, buildargs={'project': project}, tag=tag)
+    client.images.build(path=dockerfile, buildargs={'project': project, 'target': target}, tag=tag)
 
     print('*** Saving the release ID to .releases')
     write_release_id(project=project, release_id=release_id)
