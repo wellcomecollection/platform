@@ -19,6 +19,7 @@ import subprocess
 
 import docker
 import docopt
+import os
 
 from tooling import write_release_id, CURRENT_COMMIT, ROOT
 
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     print(f'*** Build target is {target}')
 
     print('*** Building the new Docker image')
-    dockerfile = f'{ROOT}/docker/scala_service'
+    dockerfile = os.path.join(ROOT, 'docker', 'scala_service')
     print(f'*** Dockerfile is at {dockerfile}')
     client = docker.from_env()
     client.images.build(path=dockerfile, buildargs={'project': project, 'target': target}, tag=tag)
