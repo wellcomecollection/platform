@@ -10,6 +10,13 @@ import dynamo_to_sns
 @mock_sns
 @mock_sqs
 def test_dynamo_to_sns():
+    # Need this otherwise boto complains about missing region in sns_utils.pblish_sns_message
+    # when trying to create client with sns = boto3.client('sns')
+    # (despite region being set with the environment variable AWS_DEFAULT_REGION,
+    # which should be read by default by boto)
+    # Weirdly enough it doesn't complain in this file when it tries to do the same thing.
+    # After investigation this is not related to moto
+    boto3.setup_default_session(region_name=os.environ['AWS_DEFAULT_REGION'])
     client = boto3.client('sns')
     client.create_topic(Name="test-topic")
     response = client.list_topics()
