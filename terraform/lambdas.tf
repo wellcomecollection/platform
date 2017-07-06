@@ -11,6 +11,8 @@ module "lambda_notify_old_deploys" {
     TOPIC_ARN         = "${module.old_deployments.arn}"
     AGE_BOUNDARY_MINS = "5"
   }
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_notify_old_deploys" {
@@ -31,6 +33,8 @@ module "lambda_service_deployment_status" {
   environment_variables = {
     TABLE_NAME = "${aws_dynamodb_table.deployments.name}"
   }
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_service_deployment_status" {
@@ -47,6 +51,8 @@ module "lambda_ecs_ec2_instance_tagger" {
   name        = "ecs_ec2_instance_tagger"
   description = "Tag an EC2 instance with ECS cluster/container instance id"
   source_dir  = "../lambdas/ecs_ec2_instance_tagger"
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_ecs_ec2_instance_tagger" {
@@ -69,6 +75,8 @@ module "lambda_update_service_list" {
     BUCKET_NAME = "${aws_s3_bucket.dashboard.id}"
     OBJECT_KEY  = "data/ecs_status.json"
   }
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_update_service_list" {
@@ -86,6 +94,8 @@ module "lambda_service_scheduler" {
   name        = "service_scheduler"
   description = "Publish an ECS service schedule to SNS"
   source_dir  = "../lambdas/service_scheduler"
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_calm_adapter" {
@@ -112,6 +122,8 @@ module "lambda_update_ecs_service_size" {
   name        = "update_ecs_service_size"
   description = "Update the desired count of an ECS service"
   source_dir  = "../lambdas/update_ecs_service_size"
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_update_ecs_service_size" {
@@ -128,6 +140,8 @@ module "lambda_update_task_for_config_change" {
   name        = "update_task_for_config_change"
   description = "Trigger a task definition change and restart on config change."
   source_dir  = "../lambdas/update_task_for_config_change"
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_application_restart_on_config_change" {
@@ -156,6 +170,8 @@ module "lambda_schedule_reindexer" {
     CLUSTER_NAME            = "${aws_ecs_cluster.services.name}"
     REINDEXERS              = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
   }
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_reindexer_lambda" {
@@ -172,6 +188,8 @@ module "lambda_update_dynamo_capacity" {
   name        = "update_dynamo_capacity"
   description = "Update the capacity of a DynamoDB table"
   source_dir  = "../lambdas/update_dynamo_capacity"
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_update_dynamo_capacity" {
@@ -187,6 +205,8 @@ module "lambda_drain_ecs_container_instance" {
   description = "Drain ECS container instance when the corresponding EC2 instance is being terminated"
   source_dir  = "../lambdas/drain_ecs_container_instance"
   timeout     = 60
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_drain_ecs_container_instance" {
@@ -207,6 +227,8 @@ module "lambda_post_to_slack" {
   environment_variables = {
     SLACK_INCOMING_WEBHOOK = "${var.slack_webhook}"
   }
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_post_to_slack_dlqs_not_empty" {
@@ -237,6 +259,13 @@ module "trigger_post_to_slack_client_error_alb" {
   sns_trigger_arn      = "${module.alb_client_error_alarm.arn}"
 }
 
+module "trigger_post_to_slack_lambda_error" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
+  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
+  sns_trigger_arn      = "${module.lambda_error_alarm.arn}"
+}
+
 # Lambda for pushing updates to dynamo tables into sqs queues
 
 module "lambda_dynamo_to_sns" {
@@ -253,6 +282,8 @@ module "lambda_dynamo_to_sns" {
       }
       EOF
   }
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
 module "trigger_dynamo_to_sns_miro" {

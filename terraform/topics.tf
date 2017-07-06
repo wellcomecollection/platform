@@ -64,3 +64,8 @@ module "alb_client_error_alarm" {
   source = "./sns"
   name   = "alb_client_error_alarm"
 }
+
+module "lambda_error_alarm" {
+  source = "./sns"
+  name   = "lambda_error_alarm"
+}
