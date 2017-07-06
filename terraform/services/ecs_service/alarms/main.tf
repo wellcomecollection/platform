@@ -9,7 +9,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_alarm" {
   threshold           = "1"
 
   dimensions {
-    LoadBalancer = "${var.dimension}"
+    LoadBalancer = "${var.lb_dimension}"
+    TargetGroup  = "${var.tg_dimension}"
   }
 
   alarm_description = "This metric monitors ${var.name}"

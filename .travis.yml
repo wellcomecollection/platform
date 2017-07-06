@@ -22,7 +22,7 @@ before_install:
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]
     then
-      if python ./scripts/should_rerun_tests.py
+      if python3 ./scripts/should_rerun_tests.py
       then
         echo "No changes that require us to re-run tests, skipping to the end"
         exit 0
@@ -34,15 +34,20 @@ before_install:
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
     then
-      if python ./scripts/should_rebuild_master.py
+      if python3 ./scripts/should_rebuild_master.py
       then
         echo "No changes that require us to re-build, skipping to the end"
         exit 0
       fi
     fi
 
+  # Retrieve docker cache
+  - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi
+
 install:
-  - ./.travis/install.sh
+  # We need this for the Elasticsearch Docker container to start
+  # See https://github.com/travis-ci/travis-ci/issues/6534
+  - sudo sysctl -w vm.max_map_count=262144
 
 cache:
   directories:
@@ -56,29 +61,30 @@ cache:
     - "id_minter/target"
     - "ingestor/target"
     - "transformer/target"
+    - "/home/travis/docker/"
 
 matrix:
   include:
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-common
         - PROJECT=common
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-api
         - PROJECT=api
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-transformer
         - PROJECT=transformer
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-calm_adapter
         - PROJECT=calm_adapter
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-ingestor
         - PROJECT=ingestor
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-id_minter
         - PROJECT=id_minter
     - env:
-        - BUILD_TYPE=sbt
+        - TASK=sbt-test-reindexer
         - PROJECT=reindexer
     - env:
         - TASK=lint-lambdas
@@ -87,14 +93,36 @@ matrix:
         - TASK=lint-ontologies
         - PROJECT=ontologies
     - env:
-        - TASK=docker-build-nginx
+        - TASK=nginx-build
         - PROJECT=docker/nginx
 
 script:
-  - ./.travis/run.sh
+  # Store docker cache
+  - |
+    if [[ ${TRAVIS_BRANCH} == "master" ]] && [[ ${TRAVIS_PULL_REQUEST} == "false" ]]
+    then
+      mkdir -p $(dirname ${DOCKER_CACHE_FILE})
+      docker save $(docker history -q ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE}
+    fi
+
+  - |
+    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
+    then
+      if [[ "$TASK" != "sbt-test-common" ]]
+      then
+        TASK="${TASK/build/deploy}"
+        TASK="${TASK/test/deploy}"
+      fi
+    fi
+    echo "Task is $TASK"
+    make "$TASK"
 
 env:
   global:
+    - AWS_REGION=eu-west-1
+    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
+    - AWS_DEFAULT_REGION=eu-west-1
+
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
     #  * AWS_ACCESS_KEY_ID
