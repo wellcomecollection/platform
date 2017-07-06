@@ -82,5 +82,5 @@ def test_dynamo_to_sns():
         QueueUrl=queue['QueueUrl'],
         MaxNumberOfMessages=1
     )
-    message_boody = messages['Messages'][0]['Body']
-    assert json.loads(message_boody)['default'] == json.dumps(new_image)
+    message_body = messages['Messages'][0]['Body']
+    assert json.loads(message_body)['default'] == json.dumps(new_image)
