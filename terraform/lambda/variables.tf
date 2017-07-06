@@ -24,3 +24,7 @@ variable "timeout" {
   description = "The amount of time your Lambda function has to run in seconds"
   default     = 3
 }
+
+variable "alarm_topic_arn" {
+  description = "ARN of the topic where to send notification for lambda errors"
+}
