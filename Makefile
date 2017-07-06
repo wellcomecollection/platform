@@ -56,7 +56,7 @@ sbt-test-common:
 	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
 
 sbt-test-api:
-	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+	sbt 'project api' ';dockerComposeUp;test;dockerComposeStop'
 
 sbt-test-calm_adapter:
 	sbt 'project calm_adapter' ';dockerComposeUp;test;dockerComposeStop'
