@@ -62,39 +62,39 @@ cache:
 
 matrix:
   include:
-    - env:
-        - TASK=sbt-test-common
-        - PROJECT=common
-    - env:
-        - TASK=sbt-test-api
-        - PROJECT=api
-    - env:
-        - TASK=sbt-test-transformer
-        - PROJECT=transformer
-    - env:
-        - TASK=sbt-test-calm_adapter
-        - PROJECT=calm_adapter
-    - env:
-        - TASK=sbt-test-ingestor
-        - PROJECT=ingestor
-    - env:
-        - TASK=sbt-test-id_minter
-        - PROJECT=id_minter
-    - env:
-        - TASK=sbt-test-reindexer
-        - PROJECT=reindexer
-    - env:
-        - TASK=lint-lambdas
-        - PROJECT=lambdas
+#    - env:
+#        - TASK=sbt-test-common
+#        - PROJECT=common
+#    - env:
+#        - TASK=sbt-test-api
+#        - PROJECT=api
+#    - env:
+#        - TASK=sbt-test-transformer
+#        - PROJECT=transformer
+#    - env:
+#        - TASK=sbt-test-calm_adapter
+#        - PROJECT=calm_adapter
+#    - env:
+#        - TASK=sbt-test-ingestor
+#        - PROJECT=ingestor
+#    - env:
+#        - TASK=sbt-test-id_minter
+#        - PROJECT=id_minter
+#    - env:
+#        - TASK=sbt-test-reindexer
+#        - PROJECT=reindexer
+#    - env:
+#        - TASK=lint-lambdas
+#        - PROJECT=lambdas
     - env:
         - TASK=test-lambdas
         - PROJECT=lambdas
-    - env:
-        - TASK=lint-ontologies
-        - PROJECT=ontologies
-    - env:
-        - TASK=nginx-build
-        - PROJECT=docker/nginx
+#    - env:
+#        - TASK=lint-ontologies
+#        - PROJECT=ontologies
+#    - env:
+#        - TASK=nginx-build
+#        - PROJECT=docker/nginx
 
 script:
   - |
