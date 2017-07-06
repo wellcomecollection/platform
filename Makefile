@@ -9,6 +9,10 @@ docker-build-jslint:
 docker-build-flake8:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
+## Build the image for terraform
+docker-build-terraform:
+	docker build ./docker/terraform_ci --tag terraform_ci
+
 
 
 install-docker-build-deps:
@@ -144,6 +148,18 @@ sbt-deploy: \
 	sbt-deploy-miro_adapter \
 	sbt-deploy-reindexer	\
 	sbt-deploy-transformer
+
+
+
+# Tasks for running terraform #
+
+## Run a plan
+terraform-plan: docker-build-terraform
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
+
+## Run an apply
+terraform-apply: docker-build-terraform
+		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 
