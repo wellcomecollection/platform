@@ -69,7 +69,7 @@ matrix:
         - TASK=sbt-test-api
         - PROJECT=api
     - env:
-        - TASK=sbt-test-transformer
+        - TASK=sbt-build-transformer
         - PROJECT=transformer
     - env:
         - TASK=sbt-test-calm_adapter
