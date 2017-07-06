@@ -175,7 +175,7 @@ lint-lambdas: docker-build-flake8
 
 ## Run tests for our Lambda code
 test-lambdas: docker-build-flake8
-	docker run -v $$(pwd)/lambdas:/data -v $$HOME/.aws:/root/.aws -e OP=test python3.6_ci:latest
+	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
 
 .PHONY: help
