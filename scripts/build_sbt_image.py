@@ -20,6 +20,7 @@ import subprocess
 import docker
 import docopt
 import os
+import shutil
 
 from tooling import write_release_id, CURRENT_COMMIT, ROOT
 
@@ -47,15 +48,19 @@ if __name__ == '__main__':
     print(f'*** Building the Scala binaries')
     subprocess.check_call(['sbt', f'project {project}', 'stage'])
 
-    # Construct the path to required build artifacts
-    target = f'{project}/target/universal/stage'
-    print(f'*** Build target is {target}')
+    source_target = os.path.join(ROOT, project, 'target', 'universal', 'stage')
+    docker_root = os.path.join(ROOT, 'docker', 'scala_service')
+    dest_target = os.path.join(docker_root, 'target', project)
+
+    print(f'*** Copying build artefacts to {dest_target} from {source_target}')
+
+    shutil.rmtree(dest_target, ignore_errors = True)
+    shutil.copytree(source_target, dest_target)
 
     print('*** Building the new Docker image')
-    dockerfile = os.path.join(ROOT, 'docker', 'scala_service')
-    print(f'*** Dockerfile is at {dockerfile}')
+    print(f'*** Dockerfile is at {docker_root}')
     client = docker.from_env()
-    client.images.build(path=dockerfile, buildargs={'project': project, 'target': target}, tag=tag)
+    client.images.build(path=docker_root, buildargs={'project': project}, tag=tag)
 
     print('*** Saving the release ID to .releases')
     write_release_id(project=project, release_id=release_id)
