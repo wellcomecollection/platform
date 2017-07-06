@@ -87,6 +87,9 @@ matrix:
         - TASK=lint-lambdas
         - PROJECT=lambdas
     - env:
+        - TASK=test-lambdas
+        - PROJECT=lambdas
+    - env:
         - TASK=lint-ontologies
         - PROJECT=ontologies
     - env:

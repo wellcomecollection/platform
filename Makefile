@@ -171,8 +171,11 @@ lint-ontologies: docker-build-jslint
 
 ## Run flake8 linting over our Lambda code
 lint-lambdas: docker-build-flake8
-	docker run -v $$(pwd)/lambdas:/data python3.6_ci:latest
+	docker run -v $$(pwd)/lambdas:/data -e OP=lint python3.6_ci:latest
 
+## Run tests for our Lambda code
+test-lambdas: docker-build-flake8
+	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
 
 .PHONY: help

@@ -4,6 +4,12 @@ VOLUME ["/data"]
 
 RUN pip install flake8
 
+RUN pip install boto3
+
+RUN pip install pytest
+
+RUN pip install moto
+
 COPY run.sh /app/run.sh
 
 ENTRYPOINT /app/run.sh
