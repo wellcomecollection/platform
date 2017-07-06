@@ -105,7 +105,7 @@ sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
 sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: install-docker-build-deps sbt-test-transformwe
+sbt-build-transformer: install-docker-build-deps sbt-test-transformer
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
