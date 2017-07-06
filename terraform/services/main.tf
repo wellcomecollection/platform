@@ -14,6 +14,10 @@ module "service" {
   healthcheck_path    = "${var.healthcheck_path}"
   infra_bucket        = "${var.infra_bucket}"
   host_name           = "${var.host_name}"
+
+  client_error_alarm_topic_arn = "${var.client_error_alarm_topic_arn}"
+  server_error_alarm_topic_arn = "${var.server_error_alarm_topic_arn}"
+  loadbalancer_cloudwatch_id   = "${var.loadbalancer_cloudwatch_id}"
 }
 
 module "task" {
