@@ -14,6 +14,10 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = "${data.archive_file.lambda_zip_file.output_base64sha256}"
   timeout          = "${var.timeout}"
 
+  dead_letter_config = {
+    target_arn = "${aws_sqs_queue.lambda_dlq.arn}"
+  }
+
   environment {
     variables = "${var.environment_variables}"
   }
