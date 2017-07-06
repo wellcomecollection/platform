@@ -41,6 +41,9 @@ before_install:
       fi
     fi
 
+  # Retrieve docker cache
+  - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi
+
 install:
   # We need this for the Elasticsearch Docker container to start
   # See https://github.com/travis-ci/travis-ci/issues/6534
@@ -58,6 +61,7 @@ cache:
     - "id_minter/target"
     - "ingestor/target"
     - "transformer/target"
+    - "/home/travis/docker/"
 
 matrix:
   include:
@@ -93,6 +97,14 @@ matrix:
         - PROJECT=docker/nginx
 
 script:
+  # Store docker cache
+  - |
+    if [[ ${TRAVIS_BRANCH} == "master" ]] && [[ ${TRAVIS_PULL_REQUEST} == "false" ]]
+    then
+      mkdir -p $(dirname ${DOCKER_CACHE_FILE})
+      docker save $(docker history -q ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE}
+    fi
+
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
     then
@@ -107,6 +119,8 @@ script:
 
 env:
   global:
+    - AWS_REGION=eu-west-1
+    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
     - AWS_DEFAULT_REGION=eu-west-1
 
     # This secure environment variable contains an encrypted version of
