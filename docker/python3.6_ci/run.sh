@@ -4,8 +4,6 @@ set -o errexit
 set -o nounset
 set -o verbose
 
-export OP="${OP:-plan}"
-
 cd /data
 
 if [[ "$OP" == "lint" ]]
@@ -16,4 +14,7 @@ elif [[ "$OP" == "test" ]]
 then
   echo "Testing Lambdas"
   find **/test_*.py | py.test
+else
+  echo "Unrecognised operation: $OP! Stopping."
+  exit 1
 fi
