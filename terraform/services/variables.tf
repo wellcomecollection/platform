@@ -59,6 +59,10 @@ variable "app_uri" {
   default     = ""
 }
 
+variable "loadbalancer_cloudwatch_id" {
+  description = "LoadBalancer ARN Suffix"
+}
+
 variable "listener_https_arn" {
   description = "ARN of listener for HTTPS listener rule"
 }
@@ -114,4 +118,12 @@ variable "is_config_managed" {
 variable "host_name" {
   description = "Hostname to be matched in the host condition"
   default     = ""
+}
+
+variable "server_error_alarm_topic_arn" {
+  description = "ARN of the topic where to send notification for 5xx ALB state"
+}
+
+variable "client_error_alarm_topic_arn" {
+  description = "ARN of the topic where to send notification for 4xx ALB state"
 }

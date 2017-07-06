@@ -159,10 +159,10 @@ module "lambda_schedule_reindexer" {
 }
 
 module "trigger_reindexer_lambda" {
-  source            = "./lambda/trigger_dynamo"
-  stream_arn        = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
-  function_arn      = "${module.lambda_schedule_reindexer.arn}"
-  function_role     = "${module.lambda_schedule_reindexer.role_name}"
+  source        = "./lambda/trigger_dynamo"
+  stream_arn    = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
+  function_arn  = "${module.lambda_schedule_reindexer.arn}"
+  function_role = "${module.lambda_schedule_reindexer.role_name}"
 }
 
 # Lambda for updating the capacity of a DynamoDB table
@@ -256,15 +256,15 @@ module "lambda_dynamo_to_sns" {
 }
 
 module "trigger_dynamo_to_sns_miro" {
-  source            = "./lambda/trigger_dynamo"
-  stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
-  function_arn      = "${module.lambda_dynamo_to_sns.arn}"
-  function_role     = "${module.lambda_dynamo_to_sns.role_name}"
+  source        = "./lambda/trigger_dynamo"
+  stream_arn    = "${aws_dynamodb_table.miro_table.stream_arn}"
+  function_arn  = "${module.lambda_dynamo_to_sns.arn}"
+  function_role = "${module.lambda_dynamo_to_sns.role_name}"
 }
 
 module "trigger_dynamo_to_sns_calm" {
-  source            = "./lambda/trigger_dynamo"
-  stream_arn        = "${aws_dynamodb_table.calm_table.stream_arn}"
-  function_arn      = "${module.lambda_dynamo_to_sns.arn}"
-  function_role     = "${module.lambda_dynamo_to_sns.role_name}"
+  source        = "./lambda/trigger_dynamo"
+  stream_arn    = "${aws_dynamodb_table.calm_table.stream_arn}"
+  function_arn  = "${module.lambda_dynamo_to_sns.arn}"
+  function_role = "${module.lambda_dynamo_to_sns.role_name}"
 }

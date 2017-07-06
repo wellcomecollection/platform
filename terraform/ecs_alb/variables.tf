@@ -23,11 +23,3 @@ variable "health_check_path" {
 variable "vpc_id" {
   description = "ID of VPC to create ALB in"
 }
-
-variable "server_error_alarm_topic_arn" {
-  description = "ARN of the topic where to send notification for 5xx ALB state"
-}
-
-variable "client_error_alarm_topic_arn" {
-  description = "ARN of the topic where to send notification for 4xx ALB state"
-}
