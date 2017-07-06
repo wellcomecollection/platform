@@ -88,7 +88,7 @@ def update_deployment_in_dynamo(table, deployment):
     return table.update_item(
         Key={
             'deployment_id': deployment.deployment_key.id,
-            'service_name': deployment.deployment_key.service_arn
+            'service_arn': deployment.deployment_key.service_arn
         },
         UpdateExpression="""
             SET deployment_status = :deployment_status,
