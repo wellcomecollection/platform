@@ -36,6 +36,9 @@ def should_rebuild_project(changed_files, project):
     elif any(f.startswith('.travis') for f in changed_files):
         print("*** Changes to the Travis config mean we should rebuild")
         return True
+    elif 'Makefile' in changed_files:
+        print("*** Changes to the Makefile mean we should rebuild")
+        return True
 
     return False
 
