@@ -34,6 +34,10 @@ module "calm_adapter" {
     table_name = "${aws_dynamodb_table.calm_table.name}"
     sns_arn    = "${module.service_scheduler_topic.arn}"
   }
+
+  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "miro_reindexer" {
@@ -59,6 +63,10 @@ module "miro_reindexer" {
     reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
     metrics_namespace  = "miro-reindexer"
   }
+
+  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "ingestor" {
@@ -89,6 +97,10 @@ module "ingestor" {
     ingest_queue_id   = "${module.es_ingest_queue.id}"
     metrics_namespace = "ingestor"
   }
+
+  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "transformer" {
@@ -112,6 +124,10 @@ module "transformer" {
     sns_arn           = "${module.id_minter_topic.arn}"
     metrics_namespace = "miro-transformer"
   }
+
+  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "id_minter" {
@@ -140,6 +156,10 @@ module "id_minter" {
     es_ingest_topic_arn = "${module.es_ingest_topic.arn}"
     metrics_namespace   = "id-minter"
   }
+
+  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "api" {
@@ -168,6 +188,10 @@ module "api" {
     es_password = "${var.es_config["password"]}"
     es_protocol = "${var.es_config["protocol"]}"
   }
+
+  loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "loris" {
@@ -186,6 +210,10 @@ module "loris" {
   healthcheck_path   = "/image/"
   alb_priority       = "109"
   host_name          = "iiif.wellcomecollection.org"
+
+  loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
 module "grafana" {
@@ -218,4 +246,8 @@ module "grafana" {
   config_key        = ""
   infra_bucket      = ""
   is_config_managed = false
+
+  loadbalancer_cloudwatch_id   = "${module.monitoring_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
