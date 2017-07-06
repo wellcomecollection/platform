@@ -100,7 +100,7 @@ script:
   - |
     if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
     then
-      if [[ "$TASK" != "sbt-test-common" ]]
+      if [[ "$TASK" != "sbt-test-common" && "$TASK" != "test-lambdas" ]]
       then
         TASK="${TASK/build/deploy}"
         TASK="${TASK/test/deploy}"
