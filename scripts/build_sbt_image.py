@@ -22,12 +22,15 @@ import docopt
 import os
 import shutil
 
-from tooling import write_release_id, CURRENT_COMMIT, ROOT
+from tooling import (
+    write_release_id,
+    CURRENT_COMMIT,
+    ROOT,
+    PLATFORM_ENV
+)
 
 
 DEFAULT_VERSION = '0.0.1'
-
-DEFAULT_BUILD_ENV = 'dev'
 
 
 if __name__ == '__main__':
@@ -36,7 +39,7 @@ if __name__ == '__main__':
     # Read arguments from docopt
     project = args['--project']
     version = args['--version'] or DEFAULT_VERSION
-    build_env = args['--env'] or DEFAULT_BUILD_ENV
+    build_env = args['--env'] or PLATFORM_ENV
 
     print(f'*** Building sbt Docker image for {project}')
 

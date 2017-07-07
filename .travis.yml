@@ -113,6 +113,7 @@ env:
   global:
     - AWS_REGION=eu-west-1
     - AWS_DEFAULT_REGION=eu-west-1
+    - PLATFORM_ENV=prod
 
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
