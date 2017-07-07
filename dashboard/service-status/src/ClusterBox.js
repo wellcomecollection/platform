@@ -8,6 +8,7 @@ import './ClusterBox.css';
 class ClusterBox extends Component {
   props: {
     clusterName: string,
+    instanceCount: number,
     serviceList: Array<Services>
   }
 
@@ -15,7 +16,7 @@ class ClusterBox extends Component {
     return (
       <div className="ClusterBox">
         <div className="ClusterBox--Header">
-          {this.props.clusterName}
+          {this.props.clusterName} ({this.props.instanceCount})
         </div>
         <div className="ClusterBox--Body">
 
