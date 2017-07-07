@@ -96,6 +96,7 @@ def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
         Bucket=bucket_name,
         Key=object_key,
         Body=json.dumps(service_snapshot),
+        CacheControl='max-age=0',
         ContentType='application/json'
     )
 
