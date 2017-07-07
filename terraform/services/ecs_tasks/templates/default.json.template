@@ -11,7 +11,14 @@
         "protocol": "tcp"
       }
     ],
-    "links": ["app"]
+    "links": ["app"],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "${nginx_log_group_name}",
+            "awslogs-region": "${log_group_region}"
+        }
+    }
   },
   {
     "cpu": 512,
