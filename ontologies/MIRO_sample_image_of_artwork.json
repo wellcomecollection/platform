@@ -17,7 +17,6 @@
         "authority": "Sierra"
       }
     ],
-  "licence": "CC-BY-4.0",
   "label": "A lecture on pneumatics at the Royal Institution, London. Co",
   "description": "A lecture on pneumatics at the Royal Institution, London. Coloured etching by J. Gillray, 1802.",
   "lettering": "Scientific researches! -New discoveries in pneumaticks! -or- an experimental lecture on the powers of air.- Js. Gillray inv. & fect.",
@@ -87,6 +86,7 @@
       {
        "id": "b28gh7z4n",
        "type": "item",
+       "licence": "CC-BY-4.0",
        "identifiers": 
         [
           {
