@@ -11,6 +11,6 @@ data "template_file" "definition" {
     secondary_container_port   = "${var.secondary_container_port}"
     volume_name      = "${var.volume_name}"
     container_path   = "${var.container_path}"
-    environment_vars = "${var.environment_vars}"
+    environment_vars = "[${join(",", concat(var.service_vars,var.extra_vars))}]"
   }
 }

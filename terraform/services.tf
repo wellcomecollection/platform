@@ -224,6 +224,8 @@ module "grafana" {
   vpc_id             = "${module.vpc_monitoring.vpc_id}"
   listener_https_arn = "${module.monitoring_alb.listener_https_arn}"
   listener_http_arn  = "${module.monitoring_alb.listener_http_arn}"
+
+  nginx_uri          = "${module.ecr_repository_nginx_grafana.repository_url}:${var.release_ids["nginx_grafana"]}"
   healthcheck_path   = "/api/health"
   secondary_container_port     = "3000"
   app_uri   = "grafana/grafana"
@@ -232,12 +234,12 @@ module "grafana" {
   volume_host_path   = "${module.monitoring_userdata.efs_mount_directory}/grafana"
   container_path = "/var/lib/grafana"
 
-  environment_vars = [
-     "{\"name\" : \"GF_AUTH_ANONYMOUS_ENABLED\", \"value\" : \"${var.grafana_anonymous_enabled}\"}",
-     "{\"name\" : \"GF_AUTH_ANONYMOUS_ORG_ROLE\", \"value\" : \"${var.grafana_anonymous_role}\"}",
-     "{\"name\" : \"GF_SECURITY_ADMIN_USER\", \"value\" : \"${var.grafana_admin_user}\"}",
-     "{\"name\" : \"GF_SECURITY_ADMIN_PASSWORD\", \"value\" : \"${var.grafana_admin_password}\"}",
-    ]
+  extra_vars = [
+       "{\"name\" : \"GF_AUTH_ANONYMOUS_ENABLED\", \"value\" : \"${var.grafana_anonymous_enabled}\"}",
+       "{\"name\" : \"GF_AUTH_ANONYMOUS_ORG_ROLE\", \"value\" : \"${var.grafana_anonymous_role}\"}",
+       "{\"name\" : \"GF_SECURITY_ADMIN_USER\", \"value\" : \"${var.grafana_admin_user}\"}",
+       "{\"name\" : \"GF_SECURITY_ADMIN_PASSWORD\", \"value\" : \"${var.grafana_admin_password}\"}",
+      ]
 
   config_key        = ""
   infra_bucket      = ""

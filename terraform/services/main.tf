@@ -33,11 +33,11 @@ module "task" {
   primary_container_port   = "${var.primary_container_port}"
   secondary_container_port   = "${var.secondary_container_port}"
   container_path   = "${var.container_path}"
-  environment_vars = [
+  service_vars = [
     "{ \"name\" : \"INFRA_BUCKET\", \"value\" : \"${var.infra_bucket}\" }",
-    "{ \"name\" : \"CONFIG_KEY\", \"value\" : \"${var.config_key}\" }",
-    "${var.environment_vars}"
+    "{ \"name\" : \"CONFIG_KEY\", \"value\" : \"${var.config_key}\" }"
   ]
+  extra_vars = "${var.extra_vars}"
 }
 
 module "config" {

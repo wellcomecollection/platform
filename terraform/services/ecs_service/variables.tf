@@ -26,7 +26,6 @@ variable "container_name" {
 
 variable "container_port" {
   description = "Port on primary container to expose for service"
-  default     = "8888"
 }
 
 variable "vpc_id" {
