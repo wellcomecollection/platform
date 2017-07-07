@@ -252,13 +252,6 @@ module "trigger_post_to_slack_server_error_alb" {
   sns_trigger_arn      = "${module.alb_server_error_alarm.arn}"
 }
 
-module "trigger_post_to_slack_client_error_alb" {
-  source               = "./lambda/trigger_sns"
-  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
-  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${module.alb_client_error_alarm.arn}"
-}
-
 module "trigger_post_to_slack_lambda_error" {
   source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
