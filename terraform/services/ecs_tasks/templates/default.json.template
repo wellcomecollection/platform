@@ -19,7 +19,7 @@
     "image": "${app_uri}",
     "memory": 2048,
     "name": "app",
-    "environment": [${environment_vars.*}],
+    "environment": ${environment_vars},
     "portMappings": [
       {
         "containerPort": ${secondary_container_port},

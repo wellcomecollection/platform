@@ -105,7 +105,7 @@ variable "container_path" {
   default     = "/tmp"
 }
 
-variable "environment_vars" {
+variable "extra_vars" {
   description = "Environment variables to pass to the container"
   type = "list"
   default     = []

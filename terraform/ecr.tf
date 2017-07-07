@@ -11,6 +11,11 @@ module "ecr_repository_nginx_api" {
   name   = "nginx_api"
 }
 
+module "ecr_repository_nginx_grafana" {
+  source = "./ecr"
+  name   = "nginx_grafana"
+}
+
 module "ecr_repository_nginx_loris" {
   source = "./ecr"
   name   = "nginx_loris"
