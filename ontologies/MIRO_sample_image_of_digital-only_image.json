@@ -13,7 +13,6 @@
         "authority": "MIRO contributor"
       }
     ],
-  "licence": "CC-BY-NC",
   "label": "A very frightened horse.",
   "description": "A very frightened horse.",
   "ipRightsStatement": "Royal Veterinary College",
@@ -41,6 +40,7 @@
       {
         "id": "no819h6",
         "type": "item",
+        "licence": "CC-BY-NC",
         "identifiers": 
           [
             {
