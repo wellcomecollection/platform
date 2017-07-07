@@ -29,6 +29,8 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
+Store.dispatch(fetchServices());
+
 function doWork(callback) {
   setTimeout(function() {
     Store.dispatch(fetchServices())

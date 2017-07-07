@@ -52,13 +52,30 @@
   color: rgb(50, 50, 50);
 }
 
-.TaskCounterHolder {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 10px;
-  grid-auto-rows: minmax(50px, 50px);
-}
-
 a.ServiceBox--Header__Name:hover + .EventBox {
     display: block;
+}
+
+@media (min-width: 1035px) {
+  .TaskCounterHolder {
+    display: grid;
+    grid: auto-flow / repeat(3, auto);
+    grid-gap: 10px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 641px) {
+  .TaskCounterHolder {
+    display: grid;
+    grid: auto-flow / repeat(2, auto);
+    grid-gap: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ClusterList {
+    display: grid;
+    grid: auto-flow / repeat(1, auto);
+    grid-gap: 10px;
+  }
 }
