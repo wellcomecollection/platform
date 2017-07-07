@@ -4,6 +4,7 @@ data "template_file" "definition" {
   vars {
     log_group_region = "${var.aws_region}"
     log_group_name   = "${aws_cloudwatch_log_group.task.name}"
+    nginx_log_group_name   = "${aws_cloudwatch_log_group.nginx_task.name}"
 
     app_uri      = "${var.app_uri}"
     nginx_uri    = "${var.nginx_uri}"
