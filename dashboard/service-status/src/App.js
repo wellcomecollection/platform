@@ -10,8 +10,10 @@ class App extends Component {
         <div className="App-header">
           <h2>Service Status</h2>
         </div>
-        <VisibleClusterList />
-        <VisibleLastUpdated />
+        <div className="App-body">
+          <VisibleClusterList />
+          <VisibleLastUpdated />
+        </div>
       </div>
     );
   }
