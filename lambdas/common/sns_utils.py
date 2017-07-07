@@ -1,9 +1,18 @@
 # -*- encoding: utf-8 -*-
 
+from datetime import datetime
 import json
 import pprint
 
 import boto3
+
+
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
 
 
 def publish_sns_message(topic_arn, message):
@@ -16,7 +25,7 @@ def publish_sns_message(topic_arn, message):
         TopicArn=topic_arn,
         MessageStructure='json',
         Message=json.dumps({
-            'default': json.dumps(message)
+            'default': json.dumps(message, cls=EnhancedJSONEncoder)
         })
     )
     print(f'SNS response:\n{pprint.pformat(resp)}')
