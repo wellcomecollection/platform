@@ -7,12 +7,8 @@ data "template_file" "definition" {
 
     app_uri      = "${var.app_uri}"
     nginx_uri    = "${var.nginx_uri}"
-    config_key   = "${var.config_key}"
-    infra_bucket = "${var.infra_bucket}"
-
-    docker_image     = "${var.docker_image}"
-    name             = "${var.task_name}"
-    container_port   = "${var.container_port}"
+    primary_container_port   = "${var.primary_container_port}"
+    secondary_container_port   = "${var.secondary_container_port}"
     volume_name      = "${var.volume_name}"
     container_path   = "${var.container_path}"
     environment_vars = "${var.environment_vars}"

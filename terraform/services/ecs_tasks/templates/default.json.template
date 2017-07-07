@@ -6,7 +6,7 @@
     "cpu": 128,
     "portMappings": [
       {
-        "containerPort": 9000,
+        "containerPort": ${primary_container_port},
         "hostPort": 0,
         "protocol": "tcp"
       }
@@ -19,13 +19,10 @@
     "image": "${app_uri}",
     "memory": 2048,
     "name": "app",
-    "environment": [
-      { "name" : "INFRA_BUCKET", "value" : "${infra_bucket}" },
-      { "name" : "CONFIG_KEY", "value" : "${config_key}" }
-    ],
+    "environment": [${environment_vars.*}],
     "portMappings": [
       {
-        "containerPort": 8888,
+        "containerPort": ${secondary_container_port},
         "hostPort": 0
       }
     ],
@@ -35,6 +32,12 @@
             "awslogs-group": "${log_group_name}",
             "awslogs-region": "${log_group_region}"
         }
-    }
+    },
+    "mountPoints": [
+      {
+        "sourceVolume": "${volume_name}",
+        "containerPath": "${container_path}"
+      }
+    ]
   }
 ]

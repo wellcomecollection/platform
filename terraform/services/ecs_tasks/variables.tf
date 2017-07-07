@@ -34,21 +34,13 @@ variable "volume_host_path" {
   default     = "/tmp"
 }
 
-variable "config_key" {
-  description = "Location of config file within S3"
-}
-
-variable "infra_bucket" {
-  description = "Location of infra bucket in S3"
-}
-
-variable "docker_image" {
-  description = "Name of the docker image to run"
+variable "primary_container_port" {
+  description = "Port exposed by the primary container"
   default     = ""
 }
 
-variable "container_port" {
-  description = "Port exposed by the container"
+variable "secondary_container_port" {
+  description = "Port exposed by the secondary container"
   default     = ""
 }
 
@@ -59,5 +51,5 @@ variable "container_path" {
 
 variable "environment_vars" {
   description = "Environment variables to pass to the container"
-  default     = ""
+  type = "list"
 }

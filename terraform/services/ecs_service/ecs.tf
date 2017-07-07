@@ -14,7 +14,8 @@ resource "aws_ecs_service" "service" {
   lifecycle {
     ignore_changes = [
       "desired_count",
-    ]
+    ],
+    create_before_destroy = true
   }
 
   depends_on = [
