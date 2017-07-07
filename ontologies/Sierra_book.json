@@ -38,7 +38,6 @@
     },
   "edition": "1st American ed.",
   "isbn": "0670824917",
-  "physicalDescription": "xii, 672 pages.  Other physical details: illustrations, map.  Dimensions: 25 cm",
   "workType": "Books",
   "subjects": 
     [
@@ -80,6 +79,7 @@
             "authority": "Sierra"
           }
         ],
+       "physicalDescription": "xii, 672 pages.  Other physical details: illustrations, map.  Dimensions: 25 cm",
        "status": "Available",
        "classmark": "ZDF.05",
        "wellcomeBarcode": "22200214921",
