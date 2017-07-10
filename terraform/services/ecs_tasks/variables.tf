@@ -51,10 +51,10 @@ variable "container_path" {
 
 variable "service_vars" {
   description = "Environment variables to pass to the container"
-  type = "list"
+  type        = "list"
 }
 
 variable "extra_vars" {
   description = "Environment variables to pass to the container"
-  type = "list"
+  type        = "list"
 }
