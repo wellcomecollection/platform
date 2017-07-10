@@ -10,7 +10,7 @@ resource "aws_alb_target_group" "ecs_service" {
   health_check {
     protocol = "HTTP"
     path     = "${var.healthcheck_path}"
-    matcher  = "200,301"
+    matcher  = "200"
   }
 }
 
