@@ -34,7 +34,8 @@ nginx-build-grafana: install-docker-build-deps
 nginx-build:	\
 	nginx-build-api \
 	nginx-build-loris \
-	nginx-build-services
+	nginx-build-services \
+    nginx-build-grafana
 
 
 
@@ -54,7 +55,8 @@ nginx-deploy-grafana: nginx-build-grafana
 nginx-deploy:	\
 	nginx-deploy-api \
 	nginx-deploy-loris \
-	nginx-deploy-services
+	nginx-deploy-services \
+	nginx-deploy-grafana
 
 
 
