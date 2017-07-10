@@ -35,14 +35,19 @@ variable "volume_host_path" {
   default     = "/tmp"
 }
 
-variable "container_name" {
+variable "primary_container_name" {
   description = "Primary container to expose for service"
   default     = "nginx"
 }
 
-variable "container_port" {
+variable "primary_container_port" {
   description = "Port on primary container to expose for service"
   default     = "9000"
+}
+
+variable "secondary_container_port" {
+  description = "Port exposed by secondary container for access the primary container"
+  default     = "8888"
 }
 
 variable "vpc_id" {
@@ -95,19 +100,15 @@ variable "config_vars" {
   default     = {}
 }
 
-variable "docker_image" {
-  description = "Name of the docker image to run"
-  default     = ""
-}
-
 variable "container_path" {
   description = "Path of the mounted volume in the docker container"
-  default     = ""
+  default     = "/tmp"
 }
 
-variable "environment_vars" {
+variable "extra_vars" {
   description = "Environment variables to pass to the container"
-  default     = ""
+  type        = "list"
+  default     = []
 }
 
 variable "is_config_managed" {

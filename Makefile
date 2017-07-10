@@ -27,11 +27,15 @@ nginx-build-loris: install-docker-build-deps
 nginx-build-services: install-docker-build-deps
 	./scripts/build_nginx_image.py --variant=services
 
+nginx-build-grafana: install-docker-build-deps
+	./scripts/build_nginx_image.py --variant=grafana
+
 ## Build images for all of our nginx proxies
 nginx-build:	\
 	nginx-build-api \
 	nginx-build-loris \
-	nginx-build-services
+	nginx-build-services \
+    nginx-build-grafana
 
 
 
@@ -44,11 +48,15 @@ nginx-deploy-loris: nginx-build-loris
 nginx-deploy-services: nginx-build-services
 	./scripts/deploy_docker_to_aws.py --project=nginx_services --infra-bucket=$(INFRA_BUCKET)
 
+nginx-deploy-grafana: nginx-build-grafana
+	./scripts/deploy_docker_to_aws.py --project=nginx_grafana --infra-bucket=$(INFRA_BUCKET)
+
 ## Push images for all of our nginx proxies
 nginx-deploy:	\
 	nginx-deploy-api \
 	nginx-deploy-loris \
-	nginx-deploy-services
+	nginx-deploy-services \
+	nginx-deploy-grafana
 
 
 

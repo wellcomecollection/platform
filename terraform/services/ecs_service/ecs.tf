@@ -15,6 +15,14 @@ resource "aws_ecs_service" "service" {
     ignore_changes = [
       "desired_count",
     ]
+
+    //    Unfortunately, when changing a service, this prevents the creation of the service with
+    //    InvalidParameterException: Creation of service was not idempotent.
+    //    Rename the service or delete this line if you get this error
+    //    Note: DELETING THIS LINE WILL RESULT IN DOWNTIME
+    //    See https://github.com/hashicorp/terraform/issues/12665 and
+    //    https://github.com/terraform-providers/terraform-provider-aws/issues/605
+    create_before_destroy = true
   }
 
   depends_on = [
