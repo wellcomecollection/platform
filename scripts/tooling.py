@@ -55,11 +55,12 @@ def authenticate_for_ecr_pushes(ecr_client, docker_client, repo_uri):
     token = resp['authorizationData'][0]['authorizationToken']
     username, password = base64.b64decode(token).decode().split(':')
 
-    docker_client.login(
+    resp = docker_client.login(
         username=username,
         password=password,
         registry=repo_uri
     )
+    print(resp)
 
 
 def write_release_id(project, release_id):

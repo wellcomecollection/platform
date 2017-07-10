@@ -63,7 +63,8 @@ if __name__ == '__main__':
     try:
         image = docker_client.images.get(docker_image)
         image.tag(repository=repo_uri, tag=tag)
-        docker_client.images.push(repository=repo_uri, tag=tag)
+        resp = docker_client.images.push(repository=repo_uri, tag=tag)
+        print(resp)
     finally:
         docker_client.images.remove(image=renamed_image_tag)
 

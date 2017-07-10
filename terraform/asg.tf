@@ -23,7 +23,7 @@ module "monitoring_cluster_asg" {
   instance_profile_name = "${module.ecs_monitoring_iam.instance_profile_name}"
   user_data             = "${module.monitoring_userdata.rendered}"
   vpc_id                = "${module.vpc_monitoring.vpc_id}"
-  instance_type         = "t2.medium"
+  instance_type         = "t2.large"
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
