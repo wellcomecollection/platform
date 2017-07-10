@@ -107,7 +107,7 @@ variable "container_path" {
 
 variable "extra_vars" {
   description = "Environment variables to pass to the container"
-  type = "list"
+  type        = "list"
   default     = []
 }
 

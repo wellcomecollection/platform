@@ -31,12 +31,14 @@ module "task" {
   template_name    = "${var.template_name}"
 
   primary_container_port   = "${var.primary_container_port}"
-  secondary_container_port   = "${var.secondary_container_port}"
-  container_path   = "${var.container_path}"
+  secondary_container_port = "${var.secondary_container_port}"
+  container_path           = "${var.container_path}"
+
   service_vars = [
     "{ \"name\" : \"INFRA_BUCKET\", \"value\" : \"${var.infra_bucket}\" }",
-    "{ \"name\" : \"CONFIG_KEY\", \"value\" : \"${var.config_key}\" }"
+    "{ \"name\" : \"CONFIG_KEY\", \"value\" : \"${var.config_key}\" }",
   ]
+
   extra_vars = "${var.extra_vars}"
 }
 
