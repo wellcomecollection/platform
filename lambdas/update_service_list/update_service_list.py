@@ -9,8 +9,10 @@ It does not use the event data from the event.
 
 import datetime
 import json
+import logging
 import os
 import pprint
+import traceback
 
 import boto3
 
@@ -102,12 +104,19 @@ def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
 
 
 def main(event, _):
-    pprint.pprint(event)
+    try:
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
 
-    ecs_client = boto3.client('ecs')
-    s3_client = boto3.client('s3')
+        logger.info(event)
 
-    bucket_name = os.environ["BUCKET_NAME"]
-    object_key = os.environ["OBJECT_KEY"]
+        ecs_client = boto3.client('ecs')
+        s3_client = boto3.client('s3')
 
-    send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key)
+        bucket_name = os.environ["BUCKET_NAME"]
+        object_key = os.environ["OBJECT_KEY"]
+
+        send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key)
+    except Exception as e:
+        logging.error(traceback.format_exc())
+
