@@ -5,3 +5,7 @@ variable "cidr_block" {
 variable "az_count" {
   description = "Number of AZs to use"
 }
+
+variable "name" {
+  description = "Name to use on resource tags"
+}
