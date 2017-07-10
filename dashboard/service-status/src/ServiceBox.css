@@ -63,7 +63,7 @@ a.ServiceBox--Header__Name:hover + .EventBox {
   }
 }
 
-@media (max-width: 1024px) and (min-width: 641px) and (max-height: 1024px) {
+@media (max-width: 1024px) and (min-width: 641px) {
   .TaskCounterHolder {
     display: grid;
     grid: auto-flow / repeat(2, auto);
@@ -75,14 +75,6 @@ a.ServiceBox--Header__Name:hover + .EventBox {
   .TaskCounterHolder {
     display: grid;
     grid: auto-flow / repeat(1, auto);
-    grid-gap: 10px;
-  }
-}
-
-@media (max-width: 1024px) and (min-height: 1025px) {
-  .TaskCounterHolder {
-    display: grid;
-    grid: auto-flow / repeat(3, auto);
     grid-gap: 10px;
   }
 }
