@@ -189,8 +189,7 @@ format-terraform:
 	terraform fmt
 
 format-scala:
-	scalafmt
-	sbt:scalafmt
+	sbt scalafmt
 
 format: \
 	format-terraform \
