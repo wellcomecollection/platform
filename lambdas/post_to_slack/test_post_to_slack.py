@@ -6,6 +6,11 @@ import post_to_slack
 from mock import patch
 
 
+def _assert_field_contains(field, title, value):
+    assert field['title'] == title
+    assert field['value'] == value
+
+
 @patch('post_to_slack.requests.post')
 def test_post_to_slack(mock_post):
     url = "http://blah.com"
@@ -66,28 +71,31 @@ def test_post_to_slack(mock_post):
     post_to_slack.main(event, None)
 
     calls = mock_post.call_args_list
-    print(calls)
 
     assert len(calls) == 1
 
     assert calls[0][0][0] == url
 
     sent_data = json.loads(calls[0][1]['data'])
-    print(sent_data)
+
     assert len(sent_data['attachments']) == 1
     attachment = sent_data['attachments'][0]
     assert attachment['fallback'] == alarm_name
     assert attachment['title'] == alarm_name
     assert len(attachment['fields']) == 3
 
-    metric_field = attachment['fields'][0]
-    assert metric_field['title'] == 'Metric'
-    assert metric_field['value'] == f'{namespace}/{metric_name}'
-
-    dimensions_field = attachment['fields'][1]
-    assert dimensions_field['title'] == 'Dimensions'
-    assert dimensions_field['value'] == f'{pprint.pformat(dimensions)}'
-
-    reason_field = attachment['fields'][2]
-    assert reason_field['title'] == 'Reason'
-    assert reason_field['value'] == reason
+    _assert_field_contains(
+        field=attachment['fields'][0],
+        title='Metric',
+        value=f'{namespace}/{metric_name}'
+    )
+    _assert_field_contains(
+        field=attachment['fields'][1],
+        title='Dimensions',
+        value=f'{pprint.pformat(dimensions)}'
+    )
+    _assert_field_contains(
+        field=attachment['fields'][2],
+        title='Reason',
+        value=reason
+    )
