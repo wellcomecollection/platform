@@ -65,7 +65,17 @@ RUN \
   apt-get install sbt -y && \
   sbt sbtVersion
 
-## Add the run script and run it!
+# Install requird python deps
+RUN apt-get install python3-pip && \
+    pip3 install --upgrade boto3 docker docopt
+
+
+## Copy required scripts and run!
+
+# Copy python scripts
+COPY scripts /scripts
+
+# Add run script
 COPY run.sh /app/run.sh
 
 ENTRYPOINT /app/run.sh
