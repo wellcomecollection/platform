@@ -4,8 +4,8 @@ import java.sql.SQLSyntaxErrorException
 
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.FunSpec
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import scalikejdbc.interpolation.SQLSyntax
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -20,7 +20,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 
-class IdMinterModuleTest
+class IdMinterWorkerTest
     extends FunSpec
     with IdMinterTestUtils
     with MockitoSugar {
