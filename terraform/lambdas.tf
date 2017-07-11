@@ -70,6 +70,7 @@ module "lambda_update_service_list" {
   name        = "update_service_list"
   description = "Publish ECS service status summary to S3"
   source_dir  = "../lambdas/update_service_list"
+  timeout     = 10
 
   environment_variables = {
     BUCKET_NAME = "${aws_s3_bucket.dashboard.id}"
