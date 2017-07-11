@@ -25,7 +25,7 @@ object WorkExtractor extends Logging {
     }
 
   private def tryExtractinWork(message: SQSMessage) = {
-      info(s"Extracting Work from SQSMessage $message")
-      JsonUtil.fromJson[Work](message.body)
+    info(s"Extracting Work from SQSMessage $message")
+    JsonUtil.fromJson[Work](message.body)
   }
 }
