@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import com.amazonaws.services.sqs.model.Message
 import com.fasterxml.jackson.core.JsonParseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
@@ -28,9 +27,8 @@ class WorkExtractorTest
                                 "topic",
                                 "messageType",
                                 "timestamp")
-    val message = new Message().withBody(JsonUtil.toJson(sqsMessage).get)
 
-    val eventualWork = WorkExtractor.toWork(message)
+    val eventualWork = WorkExtractor.toWork(sqsMessage)
 
     whenReady(eventualWork) { extractedWork =>
       extractedWork.identifiers.head.value shouldBe miroID
@@ -45,9 +43,8 @@ class WorkExtractorTest
                                 "topic",
                                 "messageType",
                                 "timestamp")
-    val message = new Message().withBody(JsonUtil.toJson(sqsMessage).get)
 
-    val eventualWork = WorkExtractor.toWork(message)
+    val eventualWork = WorkExtractor.toWork(sqsMessage)
 
     whenReady(eventualWork.failed) { e =>
       e shouldBe a[JsonParseException]
