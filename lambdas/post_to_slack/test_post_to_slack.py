@@ -30,7 +30,8 @@ def test_post_to_slack(mock_post):
             "value": "app/api/e87a4a5f32874d8b"
         }
     ]
-    reason = "Threshold Crossed: 1 datapoint (4.0) was greater than or equal to the threshold (1.0)."
+    reason = "Threshold Crossed: 1 datapoint (4.0) was \
+        greater than or equal to the threshold (1.0)."
 
     alarm_info = {
         "AlarmName": alarm_name,
@@ -56,17 +57,29 @@ def test_post_to_slack(mock_post):
             "EvaluateLowSampleCountPercentile": ""
         }
     }
-    event = {'Records': [{'EventSource': 'aws:sns', 'EventVersion': '1.0',
-                          'EventSubscriptionArn': 'arn:aws:sns:region:account_id:alb_server_error_alarm:stuff',
-                          'Sns': {'Type': 'Notification', 'MessageId': 'b20eb72b-ffc7-5d09-9636-e6f65d67d10f',
-                                  'TopicArn': 'arn:aws:sns:region:account_id:alb_server_error_alarm',
-                                  'Subject': 'ALARM: "api-alb-target-500-errors" in EU - Ireland',
-                                  'Message': json.dumps(alarm_info),
-                                  'Timestamp': '2017-07-10T15:42:24.307Z', 'SignatureVersion': '1',
-                                  'Signature': 'signature',
-                                  'SigningCertUrl': 'https://cartificate.pem',
-                                  'UnsubscribeUrl': 'https://unsubscribe-url',
-                                  'MessageAttributes': {}}}]}
+
+    event = {
+        'Records': [{
+            'EventSource': 'aws:sns',
+            'EventVersion': '1.0',
+            'EventSubscriptionArn':
+                'arn:aws:sns:region:account_id:alb_server_error_alarm:stuff',
+            'Sns': {
+                'Type': 'Notification',
+                'MessageId': 'b20eb72b-ffc7-5d09-9636-e6f65d67d10f',
+                'TopicArn':
+                    'arn:aws:sns:region:account_id:alb_server_error_alarm',
+                'Subject':
+                    'ALARM: "api-alb-target-500-errors" in EU - Ireland',
+                'Message': json.dumps(alarm_info),
+                'Timestamp': '2017-07-10T15:42:24.307Z',
+                'SignatureVersion': '1',
+                'Signature': 'signature',
+                'SigningCertUrl': 'https://certificate.pem',
+                'UnsubscribeUrl': 'https://unsubscribe-url',
+                'MessageAttributes': {}}
+        }]
+    }
 
     post_to_slack.main(event, None)
 
