@@ -45,12 +45,16 @@ trait ElasticSearchLocal
   private def waitForIndexDeleted(indexName: String) = {
     eventually {
       elasticClient
-        .execute(indexExists(indexName)).await.isExists should be(false)
+        .execute(indexExists(indexName))
+        .await
+        .isExists should be(false)
     }
   }
 
-  private def deleteIndexIfExists(indexName: String, indexExistResponse: IndexExistsResponse) = {
-    if (indexExistResponse.isExists) elasticClient.execute(deleteIndex(indexName))
+  private def deleteIndexIfExists(indexName: String,
+                                  indexExistResponse: IndexExistsResponse) = {
+    if (indexExistResponse.isExists)
+      elasticClient.execute(deleteIndex(indexName))
     else Future.successful(())
   }
 }

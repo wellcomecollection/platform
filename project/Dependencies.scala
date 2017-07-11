@@ -79,7 +79,8 @@ object Dependencies {
 
   val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
-  val idminterDependencies: Seq[ModuleID] = commonDependencies ++ mysqlDependencies
+  val idminterDependencies
+    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 }

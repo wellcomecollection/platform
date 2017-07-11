@@ -26,7 +26,8 @@ class CalmTransformerFeatureTest
   override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
     kinesisClientLibConfiguration(appName, calmDataStreamArn)
 
-  it("should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
+  it(
+    "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     Scanamo.put(dynamoDbClient)(calmDataTableName)(
       CalmTransformable(RecordID = "RecordID1",
                         RecordType = "Collection",

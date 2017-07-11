@@ -2,10 +2,12 @@ package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
 import uk.ac.wellcome.platform.api.models.DisplaySearch
-import uk.ac.wellcome.platform.api.requests.{ApiRequest, MultipleResultsRequest}
+import uk.ac.wellcome.platform.api.requests.{
+  ApiRequest,
+  MultipleResultsRequest
+}
 
 import scala.language.existentials
-
 
 case class ResultResponse(
   @JsonProperty("@context") context: String,
@@ -26,9 +28,9 @@ case class ResultListResponse(
 
 object ResultListResponse {
   private def createApiLink(
-                             requestBaseUri: String,
-                             apiRequest: ApiRequest
-                           )(
+    requestBaseUri: String,
+    apiRequest: ApiRequest
+  )(
     updateMap: Map[String, Any]
   ): String = {
 
@@ -39,11 +41,11 @@ object ResultListResponse {
   }
 
   def create(
-              contextUri: String,
-              displaySearch: DisplaySearch,
-              multipleResultsRequest: MultipleResultsRequest,
-              requestBaseUri: String
-            ): ResultListResponse = {
+    contextUri: String,
+    displaySearch: DisplaySearch,
+    multipleResultsRequest: MultipleResultsRequest,
+    requestBaseUri: String
+  ): ResultListResponse = {
 
     val currentPage = multipleResultsRequest.page
     val isLastPage = displaySearch.totalPages == currentPage
@@ -52,8 +54,14 @@ object ResultListResponse {
 
     val apiLink = createApiLink(requestBaseUri, multipleResultsRequest) _
 
-    val prevLink = if(!isFirstPage && !isOnlyPage) Some(apiLink(Map("page" -> (currentPage - 1) ))) else None
-    val nextLink = if(!isLastPage && !isOnlyPage) Some(apiLink(Map("page" -> (currentPage + 1) ))) else None
+    val prevLink =
+      if (!isFirstPage && !isOnlyPage)
+        Some(apiLink(Map("page" -> (currentPage - 1))))
+      else None
+    val nextLink =
+      if (!isLastPage && !isOnlyPage)
+        Some(apiLink(Map("page" -> (currentPage + 1))))
+      else None
 
     ResultListResponse(
       context = contextUri,

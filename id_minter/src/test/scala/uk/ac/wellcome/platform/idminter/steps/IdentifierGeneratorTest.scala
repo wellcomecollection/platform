@@ -29,7 +29,8 @@ class IdentifierGeneratorTest
     new IdentifiersDao(DB.connect(), identifiersTable),
     metricsSender)
 
-  it("should search the miro id in the database and return the canonical id if it finds it") {
+  it(
+    "should search the miro id in the database and return the canonical id if it finds it") {
     withSQL {
       insert
         .into(identifiersTable)
@@ -47,7 +48,8 @@ class IdentifierGeneratorTest
     }
   }
 
-  it("should generate an id and save it in the database if a record doesn't already exist") {
+  it(
+    "should generate an id and save it in the database if a record doesn't already exist") {
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
            label = "some label")
@@ -76,7 +78,8 @@ class IdentifierGeneratorTest
     }
   }
 
-  it("should return a failed future if it fails inserting the identifier in the database") {
+  it(
+    "should return a failed future if it fails inserting the identifier in the database") {
     val miroId = "1234"
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),

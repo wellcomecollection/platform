@@ -18,7 +18,8 @@ class IdentifiersDaoTest
 
   describe("findSourceIdInDb") {
 
-    it("should return a future of some if the requested miroId is in the database") {
+    it(
+      "should return a future of some if the requested miroId is in the database") {
       val miroId = "1234"
       val canonicalId = "5678"
       withSQL {
@@ -34,7 +35,8 @@ class IdentifiersDaoTest
       }
     }
 
-    it("should return a future of none if the requested miroId is not in the database") {
+    it(
+      "should return a future of none if the requested miroId is not in the database") {
       whenReady(identifiersDao.findSourceIdInDb("abcdef")) { maybeIdentifier =>
         maybeIdentifier shouldNot be(defined)
       }
@@ -62,17 +64,20 @@ class IdentifiersDaoTest
       }
     }
 
-    it("should fail inserting a record if there is already a record for the same miroId") {
+    it(
+      "should fail inserting a record if there is already a record for the same miroId") {
       val identifier = new Identifier(CanonicalID = "5678", MiroID = "1234")
       withSQL {
         insert
           .into(identifiersTable)
-          .namedValues(identifiersTable.column.CanonicalID -> identifier.CanonicalID,
+          .namedValues(
+            identifiersTable.column.CanonicalID -> identifier.CanonicalID,
             identifiersTable.column.MiroID -> identifier.MiroID)
       }.update().apply()
 
-      val saveCanonicalId = identifiersDao.saveIdentifier(identifier.copy(CanonicalID = "0987"))
-      whenReady(saveCanonicalId.failed){ exception =>
+      val saveCanonicalId =
+        identifiersDao.saveIdentifier(identifier.copy(CanonicalID = "0987"))
+      whenReady(saveCanonicalId.failed) { exception =>
         exception shouldBe a[SQLIntegrityConstraintViolationException]
       }
     }

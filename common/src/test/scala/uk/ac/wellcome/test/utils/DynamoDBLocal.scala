@@ -11,11 +11,7 @@ import com.amazonaws.services.dynamodbv2.{
 }
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.{
-  CalmTransformable,
-  MiroTransformable,
-  Reindex
-}
+import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable, Reindex}
 
 import scala.collection.JavaConversions._
 

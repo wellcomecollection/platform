@@ -10,7 +10,10 @@ import scalikejdbc._
 import scalikejdbc.interpolation.SQLSyntax
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.utils.JsonUtil
@@ -34,15 +37,16 @@ class IdMinterModuleTest
 
   it("should create the Identifiers table in MySQL upon startup") {
     intercept[SQLSyntaxErrorException] {
-      DB readOnly { implicit session => sql"DESCRIBE $database.$tableName"
-        .map(
-          rs =>
-            FieldDescription(rs.string("Field"),
-              rs.string("Type"),
-              rs.string("Null"),
-              rs.string("Key")))
-        .list()
-        .apply()
+      DB readOnly { implicit session =>
+        sql"DESCRIBE $database.$tableName"
+          .map(
+            rs =>
+              FieldDescription(rs.string("Field"),
+                               rs.string("Type"),
+                               rs.string("Null"),
+                               rs.string("Key")))
+          .list()
+          .apply()
       }
     }
 
@@ -54,9 +58,9 @@ class IdMinterModuleTest
           .map(
             rs =>
               FieldDescription(rs.string("Field"),
-                rs.string("Type"),
-                rs.string("Null"),
-                rs.string("Key")))
+                               rs.string("Type"),
+                               rs.string("Null"),
+                               rs.string("Key")))
           .list()
           .apply()
       }
@@ -65,21 +69,30 @@ class IdMinterModuleTest
     }
   }
 
-  it("should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
+  it(
+    "should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
     val miroId = "1234"
     when(identifiersDao.findSourceIdInDb(miroId))
       .thenReturn(Future.successful(None))
     when(identifiersDao.saveIdentifier(any[Identifier]))
       .thenReturn(Future.failed(new Exception("cannot insert")))
 
-    val message = JsonUtil.toJson(SQSMessage(Some("subject"),
-      JsonUtil.toJson(Work(
-        identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
-        label = "some label"
-      )).get,
-      "topic",
-      "messageType",
-      "timestamp")).get
+    val message = JsonUtil
+      .toJson(
+        SQSMessage(
+          Some("subject"),
+          JsonUtil
+            .toJson(
+              Work(
+                identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+                label = "some label"
+              ))
+            .get,
+          "topic",
+          "messageType",
+          "timestamp"
+        ))
+      .get
 
     sqsClient.sendMessage(idMinterQueue, message)
 

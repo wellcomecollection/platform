@@ -6,7 +6,6 @@ import org.flywaydb.core.Flyway
 
 import scala.collection.JavaConversions._
 
-
 class TableProvisioner @Inject()(@Flag("aws.rds.host") host: String,
                                  @Flag("aws.rds.port") port: String,
                                  @Flag("aws.rds.userName") userName: String,
@@ -21,7 +20,5 @@ class TableProvisioner @Inject()(@Flag("aws.rds.host") host: String,
       Map("database" -> database, "tableName" -> tableName))
     flyway.migrate()
   }
-
-
 
 }

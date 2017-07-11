@@ -6,7 +6,6 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-
 trait DynamoConfigModule extends TwitterModule {
   val appNameTpl: String = "aws.dynamo.%s.streams.appName"
   val arnTpl: String = "aws.dynamo.%s.streams.arn"
@@ -14,13 +13,12 @@ trait DynamoConfigModule extends TwitterModule {
 
   def flags(tableName: String) = (
     flag[String](appNameTpl.format(tableName), "", "Name of the Kinesis app"),
-    flag[String](arnTpl.format(tableName),"", "ARN of the DynamoDB stream"),
-    flag[String](tableTpl.format(tableName),"","Name of the DynamoDB table")
+    flag[String](arnTpl.format(tableName), "", "ARN of the DynamoDB stream"),
+    flag[String](tableTpl.format(tableName), "", "Name of the DynamoDB table")
   )
 }
 
-object PlatformDynamoConfigModule
-    extends DynamoConfigModule {
+object PlatformDynamoConfigModule extends DynamoConfigModule {
 
   val (miroAppName, miroArn, miroTable) = flags("miroData")
   val (identAppName, identArn, identTable) = flags("identifiers")

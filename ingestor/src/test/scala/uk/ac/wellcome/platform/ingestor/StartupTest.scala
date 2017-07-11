@@ -15,9 +15,10 @@ class StartupTest
     with SQSLocal
     with AmazonCloudWatchFlag {
 
-  val server = new EmbeddedHttpServer(stage = Stage.PRODUCTION,
-                                      twitterServer = new Server,
-                                      flags = sqsLocalFlags ++ cloudWatchLocalEndpointFlag)
+  val server = new EmbeddedHttpServer(
+    stage = Stage.PRODUCTION,
+    twitterServer = new Server,
+    flags = sqsLocalFlags ++ cloudWatchLocalEndpointFlag)
 
   test("server starts up correctly") {
     server.assertHealthy()

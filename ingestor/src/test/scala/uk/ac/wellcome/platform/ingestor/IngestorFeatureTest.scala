@@ -23,7 +23,7 @@ class IngestorFeatureTest
 
   // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
   sqsClient.setQueueAttributes(ingestorQueueUrl,
-    Map("VisibilityTimeout" -> "1"))
+                               Map("VisibilityTimeout" -> "1"))
 
   it(
     "should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
@@ -59,7 +59,8 @@ class IngestorFeatureTest
     }
   }
 
-  it("should not delete a message from the sqs queue if it fails processing it") {
+  it(
+    "should not delete a message from the sqs queue if it fails processing it") {
     val invalidMessage = JsonUtil
       .toJson(
         SQSMessage(Some("identified-item"),

@@ -6,7 +6,7 @@ import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.model.IdentifiersTable
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-trait MysqlLocal extends ExtendedPatience with Eventually  { this: Suite =>
+trait MysqlLocal extends ExtendedPatience with Eventually { this: Suite =>
   val host = "localhost"
   val port = "3307"
   val userName = "root"
@@ -28,12 +28,12 @@ trait MysqlLocal extends ExtendedPatience with Eventually  { this: Suite =>
     )
 
   // Wait for mysql server to start
-    eventually {
-      DB localTx { implicit session =>
-        sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
-        sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
-      }
+  eventually {
+    DB localTx { implicit session =>
+      sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
+      sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
     }
+  }
 
 }
 
