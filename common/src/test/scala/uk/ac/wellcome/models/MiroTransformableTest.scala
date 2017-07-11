@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 class MiroTransformableTest extends FunSpec with Matchers {
 
   it("should throw an error if there isn't a title field") {
-    assertTransformMiroRecordFails(data="""{
+    assertTransformMiroRecordFails(data = """{
       "image_cleared": "Y",
       "image_copyright_cleared": "Y"
     }""")
@@ -71,7 +71,9 @@ class MiroTransformableTest extends FunSpec with Matchers {
         "image_copyright_cleared": "Y"
       }"""
     )
-    work.creators shouldBe List(Agent(creator1), Agent(creator2), Agent(creator3))
+    work.creators shouldBe List(Agent(creator1),
+                                Agent(creator2),
+                                Agent(creator3))
   }
 
   it("should have no description if no image_image_desc field is present") {
@@ -124,7 +126,8 @@ class MiroTransformableTest extends FunSpec with Matchers {
     work.createdDate shouldBe None
   }
 
-  it("should use the image_creator_secondary field if image_creator is not present") {
+  it(
+    "should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
     val work = transformMiroRecord(
       data = s"""{
@@ -137,7 +140,8 @@ class MiroTransformableTest extends FunSpec with Matchers {
     work.creators shouldBe List(Agent(secondaryCreator))
   }
 
-  it("should use all the values in the image_creator_secondary field if image_creator is not present") {
+  it(
+    "should use all the values in the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator1 = "Gamekeeper Gordon"
     val secondaryCreator2 = "Herpetologist Harriet"
     val work = transformMiroRecord(
@@ -148,10 +152,12 @@ class MiroTransformableTest extends FunSpec with Matchers {
         "image_copyright_cleared": "Y"
       }"""
     )
-    work.creators shouldBe List(Agent(secondaryCreator1), Agent(secondaryCreator2))
+    work.creators shouldBe List(Agent(secondaryCreator1),
+                                Agent(secondaryCreator2))
   }
 
-  it("should combine the values in the image_creator and image_secondary_creator fields if both present") {
+  it(
+    "should combine the values in the image_creator and image_secondary_creator fields if both present") {
     val creator = "Mycologist Morgan"
     val secondaryCreator = "Manufacturer Mel"
     val work = transformMiroRecord(
@@ -167,35 +173,43 @@ class MiroTransformableTest extends FunSpec with Matchers {
   }
 
   it("should not pass through records with a missing image_cleared field") {
-    assertTransformMiroRecordFails(data="""{
+    assertTransformMiroRecordFails(data = """{
       "image_title": "Missives on museums",
       "image_copyright_cleared": "Y"
     }""")
   }
 
-  it("should not pass through records with a missing image_copyright_cleared field") {
-    assertTransformMiroRecordFails(data="""{
+  it(
+    "should not pass through records with a missing image_copyright_cleared field") {
+    assertTransformMiroRecordFails(
+      data = """{
       "image_title": "A caricature of cats",
       "image_cleared": "Y"
     }""")
   }
 
-  it("should not pass through records with missing image_cleared and missing image_copyright_cleared field") {
-    assertTransformMiroRecordFails(data="""{
+  it(
+    "should not pass through records with missing image_cleared and missing image_copyright_cleared field") {
+    assertTransformMiroRecordFails(
+      data = """{
       "image_title": "Drawings of dromedaries"
     }""")
   }
 
-  it("should not pass through records with an image_cleared value that isn't 'Y'") {
-    assertTransformMiroRecordFails(data="""{
+  it(
+    "should not pass through records with an image_cleared value that isn't 'Y'") {
+    assertTransformMiroRecordFails(
+      data = """{
       "image_title": "Confidential colourings of crododiles",
       "image_cleared": "N",
       "image_copyright_cleared": "Y"
     }""")
   }
 
-  it("should not pass through records with image_copyright_cleared field that isn't 'Y'") {
-    assertTransformMiroRecordFails(data="""{
+  it(
+    "should not pass through records with image_copyright_cleared field that isn't 'Y'") {
+    assertTransformMiroRecordFails(
+      data = """{
       "image_title": "Proprietary poetry about porcupines",
       "image_cleared": "Y",
       "image_copyright_cleared": "N"

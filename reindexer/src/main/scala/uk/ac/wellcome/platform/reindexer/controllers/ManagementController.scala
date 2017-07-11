@@ -15,7 +15,8 @@ class ManagementController @Inject()() extends Controller {
       case ReindexStatus(JobStatus.Init, _, _) => response.ok.json _
       case ReindexStatus(JobStatus.Working, _, _) => response.ok.json _
       case ReindexStatus(JobStatus.Success, _, _) => response.created.json _
-      case ReindexStatus(JobStatus.Failure, _, _) => response.internalServerError.json _
+      case ReindexStatus(JobStatus.Failure, _, _) =>
+        response.internalServerError.json _
     }
 
     respond(currentStatus.toMap)

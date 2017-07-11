@@ -19,7 +19,6 @@ class SwaggerController @Inject()(
   @Flag("api.host") apiHost: String
 ) extends Controller {
 
-
   val scheme = apiScheme match {
     case "https" => Scheme.HTTPS
     case _ => Scheme.HTTP

@@ -8,8 +8,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
 
-
-class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable) extends Logging {
+class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
+    extends Logging {
 
   implicit val session = AutoSession(db.settingsProvider)
 
@@ -35,7 +35,8 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable) extends Lo
         withSQL {
           insert
             .into(identifiers)
-            .namedValues(identifiers.column.CanonicalID -> identifier.CanonicalID,
+            .namedValues(
+              identifiers.column.CanonicalID -> identifier.CanonicalID,
               identifiers.column.MiroID -> identifier.MiroID)
         }.update().apply()
         ()
@@ -43,9 +44,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable) extends Lo
     }
     insertIntoDbFuture.onFailure {
       case e: Exception =>
-        error(
-          s"Failed inserting identifier $identifier in database",
-          e)
+        error(s"Failed inserting identifier $identifier in database", e)
     }
     insertIntoDbFuture
   }

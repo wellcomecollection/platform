@@ -32,14 +32,14 @@ class WorkExtractorTest
 
     val eventualWork = WorkExtractor.toWork(message)
 
-
     whenReady(eventualWork) { extractedWork =>
       extractedWork.identifiers.head.value shouldBe miroID
       extractedWork.label shouldBe label
     }
   }
 
-  it("should return a failed future if it fails parsing the message it receives") {
+  it(
+    "should return a failed future if it fails parsing the message it receives") {
     val sqsMessage = SQSMessage(Some("subject"),
                                 "not a json string",
                                 "topic",

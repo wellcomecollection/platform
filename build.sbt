@@ -39,4 +39,10 @@ lazy val reindexer = doSharedSetup(project)
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
 lazy val root = (project in file("."))
-  .aggregate(common, calm_adapter, api, ingestor, transformer, id_minter, reindexer)
+  .aggregate(common,
+             calm_adapter,
+             api,
+             ingestor,
+             transformer,
+             id_minter,
+             reindexer)

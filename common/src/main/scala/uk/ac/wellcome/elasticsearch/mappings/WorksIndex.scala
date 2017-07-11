@@ -26,8 +26,8 @@ class WorksIndex @Inject()(client: HttpClient,
       objectField("work").fields(
         keywordField("type"),
         objectField("identifiers").fields(keywordField("source"),
-          keywordField("sourceId"),
-          keywordField("value")),
+                                          keywordField("sourceId"),
+                                          keywordField("value")),
         textField("label").fields(
           textField("english").analyzer(EnglishLanguageAnalyzer)),
         textField("description").fields(
@@ -49,19 +49,27 @@ class WorksIndex @Inject()(client: HttpClient,
     client
       .execute(createIndex(indexName))
       .recover {
-        case e: RemoteTransportException if e.getCause.isInstanceOf[ResourceAlreadyExistsException] => info(s"Index $indexName already exists")
-        case _: ResourceAlreadyExistsException => info(s"Index $indexName already exists")
+        case e: RemoteTransportException
+            if e.getCause.isInstanceOf[ResourceAlreadyExistsException] =>
+          info(s"Index $indexName already exists")
+        case _: ResourceAlreadyExistsException =>
+          info(s"Index $indexName already exists")
         case e: Throwable =>
           error(s"Failed creating index $indexName", e)
           throw e
       }
       .flatMap { _ =>
-        client.execute {
-          mappingDefinition
-        }.recover{
-          case e: Throwable =>
-            error(s"Failed updating index $indexName", e)
-            throw e
-        }
-      }.map {_ => info("Index updated successfully")}
+        client
+          .execute {
+            mappingDefinition
+          }
+          .recover {
+            case e: Throwable =>
+              error(s"Failed updating index $indexName", e)
+              throw e
+          }
+      }
+      .map { _ =>
+        info("Index updated successfully")
+      }
 }

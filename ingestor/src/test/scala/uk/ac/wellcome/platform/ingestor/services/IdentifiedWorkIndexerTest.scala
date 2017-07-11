@@ -25,14 +25,21 @@ class IdentifiedWorkIndexerTest
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
   val identifiedWorkIndexer =
-    new IdentifiedWorkIndexer(indexName, itemType, elasticClient, metricsSender)
+    new IdentifiedWorkIndexer(indexName,
+                              itemType,
+                              elasticClient,
+                              metricsSender)
 
-  def identifiedWorkJson(canonicalId: String, sourceId: String, label: String): String = {
-    JsonUtil.toJson(
+  def identifiedWorkJson(canonicalId: String,
+                         sourceId: String,
+                         label: String): String = {
+    JsonUtil
+      .toJson(
         IdentifiedWork(
           canonicalId = canonicalId,
-          work = Work(
-            identifiers = List(SourceIdentifier("Miro", "MiroID", sourceId)), label = label)))
+          work = Work(identifiers =
+                        List(SourceIdentifier("Miro", "MiroID", sourceId)),
+                      label = label)))
       .get
   }
 
@@ -41,8 +48,8 @@ class IdentifiedWorkIndexerTest
     val identifiedWorkString =
       identifiedWorkJson("5678", "1234", "some label")
 
-    val future = identifiedWorkIndexer.indexIdentifiedWork(
-      identifiedWorkString)
+    val future =
+      identifiedWorkIndexer.indexIdentifiedWork(identifiedWorkString)
 
     whenReady(future) { _ =>
       eventually {
@@ -57,13 +64,14 @@ class IdentifiedWorkIndexerTest
 
   }
 
-  it("should add only one record when multiple records with same id are ingested") {
+  it(
+    "should add only one record when multiple records with same id are ingested") {
     val identifiedWorkString =
       identifiedWorkJson("5678", "1234", "some label")
 
     val future = Future.sequence(
-      (1 to 2).map(_ => identifiedWorkIndexer.indexIdentifiedWork(
-        identifiedWorkString))
+      (1 to 2).map(_ =>
+        identifiedWorkIndexer.indexIdentifiedWork(identifiedWorkString))
     )
 
     whenReady(future) { _ =>
@@ -79,7 +87,8 @@ class IdentifiedWorkIndexerTest
 
   }
 
-  it("should return a failed future if the input string is not an identified work") {
+  it(
+    "should return a failed future if the input string is not an identified work") {
     val future = identifiedWorkIndexer.indexIdentifiedWork("a document")
 
     whenReady(future.failed) { exception =>

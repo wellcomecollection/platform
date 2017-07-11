@@ -5,12 +5,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import com.sksamuel.elastic4s.http.ElasticDsl._
 
-class IngestorIndexTest extends FunSpec
-  with IngestorUtils
-  with Matchers
-  with ScalaFutures {
+class IngestorIndexTest
+    extends FunSpec
+    with IngestorUtils
+    with Matchers
+    with ScalaFutures {
 
-  it("should create the index at startup in elasticsearch if it doesn't already exist") {
+  it(
+    "should create the index at startup in elasticsearch if it doesn't already exist") {
     elasticClient.execute(deleteIndex(indexName))
 
     eventually {

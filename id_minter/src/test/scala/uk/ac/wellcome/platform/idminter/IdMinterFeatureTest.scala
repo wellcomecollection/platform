@@ -12,7 +12,8 @@ import uk.ac.wellcome.utils.JsonUtil
 
 class IdMinterFeatureTest
     extends FunSpec
-    with FeatureTestMixin with IdMinterTestUtils {
+    with FeatureTestMixin
+    with IdMinterTestUtils {
 
   override val server: EmbeddedHttpServer = defineServer
   private val i = identifiersTable.i
@@ -101,7 +102,8 @@ class IdMinterFeatureTest
     }
   }
 
-  it("should not delete a message from the sqs queue if it fails processing it") {
+  it(
+    "should not delete a message from the sqs queue if it fails processing it") {
     sqsClient.sendMessage(idMinterQueue, "not a json string")
 
     assertMessageIsNotDeleted()

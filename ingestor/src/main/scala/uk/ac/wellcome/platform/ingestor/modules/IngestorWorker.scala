@@ -12,9 +12,10 @@ object IngestorWorker extends SQSWorker {
   private val esIndex = flag[String]("es.index", "records", "ES index name")
   private val esType = flag[String]("es.type", "item", "ES document type")
 
-  override def processMessage(message: SQSMessage, injector: Injector): Future[Unit] = {
+  override def processMessage(message: SQSMessage,
+                              injector: Injector): Future[Unit] = {
     val indexer = injector.instance[IdentifiedWorkIndexer]
 
-    indexer.indexIdentifiedWork(message.body).map(_=>())
+    indexer.indexIdentifiedWork(message.body).map(_ => ())
   }
 }

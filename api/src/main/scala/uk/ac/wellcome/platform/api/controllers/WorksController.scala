@@ -7,11 +7,13 @@ import com.twitter.finatra.http.Controller
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.WorksIncludes
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.api.requests._
-
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
@@ -51,11 +53,11 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           "includes",
           "A comma-separated list of extra fields to include",
           required = false)
-        // Deliberately undocumented: we have an 'index' query param that
-        // allows the user to pick which Elasticsearch index to use.  This is
-        // useful for us to try out transformer changes, different index
-        // weighting, etc., but we don't want to advertise its existence
-        // in the public docs.
+    // Deliberately undocumented: we have an 'index' query param that
+    // allows the user to pick which Elasticsearch index to use.  This is
+    // useful for us to try out transformer changes, different index
+    // weighting, etc., but we don't want to advertise its existence
+    // in the public docs.
 
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
@@ -102,7 +104,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           "includes",
           "A comma-separated list of extra fields to include",
           required = false)
-        // Deliberately undocumented: the index flag.  See above.
+    // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
       // val includes = WorksIncludes(request.includes)
       worksService

@@ -26,8 +26,10 @@ trait MiroRecordUtils extends RecordUtils {
     streamRecord.addNewImageEntry("MiroCollection",
                                   new AttributeValue(MiroCollection))
     streamRecord.addNewImageEntry("data", new AttributeValue(data))
-    streamRecord.addNewImageEntry("ReindexShard", new AttributeValue("default"))
-    streamRecord.addNewImageEntry("ReindexVersion", new AttributeValue().withN("0"))
+    streamRecord.addNewImageEntry("ReindexShard",
+                                  new AttributeValue("default"))
+    streamRecord.addNewImageEntry("ReindexVersion",
+                                  new AttributeValue().withN("0"))
     streamRecord
   }
 }

@@ -20,7 +20,9 @@ class TableProvisionerTest
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    sql"drop table if exists $identifiersDatabase.schema_version".execute().apply()
+    sql"drop table if exists $identifiersDatabase.schema_version"
+      .execute()
+      .apply()
     sql"drop table if exists $identifiersDatabase.$tableName".execute().apply()
   }
 

@@ -10,18 +10,18 @@ sealed trait ApiRequest {
 }
 
 case class MultipleResultsRequest(
-                                   @Min(1) @QueryParam page: Int = 1,
-                                   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
-                                   @QueryParam includes: Option[WorksIncludes],
-                                   @RouteParam id: Option[String],
-                                   @QueryParam query: Option[String],
-                                   @QueryParam _index: Option[String],
-                                   request: Request
-                                 ) extends ApiRequest
+  @Min(1) @QueryParam page: Int = 1,
+  @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
+  @QueryParam includes: Option[WorksIncludes],
+  @RouteParam id: Option[String],
+  @QueryParam query: Option[String],
+  @QueryParam _index: Option[String],
+  request: Request
+) extends ApiRequest
 
 case class SingleWorkRequest(
-                              @RouteParam id: String,
-                              @QueryParam includes: Option[WorksIncludes],
-                              @QueryParam _index: Option[String],
-                              request: Request
-                            ) extends ApiRequest
+  @RouteParam id: String,
+  @QueryParam includes: Option[WorksIncludes],
+  @QueryParam _index: Option[String],
+  request: Request
+) extends ApiRequest
