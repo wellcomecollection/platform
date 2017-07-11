@@ -185,6 +185,21 @@ lint-lambdas: docker-build-flake8
 test-lambdas: docker-build-flake8
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
+format-terraform:
+	terraform fmt
+
+format-scala:
+	scalafmt
+	sbt:scalafmt
+
+format: \
+	format-terraform \
+	format-scala
+
+check-format: format
+	git diff --exit-code
+
+
 
 .PHONY: help
 
