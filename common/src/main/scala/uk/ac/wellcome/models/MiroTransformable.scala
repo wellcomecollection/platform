@@ -17,7 +17,8 @@ case class MiroTransformableData(
   @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String]
 )
 
-case class shouldNotTransformException(message: String) extends Exception(message)
+case class shouldNotTransformException(message: String)
+    extends Exception(message)
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
@@ -47,7 +48,8 @@ case class MiroTransformable(MiroID: String,
         throw new shouldNotTransformException("image_cleared field is not Y")
       }
       if (miroData.copyright_cleared.getOrElse("N") != "Y") {
-        throw new shouldNotTransformException("image_copyright_cleared field is not Y")
+        throw new shouldNotTransformException(
+          "image_copyright_cleared field is not Y")
       }
 
       // <image_title>: the Short Description.  This maps to our property

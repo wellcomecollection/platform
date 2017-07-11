@@ -24,8 +24,8 @@ trait SQSLocal
 
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder
     .standard()
-    .withCredentials(
-      new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+    .withCredentials(new AWSStaticCredentialsProvider(
+      new BasicAWSCredentials(accessKey, secretKey)))
     .withEndpointConfiguration(
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
@@ -44,6 +44,7 @@ trait SQSLocal
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    queueUrls.foreach(queueUrl => sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl)))
+    queueUrls.foreach(queueUrl =>
+      sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl)))
   }
 }

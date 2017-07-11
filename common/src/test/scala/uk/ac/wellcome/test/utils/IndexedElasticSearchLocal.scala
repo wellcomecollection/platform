@@ -25,7 +25,8 @@ trait IndexedElasticSearchLocal
     createIndex(indexName)
   }
 
-  def insertIntoElasticSearchWithIndex(index: String, identifiedWorks: IdentifiedWork*) = {
+  def insertIntoElasticSearchWithIndex(index: String,
+                                       identifiedWorks: IdentifiedWork*) = {
     if (index != indexName) {
       createIndex(index)
     }

@@ -9,9 +9,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil.mapper
 
-class ApiSwaggerTest
-    extends FunSpec
-    with FeatureTestMixin {
+class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
 
   implicit val jsonMapper = IdentifiedWork
   override val server =
@@ -37,9 +35,9 @@ class ApiSwaggerTest
 
     val tree = mapper.readTree(response.contentString)
 
-    tree.at("/host").toString should be ("\"test.host\"")
-    tree.at("/schemes").toString should be ("[\"http\"]")
-    tree.at("/info/version").toString should be ("\"v99\"")
-    tree.at("/basePath").toString should be ("\"/test/v99\"")
+    tree.at("/host").toString should be("\"test.host\"")
+    tree.at("/schemes").toString should be("[\"http\"]")
+    tree.at("/info/version").toString should be("\"v99\"")
+    tree.at("/basePath").toString should be("\"/test/v99\"")
   }
 }

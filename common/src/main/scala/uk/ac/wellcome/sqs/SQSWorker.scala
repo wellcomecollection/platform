@@ -11,7 +11,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.util.Try
 
-
 trait SQSWorker extends TwitterModule with TryBackoff {
   override def singletonStartup(injector: Injector) {
     info("Starting SQS worker")
@@ -25,22 +24,22 @@ trait SQSWorker extends TwitterModule with TryBackoff {
   def processMessage(message: SQSMessage, injector: Injector): Future[Unit]
 
   private def processMessages(
-                       sqsReader: SQSReader,
-                       injector: Injector
-                     ): Future[Unit] = {
+    sqsReader: SQSReader,
+    injector: Injector
+  ): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
-      Future.fromTry(extractMessage(message))
+      Future
+        .fromTry(extractMessage(message))
         .flatMap(m => processMessage(m, injector))
     }
   }
 
   private def extractMessage(sqsMessage: Message): Try[SQSMessage] =
-    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover{
+    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover {
       case e: Throwable =>
         error("Invalid message structure (not via SNS?)", e)
         throw e
     }
-
 
   override def singletonShutdown(injector: Injector) {
     info("Terminating SQS worker")

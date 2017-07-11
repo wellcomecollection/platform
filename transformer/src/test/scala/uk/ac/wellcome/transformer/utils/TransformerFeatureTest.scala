@@ -26,8 +26,7 @@ trait TransformerFeatureTest
     new EmbeddedHttpServer(
       new Server(),
       flags ++ snsLocalEndpointFlags ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag
-    )
-        .bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
+    ).bind[KinesisClientLibConfiguration](kinesisClientLibConfiguration)
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")
 

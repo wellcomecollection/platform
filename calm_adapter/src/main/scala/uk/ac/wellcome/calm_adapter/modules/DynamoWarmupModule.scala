@@ -47,8 +47,7 @@ object DynamoWarmupModule extends TwitterModule {
         val client: AmazonDynamoDB = dynamoClient
       }.updateWriteCapacity(tableToWarm(), capacity)
 
-      info(
-        s"Setting write capacity of ${tableToWarm()} table to $capacity")
+      info(s"Setting write capacity of ${tableToWarm()} table to $capacity")
     } catch {
       case e: Throwable => error(s"Error in modifyCapacity(): $e")
     }

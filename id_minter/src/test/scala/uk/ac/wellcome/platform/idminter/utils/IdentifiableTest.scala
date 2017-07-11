@@ -5,7 +5,8 @@ import org.scalatest.prop.PropertyChecks
 
 class IdentifiableTest extends FunSpec with PropertyChecks with Matchers {
 
-  it("should generate a string with 8 characters, none of which are ambiguous characters") {
+  it(
+    "should generate a string with 8 characters, none of which are ambiguous characters") {
     forAll(minSuccessful(100)) { (a: Int) =>
       {
         val id = Identifiable.generate
@@ -18,7 +19,7 @@ class IdentifiableTest extends FunSpec with PropertyChecks with Matchers {
 
   it("should never generate an identifier that starts with a number") {
     forAll(minSuccessful(100)) { (_: Int) =>
-      Identifiable.generate should not (startWith regex "[0-9]")
+      Identifiable.generate should not(startWith regex "[0-9]")
     }
   }
 

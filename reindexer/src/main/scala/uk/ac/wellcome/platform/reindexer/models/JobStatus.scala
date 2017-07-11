@@ -18,8 +18,7 @@ case class ReindexStatus(state: JobStatus.Value,
   def toMap =
     Map("state" -> state.toString,
         "recordsProcessed" -> s"$recordsProcessed",
-        "batch" -> s"$batch"
-    )
+        "batch" -> s"$batch")
 
 }
 object ReindexStatus {
@@ -34,12 +33,18 @@ object ReindexStatus {
     val currentCount = currentStatus.recordsProcessed + units
     val currentBatch = currentStatus.batch + batch
 
-    agent.send(ReindexStatus(JobStatus.Working,  currentCount, currentBatch))
+    agent.send(ReindexStatus(JobStatus.Working, currentCount, currentBatch))
   }
 
   def succeed(): Unit =
-    agent.send(ReindexStatus(JobStatus.Success, currentStatus.recordsProcessed, currentStatus.batch))
+    agent.send(
+      ReindexStatus(JobStatus.Success,
+                    currentStatus.recordsProcessed,
+                    currentStatus.batch))
 
   def fail(): Unit =
-    agent.send(ReindexStatus(JobStatus.Failure, currentStatus.recordsProcessed, currentStatus.batch))
+    agent.send(
+      ReindexStatus(JobStatus.Failure,
+                    currentStatus.recordsProcessed,
+                    currentStatus.batch))
 }

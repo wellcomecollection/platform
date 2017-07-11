@@ -18,7 +18,8 @@ case class DisplayWork(id: String,
 
 case object DisplayWork {
 
-  def apply(hit: SearchHit): DisplayWork = apply(hit, includes = WorksIncludes())
+  def apply(hit: SearchHit): DisplayWork =
+    apply(hit, includes = WorksIncludes())
 
   def apply(hit: SearchHit, includes: WorksIncludes): DisplayWork = {
     jsonToDisplayWork(hit.sourceAsString, includes)

@@ -55,7 +55,8 @@ class ScanamoQueryStreamTest
     }
 
     val ops = ScanamoQueryStream
-      .run[MiroTransformable, List[Either[DynamoReadError, MiroTransformable]]](
+      .run[MiroTransformable,
+           List[Either[DynamoReadError, MiroTransformable]]](
         scanamoQueryRequest,
         updateVersion)
 
