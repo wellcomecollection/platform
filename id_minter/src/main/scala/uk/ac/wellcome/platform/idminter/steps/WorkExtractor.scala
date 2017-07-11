@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import com.amazonaws.services.sqs.model.Message
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -11,7 +10,7 @@ import scala.concurrent.Future
 
 object WorkExtractor extends Logging {
 
-  def toWork(message: Message): Future[Work] =
+  def toWork(message: SQSMessage): Future[Work] =
     Future
       .fromTry {
         tryExtractinWork(message)
@@ -25,11 +24,8 @@ object WorkExtractor extends Logging {
         throw e
     }
 
-  private def tryExtractinWork(message: Message) = {
-    info(s"Parsing SQSMessage ${message.getBody}")
-    JsonUtil.fromJson[SQSMessage](message.getBody).flatMap { sqsMessage =>
-      info(s"Extracting Work from SQSMessage $sqsMessage")
-      JsonUtil.fromJson[Work](sqsMessage.body)
-    }
+  private def tryExtractinWork(message: SQSMessage) = {
+      info(s"Extracting Work from SQSMessage $message")
+      JsonUtil.fromJson[Work](message.body)
   }
 }
