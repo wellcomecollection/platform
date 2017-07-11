@@ -63,6 +63,9 @@ cache:
 matrix:
   include:
     - env:
+        - TASK=check-format
+        - PROJECT=.
+    - env:
         - TASK=sbt-test-common
         - PROJECT=common
     - env:
