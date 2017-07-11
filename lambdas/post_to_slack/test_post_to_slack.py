@@ -32,6 +32,7 @@ def test_post_to_slack(mock_post):
     ]
     reason = "Threshold Crossed: 1 datapoint (4.0) was \
         greater than or equal to the threshold (1.0)."
+    timestamp = "2017-07-10T15:42:24.243+0000"
 
     alarm_info = {
         "AlarmName": alarm_name,
@@ -39,7 +40,7 @@ def test_post_to_slack(mock_post):
         "AWSAccountId": "account_id",
         "NewStateValue": "ALARM",
         "NewStateReason": reason,
-        "StateChangeTime": "2017-07-10T15:42:24.243+0000",
+        "StateChangeTime": timestamp,
         "Region": "EU - Ireland",
         "OldStateValue": "INSUFFICIENT_DATA",
         "Trigger": {
@@ -95,7 +96,7 @@ def test_post_to_slack(mock_post):
     attachment = sent_data['attachments'][0]
     assert attachment['fallback'] == alarm_name
     assert attachment['title'] == alarm_name
-    assert len(attachment['fields']) == 3
+    assert len(attachment['fields']) == 4
 
     _assert_field_contains(
         field=attachment['fields'][0],
@@ -111,4 +112,9 @@ def test_post_to_slack(mock_post):
         field=attachment['fields'][2],
         title='Reason',
         value=reason
+    )
+    _assert_field_contains(
+        field=attachment['fields'][3],
+        title='Timestamp',
+        value=timestamp
     )
