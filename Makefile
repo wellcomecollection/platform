@@ -25,6 +25,10 @@ docker-build-cache_cleaner: install-docker-build-deps
 docker-deploy-cache_cleaner: docker-build-cache_cleaner
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
 
+## Build the image for scala in CI
+docker-build-scala_ci:
+	docker build ./docker/scala_ci --tag scala_ci
+
 
 install-docker-build-deps:
 	pip3 install --upgrade boto3 docker docopt
@@ -71,8 +75,8 @@ nginx-deploy:	\
 
 
 
-sbt-test-common:
-	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-common: docker-build-scala_ci
+	docker run --net host -v ~/.ivy2:/tmp/.ivy2 -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/data -e PROJECT=common scala_ci:latest
 
 sbt-test-api:
 	sbt 'project api' ';dockerComposeUp;test;dockerComposeStop'
