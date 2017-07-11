@@ -5,7 +5,11 @@ import java.util.concurrent.TimeUnit
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.calm_adapter.models.ActorRegister
-import uk.ac.wellcome.finatra.modules.{AkkaModule, SNSClientModule, SNSConfigModule}
+import uk.ac.wellcome.finatra.modules.{
+  AkkaModule,
+  SNSClientModule,
+  SNSConfigModule
+}
 import uk.ac.wellcome.models.aws.ECSServiceScheduleRequest
 import uk.ac.wellcome.platform.calm_adapter.actors._
 import uk.ac.wellcome.sns.SNSWriter

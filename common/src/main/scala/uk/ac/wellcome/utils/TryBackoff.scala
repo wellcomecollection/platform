@@ -52,7 +52,9 @@ trait TryBackoff extends Logging {
 
   private var maybeCancellable: Option[Cancellable] = None
 
-  def run(f: (() => Future[Unit]), system: ActorSystem, attempt: Int = 0): Unit = {
+  def run(f: (() => Future[Unit]),
+          system: ActorSystem,
+          attempt: Int = 0): Unit = {
 
     Future.successful(()).flatMap(_ => f()).onComplete { tried =>
       val attempted = tried match {

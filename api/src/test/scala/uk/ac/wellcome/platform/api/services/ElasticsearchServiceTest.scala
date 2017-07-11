@@ -14,7 +14,7 @@ class ElasticsearchServiceTest
     with IndexedElasticSearchLocal
     with Matchers
     with ScalaFutures
-    with WorksUtil{
+    with WorksUtil {
 
   val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)

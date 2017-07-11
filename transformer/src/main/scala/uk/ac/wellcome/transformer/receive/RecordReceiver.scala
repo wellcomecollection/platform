@@ -23,22 +23,25 @@ class RecordReceiver @Inject()(
 
   def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
     info(s"Starting to process record $record")
-    metricsSender.timeAndCount("ingest-time", () => {
-      val triedWork = for {
-        recordMap <- recordToRecordMap(record)
-        transformableRecord <- transformableParser.extractTransformable(
-          recordMap)
-        cleanRecord <- transformDynamoRecord(transformableRecord)
-      } yield cleanRecord
+    metricsSender.timeAndCount(
+      "ingest-time",
+      () => {
+        val triedWork = for {
+          recordMap <- recordToRecordMap(record)
+          transformableRecord <- transformableParser.extractTransformable(
+            recordMap)
+          cleanRecord <- transformDynamoRecord(transformableRecord)
+        } yield cleanRecord
 
-      triedWork match {
-        case Success(work) =>
-          publishMessage(work)
-        case Failure(e) =>
-          error("Failed extracting unified item from record", e)
-          Future.failed(e)
+        triedWork match {
+          case Success(work) =>
+            publishMessage(work)
+          case Failure(e) =>
+            error("Failed extracting unified item from record", e)
+            Future.failed(e)
+        }
       }
-    })
+    )
   }
 
   def recordToRecordMap(record: RecordAdapter): Try[RecordMap] = Try {

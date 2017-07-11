@@ -31,8 +31,10 @@ trait CalmRecordUtils extends RecordUtils {
     streamRecord.addNewImageEntry("RefNo", new AttributeValue(RefNo))
     streamRecord.addNewImageEntry("AltRefNo", new AttributeValue(AltRefNo))
     streamRecord.addNewImageEntry("data", new AttributeValue(data))
-    streamRecord.addNewImageEntry("ReindexShard", new AttributeValue("default"))
-    streamRecord.addNewImageEntry("ReindexVersion", new AttributeValue().withN("0"))
+    streamRecord.addNewImageEntry("ReindexShard",
+                                  new AttributeValue("default"))
+    streamRecord.addNewImageEntry("ReindexVersion",
+                                  new AttributeValue().withN("0"))
     streamRecord
   }
 }

@@ -25,7 +25,8 @@ class MiroTransformerFeatureTest
   override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
     kinesisClientLibConfiguration(appName, miroDataStreamArn)
 
-  it("should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
+  it(
+    "should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
     val miroID = "M0000001"
     val label = "A guide for a giraffe"
     putMiroImageInDynamoDb(miroID, label)
@@ -61,10 +62,9 @@ class MiroTransformerFeatureTest
 
   private def putMiroImageInDynamoDb(miroID: String, imageTitle: String) = {
     Scanamo.put(dynamoDbClient)(miroDataTableName)(
-      MiroTransformable(
-        miroID,
-        "Images-A",
-        s"""{
+      MiroTransformable(miroID,
+                        "Images-A",
+                        s"""{
           "image_title": "$imageTitle",
           "image_cleared": "Y",
           "image_copyright_cleared": "Y"

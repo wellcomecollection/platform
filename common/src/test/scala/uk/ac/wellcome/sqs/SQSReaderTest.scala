@@ -20,14 +20,12 @@ class SQSReaderTest
 
   val queueUrl = createQueueAndReturnUrl("test_queue")
   // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
-  sqsClient.setQueueAttributes(queueUrl,
-                               Map("VisibilityTimeout" -> "1"))
+  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
-  it("should get messages from the SQS queue, limited by the maximum number of messages and return them") {
+  it(
+    "should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     val sqsConfig =
-      SQSConfig(queueUrl,
-                waitTime = 20 seconds,
-                maxMessages = 2)
+      SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 2)
     val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
@@ -58,18 +56,18 @@ class SQSReaderTest
                 maxMessages = 1)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
-    val futureMessages = sqsReader.retrieveAndDeleteMessages(_ => Future.successful(()))
+    val futureMessages =
+      sqsReader.retrieveAndDeleteMessages(_ => Future.successful(()))
 
     whenReady(futureMessages.failed) { exception =>
       exception.getMessage should not be (empty)
     }
   }
 
-  it("should return a failed future if processing one of the messages throws an exception - the failed message should not be deleted") {
+  it(
+    "should return a failed future if processing one of the messages throws an exception - the failed message should not be deleted") {
     val sqsConfig =
-      SQSConfig(queueUrl,
-                waitTime = 20 seconds,
-                maxMessages = 10)
+      SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail"
     val messageStrings = List("This is the first message",
@@ -92,11 +90,10 @@ class SQSReaderTest
     assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
-  it("should return a failed future if processing one of the messages returns a failed future - the failed message should not be deleted") {
+  it(
+    "should return a failed future if processing one of the messages returns a failed future - the failed message should not be deleted") {
     val sqsConfig =
-      SQSConfig(queueUrl,
-                waitTime = 20 seconds,
-                maxMessages = 10)
+      SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail"
     val messageStrings = List("This is the first message",
@@ -108,8 +105,7 @@ class SQSReaderTest
 
     val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
       if (message.getBody == failingMessage)
-        Future { throw new RuntimeException(s"$failingMessage is not valid") }
-      else
+        Future { throw new RuntimeException(s"$failingMessage is not valid") } else
         Future.successful(message)
     }
 
@@ -126,11 +122,10 @@ class SQSReaderTest
     // wait for the visibility period to expire
     Thread.sleep(1500)
     var receivedMessages: List[Message] = Nil
-    val nextMessages = sqsReader.retrieveAndDeleteMessages(message =>
-      {
-        receivedMessages = message :: receivedMessages
-        Future.successful(())
-      })
+    val nextMessages = sqsReader.retrieveAndDeleteMessages(message => {
+      receivedMessages = message :: receivedMessages
+      Future.successful(())
+    })
     whenReady(nextMessages) { _ =>
       receivedMessages should have size expectedNumberOfMessages
     }

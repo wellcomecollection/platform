@@ -33,7 +33,6 @@ object KinesisWorker extends TwitterModule {
     system.scheduler.scheduleOnce(
       Duration.create(50, TimeUnit.MILLISECONDS), {
         val worker = new Worker(
-
           recordProcessFactory,
           kinesisConfig,
           adapter,

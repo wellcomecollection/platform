@@ -24,8 +24,10 @@ object SNSClientModule extends TwitterModule {
         .build()
     else
       standardSnsClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(awsConfig.accessKey.get, awsConfig.secretKey.get)))
+        .withCredentials(
+          new AWSStaticCredentialsProvider(
+            new BasicAWSCredentials(awsConfig.accessKey.get,
+                                    awsConfig.secretKey.get)))
         .withEndpointConfiguration(
           new EndpointConfiguration(snsEndpoint(), awsConfig.region))
         .build()

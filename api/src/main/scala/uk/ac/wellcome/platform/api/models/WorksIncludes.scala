@@ -2,11 +2,16 @@ package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonMappingException}
+import com.fasterxml.jackson.databind.{
+  DeserializationContext,
+  JsonDeserializer,
+  JsonMappingException
+}
 
 case class WorksIncludes(identifiers: Boolean = false)
 
-class WorksIncludesParsingException(msg: String) extends JsonMappingException(msg: String)
+class WorksIncludesParsingException(msg: String)
+    extends JsonMappingException(msg: String)
 
 case object WorksIncludes {
 
@@ -42,7 +47,8 @@ case object WorksIncludes {
 }
 
 class WorksIncludesDeserializer extends JsonDeserializer[WorksIncludes] {
-  override def deserialize(p: JsonParser, ctxt: DeserializationContext): WorksIncludes =
+  override def deserialize(p: JsonParser,
+                           ctxt: DeserializationContext): WorksIncludes =
     WorksIncludes(p.getText())
 }
 

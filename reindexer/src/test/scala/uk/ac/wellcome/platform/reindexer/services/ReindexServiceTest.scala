@@ -97,20 +97,16 @@ class ReindexServiceTest
       ))
 
     when(calmReindexTargetService.runReindex(ReindexAttempt(reindex)))
-      .thenReturn(
-        Future.successful(ReindexAttempt(reindex, true, 1)))
+      .thenReturn(Future.successful(ReindexAttempt(reindex, true, 1)))
 
     (1 to 4).foreach { x =>
       when(
-        calmReindexTargetService.runReindex(
-          ReindexAttempt(reindex, true, x)))
-        .thenReturn(Future.successful(
-          ReindexAttempt(reindex, false, x + 1)))
+        calmReindexTargetService.runReindex(ReindexAttempt(reindex, true, x)))
+        .thenReturn(Future.successful(ReindexAttempt(reindex, false, x + 1)))
     }
 
     when(
-      calmReindexTargetService.runReindex(
-        ReindexAttempt(reindex, false, 5)))
+      calmReindexTargetService.runReindex(ReindexAttempt(reindex, false, 5)))
       .thenReturn(Future.successful(ReindexAttempt(reindex, true, 6)))
 
     val reindexService = new ReindexService(

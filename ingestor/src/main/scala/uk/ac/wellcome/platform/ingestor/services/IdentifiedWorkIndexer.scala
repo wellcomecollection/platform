@@ -25,20 +25,23 @@ class IdentifiedWorkIndexer @Inject()(
   def indexIdentifiedWork(document: String): Future[IndexResponse] = {
     implicit val jsonMapper = IdentifiedWork
 
-    metricsSender.timeAndCount[IndexResponse]("ingestor-index-work", () => {
-      Future
-        .fromTry(JsonUtil.fromJson[IdentifiedWork](document))
-        .flatMap(item => {
-          info(s"Indexing item $item")
-          elasticClient.execute {
-            indexInto(esIndex / esType).id(item.canonicalId).doc(item)
+    metricsSender.timeAndCount[IndexResponse](
+      "ingestor-index-work",
+      () => {
+        Future
+          .fromTry(JsonUtil.fromJson[IdentifiedWork](document))
+          .flatMap(item => {
+            info(s"Indexing item $item")
+            elasticClient.execute {
+              indexInto(esIndex / esType).id(item.canonicalId).doc(item)
+            }
+          })
+          .recover {
+            case e: Throwable =>
+              error(s"Error indexing document $document into Elasticsearch", e)
+              throw e
           }
-        })
-        .recover {
-          case e: Throwable =>
-            error(s"Error indexing document $document into Elasticsearch", e)
-            throw e
-        }
-    })
+      }
+    )
   }
 }

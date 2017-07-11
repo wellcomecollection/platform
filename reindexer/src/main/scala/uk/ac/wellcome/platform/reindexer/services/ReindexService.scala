@@ -15,23 +15,32 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
   reindexTrackerService: ReindexTrackerService,
   reindexTargetService: ReindexTargetService[T],
   metricsSender: MetricsSender)
-    extends Logging with TryBackoff{
+    extends Logging
+    with TryBackoff {
 
   def run: Future[Unit] = {
     info("ReindexService started.")
 
-    metricsSender.timeAndCount("reindex-total-time", () => {
-      val attempt: Future[Option[ReindexAttempt]] = for {
-        indices <- reindexTrackerService.getIndexForReindex
-        attempt = indices.map(ReindexAttempt(_, false, 0))
-        _ <- attempt.map(processReindexAttempt).getOrElse(Future.successful((): Unit))
-      } yield attempt
+    metricsSender.timeAndCount(
+      "reindex-total-time",
+      () => {
+        val attempt: Future[Option[ReindexAttempt]] = for {
+          indices <- reindexTrackerService.getIndexForReindex
+          attempt = indices.map(ReindexAttempt(_, false, 0))
+          _ <- attempt
+            .map(processReindexAttempt)
+            .getOrElse(Future.successful((): Unit))
+        } yield attempt
 
-      attempt.map {
-        case Some(reindexAttempt) => reindexTrackerService.updateReindex(reindexAttempt)
-        case None => ()
-      }.map(_ => info("ReindexService finished."))
-    })
+        attempt
+          .map {
+            case Some(reindexAttempt) =>
+              reindexTrackerService.updateReindex(reindexAttempt)
+            case None => ()
+          }
+          .map(_ => info("ReindexService finished."))
+      }
+    )
   }
 
   private def processReindexAttempt(
@@ -42,7 +51,8 @@ class ReindexService[T <: Reindexable[String]] @Inject()(
         Future.successful(ReindexAttempt(reindex, true, attempt)) // Stop: done!
       }
       case _ => {
-        info(s"ReindexService continuing at attempt ${reindexAttempt.attempt}, ")
+        info(
+          s"ReindexService continuing at attempt ${reindexAttempt.attempt}, ")
 
         reindexTargetService
           .runReindex(reindexAttempt)

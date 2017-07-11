@@ -4,7 +4,11 @@ import javax.inject.{Inject, Singleton}
 
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.platform.api.models.{DisplaySearch, DisplayWork, WorksIncludes}
+import uk.ac.wellcome.platform.api.models.{
+  DisplaySearch,
+  DisplayWork,
+  WorksIncludes
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
