@@ -40,7 +40,7 @@ build_lambda() {
   echo ""
 }
 
-for dir in $(find "$LAMBDA_DIR" -type d -depth 1)
+for dir in $(find "$LAMBDA_DIR" -mindepth 1 -maxdepth 1 -type d)
 do
   build_lambda "$dir"
 done

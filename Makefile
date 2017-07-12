@@ -161,9 +161,11 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
+install-lambda-deps: docker-build-python36
+	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
+
 ## Run a plan
-terraform-plan: docker-build-terraform
-	./lambdas/install_lambda_deps.sh
+terraform-plan: docker-build-terraform install-lambda-deps
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
 
 ## Run an apply
