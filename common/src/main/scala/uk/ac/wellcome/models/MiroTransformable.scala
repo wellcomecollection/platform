@@ -54,11 +54,20 @@ case class MiroTransformable(MiroID: String,
 
       // <image_title>: the Short Description.  This maps to our property
       // "label".
-      val label = miroData.title.get
+      //
+      // In the V collection, this is just a truncated form of the desc field,
+      // so we pass the full string as the label and omit a description.
+      val label = MiroCollection match {
+        case "Images-V" => miroData.description.get
+        case _ => miroData.title.get
+      }
 
       // <image_image_desc>: the Description, which maps to our property
       // "description".
-      val description = miroData.description
+      val description = MiroCollection match {
+        case "Images-V" => None
+        case _ => miroData.description
+      }
 
       // <image_creator>: the Creator, which maps to our property "hasCreator"
       val creators: List[Agent] = miroData.creator match {

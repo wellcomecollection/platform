@@ -34,7 +34,9 @@ class MiroTransformableTest extends FunSpec with Matchers {
       miroCollection = "Images-V",
       data = s"""{
         "image_title": "$title",
-        "image_description": "$description"
+        "image_image_desc": "$description",
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y"
       }"""
     )
     work.label shouldBe description
@@ -116,6 +118,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{
         "image_title": "A description of a dalmation",
+        "image_image_desc": "A description of a dalmation with dots",
         "image_artwork_date": "$date",
         "image_cleared": "Y",
         "image_copyright_cleared": "Y"
