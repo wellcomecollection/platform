@@ -163,6 +163,7 @@ sbt-deploy: \
 
 ## Run a plan
 terraform-plan: docker-build-terraform
+	./lambdas/install_lambda_deps.sh
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
 
 ## Run an apply
