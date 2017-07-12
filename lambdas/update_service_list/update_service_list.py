@@ -10,7 +10,6 @@ It does not use the event data from the event.
 import datetime
 import json
 import os
-import pprint
 
 import boto3
 
@@ -82,14 +81,11 @@ def get_cluster_list(ecs_client):
     return cluster_list
 
 
-def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
-    cluster_list = get_cluster_list(ecs_client)
-    service_snapshot = {
-        'clusterList': cluster_list,
-        'lastUpdated': str(datetime.datetime.utcnow())
-    }
-
-    pprint.pprint(service_snapshot)
+def send_ecs_status_to_s3(
+        service_snapshot,
+        s3_client,
+        bucket_name,
+        object_key):
 
     return s3_client.put_object(
         ACL='public-read',
@@ -101,13 +97,55 @@ def send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key):
     )
 
 
+def create_boto_client(service, role_arn):
+    sts_client = boto3.client('sts')
+
+    assumed_role_object = sts_client.assume_role(
+        RoleArn=role_arn,
+        RoleSessionName="AssumeRoleSession"
+    )
+
+    credentials = assumed_role_object['Credentials']
+
+    return boto3.client(
+        service_name='ecs',
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
+
+
 def main(event, _):
-    pprint.pprint(event)
-
-    ecs_client = boto3.client('ecs')
-    s3_client = boto3.client('s3')
-
+    assumable_roles = (
+        [s for s in os.environ["ASSUMABLE_ROLES"].split(",")  if s]
+    )
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
 
-    send_ecs_status_to_s3(ecs_client, s3_client, bucket_name, object_key)
+    ecs_clients = (
+        [create_boto_client('ecs', role_arn) for role_arn in assumable_roles]
+    ) + [boto3.client('ecs')]
+
+    cluster_lists = (
+        [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
+    )
+
+    cluster_list = [item for sublist in cluster_lists for item in sublist]
+
+    service_snapshot = {
+        'clusterList': cluster_list,
+        'lastUpdated': str(datetime.datetime.utcnow())
+    }
+
+    print(service_snapshot)
+
+    s3_client = boto3.client('s3')
+
+    response = send_ecs_status_to_s3(
+        service_snapshot,
+        s3_client,
+        bucket_name,
+        object_key
+    )
+
+    print(response)
