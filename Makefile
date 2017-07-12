@@ -76,7 +76,15 @@ nginx-deploy:	\
 
 
 sbt-test-common: docker-build-scala_ci
-	docker run --net host -v ~/.ivy2:/tmp/.ivy2 -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/data -e PROJECT=common -e INFRA_BUCKET=$(INFRA_BUCKET) scala_ci:latest
+	docker run \
+		--net host \
+		-v ~/.ivy2:/tmp/.ivy2 \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $$(pwd):/data \
+		-e PROJECT=common \
+		-e INFRA_BUCKET=$(INFRA_BUCKET) \
+		-e OP=test \
+		scala_ci:latest
 
 sbt-test-api:
 	sbt 'project api' ';dockerComposeUp;test;dockerComposeStop'

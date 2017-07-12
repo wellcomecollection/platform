@@ -66,7 +66,8 @@ RUN \
   sbt sbtVersion
 
 # Install requird python deps
-RUN apt-get install python3-pip && \
+RUN apt-get update && \
+    apt-get install python3-pip -y && \
     pip3 install --upgrade boto3 docker docopt
 
 
