@@ -35,6 +35,10 @@ class Alarm:
     def state_reason(self):
         return self.message['NewStateReason']
 
+    @property
+    def state_change_time(self):
+        return self.message['StateChangeTime']
+
 
 def main(event, _):
     print(f'Received event:\n{pprint.pformat(event)}')
@@ -58,6 +62,10 @@ def main(event, _):
                           {
                               "title": "Reason",
                               "value": alarm.state_reason
+                          },
+                          {
+                              "title": "Timestamp",
+                              "value": alarm.state_change_time
                           }
                       ]
                   }]}
