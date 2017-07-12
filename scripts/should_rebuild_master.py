@@ -21,12 +21,8 @@ def should_rebuild_project(changed_files, project):
     if should_retest_project(changed_files, project):
         return True
 
-    elif ('Dockerfile' in changed_files) or ('.dockerignore' in changed_files):
-        print("*** Changes to Dockerfile mean we should rebuild")
-        return True
-
-    elif 'run.sh' in changed_files:
-        print("*** Changes to run.sh mean we should rebuild")
+    elif ('docker/' in changed_files):
+        print("*** Changes to the docker directory mean we should rebuild")
         return True
 
     elif any(f.startswith('scripts/') for f in changed_files):
