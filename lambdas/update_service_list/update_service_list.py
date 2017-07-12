@@ -117,7 +117,7 @@ def create_boto_client(service, role_arn):
 
 def main(event, _):
     assumable_roles = (
-        [s for s in os.environ["ASSUMABLE_ROLES"].split(",")  if s]
+        [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
     )
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
