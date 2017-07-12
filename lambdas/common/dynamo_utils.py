@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
-import pprint
-
 import boto3
+from boto3.dynamodb.types import TypeDeserializer
+import pprint
 
 
 class DynamoEvent:
@@ -16,6 +16,14 @@ class DynamoEvent:
     @property
     def source_arn(self):
         return self.event['Records'][0]['eventSourceARN']
+
+    @property
+    def simplified_new_image(self):
+        image = self.event['Records'][0]['dynamodb']['NewImage']
+
+        td = TypeDeserializer()
+
+        return {k: td.deserialize(v) for k, v in image.items()}
 
 
 def change_dynamo_capacity(table_name, desired_capacity):

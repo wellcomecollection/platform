@@ -10,6 +10,8 @@ RUN pip install pytest
 
 RUN pip install moto
 
+RUN pip install simplejson 
+
 COPY run.sh /app/run.sh
 
 ENTRYPOINT /app/run.sh
