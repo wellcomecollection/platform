@@ -1,0 +1,3 @@
+*.dist-info
+six.py
+*/structlog/*
