@@ -5,8 +5,8 @@ INFRA_BUCKET = platform-infra
 docker-build-jslint:
 	docker build ./docker/jslint_ci --tag jslint_ci
 
-## Build the image used for flake8 linting
-docker-build-flake8:
+## Build the image used for Python 3.6 work
+docker-build-python36:
 	docker build ./docker/python3.6_ci --tag python3.6_ci
 
 ## Build the image for terraform
@@ -179,11 +179,11 @@ lint-ontologies: docker-build-jslint
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
 ## Run flake8 linting over our Lambda code
-lint-lambdas: docker-build-flake8
+lint-lambdas: docker-build-python36
 	docker run -v $$(pwd)/lambdas:/data -e OP=lint python3.6_ci:latest
 
 ## Run tests for our Lambda code
-test-lambdas: docker-build-flake8
+test-lambdas: docker-build-python36
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
 format-terraform:
