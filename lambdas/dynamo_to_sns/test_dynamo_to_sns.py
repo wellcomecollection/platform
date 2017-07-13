@@ -38,12 +38,21 @@ def test_dynamo_to_sns():
     )
 
     stream_arn = 'arn:aws:dynamodb:eu-west-1:123456789012:table/table-stream'
+
     new_image = {
         'ReindexVersion': {'N': '0'},
         'ReindexShard': {'S': 'default'},
         'data': {'S': 'test-json-data'},
         'MiroID': {'S': 'V0010033'},
         'MiroCollection': {'S': 'Images-V'}
+    }
+
+    expected_image = {
+        'ReindexVersion': 0,
+        'ReindexShard': 'default',
+        'data': 'test-json-data',
+        'MiroID': 'V0010033',
+        'MiroCollection': 'Images-V'
     }
 
     event = {
@@ -83,4 +92,4 @@ def test_dynamo_to_sns():
         MaxNumberOfMessages=1
     )
     message_body = messages['Messages'][0]['Body']
-    assert json.loads(message_body)['default'] == json.dumps(new_image)
+    assert json.loads(message_body)['default'] == json.dumps(expected_image)
