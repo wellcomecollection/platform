@@ -116,6 +116,7 @@ def create_boto_client(service, role_arn):
 
 
 def main(event, _):
+    print(f'event = {event!r}')
     assumable_roles = (
         [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
     )
@@ -137,7 +138,7 @@ def main(event, _):
         'lastUpdated': str(datetime.datetime.utcnow())
     }
 
-    print(service_snapshot)
+    print(f'service_snapshot = {service_snapshot!r}')
 
     s3_client = boto3.client('s3')
 
@@ -148,4 +149,4 @@ def main(event, _):
         object_key
     )
 
-    print(response)
+    print(f'response = {response}')

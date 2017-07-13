@@ -7,7 +7,6 @@ This script is triggered by updates to the reindexer DynamoDB table.
 """
 
 import os
-import pprint
 
 from dynamo_utils import DynamoEvent
 from sns_utils import publish_sns_message
@@ -20,7 +19,7 @@ def get_service_name(reindexers, table_name):
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
 
     dynamo_event = DynamoEvent(event)
     table_name = dynamo_event.new_image["TableName"]["S"]
@@ -40,13 +39,8 @@ def main(event, _):
     message = {'cluster': cluster, 'service': service,
                'desired_count': desired_count}
 
-    print(f"""
-        desired_count: {desired_count},
-        scheduler_topic_arn: {scheduler_topic_arn},
-        cluster: {cluster},
-        service: {service}
-    """)
-
+    print(f'message = {message!r}')
+    print(f'scheduler_topic_arn = {scheduler_topic_arn!r}')
     publish_sns_message(topic_arn=scheduler_topic_arn, message=message)
 
     dynamo_topic_arn = os.environ["DYNAMO_TOPIC_ARN"]
@@ -54,10 +48,5 @@ def main(event, _):
     message = {'dynamo_table_name': dynamo_table_name,
                'desired_capacity': desired_capacity}
 
-    print(f"""
-        dynamo_topic_arn: {dynamo_topic_arn},
-        dynamo_table_name: {dynamo_table_name},
-        desired_capacity: {desired_capacity}
-    """)
-
+    print(f'message = {message!r}')
     publish_sns_message(topic_arn=dynamo_topic_arn, message=message)

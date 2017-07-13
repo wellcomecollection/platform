@@ -2,7 +2,6 @@
 
 import boto3
 from boto3.dynamodb.types import TypeDeserializer
-import pprint
 
 
 class DynamoEvent:
@@ -61,5 +60,5 @@ def change_dynamo_capacity(table_name, desired_capacity):
         GlobalSecondaryIndexUpdates=gsi_updates
     )
 
-    print(f'DynamoDB response:\n{pprint.pformat(resp)}')
+    print(f'DynamoDB response = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
