@@ -14,9 +14,10 @@ resource "aws_s3_bucket" "miro-images-sync" {
   lifecycle_rule {
     id      = "move_to_infrequent_access"
     enabled = true
+    prefix  = ""
 
     transition {
-      days          = 30
+      days          = 1
       storage_class = "STANDARD_IA"
     }
   }
