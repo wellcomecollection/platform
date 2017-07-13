@@ -8,13 +8,11 @@ one of our adapters.  It receives a blob of JSON from a CloudWatch timed
 event, and publishes that to the service scheduler topic.
 """
 
-import pprint
-
 from sns_utils import publish_sns_message
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
     message = {
         'cluster': event['cluster'],
         'service': event['service'],

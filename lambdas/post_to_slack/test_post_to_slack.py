@@ -1,6 +1,5 @@
 import json
 import os
-import pprint
 
 import post_to_slack
 from mock import patch
@@ -106,7 +105,7 @@ def test_post_to_slack(mock_post):
     _assert_field_contains(
         field=attachment['fields'][1],
         title='Dimensions',
-        value=f'{pprint.pformat(dimensions)}'
+        value=repr(dimensions)
     )
     _assert_field_contains(
         field=attachment['fields'][2],
