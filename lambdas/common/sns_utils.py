@@ -2,10 +2,9 @@
 
 from datetime import datetime
 import decimal
-import simplejson as json
-import pprint
 
 import boto3
+import simplejson as json
 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
@@ -39,5 +38,5 @@ def publish_sns_message(topic_arn, message):
             )
         })
     )
-    print(f'SNS response:\n{pprint.pformat(resp)}')
+    print(f'SNS response = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200

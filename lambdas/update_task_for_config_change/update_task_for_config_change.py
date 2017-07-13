@@ -10,7 +10,6 @@ scheduler will bring up new instances with the updated config.
 
 """
 
-import pprint
 import re
 
 import boto3
@@ -37,13 +36,13 @@ def clone_latest_task_definition(client, cluster, service):
     )
     print(f'The cloned task definition is {cloned_task}, updating {service}')
 
-    response = client.update_service(
+    resp = client.update_service(
         cluster=cluster,
         service=service,
         taskDefinition=cloned_task
     )
-    print(f'ECS response:\n{pprint.pformat(response)}')
-    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
+    print(f'ECS response = {resp!r}')
+    assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
 def trigger_config_update(app_name):
@@ -74,7 +73,7 @@ def parse_s3_event(event):
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
     app_name = parse_s3_event(event=event)
     trigger_config_update(app_name=app_name)
 

@@ -8,7 +8,6 @@ stream and writes deployment "color" to dynamo. With color being blue or green.
 """
 
 import os
-import pprint
 
 import boto3
 
@@ -77,7 +76,7 @@ def run_operations(operations, table):
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
 
     table_name = os.environ["TABLE_NAME"]
 
@@ -91,4 +90,4 @@ def main(event, _):
 
     ops = run_operations(operations, table)
 
-    print(f'Run dynamo ops:\n{pprint.pformat(ops)}')
+    print(f'ops = {ops!r}')

@@ -19,8 +19,6 @@ Requires a Cloudwatch Event with pattern:
 
 """
 
-import pprint
-
 import boto3
 
 
@@ -45,12 +43,11 @@ def create_tags(ec2_client, ec2_instance_id, event_detail):
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
 
     ec2_client = boto3.client('ec2')
 
     ec2_instance_id = event['detail']['ec2InstanceId']
 
     response = create_tags(ec2_client, ec2_instance_id, event['detail'])
-
-    print(f'Received response:\n{pprint.pformat(response)}')
+    print(f'response = {response!r}')
