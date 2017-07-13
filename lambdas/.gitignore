@@ -1,3 +1,4 @@
 *.dist-info
 six.py
 */structlog/*
+*/simplejson/*
