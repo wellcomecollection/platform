@@ -10,6 +10,16 @@ resource "aws_s3_bucket" "miro-data" {
 resource "aws_s3_bucket" "miro-images-sync" {
   bucket = "miro-images-sync"
   acl    = "private"
+
+  lifecycle_rule {
+    id      = "move_to_infrequent_access"
+    enabled = true
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+  }
 }
 
 resource "aws_s3_bucket" "miro_images_public" {
