@@ -44,7 +44,7 @@ def ecr_repo_uri_from_name(ecr_client, name):
     try:
         return resp['repositories'][0]['repositoryUri']
     except (KeyError, IndexError) as e:
-        raise RuntimeError(f'Unable to look up repo URI for {name!r}: {e}')
+        raise RuntimeError('Unable to look up repo URI for %r: %s' % (name, e))
 
 
 def authenticate_for_ecr_pushes(ecr_client, docker_client, repo_uri):

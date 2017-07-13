@@ -74,8 +74,9 @@ module "lambda_update_service_list" {
   timeout     = 10
 
   environment_variables = {
-    BUCKET_NAME = "${aws_s3_bucket.dashboard.id}"
-    OBJECT_KEY  = "data/ecs_status.json"
+    BUCKET_NAME     = "${aws_s3_bucket.dashboard.id}"
+    OBJECT_KEY      = "data/ecs_status.json"
+    ASSUMABLE_ROLES = "${join(",", var.dashboard_assumable_roles)}"
   }
 
   alarm_topic_arn = "${module.lambda_error_alarm.arn}"
@@ -87,6 +88,14 @@ module "trigger_update_service_list" {
   lambda_function_arn     = "${module.lambda_update_service_list.arn}"
   cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_task_state_change.arn}"
   cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_task_state_change.name}"
+}
+
+module "trigger_update_service_list_poll" {
+  source                  = "./lambda/trigger_cloudwatch"
+  lambda_function_name    = "${module.lambda_update_service_list.function_name}"
+  lambda_function_arn     = "${module.lambda_update_service_list.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_5_minutes.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
 }
 
 # Lambda for publishing ECS service schedules to an SNS topic
