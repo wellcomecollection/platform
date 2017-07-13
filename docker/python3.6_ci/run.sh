@@ -14,7 +14,7 @@ elif [[ "$OP" == "test" ]]
 then
   echo "Testing Lambdas"
   ./install_lambda_deps.sh
-  find **/test_*.py | py.test
+  find . -maxdepth 2 -name "test_*.py" | py.test
 elif [[ "$OP" == "install-deps" ]]
 then
   echo "Installing Lambda dependencies"
