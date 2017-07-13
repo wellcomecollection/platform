@@ -9,7 +9,7 @@ cd /data
 if [[ "$OP" == "lint" ]]
 then
   echo "Linting Lambdas"
-  flake8 .
+  flake8 --exclude six.py,six-*,structlog* .
 elif [[ "$OP" == "test" ]]
 then
   echo "Testing Lambdas"
