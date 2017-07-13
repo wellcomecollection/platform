@@ -2,7 +2,7 @@
 
 resource "random_id" "cloudwatch_trigger_name" {
   byte_length = 8
-  prefix = "AllowExecutionFromCloudWatch_${var.lambda_function_name}_"
+  prefix      = "AllowExecutionFromCloudWatch_${var.lambda_function_name}_"
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_trigger" {
