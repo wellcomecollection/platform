@@ -4,5 +4,6 @@
 #
 #    pip-compile --output-file lambdas/common/requirements.txt lambdas/common/requirements.in
 #
+simplejson==3.11.1
 six==1.10.0               # via structlog
 structlog==17.2.0
