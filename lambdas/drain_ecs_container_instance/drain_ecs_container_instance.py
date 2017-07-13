@@ -20,13 +20,14 @@ def set_container_instance_to_draining(
         cluster_arn,
         ecs_container_instance_arn):
 
-    ecs_client.update_container_instances_state(
+    resp = ecs_client.update_container_instances_state(
         cluster=cluster_arn,
         containerInstances=[
             ecs_container_instance_arn,
         ],
         status='DRAINING'
     )
+    print(resp)
 
 
 def continue_lifecycle_action(
