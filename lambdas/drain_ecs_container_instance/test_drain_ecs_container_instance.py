@@ -19,12 +19,16 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
     auto_scaling_group_name = 'TestGroup1'
     lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
 
-    fake_asg_client.create_launch_configuration(LaunchConfigurationName='TestLC')
+    fake_asg_client.create_launch_configuration(
+        LaunchConfigurationName='TestLC'
+    )
 
-    fake_asg_client.create_auto_scaling_group(AutoScalingGroupName=auto_scaling_group_name,
-                                              MinSize=1,
-                                              MaxSize=1,
-                                              LaunchConfigurationName='TestLC')
+    fake_asg_client.create_auto_scaling_group(
+        AutoScalingGroupName=auto_scaling_group_name,
+        MinSize=1,
+        MaxSize=1,
+        LaunchConfigurationName='TestLC'
+    )
 
     instances = fake_ec2_client.describe_instances()
     print(instances)
@@ -45,7 +49,8 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
     event = {
         'Records': [{
             'EventSource': 'aws:sns',
-            'EventSubscriptionArn': 'arn:aws:sns:region:account_id:ec2_terminating_topic:stuff',
+            'EventSubscriptionArn':
+                'arn:aws:sns:region:account_id:ec2_terminating_topic:stuff',
             'EventVersion': '1.0',
             'Sns': {
                 'Message': json.dumps(message),
@@ -56,7 +61,8 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
                 'SigningCertUrl': 'https://certificate.pem',
                 'Subject': None,
                 'Timestamp': '2017-07-10T12:43:55.664Z',
-                'TopicArn': 'arn:aws:sns:region:account_id:ec2_terminating_topic',
+                'TopicArn':
+                    'arn:aws:sns:region:account_id:ec2_terminating_topic',
                 'Type': 'Notification',
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
@@ -91,9 +97,12 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
     with patch("boto3.client", new_callable=client_patcher):
         drain_ecs_container_instance.main(event, None)
 
-        mocked_clients['autoscaling'].complete_lifecycle_action.assert_called_once_with(
-            LifecycleHookName=lifecycle_hook_name,
-            AutoScalingGroupName=auto_scaling_group_name,
-            LifecycleActionResult='CONTINUE',
-            InstanceId=instance_id
-        )
+        mocked_asg_client = mocked_clients['autoscaling']
+        mocked_asg_client \
+            .complete_lifecycle_action \
+            .assert_called_once_with(
+                LifecycleHookName=lifecycle_hook_name,
+                AutoScalingGroupName=auto_scaling_group_name,
+                LifecycleActionResult='CONTINUE',
+                InstanceId=instance_id
+            )
