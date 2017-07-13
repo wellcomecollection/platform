@@ -1,35 +1,37 @@
 import json
-from mock import patch
 
 import boto3
-from moto import mock_ec2, mock_ecs, mock_autoscaling
+from mock import patch, Mock
+from moto import mock_ec2, mock_autoscaling
 
 import drain_ecs_container_instance
 
+mocked_clients = {}
 
 
 @mock_ec2
 @mock_autoscaling
-@patch('drain_ecs_container_instance.asg_client.complete_lifecycle_action')
-def test_complete_ec2_shutdown_if_no_ecs_cluster(mock_complete_call):
-    mock_asg_client = boto3.client('autoscaling')
-    mock_ec2_client = boto3.client('ec2')
+def test_complete_ec2_shutdown_if_no_ecs_cluster():
+    fake_asg_client = boto3.client('autoscaling')
+    fake_ec2_client = boto3.client('ec2')
+    fake_ecs_client = boto3.client('ecs')
 
     auto_scaling_group_name = 'TestGroup1'
+    lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
 
-    mock_asg_client.create_launch_configuration(LaunchConfigurationName='TestLC')
+    fake_asg_client.create_launch_configuration(LaunchConfigurationName='TestLC')
 
-    mock_asg_client.create_auto_scaling_group(AutoScalingGroupName=auto_scaling_group_name,
+    fake_asg_client.create_auto_scaling_group(AutoScalingGroupName=auto_scaling_group_name,
                                               MinSize=1,
                                               MaxSize=1,
                                               LaunchConfigurationName='TestLC')
 
-    instances = mock_ec2_client.describe_instances()
+    instances = fake_ec2_client.describe_instances()
     print(instances)
     instance_id = instances['Reservations'][0]['Instances'][0]['InstanceId']
 
     message = {
-        "LifecycleHookName": "monitoring-cluster-LifecycleHook-OENP6M5XGYVM",
+        "LifecycleHookName": lifecycle_hook_name,
         "AccountId": "account_id",
         "RequestId": "f29364ad-8523-4d58-9a70-3537f4edec15",
         "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
@@ -59,7 +61,39 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster(mock_complete_call):
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
 
-    drain_ecs_container_instance.main(event, None)
+    # Horrible hack be able to mock the autoscaling client:
+    # client_patcher returns a function that behaves differently
+    # based on the service_name parameter passed to a call to
+    # boto3.client.
+    #
+    # I need to mock the autoscaling client only, to be able to assert
+    # on what function are called on it (As far as I know moto
+    # does not have this functionality).
+    # The other clients don't have to be mocked but, as there is no way
+    # to mock each client individually (patch needs in importable target
+    # string), the only way is to patch the entire boto3.client function.
+    def client_patcher():
+        def patch(*args):
+            if args[0] == 'autoscaling':
+                client = Mock()
+                mocked_clients[args[0]] = client
+            elif args[0] == 'ec2':
+                client = fake_ec2_client
+            elif args[0] == 'ecs':
+                client = fake_ecs_client
+            else:
+                raise Exception(f'Invalid {args[0]}')
 
-    calls = mock_complete_call.call_list
-    assert len(calls) == 1
+            return client
+
+        return patch
+
+    with patch("boto3.client", new_callable=client_patcher):
+        drain_ecs_container_instance.main(event, None)
+
+        mocked_clients['autoscaling'].complete_lifecycle_action.assert_called_once_with(
+            LifecycleHookName=lifecycle_hook_name,
+            AutoScalingGroupName=auto_scaling_group_name,
+            LifecycleActionResult='CONTINUE',
+            InstanceId=instance_id
+        )
