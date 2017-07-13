@@ -10,13 +10,12 @@ and "desired_capacity".
 """
 
 import json
-import pprint
 
 from dynamo_utils import change_dynamo_capacity
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 

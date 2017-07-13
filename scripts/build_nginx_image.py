@@ -26,23 +26,23 @@ if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
     variant = args['--variant']
-    print(f'*** Building nginx Docker image for {variant}')
+    print('*** Building nginx Docker image for %s' % variant)
 
-    conf_file = os.path.join(ROOT, 'docker', 'nginx', f'{variant}.nginx.conf')
+    conf_file = os.path.join(ROOT, 'docker', 'nginx', '%s.nginx.conf' % variant)
     if not os.path.exists(conf_file):
-        sys.exit(f'*** Unable to find {conf_file}!')
+        sys.exit('*** Unable to find %s!' % conf_file)
 
     release_id = CURRENT_COMMIT
-    tag = f'nginx_{variant}:{release_id}'
-    print(f'*** Image will be tagged {tag}')
+    tag = 'nginx_%s:%s' % (variant, release_id)
+    print('*** Image will be tagged %s' % tag)
 
-    print(f'*** Building the new Docker image')
+    print('*** Building the new Docker image')
     client = docker.from_env()
     client.images.build(
         path=os.path.join(ROOT, 'docker', 'nginx'),
-        buildargs={'conf_file': f'{variant}.nginx.conf'},
+        buildargs={'conf_file': '%s.nginx.conf' % variant},
         tag=tag
     )
 
     print('*** Saving the release ID to .releases')
-    write_release_id(project=f'nginx_{variant}', release_id=release_id)
+    write_release_id(project='nginx_%s' % variant, release_id=release_id)

@@ -16,4 +16,7 @@ def main(event, _):
     dynamo_event = DynamoEvent(event)
     stream_topic_map = json.loads(os.environ["STREAM_TOPIC_MAP"])
     topic_arn = stream_topic_map[dynamo_event.source_arn]
-    publish_sns_message(topic_arn, dynamo_event.new_image)
+
+    print(dynamo_event.simplified_new_image)
+
+    publish_sns_message(topic_arn, dynamo_event.simplified_new_image)

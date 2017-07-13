@@ -13,7 +13,6 @@ message should be a JSON string that includes "cluster", "service" and
 """
 
 import json
-import pprint
 
 import boto3
 
@@ -29,12 +28,12 @@ def change_desired_count(cluster, service, desired_count):
         service=service,
         desiredCount=desired_count
     )
-    print(f'ECS response:\n{pprint.pformat(resp)}')
+    print(f'resp = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 

@@ -36,18 +36,18 @@ if __name__ == '__main__':
     docker_client = docker.from_env()
 
     project = args['--project']
-    print(f'*** Pushing {project!r} to AWS')
+    print('*** Pushing %s to AWS' % project)
 
     # Get the release ID (which is the image tag)
     release_file = os.path.join(ROOT, '.releases', project)
     tag = open(release_file).read().strip()
-    docker_image = f'{project}:{tag}'
+    docker_image = '%s:%s' % (project, tag)
 
     # Look up the URI of our ECR repo -- this is needed for authentication
     # and for pushing.
-    repo_name = f'uk.ac.wellcome/{project}'
+    repo_name = 'uk.ac.wellcome/%s' % project
     repo_uri = ecr_repo_uri_from_name(ecr_client, name=repo_name)
-    print(f'*** ECR repo URI is {repo_uri!r}')
+    print('*** ECR repo URI is %s' % repo_uri)
 
     print('*** Authenticating for `docker push` with ECR')
     authenticate_for_ecr_pushes(
@@ -58,8 +58,8 @@ if __name__ == '__main__':
 
     # Now retag the image, prepending our ECR URI.  When we're done, we'll
     # delete the retagged image, to avoid clogging up the local image registry.
-    renamed_image_tag = f'{repo_uri}:{tag}'
-    print(f'*** Pushing image {docker_image!r} to ECR')
+    renamed_image_tag = '%s:%s' % (repo_uri, tag)
+    print('*** Pushing image %s to ECR' % docker_image)
     try:
         image = docker_client.images.get(docker_image)
         image.tag(repository=repo_uri, tag=tag)
@@ -69,5 +69,5 @@ if __name__ == '__main__':
         docker_client.images.remove(image=renamed_image_tag)
 
     # Finally, upload the release ID string to S3.
-    print(f'*** Uploading release ID to S3')
-    bucket.upload_file(Filename=release_file, Key=f'releases/{project}')
+    print('*** Uploading release ID to S3')
+    bucket.upload_file(Filename=release_file, Key='releases/%s' % project)

@@ -5,7 +5,6 @@ Sends slack notifications for alarms events
 """
 
 import json
-import pprint
 import os
 
 from botocore.vendored import requests
@@ -41,7 +40,7 @@ class Alarm:
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
 
     slack_data = {'username': 'cloudwatch-alert',
@@ -57,7 +56,7 @@ def main(event, _):
                           },
                           {
                               "title": "Dimensions",
-                              "value": f"{pprint.pformat(alarm.dimensions)}"
+                              "value": repr(alarm.dimensions)
                           },
                           {
                               "title": "Reason",

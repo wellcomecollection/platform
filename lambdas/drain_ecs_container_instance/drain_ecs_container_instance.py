@@ -8,7 +8,6 @@ EC2 instances. If the terminating instance is part of an ECS cluster, it
 drains the ECS tasks on the instance.
 """
 import json
-import pprint
 import time
 
 import boto3
@@ -36,12 +35,12 @@ def continue_lifecycle_action(
         ec2_instance_id,
         lifecycle_hook_name):
 
-    response = asg_client.complete_lifecycle_action(
+    resp = asg_client.complete_lifecycle_action(
         LifecycleHookName=lifecycle_hook_name,
         AutoScalingGroupName=asg_group_name,
         LifecycleActionResult='CONTINUE',
         InstanceId=ec2_instance_id)
-    pprint.pprint(response)
+    print(f'resp = {resp!r}')
 
 
 def get_ec2_tags(ec2_client, ec2_instance_id):
@@ -50,12 +49,12 @@ def get_ec2_tags(ec2_client, ec2_instance_id):
     ])
     tags = ec2_instance_info['Reservations'][0]['Instances'][0]['Tags']
     tag_dict = {t['Key']: t['Value'] for t in tags}
-    print(f"tag_dict: {tag_dict}")
+    print(f'tag_dict = {tag_dict!r}')
     return tag_dict
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
     asg_client = boto3.client("autoscaling")
     ec2_client = boto3.client("ec2")
     ecs_client = boto3.client('ecs')

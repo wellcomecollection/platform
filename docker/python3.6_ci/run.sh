@@ -9,12 +9,12 @@ cd /data
 if [[ "$OP" == "lint" ]]
 then
   echo "Linting Lambdas"
-  flake8 .
+  flake8 --exclude six.py,six-*,structlog* .
 elif [[ "$OP" == "test" ]]
 then
   echo "Testing Lambdas"
   ./install_lambda_deps.sh
-  find **/test_*.py | py.test
+  find . -maxdepth 2 -name "test_*.py" | xargs py.test
 elif [[ "$OP" == "install-deps" ]]
 then
   echo "Installing Lambda dependencies"

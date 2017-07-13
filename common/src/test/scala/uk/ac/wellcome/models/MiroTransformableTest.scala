@@ -27,6 +27,21 @@ class MiroTransformableTest extends FunSpec with Matchers {
     work.label shouldBe title
   }
 
+  it("should use the description field for label in the V collection") {
+    val title = "A falsehood about a ferret"
+    val description = "A falsehood about a ferret could be frightful"
+    val work = transformMiroRecord(
+      miroCollection = "Images-V",
+      data = s"""{
+        "image_title": "$title",
+        "image_image_desc": "$description",
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y"
+      }"""
+    )
+    work.label shouldBe description
+  }
+
   it("should have an empty list if no image_creator field is present") {
     val work = transformMiroRecord(data = s"""{
       "image_title": "A guide to giraffes",
@@ -103,6 +118,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val work = transformMiroRecord(
       data = s"""{
         "image_title": "A description of a dalmation",
+        "image_image_desc": "A description of a dalmation with dots",
         "image_artwork_date": "$date",
         "image_cleared": "Y",
         "image_copyright_cleared": "Y"

@@ -1,7 +1,12 @@
 /* Configures a Cloudwatch trigger for a Lambda */
 
+resource "random_id" "cloudwatch_trigger_name" {
+  byte_length = 8
+  prefix      = "AllowExecutionFromCloudWatch_${var.lambda_function_name}_"
+}
+
 resource "aws_lambda_permission" "allow_cloudwatch_trigger" {
-  statement_id  = "AllowExecutionFromCloudWatch_${var.lambda_function_name}"
+  statement_id  = "${random_id.cloudwatch_trigger_name.id}"
   action        = "lambda:InvokeFunction"
   function_name = "${var.lambda_function_name}"
   principal     = "events.amazonaws.com"

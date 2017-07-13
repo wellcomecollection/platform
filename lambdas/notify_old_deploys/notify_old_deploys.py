@@ -13,7 +13,6 @@ than AGE_BOUNDARY_MINS.
 
 from datetime import datetime, timedelta
 import os
-import pprint
 
 import boto3
 
@@ -43,7 +42,7 @@ def publish_deployments(topic_arn, deployments):
 
 
 def main(event, _):
-    print(f'Received event:\n{pprint.pformat(event)}')
+    print(f'event = {event!r}')
 
     table_name = os.environ["TABLE_NAME"]
     topic_arn = os.environ["TOPIC_ARN"]
@@ -56,4 +55,4 @@ def main(event, _):
     old_deployments = filter_old_deployments(deployments, age_boundary_mins)
     publish_deployments(topic_arn, old_deployments)
 
-    print(f'Received old deployments:\n{pprint.pformat(old_deployments)}')
+    print(f'old_deployments = {old_deployments!r}')
