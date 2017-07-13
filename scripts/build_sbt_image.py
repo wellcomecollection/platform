@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 # -*- encoding: utf-8 -*-
 """
 Build a Docker image for one of our sbt applications.
