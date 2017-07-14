@@ -14,9 +14,15 @@ import pytest
 def moto_start():
     mock_autoscaling().start()
     mock_ec2().start()
+    mock_ecs().start()
+    mock_sns().start()
+    mock_sqs().start()
     yield
     mock_autoscaling().stop()
     mock_ec2().stop()
+    mock_ecs().stop()
+    mock_sns().stop()
+    mock_sqs().stop()
 
 
 @pytest.fixture()
@@ -38,6 +44,27 @@ def autoscaling_group_info(moto_start):
     instances = fake_ec2_client.describe_instances()
     instance_id = instances['Reservations'][0]['Instances'][0]['InstanceId']
     yield auto_scaling_group_name, instance_id
+
+
+@pytest.fixture()
+def sns_sqs_info(moto_start):
+    fake_sns_client = boto3.client('sns')
+    fake_sqs_client = boto3.client('sqs')
+
+    fake_sns_client.create_topic(Name="test-topic")
+
+    response = fake_sns_client.list_topics()
+    topic_arn = response["Topics"][0]['TopicArn']
+
+    queue_name = "test-queue"
+    queue = fake_sqs_client.create_queue(QueueName=queue_name)
+
+    fake_sns_client.subscribe(
+        TopicArn=topic_arn,
+        Protocol="sqs",
+        Endpoint=f"arn:aws:sqs:eu-west-1:123456789012:{queue_name}"
+    )
+    yield topic_arn, queue['QueueUrl']
 
 
 def test_complete_ec2_shutdown_if_no_ecs_cluster(autoscaling_group_info):
@@ -99,49 +126,14 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster(autoscaling_group_info):
         )
 
 
-@mock_ec2
-@mock_ecs
-@mock_autoscaling
-@mock_sns
-@mock_sqs
-def test_drain_ecs_instance_if_running_tasks():
-    fake_asg_client = boto3.client('autoscaling')
+def test_drain_ecs_instance_if_running_tasks(sns_sqs_info, autoscaling_group_info):
     fake_ec2_client = boto3.client('ec2')
     fake_ecs_client = boto3.client('ecs')
-    fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
-
-    fake_sns_client.create_topic(Name="test-topic")
-
-    response = fake_sns_client.list_topics()
-    topic_arn = response["Topics"][0]['TopicArn']
-
-    queue_name = "test-queue"
-    queue = fake_sqs_client.create_queue(QueueName=queue_name)
-
-    fake_sns_client.subscribe(
-        TopicArn=topic_arn,
-        Protocol="sqs",
-        Endpoint=f"arn:aws:sqs:eu-west-1:123456789012:{queue_name}"
-    )
-    auto_scaling_group_name = 'TestGroup1'
-    lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
-
-    fake_asg_client.create_launch_configuration(
-        LaunchConfigurationName='TestLC'
-    )
-
-    fake_asg_client.create_auto_scaling_group(
-        AutoScalingGroupName=auto_scaling_group_name,
-        MinSize=1,
-        MaxSize=1,
-        LaunchConfigurationName='TestLC'
-    )
-
-    instances = fake_ec2_client.describe_instances()
-
-    instance_id = instances['Reservations'][0]['Instances'][0]['InstanceId']
-
+    topic_arn = sns_sqs_info[0]
+    queue_url = sns_sqs_info[1]
+    auto_scaling_group_name = autoscaling_group_info[0]
+    instance_id = autoscaling_group_info[1]
     cluster_name = 'test_ecs_cluster'
     cluster_response = fake_ecs_client.create_cluster(
         clusterName=cluster_name
@@ -213,6 +205,7 @@ def test_drain_ecs_instance_if_running_tasks():
     assert len(tasks['taskArns']) == 1
     lifecycle_action_token = "78c16884-6bd4-4296-ac0c-2da9eb6a0d29"
 
+    lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
     message = {
         "LifecycleHookName": lifecycle_hook_name,
         "AccountId": "account_id",
@@ -280,7 +273,7 @@ def test_drain_ecs_instance_if_running_tasks():
         .assert_not_called()
 
     messages = fake_sqs_client.receive_message(
-        QueueUrl=queue['QueueUrl'],
+        QueueUrl=queue_url,
         MaxNumberOfMessages=1
     )
     message_body = messages['Messages'][0]['Body']
