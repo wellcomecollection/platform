@@ -7,17 +7,22 @@ from moto.ec2 import utils as ec2_utils
 
 import drain_ecs_container_instance
 
+import pytest
 
-@mock_ec2
-@mock_autoscaling
-def test_complete_ec2_shutdown_if_no_ecs_cluster():
-    fake_asg_client = boto3.client('autoscaling')
-    fake_ec2_client = boto3.client('ec2')
-    fake_ecs_client = boto3.client('ecs')
 
+@pytest.fixture()
+def moto_start():
+    mock_autoscaling().start()
+    mock_ec2().start()
+    yield
+    mock_autoscaling().stop()
+    mock_ec2().stop()
+
+
+@pytest.fixture()
+def autoscaling_group_info(moto_start):
     auto_scaling_group_name = 'TestGroup1'
-    lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
-
+    fake_asg_client = boto3.client('autoscaling')
     fake_asg_client.create_launch_configuration(
         LaunchConfigurationName='TestLC'
     )
@@ -29,16 +34,25 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
         LaunchConfigurationName='TestLC'
     )
 
+    fake_ec2_client = boto3.client('ec2')
     instances = fake_ec2_client.describe_instances()
-    print(instances)
     instance_id = instances['Reservations'][0]['Instances'][0]['InstanceId']
+    yield auto_scaling_group_name, instance_id
+
+
+def test_complete_ec2_shutdown_if_no_ecs_cluster(autoscaling_group_info):
+    fake_ec2_client = boto3.client('ec2')
+    fake_ecs_client = boto3.client('ecs')
+    autoscaling_group = autoscaling_group_info[0]
+    instance_id = autoscaling_group_info[1]
+    lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
 
     message = {
         "LifecycleHookName": lifecycle_hook_name,
         "AccountId": "account_id",
         "RequestId": "f29364ad-8523-4d58-9a70-3537f4edec15",
         "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
-        "AutoScalingGroupName": auto_scaling_group_name,
+        "AutoScalingGroupName": autoscaling_group,
         "Service": "AWS Auto Scaling",
         "Time": "2017-07-10T12:36:05.857Z",
         "EC2InstanceId": instance_id,
@@ -79,7 +93,7 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
         .complete_lifecycle_action \
         .assert_called_once_with(
             LifecycleHookName=lifecycle_hook_name,
-            AutoScalingGroupName=auto_scaling_group_name,
+            AutoScalingGroupName=autoscaling_group,
             LifecycleActionResult='CONTINUE',
             InstanceId=instance_id
         )
@@ -140,12 +154,13 @@ def test_drain_ecs_instance_if_running_tasks():
         ec2_utils.generate_instance_identity_document(instance)
     )
 
-    container_instance_response = fake_ecs_client.register_container_instance(
+    register_container_response = fake_ecs_client.register_container_instance(
         cluster=cluster_name,
         instanceIdentityDocument=instance_id_document
     )
 
-    container_instance_arn = container_instance_response['containerInstance']['containerInstanceArn']
+    container_instance_arn = \
+        register_container_response['containerInstance']['containerInstanceArn']
     cluster_arn = cluster_response['cluster']['clusterArn']
 
     fake_ec2_client.create_tags(
@@ -239,14 +254,17 @@ def test_drain_ecs_instance_if_running_tasks():
         event
     )
 
-    # Commented out as there is a bug in moto: https://github.com/spulec/moto/issues/1009
-    # TODO figure out another way to assert on this while the bug is fixed (mocks?)
+    # Commented out as there is a bug in moto:
+    # https://github.com/spulec/moto/issues/1009
+    # TODO figure out another way to assert on this while
+    # the bug is fixed (mocks?)
     # container_instance_info = fake_ecs_client.describe_container_instances(
     #     cluster=cluster_name,
     #     containerInstances=[container_instance_arn]
     # )
     #
-    # assert container_instance_info['containerInstances'][0]['status'] == "DRAINING"
+    # assert
+    # container_instance_info['containerInstances'][0]['status'] == "DRAINING"
 
     mocked_asg_client \
         .record_lifecycle_action_heartbeat \
