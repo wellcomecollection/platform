@@ -106,7 +106,6 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, event):
             )
 
             status = container_instance_info['containerInstances'][0]['status']
-            print(ecs_container_instance_arn)
 
             if status != 'DRAINING':
                 set_container_instance_to_draining(
