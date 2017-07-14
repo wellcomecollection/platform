@@ -26,7 +26,7 @@ def moto_start():
 
 
 @pytest.fixture()
-def autoscaling_group_info(moto_start):
+def autoscaling_group(moto_start):
     auto_scaling_group_name = 'TestGroup1'
     print(f"creating autoscaling group {auto_scaling_group_name}")
     fake_asg_client = boto3.client('autoscaling')
@@ -48,7 +48,7 @@ def autoscaling_group_info(moto_start):
 
 
 @pytest.fixture()
-def sns_sqs_info(moto_start):
+def sns_sqs(moto_start):
     fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
     queue_name = "test-queue"
@@ -70,12 +70,12 @@ def sns_sqs_info(moto_start):
 
 
 @pytest.fixture()
-def ecs_cluster(autoscaling_group_info):
+def ecs_cluster(autoscaling_group):
     fake_ecs_client = boto3.client('ecs')
     fake_ec2_client = boto3.client('ec2')
     cluster_name = 'test_ecs_cluster'
     print(f"Creating ecs cluster {cluster_name}")
-    instance_id = autoscaling_group_info[1]
+    _, instance_id = autoscaling_group
     cluster_response = fake_ecs_client.create_cluster(
         clusterName=cluster_name
     )
@@ -118,10 +118,8 @@ def ecs_cluster(autoscaling_group_info):
 def ecs_task(ecs_cluster):
     fake_ecs_client = boto3.client('ecs')
     task_name = 'test_ecs_task'
-
-    cluster_name = ecs_cluster[0]
-    cluster_arn = ecs_cluster[1]
-    container_instance_arn = ecs_cluster[2]
+    print(f"Creating task {task_name}")
+    cluster_name, cluster_arn, container_instance_arn = ecs_cluster
     fake_ecs_client.register_task_definition(
         family=task_name,
         containerDefinitions=[
@@ -156,83 +154,19 @@ def ecs_task(ecs_cluster):
     yield
 
 
-def test_complete_ec2_shutdown_if_no_ecs_cluster(autoscaling_group_info):
-    fake_ec2_client = boto3.client('ec2')
-    fake_ecs_client = boto3.client('ecs')
-    autoscaling_group = autoscaling_group_info[0]
-    instance_id = autoscaling_group_info[1]
+@pytest.fixture()
+def ec2_terminating_message(sns_sqs,autoscaling_group):
+    autoscaling_group_name, instance_id = autoscaling_group
+    topic_arn, _ = sns_sqs
     lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
-
-    message = {
-        "LifecycleHookName": lifecycle_hook_name,
-        "AccountId": "account_id",
-        "RequestId": "f29364ad-8523-4d58-9a70-3537f4edec15",
-        "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
-        "AutoScalingGroupName": autoscaling_group,
-        "Service": "AWS Auto Scaling",
-        "Time": "2017-07-10T12:36:05.857Z",
-        "EC2InstanceId": instance_id,
-        "LifecycleActionToken": "78c16884-6bd4-4296-ac0c-2da9eb6a0d29"
-    }
-
-    event = {
-        'Records': [{
-            'EventSource': 'aws:sns',
-            'EventSubscriptionArn':
-                'arn:aws:sns:region:account_id:ec2_terminating_topic:stuff',
-            'EventVersion': '1.0',
-            'Sns': {
-                'Message': json.dumps(message),
-                'MessageAttributes': {},
-                'MessageId': 'a4416c50-9ec6-5a8e-934a-3d8de60d1428',
-                'Signature': 'signature',
-                'SignatureVersion': '1',
-                'SigningCertUrl': 'https://certificate.pem',
-                'Subject': None,
-                'Timestamp': '2017-07-10T12:43:55.664Z',
-                'TopicArn':
-                    'arn:aws:sns:region:account_id:ec2_terminating_topic',
-                'Type': 'Notification',
-                'UnsubscribeUrl': 'https://unsubscribe-url'
-            }}]}
-
-    mocked_asg_client = Mock()
-
-    drain_ecs_container_instance.drain_ecs_container_instance(
-        mocked_asg_client,
-        fake_ec2_client,
-        fake_ecs_client,
-        event
-    )
-
-    mocked_asg_client \
-        .complete_lifecycle_action \
-        .assert_called_once_with(
-            LifecycleHookName=lifecycle_hook_name,
-            AutoScalingGroupName=autoscaling_group,
-            LifecycleActionResult='CONTINUE',
-            InstanceId=instance_id
-        )
-
-
-def test_drain_ecs_instance_if_running_tasks(sns_sqs_info, autoscaling_group_info, ecs_task):
-    fake_ec2_client = boto3.client('ec2')
-    fake_ecs_client = boto3.client('ecs')
-    fake_sqs_client = boto3.client('sqs')
-    topic_arn = sns_sqs_info[0]
-    queue_url = sns_sqs_info[1]
-    auto_scaling_group_name = autoscaling_group_info[0]
-    instance_id = autoscaling_group_info[1]
 
     lifecycle_action_token = "78c16884-6bd4-4296-ac0c-2da9eb6a0d29"
-
-    lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
     message = {
         "LifecycleHookName": lifecycle_hook_name,
         "AccountId": "account_id",
         "RequestId": "f29364ad-8523-4d58-9a70-3537f4edec15",
         "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
-        "AutoScalingGroupName": auto_scaling_group_name,
+        "AutoScalingGroupName": autoscaling_group_name,
         "Service": "AWS Auto Scaling",
         "Time": "2017-07-10T12:36:05.857Z",
         "EC2InstanceId": instance_id,
@@ -258,6 +192,44 @@ def test_drain_ecs_instance_if_running_tasks(sns_sqs_info, autoscaling_group_inf
                 'Type': 'Notification',
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
+    yield lifecycle_hook_name, lifecycle_action_token, event, message
+
+
+def test_complete_ec2_shutdown_if_no_ecs_cluster(autoscaling_group, ec2_terminating_message):
+    fake_ec2_client = boto3.client('ec2')
+    fake_ecs_client = boto3.client('ecs')
+
+    autoscaling_group_name, instance_id = autoscaling_group
+
+    lifecycle_hook_name, _, event, _ = ec2_terminating_message
+
+    mocked_asg_client = Mock()
+
+    drain_ecs_container_instance.drain_ecs_container_instance(
+        mocked_asg_client,
+        fake_ec2_client,
+        fake_ecs_client,
+        event
+    )
+
+    mocked_asg_client \
+        .complete_lifecycle_action \
+        .assert_called_once_with(
+            LifecycleHookName=lifecycle_hook_name,
+            AutoScalingGroupName=autoscaling_group_name,
+            LifecycleActionResult='CONTINUE',
+            InstanceId=instance_id
+        )
+
+
+def test_drain_ecs_instance_if_running_tasks(sns_sqs, autoscaling_group, ecs_task, ec2_terminating_message):
+    fake_ec2_client = boto3.client('ec2')
+    fake_ecs_client = boto3.client('ecs')
+    fake_sqs_client = boto3.client('sqs')
+
+    _, queue_url = sns_sqs
+    autoscaling_group_name, instance_id = autoscaling_group
+    lifecycle_hook_name, lifecycle_action_token, event, message = ec2_terminating_message
 
     mocked_asg_client = Mock()
 
@@ -284,7 +256,7 @@ def test_drain_ecs_instance_if_running_tasks(sns_sqs_info, autoscaling_group_inf
         .record_lifecycle_action_heartbeat \
         .assert_called_once_with(
             LifecycleHookName=lifecycle_hook_name,
-            AutoScalingGroupName=auto_scaling_group_name,
+            AutoScalingGroupName=autoscaling_group_name,
             LifecycleActionToken=lifecycle_action_token,
             InstanceId=instance_id,
         )
