@@ -4,12 +4,7 @@ import pytest
 
 
 @pytest.fixture()
-def moto_start():
-    mock_autoscaling().start()
-    mock_ec2().start()
-    mock_ecs().start()
-    mock_sns().start()
-    mock_sqs().start()
+def set_region():
     # Need this otherwise boto complains about missing region
     # in sns_utils.pblish_sns_message when trying to create client
     # with sns = boto3.client('sns') (despite region being set with
@@ -21,6 +16,15 @@ def moto_start():
     session = boto3.Session()
     region = session.region_name
     boto3.setup_default_session(region_name=region)
+
+
+@pytest.fixture()
+def moto_start(set_region):
+    mock_autoscaling().start()
+    mock_ec2().start()
+    mock_ecs().start()
+    mock_sns().start()
+    mock_sqs().start()
     yield
     mock_autoscaling().stop()
     mock_ec2().stop()
