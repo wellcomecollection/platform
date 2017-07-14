@@ -222,6 +222,33 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster(autoscaling_group, ec2_terminat
         )
 
 
+def test_complete_ec2_shutdown_ecs_cluster_no_tasks(autoscaling_group, ec2_terminating_message, ecs_cluster):
+    fake_ec2_client = boto3.client('ec2')
+    fake_ecs_client = boto3.client('ecs')
+
+    autoscaling_group_name, instance_id = autoscaling_group
+
+    lifecycle_hook_name, _, event, _ = ec2_terminating_message
+
+    mocked_asg_client = Mock()
+
+    drain_ecs_container_instance.drain_ecs_container_instance(
+        mocked_asg_client,
+        fake_ec2_client,
+        fake_ecs_client,
+        event
+    )
+
+    mocked_asg_client \
+        .complete_lifecycle_action \
+        .assert_called_once_with(
+            LifecycleHookName=lifecycle_hook_name,
+            AutoScalingGroupName=autoscaling_group_name,
+            LifecycleActionResult='CONTINUE',
+            InstanceId=instance_id
+        )
+
+
 def test_drain_ecs_instance_if_running_tasks(sns_sqs, autoscaling_group, ecs_task, ec2_terminating_message):
     fake_ec2_client = boto3.client('ec2')
     fake_ecs_client = boto3.client('ecs')
