@@ -80,7 +80,7 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
     # to mock each client individually (patch needs in importable target
     # string), the only way is to patch the entire boto3.client function.
     def mock_asg_client():
-        def patch(*args):
+        def mock(*args):
             if args[0] == 'autoscaling':
                 client = Mock()
                 mocked_clients[args[0]] = client
@@ -93,7 +93,7 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
 
             return client
 
-        return patch
+        return mock
 
     with patch("boto3.client", new_callable=mock_asg_client):
         drain_ecs_container_instance.main(event, None)
@@ -267,7 +267,7 @@ def test_drain_ecs_instance_if_running_tasks():
     # to mock each client individually (patch needs in importable target
     # string), the only way is to patch the entire boto3.client function.
     def mock_asg_client():
-        def patch(*args):
+        def mock(*args):
             if args[0] == 'autoscaling':
                 client = Mock()
                 mocked_clients[args[0]] = client
@@ -282,7 +282,7 @@ def test_drain_ecs_instance_if_running_tasks():
 
             return client
 
-        return patch
+        return mock
 
     with patch("boto3.client", new_callable=mock_asg_client):
         drain_ecs_container_instance.main(event, None)
@@ -305,6 +305,10 @@ def test_drain_ecs_instance_if_running_tasks():
                 LifecycleActionToken=lifecycle_action_token,
                 InstanceId=instance_id,
             )
+
+        mocked_asg_client\
+            .complete_lifecycle_action\
+            .assert_not_called()
 
         messages = fake_sqs_client.receive_message(
             QueueUrl=queue['QueueUrl'],
