@@ -1,13 +1,11 @@
 import json
 
 import boto3
-from mock import patch, Mock
+from mock import Mock
 from moto import mock_ec2, mock_autoscaling, mock_ecs, mock_sns, mock_sqs
 from moto.ec2 import utils as ec2_utils
 
 import drain_ecs_container_instance
-
-mocked_clients = {}
 
 
 @mock_ec2
@@ -68,45 +66,23 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster():
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
 
-    # Horrible hack be able to mock the autoscaling client:
-    # mock_asg_client returns a function that behaves differently
-    # based on the service_name parameter passed to a call to
-    # boto3.client.
-    #
-    # I need to mock the autoscaling client only, to be able to assert
-    # on what function is called on it (As far as I know moto
-    # does not have this functionality).
-    # The other clients don't have to be mocked but, as there is no way
-    # to mock each client individually (patch needs in importable target
-    # string), the only way is to patch the entire boto3.client function.
-    def mock_asg_client():
-        def mock(*args):
-            if args[0] == 'autoscaling':
-                client = Mock()
-                mocked_clients[args[0]] = client
-            elif args[0] == 'ec2':
-                client = fake_ec2_client
-            elif args[0] == 'ecs':
-                client = fake_ecs_client
-            else:
-                raise Exception(f'Invalid {args[0]}')
+    mocked_asg_client = Mock()
 
-            return client
+    drain_ecs_container_instance.drain_ecs_container_instance(
+        mocked_asg_client,
+        fake_ec2_client,
+        fake_ecs_client,
+        event
+    )
 
-        return mock
-
-    with patch("boto3.client", new_callable=mock_asg_client):
-        drain_ecs_container_instance.main(event, None)
-
-        mocked_asg_client = mocked_clients['autoscaling']
-        mocked_asg_client \
-            .complete_lifecycle_action \
-            .assert_called_once_with(
-                LifecycleHookName=lifecycle_hook_name,
-                AutoScalingGroupName=auto_scaling_group_name,
-                LifecycleActionResult='CONTINUE',
-                InstanceId=instance_id
-            )
+    mocked_asg_client \
+        .complete_lifecycle_action \
+        .assert_called_once_with(
+            LifecycleHookName=lifecycle_hook_name,
+            AutoScalingGroupName=auto_scaling_group_name,
+            LifecycleActionResult='CONTINUE',
+            InstanceId=instance_id
+        )
 
 
 @mock_ec2
@@ -254,66 +230,41 @@ def test_drain_ecs_instance_if_running_tasks():
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
 
+    mocked_asg_client = Mock()
 
-    # Horrible hack be able to mock the autoscaling client:
-    # mock_asg_client returns a function that behaves differently
-    # based on the service_name parameter passed to a call to
-    # boto3.client.
+    drain_ecs_container_instance.drain_ecs_container_instance(
+        mocked_asg_client,
+        fake_ec2_client,
+        fake_ecs_client,
+        event
+    )
+
+    # Commented out as there is a bug in moto: https://github.com/spulec/moto/issues/1009
+    # TODO figure out another way to assert on this while the bug is fixed (mocks?)
+    # container_instance_info = fake_ecs_client.describe_container_instances(
+    #     cluster=cluster_name,
+    #     containerInstances=[container_instance_arn]
+    # )
     #
-    # I need to mock the autoscaling client only, to be able to assert
-    # on what function is called on it (As far as I know moto
-    # does not have this functionality).
-    # The other clients don't have to be mocked but, as there is no way
-    # to mock each client individually (patch needs in importable target
-    # string), the only way is to patch the entire boto3.client function.
-    def mock_asg_client():
-        def mock(*args):
-            if args[0] == 'autoscaling':
-                client = Mock()
-                mocked_clients[args[0]] = client
-            elif args[0] == 'ec2':
-                client = fake_ec2_client
-            elif args[0] == 'ecs':
-                client = fake_ecs_client
-            elif args[0] == 'sns':
-                client = fake_sns_client
-            else:
-                raise Exception(f'Invalid {args[0]}')
+    # assert container_instance_info['containerInstances'][0]['status'] == "DRAINING"
 
-            return client
-
-        return mock
-
-    with patch("boto3.client", new_callable=mock_asg_client):
-        drain_ecs_container_instance.main(event, None)
-
-        # Commented out as there is a bug in moto: https://github.com/spulec/moto/issues/1009
-        # TODO figure out another way to assert on this while the bug is fixed (mocks?)
-        # container_instance_info = fake_ecs_client.describe_container_instances(
-        #     cluster=cluster_name,
-        #     containerInstances=[container_instance_arn]
-        # )
-        #
-        # assert container_instance_info['containerInstances'][0]['status'] == "DRAINING"
-
-        mocked_asg_client = mocked_clients['autoscaling']
-        mocked_asg_client \
-            .record_lifecycle_action_heartbeat \
-            .assert_called_once_with(
-                LifecycleHookName=lifecycle_hook_name,
-                AutoScalingGroupName=auto_scaling_group_name,
-                LifecycleActionToken=lifecycle_action_token,
-                InstanceId=instance_id,
-            )
-
-        mocked_asg_client\
-            .complete_lifecycle_action\
-            .assert_not_called()
-
-        messages = fake_sqs_client.receive_message(
-            QueueUrl=queue['QueueUrl'],
-            MaxNumberOfMessages=1
+    mocked_asg_client \
+        .record_lifecycle_action_heartbeat \
+        .assert_called_once_with(
+            LifecycleHookName=lifecycle_hook_name,
+            AutoScalingGroupName=auto_scaling_group_name,
+            LifecycleActionToken=lifecycle_action_token,
+            InstanceId=instance_id,
         )
-        message_body = messages['Messages'][0]['Body']
 
-        assert json.loads(message_body)['default'] == json.dumps(message)
+    mocked_asg_client\
+        .complete_lifecycle_action\
+        .assert_not_called()
+
+    messages = fake_sqs_client.receive_message(
+        QueueUrl=queue['QueueUrl'],
+        MaxNumberOfMessages=1
+    )
+    message_body = messages['Messages'][0]['Body']
+
+    assert json.loads(message_body)['default'] == json.dumps(message)
