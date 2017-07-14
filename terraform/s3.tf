@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "miro-images-sync" {
     prefix  = ""
 
     transition {
-      days          = 1
+      days          = 30
       storage_class = "STANDARD_IA"
     }
   }
