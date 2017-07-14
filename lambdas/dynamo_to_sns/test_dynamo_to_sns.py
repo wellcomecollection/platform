@@ -3,40 +3,12 @@ import os
 
 import boto3
 
-from moto import mock_sns, mock_sqs
 import dynamo_to_sns
 
 
-@mock_sns
-@mock_sqs
-def test_dynamo_to_sns():
-    # Need this otherwise boto complains about missing region
-    # in sns_utils.pblish_sns_message when trying to create client
-    # with sns = boto3.client('sns') (despite region being set with
-    # the environment variable AWS_DEFAULT_REGION, which should be
-    # read by default by boto)
-    # Weirdly enough it doesn't complain in this file when it tries
-    # to do the same thing.
-    # After investigation this is not related to moto
-    session = boto3.Session()
-    region = session.region_name
-    boto3.setup_default_session(region_name=region)
-
-    client = boto3.client('sns')
-    client.create_topic(Name="test-topic")
-    response = client.list_topics()
-    topic_arn = response["Topics"][0]['TopicArn']
-
+def test_dynamo_to_sns(sns_sqs):
     sqs_client = boto3.client('sqs')
-    queue_name = "test-queue"
-    queue = sqs_client.create_queue(QueueName=queue_name)
-
-    client.subscribe(
-        TopicArn=topic_arn,
-        Protocol="sqs",
-        Endpoint=f"arn:aws:sqs:eu-west-1:123456789012:{queue_name}"
-    )
-
+    topic_arn, queue_url = sns_sqs
     stream_arn = 'arn:aws:dynamodb:eu-west-1:123456789012:table/table-stream'
 
     new_image = {
@@ -88,7 +60,7 @@ def test_dynamo_to_sns():
     dynamo_to_sns.main(event, None)
 
     messages = sqs_client.receive_message(
-        QueueUrl=queue['QueueUrl'],
+        QueueUrl=queue_url,
         MaxNumberOfMessages=1
     )
     message_body = messages['Messages'][0]['Body']

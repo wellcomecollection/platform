@@ -10,6 +10,17 @@ def moto_start():
     mock_ecs().start()
     mock_sns().start()
     mock_sqs().start()
+    # Need this otherwise boto complains about missing region
+    # in sns_utils.pblish_sns_message when trying to create client
+    # with sns = boto3.client('sns') (despite region being set with
+    # the environment variable AWS_DEFAULT_REGION, which should be
+    # read by default by boto)
+    # Weirdly enough it doesn't complain in this file when it tries
+    # to do the same thing.
+    # After investigation this is not related to moto
+    session = boto3.Session()
+    region = session.region_name
+    boto3.setup_default_session(region_name=region)
     yield
     mock_autoscaling().stop()
     mock_ec2().stop()
