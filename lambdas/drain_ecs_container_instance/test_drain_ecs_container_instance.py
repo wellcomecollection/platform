@@ -3,10 +3,9 @@ import json
 import boto3
 from mock import Mock
 from moto.ec2 import utils as ec2_utils
+import pytest
 
 import drain_ecs_container_instance
-
-import pytest
 
 
 @pytest.fixture()
