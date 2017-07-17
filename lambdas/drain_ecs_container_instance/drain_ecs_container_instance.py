@@ -19,14 +19,14 @@ def set_container_instance_to_draining(
         ecs_client,
         cluster_arn,
         ecs_container_instance_arn):
-
-    ecs_client.update_container_instances_state(
+    resp = ecs_client.update_container_instances_state(
         cluster=cluster_arn,
         containerInstances=[
             ecs_container_instance_arn,
         ],
         status='DRAINING'
     )
+    print(f'Updating container instance response:\n{resp}')
 
 
 def continue_lifecycle_action(
@@ -53,12 +53,7 @@ def get_ec2_tags(ec2_client, ec2_instance_id):
     return tag_dict
 
 
-def main(event, _):
-    print(f'event = {event!r}')
-    asg_client = boto3.client("autoscaling")
-    ec2_client = boto3.client("ec2")
-    ecs_client = boto3.client('ecs')
-
+def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, event):
     topic_arn = event['Records'][0]['Sns']['TopicArn']
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
@@ -120,3 +115,12 @@ def main(event, _):
 
             time.sleep(30)
             publish_sns_message(topic_arn, message_data)
+
+
+def main(event, _):
+    print(f'event = {event!r}')
+    asg_client = boto3.client("autoscaling")
+    ec2_client = boto3.client("ec2")
+    ecs_client = boto3.client('ecs')
+
+    drain_ecs_container_instance(asg_client, ec2_client, ecs_client, event)
