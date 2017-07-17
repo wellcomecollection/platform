@@ -10,7 +10,6 @@ import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 import scala.concurrent.Future
 import scala.util.Try
 
-
 trait SQSWorker extends TryBackoff {
 
   val sqsReader: SQSReader
@@ -41,4 +40,3 @@ trait SQSWorker extends TryBackoff {
   override def terminalFailureHook(): Unit =
     metricsSender.incrementCount(s"${workerName}_TerminalFailure")
 }
-
