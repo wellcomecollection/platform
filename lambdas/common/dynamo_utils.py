@@ -28,7 +28,7 @@ def _is_capacity_different(x, desired_capacity):
     read_capacity_units = x['ProvisionedThroughput']['ReadCapacityUnits']
     write_capacity_units = x['ProvisionedThroughput']['WriteCapacityUnits']
     return read_capacity_units != desired_capacity \
-           or write_capacity_units != desired_capacity
+        or write_capacity_units != desired_capacity
 
 
 def change_dynamo_capacity(client, table_name, desired_capacity):
