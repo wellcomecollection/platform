@@ -1,21 +1,28 @@
 package uk.ac.wellcome.platform.ingestor.modules
 
-import com.twitter.inject.Injector
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.ingestor.services.IdentifiedWorkIndexer
-import uk.ac.wellcome.sqs.SQSWorker
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import akka.actor.ActorSystem
+import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.platform.ingestor.services.IdMinterWorkerService
 
-import scala.concurrent.Future
-
-object IngestorWorker extends SQSWorker {
+object IngestorWorkerModule extends TwitterModule {
   private val esIndex = flag[String]("es.index", "records", "ES index name")
   private val esType = flag[String]("es.type", "item", "ES document type")
 
-  override def processMessage(message: SQSMessage,
-                              injector: Injector): Future[Unit] = {
-    val indexer = injector.instance[IdentifiedWorkIndexer]
+  override def singletonStartup(injector: Injector) {
+    val workerService = injector.instance[IdMinterWorkerService]
 
-    indexer.indexIdentifiedWork(message.body).map(_ => ())
+    workerService.runSQSWorker()
+
+    super.singletonStartup(injector)
+  }
+
+  override def singletonShutdown(injector: Injector) {
+    info("Terminating SQS worker")
+
+    val system = injector.instance[ActorSystem]
+    val workerService = injector.instance[IdMinterWorkerService]
+
+    workerService.cancelRun()
+    system.terminate()
   }
 }

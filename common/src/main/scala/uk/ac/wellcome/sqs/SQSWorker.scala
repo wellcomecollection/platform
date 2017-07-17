@@ -2,35 +2,32 @@ package uk.ac.wellcome.sqs
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs.model.Message
-import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 
 import scala.concurrent.Future
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
 import scala.util.Try
 
-trait SQSWorker extends TwitterModule with TryBackoff {
-  override def singletonStartup(injector: Injector) {
-    info("Starting SQS worker")
 
-    val system = injector.instance[ActorSystem]
-    val sqsReader = injector.instance[SQSReader]
+trait SQSWorker extends TryBackoff {
 
-    run(() => processMessages(sqsReader, injector), system)
-  }
+  val sqsReader: SQSReader
+  val actorSystem: ActorSystem
+  val metricsSender: MetricsSender
 
-  def processMessage(message: SQSMessage, injector: Injector): Future[Unit]
+  val workerName: String = this.getClass.getSimpleName
 
-  private def processMessages(
-    sqsReader: SQSReader,
-    injector: Injector
-  ): Future[Unit] = {
+  def processMessage(message: SQSMessage): Future[Unit]
+
+  def runSQSWorker() = run(() => processMessages, actorSystem)
+
+  private def processMessages(): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       Future
         .fromTry(extractMessage(message))
-        .flatMap(m => processMessage(m, injector))
+        .flatMap(m => processMessage(m))
     }
   }
 
@@ -41,10 +38,7 @@ trait SQSWorker extends TwitterModule with TryBackoff {
         throw e
     }
 
-  override def singletonShutdown(injector: Injector) {
-    info("Terminating SQS worker")
-    cancelRun()
-    val system = injector.instance[ActorSystem]
-    system.terminate()
-  }
+  override def terminalFailureHook(): Unit =
+    metricsSender.incrementCount(s"${workerName}_TerminalFailure")
 }
+

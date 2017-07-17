@@ -64,7 +64,8 @@ class TryBackoffTest
     f.calls.length shouldBe finalLength
   }
 
-  it("should eventually call terminalFailureHook for a a function that always fails") {
+  it(
+    "should eventually call terminalFailureHook for a a function that always fails") {
     val f = new TryBackoffHelper()
 
     tryBackoff.wasCalled = false
