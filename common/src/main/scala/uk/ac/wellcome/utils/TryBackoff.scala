@@ -47,6 +47,9 @@ trait TryBackoff extends Logging {
   lazy val baseWait: Duration = 100 millis
   lazy val totalWait: Duration = 12 seconds
 
+  // This method is intended to be optionally overridden
+  def terminalFailureHook(): Unit = Unit
+
   // This value is cached to save us repeating the calculation.
   private val maxAttempts = maximumAttemptsToTry()
 
@@ -71,6 +74,8 @@ trait TryBackoff extends Logging {
 
       val shouldReschedule = if (numberOfAttempts > maxAttempts) {
         error("Max retry attempts exceeded")
+
+        terminalFailureHook()
         false
       } else continuous || attempted.isLeft
 
