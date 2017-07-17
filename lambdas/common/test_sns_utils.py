@@ -2,35 +2,13 @@ from datetime import datetime
 import json
 
 import boto3
-from moto import mock_sns, mock_sqs
 
 import sns_utils
 
 
-@mock_sns
-@mock_sqs
-def test_publish_sns_message():
-    session = boto3.Session()
-    region = session.region_name
-    boto3.setup_default_session(region_name=region)
-
-    topic_name = "test-topic"
-
-    client = boto3.client('sns')
-    client.create_topic(Name=topic_name)
-
+def test_publish_sns_message(sns_sqs):
     sqs_client = boto3.client('sqs')
-    queue_name = "test-queue"
-    queue = sqs_client.create_queue(QueueName=queue_name)
-
-    response = client.list_topics()
-    topic_arn = response["Topics"][0]['TopicArn']
-
-    client.subscribe(
-        TopicArn=topic_arn,
-        Protocol="sqs",
-        Endpoint=f"arn:aws:sqs:eu-west-1:123456789012:{queue_name}"
-    )
+    topic_arn, queue_url = sns_sqs
 
     test_message = {
         'string': 'a',
@@ -49,7 +27,7 @@ def test_publish_sns_message():
     sns_utils.publish_sns_message(topic_arn, test_message)
 
     messages = sqs_client.receive_message(
-        QueueUrl=queue['QueueUrl'],
+        QueueUrl=queue_url,
         MaxNumberOfMessages=1
     )
 
