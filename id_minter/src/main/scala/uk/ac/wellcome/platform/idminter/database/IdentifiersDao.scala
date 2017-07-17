@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.idminter.database
 
+import javax.inject.Singleton
+
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import scalikejdbc._
@@ -8,6 +10,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
 
+@Singleton
 class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     extends Logging {
 
