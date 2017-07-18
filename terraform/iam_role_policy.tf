@@ -147,6 +147,11 @@ resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_thing" {
   policy = "${data.aws_iam_policy_document.write_ec2_tags.json}"
 }
 
+resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_thing" {
+  role   = "${module.lambda_ecs_ec2_instance_tagger.role_name}"
+  policy = "${data.aws_iam_policy_document.s3_put_infra_tmp.json}"
+}
+
 # Role policies for service_deployment_status lambda
 
 resource "aws_iam_role_policy" "service_deployment_status_describe_services" {

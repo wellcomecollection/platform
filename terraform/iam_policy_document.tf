@@ -236,6 +236,20 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
   }
 }
 
+data "aws_iam_policy_document" "s3_put_infra_tmp" {
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectACL",
+      "s3:PutObjectACL",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}/tmp/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "s3_read_miro_images" {
   statement {
     actions = [
