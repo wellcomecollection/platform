@@ -7,6 +7,7 @@ import com.amazonaws.services.cloudwatch.{
 }
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object AmazonCloudWatchModule extends TwitterModule {
@@ -17,6 +18,11 @@ object AmazonCloudWatchModule extends TwitterModule {
     "aws.cloudWatch.endpoint",
     "",
     "Endpoint of AWS CloudWatch. If not set, it will use the region")
+
+  @Provides
+  @Singleton
+  def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch) =
+    new MetricsSender(awsNamespace(), amazonCloudWatch)
 
   @Provides
   @Singleton
