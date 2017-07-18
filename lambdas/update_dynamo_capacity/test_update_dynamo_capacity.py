@@ -19,7 +19,8 @@ def _update_response(desired_capacity):
                 datetime.datetime(2017, 7, 17, 14, 58, 32, 171527,
                                   tzinfo=tzlocal()),
             'ProvisionedThroughput': {
-                'ReadCapacityUnits': desired_capacity, 'WriteCapacityUnits': desired_capacity
+                'ReadCapacityUnits': desired_capacity,
+                'WriteCapacityUnits': desired_capacity
             },
             'TableSizeBytes': 0, 'ItemCount': 0,
             'TableArn':
@@ -31,7 +32,8 @@ def _update_response(desired_capacity):
                     'KeySchema': [{'AttributeName': 'bu', 'KeyType': 'HASH'}],
                     'Projection': {'ProjectionType': 'ALL'},
                     'ProvisionedThroughput': {
-                        'ReadCapacityUnits': desired_capacity, 'WriteCapacityUnits': desired_capacity
+                        'ReadCapacityUnits': desired_capacity,
+                        'WriteCapacityUnits': desired_capacity
                     }
                 }
             ]
@@ -46,7 +48,11 @@ def _update_response(desired_capacity):
     }
 
 
-def _table_description(index_name, table_name, current_table_capacity, current_gsi_capacity):
+def _table_description(
+        index_name,
+        table_name,
+        current_table_capacity,
+        current_gsi_capacity):
     return {
         'Table': {
             'AttributeDefinitions': [
@@ -60,7 +66,8 @@ def _table_description(index_name, table_name, current_table_capacity, current_g
                 datetime.datetime(2017, 7, 17, 14, 26, 42, 517078,
                                   tzinfo=tzlocal()),
             'ProvisionedThroughput': {
-                'ReadCapacityUnits': current_table_capacity, 'WriteCapacityUnits': current_table_capacity
+                'ReadCapacityUnits': current_table_capacity,
+                'WriteCapacityUnits': current_table_capacity
             },
             'TableSizeBytes': 0,
             'ItemCount': 0,
@@ -73,7 +80,8 @@ def _table_description(index_name, table_name, current_table_capacity, current_g
                     'KeySchema': [{'AttributeName': 'bu', 'KeyType': 'HASH'}],
                     'Projection': {'ProjectionType': 'ALL'},
                     'ProvisionedThroughput': {
-                        'ReadCapacityUnits': current_gsi_capacity, 'WriteCapacityUnits': current_gsi_capacity
+                        'ReadCapacityUnits': current_gsi_capacity,
+                        'WriteCapacityUnits': current_gsi_capacity
                     }
                 }
             ]
@@ -91,7 +99,8 @@ def _table_description(index_name, table_name, current_table_capacity, current_g
 def test_update_dynamo_capacity_if_gsi_capacity_is_equal_to_desired():
     table_name = 'TestTable'
     desired_capacity = 1
-    message = {'dynamo_table_name': table_name, 'desired_capacity': desired_capacity}
+    message = {'dynamo_table_name': table_name,
+               'desired_capacity': desired_capacity}
     event = {
         'Records': [{
             'EventSource': 'aws:sns',
@@ -141,7 +150,8 @@ def test_update_dynamo_capacity_if_table_capacity_is_equal_to_desired():
     table_name = 'TestTable'
     index_name = 'TestIndexName'
     desired_capacity = 1
-    message = {'dynamo_table_name': table_name, 'desired_capacity': desired_capacity}
+    message = {'dynamo_table_name': table_name,
+               'desired_capacity': desired_capacity}
     event = {
         'Records': [{
             'EventSource': 'aws:sns',
@@ -196,7 +206,8 @@ def test_update_dynamo_capacity_if_both_capacity_different_from_desired():
     table_name = 'TestTable'
     index_name = 'TestIndexName'
     desired_capacity = 1
-    message = {'dynamo_table_name': table_name, 'desired_capacity': desired_capacity}
+    message = {'dynamo_table_name': table_name,
+               'desired_capacity': desired_capacity}
     event = {
         'Records': [{
             'EventSource': 'aws:sns',
@@ -255,7 +266,8 @@ def test_update_dynamo_capacity_if_both_capacity_equal_to_desired():
     table_name = 'TestTable'
     index_name = 'TestIndexName'
     desired_capacity = 1
-    message = {'dynamo_table_name': table_name, 'desired_capacity': desired_capacity}
+    message = {'dynamo_table_name': table_name,
+               'desired_capacity': desired_capacity}
     event = {
         'Records': [{
             'EventSource': 'aws:sns',
