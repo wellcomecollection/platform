@@ -58,7 +58,10 @@ case class MiroTransformable(MiroID: String,
       // In the V collection, this is just a truncated form of the desc field,
       // so we pass the full string as the label and omit a description.
       val label = MiroCollection match {
-        case "Images-V" => miroData.description.get
+        case "Images-V" => miroData.description match {
+          case Some(s) => s
+          case None => miroData.title.get
+        }
         case _ => miroData.title.get
       }
 
