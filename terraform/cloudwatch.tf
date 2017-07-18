@@ -13,7 +13,7 @@ resource "aws_cloudwatch_event_rule" "every_5_minutes" {
 resource "aws_cloudwatch_event_rule" "every_minute" {
   name                = "every_minute"
   description         = "Fires every minute"
-  schedule_expression = "rate(1 minutes)"
+  schedule_expression = "rate(1 minute)"
 }
 
 resource "aws_cloudwatch_event_rule" "ecs_task_state_change" {
