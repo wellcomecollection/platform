@@ -52,22 +52,30 @@ case class MiroTransformable(MiroID: String,
           "image_copyright_cleared field is not Y")
       }
 
+      // In at least the V collection, many of the titles are truncated
+      // versions of the description.  In this case, we drop the description
+      // field and put the full description in the label instead.
+      val titleIsTruncatedDescription = miroData.description
+        .getOrElse("")
+        .startsWith(miroData.title.get)
+
+      val useDescriptionAsTitle = (titleIsTruncatedDescription &&
+        MiroCollection == "Images-V")
+
       // <image_title>: the Short Description.  This maps to our property
       // "label".
       //
-      // In the V collection, this is just a truncated form of the desc field,
-      // so we pass the full string as the label and omit a description.
-      val label = MiroCollection match {
-        case "Images-V" => miroData.description.get
-        case _ => miroData.title.get
-      }
+      // Every image in the V collection that has image_cleared == Y has a
+      // non-empty title.  This is _not_ true for the MIRO records in general.
+      // TODO: Work out what label to use for those records.
+      val label =
+        if (useDescriptionAsTitle) miroData.description.get
+        else miroData.title.get
 
       // <image_image_desc>: the Description, which maps to our property
       // "description".
-      val description = MiroCollection match {
-        case "Images-V" => None
-        case _ => miroData.description
-      }
+      val description =
+        if (useDescriptionAsTitle) None else miroData.description
 
       // <image_creator>: the Creator, which maps to our property "hasCreator"
       val creators: List[Agent] = miroData.creator match {
