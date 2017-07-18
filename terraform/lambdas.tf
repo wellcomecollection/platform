@@ -19,8 +19,8 @@ module "trigger_notify_old_deploys" {
   source                  = "./lambda/trigger_cloudwatch"
   lambda_function_name    = "${module.lambda_notify_old_deploys.function_name}"
   lambda_function_arn     = "${module.lambda_notify_old_deploys.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_5_minutes.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 }
 
 # Lambda for tracking deployment status in dynamo db
@@ -42,8 +42,8 @@ module "trigger_service_deployment_status" {
   source                  = "./lambda/trigger_cloudwatch"
   lambda_function_name    = "${module.lambda_service_deployment_status.function_name}"
   lambda_function_arn     = "${module.lambda_service_deployment_status.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.name}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 }
 
 # Lambda for tagging EC2 instances with ECS cluster/container instance id
@@ -86,16 +86,8 @@ module "trigger_update_service_list" {
   source                  = "./lambda/trigger_cloudwatch"
   lambda_function_name    = "${module.lambda_update_service_list.function_name}"
   lambda_function_arn     = "${module.lambda_update_service_list.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.ecs_task_state_change.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.ecs_task_state_change.name}"
-}
-
-module "trigger_update_service_list_poll" {
-  source                  = "./lambda/trigger_cloudwatch"
-  lambda_function_name    = "${module.lambda_update_service_list.function_name}"
-  lambda_function_arn     = "${module.lambda_update_service_list.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_5_minutes.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 }
 
 # Lambda for publishing ECS service schedules to an SNS topic

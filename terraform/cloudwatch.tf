@@ -10,6 +10,12 @@ resource "aws_cloudwatch_event_rule" "every_5_minutes" {
   schedule_expression = "rate(5 minutes)"
 }
 
+resource "aws_cloudwatch_event_rule" "every_minute" {
+  name                = "every_minute"
+  description         = "Fires every minute"
+  schedule_expression = "rate(1 minutes)"
+}
+
 resource "aws_cloudwatch_event_rule" "ecs_task_state_change" {
   name        = "ecs_task_state_change"
   description = "Capture any ECS Task state change"
