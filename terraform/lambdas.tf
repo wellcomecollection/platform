@@ -52,6 +52,7 @@ module "lambda_ecs_ec2_instance_tagger" {
   name        = "ecs_ec2_instance_tagger"
   description = "Tag an EC2 instance with ECS cluster/container instance id"
   source_dir  = "../lambdas/ecs_ec2_instance_tagger"
+  timeout     = 10
 
   alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
