@@ -68,7 +68,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
       }"""
     )
     work.label shouldBe title
-    work.description shouldBe description
+    work.description.get shouldBe description
   }
 
   it("should have an empty list if no image_creator field is present") {
