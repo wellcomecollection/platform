@@ -14,9 +14,11 @@ Comment, lines 20-36
 I've not yet set up the Subjects ontology but am assuming that each subject will have a note of its label and its source authority.  NB In MIRO there are keywords that don't come from any external thesaurus
 
 
-Comment, line 53
-The status Open (ie can be shown on the web) is generated within MIRO by the combination of five factors: 
+Comment, lines 44-53
+The Access status of "Open" (ie can be shown on the web) is generated within MIRO by the combination of five factors: 
 
 * `<all_web_publish>`, `<image_general_use>` and `<image_copyright_cleared>` have Y, 
 * `<image_title>` has content, and 
 * "cataloguing is complete" - will follow up with MIRO users whether there is a flag for this
+
+Originally this property was attached to the Work but on reconsideration this should probably be attached to the actual Item, as access conditions may vary between items (eg the digital version may be open but the original 35mm slide be inaccessible)
