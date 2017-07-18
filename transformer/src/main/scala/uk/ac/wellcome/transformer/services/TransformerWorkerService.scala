@@ -7,6 +7,8 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 
 import scala.concurrent.Future
 
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
 class TransformerWorkerService(
   reader: SQSReader,
   system: ActorSystem,
