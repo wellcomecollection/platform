@@ -11,14 +11,11 @@ class TransformerWorkerService(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender
-  ) extends SQSWorker {
+) extends SQSWorker {
 
-    override val sqsReader: SQSReader = reader
-    override val actorSystem: ActorSystem = system
-    override val metricsSender: MetricsSender = metrics
+  override val sqsReader: SQSReader = reader
+  override val actorSystem: ActorSystem = system
+  override val metricsSender: MetricsSender = metrics
 
-    override def processMessage(message: SQSMessage): Future[Unit] = Future {
-
-
-    }
+  override def processMessage(message: SQSMessage): Future[Unit] = Future {}
 }
