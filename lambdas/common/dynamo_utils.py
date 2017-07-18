@@ -56,7 +56,10 @@ def change_dynamo_capacity(client, table_name, desired_capacity):
         filtered_gsis
     ))
 
-    if gsi_updates:
+    table_update = _is_capacity_different(response['Table'], desired_capacity)
+    print(f'table_update: {table_update}')
+
+    if gsi_updates and table_update:
         resp = client.update_table(
             TableName=table_name,
             ProvisionedThroughput={
@@ -65,7 +68,12 @@ def change_dynamo_capacity(client, table_name, desired_capacity):
             },
             GlobalSecondaryIndexUpdates=gsi_updates
         )
-    else:
+    elif gsi_updates:
+        resp = client.update_table(
+            TableName=table_name,
+            GlobalSecondaryIndexUpdates=gsi_updates
+        )
+    elif table_update:
         resp = client.update_table(
             TableName=table_name,
             ProvisionedThroughput={
@@ -73,6 +81,8 @@ def change_dynamo_capacity(client, table_name, desired_capacity):
                 'WriteCapacityUnits': desired_capacity
             }
         )
+    else:
+        return
 
     print(f'DynamoDB response = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
