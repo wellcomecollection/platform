@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import boto3
 from boto3.dynamodb.types import TypeDeserializer
 
 
@@ -25,40 +24,65 @@ class DynamoEvent:
         return {k: td.deserialize(v) for k, v in image.items()}
 
 
-def change_dynamo_capacity(table_name, desired_capacity):
+def _is_capacity_different(x, desired_capacity):
+    read_capacity_units = x['ProvisionedThroughput']['ReadCapacityUnits']
+    write_capacity_units = x['ProvisionedThroughput']['WriteCapacityUnits']
+    return read_capacity_units != desired_capacity \
+        or write_capacity_units != desired_capacity
+
+
+def change_dynamo_capacity(client, table_name, desired_capacity):
     """
     Given the name of a DynamoDB table and a desired capacity, update the
     read/write capacity of the table and every secondary index.
     """
 
-    client = boto3.client('dynamodb')
     response = client.describe_table(TableName=table_name)
 
-    gsi_names = [
-        idx['IndexName'] for idx in response['Table']['GlobalSecondaryIndexes']
-    ]
+    filtered_gsis = filter(
+        lambda x: _is_capacity_different(x, desired_capacity),
+        response['Table']['GlobalSecondaryIndexes'])
 
-    gsi_updates = [
-        {
+    gsi_updates = list(map(
+        lambda x: {
             'Update': {
-                'IndexName': index_name,
+                'IndexName': x['IndexName'],
                 'ProvisionedThroughput': {
                     'ReadCapacityUnits': desired_capacity,
                     'WriteCapacityUnits': desired_capacity
                 }
             }
-        }
-        for index_name in gsi_names
-    ]
-
-    resp = client.update_table(
-        TableName=table_name,
-        ProvisionedThroughput={
-            'ReadCapacityUnits': desired_capacity,
-            'WriteCapacityUnits': desired_capacity
         },
-        GlobalSecondaryIndexUpdates=gsi_updates
-    )
+        filtered_gsis
+    ))
+
+    table_update = _is_capacity_different(response['Table'], desired_capacity)
+    print(f'table_update: {table_update}')
+
+    if gsi_updates and table_update:
+        resp = client.update_table(
+            TableName=table_name,
+            ProvisionedThroughput={
+                'ReadCapacityUnits': desired_capacity,
+                'WriteCapacityUnits': desired_capacity
+            },
+            GlobalSecondaryIndexUpdates=gsi_updates
+        )
+    elif gsi_updates:
+        resp = client.update_table(
+            TableName=table_name,
+            GlobalSecondaryIndexUpdates=gsi_updates
+        )
+    elif table_update:
+        resp = client.update_table(
+            TableName=table_name,
+            ProvisionedThroughput={
+                'ReadCapacityUnits': desired_capacity,
+                'WriteCapacityUnits': desired_capacity
+            }
+        )
+    else:
+        return
 
     print(f'DynamoDB response = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
