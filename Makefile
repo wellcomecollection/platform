@@ -13,6 +13,9 @@ docker-build-python36:
 docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
 
+## Build the image for gatling
+docker-build-gatling:
+	docker build ./docker/gatling --tag gatling_ci
 
 
 install-docker-build-deps:
@@ -202,6 +205,17 @@ check-format: format
 	git diff --exit-code
 
 
+# Tasks for running gatling #
+
+
+## Run JSON linting over the ontologies directory
+gatling-loris: docker-build-gatling
+	docker run \
+		-v $$(pwd)/gatling/user-files:/opt/gatling/user-files \
+		-v $$(pwd)/gatling/results:/opt/gatling/results \
+		-v $$(pwd)/gatling/data:/opt/gatling/data \
+		-e SIMULATION=testing.load.LorisSimulation \
+		gatling:latest
 
 .PHONY: help
 
