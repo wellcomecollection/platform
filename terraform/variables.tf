@@ -82,3 +82,7 @@ variable "dashboard_assumable_roles" {
   description = "Assumable roles for the ECS dashboard"
   type        = "list"
 }
+
+variable "iiif_acm_cert_arn" {
+  description = "ARN of ACM cert for iiif API (in us-east-1) for CloudFront"
+}

@@ -9,3 +9,7 @@ output "listener_http_arn" {
 output "cloudwatch_id" {
   value = "${aws_alb.ecs_service.arn_suffix}"
 }
+
+output "dns_name" {
+  value = "${aws_alb.ecs_service.dns_name}"
+}
