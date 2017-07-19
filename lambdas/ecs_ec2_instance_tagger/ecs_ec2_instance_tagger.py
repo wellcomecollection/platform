@@ -67,12 +67,12 @@ def main(event, _):
     ec2_instance_id = event['detail']['ec2InstanceId']
 
     try:
-        s3_client.get_object(
+        s3_client.head_object(
             Bucket=bucket_name,
             Key=f'{object_path}/{ec2_instance_id}'
         )
     except ClientError as ex:
-        if ex.response['Error']['Code'] == 'NoSuchKey':
+        if ex.response['Error']['Code'] == '404':
             print(f'{ec2_instance_id} not seen yet, tagging!')
 
             response = create_tags(
