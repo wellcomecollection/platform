@@ -12,6 +12,15 @@ def main():
     now = time.time()
     max_age = 1 * 24 * 60 * 60
     tmp = "/tmp"
+
+    # TODO: Rough braindump of stuff to do:
+    #
+    #   - Create a generator of (path, atime)'s
+    #   - Stick the ones we don't delete in a list, then delete them
+    #   - What if can't delete them?  Do we spin in a loop?
+    #   - Argument parsing with docopt
+    #
+
     for root, _, filenames in os.walk(tmp):
         for f in filenames:
             path = os.path.join(root, f)
