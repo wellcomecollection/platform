@@ -1,9 +1,7 @@
 package uk.ac.wellcome.transformer.parsers
 
-import com.amazonaws.services.dynamodbv2.model.Record
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.MiroTransformable
-import uk.ac.wellcome.transformer.receive.RecordMap
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 
 class MiroParserTest extends FunSpec with TransformableSQSMessageUtils with Matchers {
@@ -25,9 +23,5 @@ class MiroParserTest extends FunSpec with TransformableSQSMessageUtils with Matc
       MiroID,
       MiroCollection,
       data)
-  }
-
-  private implicit def toRecordMap(calmRecord: Record): RecordMap = {
-    RecordMap(calmRecord.getDynamodb.getNewImage)
   }
 }

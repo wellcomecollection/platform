@@ -18,7 +18,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 
-class RecordReceiverTest
+class SQSMessageReceiverTest
     extends FunSpec
     with MockitoSugar
     with ScalaFutures
@@ -54,8 +54,8 @@ class RecordReceiverTest
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter
     val recordReceiver =
-      new RecordReceiver(snsWriter, new CalmParser, metricsSender)
-    val future = recordReceiver.receiveRecord(calmSqsMessage)
+      new SQSMessageReceiver(snsWriter, new CalmParser, metricsSender)
+    val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future) { _ =>
       verify(snsWriter).writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
@@ -64,8 +64,8 @@ class RecordReceiverTest
 
   it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
-      new RecordReceiver(mockSNSWriter, new CalmParser, metricsSender)
-    val future = recordReceiver.receiveRecord(invalidCalmSqsMessage)
+      new SQSMessageReceiver(mockSNSWriter, new CalmParser, metricsSender)
+    val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
     whenReady(future.failed) { x =>
       x shouldBe a [JsonParseException]
@@ -75,10 +75,10 @@ class RecordReceiverTest
   it(
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
-      new RecordReceiver(mockSNSWriter,
+      new SQSMessageReceiver(mockSNSWriter,
         new CalmParser,
                          metricsSender)
-    val future = recordReceiver.receiveRecord(failingTransformCalmSqsMessage)
+    val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
     whenReady(future.failed) { x =>
       x shouldBe a [JsonParseException]
@@ -88,8 +88,8 @@ class RecordReceiverTest
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new RecordReceiver(mockSNS, new CalmParser, metricsSender)
-    val future = recordReceiver.receiveRecord(calmSqsMessage)
+      new SQSMessageReceiver(mockSNS, new CalmParser, metricsSender)
+    val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future.failed) { x =>
       x.getMessage should be("Failed publishing message")

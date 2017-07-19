@@ -21,6 +21,7 @@ class  CalmTransformerFeatureTest
     "aws.sns.topic.arn" -> idMinterTopicArn,
     "aws.metrics.namespace" -> "calm-transformer"
   )
+
   it(
     "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     val calmTransformable = CalmTransformable(RecordID = "RecordID1",
@@ -37,7 +38,7 @@ class  CalmTransformerFeatureTest
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size (1)
+      snsMessages should have size 1
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
     }
 
@@ -55,7 +56,7 @@ class  CalmTransformerFeatureTest
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size (2)
+      snsMessages should have size 2
 
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
       assertSNSMessageContainsCalmDataWith(snsMessages.tail.head,

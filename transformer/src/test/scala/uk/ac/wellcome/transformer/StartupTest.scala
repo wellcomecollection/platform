@@ -16,6 +16,7 @@ class StartupTest
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
     flags = Map(
+      "transformer.source" -> "MiroData"
     ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalEndpointFlags
   )
 
