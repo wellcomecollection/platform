@@ -9,3 +9,7 @@ output "target_group_arn" {
 output "role_name" {
   value = "${module.service.role_name}"
 }
+
+output "host_name" {
+  value = "${var.host_name}"
+}
