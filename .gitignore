@@ -1,3 +1,5 @@
+### Project Specific ###
+
 .idea
 *.iml
 .lambda_hashes.json
@@ -8,6 +10,9 @@ terraform.tfvars
 release_ids.tfvars
 terraform.tfstate.backup
 .releases
+
+### Gatling ###
+/gatling/results/*
 
 # Created by https://www.gitignore.io/api/osx,vim,java,linux,scala,python,textmate,intellij
 
@@ -257,8 +262,5 @@ Session.vim
 .netrwhist
 # auto-generated tag files
 tags
-
-### Gatling ###
-/gatling/results/*
 
 # End of https://www.gitignore.io/api/osx,vim,java,linux,scala,python,textmate,intellij
