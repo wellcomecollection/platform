@@ -26,6 +26,8 @@ def delete_directory_if_empty(path):
 
     :param path: Directory to delete.
     """
+    # TODO: Discuss error handling with Alice
+    # try… except… else… finally…
     try:
         os.rmdir(path)
         print(path)
