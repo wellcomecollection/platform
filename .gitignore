@@ -258,4 +258,7 @@ Session.vim
 # auto-generated tag files
 tags
 
+### Gatling ###
+/gatling/results/*
+
 # End of https://www.gitignore.io/api/osx,vim,java,linux,scala,python,textmate,intellij
