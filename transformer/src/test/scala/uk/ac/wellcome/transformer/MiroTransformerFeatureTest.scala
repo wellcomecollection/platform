@@ -14,6 +14,7 @@ class MiroTransformerFeatureTest
 
   val queueUrl: String = createQueueAndReturnUrl("test_miro_transformer")
   override val flags: Map[String, String] = Map(
+    "transformer.source" -> "MiroData",
     "aws.region" -> "eu-west-1",
     "aws.sqs.queue.url" -> queueUrl,
     "aws.sqs.waitTime" -> "1",
