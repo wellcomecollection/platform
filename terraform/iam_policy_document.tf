@@ -239,10 +239,7 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
 data "aws_iam_policy_document" "s3_put_infra_tmp" {
   statement {
     actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:GetObjectACL",
-      "s3:PutObjectACL",
+      "s3:*"
     ]
 
     resources = [
