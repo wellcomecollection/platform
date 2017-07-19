@@ -7,6 +7,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.util.Try
 
 class CalmParser extends TransformableParser[CalmTransformable] with Logging {
-  override def readFromRecord(transformableAsJson: String): Try[CalmTransformable] =
+  override def readFromRecord(
+    transformableAsJson: String): Try[CalmTransformable] =
     JsonUtil.fromJson[CalmTransformable](transformableAsJson)
 }
