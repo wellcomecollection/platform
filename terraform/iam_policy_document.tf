@@ -246,6 +246,16 @@ data "aws_iam_policy_document" "s3_put_infra_tmp" {
       "${aws_s3_bucket.infra.arn}/tmp/*",
     ]
   }
+
+  statement {
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      "arn:aws:s3:::*",
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "s3_read_miro_images" {
