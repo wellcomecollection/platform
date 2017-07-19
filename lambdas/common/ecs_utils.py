@@ -83,7 +83,8 @@ def clone_task_definition(client, task_definition):
     new_task = client.register_task_definition(
         family=taskDefinition['family'],
         taskRoleArn=taskDefinition['taskRoleArn'],
-        containerDefinitions=taskDefinition['containerDefinitions']
+        containerDefinitions=taskDefinition['containerDefinitions'],
+        volumes=taskDefinition['volumes']
     )
 
     return new_task['taskDefinition']['taskDefinitionArn']
