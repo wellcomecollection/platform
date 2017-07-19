@@ -20,6 +20,7 @@ Requires a Cloudwatch Event with pattern:
 """
 
 import json
+import os
 
 import boto3
 from botocore.exceptions import ClientError
@@ -37,8 +38,10 @@ def create_tags(ec2_client, ec2_instance_id, event_detail):
     cluster_arn = event_detail['clusterArn']
     container_instance_arn = event_detail['containerInstanceArn']
 
-    print(f'Tagging {ec2_instance_id} clusterArn: {cluster_arn}')
-    print(f'Tagging {ec2_instance_id} containerInstanceArn: {container_instance_arn}')
+    print(f'Tag {ec2_instance_id} clusterArn: {cluster_arn}')
+    print(
+        f'Tag {ec2_instance_id} containerInstanceArn: {container_instance_arn}'
+    )
 
     return ec2_client.create_tags(
         Resources=[ec2_instance_id],
@@ -66,12 +69,17 @@ def main(event, _):
     try:
         s3_client.get_object(
             Bucket=bucket_name,
-            Key=f'{object_path}/foo/{ec2_instance_id}'
+            Key=f'{object_path}/{ec2_instance_id}'
         )
     except ClientError as ex:
         if ex.response['Error']['Code'] == 'NoSuchKey':
             print(f'{ec2_instance_id} not seen yet, tagging!')
-            response = create_tags(ec2_client, ec2_instance_id, event['detail'])
+
+            response = create_tags(
+                ec2_client,
+                ec2_instance_id,
+                event['detail'])
+
             print(f'response = {response!r}')
         else:
             raise ex
