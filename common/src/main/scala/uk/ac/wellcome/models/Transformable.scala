@@ -14,9 +14,13 @@ trait Reindexable[T] {
   val id: ItemIdentifier[T]
   val ReindexShard: String
   val ReindexVersion: Int
+}
 
-  def getReindexItem: ReindexItem[T] =
-    ReindexItem(id, ReindexShard, ReindexVersion)
+object Reindexable {
+  def getReindexItem[T](reindexable: Reindexable[T]) =
+    ReindexItem(reindexable.id,
+                reindexable.ReindexShard,
+                reindexable.ReindexVersion)
 }
 
 case class ReindexItem[T](id: ItemIdentifier[T],

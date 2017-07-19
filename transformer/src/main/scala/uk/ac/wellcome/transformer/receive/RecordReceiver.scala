@@ -44,13 +44,6 @@ class RecordReceiver @Inject()(
     )
   }
 
-  def recordToRecordMap(record: RecordAdapter): Try[RecordMap] = Try {
-    val keys = record.getInternalObject.getDynamodb.getNewImage
-
-    info(s"Received record $keys")
-    RecordMap(keys)
-  }
-
   def transformDynamoRecord(transformable: Transformable): Try[Work] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")

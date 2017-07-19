@@ -1,23 +1,22 @@
 package uk.ac.wellcome.transformer.receive
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.dynamodbv2.model.Record
-import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
+import com.fasterxml.jackson.core.JsonParseException
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceIdentifier, Transformable, Work}
+import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.transformer.parsers.TransformableParser
-import uk.ac.wellcome.transformer.utils.CalmRecordUtils
+import uk.ac.wellcome.transformer.parsers.CalmParser
+import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
-import scala.util.Try
 
 class RecordReceiverTest
     extends FunSpec
@@ -25,17 +24,27 @@ class RecordReceiverTest
     with ScalaFutures
     with Matchers
     with IntegrationPatience
-    with CalmRecordUtils {
+    with TransformableSQSMessageUtils {
 
-  val calmRecord: Record = createValidCalmRecord(
+  val calmSqsMessage: SQSMessage = createValidCalmSQSMessage(
     "abcdef",
     "collection",
     "AB/CD/12",
     "AB/CD/12",
     """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
 
+
+  val invalidCalmSqsMessage: SQSMessage = createInvalidRecord
+
+  val failingTransformCalmSqsMessage: SQSMessage = createValidCalmSQSMessage(
+    "abcdef",
+    "collection",
+    "AB/CD/12",
+    "AB/CD/12",
+    """not a json string""")
+
   val work = Work(identifiers =
-                    List(SourceIdentifier("Calm", "AltRefNo", "AB/CD/12")),
+                    List(SourceIdentifier("source", "key", "value")),
                   label = "calm data label")
 
   val metricsSender: MetricsSender = new MetricsSender(
@@ -45,25 +54,21 @@ class RecordReceiverTest
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter
     val recordReceiver =
-      new RecordReceiver(snsWriter,
-                         transformableParser(calmRecord, work),
-                         metricsSender)
-    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
+      new RecordReceiver(snsWriter, new CalmParser, metricsSender)
+    val future = recordReceiver.receiveRecord(calmSqsMessage)
 
     whenReady(future) { _ =>
       verify(snsWriter).writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
     }
   }
 
-  it("should return a failed future if it's unable to parse the dynamo record") {
+  it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
-      new RecordReceiver(mockSNSWriter,
-                         failingParser(calmRecord),
-                         metricsSender)
-    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
+      new RecordReceiver(mockSNSWriter, new CalmParser, metricsSender)
+    val future = recordReceiver.receiveRecord(invalidCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x.getMessage should startWith("Unable to parse transformable")
+      x shouldBe a [JsonParseException]
     }
   }
 
@@ -71,23 +76,20 @@ class RecordReceiverTest
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
       new RecordReceiver(mockSNSWriter,
-                         parserReturningFailingTransformable(calmRecord),
+        new CalmParser,
                          metricsSender)
-    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
+    val future = recordReceiver.receiveRecord(failingTransformCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x.getMessage should startWith("Unable to transform into Work")
+      x shouldBe a [JsonParseException]
     }
   }
 
-  it(
-    "should return a failed future if it's unable to publish the unified item") {
+  it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new RecordReceiver(mockSNS,
-                         transformableParser(calmRecord, work),
-                         metricsSender)
-    val future = recordReceiver.receiveRecord(new RecordAdapter(calmRecord))
+      new RecordReceiver(mockSNS, new CalmParser, metricsSender)
+    val future = recordReceiver.receiveRecord(calmSqsMessage)
 
     whenReady(future.failed) { x =>
       x.getMessage should be("Failed publishing message")
@@ -107,39 +109,5 @@ class RecordReceiverTest
       .thenReturn(
         Future.failed(new RuntimeException("Failed publishing message")))
     mockSNS
-  }
-
-  private def transformableParser(record: Record, work: Work) = {
-    val transformableParser = mock[TransformableParser[Transformable]]
-    val recordMap = RecordMap(record.getDynamodb.getNewImage)
-    when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
-      new Transformable {
-        override def transform: Try[Work] = Try {
-          work
-        }
-      }
-    })
-    transformableParser
-  }
-
-  private def parserReturningFailingTransformable(record: Record) = {
-    val transformableParser = mock[TransformableParser[Transformable]]
-    val recordMap = RecordMap(record.getDynamodb.getNewImage)
-    when(transformableParser.extractTransformable(recordMap)).thenReturn(Try {
-      new Transformable {
-        override def transform: Try[Work] = Try {
-          throw new RuntimeException("Unable to transform into Work")
-        }
-      }
-    })
-    transformableParser
-  }
-
-  private def failingParser(record: Record) = {
-    val transformableParser = mock[TransformableParser[Transformable]]
-    val recordMap = RecordMap(record.getDynamodb.getNewImage)
-    when(transformableParser.extractTransformable(recordMap))
-      .thenThrow(new RuntimeException("Unable to parse transformable"))
-    transformableParser
   }
 }
