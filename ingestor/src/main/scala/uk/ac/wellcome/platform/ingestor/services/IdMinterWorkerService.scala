@@ -14,11 +14,7 @@ class IdMinterWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender
-) extends SQSWorker {
-
-  override val sqsReader: SQSReader = reader
-  override val actorSystem: ActorSystem = system
-  override val metricsSender: MetricsSender = metrics
+) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     identifiedWorkIndexer.indexIdentifiedWork(message.body).map(_ => ())

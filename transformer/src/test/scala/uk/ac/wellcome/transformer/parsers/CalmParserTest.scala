@@ -1,12 +1,10 @@
 package uk.ac.wellcome.transformer.parsers
 
-import com.amazonaws.services.dynamodbv2.model.Record
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.CalmTransformable
-import uk.ac.wellcome.transformer.receive.RecordMap
-import uk.ac.wellcome.transformer.utils.CalmRecordUtils
+import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 
-class CalmParserTest extends FunSpec with CalmRecordUtils with Matchers {
+class CalmParserTest extends FunSpec with TransformableSQSMessageUtils with Matchers {
 
   val RecordID = "abcdef"
   val RecordType = "collection"
@@ -14,12 +12,12 @@ class CalmParserTest extends FunSpec with CalmRecordUtils with Matchers {
   val AltRefNo = "AB/CD/12"
   val data = """{"foo": ["bar"], "AccessStatus": ["TopSekrit"]}"""
   val calmRecord =
-    createValidCalmRecord(RecordID, RecordType, AltRefNo, RefNo, data)
+    createValidCalmSQSMessage(RecordID, RecordType, AltRefNo, RefNo, data)
 
   it("should parse a record into a calm case class") {
     val calmParser = new CalmParser
     val triedCalmTransformable =
-      calmParser.extractTransformable(toRecordMap(calmRecord))
+      calmParser.extractTransformable(calmRecord)
 
     triedCalmTransformable.isSuccess should be(true)
     triedCalmTransformable.get shouldBe a[CalmTransformable]
@@ -32,16 +30,12 @@ class CalmParserTest extends FunSpec with CalmRecordUtils with Matchers {
   }
 
   it(
-    "should return a failed try if it's unable to transform the parsed record") {
+    "should return a failed try if it's unable to parse the message") {
     val calmParser = new CalmParser
 
     val triedCalmTransformable =
-      calmParser.extractTransformable(toRecordMap(createInvalidRecord))
+      calmParser.extractTransformable(createInvalidRecord)
 
     triedCalmTransformable.isFailure should be(true)
-  }
-
-  private def toRecordMap(calmRecord: Record) = {
-    RecordMap(calmRecord.getDynamodb.getNewImage)
   }
 }
