@@ -54,6 +54,11 @@ module "lambda_ecs_ec2_instance_tagger" {
   source_dir  = "../lambdas/ecs_ec2_instance_tagger"
   timeout     = 10
 
+  environment_variables = {
+    BUCKET_NAME = "${aws_s3_bucket.infra.id}"
+    OBJECT_PATH = "tmp/ecs_ec2_instance_tagger"
+  }
+
   alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 

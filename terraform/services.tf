@@ -120,9 +120,10 @@ module "transformer" {
   config_key         = "config/${var.build_env}/transformer.ini"
 
   config_vars = {
-    stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
-    sns_arn           = "${module.id_minter_topic.arn}"
-    metrics_namespace = "miro-transformer"
+    sns_arn              = "${module.id_minter_topic.arn}"
+    transformer_queue_id = "${module.miro_transformer_queue.id}"
+    source_table_name    = "${aws_dynamodb_table.miro_table.name}"
+    metrics_namespace    = "miro-transformer"
   }
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
@@ -210,6 +211,10 @@ module "loris" {
   healthcheck_path   = "/image/"
   alb_priority       = "109"
   host_name          = "iiif.wellcomecollection.org"
+
+  volume_name      = "loris"
+  volume_host_path = "${module.api_userdata.efs_mount_directory}/loris"
+  container_path   = "/usr/local/share/images/loris"
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"

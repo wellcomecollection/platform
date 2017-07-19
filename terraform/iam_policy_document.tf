@@ -1,16 +1,3 @@
-/* TODO: Scope this policy document more tightly */
-data "aws_iam_policy_document" "allow_dynamodb_all" {
-  statement {
-    actions = [
-      "dynamodb:*",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "allow_calm_db_all" {
   statement {
     actions = [
@@ -88,18 +75,6 @@ data "aws_iam_policy_document" "allow_cloudwatch_read_metrics" {
 
     resources = [
       "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "read_calm_kinesis_stream" {
-  statement {
-    actions = [
-      "dynamodb:*",
-    ]
-
-    resources = [
-      "${aws_dynamodb_table.calm_table.stream_arn}",
     ]
   }
 }
@@ -232,6 +207,28 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
 
     resources = [
       "${aws_s3_bucket.dashboard.arn}/data/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "s3_put_infra_tmp" {
+  statement {
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}/tmp/*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::*",
     ]
   }
 }

@@ -10,17 +10,16 @@ import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 import scala.concurrent.Future
 import scala.util.Try
 
-trait SQSWorker extends TryBackoff {
-
-  val sqsReader: SQSReader
-  val actorSystem: ActorSystem
-  val metricsSender: MetricsSender
+abstract class SQSWorker(sqsReader: SQSReader,
+                         actorSystem: ActorSystem,
+                         metricsSender: MetricsSender)
+    extends TryBackoff {
 
   val workerName: String = this.getClass.getSimpleName
 
   def processMessage(message: SQSMessage): Future[Unit]
 
-  def runSQSWorker() = run(() => processMessages, actorSystem)
+  def runSQSWorker(): Unit = run(() => processMessages, actorSystem)
 
   private def processMessages(): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
