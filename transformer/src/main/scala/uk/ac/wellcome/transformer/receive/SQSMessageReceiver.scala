@@ -1,8 +1,5 @@
 package uk.ac.wellcome.transformer.receive
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue
-import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
-import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -14,15 +11,13 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-case class RecordMap(value: java.util.Map[String, AttributeValue])
-
-class RecordReceiver @Inject()(
+class SQSMessageReceiver(
   snsWriter: SNSWriter,
   transformableParser: TransformableParser[Transformable],
   metricsSender: MetricsSender)
     extends Logging {
 
-  def receiveRecord(message: SQSMessage): Future[PublishAttempt] = {
+  def receiveMessage(message: SQSMessage): Future[PublishAttempt] = {
     info(s"Starting to process message $message")
     metricsSender.timeAndCount(
       "ingest-time",
@@ -30,7 +25,7 @@ class RecordReceiver @Inject()(
         val triedWork = for {
           transformableRecord <- transformableParser.extractTransformable(
             message)
-          cleanRecord <- transformDynamoRecord(transformableRecord)
+          cleanRecord <- transformTransformable(transformableRecord)
         } yield cleanRecord
 
         triedWork match {
@@ -44,7 +39,7 @@ class RecordReceiver @Inject()(
     )
   }
 
-  def transformDynamoRecord(transformable: Transformable): Try[Work] = {
+  def transformTransformable(transformable: Transformable): Try[Work] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")
       transformed
