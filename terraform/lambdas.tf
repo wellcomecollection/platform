@@ -268,6 +268,13 @@ module "trigger_post_to_slack_lambda_error" {
   sns_trigger_arn      = "${module.lambda_error_alarm.arn}"
 }
 
+module "trigger_post_to_slack_lambda_error" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
+  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
+  sns_trigger_arn      = "${module.terminal_failure_alarm.arn}"
+}
+
 # Lambda for pushing updates to dynamo tables into sqs queues
 
 module "lambda_dynamo_to_sns" {
