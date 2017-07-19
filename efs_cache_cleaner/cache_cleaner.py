@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 import os
+import subprocess
 
 import time
 
@@ -24,17 +25,28 @@ def delete_directory_if_empty(path):
         pass
 
 
+def get_directory_size(path):
+    result = subprocess.check_output(["du", "-skH", path])
+    return int(result.split()[0])
+
+
 def main():
     now = time.time()
     max_age = 1 * 24 * 60 * 60
-    for root, _, filenames in os.walk("/tmp"):
+    tmp = "/tmp"
+    for root, _, filenames in os.walk(tmp):
         for f in filenames:
             path = os.path.join(root, f)
             last_access_time = os.stat(path).st_atime
             if now - last_access_time > max_age:
                 delete(path)
 
-    for root, dirnames, _ in os.walk("/tmp"):
+    size = get_directory_size(tmp)
+    print(size)
+    if size > 10:
+        pass
+
+    for root, dirnames, _ in os.walk(tmp):
         for directory in dirnames:
             path = os.path.join(root, directory)
             delete_directory_if_empty(path)
