@@ -4,5 +4,4 @@ set -o errexit
 set -o nounset
 set -o verbose
 
-./gatling.sh loris.BasicSimulation
-
+$GATLING_HOME/bin/gatling.sh -s $SIMULATION

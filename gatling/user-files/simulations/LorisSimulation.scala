@@ -1,10 +1,10 @@
-package loris
+package testing.load
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
 
-class BasicSimulation extends Simulation {
+class LorisSimulation extends Simulation {
 
   val imagesPerArticle = 15
   val imagesPerSearch = 20
