@@ -46,7 +46,7 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(miroTransformable) => {
-        val reindexItem = miroTransformable.getReindexItem
+        val reindexItem = Reindexable.getReindexItem(miroTransformable)
 
         scanamoUpdate(reindexItem.hashKey and reindexItem.rangeKey,
                       set('ReindexVersion -> requestedVersion))

@@ -1,13 +1,13 @@
 package uk.ac.wellcome.transformer.parsers
 
-import com.gu.scanamo.ScanamoFree
-import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.MiroTransformable
-import uk.ac.wellcome.transformer.receive.RecordMap
+import uk.ac.wellcome.utils.JsonUtil
+
+import scala.util.Try
 
 class MiroParser extends TransformableParser[MiroTransformable] with Logging {
   override def readFromRecord(
-    recordMap: RecordMap): Either[DynamoReadError, MiroTransformable] =
-    ScanamoFree.read[MiroTransformable](recordMap.value)
+    transformableAsJson: String): Try[MiroTransformable] =
+    JsonUtil.fromJson[MiroTransformable](transformableAsJson)
 }

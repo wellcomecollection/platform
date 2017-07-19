@@ -28,22 +28,16 @@ resource "aws_iam_role_policy" "ecs_calm_adapter_service_scheduler_sns" {
 
 # Role policies for the transformer
 
-resource "aws_iam_role_policy" "ecs_transformer_task_dynamo" {
-  name   = "ecs_task_transformer_task_dynamo_policy"
+resource "aws_iam_role_policy" "ecs_transformer_task_read_transformer_q" {
+  name   = "ecs_transformer_task_read_transformer_q"
   role   = "${module.ecs_transformer_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_dynamodb_all.json}"
+  policy = "${module.miro_transformer_queue.read_policy}"
 }
 
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   name   = "ecs_task_task_sns_policy"
   role   = "${module.ecs_transformer_iam.task_role_name}"
   policy = "${module.id_minter_topic.publish_policy}"
-}
-
-resource "aws_iam_role_policy" "ecs_transformer_task_kinesis_stream" {
-  name   = "ecs_task_kinesis_stream_policy"
-  role   = "${module.ecs_transformer_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.read_calm_kinesis_stream.json}"
 }
 
 resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
@@ -142,9 +136,14 @@ EOF
 
 # Role policies for ecs_ec2_instance_tagger lambda
 
-resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_thing" {
+resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_write_tags" {
   role   = "${module.lambda_ecs_ec2_instance_tagger.role_name}"
   policy = "${data.aws_iam_policy_document.write_ec2_tags.json}"
+}
+
+resource "aws_iam_role_policy" "ecs_ec2_instance_tagger_use_tmp" {
+  role   = "${module.lambda_ecs_ec2_instance_tagger.role_name}"
+  policy = "${data.aws_iam_policy_document.s3_put_infra_tmp.json}"
 }
 
 # Role policies for service_deployment_status lambda

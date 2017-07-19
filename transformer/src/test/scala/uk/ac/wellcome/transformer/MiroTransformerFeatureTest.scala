@@ -1,8 +1,7 @@
 package uk.ac.wellcome.transformer
 
-import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
-import com.gu.scanamo.Scanamo
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{MiroTransformable, Work}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
@@ -13,23 +12,21 @@ class MiroTransformerFeatureTest
     with TransformerFeatureTest
     with Matchers {
 
-  private val appName = "test-transformer-miro"
+  val queueUrl: String = createQueueAndReturnUrl("test_miro_transformer")
   override val flags: Map[String, String] = Map(
+    "transformer.source" -> "MiroData",
     "aws.region" -> "eu-west-1",
-    "aws.dynamo.miroData.streams.appName" -> appName,
-    "aws.dynamo.miroData.streams.arn" -> miroDataStreamArn,
-    "aws.dynamo.miroData.tableName" -> miroDataTableName,
+    "aws.sqs.queue.url" -> queueUrl,
+    "aws.sqs.waitTime" -> "1",
     "aws.sns.topic.arn" -> idMinterTopicArn,
     "aws.metrics.namespace" -> "miro-transformer"
   )
-  override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
-    kinesisClientLibConfiguration(appName, miroDataStreamArn)
 
   it(
     "should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
     val miroID = "M0000001"
     val label = "A guide for a giraffe"
-    putMiroImageInDynamoDb(miroID, label)
+    sendMiroImageToSQS(miroID, label)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -39,7 +36,7 @@ class MiroTransformerFeatureTest
 
     val secondMiroID = "M0000002"
     val secondLabel = "A song about a snake"
-    putMiroImageInDynamoDb(secondMiroID, secondLabel)
+    sendMiroImageToSQS(secondMiroID, secondLabel)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -60,15 +57,22 @@ class MiroTransformerFeatureTest
     parsedWork.label shouldBe imageTitle
   }
 
-  private def putMiroImageInDynamoDb(miroID: String, imageTitle: String) = {
-    Scanamo.put(dynamoDbClient)(miroDataTableName)(
-      MiroTransformable(miroID,
-                        "Images-A",
-                        s"""{
+  private def sendMiroImageToSQS(miroID: String, imageTitle: String) = {
+    val miroTransformable = MiroTransformable(miroID,
+      "Images-A",
+      s"""{
           "image_title": "$imageTitle",
           "image_cleared": "Y",
           "image_copyright_cleared": "Y"
-        }"""))
+        }""")
+
+    val sqsMessage = SQSMessage(Some("subject"),
+      JsonUtil.toJson(miroTransformable).get,
+      "topic",
+      "messageType",
+      "timestamp")
+
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
   }
 
 }
