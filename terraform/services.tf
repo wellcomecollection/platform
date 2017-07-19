@@ -120,9 +120,10 @@ module "transformer" {
   config_key         = "config/${var.build_env}/transformer.ini"
 
   config_vars = {
-    stream_arn        = "${aws_dynamodb_table.miro_table.stream_arn}"
-    sns_arn           = "${module.id_minter_topic.arn}"
-    metrics_namespace = "miro-transformer"
+    sns_arn              = "${module.id_minter_topic.arn}"
+    transformer_queue_id = "${module.miro_transformer_queue.id}"
+    source_table_name    = "${aws_dynamodb_table.miro_table.name}"
+    metrics_namespace    = "miro-transformer"
   }
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
