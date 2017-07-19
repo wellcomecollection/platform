@@ -82,7 +82,7 @@ def main(event, _):
 
             print(f'response = {response!r}')
         else:
-            raise ex
+            raise
 
     s3_client.put_object(
         Bucket=bucket_name,
