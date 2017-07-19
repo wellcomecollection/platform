@@ -1,39 +1,39 @@
 package uk.ac.wellcome.transformer
 
-import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration
 import com.gu.scanamo.Scanamo
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 
-class CalmTransformerFeatureTest
+class  CalmTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
     with Matchers {
 
-  private val appName = "test-transformer-calm"
-
+  val queueUrl: String = createQueueAndReturnUrl("test_calm_transformer")
   override val flags: Map[String, String] = Map(
     "aws.region" -> "eu-west-1",
-    "aws.dynamo.calmData.streams.appName" -> appName,
-    "aws.dynamo.calmData.streams.arn" -> calmDataStreamArn,
-    "aws.dynamo.calmData.tableName" -> calmDataTableName,
+    "aws.sqs.queue.url" -> queueUrl,
+    "aws.sqs.waitTime" -> "1",
     "aws.sns.topic.arn" -> idMinterTopicArn,
     "aws.metrics.namespace" -> "calm-transformer"
   )
-  override val kinesisClientLibConfiguration: KinesisClientLibConfiguration =
-    kinesisClientLibConfiguration(appName, calmDataStreamArn)
-
   it(
     "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
-    Scanamo.put(dynamoDbClient)(calmDataTableName)(
-      CalmTransformable(RecordID = "RecordID1",
-                        RecordType = "Collection",
-                        AltRefNo = "AltRefNo1",
-                        RefNo = "RefNo1",
-                        data = """{"AccessStatus": ["public"]}"""))
+    val calmTransformable = CalmTransformable(RecordID = "RecordID1",
+      RecordType = "Collection",
+      AltRefNo = "AltRefNo1",
+      RefNo = "RefNo1",
+      data = """{"AccessStatus": ["public"]}""")
+    val sqsMessage = SQSMessage(Some("subject"),
+      JsonUtil.toJson(calmTransformable).get,
+      "topic",
+      "messageType",
+      "timestamp")
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -41,12 +41,17 @@ class CalmTransformerFeatureTest
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
     }
 
-    Scanamo.put(dynamoDbClient)(calmDataTableName)(
-      CalmTransformable(RecordID = "RecordID2",
-                        RecordType = "Collection",
-                        AltRefNo = "AltRefNo2",
-                        RefNo = "RefNo2",
-                        data = """{"AccessStatus": ["restricted"]}"""))
+    val calmTransformable2 = CalmTransformable(RecordID = "RecordID2",
+      RecordType = "Collection",
+      AltRefNo = "AltRefNo2",
+      RefNo = "RefNo2",
+      data = """{"AccessStatus": ["restricted"]}""")
+    val sqsMessage2 = SQSMessage(Some("subject"),
+      JsonUtil.toJson(calmTransformable2).get,
+      "topic",
+      "messageType",
+      "timestamp")
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage2).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
