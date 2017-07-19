@@ -1,6 +1,5 @@
 package uk.ac.wellcome.transformer
 
-import com.gu.scanamo.Scanamo
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, Work}
@@ -15,6 +14,7 @@ class  CalmTransformerFeatureTest
 
   val queueUrl: String = createQueueAndReturnUrl("test_calm_transformer")
   override val flags: Map[String, String] = Map(
+    "transformer.source" -> "CalmData",
     "aws.region" -> "eu-west-1",
     "aws.sqs.queue.url" -> queueUrl,
     "aws.sqs.waitTime" -> "1",

@@ -10,9 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.transformer.controllers._
-import uk.ac.wellcome.platform.transformer.modules._
 import uk.ac.wellcome.transformer.modules.{
-  AmazonKinesisModule,
   TransformableParserModule,
   TransformerWorkerModule
 }
@@ -22,16 +20,14 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.transformer Transformer"
   override val modules = Seq(
-    KinesisWorker,
-    KinesisClientLibConfigurationModule,
-    AmazonKinesisModule,
     AmazonCloudWatchModule,
     AWSConfigModule,
     PlatformDynamoConfigModule,
     AkkaModule,
+    SQSClientModule,
+    SQSConfigModule,
     SNSConfigModule,
     SNSClientModule,
-    DynamoClientModule,
     TransformableParserModule,
     TransformerWorkerModule
   )
