@@ -239,7 +239,7 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
 data "aws_iam_policy_document" "s3_put_infra_tmp" {
   statement {
     actions = [
-      "s3:*"
+      "s3:*",
     ]
 
     resources = [
@@ -249,7 +249,7 @@ data "aws_iam_policy_document" "s3_put_infra_tmp" {
 
   statement {
     actions = [
-      "s3:ListBucket"
+      "s3:ListBucket",
     ]
 
     resources = [
