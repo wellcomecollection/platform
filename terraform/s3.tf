@@ -35,6 +35,16 @@ resource "aws_s3_bucket" "infra" {
   lifecycle {
     prevent_destroy = true
   }
+
+  lifecycle_rule {
+    id      = "tmp"
+    prefix  = "tmp/"
+    enabled = true
+
+    expiration {
+      days = 30
+    }
+  }
 }
 
 resource "aws_s3_bucket" "dashboard" {
