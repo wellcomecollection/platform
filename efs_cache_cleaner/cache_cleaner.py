@@ -1,33 +1,11 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-import os
-import subprocess
 
+import os
 import time
 
-import sys
+import os_utils
 
-
-def delete(path):
-    print(path)
-    try:
-        os.unlink(path)
-    except PermissionError as err:
-        print(f"Failed to delete {path}: {err}", file=sys.stderr)
-
-
-def delete_directory_if_empty(path):
-    try:
-        os.rmdir(path)
-        print(path)
-    except OSError:
-        # TODO check that it fails because the directory is not empty
-        pass
-
-
-def get_directory_size(path):
-    result = subprocess.check_output(["du", "-skH", path])
-    return int(result.split()[0])
 
 
 def main():
@@ -39,9 +17,9 @@ def main():
             path = os.path.join(root, f)
             last_access_time = os.stat(path).st_atime
             if now - last_access_time > max_age:
-                delete(path)
+                os_utils.delete(path)
 
-    size = get_directory_size(tmp)
+    size = os_utils.get_directory_size(tmp)
     print(size)
     if size > 10:
         pass
@@ -49,7 +27,7 @@ def main():
     for root, dirnames, _ in os.walk(tmp):
         for directory in dirnames:
             path = os.path.join(root, directory)
-            delete_directory_if_empty(path)
+            os_utils.delete_directory_if_empty(path)
 
 
 if __name__ == "__main__":
