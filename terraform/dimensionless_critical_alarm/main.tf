@@ -11,4 +11,3 @@ resource "aws_cloudwatch_metric_alarm" "dimensionless_critical" {
   alarm_description = "This metric monitors  service for terminal failure"
   alarm_actions     = ["${var.alarm_action_arn}"]
 }
-

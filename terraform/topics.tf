@@ -74,4 +74,3 @@ module "terminal_failure_alarm" {
   source = "./sns"
   name   = "terminal_failure_alarm"
 }
-

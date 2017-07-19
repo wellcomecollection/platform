@@ -268,7 +268,7 @@ module "trigger_post_to_slack_lambda_error" {
   sns_trigger_arn      = "${module.lambda_error_alarm.arn}"
 }
 
-module "trigger_post_to_slack_lambda_error" {
+module "trigger_post_to_slack_terminal_failure" {
   source               = "./lambda/trigger_sns"
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
