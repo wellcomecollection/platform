@@ -15,6 +15,7 @@ trait SQSLocal
   private val sqsEndpointUrl = s"http://localhost:9324"
   private val accessKey = "access"
   private val secretKey = "secret"
+
   val sqsLocalFlags = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.accessKey" -> accessKey,

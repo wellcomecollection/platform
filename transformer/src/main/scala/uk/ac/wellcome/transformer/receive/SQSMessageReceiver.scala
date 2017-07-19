@@ -1,10 +1,8 @@
 package uk.ac.wellcome.transformer.receive
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue
-import com.amazonaws.services.dynamodbv2.streamsadapter.model.RecordAdapter
-import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
@@ -13,24 +11,21 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-case class RecordMap(value: java.util.Map[String, AttributeValue])
-
-class RecordReceiver @Inject()(
+class SQSMessageReceiver(
   snsWriter: SNSWriter,
   transformableParser: TransformableParser[Transformable],
   metricsSender: MetricsSender)
     extends Logging {
 
-  def receiveRecord(record: RecordAdapter): Future[PublishAttempt] = {
-    info(s"Starting to process record $record")
+  def receiveMessage(message: SQSMessage): Future[PublishAttempt] = {
+    info(s"Starting to process message $message")
     metricsSender.timeAndCount(
       "ingest-time",
       () => {
         val triedWork = for {
-          recordMap <- recordToRecordMap(record)
           transformableRecord <- transformableParser.extractTransformable(
-            recordMap)
-          cleanRecord <- transformDynamoRecord(transformableRecord)
+            message)
+          cleanRecord <- transformTransformable(transformableRecord)
         } yield cleanRecord
 
         triedWork match {
@@ -44,14 +39,7 @@ class RecordReceiver @Inject()(
     )
   }
 
-  def recordToRecordMap(record: RecordAdapter): Try[RecordMap] = Try {
-    val keys = record.getInternalObject.getDynamodb.getNewImage
-
-    info(s"Received record $keys")
-    RecordMap(keys)
-  }
-
-  def transformDynamoRecord(transformable: Transformable): Try[Work] = {
+  def transformTransformable(transformable: Transformable): Try[Work] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")
       transformed
