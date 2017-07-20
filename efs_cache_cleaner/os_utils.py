@@ -16,11 +16,12 @@ def delete(path):
 
     :param path: File to delete.
     """
-    print(f'Deleting file {path}')
     try:
         os.unlink(path)
     except PermissionError as err:
         print(f'Failed to delete {path}: {err}', file=sys.stderr)
+    else:
+        print(f'Deleted file {path}')
 
 
 def delete_directory_if_empty(path):
