@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 
+import collections
 import errno
 import os
 import subprocess
 import sys
 
-import collections
 
 File = collections.namedtuple("File", ["path", "access_time"])
 
