@@ -18,7 +18,7 @@ docker-build-gatling:
 	docker build ./docker/gatling --tag gatling_ci
 
 ## Build the image for the cache cleaner
-docker-build-cache_cleaner:
+docker-build-cache_cleaner: install-docker-build-deps
 	docker build ./efs_cache_cleaner --tag cache_cleaner
 
 ## Build the image for the cache cleaner
@@ -223,7 +223,7 @@ gatling-loris: docker-build-gatling
 		-v $$(pwd)/gatling/results:/opt/gatling/results \
 		-v $$(pwd)/gatling/data:/opt/gatling/data \
 		-e SIMULATION=testing.load.LorisSimulation \
-		gatling:latest
+		gatling_ci:latest
 
 .PHONY: help
 

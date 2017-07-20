@@ -30,12 +30,7 @@ variable "container_path" {
   default     = ""
 }
 
-variable "service_vars" {
-  description = "Environment variables to pass to the container"
-  type        = "list"
-}
-
-variable "extra_vars" {
+variable "env_vars" {
   description = "Environment variables to pass to the container"
   type        = "list"
 }
