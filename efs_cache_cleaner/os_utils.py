@@ -5,6 +5,10 @@ import os
 import subprocess
 import sys
 
+import collections
+
+File = collections.namedtuple("File", ["path", "access_time"])
+
 
 def delete(path):
     """
@@ -26,8 +30,6 @@ def delete_directory_if_empty(path):
 
     :param path: Directory to delete.
     """
-    # TODO: Discuss error handling with Alice
-    # try… except… else… finally…
     try:
         os.rmdir(path)
         print(path)
@@ -56,3 +58,10 @@ def get_directory_size(path):
     #
     result = subprocess.check_output(["du", "-skH", path])
     return int(result.split()[0])
+
+
+def get_files(path):
+    for root, _, filenames in os.walk(path):
+        for f in filenames:
+            filename = os.path.join(root, f)
+            yield File(filename, os.stat(filename).st_atime)
