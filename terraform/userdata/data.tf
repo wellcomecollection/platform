@@ -1,5 +1,5 @@
 data "template_file" "template" {
-  template = "${file("${path.module}/templates/${var.template_name}.yml.template")}"
+  template = "${file("${path.module}/templates/ecs-agent${var.efs_filesystem_id == "no_name_set" ? "" : "-with-efs"}.yml.template")}"
 
   vars {
     aws_region          = "${var.aws_region}"
