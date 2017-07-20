@@ -17,12 +17,14 @@ docker-build-terraform:
 docker-build-gatling:
 	docker build ./docker/gatling --tag gatling_ci
 
-## Build the image for the cache cleaner
-docker-build-cache_cleaner: install-docker-build-deps
-	docker build ./efs_cache_cleaner --tag cache_cleaner
+
 
 ## Build the image for the cache cleaner
-docker-deploy-cache_cleaner: docker-build-cache_cleaner
+cache_cleaner-build: install-docker-build-deps
+	./scripts/build_cache_cleaner.py
+
+## Deploy the image for the cache cleaner
+cache_cleaner-deploy: docker-build-cache_cleaner
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
 
 
