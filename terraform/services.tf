@@ -7,39 +7,6 @@ data "template_file" "es_cluster_host" {
   }
 }
 
-module "calm_adapter" {
-  source             = "./services"
-  name               = "calm_adapter"
-  cluster_id         = "${aws_ecs_cluster.services.id}"
-  task_role_arn      = "${module.ecs_calm_adapter_iam.task_role_arn}"
-  vpc_id             = "${module.vpc_services.vpc_id}"
-  app_uri            = "${module.ecr_repository_calm_adapter.repository_url}:${var.release_ids["calm_adapter"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_services.repository_url}:${var.release_ids["nginx_services"]}"
-  listener_https_arn = "${module.services_alb.listener_https_arn}"
-  listener_http_arn  = "${module.services_alb.listener_http_arn}"
-  path_pattern       = "/calm_adapter/*"
-  alb_priority       = "101"
-  healthcheck_path   = "/calm_adapter/management/healthcheck"
-  infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/calm_adapter.ini"
-
-  # The Calm adapter is disabled when not running.  It only runs once a day
-  # because the last_changed date on Calm records has per-day granularity.
-  #
-  # A scheduled Lambda sets the desired count to 1 on weekdays, and the
-  # adapter resets it to zero when it finished running.
-  desired_count = "0"
-
-  config_vars = {
-    table_name = "${aws_dynamodb_table.calm_table.name}"
-    sns_arn    = "${module.service_scheduler_topic.arn}"
-  }
-
-  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
-  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
-}
-
 module "miro_reindexer" {
   source             = "./services"
   name               = "miro_reindexer"

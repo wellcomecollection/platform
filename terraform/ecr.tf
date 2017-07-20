@@ -41,11 +41,6 @@ module "ecr_repository_id_minter" {
   name   = "id_minter"
 }
 
-module "ecr_repository_calm_adapter" {
-  source = "./ecr"
-  name   = "calm_adapter"
-}
-
 module "ecr_repository_ingestor" {
   source = "./ecr"
   name   = "ingestor"

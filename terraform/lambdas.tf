@@ -107,23 +107,6 @@ module "lambda_service_scheduler" {
   alarm_topic_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "trigger_calm_adapter" {
-  source                  = "./lambda/trigger_cloudwatch"
-  lambda_function_name    = "${module.lambda_service_scheduler.function_name}"
-  lambda_function_arn     = "${module.lambda_service_scheduler.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.weekdays_at_7am.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.weekdays_at_7am.name}"
-
-  input = <<EOF
-{
-  "topic_arn": "${module.service_scheduler_topic.arn}",
-  "cluster": "${aws_ecs_cluster.services.name}",
-  "service": "${module.calm_adapter.service_name}",
-  "desired_count": 1
-}
-EOF
-}
-
 # Lambda for updating ECS service size
 
 module "lambda_update_ecs_service_size" {
@@ -288,7 +271,6 @@ module "lambda_dynamo_to_sns" {
     STREAM_TOPIC_MAP = <<EOF
       {
         "${aws_dynamodb_table.miro_table.stream_arn}": "${module.miro_transformer_topic.arn}",
-        "${aws_dynamodb_table.calm_table.stream_arn}": "${module.calm_transformer_topic.arn}"
       }
       EOF
   }
@@ -299,13 +281,6 @@ module "lambda_dynamo_to_sns" {
 module "trigger_dynamo_to_sns_miro" {
   source        = "./lambda/trigger_dynamo"
   stream_arn    = "${aws_dynamodb_table.miro_table.stream_arn}"
-  function_arn  = "${module.lambda_dynamo_to_sns.arn}"
-  function_role = "${module.lambda_dynamo_to_sns.role_name}"
-}
-
-module "trigger_dynamo_to_sns_calm" {
-  source        = "./lambda/trigger_dynamo"
-  stream_arn    = "${aws_dynamodb_table.calm_table.stream_arn}"
   function_arn  = "${module.lambda_dynamo_to_sns.arn}"
   function_role = "${module.lambda_dynamo_to_sns.role_name}"
 }

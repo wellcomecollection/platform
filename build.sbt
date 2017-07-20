@@ -16,10 +16,6 @@ lazy val common = project
   .enablePlugins(DockerComposePlugin)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
-lazy val calm_adapter = doSharedSetup(project)
-  .settings(Search.settings: _*)
-  .settings(libraryDependencies ++= Dependencies.calmAdapterDependencies)
-
 lazy val api = doSharedSetup(project)
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
@@ -40,7 +36,6 @@ lazy val reindexer = doSharedSetup(project)
 
 lazy val root = (project in file("."))
   .aggregate(common,
-             calm_adapter,
              api,
              ingestor,
              transformer,
