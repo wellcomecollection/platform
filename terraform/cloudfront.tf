@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "loris" {
 
   logging_config {
     include_cookies = false
-    bucket          = "cloudfront-logs"
+    bucket          = "wellcome-platform-cloudfront-logs"
     prefix          = "loris"
   }
 }
