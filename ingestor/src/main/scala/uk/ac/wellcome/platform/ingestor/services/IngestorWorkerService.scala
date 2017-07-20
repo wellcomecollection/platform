@@ -9,7 +9,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class IdMinterWorkerService @Inject()(
+class IngestorWorkerService @Inject()(
   identifiedWorkIndexer: IdentifiedWorkIndexer,
   reader: SQSReader,
   system: ActorSystem,

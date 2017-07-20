@@ -69,3 +69,8 @@ module "lambda_error_alarm" {
   source = "./sns"
   name   = "lambda_error_alarm"
 }
+
+module "terminal_failure_alarm" {
+  source = "./sns"
+  name   = "terminal_failure_alarm"
+}
