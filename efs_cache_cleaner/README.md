@@ -7,7 +7,7 @@ Because ECS instances have very little disk space, we use an EFS mount rather th
 However, EFS storage has a price – although it can grow to any size, it would be expensive to let it do so!
 This service deletes files from our EFS cache to keep our costs sustainable.
 
-Our caches are bounded by two configurable:
+Our caches are bounded by two parameters:
 
 *   **maximum age** -- if an item is in the cache but hasn't been accessed for more than 30 days, there isn't much value in keeping it in the cache.
     We can delete it, and re-fetch it the next time it's requested.
