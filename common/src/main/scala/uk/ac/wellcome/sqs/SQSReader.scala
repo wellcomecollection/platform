@@ -14,6 +14,9 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
 
+case class SQSReaderGracefulException(e: Exception)
+  extends Exception(e.getMessage)
+
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
   // SQS is not a FIFO queue so the order of arrival of messages does not necessarily reflect the order messages were sent in.
@@ -60,10 +63,16 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     Future.sequence(messages.map { message =>
       Future
         .successful(())
-        .flatMap(_ => process(message))
+        .flatMap(_ => {
+          info(s"Processing message ${message.getMessageId}")
+          process(message)
+        })
         .recover {
+          case e: SQSReaderGracefulException =>
+            info(s"Recoverable error processing message ${message.getMessageId}", e)
+            throw e
           case e: Throwable =>
-            error(s"Error processing message", e)
+            error(s"Unrecoverable error processing message ${message.getMessageId}", e)
             throw e
         }
         .flatMap(_ => deleteMessage(message))
@@ -76,10 +85,11 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
           new DeleteMessageRequest(sqsConfig.queueUrl,
                                    message.getReceiptHandle)
         )
+        info(s"Deleted message ${message.getMessageId}")
       }
     }.recover {
       case e: Throwable =>
-        error(s"Failed deleting message $message", e)
+        error(s"Failed deleting message ${message.getMessageId}", e)
         throw e
     }
 }
