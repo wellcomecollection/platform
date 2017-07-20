@@ -24,7 +24,7 @@ cache_cleaner-build: install-docker-build-deps
 	./scripts/build_cache_cleaner.py
 
 ## Deploy the image for the cache cleaner
-cache_cleaner-deploy: docker-build-cache_cleaner
+cache_cleaner-deploy: cache_cleaner-build
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
 
 
