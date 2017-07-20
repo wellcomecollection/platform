@@ -16,11 +16,12 @@ def delete(path):
 
     :param path: File to delete.
     """
-    print(f'Deleting file {path}')
     try:
         os.unlink(path)
     except PermissionError as err:
         print(f'Failed to delete {path}: {err}', file=sys.stderr)
+    else:
+        print(f'Deleted file {path}')
 
 
 def delete_directory_if_empty(path):
@@ -71,3 +72,22 @@ def get_files(path):
         for f in filenames:
             filename = os.path.join(root, f)
             yield File(filename, os.stat(filename).st_atime)
+
+
+def get_directories(path):
+    """
+    Generate the names of directories under the current directory, with the
+    deepest directories given first.
+
+    :param path: Directory to walk.
+    """
+    all_directories = [
+        os.path.join(root, directory)
+        for directory in dirnames
+        for root, dirnames, _ in os.walk(cache_path)
+    ]
+
+    return sorted(
+        all_directories,
+        key=lambda d: d.count(os.pathsep),
+        reverse=True)
