@@ -65,7 +65,6 @@ cache:
     - "project/target/resolution-cache"
     - "project/target/streams"
     - "api/target"
-    - "calm_adapter/target"
     - "common/target"
     - "id_minter/target"
     - "ingestor/target"
@@ -86,9 +85,6 @@ matrix:
     - env:
         - TASK=sbt-test-transformer
         - PROJECT=transformer
-    - env:
-        - TASK=sbt-test-calm_adapter
-        - PROJECT=calm_adapter
     - env:
         - TASK=sbt-test-ingestor
         - PROJECT=ingestor
