@@ -1,4 +1,4 @@
-# efs_cache_cleaner
+# cache_cleaner
 
 This service allows us to purge our EFS cache based on the age and size of items.
 
@@ -17,8 +17,6 @@ Our caches are bounded by two parameters:
     Items are deleted in order of last access time -- items which haven't been accessed very recently are deleted first.
 
 Both of these parameters are configurable.
-
-Although we're using EFS, a lot of the core logic could be repurposed to run against a conventional file system.
 
 ## Usage
 
