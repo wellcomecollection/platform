@@ -55,4 +55,6 @@ resource "aws_cloudfront_distribution" "loris" {
     bucket          = "wellcome-platform-cloudfront-logs"
     prefix          = "loris"
   }
+
+  depends_on = ["aws_s3_bucket.cloudfront-logs"]
 }
