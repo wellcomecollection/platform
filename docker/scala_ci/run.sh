@@ -7,15 +7,6 @@ set -o verbose
 # Set ivy cache location for sbt
 export JAVA_TOOL_OPTIONS="-Dsbt.ivy.home=/tmp/.ivy2/"
 
-function test_project()
-{
-    cd /data
-
-    sbt 'project '"$PROJECT"'' ';dockerComposeUp;test;dockerComposeStop'
-
-    cd -
-}
-
 function lint_project()
 {
     cd /data
@@ -25,9 +16,22 @@ function lint_project()
     cd -
 }
 
+function test_project()
+{
+    cd /data
+
+    sbt 'project '"$PROJECT"'' ';dockerComposeUp;test;dockerComposeStop'
+
+    cd -
+}
+
 function build_project()
 {
     /scripts/build_sbt_image.py --project="$PROJECT"
+}
+
+function deploy_project()
+{
     /scripts/deploy_docker_to_aws.py --project="$PROJECT" --infra-bucket="$INFRA_BUCKET"
 }
 
@@ -40,6 +44,12 @@ then
   lint_project
   test_project
   build_project
+elif [[ "$OP" == "deploy" ]]
+then
+  lint_project
+  test_project
+  build_project
+  deploy_project
 else
   echo "Unrecognised operation: $OP! Stopping."
   exit 1
