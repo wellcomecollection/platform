@@ -43,10 +43,8 @@ def main():
         except IndexError:
             raise RuntimeError("No files left to delete but cache is still too large")
 
-    for root, dirnames, _ in os.walk(cache_path):
-        for directory in dirnames:
-            path = os.path.join(root, directory)
-            os_utils.delete_directory_if_empty(path)
+    for directory in os_utils.get_directories(path):
+        os_utils.delete_directory_if_empty(path)
 
 
 if __name__ == "__main__":
