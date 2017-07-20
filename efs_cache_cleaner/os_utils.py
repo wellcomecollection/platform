@@ -32,12 +32,13 @@ def delete_directory_if_empty(path):
     """
     try:
         os.rmdir(path)
-        print(path)
     except OSError as err:
         if err.errno == errno.ENOTEMPTY:
             pass
         else:
             raise
+    else:
+        print(f'Deleted empty directory {path}')
 
 
 def get_directory_size(path):
@@ -61,6 +62,11 @@ def get_directory_size(path):
 
 
 def get_files(path):
+    """
+    Generate a series of File objects for files under a given directory.
+
+    :param path: Directory to walk.
+    """
     for root, _, filenames in os.walk(path):
         for f in filenames:
             filename = os.path.join(root, f)

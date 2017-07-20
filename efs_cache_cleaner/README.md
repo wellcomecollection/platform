@@ -19,3 +19,17 @@ Our caches are bounded by two parameters:
 Both of these parameters are configurable.
 
 Although we're using EFS, a lot of the core logic could be repurposed to run against a conventional file system.
+
+## Usage
+
+Build the Docker image containing the script:
+
+```console
+$ docker build -t efs_cache_cleaner .
+```
+
+To run the script, share the cache directory with the container and pass parameters as environment variables:
+
+```console
+$ docker run -v /path/to/cache:/data -e MAX_AGE=30 -e MAX_SIZE=5000000 efs_cache_cleaner
+```
