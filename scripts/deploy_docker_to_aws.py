@@ -40,7 +40,12 @@ if __name__ == '__main__':
 
     # Get the release ID (which is the image tag)
     release_file = os.path.join(ROOT, '.releases', project)
-    tag = open(release_file).read().strip()
+    release_file_exists = True
+    try:
+        tag = open(release_file).read().strip()
+    except FileNotFoundError:
+        release_file_exists = False
+        tag = 'latest'
     docker_image = '%s:%s' % (project, tag)
 
     # Look up the URI of our ECR repo -- this is needed for authentication
@@ -69,5 +74,6 @@ if __name__ == '__main__':
         docker_client.images.remove(image=renamed_image_tag)
 
     # Finally, upload the release ID string to S3.
-    print('*** Uploading release ID to S3')
-    bucket.upload_file(Filename=release_file, Key='releases/%s' % project)
+    if release_file_exists:
+        print('*** Uploading release ID to S3')
+        bucket.upload_file(Filename=release_file, Key='releases/%s' % project)

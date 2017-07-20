@@ -17,6 +17,14 @@ docker-build-terraform:
 docker-build-gatling:
 	docker build ./docker/gatling --tag gatling_ci
 
+## Build the image for the cache cleaner
+docker-build-cache_cleaner:
+	docker build ./efs_cache_cleaner --tag cache_cleaner
+
+## Build the image for the cache cleaner
+docker-deploy-cache_cleaner: docker-build-cache_cleaner
+	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
+
 
 install-docker-build-deps:
 	pip3 install --upgrade boto3 docker docopt

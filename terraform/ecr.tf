@@ -60,3 +60,8 @@ module "ecr_repository_loris" {
   source = "./ecr"
   name   = "loris"
 }
+
+module "ecr_repository_cache_cleaner" {
+  source = "./ecr"
+  name   = "cache_cleaner"
+}
