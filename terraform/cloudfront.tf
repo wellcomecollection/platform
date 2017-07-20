@@ -49,4 +49,10 @@ resource "aws_cloudfront_distribution" "loris" {
       restriction_type = "none"
     }
   }
+
+  logging_config {
+    include_cookies = false
+    bucket          = "cloudfront-logs"
+    prefix          = "loris"
+  }
 }

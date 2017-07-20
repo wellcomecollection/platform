@@ -72,3 +72,12 @@ resource "aws_s3_bucket" "mets-ingest" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket" "cloudfront-logs" {
+  bucket = "cloudfront-logs"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
