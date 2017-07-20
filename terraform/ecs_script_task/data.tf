@@ -7,7 +7,7 @@ data "template_file" "definition" {
     app_uri          = "${var.app_uri}"
     volume_name      = "${var.volume_name}"
     container_path   = "${var.container_path}"
-    environment_vars = "[${join(",", concat(var.service_vars,var.extra_vars))}]"
+    environment_vars = "[${join(",", var.env_vars)}]"
     cpu              = "${var.cpu}"
     memory           = "${var.memory}"
   }

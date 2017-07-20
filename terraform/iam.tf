@@ -47,3 +47,8 @@ module "ecs_grafana_iam" {
   source = "./ecs_iam"
   name   = "grafana"
 }
+
+module "ecs_cache_cleaner_iam" {
+  source = "./ecs_iam"
+  name   = "cache_cleaner"
+}
