@@ -106,6 +106,9 @@ matrix:
     - env:
         - TASK=nginx-build
         - PROJECT=docker/nginx
+    - env:
+        - TASK=cache_cleaner-build
+        - PROJECT=cache_cleaner
 
 script:
   - |
