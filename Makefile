@@ -77,9 +77,6 @@ sbt-test-common:
 sbt-test-api:
 	sbt 'project api' ';dockerComposeUp;test;dockerComposeStop'
 
-sbt-test-calm_adapter:
-	sbt 'project calm_adapter' ';dockerComposeUp;test;dockerComposeStop'
-
 sbt-test-id_minter:
 	sbt 'project id_minter' ';dockerComposeUp;test;dockerComposeStop'
 
@@ -97,7 +94,6 @@ sbt-test-transformer:
 
 sbt-test: \
 	sbt-test-api	\
-	sbt-test-calm_adapter	\
 	sbt-test-id_minter \
 	sbt-test-ingestor   \
 	sbt-test-miro_adapter \
@@ -108,9 +104,6 @@ sbt-test: \
 
 sbt-build-api: install-docker-build-deps sbt-test-api
 	./scripts/build_sbt_image.py --project=api
-
-sbt-build-calm_adapter: install-docker-build-deps sbt-test-calm_adapter
-	./scripts/build_sbt_image.py --project=calm_adapter
 
 sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
 	./scripts/build_sbt_image.py --project=id_minter
@@ -129,7 +122,6 @@ sbt-build-transformer: install-docker-build-deps sbt-test-transformer
 
 sbt-build: \
 	sbt-build-api	\
-	sbt-build-calm_adapter	\
 	sbt-build-id_minter \
 	sbt-build-ingestor   \
 	sbt-build-miro_adapter \
@@ -140,9 +132,6 @@ sbt-build: \
 
 sbt-deploy-api: sbt-build-api
 	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
-
-sbt-deploy-calm_adapter: sbt-build-calm_adapter
-	./scripts/deploy_docker_to_aws.py --project=calm_adapter --infra-bucket=$(INFRA_BUCKET)
 
 sbt-deploy-id_minter: sbt-build-id_minter
 	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
@@ -161,7 +150,6 @@ sbt-deploy-transformer: sbt-build-transformer
 
 sbt-deploy: \
 	sbt-deploy-api	\
-	sbt-deploy-calm_adapter	\
 	sbt-deploy-id_minter \
 	sbt-deploy-ingestor   \
 	sbt-deploy-miro_adapter \
@@ -214,7 +202,6 @@ check-format: format
 
 
 # Tasks for running gatling #
-
 
 ## Run JSON linting over the ontologies directory
 gatling-loris: docker-build-gatling

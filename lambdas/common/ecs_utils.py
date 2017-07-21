@@ -80,7 +80,6 @@ def clone_task_definition(client, task_definition):
 
     Returns the new task definition ARN.
     """
-
     resp = client.describe_task_definition(taskDefinition=task_definition)
     taskDefinition = resp['taskDefinition']
 
@@ -105,9 +104,7 @@ def _check_for_throttle_exception(f, *args, **kwargs):
         return f(*args, **kwargs)
     except ClientError as ex:
         if ex.response['Error']['Code'] == 'ThrottlingException':
-            print(
-                f'ThrottlingException: {ex}'
-            )
+            print(f'ThrottlingException: {ex}')
             raise EcsThrottleException(ex)
         else:
             raise
@@ -119,7 +116,6 @@ def get_service_arns(ecs_client, cluster_arn):
 
     Returns a list of service ARNS.
     """
-
     return _check_for_throttle_exception(
         ecs_client.list_services,
         cluster=_name_from_arn(cluster_arn)
@@ -132,7 +128,6 @@ def get_cluster_arns(ecs_client):
 
     Returns a list of cluster ARNs.
     """
-
     return _check_for_throttle_exception(
         ecs_client.list_clusters
     )
@@ -144,7 +139,6 @@ def describe_cluster(ecs_client, cluster_arn):
 
     Returns a cluster description.
     """
-
     return _check_for_throttle_exception(
         ecs_client.describe_clusters,
         clusters=[cluster_arn]
@@ -158,7 +152,6 @@ def describe_service(ecs_client, cluster_arn, service_arn):
 
     Returns a service description.
     """
-
     return _check_for_throttle_exception(
         ecs_client.describe_services,
         cluster=_name_from_arn(cluster_arn),
