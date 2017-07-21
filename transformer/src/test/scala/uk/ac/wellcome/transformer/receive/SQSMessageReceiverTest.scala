@@ -101,7 +101,7 @@ class SQSMessageReceiverTest
   private def mockSNSWriter = {
     val mockSNS = mock[SNSWriter]
     when(mockSNS.writeMessage(anyString(), any[Option[String]]))
-      .thenReturn(Future { PublishAttempt("1234") })
+      .thenReturn(Future { PublishAttempt(Right("1234")) })
     mockSNS
   }
 
