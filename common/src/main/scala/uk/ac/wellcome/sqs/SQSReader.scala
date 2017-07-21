@@ -68,15 +68,8 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
           process(message)
         })
         .recover {
-          case e: SQSReaderGracefulException =>
-            info(
-              s"Recoverable error processing message ${message.getMessageId}",
-              e)
-            throw e
           case e: Throwable =>
-            error(
-              s"Unrecoverable error processing message ${message.getMessageId}",
-              e)
+            error(s"Error processing message ${message.getMessageId}", e)
             throw e
         }
         .flatMap(_ => deleteMessage(message))

@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.receive
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{Transformable, Work}
+import uk.ac.wellcome.models.{ShouldNotTransformException, Transformable, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
@@ -34,7 +34,7 @@ class SQSMessageReceiver(
             publishMessage(work)
           case Failure(SQSReaderGracefulException(e)) =>
             info("Recoverable failure extracting unified item from record", e)
-            Future.successful(PublishAttempt("graceful-failure"))
+            Future.successful(PublishAttempt(Left("graceful-failure")))
           case Failure(e) =>
             info("Unrecoverable failure extracting unified item from record",
                  e)
@@ -49,7 +49,9 @@ class SQSMessageReceiver(
       info(s"Transformed record $transformed")
       transformed
     } recover {
-      // catch ShouldNotTransformException and rethrow as GracefulFailure
+      case e: ShouldNotTransformException =>
+        info("Work does not meet transform requirements.", e)
+        throw SQSReaderGracefulException(e)
       case e: Throwable =>
         // TODO: Send to dead letter queue or just error
         error("Failed to perform transform to unified item", e)

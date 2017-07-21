@@ -18,7 +18,7 @@ case class MiroTransformableData(
 )
 
 case class ShouldNotTransformException(message: String)
-    extends Exception(message)
+  extends Exception(message)
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
