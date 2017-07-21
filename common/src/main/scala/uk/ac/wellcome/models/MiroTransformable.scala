@@ -52,8 +52,6 @@ case class MiroTransformable(MiroID: String,
           "image_copyright_cleared field is not Y")
       }
 
-      //TODO: Ensure we throw ShouldNotTransformException in the correct places
-
       // In at least the V collection, many of the titles are truncated
       // versions of the description.  In this case, we drop the description
       // field and put the full description in the label instead.

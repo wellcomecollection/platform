@@ -17,6 +17,12 @@ trait TransformableSQSMessageUtils {
     sqsMessage(JsonUtil.toJson(calmTransformable).get)
   }
 
+  def createValidMiroSQSMessage(data: String): SQSMessage = {
+    val miroTransformable = MiroTransformable("id","collection", data)
+
+    sqsMessage(JsonUtil.toJson(miroTransformable).get)
+  }
+
   def createValidMiroRecord(MiroID: String,
                             MiroCollection: String,
                             data: String): SQSMessage = {
@@ -28,6 +34,6 @@ trait TransformableSQSMessageUtils {
   def createInvalidRecord: SQSMessage = sqsMessage("not a json string")
 
   private def sqsMessage(message: String) = {
-    SQSMessage(None, message, "test-calm_transformer_topic", "notification", "")
+    SQSMessage(None, message, "test_transformer_topic", "notification", "")
   }
 }
