@@ -14,7 +14,7 @@ resource "aws_autoscaling_schedule" "turn_off_monitoring" {
 
 resource "aws_autoscaling_schedule" "turn_on_monitoring" {
   scheduled_action_name  = "Turn on the monitoring cluster during working hours"
-  desired_capacity       = 1
+  desired_capacity       = "${module.services_cluster_asg.asg_desired}"
   max_size               = "${module.monitoring_cluster_asg.asg_max}"
   recurrence             = "0 08 * * 1-5"
   autoscaling_group_name = "${module.monitoring_cluster_asg.asg_name}"
@@ -36,7 +36,7 @@ resource "aws_autoscaling_schedule" "reduce_services" {
 
 resource "aws_autoscaling_schedule" "increase_services" {
   scheduled_action_name  = "Turn on the services cluster during working hours"
-  desired_capacity       = 2
+  desired_capacity       = "${module.services_cluster_asg.asg_desired}"
   max_size               = "${module.services_cluster_asg.asg_max}"
   recurrence             = "0 08 * * 1-5"
   autoscaling_group_name = "${module.services_cluster_asg.asg_name}"
