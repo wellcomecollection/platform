@@ -13,7 +13,7 @@ docker run \
     --net host \
     -v ~/.ivy2:/tmp/.ivy2 \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v $$(pwd):/data \
+    -v $(pwd):/data \
     -e PROJECT=$PROJECT \
     -e INFRA_BUCKET=$INFRA_BUCKET \
     -e OP=$OP \
