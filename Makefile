@@ -207,7 +207,6 @@ check-format: format
 
 # Tasks for running gatling #
 
-
 ## Run JSON linting over the ontologies directory
 gatling-loris: docker-build-gatling
 	docker run \
