@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 """
 Purge cache based on age of files and the size of the cache.
 
 Usage:
-  cache_cleaner.py --path=<PATH> --max-age=<MAX_AGE> --max-size=<MAX_SIZE>
+  cache_cleaner.py --path=<PATH> --max-age=<MAX_AGE> --max-size=<MAX_SIZE> [--force]
   cache_cleaner.py -h | --help
 
 Options:
@@ -12,6 +12,8 @@ Options:
   --path=<PATH>            Path of the cache to clean.
   --max-age=<MAX_AGE>      Delete files that are older than MAX_AGE days.
   --max-size=<MAX_SIZE>    Delete files until the cache size is less than MAX_SIZE Kbytes.
+  --force                  Actually delete the files.  Otherwise runs in a "dry run" mode,
+                           printing which files would be deleted without actually deleting.
 
 """
 
@@ -20,7 +22,7 @@ import time
 
 import docopt
 
-import os_utils
+import simulfs
 
 
 def main():
@@ -30,26 +32,25 @@ def main():
     max_age = int(args['--max-age']) * 24 * 60 * 60
     cache_path = args['--path']
     max_cache_size = int(args['--max-size'])
+    force = bool(args['--force'])
 
-    for path, last_access_time in os_utils.get_files(cache_path):
-        if now - last_access_time > max_age:
-            os_utils.delete(path)
+    fs = simulfs.SimulatedFS(cache_path)
 
-    all_files = list(os_utils.get_files(cache_path))
-    sorted_files = sorted(all_files, key=lambda x: x.access_time)
-    while os_utils.get_directory_size(cache_path) > max_cache_size:
-        try:
-            os_utils.delete(sorted_files.pop(0).path)
-        except IndexError:
-            break
+    # Start by deleting files that are older than a certain age.
+    print(f'*** Deleting files that are more than {max_age} days old')
+    for f in fs.files:
+        if now - f.last_access_time > max_age:
+            f.delete()
 
-    for directory in os_utils.get_directories(path):
-        os_utils.delete_directory_if_empty(path)
+    # If the size of the system is still too large, continue deleting
+    # files until we're under the limit.
+    files_by_size = sorted(fs.files, key=lambda f: f.last_access_time)
+    print(f'*** Deleting files to bring the cache under size {max_cache_size}')
+    while fs.size > max_cache_size:
+        next_to_delete = files_by_size.pop(0)
+        next_to_delete.delete()
 
-    if os_utils.get_directory_size(cache_path) > max_cache_size:
-        raise RuntimeError(
-            "No files left to delete but cache is still too large"
-        )
+    print(f'*** Cache clearing complete')
 
 
 if __name__ == "__main__":
