@@ -1,6 +1,11 @@
 # -*- encoding: utf-8 -*-
 
 import operator
+from botocore.exceptions import ClientError
+
+
+class EcsThrottleException(Exception):
+    pass
 
 
 def identify_cluster_by_app_name(client, app_name):
@@ -90,32 +95,42 @@ def clone_task_definition(client, task_definition):
     return new_task['taskDefinition']['taskDefinitionArn']
 
 
-def get_cluster_arns(client):
-    """
-    Extract the list of cluster ARNs in this account.
-
-    Returns a list of cluster ARNs.
-    """
-    response = client.list_clusters()
-
-    return [cluster_arn for cluster_arn in response['clusterArns']]
-
-
 def _name_from_arn(arn):
     return arn.split("/")[1]
 
 
-def get_service_arns(client, cluster_arn):
+def _check_for_throttle_exception(f, *args, **kwargs):
+    try:
+        return f(*args, **kwargs)
+    except ClientError as ex:
+        if ex.response['Error']['Code'] == 'ThrottlingException':
+            print(f'ThrottlingException: {ex}')
+            raise EcsThrottleException(ex)
+        else:
+            raise
+
+
+def get_service_arns(ecs_client, cluster_arn):
     """
     Given a cluster ARN, extracts the associated service ARNs.
 
     Returns a list of service ARNS.
     """
-    response = client.list_services(
+    return _check_for_throttle_exception(
+        ecs_client.list_services,
         cluster=_name_from_arn(cluster_arn)
     )
 
-    return response['serviceArns']
+
+def get_cluster_arns(ecs_client):
+    """
+    Extract the list of cluster ARNs in this account.
+
+    Returns a list of cluster ARNs.
+    """
+    return _check_for_throttle_exception(
+        ecs_client.list_clusters
+    )
 
 
 def describe_cluster(ecs_client, cluster_arn):
@@ -124,9 +139,10 @@ def describe_cluster(ecs_client, cluster_arn):
 
     Returns a cluster description.
     """
-    response = ecs_client.describe_clusters(clusters=[cluster_arn])
-
-    return response['clusters'][0]
+    return _check_for_throttle_exception(
+        ecs_client.describe_clusters,
+        clusters=[cluster_arn]
+    )
 
 
 def describe_service(ecs_client, cluster_arn, service_arn):
@@ -136,9 +152,8 @@ def describe_service(ecs_client, cluster_arn, service_arn):
 
     Returns a service description.
     """
-    response = ecs_client.describe_services(
+    return _check_for_throttle_exception(
+        ecs_client.describe_services,
         cluster=_name_from_arn(cluster_arn),
         services=[_name_from_arn(service_arn)]
     )
-
-    return response['services'][0]
