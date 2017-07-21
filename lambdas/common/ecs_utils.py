@@ -3,8 +3,10 @@
 import operator
 from botocore.exceptions import ClientError
 
+
 class EcsThrottleException(Exception):
     pass
+
 
 def identify_cluster_by_app_name(client, app_name):
     """
