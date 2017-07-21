@@ -15,7 +15,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
 
 case class SQSReaderGracefulException(e: Exception)
-  extends Exception(e.getMessage)
+    extends Exception(e.getMessage)
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
@@ -69,10 +69,14 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
         })
         .recover {
           case e: SQSReaderGracefulException =>
-            info(s"Recoverable error processing message ${message.getMessageId}", e)
+            info(
+              s"Recoverable error processing message ${message.getMessageId}",
+              e)
             throw e
           case e: Throwable =>
-            error(s"Unrecoverable error processing message ${message.getMessageId}", e)
+            error(
+              s"Unrecoverable error processing message ${message.getMessageId}",
+              e)
             throw e
         }
         .flatMap(_ => deleteMessage(message))

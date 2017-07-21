@@ -36,7 +36,8 @@ class SQSMessageReceiver(
             info("Recoverable failure extracting unified item from record", e)
             Future.successful(PublishAttempt("graceful-failure"))
           case Failure(e) =>
-            info("Unrecoverable failure extracting unified item from record", e)
+            info("Unrecoverable failure extracting unified item from record",
+                 e)
             Future.failed(e)
         }
       }
