@@ -9,7 +9,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
 
-case class PublishAttempt(id: Either[String,String])
+case class PublishAttempt(id: Either[Throwable,String])
 
 class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     extends Logging {
