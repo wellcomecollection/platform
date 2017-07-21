@@ -81,7 +81,7 @@ class SQSMessageReceiverTest
                          metricsSender)
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
-    whenReady(future.failed) { x =>
+    whenReady(future) { x =>
       x shouldBe a [SQSReaderGracefulException]
       x.asInstanceOf[SQSReaderGracefulException].e shouldBe a [JsonParseException]
     }
