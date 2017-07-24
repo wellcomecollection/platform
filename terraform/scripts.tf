@@ -11,6 +11,6 @@ module "loris_cache_cleaner" {
 
   env_vars = [
     "{\"name\": \"MAX_AGE\", \"value\": \"30\"}",
-    "{\"name\": \"MAX_SIZE\", \"value\": \"50000\"}",
+    "{\"name\": \"MAX_SIZE\", \"value\": \"10G\"}",
   ]
 }
