@@ -130,7 +130,7 @@ def get_cluster_arns(ecs_client):
     """
     return _check_for_throttle_exception(
         ecs_client.list_clusters
-    )
+    )['clusterArns']
 
 
 def describe_cluster(ecs_client, cluster_arn):
