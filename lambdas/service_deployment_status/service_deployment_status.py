@@ -16,7 +16,8 @@ from deployment_utils import (
     get_deployments_from_dynamo,
     put_deployment_in_dynamo,
     delete_deployment_in_dynamo,
-    update_deployment_in_dynamo
+    update_deployment_in_dynamo,
+    EcsThrottleException
 )
 
 
@@ -84,7 +85,12 @@ def main(event, _):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
-    current_deployments = get_deployments_from_ecs(ecs_client)
+    try:
+        current_deployments = get_deployments_from_ecs(ecs_client)
+    except EcsThrottleException:
+        # We do not wish to retry on throttle so fail gracefully
+        return
+
     last_deployments = get_deployments_from_dynamo(table)
     operations = compare_deployments(current_deployments, last_deployments)
 
