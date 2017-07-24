@@ -8,21 +8,40 @@ Usage:
   cache_cleaner.py -h | --help
 
 Options:
-  -h --help                Show this screen.
-  --path=<PATH>            Path of the cache to clean.
-  --max-age=<MAX_AGE>      Delete files that are older than MAX_AGE days.
-  --max-size=<MAX_SIZE>    Delete files until the cache size is less than MAX_SIZE Kbytes.
-  --force                  Actually delete the files.  Otherwise runs in a "dry run" mode,
-                           printing which files would be deleted without actually deleting.
+  -h --help                 Show this screen.
+  --path=<PATH>             Path of the cache to clean.
+  --max-age=<MAX_AGE>       Delete files that are older than MAX_AGE days.
+  --max-size=<MAX_SIZE>     Delete files until the cache size is less than MAX_SIZE Kbytes.
+                            Supports human-friendly options: 500M, 2G, 1T.
+  --force                   Actually delete the files.  Otherwise runs in a "dry run" mode,
+                            printing which files would be deleted without actually deleting.
 
 """
 
 import os
+import re
 import time
 
 import docopt
 
 import simulfs
+
+
+def parse_max_cache_size_arg(value):
+    m = re.match(r'([0-9]+)(K|M|G|T)', value)
+    if m is not None:
+        size = int(m.group(1))
+        suffix = m.group(2)
+        if suffix == 'K':
+            return size
+        elif suffix == 'M':
+            return size * 1024
+        elif suffix == 'G':
+            return size * 1024 * 1024
+        elif suffix == 'T':
+            return size * 1024 * 1024 * 1024
+    return int(value)
+
 
 
 def main():
@@ -31,7 +50,8 @@ def main():
     now = time.time()
     max_age = int(args['--max-age']) * 24 * 60 * 60
     cache_path = args['--path']
-    max_cache_size = int(args['--max-size'])
+    max_cache_size = parse_max_cache_size_arg(args['--max-size'])
+
     force = bool(args['--force'])
     if force:
         os.environ['X-RUN-CACHE-CLEANER'] = 'True'
@@ -47,7 +67,7 @@ def main():
     # If the size of the system is still too large, continue deleting
     # files until we're under the limit.
     files_by_size = sorted(fs.files, key=lambda f: f.last_access_time)
-    print(f'*** Deleting files to bring the cache under size {max_cache_size}')
+    print(f'*** Deleting files to bring the cache under {max_cache_size} Kbytes')
     while fs.size > max_cache_size:
         next_to_delete = files_by_size.pop(0)
         next_to_delete.delete()
