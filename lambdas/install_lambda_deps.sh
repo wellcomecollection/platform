@@ -24,7 +24,7 @@ build_lambda() {
   if [[ -f "$lambda_dir/requirements.txt" ]]
   then
     echo "*** Found a requirements.txt"
-    pip3 install --upgrade --requirement "$lambda_dir/requirements.txt" --target "$lambda_dir"
+    pip3 install --requirement "$lambda_dir/requirements.txt" --target "$lambda_dir" >> pip_install.log
   else
     echo "*** No requirements.txt found, skipping"
   fi
@@ -32,7 +32,7 @@ build_lambda() {
   if [[ -f "$COMMON_LIB/requirements.txt" ]]
   then
     echo "*** Found a requirements.txt in common"
-    pip3 install --upgrade --requirement "$COMMON_LIB/requirements.txt" --target "$lambda_dir"
+    pip3 install --requirement "$COMMON_LIB/requirements.txt" --target "$lambda_dir" >> pip_install.log
   else
     echo "*** No common requirements.txt, skipping"
   fi
