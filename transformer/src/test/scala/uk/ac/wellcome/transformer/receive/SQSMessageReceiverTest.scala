@@ -9,9 +9,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.{ShouldNotTransformException, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.transformer.parsers.CalmParser
+import uk.ac.wellcome.transformer.parsers.{CalmParser, MiroParser}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -94,13 +94,16 @@ class SQSMessageReceiverTest
     "should return a successful future if it meets a ShouldNotTransformException") {
     val recordReceiver =
       new SQSMessageReceiver(mockSNSWriter,
-        new CalmParser,
+        new MiroParser,
         metricsSender)
 
     val future = recordReceiver.receiveMessage(failingTransformMiroSqsMessage)
 
     whenReady(future) { x =>
-      x.id.left.get shouldBe a [JsonParseException]
+      // We expect a `Left` here as the Transform failed
+      val outerException = x.id.left.get
+
+      outerException shouldBe a [ShouldNotTransformException]
     }
   }
 
