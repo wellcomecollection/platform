@@ -17,7 +17,7 @@ case class MiroTransformableData(
   @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String]
 )
 
-case class shouldNotTransformException(message: String)
+case class ShouldNotTransformException(message: String)
     extends Exception(message)
 
 case class MiroTransformable(MiroID: String,
@@ -45,10 +45,10 @@ case class MiroTransformable(MiroID: String,
       // this image in the public API.
       // See https://github.com/wellcometrust/platform-api/issues/356
       if (miroData.cleared.getOrElse("N") != "Y") {
-        throw new shouldNotTransformException("image_cleared field is not Y")
+        throw new ShouldNotTransformException("image_cleared field is not Y")
       }
       if (miroData.copyright_cleared.getOrElse("N") != "Y") {
-        throw new shouldNotTransformException(
+        throw new ShouldNotTransformException(
           "image_copyright_cleared field is not Y")
       }
 
