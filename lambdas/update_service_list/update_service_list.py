@@ -13,11 +13,13 @@ import os
 
 import boto3
 
-from ecs_utils import \
-    get_cluster_arns, \
-    get_service_arns, \
-    describe_service, \
-    describe_cluster
+from ecs_utils import (
+    get_cluster_arns,
+    get_service_arns,
+    describe_service,
+    describe_cluster,
+    EcsThrottleException
+)
 
 
 def _create_event_dict(event):
@@ -127,9 +129,13 @@ def main(event, _):
         [create_boto_client('ecs', role_arn) for role_arn in assumable_roles]
     ) + [boto3.client('ecs')]
 
-    cluster_lists = (
-        [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
-    )
+    try:
+        cluster_lists = [
+            get_cluster_list(ecs_client) for ecs_client in ecs_clients
+        ]
+    except EcsThrottleException:
+        # We do not wish to retry on throttle so fail gracefully
+        return
 
     cluster_list = [item for sublist in cluster_lists for item in sublist]
 
