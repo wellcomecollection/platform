@@ -86,7 +86,8 @@ case class MiroTransformable(MiroID: String,
         val candidateDescription = miroData.description.get
           .replace(candidateLabel, "")
           .trim
-        if (candidateDescription.length > 0) Some(candidateDescription) else None
+        if (candidateDescription.length > 0) Some(candidateDescription)
+        else None
       } else {
         miroData.description match {
           case Some(d) => if (d.trim.length > 0) Some(d) else None
