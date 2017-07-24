@@ -52,30 +52,47 @@ case class MiroTransformable(MiroID: String,
           "image_copyright_cleared field is not Y")
       }
 
-      // In at least the V collection, many of the titles are truncated
-      // versions of the description.  In this case, we drop the description
-      // field and put the full description in the label instead.
-      val titleIsTruncatedDescription = miroData.description
-        .getOrElse("")
-        .startsWith(miroData.title.get)
-
-      val useDescriptionAsTitle = (titleIsTruncatedDescription &&
-        MiroCollection == "Images-V")
-
-      // <image_title>: the Short Description.  This maps to our property
-      // "label".
+      // Populate the label and description.  The rules are as follows:
       //
-      // Every image in the V collection that has image_cleared == Y has a
+      //  1.  For V images, if the first line of <image_image_desc> is a
+      //      prefix of <image_title>, we use that instead of the title, and
+      //      drop the first line of the description.
+      //      If it's a single-line description, drop the description entirely.
+      //  2.  Otherwise, use the <image_title> ("short description") and
+      //      <image_image_desc> ("description") fields.
+      //
+      // In at least the V collection, many of the titles are truncated forms
+      // of the description field -- and we don't want to repeat information
+      // in the public API.
+      //
+      // Note: Every image in the V collection that has image_cleared == Y has
       // non-empty title.  This is _not_ true for the MIRO records in general.
       // TODO: Work out what label to use for those records.
+      //
+      val candidateLabel = miroData.description.getOrElse("").split("\n").head
+      val titleIsTruncatedDescription = candidateLabel
+        .startsWith(miroData.title.get)
+
+      val useDescriptionAsLabel = (titleIsTruncatedDescription &&
+        MiroCollection == "Images-V")
+
       val label =
-        if (useDescriptionAsTitle) miroData.description.get
+        if (useDescriptionAsLabel) candidateLabel
         else miroData.title.get
 
-      // <image_image_desc>: the Description, which maps to our property
-      // "description".
-      val description =
-        if (useDescriptionAsTitle) None else miroData.description
+      val description = if (useDescriptionAsLabel) {
+        // Remove the first line from the description, and trim any extra
+        // whitespace (leading newlines)
+        val candidateDescription = miroData.description.get
+          .replace(candidateLabel, "")
+          .trim
+        if (candidateDescription.length > 0) Some(candidateDescription) else None
+      } else {
+        miroData.description match {
+          case Some(d) => if (d.trim.length > 0) Some(d) else None
+          case None => None
+        }
+      }
 
       // <image_creator>: the Creator, which maps to our property "hasCreator"
       val creators: List[Agent] = miroData.creator match {
