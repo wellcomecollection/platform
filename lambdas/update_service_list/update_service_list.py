@@ -130,9 +130,9 @@ def main(event, _):
     ) + [boto3.client('ecs')]
 
     try:
-        cluster_lists = (
-            [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
-        )
+        cluster_lists = [
+            get_cluster_list(ecs_client) for ecs_client in ecs_clients
+        ]
     except EcsThrottleException:
         # We do not wish to retry on throttle so fail gracefully
         return
