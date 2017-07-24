@@ -34,47 +34,51 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
 
   it("""
     should use the image_title field as the label on a V image if the
-    image_title is not a prefix of image_description
+    image_title is not a prefix of image_image_desc
   """) {
     val title = "A tome about a turtle"
+    val description = "A story of a starfish"
     transformRecordAndCheckLabel(
       data = s"""
         "image_title": "$title",
-        "image_description": "A story of a starfish"
+        "image_image_desc": "$description"
       """,
       expectedLabel = title,
+      expectedDescription = Some(description),
       miroCollection = "Images-V"
     )
   }
 
   it("""
-    should use the first line of image_description as the label on a V image
-    if image_title is a prefix of said first line (one-line description)
+    should use the first line of image_image_desc as the label on a V image
+    if image_title is a prefix of said first line, and omit a description
+    entirely (one-line description)
   """) {
     val title = "An icon of an iguana"
     val description = "An icon of an iguana is an intriguing image"
     transformRecordAndCheckLabel(
       data = s"""
         "image_title": "$title",
-        "image_description": "$description"
+        "image_image_desc": "$description"
       """,
       expectedLabel = description,
+      expectedDescription = None,
       miroCollection = "Images-V"
     )
   }
 
   it("""
-    should use the first line of image_description as the label on a V image
+    should use the first line of image_image_desc as the label on a V image
     if image_title is a prefix of said first line (multi-line description)
   """) {
     val title = "An icon of an iguana"
     val longTitle = "An icon of an iguana is an intriguing image"
     val descriptionBody = "Woodcut, by A.R. Tist.  Italian.  1897."
-    val description = s"$longTitle\n\n$descriptionBody"
+    val description = s"$longTitle\\n\\n$descriptionBody"
     transformRecordAndCheckLabel(
       data = s"""
         "image_title": "$title",
-        "image_description": "$description"
+        "image_image_desc": "$description"
       """,
       expectedLabel = longTitle,
       expectedDescription = Some(descriptionBody),
@@ -100,10 +104,7 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
 
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get.label shouldBe expectedLabel
-    expectedDescription match {
-      case Some(d) => miroTransformable.transform.get.description shouldBe expectedDescription
-      case None => {}
-    }
+    miroTransformable.transform.get.description shouldBe expectedDescription
   }
 }
 
