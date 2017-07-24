@@ -22,28 +22,26 @@ class MiroTransformerFeatureTest
     "aws.metrics.namespace" -> "miro-transformer"
   )
 
-  it(
-    "should poll the Dynamo stream for Miro records, transform into Work instances, and push them into the id_minter SNS topic") {
+  it("""
+      should poll the Dynamo stream for Miro records, transform into Work
+      instances, and push them into the id_minter SNS topic where those
+      messages are transformable
+      """) {
+
     val miroID = "M0000001"
     val label = "A guide for a giraffe"
-    sendMiroImageToSQS(miroID, label)
+
+    val secondMiroID = "M0000002"
+    val secondLabel = "A song about a snake"
+
+    sendMiroImageToSQS(miroID, shouldNotTransformMessage(label))
+    sendMiroImageToSQS(secondMiroID, shouldTransformMessage(secondLabel))
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size (1)
-      assertSNSMessageContains(snsMessages.head, miroID, label)
-    }
 
-    val secondMiroID = "M0000002"
-    val secondLabel = "A song about a snake"
-    sendMiroImageToSQS(secondMiroID, secondLabel)
-
-    eventually {
-      val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size (2)
-
-      assertSNSMessageContains(snsMessages.head, miroID, label)
-      assertSNSMessageContains(snsMessages.tail.head,
+      assertSNSMessageContains(snsMessages.head,
                                secondMiroID,
                                secondLabel)
     }
@@ -57,16 +55,27 @@ class MiroTransformerFeatureTest
     parsedWork.label shouldBe imageTitle
   }
 
-  private def sendMiroImageToSQS(miroID: String, imageTitle: String) = {
-    val miroTransformable = MiroTransformable(miroID,
-      "Images-A",
-      s"""{
+
+  def shouldTransformMessage(imageTitle: String) = s"""{
           "image_title": "$imageTitle",
           "image_cleared": "Y",
           "image_copyright_cleared": "Y"
-        }""")
+        }"""
 
-    val sqsMessage = SQSMessage(Some("subject"),
+  def shouldNotTransformMessage(imageTitle: String) = s"""{
+          "image_title": "$imageTitle",
+          "image_cleared": "N",
+          "image_copyright_cleared": "N"
+        }"""
+
+  private def sendMiroImageToSQS(miroID: String, message: String) = {
+    val miroTransformable = MiroTransformable(
+      miroID,
+      "Images-A",
+      message)
+
+    val sqsMessage = SQSMessage(
+      Some("subject"),
       JsonUtil.toJson(miroTransformable).get,
       "topic",
       "messageType",
