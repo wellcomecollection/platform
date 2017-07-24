@@ -33,11 +33,13 @@ def main():
     cache_path = args['--path']
     max_cache_size = int(args['--max-size'])
     force = bool(args['--force'])
+    if force:
+        os.environ['X-RUN-CACHE-CLEANER'] = 'True'
 
     fs = simulfs.SimulatedFS(cache_path)
 
     # Start by deleting files that are older than a certain age.
-    print(f'*** Deleting files that are more than {max_age} days old')
+    print(f'*** Deleting files that are more than {max_age} seconds old')
     for f in fs.files:
         if now - f.last_access_time > max_age:
             f.delete()
