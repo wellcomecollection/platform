@@ -56,6 +56,7 @@ def main():
     if force:
         os.environ['X-RUN-CACHE-CLEANER'] = 'True'
 
+    print(f'*** Walking filesystem for {cache_path}')
     fs = simulfs.SimulatedFS(cache_path)
 
     # Start by deleting files that are older than a certain age.
