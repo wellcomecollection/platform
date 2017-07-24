@@ -68,13 +68,11 @@ def test_get_service_arns():
     ecs_client = boto3.client('ecs')
     _, service_arn, cluster_arn = ecs_cluster(ecs_client)
 
-    get_cluster_arns_response = (
+    actual_service_list = (
         ecs_utils.get_service_arns(ecs_client, cluster_arn)
     )
 
-    actual_cluster_list = get_cluster_arns_response['serviceArns']
-
-    assert actual_cluster_list == [service_arn]
+    assert actual_service_list == [service_arn]
 
 
 def test_get_service_arns_throws_EcsThrottleException():

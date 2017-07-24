@@ -119,7 +119,7 @@ def get_service_arns(ecs_client, cluster_arn):
     return _check_for_throttle_exception(
         ecs_client.list_services,
         cluster=_name_from_arn(cluster_arn)
-    )
+    )['serviceArns']
 
 
 def get_cluster_arns(ecs_client):
