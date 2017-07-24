@@ -44,9 +44,7 @@ def test_get_cluster_arns():
     ecs_client = boto3.client('ecs')
     _, _, cluster_arn = ecs_cluster(ecs_client)
 
-    get_cluster_arns_response = ecs_utils.get_cluster_arns(ecs_client)
-
-    actual_cluster_list = get_cluster_arns_response['clusterArns']
+    actual_cluster_list = ecs_utils.get_cluster_arns(ecs_client)
 
     assert actual_cluster_list == [cluster_arn]
 
