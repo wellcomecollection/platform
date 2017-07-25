@@ -29,6 +29,8 @@ module "task" {
   app_uri          = "${var.app_uri}"
   nginx_uri        = "${var.nginx_uri}"
   template_name    = "${var.template_name}"
+  cpu              = "${var.cpu}"
+  memory           = "${var.memory}"
 
   primary_container_port   = "${var.primary_container_port}"
   secondary_container_port = "${var.secondary_container_port}"

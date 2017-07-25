@@ -22,6 +22,8 @@ module "miro_reindexer" {
   healthcheck_path   = "/miro_reindexer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/miro_reindexer.ini"
+  cpu                = 256
+  memory             = 1024
 
   desired_count = "0"
 
@@ -51,6 +53,8 @@ module "ingestor" {
   healthcheck_path   = "/ingestor/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/ingestor.ini"
+  cpu                = 256
+  memory             = 1024
 
   config_vars = {
     es_host           = "${data.template_file.es_cluster_host.rendered}"
@@ -85,6 +89,8 @@ module "transformer" {
   healthcheck_path   = "/transformer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/transformer.ini"
+  cpu                = 256
+  memory             = 1024
 
   config_vars = {
     sns_arn              = "${module.id_minter_topic.arn}"
@@ -113,6 +119,8 @@ module "id_minter" {
   healthcheck_path   = "/id_minter/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/id_minter.ini"
+  cpu                = 256
+  memory             = 1024
 
   config_vars = {
     rds_database_name   = "${module.identifiers_rds_cluster.database_name}"

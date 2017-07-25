@@ -13,5 +13,8 @@ data "template_file" "definition" {
     volume_name              = "${var.volume_name}"
     container_path           = "${var.container_path}"
     environment_vars         = "[${join(",", concat(var.service_vars,var.extra_vars))}]"
+
+    cpu    = "${var.cpu}"
+    memory = "${var.memory}"
   }
 }
