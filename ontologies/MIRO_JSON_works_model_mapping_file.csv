@@ -33,10 +33,4 @@ label
 type: Period
 startDate
 endDate","<image_pub_date>, <image_pub_date_from>, <image_pub_date_to>",,,
-Not MIRO,Work,,,items,creates new item instance with id,,,
-Admin,Item,Restrictions on Use,Y,"license
-url
-label","<image_use_restrictions> or write cc-by for all v images?
-URL = https://creativecommons.org/licenses/by/4.0/
-label = Copyrighted work available under Creative Commons Attribution only licence CC BY 4.0
-",,,
+
