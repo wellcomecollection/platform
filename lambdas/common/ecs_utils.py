@@ -142,7 +142,7 @@ def describe_cluster(ecs_client, cluster_arn):
     return _check_for_throttle_exception(
         ecs_client.describe_clusters,
         clusters=[cluster_arn]
-    )
+    )['clusters'][0]
 
 
 def describe_service(ecs_client, cluster_arn, service_arn):
@@ -156,4 +156,4 @@ def describe_service(ecs_client, cluster_arn, service_arn):
         ecs_client.describe_services,
         cluster=_name_from_arn(cluster_arn),
         services=[_name_from_arn(service_arn)]
-    )
+    )['services'][0]
