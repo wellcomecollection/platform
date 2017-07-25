@@ -1,0 +1,57 @@
+Area,Relationship from..,Field in MIRO,Picklist etc?,JSON mapping and structure,XML tag to map to,,,
+Not MIRO,Work,,,workType,Fixed value “Image”,,,
+Catalogue 1,Work,Prefix,Y,"identifier
+micr-image-number
+value = <image_no_calc>","concatenate to form <image_no_calc>, and identical <image_iap_image_no>",,,
+Catalogue 1,Work,Short descr.,,title,<image_title>,,,
+Catalogue 1,Work,Creation date,,"createdDate
+label
+type: Period
+startDate
+endDate","<image_artwork_date>, <image_artwork_date_to>, <image_artwork_date_from>",,,
+Library,Work,Technique,,"genre
+label
+type: Genre
+","<image_lc_genre> and <image_technique> and <image_technique_note>
+",,,
+Catalogue 1,Work,Creator,Link to authority client,"creator
+label
+no type",<image_creator>,,,
+Catalogue 1,Work,Secondary creator,Link to authority client,"creator
+label
+no type",<image_creator_secondary>,,,
+Catalogue 1,Work,Description of image content,,description,<image_image_desc> if not there <image_image_desc_academic>,,,
+Catalogue 2,Work,Lettering,,lettering,<image_supp_lettering>,,,
+Publisher,Work,,,"publishers
+label
+no type",<image_pub_publisher>,,,
+Place of publication,Work,,,"placeOfPublication
+label
+type: Place",<image_pub_place>,,,
+Date of publication,Work,,,"publicationDate
+label
+type: Period
+startDate
+endDate","<image_pub_date>, <image_pub_date_from>, <image_pub_date_to>",,,
+Photosoft,Work,Caption Field,,,<image_psoft_caption_fieldname>,,,
+Photosoft,Work,Caption,,,<image_psoft_caption>,,,
+Subjects,Work,Names,Link to authority client,"subject
+label
+concept scheme","<image_subject_names>, <image_subject_names_id>",,,
+Subjects,Work,Supplementary keywords,Y,keywords,<image_keywords>,,,
+Subjects,Work,LCSH Place,,subject,<image_lcsh_place>,,,
+MeSH/LoC,Work,MeSH,Link to authority client,subject,"<image_mesh>, <image_mesh_th_h> and <image_mesh_th_i>; <image_mesh> shows the concept as a word, whilst the other two are both are drawn from information in the MeSH browser, where <image_mesh_th_h> represents the Tree number of the concept and <image_mesh_th_i> its unique ID.",,,
+MeSH/LoC,Work,LCSH,,subject,<image_loc>,,,
+Not MIRO,Work,,,items,creates new item instance with id,,,
+Admin,Item,Restrictions on Use,Y,"license
+url
+label","<image_use_restrictions> or write cc-by for all v images?
+URL = https://creativecommons.org/licenses/by/4.0/
+label = Copyrighted work available under Creative Commons Attribution only licence CC BY 4.0
+",,,
+Admin,Item,Restrictions on Access,Y,type of people who can see it?,<image_access_restrictions>,,,
+Admin,Item,Credit,,creditStatement,<image_credit_line>,,,
+Admin,Item,Copyright Cleared,Y,access status,<image_copyright_cleared>,,,
+Admin,Item,Suitable for general use,Y,access status,<image_general_use>,,,
+,,,,,,,,
+,,,,,,,,
