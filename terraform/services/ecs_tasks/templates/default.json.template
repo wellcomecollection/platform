@@ -21,10 +21,10 @@
     }
   },
   {
-    "cpu": 512,
+    "cpu": ${cpu},
     "essential": true,
     "image": "${app_uri}",
-    "memory": 2048,
+    "memory": ${memory},
     "name": "app",
     "environment": ${environment_vars},
     "portMappings": [

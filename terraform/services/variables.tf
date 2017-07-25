@@ -128,3 +128,13 @@ variable "server_error_alarm_topic_arn" {
 variable "client_error_alarm_topic_arn" {
   description = "ARN of the topic where to send notification for 4xx ALB state"
 }
+
+variable "memory" {
+  description = "How much memory to allocate to the app"
+  default     = 2048
+}
+
+variable "cpu" {
+  description = "How much CPU to allocate to the app"
+  default     = 512
+}
