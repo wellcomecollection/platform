@@ -303,6 +303,21 @@ class MiroTransformableTest extends FunSpec with Matchers {
     work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
+  it(
+    "should correct HTML-encoded entities in the input JSON") {
+    val work = transformMiroRecord(
+      data = s"""{
+        "image_title": "A caf&#233; for cats",
+        "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"],
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y"
+      }"""
+    )
+
+    work.label shouldBe "A café for cats"
+    work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
+  }
+
   it("should not pass through records with a missing image_cleared field") {
     assertTransformMiroRecordFails(data = """{
       "image_title": "Missives on museums",
