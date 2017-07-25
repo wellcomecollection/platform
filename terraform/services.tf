@@ -23,7 +23,7 @@ module "miro_reindexer" {
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/miro_reindexer.ini"
 
-  cpu    = 256
+  cpu    = 512
   memory = 1024
 
   desired_count = "0"

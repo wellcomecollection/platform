@@ -2,7 +2,7 @@
   The monitoring cluster isn't accessible outside the office, so running it
   outside working hours is just wasting money.  Have it turn itself off when
   we're not working.
-*/
+
 
 resource "aws_autoscaling_schedule" "turn_off_monitoring" {
   scheduled_action_name  = "Turn off the monitoring cluster outside working hours"
@@ -20,11 +20,12 @@ resource "aws_autoscaling_schedule" "turn_on_monitoring" {
   autoscaling_group_name = "${module.monitoring_cluster_asg.asg_name}"
 }
 
+*/
 /*
   The services cluster needs extra capacity when we're doing deployments,
   but deployments usually only happen during working hours.  Reduce the slack
   when we're not working.
-*/
+
 
 resource "aws_autoscaling_schedule" "reduce_services" {
   scheduled_action_name  = "Turn off the services cluster outside working hours"
@@ -41,3 +42,6 @@ resource "aws_autoscaling_schedule" "increase_services" {
   recurrence             = "0 08 * * 1-5"
   autoscaling_group_name = "${module.services_cluster_asg.asg_name}"
 }
+
+*/
+
