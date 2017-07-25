@@ -99,7 +99,7 @@ def test_describe_cluster():
     )
 
     actual_cluster_arn = (
-        actual_cluster_description['clusters'][0]['clusterArn']
+        actual_cluster_description['clusterArn']
     )
 
     assert actual_cluster_arn == cluster_arn
@@ -130,7 +130,7 @@ def test_describe_service():
     )
 
     actual_service_arn = (
-        actual_service_description['services'][0]['serviceArn']
+        actual_service_description['serviceArn']
     )
 
     assert actual_service_arn == service_arn
