@@ -69,3 +69,6 @@ variable "client_error_alarm_topic_arn" {
 variable "loadbalancer_cloudwatch_id" {
   description = "LoadBalancer ARN Suffix"
 }
+
+variable "deployment_minimum_healthy_percent" {}
+variable "deployment_maximum_percent" {}
