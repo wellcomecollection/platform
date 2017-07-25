@@ -4,13 +4,7 @@
   "type": "Work",
   "thumbnail":{
 	"id": "https://wellcomelibrary.org/iiif/b28480351/imageanno/b28gh7z4n.jpg" , 
-	"type": "Image" , 
-    "service":
-      {
-	  "id": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
-	  "label": "IIIF Image API" ,
-	  "profile": "http://iiif.io/api/image/2/level2.json" 
-      }
+	"type": "Image" 
    } ,
   "identifiers": 
     [
