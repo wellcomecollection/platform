@@ -2,6 +2,113 @@ package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
 
+
+/** Tests that the Miro transformer extracts the "label" field correctly.
+ *
+ *  The rules around this heuristic are somewhat fiddly, and we need to be
+ *  careful that we're extracting the right fields from the Miro metadata.
+ */
+class MiroTransformableLabelTest extends FunSpec with Matchers {
+
+  it("should use the image_title field on non-V records") {
+    val title = "A picture of a parrot"
+    transformRecordAndCheckLabel(
+      data = s""""image_title": "$title"""",
+      expectedLabel = title,
+      miroCollection = "Images-A"
+    )
+  }
+
+
+  it("""
+    should use the title field in the V collection if the description field
+    is absent
+  """) {
+    val title = "A limerick about a lemming"
+    transformRecordAndCheckLabel(
+      data = s""""image_title": "$title"""",
+      expectedLabel = title,
+      miroCollection = "Images-V"
+    )
+  }
+
+  it("""
+    should use the image_title field as the label on a V image if the
+    image_title is not a prefix of image_image_desc
+  """) {
+    val title = "A tome about a turtle"
+    val description = "A story of a starfish"
+    transformRecordAndCheckLabel(
+      data = s"""
+        "image_title": "$title",
+        "image_image_desc": "$description"
+      """,
+      expectedLabel = title,
+      expectedDescription = Some(description),
+      miroCollection = "Images-V"
+    )
+  }
+
+  it("""
+    should use the first line of image_image_desc as the label on a V image
+    if image_title is a prefix of said first line, and omit a description
+    entirely (one-line description)
+  """) {
+    val title = "An icon of an iguana"
+    val description = "An icon of an iguana is an intriguing image"
+    transformRecordAndCheckLabel(
+      data = s"""
+        "image_title": "$title",
+        "image_image_desc": "$description"
+      """,
+      expectedLabel = description,
+      expectedDescription = None,
+      miroCollection = "Images-V"
+    )
+  }
+
+  it("""
+    should use the first line of image_image_desc as the label on a V image
+    if image_title is a prefix of said first line (multi-line description)
+  """) {
+    val title = "An icon of an iguana"
+    val longTitle = "An icon of an iguana is an intriguing image"
+    val descriptionBody = "Woodcut, by A.R. Tist.  Italian.  1897."
+    val description = s"$longTitle\\n\\n$descriptionBody"
+    transformRecordAndCheckLabel(
+      data = s"""
+        "image_title": "$title",
+        "image_image_desc": "$description"
+      """,
+      expectedLabel = longTitle,
+      expectedDescription = Some(descriptionBody),
+      miroCollection = "Images-V"
+    )
+  }
+
+  private def transformRecordAndCheckLabel(
+    data: String,
+    expectedLabel: String,
+    expectedDescription: Option[String] = None,
+    miroCollection: String = "TestCollection"
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = "M0000001",
+      MiroCollection = miroCollection,
+      data = s"""{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        $data
+      }"""
+    )
+
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get.label shouldBe expectedLabel
+    miroTransformable.transform.get.description shouldBe expectedDescription
+  }
+}
+
+
 class MiroTransformableTest extends FunSpec with Matchers {
 
   it("should throw an error if there isn't a title field") {
@@ -15,60 +122,6 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val miroID = "M0000005_test"
     val work = transformMiroRecord(miroID = miroID)
     work.identifiers shouldBe List(SourceIdentifier("Miro", "MiroID", miroID))
-  }
-
-  it("should pass through the image_title to the label field") {
-    val title = "A picture of a parrot"
-    val work = transformMiroRecord(data = s"""{
-      "image_title": "$title",
-      "image_cleared": "Y",
-      "image_copyright_cleared": "Y"
-    }""")
-    work.label shouldBe title
-  }
-
-  it("should use the description field for label in the V collection") {
-    val title = "A falsehood about a ferret"
-    val description = "A falsehood about a ferret could be frightful"
-    val work = transformMiroRecord(
-      miroCollection = "Images-V",
-      data = s"""{
-        "image_title": "$title",
-        "image_image_desc": "$description",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
-    )
-    work.label shouldBe description
-  }
-
-  it("should fall back to the label field in the V collection if the description field is missing") {
-    val title = "A missive about a mouse"
-    val work = transformMiroRecord(
-      miroCollection = "Images-V",
-      data = s"""{
-        "image_title": "$title",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
-    )
-    work.label shouldBe title
-  }
-
-  it("should only use description as label in the V collection if the title is a prefix of the description") {
-    val title = "A prefix of a parrot"
-    val description = "A suffix to a snake"
-    val work = transformMiroRecord(
-      miroCollection = "Images-V",
-      data = s"""{
-        "image_title": "$title",
-        "image_image_desc": "$description",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
-    )
-    work.label shouldBe title
-    work.description.get shouldBe description
   }
 
   it("should have an empty list if no image_creator field is present") {
