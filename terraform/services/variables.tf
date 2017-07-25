@@ -138,3 +138,11 @@ variable "cpu" {
   description = "How much CPU to allocate to the app"
   default     = 512
 }
+
+variable "deployment_minimum_healthy_percent" {
+  default = "100"
+}
+
+variable "deployment_maximum_percent" {
+  default = "200"
+}

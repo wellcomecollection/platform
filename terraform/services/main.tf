@@ -18,6 +18,9 @@ module "service" {
   client_error_alarm_topic_arn = "${var.client_error_alarm_topic_arn}"
   server_error_alarm_topic_arn = "${var.server_error_alarm_topic_arn}"
   loadbalancer_cloudwatch_id   = "${var.loadbalancer_cloudwatch_id}"
+
+  deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+  deployment_maximum_percent         = "${var.deployment_maximum_percent}"
 }
 
 module "task" {

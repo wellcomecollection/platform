@@ -22,8 +22,9 @@ module "miro_reindexer" {
   healthcheck_path   = "/miro_reindexer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/miro_reindexer.ini"
-  cpu                = 256
-  memory             = 1024
+
+  cpu    = 512
+  memory = 1024
 
   desired_count = "0"
 
@@ -53,8 +54,9 @@ module "ingestor" {
   healthcheck_path   = "/ingestor/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/ingestor.ini"
-  cpu                = 256
-  memory             = 1024
+
+  cpu    = 256
+  memory = 1024
 
   config_vars = {
     es_host           = "${data.template_file.es_cluster_host.rendered}"
@@ -89,8 +91,9 @@ module "transformer" {
   healthcheck_path   = "/transformer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/transformer.ini"
-  cpu                = 256
-  memory             = 1024
+
+  cpu    = 256
+  memory = 1024
 
   config_vars = {
     sns_arn              = "${module.id_minter_topic.arn}"
@@ -119,8 +122,9 @@ module "id_minter" {
   healthcheck_path   = "/id_minter/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/id_minter.ini"
-  cpu                = 256
-  memory             = 1024
+
+  cpu    = 256
+  memory = 1024
 
   config_vars = {
     rds_database_name   = "${module.identifiers_rds_cluster.database_name}"
@@ -187,6 +191,13 @@ module "loris" {
   alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
+  cpu = 1280
+
+  desired_count = "2"
+
+  deployment_minimum_healthy_percent = "50"
+  deployment_maximum_percent         = "200"
+
   volume_name      = "loris"
   volume_host_path = "${module.api_userdata.efs_mount_directory}/loris"
   container_path   = "/usr/local/share/images/loris"
@@ -204,6 +215,9 @@ module "grafana" {
   vpc_id             = "${module.vpc_monitoring.vpc_id}"
   listener_https_arn = "${module.monitoring_alb.listener_https_arn}"
   listener_http_arn  = "${module.monitoring_alb.listener_http_arn}"
+
+  cpu    = 256
+  memory = 1024
 
   nginx_uri                = "${module.ecr_repository_nginx_grafana.repository_url}:${var.release_ids["nginx_grafana"]}"
   healthcheck_path         = "/api/health"

@@ -5,6 +5,9 @@ resource "aws_ecs_service" "service" {
   desired_count   = "${var.desired_count}"
   iam_role        = "${aws_iam_role.ecs_service.name}"
 
+  deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+  deployment_maximum_percent         = "${var.deployment_maximum_percent}"
+
   load_balancer {
     target_group_arn = "${aws_alb_target_group.ecs_service.arn}"
     container_name   = "${var.container_name}"
