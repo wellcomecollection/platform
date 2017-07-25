@@ -10,6 +10,8 @@ case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
   @JsonProperty("image_creator") creator: Option[List[String]],
   @JsonProperty("image_image_desc") description: Option[String],
+  @JsonProperty("image_image_desc_academic") academicDescription: Option[
+    String],
   @JsonProperty("image_secondary_creator") secondaryCreator: Option[
     List[String]],
   @JsonProperty("image_artwork_date") artworkDate: Option[String],
@@ -52,6 +54,21 @@ case class MiroTransformable(MiroID: String,
           "image_copyright_cleared field is not Y")
       }
 
+      // In Miro, the <image_image_desc> and <image_image_title> fields are
+      // filled in by the cataloguer at point of import.  There's also an
+      // <image_image_desc_academic> field which contains a description
+      // taken from Sierra.  In some cases, the cataloguer hasn't copied any
+      // of this field over the desc/title, just leaving them as "--"/"-".
+      //
+      // Since desc_academic is exposed publicly via Sierra, we can use it
+      // here if there's nothing more useful in the other fields.
+      val candidateDescription = miroData.description match {
+        case Some(s) => {
+          if (s == "--") miroData.academicDescription.getOrElse("") else s
+        }
+        case None => ""
+      }
+
       // Populate the label and description.  The rules are as follows:
       //
       //  1.  For V images, if the first line of <image_image_desc> is a
@@ -69,12 +86,12 @@ case class MiroTransformable(MiroID: String,
       // non-empty title.  This is _not_ true for the MIRO records in general.
       // TODO: Work out what label to use for those records.
       //
-      val candidateLabel = miroData.description.getOrElse("").split("\n").head
+      val candidateLabel = candidateDescription.split("\n").head
       val titleIsTruncatedDescription = candidateLabel
         .startsWith(miroData.title.get)
 
       val useDescriptionAsLabel = (titleIsTruncatedDescription &&
-        MiroCollection == "Images-V")
+        MiroCollection == "Images-V") || (miroData.title.get == "-")
 
       val label =
         if (useDescriptionAsLabel) candidateLabel
@@ -83,16 +100,18 @@ case class MiroTransformable(MiroID: String,
       val description = if (useDescriptionAsLabel) {
         // Remove the first line from the description, and trim any extra
         // whitespace (leading newlines)
-        val candidateDescription = miroData.description.get
-          .replace(candidateLabel, "")
-          .trim
-        if (candidateDescription.length > 0) Some(candidateDescription)
-        else None
+        Some(
+          candidateDescription
+            .replace(candidateLabel, "")
+            .trim)
       } else {
-        miroData.description match {
-          case Some(d) => if (d.trim.length > 0) Some(d) else None
-          case None => None
-        }
+        miroData.description
+      }
+
+      // If the description is an empty string, use a proper None type instead
+      val trimmedDescription = description match {
+        case Some(d) => if (d.trim.length > 0) Some(d.trim) else None
+        case None => None
       }
 
       // <image_creator>: the Creator, which maps to our property "hasCreator"
@@ -118,7 +137,7 @@ case class MiroTransformable(MiroID: String,
       Work(
         identifiers = identifiers,
         label = label,
-        description = description,
+        description = trimmedDescription,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators
       )
