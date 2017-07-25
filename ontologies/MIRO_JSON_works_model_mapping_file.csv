@@ -33,15 +33,6 @@ label
 type: Period
 startDate
 endDate","<image_pub_date>, <image_pub_date_from>, <image_pub_date_to>",,,
-Photosoft,Work,Caption Field,,,<image_psoft_caption_fieldname>,,,
-Photosoft,Work,Caption,,,<image_psoft_caption>,,,
-Subjects,Work,Names,Link to authority client,"subject
-label
-concept scheme","<image_subject_names>, <image_subject_names_id>",,,
-Subjects,Work,Supplementary keywords,Y,keywords,<image_keywords>,,,
-Subjects,Work,LCSH Place,,subject,<image_lcsh_place>,,,
-MeSH/LoC,Work,MeSH,Link to authority client,subject,"<image_mesh>, <image_mesh_th_h> and <image_mesh_th_i>; <image_mesh> shows the concept as a word, whilst the other two are both are drawn from information in the MeSH browser, where <image_mesh_th_h> represents the Tree number of the concept and <image_mesh_th_i> its unique ID.",,,
-MeSH/LoC,Work,LCSH,,subject,<image_loc>,,,
 Not MIRO,Work,,,items,creates new item instance with id,,,
 Admin,Item,Restrictions on Use,Y,"license
 url
@@ -49,9 +40,3 @@ label","<image_use_restrictions> or write cc-by for all v images?
 URL = https://creativecommons.org/licenses/by/4.0/
 label = Copyrighted work available under Creative Commons Attribution only licence CC BY 4.0
 ",,,
-Admin,Item,Restrictions on Access,Y,type of people who can see it?,<image_access_restrictions>,,,
-Admin,Item,Credit,,creditStatement,<image_credit_line>,,,
-Admin,Item,Copyright Cleared,Y,access status,<image_copyright_cleared>,,,
-Admin,Item,Suitable for general use,Y,access status,<image_general_use>,,,
-,,,,,,,,
-,,,,,,,,
