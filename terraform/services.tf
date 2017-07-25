@@ -177,7 +177,7 @@ module "loris" {
   path_pattern       = "/image*"
   healthcheck_path   = "/image/"
   alb_priority       = "109"
-  host_name          = "iiif.wellcomecollection.org"
+  host_name          = "iiif-origin.wellcomecollection.org"
 
   volume_name      = "loris"
   volume_host_path = "${module.api_userdata.efs_mount_directory}/loris"
