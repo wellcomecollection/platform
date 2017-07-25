@@ -58,3 +58,13 @@ variable "extra_vars" {
   description = "Environment variables to pass to the container"
   type        = "list"
 }
+
+variable "memory" {
+  description = "How much memory to allocate to the app"
+  default     = 2048
+}
+
+variable "memory" {
+  description = "How much CPU to allocate to the app"
+  default     = 512
+}
