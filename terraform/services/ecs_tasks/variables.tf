@@ -61,10 +61,8 @@ variable "extra_vars" {
 
 variable "memory" {
   description = "How much memory to allocate to the app"
-  default     = 2048
 }
 
-variable "memory" {
+variable "cpu" {
   description = "How much CPU to allocate to the app"
-  default     = 512
 }
