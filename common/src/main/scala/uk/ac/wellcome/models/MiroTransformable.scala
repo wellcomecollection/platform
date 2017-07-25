@@ -3,6 +3,7 @@ package uk.ac.wellcome.models
 import scala.util.Try
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.apache.commons.lang.StringEscapeUtils;
 
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -35,8 +36,14 @@ case class MiroTransformable(MiroID: String,
     RangeKey("MiroCollection", MiroCollection)
   )
 
-  override def transform: Try[Work] =
-    JsonUtil.fromJson[MiroTransformableData](data).map { miroData =>
+  override def transform: Try[Work] = {
+
+    // Some of the Miro fields were imported from Sierra, and had special
+    // characters replaced by HTML-encoded entities when copied across.
+    // We need to fix them up before we decode as JSON.
+    val unencodedData = StringEscapeUtils.unescapeHtml(data)
+
+    JsonUtil.fromJson[MiroTransformableData](unencodedData).map { miroData =>
       // Identifier is passed straight through
       val identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID))
 
@@ -142,4 +149,5 @@ case class MiroTransformable(MiroID: String,
         creators = creators ++ secondaryCreators
       )
     }
+  }
 }
