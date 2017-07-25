@@ -10,7 +10,8 @@ case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
   @JsonProperty("image_creator") creator: Option[List[String]],
   @JsonProperty("image_image_desc") description: Option[String],
-  @JsonProperty("image_image_desc_academic") academicDescription: Option[String],
+  @JsonProperty("image_image_desc_academic") academicDescription: Option[
+    String],
   @JsonProperty("image_secondary_creator") secondaryCreator: Option[
     List[String]],
   @JsonProperty("image_artwork_date") artworkDate: Option[String],
@@ -99,9 +100,10 @@ case class MiroTransformable(MiroID: String,
       val description = if (useDescriptionAsLabel) {
         // Remove the first line from the description, and trim any extra
         // whitespace (leading newlines)
-        Some(candidateDescription
-          .replace(candidateLabel, "")
-          .trim)
+        Some(
+          candidateDescription
+            .replace(candidateLabel, "")
+            .trim)
       } else {
         miroData.description
       }
