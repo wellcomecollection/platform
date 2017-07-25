@@ -1,6 +1,6 @@
 resource "aws_cloudfront_distribution" "loris" {
   origin {
-    domain_name = "${module.api_alb.dns_name}"
+    domain_name = "iiif-origin.wellcomecollection.org"
     origin_id   = "loris"
 
     custom_origin_config {
