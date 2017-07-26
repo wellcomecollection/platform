@@ -28,6 +28,9 @@ module "miro_reindexer" {
 
   desired_count = "0"
 
+  deployment_minimum_healthy_percent = "0"
+  deployment_maximum_percent         = "200"
+
   config_vars = {
     miro_table_name    = "${aws_dynamodb_table.miro_table.name}"
     reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
@@ -57,6 +60,9 @@ module "ingestor" {
 
   cpu    = 256
   memory = 1024
+
+  deployment_minimum_healthy_percent = "0"
+  deployment_maximum_percent         = "200"
 
   config_vars = {
     es_host           = "${data.template_file.es_cluster_host.rendered}"
@@ -95,6 +101,9 @@ module "transformer" {
   cpu    = 256
   memory = 1024
 
+  deployment_minimum_healthy_percent = "0"
+  deployment_maximum_percent         = "200"
+
   config_vars = {
     sns_arn              = "${module.id_minter_topic.arn}"
     transformer_queue_id = "${module.miro_transformer_queue.id}"
@@ -125,6 +134,9 @@ module "id_minter" {
 
   cpu    = 256
   memory = 1024
+
+  deployment_minimum_healthy_percent = "0"
+  deployment_maximum_percent         = "200"
 
   config_vars = {
     rds_database_name   = "${module.identifiers_rds_cluster.database_name}"
@@ -218,6 +230,9 @@ module "grafana" {
 
   cpu    = 256
   memory = 256
+
+  deployment_minimum_healthy_percent = "0"
+  deployment_maximum_percent         = "200"
 
   nginx_uri                = "${module.ecr_repository_nginx_grafana.repository_url}:${var.release_ids["nginx_grafana"]}"
   healthcheck_path         = "/api/health"
