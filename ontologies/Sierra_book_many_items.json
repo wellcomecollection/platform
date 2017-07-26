@@ -1,0 +1,141 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "r8wuk27",
+  "type": "Work",
+  "identifiers": 
+    [
+      {
+        "label": "b18043057",
+        "authority": "Sierra"
+      }
+    ],
+  "label": "Ancient Medicine",
+  "creators": 
+    [
+      {
+        "label": "Nutton, Vivian",
+        "type": "Agent"
+      }
+    ],
+  "publishers": 
+    [
+      {
+        "label": "Routledge",
+        "type": "Agent"
+      }
+    ],
+    "placeOfPublication": 
+       [
+         {
+          "label": "London",
+          "type": "Place"
+        },
+       {
+        "label": "New York",
+        "type": "Place"
+      }
+    ],
+  	"publicationDate": 
+    {
+      "label": "2004",
+      "type": "Period"
+    },
+	"isPartOf": "Sciences of Antiquity",
+  "isbn": "041586116",
+  "workType": "Books",
+  "subjects": 
+    [
+	{
+		"label": "Ancient",
+		"authority": "MeSH"
+	},
+	{
+        "label": "Galen",
+        "authority": "LCSH" 
+    },
+    {
+        "label": "Hippocrates",
+        "authority": "LCSH"
+    },
+      {
+        "label": "Physiciabns",
+        "authority": "fast"
+      },
+      {
+        "label": "Medicine, Ancient",
+        "authority": "fast"
+      }
+    ],
+  "generalNotes":
+    [
+      {
+      "label": "Includes bibliographical references and index"
+      },
+      {
+      "label": "Sources and Scope -- Patterns of disease -- Before Hippocrates -- Hippocrates, the Hippocratic Corpus, and the defining of medicine -- Hippocratic theories -- Hippocratic practices -- Religion and medicine in fifth- and fourth-century Greece -- From Plato to Praxagoras -- Alexandria, anatomy, and experimentation -- Hellenistic medicine -- Rome and the transplantation of Greek medicine -- The Consequences of Empire: pharmacology, surgery and the Roman Army -- The rise of Methodism -- Humoral alternatives -- The life and career of Galen -- Galenic medicine -- All sorts and conditions of (mainly) men -- Medicine and the Religions of the Roman Empire -- Medicine in the later Roman Empire."
+      }
+    ],
+	"relatedMaterialNote": 
+	[
+		{
+			"label": "Also available as an electronic book made availavble via MyLibrary."
+		},
+		{
+			"label": "Electronic version: Ancient medicine"
+		}
+	],
+  "items":
+    [
+      {
+       "id": "vnwp572",
+       "type": "item",
+       "identifiers": 
+        [
+          {
+            "label": "i15124290",
+            "authority": "Sierra"
+          }
+        ],
+       "physicalDescription": "xiv, 486 pages.  Other physical details: llustrations.  Dimensions: 24 cm",
+       "status": "Available",
+       "classmark": "BD/NUT",
+       "wellcomeBarcode": "22501632169",
+       "location": "History of Medicine",
+       "access": "Open Shelves"
+      },
+      {
+       "id": "th385bd",
+       "type": "item",
+       "identifiers": 
+        [
+          {
+            "label": "i15124307",
+            "authority": "Sierra"
+          }
+        ],
+       "physicalDescription": "xiv, 486 pages.  Other physical details: llustrations.  Dimensions: 24 cm",
+       "status": "Available",
+       "classmark": "/NUT",
+       "wellcomeBarcode": "22501629538",
+       "location": "Student Collection",
+       "access": "Open Shelves"
+      },
+      {
+       "id": "dhqg386",
+       "type": "item",
+       "identifiers": 
+        [
+          {
+            "label": "i15124319",
+            "authority": "Sierra"
+          }
+        ],
+       "physicalDescription": "xiv, 486 pages.  Other physical details: llustrations.  Dimensions: 24 cm",
+       "status": "Available",
+       "classmark": "/NUT",
+       "wellcomeBarcode": "22501629495",
+       "location": "Student Collection",
+       "access": "Open Shelves"
+      }
+    ]
+}
