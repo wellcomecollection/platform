@@ -1,5 +1,6 @@
 resource "aws_efs_file_system" "efs" {
-  creation_token = "${var.name}_efs"
+  creation_token   = "${var.name}_efs"
+  performance_mode = "${var.performance_mode}"
 }
 
 resource "aws_efs_mount_target" "mount_target" {
