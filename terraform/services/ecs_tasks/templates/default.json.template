@@ -2,7 +2,7 @@
   {
     "name": "nginx",
     "image": "${nginx_uri}",
-    "memory": 256,
+    "memory": 128,
     "cpu": 128,
     "portMappings": [
       {
