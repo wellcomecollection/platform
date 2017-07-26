@@ -212,9 +212,9 @@ module "loris" {
 
   cpu = 3072
 
-  desired_count = "2"
+  desired_count = "4"
 
-  deployment_minimum_healthy_percent = "50"
+  deployment_minimum_healthy_percent = "25"
   deployment_maximum_percent         = "200"
 
   volume_name      = "loris"
