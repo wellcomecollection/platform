@@ -169,7 +169,7 @@ module "api" {
   alb_priority       = "110"
   host_name          = "api.wellcomecollection.org"
 
-  cpu = 1024
+  cpu = 768
 
   desired_count = "2"
 
