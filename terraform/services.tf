@@ -210,7 +210,7 @@ module "loris" {
   alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
-  cpu = 4096
+  cpu = 3072
 
   desired_count = "2"
 
