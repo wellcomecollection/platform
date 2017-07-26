@@ -21,6 +21,9 @@ gatling-build: install-docker-build-deps
 gatling-deploy: gatling-build
 	./scripts/deploy_docker_to_aws.py --project=gatling --infra-bucket=$(INFRA_BUCKET)
 
+## Build the image for spot_termination_watcher
+cache_cleaner-build:
+	docker build ./docker/cache_cleaner --tag cache_cleaner
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: install-docker-build-deps

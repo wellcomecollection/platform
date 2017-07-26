@@ -79,3 +79,8 @@ module "terraform_apply_topic" {
   source = "./sns"
   name   = "terraform_apply"
 }
+
+module "spot_termination_notice" {
+  source = "./sns"
+  name   = "spot_termination_notice"
+}
