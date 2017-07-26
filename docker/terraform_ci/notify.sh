@@ -13,7 +13,7 @@ if [ -e $MESSAGE_FILE ]; then
     aws sns publish \
         --topic-arn "$TOPIC_ARN" \
         --message "file://$MESSAGE_FILE"
-    echo "Notification sent to $TOPIC_ARN"
+    echo "Notification sent to $TOPIC_NAME"
 else
     echo "$MESSAGE_FILE result not found!"
     exit 1

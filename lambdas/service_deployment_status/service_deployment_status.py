@@ -11,13 +11,16 @@ import os
 
 import boto3
 
+from ecs_utils import (
+    EcsThrottleException
+)
+
 from deployment_utils import (
     get_deployments_from_ecs,
     get_deployments_from_dynamo,
     put_deployment_in_dynamo,
     delete_deployment_in_dynamo,
-    update_deployment_in_dynamo,
-    EcsThrottleException
+    update_deployment_in_dynamo
 )
 
 
