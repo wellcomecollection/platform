@@ -1,0 +1,36 @@
+Area,Relationship from..,Field in MIRO,Picklist etc?,JSON mapping and structure,XML tag to map to,,,
+Not MIRO,Work,,,workType,Fixed value “Image”,,,
+Catalogue 1,Work,Prefix,Y,"identifier
+micr-image-number
+value = <image_no_calc>","concatenate to form <image_no_calc>, and identical <image_iap_image_no>",,,
+Catalogue 1,Work,Short descr.,,title,<image_title>,,,
+Catalogue 1,Work,Creation date,,"createdDate
+label
+type: Period
+startDate
+endDate","<image_artwork_date>, <image_artwork_date_to>, <image_artwork_date_from>",,,
+Library,Work,Technique,,"genre
+label
+type: Genre
+","<image_lc_genre> and <image_technique> and <image_technique_note>
+",,,
+Catalogue 1,Work,Creator,Link to authority client,"creator
+label
+no type",<image_creator>,,,
+Catalogue 1,Work,Secondary creator,Link to authority client,"creator
+label
+no type",<image_creator_secondary>,,,
+Catalogue 1,Work,Description of image content,,description,<image_image_desc> if not there <image_image_desc_academic>,,,
+Catalogue 2,Work,Lettering,,lettering,<image_supp_lettering>,,,
+Publisher,Work,,,"publishers
+label
+no type",<image_pub_publisher>,,,
+Place of publication,Work,,,"placeOfPublication
+label
+type: Place",<image_pub_place>,,,
+Date of publication,Work,,,"publicationDate
+label
+type: Period
+startDate
+endDate","<image_pub_date>, <image_pub_date_from>, <image_pub_date_to>",,,
+
