@@ -27,7 +27,7 @@ module "monitoring_cluster_asg" {
   user_data             = "${module.monitoring_userdata.rendered}"
   vpc_id                = "${module.vpc_monitoring.vpc_id}"
 
-  instance_type = "t2.small"
+  instance_type = "t2.nano"
 
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
@@ -47,7 +47,8 @@ module "api_cluster_asg" {
   asg_desired = "2"
   asg_max     = "4"
 
-  instance_type         = "t2.large"
+  instance_type = "t2.large"
+
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
   alarm_topic_arn       = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"

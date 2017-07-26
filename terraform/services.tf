@@ -217,7 +217,7 @@ module "grafana" {
   listener_http_arn  = "${module.monitoring_alb.listener_http_arn}"
 
   cpu    = 256
-  memory = 1024
+  memory = 512
 
   nginx_uri                = "${module.ecr_repository_nginx_grafana.repository_url}:${var.release_ids["nginx_grafana"]}"
   healthcheck_path         = "/api/health"
