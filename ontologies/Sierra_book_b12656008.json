@@ -1,0 +1,69 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "25bbk5m",
+  "type": "Work",
+  "identifiers": 
+  [
+      {
+        "label": "b12656008",
+        "authority": "Sierra" ,
+        "type": "Identifier"
+      }
+    ],
+  "label": "A dictionary of archaic and provincial words, obsolete phrases, proverbs, and ancient customs, from the fourteenth century",
+  "creators": 
+    [
+      {
+        "label": "Halliwell-Phillipps, J. O. (James Orchard), 1820-1889",
+        "type": "Person"
+      }
+    ],
+  "publishers": 
+    [
+      {
+        "label": "Reeves and Turner",
+        "type": "Organisation"
+      }
+    ],
+  "placeOfPublication": 
+     [
+       {
+        "id" : "ghy4567" ,
+        "label": "London",
+        "type": "Place"
+      }
+    ],
+  "publicationDate": 
+    {
+      "label": "1889",
+      "type": "Period"
+    },
+  "edition": "11th ed",
+  "workType": { "id": "http://wellcome.org/work-types/book",
+        "type": "WorkType",
+        "label": "Books" } ,
+  "physicalDescription": "2 volumes ; 23 cm",
+  "subjects": 
+    [
+     {
+        "label": "English language -- Provincialisms",
+        "authority": "LCSH"
+      },
+      {
+        "label": "English language -- Obsolete words",
+        "authority": "LCSH"
+      },
+      {
+        "label": "Arctic regions",
+        "authority": "LCSH"
+      }
+    ],
+  "notes":
+      {
+      "label": "Paged continuously" ,
+	  "noteType": 
+        { "id": "http://wellcome.org/note-types/generalNote",
+        "type": "NoteType",
+        "label": "General note" }
+      }
+}
