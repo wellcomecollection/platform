@@ -10,7 +10,7 @@ class LorisSimulation extends Simulation {
   val imagesPerSearch = 20
 
   val httpConf = http
-    .baseURL("https://iiif.wellcomecollection.org")
+    .baseURL("https://iiif-origin.wellcomecollection.org")
 
   // We expect a small subset of images to be requested repeatedly -- for
   // example, images that are embedded in an Explore article.  These images

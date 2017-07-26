@@ -169,6 +169,13 @@ module "api" {
   alb_priority       = "110"
   host_name          = "api.wellcomecollection.org"
 
+  cpu = 1024
+
+  desired_count = "2"
+
+  deployment_minimum_healthy_percent = "50"
+  deployment_maximum_percent         = "200"
+
   config_vars = {
     api_host    = "${var.api_host}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
@@ -203,7 +210,7 @@ module "loris" {
   alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
-  cpu = 1280
+  cpu = 2048
 
   desired_count = "2"
 
