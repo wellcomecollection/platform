@@ -14,3 +14,8 @@ variable "vpc_id" {
 variable "efs_access_security_group_id" {
   description = "ID of the security group of the EC2 instaces that need to access the EFS"
 }
+
+variable "performance_mode" {
+  description = "EFS Performance mode (generalPurpose or maxIO)"
+  default     = "generalPurpose"
+}
