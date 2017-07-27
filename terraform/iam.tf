@@ -57,4 +57,3 @@ module "ecs_gatling_iam" {
   source = "./ecs_iam"
   name   = "gatling"
 }
-
