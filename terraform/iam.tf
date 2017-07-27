@@ -57,3 +57,8 @@ module "ecs_gatling_iam" {
   source = "./ecs_iam"
   name   = "gatling"
 }
+
+module "ecs_spot_termination_watcher_iam" {
+  source = "./ecs_iam"
+  name   = "spot_termination_watcher"
+}
