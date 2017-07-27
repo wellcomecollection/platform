@@ -41,6 +41,9 @@ VOLUME ["/opt/gatling/data", "/opt/gatling/conf", "/opt/gatling/results", "/opt/
 ENV PATH /opt/gatling/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV GATLING_HOME /opt/gatling
 
+COPY data /opt/gatling/data
+COPY user-files /opt/gatling/user-files
+
 COPY run.sh /opt/gatling/run.sh
 COPY upload_results_to_s3.sh /opt/gatling/upload_results_to_s3.sh
 

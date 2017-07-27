@@ -60,3 +60,8 @@ module "ecr_repository_cache_cleaner" {
   source = "./ecr"
   name   = "cache_cleaner"
 }
+
+module "ecr_repository_gatling" {
+  source = "./ecr"
+  name   = "gatling"
+}
