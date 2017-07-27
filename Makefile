@@ -21,7 +21,7 @@ docker-build-gatling:
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: install-docker-build-deps
-	./scripts/build_cache_cleaner.py
+	./scripts/build_docker_image.py --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build
