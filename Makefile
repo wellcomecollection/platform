@@ -14,9 +14,12 @@ docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
 
 ## Build the image for gatling
-docker-build-gatling:
-	docker build ./docker/gatling --tag gatling_ci
+gatling-build:
+	./scripts/build_docker_image.py --project=gatling
 
+## Deploy the image for the cache cleaner
+gatling-deploy: gatling-build
+	./scripts/deploy_docker_to_aws.py --project=gatling --infra-bucket=$(INFRA_BUCKET)
 
 
 ## Build the image for the cache cleaner
@@ -206,12 +209,9 @@ check-format: format
 # Tasks for running gatling #
 
 ## Run JSON linting over the ontologies directory
-gatling-loris: docker-build-gatling
+gatling-loris: gatling-build
 	docker run \
 		-v $$HOME/.aws:/root/.aws \
-		-v $$(pwd)/gatling/user-files:/opt/gatling/user-files \
-		-v $$(pwd)/gatling/results:/opt/gatling/results \
-		-v $$(pwd)/gatling/data:/opt/gatling/data \
 		-e SIMULATION=testing.load.LorisSimulation \
 		gatling_ci:latest
 

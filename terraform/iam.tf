@@ -52,3 +52,8 @@ module "ecs_cache_cleaner_iam" {
   source = "./ecs_iam"
   name   = "cache_cleaner"
 }
+
+module "ecs_gatling_iam" {
+  source = "./ecs_iam"
+  name   = "gatling"
+}
