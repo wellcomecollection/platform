@@ -31,7 +31,8 @@ if __name__ == '__main__':
     print('*** Building Docker image for %s' % project)
 
     release_id = CURRENT_COMMIT
-    tag = f'{project}:{release_id}'
+
+    tag = '%s:%s' % (project, release_id)
     print('*** Image will be tagged %s' % tag)
 
     print('*** Building the new Docker image')
