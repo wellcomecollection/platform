@@ -9,7 +9,7 @@ class WorkTest extends FunSpec with Matchers {
   it("should have an LD type 'Work' when serialised to JSON") {
     val work = Work(
       identifiers = List(),
-      label = "A book about a blue whale"
+      title = "A book about a blue whale"
     )
     val jsonString = JsonUtil.toJson(work).get
 
@@ -21,7 +21,7 @@ class JsonUtilTest extends FunSpec with Matchers {
   it("should not include fields where the value is empty or None") {
     val work = Work(
       identifiers = List(),
-      label = "A haiku about a heron"
+      title = "A haiku about a heron"
     )
     val jsonString = JsonUtil.toJson(work).get
 
@@ -30,7 +30,7 @@ class JsonUtilTest extends FunSpec with Matchers {
   }
 
   it("should round-trip an empty list back to an empty list") {
-    val jsonString = """{"accessStatus": [], "label": "A doodle of a dog"}"""
+    val jsonString = """{"accessStatus": [], "title": "A doodle of a dog"}"""
     val parsedWork = JsonUtil.fromJson[Work](jsonString).get
     val extrapolatedString = JsonUtil.toJson(parsedWork).get
 

@@ -14,7 +14,7 @@ case class IdentifiedWork(canonicalId: String, work: Work)
   */
 case class Work(
   identifiers: List[SourceIdentifier],
-  label: String,
+  title: String,
   description: Option[String] = None,
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
