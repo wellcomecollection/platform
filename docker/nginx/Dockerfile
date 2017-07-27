@@ -1,5 +1,5 @@
 FROM nginx:alpine
 
-ARG conf_file
+ARG variant
 
-COPY $conf_file /etc/nginx/nginx.conf
+COPY $variant.nginx.conf /etc/nginx/nginx.conf
