@@ -208,6 +208,7 @@ check-format: format
 ## Run JSON linting over the ontologies directory
 gatling-loris: docker-build-gatling
 	docker run \
+		-v $$HOME/.aws:/root/.aws \
 		-v $$(pwd)/gatling/user-files:/opt/gatling/user-files \
 		-v $$(pwd)/gatling/results:/opt/gatling/results \
 		-v $$(pwd)/gatling/data:/opt/gatling/data \
