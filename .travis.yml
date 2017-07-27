@@ -108,10 +108,10 @@ matrix:
         - PROJECT=docker/nginx
     - env:
         - TASK=cache_cleaner-build
-        - PROJECT=cache_cleaner
+        - PROJECT=docker/cache_cleaner
     - env:
         - TASK=gatling-build
-        - PROJECT=gatling
+        - PROJECT=docker/gatling
 
 script:
   - |
