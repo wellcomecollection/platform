@@ -40,7 +40,7 @@ class IdentifierGeneratorTest
 
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
-           label = "some label")
+           search = "Searching for a sea slug")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
@@ -52,7 +52,7 @@ class IdentifierGeneratorTest
     "should generate an id and save it in the database if a record doesn't already exist") {
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
-           label = "some label")
+           title = "A novel name for a nightingale")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
@@ -70,7 +70,7 @@ class IdentifierGeneratorTest
     val work =
       Work(
         identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")),
-        label = "some label")
+        title = "The rejection of a robin")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId.failed) { exception =>
@@ -83,7 +83,7 @@ class IdentifierGeneratorTest
     val miroId = "1234"
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
-           label = "some label")
+           title = "A fear of failing in a fox")
     val identifiersDao = mock[IdentifiersDao]
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao, metricsSender)
