@@ -14,7 +14,7 @@ docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
 
 ## Build the image for gatling
-gatling-build:
+gatling-build: install-docker-build-deps
 	./scripts/build_docker_image.py --project=gatling
 
 ## Deploy the image for the cache cleaner
