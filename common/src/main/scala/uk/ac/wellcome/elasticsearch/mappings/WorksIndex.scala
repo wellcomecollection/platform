@@ -28,7 +28,7 @@ class WorksIndex @Inject()(client: HttpClient,
         objectField("identifiers").fields(keywordField("source"),
                                           keywordField("sourceId"),
                                           keywordField("value")),
-        textField("label").fields(
+        textField("title").fields(
           textField("english").analyzer(EnglishLanguageAnalyzer)),
         textField("description").fields(
           textField("english").analyzer(EnglishLanguageAnalyzer)),

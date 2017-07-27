@@ -10,7 +10,7 @@ case class CalmTransformableData(
   def transform: Try[Work] = Try {
     Work(
       identifiers = List(SourceIdentifier("source", "key", "value")),
-      label = "calm data label"
+      title = "Title for a Calm record"
     )
   }
 }
