@@ -16,11 +16,11 @@ class WorkExtractorTest
   it("extracts the work included in the SQS message") {
 
     val miroID = "M0000001"
-    val label = "A note about a narwhal"
+    val title = "A note about a narwhal"
 
     val work = Work(
       identifiers = List(SourceIdentifier("Miro", "MiroId", miroID)),
-      label = label
+      title = title
     )
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
@@ -32,7 +32,7 @@ class WorkExtractorTest
 
     whenReady(eventualWork) { extractedWork =>
       extractedWork.identifiers.head.value shouldBe miroID
-      extractedWork.label shouldBe label
+      extractedWork.title shouldBe title
     }
   }
 
