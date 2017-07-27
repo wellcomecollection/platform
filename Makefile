@@ -35,16 +35,16 @@ install-docker-build-deps:
 	pip3 install --upgrade boto3 docker docopt
 
 nginx-build-api: install-docker-build-deps
-	./scripts/build_nginx_image.py --variant=api
+	./scripts/build_docker_image.py --project=nginx --variant=api
 
 nginx-build-loris: install-docker-build-deps
-	./scripts/build_nginx_image.py --variant=loris
+	./scripts/build_docker_image.py --project=nginx --variant=loris
 
 nginx-build-services: install-docker-build-deps
-	./scripts/build_nginx_image.py --variant=services
+	./scripts/build_docker_image.py --project=nginx --variant=services
 
 nginx-build-grafana: install-docker-build-deps
-	./scripts/build_nginx_image.py --variant=grafana
+	./scripts/build_docker_image.py --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
