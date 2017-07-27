@@ -33,7 +33,7 @@ class IngestorFeatureTest
           canonicalId = "1234",
           work = Work(identifiers =
                         List(SourceIdentifier("Miro", "MiroID", "5678")),
-                      label = "some label")))
+                      title = "A type of a tame turtle")))
       .get
 
     sqsClient.sendMessage(
