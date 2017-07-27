@@ -244,3 +244,10 @@ resource "aws_iam_role_policy" "dynamo_to_calm_sns" {
   role   = "${module.lambda_dynamo_to_sns.role_name}"
   policy = "${module.calm_transformer_topic.publish_policy}"
 }
+
+# Policies for gatling script task
+
+resource "aws_iam_role_policy" "update_service_list_push_to_s3" {
+  role   = "${module.ecs_gatling_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.s3_put_gatling_reports.json}"
+}
