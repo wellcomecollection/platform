@@ -13,6 +13,7 @@ docker-build-python36:
 docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
 
+
 ## Build the image for gatling
 gatling-build: install-docker-build-deps
 	./scripts/build_docker_image.py --project=gatling
@@ -21,9 +22,6 @@ gatling-build: install-docker-build-deps
 gatling-deploy: gatling-build
 	./scripts/deploy_docker_to_aws.py --project=gatling --infra-bucket=$(INFRA_BUCKET)
 
-## Build the image for spot_termination_watcher
-cache_cleaner-build:
-	docker build ./docker/cache_cleaner --tag cache_cleaner
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: install-docker-build-deps
@@ -32,6 +30,15 @@ cache_cleaner-build: install-docker-build-deps
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
+
+
+## Build the image for the spot_termination_watcher
+spot_termination_watcher-build: install-docker-build-deps
+	./scripts/build_docker_image.py --project=spot_termination_watcher
+
+## Deploy the image for the spot_termination_watcher
+spot_termination_watcher-deploy: spot_termination_watcher-build
+	./scripts/deploy_docker_to_aws.py --project=spot_termination_watcher --infra-bucket=$(INFRA_BUCKET)
 
 
 install-docker-build-deps:

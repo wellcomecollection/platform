@@ -65,3 +65,8 @@ module "ecr_repository_gatling" {
   source = "./ecr"
   name   = "gatling"
 }
+
+module "ecr_spot_termination_watcher" {
+  source = "./ecr"
+  name   = "spot_termination_watcher"
+}
