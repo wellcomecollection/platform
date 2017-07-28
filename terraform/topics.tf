@@ -75,6 +75,11 @@ module "terminal_failure_alarm" {
   name   = "terminal_failure_alarm"
 }
 
+module "load_test_results" {
+  source = "./sns"
+  name   = "load_test_results"
+}
+
 module "load_test_failure_alarm" {
   source = "./sns"
   name   = "load_test_failure_alarm"
