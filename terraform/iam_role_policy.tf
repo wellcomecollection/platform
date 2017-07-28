@@ -257,7 +257,7 @@ resource "aws_iam_role_policy" "gatling_failure_alarm" {
   policy = "${module.load_test_results.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "gatling_failure_alarm" {
+resource "aws_iam_role_policy" "gatling_results_publication" {
   role   = "${module.ecs_gatling_iam.task_role_name}"
   policy = "${module.load_test_failure_alarm.publish_policy}"
 }
