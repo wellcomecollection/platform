@@ -66,9 +66,14 @@ class LorisSimulation extends Simulation {
     )
 
   setUp(
-    articleScn.inject(rampUsers(20) over (5 seconds)),
+    articleScn.inject(rampUsers(5) over (5 seconds))
     randomAccessScn.inject(rampUsers(20) over (5 seconds)),
     searchPageScn.inject(rampUsers(20) over (5 seconds)),
     complexScn.inject(rampUsers(10) over (3 seconds))
-  ).protocols(httpConf)
+  ).protocols(
+    httpConf
+  ).assertions(
+    global.responseTime.max.lt(1500),
+    global.successfulRequests.percent.gt(95)
+  )
 }
