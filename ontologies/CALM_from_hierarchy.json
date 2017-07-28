@@ -21,8 +21,9 @@
         "type": "Identifier",
         "identifierScheme": "CALM-RefNo"
       },
-  "title": "Correspondence: H",
-  "creationDate": 
+"title": "Correspondence: H",
+"level": "Item"
+"creationDate": 
     {
       "label": "1953-1970",
       "type": "Period"
