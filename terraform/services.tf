@@ -169,9 +169,9 @@ module "api" {
   alb_priority       = "110"
   host_name          = "api.wellcomecollection.org"
 
-  cpu = 1024
+  cpu = 896
 
-  desired_count = "2"
+  desired_count = 3
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
@@ -210,9 +210,9 @@ module "loris" {
   alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
-  cpu = 1024
+  cpu = 896
 
-  desired_count = "2"
+  desired_count = 3
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
