@@ -3,7 +3,7 @@ package uk.ac.wellcome.models
 import scala.util.Try
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils
 
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -108,19 +108,14 @@ case class MiroTransformable(MiroID: String,
       val description = if (useDescriptionAsLabel) {
         // Remove the first line from the description, and trim any extra
         // whitespace (leading newlines)
-        Some(
-          candidateDescription
-            .replace(candidateLabel, "")
-            .trim)
+        candidateDescription
+          .replace(candidateLabel, "")
       } else {
         candidateDescription
       }
 
       // If the description is an empty string, use a proper None type instead
-      val trimmedDescription = description match {
-        case Some(d) => if (d.trim.length > 0) Some(d.trim) else None
-        case None => None
-      }
+      val trimmedDescription = if (description.trim.length > 0) Some(description.trim) else None
 
       // <image_creator>: the Creator, which maps to our property "hasCreator"
       val creators: List[Agent] = miroData.creator match {
