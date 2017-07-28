@@ -6,48 +6,86 @@ Decide whether we should re-run tests for a project on a pull request.
 Exits with code 1 if there are changes that require a retest, 0 if not.
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
 import tooling
 
 
-def should_retest_project(changed_files, project):
+class ShouldRebuild(Exception):
+    pass
+
+
+def should_run_tests(changed_files, task):
     """
-    Given a set of changed files, return True/False if we should re-run
-    the tests for this project.
+    Given a set of changed files, check if we need to run tests.
+    """
+    if task in ('check-format', 'lint-lambdas', 'lint-ontologies'):
+        raise ShouldRebuild('Linting/formatting tasks should always run')
+
+    if 'Makefile' in changed_files:
+        raise ShouldRebuild(
+            'Changes to the Makefile always trigger a full run'
+        )
+
+    if any(f.startswith('.travis') for f in changed_files):
+        raise ShouldRebuild(
+            'Changes to the Travis config always trigger a full run'
+        )
+
+    if any(f.startswith('scripts/') for f in changed_files):
+        raise ShouldRebuild(
+            'Changes to the build scripts always trigger a full run'
+        )
+
+    if task.startswith('sbt-'):
+        _should_run_tests_sbt(changed_files=changed_files, task=task)
+
+    docker_images = os.listdir('docker')
+    if any(task.startswith('d') for d in docker_images):
+        _should_run_tests_docker(changed_files=changed_files, task=task)
+
+
+def _should_run_tests_sbt(changed_files, task):
+    """
+    Given an sbt task, check if we need to run tests.
     """
     if 'build.sbt' in changed_files:
-        print("*** Changes to build.sbt mean we should rebuild")
-        return True
+        raise ShouldRebuild('Changes to build.sbt always trigger a full run')
 
-    elif any(f.startswith(('common/', 'project/')) for f in changed_files):
-        print("*** Changes to common/project dirs mean we should rebuild")
-        return True
+    if any(f.startswith(('common/', 'project/')) for f in changed_files):
+        raise ShouldRebuild(
+            'Changes to common/project dirs mean we should rebuild'
+        )
 
-    elif any(f.startswith('%s/' % project) for f in changed_files):
-        print("*** Changes to the project dir mean we should rebuild")
-        return True
+    sbt_project = task.split('-')[-1]
+    if any(f.startswith('%s/' % sbt_project) for f in changed_files):
+        raise ShouldRebuild(
+            'Changes to the %s dir mean we should rebuild' % sbt_project
+        )
 
-    elif 'scripts/run_tests.sh' in changed_files:
-        print("*** Changes to the test runner mean we should retest")
-        return True
 
-    elif any(f.startswith('.travis') for f in changed_files):
-        print("*** Changes to the Travis config mean we should rerun")
-        return True
-
-    else:
-        return False
+def _should_run_tests_docker(changed_files, task):
+    """
+    Given a Docker task, check if we need to run tests.
+    """
+    image = task.split('-')[0]
+    if any(f.startswith('docker/%s/' % image) for f in changed_files):
+        raise ShouldRebuild(
+            'Changes to the docker/%s dir mean we should rebuild' % image
+        )
 
 
 if __name__ == '__main__':
     changed_files = tooling.changed_files(['HEAD', 'master'])
-    should_retest = should_retest_project(
-        changed_files=changed_files,
-        project=os.environ['PROJECT']
-    )
-    if should_retest:
+    task = os.environ['TASK']
+
+    try:
+        should_run_tests(changed_files=changed_files, task=task)
+    except ShouldRebuild as err:
+        print('*** %s' % err, file=sys.stderr)
         sys.exit(1)
     else:
         sys.exit(0)
