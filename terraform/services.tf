@@ -170,7 +170,7 @@ module "api" {
   host_name          = "api.wellcomecollection.org"
 
   cpu    = 896
-  memory = 1920
+  memory = 1840
 
   desired_count = 3
 
@@ -212,7 +212,7 @@ module "loris" {
   host_name          = "iiif-origin.wellcomecollection.org"
 
   cpu    = 896
-  memory = 1920
+  memory = 1840
 
   desired_count = 3
 
