@@ -21,8 +21,8 @@ module "gatling" {
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
-  cpu    = 256
-  memory = 256
+  cpu    = 1024
+  memory = 1024
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
