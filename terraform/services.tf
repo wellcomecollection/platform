@@ -169,7 +169,8 @@ module "api" {
   alb_priority       = "110"
   host_name          = "api.wellcomecollection.org"
 
-  cpu = 896
+  cpu    = 896
+  memory = 1920
 
   desired_count = 3
 
@@ -210,7 +211,8 @@ module "loris" {
   alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
-  cpu = 896
+  cpu    = 896
+  memory = 1920
 
   desired_count = 3
 
