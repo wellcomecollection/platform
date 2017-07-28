@@ -73,45 +73,19 @@ cache:
 
 matrix:
   include:
-    - env:
-        - TASK=check-format
-        - PROJECT=.
-    - env:
-        - TASK=sbt-test-common
-        - PROJECT=common
-    - env:
-        - TASK=sbt-test-api
-        - PROJECT=api
-    - env:
-        - TASK=sbt-test-transformer
-        - PROJECT=transformer
-    - env:
-        - TASK=sbt-test-ingestor
-        - PROJECT=ingestor
-    - env:
-        - TASK=sbt-test-id_minter
-        - PROJECT=id_minter
-    - env:
-        - TASK=sbt-test-reindexer
-        - PROJECT=reindexer
-    - env:
-        - TASK=lint-lambdas
-        - PROJECT=lambdas
-    - env:
-        - TASK=test-lambdas
-        - PROJECT=lambdas
-    - env:
-        - TASK=lint-ontologies
-        - PROJECT=ontologies
-    - env:
-        - TASK=nginx-build
-        - PROJECT=docker/nginx
-    - env:
-        - TASK=cache_cleaner-build
-        - PROJECT=docker/cache_cleaner
-    - env:
-        - TASK=gatling-build
-        - PROJECT=docker/gatling
+    - TASK=check-format
+    - TASK=sbt-test-common
+    - TASK=sbt-test-api
+    - TASK=sbt-test-transformer
+    - TASK=sbt-test-ingestor
+    - TASK=sbt-test-id_minter
+    - TASK=sbt-test-reindexer
+    - TASK=lint-lambdas
+    - TASK=test-lambdas
+    - TASK=lint-ontologies
+    - TASK=nginx-build
+    - TASK=cache_cleaner-build
+    - TASK=gatling-build
 
 script:
   - |
