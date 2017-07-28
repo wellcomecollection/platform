@@ -1,0 +1,85 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "n9gfw78",
+  "type": "Work",
+  "identifiers": 
+    [
+      {
+        "value": "PPCRI/D/1/1/8",
+        "type": "Identifier",
+        "identifierScheme": "CALM-RefNo"
+      },
+      {
+        "value": "PP/CRI/D/1/1/8",
+        "type": "Identifier",
+        "identifierScheme": "CALM-AltRefNo"
+      }
+    ],
+	"isPartOf":
+      {
+        "value": "PPCRI/D/1/1",
+        "type": "Identifier",
+        "identifierScheme": "CALM-RefNo"
+      },
+  "title": "Correspondence: H",
+  "creationDate": 
+    {
+      "label": "1953-1970",
+      "type": "Period"
+    },
+  "description": "<p>The correspondents are: <p>Dr David Harker (1953), Dr R A Hickling, Sir Harold P Himsworth (permission for Olby \"to see the report prepared for the Biophysics Committee to assist him with the historical account he is preparing...\"), Professor Mahlon Hoagland, Dorothy Hodgkin, Dr Robert W Holley, Dr R Holliday, Christopher Holme (BBC, \"The Life Code\"), Dr K Holmes (Paradies), Dr Norman J Holter, T A Hood (Central Office of Information, the counter current distribution machine), Dr David H Hubel, J H Humphrey, Dr John A Hunt, Dr Ing. Fritz Haas, Dr Lowell P Hager, Dr J B S Haldane, Dr James Hall (Polanyi), Dr L D Hamilton (<i>The Double Helix</i>), Dr Edda Hanington, Dr C Hansch (Pomona monograph), Miss Barabara Hanson, Miss Donna Haraway, [   ] Harris, Professor Henry Harris (Ken Burton), C M H Harrisson, W. Harrison (Leeds University), Dr Philip E Hartman, Dr Robert Haselkorn (<i>The Bulletin of the Atomic Scientists</i>, ochre suppressors), Dr K A Hassall, Professor Felix Haurowitz, R S Haworth (Crick family tree enquiry), Professor W Hayes, and [   ] Huxley.   ",
+  "workType": "Archives",
+  "hasCopy": "A digitised copy is held by the Wellcome Library as part of Codebreakers: Makers of Modern Genetics.",
+   
+  "items":
+    [
+      {
+       "id": "v938kwb",
+       "type": "item",
+       "identifiers": 
+        [
+	        {
+	          	"value": "PPCRI/D/1/1/8",
+              "type": "Identifier",
+              "identifierScheme": "CALM-RefNo"
+	        },
+	        {
+	        	  "value": "PP/CRI/D/1/1/8",
+              "type": "Identifier",
+              "identifierScheme": "CALM-AltRefNo"
+	        }
+        ],
+       "physicalDescription": "1 file.",
+       "accessStatus": "Open",
+       "accessRightsStatement": "The papers are available subject to the usual conditions of access to Archives and Manuscripts material. A digitised copy is available to view via the online catalogue on the Wellcome Library website.",
+       "reproduction": "Images are supplied for private research only at the Archivist's discretion. Please note that material may be unsuitable for copying on conservation grounds. Researchers who wish to publish material must seek copyright permission from the copyright owner.",
+       "itemAccess":
+         [
+            {
+              "type": "PhysicalAccess" ,
+              "format": "Archives - non-digital" ,
+              "location": "PP/CRI/D/1/1/8:Box 9",
+              "accessStatus": "Open" ,
+              "service":
+                  {
+                      "label": "Closed stores Arch. & MSS" ,
+                      "profile": "http://catalogue.wellcomelibrary.org/screens/loc_amss_online_cmac.html" 
+                  } 
+      
+            },
+            {
+              "type": "DigitalAccess",
+              "format": "Manifest" ,
+              "accessStatus": "Open: Archives under 100 years old" ,
+              "location": "https://dlcs.io/iiif-img/wellcome/1/v938kwb" ,
+              "service":
+                {
+                    "id": "https://dlcs.io/iiif-img/wellcome/1/v938kwb" ,
+                    "label": "IIIF Image API" ,
+                    "profile": "http://iiif.io/api/image/2/level2.json" 
+                } 
+            }
+          ]
+      }
+    ]
+}
