@@ -71,7 +71,8 @@ case class MiroTransformable(MiroID: String,
       // here if there's nothing more useful in the other fields.
       val candidateDescription = miroData.description match {
         case Some(s) => {
-          if (s == "--" || s == "-") miroData.academicDescription.getOrElse("") else s
+          if (s == "--" || s == "-") miroData.academicDescription.getOrElse("")
+          else s
         }
         case None => ""
       }
