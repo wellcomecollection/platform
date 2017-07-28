@@ -206,15 +206,6 @@ check-format: format
 	git diff --exit-code
 
 
-# Tasks for running gatling #
-
-## Run JSON linting over the ontologies directory
-gatling-loris: gatling-build
-	docker run \
-		-v $$HOME/.aws:/root/.aws \
-		-e SIMULATION=testing.load.LorisSimulation \
-		gatling_ci:latest
-
 .PHONY: help
 
 ## Display this help text
