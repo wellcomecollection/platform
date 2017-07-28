@@ -14,10 +14,12 @@ aws s3 cp \
     --recursive "$LAST_RESULT" \
     $S3_LOCATION
 
+# Always push results to load_test_results topic
+/opt/gatling/notify.sh load_test_results "$LAST_RESULT/js/assertions.json"
+
+# On failure push results to load_test_failure_alarm topic so we can alarm
 if [ $GATLING_STATUS -ne 0 ]; then
     echo "Load test failed, pushing to SNS."
 
-    /opt/gatling/notify.sh \
-        load_test_failure_alarm \
-        "$LAST_RESULT/js/assertions.json"
+    /opt/gatling/notify.sh load_test_failure_alarm "$LAST_RESULT/js/assertions.json"
 fi

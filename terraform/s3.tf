@@ -62,6 +62,16 @@ resource "aws_s3_bucket" "dashboard" {
   lifecycle {
     prevent_destroy = true
   }
+
+  lifecycle_rule {
+    id      = "gatling"
+    prefix  = "gatling/"
+    enabled = true
+
+    expiration {
+      days = 30
+    }
+  }
 }
 
 resource "aws_s3_bucket" "mets-ingest" {
