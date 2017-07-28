@@ -6,8 +6,8 @@ module "loris_cache_cleaner" {
   volume_name      = "loris"
   volume_host_path = "${module.api_userdata.efs_mount_directory}/loris"
 
-  cpu    = 256
-  memory = 256
+  cpu    = 128
+  memory = 128
 
   env_vars = [
     "{\"name\": \"MAX_AGE\", \"value\": \"30\"}",
