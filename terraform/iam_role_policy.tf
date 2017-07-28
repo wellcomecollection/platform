@@ -254,5 +254,10 @@ resource "aws_iam_role_policy" "gatling_push_to_s3" {
 
 resource "aws_iam_role_policy" "gatling_failure_alarm" {
   role   = "${module.ecs_gatling_iam.task_role_name}"
+  policy = "${module.load_test_results.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "gatling_failure_alarm" {
+  role   = "${module.ecs_gatling_iam.task_role_name}"
   policy = "${module.load_test_failure_alarm.publish_policy}"
 }
