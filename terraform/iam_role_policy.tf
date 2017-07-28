@@ -247,7 +247,7 @@ resource "aws_iam_role_policy" "dynamo_to_calm_sns" {
 
 # Policies for gatling script task
 
-resource "aws_iam_role_policy" "update_service_list_push_to_s3" {
+resource "aws_iam_role_policy" "gatling_push_to_s3" {
   role   = "${module.ecs_gatling_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.s3_put_gatling_reports.json}"
 }
