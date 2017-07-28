@@ -115,7 +115,8 @@ case class MiroTransformable(MiroID: String,
       }
 
       // If the description is an empty string, use a proper None type instead
-      val trimmedDescription = if (description.trim.length > 0) Some(description.trim) else None
+      val trimmedDescription =
+        if (description.trim.length > 0) Some(description.trim) else None
 
       // <image_creator>: the Creator, which maps to our property "hasCreator"
       val creators: List[Agent] = miroData.creator match {
