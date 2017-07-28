@@ -28,3 +28,13 @@ module "gatling" {
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
   ]
 }
+
+module "spot_termination_watcher" {
+  source        = "./ecs_script_task"
+  task_name     = "spot_termination_watcher"
+  app_uri       = "${module.ecr_spot_termination_watcher.repository_url}:${var.release_ids["spot_termination_watcher"]}"
+  task_role_arn = "${module.ecs_spot_termination_watcher_iam.task_role_arn}"
+
+  cpu    = 32
+  memory = 32
+}

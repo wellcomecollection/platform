@@ -251,3 +251,10 @@ resource "aws_iam_role_policy" "gatling_push_to_s3" {
   role   = "${module.ecs_gatling_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.s3_put_gatling_reports.json}"
 }
+
+# Policies for spot_termination_watcher
+
+resource "aws_iam_role_policy" "spot_termination_watcher_sns" {
+  role   = "${module.ecs_spot_termination_watcher_iam.task_role_name}"
+  policy = "${module.spot_termination_notice.publish_policy}"
+}
