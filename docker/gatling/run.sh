@@ -19,5 +19,5 @@ if [ $GATLING_STATUS -ne 0 ]; then
 
     /opt/gatling/notify.sh \
         load_test_failure_alarm \
-        "$S3_LOCATION/js/assertions.json"
+        "$LAST_RESULT/js/assertions.json"
 fi
