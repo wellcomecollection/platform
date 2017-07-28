@@ -8,6 +8,7 @@ class LorisSimulation extends Simulation {
 
   val imagesPerArticle = 15
   val imagesPerSearch = 20
+  val usersToSimulate = 20
 
   val httpConf = http
     .baseURL("https://iiif-origin.wellcomecollection.org")
@@ -66,10 +67,10 @@ class LorisSimulation extends Simulation {
     )
 
   setUp(
-    articleScn.inject(rampUsers(20) over (5 seconds)),
-    randomAccessScn.inject(rampUsers(20) over (5 seconds)),
-    searchPageScn.inject(rampUsers(20) over (5 seconds)),
-    complexScn.inject(rampUsers(10) over (3 seconds))
+    articleScn.inject(rampUsers(usersToSimulate) over (5 seconds)),
+    randomAccessScn.inject(rampUsers(usersToSimulate) over (5 seconds)),
+    searchPageScn.inject(rampUsers(usersToSimulate) over (5 seconds)),
+    complexScn.inject(rampUsers(usersToSimulate / 2) over (3 seconds))
   ).protocols(
     httpConf
   ).assertions(
