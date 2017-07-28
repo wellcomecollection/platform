@@ -18,7 +18,7 @@ RUN mkdir -p gatling
 
 # install some base packages
 RUN apk --no-cache update && \
-    apk --no-cache add findutils wget bash python py-pip py-setuptools ca-certificates curl groff less zip git && \
+    apk --no-cache add findutils jq wget bash python py-pip py-setuptools ca-certificates curl groff less zip git && \
     pip --no-cache-dir install awscli && \
     rm -rf /var/cache/apk/*
 
