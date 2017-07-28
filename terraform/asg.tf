@@ -47,7 +47,7 @@ module "api_cluster_asg" {
   asg_desired = "3"
   asg_max     = "6"
 
-  instance_type = "t2.large"
+  instance_type = "t2.medium"
 
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
