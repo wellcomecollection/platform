@@ -45,6 +45,6 @@ COPY data /opt/gatling/data
 COPY user-files /opt/gatling/user-files
 
 COPY run.sh /opt/gatling/run.sh
-COPY upload_results_to_s3.sh /opt/gatling/upload_results_to_s3.sh
+COPY notify.sh /opt/gatling/notify.sh
 
 ENTRYPOINT ["/opt/gatling/run.sh"]
