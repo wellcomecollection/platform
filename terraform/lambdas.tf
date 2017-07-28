@@ -284,3 +284,21 @@ module "trigger_dynamo_to_sns_miro" {
   function_arn  = "${module.lambda_dynamo_to_sns.arn}"
   function_role = "${module.lambda_dynamo_to_sns.role_name}"
 }
+
+# Lambda for recording gatling results as cloudwatch metrics
+
+module "lambda_gatling_to_cloudwatch" {
+  source      = "./lambda"
+  name        = "gatling_to_cloudwatch"
+  description = "Record gatling results as CloudWatch metrics"
+  source_dir  = "../lambdas/gatling_to_cloudwatch"
+
+  alarm_topic_arn = "${module.lambda_error_alarm.arn}"
+}
+
+module "trigger_gatling_to_cloudwatch" {
+  source               = "./lambda/trigger_sns"
+  lambda_function_name = "${module.lambda_gatling_to_cloudwatch.function_name}"
+  lambda_function_arn  = "${module.lambda_gatling_to_cloudwatch.arn}"
+  sns_trigger_arn      = "${module.load_test_results.arn}"
+}
