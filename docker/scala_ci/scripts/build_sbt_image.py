@@ -41,27 +41,27 @@ if __name__ == '__main__':
     version = args['--version'] or DEFAULT_VERSION
     build_env = args['--env'] or PLATFORM_ENV
 
-    print('*** Building sbt Docker image for %s' % project)
+    print(f'*** Building sbt Docker image for {project}')
 
     # Construct the release ID and the tag
-    release_id = '%s-%s_%s' % (version, CURRENT_COMMIT, build_env)
-    tag = '%s:%s' % (project, release_id)
-    print('*** Image will be tagged %s' % tag)
+    release_id = f'{version}-{CURRENT_COMMIT}_{build_env}'
+    tag = f'{project}:{release_id}'
+    print(f'*** Image will be tagged {tag}')
 
-    print('*** Building the Scala binaries')
-    subprocess.check_call(['sbt', 'project %s' % project, 'stage'])
+    print(f'*** Building the Scala binaries')
+    subprocess.check_call(['sbt', f'project {project}', 'stage'])
 
     source_target = os.path.join(ROOT, project, 'target', 'universal', 'stage')
     docker_root = os.path.join(ROOT, 'docker', 'scala_service')
     dest_target = os.path.join(docker_root, 'target', project)
 
-    print('*** Copying build artefacts to %s from %s' % (dest_target, source_target))
+    print(f'*** Copying build artefacts to {dest_target} from {source_target}')
 
     shutil.rmtree(dest_target, ignore_errors = True)
     shutil.copytree(source_target, dest_target)
 
     print('*** Building the new Docker image')
-    print('*** Dockerfile is at %s' % docker_root)
+    print(f'*** Dockerfile is at {docker_root}')
     client = docker.from_env()
     client.images.build(path=docker_root, buildargs={'project': project}, tag=tag)
 

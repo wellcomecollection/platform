@@ -30,6 +30,10 @@ cache_cleaner-build: install-docker-build-deps
 cache_cleaner-deploy: cache_cleaner-build
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
 
+## Build the image for scala in CI
+docker-build-scala_ci:
+	docker build ./docker/scala_ci --tag scala_ci
+
 
 install-docker-build-deps:
 	pip3 install --upgrade boto3 docker docopt
@@ -76,26 +80,26 @@ nginx-deploy:	\
 
 
 
-sbt-test-common:
-	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-common: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh common test $(INFRA_BUCKET)
 
-sbt-test-api:
-	sbt 'project api' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-api: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh api test $(INFRA_BUCKET)
 
-sbt-test-id_minter:
-	sbt 'project id_minter' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-id_minter: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh id_minter test $(INFRA_BUCKET)
 
-sbt-test-ingestor:
-	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-ingestor: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh ingestor test $(INFRA_BUCKET)
 
-sbt-test-miro_adapter:
-	sbt 'project miro_adapter' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-miro_adapter: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh miro_adapter test $(INFRA_BUCKET)
 
-sbt-test-reindexer:
-	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-reindexer: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh reindexer test $(INFRA_BUCKET)
 
-sbt-test-transformer:
-	sbt 'project transformer' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-transformer: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh transformer test $(INFRA_BUCKET)
 
 sbt-test: \
 	sbt-test-api	\
@@ -107,23 +111,23 @@ sbt-test: \
 
 
 
-sbt-build-api: install-docker-build-deps sbt-test-api
-	./scripts/build_sbt_image.py --project=api
+sbt-build-api: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh api build $(INFRA_BUCKET)
 
-sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
-	./scripts/build_sbt_image.py --project=id_minter
+sbt-build-id_minter: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh id_minter build $(INFRA_BUCKET)
 
-sbt-build-ingestor: install-docker-build-deps sbt-test-ingestor
-	./scripts/build_sbt_image.py --project=ingestor
+sbt-build-ingestor: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh ingestor build $(INFRA_BUCKET)
 
-sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
-	./scripts/build_sbt_image.py --project=miro_adapter
+sbt-build-miro_adapter: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh miro_adapter build $(INFRA_BUCKET)
 
-sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
-	./scripts/build_sbt_image.py --project=reindexer
+sbt-build-reindexer: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh reindexer build $(INFRA_BUCKET)
 
-sbt-build-transformer: install-docker-build-deps sbt-test-transformer
-	./scripts/build_sbt_image.py --project=transformer
+sbt-build-transformer: docker-build-scala_ci
+	./scripts/scala_ci_docker.sh transformer build $(INFRA_BUCKET)
 
 sbt-build: \
 	sbt-build-api	\
@@ -136,22 +140,22 @@ sbt-build: \
 
 
 sbt-deploy-api: sbt-build-api
-	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
+	./scripts/scala_ci_docker.sh api deploy $(INFRA_BUCKET)
 
 sbt-deploy-id_minter: sbt-build-id_minter
-	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
+	./scripts/scala_ci_docker.sh id_minter deploy $(INFRA_BUCKET)
 
 sbt-deploy-ingestor: sbt-build-ingestor
-	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
+	./scripts/scala_ci_docker.sh ingestor deploy $(INFRA_BUCKET)
 
 sbt-deploy-miro_adapter: sbt-build-miro_adapter
-	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+	./scripts/scala_ci_docker.sh miro_adapter deploy $(INFRA_BUCKET)
 
 sbt-deploy-reindexer: sbt-build-reindexer
-	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
+	./scripts/scala_ci_docker.sh reindexer deploy $(INFRA_BUCKET)
 
 sbt-deploy-transformer: sbt-build-transformer
-	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
+	./scripts/scala_ci_docker.sh transformer deploy $(INFRA_BUCKET)
 
 sbt-deploy: \
 	sbt-deploy-api	\
