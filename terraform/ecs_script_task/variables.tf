@@ -27,7 +27,7 @@ variable "volume_host_path" {
 
 variable "container_path" {
   description = "Path of the mounted volume in the docker container"
-  default     = ""
+  default     = "/data"
 }
 
 variable "env_vars" {

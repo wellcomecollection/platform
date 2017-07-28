@@ -5,7 +5,6 @@ module "loris_cache_cleaner" {
   task_role_arn    = "${module.ecs_cache_cleaner_iam.task_role_arn}"
   volume_name      = "loris"
   volume_host_path = "${module.api_userdata.efs_mount_directory}/loris"
-  container_path   = "/data"
 
   cpu    = 256
   memory = 256
