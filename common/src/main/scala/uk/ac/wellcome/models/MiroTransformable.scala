@@ -99,7 +99,7 @@ case class MiroTransformable(MiroID: String,
         .startsWith(miroData.title.get)
 
       val useDescriptionAsLabel = (titleIsTruncatedDescription &&
-        MiroCollection == "Images-V") || (miroData.title.get == "-")
+        MiroCollection == "Images-V") || (miroData.title.get == "-" || miroData.title.get == "--")
 
       val label =
         if (useDescriptionAsLabel) candidateLabel
@@ -113,7 +113,7 @@ case class MiroTransformable(MiroID: String,
             .replace(candidateLabel, "")
             .trim)
       } else {
-        miroData.description
+        candidateDescription
       }
 
       // If the description is an empty string, use a proper None type instead

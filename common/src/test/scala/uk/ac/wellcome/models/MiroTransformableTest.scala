@@ -118,6 +118,21 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
 
   it("""
     should use the image_image_desc_academic if the image_image_desc field
+    doesn't contain useful data (double hyphen in title and description)
+  """) {
+    val academicDescription = "Dirty doubling of dastardly data"
+    transformRecordAndCheckLabel(
+      data = s"""
+        "image_title": "--",
+        "image_image_desc": "--",
+        "image_image_desc_academic": "$academicDescription"
+      """,
+      expectedLabel = academicDescription
+    )
+  }
+
+  it("""
+    should use the image_image_desc_academic if the image_image_desc field
     doesn't contain useful data (multi-line description)
   """) {
     val academicLabel = "A lithograph of a lecturer"
