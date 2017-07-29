@@ -14,7 +14,12 @@ assertions_json = f"""
   "simulationId": "lorissimulation",
   "start": {unix_time},
   "description": "",
-  "scenarios": ["article-full-size", "random-full-size", "search-thumbnail", "complex"],
+  "scenarios": [
+      "article-full-size",
+      "random-full-size",
+      "search-thumbnail",
+      "complex"
+  ],
   "assertions": [
     {{
       "path": "Global",
@@ -22,7 +27,7 @@ assertions_json = f"""
       "condition": "is less than",
       "expectedValues": [1500.0],
       "result": false,
-      "message": "Global: max of response time is less than 1500.0",
+      "message": "Global: bar",
       "actualValue": [59645.0]
     }},
     {{
@@ -31,7 +36,7 @@ assertions_json = f"""
       "condition": "is greater than",
       "expectedValues": [95.0],
       "result": false,
-      "message": "Global: percentage of successful requests is greater than 95.0",
+      "message": "Global: foo",
       "actualValue": [50.77669902912621]
     }}
   ]
@@ -48,6 +53,7 @@ event = {
         }
     ]
 }
+
 
 @mock_cloudwatch
 def test_send_assertions_to_cloudwatch():
