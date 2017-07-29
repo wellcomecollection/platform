@@ -17,7 +17,6 @@ Options:
 """
 
 import os
-import sys
 
 import docopt
 import docker
@@ -37,8 +36,10 @@ if __name__ == '__main__':
 
     if variant is not None:
         tag = '%s_%s:%s' % (project, variant, release_id)
+        release_name = '%s_%s' % (project, variant)
     else:
         tag = '%s:%s' % (project, release_id)
+        release_name = project
 
     print('*** Image will be tagged %s' % tag)
 
@@ -51,4 +52,4 @@ if __name__ == '__main__':
     )
 
     print('*** Saving the release ID to .releases')
-    write_release_id(project=project, release_id=release_id)
+    write_release_id(project=release_name, release_id=release_id)
