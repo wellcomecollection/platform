@@ -46,9 +46,9 @@ def send_assertions_to_cloudwatch(client, event):
     )
 
     _send_metric(
-        client = client,
-        namespace = namespace,
-        metric_data = metric_data
+        client=client,
+        namespace=namespace,
+        metric_data=metric_data
     )
 
 
