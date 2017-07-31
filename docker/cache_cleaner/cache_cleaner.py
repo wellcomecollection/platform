@@ -33,13 +33,13 @@ def parse_max_cache_size_arg(value):
         size = int(m.group(1))
         suffix = m.group(2)
         if suffix == 'K':
-            return size
-        elif suffix == 'M':
             return size * 1024
-        elif suffix == 'G':
+        elif suffix == 'M':
             return size * 1024 * 1024
-        elif suffix == 'T':
+        elif suffix == 'G':
             return size * 1024 * 1024 * 1024
+        elif suffix == 'T':
+            return size * 1024 * 1024 * 1024 * 1024
     return int(value)
 
 
