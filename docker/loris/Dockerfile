@@ -7,5 +7,6 @@ RUN apk update && \
     pip3 install awscli && \
     rm -rf /var/cache/apk
 
+COPY uwsgi.ini /etc/uwsgi
 COPY run.sh /run.sh
 CMD ["/run.sh"]
