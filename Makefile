@@ -194,9 +194,9 @@ terraform-apply: docker-build-terraform
 lint-ontologies: docker-build-jslint
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
-## Run flake8 linting over our Lambda code
-lint-lambdas: docker-build-python36
-	docker run -v $$(pwd)/lambdas:/data -e OP=lint python3.6_ci:latest
+## Run flake8 linting over our Python code
+lint-python: docker-build-python36
+	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
 ## Run tests for our Lambda code
 test-lambdas: docker-build-python36
