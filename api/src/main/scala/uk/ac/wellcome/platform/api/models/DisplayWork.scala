@@ -7,7 +7,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 
 case class DisplayWork(id: String,
-                       label: String,
+                       title: String,
                        description: Option[String] = None,
                        lettering: Option[String] = None,
                        createdDate: Option[Period] = None,
@@ -35,7 +35,7 @@ case object DisplayWork {
 
     DisplayWork(
       id = identifiedWork.canonicalId,
-      label = identifiedWork.work.label,
+      title = identifiedWork.work.title,
       description = identifiedWork.work.description,
       lettering = identifiedWork.work.lettering,
       createdDate = identifiedWork.work.createdDate,
