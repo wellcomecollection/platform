@@ -11,7 +11,6 @@ and look for discrepancies.  In particular:
 
 import collections
 import json
-from urllib.parse import unquote
 
 data = json.load(open('calm_records.json'))
 
@@ -35,6 +34,6 @@ for r_id in bad_records:
 
 print()
 print('AltRefNos attached to more than one record:')
-for m, v in mm.items():
+for m, v in altrefno_to_record_id.items():
     if len(v) > 1:
-        print('%s\t%s' % (k, v))
+        print('%s\t%s' % (m, v))
