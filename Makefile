@@ -13,6 +13,7 @@ docker-build-python36:
 docker-build-terraform:
 	docker build ./docker/terraform_ci --tag terraform_ci
 
+
 ## Build the image for gatling
 gatling-build: install-docker-build-deps
 	./scripts/build_docker_image.py --project=gatling
@@ -29,6 +30,15 @@ cache_cleaner-build: install-docker-build-deps
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
+
+
+## Build the image for Loris
+loris-build: install-docker-build-deps
+	./scripts/build_docker_image.py --project=loris
+
+## Deploy the image for Loris
+loris-deploy: loris-build
+	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
 
 
 install-docker-build-deps:
