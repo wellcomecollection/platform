@@ -40,7 +40,7 @@ class IdentifierGeneratorTest
 
     val work =
       Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
-           search = "Searching for a sea slug")
+           title = "Searching for a sea slug")
     val futureId = identifierGenerator.generateId(work)
 
     whenReady(futureId) { id =>
