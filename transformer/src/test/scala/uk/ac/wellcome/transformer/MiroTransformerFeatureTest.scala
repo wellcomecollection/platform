@@ -43,7 +43,7 @@ class MiroTransformerFeatureTest
 
       assertSNSMessageContains(snsMessages.head,
                                secondMiroID,
-                               secondLabel)
+                               secondTitle)
     }
   }
 
