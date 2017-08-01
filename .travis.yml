@@ -111,3 +111,4 @@ env:
     - TASK=nginx-build
     - TASK=cache_cleaner-build
     - TASK=gatling-build
+    - TASK=loris-build

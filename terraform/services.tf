@@ -200,7 +200,7 @@ module "loris" {
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_loris.repository_url}:latest"
+  app_uri            = "${module.ecr_repository_loris.repository_url}:${var.release_ids["loris"]}"
   nginx_uri          = "${module.ecr_repository_nginx_loris.repository_url}:${var.release_ids["nginx_loris"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
