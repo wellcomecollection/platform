@@ -9,6 +9,7 @@ echo "Running terraform operation: $OP"
 echo "Terraform version: $(terraform version)"
 
 OUTPUT_LOCATION="/app/output.json"
+TOPIC_ARN=$(aws sns list-topics | jq .Topics[].TopicArn -r | grep "$TOPIC_NAME" | tail -n 1)
 
 if [[ "$OP" == "plan" ]]
 then
@@ -25,7 +26,7 @@ then
     terraform output --json > "$OUTPUT_LOCATION"
 
     echo "Sending succesful apply notification."
-    /app/notify.sh terraform_apply "$OUTPUT_LOCATION"
+    /app/notify.sh $TOPIC_ARN "$OUTPUT_LOCATION"
   else
     echo "terraform.plan not found. Have you run a plan?"
     exit 1
