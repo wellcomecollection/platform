@@ -15,7 +15,7 @@ module "loris_cache_cleaner" {
   ]
 }
 
-module "gatling" {
+module "gatling-loris" {
   source        = "./ecs_script_task"
   task_name     = "gatling"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
@@ -26,6 +26,21 @@ module "gatling" {
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
+    "{\"name\": \"AWS_REGION\", \"value\": \"${var.aws_region}\"}",
+  ]
+}
+
+module "gatling-digital-experience" {
+  source        = "./ecs_script_task"
+  task_name     = "gatling"
+  app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
+  task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
+
+  cpu    = 1024
+  memory = 1024
+
+  env_vars = [
+    "{\"name\": \"SIMULATION\", \"value\": \"testing.load.DigitalExperienceImageSearch\"}",
     "{\"name\": \"AWS_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
