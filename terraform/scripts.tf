@@ -26,7 +26,7 @@ module "gatling-loris" {
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
-    "{\"name\": \"AWS_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
 
@@ -41,6 +41,6 @@ module "gatling-digital-experience" {
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.DigitalExperienceImageSearch\"}",
-    "{\"name\": \"AWS_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
