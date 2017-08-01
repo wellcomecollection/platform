@@ -23,7 +23,7 @@ def should_run_deploy(changed_files, task):
 
     if (
         task.startswith('sbt-') and
-        any(f.startswith('docker/scala_service') in changed_files
+        any(f.startswith('docker/scala_service') in changed_files)
     ):
         raise ShouldRebuild(
             'Changes to docker/scala_service mean we should deploy'
