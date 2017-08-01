@@ -26,6 +26,6 @@ module "gatling" {
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
-    "{\"name\": \"AWS_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
