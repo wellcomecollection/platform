@@ -62,11 +62,11 @@ class ApiWorksTest
             |     "lettering": "${works(0).work.lettering.get}",
             |     "createdDate": {
             |       "type": "Period",
-            |       "title": "${works(0).work.createdDate.get.title}"
+            |       "label": "${works(0).work.createdDate.get.label}"
             |     },
             |     "creators": [{
             |       "type": "Agent",
-            |       "title": "${works(0).work.creators(0).title}"
+            |       "label": "${works(0).work.creators(0).label}"
             |     }]
             |   },
             |   {
@@ -77,11 +77,11 @@ class ApiWorksTest
             |     "lettering": "${works(1).work.lettering.get}",
             |     "createdDate": {
             |       "type": "Period",
-            |       "title": "${works(1).work.createdDate.get.title}"
+            |       "label": "${works(1).work.createdDate.get.label}"
             |     },
             |     "creators": [{
             |       "type": "Agent",
-            |       "title": "${works(1).work.creators(0).title}"
+            |       "label": "${works(1).work.creators(0).label}"
             |     }]
             |   },
             |   {
@@ -92,11 +92,11 @@ class ApiWorksTest
             |     "lettering": "${works(2).work.lettering.get}",
             |     "createdDate": {
             |       "type": "Period",
-            |       "title": "${works(2).work.createdDate.get.title}"
+            |       "label": "${works(2).work.createdDate.get.label}"
             |     },
             |     "creators": [{
             |       "type": "Agent",
-            |       "title": "${works(2).work.creators(0).title}"
+            |       "label": "${works(2).work.creators(0).label}"
             |     }]
             |   }
             |  ]
@@ -132,11 +132,11 @@ class ApiWorksTest
             | "lettering": "$lettering",
             | "createdDate": {
             |   "type": "Period",
-            |   "title": "${period.title}"
+            |   "label": "${period.label}"
             | },
             | "creators": [{
             |   "type": "Agent",
-            |   "title": "${agent.title}"
+            |   "label": "${agent.label}"
             | }]
             |}
           """.stripMargin
@@ -172,11 +172,11 @@ class ApiWorksTest
                           |     "lettering": "${works(1).work.lettering.get}",
                           |     "createdDate": {
                           |       "type": "Period",
-                          |       "title": "${works(1).work.createdDate.get.title}"
+                          |       "label": "${works(1).work.createdDate.get.label}"
                           |     },
                           |     "creators": [{
                           |       "type": "Agent",
-                          |       "title": "${works(1).work.creators(0).title}"
+                          |       "label": "${works(1).work.creators(0).label}"
                           |     }]
                           |   }]
                           |   }
@@ -205,11 +205,11 @@ class ApiWorksTest
                           |     "lettering": "${works(0).work.lettering.get}",
                           |     "createdDate": {
                           |       "type": "Period",
-                          |       "title": "${works(0).work.createdDate.get.title}"
+                          |       "label": "${works(0).work.createdDate.get.label}"
                           |     },
                           |     "creators": [{
                           |       "type": "Agent",
-                          |       "title": "${works(0).work.creators(0).title}"
+                          |       "label": "${works(0).work.creators(0).label}"
                           |     }]
                           |   }]
                           |   }
@@ -238,11 +238,11 @@ class ApiWorksTest
                           |     "lettering": "${works(2).work.lettering.get}",
                           |     "createdDate": {
                           |       "type": "Period",
-                          |       "title": "${works(2).work.createdDate.get.title}"
+                          |       "label": "${works(2).work.createdDate.get.label}"
                           |     },
                           |     "creators": [{
                           |       "type": "Agent",
-                          |       "title": "${works(2).work.creators(0).title}"
+                          |       "label": "${works(2).work.creators(0).label}"
                           |     }]
                           |   }]
                           |   }
