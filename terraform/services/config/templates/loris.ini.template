@@ -28,6 +28,11 @@ enable_caching = True
 redirect_canonical_image_request = False
 redirect_id_slash_to_info = True
 
+# Allow arbitrary resizing of images.  This means that when next.wc.org request
+# different sizes of image, if they inadvertently request an image that's too
+# large, Loris doesn't 404.
+max_size_above_full = 0
+
 [logging]
 log_to = 'file'    # 'console'|'file'
 log_level = 'INFO'  # 'DEBUG'|'INFO'|'WARNING'|'ERROR'|'CRITICAL'
