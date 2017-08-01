@@ -3,6 +3,11 @@
 """
 Remove unused Docker containers and images from an ECS cluster.
 
+Normally the ECS agent handles this for us, but the ECS cleaner only runs
+on a fixed schedule.  Sometimes we fill up an instance disk very quickly
+(e.g. if there are lots of failed deployments in quick succession).  This
+allows us to clean up a cluster without waiting for the ECS agent.
+
 Usage:
   ecs_clean_cluster.py --key=<PRIV_KEY> --cluster=<CLUSTER_NAME>
   ecs_clean_cluster.py -h | --help
