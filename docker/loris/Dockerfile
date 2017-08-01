@@ -22,7 +22,6 @@ RUN apt-get install -y uwsgi
 
 COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
-COPY uwsgi.ini /etc/uwsgi
 COPY run.sh /run.sh
 
 EXPOSE 8888

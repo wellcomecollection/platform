@@ -13,4 +13,4 @@ cat /opt/loris/etc/loris2.conf
 echo "=============="
 
 echo "Starting uwsgi..."
-/usr/sbin/uwsgi --ini /etc/uwsgi/uwsgi.ini
+/usr/bin/uwsgi --ini /etc/uwsgi/uwsgi.ini
