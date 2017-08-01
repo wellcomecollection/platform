@@ -27,5 +27,6 @@ module "gatling" {
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
   ]
 }
