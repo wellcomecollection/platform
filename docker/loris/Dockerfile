@@ -1,7 +1,10 @@
 FROM ubuntu:14.04
 
 RUN apt-get update
-RUN apt-get install -y python-pip python-setuptools
+
+RUN apt-get install -y python python-pip python-setuptools python-dev
+RUN pip install awscli
+
 RUN apt-get install -y libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
     liblcms2-dev liblcms2-utils libtiff5-dev python-dev libwebp-dev apache2 \
     libapache2-mod-wsgi
