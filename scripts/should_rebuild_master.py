@@ -58,7 +58,6 @@ def should_run_deploy(changed_files, task):
         )
 
 
-
 if __name__ == '__main__':
 
     # Travis has an environment variable $TRAVIS_COMMIT_RANGE which tells us
