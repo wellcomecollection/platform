@@ -30,8 +30,8 @@ trait WorksUtil {
           title = s"${idx}-${title}",
           description = s"${idx}-${description}",
           lettering = s"${idx}-${lettering}",
-          createdDate = period.copy(title = s"${idx}-${period.title}"),
-          creator = agent.copy(title = s"${idx}-${agent.title}")
+          createdDate = Period(s"${idx}-${period.label}"),
+          creator = Agent(s"${idx}-${agent.label}")
       ))
 
   def identifiedWorkWith(canonicalId: String, title: String): IdentifiedWork =
