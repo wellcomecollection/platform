@@ -58,6 +58,9 @@ install:
       cd $repo_dir
     fi
 
+  # Install the AWS CLI tools
+  - pip install awscli
+
 cache:
   directories:
     - "~/.sbt"
