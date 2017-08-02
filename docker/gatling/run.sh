@@ -2,16 +2,9 @@
 
 set -o nounset
 
-# Parse test parameters, and then re-export them so the same variables
-# are available in the Scala test.
-export USE_CLOUDFRONT=${USE_CLOUDFRONT:-false}
-export IMAGES_PER_ARTICLE=${IMAGES_PER_ARTICLE:-15}
-export IMAGES_PER_SEARCH=${IMAGES_PER_SEARCH:-20}
-export USERS_TO_SIMULATE=${USERS_TO_SIMULATE:-5}
-
 SUMMARY=${SUMMARY:-Gatling run}
 
-export DESCRIPTION="$SUMMARY (CF=$USE_CLOUDFRONT, article=$IMAGES_PER_ARTICLE, search=$IMAGES_PER_SEARCH, users=$USERS_TO_SIMULATE)"
+export DESCRIPTION="$SUMMARY"
 
 $GATLING_HOME/bin/gatling.sh --simulation $SIMULATION --run-description="$DESCRIPTION"
 GATLING_STATUS=$?
