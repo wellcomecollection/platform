@@ -5,15 +5,18 @@
   "identifiers": 
     [
       {
-        "label": "MS5754",
-        "authority": "CALM"
+        "value": "MS5754",
+        "type": "Identifier" ,
+        "identifierScheme": "CALM-RefNo"
       },
       {
-        "label": "MS.5754",
-        "authority": "CALM"
+        "value": "MS.5754",
+        "type": "Identifier" ,
+        "identifierScheme": "CALM-AltRefNo"
       }
     ],
-  "label": "Oxyrhynchus Papyrus 2547",
+  "title": "Oxyrhynchus Papyrus 2547",
+  "level": "Item",
   "creationDate": 
     {
       "label": "3rd century AD",
@@ -26,11 +29,13 @@
     [
      {
         "label": "Hippocratic Oath",
-        "authority": "MeSH" 
+        "conceptScheme": "MeSH",
+        "type": "Subject"
       },
      {
         "label": "Manuscripts, Greek (Papyri)",
-        "authority": "LCSH"
+        "conceptScheme": "LCSH",
+        "type": "Subject"
       }
     ],
   "isOriginalOf": "Colour photograph of a fragment of Hippocratic Oath, held at L5847EA",
@@ -44,12 +49,14 @@
        "identifiers": 
         [
           {
-            "label": "MS.5754",
-            "authority": "CALM"
+            "value": "MS5754",
+           "type": "Identifier" ,
+            "identifierScheme": "CALM-RefNo"
           },
           {
-            "label": "MS5754",
-            "authority": "CALM"
+            "value": "MS.5754",
+            "type": "Identifier" ,
+            "identifierScheme": "CALM-AltRefNo"
           }
         ],
        "physicalDescription": "1 file.  Papyrus fragment: 105 × 52 mm.",
