@@ -27,6 +27,9 @@ module "gatling-loris" {
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
+    "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
+    "{\"name\": \"S3_BUCKET\", \"value\": \"${aws_s3_bucket.dashboard.id}\"}",
   ]
 }
 
