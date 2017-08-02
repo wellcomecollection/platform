@@ -21,6 +21,7 @@ def should_run_deploy(changed_files, task):
     """
     should_run_tests(changed_files=changed_files, task=task)
 
+    # Rebuild scala apps if docker base changes
     if (
         task.startswith('sbt-') and
         any(f.startswith('docker/scala_service') for f in changed_files)
@@ -28,6 +29,34 @@ def should_run_deploy(changed_files, task):
         raise ShouldRebuild(
             'Changes to docker/scala_service mean we should deploy'
         )
+
+    # Rebuild loris if docker base changes
+    if (
+        task.startswith('loris') and
+        any(f.startswith('docker/loris') for f in changed_files)
+    ):
+        raise ShouldRebuild(
+            'Changes to docker/loris mean we should deploy'
+        )
+
+    # Rebuild gatling if docker base changes
+    if (
+        task.startswith('gatling') and
+        any(f.startswith('docker/gatling') for f in changed_files)
+    ):
+        raise ShouldRebuild(
+            'Changes to docker/gatling mean we should deploy'
+        )
+
+    # Rebuild nginx if docker base changes
+    if (
+        task.startswith('nginx') and
+        any(f.startswith('docker/nginx') for f in changed_files)
+    ):
+        raise ShouldRebuild(
+            'Changes to docker/nginx mean we should deploy'
+        )
+
 
 
 if __name__ == '__main__':
