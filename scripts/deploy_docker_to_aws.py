@@ -19,12 +19,12 @@ from the .releases directory in the root of the repo.
 """
 
 import os
+import subprocess
 
 import boto3
-import docker
 import docopt
 
-from tooling import authenticate_for_ecr_pushes, ecr_repo_uri_from_name, ROOT
+from tooling import ecr_login, ecr_repo_uri_from_name, ROOT
 
 
 if __name__ == '__main__':
@@ -33,7 +33,6 @@ if __name__ == '__main__':
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(args['--infra-bucket'])
     ecr_client = boto3.client('ecr')
-    docker_client = docker.from_env()
 
     project = args['--project']
     print('*** Pushing %s to AWS' % project)
@@ -55,23 +54,17 @@ if __name__ == '__main__':
     print('*** ECR repo URI is %s' % repo_uri)
 
     print('*** Authenticating for `docker push` with ECR')
-    authenticate_for_ecr_pushes(
-        ecr_client=ecr_client,
-        docker_client=docker_client,
-        repo_uri=repo_uri
-    )
+    ecr_login()
 
     # Now retag the image, prepending our ECR URI.  When we're done, we'll
     # delete the retagged image, to avoid clogging up the local image registry.
     renamed_image_tag = '%s:%s' % (repo_uri, tag)
     print('*** Pushing image %s to ECR' % docker_image)
     try:
-        image = docker_client.images.get(docker_image)
-        image.tag(repository=repo_uri, tag=tag)
-        resp = docker_client.images.push(repository=repo_uri, tag=tag)
-        print(resp)
+        subprocess.check_call(['docker', 'tag', docker_image, renamed_image_tag])
+        subprocess.check_call(['docker', 'push', renamed_image_tag])
     finally:
-        docker_client.images.remove(image=renamed_image_tag)
+        subprocess.check_call(['docker', 'rmi', renamed_image_tag])
 
     # Finally, upload the release ID string to S3.
     if release_file_exists:

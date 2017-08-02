@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
-import base64
 import os
+import shlex
 import subprocess
 
 
@@ -47,20 +47,14 @@ def ecr_repo_uri_from_name(ecr_client, name):
         raise RuntimeError('Unable to look up repo URI for %r: %s' % (name, e))
 
 
-def authenticate_for_ecr_pushes(ecr_client, docker_client, repo_uri):
+def ecr_login():
     """
-    Get a login token from ECR, and authenticate ourselves to do 'docker push'.
+    Authenticates for pushing to ECR.
     """
-    resp = ecr_client.get_authorization_token()
-    token = resp['authorizationData'][0]['authorizationToken']
-    username, password = base64.b64decode(token).decode().split(':')
-
-    resp = docker_client.login(
-        username=username,
-        password=password,
-        registry=repo_uri
-    )
-    print(resp)
+    command = subprocess.check_output([
+        'aws', 'ecr', 'get-login', '--no-include-email'
+    ]).decode('ascii')
+    subprocess.check_call(shlex.split(command))
 
 
 def write_release_id(project, release_id):

@@ -15,12 +15,11 @@ Options:
 
 """
 
-import subprocess
-
-import docker
-import docopt
 import os
 import shutil
+import subprocess
+
+import docopt
 
 from tooling import (
     write_release_id,
@@ -62,8 +61,13 @@ if __name__ == '__main__':
 
     print('*** Building the new Docker image')
     print('*** Dockerfile is at %s' % docker_root)
-    client = docker.from_env()
-    client.images.build(path=docker_root, buildargs={'project': project}, tag=tag)
+    subprocess.check_call([
+        'docker', 'build',
+        '--file', os.path.join(docker_root, 'Dockerfile'),
+        '--tag', tag,
+        '--build-arg', 'project=%s' % project,
+        docker_root
+    ])
 
     print('*** Saving the release ID to .releases')
     write_release_id(project=project, release_id=release_id)
