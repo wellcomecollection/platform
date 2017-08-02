@@ -6,10 +6,22 @@ import scala.concurrent.duration._
 
 class LorisSimulation extends Simulation {
 
-  val useCloudFront = (sys.env("USE_CLOUDFRONT") == "true")
-  val imagesPerArticle = sys.env("IMAGES_PER_ARTICLE").toInt
-  val imagesPerSearch = sys.env("IMAGES_PER_SEARCH").toInt
-  val usersToSimulate = sys.env("USERS_TO_SIMULATE").toInt
+  val defaultUseCloudFront = false
+  val defaultImagesPerArticle = 15
+  val defaultImagesPerSearch = 20
+  val defaultUsersToSimulate = 5
+
+  val useCloudFront = sys.env.get("USE_CLOUDFRONT").map(_.toBoolean)
+    .getOrElse(defaultUseCloudFront)
+
+  val imagesPerArticle = sys.env.get("IMAGES_PER_ARTICLE").map(_.toInt)
+    .getOrElse(defaultImagesPerArticle)
+
+  val imagesPerSearch = sys.env.get("IMAGES_PER_SEARCH").map(_.toInt)
+    .getOrElse(defaultImagesPerSearch)
+
+  val usersToSimulate = sys.env.get("USERS_TO_SIMULATE").map(_.toInt)
+      .getOrElse(defaultUsersToSimulate)
 
   val hostname = if (useCloudFront) "iiif" else "iiif-origin"
 
@@ -79,8 +91,8 @@ class LorisSimulation extends Simulation {
   ).protocols(
     httpConf
   ).assertions(
-    percentile1.responseTime.max.lt(1000),  // 95th percentile
-    percentile2.responseTime.max.lt(1500),  // 99th percentile
+    global.responseTime.percentile1.lt(1000),  // 95th percentile
+    global.responseTime.percentile2.lt(1500),  // 99th percentile
     global.successfulRequests.percent.gt(99)
   )
 }

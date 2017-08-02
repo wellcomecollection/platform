@@ -6,6 +6,15 @@ import scala.concurrent.duration._
 
 class DigitalExperienceImageSearch extends Simulation {
 
+  val defaultUsersPerSec = 10
+  val defaultDuration = 120
+
+  val usersPerSec = sys.env.get("USERS_PER_SEC").map(_.toInt)
+    .getOrElse(defaultUsersPerSec)
+
+  val duration = sys.env.get("DEFAULT_DURATION").map(_.toInt)
+    .getOrElse(defaultDuration)
+
   val httpConf = http
     .baseURL("https://next.wellcomecollection.org")
     .inferHtmlResources()
@@ -20,7 +29,7 @@ class DigitalExperienceImageSearch extends Simulation {
       )
 
   setUp(
-    searchScn.inject(constantUsersPerSec(10) during(120 seconds) randomized)
+    searchScn.inject(constantUsersPerSec(usersPerSec) during(duration seconds) randomized)
   ).protocols(
     httpConf
   ).assertions(
