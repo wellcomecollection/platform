@@ -17,9 +17,9 @@ Options:
 """
 
 import os
+import subprocess
 
 import docopt
-import docker
 
 from tooling import write_release_id, CURRENT_COMMIT, ROOT
 
@@ -44,12 +44,17 @@ if __name__ == '__main__':
     print('*** Image will be tagged %s' % tag)
 
     print('*** Building the new image')
-    client = docker.from_env()
-    client.images.build(
-        path=os.path.join(ROOT, 'docker', project),
-        buildargs={'variant': variant},
-        tag=tag
-    )
+
+    cmd = [
+        'docker', 'build',
+        '--file', os.path.join(ROOT, 'docker', project, 'Dockerfile'),
+        '--tag', tag,
+    ]
+    if variant is not None:
+        cmd.extend(['--build-arg', 'variant=%s' % variant])
+    cmd.append(os.path.join(ROOT, 'docker', project))
+
+    subprocess.check_call(cmd)
 
     print('*** Saving the release ID to .releases')
     write_release_id(project=release_name, release_id=release_id)

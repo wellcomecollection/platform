@@ -42,7 +42,7 @@ loris-deploy: loris-build
 
 
 install-docker-build-deps:
-	pip3 install --upgrade boto3 docker docopt
+	pip3 install --upgrade boto3 docopt
 
 nginx-build-api: install-docker-build-deps
 	./scripts/build_docker_image.py --project=nginx --variant=api
