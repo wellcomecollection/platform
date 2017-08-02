@@ -68,7 +68,7 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
   }
 
   it("""
-    should use the first line of image_image_desc as the latitlebel on a V image
+    should use the first line of image_image_desc as the title on a V image
     if image_title is a prefix of said first line (multi-line description)
   """) {
     val title = "An icon of an iguana"

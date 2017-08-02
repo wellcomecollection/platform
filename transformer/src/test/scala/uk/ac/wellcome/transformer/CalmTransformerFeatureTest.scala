@@ -72,7 +72,7 @@ class  CalmTransformerFeatureTest
       .toJson(
         Work(
           identifiers = List(SourceIdentifier("source", "key", "value")),
-          title = "Cats that can carry themselves calmly"
+          title = "placeholder title for a Calm record"
         ))
       .get
   }
