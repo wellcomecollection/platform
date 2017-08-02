@@ -78,7 +78,8 @@ class LorisSimulation extends Simulation {
   ).protocols(
     httpConf
   ).assertions(
-    global.responseTime.max.lt(1500),
-    global.successfulRequests.percent.gt(95)
+    percentile1.responseTime.max.lt(1000),  // 95th percentile
+    percentile2.responseTime.max.lt(1500),  // 99th percentile
+    global.successfulRequests.percent.gt(99)
   )
 }
