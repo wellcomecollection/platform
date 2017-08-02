@@ -34,8 +34,9 @@ redirect_id_slash_to_info = True
 max_size_above_full = 0
 
 [logging]
-log_to = 'file'    # 'console'|'file'
+log_to = 'console'    # 'console'|'file'
 log_level = 'INFO'  # 'DEBUG'|'INFO'|'WARNING'|'ERROR'|'CRITICAL'
+format = '%(asctime)s (%(name)s) [%(levelname)s]: %(message)s'
 
 [resolver]
 impl = 'loris.resolver.TemplateHTTPResolver'
