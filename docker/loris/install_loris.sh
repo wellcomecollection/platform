@@ -14,7 +14,7 @@ apt-get install -y unzip wget
 wget https://github.com/loris-imageserver/loris/archive/v2.1.0-final.zip
 unzip v2.1.0-final.zip
 rm v2.1.0-final.zip
-apt-get uninstall -y unzip wget
+apt-get remove -y unzip wget
 
 # Required or setup.py complains
 useradd -d /var/www/loris -s /sbin/false loris
