@@ -58,15 +58,16 @@ class LorisSimulation extends Simulation {
 
   val regionFeeder = csv("region.csv").random
   val sizeFeeder = csv("size.csv").random
+  val rotationFeeder = csv("rotate.csv").random
 
   // And a handful of requests that involve more image processing
-  // TODO Allow different rotation parameters
   val complexScn = scenario("complex")
     .feed(identFeeder)
     .feed(regionFeeder)
     .feed(sizeFeeder)
+    .feed(rotationFeeder)
     .exec(http("complex-scenario")
-      .get("/image/${ident}/${region}/${size}/0/default.jpg")
+      .get("/image/${ident}/${region}/${size}/${rotate}/default.jpg")
       .check(status.in(200, 304))
     )
 
