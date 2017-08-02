@@ -15,9 +15,9 @@ module "loris_cache_cleaner" {
   ]
 }
 
-module "gatling-loris" {
+module "gatling_loris" {
   source        = "./ecs_script_task"
-  task_name     = "gatling"
+  task_name     = "gatling_loris"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
@@ -33,9 +33,9 @@ module "gatling-loris" {
   ]
 }
 
-module "gatling-digital-experience" {
+module "gatling_digital_experience" {
   source        = "./ecs_script_task"
-  task_name     = "gatling"
+  task_name     = "gatling_digital_experience"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
