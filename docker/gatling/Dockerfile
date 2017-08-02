@@ -34,15 +34,12 @@ RUN mkdir -p /tmp/downloads && \
 # change context to gatling directory
 WORKDIR  /opt/gatling
 
-# set directories below to be mountable from host
-VOLUME ["/opt/gatling/data", "/opt/gatling/conf", "/opt/gatling/results", "/opt/gatling/user-files"]
-
 # set environment variables
 ENV PATH /opt/gatling/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV GATLING_HOME /opt/gatling
 
-COPY data /opt/gatling/data
 COPY user-files /opt/gatling/user-files
+COPY data /opt/gatling/data
 
 COPY run.sh /opt/gatling/run.sh
 COPY notify.sh /opt/gatling/notify.sh

@@ -7,19 +7,20 @@ import scala.concurrent.duration._
 class DigitalExperienceImageSearch extends Simulation {
 
   val httpConf = http
-    .baseURL("https://next.wellcomecollection.org/search")
+    .baseURL("https://next.wellcomecollection.org")
+    .inferHtmlResources()
 
-  val searchFeeder = csv("search.csv").random
+  val searchFeeder = csv("terms.csv").random
 
-  val searchScn = scenario("article-full-size")
+  val searchScn = scenario("simple-search")
       .feed(searchFeeder)
       .exec(http("simple-search")
-        .get("?query=${searchTerm}")
+        .get("/search?query=${term}")
         .check(status.in(200, 304))
       )
 
   setUp(
-    searchScn.inject(constantUsersPerSec(30) during(120 seconds) randomized)
+    searchScn.inject(constantUsersPerSec(10) during(120 seconds) randomized)
   ).protocols(
     httpConf
   ).assertions(
