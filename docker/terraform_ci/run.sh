@@ -9,7 +9,7 @@ echo "Running terraform operation: $OP"
 echo "Terraform version: $(terraform version)"
 
 OUTPUT_LOCATION="/app/output.json"
-TOPIC_ARN=$(aws sns list-topics | jq .Topics[].TopicArn -r | grep "$TOPIC_NAME" | tail -n 1)
+TOPIC_ARN=$(aws sns list-topics | jq .Topics[].TopicArn -r | grep "terraform_apply" | tail -n 1)
 
 if [[ "$OP" == "plan" ]]
 then
