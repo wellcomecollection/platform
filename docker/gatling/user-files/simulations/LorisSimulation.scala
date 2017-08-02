@@ -6,12 +6,15 @@ import scala.concurrent.duration._
 
 class LorisSimulation extends Simulation {
 
-  val imagesPerArticle = 15
-  val imagesPerSearch = 20
-  val usersToSimulate = 20
+  val useCloudFront = (sys.env("USE_CLOUDFRONT") == "true")
+  val imagesPerArticle = sys.env("IMAGES_PER_ARTICLE").toInt
+  val imagesPerSearch = sys.env("IMAGES_PER_SEARCH").toInt
+  val usersToSimulate = sys.env("USERS_TO_SIMULATE").toInt
+
+  val hostname = if (useCloudFront) "iiif" else "iiif-origin"
 
   val httpConf = http
-    .baseURL("https://iiif-origin.wellcomecollection.org")
+    .baseURL(s"https://$hostname.wellcomecollection.org")
 
   // We expect a small subset of images to be requested repeatedly -- for
   // example, images that are embedded in an Explore article.  These images
