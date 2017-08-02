@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     print('*** Copying build artefacts to %s from %s' % (dest_target, source_target))
 
-    shutil.rmtree(dest_target, ignore_errors = True)
+    shutil.rmtree(dest_target, ignore_errors=True)
     shutil.copytree(source_target, dest_target)
 
     print('*** Building the new Docker image')
