@@ -48,7 +48,7 @@ class SQSMessageReceiverTest
 
   val work = Work(identifiers =
                     List(SourceIdentifier("source", "key", "value")),
-                  title = "A calming camel")
+                  title = "placeholder title for a Calm record")
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
