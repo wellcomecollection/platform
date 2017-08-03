@@ -211,10 +211,10 @@ module "loris" {
   alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
-  cpu    = 1792
+  cpu    = 3584
   memory = 1840
 
-  desired_count = 3
+  desired_count = 2
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
