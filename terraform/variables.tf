@@ -75,3 +75,9 @@ variable "dashboard_assumable_roles" {
 variable "iiif_acm_cert_arn" {
   description = "ARN of ACM cert for iiif API (in us-east-1) for CloudFront"
 }
+
+variable "es_config_ingestor" {
+  description = "ElasticCloud config for the ingestor"
+  type        = "map"
+  default     = {}
+}
