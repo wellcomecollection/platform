@@ -31,11 +31,6 @@ variable "dash_bucket" {
   default     = "wellcome-platform-dash"
 }
 
-variable "api_host" {
-  description = "hostname to use for api"
-  default     = "api.wellcomecollection.org"
-}
-
 variable "es_config" {
   description = "Elasticcloud config"
   type        = "map"
