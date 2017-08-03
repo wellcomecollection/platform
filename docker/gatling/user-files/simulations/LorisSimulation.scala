@@ -91,8 +91,8 @@ class LorisSimulation extends Simulation {
   ).protocols(
     httpConf
   ).assertions(
-    global.responseTime.percentile3.lt(1000),  // 95th percentile
-    global.responseTime.percentile4.lt(1500),  // 99th percentile
+    global.responseTime.percentile3.lt(1500),  // 95th percentile
+    global.responseTime.percentile4.lt(2000),  // 99th percentile
     global.successfulRequests.percent.gt(99)
   )
 }
