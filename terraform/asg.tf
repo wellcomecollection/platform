@@ -44,8 +44,8 @@ module "api_cluster_asg" {
   user_data             = "${module.api_userdata.rendered}"
   vpc_id                = "${module.vpc_api.vpc_id}"
 
-  asg_desired = "3"
-  asg_max     = "6"
+  asg_desired = "6"
+  asg_max     = "12"
 
   instance_type = "t2.xlarge"
 
