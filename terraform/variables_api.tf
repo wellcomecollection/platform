@@ -22,13 +22,18 @@ variable "staging_nginx_version" {
   description = "ECR tag for the staging version of nginx"
 }
 
-variable "staging_task_count" {
-  description = "How many versions of the staging API to run"
+variable "api_task_count_stage" {
+  description = "How many tasks to run in the staging API"
   default     = 1
 }
 
 # These variables change less frequently -- the service blocks in services.tf
 # will choose which variable to use based on the value of `production_api`.
+
+variable "api_task_count" {
+  description = "How many tasks to run in the production API"
+  default     = 3
+}
 
 variable "api_host" {
   description = "Hostname to use for the production API"

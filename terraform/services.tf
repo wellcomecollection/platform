@@ -181,7 +181,7 @@ module "api_romulus" {
   cpu    = 1792
   memory = 1840
 
-  desired_count = 3
+  desired_count = "${var.production_api == "remus" ? var.api_task_count : var.api_task_count_stage}"
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
@@ -221,7 +221,7 @@ module "api_remus" {
   cpu    = 1792
   memory = 1840
 
-  desired_count = 3
+  desired_count = "${var.production_api == "remus" ? var.api_task_count : var.api_task_count_stage}"
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
