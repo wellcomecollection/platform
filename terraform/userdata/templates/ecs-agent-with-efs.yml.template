@@ -25,7 +25,7 @@ coreos:
        What=${efs_filesystem_id}.efs.${aws_region}.amazonaws.com:/
        Where=${efs_mount_directory}
        Type=nfs
-       Options=nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+       Options=nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,async
    - name: update-engine.service
      command: stop
    - name: task-role-iptables.service
