@@ -154,9 +154,9 @@ module "id_minter" {
   client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
-module "api" {
+module "api_romulus" {
   source             = "./services"
-  name               = "api"
+  name               = "api_romulus"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
@@ -165,9 +165,49 @@ module "api" {
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/api.ini"
+  config_key         = "config/${var.build_env}/api_romulus.ini"
   alb_priority       = "110"
   host_name          = "api.wellcomecollection.org"
+
+  cpu    = 1792
+  memory = 1840
+
+  desired_count = 3
+
+  deployment_minimum_healthy_percent = "50"
+  deployment_maximum_percent         = "200"
+
+  config_vars = {
+    api_host    = "${var.api_host}"
+    es_host     = "${data.template_file.es_cluster_host.rendered}"
+    es_port     = "${var.es_config["port"]}"
+    es_name     = "${var.es_config["name"]}"
+    es_index    = "${var.es_config["index_api"]}"
+    es_doc_type = "${var.es_config["doc_type"]}"
+    es_username = "${var.es_config["username"]}"
+    es_password = "${var.es_config["password"]}"
+    es_protocol = "${var.es_config["protocol"]}"
+  }
+
+  loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+}
+
+module "api_remus" {
+  source             = "./services"
+  name               = "api_remus"
+  cluster_id         = "${aws_ecs_cluster.api.id}"
+  task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
+  vpc_id             = "${module.vpc_api.vpc_id}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.release_ids["api"]}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.release_ids["nginx_api"]}"
+  listener_https_arn = "${module.api_alb.listener_https_arn}"
+  listener_http_arn  = "${module.api_alb.listener_http_arn}"
+  infra_bucket       = "${var.infra_bucket}"
+  config_key         = "config/${var.build_env}/api_remus.ini"
+  alb_priority       = "111"
+  host_name          = "api-stage.wellcomecollection.org"
 
   cpu    = 1792
   memory = 1840
