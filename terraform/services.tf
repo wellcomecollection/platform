@@ -167,7 +167,7 @@ module "api_romulus" {
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/api_romulus.ini"
   alb_priority       = "110"
-  host_name          = "${var.api_host}"
+  host_name          = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
 
   cpu    = 1792
   memory = 1840
@@ -178,7 +178,7 @@ module "api_romulus" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    api_host    = "${var.api_host}"
+    api_host    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_config["port"]}"
     es_name     = "${var.es_config["name"]}"
@@ -207,7 +207,7 @@ module "api_remus" {
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/api_remus.ini"
   alb_priority       = "111"
-  host_name          = "${var.api_host_stage}"
+  host_name          = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
 
   cpu    = 1792
   memory = 1840
@@ -218,7 +218,7 @@ module "api_remus" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    api_host    = "${var.api_host_stage}"
+    api_host    = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_config["port"]}"
     es_name     = "${var.es_config["name"]}"
