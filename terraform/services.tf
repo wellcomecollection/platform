@@ -1,12 +1,3 @@
-data "template_file" "es_cluster_host" {
-  template = "$${name}.$${region}.aws.found.io"
-
-  vars {
-    name   = "${var.es_config["name"]}"
-    region = "${var.es_config["region"]}"
-  }
-}
-
 module "miro_reindexer" {
   source             = "./services"
   name               = "miro_reindexer"
@@ -154,14 +145,32 @@ module "id_minter" {
   client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
+data "template_file" "es_cluster_host" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config["name"]}"
+    region = "${var.es_config["region"]}"
+  }
+}
+
+data "template_file" "es_cluster_host_stage" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_stage["name"]}"
+    region = "${var.es_config_stage["region"]}"
+  }
+}
+
 module "api_romulus" {
   source             = "./services"
   name               = "api_romulus"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_api.repository_url}:${var.release_ids["api"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.release_ids["nginx_api"]}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.production_api == "romulus" ? var.release_ids["api"] : var.staging_app_version}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.production_api == "romulus" ? var.release_ids["nginx_api"] : var.staging_nginx_version}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
@@ -179,14 +188,14 @@ module "api_romulus" {
 
   config_vars = {
     api_host    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
-    es_host     = "${data.template_file.es_cluster_host.rendered}"
-    es_port     = "${var.es_config["port"]}"
-    es_name     = "${var.es_config["name"]}"
-    es_index    = "${var.es_config["index_api"]}"
-    es_doc_type = "${var.es_config["doc_type"]}"
-    es_username = "${var.es_config["username"]}"
-    es_password = "${var.es_config["password"]}"
-    es_protocol = "${var.es_config["protocol"]}"
+    es_host     = "${var.production_api == "romulus" ? data.template_file.es_cluster_host.rendered : data.template_file.es_cluster_host_stage.rendered}"
+    es_port     = "${var.production_api == "romulus" ? var.es_config["port"] : var.es_config_stage["port"]}"
+    es_name     = "${var.production_api == "romulus" ? var.es_config["name"] : var.es_config_stage["name"]}"
+    es_index    = "${var.production_api == "romulus" ? var.es_config["index_api"] : var.es_config_stage["index_api"]}"
+    es_doc_type = "${var.production_api == "romulus" ? var.es_config["doc_type"] : var.es_config_stage["doc_type"]}"
+    es_username = "${var.production_api == "romulus" ? var.es_config["username"] : var.es_config_stage["username"]}"
+    es_password = "${var.production_api == "romulus" ? var.es_config["password"] : var.es_config_stage["password"]}"
+    es_protocol = "${var.production_api == "romulus" ? var.es_config["protocol"] : var.es_config_stage["protocol"]}"
   }
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
@@ -200,8 +209,8 @@ module "api_remus" {
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_api.repository_url}:${var.release_ids["api"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.release_ids["nginx_api"]}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.production_api == "remus" ? var.release_ids["api"] : var.staging_app_version}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.production_api == "remus" ? var.release_ids["nginx_api"] : var.staging_nginx_version}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
@@ -219,14 +228,14 @@ module "api_remus" {
 
   config_vars = {
     api_host    = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
-    es_host     = "${data.template_file.es_cluster_host.rendered}"
-    es_port     = "${var.es_config["port"]}"
-    es_name     = "${var.es_config["name"]}"
-    es_index    = "${var.es_config["index_api"]}"
-    es_doc_type = "${var.es_config["doc_type"]}"
-    es_username = "${var.es_config["username"]}"
-    es_password = "${var.es_config["password"]}"
-    es_protocol = "${var.es_config["protocol"]}"
+    es_host     = "${var.production_api == "remus" ? data.template_file.es_cluster_host.rendered : data.template_file.es_cluster_host_stage.rendered}"
+    es_port     = "${var.production_api == "remus" ? var.es_config["port"] : var.es_config_stage["port"]}"
+    es_name     = "${var.production_api == "remus" ? var.es_config["name"] : var.es_config_stage["name"]}"
+    es_index    = "${var.production_api == "remus" ? var.es_config["index_api"] : var.es_config_stage["index_api"]}"
+    es_doc_type = "${var.production_api == "remus" ? var.es_config["doc_type"] : var.es_config_stage["doc_type"]}"
+    es_username = "${var.production_api == "remus" ? var.es_config["username"] : var.es_config_stage["username"]}"
+    es_password = "${var.production_api == "remus" ? var.es_config["password"] : var.es_config_stage["password"]}"
+    es_protocol = "${var.production_api == "remus" ? var.es_config["protocol"] : var.es_config_stage["protocol"]}"
   }
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
