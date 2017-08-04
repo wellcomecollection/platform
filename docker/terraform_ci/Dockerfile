@@ -5,7 +5,7 @@ RUN apk add --update git bash openssh
 
 RUN apk --no-cache update && \
     apk --no-cache add findutils jq python py-pip py-setuptools ca-certificates curl groff less zip git && \
-    pip --no-cache-dir install awscli pyhcl && \
+    pip --no-cache-dir install awscli && \
     rm -rf /var/cache/apk/*
 
 # Install terraform.  This is the last build step because it changes with
