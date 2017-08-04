@@ -3,12 +3,12 @@ package uk.ac.wellcome.models
 import org.scalatest.{FunSpec, Matchers}
 
 
-/** Tests that the Miro transformer extracts the "label" field correctly.
+/** Tests that the Miro transformer extracts the "title" field correctly.
  *
  *  The rules around this heuristic are somewhat fiddly, and we need to be
  *  careful that we're extracting the right fields from the Miro metadata.
  */
-class MiroTransformableLabelTest extends FunSpec with Matchers {
+class MiroTransformableTitleTest extends FunSpec with Matchers {
 
   it("should use the image_title field on non-V records") {
     val title = "A picture of a parrot"
@@ -33,7 +33,7 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
   }
 
   it("""
-    should use the image_title field as the label on a V image if the
+    should use the image_title field as the title on a V image if the
     image_title is not a prefix of image_image_desc
   """) {
     val title = "A tome about a turtle"
@@ -50,7 +50,7 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
   }
 
   it("""
-    should use the first line of image_image_desc as the label on a V image
+    should use the first line of image_image_desc as the title on a V image
     if image_title is a prefix of said first line, and omit a description
     entirely (one-line description)
   """) {
@@ -68,7 +68,7 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
   }
 
   it("""
-    should use the first line of image_image_desc as the label on a V image
+    should use the first line of image_image_desc as the title on a V image
     if image_title is a prefix of said first line (multi-line description)
   """) {
     val title = "An icon of an iguana"
@@ -166,7 +166,7 @@ class MiroTransformableLabelTest extends FunSpec with Matchers {
     )
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.label shouldBe expectedLabel
+    miroTransformable.transform.get.title shouldBe expectedLabel
     miroTransformable.transform.get.description shouldBe expectedDescription
   }
 }
@@ -344,7 +344,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
       }"""
     )
 
-    work.label shouldBe "A café for cats"
+    work.title shouldBe "A café for cats"
     work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
   }
 

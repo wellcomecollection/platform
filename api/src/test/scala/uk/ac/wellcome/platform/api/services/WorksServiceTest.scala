@@ -37,9 +37,9 @@ class WorksServiceTest
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
       displayWork.results.head shouldBe DisplayWork(works(0).canonicalId,
-                                                    works(0).work.label)
+                                                    works(0).work.title)
       displayWork.results.tail.head shouldBe DisplayWork(works(1).canonicalId,
-                                                         works(1).work.label)
+                                                         works(1).work.title)
     }
   }
 
@@ -59,11 +59,11 @@ class WorksServiceTest
   it("should only find results that match a query if doing a full-text search") {
     val workDodo = identifiedWorkWith(
       canonicalId = "1234",
-      label = "A drawing of a dodo"
+      title = "A drawing of a dodo"
     )
     val workMouse = identifiedWorkWith(
       canonicalId = "5678",
-      label = "A mezzotint of a mouse"
+      title = "A mezzotint of a mouse"
     )
 
     insertIntoElasticSearch(workDodo, workMouse)
@@ -78,7 +78,7 @@ class WorksServiceTest
     whenReady(searchForDodo) { works =>
       works.results should have size 1
       works.results.head shouldBe DisplayWork(workDodo.canonicalId,
-                                              workDodo.work.label)
+                                              workDodo.work.title)
     }
   }
 
@@ -154,7 +154,7 @@ class WorksServiceTest
     "should not throw an exception if passed an invalid query string for full-text search") {
     val workEmu = identifiedWorkWith(
       canonicalId = "1234",
-      label = "An etching of an emu"
+      title = "An etching of an emu"
     )
     insertIntoElasticSearch(workEmu)
 
@@ -165,19 +165,19 @@ class WorksServiceTest
     whenReady(searchForEmu) { works =>
       works.results should have size 1
       works.results.head shouldBe DisplayWork(workEmu.canonicalId,
-                                              workEmu.work.label)
+                                              workEmu.work.title)
     }
   }
 
   it("should return identifiers if specified in the includes for findWorkById") {
     val canonicalId = "1234"
 
-    val label = "image label"
+    val title = "image title"
     val miroId = "abcdef"
     val sourceName = "Miro"
     val sourceId = "MiroID"
     val work = identifiedWorkWith(canonicalId,
-                                  label,
+                                  title,
                                   identifiers = List(
                                     SourceIdentifier(source = sourceName,
                                                      sourceId = sourceId,
@@ -203,12 +203,12 @@ class WorksServiceTest
   it("should return identifiers if specified in the includes for listWorks") {
     val canonicalId = "1234"
 
-    val label = "image label"
+    val title = "image title"
     val miroId = "abcdef"
     val sourceName = "Miro"
     val sourceId = "MiroID"
     val work = identifiedWorkWith(canonicalId,
-                                  label,
+                                  title,
                                   identifiers = List(
                                     SourceIdentifier(source = sourceName,
                                                      sourceId = sourceId,
@@ -230,12 +230,12 @@ class WorksServiceTest
   it("should return identifiers if specified in the includes for searchWorks") {
     val canonicalId = "1234"
 
-    val label = "A search for a snail"
+    val title = "A search for a snail"
     val miroId = "abcdef"
     val sourceName = "Miro"
     val sourceId = "MiroID"
     val work = identifiedWorkWith(canonicalId,
-                                  label,
+                                  title,
                                   identifiers = List(
                                     SourceIdentifier(source = sourceName,
                                                      sourceId = sourceId,
