@@ -20,7 +20,7 @@
 #
 
 [loris.Loris]
-tmp_dp = '/tmp/loris2/tmp' # r--
+tmp_dp = '/tmp/loris2' # r--
 www_dp = '/var/www/loris2' # r-x
 run_as_user = 'loris'
 run_as_group = 'loris'
