@@ -19,23 +19,6 @@ rm -rf releases
 echo "Getting variables from S3"
 aws s3 cp s3://platform-infra/terraform.tfvars .
 
-# We run two versions of the API: romulus and remus.  Travis bumps the
-# release ID in S3 on every build of the API, but we don't always want to
-# advance both romulus and remus.  Decide which version, if either, we want
-# to bump to the latest API version.
-
-if ! hcltool terraform.tfvars | jq --exit-status '.remus_runs_latest? == "false"' >/dev/null
-then
-  aws s3 cp s3://platform-infra/releases/api s3://platform-infra/releases/api_remus
-  aws s3 cp s3://platform-infra/releases/nginx_api s3://platform-infra/releases/nginx_api_remus
-fi
-
-if ! hcltool terraform.tfvars | jq --exit-status '.romulus_runs_latest? == "false"' >/dev/null
-then
-  aws s3 cp s3://platform-infra/releases/api s3://platform-infra/releases/api_romulus
-  aws s3 cp s3://platform-infra/releases/nginx_api s3://platform-infra/releases/nginx_api_romulus
-fi
-
 # Download releases from S3
 mkdir -p releases
 aws s3 cp s3://platform-infra/releases releases --recursive
