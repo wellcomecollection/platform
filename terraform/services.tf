@@ -1,12 +1,3 @@
-data "template_file" "es_cluster_host" {
-  template = "$${name}.$${region}.aws.found.io"
-
-  vars {
-    name   = "${var.es_config["name"]}"
-    region = "${var.es_config["region"]}"
-  }
-}
-
 module "miro_reindexer" {
   source             = "./services"
   name               = "miro_reindexer"
@@ -42,6 +33,15 @@ module "miro_reindexer" {
   client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
+data "template_file" "es_cluster_host_ingestor" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_ingestor["name"]}"
+    region = "${var.es_config_ingestor["region"]}"
+  }
+}
+
 module "ingestor" {
   source             = "./services"
   name               = "ingestor"
@@ -65,14 +65,14 @@ module "ingestor" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    es_host           = "${data.template_file.es_cluster_host.rendered}"
-    es_port           = "${var.es_config["port"]}"
-    es_name           = "${var.es_config["name"]}"
-    es_index          = "${var.es_config["index_ingestor"]}"
-    es_doc_type       = "${var.es_config["doc_type"]}"
-    es_username       = "${var.es_config["username"]}"
-    es_password       = "${var.es_config["password"]}"
-    es_protocol       = "${var.es_config["protocol"]}"
+    es_host           = "${data.template_file.es_cluster_host_ingestor.rendered}"
+    es_port           = "${var.es_config_ingestor["port"]}"
+    es_name           = "${var.es_config_ingestor["name"]}"
+    es_index          = "${var.es_config_ingestor["index"]}"
+    es_doc_type       = "${var.es_config_ingestor["doc_type"]}"
+    es_username       = "${var.es_config_ingestor["username"]}"
+    es_password       = "${var.es_config_ingestor["password"]}"
+    es_protocol       = "${var.es_config_ingestor["protocol"]}"
     ingest_queue_id   = "${module.es_ingest_queue.id}"
     metrics_namespace = "ingestor"
   }
@@ -154,39 +154,97 @@ module "id_minter" {
   client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
-module "api" {
+data "template_file" "es_cluster_host_romulus" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_romulus["name"]}"
+    region = "${var.es_config_romulus["region"]}"
+  }
+}
+
+module "api_romulus" {
   source             = "./services"
-  name               = "api"
+  name               = "api_romulus"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_api.repository_url}:${var.release_ids["api"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.release_ids["nginx_api"]}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_romulus_api != "" ? var.pinned_romulus_api : var.release_ids["api_romulus"]}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_romulus_api_nginx != "" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/api.ini"
-  alb_priority       = "110"
-  host_name          = "api.wellcomecollection.org"
+  config_key         = "config/${var.build_env}/api_romulus.ini"
+  alb_priority       = "112"
+  host_name          = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
 
   cpu    = 1792
   memory = 1840
 
-  desired_count = 3
+  desired_count = "${var.production_api == "romulus" ? var.api_task_count : var.api_task_count_stage}"
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
 
   config_vars = {
     api_host    = "${var.api_host}"
-    es_host     = "${data.template_file.es_cluster_host.rendered}"
-    es_port     = "${var.es_config["port"]}"
-    es_name     = "${var.es_config["name"]}"
-    es_index    = "${var.es_config["index_api"]}"
-    es_doc_type = "${var.es_config["doc_type"]}"
-    es_username = "${var.es_config["username"]}"
-    es_password = "${var.es_config["password"]}"
-    es_protocol = "${var.es_config["protocol"]}"
+    es_host     = "${data.template_file.es_cluster_host_romulus.rendered}"
+    es_port     = "${var.es_config_romulus["port"]}"
+    es_name     = "${var.es_config_romulus["name"]}"
+    es_index    = "${var.es_config_romulus["index"]}"
+    es_doc_type = "${var.es_config_romulus["doc_type"]}"
+    es_username = "${var.es_config_romulus["username"]}"
+    es_password = "${var.es_config_romulus["password"]}"
+    es_protocol = "${var.es_config_romulus["protocol"]}"
+  }
+
+  loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
+  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
+  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+}
+
+data "template_file" "es_cluster_host_remus" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_remus["name"]}"
+    region = "${var.es_config_remus["region"]}"
+  }
+}
+
+module "api_remus" {
+  source             = "./services"
+  name               = "api_remus"
+  cluster_id         = "${aws_ecs_cluster.api.id}"
+  task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
+  vpc_id             = "${module.vpc_api.vpc_id}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_remus_api != "" ? var.pinned_remus_api : var.release_ids["api"]}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api_nginx != "" ? var.pinned_remus_api_nginx : var.release_ids["nginx_api"]}"
+  listener_https_arn = "${module.api_alb.listener_https_arn}"
+  listener_http_arn  = "${module.api_alb.listener_http_arn}"
+  infra_bucket       = "${var.infra_bucket}"
+  config_key         = "config/${var.build_env}/api_remus.ini"
+  alb_priority       = "111"
+  host_name          = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
+
+  cpu    = 1792
+  memory = 1840
+
+  desired_count = "${var.production_api == "remus" ? var.api_task_count : var.api_task_count_stage}"
+
+  deployment_minimum_healthy_percent = "50"
+  deployment_maximum_percent         = "200"
+
+  config_vars = {
+    api_host    = "${var.api_host}"
+    es_host     = "${data.template_file.es_cluster_host_remus.rendered}"
+    es_port     = "${var.es_config_remus["port"]}"
+    es_name     = "${var.es_config_remus["name"]}"
+    es_index    = "${var.es_config_remus["index"]}"
+    es_doc_type = "${var.es_config_remus["doc_type"]}"
+    es_username = "${var.es_config_remus["username"]}"
+    es_password = "${var.es_config_remus["password"]}"
+    es_protocol = "${var.es_config_remus["protocol"]}"
   }
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
