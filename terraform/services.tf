@@ -187,7 +187,7 @@ module "api_romulus" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    api_host    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
+    api_host    = "${var.api_host}"
     es_host     = "${data.template_file.es_cluster_host_romulus.rendered}"
     es_port     = "${var.es_config_romulus["port"]}"
     es_name     = "${var.es_config_romulus["name"]}"
@@ -236,7 +236,7 @@ module "api_remus" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    api_host    = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
+    api_host    = "${var.api_host}"
     es_host     = "${data.template_file.es_cluster_host_remus.rendered}"
     es_port     = "${var.es_config_remus["port"]}"
     es_name     = "${var.es_config_remus["name"]}"
