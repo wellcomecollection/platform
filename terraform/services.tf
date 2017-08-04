@@ -33,6 +33,15 @@ module "miro_reindexer" {
   client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
 }
 
+data "template_file" "es_cluster_host_ingestor" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_ingestor["name"]}"
+    region = "${var.es_config_ingestor["region"]}"
+  }
+}
+
 module "ingestor" {
   source             = "./services"
   name               = "ingestor"
@@ -56,7 +65,7 @@ module "ingestor" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    es_host           = "${data.template_file.es_cluster_host.rendered}"
+    es_host           = "${data.template_file.es_cluster_host_ingestor.rendered}"
     es_port           = "${var.es_config_ingestor["port"]}"
     es_name           = "${var.es_config_ingestor["name"]}"
     es_index          = "${var.es_config_ingestor["index"]}"
@@ -154,15 +163,6 @@ data "template_file" "es_cluster_host_romulus" {
   }
 }
 
-data "template_file" "es_cluster_host_remus" {
-  template = "$${name}.$${region}.aws.found.io"
-
-  vars {
-    name   = "${var.es_config_remus["name"]}"
-    region = "${var.es_config_remus["region"]}"
-  }
-}
-
 module "api_romulus" {
   source             = "./services"
   name               = "api_romulus"
@@ -188,7 +188,7 @@ module "api_romulus" {
 
   config_vars = {
     api_host    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
-    es_host     = "${data.template_file.es_cluster_host_romuluus.rendered}"
+    es_host     = "${data.template_file.es_cluster_host_romulus.rendered}"
     es_port     = "${var.es_config_romulus["port"]}"
     es_name     = "${var.es_config_romulus["name"]}"
     es_index    = "${var.es_config_romulus["index"]}"
@@ -201,6 +201,15 @@ module "api_romulus" {
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
   client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+}
+
+data "template_file" "es_cluster_host_remus" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_remus["name"]}"
+    region = "${var.es_config_remus["region"]}"
+  }
 }
 
 module "api_remus" {
