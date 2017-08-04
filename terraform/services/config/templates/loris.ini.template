@@ -24,7 +24,7 @@ tmp_dp = '/tmp/loris2' # r--
 www_dp = '/var/www/loris2' # r-x
 run_as_user = 'loris'
 run_as_group = 'loris'
-enable_caching = True
+enable_caching = False
 redirect_canonical_image_request = False
 redirect_id_slash_to_info = True
 
