@@ -7,21 +7,31 @@
 #
 # https://www.terraform.io/docs/configuration/interpolation.html#conditionals
 
-# These three variables will change fairly regularly, whenever we want to
-# swap the staging and production APIs.
+# These variables will change fairly regularly, whenever we want to swap the
+# staging and production APIs.
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
 }
 
-variable "romulus_runs_latest" {
-  description = "Should romulus be running the latest version of the API?"
-  default     = "true"
+variable "pinned_romulus_api" {
+  description = "Which version of the API imag to pin romulus to, if any"
+  default     = ""
 }
 
-variable "remus_runs_latest" {
-  description = "Should remus be running the latest version of the API?"
-  default     = "true"
+variable "pinned_romulus_api_nginx" {
+  description = "Which version of the nginx API imag to pin romulus to, if any"
+  default     = ""
+}
+
+variable "pinned_remus_api" {
+  description = "Which version of the API imag to pin remus to, if any"
+  default     = ""
+}
+
+variable "pinned_remus_api_nginx" {
+  description = "Which version of the nginx API imag to pin remus to, if any"
+  default     = ""
 }
 
 variable "api_task_count_stage" {
