@@ -11,7 +11,7 @@ apt-get install -y libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
 
 # Download and install the Loris code itself
 apt-get install -y unzip wget
-wget https://github.com/loris-imageserver/loris/archive/v2.1.0-final.zip
+wget https://github.com/loris-imageserver/loris/archive/development.zip
 unzip v2.1.0-final.zip
 rm v2.1.0-final.zip
 apt-get remove -y unzip wget
