@@ -35,7 +35,7 @@ module "gatling_loris" {
 
 module "gatling_catalogue_api" {
   source        = "./ecs_script_task"
-  task_name     = "gatling_loris"
+  task_name     = "gatling_catalogue_api"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
