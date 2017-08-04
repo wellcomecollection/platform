@@ -31,17 +31,6 @@ variable "dash_bucket" {
   default     = "wellcome-platform-dash"
 }
 
-variable "api_host" {
-  description = "hostname to use for api"
-  default     = "api.wellcomecollection.org"
-}
-
-variable "es_config" {
-  description = "Elasticcloud config"
-  type        = "map"
-  default     = {}
-}
-
 variable "build_env" {
   description = "Build environment (prod, dev, stage, ...)"
   default     = "prod"
@@ -85,4 +74,10 @@ variable "dashboard_assumable_roles" {
 
 variable "iiif_acm_cert_arn" {
   description = "ARN of ACM cert for iiif API (in us-east-1) for CloudFront"
+}
+
+variable "es_config_ingestor" {
+  description = "ElasticCloud config for the ingestor"
+  type        = "map"
+  default     = {}
 }
