@@ -57,7 +57,7 @@ class ApiWorksTest
             |   {
             |     "type": "Work",
             |     "id": "${works(0).canonicalId}",
-            |     "label": "${works(0).work.label}",
+            |     "title": "${works(0).work.title}",
             |     "description": "${works(0).work.description.get}",
             |     "lettering": "${works(0).work.lettering.get}",
             |     "createdDate": {
@@ -72,7 +72,7 @@ class ApiWorksTest
             |   {
             |     "type": "Work",
             |     "id": "${works(1).canonicalId}",
-            |     "label": "${works(1).work.label}",
+            |     "title": "${works(1).work.title}",
             |     "description": "${works(1).work.description.get}",
             |     "lettering": "${works(1).work.lettering.get}",
             |     "createdDate": {
@@ -87,7 +87,7 @@ class ApiWorksTest
             |   {
             |     "type": "Work",
             |     "id": "${works(2).canonicalId}",
-            |     "label": "${works(2).work.label}",
+            |     "title": "${works(2).work.title}",
             |     "description": "${works(2).work.description.get}",
             |     "lettering": "${works(2).work.lettering.get}",
             |     "createdDate": {
@@ -110,7 +110,7 @@ class ApiWorksTest
     val identifiedWork =
       identifiedWorkWith(
         canonicalId = canonicalId,
-        label = label,
+        title = title,
         description = description,
         lettering = lettering,
         createdDate = period,
@@ -127,7 +127,7 @@ class ApiWorksTest
             | "@context": "https://localhost:8888/$apiPrefix/context.json",
             | "type": "Work",
             | "id": "$canonicalId",
-            | "label": "$label",
+            | "title": "$title",
             | "description": "$description",
             | "lettering": "$lettering",
             | "createdDate": {
@@ -167,7 +167,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${works(1).canonicalId}",
-                          |     "label": "${works(1).work.label}",
+                          |     "title": "${works(1).work.title}",
                           |     "description": "${works(1).work.description.get}",
                           |     "lettering": "${works(1).work.lettering.get}",
                           |     "createdDate": {
@@ -200,7 +200,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${works(0).canonicalId}",
-                          |     "label": "${works(0).work.label}",
+                          |     "title": "${works(0).work.title}",
                           |     "description": "${works(0).work.description.get}",
                           |     "lettering": "${works(0).work.lettering.get}",
                           |     "createdDate": {
@@ -233,7 +233,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${works(2).canonicalId}",
-                          |     "label": "${works(2).work.label}",
+                          |     "title": "${works(2).work.title}",
                           |     "description": "${works(2).work.description.get}",
                           |     "lettering": "${works(2).work.lettering.get}",
                           |     "createdDate": {
@@ -365,11 +365,11 @@ class ApiWorksTest
   it("should return matching results if doing a full-text search") {
     val work1 = identifiedWorkWith(
       canonicalId = "1234",
-      label = "A drawing of a dodo"
+      title = "A drawing of a dodo"
     )
     val work2 = identifiedWorkWith(
       canonicalId = "5678",
-      label = "A mezzotint of a mouse"
+      title = "A mezzotint of a mouse"
     )
     insertIntoElasticSearch(work1, work2)
 
@@ -396,7 +396,7 @@ class ApiWorksTest
              |   {
              |     "type": "Work",
              |     "id": "${work1.canonicalId}",
-             |     "label": "${work1.work.label}",
+             |     "title": "${work1.work.title}",
              |     "creators": []
              |   }
              |  ]
@@ -414,7 +414,7 @@ class ApiWorksTest
     )
     val work1 = identifiedWorkWith(
       canonicalId = "1234",
-      label = "An image of an iguana",
+      title = "An image of an iguana",
       identifiers = List(identifier1)
     )
 
@@ -425,7 +425,7 @@ class ApiWorksTest
     )
     val work2 = identifiedWorkWith(
       canonicalId = "5678",
-      label = "An impression of an igloo",
+      title = "An impression of an igloo",
       identifiers = List(identifier2)
     )
 
@@ -448,7 +448,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${work1.canonicalId}",
-                          |     "label": "${work1.work.label}",
+                          |     "title": "${work1.work.title}",
                           |     "creators": [ ],
                           |     "identifiers": [
                           |       {
@@ -462,7 +462,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${work2.canonicalId}",
-                          |     "label": "${work2.work.label}",
+                          |     "title": "${work2.work.title}",
                           |     "creators": [ ],
                           |     "identifiers": [
                           |       {
@@ -489,7 +489,7 @@ class ApiWorksTest
     )
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      label = "An image of an iguana",
+      title = "An image of an iguana",
       identifiers = List(identifier)
     )
     insertIntoElasticSearch(work)
@@ -503,7 +503,7 @@ class ApiWorksTest
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "label": "${work.work.label}",
+                          | "title": "${work.work.title}",
                           | "creators": [ ],
                           | "identifiers": [
                           |   {
@@ -523,13 +523,13 @@ class ApiWorksTest
     "should be able to look at different Elasticsearch indices based on the ?index query parameter") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      label = "A whale on a wave"
+      title = "A whale on a wave"
     )
     insertIntoElasticSearch(work)
 
     val work_alt = identifiedWorkWith(
       canonicalId = "5678",
-      label = "An impostor in an igloo"
+      title = "An impostor in an igloo"
     )
     insertIntoElasticSearchWithIndex("alt_records", work_alt)
 
@@ -542,7 +542,7 @@ class ApiWorksTest
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "label": "${work.work.label}",
+                          | "title": "${work.work.title}",
                           | "creators": [ ]
                           |}
           """.stripMargin
@@ -558,7 +558,7 @@ class ApiWorksTest
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
                           | "id": "${work_alt.canonicalId}",
-                          | "label": "${work_alt.work.label}",
+                          | "title": "${work_alt.work.title}",
                           | "creators": [ ]
                           |}
           """.stripMargin
@@ -570,13 +570,13 @@ class ApiWorksTest
     "should be able to search different Elasticsearch indices based on the ?index query parameter") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      label = "A whale on a wave"
+      title = "A whale on a wave"
     )
     insertIntoElasticSearch(work)
 
     val work_alt = identifiedWorkWith(
       canonicalId = "5678",
-      label = "An impostor in an igloo"
+      title = "An impostor in an igloo"
     )
     insertIntoElasticSearchWithIndex("alt_records", work_alt)
 
@@ -595,7 +595,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${work.canonicalId}",
-                          |     "label": "${work.work.label}",
+                          |     "title": "${work.work.title}",
                           |     "creators": [ ]
                           |   }
                           |  ]
@@ -619,7 +619,7 @@ class ApiWorksTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${work_alt.canonicalId}",
-                          |     "label": "${work_alt.work.label}",
+                          |     "title": "${work_alt.work.title}",
                           |     "creators": [ ]
                           |   }
                           |  ]
@@ -668,7 +668,7 @@ class ApiWorksTest
     "should return a Bad Request error if asked for an invalid include on an individual work") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      label = "A emu and an elephant"
+      title = "A emu and an elephant"
     )
     insertIntoElasticSearch(work)
 

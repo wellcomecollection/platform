@@ -32,21 +32,21 @@ class IdentifiedWorkIndexerTest
 
   def identifiedWorkJson(canonicalId: String,
                          sourceId: String,
-                         label: String): String = {
+                         title: String): String = {
     JsonUtil
       .toJson(
         IdentifiedWork(
           canonicalId = canonicalId,
           work = Work(identifiers =
                         List(SourceIdentifier("Miro", "MiroID", sourceId)),
-                      label = label)))
+                      title = title)))
       .get
   }
 
   it("should insert an identified unified item into Elasticsearch") {
 
     val identifiedWorkString =
-      identifiedWorkJson("5678", "1234", "some label")
+      identifiedWorkJson("5678", "1234", "An identified igloo")
 
     val future =
       identifiedWorkIndexer.indexIdentifiedWork(identifiedWorkString)
@@ -67,7 +67,7 @@ class IdentifiedWorkIndexerTest
   it(
     "should add only one record when multiple records with same id are ingested") {
     val identifiedWorkString =
-      identifiedWorkJson("5678", "1234", "some label")
+      identifiedWorkJson("5678", "1234", "A multiplicity of mice")
 
     val future = Future.sequence(
       (1 to 2).map(_ =>

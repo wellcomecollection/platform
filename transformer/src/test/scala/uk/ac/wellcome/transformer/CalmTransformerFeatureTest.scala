@@ -72,7 +72,7 @@ class  CalmTransformerFeatureTest
       .toJson(
         Work(
           identifiers = List(SourceIdentifier("source", "key", "value")),
-          label = "calm data label"
+          title = "placeholder title for a Calm record"
         ))
       .get
   }

@@ -29,13 +29,13 @@ class MiroTransformerFeatureTest
       """) {
 
     val miroID = "M0000001"
-    val label = "A guide for a giraffe"
+    val title = "A guide for a giraffe"
 
     val secondMiroID = "M0000002"
-    val secondLabel = "A song about a snake"
+    val secondTitle = "A song about a snake"
 
-    sendMiroImageToSQS(miroID, shouldNotTransformMessage(label))
-    sendMiroImageToSQS(secondMiroID, shouldTransformMessage(secondLabel))
+    sendMiroImageToSQS(miroID, shouldNotTransformMessage(title))
+    sendMiroImageToSQS(secondMiroID, shouldTransformMessage(secondTitle))
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -43,7 +43,7 @@ class MiroTransformerFeatureTest
 
       assertSNSMessageContains(snsMessages.head,
                                secondMiroID,
-                               secondLabel)
+                               secondTitle)
     }
   }
 
@@ -52,7 +52,7 @@ class MiroTransformerFeatureTest
                                        imageTitle: String) = {
     val parsedWork = JsonUtil.fromJson[Work](snsMessage.message).get
     parsedWork.identifiers.head.value shouldBe miroID
-    parsedWork.label shouldBe imageTitle
+    parsedWork.title shouldBe imageTitle
   }
 
 

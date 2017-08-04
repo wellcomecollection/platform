@@ -42,7 +42,7 @@ class WorksIndexTest
                         SourceIdentifier(source = "Miro",
                                          sourceId = "MiroID",
                                          value = "4321")),
-                      label = "this is the miro image label")
+                      title = "A magical menagerie for magpies")
         ))
       .get
 

@@ -169,7 +169,7 @@ module "api_romulus" {
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_romulus_api != "" ? var.pinned_romulus_api : var.release_ids["api_romulus"]}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_romulus_api != "" ? var.pinned_romulus_api : var.release_ids["api"]}"
   nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_romulus_api_nginx != "" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"

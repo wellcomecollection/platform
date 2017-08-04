@@ -6,7 +6,7 @@ import uk.ac.wellcome.platform.api.models.DisplayWork
 trait WorksUtil {
 
   val canonicalId = "1234"
-  val label = "this is the first image title"
+  val title = "this is the first image title"
   val description = "this is a description"
   val lettering = "some lettering"
 
@@ -15,7 +15,7 @@ trait WorksUtil {
 
   def convertWorkToDisplayWork(work: IdentifiedWork) = DisplayWork(
     work.canonicalId,
-    work.work.label,
+    work.work.title,
     work.work.description,
     work.work.lettering,
     work.work.createdDate,
@@ -27,26 +27,26 @@ trait WorksUtil {
       (idx: Int) =>
         identifiedWorkWith(
           canonicalId = s"${idx}-${canonicalId}",
-          label = s"${idx}-${label}",
+          title = s"${idx}-${title}",
           description = s"${idx}-${description}",
           lettering = s"${idx}-${lettering}",
-          createdDate = period.copy(label = s"${idx}-${period.label}"),
-          creator = agent.copy(label = s"${idx}-${agent.label}")
+          createdDate = Period(s"${idx}-${period.label}"),
+          creator = Agent(s"${idx}-${agent.label}")
       ))
 
-  def identifiedWorkWith(canonicalId: String, label: String): IdentifiedWork =
+  def identifiedWorkWith(canonicalId: String, title: String): IdentifiedWork =
     IdentifiedWork(canonicalId,
                    Work(identifiers =
                           List(SourceIdentifier("Miro", "MiroID", "5678")),
-                        label = label))
+                        title = title))
 
   def identifiedWorkWith(canonicalId: String,
-                         label: String,
+                         title: String,
                          identifiers: List[SourceIdentifier]): IdentifiedWork =
-    IdentifiedWork(canonicalId, Work(identifiers = identifiers, label = label))
+    IdentifiedWork(canonicalId, Work(identifiers = identifiers, title = title))
 
   def identifiedWorkWith(canonicalId: String,
-                         label: String,
+                         title: String,
                          description: String,
                          lettering: String,
                          createdDate: Period,
@@ -54,7 +54,7 @@ trait WorksUtil {
     canonicalId = canonicalId,
     work = Work(
       identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")),
-      label = label,
+      title = title,
       description = Some(description),
       lettering = Some(lettering),
       createdDate = Some(createdDate),

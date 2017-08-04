@@ -77,7 +77,7 @@ case class MiroTransformable(MiroID: String,
         case None => ""
       }
 
-      // Populate the label and description.  The rules are as follows:
+      // Populate the title and description.  The rules are as follows:
       //
       //  1.  For V images, if the first line of <image_image_desc> is a
       //      prefix of <image_title>, we use that instead of the title, and
@@ -92,24 +92,24 @@ case class MiroTransformable(MiroID: String,
       //
       // Note: Every image in the V collection that has image_cleared == Y has
       // non-empty title.  This is _not_ true for the MIRO records in general.
-      // TODO: Work out what label to use for those records.
+      // TODO: Work out what title to use for those records.
       //
-      val candidateLabel = candidateDescription.split("\n").head
-      val titleIsTruncatedDescription = candidateLabel
+      val candidateTitle = candidateDescription.split("\n").head
+      val titleIsTruncatedDescription = candidateTitle
         .startsWith(miroData.title.get)
 
-      val useDescriptionAsLabel = (titleIsTruncatedDescription &&
+      val useDescriptionAsTitle = (titleIsTruncatedDescription &&
         MiroCollection == "Images-V") || (miroData.title.get == "-" || miroData.title.get == "--")
 
-      val label =
-        if (useDescriptionAsLabel) candidateLabel
+      val title =
+        if (useDescriptionAsTitle) candidateTitle
         else miroData.title.get
 
-      val description = if (useDescriptionAsLabel) {
+      val description = if (useDescriptionAsTitle) {
         // Remove the first line from the description, and trim any extra
         // whitespace (leading newlines)
         candidateDescription
-          .replace(candidateLabel, "")
+          .replace(candidateTitle, "")
       } else {
         candidateDescription
       }
@@ -140,7 +140,7 @@ case class MiroTransformable(MiroID: String,
 
       Work(
         identifiers = identifiers,
-        label = label,
+        title = title,
         description = trimmedDescription,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators

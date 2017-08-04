@@ -8,9 +8,10 @@ case class CalmTransformableData(
   AccessStatus: Array[String]
 ) extends Transformable {
   def transform: Try[Work] = Try {
+    // TODO: Fill in proper data here
     Work(
       identifiers = List(SourceIdentifier("source", "key", "value")),
-      label = "calm data label"
+      title = "placeholder title for a Calm record"
     )
   }
 }
