@@ -33,6 +33,24 @@ module "gatling_loris" {
   ]
 }
 
+module "gatling_catalogue_api" {
+  source        = "./ecs_script_task"
+  task_name     = "gatling_loris"
+  app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
+  task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
+
+  cpu    = 1024
+  memory = 1024
+
+  env_vars = [
+    "{\"name\": \"SIMULATION\", \"value\": \"testing.load.CatalogueApiSimulation\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
+    "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
+    "{\"name\": \"S3_BUCKET\", \"value\": \"${aws_s3_bucket.dashboard.id}\"}",
+  ]
+}
+
 module "gatling_digital_experience" {
   source        = "./ecs_script_task"
   task_name     = "gatling_digital_experience"
