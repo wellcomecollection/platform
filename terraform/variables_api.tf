@@ -12,6 +12,7 @@
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
+  default     = "romulus"
 }
 
 variable "pinned_romulus_api" {
