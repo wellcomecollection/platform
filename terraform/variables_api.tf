@@ -59,13 +59,13 @@ variable "api_host_stage" {
 }
 
 variable "es_config_romulus" {
-  description = "ElasticCloud config for the production API"
+  description = "ElasticCloud config for romulus"
   type        = "map"
   default     = {}
 }
 
 variable "es_config_remus" {
-  description = "ElasticCloud config for the staging API"
+  description = "ElasticCloud config for remus"
   type        = "map"
   default     = {}
 }
