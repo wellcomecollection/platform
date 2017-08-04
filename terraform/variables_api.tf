@@ -14,12 +14,14 @@ variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
 }
 
-variable "staging_app_version" {
-  description = "ECR tag for the staging version of the API"
+variable "romulus_runs_latest" {
+  description = "Should romulus be running the latest version of the API?"
+  default     = "true"
 }
 
-variable "staging_nginx_version" {
-  description = "ECR tag for the staging version of nginx"
+variable "remus_runs_latest" {
+  description = "Should remus be running the latest version of the API?"
+  default     = "true"
 }
 
 variable "api_task_count_stage" {
