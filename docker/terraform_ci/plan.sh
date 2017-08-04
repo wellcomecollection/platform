@@ -24,14 +24,16 @@ aws s3 cp s3://platform-infra/terraform.tfvars .
 # advance both romulus and remus.  Decide which version, if either, we want
 # to bump to the latest API version.
 
-if hcltool terraform.tfvars | jq --exit-status '.remus_runs_latest? == "false"' >/dev/null
+if ! hcltool terraform.tfvars | jq --exit-status '.remus_runs_latest? == "false"' >/dev/null
 then
   aws s3 cp s3://platform-infra/releases/api s3://platform-infra/releases/api_remus
+  aws s3 cp s3://platform-infra/releases/nginx_api s3://platform-infra/releases/nginx_api_remus
 fi
 
-if hcltool terraform.tfvars | jq --exit-status '.romulus_runs_latest? == "false"' >/dev/null
+if ! hcltool terraform.tfvars | jq --exit-status '.romulus_runs_latest? == "false"' >/dev/null
 then
   aws s3 cp s3://platform-infra/releases/api s3://platform-infra/releases/api_romulus
+  aws s3 cp s3://platform-infra/releases/nginx_api s3://platform-infra/releases/nginx_api_romulus
 fi
 
 # Download releases from S3

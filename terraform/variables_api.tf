@@ -47,13 +47,13 @@ variable "api_host_stage" {
   default     = "api-stage.wellcomecollection.org"
 }
 
-variable "es_config_api_romulus" {
+variable "es_config_romulus" {
   description = "ElasticCloud config for the production API"
   type        = "map"
   default     = {}
 }
 
-variable "es_config_api_remus" {
+variable "es_config_remus" {
   description = "ElasticCloud config for the staging API"
   type        = "map"
   default     = {}
