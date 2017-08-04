@@ -219,7 +219,7 @@ module "api_remus" {
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
   app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_remus_api != "" ? var.pinned_remus_api : var.release_ids["api"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api != "" ? var.pinned_remus_api : var.release_ids["nginx_api"]}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api_nginx != "" ? var.pinned_remus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
