@@ -6,8 +6,8 @@ import scala.concurrent.duration._
 
 class CatalogueApiSimulation extends Simulation {
 
-  val defaultUsersPerSec = 100
-  val defaultDuration = 120
+  val defaultUsersPerSec = 20
+  val defaultDuration = 60
 
   val usersPerSec = sys.env.get("USERS_PER_SEC").map(_.toInt)
     .getOrElse(defaultUsersPerSec)
