@@ -4,6 +4,7 @@ module "compute_environment_iam" {
 
 module "compute_environment_tpl" {
   source = "./compute_environment"
+  name = "${var.name}"
 
   ec2_key_pair = "${var.key_name}"
 
@@ -18,7 +19,28 @@ module "compute_environment_tpl" {
 }
 
 resource "null_resource" "export_rendered_template" {
-  provisioner "local-exec" {
-    command = "cat > test_output.json <<EOL\n${module.compute_environment_tpl.rendered_template}\nEOL"
+  triggers {
+    template = "${module.compute_environment_tpl.rendered_template}"
   }
+
+  provisioner "local-exec" {
+    command = "cat > /app/batch_compute_environment.json <<EOL\n${module.compute_environment_tpl.rendered_template}\nEOL"
+
+    on_failure = "fail"
+  }
+
+  provisioner "local-exec" {
+    command = "/app/provisioners/aws_batch_compute.py create=/app/batch_compute_environment.json"
+
+    on_failure = "fail"
+  }
+
+  provisioner "local-exec" {
+    command = "/app/provisioners/aws_batch_compute.py destroy=${var.name}"
+
+    when = "destroy"
+    on_failure = "fail"
+  }
+
+
 }
