@@ -178,6 +178,8 @@ module "api_romulus" {
   alb_priority       = "112"
   host_name          = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
 
+  enable_alb_alarm = "${var.production_api == "romulus" ? 1 : 0}"
+
   cpu    = 1792
   memory = 1840
 
@@ -226,6 +228,8 @@ module "api_remus" {
   config_key         = "config/${var.build_env}/api_remus.ini"
   alb_priority       = "111"
   host_name          = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
+
+  enable_alb_alarm = "${var.production_api == "remus" ? 1 : 0}"
 
   cpu    = 1792
   memory = 1840
