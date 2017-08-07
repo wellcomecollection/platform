@@ -148,5 +148,5 @@ variable "deployment_maximum_percent" {
 }
 
 variable "enable_alb_alarm" {
-  default = true
+  default = 1
 }
