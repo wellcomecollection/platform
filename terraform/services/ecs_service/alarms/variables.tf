@@ -14,4 +14,8 @@ variable "topic_arn" {
   description = "SNS Topic to publish alarm state changes"
 }
 
+variable "enable_alb_alarm" {
+  default = true
+}
+
 variable "metric" {}
