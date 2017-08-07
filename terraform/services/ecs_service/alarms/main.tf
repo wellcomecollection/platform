@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "alb_alarm" {
-  count = "${var.enable_alarm}"
+  count = "${var.enable_alarm == true ? 1 : 0}"
 
   alarm_name          = "${var.name}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
