@@ -2,10 +2,10 @@
   "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
   "id": "watu9tbc",
   "type": "Work",
-  "thumbnail":{
-	"url": "https://wellcomelibrary.org/iiif/b28480351/imageanno/b28gh7z4n.jpg" , 
-	"type": "Image" , 
-   } ,
+  "workType" : {
+      "id" : "image" ,
+      "label" : "Image" ,
+  } ,
   "identifiers": 
     [
       {
@@ -61,13 +61,18 @@
   [	   
 	  {
            "label": "Caricatures",
-           "conceptScheme": "lctgm" ,
-		   "type": "GenreOrTechnique" 	   	
+		   "type": "Concept",
+		   "identifiers": [
+		   		{
+		   			"type": "Identifier",
+					"identifierScheme": "lctgm" ,
+					"value": "Caricatures"
+		   		}
+		   ] 	   	
 	   } , 
 	   {
 	       "label": "Etching and water colour" ,
-		   "conceptScheme": "miro-technique" ,
-		   "type": "GenreOrTechnique" 	   	
+		   "type": "Concept" 	   	
 	   } 
    ],
   "physicalDescription": "etching, with watercolour"  , 
@@ -75,28 +80,23 @@
     [
       {
         "label": "Thomas Young [1773  - 1829 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+		"type": "Concept"
       },
       {
         "label": "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+		"type": "Concept"
       },
       {
         "label": "Sir Humphry Davy [1778  - 1829 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+		"type": "Concept"
       },
       {
         "label": "Sir John Coxe Hippisley [1748  - 1825 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+		"type": "Concept"
       },
       {
         "label": "Royal Institution of Great Britain [ - ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+		"type": "Concept"
       }
     ],
   "items":
@@ -104,42 +104,52 @@
       {
        "id": "b28gh7z4n",
        "type": "Item",
-       "licence": "CC-BY-4.0",
-       "identifiers": 
+		"identifiers": 
         [
           {
             "value": "V0006724",
 			"type": "Identifier" ,
-            "identifierScheme": "miro-image-number"
+            "identifierScheme": "miro-image-number" ,
           }
         ],
-		"itemAccess" :
+		"locations" :
          [
 			 {
-		     "type": "PhysicalAccess" ,
-			 "format": "Picture" ,
-			 "location": "1l19",
-			 "accessStatus": "Open" ,
-			 "service":
-			  {
-				  "label": "Closed Store Iconographic" ,
-				  "profile": "http://catalogue.wellcomelibrary.org/screens/loc_closed_online_icon.html" 
-			  } 
-				 
+		     "type": "PhysicalLocation" ,
+			 "locationType": {
+				 "id" : "sicon" ,
+				 "label" : "Closed Store Iconographic" ,
+				 "url" : "http://catalogue.wellcomelibrary.org/screens/loc_closed_online_icon.html" , 
+				 "type" : "LocationType"
+			     } ,
+			 "identifiers": {
+				 "type" : "Identifier" ,
+				 "identifierScheme" : "icon-shelfmark" ,
+				 "value" : "1L9N"
+			 } ,
+			 "accessStatus":{
+				 "id" : "open" ,
+				 "type" : "AccessStatus"
+			     } ,
+			 "accessProcess" : {
+				 "id" : "online-access" ,
+				 "label" : "Online access" ,
+				 "type" : "AccessProcess" 
+				 } ,
 			 } ,
 			 {
-			 "type": "DigitalAccess" ,
-			 "format": "Manifest" ,
-			 "accessStatus": "Open" ,
-			 "license": "CC-BY-4.0" ,
-			 "location": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
-			 "service":
-			  {
-				  "id": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
-				  "label": "IIIF Image API" ,
-				  "profile": "http://iiif.io/api/image/2/level2.json" 
-			  } 
-			 }
+		     "id" : "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
+			 "type": "DigitalLocation" ,
+			 "locationType": "iiif-image" ,
+			 "label" : "IIIF Image API" ,
+			 "url" : "http://wellcomelibrary.org/what-we-do/digitisation/" , 
+		 	 "license" : {
+		 		"type" : "License" ,
+		 	    "label" : "CC-BY-4.0" ,
+		 		"description" : "Copyrighted work available under Creative Commons Attribution only licence CC BY 4.0" ,
+		 	    "url" : "http://creativecommons.org/licenses/by/4.0/" ,	
+		 		} ,
+			 } ,
 		 ] 	
        }
     ]

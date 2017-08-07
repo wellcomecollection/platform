@@ -79,5 +79,12 @@ wcore:description rdf:type owl:DatatypeProperty ;
 	rdfs:comment "A description given to a thing"@en ;
 	rdfs:domain wcore:Thing ;
 	rdfs:range rdfs:Literal ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .				
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
+	
+wcore:url rdf:type owl:DatatypeProperty ;
+	rdfs:label "url"@en ;
+	rdfs:comment "A url for a thing"@en ;
+	rdfs:domain wcore:Thing ;
+	rdfs:range rdfs:Literal ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .					
 	
