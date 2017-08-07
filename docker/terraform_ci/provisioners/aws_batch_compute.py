@@ -19,24 +19,47 @@ import json
 import boto3
 import docopt
 
+def _environment_exists(client, name):
+    response = client.describe_compute_environments(
+        computeEnvironments=[
+            name,
+        ],
+        maxResults=1,
+    )
+
+    return response["computeEnvironments"].length > 0
+
+
+def _parse_json_file(file):
+    file_contents = open(file).read()
+
+    return json.loads(file_contents)
+
+
+def create_compute_environment(client, description):
+    name = description["computeEnvironmentName"]
+
+    if not _environment_exists(client, name):
+        client.create_compute_environment(**description)
+
+
+def delete_compute_environment(name):
+    if _environment_exists(client, name):
+        client.delete_compute_environment(
+            computeEnvironment=name
+        )
 
 
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
-    create = args['--create']
-    destroy = args['--destroy']
+    description_file_location = args['--create']
+    compute_env_name = args['--destroy']
 
     client = boto3.client('batch')
 
     if create is not None:
-        create_description = open(create).read()
-        parsed_description = json.loads(create_description)
-
-        client.create_compute_environment(**parsed_description)
+        description = _parse_json_file(description_file_location)
+        create_compute_environment(client, description)
     else:
-        compute_env_name = destroy
-
-        client.delete_compute_environment(
-            computeEnvironment=compute_env_name
-        )
+        delete_compute_environment(client, compute_env_name)
