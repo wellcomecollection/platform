@@ -1,12 +1,15 @@
 variable "name" {
   default = "batch_compute"
 }
+
 variable "min_vcpus" {
   default = 0
 }
+
 variable "max_vcpus" {
   default = 6
 }
+
 variable "desired_vcpus" {
   default = 3
 }

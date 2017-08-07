@@ -4,18 +4,18 @@ module "compute_environment_iam" {
 
 module "compute_environment_tpl" {
   source = "./compute_environment"
-  name = "${var.name}"
+  name   = "${var.name}"
 
   ec2_key_pair = "${var.key_name}"
 
   subnets = "${var.subnets}"
 
   ecs_instance_role = "${module.compute_environment_iam.ecs_instance_role_arn}"
-  spot_fleet_role = "${module.compute_environment_iam.spot_fleet_role_arn}"
-  service_role = "${module.compute_environment_iam.batch_service_role_arn}"
+  spot_fleet_role   = "${module.compute_environment_iam.spot_fleet_role_arn}"
+  service_role      = "${module.compute_environment_iam.batch_service_role_arn}"
 
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
-  vpc_id = "${var.vpc_id}"
+  vpc_id             = "${var.vpc_id}"
 }
 
 resource "null_resource" "export_rendered_template" {
@@ -38,9 +38,7 @@ resource "null_resource" "export_rendered_template" {
   provisioner "local-exec" {
     command = "/app/provisioners/aws_batch_compute.py destroy=${var.name}"
 
-    when = "destroy"
+    when       = "destroy"
     on_failure = "fail"
   }
-
-
 }

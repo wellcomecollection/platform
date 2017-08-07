@@ -38,4 +38,3 @@ resource "aws_iam_role" "spot_fleet" {
   name               = "${var.prefix}_AmazonEC2SpotFleetRole"
   assume_role_policy = "${data.aws_iam_policy_document.spot_fleet_assume_role.json}"
 }
-
