@@ -70,5 +70,9 @@ variable "loadbalancer_cloudwatch_id" {
   description = "LoadBalancer ARN Suffix"
 }
 
+variable "enable_alb_alarm" {
+  default = true
+}
+
 variable "deployment_minimum_healthy_percent" {}
 variable "deployment_maximum_percent" {}

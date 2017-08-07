@@ -1,4 +1,6 @@
 module "alb_target_500_errors" {
+  count = "${var.enable_alb_alarm}"
+
   source = "./alarms"
   name   = "${var.service_name}-alb-target-500-errors"
 
@@ -10,6 +12,8 @@ module "alb_target_500_errors" {
 }
 
 module "alb_target_400_errors" {
+  count = "${var.enable_alb_alarm}"
+
   source = "./alarms"
   name   = "${var.service_name}-alb-target-400-errors"
 
