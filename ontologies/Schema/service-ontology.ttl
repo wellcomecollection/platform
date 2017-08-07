@@ -1,0 +1,91 @@
+@prefix ws: <http://www.wellcomecollection.org/ontologies/service> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://www.wellcomecollection.org/ontologies/service>
+    rdf:type owl:Ontology ;
+    dcterms:title "Service ontology"@en ;
+    dcterms:created "2017-07-25"^^xsd:date ;
+    dcterms:description "Ontology describing the properties of services that deliver resources"@en .
+	
+	###### classes ###	
+
+ws:Item rdf:type owl:Class ;
+    rdfs:label "Item"@en ;
+    rdfs:comment "An item"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .
+
+ws:Service rdf:type owl:Class ;
+    rdfs:label "Service"@en ;
+    rdfs:comment "A service that delivers resources"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .	
+	
+ws:Profile rdf:type owl:Class ;
+    rdfs:label "Profile"@en ;
+    rdfs:comment "A service profile"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .		
+	
+ws:Protocol rdf:type owl:Class ;
+    rdfs:label "Protocol"@en ;
+    rdfs:comment "A service protocol"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .
+	
+ws:Access rdf:type owl:Class ;
+    rdfs:label "Access"@en ;
+    rdfs:comment "A description of broad considerations that affect how the item may be consulted: whether it is on open shelves, requires ordering from closed stack, is closed for consultation due to considerations such as data protection legislation or fragility, or is missing."@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .
+	
+ws:AccessLocation rdf:type owl:Class ;
+    rdfs:label "AccessLocation"@en ;
+    rdfs:comment "A location that a access to an item is made avaliable"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .
+	
+
+ws:AccessStatus rdf:type owl:Class ;
+    rdfs:label "AccessStatusType"@en ;
+    rdfs:comment "A description of broad considerations that affect how the item may be consulted: whether it is on open shelves, requires ordering from closed stack, is closed for consultation due to considerations such as data protection legislation or fragility, or is missing."@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .	
+	
+	
+##### Object properties ####
+
+ws:service rdf:type owl:ObjectProperty ;
+	rdfs:label "service"@en ;
+	rdfs:comment "A service that makes the thing accessible"@en ; 
+	rdfs:domain ws:Access ;
+	rdfs:range ws:Service ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .
+	
+ws:itemAccess  rdf:type owl:ObjectProperty ;
+	rdfs:label "itemAccess"@en ;
+	rdfs:comment "An access route for an item"@en ; 
+	rdfs:domain ws:Item ;
+	rdfs:range ws:Access ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .	
+	
+ws:accessStatus rdf:type owl:ObjectProperty ;
+	rdfs:label "accessStatus"@en ;
+	rdfs:comment "A service that makes the thing accesible"@en ; 
+	rdfs:domain ws:Access ;
+	rdfs:range ws:AccessStatus ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .
+	
+ws:avaliableFormat rdf:type owl:ObjectProperty ;
+	rdfs:label "avaliableFormat"@en ;
+	rdfs:comment "The format an item is accessible as."@en ;
+	rdfs:domain ws:Access ;
+	rdfs:range ws:Format ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .	
+	
+ws:locations rdf:type owl:ObjectProperty ;
+	rdfs:label "locations"@en ;
+	rdfs:comment "This relates an accessebile item to a broad intellectual division of the Library or its storage areas within which an item is held: for instance, the History of Medicine collection, or the Closed Store Archives and Manuscripts material.  Although driven by intellectual divisions rather than physical, it will usually have implications for physical location."@en ;
+	rdfs:domain ws:Access ;
+	rdfs:range ws:AccessLocation ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/service> .					
+	
+	
+	
