@@ -71,7 +71,7 @@ variable "loadbalancer_cloudwatch_id" {
 }
 
 variable "enable_alb_alarm" {
-  default = true
+  default = 1
 }
 
 variable "deployment_minimum_healthy_percent" {}
