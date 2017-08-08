@@ -26,13 +26,13 @@ resource "null_resource" "export_rendered_template" {
   }
 
   provisioner "local-exec" {
-    command = "cat > /app/batch_compute_environment.json <<EOL\n${module.compute_environment_tpl.rendered_template}\nEOL"
+    command = "cat > /app/batch_compute_environment_${var.name}.json <<EOL\n${module.compute_environment_tpl.rendered_template}\nEOL"
 
     on_failure = "fail"
   }
 
   provisioner "local-exec" {
-    command = "/app/provisioners/aws_batch_compute.py create /app/batch_compute_environment.json"
+    command = "/app/provisioners/aws_batch_compute.py create /app/batch_compute_environment_${var.name}.json"
 
     on_failure = "fail"
   }
