@@ -4,6 +4,10 @@
 set -o errexit
 set -o nounset
 
+LORIS_COMMIT="2ba933cbddad7f322c2d1d483b11f1445ba6204c"
+
+https://github.com/loris-imageserver/loris/archive/2ba933cbddad7f322c2d1d483b11f1445ba6204c.zip
+
 # Install dependencies.  We don't include Apache because we're running
 # Loris with UWSGI and nginx, not Apache.
 apt-get install -y libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
@@ -11,14 +15,14 @@ apt-get install -y libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
 
 # Download and install the Loris code itself
 apt-get install -y unzip wget
-wget https://github.com/loris-imageserver/loris/archive/development.zip
-unzip development.zip
-rm development.zip
+wget "https://github.com/loris-imageserver/loris/archive/$LORIS_COMMIT.zip"
+unzip "$LORIS_COMMIT.zip"
+rm "$LORIS_COMMIT.zip"
 apt-get remove -y unzip wget
 
 # Required or setup.py complains
 useradd -d /var/www/loris -s /sbin/false loris
 
-cd loris-development
+cd "loris-$LORIS_COMMIT"
 pip install -r requirements.txt
-python setup.py install --image-cache=/mnt/efs/image_cache --info-cache=/mnt/efs/info_cache
+python setup.py install
