@@ -438,17 +438,17 @@ class ApiWorksTest
              |  "results": [
              |   {
              |     "type": "Work",
-             |     "id": "g1234",
-             |     "title": "A guppy in a greenhouse",
+             |     "id": "${workWithGenres.canonicalId}",
+             |     "title": "${workWithGenres.work.title}",
              |     "creators": [],
              |     "genres": [
              |      {
              |        "type": "Concept",
-             |        "label": "fish",
+             |        "label": "fish"
              |      },
              |      {
              |        "type": "Concept",
-             |        "label": "gardening",
+             |        "label": "gardening"
              |      }
              |     ]
              |   }
@@ -539,12 +539,12 @@ class ApiWorksTest
     "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val identifier = SourceIdentifier(
       source = "TestSource",
-      sourceId = "The ID field within the TestSource",
+      sourceId = "An Insectoid Identifier",
       value = "Test1234"
     )
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      title = "An image of an iguana",
+      title = "An insect huddled in an igloo",
       identifiers = List(identifier)
     )
     insertIntoElasticSearch(work)
@@ -567,7 +567,8 @@ class ApiWorksTest
                           |     "name": "${identifier.sourceId}",
                           |     "value": "${identifier.value}"
                           |   }
-                          | ]
+                          | ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -627,7 +628,7 @@ class ApiWorksTest
     "should be able to search different Elasticsearch indices based on the ?index query parameter") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      title = "A whale on a wave"
+      title = "A wombat wallowing under a willow"
     )
     insertIntoElasticSearch(work)
 
@@ -639,7 +640,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works?query=whale",
+        path = s"/$apiPrefix/works?query=wombat",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
