@@ -41,10 +41,14 @@ copyright = args['--copyright']
 client = boto3.client('s3')
 _, tmp_fp = tempfile.mkstemp()
 
-client.download_file(Bucket=src_bucket, Key=src_key, Filename=tmp_fp)
-client.upload_file(Bucket=dst_bucket, Key=dst_key, Filename=tmp_fp)
+try:
+    client.download_file(Bucket=src_bucket, Key=src_key, Filename=tmp_fp)
 
-if delete_original:
-    client.delete_object(Bucket=src_bucket, Key=src_key)
+    # Magic happens here...
 
-os.unlink(tmp_fp)
+    client.upload_file(Bucket=dst_bucket, Key=dst_key, Filename=tmp_fp)
+
+    if delete_original:
+        client.delete_object(Bucket=src_bucket, Key=src_key)
+finally:
+    os.unlink(tmp_fp)
