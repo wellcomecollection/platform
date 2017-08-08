@@ -428,17 +428,17 @@ class MiroTransformableTest extends FunSpec with Matchers {
 
 
 
-/** Tests that the Miro transformer extracts the "genres" field correctly.
+/** Tests that the Miro transformer extracts the "subjects" field correctly.
  *
  *  Although this transformation is currently a bit basic, the data we get
  *  from Miro will need cleaning before it's presented in the API (casing,
  *  names, etc.) -- these tests will become more complicated.
  */
-class MiroTransformableGenresTest extends FunSpec with Matchers {
+class MiroTransformableSubjectsTest extends FunSpec with Matchers {
 
-  it("should have an empty genre list on records without keywords") {
+  it("should have an empty subject list on records without keywords") {
     transformRecordAndCheckGenres(
-      data = s""""image_title": "A giraffe without genres"""",
+      data = s""""image_title": "A snail without a subject"""",
       expectedGenres = List[Concept]()
     )
   }
@@ -446,11 +446,11 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
   it("should use the image_keywords field if present") {
     transformRecordAndCheckGenres(
       data = s"""
-        "image_title": "A gecko with a gooseberry",
-        "image_keywords": ["animals", "lizards", "fruit"]
+        "image_title": "A scorpion with a strawberry",
+        "image_keywords": ["animals", "arachnids", "fruit"]
       """,
       expectedGenres = List(
-        Concept("animals"), Concept("lizards"), Concept("fruit")
+        Concept("animals"), Concept("arachnids"), Concept("fruit")
       )
     )
   }
@@ -458,11 +458,11 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
   it("should use the image_keywords_unauth field if present") {
     transformRecordAndCheckGenres(
       data = s"""
-        "image_title": "A generous gerbil gives you a grape",
-        "image_keywords_unauth": ["altruism", "rodents"]
+        "image_title": "A sweet seal gives you a sycamore",
+        "image_keywords_unauth": ["altruism", "mammals"]
       """,
       expectedGenres = List(
-        Concept("altruism"), Concept("rodents")
+        Concept("altruism"), Concept("mammals")
       )
     )
   }
@@ -470,12 +470,12 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
   it("should use the image_keywords and image_keywords_unauth fields if both present") {
     transformRecordAndCheckGenres(
       data = s"""
-        "image_title": "A gibbon, a gorilla and a goat walk into a bar",
+        "image_title": "A squid, a sponge and a stingray walk into a bar",
         "image_keywords": ["humour"],
-        "image_keywords_unauth": ["primates"]
+        "image_keywords_unauth": ["marine creatures"]
       """,
       expectedGenres = List(
-        Concept("humour"), Concept("primates")
+        Concept("humour"), Concept("marine creatures")
       )
     )
   }
@@ -495,6 +495,6 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
     )
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.genres shouldBe expectedGenres
+    miroTransformable.transform.get.subjects shouldBe expectedGenres
   }
 }

@@ -133,7 +133,7 @@ case class MiroTransformable(MiroID: String,
         case None => List()
       }
 
-      // Populate the genres field.  This is based on two fields in the XML,
+      // Populate the subjects field.  This is based on two fields in the XML,
       // <image_keywords> and <image_keywords_unauth>.  Both of these were
       // defined in part or whole by the human cataloguers, and in general do
       // not correspond to a controlled vocabulary.  (The latter was imported
@@ -152,7 +152,7 @@ case class MiroTransformable(MiroID: String,
         case None => List()
       }
 
-      val genres = keywords ++ keywordsUnauth
+      val subjects = keywords ++ keywordsUnauth
 
       // Determining the creation date depends on several factors, so we do
       // it on a per-collection basis.
@@ -167,7 +167,7 @@ case class MiroTransformable(MiroID: String,
         description = trimmedDescription,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators,
-        genres = genres
+        subjects = subjects
       )
     }
   }

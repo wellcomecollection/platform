@@ -18,7 +18,7 @@ case class Work(
   description: Option[String] = None,
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
-  genres: List[Concept] = List(),
+  subjects: List[Concept] = List(),
   creators: List[Agent] = List()
 ) {
   @JsonProperty("type") val ldType: String = "Work"

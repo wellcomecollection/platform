@@ -42,7 +42,7 @@ class WorksIndex @Inject()(client: HttpClient,
           textField("label"),
           keywordField("type")
         ),
-        objectField("genres").fields(
+        objectField("subjects").fields(
           textField("label"),
           keywordField("type")
         )
