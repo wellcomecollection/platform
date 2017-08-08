@@ -12,9 +12,9 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
 
   it("should use the image_title field on non-V records") {
     val title = "A picture of a parrot"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s""""image_title": "$title"""",
-      expectedLabel = title,
+      expectedTitle = title,
       miroCollection = "Images-A"
     )
   }
@@ -25,9 +25,9 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     is absent
   """) {
     val title = "A limerick about a lemming"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s""""image_title": "$title"""",
-      expectedLabel = title,
+      expectedTitle = title,
       miroCollection = "Images-V"
     )
   }
@@ -38,12 +38,12 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
   """) {
     val title = "A tome about a turtle"
     val description = "A story of a starfish"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """,
-      expectedLabel = title,
+      expectedTitle = title,
       expectedDescription = Some(description),
       miroCollection = "Images-V"
     )
@@ -56,12 +56,12 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
   """) {
     val title = "An icon of an iguana"
     val description = "An icon of an iguana is an intriguing image"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """,
-      expectedLabel = description,
+      expectedTitle = description,
       expectedDescription = None,
       miroCollection = "Images-V"
     )
@@ -75,12 +75,12 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     val longTitle = "An icon of an iguana is an intriguing image"
     val descriptionBody = "Woodcut, by A.R. Tist.  Italian.  1897."
     val description = s"$longTitle\\n\\n$descriptionBody"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """,
-      expectedLabel = longTitle,
+      expectedTitle = longTitle,
       expectedDescription = Some(descriptionBody),
       miroCollection = "Images-V"
     )
@@ -91,13 +91,13 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     doesn't contain useful data (one-line description)
   """) {
     val academicDescription = "An alibi for an academic"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "-",
         "image_image_desc": "--",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicDescription
+      expectedTitle = academicDescription
     )
   }
 
@@ -106,13 +106,13 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     doesn't contain useful data (single hyphen in the description)
   """) {
     val academicDescription = "Using an upside-down umbrella"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "-",
         "image_image_desc": "-",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicDescription
+      expectedTitle = academicDescription
     )
   }
 
@@ -121,13 +121,13 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     doesn't contain useful data (double hyphen in title and description)
   """) {
     val academicDescription = "Dirty doubling of dastardly data"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "--",
         "image_image_desc": "--",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicDescription
+      expectedTitle = academicDescription
     )
   }
 
@@ -138,20 +138,20 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     val academicLabel = "A lithograph of a lecturer"
     val academicBody = "The corpus of a chancellor"
     val academicDescription = s"$academicLabel\\n\\n$academicBody"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "-",
         "image_image_desc": "--",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicLabel,
+      expectedTitle = academicLabel,
       expectedDescription = Some(academicBody)
     )
   }
 
-  private def transformRecordAndCheckLabel(
+  private def transformRecordAndCheckTitle(
     data: String,
-    expectedLabel: String,
+    expectedTitle: String,
     expectedDescription: Option[String] = None,
     miroCollection: String = "TestCollection"
   ) = {
@@ -166,7 +166,7 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     )
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.title shouldBe expectedLabel
+    miroTransformable.transform.get.title shouldBe expectedTitle
     miroTransformable.transform.get.description shouldBe expectedDescription
   }
 }
