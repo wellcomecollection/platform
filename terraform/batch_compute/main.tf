@@ -19,6 +19,8 @@ module "compute_environment_tpl" {
 }
 
 resource "null_resource" "export_rendered_template" {
+  depends_on = ["module.compute_environment_tpl", "module.compute_environment_iam"]
+
   triggers {
     template = "${module.compute_environment_tpl.rendered_template}"
   }
@@ -30,13 +32,13 @@ resource "null_resource" "export_rendered_template" {
   }
 
   provisioner "local-exec" {
-    command = "/app/provisioners/aws_batch_compute.py create=/app/batch_compute_environment.json"
+    command = "/app/provisioners/aws_batch_compute.py create /app/batch_compute_environment.json"
 
     on_failure = "fail"
   }
 
   provisioner "local-exec" {
-    command = "/app/provisioners/aws_batch_compute.py destroy=${var.name}"
+    command = "/app/provisioners/aws_batch_compute.py destroy ${var.name}"
 
     when       = "destroy"
     on_failure = "fail"

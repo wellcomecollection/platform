@@ -76,11 +76,11 @@ data "aws_iam_policy_document" "batch_service_assume_role" {
 
 resource "aws_iam_role_policy" "batch_service" {
   name   = "${var.prefix}_AWSBatchServiceRolePolicy"
-  role   = "${aws_iam_role.spot_fleet.name}"
+  role   = "${aws_iam_role.batch_service.name}"
   policy = "${data.aws_iam_policy_document.batch_service.json}"
 }
 
 resource "aws_iam_role" "batch_service" {
-  name               = "${var.prefix}AWSBatchServiceRole"
+  name               = "${var.prefix}_AWSBatchServiceRole"
   assume_role_policy = "${data.aws_iam_policy_document.batch_service_assume_role.json}"
 }

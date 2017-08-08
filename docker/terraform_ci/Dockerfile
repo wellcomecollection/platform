@@ -4,8 +4,8 @@ FROM alpine
 RUN apk add --update git bash openssh
 
 RUN apk --no-cache update && \
-    apk --no-cache add findutils jq python py-pip py-setuptools ca-certificates curl groff less zip git && \
-    pip --no-cache-dir install awscli pip-tools && \
+    apk --no-cache add findutils jq python3 ca-certificates curl groff less zip git && \
+    pip3 --no-cache-dir install awscli && \
     rm -rf /var/cache/apk/*
 
 # Install terraform.  This is the last build step because it changes with
@@ -23,8 +23,7 @@ COPY provisioners /app/provisioners
 
 WORKDIR /app/provisioners
 
-RUN pip-compile --output-file requirements.txt requirements.in
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 VOLUME ["/data"]
 WORKDIR /data/terraform

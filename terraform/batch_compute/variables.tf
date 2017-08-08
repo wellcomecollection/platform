@@ -1,5 +1,5 @@
 variable "name" {
-  default = "batch_compute"
+  default = "default"
 }
 
 variable "key_name" {}
