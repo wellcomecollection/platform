@@ -15,6 +15,7 @@ Options:
 
 """
 
+import os
 import subprocess
 import tempfile
 
@@ -45,3 +46,5 @@ client.upload_file(Bucket=dst_bucket, Key=dst_key, Filename=tmp_fp)
 
 if delete_original:
     client.delete_object(Bucket=src_bucket, Key=src_key)
+
+os.unlink(tmp_fp)
