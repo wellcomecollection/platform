@@ -36,11 +36,4 @@ resource "null_resource" "export_rendered_template" {
 
     on_failure = "fail"
   }
-
-  provisioner "local-exec" {
-    command = "/app/provisioners/aws_batch_compute.py destroy ${var.name}"
-
-    when       = "destroy"
-    on_failure = "fail"
-  }
 }
