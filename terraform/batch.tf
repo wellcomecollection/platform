@@ -14,3 +14,10 @@ module "aws_batch_queue" {
   name             = "adhoc"
   compute_env_name = "adhoc"
 }
+
+module "aws_batch_job" {
+  source = "./batch_job"
+
+  image_uri = "hello-world"
+  jobRoleArn = "${module.batch_example_iam.task_role_arn}"
+}
