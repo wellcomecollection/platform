@@ -19,7 +19,7 @@ case class MiroTransformableData(
   @JsonProperty("image_cleared") cleared: Option[String],
   @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String],
   @JsonProperty("image_keywords") keywords: Option[List[String]],
-  @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]],
+  @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]]
 )
 
 case class ShouldNotTransformException(message: String)
