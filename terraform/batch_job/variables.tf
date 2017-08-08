@@ -3,7 +3,7 @@ variable "name" {
 }
 
 variable "image_uri" {}
-variable "jobRoleArn" {}
+variable "job_role_arn" {}
 
 variable "job_vars" {
   description = "Environment variables to pass to the container"

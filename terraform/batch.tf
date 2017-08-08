@@ -1,7 +1,7 @@
 module "aws_batch_compute" {
   source = "./batch_compute"
 
-  name               = "adhoc"
+  name               = "example"
   subnets            = "${join(",", formatlist("\"%s\"", module.vpc_batch.subnets))}"
   key_name           = "${var.key_name}"
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
@@ -11,13 +11,14 @@ module "aws_batch_compute" {
 module "aws_batch_queue" {
   source = "./batch_queue"
 
-  name             = "adhoc"
-  compute_env_name = "adhoc"
+  name             = "example"
+  compute_env_name = "example"
 }
 
 module "aws_batch_job" {
   source = "./batch_job"
 
-  image_uri = "hello-world"
-  jobRoleArn = "${module.batch_example_iam.task_role_arn}"
+  name         = "example"
+  image_uri    = "hello-world"
+  job_role_arn = "${module.batch_example_iam.task_role_arn}"
 }

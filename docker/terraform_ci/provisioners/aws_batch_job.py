@@ -45,7 +45,7 @@ def _job_exists(client, name):
 
 
 def register_job_definition(client, requested_description):
-    name = requested_description['jobQueueName']
+    name = requested_description['jobDefinitionName']
     description = _job_exists(client, name)
 
     if description:
