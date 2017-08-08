@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 """
 Usage:
-  run.py --src-bucket=<BUCKET> [--dst-bucket=<BUCKET>] --src-key=<SRC> --dst-key=<DST> [--delete-original]
+  run.py --src-bucket=<BUCKET> [--dst-bucket=<BUCKET>] --src-key=<SRC> --dst-key=<DST> [--delete-original] --location=<LOCATION> --creator=<CREATOR> --keywords=<KEYWORDS> --intended-usage=<USAGE> --copyright=<COPYRIGHT>
   run.py -h | --help
 
 Options:
@@ -15,6 +15,7 @@ Options:
 
 """
 
+import subprocess
 import tempfile
 
 import boto3
@@ -28,7 +29,19 @@ dst_bucket = args['--dst-bucket'] or src_bucket
 src_key = args['--src-key']
 dst_key = args['--dst-key']
 delete_original = bool(args['--delete-original'])
-print(delete_original)
+
+# Metadata to be embedded
+location = args['--location']
+creator = args['--creator']
+keywords = args['--keywords']
+usage = args['--intended-usage']
+copyright = args['--copyright']
 
 client = boto3.client('s3')
 _, tmp_fp = tempfile.mkstemp()
+
+client.download_file(Bucket=src_bucket, Key=src_key, Filename=tmp_fp)
+client.upload_file(Bucket=dst_bucket, Key=dst_key, Filename=tmp_fp)
+
+if delete_original:
+    client.delete_object(Bucket=src_bucket, Key=src_key)
