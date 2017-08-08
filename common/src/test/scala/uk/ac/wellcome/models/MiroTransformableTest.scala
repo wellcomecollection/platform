@@ -425,3 +425,76 @@ class MiroTransformableTest extends FunSpec with Matchers {
     miroTransformable.transform.get
   }
 }
+
+
+
+/** Tests that the Miro transformer extracts the "genres" field correctly.
+ *
+ *  Although this transformation is currently a bit basic, the data we get
+ *  from Miro will need cleaning before it's presented in the API (casing,
+ *  names, etc.) -- these tests will become more complicated.
+ */
+class MiroTransformableGenresTest extends FunSpec with Matchers {
+
+  it("should have an empty genre list on records without keywords") {
+    transformRecordAndCheckGenres(
+      data = s""""image_title": "A giraffe without genres"""",
+      expectedGenres = List[Concept]()
+    )
+  }
+
+  it("should use the image_keywords field if present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A gecko with a gooseberry",
+        "image_keywords": ["animals", "lizards", "fruit"]
+      """,
+      expectedGenres = List(
+        Concept("animals"), Concept("lizards"), Concept("fruit")
+      )
+    )
+  }
+
+  it("should use the image_keywords_unauth field if present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A generous gerbil gives you a grape",
+        "image_keywords_unauth": ["altruism", "rodents"]
+      """,
+      expectedGenres = List(
+        Concept("altruism"), Concept("rodents")
+      )
+    )
+  }
+
+  it("should use the image_keywords and image_keywords_unauth fields if both present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A gibbon, a gorilla and a goat walk into a bar",
+        "image_keywords": ["humour"],
+        "image_keywords_unauth": ["primates"]
+      """,
+      expectedGenres = List(
+        Concept("humour"), Concept("primates")
+      )
+    )
+  }
+
+  private def transformRecordAndCheckGenres(
+    data: String,
+    expectedGenres: List[Concept] = List()
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = "M0000001",
+      MiroCollection = "Images-V",
+      data = s"""{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        $data
+      }"""
+    )
+
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get.genres shouldBe expectedGenres
+  }
+}

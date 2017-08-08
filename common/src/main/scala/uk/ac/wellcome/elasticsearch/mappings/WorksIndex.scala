@@ -41,6 +41,10 @@ class WorksIndex @Inject()(client: HttpClient,
         objectField("creators").fields(
           textField("label"),
           keywordField("type")
+        ),
+        objectField("genres").fields(
+          textField("label"),
+          keywordField("type")
         )
       )
     )
