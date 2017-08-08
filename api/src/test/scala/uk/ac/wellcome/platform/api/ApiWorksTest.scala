@@ -68,7 +68,7 @@ class ApiWorksTest
             |       "type": "Agent",
             |       "label": "${works(0).work.creators(0).label}"
             |     }],
-            |     "genres": [ ]
+            |     "subjects": [ ]
             |   },
             |   {
             |     "type": "Work",
@@ -84,7 +84,7 @@ class ApiWorksTest
             |       "type": "Agent",
             |       "label": "${works(1).work.creators(0).label}"
             |     }],
-            |     "genres": [ ]
+            |     "subjects": [ ]
             |   },
             |   {
             |     "type": "Work",
@@ -100,7 +100,7 @@ class ApiWorksTest
             |       "type": "Agent",
             |       "label": "${works(2).work.creators(0).label}"
             |     }],
-            |     "genres": [ ]
+            |     "subjects": [ ]
             |   }
             |  ]
             |}
@@ -141,7 +141,7 @@ class ApiWorksTest
             |   "type": "Agent",
             |   "label": "${agent.label}"
             | }],
-            | "genres": [ ]
+            | "subjects": [ ]
             |}
           """.stripMargin
       )
@@ -182,7 +182,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(1).work.creators(0).label}"
                           |     }],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -216,7 +216,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(0).work.creators(0).label}"
                           |     }],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -250,7 +250,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(2).work.creators(0).label}"
                           |     }],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -405,7 +405,7 @@ class ApiWorksTest
              |     "id": "${work1.canonicalId}",
              |     "title": "${work1.work.title}",
              |     "creators": [],
-             |     "genres": [ ]
+             |     "subjects": [ ]
              |   }
              |  ]
              |}""".stripMargin
@@ -413,13 +413,13 @@ class ApiWorksTest
     }
   }
 
-  it("should include genre information in API responses") {
+  it("should include subject information in API responses") {
     val workWithGenres = IdentifiedWork(
-      canonicalId = "test_genre1",
+      canonicalId = "test_subject1",
       Work(
         identifiers = List(),
         title = "A guppy in a greenhouse",
-        genres = List(Concept("fish"), Concept("gardening"))
+        subjects = List(Concept("fish"), Concept("gardening"))
       )
     )
     insertIntoElasticSearch(workWithGenres)
@@ -441,7 +441,7 @@ class ApiWorksTest
              |     "id": "${workWithGenres.canonicalId}",
              |     "title": "${workWithGenres.work.title}",
              |     "creators": [],
-             |     "genres": [
+             |     "subjects": [
              |      {
              |        "type": "Concept",
              |        "label": "fish"
@@ -511,7 +511,7 @@ class ApiWorksTest
                           |         "value": "${identifier1.value}"
                           |       }
                           |     ],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -526,7 +526,7 @@ class ApiWorksTest
                           |         "value": "${identifier2.value}"
                           |       }
                           |     ],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   }
                           |  ]
                           |}
@@ -568,7 +568,7 @@ class ApiWorksTest
                           |     "value": "${identifier.value}"
                           |   }
                           | ],
-                          | "genres": [ ]
+                          | "subjects": [ ]
                           |}
           """.stripMargin
       )
@@ -600,7 +600,7 @@ class ApiWorksTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.work.title}",
                           | "creators": [ ],
-                          | "genres": [ ]
+                          | "subjects": [ ]
                           |}
           """.stripMargin
       )
@@ -617,7 +617,7 @@ class ApiWorksTest
                           | "id": "${work_alt.canonicalId}",
                           | "title": "${work_alt.work.title}",
                           | "creators": [ ],
-                          | "genres": [ ]
+                          | "subjects": [ ]
                           |}
           """.stripMargin
       )
@@ -655,7 +655,7 @@ class ApiWorksTest
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.work.title}",
                           |     "creators": [ ],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   }
                           |  ]
                           |}
@@ -680,7 +680,7 @@ class ApiWorksTest
                           |     "id": "${work_alt.canonicalId}",
                           |     "title": "${work_alt.work.title}",
                           |     "creators": [ ],
-                          |     "genres": [ ]
+                          |     "subjects": [ ]
                           |   }
                           |  ]
                           |}
