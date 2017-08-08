@@ -185,7 +185,7 @@ module "api_romulus" {
 
   desired_count = "${var.production_api == "romulus" ? var.api_task_count : var.api_task_count_stage}"
 
-  deployment_minimum_healthy_percent = "50"
+  deployment_minimum_healthy_percent = "${var.production_api == "romulus" ? "50" : "0"}"
   deployment_maximum_percent         = "200"
 
   config_vars = {
@@ -236,7 +236,7 @@ module "api_remus" {
 
   desired_count = "${var.production_api == "remus" ? var.api_task_count : var.api_task_count_stage}"
 
-  deployment_minimum_healthy_percent = "50"
+  deployment_minimum_healthy_percent = "${var.production_api == "remus" ? "50" : "0"}"
   deployment_maximum_percent         = "200"
 
   config_vars = {
