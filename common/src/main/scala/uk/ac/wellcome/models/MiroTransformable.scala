@@ -149,7 +149,7 @@ case class MiroTransformable(MiroID: String,
 
       val keywordsUnauth: List[Concept] = miroData.keywordsUnauth match {
         case Some(k) => k.map { Concept(_) }
-        case None => List
+        case None => List()
       }
 
       val genres = keywords ++ keywordsUnauth
