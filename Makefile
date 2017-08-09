@@ -18,7 +18,7 @@ docker-build-terraform:
 gatling-build: install-docker-build-deps
 	./scripts/build_docker_image.py --project=gatling
 
-## Deploy the image for the cache cleaner
+## Deploy the image for gatling
 gatling-deploy: gatling-build
 	./scripts/deploy_docker_to_aws.py --project=gatling --infra-bucket=$(INFRA_BUCKET)
 
@@ -30,6 +30,15 @@ cache_cleaner-build: install-docker-build-deps
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build
 	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
+
+
+## Build the image for tif-metadata
+tif-metadata-build: install-docker-build-deps
+	./scripts/build_docker_image.py --project=tif-metadata
+
+## Deploy the image for tif-metadata
+tif-metadata-deploy: tif-metadata-build
+	./scripts/deploy_docker_to_aws.py --project=tif-metadata --infra-bucket=$(INFRA_BUCKET)
 
 
 ## Build the image for Loris

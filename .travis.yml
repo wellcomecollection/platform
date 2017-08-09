@@ -112,6 +112,6 @@ env:
     - TASK=sbt-test-reindexer
     - TASK=test-lambdas
     - TASK=nginx-build
-    - TASK=cache_cleaner-build
+    - TASK=tif-metadata-build
     - TASK=gatling-build
     - TASK=loris-build

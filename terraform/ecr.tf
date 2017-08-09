@@ -65,3 +65,8 @@ module "ecr_repository_gatling" {
   source = "./ecr"
   name   = "gatling"
 }
+
+module "ecr_repository_tif-metadata" {
+  source = "./ecr"
+  name   = "tif-metadata"
+}
