@@ -68,7 +68,8 @@ class ApiWorksTest
             |       "type": "Agent",
             |       "label": "${works(0).work.creators(0).label}"
             |     }],
-            |     "subjects": [ ]
+            |     "subjects": [ ],
+            |     "genres": [ ]
             |   },
             |   {
             |     "type": "Work",
@@ -84,7 +85,8 @@ class ApiWorksTest
             |       "type": "Agent",
             |       "label": "${works(1).work.creators(0).label}"
             |     }],
-            |     "subjects": [ ]
+            |     "subjects": [ ],
+            |     "genres": [ ]
             |   },
             |   {
             |     "type": "Work",
@@ -100,7 +102,8 @@ class ApiWorksTest
             |       "type": "Agent",
             |       "label": "${works(2).work.creators(0).label}"
             |     }],
-            |     "subjects": [ ]
+            |     "subjects": [ ],
+            |     "genres": [ ]
             |   }
             |  ]
             |}
@@ -141,7 +144,8 @@ class ApiWorksTest
             |   "type": "Agent",
             |   "label": "${agent.label}"
             | }],
-            | "subjects": [ ]
+            | "subjects": [ ],
+            | "genres": [ ]
             |}
           """.stripMargin
       )
@@ -182,7 +186,8 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(1).work.creators(0).label}"
                           |     }],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -216,7 +221,8 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(0).work.creators(0).label}"
                           |     }],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -250,7 +256,8 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(2).work.creators(0).label}"
                           |     }],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -405,7 +412,8 @@ class ApiWorksTest
              |     "id": "${work1.canonicalId}",
              |     "title": "${work1.work.title}",
              |     "creators": [],
-             |     "subjects": [ ]
+             |     "subjects": [ ],
+             |     "genres": [ ]
              |   }
              |  ]
              |}""".stripMargin
@@ -418,7 +426,7 @@ class ApiWorksTest
       canonicalId = "test_subject1",
       Work(
         identifiers = List(),
-        title = "A guppy in a greenhouse",
+        title = "A seal selling seaweed sandwiches in Scotland",
         subjects = List(Concept("fish"), Concept("gardening"))
       )
     )
@@ -450,6 +458,53 @@ class ApiWorksTest
              |        "type": "Concept",
              |        "label": "gardening"
              |      }
+             |     ],
+             |     "genres": [ ]
+             |   }
+             |  ]
+             |}""".stripMargin
+      )
+    }
+  }
+
+  it("should include genre information in API responses") {
+    val workWithSubjects = IdentifiedWork(
+      canonicalId = "test_subject1",
+      Work(
+        identifiers = List(),
+        title = "A guppy in a greenhouse",
+        genres = List(Concept("woodwork"), Concept("etching"))
+      )
+    )
+    insertIntoElasticSearch(workWithSubjects)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+             |{
+             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+             |  "type": "ResultList",
+             |  "pageSize": 10,
+             |  "totalPages": 1,
+             |  "totalResults": 1,
+             |  "results": [
+             |   {
+             |     "type": "Work",
+             |     "id": "${workWithSubjects.canonicalId}",
+             |     "title": "${workWithSubjects.work.title}",
+             |     "creators": [],
+             |     "subjects": [ ],
+             |     "genres": [
+             |       {
+             |         "type": "Concept",
+             |         "label": "woodwork"
+             |       },
+             |       {
+             |         "type": "Concept",
+             |         "label": "etching"
+             |       }
              |     ]
              |   }
              |  ]
@@ -511,7 +566,8 @@ class ApiWorksTest
                           |         "value": "${identifier1.value}"
                           |       }
                           |     ],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -526,7 +582,8 @@ class ApiWorksTest
                           |         "value": "${identifier2.value}"
                           |       }
                           |     ],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -568,7 +625,8 @@ class ApiWorksTest
                           |     "value": "${identifier.value}"
                           |   }
                           | ],
-                          | "subjects": [ ]
+                          | "subjects": [ ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -600,7 +658,8 @@ class ApiWorksTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.work.title}",
                           | "creators": [ ],
-                          | "subjects": [ ]
+                          | "subjects": [ ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -617,7 +676,8 @@ class ApiWorksTest
                           | "id": "${work_alt.canonicalId}",
                           | "title": "${work_alt.work.title}",
                           | "creators": [ ],
-                          | "subjects": [ ]
+                          | "subjects": [ ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -655,7 +715,8 @@ class ApiWorksTest
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.work.title}",
                           |     "creators": [ ],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -680,7 +741,8 @@ class ApiWorksTest
                           |     "id": "${work_alt.canonicalId}",
                           |     "title": "${work_alt.work.title}",
                           |     "creators": [ ],
-                          |     "subjects": [ ]
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}

@@ -498,3 +498,70 @@ class MiroTransformableSubjectsTest extends FunSpec with Matchers {
     miroTransformable.transform.get.subjects shouldBe expectedSubjects
   }
 }
+
+
+
+class MiroTransformableGenresTest extends FunSpec with Matchers {
+
+  it("should have an empty genre list on records without keywords") {
+    transformRecordAndCheckGenres(
+      data = s""""image_title": "The giraffe's genre is gone'"""",
+      expectedGenres = List[Concept]()
+    )
+  }
+
+  it("should use the image_phys_format field if present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A goat grazes on some grass",
+        "image_phys_format": "painting"
+      """,
+      expectedGenres = List(
+        Concept("painting")
+      )
+    )
+  }
+
+  it("should use the image_lc_genre field if present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "Grouchy geese are good as guards",
+        "image_lc_genre": "sculpture"
+      """,
+      expectedGenres = List(
+        Concept("sculpture")
+      )
+    )
+  }
+
+  it("should use the image_phys_format and image_lc_genre fields if both present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A gorilla and a gibbon in a garden",
+        "image_phys_format": "etching",
+        "image_lc_genre": "woodwork"
+      """,
+      expectedGenres = List(
+        Concept("etching"), Concept("woodwork")
+      )
+    )
+  }
+
+  private def transformRecordAndCheckGenres(
+    data: String,
+    expectedGenres: List[Concept] = List()
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = "M0000001",
+      MiroCollection = "Images-V",
+      data = s"""{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        $data
+      }"""
+    )
+
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get.genres shouldBe expectedGenres
+  }
+}
