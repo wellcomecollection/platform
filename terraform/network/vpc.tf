@@ -15,6 +15,8 @@ resource "aws_subnet" "network" {
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   vpc_id            = "${aws_vpc.vpc.id}"
 
+  map_public_ip_on_launch = "${var.map_public_ip}"
+
   tags {
     Name = "${var.name}"
   }
