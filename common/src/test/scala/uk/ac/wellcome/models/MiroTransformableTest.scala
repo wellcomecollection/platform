@@ -501,7 +501,6 @@ class MiroTransformableSubjectsTest extends FunSpec with Matchers {
 
 
 
-
 class MiroTransformableGenresTest extends FunSpec with Matchers {
 
   it("should have an empty genre list on records without keywords") {
@@ -515,10 +514,10 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "A goat grazes on some grass",
-        "image_phys_format": ["painting", "watercolour"]
+        "image_phys_format": "painting"
       """,
       expectedGenres = List(
-        Concept("painting"), Concept("watercolour")
+        Concept("painting")
       )
     )
   }
@@ -527,7 +526,7 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "Grouchy geese are good as guards",
-        "image_lc_genre": ["sculpture"]
+        "image_lc_genre": "sculpture"
       """,
       expectedGenres = List(
         Concept("sculpture")
@@ -539,8 +538,8 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "A gorilla and a gibbon in a garden",
-        "image_phys_format": ["etching"],
-        "image_lc_genre": ["woodwork"]
+        "image_phys_format": "etching",
+        "image_lc_genre": "woodwork"
       """,
       expectedGenres = List(
         Concept("etching"), Concept("woodwork")
