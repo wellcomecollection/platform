@@ -437,52 +437,52 @@ class MiroTransformableTest extends FunSpec with Matchers {
 class MiroTransformableSubjectsTest extends FunSpec with Matchers {
 
   it("should have an empty subject list on records without keywords") {
-    transformRecordAndCheckGenres(
+    transformRecordAndCheckSubjects(
       data = s""""image_title": "A snail without a subject"""",
-      expectedGenres = List[Concept]()
+      expectedSubjects = List[Concept]()
     )
   }
 
   it("should use the image_keywords field if present") {
-    transformRecordAndCheckGenres(
+    transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A scorpion with a strawberry",
         "image_keywords": ["animals", "arachnids", "fruit"]
       """,
-      expectedGenres = List(
+      expectedSubjects = List(
         Concept("animals"), Concept("arachnids"), Concept("fruit")
       )
     )
   }
 
   it("should use the image_keywords_unauth field if present") {
-    transformRecordAndCheckGenres(
+    transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A sweet seal gives you a sycamore",
         "image_keywords_unauth": ["altruism", "mammals"]
       """,
-      expectedGenres = List(
+      expectedSubjects = List(
         Concept("altruism"), Concept("mammals")
       )
     )
   }
 
   it("should use the image_keywords and image_keywords_unauth fields if both present") {
-    transformRecordAndCheckGenres(
+    transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A squid, a sponge and a stingray walk into a bar",
         "image_keywords": ["humour"],
         "image_keywords_unauth": ["marine creatures"]
       """,
-      expectedGenres = List(
+      expectedSubjects = List(
         Concept("humour"), Concept("marine creatures")
       )
     )
   }
 
-  private def transformRecordAndCheckGenres(
+  private def transformRecordAndCheckSubjects(
     data: String,
-    expectedGenres: List[Concept] = List()
+    expectedSubjects: List[Concept] = List()
   ) = {
     val miroTransformable = MiroTransformable(
       MiroID = "M0000001",
@@ -495,6 +495,6 @@ class MiroTransformableSubjectsTest extends FunSpec with Matchers {
     )
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.subjects shouldBe expectedGenres
+    miroTransformable.transform.get.subjects shouldBe expectedSubjects
   }
 }

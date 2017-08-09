@@ -414,7 +414,7 @@ class ApiWorksTest
   }
 
   it("should include subject information in API responses") {
-    val workWithGenres = IdentifiedWork(
+    val workWithSubjects = IdentifiedWork(
       canonicalId = "test_subject1",
       Work(
         identifiers = List(),
@@ -422,7 +422,7 @@ class ApiWorksTest
         subjects = List(Concept("fish"), Concept("gardening"))
       )
     )
-    insertIntoElasticSearch(workWithGenres)
+    insertIntoElasticSearch(workWithSubjects)
 
     eventually {
       server.httpGet(
@@ -438,8 +438,8 @@ class ApiWorksTest
              |  "results": [
              |   {
              |     "type": "Work",
-             |     "id": "${workWithGenres.canonicalId}",
-             |     "title": "${workWithGenres.work.title}",
+             |     "id": "${workWithSubjects.canonicalId}",
+             |     "title": "${workWithSubjects.work.title}",
              |     "creators": [],
              |     "subjects": [
              |      {
