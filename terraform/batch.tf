@@ -1,7 +1,6 @@
 module "aws_batch_compute" {
   source = "./batch_compute"
 
-  name               = "example"
   subnets            = "${join(",", formatlist("\"%s\"", module.vpc_batch.subnets))}"
   key_name           = "${var.key_name}"
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
@@ -11,10 +10,11 @@ module "aws_batch_compute" {
 module "aws_batch_queue" {
   source = "./batch_queue"
 
-  name             = "example"
-  compute_env_name = "example"
+  name             = "default"
+  compute_env_name = "default"
 }
 
+/*
 module "aws_batch_job" {
   source = "./batch_job"
 
@@ -22,3 +22,5 @@ module "aws_batch_job" {
   image_uri    = "hello-world"
   job_role_arn = "${module.batch_example_iam.task_role_arn}"
 }
+*/
+
