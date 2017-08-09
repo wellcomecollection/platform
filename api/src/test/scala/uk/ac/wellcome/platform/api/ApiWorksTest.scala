@@ -473,7 +473,7 @@ class ApiWorksTest
       Work(
         identifiers = List(),
         title = "A guppy in a greenhouse",
-        subjects = List(Concept("woodwork"), Concept("etching"))
+        genres = List(Concept("woodwork"), Concept("etching"))
       )
     )
     insertIntoElasticSearch(workWithSubjects)
@@ -499,11 +499,11 @@ class ApiWorksTest
              |     "genres": [
              |       {
              |         "type": "Concept",
-             |         "label": "fish"
+             |         "label": "woodwork"
              |       },
              |       {
              |         "type": "Concept",
-             |         "label": "gardening"
+             |         "label": "etching"
              |       }
              |     ]
              |   }
