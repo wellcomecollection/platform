@@ -19,7 +19,7 @@ class WorkExtractorTest
     val title = "A note about a narwhal"
 
     val work = Work(
-      identifiers = List(SourceIdentifier("Miro", "MiroId", miroID)),
+      identifiers = List(SourceIdentifier("test-miro-image-number", miroID)),
       title = title
     )
     val sqsMessage = SQSMessage(Some("subject"),

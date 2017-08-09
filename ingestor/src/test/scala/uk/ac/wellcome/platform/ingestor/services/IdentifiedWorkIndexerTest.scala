@@ -38,7 +38,7 @@ class IdentifiedWorkIndexerTest
         IdentifiedWork(
           canonicalId = canonicalId,
           work = Work(identifiers =
-                        List(SourceIdentifier("Miro", "MiroID", sourceId)),
+                        List(SourceIdentifier("test-miro-image-number", sourceId)),
                       title = title)))
       .get
   }

@@ -37,7 +37,7 @@ trait WorksUtil {
   def identifiedWorkWith(canonicalId: String, title: String): IdentifiedWork =
     IdentifiedWork(canonicalId,
                    Work(identifiers =
-                          List(SourceIdentifier("Miro", "MiroID", "5678")),
+                          List(SourceIdentifier("test-miro-image-number", "5678")),
                         title = title))
 
   def identifiedWorkWith(canonicalId: String,
@@ -53,7 +53,7 @@ trait WorksUtil {
                          creator: Agent): IdentifiedWork = IdentifiedWork(
     canonicalId = canonicalId,
     work = Work(
-      identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")),
+      identifiers = List(SourceIdentifier("test-miro-image-number", "5678")),
       title = title,
       description = Some(description),
       lettering = Some(lettering),

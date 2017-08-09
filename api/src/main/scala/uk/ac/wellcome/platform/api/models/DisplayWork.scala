@@ -60,7 +60,7 @@ case class DisplayIdentifier(source: String, name: String, value: String) {
 
 object DisplayIdentifier {
   def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifier =
-    DisplayIdentifier(source = sourceIdentifier.source,
-                      name = sourceIdentifier.sourceId,
+    DisplayIdentifier(source = sourceIdentifier.identifierScheme,
+                      name = "",
                       value = sourceIdentifier.value)
 }

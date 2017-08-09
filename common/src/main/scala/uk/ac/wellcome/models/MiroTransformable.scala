@@ -49,7 +49,7 @@ case class MiroTransformable(MiroID: String,
 
     JsonUtil.fromJson[MiroTransformableData](unencodedData).map { miroData =>
       // Identifier is passed straight through
-      val identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID))
+      val identifiers = List(SourceIdentifier("miro-image-number", MiroID))
 
       // XML tags refer to fields within the Miro XML dumps.
 
