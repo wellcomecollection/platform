@@ -14,13 +14,10 @@ module "aws_batch_queue" {
   compute_env_name = "default"
 }
 
-/*
-module "aws_batch_job" {
+module "aws_batch_job_tif-conversion" {
   source = "./batch_job"
 
-  name         = "example"
-  image_uri    = "hello-world"
+  name         = "tif-conversion"
+  image_uri    = "${module.ecr_repository_tif-metadata.repository_url}:${var.release_ids["tif-metadata"]}"
   job_role_arn = "${module.batch_example_iam.task_role_arn}"
 }
-*/
-
