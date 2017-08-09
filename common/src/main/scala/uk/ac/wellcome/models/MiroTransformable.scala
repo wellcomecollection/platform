@@ -19,7 +19,9 @@ case class MiroTransformableData(
   @JsonProperty("image_cleared") cleared: Option[String],
   @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String],
   @JsonProperty("image_keywords") keywords: Option[List[String]],
-  @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]]
+  @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]],
+  @JsonProperty("image_phys_format") physFormat: Option[String],
+  @JsonProperty("image_lc_genre") lcGenre: Option[String]
 )
 
 case class ShouldNotTransformException(message: String)
@@ -154,6 +156,20 @@ case class MiroTransformable(MiroID: String,
 
       val subjects = keywords ++ keywordsUnauth
 
+      // Populate the subjects field.  This is based on two fields in the XML,
+      // <image_phys_format> and <image_lc_genre>.
+      val physFormat: List[Concept] = miroData.physFormat match {
+        case Some(f) => List(Concept(f))
+        case None => List()
+      }
+
+      val lcGenre: List[Concept] = miroData.lcGenre match {
+        case Some(g) => List(Concept(g))
+        case None => List()
+      }
+
+      val genres = physFormat ++ lcGenre
+
       // Determining the creation date depends on several factors, so we do
       // it on a per-collection basis.
       val createdDate: Option[Period] = MiroCollection match {
@@ -167,7 +183,8 @@ case class MiroTransformable(MiroID: String,
         description = trimmedDescription,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators,
-        subjects = subjects
+        subjects = subjects,
+        genres = genres
       )
     }
   }
