@@ -32,7 +32,7 @@ resource "null_resource" "export_rendered_template" {
   }
 
   provisioner "local-exec" {
-    command = "/app/provisioners/aws_batch_compute.py create /app/batch_compute_environment_${var.name}.json"
+    command = "aws_batch_helper compute create /app/batch_compute_environment_${var.name}.json"
 
     on_failure = "fail"
   }

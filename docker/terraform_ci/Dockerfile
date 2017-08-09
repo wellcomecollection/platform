@@ -5,7 +5,7 @@ RUN apk add --update git bash openssh
 
 RUN apk --no-cache update && \
     apk --no-cache add findutils jq python3 ca-certificates curl groff less zip git && \
-    pip3 --no-cache-dir install awscli && \
+    pip3 --no-cache-dir install awscli aws_batch_helper && \
     rm -rf /var/cache/apk/*
 
 # Install terraform.  This is the last build step because it changes with
@@ -18,12 +18,6 @@ COPY is_up_to_date_with_master.py /app/is_up_to_date_with_master.py
 COPY plan.sh /app/plan.sh
 COPY run.sh /app/run.sh
 COPY notify.sh /app/notify.sh
-
-COPY provisioners /app/provisioners
-
-WORKDIR /app/provisioners
-
-RUN pip3 install -r requirements.txt
 
 VOLUME ["/data"]
 WORKDIR /data/terraform

@@ -19,7 +19,7 @@ resource "null_resource" "export_rendered_template" {
   }
 
   provisioner "local-exec" {
-    command = "/app/provisioners/aws_batch_queue.py create /app/batch_queue_${var.name}.json"
+    command = "aws_batch_helper queue create /app/batch_queue_${var.name}.json"
 
     on_failure = "fail"
   }
