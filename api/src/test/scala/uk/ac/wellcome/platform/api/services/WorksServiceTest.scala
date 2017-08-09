@@ -174,8 +174,6 @@ class WorksServiceTest
 
     val title = "image title"
     val miroId = "abcdef"
-    val sourceName = "Miro"
-    val sourceId = "MiroID"
     val identifierScheme = "miro-image-number"
     val work = identifiedWorkWith(canonicalId,
                                   title,
@@ -193,8 +191,7 @@ class WorksServiceTest
       maybeDisplayWork.isDefined shouldBe true
       maybeDisplayWork.get.identifiers.isDefined shouldBe true
       maybeDisplayWork.get.identifiers.get shouldBe List(
-        DisplayIdentifier(source = sourceName,
-                          name = sourceId,
+        DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
 
     }
@@ -205,8 +202,6 @@ class WorksServiceTest
 
     val title = "image title"
     val miroId = "abcdef"
-    val sourceName = "Miro"
-    val sourceId = "MiroID"
     val identifierScheme = "miro-image-number"
     val work = identifiedWorkWith(canonicalId,
                                   title,
@@ -220,8 +215,7 @@ class WorksServiceTest
 
     whenReady(listWorksResult) { (displayWork: DisplaySearch) =>
       displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(source = sourceName,
-                          name = sourceId,
+        DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
 
     }
@@ -232,8 +226,6 @@ class WorksServiceTest
 
     val title = "A search for a snail"
     val miroId = "abcdef"
-    val sourceName = "Miro"
-    val sourceId = "MiroID"
     val identifierScheme = "miro-image-number"
     val work = identifiedWorkWith(canonicalId,
                                   title,
@@ -249,8 +241,7 @@ class WorksServiceTest
 
     whenReady(searchWorksResult) { (displayWork: DisplaySearch) =>
       displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(source = sourceName,
-                          name = sourceId,
+        DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
 
     }
