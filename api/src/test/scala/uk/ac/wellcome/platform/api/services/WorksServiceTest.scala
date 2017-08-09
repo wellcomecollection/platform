@@ -176,11 +176,11 @@ class WorksServiceTest
     val miroId = "abcdef"
     val sourceName = "Miro"
     val sourceId = "MiroID"
+    val identifierScheme = "miro-image-number"
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
-                                    SourceIdentifier(source = sourceName,
-                                                     sourceId = sourceId,
+                                    SourceIdentifier(identifierScheme = identifierScheme,
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
@@ -207,11 +207,11 @@ class WorksServiceTest
     val miroId = "abcdef"
     val sourceName = "Miro"
     val sourceId = "MiroID"
+    val identifierScheme = "miro-image-number"
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
-                                    SourceIdentifier(source = sourceName,
-                                                     sourceId = sourceId,
+                                    SourceIdentifier(identifierScheme = identifierScheme,
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
@@ -234,11 +234,11 @@ class WorksServiceTest
     val miroId = "abcdef"
     val sourceName = "Miro"
     val sourceId = "MiroID"
+    val identifierScheme = "miro-image-number"
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
-                                    SourceIdentifier(source = sourceName,
-                                                     sourceId = sourceId,
+                                    SourceIdentifier(identifierScheme = identifierScheme,
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 

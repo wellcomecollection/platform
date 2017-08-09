@@ -7,7 +7,7 @@ import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 
-class  CalmTransformerFeatureTest
+class CalmTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
     with Matchers {
@@ -71,7 +71,7 @@ class  CalmTransformerFeatureTest
     snsMessage.message shouldBe JsonUtil
       .toJson(
         Work(
-          identifiers = List(SourceIdentifier("source", "key", "value")),
+          identifiers = List(SourceIdentifier("calm-placeholder-scheme", "value")),
           title = "placeholder title for a Calm record"
         ))
       .get

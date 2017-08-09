@@ -32,7 +32,7 @@ class IngestorFeatureTest
         IdentifiedWork(
           canonicalId = "1234",
           work = Work(identifiers =
-                        List(SourceIdentifier("Miro", "MiroID", "5678")),
+                        List(SourceIdentifier("test-miro-image-number", "5678")),
                       title = "A type of a tame turtle")))
       .get
 

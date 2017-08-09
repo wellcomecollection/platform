@@ -47,7 +47,7 @@ class SQSMessageReceiverTest
     createValidMiroSQSMessage("""{}""")
 
   val work = Work(identifiers =
-                    List(SourceIdentifier("source", "key", "value")),
+                    List(SourceIdentifier("calm-placeholder-scheme", "value")),
                   title = "placeholder title for a Calm record")
 
   val metricsSender: MetricsSender = new MetricsSender(

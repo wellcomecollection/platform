@@ -39,8 +39,7 @@ class WorksIndexTest
         IdentifiedWork(
           canonicalId = "1234",
           work = Work(identifiers = List(
-                        SourceIdentifier(source = "Miro",
-                                         sourceId = "MiroID",
+                        SourceIdentifier(identifierScheme = "miro-image-number",
                                          value = "4321")),
                       title = "A magical menagerie for magpies")
         ))
