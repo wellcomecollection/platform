@@ -6,11 +6,12 @@
       "id": "@id",
       "type": "@type",
       "creators": {
-        "@id": "hasCreator",
         "@container": "@list"
       },
       "identifiers": {
-        "@id": "hasIdentifier",
+        "@container": "@list"
+      },
+      "genres": {
         "@container": "@list"
       }
     },
