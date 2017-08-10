@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.idminter.steps
 import com.fasterxml.jackson.core.JsonParseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.utils.JsonUtil
@@ -19,7 +20,7 @@ class WorkExtractorTest
     val title = "A note about a narwhal"
 
     val work = Work(
-      identifiers = List(SourceIdentifier("test-miro-image-number", miroID)),
+      identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)),
       title = title
     )
     val sqsMessage = SQSMessage(Some("subject"),

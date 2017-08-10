@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.api.services
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{
   DisplayIdentifier,
@@ -174,7 +175,7 @@ class WorksServiceTest
 
     val title = "image title"
     val miroId = "abcdef"
-    val identifierScheme = "miro-image-number"
+    val identifierScheme = IdentifierSchemes.miroImageNumber
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
@@ -202,7 +203,7 @@ class WorksServiceTest
 
     val title = "image title"
     val miroId = "abcdef"
-    val identifierScheme = "miro-image-number"
+    val identifierScheme = IdentifierSchemes.miroImageNumber
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
@@ -226,7 +227,7 @@ class WorksServiceTest
 
     val title = "A search for a snail"
     val miroId = "abcdef"
-    val identifierScheme = "miro-image-number"
+    val identifierScheme = IdentifierSchemes.miroImageNumber
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(

@@ -7,6 +7,7 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -39,7 +40,7 @@ class WorksIndexTest
         IdentifiedWork(
           canonicalId = "1234",
           work = Work(identifiers = List(
-                        SourceIdentifier(identifierScheme = "miro-image-number",
+                        SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber,
                                          value = "4321")),
                       title = "A magical menagerie for magpies")
         ))

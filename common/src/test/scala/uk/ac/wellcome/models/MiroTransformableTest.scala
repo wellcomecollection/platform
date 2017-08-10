@@ -2,6 +2,8 @@ package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
+
 
 /** Tests that the Miro transformer extracts the "title" field correctly.
  *
@@ -184,7 +186,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it("should pass through the Miro identifier") {
     val miroID = "M0000005_test"
     val work = transformMiroRecord(miroID = miroID)
-    work.identifiers shouldBe List(SourceIdentifier("miro-image-number", miroID))
+    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID))
   }
 
   it("should have an empty list if no image_creator field is present") {
