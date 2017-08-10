@@ -5,6 +5,9 @@ import javax.inject.{Inject, Singleton}
 import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.annotations.Flag
+import io.swagger.models.parameters.QueryParameter
+import io.swagger.models.properties.StringProperty
+import scala.collection.JavaConverters._
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.{DisplayResultList, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
@@ -25,6 +28,14 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
   override implicit protected val swagger = ApiSwagger
 
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
+  val includesSwaggerParam: QueryParameter = new QueryParameter()
+    .name("includes")
+    .description("A comma-separated list of extra fields to include")
+    .required(false)
+    .`type`("array")
+    .collectionFormat("csv")
+    .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
+
 
   prefix(apiPrefix) {
 
@@ -36,20 +47,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .description("Returns a paginated list of works")
         .tag("Works")
         .responseWith[DisplayResultList](200, "ResultList[Work]")
-        .queryParam[Int]("page",
-                         "The page to return from the result list",
-                         required = false)
-        .queryParam[Int](
-          "pageSize",
-          "The number of works to return per page (default: 10)",
-          required = false)
-        .queryParam[String]("query",
-                            "Full-text search query",
-                            required = false)
-        .queryParam[String](
-          "includes",
-          "A comma-separated list of extra fields to include",
-          required = false)
+        .queryParam[Int]("page", "The page to return from the result list", required = false)
+        .queryParam[Int]("pageSize", "The number of works to return per page (default: 10)", required = false)
+        .queryParam[String]("query", "Full-text search query", required = false)
+        .parameter(includesSwaggerParam)
     // Deliberately undocumented: we have an 'index' query param that
     // allows the user to pick which Elasticsearch index to use.  This is
     // useful for us to try out transformer changes, different index
@@ -97,10 +98,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .tag("Works")
         .routeParam[String]("id", "The work to return", required = true)
         .responseWith[DisplayWork](200, "Work")
-        .queryParam[String](
-          "includes",
-          "A comma-separated list of extra fields to include",
-          required = false)
+        .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
       // val includes = WorksIncludes(request.includes)
