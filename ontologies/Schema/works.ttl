@@ -124,8 +124,9 @@ ww:subjects rdf:type owl:ObjectProperty ;
 	rdfs:label "subjects"@en ;
 	rdfs:comment "Relates a work to the general thesaurus-based concept that describes the work's content."@en ;
 	rdfs:domain ww:Work ;
-	rdfs:range ww:Subject ;
-	rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+	rdfs:range ww:Concept ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
+
 
 ww:genres rdf:type owl:ObjectProperty ;
 	rdfs:label "genres"@en ;
@@ -308,7 +309,7 @@ ww:accessStatus rdf:type owl:DatatypeProperty ;
 ww:ipRightsStatement rdf:type owl:DatatypeProperty ;
 	rdfs:label "ipRightsStatement"@en ;
 	rdfs:comment "A statement describing the status and ownership of the intellectual property rights to a work, including whether it is in copyright and if so to whom."@en ;
-	rdfs:domain ww:Work ;
+	rdfs:domain ww:Item ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .	
 	

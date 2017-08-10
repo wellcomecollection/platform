@@ -1,0 +1,113 @@
+{
+  "@context": {
+    "wwork": "http://www.wellcomecollection.org/ontologies/works/",
+    "wcore": "http://www.wellcomecollection.org/ontologies/core/",
+    "wcon": "http://www.wellcomecollection.org/ontologies/concept/",
+    "wloc": "http://www.wellcomecollection.org/ontologies/location/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "@base": "http://id.wellcomecollection.org/",
+	"id": "@id",
+    "type": "@type",
+	"Work": {
+      "@id": "wwork:Work"
+    },
+    "Identifier": {
+      "@id": "wcore:Identifier"
+    },
+    "PhysicalLocation": {
+      "@id": "wloc:PhysicalLocation"
+    },
+    "DigitalLocation": {
+      "@id": "wloc:DigitalLocation"
+    },
+    "Place": {
+      "@id": "wwork:Place"
+    },
+    "Period": {
+      "@id": "wwork:Period"
+    },
+    "Concept": {
+      "@id": "wwork:Concept"
+    },
+    "Item": {
+      "@id": "wwork:Item"
+    },
+    "ItemLocation": {
+      "@id": "wloc:Access"
+    },
+    "License": {
+      "@id": "wwork:License"
+    },
+    "identifiers": {
+      "@id": "wcore:identifiers" 
+      },
+    "value": {
+      "@id": "wcore:value" ,
+	  "@type": "rdfs:Literal"
+    },
+    "identifierScheme": {
+      "@id": "wcore:identifierScheme" ,
+	  "@type": "rdfs:Literal"
+    },
+    "title": {
+      "@id": "wwork:title" ,
+	  "@type": "rdf:langString"
+    },
+    "description": {
+      "@id": "wwork:description" ,
+	  "@type": "rdf:langString"
+    },
+    "lettering": {
+      "@id": "wwork:lettering" ,
+	  "@type": "rdf:langString"
+    },
+    "creators": {
+      "@id": "wwork:creators" 
+    },
+    "publishers": {
+      "@id": "wwork:publishers" 
+    },
+    "placeOfPublication": {
+      "@id": "wwork:placeOfPublication"
+    },
+    "createdDate": {
+      "@id": "wwork:createdDate"
+    },
+    "publicationDate": {
+      "@id": "wwork:publicationDate"
+    },
+    "genres": {
+      "@id": "wwork:genres" 
+    },
+    "license": {
+      "@id": "wwork:license"
+    },
+    "items": {
+      "@id": "wwork:items" 
+    },
+    "format": {
+      "@id": "wloc:format"
+    },
+    "locations": {
+      "@id": "wloc:locations" ,
+    },
+    "accessStatus": {
+      "@id": "wloc:accessStatus"
+    },
+    "locationType": {
+      "@id": "wloc:locationType"
+    },
+    "accessProcess": {
+      "@id": "wloc:accessProcess"
+    },
+    "url": {
+      "@id": "wcore:url" ,
+	  "@type": "rdfs:Literal" 	  
+    },
+    "profile": {
+      "@id": "wloc:profile" ,
+	  "@type": "rdfs:Literal" 
+    }
+  }
+}

@@ -1,0 +1,87 @@
+@prefix wloc: <http://www.wellcomecollection.org/ontologies/location/> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://www.wellcomecollection.org/ontologies/location>
+    rdf:type owl:Ontology ;
+    dcterms:title "Location ontology"@en ;
+    dcterms:created "2017-07-25"^^xsd:date ;
+    dcterms:description "Ontology describing the locations through which items are accessed"@en .
+	
+	###### classes ###	
+
+wloc:Item rdf:type owl:Class ;
+    rdfs:label "Item"@en ;
+    rdfs:comment "An item"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
+
+wloc:ItemLocation rdf:type owl:Class ;
+    rdfs:label "ItemLocation"@en ;
+    rdfs:comment "A location that provides access to an item"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
+
+wloc:PhysicalLocation rdf:type owl:Class ;
+    rdfs:isSubClassOf wloc:ItemLocation ;
+    rdfs:label "PhysicalLocation"@en ;
+    rdfs:comment "A physical location that provides access to an item"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+
+wloc:DigitalLocation rdf:type owl:Class ;
+    rdfs:isSubClassOf wloc:ItemLocation ;
+    rdfs:label "DigitalLocation"@en ;
+    rdfs:comment "A digital location that provides access to an item"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .		
+
+wloc:AccessStatus rdf:type owl:Class ;
+    rdfs:label "AccessStatus"@en ;
+    rdfs:comment "A simple open or closed access status type."@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+	
+wloc:LocationType rdf:type owl:Class ;
+	rdfs:label "LocationType"@en ;
+	rdfs:comment "The type of location that an item is accessible from."@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+
+wloc:AccessProcess rdf:type owl:Class ;
+	rdfs:label "AccessProcess"@en ;
+	rdfs:comment "The process of accessing an item."@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+
+		
+	
+##### Object properties ####
+
+	
+wloc:locations  rdf:type owl:ObjectProperty ;
+	rdfs:label "locations"@en ;
+	rdfs:comment "An access route for an item"@en ; 
+	rdfs:domain wloc:Item ;
+	rdfs:range wloc:Itemlocation ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+	
+wloc:accessStatus rdf:type owl:ObjectProperty ;
+	rdfs:label "accessStatus"@en ;
+	rdfs:comment "A service that makes the thing accesible"@en ; 
+	rdfs:domain wloc:Itemlocation ;
+	rdfs:range wloc:AccessStatus ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
+	
+wloc:locationType rdf:type owl:ObjectProperty ;
+	rdfs:label "locationType"@en ;
+	rdfs:comment "The type of location an item is accessible from"@en ;
+	rdfs:domain wloc:Itemlocation ;
+	rdfs:range wloc:LocationType ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+	
+wloc:accessProcess rdf:type owl:ObjectProperty ;
+	rdfs:label "accessProcess"@en ;
+	rdfs:comment "This relates an accesible item to a process of access."@en ;
+	rdfs:domain wloc:Itemlocation ;
+	rdfs:range wloc:AccessProcess ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .					
+	
+	
+	
