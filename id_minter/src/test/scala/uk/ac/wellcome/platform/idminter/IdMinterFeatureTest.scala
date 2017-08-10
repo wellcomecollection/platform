@@ -4,6 +4,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import scalikejdbc.{select, _}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.model.Identifier
@@ -31,7 +32,7 @@ class IdMinterFeatureTest
     val title = "A limerick about a lion"
 
     val work = Work(identifiers =
-                      List(SourceIdentifier("miro-image-number", miroID)),
+                      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)),
                     title = title)
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
