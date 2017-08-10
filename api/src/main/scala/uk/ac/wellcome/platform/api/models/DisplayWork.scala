@@ -18,7 +18,9 @@ case class DisplayWork(
   @ApiModelProperty(dataType = "String", value = "Recording written text on a (usually visual) work.") lettering: Option[String] = None,
   @ApiModelProperty(dataType = "uk.ac.wellcome.models.Period", value = "Relates the creation of a work to a date, when the date of creation does not cover a range.") createdDate: Option[Period] = None,
   @ApiModelProperty(value = "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has.") creators: List[Agent] = List(),
-  @ApiModelProperty(value = "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem.") identifiers: Option[List[DisplayIdentifier]] = None) {
+  @ApiModelProperty(value = "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem.") identifiers: Option[List[DisplayIdentifier]] = None),
+  subjects: List[Concept] = List(),
+  genres: List[Concept] = List()) {
   @ApiModelProperty(value = "A type of thing") @JsonProperty("type") val ontologyType: String = "Work"
 }
 
@@ -47,6 +49,8 @@ case object DisplayWork {
       createdDate = identifiedWork.work.createdDate,
       // Wrapping this in Option to catch null value from Jackson
       creators = Option(identifiedWork.work.creators).getOrElse(Nil),
+      subjects = Option(identifiedWork.work.subjects).getOrElse(Nil),
+      genres = Option(identifiedWork.work.genres).getOrElse(Nil),
       identifiers =
         if (includes.identifiers)
           Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
@@ -55,14 +59,13 @@ case object DisplayWork {
   }
 }
 
-case class DisplayIdentifier(source: String, name: String, value: String) {
+case class DisplayIdentifier(identifierScheme: String, value: String) {
   @JsonProperty("type")
   val ontologyType: String = "Identifier"
 }
 
 object DisplayIdentifier {
   def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifier =
-    DisplayIdentifier(source = sourceIdentifier.source,
-                      name = sourceIdentifier.sourceId,
+    DisplayIdentifier(identifierScheme = sourceIdentifier.identifierScheme,
                       value = sourceIdentifier.value)
 }

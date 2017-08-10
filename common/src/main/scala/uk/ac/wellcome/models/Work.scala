@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.Indexable
 import uk.ac.wellcome.utils.JsonUtil
 
 /** An identifier received from one of the original sources */
-case class SourceIdentifier(source: String, sourceId: String, value: String)
+case class SourceIdentifier(identifierScheme: String, value: String)
 
 case class IdentifiedWork(canonicalId: String, work: Work)
 
@@ -18,7 +18,9 @@ case class Work(
   description: Option[String] = None,
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
-  creators: List[Agent] = List()
+  subjects: List[Concept] = List(),
+  creators: List[Agent] = List(),
+  genres: List[Concept] = List()
 ) {
   @JsonProperty("type") val ldType: String = "Work"
 }

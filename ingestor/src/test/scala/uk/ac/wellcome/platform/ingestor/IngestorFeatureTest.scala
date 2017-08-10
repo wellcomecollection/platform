@@ -5,6 +5,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -32,7 +33,7 @@ class IngestorFeatureTest
         IdentifiedWork(
           canonicalId = "1234",
           work = Work(identifiers =
-                        List(SourceIdentifier("Miro", "MiroID", "5678")),
+                        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
                       title = "A type of a tame turtle")))
       .get
 

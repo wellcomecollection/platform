@@ -67,7 +67,9 @@ class ApiWorksTest
             |     "creators": [{
             |       "type": "Agent",
             |       "label": "${works(0).work.creators(0).label}"
-            |     }]
+            |     }],
+            |     "subjects": [ ],
+            |     "genres": [ ]
             |   },
             |   {
             |     "type": "Work",
@@ -82,7 +84,9 @@ class ApiWorksTest
             |     "creators": [{
             |       "type": "Agent",
             |       "label": "${works(1).work.creators(0).label}"
-            |     }]
+            |     }],
+            |     "subjects": [ ],
+            |     "genres": [ ]
             |   },
             |   {
             |     "type": "Work",
@@ -97,7 +101,9 @@ class ApiWorksTest
             |     "creators": [{
             |       "type": "Agent",
             |       "label": "${works(2).work.creators(0).label}"
-            |     }]
+            |     }],
+            |     "subjects": [ ],
+            |     "genres": [ ]
             |   }
             |  ]
             |}
@@ -137,7 +143,9 @@ class ApiWorksTest
             | "creators": [{
             |   "type": "Agent",
             |   "label": "${agent.label}"
-            | }]
+            | }],
+            | "subjects": [ ],
+            | "genres": [ ]
             |}
           """.stripMargin
       )
@@ -177,7 +185,9 @@ class ApiWorksTest
                           |     "creators": [{
                           |       "type": "Agent",
                           |       "label": "${works(1).work.creators(0).label}"
-                          |     }]
+                          |     }],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -210,7 +220,9 @@ class ApiWorksTest
                           |     "creators": [{
                           |       "type": "Agent",
                           |       "label": "${works(0).work.creators(0).label}"
-                          |     }]
+                          |     }],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -243,7 +255,9 @@ class ApiWorksTest
                           |     "creators": [{
                           |       "type": "Agent",
                           |       "label": "${works(2).work.creators(0).label}"
-                          |     }]
+                          |     }],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -397,7 +411,101 @@ class ApiWorksTest
              |     "type": "Work",
              |     "id": "${work1.canonicalId}",
              |     "title": "${work1.work.title}",
-             |     "creators": []
+             |     "creators": [],
+             |     "subjects": [ ],
+             |     "genres": [ ]
+             |   }
+             |  ]
+             |}""".stripMargin
+      )
+    }
+  }
+
+  it("should include subject information in API responses") {
+    val workWithSubjects = IdentifiedWork(
+      canonicalId = "test_subject1",
+      Work(
+        identifiers = List(),
+        title = "A seal selling seaweed sandwiches in Scotland",
+        subjects = List(Concept("fish"), Concept("gardening"))
+      )
+    )
+    insertIntoElasticSearch(workWithSubjects)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+             |{
+             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+             |  "type": "ResultList",
+             |  "pageSize": 10,
+             |  "totalPages": 1,
+             |  "totalResults": 1,
+             |  "results": [
+             |   {
+             |     "type": "Work",
+             |     "id": "${workWithSubjects.canonicalId}",
+             |     "title": "${workWithSubjects.work.title}",
+             |     "creators": [],
+             |     "subjects": [
+             |      {
+             |        "type": "Concept",
+             |        "label": "fish"
+             |      },
+             |      {
+             |        "type": "Concept",
+             |        "label": "gardening"
+             |      }
+             |     ],
+             |     "genres": [ ]
+             |   }
+             |  ]
+             |}""".stripMargin
+      )
+    }
+  }
+
+  it("should include genre information in API responses") {
+    val workWithSubjects = IdentifiedWork(
+      canonicalId = "test_subject1",
+      Work(
+        identifiers = List(),
+        title = "A guppy in a greenhouse",
+        genres = List(Concept("woodwork"), Concept("etching"))
+      )
+    )
+    insertIntoElasticSearch(workWithSubjects)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+             |{
+             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+             |  "type": "ResultList",
+             |  "pageSize": 10,
+             |  "totalPages": 1,
+             |  "totalResults": 1,
+             |  "results": [
+             |   {
+             |     "type": "Work",
+             |     "id": "${workWithSubjects.canonicalId}",
+             |     "title": "${workWithSubjects.work.title}",
+             |     "creators": [],
+             |     "subjects": [ ],
+             |     "genres": [
+             |       {
+             |         "type": "Concept",
+             |         "label": "woodwork"
+             |       },
+             |       {
+             |         "type": "Concept",
+             |         "label": "etching"
+             |       }
+             |     ]
              |   }
              |  ]
              |}""".stripMargin
@@ -408,8 +516,7 @@ class ApiWorksTest
   it(
     "should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
-      source = "TestSource",
-      sourceId = "The ID field within the TestSource",
+      identifierScheme = "The ID field within the TestSource",
       value = "Test1234"
     )
     val work1 = identifiedWorkWith(
@@ -419,8 +526,7 @@ class ApiWorksTest
     )
 
     val identifier2 = SourceIdentifier(
-      source = "DifferentTestSource",
-      sourceId = "The ID field within the DifferentTestSource",
+      identifierScheme = "The ID field within the DifferentTestSource",
       value = "DTest5678"
     )
     val work2 = identifiedWorkWith(
@@ -453,11 +559,12 @@ class ApiWorksTest
                           |     "identifiers": [
                           |       {
                           |         "type": "Identifier",
-                          |         "source": "${identifier1.source}",
-                          |         "name": "${identifier1.sourceId}",
+                          |         "identifierScheme": "${identifier1.identifierScheme}",
                           |         "value": "${identifier1.value}"
                           |       }
-                          |     ]
+                          |     ],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -467,11 +574,12 @@ class ApiWorksTest
                           |     "identifiers": [
                           |       {
                           |         "type": "Identifier",
-                          |         "source": "${identifier2.source}",
-                          |         "name": "${identifier2.sourceId}",
+                          |         "identifierScheme": "${identifier2.identifierScheme}",
                           |         "value": "${identifier2.value}"
                           |       }
-                          |     ]
+                          |     ],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -483,13 +591,12 @@ class ApiWorksTest
   it(
     "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val identifier = SourceIdentifier(
-      source = "TestSource",
-      sourceId = "The ID field within the TestSource",
+      identifierScheme = "An Insectoid Identifier",
       value = "Test1234"
     )
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      title = "An image of an iguana",
+      title = "An insect huddled in an igloo",
       identifiers = List(identifier)
     )
     insertIntoElasticSearch(work)
@@ -508,11 +615,12 @@ class ApiWorksTest
                           | "identifiers": [
                           |   {
                           |     "type": "Identifier",
-                          |     "source": "${identifier.source}",
-                          |     "name": "${identifier.sourceId}",
+                          |     "identifierScheme": "${identifier.identifierScheme}",
                           |     "value": "${identifier.value}"
                           |   }
-                          | ]
+                          | ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -543,7 +651,9 @@ class ApiWorksTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.work.title}",
-                          | "creators": [ ]
+                          | "creators": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -559,7 +669,9 @@ class ApiWorksTest
                           | "type": "Work",
                           | "id": "${work_alt.canonicalId}",
                           | "title": "${work_alt.work.title}",
-                          | "creators": [ ]
+                          | "creators": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -570,7 +682,7 @@ class ApiWorksTest
     "should be able to search different Elasticsearch indices based on the ?index query parameter") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
-      title = "A whale on a wave"
+      title = "A wombat wallowing under a willow"
     )
     insertIntoElasticSearch(work)
 
@@ -582,7 +694,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works?query=whale",
+        path = s"/$apiPrefix/works?query=wombat",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
@@ -596,7 +708,9 @@ class ApiWorksTest
                           |     "type": "Work",
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.work.title}",
-                          |     "creators": [ ]
+                          |     "creators": [ ],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -620,7 +734,9 @@ class ApiWorksTest
                           |     "type": "Work",
                           |     "id": "${work_alt.canonicalId}",
                           |     "title": "${work_alt.work.title}",
-                          |     "creators": [ ]
+                          |     "creators": [ ],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}

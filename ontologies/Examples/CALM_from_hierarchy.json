@@ -15,15 +15,35 @@
         "identifierScheme": "CALM-AltRefNo"
       }
     ],
-	"isPartOf":
-      {
-        "value": "PPCRI/D/1/1",
-        "type": "Identifier",
-        "identifierScheme": "CALM-RefNo"
-      },
-"title": "Correspondence: H",
-"level": "Item",
-"creationDate": 
+	"isPartOf": [
+   	 {
+   	 "id" : "n9jfh49" ,	
+   	 "label" : "Correspondence 1" ,
+   	 "date" : "1947-1972" ,
+	 "level" : "Series"	
+   	 } ,
+   	 {
+   	 "id" : "n56fj89" ,	
+   	 "label" : "Alphabetical Correspondence " ,
+   	 "date" : "1947-1985" ,
+	 "level" : "SubSection"			
+   	 } ,
+   	 {
+   	 "id" : "n46gh87" ,	
+   	 "label" : "Correspondence" ,
+   	 "date" : "1947-1998" ,
+	 "level" : "Section"		
+   	 } ,		
+   	 {
+   	 "id" : "y67hj90" ,	
+   	 "label" : "Francis Crick (1916-2004): archives" ,
+   	 "date" : "c.1911-2004"	,
+	 "level" : "Collection"	
+   	 }	
+	] ,
+    "title": "Correspondence: H",
+    "level": "Item",
+    "creationDate": 
     {
       "label": "1953-1970",
       "type": "Period"

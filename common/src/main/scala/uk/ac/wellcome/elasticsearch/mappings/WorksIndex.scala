@@ -25,9 +25,9 @@ class WorksIndex @Inject()(client: HttpClient,
       keywordField("canonicalId"),
       objectField("work").fields(
         keywordField("type"),
-        objectField("identifiers").fields(keywordField("source"),
-                                          keywordField("sourceId"),
-                                          keywordField("value")),
+        objectField("identifiers").fields(keywordField("identifierScheme"),
+                                          keywordField("value"),
+                                          keywordField("type")),
         textField("title").fields(
           textField("english").analyzer(EnglishLanguageAnalyzer)),
         textField("description").fields(
@@ -39,6 +39,14 @@ class WorksIndex @Inject()(client: HttpClient,
           keywordField("type")
         ),
         objectField("creators").fields(
+          textField("label"),
+          keywordField("type")
+        ),
+        objectField("subjects").fields(
+          textField("label"),
+          keywordField("type")
+        ),
+        objectField("genres").fields(
           textField("label"),
           keywordField("type")
         )

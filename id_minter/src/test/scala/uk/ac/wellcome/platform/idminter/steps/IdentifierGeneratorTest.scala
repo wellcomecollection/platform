@@ -7,6 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
@@ -39,7 +40,7 @@ class IdentifierGeneratorTest
     }.update().apply()
 
     val work =
-      Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
+      Work(identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234")),
            title = "Searching for a sea slug")
     val futureId = identifierGenerator.generateId(work)
 
@@ -51,7 +52,7 @@ class IdentifierGeneratorTest
   it(
     "should generate an id and save it in the database if a record doesn't already exist") {
     val work =
-      Work(identifiers = List(SourceIdentifier("Miro", "MiroID", "1234")),
+      Work(identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234")),
            title = "A novel name for a nightingale")
     val futureId = identifierGenerator.generateId(work)
 
@@ -69,7 +70,7 @@ class IdentifierGeneratorTest
   it("should reject an item with no miroId in the list of Identifiers") {
     val work =
       Work(
-        identifiers = List(SourceIdentifier("NotMiro", "NotMiroID", "1234")),
+        identifiers = List(SourceIdentifier("not-a-miro-image-number", "1234")),
         title = "The rejection of a robin")
     val futureId = identifierGenerator.generateId(work)
 
@@ -82,7 +83,7 @@ class IdentifierGeneratorTest
     "should return a failed future if it fails inserting the identifier in the database") {
     val miroId = "1234"
     val work =
-      Work(identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+      Work(identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)),
            title = "A fear of failing in a fox")
     val identifiersDao = mock[IdentifiersDao]
     val identifierGenerator =

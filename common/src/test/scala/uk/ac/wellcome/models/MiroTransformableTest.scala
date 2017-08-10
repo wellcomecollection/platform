@@ -2,6 +2,8 @@ package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
+
 
 /** Tests that the Miro transformer extracts the "title" field correctly.
  *
@@ -12,9 +14,9 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
 
   it("should use the image_title field on non-V records") {
     val title = "A picture of a parrot"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s""""image_title": "$title"""",
-      expectedLabel = title,
+      expectedTitle = title,
       miroCollection = "Images-A"
     )
   }
@@ -25,9 +27,9 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     is absent
   """) {
     val title = "A limerick about a lemming"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s""""image_title": "$title"""",
-      expectedLabel = title,
+      expectedTitle = title,
       miroCollection = "Images-V"
     )
   }
@@ -38,12 +40,12 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
   """) {
     val title = "A tome about a turtle"
     val description = "A story of a starfish"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """,
-      expectedLabel = title,
+      expectedTitle = title,
       expectedDescription = Some(description),
       miroCollection = "Images-V"
     )
@@ -56,12 +58,12 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
   """) {
     val title = "An icon of an iguana"
     val description = "An icon of an iguana is an intriguing image"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """,
-      expectedLabel = description,
+      expectedTitle = description,
       expectedDescription = None,
       miroCollection = "Images-V"
     )
@@ -75,12 +77,12 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     val longTitle = "An icon of an iguana is an intriguing image"
     val descriptionBody = "Woodcut, by A.R. Tist.  Italian.  1897."
     val description = s"$longTitle\\n\\n$descriptionBody"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """,
-      expectedLabel = longTitle,
+      expectedTitle = longTitle,
       expectedDescription = Some(descriptionBody),
       miroCollection = "Images-V"
     )
@@ -91,13 +93,13 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     doesn't contain useful data (one-line description)
   """) {
     val academicDescription = "An alibi for an academic"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "-",
         "image_image_desc": "--",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicDescription
+      expectedTitle = academicDescription
     )
   }
 
@@ -106,13 +108,13 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     doesn't contain useful data (single hyphen in the description)
   """) {
     val academicDescription = "Using an upside-down umbrella"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "-",
         "image_image_desc": "-",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicDescription
+      expectedTitle = academicDescription
     )
   }
 
@@ -121,13 +123,13 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     doesn't contain useful data (double hyphen in title and description)
   """) {
     val academicDescription = "Dirty doubling of dastardly data"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "--",
         "image_image_desc": "--",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicDescription
+      expectedTitle = academicDescription
     )
   }
 
@@ -138,20 +140,20 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     val academicLabel = "A lithograph of a lecturer"
     val academicBody = "The corpus of a chancellor"
     val academicDescription = s"$academicLabel\\n\\n$academicBody"
-    transformRecordAndCheckLabel(
+    transformRecordAndCheckTitle(
       data = s"""
         "image_title": "-",
         "image_image_desc": "--",
         "image_image_desc_academic": "$academicDescription"
       """,
-      expectedLabel = academicLabel,
+      expectedTitle = academicLabel,
       expectedDescription = Some(academicBody)
     )
   }
 
-  private def transformRecordAndCheckLabel(
+  private def transformRecordAndCheckTitle(
     data: String,
-    expectedLabel: String,
+    expectedTitle: String,
     expectedDescription: Option[String] = None,
     miroCollection: String = "TestCollection"
   ) = {
@@ -166,7 +168,7 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     )
 
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.title shouldBe expectedLabel
+    miroTransformable.transform.get.title shouldBe expectedTitle
     miroTransformable.transform.get.description shouldBe expectedDescription
   }
 }
@@ -184,7 +186,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it("should pass through the Miro identifier") {
     val miroID = "M0000005_test"
     val work = transformMiroRecord(miroID = miroID)
-    work.identifiers shouldBe List(SourceIdentifier("Miro", "MiroID", miroID))
+    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID))
   }
 
   it("should have an empty list if no image_creator field is present") {
@@ -423,5 +425,145 @@ class MiroTransformableTest extends FunSpec with Matchers {
 
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get
+  }
+}
+
+
+
+/** Tests that the Miro transformer extracts the "subjects" field correctly.
+ *
+ *  Although this transformation is currently a bit basic, the data we get
+ *  from Miro will need cleaning before it's presented in the API (casing,
+ *  names, etc.) -- these tests will become more complicated.
+ */
+class MiroTransformableSubjectsTest extends FunSpec with Matchers {
+
+  it("should have an empty subject list on records without keywords") {
+    transformRecordAndCheckSubjects(
+      data = s""""image_title": "A snail without a subject"""",
+      expectedSubjects = List[Concept]()
+    )
+  }
+
+  it("should use the image_keywords field if present") {
+    transformRecordAndCheckSubjects(
+      data = s"""
+        "image_title": "A scorpion with a strawberry",
+        "image_keywords": ["animals", "arachnids", "fruit"]
+      """,
+      expectedSubjects = List(
+        Concept("animals"), Concept("arachnids"), Concept("fruit")
+      )
+    )
+  }
+
+  it("should use the image_keywords_unauth field if present") {
+    transformRecordAndCheckSubjects(
+      data = s"""
+        "image_title": "A sweet seal gives you a sycamore",
+        "image_keywords_unauth": ["altruism", "mammals"]
+      """,
+      expectedSubjects = List(
+        Concept("altruism"), Concept("mammals")
+      )
+    )
+  }
+
+  it("should use the image_keywords and image_keywords_unauth fields if both present") {
+    transformRecordAndCheckSubjects(
+      data = s"""
+        "image_title": "A squid, a sponge and a stingray walk into a bar",
+        "image_keywords": ["humour"],
+        "image_keywords_unauth": ["marine creatures"]
+      """,
+      expectedSubjects = List(
+        Concept("humour"), Concept("marine creatures")
+      )
+    )
+  }
+
+  private def transformRecordAndCheckSubjects(
+    data: String,
+    expectedSubjects: List[Concept] = List()
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = "M0000001",
+      MiroCollection = "Images-V",
+      data = s"""{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        $data
+      }"""
+    )
+
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get.subjects shouldBe expectedSubjects
+  }
+}
+
+
+
+class MiroTransformableGenresTest extends FunSpec with Matchers {
+
+  it("should have an empty genre list on records without keywords") {
+    transformRecordAndCheckGenres(
+      data = s""""image_title": "The giraffe's genre is gone'"""",
+      expectedGenres = List[Concept]()
+    )
+  }
+
+  it("should use the image_phys_format field if present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A goat grazes on some grass",
+        "image_phys_format": "painting"
+      """,
+      expectedGenres = List(
+        Concept("painting")
+      )
+    )
+  }
+
+  it("should use the image_lc_genre field if present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "Grouchy geese are good as guards",
+        "image_lc_genre": "sculpture"
+      """,
+      expectedGenres = List(
+        Concept("sculpture")
+      )
+    )
+  }
+
+  it("should use the image_phys_format and image_lc_genre fields if both present") {
+    transformRecordAndCheckGenres(
+      data = s"""
+        "image_title": "A gorilla and a gibbon in a garden",
+        "image_phys_format": "etching",
+        "image_lc_genre": "woodwork"
+      """,
+      expectedGenres = List(
+        Concept("etching"), Concept("woodwork")
+      )
+    )
+  }
+
+  private def transformRecordAndCheckGenres(
+    data: String,
+    expectedGenres: List[Concept] = List()
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = "M0000001",
+      MiroCollection = "Images-V",
+      data = s"""{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        $data
+      }"""
+    )
+
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get.genres shouldBe expectedGenres
   }
 }
