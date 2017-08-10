@@ -6,11 +6,8 @@ import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.models.WorksIncludes
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
+import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.api.requests._
@@ -99,7 +96,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .description("Returns a single work")
         .tag("Works")
         .routeParam[String]("id", "The work to return", required = true)
-        .responseWith[Object](200, "Work")
+        .responseWith[DisplayWork](200, "Work")
         .queryParam[String](
           "includes",
           "A comma-separated list of extra fields to include",
