@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
-import uk.ac.wellcome.platform.api.models.DisplaySearch
+import uk.ac.wellcome.platform.api.models.DisplayResultList
 import uk.ac.wellcome.platform.api.requests.{
   ApiRequest,
   MultipleResultsRequest
@@ -22,9 +22,7 @@ case class ResultListResponse(
   results: Array[_ <: Any],
   prevPage: Option[String] = None,
   nextPage: Option[String] = None
-) {
-  @JsonProperty("type") val ontologyType: String = "ResultList"
-}
+)
 
 object ResultListResponse {
   private def createApiLink(
@@ -41,10 +39,10 @@ object ResultListResponse {
   }
 
   def create(
-    contextUri: String,
-    displaySearch: DisplaySearch,
-    multipleResultsRequest: MultipleResultsRequest,
-    requestBaseUri: String
+              contextUri: String,
+              displaySearch: DisplayResultList,
+              multipleResultsRequest: MultipleResultsRequest,
+              requestBaseUri: String
   ): ResultListResponse = {
 
     val currentPage = multipleResultsRequest.page

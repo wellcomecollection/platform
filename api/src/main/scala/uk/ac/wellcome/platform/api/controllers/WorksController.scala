@@ -6,7 +6,7 @@ import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
+import uk.ac.wellcome.platform.api.models.{DisplayResultList, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -35,7 +35,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .summary(endpointSuffix)
         .description("Returns a paginated list of works")
         .tag("Works")
-        .responseWith[Object](200, "ResultList[Work]")
+        .responseWith[DisplayResultList](200, "ResultList[Work]")
         .queryParam[Int]("page",
                          "The page to return from the result list",
                          required = false)
@@ -79,10 +79,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
 
       works
         .map(
-          displaySearch => {
+          displayResultList => {
             ResultListResponse.create(
               contextUri,
-              displaySearch,
+              displayResultList,
               request,
               s"${apiScheme}://${apiHost}"
             )

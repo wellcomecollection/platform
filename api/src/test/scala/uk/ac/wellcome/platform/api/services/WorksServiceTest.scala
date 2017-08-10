@@ -7,7 +7,7 @@ import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{
   DisplayIdentifier,
-  DisplaySearch,
+  DisplayResultList,
   DisplayWork,
   WorksIncludes
 }
@@ -214,7 +214,7 @@ class WorksServiceTest
     val listWorksResult =
       worksService.listWorks(includes = WorksIncludes(identifiers = true))
 
-    whenReady(listWorksResult) { (displayWork: DisplaySearch) =>
+    whenReady(listWorksResult) { (displayWork: DisplayResultList) =>
       displayWork.results.head.identifiers.get shouldBe List(
         DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
@@ -240,7 +240,7 @@ class WorksServiceTest
       includes = WorksIncludes(identifiers = true)
     )
 
-    whenReady(searchWorksResult) { (displayWork: DisplaySearch) =>
+    whenReady(searchWorksResult) { (displayWork: DisplayResultList) =>
       displayWork.results.head.identifiers.get shouldBe List(
         DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
