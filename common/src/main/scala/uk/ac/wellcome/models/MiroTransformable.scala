@@ -17,7 +17,11 @@ case class MiroTransformableData(
     List[String]],
   @JsonProperty("image_artwork_date") artworkDate: Option[String],
   @JsonProperty("image_cleared") cleared: Option[String],
-  @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String]
+  @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String],
+  @JsonProperty("image_keywords") keywords: Option[List[String]],
+  @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]],
+  @JsonProperty("image_phys_format") physFormat: Option[String],
+  @JsonProperty("image_lc_genre") lcGenre: Option[String]
 )
 
 case class ShouldNotTransformException(message: String)
@@ -131,6 +135,41 @@ case class MiroTransformable(MiroID: String,
         case None => List()
       }
 
+      // Populate the subjects field.  This is based on two fields in the XML,
+      // <image_keywords> and <image_keywords_unauth>.  Both of these were
+      // defined in part or whole by the human cataloguers, and in general do
+      // not correspond to a controlled vocabulary.  (The latter was imported
+      // directly from PhotoSoft.)
+      //
+      // In some cases, these actually do correspond to controlled vocabs,
+      // e.g. where keywords were pulled directly from Sierra -- but we don't
+      // have enough information in Miro to determine which ones those are.
+      val keywords: List[Concept] = miroData.keywords match {
+        case Some(k) => k.map { Concept(_) }
+        case None => List()
+      }
+
+      val keywordsUnauth: List[Concept] = miroData.keywordsUnauth match {
+        case Some(k) => k.map { Concept(_) }
+        case None => List()
+      }
+
+      val subjects = keywords ++ keywordsUnauth
+
+      // Populate the subjects field.  This is based on two fields in the XML,
+      // <image_phys_format> and <image_lc_genre>.
+      val physFormat: List[Concept] = miroData.physFormat match {
+        case Some(f) => List(Concept(f))
+        case None => List()
+      }
+
+      val lcGenre: List[Concept] = miroData.lcGenre match {
+        case Some(g) => List(Concept(g))
+        case None => List()
+      }
+
+      val genres = physFormat ++ lcGenre
+
       // Determining the creation date depends on several factors, so we do
       // it on a per-collection basis.
       val createdDate: Option[Period] = MiroCollection match {
@@ -143,7 +182,9 @@ case class MiroTransformable(MiroID: String,
         title = title,
         description = trimmedDescription,
         createdDate = createdDate,
-        creators = creators ++ secondaryCreators
+        creators = creators ++ secondaryCreators,
+        subjects = subjects,
+        genres = genres
       )
     }
   }

@@ -57,3 +57,8 @@ module "ecs_gatling_iam" {
   source = "./ecs_iam"
   name   = "gatling"
 }
+
+module "batch_example_iam" {
+  source = "./ecs_iam"
+  name   = "batch_example"
+}
