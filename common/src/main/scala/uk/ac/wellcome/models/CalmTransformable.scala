@@ -1,5 +1,6 @@
 package uk.ac.wellcome.models
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try
@@ -10,7 +11,7 @@ case class CalmTransformableData(
   def transform: Try[Work] = Try {
     // TODO: Fill in proper data here
     Work(
-      identifiers = List(SourceIdentifier("calm-placeholder-scheme", "value")),
+      identifiers = List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
       title = "placeholder title for a Calm record"
     )
   }

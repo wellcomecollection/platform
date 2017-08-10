@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter.utils
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{Matchers, Suite}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.Server
@@ -37,7 +38,7 @@ trait IdMinterTestUtils
 
   def generateSqsMessage(MiroID: String): SQSMessage = {
     val work = Work(identifiers =
-                      List(SourceIdentifier("miro-image-number", MiroID)),
+                      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)),
                     title = "A query about a queue of quails")
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,
