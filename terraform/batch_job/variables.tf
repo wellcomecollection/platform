@@ -25,3 +25,8 @@ variable "command" {
   type        = "list"
   default = []
 }
+
+variable "params" {
+  type = "map"
+  default = {}
+}
