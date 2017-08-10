@@ -48,7 +48,8 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
 
   private def findMiroID(work: Work): Option[SourceIdentifier] = {
     val maybeSourceIdentifier =
-      work.identifiers.find(identifier => identifier.identifierScheme == "miro-image-number")
+      work.identifiers.find(identifier =>
+        identifier.identifierScheme == "miro-image-number")
     info(s"SourceIdentifier: $maybeSourceIdentifier")
     maybeSourceIdentifier
   }
