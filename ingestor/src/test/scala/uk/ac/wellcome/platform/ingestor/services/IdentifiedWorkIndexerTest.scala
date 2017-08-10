@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
@@ -38,7 +39,7 @@ class IdentifiedWorkIndexerTest
         IdentifiedWork(
           canonicalId = canonicalId,
           work = Work(identifiers =
-                        List(SourceIdentifier("test-miro-image-number", sourceId)),
+                        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, sourceId)),
                       title = title)))
       .get
   }
