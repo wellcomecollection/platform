@@ -84,7 +84,7 @@ class IdMinterWorkerTest
           JsonUtil
             .toJson(
               Work(
-                identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+                identifiers = List(SourceIdentifier("miro-image-number", miroId)),
                 title = "Some fresh fruit for a flamingo"
               ))
             .get,
