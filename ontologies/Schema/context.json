@@ -2,7 +2,6 @@
   "@context": {
     "wwork": "http://www.wellcomecollection.org/ontologies/works/",
     "wcore": "http://www.wellcomecollection.org/ontologies/core/",
-    "wcon": "http://www.wellcomecollection.org/ontologies/concept/",
     "wloc": "http://www.wellcomecollection.org/ontologies/location/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -12,14 +11,11 @@
 	"Work": {
       "@id": "wwork:Work"
     },
+	"WorkType": {
+      "@id": "wwork:WorkType"
+    },
     "Identifier": {
       "@id": "wcore:Identifier"
-    },
-    "PhysicalLocation": {
-      "@id": "wloc:PhysicalLocation"
-    },
-    "DigitalLocation": {
-      "@id": "wloc:DigitalLocation"
     },
     "Place": {
       "@id": "wwork:Place"
@@ -33,17 +29,21 @@
     "Item": {
       "@id": "wwork:Item"
     },
-    "ItemLocation": {
-      "@id": "wloc:Access"
+    "Location": {
+      "@id": "wloc:Location"
     },
     "License": {
-      "@id": "wwork:License"
+      "@id": "wloc:License"
     },
     "identifiers": {
       "@id": "wcore:identifiers" 
       },
     "value": {
       "@id": "wcore:value" ,
+	  "@type": "rdfs:Literal"
+    },
+    "label": {
+      "@id": "wcore:label" ,
 	  "@type": "rdfs:Literal"
     },
     "identifierScheme": {
@@ -57,6 +57,13 @@
     "description": {
       "@id": "wwork:description" ,
 	  "@type": "rdf:langString"
+    },
+    "physicalDescription": {
+      "@id": "wwork:physicalDescription" ,
+	  "@type": "rdf:langString"
+    },
+    "workType": {
+      "@id": "wwork:workType" 
     },
     "lettering": {
       "@id": "wwork:lettering" ,
@@ -81,16 +88,13 @@
       "@id": "wwork:genres" 
     },
     "license": {
-      "@id": "wwork:license"
+      "@id": "wloc:license"
     },
     "items": {
       "@id": "wwork:items" 
     },
-    "format": {
-      "@id": "wloc:format"
-    },
     "locations": {
-      "@id": "wloc:locations" ,
+      "@id": "wloc:locations" 
     },
     "accessStatus": {
       "@id": "wloc:accessStatus"
@@ -101,13 +105,13 @@
     "accessProcess": {
       "@id": "wloc:accessProcess"
     },
+    "shelfmark": {
+      "@id": "wloc:shelfmark" ,
+	  "@type": "rdfs:Literal" 	  
+    },
     "url": {
       "@id": "wcore:url" ,
 	  "@type": "rdfs:Literal" 	  
-    },
-    "profile": {
-      "@id": "wloc:profile" ,
-	  "@type": "rdfs:Literal" 
     }
   }
 }

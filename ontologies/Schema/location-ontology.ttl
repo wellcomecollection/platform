@@ -50,14 +50,14 @@ wloc:License rdf:type owl:Class ;
 	
 wloc:locations  rdf:type owl:ObjectProperty ;
 	rdfs:label "locations"@en ;
-	rdfs:comment "An access route for an item"@en ; 
+	rdfs:comment "An access route for an item"@en ;
 	rdfs:domain wloc:Item ;
 	rdfs:range wloc:Location ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
 	
 wloc:accessStatus rdf:type owl:ObjectProperty ;
 	rdfs:label "accessStatus"@en ;
-	rdfs:comment "A service that makes the thing accesible"@en ; 
+	rdfs:comment "A service that makes the thing accesible"@en ;
 	rdfs:domain wloc:Location ;
 	rdfs:range wloc:AccessStatus ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
