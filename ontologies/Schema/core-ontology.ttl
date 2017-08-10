@@ -23,8 +23,8 @@ wcore:Identifier rdf:type owl:Class ;
     rdfs:comment "A unique system-generated identifier that governs interaction between systems and is regarded as canonical wcorethin the Wellcome data ecosystem."@en ;
     rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .		   
 
-wcore:IdentifierScheme rdf:type owl:Class;
-    rdfs:label "IdentifierScheme"
+wcore:IdentifierScheme rdf:type owl:Class ;
+    rdfs:label "IdentifierScheme" ;
     rdfs:comment "An indication of the origin of identifiers identity scheme: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
     rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .	
 	
@@ -32,7 +32,7 @@ wcore:IdentifierScheme rdf:type owl:Class;
 
 wcore:identifiers rdf:type owl:ObjectProperty ;
 	rdfs:label "identifiers"@en ;
-	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical wcorethin the Wellcome data ecosystem."@en ; 
+	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical wcorethin the Wellcome data ecosystem."@en ;
 	rdfs:domain wcore:Thing ;
 	rdfs:range wcore:Identifier ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
@@ -40,8 +40,8 @@ wcore:identifiers rdf:type owl:ObjectProperty ;
 wcore:identifierScheme rdf:type owl:ObjectProperty ;
 	rdfs:label "identifierScheme"@en ;
 	rdfs:comment "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;
-	rdfs:domain wcore:Identifier
-	rdfs:range wcore:IdentifierScheme
+	rdfs:domain wcore:Identifier ;
+	rdfs:range wcore:IdentifierScheme ;
 	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 	
 wcore:startDate rdf:type owl:DatatypeProperty ;
