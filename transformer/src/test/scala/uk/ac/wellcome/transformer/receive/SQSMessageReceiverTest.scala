@@ -7,6 +7,7 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{ShouldNotTransformException, SourceIdentifier, Work}
@@ -47,7 +48,7 @@ class SQSMessageReceiverTest
     createValidMiroSQSMessage("""{}""")
 
   val work = Work(identifiers =
-                    List(SourceIdentifier("source", "key", "value")),
+                    List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
                   title = "placeholder title for a Calm record")
 
   val metricsSender: MetricsSender = new MetricsSender(

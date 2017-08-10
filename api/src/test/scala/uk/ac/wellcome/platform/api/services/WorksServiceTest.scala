@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.api.services
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{
   DisplayIdentifier,
@@ -174,13 +175,11 @@ class WorksServiceTest
 
     val title = "image title"
     val miroId = "abcdef"
-    val sourceName = "Miro"
-    val sourceId = "MiroID"
+    val identifierScheme = IdentifierSchemes.miroImageNumber
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
-                                    SourceIdentifier(source = sourceName,
-                                                     sourceId = sourceId,
+                                    SourceIdentifier(identifierScheme = identifierScheme,
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
@@ -193,8 +192,7 @@ class WorksServiceTest
       maybeDisplayWork.isDefined shouldBe true
       maybeDisplayWork.get.identifiers.isDefined shouldBe true
       maybeDisplayWork.get.identifiers.get shouldBe List(
-        DisplayIdentifier(source = sourceName,
-                          name = sourceId,
+        DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
 
     }
@@ -205,13 +203,11 @@ class WorksServiceTest
 
     val title = "image title"
     val miroId = "abcdef"
-    val sourceName = "Miro"
-    val sourceId = "MiroID"
+    val identifierScheme = IdentifierSchemes.miroImageNumber
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
-                                    SourceIdentifier(source = sourceName,
-                                                     sourceId = sourceId,
+                                    SourceIdentifier(identifierScheme = identifierScheme,
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
@@ -220,8 +216,7 @@ class WorksServiceTest
 
     whenReady(listWorksResult) { (displayWork: DisplaySearch) =>
       displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(source = sourceName,
-                          name = sourceId,
+        DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
 
     }
@@ -232,13 +227,11 @@ class WorksServiceTest
 
     val title = "A search for a snail"
     val miroId = "abcdef"
-    val sourceName = "Miro"
-    val sourceId = "MiroID"
+    val identifierScheme = IdentifierSchemes.miroImageNumber
     val work = identifiedWorkWith(canonicalId,
                                   title,
                                   identifiers = List(
-                                    SourceIdentifier(source = sourceName,
-                                                     sourceId = sourceId,
+                                    SourceIdentifier(identifierScheme = identifierScheme,
                                                      value = miroId)))
     insertIntoElasticSearch(work)
 
@@ -249,8 +242,7 @@ class WorksServiceTest
 
     whenReady(searchWorksResult) { (displayWork: DisplaySearch) =>
       displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(source = sourceName,
-                          name = sourceId,
+        DisplayIdentifier(identifierScheme = identifierScheme,
                           value = miroId))
 
     }

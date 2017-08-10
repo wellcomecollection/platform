@@ -516,8 +516,7 @@ class ApiWorksTest
   it(
     "should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
-      source = "TestSource",
-      sourceId = "The ID field within the TestSource",
+      identifierScheme = "The ID field within the TestSource",
       value = "Test1234"
     )
     val work1 = identifiedWorkWith(
@@ -527,8 +526,7 @@ class ApiWorksTest
     )
 
     val identifier2 = SourceIdentifier(
-      source = "DifferentTestSource",
-      sourceId = "The ID field within the DifferentTestSource",
+      identifierScheme = "The ID field within the DifferentTestSource",
       value = "DTest5678"
     )
     val work2 = identifiedWorkWith(
@@ -561,8 +559,7 @@ class ApiWorksTest
                           |     "identifiers": [
                           |       {
                           |         "type": "Identifier",
-                          |         "source": "${identifier1.source}",
-                          |         "name": "${identifier1.sourceId}",
+                          |         "identifierScheme": "${identifier1.identifierScheme}",
                           |         "value": "${identifier1.value}"
                           |       }
                           |     ],
@@ -577,8 +574,7 @@ class ApiWorksTest
                           |     "identifiers": [
                           |       {
                           |         "type": "Identifier",
-                          |         "source": "${identifier2.source}",
-                          |         "name": "${identifier2.sourceId}",
+                          |         "identifierScheme": "${identifier2.identifierScheme}",
                           |         "value": "${identifier2.value}"
                           |       }
                           |     ],
@@ -595,8 +591,7 @@ class ApiWorksTest
   it(
     "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val identifier = SourceIdentifier(
-      source = "TestSource",
-      sourceId = "An Insectoid Identifier",
+      identifierScheme = "An Insectoid Identifier",
       value = "Test1234"
     )
     val work = identifiedWorkWith(
@@ -620,8 +615,7 @@ class ApiWorksTest
                           | "identifiers": [
                           |   {
                           |     "type": "Identifier",
-                          |     "source": "${identifier.source}",
-                          |     "name": "${identifier.sourceId}",
+                          |     "identifierScheme": "${identifier.identifierScheme}",
                           |     "value": "${identifier.value}"
                           |   }
                           | ],

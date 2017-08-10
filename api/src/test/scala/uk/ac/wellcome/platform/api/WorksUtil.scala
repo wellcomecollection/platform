@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.models.DisplayWork
 
@@ -37,7 +38,7 @@ trait WorksUtil {
   def identifiedWorkWith(canonicalId: String, title: String): IdentifiedWork =
     IdentifiedWork(canonicalId,
                    Work(identifiers =
-                          List(SourceIdentifier("Miro", "MiroID", "5678")),
+                          List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
                         title = title))
 
   def identifiedWorkWith(canonicalId: String,
@@ -53,7 +54,7 @@ trait WorksUtil {
                          creator: Agent): IdentifiedWork = IdentifiedWork(
     canonicalId = canonicalId,
     work = Work(
-      identifiers = List(SourceIdentifier("Miro", "MiroID", "5678")),
+      identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
       title = title,
       description = Some(description),
       lettering = Some(lettering),

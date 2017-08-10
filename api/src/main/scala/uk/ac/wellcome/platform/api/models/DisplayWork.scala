@@ -53,14 +53,13 @@ case object DisplayWork {
   }
 }
 
-case class DisplayIdentifier(source: String, name: String, value: String) {
+case class DisplayIdentifier(identifierScheme: String, value: String) {
   @JsonProperty("type")
   val ontologyType: String = "Identifier"
 }
 
 object DisplayIdentifier {
   def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifier =
-    DisplayIdentifier(source = sourceIdentifier.source,
-                      name = sourceIdentifier.sourceId,
+    DisplayIdentifier(identifierScheme = sourceIdentifier.identifierScheme,
                       value = sourceIdentifier.value)
 }

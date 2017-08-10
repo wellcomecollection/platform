@@ -4,6 +4,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import scalikejdbc.{select, _}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.model.Identifier
@@ -26,12 +27,12 @@ class IdMinterFeatureTest
   }
 
   it(
-    "should read a work from the SQS queue, generate a canonical ID, save it in dynamoDB and send a message to the SNS topic with the original work and the id") {
+    "should read a work from the SQS queue, generate a canonical ID, save it in SQL and send a message to the SNS topic with the original work and the id") {
     val miroID = "M0001234"
     val title = "A limerick about a lion"
 
     val work = Work(identifiers =
-                      List(SourceIdentifier("Miro", "MiroID", miroID)),
+                      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)),
                     title = title)
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
