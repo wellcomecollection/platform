@@ -184,7 +184,7 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it("should pass through the Miro identifier") {
     val miroID = "M0000005_test"
     val work = transformMiroRecord(miroID = miroID)
-    work.identifiers shouldBe List(SourceIdentifier("test-miro-image-number", miroID))
+    work.identifiers shouldBe List(SourceIdentifier("miro-image-number", miroID))
   }
 
   it("should have an empty list if no image_creator field is present") {
