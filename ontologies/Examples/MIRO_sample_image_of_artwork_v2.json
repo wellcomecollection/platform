@@ -4,7 +4,8 @@
   "type": "Work",
   "workType" : {
       "id" : "digital-image" ,
-      "label" : "Digital Images" ,
+	  "type": "WorkType" ,
+      "label" : "Digital Images" 
   } ,
   "identifiers": 
     [
@@ -109,10 +110,11 @@
           {
             "value": "V0006724",
 			"type": "Identifier" ,
-            "identifierScheme": "miro-image-number" ,
+            "identifierScheme": "miro-image-number" 
           }
         ],
 		"locations" :
+		[
 		   {
 			"type": "Location" ,
 		    "locationType":  "iiif-image",
@@ -123,7 +125,8 @@
 		 		"description" : "Copyrighted work available under Creative Commons Attribution only license CC BY 4.0" ,
 		 	    "url" : "http://creativecommons.org/licenses/by/4.0/" 
 			}
-			  },
+			  }
+		  ]
        }
     ]
 }
