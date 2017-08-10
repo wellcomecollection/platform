@@ -5,6 +5,7 @@ import scala.util.Try
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.apache.commons.lang.StringEscapeUtils
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.utils.JsonUtil
 
 case class MiroTransformableData(
@@ -49,7 +50,8 @@ case class MiroTransformable(MiroID: String,
 
     JsonUtil.fromJson[MiroTransformableData](unencodedData).map { miroData =>
       // Identifier is passed straight through
-      val identifiers = List(SourceIdentifier("Miro", "MiroID", MiroID))
+      val identifiers =
+        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
 
       // XML tags refer to fields within the Miro XML dumps.
 

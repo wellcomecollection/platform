@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
@@ -46,9 +47,10 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
       }
     }
 
-  private def findMiroID(work: Work) = {
+  private def findMiroID(work: Work): Option[SourceIdentifier] = {
     val maybeSourceIdentifier =
-      work.identifiers.find(identifier => identifier.sourceId == "MiroID")
+      work.identifiers.find(identifier =>
+        identifier.identifierScheme == IdentifierSchemes.miroImageNumber)
     info(s"SourceIdentifier: $maybeSourceIdentifier")
     maybeSourceIdentifier
   }

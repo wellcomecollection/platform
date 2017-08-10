@@ -8,6 +8,7 @@ import org.scalatest.FunSpec
 import org.scalatest.mockito.MockitoSugar
 import scalikejdbc._
 import scalikejdbc.interpolation.SQLSyntax
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.platform.idminter.database.{
@@ -84,7 +85,7 @@ class IdMinterWorkerTest
           JsonUtil
             .toJson(
               Work(
-                identifiers = List(SourceIdentifier("Miro", "MiroID", miroId)),
+                identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)),
                 title = "Some fresh fruit for a flamingo"
               ))
             .get,
