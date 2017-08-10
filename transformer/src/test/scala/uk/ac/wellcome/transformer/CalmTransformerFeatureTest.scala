@@ -1,6 +1,7 @@
 package uk.ac.wellcome.transformer
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{CalmTransformable, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.MessageInfo
@@ -71,7 +72,7 @@ class CalmTransformerFeatureTest
     snsMessage.message shouldBe JsonUtil
       .toJson(
         Work(
-          identifiers = List(SourceIdentifier("calm-placeholder-scheme", "value")),
+          identifiers = List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
           title = "placeholder title for a Calm record"
         ))
       .get
