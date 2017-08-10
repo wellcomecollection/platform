@@ -45,6 +45,7 @@ try:
     client.download_file(Bucket=src_bucket, Key=src_key, Filename=tmp_fp)
 
     # Magic happens here...
+    # exiftool -m -sep ", " -xmp:Location="$Location" -xmp:Creator="$Photog" -xmp:Description="$Caption" -xmp:Subject="$Keywords" -xmp:Instructions="$IntendedUsage" -xmp:UsageTerms="$UsageTerms" -xmp:Copyright="Wellcome" -xmp:License="$CC_URL" $Filename
 
     client.upload_file(Bucket=dst_bucket, Key=dst_key, Filename=tmp_fp)
 

@@ -18,3 +18,10 @@ variable "memory" {
 variable "vcpus" {
   default = 1
 }
+
+variable "command" {
+  # Used to generate a string of the form:
+  # [ "cmd", "-i", "Ref::param" ]
+  type        = "list"
+  default = []
+}

@@ -3,6 +3,7 @@ data "template_file" "job_definition" {
 
   vars {
     name             = "${var.name}"
+    command          = "[${join(",", var.command)}]"
     image_uri        = "${var.image_uri}"
     memory           = "${var.memory}"
     vcpus            = "${var.vcpus}"
