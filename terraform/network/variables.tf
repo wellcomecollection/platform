@@ -9,3 +9,8 @@ variable "az_count" {
 variable "name" {
   description = "Name to use on resource tags"
 }
+
+variable "map_public_ip" {
+  description = "Assign public IP addresses to instances launched in this subnet"
+  default     = false
+}

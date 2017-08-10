@@ -146,3 +146,7 @@ variable "deployment_minimum_healthy_percent" {
 variable "deployment_maximum_percent" {
   default = "200"
 }
+
+variable "enable_alb_alarm" {
+  default = 1
+}

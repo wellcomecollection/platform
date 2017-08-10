@@ -21,6 +21,8 @@ module "service" {
 
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
+
+  enable_alb_alarm = "${var.enable_alb_alarm}"
 }
 
 module "task" {

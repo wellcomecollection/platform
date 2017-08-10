@@ -9,6 +9,7 @@
 <!-- If you're making public API changes -->
 - [ ] Reviewed by @jtweed
 - [ ] Updated the Swagger documentation
+- [ ] Updated the JSON-LD context
 <!-- If you're making application changes -->
 - [ ] Deployed new versions
 <!-- Remove this section if you don't have Terraform changes -->
