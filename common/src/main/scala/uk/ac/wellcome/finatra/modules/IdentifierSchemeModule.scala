@@ -1,8 +1,8 @@
 package uk.ac.wellcome.finatra.modules
 
 /** This is the canonical version of our identifier schemes.  This contains
- *  the strings that will be presented to users of the API.
- */
+  *  the strings that will be presented to users of the API.
+  */
 object IdentifierSchemes {
 
   // Corresponds to the image number in Miro, e.g. V00127563.
