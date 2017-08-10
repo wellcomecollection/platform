@@ -2,10 +2,10 @@
   "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
   "id": "watu9tbc",
   "type": "Work",
-  "workType" : {
-      "id" : "digital-image" ,
-      "label" : "Digital Images" ,
-  } ,
+  "thumbnail":{
+	"id": "https://wellcomelibrary.org/iiif/b28480351/imageanno/b28gh7z4n.jpg" , 
+	"type": "Image" 
+   } ,
   "identifiers": 
     [
       {
@@ -57,22 +57,17 @@
       "label": "May 23 1802",
       "type": "Period"
     },
-  "genres":
+  "genresOrTechniques":
   [	   
 	  {
            "label": "Caricatures",
-		   "type": "Concept",
-		   "identifiers": [
-		   		{
-		   			"type": "Identifier",
-					"identifierScheme": "lctgm" ,
-					"value": "Caricatures"
-		   		}
-		   ] 	   	
+           "conceptScheme": "lctgm" ,
+		   "type": "GenreOrTechnique" 	   	
 	   } , 
 	   {
 	       "label": "Etching and water colour" ,
-		   "type": "Concept" 	   	
+		   "conceptScheme": "miro-technique" ,
+		   "type": "GenreOrTechnique" 	   	
 	   } 
    ],
   "physicalDescription": "etching, with watercolour"  , 
@@ -80,23 +75,28 @@
     [
       {
         "label": "Thomas Young [1773  - 1829 ]",
-		"type": "Concept"
+        "conceptScheme": "miro-keywords" ,
+		"type": "Keyword"
       },
       {
         "label": "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
-		"type": "Concept"
+        "conceptScheme": "miro-keywords" ,
+		"type": "Keyword"
       },
       {
         "label": "Sir Humphry Davy [1778  - 1829 ]",
-		"type": "Concept"
+        "conceptScheme": "miro-keywords" ,
+		"type": "Keyword"
       },
       {
         "label": "Sir John Coxe Hippisley [1748  - 1825 ]",
-		"type": "Concept"
+        "conceptScheme": "miro-keywords" ,
+		"type": "Keyword"
       },
       {
         "label": "Royal Institution of Great Britain [ - ]",
-		"type": "Concept"
+        "conceptScheme": "miro-keywords" ,
+		"type": "Keyword"
       }
     ],
   "items":
@@ -104,26 +104,42 @@
       {
        "id": "b28gh7z4n",
        "type": "Item",
-		"identifiers": 
+       "licence": "CC-BY-4.0",
+       "identifiers": 
         [
           {
             "value": "V0006724",
 			"type": "Identifier" ,
-            "identifierScheme": "miro-image-number" ,
+            "identifierScheme": "miro-image-number"
           }
         ],
-		"locations" :
-		   {
-			"type": "Location" ,
-		    "locationType":  "iiif-image",
-			"url" : "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json" ,
-		 	 "license" : {
-		 		"type" : "License" ,
-		 	    "label" : "CC-BY-4.0" ,
-		 		"description" : "Copyrighted work available under Creative Commons Attribution only license CC BY 4.0" ,
-		 	    "url" : "http://creativecommons.org/licenses/by/4.0/" 
-			}
-			  },
+		"itemAccess" :
+         [
+			 {
+		     "type": "PhysicalAccess" ,
+			 "format": "Picture" ,
+			 "location": "1l19",
+			 "accessStatus": "Open" ,
+			 "service":
+			  {
+				  "label": "Closed Store Iconographic" ,
+				  "profile": "http://catalogue.wellcomelibrary.org/screens/loc_closed_online_icon.html" 
+			  } 
+				 
+			 } ,
+			 {
+			 "type": "DigitalAccess" ,
+			 "format": "Manifest" ,
+			 "accessStatus": "Open" ,
+			 "location": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
+			 "service":
+			  {
+				  "id": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
+				  "label": "IIIF Image API" ,
+				  "profile": "http://iiif.io/api/image/2/level2.json" 
+			  } 
+			 }
+		 ] 	
        }
     ]
 }
