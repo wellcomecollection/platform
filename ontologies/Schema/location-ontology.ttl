@@ -18,21 +18,9 @@ wloc:Item rdf:type owl:Class ;
     rdfs:comment "An item"@en ;
     rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
 
-wloc:ItemLocation rdf:type owl:Class ;
-    rdfs:label "ItemLocation"@en ;
+wloc:Location rdf:type owl:Class ;
+    rdfs:label "Location"@en ;
     rdfs:comment "A location that provides access to an item"@en ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
-
-wloc:PhysicalLocation rdf:type owl:Class ;
-    rdfs:isSubClassOf wloc:ItemLocation ;
-    rdfs:label "PhysicalLocation"@en ;
-    rdfs:comment "A physical location that provides access to an item"@en ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
-
-wloc:DigitalLocation rdf:type owl:Class ;
-    rdfs:isSubClassOf wloc:ItemLocation ;
-    rdfs:label "DigitalLocation"@en ;
-    rdfs:comment "A digital location that provides access to an item"@en ;
     rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .		
 
 wloc:AccessStatus rdf:type owl:Class ;
@@ -48,7 +36,12 @@ wloc:LocationType rdf:type owl:Class ;
 wloc:AccessProcess rdf:type owl:Class ;
 	rdfs:label "AccessProcess"@en ;
 	rdfs:comment "The process of accessing an item."@en ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
+	
+wloc:License rdf:type owl:Class ;
+	rdfs:label "License"@en ;
+	rdfs:comment "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."@en ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .			
 
 		
 	
@@ -59,29 +52,36 @@ wloc:locations  rdf:type owl:ObjectProperty ;
 	rdfs:label "locations"@en ;
 	rdfs:comment "An access route for an item"@en ; 
 	rdfs:domain wloc:Item ;
-	rdfs:range wloc:Itemlocation ;
+	rdfs:range wloc:Location ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
 	
 wloc:accessStatus rdf:type owl:ObjectProperty ;
 	rdfs:label "accessStatus"@en ;
 	rdfs:comment "A service that makes the thing accesible"@en ; 
-	rdfs:domain wloc:Itemlocation ;
+	rdfs:domain wloc:Location ;
 	rdfs:range wloc:AccessStatus ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
 	
 wloc:locationType rdf:type owl:ObjectProperty ;
 	rdfs:label "locationType"@en ;
 	rdfs:comment "The type of location an item is accessible from"@en ;
-	rdfs:domain wloc:Itemlocation ;
+	rdfs:domain wloc:Location ;
 	rdfs:range wloc:LocationType ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .	
 	
 wloc:accessProcess rdf:type owl:ObjectProperty ;
 	rdfs:label "accessProcess"@en ;
 	rdfs:comment "This relates an accesible item to a process of access."@en ;
-	rdfs:domain wloc:Itemlocation ;
+	rdfs:domain wloc:Location ;
 	rdfs:range wloc:AccessProcess ;
-	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .					
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .
+	
+wloc:license rdf:type owl:ObjectProperty ;
+	rdfs:label "license"@en ;
+	rdfs:comment "Relates an item to the specific license under which the item in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise licence to which a link can be made."@en ;
+	rdfs:domain wloc:Location ;
+	rdfs:range wloc:License ;
+	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/location> .							
 	
 	
 	
