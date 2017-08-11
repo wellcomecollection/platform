@@ -8,6 +8,7 @@ boto3==1.4.5
 botocore==1.5.94          # via boto3, s3transfer
 certifi==2017.7.27.1      # via requests
 chardet==3.0.4            # via requests
+docopt==0.6.2
 docutils==0.14            # via botocore
 futures==3.1.1            # via s3transfer
 idna==2.5                 # via requests

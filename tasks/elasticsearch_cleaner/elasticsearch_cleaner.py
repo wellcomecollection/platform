@@ -1,10 +1,28 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
+"""
+Delete unused indexes from Elasticsearch.
+
+This script inspects our Terraform config in S3, identifies which indexes are
+in use, and deletes any indexes on the cluster which aren't being used.
+
+Usage:
+  elasticsearch_cleaner.py --bucket=<BUCKET> --key=<KEY> [--dry-run]
+  elasticsearch_cleaner.py -h | --help
+
+Options:
+  --bucket=<BUCKET>     Name of the S3 bucket holding our Terraform config
+  --key=<KEY>           Key of our Terraform config in S3
+  --dry-run             Only print the name of indexes to delete, don't
+                        actually delete anything
+  -h --help             Show this screen
+"""
 
 import collections
 from urllib.parse import urljoin
 
 import boto3
+import docopt
 import hcl
 import requests
 
@@ -72,24 +90,26 @@ def find_unused_es_indexes(known_indexes):
     return unused_indexes
 
 
-def delete_indexes(unused_indexes):
+def delete_indexes(unused_indexes, is_dry_run):
     for cluster, indexes in unused_indexes.items():
         for i in indexes:
-            print(f'Deleting unused index {i}')
-            resp = requests.delete(
-                urljoin(cluster.url, i),
-                auth=(cluster.username, cluster.password)
-            )
-            resp.raise_for_status()
+            print(f'Deleting unused index {i} on cluster {cluster.url}')
+            if not is_dry_run:
+                resp = requests.delete(
+                    urljoin(cluster.url, i),
+                    auth=(cluster.username, cluster.password)
+                )
+                resp.raise_for_status()
 
 
-tfvars = parse_terraform_config(
-    bucket='platform-infra',
-    key='terraform.tfvars'
-)
+if __name__ == '__main__':
+    args = docopt.docopt(__doc__)
 
-known_indexes = identify_es_config_in_tfvars(tfvars)
+    bucket = args['--bucket']
+    key = args['--key']
+    is_dry_run = args['--dry-run']
 
-unused_indexes = find_unused_es_indexes(known_indexes)
-
-delete_indexes(unused_indexes)
+    tfvars = parse_terraform_config(bucket=bucket, key=key)
+    known_indexes = identify_es_config_in_tfvars(tfvars)
+    unused_indexes = find_unused_es_indexes(known_indexes)
+    delete_indexes(unused_indexes, is_dry_run=is_dry_run)
