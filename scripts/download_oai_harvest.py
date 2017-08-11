@@ -34,14 +34,21 @@ def fetch_calm_records():
     while True:
         r = requests.get(OAI_URL, params=params)
 
+        # We can't parse the Calm "XML" with an XML parser, because it isn't
+        # actually valid XML.  Instead the values are URL-encoded as an
+        # attribute on an XML-like tag, so we unpick those with a regex
+        # and store the values that way.
         records = r.text.split('</record>')
         records.pop()
-        for q in records:
+        for rec in records:
             d = collections.defaultdict(list)
-            for m in STREAM_PARSER_RE.finditer(q):
+            for m in STREAM_PARSER_RE.finditer(rec):
                 d[m.group('name')].append(unquote(m.group('value')))
             yield dict(d)
 
+        # Results from the OAI harvests are paginated, to prevent records
+        # changing order under our feet.  The presence of a `resumptionToken`
+        # tells us how to access the next page.
         try:
             params['resumptionToken'] = RESUMPTION_TOKEN_RE.search(r.text).group('token')
         except Exception as e:
@@ -51,10 +58,14 @@ def fetch_calm_records():
             del params['metadataPrefix']
 
 
-d = []
+all_records = []
 for r in fetch_calm_records():
-    d.append(r)
+    all_records.append(r)
     if len(d) % 1000 == 0:
         print(f'{len(d)}...')
 
-json.dump(d, open('calm_records.json', 'w'), indent=2, sort_keys=True)
+json.dump(
+    all_records,
+    open('calm_records.json', 'w'),
+    indent=2, sort_keys=True
+)
