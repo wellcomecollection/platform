@@ -61,7 +61,7 @@ def fetch_calm_records():
 all_records = []
 for r in fetch_calm_records():
     all_records.append(r)
-    if len(d) % 1000 == 0:
+    if len(all_records) % 1000 == 0:
         print(f'{len(d)}...')
 
 json.dump(
