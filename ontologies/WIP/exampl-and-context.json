@@ -30,9 +30,6 @@
     "Concept": {
       "@id": "wwork:Concept"
     },
-    "Concept": {
-      "@id": "wwork:Concept"
-    },
     "Item": {
       "@id": "wwork:Item"
     },
