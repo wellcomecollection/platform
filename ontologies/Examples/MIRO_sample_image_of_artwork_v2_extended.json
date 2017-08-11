@@ -128,7 +128,7 @@
 				 "id" : "online-access" ,
 				 "label" : "Online access" ,
 				 "type" : "AccessProcess" 
-				 } ,
+       }
 			 } ,
   		   {
   			"type": "Location" ,
