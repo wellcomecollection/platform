@@ -109,7 +109,9 @@ if __name__ == '__main__':
     key = args['--key']
     is_dry_run = args['--dry-run']
 
+    print('*** Starting elasticsearch_cleaner.py')
     tfvars = parse_terraform_config(bucket=bucket, key=key)
     known_indexes = identify_es_config_in_tfvars(tfvars)
     unused_indexes = find_unused_es_indexes(known_indexes)
     delete_indexes(unused_indexes, is_dry_run=is_dry_run)
+    print('*** Finished elasticsearch_cleaner.py')

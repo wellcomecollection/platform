@@ -260,6 +260,18 @@ data "aws_iam_policy_document" "s3_read_miro_images" {
   }
 }
 
+data "aws_iam_policy_document" "s3_get_infra_bucket" {
+  statement {
+    actions = [
+      "s3:Get*",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "write_ec2_tags" {
   statement {
     actions = [
