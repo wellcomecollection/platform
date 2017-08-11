@@ -28,7 +28,7 @@ def identify_es_config_in_tfvars(tfvars):
     """
     known_indexes = collections.defaultdict(set)
 
-    for key, data in tfvars.items():
+    for key, v in tfvars.items():
         # Elasticsearch config blocks are of the form es_config_{variant},
         # e.g. es_config_ingestor, es_config_remus
         if not key.startswith('es_config_'):
@@ -37,10 +37,10 @@ def identify_es_config_in_tfvars(tfvars):
         url = f'https://{v["name"]}.{v["region"]}.aws.found.io:{v["port"]}'
         cluster = Cluster(
             url=url,
-            username=data['username'],
-            password=data['password']
+            username=v['username'],
+            password=v['password']
         )
-        known_indexes[cluster].add(data['index'])
+        known_indexes[cluster].add(v['index'])
 
     return known_indexes
 
@@ -52,7 +52,7 @@ def find_unused_es_indexes(known_indexes):
 
         # Ask the cluster for all the indexes it knows about
         resp = requests.get(
-            urljoin(cluster.url, '/_cat/indexes'),
+            urljoin(cluster.url, '/_cat/indices'),
             params={'format': 'json'},
             auth=(cluster.username, cluster.password)
         )
