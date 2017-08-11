@@ -73,6 +73,12 @@ def guess_cloudwatch_url(alarm):
         lambda_name = alarm.name.split('-')[1]
         group = f'/aws/lambda/{lambda_name}'
         search_term = 'Traceback'
+    elif alarm.name == 'api_romulus-alb-target-500-errors':
+        group = 'platform/api_romulus'
+        search_term = 'Unhandled Exception'
+    elif alarm.name == 'api_remus-alb-target-500-errors':
+        group = 'platform/api_remus'
+        search_term = 'Unhandled Exception'
     else:
         return
 
