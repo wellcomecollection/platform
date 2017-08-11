@@ -8,7 +8,7 @@ It's a good idea to start with a clear idea of where you want to get to. Define 
 
 ##Don't load test your load tester
 
-Where you run your load test from has an impact on the results of your test. If you're trying to recieve a lot of large responses back from your target under test you could well bottleneck on the load tester end.
+Where you run your load test from has an impact on the results of your test. If you're trying to receive a lot of large responses back from your target under test you could well bottleneck on the load tester end.
 
 ##Soak testing
 
