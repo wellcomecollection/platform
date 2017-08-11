@@ -112,17 +112,9 @@ def main(event, _):
                               "value": f"{alarm.namespace}/{alarm.metric_name}"
                           },
                           {
-                              "title": "Dimensions",
-                              "value": repr(alarm.dimensions)
-                          },
-                          {
                               "title": "Reason",
                               "value": alarm.state_reason
                           },
-                          {
-                              "title": "Timestamp",
-                              "value": alarm.state_change_time
-                          }
                       ]
                   }]}
 
