@@ -100,7 +100,7 @@ def main(event, _):
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
 
     slack_data = {'username': 'cloudwatch-alert',
-                  "icon_emoji": ":slack:",
+                  "icon_emoji": ":rotating_light:",
                   "attachments": [{
                       'color': 'danger',
                       'fallback': alarm.name,
