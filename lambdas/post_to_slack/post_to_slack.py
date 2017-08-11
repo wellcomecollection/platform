@@ -107,10 +107,6 @@ def main(event, _):
                       "title": alarm.name,
                       "fields": [
                           {
-                              "title": "Metric",
-                              "value": f"{alarm.namespace}/{alarm.metric_name}"
-                          },
-                          {
                               "title": "Reason",
                               "value": alarm.state_reason
                           },
