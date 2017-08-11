@@ -51,7 +51,7 @@ def fetch_calm_records():
         # tells us how to access the next page.
         try:
             params['resumptionToken'] = RESUMPTION_TOKEN_RE.search(r.text).group('token')
-        except Exception as e:
+        except Exception:
             raise StopIteration
 
         if 'resumptionToken' in params and 'metadataPrefix' in params:
@@ -62,7 +62,7 @@ all_records = []
 for r in fetch_calm_records():
     all_records.append(r)
     if len(all_records) % 1000 == 0:
-        print(f'{len(d)}...')
+        print(f'{len(all_records)}...')
 
 json.dump(
     all_records,
