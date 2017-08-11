@@ -41,59 +41,58 @@ class Alarm:
     def state_change_time(self):
         return self.message['StateChangeTime']
 
+    def cloudwatch_url(self):
+        """
+        Sometimes there's enough data in the alarm to make an educated guess
+        about useful CloudWatch logs to check.  This method tries to do that.
+        """
+        # We can get the time from the datapoint in the reason, which is
+        # typically of the form
+        #
+        #     Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was
+        #     greater than or equal to the threshold (1.0).
+        #
+        # So try to get the timestamp.
+        match = re.search(
+            r'\[(?P<datapoint>[0-9.]+) \((?P<timestamp>[0-9]{2}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\)\]',
+            self.state_reason
+        )
+        if match is None:
+            return
 
-def guess_cloudwatch_url(alarm):
-    """
-    Sometimes there's enough data in the alarm to make an educated guess
-    about useful CloudWatch logs to check.  This function tries to do that.
-    """
-    # We can get the time from the datapoint in the reason, which is
-    # typically of the form
-    #
-    #     Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was
-    #     greater than or equal to the threshold (1.0).
-    #
-    # So try to get the timestamp.
-    match = re.search(
-        r'\[(?P<datapoint>[0-9.]+) \((?P<timestamp>[0-9]{2}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\)\]',
-        alarm.state_reason
-    )
-    if match is None:
-        return
+        timestamp = match.group('timestamp')
+        time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
+        start = time - dt.timedelta(seconds=300)
+        end = time + dt.timedelta(seconds=300)
 
-    timestamp = match.group('timestamp')
-    time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-    start = time - dt.timedelta(seconds=300)
-    end = time + dt.timedelta(seconds=300)
+        if self.name == 'loris-alb-target-500-errors':
+            group = 'platform/loris'
+            search_term = '"HTTP/1.0 500"'
+        elif self.name.startswith('lambda'):
+            lambda_name = alarm.name.split('-')[1]
+            group = f'/aws/lambda/{lambda_name}'
+            search_term = 'Traceback'
+        elif self.name == 'api_romulus-alb-target-500-errors':
+            group = 'platform/api_romulus'
+            search_term = 'Unhandled Exception'
+        elif self.name == 'api_remus-alb-target-500-errors':
+            group = 'platform/api_remus'
+            search_term = 'Unhandled Exception'
+        else:
+            return
 
-    if alarm.name == 'loris-alb-target-500-errors':
-        group = 'platform/loris'
-        search_term = '"HTTP/1.0 500"'
-    elif alarm.name.startswith('lambda'):
-        lambda_name = alarm.name.split('-')[1]
-        group = f'/aws/lambda/{lambda_name}'
-        search_term = 'Traceback'
-    elif alarm.name == 'api_romulus-alb-target-500-errors':
-        group = 'platform/api_romulus'
-        search_term = 'Unhandled Exception'
-    elif alarm.name == 'api_remus-alb-target-500-errors':
-        group = 'platform/api_remus'
-        search_term = 'Unhandled Exception'
-    else:
-        return
+        return (
+            'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
+            '?region=eu-west-1'
+            f'#logEventViewer:group={group};'
 
-    return (
-        'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
-        '?region=eu-west-1'
-        f'#logEventViewer:group={group};'
+            # Look for strings matching 'HTTP/1.0 500'
+            f'filter={quote(search_term)};'
 
-        # Look for strings matching 'HTTP/1.0 500'
-        f'filter={quote(search_term)};'
-
-        # And add the date parameters to filter to the exact time
-        f'start={start.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-        f'end={end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-    )
+            # And add the date parameters to filter to the exact time
+            f'start={start.strftime("%Y-%m-%dT%H:%M:%SZ")};'
+            f'end={end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
+        )
 
 
 def main(event, _):
@@ -118,7 +117,7 @@ def main(event, _):
                       ]
                   }]}
 
-    cloudwatch_url = guess_cloudwatch_url(alarm)
+    cloudwatch_url = alarm.cloudwatch_url()
     if cloudwatch_url is not None:
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch URL',
