@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.platform.api.models.{
-  DisplaySearch,
+  DisplayResultList,
   DisplayWork,
   WorksIncludes
 }
@@ -29,7 +29,7 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
   def listWorks(pageSize: Int = defaultPageSize,
                 pageNumber: Int = 1,
                 includes: WorksIncludes = WorksIncludes(),
-                index: Option[String] = None): Future[DisplaySearch] =
+                index: Option[String] = None): Future[DisplayResultList] =
     searchService
       .listResults(
         sortByField = "canonicalId",
@@ -37,13 +37,13 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
         from = (pageNumber - 1) * pageSize,
         index = index
       )
-      .map { DisplaySearch(_, pageSize, includes) }
+      .map { DisplayResultList(_, pageSize, includes) }
 
   def searchWorks(query: String,
                   pageSize: Int = defaultPageSize,
                   pageNumber: Int = 1,
                   includes: WorksIncludes = WorksIncludes(),
-                  index: Option[String] = None): Future[DisplaySearch] =
+                  index: Option[String] = None): Future[DisplayResultList] =
     searchService
       .simpleStringQueryResults(
         query,
@@ -51,6 +51,6 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
         from = (pageNumber - 1) * pageSize,
         index = index
       )
-      .map { DisplaySearch(_, pageSize, includes) }
+      .map { DisplayResultList(_, pageSize, includes) }
 
 }
