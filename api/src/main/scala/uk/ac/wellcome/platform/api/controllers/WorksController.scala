@@ -9,8 +9,15 @@ import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import scala.collection.JavaConverters._
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.models.{DisplayResultList, DisplayWork, WorksIncludes}
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.models.{
+  DisplayResultList,
+  DisplayWork,
+  WorksIncludes
+}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.api.requests._
@@ -36,7 +43,6 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     .collectionFormat("csv")
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
-
   prefix(apiPrefix) {
 
     val endpointSuffix = "/works"
@@ -47,9 +53,16 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .description("Returns a paginated list of works")
         .tag("Works")
         .responseWith[DisplayResultList](200, "ResultList[Work]")
-        .queryParam[Int]("page", "The page to return from the result list", required = false)
-        .queryParam[Int]("pageSize", "The number of works to return per page (default: 10)", required = false)
-        .queryParam[String]("query", "Full-text search query", required = false)
+        .queryParam[Int]("page",
+                         "The page to return from the result list",
+                         required = false)
+        .queryParam[Int](
+          "pageSize",
+          "The number of works to return per page (default: 10)",
+          required = false)
+        .queryParam[String]("query",
+                            "Full-text search query",
+                            required = false)
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: we have an 'index' query param that
     // allows the user to pick which Elasticsearch index to use.  This is

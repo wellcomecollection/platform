@@ -16,6 +16,7 @@ case class ResultResponse(
 
 case class ResultListResponse(
   @JsonProperty("@context") context: String,
+  @JsonProperty("type") ontologyType: String,
   pageSize: Int = 10,
   totalPages: Int = 10,
   totalResults: Int = 100,
@@ -39,16 +40,16 @@ object ResultListResponse {
   }
 
   def create(
-              contextUri: String,
-              displaySearch: DisplayResultList,
-              multipleResultsRequest: MultipleResultsRequest,
-              requestBaseUri: String
+    contextUri: String,
+    displayResultList: DisplayResultList,
+    multipleResultsRequest: MultipleResultsRequest,
+    requestBaseUri: String
   ): ResultListResponse = {
 
     val currentPage = multipleResultsRequest.page
-    val isLastPage = displaySearch.totalPages == currentPage
+    val isLastPage = displayResultList.totalPages == currentPage
     val isFirstPage = currentPage == 1
-    val isOnlyPage = displaySearch.totalPages <= 1
+    val isOnlyPage = displayResultList.totalPages <= 1
 
     val apiLink = createApiLink(requestBaseUri, multipleResultsRequest) _
 
@@ -63,10 +64,11 @@ object ResultListResponse {
 
     ResultListResponse(
       context = contextUri,
-      results = displaySearch.results,
-      pageSize = displaySearch.pageSize,
-      totalPages = displaySearch.totalPages,
-      totalResults = displaySearch.totalResults,
+      ontologyType = displayResultList.ontologyType,
+      results = displayResultList.results,
+      pageSize = displayResultList.pageSize,
+      totalPages = displayResultList.totalPages,
+      totalResults = displayResultList.totalResults,
       prevPage = prevLink,
       nextPage = nextLink
     )
