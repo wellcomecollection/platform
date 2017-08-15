@@ -1,6 +1,9 @@
 import json
 import os
 
+import mock
+import pytest
+
 import post_to_slack
 from mock import patch
 
@@ -10,7 +13,7 @@ def _assert_field_contains(field, title, value):
     assert field['value'] == value
 
 
-@patch('post_to_slack.requests.post')
+@mock.patch('post_to_slack.requests.post')
 def test_post_to_slack(mock_post):
     url = "http://blah.com"
     os.environ['SLACK_INCOMING_WEBHOOK'] = url
@@ -95,25 +98,54 @@ def test_post_to_slack(mock_post):
     attachment = sent_data['attachments'][0]
     assert attachment['fallback'] == alarm_name
     assert attachment['title'] == alarm_name
-    assert len(attachment['fields']) == 4
+    assert len(attachment['fields']) == 1
 
     _assert_field_contains(
         field=attachment['fields'][0],
-        title='Metric',
-        value=f'{namespace}/{metric_name}'
-    )
-    _assert_field_contains(
-        field=attachment['fields'][1],
-        title='Dimensions',
-        value=repr(dimensions)
-    )
-    _assert_field_contains(
-        field=attachment['fields'][2],
         title='Reason',
         value=reason
     )
-    _assert_field_contains(
-        field=attachment['fields'][3],
-        title='Timestamp',
-        value=timestamp
-    )
+
+
+class TestAlarm:
+
+    @pytest.mark.parametrize('alarm_data, expected_reason', [
+        (
+            {
+                'AlarmName': 'loris-alb-target-500-errors',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
+            },
+            'The ALB spotted a 500 error in Loris at 10:55:00 on 11 Aug 2018.'
+        ),
+        (
+            {
+                'AlarmName': 'api_romulus-alb-target-500-errors',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
+            },
+            'The ALB spotted a 500 error in the API at 10:55:00 on 11 Aug 2018.'
+        ),
+        (
+            {
+                'AlarmName': 'api_remus-alb-target-500-errors',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
+            },
+            'The ALB spotted multiple 500 errors (3) in the API at 10:55:00 on 11 Aug 2018.'
+        ),
+        (
+            {
+                'AlarmName': 'api_remus-alb-target-500-errors',
+                'NewStateReason': 'Some other thing',
+            },
+            None
+        ),
+        (
+            {
+                'AlarmName': 'unrecognised-name',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
+            },
+            None
+        ),
+    ])
+    def test_human_reason(self, alarm_data, expected_reason):
+        a = post_to_slack.Alarm(json.dumps(alarm_data))
+        assert a.human_reason() == expected_reason
