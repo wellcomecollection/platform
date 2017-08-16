@@ -38,6 +38,9 @@
     "identifiers": {
       "@id": "wcore:identifiers"
     },
+    "thumbnail": {
+      "@id": "wcore:thumbnail"
+    },
     "value": {
       "@id": "wcore:value",
       "@type": "rdfs:Literal"
@@ -90,17 +93,20 @@
     "license": {
       "@id": "wloc:license"
     },
+    "licenseType": {
+      "@id": "wloc:licenseType"
+    },
     "items": {
       "@id": "wwork:items"
     },
     "locations": {
       "@id": "wloc:locations"
     },
-    "accessStatus": {
-      "@id": "wloc:accessStatus"
-    },
     "locationType": {
       "@id": "wloc:locationType"
+    },
+    "accessStatus": {
+      "@id": "wloc:accessStatus"
     },
     "accessProcess": {
       "@id": "wloc:accessProcess"
