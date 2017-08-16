@@ -83,7 +83,14 @@
   "subjects": [
     {
       "label": "Thomas Young [1773  - 1829 ]",
-      "type": "Concept"
+      "type": "Concept",
+      "identifiers": [
+        {
+          "type": "Identifier",
+          "identifierScheme": "lc-names",
+          "value": "n85830093"
+        }
+      ]
     },
     {
       "label": "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
