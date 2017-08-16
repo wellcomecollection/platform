@@ -17,6 +17,7 @@ import json
 import subprocess
 import os
 import tempfile
+import time
 
 import boto3
 import docopt
@@ -31,8 +32,8 @@ def start_download_process(task):
 
 def start_upload_process(local_image_path, task):
     s3_location = build_s3_destination(task)
-    print(s3_location)
-    p = subprocess.Popen(["aws", "s3", "cp", local_image_path, s3_location])
+    # p = subprocess.Popen(["aws", "s3", "cp", local_image_path, s3_location])
+    p = subprocess.Popen(["echo", f"uploaded {local_image_path} to {s3_location}"])
     return p, local_image_path, s3_location
 
 
@@ -51,19 +52,24 @@ def build_s3_source(task):
 
 
 def wait(process, success_message, failure_message):
-    process.wait()
-    if process.returncode != 0:
+    returncode = process.poll()
+    if returncode is None:
+        time.sleep(1)
+    elif returncode != 0:
         raise Exception(failure_message)
     else:
         print(success_message)
 
 
 def embed_image_metadata(task, local_image_path):
-    print(task)
     xmp_metadata = task["metadata"]["xmp"]
     arguments = [f"-xmp:{key}=\"{value}\"" for key, value in xmp_metadata.items() if value is not None]
-    arguments_line = " ".join(arguments)
-    print(f"exiftool -m -sep \", \" {arguments_line} {local_image_path}")
+    sep_arguments = ["exiftool", "-m", "-sep", "\", \""] + arguments
+    sep_arguments.append(local_image_path)
+    if subprocess.call(sep_arguments) != 0:
+        raise Exception("Failed embedding metadata!")
+    else:
+        print(f"Metadata embedded successfully for {build_s3_source(task)}")
 
 
 def main():
