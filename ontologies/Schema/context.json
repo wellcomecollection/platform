@@ -6,12 +6,12 @@
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "@base": "http://id.wellcomecollection.org/",
-	"id": "@id",
+    "id": "@id",
     "type": "@type",
-	"Work": {
+    "Work": {
       "@id": "wwork:Work"
     },
-	"WorkType": {
+    "WorkType": {
       "@id": "wwork:WorkType"
     },
     "Identifier": {
@@ -36,44 +36,44 @@
       "@id": "wloc:License"
     },
     "identifiers": {
-      "@id": "wcore:identifiers" 
-      },
+      "@id": "wcore:identifiers"
+    },
     "value": {
-      "@id": "wcore:value" ,
-	  "@type": "rdfs:Literal"
+      "@id": "wcore:value",
+      "@type": "rdfs:Literal"
     },
     "label": {
-      "@id": "wcore:label" ,
-	  "@type": "rdfs:Literal"
+      "@id": "wcore:label",
+      "@type": "rdfs:Literal"
     },
     "identifierScheme": {
-      "@id": "wcore:identifierScheme" ,
-	  "@type": "rdfs:Literal"
+      "@id": "wcore:identifierScheme",
+      "@type": "rdfs:Literal"
     },
     "title": {
-      "@id": "wwork:title" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:title",
+      "@type": "rdf:langString"
     },
     "description": {
-      "@id": "wwork:description" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:description",
+      "@type": "rdf:langString"
     },
     "physicalDescription": {
-      "@id": "wwork:physicalDescription" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:physicalDescription",
+      "@type": "rdf:langString"
     },
     "workType": {
-      "@id": "wwork:workType" 
+      "@id": "wwork:workType"
     },
     "lettering": {
-      "@id": "wwork:lettering" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:lettering",
+      "@type": "rdf:langString"
     },
     "creators": {
-      "@id": "wwork:creators" 
+      "@id": "wwork:creators"
     },
     "publishers": {
-      "@id": "wwork:publishers" 
+      "@id": "wwork:publishers"
     },
     "placeOfPublication": {
       "@id": "wwork:placeOfPublication"
@@ -85,16 +85,16 @@
       "@id": "wwork:publicationDate"
     },
     "genres": {
-      "@id": "wwork:genres" 
+      "@id": "wwork:genres"
     },
     "license": {
       "@id": "wloc:license"
     },
     "items": {
-      "@id": "wwork:items" 
+      "@id": "wwork:items"
     },
     "locations": {
-      "@id": "wloc:locations" 
+      "@id": "wloc:locations"
     },
     "accessStatus": {
       "@id": "wloc:accessStatus"
@@ -106,12 +106,12 @@
       "@id": "wloc:accessProcess"
     },
     "shelfmark": {
-      "@id": "wloc:shelfmark" ,
-	  "@type": "rdfs:Literal" 	  
+      "@id": "wloc:shelfmark",
+      "@type": "rdfs:Literal"
     },
     "url": {
-      "@id": "wcore:url" ,
-	  "@type": "rdfs:Literal" 	  
+      "@id": "wcore:url",
+      "@type": "rdfs:Literal"
     }
   }
 }
