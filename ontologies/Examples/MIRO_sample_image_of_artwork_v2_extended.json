@@ -82,6 +82,7 @@
   "physicalDescription": "etching, with watercolour",
   "subjects": [
     {
+      "id": "hd2891f",
       "label": "Thomas Young [1773  - 1829 ]",
       "type": "Concept",
       "identifiers": [
@@ -109,6 +110,7 @@
       "type": "Concept"
     },
     {
+      "id": "jd921000",
       "label": "Caricatures",
       "type": "Concept",
       "identifiers": [
