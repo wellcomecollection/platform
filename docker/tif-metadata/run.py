@@ -60,20 +60,10 @@ def wait(process, success_message, failure_message):
 
 def embed_image_metadata(task, local_image_path):
     print(task)
-    location = task['shoot']["location"] or None
-    creator = task['shoot']["staff_photog"] or task['shoot'][
-        "freelance_photog"]  # or freelance_photog?? Check one then the other? Can they both be set?
-    caption = task['image']["caption"] or None
-    intended_usage = task['shoot']["intended_usage"] or None
-    copyright = task['image']["credit_line"] or None
-    print(f"location: {location}")
-    print(f"creator: {creator}")
-    print(f"caption: {caption}")
-    print(f"intended_usage: {intended_usage}")
-    print(f"copyright: {copyright}")
-    # missing subject, usage terms, licence
-    # Magic happens here...
-    # exiftool -m -sep ", " -xmp:Location="$Location" -xmp:Creator="$Photog" -xmp:Description="$Caption" -xmp:Subject="$Keywords" -xmp:Instructions="$IntendedUsage" -xmp:UsageTerms="$UsageTerms" -xmp:Copyright="Wellcome" -xmp:License="$CC_URL" $Filename
+    xmp_metadata = task["metadata"]["xmp"]
+    arguments = [f"-xmp:{key}=\"{value}\"" for key, value in xmp_metadata.items() if value is not None]
+    arguments_line = " ".join(arguments)
+    print(f"exiftool -m -sep \", \" {arguments_line} {local_image_path}")
 
 
 def main():
@@ -109,14 +99,19 @@ def main():
         embed_image_metadata(task, local_image_path)
 
     print(f"Starting upload of {len(tasks)} images from s3")
-    upload_processes = [start_upload_process(local_image_path, task) for _, task, local_image_path in processes]
+    upload_processes = [
+        start_upload_process(local_image_path, task)
+        for _, task, local_image_path in processes
+    ]
 
     try:
         for process, _, upload_location in upload_processes:
             failure_message = f"Uploading to {upload_location} failed!"
             success_message = f"Uploading to {upload_location} succeeded"
-            wait(process, success_message=success_message, failure_message=failure_message)
-        # TODO delete original file if --delete-original flag is set
+            wait(process,
+                 success_message,
+                 failure_message)
+            # TODO delete original file if --delete-original flag is set
     finally:
         for _, local_image_path, _ in upload_processes:
             os.unlink(local_image_path)
