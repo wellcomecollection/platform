@@ -119,14 +119,6 @@
     "url": {
       "@id": "wcore:url",
       "@type": "rdfs:Literal"
-    },
-    "ResultList": "wa:ResultList",
-    "pageSize": "wa:pageSize",
-    "totalPages": "wa:totalPages",
-    "totalResults": "wa:totalResults",
-    "results": {
-      "@type": "wa:results",
-      "@container": "@list"
     }
   }
 }
