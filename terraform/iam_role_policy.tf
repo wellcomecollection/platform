@@ -268,3 +268,10 @@ resource "aws_iam_role_policy" "lambda_gatling_to_cloudwatch_put_metric" {
   role   = "${module.lambda_gatling_to_cloudwatch.role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
+
+# Policies for the Elasticsearch cleaner
+
+resource "aws_iam_role_policy" "es_cleaner_allow_s3_read" {
+  role   = "ecs_elasticsearch_cleaner_iam"
+  policy = "${data.aws_iam_policy_document.s3_get_infra_bucket.json}"
+}

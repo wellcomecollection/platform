@@ -65,3 +65,8 @@ module "ecr_repository_gatling" {
   source = "./ecr"
   name   = "gatling"
 }
+
+module "ecr_repository_elasticsearch_cleaner" {
+  source = "./ecr"
+  name   = "elasticsearch_cleaner"
+}

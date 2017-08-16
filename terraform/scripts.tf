@@ -68,3 +68,19 @@ module "gatling_digital_experience" {
     "{\"name\": \"S3_BUCKET\", \"value\": \"${aws_s3_bucket.dashboard.id}\"}",
   ]
 }
+
+module "elasticsearch_cleaner" {
+  source        = "./ecs_script_task"
+  task_name     = "elasticsearch_cleaner"
+  app_uri       = "${module.ecr_repository_elasticsearch_cleaner.repository_url}:${var.release_ids["elasticsearch_cleaner"]}"
+  task_role_arn = "${module.ecs_elasticsearch_cleaner_iam.task_role_arn}"
+
+  cpu    = 512
+  memory = 512
+
+  env_vars = [
+    "{\"name\": \"DRY_RUN\", \"value\": \"false\"}",
+    "{\"name\": \"KEY\", \"value\": \"terraform.tfvars\"}",
+    "{\"name\": \"BUCKET\", \"value\": \"${var.infra_bucket}\"}",
+  ]
+}

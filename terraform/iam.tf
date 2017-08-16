@@ -62,3 +62,8 @@ module "batch_example_iam" {
   source = "./ecs_iam"
   name   = "batch_example"
 }
+
+module "ecs_elasticsearch_cleaner_iam" {
+  source = "./ecs_iam"
+  name   = "elasticsearch_cleaner"
+}
