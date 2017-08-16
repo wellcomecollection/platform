@@ -100,6 +100,17 @@
     {
       "label": "Royal Institution of Great Britain [ - ]",
       "type": "Concept"
+    },
+    {
+      "label": "Caricatures",
+      "type": "Concept",
+      "identifiers": [
+        {
+          "type": "Identifier",
+          "identifierScheme": "mesh",
+          "value": "D019492"
+        }
+      ]
     }
   ],
   "items": [
