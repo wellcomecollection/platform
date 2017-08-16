@@ -1,0 +1,43 @@
+@prefix wcon: <http://www.wellcomecollection.org/ontologies/concept/> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://www.wellcomecollection.org/ontologies/concept>
+    rdf:type owl:Ontology ;
+    dcterms:title "Concept"@en ;
+    dcterms:created "2017-08-16"^^xsd:date ;
+    dcterms:description "A concept ontology describing concepts and their relationships"@en .
+
+###### classes ###  
+    
+wcon:Concept rdf:type owl:Class ;
+    rdfs:label "Concept"@en ;
+    rdfs:comment "A concept"@en ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/concept> .   
+
+
+    
+#### object properties ####
+
+wcon:broaderConcept rdf:type owl:ObjectProperty ;
+    rdfs:label "broaderConcept"@en ;
+    rdfs:comment "Relates a concept to a broader concept."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range wcon:Concept ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/concept> .
+
+wcon:narrowerConcept rdf:type owl:ObjectProperty ;
+    rdfs:label "narrowerConcept"@en ;
+    rdfs:comment "Relates a concept to a narrower concept."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range wcon:Concept ;
+    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/concept> .
+    
+    
+####### data properties #####
+
+           
+    
