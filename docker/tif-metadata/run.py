@@ -51,8 +51,7 @@ def build_s3_source(task):
 
 
 def wait(process, success_message, failure_message):
-    if process.poll() is not None:
-        process.wait()
+    process.wait()
     if process.returncode != 0:
         raise Exception(failure_message)
     else:
@@ -86,7 +85,8 @@ def main():
 
     client = boto3.client("s3")
     job_filename = os.path.basename(job_s3_key)
-    client.download_file(Bucket=job_bucket, Key=job_s3_key,
+    client.download_file(Bucket=job_bucket,
+                         Key=job_s3_key,
                          Filename=job_filename)
 
     with open(job_filename, "r") as job_file:
@@ -95,7 +95,7 @@ def main():
     tasks = job['task_list']
     print(f"Starting download of {len(tasks)} images from s3")
 
-    processes = [start_download_process(task["source"]) for task in tasks]
+    processes = [start_download_process(task) for task in tasks]
 
     for process, task, _ in processes:
         s3_source = build_s3_source(task)
