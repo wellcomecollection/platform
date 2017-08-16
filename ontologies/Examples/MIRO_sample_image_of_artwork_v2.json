@@ -3,9 +3,20 @@
   "id": "watu9tbc",
   "type": "Work",
   "workType": {
-    "id": "digital-image",
+    "id": "digital-images",
     "type": "WorkType",
     "label": "Digital Images"
+  },
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/V0042826ER.jpg/full/300,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
   },
   "identifiers": [
     {
@@ -95,13 +106,6 @@
     {
       "id": "b28gh7z4n",
       "type": "Item",
-      "identifiers": [
-        {
-          "value": "V0006724",
-          "type": "Identifier",
-          "identifierScheme": "miro-image-number"
-        }
-      ],
       "locations": [
         {
           "type": "Location",
@@ -109,8 +113,8 @@
           "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
           "license": {
             "type": "License",
-            "label": "CC-BY-4.0",
-            "description": "Copyrighted work available under Creative Commons Attribution only license CC BY 4.0",
+            "licenseType": "CC-BY",
+            "label": "Attribution 4.0 International (CC BY 4.0)",
             "url": "http://creativecommons.org/licenses/by/4.0/"
           }
         }
