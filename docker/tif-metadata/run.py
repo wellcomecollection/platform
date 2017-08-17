@@ -29,11 +29,11 @@ def download_in_parallel(tasks):
     return images
 
 
-def upload_in_parallel(upload_processes):
-    print(f"Starting upload of {len(upload_processes)} images to s3")
+def upload_in_parallel(images):
+    print(f"Starting upload of {len(images)} images to s3")
     upload_processes = [
         start_upload_process(local_image_path, task)
-        for task, local_image_path in upload_processes
+        for task, local_image_path in images
     ]
     try:
         for process, local_image_path, upload_location in upload_processes:
@@ -119,6 +119,7 @@ def main():
     delete_original = bool(args['--delete-original'])
     parallelism = 10
 
+    print(f"Downloading {job_s3_key}")
     client = boto3.client("s3")
     job_filename = os.path.basename(job_s3_key)
     client.download_file(Bucket=job_bucket,
@@ -128,19 +129,17 @@ def main():
     with open(job_filename, "r") as job_file:
         job = json.load(job_file)
 
-    tasks = job['task_list']
-
     images = []
-    for tasks in split(parallelism, tasks):
-        images += download_in_parallel(tasks)
+    for split_tasks in split(parallelism, job['task_list']):
+        images += download_in_parallel(split_tasks)
 
     print("Finished downloading s3 files!")
 
     for task, local_image_path in images:
         embed_image_metadata(task, local_image_path)
 
-    for upload_processes in split(parallelism, images):
-        upload_in_parallel(upload_processes)
+    for split_images in split(parallelism, images):
+        upload_in_parallel(split_images)
 
     print("Finished uploading files to s3!")
 
