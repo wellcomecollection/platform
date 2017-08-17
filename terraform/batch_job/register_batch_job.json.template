@@ -4,6 +4,8 @@
   "containerProperties": {
     "image": "${image_uri}",
     "memory": ${memory},
+    "command": ${memory},
+    "parameters" : ${params},
     "vcpus": ${vcpus},
     "jobRoleArn": "${job_role_arn}",
     "environment": ${environment_vars},

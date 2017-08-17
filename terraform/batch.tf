@@ -11,16 +11,14 @@ module "aws_batch_queue" {
   source = "./batch_queue"
 
   name             = "default"
-  compute_env_name = "default"
+  compute_env_name = "${module.aws_batch_compute.name}"
 }
 
-/*
-module "aws_batch_job" {
+module "aws_batch_job_tif-conversion" {
   source = "./batch_job"
 
-  name         = "example"
-  image_uri    = "hello-world"
+  name         = "tif-conversion"
+  image_uri    = "${module.ecr_repository_tif-metadata.repository_url}:${var.release_ids["tif-metadata"]}"
   job_role_arn = "${module.batch_example_iam.task_role_arn}"
+  command      = ["/run.py", "--bucket-name=Ref::bucket_name", "--key=Ref::key"]
 }
-*/
-
