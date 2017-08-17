@@ -27,7 +27,7 @@ variable "pinned_romulus_api_nginx" {
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = "0.0.1-8d6268900896cb0f3034ecb83d6695b3501ff11a_prod"
+  default     = "0.0.1-e6e8c3fd32ea524e10338243f7ae5876512312a7_prod"
 }
 
 variable "pinned_remus_api_nginx" {

@@ -268,3 +268,8 @@ resource "aws_iam_role_policy" "lambda_gatling_to_cloudwatch_put_metric" {
   role   = "${module.lambda_gatling_to_cloudwatch.role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
+
+resource "aws_iam_role_policy" "batch_tif_conversion_s3_tif_derivative" {
+  role   = "${module.batch_tif_conversion_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.s3_tif_derivative.json}"
+}

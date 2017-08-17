@@ -58,7 +58,7 @@ module "ecs_gatling_iam" {
   name   = "gatling"
 }
 
-module "batch_example_iam" {
+module "batch_tif_conversion_iam" {
   source = "./ecs_iam"
-  name   = "batch_example"
+  name   = "tif_conversion"
 }
