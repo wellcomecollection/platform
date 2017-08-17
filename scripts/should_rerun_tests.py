@@ -47,6 +47,14 @@ def should_run_tests(changed_files, task):
     if any(task.startswith('d') for d in docker_images):
         _should_run_tests_docker(changed_files=changed_files, task=task)
 
+    if (
+        task.startswith('miro_adapter') and
+        any(c.startswith('miro_adapter') for c in changed_files)
+    ):
+        raise ShouldRebuild(
+            'Changes to the miro_adapter directory trigger a full run'
+        )
+
 
 def _should_run_tests_sbt(changed_files, task):
     """

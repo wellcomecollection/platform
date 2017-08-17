@@ -269,7 +269,21 @@ resource "aws_iam_role_policy" "lambda_gatling_to_cloudwatch_put_metric" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
+# Policies for the TIF conversion batch job
+
 resource "aws_iam_role_policy" "batch_tif_conversion_s3_tif_derivative" {
   role   = "${module.batch_tif_conversion_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.s3_tif_derivative.json}"
+}
+
+# Policies for the Miro adapter
+
+resource "aws_iam_role_policy" "miro_adapter_read_from_s3" {
+  role   = "${module.ecs_miro_adapter_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
+}
+
+resource "aws_iam_role_policy" "miro_adapter_dynamodb_access" {
+  role   = "${module.ecs_miro_adapter_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.reindex_target_miro.json}"
 }
