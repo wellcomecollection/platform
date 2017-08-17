@@ -22,7 +22,8 @@ case class MiroTransformableData(
   @JsonProperty("image_keywords") keywords: Option[List[String]],
   @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]],
   @JsonProperty("image_phys_format") physFormat: Option[String],
-  @JsonProperty("image_lc_genre") lcGenre: Option[String]
+  @JsonProperty("image_lc_genre") lcGenre: Option[String],
+  @JsonProperty("image_tech_file_size") techFileSize: Option[List[String]]
 )
 
 case class ShouldNotTransformException(message: String)
@@ -65,6 +66,20 @@ case class MiroTransformable(MiroID: String,
       if (miroData.copyrightCleared.getOrElse("N") != "Y") {
         throw new ShouldNotTransformException(
           "image_copyright_cleared field is not Y")
+      }
+
+      // There are a bunch of <image_tech_*> fields that refer to the
+      // underlying image file.  If these are empty, there isn't actually a
+      // file to retrieve, which breaks the Collection site.  Sometimes this is
+      // a "glue" record that refers to multiple images.  e.g. V0011212ETL
+      //
+      // Eventually it might be nice to collate these -- have all the images
+      // in the same API result, but for now, we just exclude them from
+      // the API.  They aren't useful for testing image search.
+      if (miroData.techFileSize.getOrElse(List[String]()).isEmpty) {
+        throw new ShouldNotTransformException(
+          "No image_tech_file_size means there is no underlying image"
+        )
       }
 
       // In Miro, the <image_image_desc> and <image_image_title> fields are
