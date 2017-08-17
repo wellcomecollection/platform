@@ -354,7 +354,7 @@ class MiroTransformableTest
     "should not pass through records with an image_cleared value that isn't 'Y'") {
     assertTransformMiroRecordFails(
       data = """{
-      "image_title": "Confidential colourings of crododiles",
+      "image_title": "Confidential colourings of crocodiles",
       "image_cleared": "N",
       "image_copyright_cleared": "Y"
     }""")
@@ -368,6 +368,18 @@ class MiroTransformableTest
       "image_cleared": "Y",
       "image_copyright_cleared": "N"
     }""")
+  }
+
+  it(
+    "should not pass through records that are missing technical metadata") {
+    assertTransformMiroRecordFails(
+      data = """{
+        "image_title": "Touching a toxic tree is truly tragic",
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        "image_tech_file_size": []
+      }"""
+    )
   }
 
   private def assertTransformMiroRecordFails(
