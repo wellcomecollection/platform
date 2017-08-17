@@ -187,7 +187,10 @@ class MiroTransformableTest
 
   it("should pass through the Miro identifier") {
     val miroID = "M0000005_test"
-    val work = transformMiroRecord(miroID = miroID)
+    val work = transformMiroRecord(
+      data = """"image_title": "A picture of a passing porpoise"""",
+      miroID = miroID
+    )
     work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID))
   }
 
