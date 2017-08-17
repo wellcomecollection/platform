@@ -1,11 +1,11 @@
-@prefix wcore: <http://www.wellcomecollection.org/ontologies/core/> . 
+@prefix wcore: <http://wellcomecollection.org/ontologies/core/> . 
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 
-<http://www.wellcomecollection.org/ontologies/core>
+<http://wellcomecollection.org/ontologies/core>
     rdf:type owl:Ontology ;
     dcterms:title "Core"@en ;
     dcterms:created "2017-02-13"^^xsd:date ;
@@ -16,17 +16,17 @@
 wcore:Thing rdf:type owl:Class ;
     rdfs:label "Thing"@en ;
     rdfs:comment "A thing"@en ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .   
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .   
 
 wcore:Identifier rdf:type owl:Class ;
     rdfs:label "Identifier"@en ;
     rdfs:comment "A unique system-generated identifier that governs interaction between systems and is regarded as canonical wcorethin the Wellcome data ecosystem."@en ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .          
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .          
 
 wcore:IdentifierScheme rdf:type owl:Class ;
     rdfs:label "IdentifierScheme" ;
     rdfs:comment "An indication of the origin of identifiers identity scheme: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
-    rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .  
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .  
     
 #### object properties ####
 
@@ -35,28 +35,28 @@ wcore:identifiers rdf:type owl:ObjectProperty ;
     rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical wcorethin the Wellcome data ecosystem."@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range wcore:Identifier ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
 
 wcore:identifierScheme rdf:type owl:ObjectProperty ;
     rdfs:label "identifierScheme"@en ;
     rdfs:comment "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;
     rdfs:domain wcore:Identifier ;
     rdfs:range wcore:IdentifierScheme ;
-    rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
     
 wcore:startDate rdf:type owl:DatatypeProperty ;
     rdfs:label "startDate"@en ;
     rdfs:comment "Relates the creation of a work to a start date, when the date of creation covers a range"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range xsd:dateTime ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .  
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
     
 wcore:endDate rdf:type owl:DatatypeProperty ;
     rdfs:label "endDate"@en ;
     rdfs:comment "Relates the creation of a work to an end date, when the date of creation covers a range"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range xsd:dateTime ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .      
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
     
 ####### data properties #####
 
@@ -65,33 +65,33 @@ wcore:value rdf:type owl:DatatypeProperty ;
     rdfs:comment "The value of the thing. e.g. an indentifier"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range rdfs:Literal ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
     
 wcore:label rdf:type owl:DatatypeProperty ;
     rdfs:label "label"@en ;
     rdfs:comment "A label given to a thing"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range rdfs:Literal ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
     
 wcore:description rdf:type owl:DatatypeProperty ;
     rdfs:label "description"@en ;
     rdfs:comment "A description given to a thing"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range rdfs:Literal ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
     
 wcore:url rdf:type owl:DatatypeProperty ;
     rdfs:label "url"@en ;
     rdfs:comment "A url for a thing"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range rdfs:Literal ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/core> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
 
 wcore:thumbnail rdf:type owl:DatatypeProperty ;
     rdfs:label "thumbnail"@en ;
     rdfs:comment "Relates any thing to the location of a representative thumbnail image"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range wcore:Location ;
-    rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .              
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .              
     
