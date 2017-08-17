@@ -1,33 +1,147 @@
 {
-  "@context": [
-    {
-      "@base": "http://id.wellcomecollection.org/",
-      "@vocab": "http://wellcomecollection.org/ontologies/works/",
-      "id": "@id",
-      "type": "@type",
-      "creators": {
-        "@container": "@list"
-      },
-      "identifiers": {
-        "@container": "@list"
-      },
-      "genres": {
-        "@container": "@list"
-      },
-      "subjects": {
-        "@container": "@list"
-      }
+  "@context": {
+    "wwork": "http://wellcomecollection.org/ontologies/works/",
+    "wcore": "http://wellcomecollection.org/ontologies/core/",
+    "wloc": "http://wellcomecollection.org/ontologies/location/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "@base": "http://id.wellcomecollection.org/",
+    "wa": "http://wellcomecollection.org/ontologies/api/",
+    "id": {
+      "@id": "@id"
     },
-    {
-      "wa": "http://wellcomecollection.org/ontologies/api/",
-      "ResultList": "wa:ResultList",
-      "pageSize": "wa:pageSize",
-      "totalPages": "wa:totalPages",
-      "totalResults": "wa:totalResults",
-      "results": {
-        "@type": "wa:results",
-        "@container": "@list"
-      }
+    "type": {
+      "@id": "@type"
+    },
+    "Work": {
+      "@id": "wwork:Work"
+    },
+    "WorkType": {
+      "@id": "wwork:WorkType"
+    },
+    "Identifier": {
+      "@id": "wcore:Identifier"
+    },
+    "Place": {
+      "@id": "wwork:Place"
+    },
+    "Period": {
+      "@id": "wwork:Period"
+    },
+    "Concept": {
+      "@id": "wwork:Concept"
+    },
+    "Item": {
+      "@id": "wwork:Item"
+    },
+    "Location": {
+      "@id": "wloc:Location"
+    },
+    "License": {
+      "@id": "wloc:License"
+    },
+    "identifiers": {
+      "@id": "wcore:identifiers"
+    },
+    "thumbnail": {
+      "@id": "wcore:thumbnail"
+    },
+    "value": {
+      "@id": "wcore:value",
+      "@type": "rdfs:Literal"
+    },
+    "label": {
+      "@id": "wcore:label",
+      "@type": "rdfs:Literal"
+    },
+    "identifierScheme": {
+      "@id": "wcore:identifierScheme",
+      "@type": "rdfs:Literal"
+    },
+    "title": {
+      "@id": "wwork:title",
+      "@type": "rdf:langString"
+    },
+    "description": {
+      "@id": "wwork:description",
+      "@type": "rdf:langString"
+    },
+    "physicalDescription": {
+      "@id": "wwork:physicalDescription",
+      "@type": "rdf:langString"
+    },
+    "workType": {
+      "@id": "wwork:workType"
+    },
+    "lettering": {
+      "@id": "wwork:lettering",
+      "@type": "rdf:langString"
+    },
+    "creators": {
+      "@id": "wwork:creators"
+    },
+    "publishers": {
+      "@id": "wwork:publishers"
+    },
+    "placeOfPublication": {
+      "@id": "wwork:placeOfPublication"
+    },
+    "createdDate": {
+      "@id": "wwork:createdDate"
+    },
+    "publicationDate": {
+      "@id": "wwork:publicationDate"
+    },
+    "genres": {
+      "@id": "wwork:genres"
+    },
+    "license": {
+      "@id": "wloc:license"
+    },
+    "licenseType": {
+      "@id": "wloc:licenseType"
+    },
+    "items": {
+      "@id": "wwork:items"
+    },
+    "subjects": {
+      "@id": "wwork:subjects"
+    },
+    "locations": {
+      "@id": "wloc:locations"
+    },
+    "locationType": {
+      "@id": "wloc:locationType"
+    },
+    "accessStatus": {
+      "@id": "wloc:accessStatus"
+    },
+    "accessProcess": {
+      "@id": "wloc:accessProcess"
+    },
+    "shelfmark": {
+      "@id": "wloc:shelfmark",
+      "@type": "rdfs:Literal"
+    },
+    "url": {
+      "@id": "wcore:url",
+      "@type": "rdfs:Literal"
+    },
+    "ResultList": {
+      "@id": "wa:ResultList"
+    },
+    "pageSize": {
+      "@id": "wa:pageSize"
+    },
+    "totalPages": {
+      "@id": "wa:totalPages"
+    },
+    "totalResults": {
+      "@id": "wa:totalResults"
+    },
+    "results": {
+      "@id": "wa:results",
+      "@container": "@list"
     }
-  ]
+  }
 }
