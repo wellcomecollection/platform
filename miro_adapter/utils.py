@@ -46,3 +46,19 @@ def elem_to_dict(elem):
         else:
             res[name] = _render_value(child.text)
     return res
+
+
+def fix_miro_xml_entities(xml_string):
+    """
+    The Miro XML contains some weird Unicode entities that cause lxml
+    to break.  For now, we just throw them away.
+
+    TODO: Process these properly (what do they contain in the original Miro?)
+    """
+    bad_values = (
+        b'\x13', b'\x14', b'\x18', b'\x19', b'\x1b', b'\x7f', b'\xa3', b'\xae',
+        b'\xe1', b'\xe9'
+    )
+    for v in bad_values:
+        v = xml_string.replace(v, b'_')
+    return xml_string
