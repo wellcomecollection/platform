@@ -59,13 +59,15 @@ class MiroTransformerFeatureTest
   def shouldTransformMessage(imageTitle: String) = s"""{
           "image_title": "$imageTitle",
           "image_cleared": "Y",
-          "image_copyright_cleared": "Y"
+          "image_copyright_cleared": "Y",
+          "image_tech_file_size": ["100000"]
         }"""
 
   def shouldNotTransformMessage(imageTitle: String) = s"""{
           "image_title": "$imageTitle",
           "image_cleared": "N",
-          "image_copyright_cleared": "N"
+          "image_copyright_cleared": "N",
+          "image_tech_file_size": ["100000"]
         }"""
 
   private def sendMiroImageToSQS(miroID: String, message: String) = {
