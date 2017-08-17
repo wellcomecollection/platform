@@ -1,6 +1,6 @@
 package uk.ac.wellcome.test.utils
 
-import org.scalatest.Suite
+import org.scalatest.{Matchers, Suite}
 import scala.util.Try
 
 import uk.ac.wellcome.models.{MiroTransformable, Work}
@@ -12,13 +12,13 @@ import uk.ac.wellcome.models.{MiroTransformable, Work}
  *  fields before transformation, allowing tests to focus on only the fields
  *  that are interesting for that test.
  */
-trait MiroTransformableWrapper { this: Suite =>
+trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
   def transformWork(
     data: String,
     MiroID: String = "M0000001",
     MiroCollection: String = "TestCollection"
-  ): Try[Work] = {
+  ): Work = {
     val miroTransformable = MiroTransformable(
       MiroID = MiroID,
       MiroCollection = MiroCollection,
@@ -28,6 +28,7 @@ trait MiroTransformableWrapper { this: Suite =>
         $data
       }"""
     )
-    miroTransformable.transform
+    miroTransformable.transform.isSuccess shouldBe true
+    miroTransformable.transform.get
   }
 }
