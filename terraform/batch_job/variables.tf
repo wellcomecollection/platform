@@ -26,8 +26,3 @@ variable "command" {
 
   default = []
 }
-
-variable "params" {
-  type    = "map"
-  default = {}
-}
