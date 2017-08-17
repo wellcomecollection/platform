@@ -348,7 +348,7 @@ data "aws_iam_policy_document" "deployments_table" {
 data "aws_iam_policy_document" "s3_tif_derivative" {
   statement {
     actions = [
-      "s3:*"
+      "s3:*",
     ]
 
     resources = [
@@ -356,4 +356,3 @@ data "aws_iam_policy_document" "s3_tif_derivative" {
     ]
   }
 }
-
