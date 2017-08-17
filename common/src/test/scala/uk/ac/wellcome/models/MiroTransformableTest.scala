@@ -185,12 +185,12 @@ class MiroTransformableTest
   }
 
   it("should pass through the Miro identifier") {
-    val miroID = "M0000005_test"
+    val MiroID = "M0000005_test"
     val work = transformWork(
       data = """"image_title": "A picture of a passing porpoise"""",
-      miroID = miroID
+      MiroID = MiroID
     )
-    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID))
+    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
   }
 
   it("should have an empty list if no image_creator field is present") {
@@ -256,7 +256,7 @@ class MiroTransformableTest
         "image_image_desc": "A description of a dalmation with dots",
         "image_artwork_date": "$date"
       """,
-      miroCollection = "Images-V"
+      MiroCollection = "Images-V"
     )
     work.createdDate shouldBe Some(Period(date))
   }
@@ -268,7 +268,7 @@ class MiroTransformableTest
         "image_title": "A diary about a dodo",
         "image_artwork_date": "$date"
       """,
-      miroCollection = "Images-A"
+      MiroCollection = "Images-A"
     )
     work.createdDate shouldBe None
   }
