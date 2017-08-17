@@ -81,5 +81,3 @@ variable "es_config_ingestor" {
   type        = "map"
   default     = {}
 }
-
-variable "tif-source-bucket" {}

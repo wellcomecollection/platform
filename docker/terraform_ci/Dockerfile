@@ -5,7 +5,7 @@ RUN apk add --update git bash openssh
 
 RUN apk --no-cache update && \
     apk --no-cache add findutils jq python3 ca-certificates curl groff less zip git && \
-    pip3 --no-cache-dir install awscli aws_batch_helper && \
+    pip3 --no-cache-dir install boto3 awscli aws_batch_helper && \
     rm -rf /var/cache/apk/*
 
 # Install terraform.  This is the last build step because it changes with
