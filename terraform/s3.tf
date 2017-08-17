@@ -83,6 +83,15 @@ resource "aws_s3_bucket" "mets-ingest" {
   }
 }
 
+resource "aws_s3_bucket" "wellcomecollection-mets-ingest" {
+  bucket = "wellcomecollection-mets-ingest"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "aws_s3_bucket" "cloudfront-logs" {
   bucket = "wellcome-platform-cloudfront-logs"
   acl    = "private"
