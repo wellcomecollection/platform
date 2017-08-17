@@ -62,3 +62,8 @@ module "batch_tif_conversion_iam" {
   source = "./ecs_iam"
   name   = "tif_conversion"
 }
+
+module "ecs_miro_adapter_iam" {
+  source = "./ecs_iam"
+  name   = "miro_adapter"
+}

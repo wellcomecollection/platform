@@ -70,3 +70,8 @@ module "ecr_repository_tif-metadata" {
   source = "./ecr"
   name   = "tif-metadata"
 }
+
+module "ecr_repository_miro_adapter" {
+  source = "./ecr"
+  name   = "miro_adapter"
+}
