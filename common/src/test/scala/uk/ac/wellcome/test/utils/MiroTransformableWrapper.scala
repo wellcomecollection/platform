@@ -1,5 +1,8 @@
 package uk.ac.wellcome.test.utils
 
+import org.scalatest.Suite
+import scala.util.Try
+
 import uk.ac.wellcome.models.{MiroTransformable, Work}
 
 /** MiroTransformable looks for several fields in the source JSON -- if they're
@@ -11,7 +14,7 @@ import uk.ac.wellcome.models.{MiroTransformable, Work}
  */
 trait MiroTransformableWrapper { this: Suite =>
 
-  def transformRecord(
+  def transformWork(
     data: String,
     MiroID: String = "M0000001",
     MiroCollection: String = "TestCollection"
