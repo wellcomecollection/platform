@@ -2,29 +2,27 @@
 # -*- encoding: utf-8 -*-
 """
 Parse image records from a Miro export and push them into a DynamoDB table.
+
+Usage:
+  miro_adapter.py --table=<TABLE> --collection=<COLLECTION> --bucket=<BUCKET> --key=<KEY>
+  miro_adapter.py -h | --help
+
+Options:
+  -h --help                   Show this screen.
+  --table=<TABLE>             DynamoDB table to write the Miro data to.
+  --collection=<COLLECTION>   Name of the associated Miro images collection.
+  --bucket=<BUCKET>           S3 bucket containing the Miro XML dumps.
+  --key=<KEY>                 Key of the Miro XML dump in the S3 bucket.
+
 """
 
-import argparse
 import json
 
 import boto3
+import docopt
 from lxml import etree
 
-from utils import elem_to_dict
-
-
-def parse_args():
-    """Parse command-line arguments."""
-    parser = argparse.ArgumentParser(__doc__.strip())
-
-    parser.add_argument(
-        '--table', help='Name of the DynamoDB table', required=True)
-    parser.add_argument(
-        '--collection', help='Name of the Miro collection', required=True)
-    parser.add_argument(
-        'EXPORT_PATH', help='Path to the Miro export file')
-
-    return parser.parse_args()
+from utils import elem_to_dict, fix_miro_xml_entities
 
 
 def parse_image_data(xml_string):
@@ -70,11 +68,21 @@ def push_to_dynamodb(table_name, collection_name, image_data):
         print('Written %d records to DynamoDB' % idx)
 
 
+def read_from_s3(bucket, key):
+    client = boto3.client('s3')
+    obj = client.get_object(Bucket=bucket, Key=key)
+    return obj['Body'].read()
+
+
 if __name__ == '__main__':
-    args = parse_args()
-    image_data = parse_image_data(open(args.EXPORT_PATH, 'rb').read())
+    args = docopt.docopt(__doc__)
+    xml_string = fix_miro_xml_entities(
+        read_from_s3(bucket=args['--bucket'], key=args['--key'])
+    )
+
+    image_data = parse_image_data(xml_string)
     push_to_dynamodb(
-        table_name=args.table,
-        collection_name=args.collection,
+        table_name=args['--table'],
+        collection_name=args['--collection'],
         image_data=image_data
     )

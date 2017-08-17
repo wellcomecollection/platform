@@ -50,6 +50,13 @@ loris-deploy: loris-build
 	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
 
 
+miro_adapter-build: install-docker-build-deps
+	./scripts/build_docker_image.py --project=miro_adapter --file=miro_adapter/Dockerfile
+
+miro_adapter-deploy: miro_adapter-build
+	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+
+
 install-docker-build-deps:
 	pip3 install --upgrade boto3 docopt
 
