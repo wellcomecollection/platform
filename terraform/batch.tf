@@ -20,5 +20,5 @@ module "aws_batch_job_tif-conversion" {
   name         = "tif-conversion"
   image_uri    = "${module.ecr_repository_tif-metadata.repository_url}:${var.release_ids["tif-metadata"]}"
   job_role_arn = "${module.batch_example_iam.task_role_arn}"
-  command      = ["/run.py", "--bucket-name=Ref::bucket_name", "--key=Ref::key"]
+  command      = ["/run.py", "--bucket-name", "Ref::bucket_name", "--key", "Ref::key"]
 }
