@@ -25,6 +25,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       data = s"""{
         "image_cleared": "Y",
         "image_copyright_cleared": "Y",
+        "image_tech_file_size": ["1000000"],
         $data
       }"""
     )
