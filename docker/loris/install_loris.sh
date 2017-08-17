@@ -4,7 +4,7 @@
 set -o errexit
 set -o nounset
 
-LORIS_COMMIT="2ba933cbddad7f322c2d1d483b11f1445ba6204c"
+LORIS_COMMIT="400bc3979a7dc3ff938abff84665c2731f750a69"
 
 # Install dependencies.  We don't include Apache because we're running
 # Loris with UWSGI and nginx, not Apache.
