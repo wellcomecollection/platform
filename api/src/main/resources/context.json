@@ -7,10 +7,12 @@
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "@base": "http://id.wellcomecollection.org/",
     "wa": "http://wellcomecollection.org/ontologies/api/",
-    "id": 
-    {"@id": "@id" } ,
-    "type": 
-    {"@id" : "@type"} ,
+    "id": {
+      "@id": "@id"
+    },
+    "type": {
+      "@id": "@type"
+    },
     "Work": {
       "@id": "wwork:Work"
     },
@@ -101,6 +103,9 @@
     },
     "items": {
       "@id": "wwork:items"
+    },
+    "subjects": {
+      "@id": "wwork:subjects"
     },
     "locations": {
       "@id": "wloc:locations"
