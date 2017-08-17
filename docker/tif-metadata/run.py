@@ -95,6 +95,7 @@ def embed_image_metadata(task, local_image_path):
     arguments = [build_exiftool_argument(key, value) for key, value in xmp_metadata.items() if value is not None]
     sep_arguments = ["exiftool", "-m", "-sep", ","] + arguments
     sep_arguments.append(local_image_path)
+
     if subprocess.call(sep_arguments) != 0:
         raise Exception("Failed embedding metadata!")
     else:
