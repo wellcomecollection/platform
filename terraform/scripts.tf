@@ -79,7 +79,7 @@ module "miro_adapter" {
 
   # This script has to load the XML files into memory, so make sure it
   # has plenty of overhead.
-  memory = 2048
+  memory = 2000
 
   env_vars = [
     "{\"name\": \"TABLE\", \"value\": \"${aws_dynamodb_table.miro_table.id}\"}",
