@@ -166,9 +166,8 @@ class MiroTransformableTitleTest
       data = data
     )
 
-    transformedWork.isSuccess shouldBe true
-    transformedWork.get.title shouldBe expectedTitle
-    transformedWork.get.description shouldBe expectedDescription
+    transformedWork.title shouldBe expectedTitle
+    transformedWork.description shouldBe expectedDescription
   }
 }
 
@@ -187,7 +186,7 @@ class MiroTransformableTest
 
   it("should pass through the Miro identifier") {
     val miroID = "M0000005_test"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = """"image_title": "A picture of a passing porpoise"""",
       miroID = miroID
     )
@@ -195,12 +194,12 @@ class MiroTransformableTest
   }
 
   it("should have an empty list if no image_creator field is present") {
-    val work = transformMiroRecord(data = s""""image_title": "A guide to giraffes"""")
+    val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
     work.creators shouldBe List[Agent]()
   }
 
   it("should have an empty list if the image_creator field is empty") {
-    val work = transformMiroRecord(data = s"""
+    val work = transformWork(data = s"""
       "image_title": "A box of beavers",
       "image_creator": []
     """)
@@ -209,7 +208,7 @@ class MiroTransformableTest
 
   it("should pass through a single value in the image_creator field") {
     val creator = "Researcher Rosie"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "A radio for a racoon",
         "image_creator": ["$creator"]
@@ -222,7 +221,7 @@ class MiroTransformableTest
     val creator1 = "Beekeeper Brian"
     val creator2 = "Cat-wrangler Carol"
     val creator3 = "Dog-owner Derek"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "A book about badgers",
         "image_creator": ["$creator1", "$creator2", "$creator3"]
@@ -234,13 +233,13 @@ class MiroTransformableTest
   }
 
   it("should have no description if no image_image_desc field is present") {
-    val work = transformMiroRecord(data = s""""image_title": "A line of lions"""")
+    val work = transformWork(data = s""""image_title": "A line of lions"""")
     work.description shouldBe None
   }
 
   it("should pass through the value of the description field") {
     val description = "A new novel about northern narwhals in November"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "A note on narwhals",
         "image_image_desc": "$description"
@@ -251,7 +250,7 @@ class MiroTransformableTest
 
   it("should pass through the value of the creation date on V records") {
     val date = "1820-1848"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "A description of a dalmation",
         "image_image_desc": "A description of a dalmation with dots",
@@ -264,7 +263,7 @@ class MiroTransformableTest
 
   it("should not pass through the value of the creation date on non-V records") {
     val date = "1820-1848"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "A diary about a dodo",
         "image_artwork_date": "$date"
@@ -277,7 +276,7 @@ class MiroTransformableTest
   it(
     "should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "Samples of a shark",
         "image_secondary_creator": ["$secondaryCreator"]
@@ -290,7 +289,7 @@ class MiroTransformableTest
     "should use all the values in the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator1 = "Gamekeeper Gordon"
     val secondaryCreator2 = "Herpetologist Harriet"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "Verdant and vivid",
         "image_secondary_creator": ["$secondaryCreator1", "$secondaryCreator2"]
@@ -304,7 +303,7 @@ class MiroTransformableTest
     "should combine the values in the image_creator and image_secondary_creator fields if both present") {
     val creator = "Mycologist Morgan"
     val secondaryCreator = "Manufacturer Mel"
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "Musings on mice",
         "image_creator": ["$creator"],
@@ -316,7 +315,7 @@ class MiroTransformableTest
 
   it(
     "should correct HTML-encoded entities in the input JSON") {
-    val work = transformMiroRecord(
+    val work = transformWork(
       data = s"""
         "image_title": "A caf&#233; for cats",
         "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"]
@@ -372,9 +371,9 @@ class MiroTransformableTest
   }
 
   private def assertTransformMiroRecordFails(
+    data: String = """{"image_title": "A failed fumble in the fire"}""",
     miroID: String = "M0000001",
-    miroCollection: String = "TestCollection",
-    data: String = """{"image_title": "A failed fumble in the fire"}"""
+    miroCollection: String = "TestCollection"
   ) = {
     val miroTransformable = MiroTransformable(
       MiroID = miroID,
@@ -383,21 +382,6 @@ class MiroTransformableTest
     )
 
     miroTransformable.transform.isSuccess shouldBe false
-  }
-
-  private def transformMiroRecord(
-    data: String = "",
-    miroID: String = "M0000001",
-    miroCollection: String = "TestCollection"
-  ): Work = {
-    val transformedWork = transformWork(
-      MiroID = miroID,
-      MiroCollection = miroCollection,
-      data = data
-    )
-
-    transformedWork.isSuccess shouldBe true
-    transformedWork.get
   }
 }
 
@@ -463,9 +447,7 @@ class MiroTransformableSubjectsTest
     expectedSubjects: List[Concept] = List()
   ) = {
     val transformedWork = transformWork(data = data)
-
-    transformedWork.isSuccess shouldBe true
-    transformedWork.get.subjects shouldBe expectedSubjects
+    transformedWork.subjects shouldBe expectedSubjects
   }
 }
 
@@ -525,8 +507,6 @@ class MiroTransformableGenresTest
     expectedGenres: List[Concept] = List()
   ) = {
     val transformedWork = transformWork(data = data)
-
-    transformedWork.isSuccess shouldBe true
-    transformedWork.get.genres shouldBe expectedGenres
+    transformedWork.genres shouldBe expectedGenres
   }
 }
