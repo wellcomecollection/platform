@@ -13,7 +13,7 @@
         "sourceVolume": "ephemera",
         "containerPath": "/tmp"
       }
-    ]
+    ],
     "volumes": [
         {
             'host': {
