@@ -3,6 +3,7 @@ package uk.ac.wellcome.models
 import org.scalatest.{FunSpec, Matchers}
 
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
+import uk.ac.wellcome.test.utils.MiroTransformableWrapper
 
 
 /** Tests that the Miro transformer extracts the "title" field correctly.
@@ -10,7 +11,10 @@ import uk.ac.wellcome.finatra.modules.IdentifierSchemes
  *  The rules around this heuristic are somewhat fiddly, and we need to be
  *  careful that we're extracting the right fields from the Miro metadata.
  */
-class MiroTransformableTitleTest extends FunSpec with Matchers {
+class MiroTransformableTitleTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
 
   it("should use the image_title field on non-V records") {
     val title = "A picture of a parrot"
@@ -157,24 +161,21 @@ class MiroTransformableTitleTest extends FunSpec with Matchers {
     expectedDescription: Option[String] = None,
     miroCollection: String = "TestCollection"
   ) = {
-    val miroTransformable = MiroTransformable(
-      MiroID = "M0000001",
+    val transformedWork = transformWork(
       MiroCollection = miroCollection,
-      data = s"""{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        $data
-      }"""
+      data = data
     )
 
-    miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.title shouldBe expectedTitle
-    miroTransformable.transform.get.description shouldBe expectedDescription
+    transformedWork.title shouldBe expectedTitle
+    transformedWork.description shouldBe expectedDescription
   }
 }
 
 
-class MiroTransformableTest extends FunSpec with Matchers {
+class MiroTransformableTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
 
   it("should throw an error if there isn't a title field") {
     assertTransformMiroRecordFails(data = """{
@@ -184,39 +185,34 @@ class MiroTransformableTest extends FunSpec with Matchers {
   }
 
   it("should pass through the Miro identifier") {
-    val miroID = "M0000005_test"
-    val work = transformMiroRecord(miroID = miroID)
-    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID))
+    val MiroID = "M0000005_test"
+    val work = transformWork(
+      data = """"image_title": "A picture of a passing porpoise"""",
+      MiroID = MiroID
+    )
+    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
   }
 
   it("should have an empty list if no image_creator field is present") {
-    val work = transformMiroRecord(data = s"""{
-      "image_title": "A guide to giraffes",
-      "image_cleared": "Y",
-      "image_copyright_cleared": "Y"
-    }""")
+    val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
     work.creators shouldBe List[Agent]()
   }
 
   it("should have an empty list if the image_creator field is empty") {
-    val work = transformMiroRecord(data = s"""{
+    val work = transformWork(data = s"""
       "image_title": "A box of beavers",
-      "image_creator": [],
-      "image_cleared": "Y",
-      "image_copyright_cleared": "Y"
-    }""")
+      "image_creator": []
+    """)
     work.creators shouldBe List[Agent]()
   }
 
   it("should pass through a single value in the image_creator field") {
     val creator = "Researcher Rosie"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "A radio for a racoon",
-        "image_creator": ["$creator"],
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_creator": ["$creator"]
+      """
     )
     work.creators shouldBe List(Agent(creator))
   }
@@ -225,13 +221,11 @@ class MiroTransformableTest extends FunSpec with Matchers {
     val creator1 = "Beekeeper Brian"
     val creator2 = "Cat-wrangler Carol"
     val creator3 = "Dog-owner Derek"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "A book about badgers",
-        "image_creator": ["$creator1", "$creator2", "$creator3"],
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_creator": ["$creator1", "$creator2", "$creator3"]
+      """
     )
     work.creators shouldBe List(Agent(creator1),
                                 Agent(creator2),
@@ -239,52 +233,42 @@ class MiroTransformableTest extends FunSpec with Matchers {
   }
 
   it("should have no description if no image_image_desc field is present") {
-    val work = transformMiroRecord(data = s"""{
-      "image_title": "A line of lions",
-      "image_cleared": "Y",
-      "image_copyright_cleared": "Y"
-    }""")
+    val work = transformWork(data = s""""image_title": "A line of lions"""")
     work.description shouldBe None
   }
 
   it("should pass through the value of the description field") {
     val description = "A new novel about northern narwhals in November"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "A note on narwhals",
-        "image_image_desc": "$description",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_image_desc": "$description"
+      """
     )
     work.description shouldBe Some(description)
   }
 
   it("should pass through the value of the creation date on V records") {
     val date = "1820-1848"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "A description of a dalmation",
         "image_image_desc": "A description of a dalmation with dots",
-        "image_artwork_date": "$date",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }""",
-      miroCollection = "Images-V"
+        "image_artwork_date": "$date"
+      """,
+      MiroCollection = "Images-V"
     )
     work.createdDate shouldBe Some(Period(date))
   }
 
   it("should not pass through the value of the creation date on non-V records") {
     val date = "1820-1848"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "A diary about a dodo",
-        "image_artwork_date": "$date",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }""",
-      miroCollection = "Images-A"
+        "image_artwork_date": "$date"
+      """,
+      MiroCollection = "Images-A"
     )
     work.createdDate shouldBe None
   }
@@ -292,13 +276,11 @@ class MiroTransformableTest extends FunSpec with Matchers {
   it(
     "should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "Samples of a shark",
-        "image_secondary_creator": ["$secondaryCreator"],
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_secondary_creator": ["$secondaryCreator"]
+      """
     )
     work.creators shouldBe List(Agent(secondaryCreator))
   }
@@ -307,13 +289,11 @@ class MiroTransformableTest extends FunSpec with Matchers {
     "should use all the values in the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator1 = "Gamekeeper Gordon"
     val secondaryCreator2 = "Herpetologist Harriet"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "Verdant and vivid",
-        "image_secondary_creator": ["$secondaryCreator1", "$secondaryCreator2"],
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_secondary_creator": ["$secondaryCreator1", "$secondaryCreator2"]
+      """
     )
     work.creators shouldBe List(Agent(secondaryCreator1),
                                 Agent(secondaryCreator2))
@@ -323,27 +303,23 @@ class MiroTransformableTest extends FunSpec with Matchers {
     "should combine the values in the image_creator and image_secondary_creator fields if both present") {
     val creator = "Mycologist Morgan"
     val secondaryCreator = "Manufacturer Mel"
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "Musings on mice",
         "image_creator": ["$creator"],
-        "image_secondary_creator": ["$secondaryCreator"],
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_secondary_creator": ["$secondaryCreator"]
+      """
     )
     work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
   it(
     "should correct HTML-encoded entities in the input JSON") {
-    val work = transformMiroRecord(
-      data = s"""{
+    val work = transformWork(
+      data = s"""
         "image_title": "A caf&#233; for cats",
-        "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"],
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y"
-      }"""
+        "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"]
+      """
     )
 
     work.title shouldBe "A café for cats"
@@ -395,9 +371,9 @@ class MiroTransformableTest extends FunSpec with Matchers {
   }
 
   private def assertTransformMiroRecordFails(
+    data: String = """{"image_title": "A failed fumble in the fire"}""",
     miroID: String = "M0000001",
-    miroCollection: String = "TestCollection",
-    data: String = """{"image_title": "A failed fumble in the fire"}"""
+    miroCollection: String = "TestCollection"
   ) = {
     val miroTransformable = MiroTransformable(
       MiroID = miroID,
@@ -406,25 +382,6 @@ class MiroTransformableTest extends FunSpec with Matchers {
     )
 
     miroTransformable.transform.isSuccess shouldBe false
-  }
-
-  private def transformMiroRecord(
-    miroID: String = "M0000001",
-    miroCollection: String = "TestCollection",
-    data: String = """{
-      "image_title": "A test tome telling tales about a tapir",
-      "image_cleared": "Y",
-      "image_copyright_cleared": "Y"
-    }"""
-  ): Work = {
-    val miroTransformable = MiroTransformable(
-      MiroID = miroID,
-      MiroCollection = miroCollection,
-      data = data
-    )
-
-    miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get
   }
 }
 
@@ -436,7 +393,10 @@ class MiroTransformableTest extends FunSpec with Matchers {
  *  from Miro will need cleaning before it's presented in the API (casing,
  *  names, etc.) -- these tests will become more complicated.
  */
-class MiroTransformableSubjectsTest extends FunSpec with Matchers {
+class MiroTransformableSubjectsTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
 
   it("should have an empty subject list on records without keywords") {
     transformRecordAndCheckSubjects(
@@ -486,24 +446,17 @@ class MiroTransformableSubjectsTest extends FunSpec with Matchers {
     data: String,
     expectedSubjects: List[Concept] = List()
   ) = {
-    val miroTransformable = MiroTransformable(
-      MiroID = "M0000001",
-      MiroCollection = "Images-V",
-      data = s"""{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        $data
-      }"""
-    )
-
-    miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.subjects shouldBe expectedSubjects
+    val transformedWork = transformWork(data = data)
+    transformedWork.subjects shouldBe expectedSubjects
   }
 }
 
 
 
-class MiroTransformableGenresTest extends FunSpec with Matchers {
+class MiroTransformableGenresTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
 
   it("should have an empty genre list on records without keywords") {
     transformRecordAndCheckGenres(
@@ -553,17 +506,7 @@ class MiroTransformableGenresTest extends FunSpec with Matchers {
     data: String,
     expectedGenres: List[Concept] = List()
   ) = {
-    val miroTransformable = MiroTransformable(
-      MiroID = "M0000001",
-      MiroCollection = "Images-V",
-      data = s"""{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        $data
-      }"""
-    )
-
-    miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.genres shouldBe expectedGenres
+    val transformedWork = transformWork(data = data)
+    transformedWork.genres shouldBe expectedGenres
   }
 }
