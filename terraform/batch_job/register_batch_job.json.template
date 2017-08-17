@@ -4,8 +4,7 @@
   "containerProperties": {
     "image": "${image_uri}",
     "memory": ${memory},
-    "command": ${memory},
-    "parameters" : ${params},
+    "command": ${command},
     "vcpus": ${vcpus},
     "jobRoleArn": "${job_role_arn}",
     "environment": ${environment_vars},
@@ -18,10 +17,10 @@
     ],
     "volumes": [
         {
-            'host': {
-                'sourcePath': '/tmp'
+            "host": {
+                "sourcePath": "/tmp"
             },
-            'name': 'ephemera'
+            "name": "ephemera"
         }
     ]
   }
