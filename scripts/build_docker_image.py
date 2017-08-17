@@ -29,7 +29,10 @@ if __name__ == '__main__':
 
     project = args['--project']
     variant = args['--variant']
-    dockerfile = os.path.join(ROOT, args['--file']) or os.path.join(ROOT, 'docker', project, 'Dockerfile')
+    if args['--file']:
+        dockerfile = os.path.join(ROOT, args['--file'])
+    else:
+        dockerfile = os.path.join(ROOT, 'docker', project, 'Dockerfile')
 
     print('*** Building image for %s' % project)
 
@@ -46,7 +49,7 @@ if __name__ == '__main__':
 
     print('*** Building the new image')
 
-    cmd = ['docker', 'build', '--file', dockerfile, '--tag', tag,]
+    cmd = ['docker', 'build', '--file', dockerfile, '--tag', tag]
     if variant is not None:
         cmd.extend(['--build-arg', 'variant=%s' % variant])
     cmd.append(os.path.dirname(dockerfile))
