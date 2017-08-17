@@ -5,7 +5,7 @@ data "template_file" "job_definition" {
     name             = "${var.name}"
     command          = "[${join(",", var.command)}]"
     image_uri        = "${var.image_uri}"
-    params        = "${jsonencode(var.params)}"
+    params           = "${jsonencode(var.params)}"
     memory           = "${var.memory}"
     vcpus            = "${var.vcpus}"
     job_role_arn     = "${var.job_role_arn}"

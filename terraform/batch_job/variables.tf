@@ -22,11 +22,12 @@ variable "vcpus" {
 variable "command" {
   # Used to generate a string of the form:
   # [ "cmd", "-i", "Ref::param" ]
-  type        = "list"
+  type = "list"
+
   default = []
 }
 
 variable "params" {
-  type = "map"
+  type    = "map"
   default = {}
 }
