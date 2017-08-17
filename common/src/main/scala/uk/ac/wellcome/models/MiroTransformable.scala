@@ -18,7 +18,7 @@ case class MiroTransformableData(
     List[String]],
   @JsonProperty("image_artwork_date") artworkDate: Option[String],
   @JsonProperty("image_cleared") cleared: Option[String],
-  @JsonProperty("image_copyright_cleared") copyright_cleared: Option[String],
+  @JsonProperty("image_copyright_cleared") copyrightCleared: Option[String],
   @JsonProperty("image_keywords") keywords: Option[List[String]],
   @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]],
   @JsonProperty("image_phys_format") physFormat: Option[String],
@@ -62,7 +62,7 @@ case class MiroTransformable(MiroID: String,
       if (miroData.cleared.getOrElse("N") != "Y") {
         throw new ShouldNotTransformException("image_cleared field is not Y")
       }
-      if (miroData.copyright_cleared.getOrElse("N") != "Y") {
+      if (miroData.copyrightCleared.getOrElse("N") != "Y") {
         throw new ShouldNotTransformException(
           "image_copyright_cleared field is not Y")
       }
