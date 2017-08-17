@@ -22,6 +22,40 @@ import boto3
 import docopt
 
 
+def download_in_parallel(tasks):
+    print(f"Starting download of {len(tasks)} images from s3")
+    processes = [start_download_process(task) for task in tasks]
+    images = [check_status(local_image_path, process, task) for process, task, local_image_path in processes]
+    return images
+
+
+def upload_in_parallel(images):
+    print(f"Starting upload of {len(images)} images to s3")
+    upload_processes = [
+        start_upload_process(local_image_path, task)
+        for task, local_image_path in images
+    ]
+    try:
+        for process, local_image_path, upload_location in upload_processes:
+            failure_message = f"Uploading from {local_image_path} to {upload_location} failed!"
+            success_message = f"Uploading from {local_image_path} to {upload_location} succeeded"
+            wait(process,
+                 success_message,
+                 failure_message)
+            # TODO delete original file if --delete-original flag is set
+    finally:
+        for _, local_image_path, _ in upload_processes:
+            os.unlink(local_image_path)
+
+
+def check_status(local_image_path, process, task):
+    s3_source = build_s3_source(task)
+    success_message = f"Downloading of {s3_source} to {local_image_path} succeeded"
+    failure_message = f"Downloading of {s3_source} to {local_image_path} failed!"
+    wait(process, success_message, failure_message)
+    return task, local_image_path
+
+
 def start_download_process(task):
     _, tmp_fp = tempfile.mkstemp()
     s3_source = build_s3_source(task)
@@ -73,13 +107,19 @@ def build_exiftool_argument(key, value):
     return f"-xmp:{key}={value}"
 
 
+def split(parallelism, tasks):
+    return [tasks[i:i + parallelism] for i in range(0, len(tasks), parallelism)]
+
+
 def main():
     args = docopt.docopt(__doc__)
 
     job_bucket = args["--bucket-name"]
     job_s3_key = args["--key"]
     delete_original = bool(args['--delete-original'])
+    parallelism = 10
 
+    print(f"Downloading {job_s3_key}")
     client = boto3.client("s3")
     job_filename = os.path.basename(job_s3_key)
     client.download_file(Bucket=job_bucket,
@@ -89,39 +129,17 @@ def main():
     with open(job_filename, "r") as job_file:
         job = json.load(job_file)
 
-    tasks = job['task_list']
-    print(f"Starting download of {len(tasks)} images from s3")
-
-    processes = [start_download_process(task) for task in tasks]
-
-    for process, task, _ in processes:
-        s3_source = build_s3_source(task)
-        success_message = f"Downloading of {s3_source} succeeded"
-        failure_message = f"Downloading of {s3_source} failed!"
-        wait(process, success_message, failure_message)
+    images = []
+    for split_tasks in split(parallelism, job['task_list']):
+        images += download_in_parallel(split_tasks)
 
     print("Finished downloading s3 files!")
 
-    for _, task, local_image_path in processes:
+    for task, local_image_path in images:
         embed_image_metadata(task, local_image_path)
 
-    print(f"Starting upload of {len(tasks)} images from s3")
-    upload_processes = [
-        start_upload_process(local_image_path, task)
-        for _, task, local_image_path in processes
-    ]
-
-    try:
-        for process, _, upload_location in upload_processes:
-            failure_message = f"Uploading to {upload_location} failed!"
-            success_message = f"Uploading to {upload_location} succeeded"
-            wait(process,
-                 success_message,
-                 failure_message)
-            # TODO delete original file if --delete-original flag is set
-    finally:
-        for _, local_image_path, _ in upload_processes:
-            os.unlink(local_image_path)
+    for split_images in split(parallelism, images):
+        upload_in_parallel(split_images)
 
     print("Finished uploading files to s3!")
 
