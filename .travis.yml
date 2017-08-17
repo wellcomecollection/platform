@@ -115,3 +115,4 @@ env:
     - TASK=tif-metadata-build
     - TASK=gatling-build
     - TASK=loris-build
+    - TASK=miro_adapter-build
