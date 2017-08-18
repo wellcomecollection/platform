@@ -6,7 +6,7 @@ Autogen for the License type.
 import csv
 import os
 
-from . import env, ROOT, REFERENCE_DATA
+from . import ENV, ROOT, REFERENCE_DATA
 
 
 LICENSE_IN = os.path.join(REFERENCE_DATA, 'licenses.csv')
@@ -45,7 +45,7 @@ def run_autogen():
         reader = csv.DictReader(csvfile)
         licenses = [License(row) for row in reader]
 
-    template = env.get_template('License.scala')
+    template = ENV.get_template('License.scala')
 
     with open(LICENSE_OUT, 'w') as outfile:
         outfile.write(template.render(licenses=licenses) + '\n')

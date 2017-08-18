@@ -230,12 +230,16 @@ check-format: format
 	git diff --exit-code
 
 
-autogen:
-	pip3 install jinja2
-	./scripts/run_autogen.py
+
+docker-build-autogen:
+	cd autogen && docker build --tag autogen .
+
+autogen: docker-build-autogen
+	docker run -v $$(pwd):/repo autogen
 
 check-autogen: autogen
 	git diff --exit-code
+
 
 
 .PHONY: help
