@@ -224,11 +224,16 @@ format-terraform:
 format-scala:
 	sbt scalafmt
 
-format: \
-	format-terraform \
-	format-scala
+format: format-terraform format-scala
 
 check-format: format
+	git diff --exit-code
+
+
+autogen:
+	./scripts/run_autogen.py
+
+check-autogen: autogen
 	git diff --exit-code
 
 
