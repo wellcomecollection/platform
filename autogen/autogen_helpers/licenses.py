@@ -20,8 +20,7 @@ def run_autogen():
     os.makedirs(os.path.dirname(LICENSE_OUT), exist_ok=True)
 
     with open(LICENSE_IN) as csvfile:
-        reader = csv.DictReader(csvfile)
-        licenses = [row for row in reader]
+        licenses = list(csv.DictReader(csvfile))
 
     template = ENV.get_template('License.scala')
 
