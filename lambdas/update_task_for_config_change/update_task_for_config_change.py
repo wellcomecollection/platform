@@ -41,6 +41,7 @@ def clone_latest_task_definition(client, cluster, service):
         service=service,
         taskDefinition=cloned_task
     )
+
     print(f'ECS response = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
 
