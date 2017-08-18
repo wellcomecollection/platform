@@ -27,6 +27,11 @@ wcore:IdentifierScheme rdf:type owl:Class ;
     rdfs:label "IdentifierScheme" ;
     rdfs:comment "An indication of the origin of identifiers identity scheme: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
     rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .  
+
+wcore:Location rdf:type owl:Class ;
+    rdfs:label "Location" ;
+    rdfs:comment "A location that provides access to an item."@en ;
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .      
     
 #### object properties ####
 
@@ -37,6 +42,13 @@ wcore:identifiers rdf:type owl:ObjectProperty ;
     rdfs:range wcore:Identifier ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
 
+wcore:thumbnail rdf:type owl:ObjectProperty ;
+    rdfs:label "thumbnail"@en ;
+    rdfs:comment "Relates any thing to the location of a representative thumbnail image"@en ;
+    rdfs:domain wcore:Thing ;
+    rdfs:range wcore:Location ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
+
 wcore:identifierScheme rdf:type owl:ObjectProperty ;
     rdfs:label "identifierScheme"@en ;
     rdfs:comment "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;
@@ -44,19 +56,7 @@ wcore:identifierScheme rdf:type owl:ObjectProperty ;
     rdfs:range wcore:IdentifierScheme ;
     rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
     
-wcore:startDate rdf:type owl:DatatypeProperty ;
-    rdfs:label "startDate"@en ;
-    rdfs:comment "Relates the creation of a work to a start date, when the date of creation covers a range"@en ;
-    rdfs:domain wcore:Thing ;
-    rdfs:range xsd:dateTime ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
-    
-wcore:endDate rdf:type owl:DatatypeProperty ;
-    rdfs:label "endDate"@en ;
-    rdfs:comment "Relates the creation of a work to an end date, when the date of creation covers a range"@en ;
-    rdfs:domain wcore:Thing ;
-    rdfs:range xsd:dateTime ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
+
     
 ####### data properties #####
 
@@ -88,10 +88,19 @@ wcore:url rdf:type owl:DatatypeProperty ;
     rdfs:range rdfs:Literal ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
 
-wcore:thumbnail rdf:type owl:DatatypeProperty ;
-    rdfs:label "thumbnail"@en ;
-    rdfs:comment "Relates any thing to the location of a representative thumbnail image"@en ;
+wcore:startDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "startDate"@en ;
+    rdfs:comment "Relates the creation of a work to a start date, when the date of creation covers a range"@en ;
     rdfs:domain wcore:Thing ;
-    rdfs:range wcore:Location ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .              
+    rdfs:range xsd:dateTime ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wcore:endDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "endDate"@en ;
+    rdfs:comment "Relates the creation of a work to an end date, when the date of creation covers a range"@en ;
+    rdfs:domain wcore:Thing ;
+    rdfs:range xsd:dateTime ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .     
+
+            
     

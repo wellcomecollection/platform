@@ -28,11 +28,6 @@ wwork:WorkType rdf:type owl:Class ;
     rdfs:comment "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
     
-wwork:Format rdf:type owl:Class ;
-    rdfs:label "Format"@en ;
-    rdfs:comment "Format is used to provide a detailed expansion of a WorkType, in terms of physical characteristics, rendering requirements or both: thus, WorkType would state that a work comprises moving image material, whilst Format explains that it is a VHS video."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
-    
 wwork:Place rdf:type owl:Class ;
     rdfs:label "Place"@en ;
     rdfs:comment "A physical location that relates in some way to a work: for example, the place at which a work was published or otherwise created."@en ;
@@ -47,6 +42,11 @@ wwork:Concept rdf:type owl:Class ;
     rdfs:label "Concept"@en ;
     rdfs:comment "A broad concept that forms part of a thesaurus-based classification of human knowledge."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+
+wwork:Agent rdf:type owl:Class ;
+    rdfs:label "Agent"@en ;
+    rdfs:comment "A person, group, event or organisation."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
                 
 #######  Object properties ##### 
     
@@ -164,7 +164,7 @@ wwork:level rdf:type owl:DatatypeProperty ;
     rdfs:label "level"@en ;
     rdfs:comment "Indicates the position of a work within a hierarchy of works: for example, Collection, Series, Item etc. The terminology used here will typically be drawn from external systems and may not necessarily correspond directly to the terminology of this ontology: for instance, in archive catalogues the term Item may be used to describe an entity that combines properties assigned in this ontology to the Work and Item classes."@en ;
     rdfs:domain wwork:Work ;
-    rdfs:range rdf:langString ; 
+    rdfs:range xsd:integer ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
     
 wwork:alternativeTitle rdf:type owl:DatatypeProperty ;
