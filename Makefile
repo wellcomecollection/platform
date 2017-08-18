@@ -231,14 +231,7 @@ check-format: format
 
 
 
-docker-build-autogen:
-	cd autogen && docker build --tag autogen .
-
-autogen: docker-build-autogen
-	docker run -v $$(pwd):/repo autogen
-
-check-autogen: autogen
-	git diff --exit-code
+include autogen/Makefile
 
 
 
