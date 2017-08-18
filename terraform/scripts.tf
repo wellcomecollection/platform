@@ -84,5 +84,6 @@ module "miro_adapter" {
   env_vars = [
     "{\"name\": \"TABLE\", \"value\": \"${aws_dynamodb_table.miro_table.id}\"}",
     "{\"name\": \"BUCKET\", \"value\": \"${aws_s3_bucket.miro-data.id}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
