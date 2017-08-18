@@ -69,5 +69,5 @@ def fix_miro_xml_entities(xml_string):
         b'\xff'
     }
     for v in bad_values:
-        v = xml_string.replace(v, b'_')
+        xml_string = xml_string.replace(v, b'_')
     return xml_string
