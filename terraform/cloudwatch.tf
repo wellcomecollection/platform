@@ -47,3 +47,45 @@ resource "aws_cloudwatch_event_rule" "ecs_container_instance_state_change" {
 }
 PATTERN
 }
+
+# ECS Scheduled tasks
+
+resource "aws_cloudwatch_event_target" "gatling_loris" {
+  rule     = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
+  arn      = "${aws_ecs_cluster.services.id}"
+  role_arn = "${aws_iam_role.scheduled_tasks_role.arn}"
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = "${module.gatling_loris.task_arn}"
+  }
+}
+
+resource "aws_cloudwatch_event_target" "gatling_catalogue_api" {
+  rule     = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
+  arn      = "${aws_ecs_cluster.services.id}"
+  role_arn = "${aws_iam_role.scheduled_tasks_role.arn}"
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = "${module.gatling_catalogue_api.task_arn}"
+  }
+}
+
+resource "aws_iam_role" "scheduled_tasks_role" {
+  name               = "scheduled_tasks_role"
+  assume_role_policy = "${data.aws_iam_policy_document.assume_scheduled_tasks_role.json}"
+}
+
+data "aws_iam_policy_document" "assume_scheduled_tasks_role" {
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
