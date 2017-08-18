@@ -17,7 +17,7 @@ trait License {
 }
 
 {% for lic in licenses %}
-case object {{ lic.name }} extends License {
+case object License_{{ lic.licenseType|replace('-', '') }} extends License {
   val licenseType = "{{ lic.licenseType }}"
   val label = "{{ lic.label }}"
   val url = "{{ lic.url }}"
