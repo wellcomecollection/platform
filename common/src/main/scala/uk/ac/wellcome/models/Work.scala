@@ -23,7 +23,7 @@ case class Work(
   genres: List[Concept] = List(),
   thumbnail: Option[License] = None
 ) {
-  @JsonProperty("type") val ldType: String = "Work"
+  @JsonProperty("type") val ontologyType: String = "Work"
 }
 
 object IdentifiedWork extends Indexable[IdentifiedWork] {
