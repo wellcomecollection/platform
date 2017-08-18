@@ -44,7 +44,13 @@ case class DisplayWork(
     Concept] = List(),
   @ApiModelProperty(value =
     "Relates a work to the genre that describes the work's content.") genres: List[
-    Concept] = List()) {
+    Concept] = List(),
+  @ApiModelProperty(
+    dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
+    value =
+      "Relates any thing to the location of a representative thumbnail image"
+  ) thumbnail: Option[Location] = None
+) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Work"
 }
