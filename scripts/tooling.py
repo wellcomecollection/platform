@@ -9,6 +9,13 @@ import subprocess
 ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
+# Directory containing reference data for autogen
+REFERENCE_DATA = os.path.join(ROOT, 'ontologies', 'Reference data')
+
+AUTOGEN_OUT = os.path.join(
+    ROOT, 'common', 'src', 'main', 'scala', 'uk', 'ac', 'wellcome', 'autogen'
+)
+
 # Hash of the current commit
 CURRENT_COMMIT = subprocess.check_output([
     'git', 'rev-parse', 'HEAD']).decode('ascii').strip()
