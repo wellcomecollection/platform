@@ -7,5 +7,5 @@ case class License(
   val label: String,
   val url: String
 ) {
-  @JsonProperty("type") val ldType: String = "License"
+  @JsonProperty("type") val ontologyType: String = "License"
 }
