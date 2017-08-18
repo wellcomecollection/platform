@@ -6,10 +6,10 @@ Usage:
   run.py -h | --help
 
 Options:
-  -h --help              Show this message.
-  --bucket-name=<BUCKET_NAME>
-  --key=<>
-  --delete-original      Delete the original source key.
+  -h --help                     Show this message.
+  --bucket-name=<BUCKET_NAME>   Name of the bucket where the job json file resides.
+  --key=<KEY>                   Key of the job json file.
+  --delete-original             Delete the original source key.
 
 """
 
@@ -35,17 +35,13 @@ def upload_in_parallel(images):
         start_upload_process(local_image_path, task)
         for task, local_image_path in images
     ]
-    try:
-        for process, local_image_path, upload_location in upload_processes:
-            failure_message = f"Uploading from {local_image_path} to {upload_location} failed!"
-            success_message = f"Uploading from {local_image_path} to {upload_location} succeeded"
-            wait(process,
-                 success_message,
-                 failure_message)
-            # TODO delete original file if --delete-original flag is set
-    finally:
-        for _, local_image_path, _ in upload_processes:
-            os.unlink(local_image_path)
+    for process, local_image_path, upload_location in upload_processes:
+        failure_message = f"Uploading from {local_image_path} to {upload_location} failed!"
+        success_message = f"Uploading from {local_image_path} to {upload_location} succeeded"
+        wait(process,
+             success_message,
+             failure_message)
+        # TODO delete original file if --delete-original flag is set
 
 
 def check_status(local_image_path, process, task):
@@ -131,16 +127,20 @@ def main():
         job = json.load(job_file)
 
     images = []
-    for split_tasks in split(parallelism, job['task_list']):
-        images += download_in_parallel(split_tasks)
+    try:
+        for split_tasks in split(parallelism, job['task_list']):
+            images += download_in_parallel(split_tasks)
 
-    print("Finished downloading s3 files!")
+        print("Finished downloading s3 files!")
 
-    for task, local_image_path in images:
-        embed_image_metadata(task, local_image_path)
+        for task, local_image_path in images:
+            embed_image_metadata(task, local_image_path)
 
-    for split_images in split(parallelism, images):
-        upload_in_parallel(split_images)
+        for split_images in split(parallelism, images):
+            upload_in_parallel(split_images)
+    finally:
+        for _, local_image_path in images:
+            os.unlink(local_image_path)
 
     print("Finished uploading files to s3!")
 
