@@ -1,6 +1,7 @@
 {
   "@context": {
     "wwork": "http://wellcomecollection.org/ontologies/works/",
+    "wcon": "http://wellcomecollection.org/ontologies/concept/",
     "wcore": "http://wellcomecollection.org/ontologies/core/",
     "wloc": "http://wellcomecollection.org/ontologies/location/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
@@ -29,7 +30,7 @@
       "@id": "wwork:Period"
     },
     "Concept": {
-      "@id": "wwork:Concept"
+      "@id": "wcon:Concept"
     },
     "Item": {
       "@id": "wwork:Item"

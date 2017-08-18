@@ -1,8 +1,8 @@
 {
   "@context": {
-    "wwork": "http://www.wellcomecollection.org/ontologies/works/",
-    "wcore": "http://www.wellcomecollection.org/ontologies/core/",
-    "wloc": "http://www.wellcomecollection.org/ontologies/location/",
+    "wwork": "http://wellcomecollection.org/ontologies/works/",
+    "wcore": "http://wellcomecollection.org/ontologies/core/",
+    "wloc": "http://wellcomecollection.org/ontologies/location/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "@base": "http://id.wellcomecollection.org/",
