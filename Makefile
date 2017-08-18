@@ -133,22 +133,22 @@ sbt-test: \
 
 
 
-sbt-build-api: install-docker-build-deps sbt-test-api
+sbt-build-api: install-docker-build-deps autogen sbt-test-api
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
+sbt-build-id_minter: install-docker-build-deps autogen sbt-test-id_minter
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: install-docker-build-deps sbt-test-ingestor
+sbt-build-ingestor: install-docker-build-deps autogen sbt-test-ingestor
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
+sbt-build-miro_adapter: install-docker-build-deps autogen sbt-test-miro_adapter
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
+sbt-build-reindexer: install-docker-build-deps autogen sbt-test-reindexer
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: install-docker-build-deps sbt-test-transformer
+sbt-build-transformer: install-docker-build-deps autogen sbt-test-transformer
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
@@ -231,6 +231,7 @@ check-format: format
 
 
 autogen:
+	pip3 install jinja2
 	./scripts/run_autogen.py
 
 check-autogen: autogen
