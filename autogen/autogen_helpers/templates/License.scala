@@ -12,7 +12,7 @@ trait License {
   @JsonProperty("type") val ontologyType: String = "License"
 }
 
-{% for lic in licenses %}
+{% for lic in data %}
 case object License_{{ lic.licenseType|replace('-', '') }} extends License {
   val licenseType = "{{ lic.licenseType }}"
   val label = "{{ lic.label }}"
