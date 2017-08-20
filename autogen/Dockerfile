@@ -11,7 +11,6 @@ RUN pip3 install -r requirements.txt
 VOLUME /repo
 WORKDIR /repo
 
-COPY run_autogen.py /run_autogen.py
-COPY autogen_helpers /autogen_helpers
+COPY . /usr/lib/python3.6/autogen
 
-ENTRYPOINT ["/run_autogen.py"]
+ENTRYPOINT ["/usr/lib/python3.6/autogen/run_autogen.py"]
