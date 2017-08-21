@@ -3,6 +3,7 @@ package uk.ac.wellcome.models
 import scala.util.Try
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.twitter.inject.TwitterModule
 import org.apache.commons.lang.StringEscapeUtils
 
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
@@ -43,13 +44,19 @@ case class MiroTransformable(MiroID: String,
                              data: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
-    extends Transformable
+    extends TwitterModule
+    with Transformable
     with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
     HashKey("MiroID", MiroID),
     RangeKey("MiroCollection", MiroCollection)
   )
+
+  private val miroThumbnailURLTemplate = flag[String](
+    "miro.thumbnail.url_template",
+    "https://iiif.wellcomecollection.org/image/MIROID.jpg/full/300,/0/default.jpg",
+    "Template URL for Miro thumbnails")
 
   override def transform: Try[Work] = {
 
@@ -214,8 +221,7 @@ case class MiroTransformable(MiroID: String,
       }
       val thumbnail = Location(
         locationType = "thumbnail-image",
-        url = Some(
-          s"https://iiif.wellcomecollection.org/image/$MiroID.jpg/full/300,/0/default.jpg"),
+        url = Some(miroThumbnailURLTemplate().replace("MIROID", MiroID)),
         license = chooseLicense(useRestrictions = useRestrictions)
       )
 
