@@ -21,7 +21,7 @@ case class Work(
   subjects: List[Concept] = List(),
   creators: List[Agent] = List(),
   genres: List[Concept] = List(),
-  thumbnail: Option[License] = None,
+  thumbnail: Option[Location] = None,
   items: List[Item] = List()
 ) {
   @JsonProperty("type") val ontologyType: String = "Work"
