@@ -49,6 +49,17 @@ class WorksIndex @Inject()(client: HttpClient,
         objectField("genres").fields(
           textField("label"),
           keywordField("type")
+        ),
+        objectField("thumbnail").fields(
+          keywordField("type"),
+          keywordField("locationType"),
+          textField("url"),
+          objectField("license").fields(
+            keywordField("type"),
+            keywordField("licenseType"),
+            textField("label"),
+            textField("url")
+          )
         )
       )
     )
