@@ -35,7 +35,7 @@ class LicenseTest extends FunSpec with Matchers {
         "url": "$url",
         "type": "License"
       }"""
-    val result= JsonUtil.fromJson[T](jsonString)
+    val result = JsonUtil.fromJson[T](jsonString)
     result.isSuccess shouldBe true
 
     val license = result.get
