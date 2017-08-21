@@ -245,7 +245,7 @@ case class MiroTransformable(MiroID: String,
       // Any images with this label are explicitly withheld from the API.
       case "See Related Images Tab for Higher Res Available" => {
         throw new ShouldNotTransformException(
-          s"image_use_restrictions=\"$useRestrictions\" mean we should exclude this from the API"
+          s"image_use_restrictions='${useRestrictions}' mean we should exclude this from the API"
         )
       }
 
@@ -256,12 +256,12 @@ case class MiroTransformable(MiroID: String,
             "See Copyright Information" |
             "Suppressed from WI site") => {
         throw new ShouldNotTransformException(
-          s"image_use_restrictions=\"$useRestrictions\" needs more investigation before we can assign a license"
+          s"image_use_restrictions='$useRestrictions' needs more investigation before we can assign a license"
         )
       }
 
       case _ => throw new MiroDataException(
-        s"image_use_restrictions=\"$useRestrictions\" is unrecognised"
+        s"image_use_restrictions='${useRestrictions}' is unrecognised"
       )
     }
 }
