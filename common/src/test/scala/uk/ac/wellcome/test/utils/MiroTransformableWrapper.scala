@@ -32,4 +32,18 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get
   }
+
+  def assertTransformWorkFails(
+      data: String,
+      miroID: String = "M0000001",
+      miroCollection: String = "TestCollection"
+    ) = {
+      val miroTransformable = MiroTransformable(
+        MiroID = miroID,
+        MiroCollection = miroCollection,
+        data = data
+      )
+
+      miroTransformable.transform.isSuccess shouldBe false
+    }
 }
