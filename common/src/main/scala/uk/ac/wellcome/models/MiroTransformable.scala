@@ -214,7 +214,7 @@ case class MiroTransformable(MiroID: String,
       }
       val thumbnail = Location(
         locationType = "thumbnail-image",
-        url = s"https://iiif.wellcomecollection.org/image/$MiroID.jpg/full/300,/0/default.jpg",
+        url = Some(s"https://iiif.wellcomecollection.org/image/$MiroID.jpg/full/300,/0/default.jpg"),
         license = chooseLicense(useRestrictions=useRestrictions)
       )
 
@@ -226,7 +226,7 @@ case class MiroTransformable(MiroID: String,
         creators = creators ++ secondaryCreators,
         subjects = subjects,
         genres = genres,
-        thumbnail = thumbnail
+        thumbnail = Some(thumbnail)
       )
     }
   }
