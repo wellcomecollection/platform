@@ -49,7 +49,7 @@ case class DisplayWork(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
     value =
       "Relates any thing to the location of a representative thumbnail image"
-  ) thumbnail: Option[Location] = None
+  ) thumbnail: Option[DisplayLocation] = None
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Work"
@@ -85,7 +85,11 @@ case object DisplayWork {
       identifiers =
         if (includes.identifiers)
           Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
-        else None
+        else None,
+      thumbnail = identifiedWork.work.thumbnail match {
+        case Some(s) => Some(DisplayLocation(s))
+        case None => None
+      }
     )
   }
 }

@@ -8,7 +8,9 @@
 package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+@JsonDeserialize(as = classOf[License])
 trait LicenseTrait {
   val licenseType: String
   val label: String
@@ -16,7 +18,7 @@ trait LicenseTrait {
   @JsonProperty("type") val ontologyType: String = "License"
 }
 
-case class License (
+case class License(
   val licenseType: String,
   val label: String,
   val url: String

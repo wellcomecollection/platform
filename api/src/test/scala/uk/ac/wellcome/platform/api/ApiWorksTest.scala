@@ -819,7 +819,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works?query=igloo&_index=alt_records",
+        path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
@@ -839,7 +839,7 @@ class ApiWorksTest
                           |     "thumbnail": {
                           |       "type": "Location",
                           |       "locationType": "${thumbnail.locationType}",
-                          |       "url": "${thumbnail.url}",
+                          |       "url": "${thumbnail.url.get}",
                           |       "license": {
                           |         "type": "License",
                           |         "licenseType": "${license.licenseType}",
