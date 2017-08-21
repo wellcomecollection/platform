@@ -1,7 +1,9 @@
 package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+@JsonDeserialize(as = classOf[License])
 trait BaseLicense {
   val licenseType: String
   val label: String

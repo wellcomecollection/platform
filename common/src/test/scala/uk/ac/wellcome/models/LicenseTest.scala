@@ -1,6 +1,8 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
+import scala.util.Try
+
 import uk.ac.wellcome.utils.JsonUtil
 
 class LicenseTest extends FunSpec with Matchers {
@@ -12,6 +14,16 @@ class LicenseTest extends FunSpec with Matchers {
   }
 
   it("should deserialise a JSON string as a License") {
+    assertDeserialisationSucceededForType[License]()
+  }
+
+  it("should deserialise a JSON string as a BaseLicense") {
+    // Because BaseLicense is an abstract type, Jackson can't deserialise it
+    // without an annotation from us.
+    assertDeserialisationSucceededForType[BaseLicense]()
+  }
+
+  def assertDeserialisationSucceededForType[T <: BaseLicense]()(implicit m: Manifest[T]) = {
     val licenseType = "CC-Test"
     val label = "A fictional license for testing"
     val url = "http://creativecommons.org/licenses/test/-1.0/"
@@ -23,7 +35,7 @@ class LicenseTest extends FunSpec with Matchers {
         "url": "$url",
         "type": "License"
       }"""
-    val result = JsonUtil.fromJson[License](jsonString)
+    val result= JsonUtil.fromJson[T](jsonString)
     result.isSuccess shouldBe true
 
     val license = result.get
