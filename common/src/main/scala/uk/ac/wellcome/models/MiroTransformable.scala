@@ -28,14 +28,6 @@ case class MiroTransformableData(
   @JsonProperty("image_use_restrictions") useRestrictions: Option[String]
 )
 
-/** Thrown for errors in the data which need further investigation or indicate
-  *  a transformer bug.
-  */
-case class MiroDataException(message: String) extends Exception(message)
-
-/** Thrown when we know we have a known reason for not transforming
-  *  this record.
-  */
 case class ShouldNotTransformException(message: String)
     extends Exception(message)
 
@@ -215,7 +207,7 @@ case class MiroTransformable(MiroID: String,
       val useRestrictions = miroData.useRestrictions match {
         case Some(s) => s
         case None =>
-          throw new MiroDataException(
+          throw new ShouldNotTransformException(
             "No value provided for image_use_restrictions?"
           )
       }
@@ -281,7 +273,7 @@ case class MiroTransformable(MiroID: String,
       }
 
       case _ =>
-        throw new MiroDataException(
+        throw new ShouldNotTransformException(
           s"image_use_restrictions='${useRestrictions}' is unrecognised"
         )
     }
