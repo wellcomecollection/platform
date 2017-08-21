@@ -8,7 +8,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 class ApiWorksTest
-    extends FunSpec
+  extends FunSpec
     with FeatureTestMixin
     with IndexedElasticSearchLocal
     with WorksUtil {
@@ -27,14 +27,14 @@ class ApiWorksTest
   val apiPrefix = "catalogue/v0"
 
   val emptyJsonResult = s"""
-                                 |{
-                                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                                 |  "type": "ResultList",
-                                 |  "pageSize": 10,
-                                 |  "totalPages": 0,
-                                 |  "totalResults": 0,
-                                 |  "results": []
-                                 |}""".stripMargin
+                           |{
+                           |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                           |  "type": "ResultList",
+                           |  "pageSize": 10,
+                           |  "totalPages": 0,
+                           |  "totalResults": 0,
+                           |  "results": []
+                           |}""".stripMargin
 
   it("should return a list of works") {
 
@@ -47,66 +47,69 @@ class ApiWorksTest
         path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
         withJsonBody = s"""
-            |{
-            |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-            |  "type": "ResultList",
-            |  "pageSize": 10,
-            |  "totalPages": 1,
-            |  "totalResults": 3,
-            |  "results": [
-            |   {
-            |     "type": "Work",
-            |     "id": "${works(0).canonicalId}",
-            |     "title": "${works(0).work.title}",
-            |     "description": "${works(0).work.description.get}",
-            |     "lettering": "${works(0).work.lettering.get}",
-            |     "createdDate": {
-            |       "type": "Period",
-            |       "label": "${works(0).work.createdDate.get.label}"
-            |     },
-            |     "creators": [{
-            |       "type": "Agent",
-            |       "label": "${works(0).work.creators(0).label}"
-            |     }],
-            |     "subjects": [ ],
-            |     "genres": [ ]
-            |   },
-            |   {
-            |     "type": "Work",
-            |     "id": "${works(1).canonicalId}",
-            |     "title": "${works(1).work.title}",
-            |     "description": "${works(1).work.description.get}",
-            |     "lettering": "${works(1).work.lettering.get}",
-            |     "createdDate": {
-            |       "type": "Period",
-            |       "label": "${works(1).work.createdDate.get.label}"
-            |     },
-            |     "creators": [{
-            |       "type": "Agent",
-            |       "label": "${works(1).work.creators(0).label}"
-            |     }],
-            |     "subjects": [ ],
-            |     "genres": [ ]
-            |   },
-            |   {
-            |     "type": "Work",
-            |     "id": "${works(2).canonicalId}",
-            |     "title": "${works(2).work.title}",
-            |     "description": "${works(2).work.description.get}",
-            |     "lettering": "${works(2).work.lettering.get}",
-            |     "createdDate": {
-            |       "type": "Period",
-            |       "label": "${works(2).work.createdDate.get.label}"
-            |     },
-            |     "creators": [{
-            |       "type": "Agent",
-            |       "label": "${works(2).work.creators(0).label}"
-            |     }],
-            |     "subjects": [ ],
-            |     "genres": [ ]
-            |   }
-            |  ]
-            |}
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 3,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${works(0).canonicalId}",
+                          |     "title": "${works(0).work.title}",
+                          |     "description": "${works(0).work.description.get}",
+                          |     "lettering": "${works(0).work.lettering.get}",
+                          |     "createdDate": {
+                          |       "type": "Period",
+                          |       "label": "${works(0).work.createdDate.get.label}"
+                          |     },
+                          |     "creators": [{
+                          |       "type": "Agent",
+                          |       "label": "${works(0).work.creators(0).label}"
+                          |     }],
+                          |     "subjects": [ ],
+                          |     "genres": [ ],
+                          |     "items": [ ]
+                          |   },
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${works(1).canonicalId}",
+                          |     "title": "${works(1).work.title}",
+                          |     "description": "${works(1).work.description.get}",
+                          |     "lettering": "${works(1).work.lettering.get}",
+                          |     "createdDate": {
+                          |       "type": "Period",
+                          |       "label": "${works(1).work.createdDate.get.label}"
+                          |     },
+                          |     "creators": [{
+                          |       "type": "Agent",
+                          |       "label": "${works(1).work.creators(0).label}"
+                          |     }],
+                          |     "subjects": [ ],
+                          |     "genres": [ ],
+                          |     "items": [ ]
+                          |   },
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${works(2).canonicalId}",
+                          |     "title": "${works(2).work.title}",
+                          |     "description": "${works(2).work.description.get}",
+                          |     "lettering": "${works(2).work.lettering.get}",
+                          |     "createdDate": {
+                          |       "type": "Period",
+                          |       "label": "${works(2).work.createdDate.get.label}"
+                          |     },
+                          |     "creators": [{
+                          |       "type": "Agent",
+                          |       "label": "${works(2).work.creators(0).label}"
+                          |     }],
+                          |     "subjects": [ ],
+                          |     "genres": [ ],
+                          |     "items": [ ]
+                          |   }
+                          |  ]
+                          |}
           """.stripMargin
       )
     }
@@ -129,24 +132,25 @@ class ApiWorksTest
         path = s"/$apiPrefix/works/$canonicalId",
         andExpect = Status.Ok,
         withJsonBody = s"""
-            |{
-            | "@context": "https://localhost:8888/$apiPrefix/context.json",
-            | "type": "Work",
-            | "id": "$canonicalId",
-            | "title": "$title",
-            | "description": "$description",
-            | "lettering": "$lettering",
-            | "createdDate": {
-            |   "type": "Period",
-            |   "label": "${period.label}"
-            | },
-            | "creators": [{
-            |   "type": "Agent",
-            |   "label": "${agent.label}"
-            | }],
-            | "subjects": [ ],
-            | "genres": [ ]
-            |}
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "$canonicalId",
+                          | "title": "$title",
+                          | "description": "$description",
+                          | "lettering": "$lettering",
+                          | "createdDate": {
+                          |   "type": "Period",
+                          |   "label": "${period.label}"
+                          | },
+                          | "creators": [{
+                          |   "type": "Agent",
+                          |   "label": "${agent.label}"
+                          | }],
+                          | "items": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
           """.stripMargin
       )
     }
@@ -186,6 +190,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(1).work.creators(0).label}"
                           |     }],
+                          |     "items": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -221,6 +226,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(0).work.creators(0).label}"
                           |     }],
+                          |     "items": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -257,6 +263,7 @@ class ApiWorksTest
                           |       "label": "${works(2).work.creators(0).label}"
                           |     }],
                           |     "subjects": [ ],
+                          |      "items": [ ],
                           |     "genres": [ ]
                           |   }]
                           |   }
@@ -273,12 +280,12 @@ class ApiWorksTest
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
       withJsonBody = """
-          |{
-          |  "errors" : [
-          |    "pageSize: 'penguin' is not a valid Integer"
-          |  ]
-          |}
-        """.stripMargin
+                       |{
+                       |  "errors" : [
+                       |    "pageSize: 'penguin' is not a valid Integer"
+                       |  ]
+                       |}
+                     """.stripMargin
     )
   }
 
@@ -366,12 +373,12 @@ class ApiWorksTest
       path = s"/$apiPrefix/works?pageSize=-60&page=-50",
       andExpect = Status.BadRequest,
       withJsonBody = s"""
-        |{
-        |  "errors": [
-        |    "page: [-50] is not greater than or equal to 1",
-        |    "pageSize: [-60] is not greater than or equal to 1"
-        |  ]
-        |}
+                        |{
+                        |  "errors": [
+                        |    "page: [-50] is not greater than or equal to 1",
+                        |    "pageSize: [-60] is not greater than or equal to 1"
+                        |  ]
+                        |}
       """.stripMargin
     )
   }
@@ -400,23 +407,24 @@ class ApiWorksTest
         path = s"/$apiPrefix/works?query=dodo",
         andExpect = Status.Ok,
         withJsonBody = s"""
-             |{
-             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-             |  "type": "ResultList",
-             |  "pageSize": 10,
-             |  "totalPages": 1,
-             |  "totalResults": 1,
-             |  "results": [
-             |   {
-             |     "type": "Work",
-             |     "id": "${work1.canonicalId}",
-             |     "title": "${work1.work.title}",
-             |     "creators": [],
-             |     "subjects": [ ],
-             |     "genres": [ ]
-             |   }
-             |  ]
-             |}""".stripMargin
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 1,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${work1.canonicalId}",
+                          |     "title": "${work1.work.title}",
+                          |     "creators": [],
+                          |     "subjects": [ ],
+                          |     "genres": [ ],
+                          |     "items": [ ]
+                          |   }
+                          |  ]
+                          |}""".stripMargin
       )
     }
   }
@@ -437,32 +445,33 @@ class ApiWorksTest
         path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
         withJsonBody = s"""
-             |{
-             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-             |  "type": "ResultList",
-             |  "pageSize": 10,
-             |  "totalPages": 1,
-             |  "totalResults": 1,
-             |  "results": [
-             |   {
-             |     "type": "Work",
-             |     "id": "${workWithSubjects.canonicalId}",
-             |     "title": "${workWithSubjects.work.title}",
-             |     "creators": [],
-             |     "subjects": [
-             |      {
-             |        "type": "Concept",
-             |        "label": "fish"
-             |      },
-             |      {
-             |        "type": "Concept",
-             |        "label": "gardening"
-             |      }
-             |     ],
-             |     "genres": [ ]
-             |   }
-             |  ]
-             |}""".stripMargin
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 1,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${workWithSubjects.canonicalId}",
+                          |     "title": "${workWithSubjects.work.title}",
+                          |     "creators": [],
+                          |     "subjects": [
+                          |      {
+                          |        "type": "Concept",
+                          |        "label": "fish"
+                          |      },
+                          |      {
+                          |        "type": "Concept",
+                          |        "label": "gardening"
+                          |      }
+                          |     ],
+                          |     "genres": [ ],
+                          |     "items": [ ]
+                          |   }
+                          |  ]
+                          |}""".stripMargin
       )
     }
   }
@@ -483,32 +492,33 @@ class ApiWorksTest
         path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
         withJsonBody = s"""
-             |{
-             |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-             |  "type": "ResultList",
-             |  "pageSize": 10,
-             |  "totalPages": 1,
-             |  "totalResults": 1,
-             |  "results": [
-             |   {
-             |     "type": "Work",
-             |     "id": "${workWithSubjects.canonicalId}",
-             |     "title": "${workWithSubjects.work.title}",
-             |     "creators": [],
-             |     "subjects": [ ],
-             |     "genres": [
-             |       {
-             |         "type": "Concept",
-             |         "label": "woodwork"
-             |       },
-             |       {
-             |         "type": "Concept",
-             |         "label": "etching"
-             |       }
-             |     ]
-             |   }
-             |  ]
-             |}""".stripMargin
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 1,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${workWithSubjects.canonicalId}",
+                          |     "title": "${workWithSubjects.work.title}",
+                          |     "creators": [],
+                          |     "subjects": [ ],
+                          |     "genres": [
+                          |       {
+                          |         "type": "Concept",
+                          |         "label": "woodwork"
+                          |       },
+                          |       {
+                          |         "type": "Concept",
+                          |         "label": "etching"
+                          |       }
+                          |     ],
+                          |     "items": [ ]
+                          |   }
+                          |  ]
+                          |}""".stripMargin
       )
     }
   }
@@ -564,7 +574,8 @@ class ApiWorksTest
                           |       }
                           |     ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "items": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -579,7 +590,8 @@ class ApiWorksTest
                           |       }
                           |     ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "items": [ ]
                           |   }
                           |  ]
                           |}
@@ -620,7 +632,8 @@ class ApiWorksTest
                           |   }
                           | ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "items": [ ]
                           |}
           """.stripMargin
       )
@@ -653,7 +666,8 @@ class ApiWorksTest
                           | "title": "${work.work.title}",
                           | "creators": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "items": [ ]
                           |}
           """.stripMargin
       )
@@ -671,7 +685,8 @@ class ApiWorksTest
                           | "title": "${work_alt.work.title}",
                           | "creators": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "items": [ ]
                           |}
           """.stripMargin
       )
@@ -710,7 +725,8 @@ class ApiWorksTest
                           |     "title": "${work.work.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "items": [ ]
                           |   }
                           |  ]
                           |}
@@ -736,7 +752,8 @@ class ApiWorksTest
                           |     "title": "${work_alt.work.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "items": [ ]
                           |   }
                           |  ]
                           |}
