@@ -178,7 +178,7 @@ class MiroTransformableTest
     with MiroTransformableWrapper {
 
   it("should throw an error if there isn't a title field") {
-    assertTransformMiroRecordFails(data = """{
+    assertTransformWorkFails(data = """{
       "image_cleared": "Y",
       "image_copyright_cleared": "Y"
     }""")
@@ -327,7 +327,7 @@ class MiroTransformableTest
   }
 
   it("should not pass through records with a missing image_cleared field") {
-    assertTransformMiroRecordFails(data = """{
+    assertTransformWorkFails(data = """{
       "image_title": "Missives on museums",
       "image_copyright_cleared": "Y"
     }""")
@@ -335,7 +335,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with a missing image_copyright_cleared field") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "A caricature of cats",
       "image_cleared": "Y"
@@ -344,7 +344,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with missing image_cleared and missing image_copyright_cleared field") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "Drawings of dromedaries"
     }""")
@@ -352,7 +352,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with an image_cleared value that isn't 'Y'") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "Confidential colourings of crocodiles",
       "image_cleared": "N",
@@ -362,7 +362,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with image_copyright_cleared field that isn't 'Y'") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "Proprietary poetry about porcupines",
       "image_cleared": "Y",
@@ -372,7 +372,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records that are missing technical metadata") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
         "image_title": "Touching a toxic tree is truly tragic",
         "image_cleared": "Y",
@@ -380,20 +380,6 @@ class MiroTransformableTest
         "image_tech_file_size": []
       }"""
     )
-  }
-
-  private def assertTransformMiroRecordFails(
-    data: String = """{"image_title": "A failed fumble in the fire"}""",
-    miroID: String = "M0000001",
-    miroCollection: String = "TestCollection"
-  ) = {
-    val miroTransformable = MiroTransformable(
-      MiroID = miroID,
-      MiroCollection = miroCollection,
-      data = data
-    )
-
-    miroTransformable.transform.isSuccess shouldBe false
   }
 }
 
