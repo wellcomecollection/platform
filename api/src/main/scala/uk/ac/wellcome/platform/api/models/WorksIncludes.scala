@@ -8,14 +8,17 @@ import com.fasterxml.jackson.databind.{
   JsonMappingException
 }
 
-case class WorksIncludes(identifiers: Boolean = false)
+case class WorksIncludes(
+  identifiers: Boolean = false,
+  thumbnail: Boolean = false
+)
 
 class WorksIncludesParsingException(msg: String)
     extends JsonMappingException(msg: String)
 
 case object WorksIncludes {
 
-  val recognisedIncludes = List("identifiers")
+  val recognisedIncludes = List("identifiers", "thumbnail")
 
   /// Parse an ?includes query-parameter string.
   ///
@@ -27,7 +30,8 @@ case object WorksIncludes {
       .filterNot(recognisedIncludes.contains)
     if (unrecognisedIncludes.length == 0) {
       WorksIncludes(
-        identifiers = includesList.contains("identifiers")
+        identifiers = includesList.contains("identifiers"),
+        thumbnail = includesList.contains("thumbnail")
       )
     } else {
       val errorMessage = if (unrecognisedIncludes.length == 1) {

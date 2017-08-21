@@ -798,7 +798,7 @@ class ApiWorksTest
     }
   }
 
-  it("should include the thumbnail field if available") {
+  it("should include the thumbnail field if available and we use the thumbnail include") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",
@@ -819,7 +819,7 @@ class ApiWorksTest
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works",
+        path = s"/$apiPrefix/works?includes=thumbnail",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
@@ -854,4 +854,48 @@ class ApiWorksTest
       )
     }
   }
+
+  it("should not include the thumbnail if we omit the thumbnail include") {
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      title = "A thorn in the thumb tells a traumatic tale",
+      thumbnail = Location(
+        locationType = "thumbnail-image",
+        url = Some("https://iiif.example.org/1234/default.jpg"),
+        license = License(
+          licenseType = "CC-test",
+          label = "A fictional license for testing",
+          url = "http://creativecommons.org/licenses/test/-1.0/"
+        )
+      )
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          |  "type": "ResultList",
+                          |  "pageSize": 10,
+                          |  "totalPages": 1,
+                          |  "totalResults": 1,
+                          |  "results": [
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${work.canonicalId}",
+                          |     "title": "${work.work.title}",
+                          |     "creators": [ ],
+                          |     "subjects": [ ],
+                          |     "genres": [ ]
+                          |   }
+                          |  ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
 }
