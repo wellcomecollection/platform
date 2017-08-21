@@ -508,3 +508,58 @@ class MiroTransformableGenresTest
     transformedWork.genres shouldBe expectedGenres
   }
 }
+
+
+
+class MiroTransformableThumbnailTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
+
+  it("should reject records that don't have usage data") {
+    assertTransformWorkFails(
+      data = """{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        "image_tech_file_size": ["1000000"],
+        "image_title": "Understand that using this umbrella is unauthorised"
+      }"""
+    )
+  }
+
+  it("should reject records with unrecognised usage data") {
+    assertTransformWorkFails(
+      data = """{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        "image_tech_file_size": ["1000000"],
+        "image_use_restrictions": "Poetic license, normally reserved for authors and not suitable in the real world",
+        "image_title": "Plagiarised poetry by a penguin"
+      }"""
+    )
+  }
+
+  it("should create a thumbnail if the license is present") {
+    transformRecordAndCheckThumbnail(
+      data = s"""
+        "image_use_restrictions": "CC-BY-NC",
+        "image_title": "A thumb-sized tarantula"
+      """,
+      MiroID = "MT0001234",
+      expectedThumbnail = Location(
+        locationType = "thumbnail-image",
+        url = Some("https://iiif.wellcomecollection.org/image/MT0001234.jpg/full/300,/0/default.jpg"),
+        license = License_CCBYNC
+      )
+    )
+  }
+
+  private def transformRecordAndCheckThumbnail(
+    data: String,
+    MiroID: String,
+    expectedThumbnail: Location
+  ) = {
+    val transformedWork = transformWork(data = data, MiroID = MiroID)
+    transformedWork.thumbnail.get shouldBe expectedThumbnail
+  }
+}
