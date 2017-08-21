@@ -203,6 +203,22 @@ case class MiroTransformable(MiroID: String,
         case _ => None
       }
 
+      // Add a thumbnail.  For now the URL is hard coded.
+      // TODO: Less magic strings here.
+      val useRestrictions = miroData.useRestrictions match {
+        case Some(s) => s
+        case None =>
+          throw new MiroDataException(
+            "No value provided for image_use_restrictions?"
+          )
+      }
+      val thumbnail = Location(
+        locationType = "thumbnail-image",
+        url = Some(
+          s"https://iiif.wellcomecollection.org/image/$MiroID.jpg/full/300,/0/default.jpg"),
+        license = chooseLicense(useRestrictions = useRestrictions)
+      )
+
       Work(
         identifiers = identifiers,
         title = title,
@@ -210,7 +226,8 @@ case class MiroTransformable(MiroID: String,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators,
         subjects = subjects,
-        genres = genres
+        genres = genres,
+        thumbnail = Some(thumbnail)
       )
     }
   }
