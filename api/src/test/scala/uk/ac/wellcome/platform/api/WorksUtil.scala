@@ -48,6 +48,15 @@ trait WorksUtil {
 
   def identifiedWorkWith(canonicalId: String,
                          title: String,
+                         thumbnail: Location): IdentifiedWork =
+    IdentifiedWork(canonicalId, Work(
+      identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+      title = title,
+      thumbnail = Some(thumbnail)
+    ))
+
+  def identifiedWorkWith(canonicalId: String,
+                         title: String,
                          description: String,
                          lettering: String,
                          createdDate: Period,
