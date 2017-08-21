@@ -1,5 +1,8 @@
 # -*- encoding: utf-8 -*-
 
+import boto3
+from lxml import etree
+
 
 def _render_value(value):
     """Renders a value."""
@@ -71,3 +74,29 @@ def fix_miro_xml_entities(xml_string):
     for v in bad_values:
         xml_string = xml_string.replace(v, b'_')
     return xml_string
+
+
+def read_image_chunks_from_s3(bucket, key):
+    """
+    Loading an entire XML file at once would be prohibitively expensive,
+    but we only need one <image> ... </image> block at a time.
+    """
+    client = boto3.client('s3')
+    obj = client.get_object(Bucket=bucket, Key=key)
+    running = b''
+    while True:
+        new_data = obj['Body'].read(1024)
+        if not new_data:
+            break
+        running += new_data
+        if b'</image>' in running:
+            curr, running = running.split(b'</image>')
+            curr = curr.split(b'<image>')[-1]
+            yield (b'<image>' + curr + b'</image>')
+
+
+def generate_images(bucket, key):
+    for xml_chunk in read_image_chunks_from_s3(bucket, key):
+        xml_string = fix_miro_xml_entities(xml_chunk)
+        lxml_elem = etree.fromstring(xml_string)
+        yield elem_to_dict(lxml_elem)
