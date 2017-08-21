@@ -202,8 +202,7 @@ case class MiroTransformable(MiroID: String,
         case _ => None
       }
 
-      // Add a thumbnail.  For now the URL is hard coded.
-      // TODO: Less magic strings here.
+      // Add a thumbnail.
       val useRestrictions = miroData.useRestrictions match {
         case Some(s) => s
         case None =>
