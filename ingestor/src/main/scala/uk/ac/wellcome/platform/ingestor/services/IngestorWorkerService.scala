@@ -10,13 +10,13 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class IngestorWorkerService @Inject()(
-  identifiedWorkIndexer: IdentifiedWorkIndexer,
+  identifiedWorkIndexer: WorkIndexer,
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
-    identifiedWorkIndexer.indexIdentifiedWork(message.body).map(_ => ())
+    identifiedWorkIndexer.indexWork(message.body).map(_ => ())
 
 }

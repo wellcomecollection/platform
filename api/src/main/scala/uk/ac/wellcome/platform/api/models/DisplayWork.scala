@@ -73,28 +73,29 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    val identifiedWork =
-      JsonUtil.fromJson[IdentifiedWork](document).get
+    val work =
+      JsonUtil.fromJson[Work](document).get
 
     DisplayWork(
-      id = identifiedWork.canonicalId,
-      title = identifiedWork.work.title,
-      description = identifiedWork.work.description,
-      lettering = identifiedWork.work.lettering,
-      createdDate = identifiedWork.work.createdDate,
+      // TODO: Throw sensible exception here if empty
+      id = work.canonicalId.get,
+      title = work.title,
+      description = work.description,
+      lettering = work.lettering,
+      createdDate = work.createdDate,
       // Wrapping this in Option to catch null value from Jackson
-      creators = Option(identifiedWork.work.creators).getOrElse(Nil),
-      subjects = Option(identifiedWork.work.subjects).getOrElse(Nil),
-      genres = Option(identifiedWork.work.genres).getOrElse(Nil),
+      creators = Option(work.creators).getOrElse(Nil),
+      subjects = Option(work.subjects).getOrElse(Nil),
+      genres = Option(work.genres).getOrElse(Nil),
       identifiers =
         if (includes.identifiers)
-          Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
+          Some(work.identifiers.map(DisplayIdentifier(_)))
         else None,
       thumbnail =
         if (includes.thumbnail)
-          identifiedWork.work.thumbnail.map(DisplayLocation(_))
+          work.thumbnail.map(DisplayLocation(_))
         else None,
-      items = Option(identifiedWork.work.items)
+      items = Option(work.items)
         .getOrElse(Nil)
         .map(DisplayItem(_, includes.identifiers))
     )

@@ -7,12 +7,11 @@ import uk.ac.wellcome.utils.JsonUtil
 /** An identifier received from one of the original sources */
 case class SourceIdentifier(identifierScheme: String, value: String)
 
-case class IdentifiedWork(canonicalId: String, work: Work)
-
 /** A representation of a work in our ontology, without a
   *  canonical identifier.
   */
 case class Work(
+  canonicalId: Option[String] = None,
   identifiers: List[SourceIdentifier],
   title: String,
   description: Option[String] = None,
@@ -27,7 +26,7 @@ case class Work(
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 
-object IdentifiedWork extends Indexable[IdentifiedWork] {
-  override def json(t: IdentifiedWork): String =
+object Work extends Indexable[Work] {
+  override def json(t: Work): String =
     JsonUtil.toJson(t).get
 }

@@ -28,13 +28,12 @@ class IngestorFeatureTest
 
   it(
     "should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
-    val identifiedWork = JsonUtil
+    val work = JsonUtil
       .toJson(
-        IdentifiedWork(
-          canonicalId = "1234",
-          work = Work(identifiers =
+        Work(
+          canonicalId = Some("1234"),
                         List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-                      title = "A type of a tame turtle")))
+                      title = "A type of a tame turtle"))
       .get
 
     sqsClient.sendMessage(
@@ -42,7 +41,7 @@ class IngestorFeatureTest
       JsonUtil
         .toJson(
           SQSMessage(Some("identified-item"),
-                     identifiedWork,
+                     work,
                      "ingester",
                      "messageType",
                      "timestamp"))
@@ -55,7 +54,7 @@ class IngestorFeatureTest
         .map { _.hits.hits }
       whenReady(hitsFuture) { hits =>
         hits should have size 1
-        hits.head.sourceAsString shouldBe identifiedWork
+        hits.head.sourceAsString shouldBe work
       }
     }
   }
