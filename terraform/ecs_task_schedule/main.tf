@@ -25,3 +25,20 @@ data "aws_iam_policy_document" "assume_scheduled_task_role" {
     }
   }
 }
+
+data "aws_iam_policy_document" "scheduled_task_runtask_role" {
+  statement {
+    actions = [
+      "ecs:RunTask",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "scheduled_task_runtask_role_policy" {
+  role   = "${aws_iam_role.scheduled_task_role.name}"
+  policy = "${data.aws_iam_policy_document.scheduled_task_runtask_role.json}"
+}
