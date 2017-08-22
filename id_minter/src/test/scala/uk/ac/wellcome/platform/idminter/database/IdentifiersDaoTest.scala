@@ -37,7 +37,7 @@ class IdentifiersDaoTest
     }
   }
 
-  describe("findSourceIdInDb") {
+  describe("lookupMiroID") {
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
       val identifier = Identifier(
         CanonicalID = "A sand snail",
@@ -45,14 +45,14 @@ class IdentifiersDaoTest
       )
       insertIdentifier(identifier)
 
-      whenReady(identifiersDao.findSourceIdInDb(identifier.MiroID)) { maybeIdentifier =>
+      whenReady(identifiersDao.lookupMiroID(identifier.MiroID)) { maybeIdentifier =>
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe identifier
       }
     }
 
     it("should return a future of None if looking up a non-existent Miro ID") {
-      whenReady(identifiersDao.findSourceIdInDb("A missing mouse")) { maybeIdentifier =>
+      whenReady(identifiersDao.lookupMiroID("A missing mouse")) { maybeIdentifier =>
         maybeIdentifier shouldNot be(defined)
       }
     }
