@@ -33,7 +33,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
 
   private def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier): Future[String] =
-    identifiersDao.findSourceIdInDb(identifier.value).flatMap {
+    identifiersDao.lookupMiroID(identifier.value).flatMap {
       case Some(id) => {
         metricsSender.incrementCount("found-old-id")
         Future.successful(id.CanonicalID)

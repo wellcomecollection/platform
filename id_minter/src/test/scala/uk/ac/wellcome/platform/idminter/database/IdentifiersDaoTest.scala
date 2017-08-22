@@ -16,37 +16,33 @@ class IdentifiersDaoTest
 
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-  describe("findSourceIdInDb") {
+  describe("lookupMiroID") {
+    it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
+      val identifier = Identifier(
+        CanonicalID = "A sand snail",
+        MiroID = "A soft shell"
+      )
+      insertIdentifier(identifier)
 
-    it(
-      "should return a future of some if the requested miroId is in the database") {
-      val miroId = "1234"
-      val canonicalId = "5678"
-      withSQL {
-        insert
-          .into(identifiersTable)
-          .namedValues(identifiersTable.column.CanonicalID -> canonicalId,
-                       identifiersTable.column.MiroID -> miroId)
-      }.update().apply()
-
-      whenReady(identifiersDao.findSourceIdInDb(miroId)) { maybeIdentifier =>
+      whenReady(identifiersDao.lookupMiroID(identifier.MiroID)) { maybeIdentifier =>
         maybeIdentifier shouldBe defined
-        maybeIdentifier.get shouldBe Identifier(canonicalId, miroId)
+        maybeIdentifier.get shouldBe identifier
       }
     }
 
-    it(
-      "should return a future of none if the requested miroId is not in the database") {
-      whenReady(identifiersDao.findSourceIdInDb("abcdef")) { maybeIdentifier =>
+    it("should return a future of None if looking up a non-existent Miro ID") {
+      whenReady(identifiersDao.lookupMiroID("A missing mouse")) { maybeIdentifier =>
         maybeIdentifier shouldNot be(defined)
       }
     }
   }
 
   describe("saveIdentifier") {
-
     it("should insert the provided identifier into the database") {
-      val identifier = Identifier(CanonicalID = "5678", MiroID = "1234")
+      val identifier = Identifier(
+        CanonicalID = "A provision of porpoises",
+        MiroID = "A picture of pangolins"
+      )
       val future = identifiersDao.saveIdentifier(identifier)
 
       whenReady(future) { _ =>
@@ -64,22 +60,49 @@ class IdentifiersDaoTest
       }
     }
 
-    it(
-      "should fail inserting a record if there is already a record for the same miroId") {
-      val identifier = new Identifier(CanonicalID = "5678", MiroID = "1234")
-      withSQL {
-        insert
-          .into(identifiersTable)
-          .namedValues(
-            identifiersTable.column.CanonicalID -> identifier.CanonicalID,
-            identifiersTable.column.MiroID -> identifier.MiroID)
-      }.update().apply()
+    it("should fail to insert a record with a duplicate CanonicalID") {
+      val identifier = new Identifier(
+        CanonicalID = "A failed field of flowers",
+        MiroID = "A farm full of fruit"
+      )
+      val duplicateIdentifier = new Identifier(
+        CanonicalID = identifier.CanonicalID,
+        MiroID = "Fuel for a factory"
+      )
 
-      val saveCanonicalId =
-        identifiersDao.saveIdentifier(identifier.copy(CanonicalID = "0987"))
-      whenReady(saveCanonicalId.failed) { exception =>
-        exception shouldBe a[SQLIntegrityConstraintViolationException]
-      }
+      assertInsertingDuplicateFails(identifier, duplicateIdentifier)
+    }
+
+    it("should fail to insert a record with a duplicate MiroID") {
+      val identifier = new Identifier(
+        CanonicalID = "A picking of parsley",
+        MiroID = "A packet of peppermints"
+      )
+      val duplicateIdentifier = new Identifier(
+        CanonicalID = "A portion of potatoes",
+        MiroID = identifier.MiroID
+      )
+
+      assertInsertingDuplicateFails(identifier, duplicateIdentifier)
     }
   }
+
+  /** Helper method.  Given two records, try to insert them both, and check
+    * that integrity checks in the database reject the second record.
+    */
+  private def assertInsertingDuplicateFails(identifier: Identifier,
+                                            duplicateIdentifier: Identifier) = {
+    insertIdentifier(identifier)
+
+    val duplicateFuture = identifiersDao.saveIdentifier(duplicateIdentifier)
+    whenReady(duplicateFuture.failed) { exception =>
+      exception shouldBe a[SQLIntegrityConstraintViolationException]
+    }
+  }
+
+  /** Helper method.  Insert a record and check that it succeeds. */
+  private def insertIdentifier(identifier: Identifier) =
+    whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
+      result shouldBe 1
+    }
 }
