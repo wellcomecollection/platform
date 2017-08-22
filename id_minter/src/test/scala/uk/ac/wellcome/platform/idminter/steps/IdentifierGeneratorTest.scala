@@ -89,7 +89,7 @@ class IdentifierGeneratorTest
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao, metricsSender)
 
-    when(identifiersDao.findSourceIdInDb(miroId))
+    when(identifiersDao.lookupMiroID(miroId))
       .thenReturn(Future.successful(None))
     val expectedException = new Exception("Noooo")
     when(identifiersDao.saveIdentifier(any[Identifier]()))

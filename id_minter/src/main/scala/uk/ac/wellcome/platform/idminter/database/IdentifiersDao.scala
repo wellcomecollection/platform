@@ -31,18 +31,18 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
         throw e
     }
 
-  def findSourceIdInDb(miroId: String): Future[Option[Identifier]] =
+  def lookupMiroID(miroID: String): Future[Option[Identifier]] =
     Future {
       blocking {
-        info(s"About to search for MiroID $miroId in Identifiers")
+        info(s"About to search for MiroID $miroID in Identifiers")
         val i = identifiers.i
         withSQL {
-          select.from(identifiers as i).where.eq(i.MiroID, miroId)
+          select.from(identifiers as i).where.eq(i.MiroID, miroID)
         }.map(Identifier(i)).single.apply()
       }
     } recover {
       case e: Throwable =>
-        error(s"Failed getting MiroID $miroId in DynamoDB", e)
+        error(s"Failed getting MiroID $miroID in Identifiers", e)
         throw e
     }
 
