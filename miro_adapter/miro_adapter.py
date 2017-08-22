@@ -33,8 +33,8 @@ def push_to_dynamodb(table_name, collection_name, image_data):
     table = dynamodb.Table(table_name)
 
     with table.batch_writer() as batch:
-        for idx, image in enumerate(image_data, start=1):
-            print('Pushing image with ID %s' % image['image_no_calc'])
+        for i, image in enumerate(image_data, start=1):
+            print('Pushing image %d with ID %s' % (i, image['image_no_calc']))
             batch.put_item(
                 Item={
                     'MiroID': image['image_no_calc'],
@@ -44,7 +44,6 @@ def push_to_dynamodb(table_name, collection_name, image_data):
                     'data': json.dumps(image, separators=(',', ':'))
                 }
             )
-        print('Written %d records to DynamoDB' % idx)
 
 
 if __name__ == '__main__':
