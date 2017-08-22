@@ -13,8 +13,8 @@ echo "password=$password" >> auth.ini
 
 # Now run the elasticdump tool and pull it down
 hostname=$(awk -F "=" '/es.host/ {print $2}' ingestor_config.ini)
-outfile="dump_$(date)_$INDEX.txt"
+outfile="dump_$(date +"%Y-%m-%d_%H-%M-%S")_$INDEX.txt"
 elasticdump --input="https://$hostname/$INDEX" --output="$outfile" --httpAuthFile=auth.ini
 
 # And copy it back up to S3
-aws s3 cp "$outfile" "s3://platform-infra/esdump/$outfile"
+aws s3 cp "$outfile" "s3://platform-infra/elasticdump/$outfile"
