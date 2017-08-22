@@ -86,7 +86,11 @@ def read_image_chunks_from_s3(bucket, key):
 
 
 def generate_images(bucket, key):
+    # Because this is a stream parser, lxml doesn't know about the encoding
+    # declaration at the top of the Miro XML exports.  We have to tell it.
+    # It's a bit magic, but this is the easiest way to do it.
+    iso_88591_parser = etree.XMLParser(encoding='iso-8859-1')
     for xml_chunk in read_image_chunks_from_s3(bucket, key):
         xml_string = fix_miro_xml_entities(xml_chunk)
-        lxml_elem = etree.fromstring(xml_string)
-        yield elem_to_dict(lxml_elem)
+        lxml_elem = etree.fromstring(xml_string, parser=iso_88591_parser)
+        yield lxml_elem
