@@ -20,7 +20,6 @@ import json
 import time
 
 import boto3
-from botocore.exceptions import ClientError
 import docopt
 
 from utils import generate_images
@@ -33,8 +32,6 @@ def push_to_dynamodb(table_name, collection_name, image_data):
     """
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
-
-    wait_time = 1
 
     with table.batch_writer() as batch:
         for i, image in enumerate(image_data, start=1):
