@@ -3,7 +3,6 @@ package uk.ac.wellcome.models
 import scala.util.Try
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.twitter.inject.TwitterModule
 import org.apache.commons.lang.StringEscapeUtils
 
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
@@ -36,19 +35,13 @@ case class MiroTransformable(MiroID: String,
                              data: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
-    extends TwitterModule
-    with Transformable
+    extends Transformable
     with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
     HashKey("MiroID", MiroID),
     RangeKey("MiroCollection", MiroCollection)
   )
-
-  private val miroThumbnailURLTemplate = flag[String](
-    "miro.thumbnail.url_template",
-    "https://iiif.wellcomecollection.org/image/MIROID.jpg/full/300,/0/default.jpg",
-    "Template URL for Miro thumbnails")
 
   override def transform: Try[Work] = {
 
@@ -212,7 +205,7 @@ case class MiroTransformable(MiroID: String,
       }
       val thumbnail = Location(
         locationType = "thumbnail-image",
-        url = Some(miroThumbnailURLTemplate().replace("MIROID", MiroID)),
+        url = Some(buildThumbnailURL(MiroID)),
         license = chooseLicense(useRestrictions = useRestrictions)
       )
 
@@ -228,6 +221,17 @@ case class MiroTransformable(MiroID: String,
       )
     }
   }
+
+  /** Build a thumbnail URL for the image.
+    *
+    * TODO: Make the template configurable
+    */
+  def buildThumbnailURL(miroID: String): String =
+    "https://iiif.wellcomecollection.org/image/MIROID.jpg/full/300,/0/default.jpg"
+      .replace(
+        "MIROID",
+        miroID
+      )
 
   /** If the image has a non-empty image_use_restrictions field, choose which
     *  license (if any) we're going to assign to the thumbnail for this work.
