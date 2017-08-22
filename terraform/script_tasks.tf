@@ -89,3 +89,18 @@ module "elasticdump" {
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
+
+module "elasticdump" {
+  source        = "./ecs_script_task"
+  task_name     = "elasticdump"
+  app_uri       = "${module.ecr_repository_elasticdump.repository_url}:${var.release_ids["elasticdump"]}"
+  task_role_arn = "${module.ecs_elasticdump_iam.task_role_arn}"
+
+  cpu    = 1024
+  memory = 1024
+
+  env_vars = [
+    "{\"name\": \"BUCKET\", \"value\": \"${var.infra_bucket}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+  ]
+}
