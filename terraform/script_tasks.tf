@@ -101,6 +101,7 @@ module "elasticdump" {
 
   env_vars = [
     "{\"name\": \"BUCKET\", \"value\": \"${var.infra_bucket}\"}",
+    "{\"name\": \"CONFIG_KEY\", \"value\": \"${module.ingestor.config_key}\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
