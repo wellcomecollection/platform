@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.api
 
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.platform.api.models.DisplayWork
 
 trait WorksUtil {
 
@@ -13,15 +12,6 @@ trait WorksUtil {
 
   val period = Period("the past")
   val agent = Agent("a person")
-
-  def convertWorkToDisplayWork(work: Work) = DisplayWork(
-    work.id,
-    work.title,
-    work.description,
-    work.lettering,
-    work.createdDate,
-    work.creators
-  )
 
   def createWorks(count: Int): Seq[Work] =
     (1 to count).map(
@@ -36,39 +26,53 @@ trait WorksUtil {
       ))
 
   def workWith(canonicalId: String, title: String): Work =
-    Work(Some(canonicalId),
-                   identifiers =
-                          List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-                        title = title)
-
-  def workWith(canonicalId: String,
-               title: String,
-               identifiers: List[SourceIdentifier]): Work =
-    Work(Some(canonicalId), identifiers = identifiers, title = title)
-
-  def identifiedWorkWith(canonicalId: String,
-                         title: String,
-                         thumbnail: Location): Work =
     Work(
-      Some(canonicalId),
-      identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+      canonicalId = canonicalId,
+      identifiers = List(
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+      ),
+      title = title
+    )
+
+  def workWith(
+    canonicalId: String,
+    title: String,
+    identifiers: List[SourceIdentifier]
+  ): Work =
+    Work(
+      canonicalId = canonicalId,
+      identifiers = identifiers,
+      title = title
+    )
+
+  def identifiedWorkWith(
+    canonicalId: String,
+    title: String,
+    thumbnail: Location
+  ): Work =
+    Work(
+      canonicalId = canonicalId,
+      identifiers = List(
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+      ),
       title = title,
       thumbnail = Some(thumbnail)
     )
 
-  def workWith(canonicalId: String,
-                         title: String,
-                         description: String,
-                         lettering: String,
-                         createdDate: Period,
-                         creator: Agent): Work = Work(
-    canonicalId = Some(canonicalId),
-      identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-      title = title,
-      description = Some(description),
-      lettering = Some(lettering),
-      createdDate = Some(createdDate),
-      creators = List(creator)
-
+  def workWith(
+    canonicalId: String,
+     title: String,
+     description: String,
+     lettering: String,
+     createdDate: Period,
+     creator: Agent
+  ): Work = Work(
+    canonicalId = canonicalId,
+    identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+    title = title,
+    description = Some(description),
+    lettering = Some(lettering),
+    createdDate = Some(createdDate),
+    creators = List(creator)
   )
 }

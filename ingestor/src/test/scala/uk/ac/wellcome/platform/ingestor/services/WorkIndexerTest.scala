@@ -37,7 +37,7 @@ class WorkIndexerTest
     JsonUtil
       .toJson(
         Work(
-            canonicalId = Some(canonicalId),
+            canonicalId = canonicalId,
                 identifiers =
                         List(SourceIdentifier(IdentifierSchemes.miroImageNumber, sourceId)),
                       title = title))

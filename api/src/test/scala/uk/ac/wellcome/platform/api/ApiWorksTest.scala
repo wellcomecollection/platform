@@ -118,15 +118,15 @@ class ApiWorksTest
   }
 
   it("should return a single work when requested with id") {
-    val work =
-      workWith(
-        canonicalId = canonicalId,
-        title = title,
-        description = description,
-        lettering = lettering,
-        createdDate = period,
-        creator = agent
-      )
+    val work = workWith(
+      canonicalId = canonicalId,
+      title = title,
+      description = description,
+      lettering = lettering,
+      createdDate = period,
+      creator = agent
+    )
+
     insertIntoElasticSearch(work)
 
     eventually {
@@ -433,7 +433,7 @@ class ApiWorksTest
 
   it("should include subject information in API responses") {
     val workWithSubjects = Work(
-      canonicalId = Some("test_subject1"),
+      canonicalId = "test_subject1",
       identifiers = List(),
       title = "A seal selling seaweed sandwiches in Scotland",
       subjects = List(Concept("fish"), Concept("gardening"))
@@ -478,7 +478,7 @@ class ApiWorksTest
 
   it("should include genre information in API responses") {
     val workWithSubjects = Work(
-      canonicalId = Some("test_subject1"),
+      canonicalId = "test_subject1",
       identifiers = List(),
       title = "A guppy in a greenhouse",
       genres = List(Concept("woodwork"), Concept("etching"))

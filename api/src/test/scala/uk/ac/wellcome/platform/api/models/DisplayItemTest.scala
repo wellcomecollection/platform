@@ -46,11 +46,10 @@ class DisplayItemTest extends FunSpec with Matchers {
   it("should read an Item as a DisplayItem correctly") {
 
     val item = Item(
-        Some("foo"),
+        canonicalId = "foo",
         identifiers = List(identifier),
         locations = List(location)
       )
-
 
     val displayItem = DisplayItem(
       item = item,

@@ -27,4 +27,31 @@ case class Work(
 object Work extends Indexable[Work] {
   override def json(t: Work): String =
     JsonUtil.toJson(t).get
+
+  def apply(
+    canonicalId: String,
+    identifiers: List[SourceIdentifier],
+    title: String,
+    description: Option[String] = None,
+    lettering: Option[String] = None,
+    createdDate: Option[Period] = None,
+    subjects: List[Concept] = List(),
+    creators: List[Agent] = List(),
+    genres: List[Concept] = List(),
+    thumbnail: Option[Location] = None,
+    items: List[Item] = List()
+  ): Work =
+    Work(
+      canonicalId = canonicalId,
+      identifiers = identifiers,
+      title = title,
+      description = description,
+      lettering = lettering,
+      createdDate = createdDate,
+      subjects = List(),
+      creators = List(),
+      genres = List(),
+      thumbnail = None,
+      items = List()
+    )
 }

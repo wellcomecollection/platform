@@ -96,7 +96,7 @@ class ElasticsearchServiceTest
     val works = createWorks(10)
     insertIntoElasticSearch(works: _*)
 
-    works.map(convertWorkToDisplayWork).sortBy(_.id).toList
+    works.map(DisplayWork(_)).sortBy(_.id).toList
   }
 
   private def assertSliceIsCorrect(

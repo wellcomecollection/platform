@@ -61,21 +61,8 @@ case class DisplayWork(
 
 case object DisplayWork {
 
-  def apply(hit: SearchHit): DisplayWork =
-    apply(hit, includes = WorksIncludes())
-
-  def apply(hit: SearchHit, includes: WorksIncludes): DisplayWork = {
-    jsonToDisplayWork(hit.sourceAsString, includes)
-  }
-
-  def apply(got: GetResponse, includes: WorksIncludes): DisplayWork = {
-    jsonToDisplayWork(got.sourceAsString, includes)
-  }
-
-  private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    val work =
-      JsonUtil.fromJson[Work](document).get
-
+  def apply(work: Work,
+            includes: WorksIncludes = WorksIncludes()): DisplayWork = {
     DisplayWork(
       id = work.id,
       title = work.title,
@@ -98,5 +85,24 @@ case object DisplayWork {
         .getOrElse(Nil)
         .map(DisplayItem(_, includes.identifiers))
     )
+
+  }
+
+  def apply(hit: SearchHit): DisplayWork =
+    apply(hit, includes = WorksIncludes())
+
+  def apply(hit: SearchHit, includes: WorksIncludes): DisplayWork = {
+    jsonToDisplayWork(hit.sourceAsString, includes)
+  }
+
+  def apply(got: GetResponse, includes: WorksIncludes): DisplayWork = {
+    jsonToDisplayWork(got.sourceAsString, includes)
+  }
+
+  private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
+    val work =
+      JsonUtil.fromJson[Work](document).get
+
+    DisplayWork(work, includes)
   }
 }

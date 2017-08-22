@@ -31,10 +31,10 @@ class IngestorFeatureTest
     val work = JsonUtil
       .toJson(
         Work(
-          canonicalId = Some("1234"),
-                        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-                      title = "A type of a tame turtle"))
-      .get
+          canonicalId = "1234",
+          List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+          title = "A type of a tame turtle")
+      ).get
 
     sqsClient.sendMessage(
       ingestorQueueUrl,
