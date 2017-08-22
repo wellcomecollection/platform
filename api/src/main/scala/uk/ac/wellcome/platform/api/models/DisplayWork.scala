@@ -90,10 +90,10 @@ case object DisplayWork {
         if (includes.identifiers)
           Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
         else None,
-      thumbnail = identifiedWork.work.thumbnail match {
-        case Some(s) => Some(DisplayLocation(s))
-        case None => None
-      },
+      thumbnail =
+        if (includes.thumbnail)
+          identifiedWork.work.thumbnail.map(DisplayLocation(_))
+        else None,
       items = Option(identifiedWork.work.items)
         .getOrElse(Nil)
         .map(DisplayItem(_, includes.identifiers))
