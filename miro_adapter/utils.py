@@ -93,4 +93,4 @@ def generate_images(bucket, key):
     for xml_chunk in read_image_chunks_from_s3(bucket, key):
         xml_string = fix_miro_xml_entities(xml_chunk)
         lxml_elem = etree.fromstring(xml_string, parser=iso_88591_parser)
-        yield lxml_elem
+        yield elem_to_dict(lxml_elem)
