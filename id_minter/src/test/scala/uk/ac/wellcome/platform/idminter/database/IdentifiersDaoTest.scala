@@ -16,22 +16,39 @@ class IdentifiersDaoTest
 
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-  describe("findSourceIdInDb") {
+  describe("lookupCanonicalID") {
+    it("should return a future of Some[Identifier] able to find a Canonical ID in the DB") {
+      val identifier = Identifier(
+        CanonicalID = "A canonical cat",
+        MiroID = "A curious cheetah"
+      )
+      insertIdentifier(identifier)
 
+      whenReady(identifiersDao.lookupCanonicalID(identifier.CanonicalID)) { maybeIdentifier =>
+        maybeIdentifier shouldBe defined
+        maybeIdentifier.get shouldBe identifier
+      }
+    }
+
+    it("should return a future of None if looking up a non-existent Canonical ID") {
+      whenReady(identifiersDao.lookupCanonicalID("A vanishing vulture")) { maybeIdentifier =>
+        maybeIdentifier shouldNot be(defined)
+      }
+    }
+  }
+
+  describe("findSourceIdInDb") {
     it(
       "should return a future of some if the requested miroId is in the database") {
-      val miroId = "1234"
-      val canonicalId = "5678"
-      withSQL {
-        insert
-          .into(identifiersTable)
-          .namedValues(identifiersTable.column.CanonicalID -> canonicalId,
-                       identifiersTable.column.MiroID -> miroId)
-      }.update().apply()
+      val identifier = Identifier(
+        CanonicalID = "A sand snail",
+        MiroID = "A soft shell"
+      )
+      insertIdentifier(identifier)
 
-      whenReady(identifiersDao.findSourceIdInDb(miroId)) { maybeIdentifier =>
+      whenReady(identifiersDao.findSourceIdInDb(identifier.MiroID)) { maybeIdentifier =>
         maybeIdentifier shouldBe defined
-        maybeIdentifier.get shouldBe Identifier(canonicalId, miroId)
+        maybeIdentifier.get shouldBe identifier
       }
     }
 
@@ -82,4 +99,14 @@ class IdentifiersDaoTest
       }
     }
   }
+
+  private def insertIdentifier(identifier: Identifier) =
+    withSQL {
+      insert
+        .into(identifiersTable)
+        .namedValues(
+          identifiersTable.column.CanonicalID -> identifier.CanonicalID,
+          identifiersTable.column.MiroID -> identifier.MiroID
+        )
+    }.update().apply()
 }
