@@ -45,6 +45,16 @@ resource "aws_s3_bucket" "infra" {
       days = 30
     }
   }
+
+  lifecycle_rule {
+    id      = "elasticdump"
+    prefix  = "elasticdump/"
+    enabled = true
+
+    expiration {
+      days = 30
+    }
+  }
 }
 
 resource "aws_s3_bucket" "dashboard" {

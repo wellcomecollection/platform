@@ -369,3 +369,27 @@ data "aws_iam_policy_document" "s3_tif_derivative" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "s3_read_ingestor_config" {
+  statement {
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.infra_bucket}/${module.ingestor.config_key}",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "s3_upload_to_to_elasticdump_directory" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.infra_bucket}/elasticdump/*",
+    ]
+  }
+}
