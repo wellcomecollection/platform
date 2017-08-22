@@ -287,3 +287,15 @@ resource "aws_iam_role_policy" "miro_adapter_dynamodb_access" {
   role   = "${module.ecs_miro_adapter_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.reindex_target_miro.json}"
 }
+
+# Policies for the Elasticdump task
+
+resource "aws_iam_role_policy" "elasticdump_read_ingestor_config_from_s3" {
+  role   = "${module.ecs_elasticdump_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.s3_read_ingestor_config.json}"
+}
+
+resource "aws_iam_role_policy" "elasticdump_upload_files_to_s3" {
+  role   = "${module.ecs_elasticdump_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.s3_upload_to_to_elasticdump_directory.json}"
+}

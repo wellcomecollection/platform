@@ -67,3 +67,8 @@ module "ecs_miro_adapter_iam" {
   source = "./ecs_iam"
   name   = "miro_adapter"
 }
+
+module "ecs_elasticdump_iam" {
+  source = "./ecs_iam"
+  name   = "elasticdump"
+}
