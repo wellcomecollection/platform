@@ -116,3 +116,4 @@ env:
     - TASK=gatling-build
     - TASK=loris-build
     - TASK=miro_adapter-build
+    - TASK=elasticdump-build
