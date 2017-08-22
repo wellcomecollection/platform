@@ -16,27 +16,6 @@ class IdentifiersDaoTest
 
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-  describe("lookupCanonicalID") {
-    it("should return a future of Some[Identifier] if it can find a Canonical ID in the DB") {
-      val identifier = Identifier(
-        CanonicalID = "A canonical cat",
-        MiroID = "A curious cheetah"
-      )
-      insertIdentifier(identifier)
-
-      whenReady(identifiersDao.lookupCanonicalID(identifier.CanonicalID)) { maybeIdentifier =>
-        maybeIdentifier shouldBe defined
-        maybeIdentifier.get shouldBe identifier
-      }
-    }
-
-    it("should return a future of None if looking up a non-existent Canonical ID") {
-      whenReady(identifiersDao.lookupCanonicalID("A vanishing vulture")) { maybeIdentifier =>
-        maybeIdentifier shouldNot be(defined)
-      }
-    }
-  }
-
   describe("lookupMiroID") {
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
       val identifier = Identifier(

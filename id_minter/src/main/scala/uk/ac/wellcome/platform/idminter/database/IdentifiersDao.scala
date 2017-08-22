@@ -16,21 +16,6 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
 
   implicit val session = AutoSession(db.settingsProvider)
 
-  def lookupCanonicalID(canonicalID: String): Future[Option[Identifier]] =
-    Future {
-      blocking {
-        info(s"About to search for canonical ID $canonicalID in Identifiers")
-        val i = identifiers.i
-        withSQL {
-          select.from(identifiers as i).where.eq(i.CanonicalID, canonicalID)
-        }.map(Identifier(i)).single.apply()
-      }
-    } recover {
-      case e: Throwable =>
-        error(s"Failed getting canonicalID $canonicalID in Identifiers", e)
-        throw e
-    }
-
   def lookupMiroID(miroID: String): Future[Option[Identifier]] =
     Future {
       blocking {
