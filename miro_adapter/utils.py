@@ -59,17 +59,7 @@ def fix_miro_xml_entities(xml_string):
     TODO: Process these properly (what do they contain in the original Miro?)
     """
     bad_values = {
-        b'\x14', b'\x1b', b'\x7f', b'\x81', b'\x8d', b'\x9d', b'\xa0', b'\xa1',
-        b'\xa2', b'\xa3', b'\xa4', b'\xa5', b'\xa6', b'\xa7', b'\xa8', b'\xa9',
-        b'\xaa', b'\xab', b'\xac', b'\xad', b'\xae', b'\xaf', b'\xb0', b'\xb1',
-        b'\xb2', b'\xb3', b'\xb4', b'\xb5', b'\xb6', b'\xb8', b'\xb9', b'\xba',
-        b'\xbb', b'\xbc', b'\xbd', b'\xbe', b'\xbf', b'\xc0', b'\xc1', b'\xc2',
-        b'\xc3', b'\xc4', b'\xc5', b'\xc6', b'\xc8', b'\xc9', b'\xca', b'\xcc',
-        b'\xce', b'\xd3', b'\xd4', b'\xd6', b'\xdc', b'\xde', b'\xe0', b'\xe1',
-        b'\xe2', b'\xe3', b'\xe4', b'\xe5', b'\xe6', b'\xe7', b'\xe8', b'\xe9',
-        b'\xea', b'\xeb', b'\xec', b'\xed', b'\xee', b'\xef', b'\xf1', b'\xf2',
-        b'\xf3', b'\xf4', b'\xf5', b'\xf6', b'\xf9', b'\xfa', b'\xfb', b'\xfc',
-        b'\xff'
+        b'\x1b', b'\x7f', b'\x1f', b'\x14',
     }
     for v in bad_values:
         xml_string = xml_string.replace(v, b'_')
@@ -96,7 +86,11 @@ def read_image_chunks_from_s3(bucket, key):
 
 
 def generate_images(bucket, key):
+    # Because this is a stream parser, lxml doesn't know about the encoding
+    # declaration at the top of the Miro XML exports.  We have to tell it.
+    # It's a bit magic, but this is the easiest way to do it.
+    iso_88591_parser = etree.XMLParser(encoding='iso-8859-1')
     for xml_chunk in read_image_chunks_from_s3(bucket, key):
         xml_string = fix_miro_xml_entities(xml_chunk)
-        lxml_elem = etree.fromstring(xml_string)
-        yield elem_to_dict(lxml_elem)
+        lxml_elem = etree.fromstring(xml_string, parser=iso_88591_parser)
+        yield lxml_elem
