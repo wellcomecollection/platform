@@ -57,6 +57,13 @@ miro_adapter-deploy: miro_adapter-build
 	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
 
 
+elasticdump-build: install-docker-build-deps
+	./scripts/build_docker_image.py --project=elasticdump
+
+elasticdump-deploy: elasticdump-build
+	./scripts/deploy_docker_to_aws.py --project=elasticdump --infra-bucket=$(INFRA_BUCKET)
+
+
 install-docker-build-deps:
 	pip3 install --upgrade boto3 docopt
 
