@@ -84,13 +84,7 @@ class IdentifiersDaoTest
     it(
       "should fail inserting a record if there is already a record for the same miroId") {
       val identifier = new Identifier(CanonicalID = "5678", MiroID = "1234")
-      withSQL {
-        insert
-          .into(identifiersTable)
-          .namedValues(
-            identifiersTable.column.CanonicalID -> identifier.CanonicalID,
-            identifiersTable.column.MiroID -> identifier.MiroID)
-      }.update().apply()
+      insertIdentifier(identifier)
 
       val saveCanonicalId =
         identifiersDao.saveIdentifier(identifier.copy(CanonicalID = "0987"))
@@ -101,12 +95,7 @@ class IdentifiersDaoTest
   }
 
   private def insertIdentifier(identifier: Identifier) =
-    withSQL {
-      insert
-        .into(identifiersTable)
-        .namedValues(
-          identifiersTable.column.CanonicalID -> identifier.CanonicalID,
-          identifiersTable.column.MiroID -> identifier.MiroID
-        )
-    }.update().apply()
+    whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
+      result shouldBe 1
+    }
 }
