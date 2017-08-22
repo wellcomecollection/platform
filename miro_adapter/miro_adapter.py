@@ -54,7 +54,7 @@ def push_to_dynamodb(table_name, collection_name, image_data):
             # carry on.  Wait up to five minutes between bursts if necessary.
             except ClientError as err:
                 if err.response['Error']['Code'] == 'ProvisionedThroughputExceededException':
-                    wait_time = min(wait_time * 2, 5 * 50)
+                    wait_time = min(wait_time * 2, 5 * 60)
                     print('Hit DynamoDB rate limits; sleeping for %d' % wait_time)
                     time.sleep(wait_time)
                 else:
