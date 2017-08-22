@@ -46,7 +46,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
         throw e
     }
 
-  def saveIdentifier(identifier: Identifier): Future[Unit] = {
+  def saveIdentifier(identifier: Identifier): Future[Int] = {
     val insertIntoDbFuture = Future {
       blocking {
         info(s"putting new identifier $identifier")
@@ -57,7 +57,6 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
               identifiers.column.CanonicalID -> identifier.CanonicalID,
               identifiers.column.MiroID -> identifier.MiroID)
         }.update().apply()
-        ()
       }
     }
     insertIntoDbFuture.onFailure {
