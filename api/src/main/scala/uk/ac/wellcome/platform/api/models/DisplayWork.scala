@@ -49,7 +49,7 @@ case class DisplayWork(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
     value =
       "Relates any thing to the location of a representative thumbnail image"
-  ) thumbnail: Option[Location] = None,
+  ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
     value = "List of items related to this work."
@@ -89,6 +89,10 @@ case object DisplayWork {
       identifiers =
         if (includes.identifiers)
           Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
+        else None,
+      thumbnail =
+        if (includes.thumbnail)
+          identifiedWork.work.thumbnail.map(DisplayLocation(_))
         else None,
       items = Option(identifiedWork.work.items)
         .getOrElse(Nil)
