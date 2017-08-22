@@ -34,7 +34,7 @@ class WorksIndexTest
     val workJson = JsonUtil
       .toJson(
         Work(
-          canonicalId = "1234",
+          canonicalId = Some("1234"),
           identifiers = List(
                         SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber,
                                          value = "4321")),
