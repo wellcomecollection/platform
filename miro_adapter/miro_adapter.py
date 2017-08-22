@@ -39,26 +39,17 @@ def push_to_dynamodb(table_name, collection_name, image_data):
     with table.batch_writer() as batch:
         for i, image in enumerate(image_data, start=1):
             print('Pushing image %d with ID %s' % (i, image['image_no_calc']))
-            try:
-                batch.put_item(
-                    Item={
-                        'MiroID': image['image_no_calc'],
-                        'MiroCollection': collection_name,
-                        'ReindexShard': 'default',
-                        'ReindexVersion': 0,
-                        'data': json.dumps(image, separators=(',', ':'))
-                    }
-                )
-
-            # We hit write limits on the DynamoDB table.  Wait a bit then
-            # carry on.  Wait up to five minutes between bursts if necessary.
-            except ClientError as err:
-                if err.response['Error']['Code'] == 'ProvisionedThroughputExceededException':
-                    wait_time = min(wait_time * 2, 5 * 60)
-                    print('Hit DynamoDB rate limits; sleeping for %d' % wait_time)
-                    time.sleep(wait_time)
-                else:
-                    raise
+            batch.put_item(
+                Item={
+                    'MiroID': image['image_no_calc'],
+                    'MiroCollection': collection_name,
+                    'ReindexShard': 'default',
+                    'ReindexVersion': 1,
+                    'data': json.dumps(image, separators=(',', ':'))
+                }
+            )
+            if i % 50 == 0:
+                time.sleep(5)
 
 
 if __name__ == '__main__':
