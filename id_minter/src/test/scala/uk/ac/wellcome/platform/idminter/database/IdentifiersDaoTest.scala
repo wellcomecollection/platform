@@ -20,7 +20,8 @@ class IdentifiersDaoTest
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
       val identifier = Identifier(
         CanonicalID = "A sand snail",
-        MiroID = "A soft shell"
+        MiroID = "A soft shell",
+        ontologyType = "Work"
       )
       insertIdentifier(identifier)
 
@@ -41,7 +42,8 @@ class IdentifiersDaoTest
     it("should insert the provided identifier into the database") {
       val identifier = Identifier(
         CanonicalID = "A provision of porpoises",
-        MiroID = "A picture of pangolins"
+        MiroID = "A picture of pangolins",
+        ontologyType = "Work"
       )
       val future = identifiersDao.saveIdentifier(identifier)
 
@@ -63,11 +65,13 @@ class IdentifiersDaoTest
     it("should fail to insert a record with a duplicate CanonicalID") {
       val identifier = new Identifier(
         CanonicalID = "A failed field of flowers",
-        MiroID = "A farm full of fruit"
+        MiroID = "A farm full of fruit",
+        ontologyType = "Work"
       )
       val duplicateIdentifier = new Identifier(
         CanonicalID = identifier.CanonicalID,
-        MiroID = "Fuel for a factory"
+        MiroID = "Fuel for a factory",
+        ontologyType = "Work"
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
@@ -76,11 +80,13 @@ class IdentifiersDaoTest
     it("should fail to insert a record with a duplicate MiroID") {
       val identifier = new Identifier(
         CanonicalID = "A picking of parsley",
-        MiroID = "A packet of peppermints"
+        MiroID = "A packet of peppermints",
+        ontologyType = "Work"
       )
       val duplicateIdentifier = new Identifier(
         CanonicalID = "A portion of potatoes",
-        MiroID = identifier.MiroID
+        MiroID = identifier.MiroID,
+        ontologyType = "Work"
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
