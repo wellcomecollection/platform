@@ -21,9 +21,6 @@ module "gatling_loris" {
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
-  cpu    = 1024
-  memory = 1024
-
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
@@ -38,9 +35,6 @@ module "gatling_catalogue_api" {
   task_name     = "gatling_catalogue_api"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
-
-  cpu    = 1024
-  memory = 1024
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.CatalogueApiSimulation\"}",
@@ -57,9 +51,6 @@ module "gatling_digital_experience" {
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
-  cpu    = 1024
-  memory = 1024
-
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.DigitalExperienceImageSearch\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
@@ -75,8 +66,6 @@ module "miro_adapter" {
   app_uri       = "${module.ecr_repository_miro_adapter.repository_url}:${var.release_ids["miro_adapter"]}"
   task_role_arn = "${module.ecs_miro_adapter_iam.task_role_arn}"
 
-  cpu = 1024
-
   # This script has to load the XML files into memory, so make sure it
   # has plenty of overhead.
   memory = 2000
@@ -84,6 +73,19 @@ module "miro_adapter" {
   env_vars = [
     "{\"name\": \"TABLE\", \"value\": \"${aws_dynamodb_table.miro_table.id}\"}",
     "{\"name\": \"BUCKET\", \"value\": \"${aws_s3_bucket.miro-data.id}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+  ]
+}
+
+module "elasticdump" {
+  source        = "./ecs_script_task"
+  task_name     = "elasticdump"
+  app_uri       = "${module.ecr_repository_elasticdump.repository_url}:${var.release_ids["elasticdump"]}"
+  task_role_arn = "${module.ecs_elasticdump_iam.task_role_arn}"
+
+  env_vars = [
+    "{\"name\": \"BUCKET\", \"value\": \"${var.infra_bucket}\"}",
+    "{\"name\": \"CONFIG_KEY\", \"value\": \"${module.ingestor.config_key}\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
