@@ -14,6 +14,15 @@ import uk.ac.wellcome.models.{MiroTransformable, Work}
  */
 trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
+  def buildJSONForWork(extraData: String): String =
+    s"""{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        "image_tech_file_size": ["1000000"],
+        "image_use_restrictions": "CC-BY",
+        $extraData
+      }"""
+
   def transformWork(
     data: String,
     MiroID: String = "M0000001",
@@ -22,12 +31,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     val miroTransformable = MiroTransformable(
       MiroID = MiroID,
       MiroCollection = MiroCollection,
-      data = s"""{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        "image_tech_file_size": ["1000000"],
-        $data
-      }"""
+      data = buildJSONForWork(data)
     )
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get

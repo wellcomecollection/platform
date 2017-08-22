@@ -23,7 +23,8 @@ case class MiroTransformableData(
   @JsonProperty("image_keywords_unauth") keywordsUnauth: Option[List[String]],
   @JsonProperty("image_phys_format") physFormat: Option[String],
   @JsonProperty("image_lc_genre") lcGenre: Option[String],
-  @JsonProperty("image_tech_file_size") techFileSize: Option[List[String]]
+  @JsonProperty("image_tech_file_size") techFileSize: Option[List[String]],
+  @JsonProperty("image_use_restrictions") useRestrictions: Option[String]
 )
 
 case class ShouldNotTransformException(message: String)
@@ -194,6 +195,20 @@ case class MiroTransformable(MiroID: String,
         case _ => None
       }
 
+      // Add a thumbnail.
+      val useRestrictions = miroData.useRestrictions match {
+        case Some(s) => s
+        case None =>
+          throw new ShouldNotTransformException(
+            "No value provided for image_use_restrictions?"
+          )
+      }
+      val thumbnail = Location(
+        locationType = "thumbnail-image",
+        url = Some(buildThumbnailURL(MiroID)),
+        license = chooseLicense(useRestrictions = useRestrictions)
+      )
+
       Work(
         identifiers = identifiers,
         title = title,
@@ -201,8 +216,68 @@ case class MiroTransformable(MiroID: String,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators,
         subjects = subjects,
-        genres = genres
+        genres = genres,
+        thumbnail = Some(thumbnail)
       )
     }
   }
+
+  /** Build a thumbnail URL for the image.
+    *
+    * TODO: Make the template configurable
+    */
+  def buildThumbnailURL(miroID: String): String =
+    "https://iiif.wellcomecollection.org/image/MIROID.jpg/full/300,/0/default.jpg"
+      .replace(
+        "MIROID",
+        miroID
+      )
+
+  /** If the image has a non-empty image_use_restrictions field, choose which
+    *  license (if any) we're going to assign to the thumbnail for this work.
+    *
+    *  The mappings in this function are based on a document provided by
+    *  Christy Henshaw (MIRO drop-downs.docx).  There are still some gaps in
+    *  that, we'll have to come back and update this code later.
+    *
+    *  For now, this mapping only covers use restrictions seen in the
+    *  V collection.  We'll need to extend this for other licenses later.
+    *
+    *  TODO: Expand this mapping to cover all of MIRO.
+    *  TODO: Update these mappings based on the final version of Christy's
+    *        document.
+    */
+  def chooseLicense(useRestrictions: String): BaseLicense =
+    useRestrictions match {
+
+      // Certain strings map directly onto license types
+      case "CC-0" => License_CC0
+      case "CC-BY" => License_CCBY
+      case "CC-BY-NC" => License_CCBYNC
+      case "CC-BY-NC-ND" => License_CCBYNCND
+
+      // These mappings are defined in Christy's document
+      case "Academics" => License_CCBYNC
+
+      // Any images with this label are explicitly withheld from the API.
+      case "See Related Images Tab for Higher Res Available" => {
+        throw new ShouldNotTransformException(
+          s"image_use_restrictions='${useRestrictions}' mean we should exclude this from the API"
+        )
+      }
+
+      // These fields are labelled "[Investigate further]" in Christy's
+      // document, so for now we exclude them.
+      case ("Do not use" | "Not for external use" |
+          "See Copyright Information" | "Suppressed from WI site") => {
+        throw new ShouldNotTransformException(
+          s"image_use_restrictions='$useRestrictions' needs more investigation before we can assign a license"
+        )
+      }
+
+      case _ =>
+        throw new ShouldNotTransformException(
+          s"image_use_restrictions='${useRestrictions}' is unrecognised"
+        )
+    }
 }
