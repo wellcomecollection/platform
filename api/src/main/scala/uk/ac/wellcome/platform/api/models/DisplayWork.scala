@@ -62,7 +62,7 @@ case class DisplayWork(
 case object DisplayWork {
 
   def apply(work: Work,
-            includes: WorksIncludes = WorksIncludes()): DisplayWork = {
+            includes: WorksIncludes): DisplayWork = {
     DisplayWork(
       id = work.id,
       title = work.title,

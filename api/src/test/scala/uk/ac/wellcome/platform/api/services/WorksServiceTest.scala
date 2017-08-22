@@ -53,7 +53,7 @@ class WorksServiceTest
 
     whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
-      records.get shouldBe DisplayWork(works.head)
+      records.get shouldBe DisplayWork(works.head, WorksIncludes())
     }
   }
 
@@ -133,7 +133,7 @@ class WorksServiceTest
       worksService.listWorks(pageSize = 1, pageNumber = 2)
 
     whenReady(displayWorksFuture) { receivedWorks =>
-      receivedWorks.results.head shouldBe DisplayWork(works(1))
+      receivedWorks.results.head shouldBe DisplayWork(works(1), WorksIncludes())
     }
   }
 

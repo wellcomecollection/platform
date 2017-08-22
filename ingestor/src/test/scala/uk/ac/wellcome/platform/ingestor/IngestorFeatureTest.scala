@@ -31,7 +31,7 @@ class IngestorFeatureTest
     val work = JsonUtil
       .toJson(
         Work(
-          canonicalId = "1234",
+          canonicalId = Some("1234"),
           List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
           title = "A type of a tame turtle")
       ).get

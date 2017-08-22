@@ -27,7 +27,7 @@ trait WorksUtil {
 
   def workWith(canonicalId: String, title: String): Work =
     Work(
-      canonicalId = canonicalId,
+      canonicalId = Some(canonicalId),
       identifiers = List(
         SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
       ),
@@ -40,7 +40,7 @@ trait WorksUtil {
     identifiers: List[SourceIdentifier]
   ): Work =
     Work(
-      canonicalId = canonicalId,
+      canonicalId = Some(canonicalId),
       identifiers = identifiers,
       title = title
     )
@@ -51,7 +51,7 @@ trait WorksUtil {
     thumbnail: Location
   ): Work =
     Work(
-      canonicalId = canonicalId,
+      canonicalId = Some(canonicalId),
       identifiers = List(
         SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
       ),
@@ -67,7 +67,7 @@ trait WorksUtil {
      createdDate: Period,
      creator: Agent
   ): Work = Work(
-    canonicalId = canonicalId,
+    canonicalId = Some(canonicalId),
     identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
     title = title,
     description = Some(description),

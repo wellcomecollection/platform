@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.services
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.api.WorksUtil
-import uk.ac.wellcome.platform.api.models.DisplayWork
+import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 class ElasticsearchServiceTest
@@ -92,11 +92,11 @@ class ElasticsearchServiceTest
     )
   }
 
-  private def populateElasticsearch(): List[DisplayWork] = {
+  private def populateElasticsearch(worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] = {
     val works = createWorks(10)
     insertIntoElasticSearch(works: _*)
 
-    works.map(DisplayWork(_)).sortBy(_.id).toList
+    works.map(DisplayWork(_, worksIncludes)).sortBy(_.id).toList
   }
 
   private def assertSliceIsCorrect(
