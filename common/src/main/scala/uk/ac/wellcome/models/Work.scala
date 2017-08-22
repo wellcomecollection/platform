@@ -7,9 +7,7 @@ import uk.ac.wellcome.utils.JsonUtil
 /** An identifier received from one of the original sources */
 case class SourceIdentifier(identifierScheme: String, value: String)
 
-/** A representation of a work in our ontology, without a
-  *  canonical identifier.
-  */
+/** A representation of a work in our ontology */
 case class Work(
   canonicalId: Option[String] = None,
   identifiers: List[SourceIdentifier],
@@ -22,7 +20,7 @@ case class Work(
   genres: List[Concept] = List(),
   thumbnail: Option[Location] = None,
   items: List[Item] = List()
-) {
+) extends Identifiable {
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 

@@ -77,8 +77,7 @@ case object DisplayWork {
       JsonUtil.fromJson[Work](document).get
 
     DisplayWork(
-      // TODO: Throw sensible exception here if empty
-      id = work.canonicalId.get,
+      id = work.id,
       title = work.title,
       description = work.description,
       lettering = work.lettering,

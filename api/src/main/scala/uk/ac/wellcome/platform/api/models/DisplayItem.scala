@@ -28,9 +28,8 @@ case class DisplayItem(
 
 object DisplayItem {
   def apply(item: Item, includesIdentifiers: Boolean): DisplayItem =
-    // TODO: Throw sensible exception here if empty
     DisplayItem(
-      id = item.canonicalId.get,
+      id = item.id,
       identifiers =
         if (includesIdentifiers)
           Some(item.identifiers.map(DisplayIdentifier(_)))

@@ -6,12 +6,10 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
-import uk.ac.wellcome.utils.JsonUtil.mapper
 
 class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
 
-  implicit val jsonMapper = IdentifiedWork
+  implicit val jsonMapper = Work
   override val server =
     new EmbeddedHttpServer(
       new Server,

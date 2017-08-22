@@ -8,7 +8,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -31,9 +31,9 @@ class WorkIndexerTest
                               elasticClient,
                               metricsSender)
 
-  def identifiedWorkJson(canonicalId: String,
-                         sourceId: String,
-                         title: String): String = {
+  def workJson(canonicalId: String,
+               sourceId: String,
+               title: String): String = {
     JsonUtil
       .toJson(
         Work(
@@ -46,11 +46,11 @@ class WorkIndexerTest
 
   it("should insert an identified unified item into Elasticsearch") {
 
-    val identifiedWorkString =
-      identifiedWorkJson("5678", "1234", "An identified igloo")
+    val workString =
+      workJson("5678", "1234", "An identified igloo")
 
     val future =
-      workIndexer.indexWork(identifiedWorkString)
+      workIndexer.indexWork(workString)
 
     whenReady(future) { _ =>
       eventually {
@@ -59,7 +59,7 @@ class WorkIndexerTest
           .map { _.hits.hits }
           .await
         hits should have size 1
-        hits.head.sourceAsString shouldBe identifiedWorkString
+        hits.head.sourceAsString shouldBe workString
       }
     }
 
@@ -68,7 +68,7 @@ class WorkIndexerTest
   it(
     "should add only one record when multiple records with same id are ingested") {
     val workString =
-      identifiedWorkJson("5678", "1234", "A multiplicity of mice")
+      workJson("5678", "1234", "A multiplicity of mice")
 
     val future = Future.sequence(
       (1 to 2).map(_ =>
@@ -89,7 +89,7 @@ class WorkIndexerTest
   }
 
   it(
-    "should return a failed future if the input string is not an identified work") {
+    "should return a failed future if the input string is not a Work") {
     val future = workIndexer.indexWork("a document")
 
     whenReady(future.failed) { exception =>

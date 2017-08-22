@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.idminter.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifiedWork, Work}
+import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.steps.{
   IdentifierGenerator,

@@ -29,7 +29,7 @@ class WorksServiceTest
     new WorksService(10, searchService)
 
   it("should return the records in Elasticsearch") {
-    val works = createIdentifiedWorks(2)
+    val works = createWorks(2)
 
     insertIntoElasticSearch(works: _*)
 
@@ -37,19 +37,19 @@ class WorksServiceTest
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
-      displayWork.results.head shouldBe DisplayWork(works(0).canonicalId,
-                                                    works(0).work.title)
-      displayWork.results.tail.head shouldBe DisplayWork(works(1).canonicalId,
-                                                         works(1).work.title)
+      displayWork.results.head shouldBe DisplayWork(works(0).id,
+                                                    works(0).title)
+      displayWork.results.tail.head shouldBe DisplayWork(works(1).id,
+                                                         works(1).title)
     }
   }
 
   it("should get a DisplayWork by id") {
-    val works = createIdentifiedWorks(1)
+    val works = createWorks(1)
 
     insertIntoElasticSearch(works: _*)
 
-    val recordsFuture = worksService.findWorkById(works.head.canonicalId)
+    val recordsFuture = worksService.findWorkById(works.head.id)
 
     whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
@@ -58,11 +58,11 @@ class WorksServiceTest
   }
 
   it("should only find results that match a query if doing a full-text search") {
-    val workDodo = identifiedWorkWith(
+    val workDodo = workWith(
       canonicalId = "1234",
       title = "A drawing of a dodo"
     )
-    val workMouse = identifiedWorkWith(
+    val workMouse = workWith(
       canonicalId = "5678",
       title = "A mezzotint of a mouse"
     )
@@ -78,8 +78,8 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workDodo.canonicalId,
-                                              workDodo.work.title)
+      works.results.head shouldBe DisplayWork(workDodo.id,
+                                              workDodo.title)
     }
   }
 
@@ -101,7 +101,7 @@ class WorksServiceTest
 
   it(
     "should return the correct totalPages for the number of results and pageSize") {
-    val works = createIdentifiedWorks(2)
+    val works = createWorks(2)
 
     insertIntoElasticSearch(works: _*)
 
@@ -113,7 +113,7 @@ class WorksServiceTest
   }
 
   it("should return the correct number of results per page for the pageSize") {
-    val works = createIdentifiedWorks(3)
+    val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
 
@@ -125,7 +125,7 @@ class WorksServiceTest
   }
 
   it("should display the correct page when asked") {
-    val works = createIdentifiedWorks(3)
+    val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
 
@@ -139,7 +139,7 @@ class WorksServiceTest
 
   it(
     "should return an empty result set when asked for a page that does not exist") {
-    val works = createIdentifiedWorks(3)
+    val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
 
@@ -153,7 +153,7 @@ class WorksServiceTest
 
   it(
     "should not throw an exception if passed an invalid query string for full-text search") {
-    val workEmu = identifiedWorkWith(
+    val workEmu = workWith(
       canonicalId = "1234",
       title = "An etching of an emu"
     )
@@ -165,8 +165,8 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workEmu.canonicalId,
-                                              workEmu.work.title)
+      works.results.head shouldBe DisplayWork(workEmu.id,
+                                              workEmu.title)
     }
   }
 
@@ -176,7 +176,7 @@ class WorksServiceTest
     val title = "image title"
     val miroId = "abcdef"
     val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = identifiedWorkWith(canonicalId,
+    val work = workWith(canonicalId,
                                   title,
                                   identifiers = List(
                                     SourceIdentifier(identifierScheme = identifierScheme,
@@ -204,7 +204,7 @@ class WorksServiceTest
     val title = "image title"
     val miroId = "abcdef"
     val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = identifiedWorkWith(canonicalId,
+    val work = workWith(canonicalId,
                                   title,
                                   identifiers = List(
                                     SourceIdentifier(identifierScheme = identifierScheme,
@@ -228,7 +228,7 @@ class WorksServiceTest
     val title = "A search for a snail"
     val miroId = "abcdef"
     val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = identifiedWorkWith(canonicalId,
+    val work = workWith(canonicalId,
                                   title,
                                   identifiers = List(
                                     SourceIdentifier(identifierScheme = identifierScheme,

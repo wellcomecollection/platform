@@ -32,8 +32,7 @@ class WorkIndexer @Inject()(
           .flatMap(item => {
             info(s"Indexing item $item")
             elasticClient.execute {
-              // TODO: Throw sensible exception here if empty
-              indexInto(esIndex / esType).id(item.canonicalId.get).doc(item)
+              indexInto(esIndex / esType).id(item.id).doc(item)
             }
           })
           .recover {
