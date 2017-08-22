@@ -48,10 +48,14 @@ class TableProvisionerTest
                          dataType = "varchar(255)",
                          nullable = "NO",
                          key = "PRI"),
+        FieldDescription(field = "ontologyType",
+                         dataType = "varchar(255)",
+                         nullable = "YES",
+                         key = "MUL"),
         FieldDescription(field = "MiroID",
                          dataType = "varchar(255)",
                          nullable = "YES",
-                         key = "UNI")
+                         key = "")
       )
     }
   }
