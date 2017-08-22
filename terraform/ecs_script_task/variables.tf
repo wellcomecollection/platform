@@ -37,8 +37,10 @@ variable "env_vars" {
 
 variable "cpu" {
   description = "vCPU units to provision for the script"
+  default     = 1024
 }
 
 variable "memory" {
   description = "Memory units to provision for the script"
+  default     = 1024
 }
