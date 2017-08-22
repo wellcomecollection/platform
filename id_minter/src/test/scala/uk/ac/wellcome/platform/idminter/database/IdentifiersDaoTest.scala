@@ -108,6 +108,9 @@ class IdentifiersDaoTest
     }
   }
 
+  /** Helper method.  Given two records, try to insert them both, and check
+    * that integrity checks in the database reject the second record.
+    */
   private def assertInsertingDuplicateFails(identifier: Identifier,
                                             duplicateIdentifier: Identifier) = {
     insertIdentifier(identifier)
@@ -118,6 +121,7 @@ class IdentifiersDaoTest
     }
   }
 
+  /** Helper method.  Insert a record and check that it succeeds. */
   private def insertIdentifier(identifier: Identifier) =
     whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
       result shouldBe 1
