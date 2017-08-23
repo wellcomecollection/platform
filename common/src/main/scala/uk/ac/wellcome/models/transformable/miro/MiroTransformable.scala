@@ -89,15 +89,12 @@ case class MiroTransformable(MiroID: String,
    */
   def getCreators(miroData: MiroTransformableData): List[Agent] = {
     val primaryCreators = miroData.creator match {
-      case Some(c) =>
-        c.map {
-          Agent(_)
-        }
+      case Some(c) => c.map { Agent(_) }
       case None => List()
     }
 
     // <image_secondary_creator>: what MIRO calls Secondary Creator, which
-    // will also just have to map to our object property "hasCreator
+    // will also just have to map to our object property "hasCreator"
     val secondaryCreators = miroData.secondaryCreator match {
       case Some(c) => c.map { Agent(_) }
       case None => List()
@@ -119,17 +116,12 @@ case class MiroTransformable(MiroID: String,
   def getSubjects(miroData: MiroTransformableData): List[Concept] = {
     val keywords: List[Concept] = miroData.keywords match {
       case Some(k) =>
-        k.map {
-          Concept(_)
-        }
+        k.map { Concept(_) }
       case None => List()
     }
 
     val keywordsUnauth: List[Concept] = miroData.keywordsUnauth match {
-      case Some(k) =>
-        k.map {
-          Concept(_)
-        }
+      case Some(k) => k.map { Concept(_) }
       case None => List()
     }
 

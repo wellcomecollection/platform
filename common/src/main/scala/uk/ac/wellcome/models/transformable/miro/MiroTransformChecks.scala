@@ -38,11 +38,12 @@ trait MiroTransformChecks {
   private def checkImageExists(
     data: MiroTransformableData): List[FieldIssues] =
     if (data.techFileSize.getOrElse(List[String]()).isEmpty) {
-      List(FieldIssues(
-        "image_tech_file_size",
-        data.techFileSize,
-        Some(
-          "Missing image_tech_file_size means there is no underlying image")))
+      List(
+        FieldIssues(
+          "image_tech_file_size",
+          data.techFileSize,
+          Some(
+            "Missing image_tech_file_size means there is likely no underlying image")))
     } else Nil
 
   private def checkLicense(data: MiroTransformableData): List[FieldIssues] =
@@ -50,8 +51,8 @@ trait MiroTransformChecks {
       case None =>
         throw ShouldNotTransformException(
           List(
-            FieldIssues("image_tech_file_size",
-                        data.techFileSize,
+            FieldIssues("image_use_restrictions",
+                        data.useRestrictions,
                         Some("No value provided for image_use_restrictions?"))
           ))
 
