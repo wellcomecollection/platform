@@ -1,7 +1,8 @@
 package uk.ac.wellcome.transformer.utils
 
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable}
+import uk.ac.wellcome.models.CalmTransformable
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableSQSMessageUtils {

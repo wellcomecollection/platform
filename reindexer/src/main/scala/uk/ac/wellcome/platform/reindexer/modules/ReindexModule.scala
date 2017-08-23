@@ -8,7 +8,8 @@ import com.google.inject.Provides
 import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable}
+import uk.ac.wellcome.models.CalmTransformable
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.platform.reindexer.models._
 import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

@@ -5,12 +5,9 @@ import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{MiroTransformable, Reindex}
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  DynamoDBLocal,
-  ExtendedPatience
-}
+import uk.ac.wellcome.models.Reindex
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, DynamoDBLocal, ExtendedPatience}
 
 class ReindexerFeatureTest
     extends FunSpec
