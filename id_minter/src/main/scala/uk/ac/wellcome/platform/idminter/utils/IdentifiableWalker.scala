@@ -5,7 +5,10 @@ import scala.collection.JavaConversions._
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.databind.node.{
-  ArrayNode, JsonNodeFactory, ObjectNode, TextNode
+  ArrayNode,
+  JsonNodeFactory,
+  ObjectNode,
+  TextNode
 }
 
 import uk.ac.wellcome.models.SourceIdentifier
@@ -71,14 +74,16 @@ object IdentifiableWalker {
       // This code may throw an exception if these identifiers don't look
       // correct, which may screw with the TryBackoff mechanism.
       // TODO: Be less crappy with error handling here.
-      val sourceIdentifiers = node.get("identifiers")
+      val sourceIdentifiers = node
+        .get("identifiers")
         .elements
         .map { elem: JsonNode =>
           SourceIdentifier(
             identifierScheme = elem.get("identifierScheme").textValue,
             elem.get("value").textValue
           )
-        }.toList
+        }
+        .toList
 
       val ontologyType = node.get("ontologyType").textValue
 
