@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.node.{
   ArrayNode, JsonNodeFactory, ObjectNode, TextNode
 }
 
+import uk.ac.wellcome.utils.JsonUtil
+
 /* This object takes a JSON string (which is assumed to be a map) and walks
  * it, looking for objects that conform to the Identifiable trait.
  * Rather than using first-class Scala types, this does a completely generic
@@ -18,6 +20,11 @@ import com.fasterxml.jackson.databind.node.{
  *   - a string field called "ontologyType"
  *   - a list field called "identifiers" which has a non-empty list of
  *     objects which deserialise as instances of SourceIdentifier
+ *
+ * In a nutshell, this walks the entire JSON document, and whenever it's
+ * on a map/object node, it looks to see if the node is Identifiable.
+ * If so, it adds an identifier to the node.  Otherwise the document is
+ * passed through unmodified.
  */
 object IdentifiableWalker {
 
@@ -26,9 +33,9 @@ object IdentifiableWalker {
     mapper.readTree(jsonString)
   }
 
-  def identifyDocument(jsonString: String): JsonNode = {
+  def identifyDocument(jsonString: String): String = {
     val node = readTree(jsonString)
-    rebuildObjectNode(node)
+    JsonUtil.toJson(rebuildObjectNode(node)).get
   }
 
   private def processValue(value: JsonNode) = {
