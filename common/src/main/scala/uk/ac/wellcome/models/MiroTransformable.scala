@@ -24,7 +24,8 @@ case class MiroTransformableData(
   @JsonProperty("image_phys_format") physFormat: Option[String],
   @JsonProperty("image_lc_genre") lcGenre: Option[String],
   @JsonProperty("image_tech_file_size") techFileSize: Option[List[String]],
-  @JsonProperty("image_use_restrictions") useRestrictions: Option[String]
+  @JsonProperty("image_use_restrictions") useRestrictions: Option[String],
+  @JsonProperty("image_supp_lettering") suppLettering: Option[String]
 )
 
 case class ShouldNotTransformException(field: String,
@@ -230,6 +231,7 @@ case class MiroTransformable(MiroID: String,
         identifiers = identifiers,
         title = title,
         description = trimmedDescription,
+        lettering = miroData.suppLettering,
         createdDate = createdDate,
         creators = creators ++ secondaryCreators,
         subjects = subjects,
