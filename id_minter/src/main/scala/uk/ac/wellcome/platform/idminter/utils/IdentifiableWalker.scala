@@ -39,6 +39,11 @@ object IdentifiableWalker {
     for (field <- node.fields) {
       newNode.set(field.getKey, processValue(field.getValue))
     }
+
+    if (node.has("identifiers") && node.has("ontologyType")) {
+      println("It's an identifier!")
+    }
+
     newNode
   }
 
