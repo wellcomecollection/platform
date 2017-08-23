@@ -4,7 +4,9 @@ import java.util.Map.Entry
 import scala.collection.JavaConversions._
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
+import com.fasterxml.jackson.databind.node.{
+  ArrayNode, JsonNodeFactory, ObjectNode, TextNode
+}
 
 /* This object takes a JSON string (which is assumed to be a map) and walks
  * it, looking for objects that conform to the Identifiable trait.
@@ -24,6 +26,11 @@ object IdentifiableWalker {
     mapper.readTree(jsonString)
   }
 
+  def identifyDocument(jsonString: String): JsonNode = {
+    val node = readTree(jsonString)
+    rebuildObjectNode(node)
+  }
+
   private def processValue(value: JsonNode) = {
     if (value.isObject) {
       rebuildObjectNode(value)
@@ -41,7 +48,7 @@ object IdentifiableWalker {
     }
 
     if (node.has("identifiers") && node.has("ontologyType")) {
-      println("It's an identifier!")
+      newNode.set("canonicalId", new TextNode("PlaceholderIdentifier"))
     }
 
     newNode
