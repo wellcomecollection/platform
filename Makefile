@@ -1,17 +1,23 @@
 INFRA_BUCKET = platform-infra
 
 
-## Build the image used for jslint
-docker-build-jslint:
-	docker build ./docker/jslint_ci --tag jslint_ci
+# Build the Docker images used for CI tasks.
+#
+# The script sticks a record that the image has been built in .docker, so the
+# image isn't rebuilt unless you run 'make clean' first.  This makes CI tasks
+# slightly less chatty when run locally.
 
-## Build the image used for Python 3.6 work
-docker-build-python36:
-	docker build ./docker/python3.6_ci --tag python3.6_ci
+clean:
+	rm -rf .docker
 
-## Build the image for terraform
-docker-build-terraform:
-	docker build ./docker/terraform_ci --tag terraform_ci
+.docker/jslint_ci:
+	./scripts/build_ci_docker_image.py --project jslint_ci
+
+.docker/python3.6_ci:
+	./scripts/build_ci_docker_image.py --project python3.6_ci
+
+.docker/terraform_ci:
+	./scripts/build_ci_docker_image.py --project terraform_ci
 
 
 ## Build the image for gatling
@@ -198,31 +204,31 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
-install-lambda-deps: docker-build-python36
+install-lambda-deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
 
 ## Run a plan
-terraform-plan: docker-build-terraform install-lambda-deps
+terraform-plan: .docker/terraform_ci install-lambda-deps
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
 
 ## Run an apply
-terraform-apply: docker-build-terraform
-		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
+terraform-apply: .docker/terraform_ci
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
-lint-ontologies: docker-build-jslint
+lint-ontologies: .docker/jslint_ci
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
 ## Run flake8 linting over our Python code
-lint-python: docker-build-python36
+lint-python: .docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
 ## Run tests for our Lambda code
-test-lambdas: docker-build-python36
+test-lambdas: .docker/python3.6_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
 format-terraform:
@@ -239,7 +245,7 @@ check-format: format
 	git diff --exit-code
 
 
-.PHONY: help
+.PHONY: clean help
 
 ## Display this help text
 help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383502660
