@@ -19,9 +19,13 @@ clean:
 .docker/terraform_ci:
 	./scripts/build_ci_docker_image.py --project terraform_ci
 
+.docker/_build_deps:
+	pip3 install --upgrade boto3 docopt
+	mkdir -p .docker && touch .docker/_build_deps
+
 
 ## Build the image for gatling
-gatling-build: install-docker-build-deps
+gatling-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=gatling
 
 ## Deploy the image for gatling
@@ -30,7 +34,7 @@ gatling-deploy: gatling-build
 
 
 ## Build the image for the cache cleaner
-cache_cleaner-build: install-docker-build-deps
+cache_cleaner-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
@@ -39,7 +43,7 @@ cache_cleaner-deploy: cache_cleaner-build
 
 
 ## Build the image for tif-metadata
-tif-metadata-build: install-docker-build-deps
+tif-metadata-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=tif-metadata
 
 ## Deploy the image for tif-metadata
@@ -48,7 +52,7 @@ tif-metadata-deploy: tif-metadata-build
 
 
 ## Build the image for Loris
-loris-build: install-docker-build-deps
+loris-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=loris
 
 ## Deploy the image for Loris
@@ -56,33 +60,30 @@ loris-deploy: loris-build
 	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
 
 
-miro_adapter-build: install-docker-build-deps
+miro_adapter-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=miro_adapter --file=miro_adapter/Dockerfile
 
 miro_adapter-deploy: miro_adapter-build
 	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
 
 
-elasticdump-build: install-docker-build-deps
+elasticdump-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=elasticdump
 
 elasticdump-deploy: elasticdump-build
 	./scripts/deploy_docker_to_aws.py --project=elasticdump --infra-bucket=$(INFRA_BUCKET)
 
 
-install-docker-build-deps:
-	pip3 install --upgrade boto3 docopt
-
-nginx-build-api: install-docker-build-deps
+nginx-build-api: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=api
 
-nginx-build-loris: install-docker-build-deps
+nginx-build-loris: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=loris
 
-nginx-build-services: install-docker-build-deps
+nginx-build-services: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=services
 
-nginx-build-grafana: install-docker-build-deps
+nginx-build-grafana: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
@@ -146,22 +147,22 @@ sbt-test: \
 
 
 
-sbt-build-api: install-docker-build-deps sbt-test-api
+sbt-build-api: .docker/_build_deps sbt-test-api
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
+sbt-build-id_minter: .docker/_build_deps sbt-test-id_minter
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: install-docker-build-deps sbt-test-ingestor
+sbt-build-ingestor: .docker/_build_deps sbt-test-ingestor
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
+sbt-build-miro_adapter: .docker/_build_deps sbt-test-miro_adapter
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
+sbt-build-reindexer: .docker/_build_deps sbt-test-reindexer
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: install-docker-build-deps sbt-test-transformer
+sbt-build-transformer: .docker/_build_deps sbt-test-transformer
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
