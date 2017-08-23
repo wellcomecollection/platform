@@ -10,6 +10,7 @@ terraform.tfvars
 release_ids.tfvars
 terraform.tfstate.backup
 .releases
+.docker
 
 ### Gatling ###
 /gatling/results/*
