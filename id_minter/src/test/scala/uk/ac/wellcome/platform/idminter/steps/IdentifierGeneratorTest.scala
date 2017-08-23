@@ -64,7 +64,8 @@ class IdentifierGeneratorTest
         select.from(identifiersTable as i).where.eq(i.MiroID, "1234")
       }.map(Identifier(i)).single.apply()
       maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe Identifier(id, "1234")
+      maybeIdentifier.get shouldBe Identifier(id, "1234",
+        ontologyType = work.ontologyType)
     }
   }
 
@@ -90,7 +91,7 @@ class IdentifierGeneratorTest
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao, metricsSender)
 
-    when(identifiersDao.lookupMiroID(miroId))
+    when(identifiersDao.lookupMiroID(miroId, ontologyType = work.ontologyType))
       .thenReturn(Future.successful(None))
     val expectedException = new Exception("Noooo")
     when(identifiersDao.saveIdentifier(any[Identifier]()))
