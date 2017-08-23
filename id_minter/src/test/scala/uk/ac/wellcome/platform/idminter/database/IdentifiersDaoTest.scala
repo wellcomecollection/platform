@@ -156,7 +156,7 @@ class IdentifiersDaoTest
     }
 
   /** Helper method.  Do a Miro ID lookup and check that it fails. */
-  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String = "Work") = {
+  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String) = {
     val lookupFuture = identifiersDao.lookupMiroID(
       miroID = miroID,
       ontologyType = ontologyType
