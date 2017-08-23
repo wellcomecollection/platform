@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.{
   ArrayNode, JsonNodeFactory, ObjectNode, TextNode
 }
 
+import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.utils.JsonUtil
 
 /* This object takes a JSON string (which is assumed to be a map) and walks
@@ -28,7 +29,7 @@ import uk.ac.wellcome.utils.JsonUtil
  */
 object IdentifiableWalker {
 
-  def readTree(jsonString: String): JsonNode = {
+  private def readTree(jsonString: String): JsonNode = {
     val mapper = new ObjectMapper()
     mapper.readTree(jsonString)
   }
@@ -36,6 +37,17 @@ object IdentifiableWalker {
   def identifyDocument(jsonString: String): String = {
     val node = readTree(jsonString)
     JsonUtil.toJson(rebuildObjectNode(node)).get
+  }
+
+  // Dummy function for generating canonical IDs.  Eventually this should
+  // use the identifier proper, but for the purposes of testing the tree
+  // parsing code is just drops in a string that proves it extracted the
+  // identifiers correctly.
+  def generateCanonicalId(sourceIdentifiers: List[SourceIdentifier],
+                          ontologyType: String): String = {
+    val sourceIdentifiersStrings = sourceIdentifiers.map { _.toString }
+    List(ontologyType, sourceIdentifiersStrings.mkString(";"))
+      .mkString("==")
   }
 
   private def processValue(value: JsonNode) = {
@@ -55,7 +67,27 @@ object IdentifiableWalker {
     }
 
     if (node.has("identifiers") && node.has("ontologyType")) {
-      newNode.set("canonicalId", new TextNode("PlaceholderIdentifier"))
+
+      // This code may throw an exception if these identifiers don't look
+      // correct, which may screw with the TryBackoff mechanism.
+      // TODO: Be less crappy with error handling here.
+      val sourceIdentifiers = node.get("identifiers")
+        .elements
+        .map { elem: JsonNode =>
+          SourceIdentifier(
+            identifierScheme = elem.get("identifierScheme").textValue,
+            elem.get("value").textValue
+          )
+        }.toList
+
+      val ontologyType = node.get("ontologyType").textValue
+
+      val canonicalId = generateCanonicalId(
+        sourceIdentifiers = sourceIdentifiers,
+        ontologyType = ontologyType
+      )
+
+      newNode.set("canonicalId", new TextNode(canonicalId))
     }
 
     newNode
