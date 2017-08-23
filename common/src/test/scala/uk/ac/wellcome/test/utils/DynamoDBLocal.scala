@@ -3,15 +3,11 @@ package uk.ac.wellcome.test.utils
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.{
-  AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder,
-  AmazonDynamoDBStreams,
-  AmazonDynamoDBStreamsClientBuilder
-}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.{CalmTransformable, MiroTransformable, Reindex}
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.models.{CalmTransformable, Reindex}
 
 import scala.collection.JavaConversions._
 

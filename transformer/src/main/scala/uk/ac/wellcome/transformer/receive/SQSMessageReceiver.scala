@@ -3,7 +3,11 @@ package uk.ac.wellcome.transformer.receive
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{ShouldNotTransformException, Transformable, Work}
+import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.transformable.{
+  ShouldNotTransformException,
+  Transformable
+}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
