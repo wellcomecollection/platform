@@ -533,7 +533,7 @@ class MiroTransformableThumbnailTest
         "image_cleared": "Y",
         "image_copyright_cleared": "Y",
         "image_tech_file_size": ["1000000"],
-        "image_use_restrictions": "Poetic license, normally reserved for authors and not suitable in the real world",
+        "image_use_restrictions": "Poetic license, normally reserved for playwrights and not suitable in practice",
         "image_title": "Plagiarised poetry by a penguin"
       }"""
     )
