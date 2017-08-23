@@ -150,12 +150,21 @@ case class MiroTransformable(MiroID: String,
       case _ => None
     }
 
-  private def buildThumbnailURL(miroID: String): String =
-    "https://iiif.wellcomecollection.org/image/MIROID.jpg/full/300,/0/default.jpg"
-      .replace(
-        "MIROID",
-        miroID
-      )
+  private def buildImageApiURL(miroID: String, templateName: String): String = {
+    val iiifImageApiBaseUri = "https://iiif.wellcomecollection.org"
+
+    val imageUriTemplates = Map(
+      "thumbnail" -> "%s/image/%s.jpg/full/300,/0/default.jpg",
+      "info" -> "%s/image/%s.jpg/info.json"
+    )
+
+    val imageUriTemplate = imageUriTemplates.getOrElse(
+      templateName,
+      throw new Exception(
+        s"Unrecognised Image API URI template ($templateName)!"))
+
+    imageUriTemplate.format(iiifImageApiBaseUri, miroID)
+  }
 
   /** If the image has a non-empty image_use_restrictions field, choose which
     *  license (if any) we're going to assign to the thumbnail for this work.
@@ -187,9 +196,25 @@ case class MiroTransformable(MiroID: String,
   def getThumbnail(miroData: MiroTransformableData): Location = {
     Location(
       locationType = "thumbnail-image",
-      url = Some(buildThumbnailURL(MiroID)),
+      url = Some(buildImageApiURL(MiroID, "thumbnail")),
       license = chooseLicense(miroData.useRestrictions.get)
     )
+  }
+
+  def getItems(miroData: MiroTransformableData): List[Item] = {
+    List(
+      Item(
+        identifiers = List(
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
+        ),
+        locations = List(
+          Location(
+            locationType = "iiif-image",
+            url = Some(buildImageApiURL(MiroID, "info")),
+            license = chooseLicense(miroData.useRestrictions.get)
+          )
+        )
+      ))
   }
 
   override def transform: Try[Work] = Try {
