@@ -5,12 +5,19 @@ import com.twitter.inject.annotations.Flag
 import scalikejdbc._
 
 /** Represents a set of identifiers as stored in MySQL */
-case class Identifier(CanonicalID: String, MiroID: String)
+case class Identifier(
+  CanonicalID: String,
+  MiroID: String,
+  ontologyType: String = "Work"
+)
 
 object Identifier {
   def apply(p: SyntaxProvider[Identifier])(rs: WrappedResultSet): Identifier =
-    Identifier(rs.string(p.resultName.CanonicalID),
-               rs.string(p.resultName.MiroID))
+    Identifier(
+      CanonicalID = rs.string(p.resultName.CanonicalID),
+      MiroID = rs.string(p.resultName.MiroID),
+      ontologyType = rs.string(p.resultName.ontologyType)
+    )
 }
 
 class IdentifiersTable @Inject()(
@@ -20,7 +27,7 @@ class IdentifiersTable @Inject()(
   override val schemaName = Some(database)
   override val tableName = table
   override val useSnakeCaseColumnName = false
-  override val columns = Seq("MiroID", "CanonicalID")
+  override val columns = Seq("CanonicalID", "ontologyType", "MiroID")
 
   val i = this.syntax("i")
 }

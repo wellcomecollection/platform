@@ -16,13 +16,19 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
 
   implicit val session = AutoSession(db.settingsProvider)
 
-  def lookupMiroID(miroID: String): Future[Option[Identifier]] =
+  def lookupMiroID(miroID: String,
+                   ontologyType: String = "Work"): Future[Option[Identifier]] =
     Future {
       blocking {
         info(s"About to search for MiroID $miroID in Identifiers")
         val i = identifiers.i
         withSQL {
-          select.from(identifiers as i).where.eq(i.MiroID, miroID)
+          select
+            .from(identifiers as i)
+            .where
+            .eq(i.ontologyType, ontologyType)
+            .and
+            .eq(i.MiroID, miroID)
         }.map(Identifier(i)).single.apply()
       }
     } recover {
@@ -40,7 +46,9 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
             .into(identifiers)
             .namedValues(
               identifiers.column.CanonicalID -> identifier.CanonicalID,
-              identifiers.column.MiroID -> identifier.MiroID)
+              identifiers.column.ontologyType -> identifier.ontologyType,
+              identifiers.column.MiroID -> identifier.MiroID
+            )
         }.update().apply()
       }
     }
