@@ -27,8 +27,15 @@ case class MiroTransformableData(
   @JsonProperty("image_use_restrictions") useRestrictions: Option[String]
 )
 
-case class ShouldNotTransformException(message: String)
-    extends Exception(message)
+case class ShouldNotTransformException(field: String,
+                                       value: Any,
+                                       message: String = "")
+    extends Exception(
+      if (message.isEmpty)
+        s"$field='${value.toString}' ($message)"
+      else
+        s"$field='${value.toString}'"
+    )
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
@@ -62,11 +69,16 @@ case class MiroTransformable(MiroID: String,
       // this image in the public API.
       // See https://github.com/wellcometrust/platform-api/issues/356
       if (miroData.cleared.getOrElse("N") != "Y") {
-        throw new ShouldNotTransformException("image_cleared field is not Y")
+        throw new ShouldNotTransformException(
+          field = "image_cleared",
+          value = miroData.cleared
+        )
       }
       if (miroData.copyrightCleared.getOrElse("N") != "Y") {
         throw new ShouldNotTransformException(
-          "image_copyright_cleared field is not Y")
+          field = "image_copyright_cleared",
+          value = miroData.copyrightCleared
+        )
       }
 
       // There are a bunch of <image_tech_*> fields that refer to the
@@ -79,7 +91,10 @@ case class MiroTransformable(MiroID: String,
       // the API.  They aren't useful for testing image search.
       if (miroData.techFileSize.getOrElse(List[String]()).isEmpty) {
         throw new ShouldNotTransformException(
-          "No image_tech_file_size means there is no underlying image"
+          field = "image_tech_file_size",
+          value = miroData.techFileSize,
+          message =
+            "Missing image_tech_file_size means there is no underlying image"
         )
       }
 
@@ -200,7 +215,9 @@ case class MiroTransformable(MiroID: String,
         case Some(s) => s
         case None =>
           throw new ShouldNotTransformException(
-            "No value provided for image_use_restrictions?"
+            field = "image_use_restrictions",
+            value = miroData.useRestrictions,
+            message = "No value provided for image_use_restrictions?"
           )
       }
       val thumbnail = Location(
@@ -262,7 +279,9 @@ case class MiroTransformable(MiroID: String,
       // Any images with this label are explicitly withheld from the API.
       case "See Related Images Tab for Higher Res Available" => {
         throw new ShouldNotTransformException(
-          s"image_use_restrictions='${useRestrictions}' mean we should exclude this from the API"
+          field = "image_use_restrictions",
+          value = useRestrictions,
+          message = "Images with this license are explicitly excluded"
         )
       }
 
@@ -271,13 +290,18 @@ case class MiroTransformable(MiroID: String,
       case ("Do not use" | "Not for external use" |
           "See Copyright Information" | "Suppressed from WI site") => {
         throw new ShouldNotTransformException(
-          s"image_use_restrictions='$useRestrictions' needs more investigation before we can assign a license"
+          field = "image_use_restrictions",
+          value = useRestrictions,
+          message =
+            "Images with this license need more investigation before showing in the API"
         )
       }
 
       case _ =>
         throw new ShouldNotTransformException(
-          s"image_use_restrictions='${useRestrictions}' is unrecognised"
+          field = "image_use_restrictions",
+          value = useRestrictions,
+          message = "This license type is unrecognised"
         )
     }
 }
