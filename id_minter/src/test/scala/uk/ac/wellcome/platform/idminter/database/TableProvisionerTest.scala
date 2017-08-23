@@ -50,7 +50,7 @@ class TableProvisionerTest
                          key = "PRI"),
         FieldDescription(field = "ontologyType",
                          dataType = "varchar(255)",
-                         nullable = "YES",
+                         nullable = "NO",
                          key = "MUL"),
         FieldDescription(field = "MiroID",
                          dataType = "varchar(255)",

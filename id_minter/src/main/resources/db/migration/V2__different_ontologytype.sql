@@ -10,10 +10,10 @@
 USE ${database};
 
 ALTER TABLE ${tableName}
-ADD COLUMN ontologyType varchar(255) DEFAULT 'Work' AFTER CanonicalID;
+ADD COLUMN ontologyType varchar(255) NOT NULL DEFAULT 'Work' AFTER CanonicalID;
 
 ALTER TABLE ${tableName}
-ALTER COLUMN ontologyType SET DEFAULT null;
+ALTER COLUMN ontologyType DROP DEFAULT;
 
 --   * Drop the uniqueness constraint on (MiroID), and add a new uniqueness
 --     constraint for (ontologyType, MiroID).  This allows us to put the same

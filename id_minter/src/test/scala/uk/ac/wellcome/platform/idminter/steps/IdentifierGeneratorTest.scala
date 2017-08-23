@@ -36,7 +36,8 @@ class IdentifierGeneratorTest
       insert
         .into(identifiersTable)
         .namedValues(identifiersTable.column.CanonicalID -> "5678",
-                     identifiersTable.column.MiroID -> "1234")
+                     identifiersTable.column.MiroID -> "1234",
+                     identifiersTable.column.ontologyType -> "Work")
     }.update().apply()
 
     val work =
