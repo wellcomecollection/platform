@@ -1,8 +1,8 @@
 package uk.ac.wellcome.transformer.parsers
 
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.Transformable
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.Transformable
 
 import scala.util.Try
 

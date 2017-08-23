@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.parsers
 
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.MiroTransformable
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try

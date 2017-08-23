@@ -10,7 +10,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{ShouldNotTransformException, SourceIdentifier, Work}
+import uk.ac.wellcome.models.transformable.miro.ShouldNotTransformException
+import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.{CalmParser, MiroParser}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils

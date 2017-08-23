@@ -1,4 +1,6 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.transformable
+
+import uk.ac.wellcome.models.Work
 
 import scala.util.Try
 

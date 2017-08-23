@@ -1,9 +1,10 @@
 package uk.ac.wellcome.test.utils
 
 import org.scalatest.{Matchers, Suite}
-import scala.util.Try
 
-import uk.ac.wellcome.models.{MiroTransformable, Work}
+import scala.util.Try
+import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 
 /** MiroTransformable looks for several fields in the source JSON -- if they're
  *  missing or have the wrong values, it rejects the record.

@@ -10,7 +10,7 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.update.UpdateExpression
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Reindexable
+import uk.ac.wellcome.models.transformable.Reindexable
 import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexStatus}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
