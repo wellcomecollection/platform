@@ -1,21 +1,31 @@
 INFRA_BUCKET = platform-infra
 
 
-## Build the image used for jslint
-docker-build-jslint:
-	docker build ./docker/jslint_ci --tag jslint_ci
+# Build the Docker images used for CI tasks.
+#
+# The script sticks a record that the image has been built in .docker, so the
+# image isn't rebuilt unless you run 'make clean' first.  This makes CI tasks
+# slightly less chatty when run locally.
 
-## Build the image used for Python 3.6 work
-docker-build-python36:
-	docker build ./docker/python3.6_ci --tag python3.6_ci
+clean:
+	rm -rf .docker
 
-## Build the image for terraform
-docker-build-terraform:
-	docker build ./docker/terraform_ci --tag terraform_ci
+.docker/jslint_ci:
+	./scripts/build_ci_docker_image.py --project jslint_ci
+
+.docker/python3.6_ci:
+	./scripts/build_ci_docker_image.py --project python3.6_ci
+
+.docker/terraform_ci:
+	./scripts/build_ci_docker_image.py --project terraform_ci
+
+.docker/_build_deps:
+	pip3 install --upgrade boto3 docopt
+	mkdir -p .docker && touch .docker/_build_deps
 
 
 ## Build the image for gatling
-gatling-build: install-docker-build-deps
+gatling-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=gatling
 
 ## Deploy the image for gatling
@@ -24,7 +34,7 @@ gatling-deploy: gatling-build
 
 
 ## Build the image for the cache cleaner
-cache_cleaner-build: install-docker-build-deps
+cache_cleaner-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
@@ -33,7 +43,7 @@ cache_cleaner-deploy: cache_cleaner-build
 
 
 ## Build the image for tif-metadata
-tif-metadata-build: install-docker-build-deps
+tif-metadata-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=tif-metadata
 
 ## Deploy the image for tif-metadata
@@ -42,7 +52,7 @@ tif-metadata-deploy: tif-metadata-build
 
 
 ## Build the image for Loris
-loris-build: install-docker-build-deps
+loris-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=loris
 
 ## Deploy the image for Loris
@@ -50,33 +60,30 @@ loris-deploy: loris-build
 	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
 
 
-miro_adapter-build: install-docker-build-deps
+miro_adapter-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=miro_adapter --file=miro_adapter/Dockerfile
 
 miro_adapter-deploy: miro_adapter-build
 	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
 
 
-elasticdump-build: install-docker-build-deps
+elasticdump-build: .docker/_build_deps
 	./scripts/build_docker_image.py --project=elasticdump
 
 elasticdump-deploy: elasticdump-build
 	./scripts/deploy_docker_to_aws.py --project=elasticdump --infra-bucket=$(INFRA_BUCKET)
 
 
-install-docker-build-deps:
-	pip3 install --upgrade boto3 docopt
-
-nginx-build-api: install-docker-build-deps
+nginx-build-api: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=api
 
-nginx-build-loris: install-docker-build-deps
+nginx-build-loris: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=loris
 
-nginx-build-services: install-docker-build-deps
+nginx-build-services: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=services
 
-nginx-build-grafana: install-docker-build-deps
+nginx-build-grafana: .docker/_build_deps
 	./scripts/build_docker_image.py --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
@@ -140,22 +147,22 @@ sbt-test: \
 
 
 
-sbt-build-api: install-docker-build-deps sbt-test-api
+sbt-build-api: .docker/_build_deps sbt-test-api
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
+sbt-build-id_minter: .docker/_build_deps sbt-test-id_minter
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: install-docker-build-deps sbt-test-ingestor
+sbt-build-ingestor: .docker/_build_deps sbt-test-ingestor
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
+sbt-build-miro_adapter: .docker/_build_deps sbt-test-miro_adapter
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
+sbt-build-reindexer: .docker/_build_deps sbt-test-reindexer
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: install-docker-build-deps sbt-test-transformer
+sbt-build-transformer: .docker/_build_deps sbt-test-transformer
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
@@ -198,35 +205,35 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
-install-lambda-deps: docker-build-python36
+.docker/lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
 
 ## Run a plan
-terraform-plan: docker-build-terraform install-lambda-deps
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
+terraform-plan: .docker/terraform_ci .docker/lambda_deps
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply
-terraform-apply: docker-build-terraform
-		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
+terraform-apply: .docker/terraform_ci
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
-lint-ontologies: docker-build-jslint
+lint-ontologies: .docker/jslint_ci
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
 ## Run flake8 linting over our Python code
-lint-python: docker-build-python36
+lint-python: .docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
 ## Run tests for our Lambda code
-test-lambdas: docker-build-python36
+test-lambdas: .docker/python3.6_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
-format-terraform:
-	terraform fmt
+format-terraform: .docker/terraform_ci
+	docker run -v $$(pwd):/data -e OP=fmt terraform_ci
 
 format-scala:
 	sbt scalafmt
@@ -239,7 +246,7 @@ check-format: format
 	git diff --exit-code
 
 
-.PHONY: help
+.PHONY: clean help
 
 ## Display this help text
 help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383502660
