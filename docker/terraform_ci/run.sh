@@ -31,6 +31,9 @@ then
     echo "terraform.plan not found. Have you run a plan?"
     exit 1
   fi
+elif [[ "$OP" == "fmt" ]]
+then
+  terraform fmt
 else
   echo "Unrecognised operation: $OP! Stopping."
   exit 1
