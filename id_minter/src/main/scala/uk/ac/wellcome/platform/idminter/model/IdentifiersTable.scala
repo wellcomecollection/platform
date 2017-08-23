@@ -20,7 +20,7 @@ class IdentifiersTable @Inject()(
   override val schemaName = Some(database)
   override val tableName = table
   override val useSnakeCaseColumnName = false
-  override val columns = Seq("MiroID", "CanonicalID")
+  override val columns = Seq("CanonicalID", "ontologyType", "MiroID")
 
   val i = this.syntax("i")
 }
