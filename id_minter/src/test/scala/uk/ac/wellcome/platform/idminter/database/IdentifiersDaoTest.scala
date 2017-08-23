@@ -20,8 +20,7 @@ class IdentifiersDaoTest
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
       val identifier = Identifier(
         CanonicalID = "A sand snail",
-        MiroID = "A soft shell",
-        ontologyType = "Work"
+        MiroID = "A soft shell"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
@@ -32,9 +31,23 @@ class IdentifiersDaoTest
     }
 
     it("should return a future of None if looking up a non-existent Miro ID") {
-      whenReady(identifiersDao.lookupMiroID("A missing mouse")) { maybeIdentifier =>
-        maybeIdentifier shouldNot be(defined)
-      }
+      assertLookupMiroIDFindsNothing(
+        miroID = "A missing mouse"
+      )
+    }
+
+    it("should return a future of None if looking up a Miro ID with the wrong ontologyType") {
+      val identifier = Identifier(
+        CanonicalID = "A sprinkling of sage",
+        MiroID = "Seasoning with saffron",
+        ontologyType = "Herbs"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      assertLookupMiroIDFindsNothing(
+        miroID = identifier.MiroID,
+        ontologyType = "Vegetables"
+      )
     }
   }
 
@@ -66,27 +79,57 @@ class IdentifiersDaoTest
       val identifier = new Identifier(
         CanonicalID = "A failed field of flowers",
         MiroID = "A farm full of fruit",
-        ontologyType = "Work"
+        ontologyType = "Fruits"
       )
       val duplicateIdentifier = new Identifier(
         CanonicalID = identifier.CanonicalID,
         MiroID = "Fuel for a factory",
-        ontologyType = "Work"
+        ontologyType = "Fuels"
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
     }
 
-    it("should fail to insert a record with a duplicate MiroID") {
+    it("should allow saving two records with the same MiroID but different ontologyType") {
       val identifier = new Identifier(
-        CanonicalID = "A picking of parsley",
-        MiroID = "A packet of peppermints",
-        ontologyType = "Work"
+        CanonicalID = "A mountain of muesli",
+        MiroID = "A maize made of maze",
+        ontologyType = "Cereals"
+      )
+      val secondIdentifier = new Identifier(
+        CanonicalID = "A mere mango",
+        MiroID = identifier.MiroID,
+        ontologyType = "Fruits"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+      assertInsertingIdentifierSucceeds(secondIdentifier)
+    }
+
+    it("should allow saving two records with different MiroID but the same ontologyType") {
+      val identifier = new Identifier(
+        CanonicalID = "Overflowing with okra",
+        MiroID = "Olive oil in an orchard",
+        ontologyType = "Crops"
+      )
+      val secondIdentifier = new Identifier(
+        CanonicalID = "An order of onions",
+        MiroID = "Only orange orbs",
+        ontologyType = identifier.ontologyType
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+      assertInsertingIdentifierSucceeds(secondIdentifier)
+    }
+
+    it("should reject inserting two records with the same MiroID and ontologyType") {
+      val identifier = new Identifier(
+        CanonicalID = "A surplus of strawberries",
+        MiroID = "Sunflower seeds in a sack",
+        ontologyType = "Cropssss"
       )
       val duplicateIdentifier = new Identifier(
-        CanonicalID = "A portion of potatoes",
+        CanonicalID = "Sweeteners and sugar cane",
         MiroID = identifier.MiroID,
-        ontologyType = "Work"
+        ontologyType = identifier.ontologyType
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
@@ -111,4 +154,15 @@ class IdentifiersDaoTest
     whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
       result shouldBe 1
     }
+
+  /** Helper method.  Do a Miro ID lookup and check that it fails. */
+  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String = "Work") = {
+    val lookupFuture = identifiersDao.lookupMiroID(
+      miroID = miroID,
+      ontologyType = ontologyType
+    )
+    whenReady(lookupFuture) { maybeIdentifier =>
+      maybeIdentifier shouldNot be(defined)
+    }
+  }
 }
