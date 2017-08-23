@@ -23,7 +23,7 @@ class IdentifiersDaoTest
         MiroID = "A soft shell",
         ontologyType = "Work"
       )
-      insertIdentifier(identifier)
+      assertInsertingIdentifierSucceeds(identifier)
 
       whenReady(identifiersDao.lookupMiroID(identifier.MiroID)) { maybeIdentifier =>
         maybeIdentifier shouldBe defined
@@ -98,7 +98,7 @@ class IdentifiersDaoTest
     */
   private def assertInsertingDuplicateFails(identifier: Identifier,
                                             duplicateIdentifier: Identifier) = {
-    insertIdentifier(identifier)
+    assertInsertingIdentifierSucceeds(identifier)
 
     val duplicateFuture = identifiersDao.saveIdentifier(duplicateIdentifier)
     whenReady(duplicateFuture.failed) { exception =>
@@ -107,7 +107,7 @@ class IdentifiersDaoTest
   }
 
   /** Helper method.  Insert a record and check that it succeeds. */
-  private def insertIdentifier(identifier: Identifier) =
+  private def assertInsertingIdentifierSucceeds(identifier: Identifier) =
     whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
       result shouldBe 1
     }
