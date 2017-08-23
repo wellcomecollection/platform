@@ -1,18 +1,21 @@
 package uk.ac.wellcome.test.utils
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.http.index.IndexResponse
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.mappings.WorksIndex
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+
+import scala.concurrent.Future
 
 trait IndexedElasticSearchLocal
     extends ElasticSearchLocal
     with BeforeAndAfterEach { this: Suite =>
 
-  val indexName = "records"
-  val itemType = "item"
+  val indexName = "works"
+  val itemType = "work"
 
   private def createIndex(index: String) = {
     ensureIndexDeleted(index)
@@ -26,16 +29,23 @@ trait IndexedElasticSearchLocal
   }
 
   def insertIntoElasticSearchWithIndex(index: String,
-                                       identifiedWorks: IdentifiedWork*) = {
+                                       works: Work*) = {
     if (index != indexName) {
       createIndex(index)
     }
-    identifiedWorks.foreach { identifiedWork =>
-      elasticClient.execute(
+
+    works.foreach { work =>
+      val jsonDoc = JsonUtil.toJson(work).get
+
+      val result: Future[IndexResponse] = elasticClient.execute(
         indexInto(index / itemType)
-          .id(identifiedWork.canonicalId)
-          .doc(JsonUtil.toJson(identifiedWork).get)
+          .id(work.id)
+          .doc(jsonDoc)
       )
+
+      result.map { indexResponse =>
+        print(indexResponse)
+      }
     }
     eventually {
       elasticClient
@@ -43,10 +53,10 @@ trait IndexedElasticSearchLocal
           search(index).matchAllQuery()
         }
         .await
-        .hits should have size identifiedWorks.size
+        .hits should have size works.size
     }
   }
 
-  def insertIntoElasticSearch(identifiedWorks: IdentifiedWork*): Unit =
-    insertIntoElasticSearchWithIndex(indexName, identifiedWorks: _*)
+  def insertIntoElasticSearch(works: Work*): Unit =
+    insertIntoElasticSearchWithIndex(indexName, works: _*)
 }

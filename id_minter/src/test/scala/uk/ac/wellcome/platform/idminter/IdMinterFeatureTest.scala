@@ -34,6 +34,7 @@ class IdMinterFeatureTest
     val work = Work(identifiers =
                       List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)),
                     title = title)
+
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,
                                 "topic",
@@ -52,12 +53,12 @@ class IdMinterFeatureTest
       messages should have size (1)
 
       val parsedIdentifiedWork = JsonUtil
-        .fromJson[IdentifiedWork](messages.head.message)
+        .fromJson[Work](messages.head.message)
         .get
 
-      parsedIdentifiedWork.canonicalId shouldBe maybeIdentifier.get.CanonicalID
-      parsedIdentifiedWork.work.identifiers.head.value shouldBe miroID
-      parsedIdentifiedWork.work.title shouldBe title
+      parsedIdentifiedWork.id shouldBe maybeIdentifier.get.CanonicalID
+      parsedIdentifiedWork.identifiers.head.value shouldBe miroID
+      parsedIdentifiedWork.title shouldBe title
 
       messages.head.subject should be("identified-item")
     }

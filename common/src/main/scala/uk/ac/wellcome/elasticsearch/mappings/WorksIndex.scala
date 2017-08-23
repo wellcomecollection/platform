@@ -57,22 +57,20 @@ class WorksIndex @Inject()(client: HttpClient,
     .dynamic(DynamicMapping.Strict)
     .as(
       keywordField("canonicalId"),
-      objectField("work").fields(
-        keywordField("type"),
-        identifiers,
-        textField("title").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        textField("description").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        textField("lettering").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        date("createdDate"),
-        labelledTextField("creators"),
-        labelledTextField("subjects"),
-        labelledTextField("genres"),
-        items,
-        location("thumbnail")
-      )
+      keywordField("type"),
+      identifiers,
+      textField("title").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      textField("description").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      textField("lettering").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      date("createdDate"),
+      labelledTextField("creators"),
+      labelledTextField("subjects"),
+      labelledTextField("genres"),
+      items,
+      location("thumbnail")
     )
 
   def create: Future[Unit] =

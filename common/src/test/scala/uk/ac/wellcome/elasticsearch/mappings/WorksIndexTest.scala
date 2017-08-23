@@ -1,19 +1,15 @@
 package uk.ac.wellcome.elasticsearch.mappings
 
-import java.util
-
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
-import uk.ac.wellcome.models.{IdentifiedWork, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
-
-import scala.collection.JavaConversions._
 
 class WorksIndexTest
     extends FunSpec
@@ -37,13 +33,13 @@ class WorksIndexTest
 
     val workJson = JsonUtil
       .toJson(
-        IdentifiedWork(
-          canonicalId = "1234",
-          work = Work(identifiers = List(
+        Work(
+          canonicalId = Some("1234"),
+          identifiers = List(
                         SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber,
                                          value = "4321")),
                       title = "A magical menagerie for magpies")
-        ))
+        )
       .get
 
     elasticClient.execute(indexInto(indexName / itemType).doc(workJson))

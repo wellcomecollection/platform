@@ -10,6 +10,9 @@ import uk.ac.wellcome.models.Item
 )
 case class DisplayItem(
   @ApiModelProperty(
+    readOnly = true,
+    value = "The canonical identifier given to a thing.") id: String,
+  @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
@@ -26,6 +29,7 @@ case class DisplayItem(
 object DisplayItem {
   def apply(item: Item, includesIdentifiers: Boolean): DisplayItem =
     DisplayItem(
+      id = item.id,
       identifiers =
         if (includesIdentifiers)
           Some(item.identifiers.map(DisplayIdentifier(_)))

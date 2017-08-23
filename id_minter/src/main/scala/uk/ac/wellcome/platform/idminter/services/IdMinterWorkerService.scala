@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.idminter.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifiedWork, Work}
+import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.steps.{
   IdentifierGenerator,
@@ -26,16 +26,15 @@ class IdMinterWorkerService @Inject()(
 
   val snsSubject = "identified-item"
 
-  private def toIdentifiedWorkJson(work: Work, canonicalId: String) = {
-    JsonUtil.toJson(IdentifiedWork(canonicalId, work)).get
+  private def toWorkJson(work: Work, canonicalId: String) = {
+    JsonUtil.toJson(work.copy(canonicalId = Some(canonicalId))).get
   }
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       work <- WorkExtractor.toWork(message)
       canonicalId <- idGenerator.generateId(work)
-      _ <- writer.writeMessage(toIdentifiedWorkJson(work, canonicalId),
-                               Some(snsSubject))
+      _ <- writer.writeMessage(toWorkJson(work, canonicalId), Some(snsSubject))
     } yield ()
 
 }
