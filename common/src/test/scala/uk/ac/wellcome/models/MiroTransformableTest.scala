@@ -321,6 +321,7 @@ class MiroTransformableTest
         "image_supp_lettering": "$lettering"
       """
     )
+    work.lettering shouldBe Some(lettering)
   }
 
   it(
