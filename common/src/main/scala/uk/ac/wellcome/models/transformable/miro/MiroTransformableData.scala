@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.transformable.{
 }
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 case class MiroTransformableData(
   @JsonProperty("image_title") title: Option[String],
@@ -41,13 +41,14 @@ case object MiroTransformableData extends MiroTransformChecks {
     StringEscapeUtils.unescapeHtml(data)
 
   /* Create MiroTransformableData from string */
-  private def createMiroTransformableData(data: String): MiroTry =
+  private def createMiroTransformableData(
+    data: String): Try[MiroTransformableData] =
     JsonUtil.fromJson[MiroTransformableData](data)
 
   def create(data: String): MiroTransformableData = {
     val unescapedData = unescapeHtml(data)
 
-    val tryMiroTransformableData: MiroTransformableData.MiroTry =
+    val tryMiroTransformableData =
       createMiroTransformableData(unescapedData)
 
     val miroTransformableData: MiroTransformableData =
@@ -56,16 +57,14 @@ case object MiroTransformableData extends MiroTransformChecks {
         case Failure(e) => throw e
       }
 
-    val failures: Seq[ShouldNotTransformException] =
-      checks.map(_(miroTransformableData)).collect {
-        case Failure(e: ShouldNotTransformException) => e
-      }
+    val failures: List[FieldIssues] =
+      checks
+        .map(_(miroTransformableData))
+        .filter(_.nonEmpty)
+        .flatten
 
-    val collectedFailures = failures.foldLeft(List[FieldIssues]())((memo, e) =>
-      e.fieldIssues ++ memo)
-
-    if (collectedFailures.nonEmpty) {
-      throw ShouldNotTransformException(collectedFailures)
+    if (failures.nonEmpty) {
+      throw ShouldNotTransformException(failures)
     }
 
     miroTransformableData
