@@ -12,27 +12,27 @@
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
+  default     = "remus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "0.0.1-9aed48161de1570d067b4d19636fcd0edeb0e02d_prod"
+  default     = ""
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "a02ff2ec1977446ef4fcb993c68f882a56fa0a01"
+  default     = ""
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "0.0.1-5983f6896e0e59834097b31e0d4fdc20d4028ef7_prod"
 }
 
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "1f7909618537f41d076c54163fc48789c6b11138"
 }
 
 variable "api_task_count_stage" {
