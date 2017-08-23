@@ -233,4 +233,14 @@ class WorkTest extends FunSpec with Matchers {
   it("should throw an UnidentifiableException when trying to get the id of an unidentified Work") {
     an [UnidentifiableException] should be thrownBy unidentifiedWork.id
   }
+
+  it("should have an ontology type 'Work' when serialised to JSON") {
+    val work = Work(
+      identifiers = List(),
+      title = "A book about a blue whale"
+    )
+    val jsonString = JsonUtil.toJson(work).get
+
+    jsonString.contains("""type":"Work"""") should be(true)
+  }
 }
