@@ -313,6 +313,16 @@ class MiroTransformableTest
     work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
+  it("should pass through the lettering field if available") {
+    val lettering = "A lifelong lament for lemurs"
+    val work = transformWork(
+      data = s"""
+        "image_title": "Lemurs and lemons",
+        "image_supp_lettering": "$lettering"
+      """
+    )
+  }
+
   it(
     "should correct HTML-encoded entities in the input JSON") {
     val work = transformWork(
