@@ -8,5 +8,14 @@
     "vcpus": ${vcpus},
     "jobRoleArn": "${job_role_arn}",
     "environment": ${environment_vars},
-    "readonlyRootFilesystem": false
+    "readonlyRootFilesystem": false,
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/tmp"
+            },
+            "name": "ephemera"
+        }
+    ]
+  }
 }

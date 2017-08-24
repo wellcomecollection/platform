@@ -1,11 +1,11 @@
 module "aws_batch_compute" {
   source = "./batch_compute"
-
+  name = "default"
   subnets            = "${join(",", formatlist("\"%s\"", module.vpc_batch.subnets))}"
   key_name           = "${var.key_name}"
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
   vpc_id             = "${module.vpc_batch.vpc_id}"
-  image_id = "ami-84c937fd"
+  image_id = "ami-0657a97f"
 }
 
 module "aws_batch_queue" {

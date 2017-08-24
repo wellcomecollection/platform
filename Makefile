@@ -210,18 +210,11 @@ sbt-deploy: \
 
 ## Run a plan
 terraform-plan: .docker/terraform_ci .docker/lambda_deps
-	docker run -v $$(pwd):/data -e TERRAFORM_ROOT=terraform -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply
 terraform-apply: .docker/terraform_ci
-	docker run -v $$(pwd):/data -e TERRAFORM_ROOT=terraform -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
-
-terraform-batch-plan: .docker/terraform_ci .docker/lambda_deps
-	docker run -v $$(pwd):/data -e TERRAFORM_ROOT=terraform-batch -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
-
-terraform-batch-apply: .docker/terraform_ci
-		docker run -v $$(pwd):/data -e TERRAFORM_ROOT=terraform-batch -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
-
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 # Tasks for running linting #
 
