@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "eu-west-1",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "*amazon-ecs-optimized",
+        "root-device-type": "ebs"
+      },
+      "owners": ["591542846629"],
+      "most_recent": true
+    },
+    "user_data_file": "batch_userdata.txt",
+    "instance_type": "t2.micro",
+    "ssh_username": "ec2-user",
+    "ami_name": "batch-ami-no-awslogs",
+    "ami_block_device_mappings": [
+      {
+        "delete_on_termination": true,
+        "device_name": "/dev/xvda",
+        "encrypted": false,
+        "volume_size": 8,
+        "volume_type": "gp2"
+      },
+      {
+        "delete_on_termination": true,
+        "device_name": "/dev/xvdcz",
+        "encrypted": false,
+        "volume_size": 100,
+        "volume_type": "gp2"
+      }
+    ]
+  }]
+}
