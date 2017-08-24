@@ -65,7 +65,7 @@ case class IdentifiableWalker(
       newNode.set(field.getKey, processValue(field.getValue))
     }
 
-    if (node.has("identifiers") && node.has("ontologyType")) {
+    if (node.has("identifiers") && node.has("type")) {
 
       // This code may throw an exception if these identifiers don't look
       // correct, which may screw with the TryBackoff mechanism.
@@ -81,7 +81,7 @@ case class IdentifiableWalker(
         }
         .toList
 
-      val ontologyType = node.get("ontologyType").textValue
+      val ontologyType = node.get("type").textValue
 
       val canonicalId = generateCanonicalId(sourceIdentifiers, ontologyType)
       newNode.set("canonicalId", new TextNode(canonicalId))
