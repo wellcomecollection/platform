@@ -1,5 +1,7 @@
 package uk.ac.wellcome.sqs
 
+import scala.util.Try
+
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.fasterxml.jackson.core.JsonParseException
 import org.mockito.Matchers.{any, anyString}
@@ -18,7 +20,11 @@ import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
+import uk.ac.wellcome.models.transformable.{
+  Transformable
+}
 import scala.concurrent.Future
+import com.twitter.inject.Logging
 
 class SQSMessageReceiverTest
     extends FunSpec
@@ -26,7 +32,8 @@ class SQSMessageReceiverTest
     with ScalaFutures
     with Matchers
     with IntegrationPatience
-    with TransformableSQSMessageUtils {
+    with TransformableSQSMessageUtils
+    with Logging {
 
   val calmSqsMessage: SQSMessage = createValidCalmSQSMessage(
     "abcdef",
@@ -56,10 +63,40 @@ class SQSMessageReceiverTest
     namespace = "record-receiver-tests",
     mock[AmazonCloudWatch])
 
+  def transformTransformable(transformable: Transformable): Try[Work] = {
+    transformable.transform map { transformed =>
+      info(s"Transformed record $transformed")
+      transformed
+    } recover {
+      case e: ShouldNotTransformException =>
+        info("Work does not meet transform requirements.", e)
+        throw SQSReaderGracefulException(e)
+      case e: Throwable =>
+        // TODO: Send to dead letter queue or just error
+        error("Failed to perform transform to unified item", e)
+        throw e
+    }
+  }
+
+  def calmMessageProcessor(message: SQSMessage): Try[Work] =
+    for {
+      transformableRecord <- new CalmParser().extractTransformable(
+        message)
+      cleanRecord <- transformTransformable(transformableRecord)
+    } yield cleanRecord
+
+  def miroMessageProcessor(message: SQSMessage): Try[Work] =
+    for {
+      transformableRecord <- new MiroParser().extractTransformable(
+        message)
+      cleanRecord <- transformTransformable(transformableRecord)
+    } yield cleanRecord
+
+
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter
     val recordReceiver =
-      new SQSMessageReceiver(snsWriter, new CalmParser, metricsSender)
+      new SQSMessageReceiver(snsWriter, calmMessageProcessor, metricsSender)
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future) { _ =>
@@ -69,7 +106,7 @@ class SQSMessageReceiverTest
 
   it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter, new CalmParser, metricsSender)
+      new SQSMessageReceiver(mockSNSWriter, calmMessageProcessor, metricsSender)
 
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
@@ -82,7 +119,7 @@ class SQSMessageReceiverTest
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
       new SQSMessageReceiver(mockSNSWriter,
-        new CalmParser,
+        calmMessageProcessor,
                          metricsSender)
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
@@ -96,7 +133,7 @@ class SQSMessageReceiverTest
     "should return a successful future if it meets a ShouldNotTransformException") {
     val recordReceiver =
       new SQSMessageReceiver(mockSNSWriter,
-        new MiroParser,
+        miroMessageProcessor,
         metricsSender)
 
     val future = recordReceiver.receiveMessage(failingTransformMiroSqsMessage)
@@ -112,7 +149,7 @@ class SQSMessageReceiverTest
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new SQSMessageReceiver(mockSNS, new CalmParser, metricsSender)
+      new SQSMessageReceiver(mockSNS, calmMessageProcessor, metricsSender)
 
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
