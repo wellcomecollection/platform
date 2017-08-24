@@ -20,6 +20,6 @@ COPY run.sh /app/run.sh
 COPY notify.sh /app/notify.sh
 
 VOLUME ["/data"]
-WORKDIR /data/terraform
+WORKDIR /data
 
 ENTRYPOINT /app/run.sh

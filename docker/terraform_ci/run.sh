@@ -17,6 +17,7 @@ elif [[ "$OP" == "apply" ]]
 then
   if [ -e terraform.plan ]
   then
+    cd $TERRAFORM_ROOT
     echo "Running apply operation."
     terraform apply terraform.plan
 

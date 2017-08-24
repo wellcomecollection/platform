@@ -19,7 +19,8 @@
     "ec2KeyPair": "${ec2_key_pair}",
     "instanceRole": "${ecs_instance_role}",
     "bidPercentage": ${bid_percentage},
-    "spotIamFleetRole": "${spot_fleet_role}"
+    "spotIamFleetRole": "${spot_fleet_role}",
+    "imageId": "${ami_image_id}"
   },
   "serviceRole": "${service_role}"
 }

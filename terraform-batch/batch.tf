@@ -5,6 +5,7 @@ module "aws_batch_compute" {
   key_name           = "${var.key_name}"
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
   vpc_id             = "${module.vpc_batch.vpc_id}"
+  image_id = "ami-84c937fd"
 }
 
 module "aws_batch_queue" {
@@ -16,7 +17,7 @@ module "aws_batch_queue" {
 
 module "aws_batch_job_tif-conversion" {
   source = "./batch_job"
-
+  memory = "2048"
   name         = "tif-conversion"
   image_uri    = "${module.ecr_repository_tif-metadata.repository_url}:${var.release_ids["tif-metadata"]}"
   job_role_arn = "${module.batch_tif_conversion_iam.task_role_arn}"

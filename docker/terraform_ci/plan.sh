@@ -11,6 +11,8 @@ RELEASE_IDS_FILE="release_ids.tfvars"
 # Check if we're up-to-date with the current state of master.
 python3 /app/is_up_to_date_with_master.py
 
+cd $TERRAFORM_ROOT
+
 # Ensure we don't have stale variables from a previous run
 rm -f $TF_VARS
 rm -f $RELEASE_IDS_FILE

@@ -28,3 +28,5 @@ variable "admin_cidr_ingress" {}
 variable "service_role" {}
 variable "ecs_instance_role" {}
 variable "spot_fleet_role" {}
+variable "image_id" {
+}

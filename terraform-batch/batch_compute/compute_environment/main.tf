@@ -18,5 +18,6 @@ data "template_file" "compute_environment" {
     spot_fleet_role = "${var.spot_fleet_role}"
 
     service_role = "${var.service_role}"
+    ami_image_id = "${var.image_id}"
   }
 }
