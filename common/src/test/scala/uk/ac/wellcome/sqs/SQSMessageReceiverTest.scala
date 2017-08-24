@@ -1,4 +1,4 @@
-package uk.ac.wellcome.transformer.receive
+package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.fasterxml.jackson.core.JsonParseException
