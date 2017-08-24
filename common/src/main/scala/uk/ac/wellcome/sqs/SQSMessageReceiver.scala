@@ -1,4 +1,4 @@
-package uk.ac.wellcome.transformer.receive
+package uk.ac.wellcome.sqs
 
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
