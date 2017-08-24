@@ -73,6 +73,19 @@ trait WorksUtil {
     description = Some(description),
     lettering = Some(lettering),
     createdDate = Some(createdDate),
-    creators = List(creator)
+    creators = List(creator),
+    items = List(Item(
+      canonicalId = Some("item-canonical-id"),
+      List(
+        SourceIdentifier("miro-image-number","M0000001")
+      ),
+      List(
+        Location(
+          "iiif-image",
+          Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          License_CCBY
+        )
+      )
+    ))
   )
 }
