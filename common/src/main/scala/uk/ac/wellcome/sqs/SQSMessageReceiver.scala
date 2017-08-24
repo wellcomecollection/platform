@@ -5,7 +5,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
+// import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
@@ -37,6 +37,6 @@ class SQSMessageReceiver(
     )
   }
 
-  def publishMessage(work: Work): Future[PublishAttempt] =
-    snsWriter.writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+  def publishMessage(message: Any): Future[PublishAttempt] =
+    snsWriter.writeMessage(JsonUtil.toJson(message).get, Some("Foo"))
 }
