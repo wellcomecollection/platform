@@ -11,11 +11,10 @@ class IdentifiableWalkerTest
     extends FunSpec
     with Matchers {
 
-  /* Because the IdentifiableWalker works by walking the entire tree and
-   * rebuilding a copy of it, we try some JSON structures that don't contain
-   * anything Identifiable and check it isn't losing information.
-   */
-  describe("JSON strings with no Identifiable objects should pass through unchanged") {
+  // Because the IdentifiableWalker works by walking the entire tree and
+  // rebuilding a copy of it, we try some JSON structures that don't contain
+  // anything Identifiable and check it isn't losing information.
+  describe("Documents with no Identifiable objects should pass through unchanged") {
     it("an empty map") {
       assertWalkerDoesNothing("""{}""")
     }
@@ -62,8 +61,20 @@ class IdentifiableWalkerTest
     }
   }
 
+  val walker = IdentifiableWalker(generateCanonicalId = generateCanonicalId)
+
+  // An in-memory canonical ID generator for use in testing.  This allows us
+  // to write lots of fast tests for the tree-walking logic, and we can have
+  // fewer, slower tests that make database calls.
+  def generateCanonicalId(sourceIdentifiers: List[SourceIdentifier],
+                          ontologyType: String): String = {
+    val sourceIdentifiersStrings = sourceIdentifiers.map { _.toString }
+    List(ontologyType, sourceIdentifiersStrings.mkString(";"))
+      .mkString("==")
+  }
+
   private def assertWalkerDoesNothing(jsonString: String) = {
-    assertJsonStringsAreEqual(jsonString, IdentifiableWalker.identifyDocument(jsonString))
+    assertJsonStringsAreEqual(jsonString, walker.identifyDocument(jsonString))
   }
 
   private def assertJsonStringsAreEqual(jsonString1: String, jsonString2: String) = {

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.{
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.utils.JsonUtil
 
-/* This object takes a JSON string (which is assumed to be a map) and walks
+/* This class takes a JSON string (which is assumed to be a map) and walks
  * it, looking for objects that conform to the Identifiable trait.
  * Rather than using first-class Scala types, this does a completely generic
  * tree-walk -- we're trading some type safety for flexibility.
@@ -29,8 +29,15 @@ import uk.ac.wellcome.utils.JsonUtil
  * on a map/object node, it looks to see if the node is Identifiable.
  * If so, it adds an identifier to the node.  Otherwise the document is
  * passed through unmodified.
+ *
+ * This class takes a single parameter: a `generateCanonicalId` callback
+ * which receives a list of `SourceIdentifier` instances, and the ontology
+ * type of the object to be identifier.  This callback should return the
+ * canonical ID.
  */
-object IdentifiableWalker {
+case class IdentifiableWalker(
+  generateCanonicalId: (List[SourceIdentifier], String) => String
+) {
 
   private def readTree(jsonString: String): JsonNode = {
     val mapper = new ObjectMapper()
@@ -40,17 +47,6 @@ object IdentifiableWalker {
   def identifyDocument(jsonString: String): String = {
     val node = readTree(jsonString)
     JsonUtil.toJson(rebuildObjectNode(node)).get
-  }
-
-  // Dummy function for generating canonical IDs.  Eventually this should
-  // use the identifier proper, but for the purposes of testing the tree
-  // parsing code is just drops in a string that proves it extracted the
-  // identifiers correctly.
-  def generateCanonicalId(sourceIdentifiers: List[SourceIdentifier],
-                          ontologyType: String): String = {
-    val sourceIdentifiersStrings = sourceIdentifiers.map { _.toString }
-    List(ontologyType, sourceIdentifiersStrings.mkString(";"))
-      .mkString("==")
   }
 
   private def processValue(value: JsonNode) = {
@@ -87,11 +83,7 @@ object IdentifiableWalker {
 
       val ontologyType = node.get("ontologyType").textValue
 
-      val canonicalId = generateCanonicalId(
-        sourceIdentifiers = sourceIdentifiers,
-        ontologyType = ontologyType
-      )
-
+      val canonicalId = generateCanonicalId(sourceIdentifiers, ontologyType)
       newNode.set("canonicalId", new TextNode(canonicalId))
     }
 
