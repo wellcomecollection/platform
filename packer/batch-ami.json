@@ -20,7 +20,7 @@
     "user_data_file": "batch_userdata.txt",
     "instance_type": "t2.micro",
     "ssh_username": "ec2-user",
-    "ami_name": "batch-ami-no-awslogs",
+    "ami_name": "batch-ami",
     "ami_block_device_mappings": [
       {
         "delete_on_termination": true,
