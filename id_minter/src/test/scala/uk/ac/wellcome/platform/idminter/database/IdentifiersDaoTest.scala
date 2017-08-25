@@ -40,17 +40,139 @@ class IdentifiersDaoTest
         maybeIdentifier.get shouldBe identifier
       }
     }
+  }
 
-    it("should return a future of None if looking up a non-existent ID") {
-      val lookupFuture = identifiersDao.lookupID(
-        miroID = "A vanishing violet",
-        ontologyType = "flowers"
+  val miroSourceIdentifier = SourceIdentifier(
+    identifierScheme = "miro-image-number",
+    value = "V0023075"
+  )
+
+  val calmSourceIdentifier = SourceIdentifier(
+    identifierScheme = "calm-altrefno",
+    value = "MS.290"
+  )
+
+  describe("lookupID should return a future of None if it can't find a matching ID") {
+    it("empty database, looking for a Miro ID") {
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier)
       )
-      whenReady(lookupFuture) { maybeIdentifier =>
-        maybeIdentifier shouldNot be(defined)
-      }
+    }
+
+    it("empty database, looking for a Calm AltRefNo") {
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(calmSourceIdentifier)
+      )
+    }
+
+    it("empty database, looking for a Miro ID and a Calm AltRefNo") {
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier)
+      )
+    }
+
+    it("matching Miro ID, wrong ontology type") {
+      val identifier = Identifier(
+        CanonicalID = "qk9yeajr",
+        MiroID = miroSourceIdentifier.value,
+        ontologyType = "TestItem"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+    }
+
+    it("matching Calm AltRefNo, wrong ontology type") {
+      val identifier = Identifier(
+        CanonicalID = "pptk9sz6",
+        CalmAltRefNo = calmSourceIdentifier.value,
+        ontologyType = "TestItem"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(calmSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(calmSourceIdentifier, miroSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+    }
+
+    it("matching Calm AltRefNo and Miro ID, wrong ontology type") {
+      val identifier = Identifier(
+        CanonicalID = "w9wr583y",
+        CalmAltRefNo = calmSourceIdentifier.value,
+        MiroID = miroSourceIdentifier.value,
+        ontologyType = "TestItem"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(calmSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(calmSourceIdentifier, miroSourceIdentifier),
+        ontologyType = "TestWork"
+      )
+    }
+
+    it("matching Miro ID, wrong Calm AltRefNo") {
+      val identifier = Identifier(
+        CanonicalID = "qs5apdq8",
+        MiroID = miroSourceIdentifier.value,
+        CalmAltRefNo = "Not a real Calm AltRefNo",
+        ontologyType = "TestWork"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        ontologyType = identifier.ontologyType
+      )
+    }
+
+    it("matching Calm AltRefNo, wrong Miro ID") {
+      val identifier = Identifier(
+        CanonicalID = "qs5apdq8",
+        MiroID = "Not a real MiroID",
+        CalmAltRefNo = calmSourceIdentifier.value,
+        ontologyType = "TestWork"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        ontologyType = identifier.ontologyType
+      )
     }
   }
+
+  private def assertLookupIDFindsNothing(sourceIdentifiers: List[SourceIdentifier],
+                                         ontologyType: String = "TestWork") {
+    val lookupFuture = identifiersDao.lookupID(
+      sourceIdentifiers = sourceIdentifiers,
+      ontologyType = ontologyType
+    )
+    whenReady(lookupFuture) { maybeIdentifier =>
+      maybeIdentifier shouldNot be(defined)
+    }
+  }
+
+
 
   describe("lookupMiroID") {
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
