@@ -5,24 +5,16 @@ import com.google.inject.Inject
 import scala.util.Try
 
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
-// import uk.ac.wellcome.transformer.receive.SQSMessageReceiver
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
-import uk.ac.wellcome.models.transformable.{
-  ShouldNotTransformException,
-  Transformable
-}
+import uk.ac.wellcome.models.transformable.Transformable
 import com.twitter.inject.Logging
 
-import uk.ac.wellcome.sqs.SQSMessageReceiver
 import uk.ac.wellcome.transformer.SQSMessageReceiverBuilder
 
 
