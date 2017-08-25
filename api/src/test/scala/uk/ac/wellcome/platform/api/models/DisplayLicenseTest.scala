@@ -20,5 +20,6 @@ class DisplayLicenseTest extends FunSpec with Matchers {
     displayLicense.licenseType shouldBe licenseType
     displayLicense.label shouldBe label
     displayLicense.url shouldBe url
+    displayLicense.ontologyType shouldBe "License"
   }
 }
