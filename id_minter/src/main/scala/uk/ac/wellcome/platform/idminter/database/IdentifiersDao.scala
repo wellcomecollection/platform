@@ -108,18 +108,6 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     }
   }
 
-  def lookupMiroID(miroID: String,
-                   ontologyType: String = "Work"): Future[Option[Identifier]] =
-    lookupID(
-      sourceIdentifiers = List(
-        SourceIdentifier(
-          identifierScheme = "miro-image-number",
-          value = miroID
-        )
-      ),
-      ontologyType = ontologyType
-    )
-
   def saveIdentifier(identifier: Identifier): Future[Int] = {
     val insertIntoDbFuture = Future {
       blocking {

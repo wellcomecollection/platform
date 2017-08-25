@@ -22,7 +22,10 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
       "generate-id",
       () =>
         findMiroID(work) match {
-          case Some(identifier) => retrieveOrGenerateCanonicalId(identifier)
+          case Some(identifier) => retrieveOrGenerateCanonicalId(
+            identifier,
+            ontologyType = work.ontologyType
+          )
           case None =>
             error(s"Item $work did not contain a MiroID")
             Future.failed(
@@ -32,8 +35,9 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
   }
 
   private def retrieveOrGenerateCanonicalId(
-    identifier: SourceIdentifier): Future[String] =
-    identifiersDao.lookupMiroID(identifier.value).flatMap {
+    identifier: SourceIdentifier,
+    ontologyType: String): Future[String] = {
+    identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
       case Some(id) => {
         metricsSender.incrementCount("found-old-id")
         Future.successful(id.CanonicalID)
@@ -46,6 +50,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
         result
       }
     }
+  }
 
   private def findMiroID(work: Work): Option[SourceIdentifier] = {
     val maybeSourceIdentifier =

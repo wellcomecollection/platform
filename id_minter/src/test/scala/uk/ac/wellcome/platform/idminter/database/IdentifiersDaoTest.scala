@@ -269,41 +269,6 @@ class IdentifiersDaoTest
     }
   }
 
-  describe("lookupMiroID") {
-    it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
-      val identifier = Identifier(
-        CanonicalID = "A sand snail",
-        MiroID = "A soft shell"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      whenReady(identifiersDao.lookupMiroID(identifier.MiroID)) { maybeIdentifier =>
-        maybeIdentifier shouldBe defined
-        maybeIdentifier.get shouldBe identifier
-      }
-    }
-
-    it("should return a future of None if looking up a non-existent Miro ID") {
-      assertLookupMiroIDFindsNothing(
-        miroID = "A missing mouse"
-      )
-    }
-
-    it("should return a future of None if looking up a Miro ID with the wrong ontologyType") {
-      val identifier = Identifier(
-        CanonicalID = "A sprinkling of sage",
-        MiroID = "Seasoning with saffron",
-        ontologyType = "Herbs"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupMiroIDFindsNothing(
-        miroID = identifier.MiroID,
-        ontologyType = "Vegetables"
-      )
-    }
-  }
-
   describe("saveIdentifier") {
     it("should insert the provided identifier into the database") {
       val identifier = Identifier(
@@ -386,36 +351,6 @@ class IdentifiersDaoTest
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
-    }
-  }
-
-  /** Helper method.  Given two records, try to insert them both, and check
-    * that integrity checks in the database reject the second record.
-    */
-  private def assertInsertingDuplicateFails(identifier: Identifier,
-                                            duplicateIdentifier: Identifier) = {
-    assertInsertingIdentifierSucceeds(identifier)
-
-    val duplicateFuture = identifiersDao.saveIdentifier(duplicateIdentifier)
-    whenReady(duplicateFuture.failed) { exception =>
-      exception shouldBe a[SQLIntegrityConstraintViolationException]
-    }
-  }
-
-  /** Helper method.  Insert a record and check that it succeeds. */
-  private def assertInsertingIdentifierSucceeds(identifier: Identifier) =
-    whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
-      result shouldBe 1
-    }
-
-  /** Helper method.  Do a Miro ID lookup and check that it fails. */
-  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String = "Work") = {
-    val lookupFuture = identifiersDao.lookupMiroID(
-      miroID = miroID,
-      ontologyType = ontologyType
-    )
-    whenReady(lookupFuture) { maybeIdentifier =>
-      maybeIdentifier shouldNot be(defined)
     }
   }
 }
