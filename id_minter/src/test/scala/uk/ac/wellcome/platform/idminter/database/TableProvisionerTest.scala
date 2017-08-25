@@ -55,6 +55,10 @@ class TableProvisionerTest
         FieldDescription(field = "MiroID",
                          dataType = "varchar(255)",
                          nullable = "YES",
+                         key = ""),
+        FieldDescription(field = "CalmAltRefNo",
+                         dataType = "varchar(255)",
+                         nullable = "YES",
                          key = "")
       )
     }
