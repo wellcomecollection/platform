@@ -52,24 +52,15 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
 
   def lookupMiroID(miroID: String,
                    ontologyType: String = "Work"): Future[Option[Identifier]] =
-    Future {
-      blocking {
-        info(s"About to search for MiroID $miroID in Identifiers")
-        val i = identifiers.i
-        withSQL {
-          select
-            .from(identifiers as i)
-            .where
-            .eq(i.ontologyType, ontologyType)
-            .and
-            .eq(i.MiroID, miroID)
-        }.map(Identifier(i)).single.apply()
-      }
-    } recover {
-      case e: Throwable =>
-        error(s"Failed getting MiroID $miroID in Identifiers", e)
-        throw e
-    }
+    lookupID(
+      sourceIdentifiers = List(
+        SourceIdentifier(
+          identifierScheme = "miro-image-number",
+          value = miroID
+        )
+      ),
+      ontologyType = ontologyType
+    )
 
   def saveIdentifier(identifier: Identifier): Future[Int] = {
     val insertIntoDbFuture = Future {
