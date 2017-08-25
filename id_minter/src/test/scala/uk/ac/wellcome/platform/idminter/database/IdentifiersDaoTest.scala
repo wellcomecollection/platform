@@ -5,6 +5,7 @@ import java.sql.SQLIntegrityConstraintViolationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
@@ -27,7 +28,7 @@ class IdentifiersDaoTest
       assertInsertingIdentifierSucceeds(identifier)
 
       val sourceIdentifiers = List(SourceIdentifier(
-        identifierScheme = "miro-image-number",
+        identifierScheme = IdentifierSchemes.miroImageNumber,
         value = identifier.MiroID
       ))
 
@@ -43,12 +44,12 @@ class IdentifiersDaoTest
   }
 
   val miroSourceIdentifier = SourceIdentifier(
-    identifierScheme = "miro-image-number",
+    identifierScheme = IdentifierSchemes.miroImageNumber,
     value = "V0023075"
   )
 
   val calmSourceIdentifier = SourceIdentifier(
-    identifierScheme = "calm-altrefno",
+    identifierScheme = IdentifierSchemes.calmAltRefNo,
     value = "MS.290"
   )
 

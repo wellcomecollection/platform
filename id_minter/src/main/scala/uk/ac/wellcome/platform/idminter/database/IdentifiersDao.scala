@@ -6,6 +6,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import scalikejdbc._
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -56,7 +57,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
                 sql = sql,
                 sourceIdentifiers = sourceIdentifiers,
                 column = i.MiroID,
-                identifierScheme = "miro-image-number"
+                identifierScheme = IdentifierSchemes.miroImageNumber
               )
             }
             .map { sql: ConditionSQLBuilder[String] =>
@@ -64,7 +65,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
                 sql = sql,
                 sourceIdentifiers = sourceIdentifiers,
                 column = i.CalmAltRefNo,
-                identifierScheme = "calm-altrefno"
+                identifierScheme = IdentifierSchemes.calmAltRefNo
               )
             }
         }.map(Identifier(i)).single
