@@ -9,16 +9,16 @@ case class Identifier(
   ontologyType: String = "Work",
   CanonicalID: String,
   MiroID: String,
-  CalmAltRefNo: String
+  CalmAltRefNo: Option[String] = Some(null)
 )
 
 object Identifier {
   def apply(p: SyntaxProvider[Identifier])(rs: WrappedResultSet): Identifier =
     Identifier(
-      ontologyType = rs.string(p.resultName.ontologyType)
+      ontologyType = rs.string(p.resultName.ontologyType),
       CanonicalID = rs.string(p.resultName.CanonicalID),
       MiroID = rs.string(p.resultName.MiroID),
-      CalmAltRefNo = rs.string(p.resultName.CalmAltRefNo)
+      CalmAltRefNo = Some(rs.string(p.resultName.CalmAltRefNo))
     )
 }
 
