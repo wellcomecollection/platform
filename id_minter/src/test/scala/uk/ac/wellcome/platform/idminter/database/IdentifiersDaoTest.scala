@@ -5,6 +5,7 @@ import java.sql.SQLIntegrityConstraintViolationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
+import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
@@ -15,6 +16,41 @@ class IdentifiersDaoTest
     with Matchers {
 
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
+
+  describe("lookupID") {
+    it("should return a future of Some[Identifier] if it can find a matching MiroID in the DB") {
+      val identifier = Identifier(
+        CanonicalID = "A turtle turns to try to taste",
+        MiroID = "A tangerine",
+        ontologyType = "t-t-t-turtles"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      val sourceIdentifiers = List(SourceIdentifier(
+        identifierScheme = "miro-image-number",
+        value = identifier.MiroID
+      ))
+
+      val lookupFuture = identifiersDao.lookupID(
+        sourceIdentifiers = sourceIdentifiers,
+        ontologyType = identifier.ontologyType
+      )
+      whenReady(lookupFuture) { maybeIdentifier =>
+        maybeIdentifier shouldBe defined
+        maybeIdentifier.get shouldBe identifier
+      }
+    }
+
+    it("should return a future of None if looking up a non-existent ID") {
+      val lookupFuture = identifiersDao.lookupID(
+        miroID = "A vanishing violet",
+        ontologyType = "flowers"
+      )
+      whenReady(lookupFuture) { maybeIdentifier =>
+        maybeIdentifier shouldNot be(defined)
+      }
+    }
+  }
 
   describe("lookupMiroID") {
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
