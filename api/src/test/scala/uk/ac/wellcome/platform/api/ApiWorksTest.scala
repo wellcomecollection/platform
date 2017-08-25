@@ -8,7 +8,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 class ApiWorksTest
-  extends FunSpec
+    extends FunSpec
     with FeatureTestMixin
     with IndexedElasticSearchLocal
     with WorksUtil {
@@ -38,6 +38,30 @@ class ApiWorksTest
                            |  "results": []
                            |}""".stripMargin
 
+  def items(work: Work) = {
+    work.items.map { it =>
+      val location = it.locations.head
+      val license = location.license
+      s"""{
+         "id": "${it.canonicalId.get}",
+         "type": "${it.ontologyType}",
+         "locations": [
+           {
+             "type": "${location.ontologyType}",
+             "locationType": "${location.locationType}",
+             "url": "${location.url.get}",
+             "license": {
+               "label": "${license.label}",
+               "licenseType": "${license.licenseType}",
+               "type": "${license.ontologyType}",
+               "url": "${license.url}"
+             }
+           }
+         ]
+       }"""
+    }.mkString(",")
+  }
+
   it("should return a list of works") {
 
     val works = createWorks(3)
@@ -45,6 +69,7 @@ class ApiWorksTest
     insertIntoElasticSearch(works: _*)
 
     eventually {
+
       server.httpGet(
         path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
@@ -72,7 +97,9 @@ class ApiWorksTest
                           |     }],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "items": [
+                          |       ${items(works(0))}
+                          |     ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -90,7 +117,9 @@ class ApiWorksTest
                           |     }],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "items": [
+                          |       ${items(works(1))}
+                          |     ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -108,7 +137,9 @@ class ApiWorksTest
                           |     }],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "items": [
+                          |       ${items(works(2))}
+                          |     ]
                           |   }
                           |  ]
                           |}
@@ -149,7 +180,7 @@ class ApiWorksTest
                           |   "type": "Agent",
                           |   "label": "${agent.label}"
                           | }],
-                          | "items": [ ],
+                          | "items": [${items(work)}],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
@@ -192,7 +223,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(1).creators(0).label}"
                           |     }],
-                          |     "items": [ ],
+                          |     "items": [ ${items(works(1))}],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -228,7 +259,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(0).creators(0).label}"
                           |     }],
-                          |     "items": [ ],
+                          |     "items": [${items(works(0))}],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -265,7 +296,7 @@ class ApiWorksTest
                           |       "label": "${works(2).creators(0).label}"
                           |     }],
                           |     "subjects": [ ],
-                          |      "items": [ ],
+                          |      "items": [${items(works(2))}],
                           |     "genres": [ ]
                           |   }]
                           |   }
@@ -276,8 +307,7 @@ class ApiWorksTest
     }
   }
 
-  it(
-    "should return a BadRequest when malformed query parameters are presented") {
+  it("should return a BadRequest when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -369,8 +399,7 @@ class ApiWorksTest
     )
   }
 
-  it(
-    "should return multiple errors if there's more than one invalid parameter") {
+  it("should return multiple errors if there's more than one invalid parameter") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=-60&page=-50",
       andExpect = Status.BadRequest,
@@ -482,7 +511,6 @@ class ApiWorksTest
       identifiers = List(),
       title = "A guppy in a greenhouse",
       genres = List(Concept("woodwork"), Concept("etching"))
-
     )
     insertIntoElasticSearch(workWithSubjects)
 
@@ -814,7 +842,8 @@ class ApiWorksTest
     }
   }
 
-  it("should include the thumbnail field if available and we use the thumbnail include") {
+  it(
+    "should include the thumbnail field if available and we use the thumbnail include") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",

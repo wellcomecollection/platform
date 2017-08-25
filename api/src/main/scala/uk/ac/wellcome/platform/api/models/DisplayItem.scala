@@ -23,7 +23,7 @@ case class DisplayItem(
   ) locations: List[DisplayLocation] = List()
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") val ontologyType: String = "Location"
+  @JsonProperty("type") val ontologyType: String = "Item"
 }
 
 object DisplayItem {
