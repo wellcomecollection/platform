@@ -19,6 +19,9 @@ clean:
 .docker/terraform_ci:
 	./scripts/build_ci_docker_image.py --project terraform_ci
 
+.docker/packer_ci:
+	./scripts/build_ci_docker_image.py --project packer_ci
+
 .docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
 	mkdir -p .docker && touch .docker/_build_deps
@@ -207,6 +210,10 @@ sbt-deploy: \
 
 .docker/lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
+
+## Build ami
+packer-build: .docker/packer_ci
+	docker run -v $$HOME/.aws:/root/.aws -v $$(pwd)/packer:/data packer_ci:latest
 
 ## Run a plan
 terraform-plan: .docker/terraform_ci .docker/lambda_deps

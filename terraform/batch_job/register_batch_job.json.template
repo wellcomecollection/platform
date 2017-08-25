@@ -17,5 +17,6 @@
             "name": "ephemera"
         }
     ]
-  }
+  },
+  "retryStrategy": {"attempts": 3}
 }
