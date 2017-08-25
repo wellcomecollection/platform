@@ -34,43 +34,45 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     // TODO: This exception should be handled gracefully, not sent around the
     // TryBackoff ad infinitum.
     if (sourceIdentifiers.isEmpty) {
-      throw new UnableToMintIdentifierException(
-        "No source identifiers supplied!")
-    }
-    Future {
-      blocking {
-        info(
-          s"About to search for existing ID matching $identifiers and $ontologyType")
-        val i = identifiers.i
-        val query = withSQL {
-          select
-            .from(identifiers as i)
-            .where
+      Future.failed(
+        new UnableToMintIdentifierException("No source identifiers supplied!")
+      )
+    } else {
+      Future {
+        blocking {
+          info(
+            s"About to search for existing ID matching $identifiers and $ontologyType")
+          val i = identifiers.i
+          val query = withSQL {
+            select
+              .from(identifiers as i)
+              .where
 
-            // We always want to match the ontology type, and this field
-            // in SQL is never null.
-            .eq(i.ontologyType, ontologyType)
+              // We always want to match the ontology type, and this field
+              // in SQL is never null.
+              .eq(i.ontologyType, ontologyType)
 
-            // Add conditions for matching on different source identifiers.
-            .map { sql: ConditionSQLBuilder[String] =>
-              addConditionForLookingUpID(
-                sql = sql,
-                sourceIdentifiers = sourceIdentifiers,
-                column = i.MiroID,
-                identifierScheme = IdentifierSchemes.miroImageNumber
-              )
-            }
-            .map { sql: ConditionSQLBuilder[String] =>
-              addConditionForLookingUpID(
-                sql = sql,
-                sourceIdentifiers = sourceIdentifiers,
-                column = i.CalmAltRefNo,
-                identifierScheme = IdentifierSchemes.calmAltRefNo
-              )
-            }
-        }.map(Identifier(i)).single
-        debug(s"Executing SQL query = '${query.statement}'")
-        query.apply()
+              // Add conditions for matching on different source identifiers.
+              .map { sql: ConditionSQLBuilder[String] =>
+                addConditionForLookingUpID(
+                  sql = sql,
+                  sourceIdentifiers = sourceIdentifiers,
+                  column = i.MiroID,
+                  identifierScheme = IdentifierSchemes.miroImageNumber
+                )
+              }
+              .map { sql: ConditionSQLBuilder[String] =>
+                addConditionForLookingUpID(
+                  sql = sql,
+                  sourceIdentifiers = sourceIdentifiers,
+                  column = i.CalmAltRefNo,
+                  identifierScheme = IdentifierSchemes.calmAltRefNo
+                )
+              }
+          }.map(Identifier(i)).single
+          debug(s"Executing SQL query = '${query.statement}'")
+          query.apply()
+        }
       }
     }
   }
