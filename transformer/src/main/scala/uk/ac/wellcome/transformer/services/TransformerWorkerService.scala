@@ -17,7 +17,6 @@ import com.twitter.inject.Logging
 
 import uk.ac.wellcome.transformer.SQSMessageReceiverBuilder
 
-
 import scala.concurrent.Future
 
 class TransformerWorkerService @Inject()(
@@ -26,7 +25,8 @@ class TransformerWorkerService @Inject()(
   system: ActorSystem,
   metrics: MetricsSender,
   transformableParser: TransformableParser[Transformable]
-) extends SQSWorker(reader, system, metrics) with Logging {
+) extends SQSWorker(reader, system, metrics)
+    with Logging {
 
   private val messageReceiver = SQSMessageReceiverBuilder.buildReceiver(
     snsWriter = writer,

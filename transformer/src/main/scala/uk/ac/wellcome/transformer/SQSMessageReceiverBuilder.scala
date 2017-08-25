@@ -12,28 +12,27 @@ import uk.ac.wellcome.models.transformable.{
   Transformable
 }
 import uk.ac.wellcome.sns.SNSWriter
-import uk.ac.wellcome.sqs.{
-  SQSMessageReceiver,
-  SQSReaderGracefulException
-}
+import uk.ac.wellcome.sqs.{SQSMessageReceiver, SQSReaderGracefulException}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 
 object SQSMessageReceiverBuilder extends Logging {
 
-  def buildReceiver(
-      snsWriter: SNSWriter,
-      parser: TransformableParser[Transformable],
-      metricsSender: MetricsSender): SQSMessageReceiver = new SQSMessageReceiver(
-    snsWriter = snsWriter,
-    messageProcessor = buildMessageProcessor(parser),
-    metricsSender = metricsSender
-  )
+  def buildReceiver(snsWriter: SNSWriter,
+                    parser: TransformableParser[Transformable],
+                    metricsSender: MetricsSender): SQSMessageReceiver =
+    new SQSMessageReceiver(
+      snsWriter = snsWriter,
+      messageProcessor = buildMessageProcessor(parser),
+      metricsSender = metricsSender
+    )
 
-  private def buildMessageProcessor(parser: TransformableParser[Transformable]): (SQSMessage) => Try[Work] =
-    (message: SQSMessage) => for {
-      transformableRecord <- parser.extractTransformable(message)
-      cleanRecord <- transformTransformable(transformableRecord)
-    } yield cleanRecord
+  private def buildMessageProcessor(
+    parser: TransformableParser[Transformable]): (SQSMessage) => Try[Work] =
+    (message: SQSMessage) =>
+      for {
+        transformableRecord <- parser.extractTransformable(message)
+        cleanRecord <- transformTransformable(transformableRecord)
+      } yield cleanRecord
 
   private def transformTransformable(transformable: Transformable): Try[Work] =
     transformable.transform map { transformed =>

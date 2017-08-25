@@ -11,10 +11,9 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class SQSMessageReceiver(
-  snsWriter: SNSWriter,
-  messageProcessor: (SQSMessage) => Try[Any],
-  metricsSender: MetricsSender)
+class SQSMessageReceiver(snsWriter: SNSWriter,
+                         messageProcessor: (SQSMessage) => Try[Any],
+                         metricsSender: MetricsSender)
     extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[PublishAttempt] = {
