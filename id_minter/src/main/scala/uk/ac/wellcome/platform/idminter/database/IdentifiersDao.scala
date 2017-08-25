@@ -18,6 +18,12 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
 
   implicit val session = AutoSession(db.settingsProvider)
 
+  /* An unidentified record from the transformer can give us a list of
+   * identifiers from the source systems, and an ontology type (e.g. "Work").
+   *
+   * This method looks for existing IDs that have matching ontology type and
+   * source identifiers.
+   */
   def lookupID(sourceIdentifiers: List[SourceIdentifier],
                ontologyType: String): Future[Option[Identifier]] =
     Future {
@@ -33,22 +39,55 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
             // in SQL is never null.
             .eq(i.ontologyType, ontologyType)
 
-            // This seems awfully repetitive, but I haven't been able to pin
-            // down a type parameter for `sql` that lets me put this in a
-            // function.
+            // Add conditions for matching on different source identifiers.
             .map { sql: ConditionSQLBuilder[String] =>
-              val miroID = sourceIdentifiers.filter {
-                _.identifierScheme == "miro-image-number"
-              }
-              if (miroID.isEmpty) {
-                sql
-              } else {
-                sql.and.eq(i.MiroID, miroID.head.value).or.isNull(i.MiroID)
-              }
+              addConditionForLookingUpID(
+                sql = sql,
+                sourceIdentifiers = sourceIdentifiers,
+                column = i.MiroID,
+                identifierScheme = "miro-image-number"
+              )
             }
+
+            .map { sql: ConditionSQLBuilder[String] =>
+              addConditionForLookingUpID(
+                sql = sql,
+                sourceIdentifiers = sourceIdentifiers,
+                column = i.CalmAltRefNo,
+                identifierScheme = "calm-altrefno"
+              )
+            }
+
         }.map(Identifier(i)).single.apply()
       }
     }
+
+  /* For a given source identifier scheme (e.g. "miro-image-number") and a
+   * corresponding column in the SQL database (e.g. i.MiroID), add a condition
+   * to the SQL query that looks for matching identifiers.
+   *
+   * Note that we look for equality _or_ null -- in the case where the
+   * database only has a partial match, we want that.  Consider the following
+   * example:
+   *
+   *            canonical ID  | Calm ID | Miro ID | Sierra ID
+   *           ---------------+---------+---------+-----------
+   *            zgz4vf4q      | 1234    | abcd    | null
+   *
+   * If we find a Sierra record with (Miro = abcd, Sierra = IVDC), we want
+   * to find this record even though it doesn't have a complete match.
+   */
+  private def addConditionForLookingUpID(sql: ConditionSQLBuilder[String],
+                                         sourceIdentifiers: List[SourceIdentifier],
+                                         column: SQLSyntax,
+                                         identifierScheme: String): ConditionSQLBuilder[String] = {
+    val sourceID = sourceIdentifiers.filter { _.identifierScheme == identifierScheme }
+    if (sourceID.isEmpty) {
+      sql
+    } else {
+      sql.and.eq(column, sourceID.head.value).or.isNull(column)
+    }
+  }
 
   def lookupMiroID(miroID: String,
                    ontologyType: String = "Work"): Future[Option[Identifier]] =
