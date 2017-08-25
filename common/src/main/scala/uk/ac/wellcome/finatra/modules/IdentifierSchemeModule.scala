@@ -11,4 +11,6 @@ object IdentifierSchemes {
   // Placeholder until we ingest real Calm records.
   // TODO: Replace this with something more appropriate
   val calmPlaceholder = "calm-placeholder"
+
+  val calmAltRefNo = "calm-altrefno"
 }
