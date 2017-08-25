@@ -12,6 +12,9 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
 
+case class UnableToMintIdentifierException(message: String)
+    extends Exception(message)
+
 @Singleton
 class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     extends Logging {
@@ -25,7 +28,10 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    * source identifiers.
    */
   def lookupID(sourceIdentifiers: List[SourceIdentifier],
-               ontologyType: String): Future[Option[Identifier]] =
+               ontologyType: String): Future[Option[Identifier]] = {
+    if (sourceIdentifiers.isEmpty) {
+      throw new UnableToMintIdentifierException("No source identifiers supplied!")
+    }
     Future {
       blocking {
         info(s"About to search for existing ID matching $identifiers and $ontologyType")
@@ -61,6 +67,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
         }.map(Identifier(i)).single.apply()
       }
     }
+  }
 
   /* For a given source identifier scheme (e.g. "miro-image-number") and a
    * corresponding column in the SQL database (e.g. i.MiroID), add a condition
