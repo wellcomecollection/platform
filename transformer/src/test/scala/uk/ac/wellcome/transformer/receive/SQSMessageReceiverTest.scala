@@ -132,7 +132,7 @@ class SQSMessageReceiverTest
     val mockSNS = mockFailPublishMessage
     val recordReceiver = SQSMessageReceiverBuilder.buildReceiver(
       snsWriter = mockSNS,
-      parser = new MiroParser(),
+      parser = new CalmParser(),
       metricsSender = metricsSender
     )
 
