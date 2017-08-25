@@ -29,6 +29,9 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    */
   def lookupID(sourceIdentifiers: List[SourceIdentifier],
                ontologyType: String): Future[Option[Identifier]] = {
+
+    // TODO: This exception should be handled gracefully, not sent around the
+    // TryBackoff ad infinitum.
     if (sourceIdentifiers.isEmpty) {
       throw new UnableToMintIdentifierException("No source identifiers supplied!")
     }
@@ -36,7 +39,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
       blocking {
         info(s"About to search for existing ID matching $identifiers and $ontologyType")
         val i = identifiers.i
-        withSQL {
+        val query = withSQL {
           select
             .from(identifiers as i)
             .where
@@ -63,20 +66,9 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
                 identifierScheme = "calm-altrefno"
               )
             }
-
-            .map { sql: ConditionSQLBuilder[String] =>
-              println(s"${sql}")
-              sql
-            }
-
-            // TODO: Might be nice to log the SQL query we're making as a
-            // debug statement
-            // .map { sql: ConditionSQLBuilder[String] =>
-            //   info(s"Executing SQL query '${sql.value}'")
-            //   sql
-            // }
-
-        }.map(Identifier(i)).single.apply()
+        }.map(Identifier(i)).single
+        debug(s"Executing SQL query = '${query.statement}'")
+        query.apply()
       }
     }
   }
