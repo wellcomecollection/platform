@@ -130,7 +130,6 @@ class SQSMessageReceiverTest
 
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
-    val snsWriter = mockSNSWriter
     val recordReceiver = SQSMessageReceiverBuilder.buildReceiver(
       snsWriter = mockSNS,
       parser = new MiroParser(),
