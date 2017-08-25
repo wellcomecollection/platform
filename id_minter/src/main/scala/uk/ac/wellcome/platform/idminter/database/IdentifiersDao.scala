@@ -33,11 +33,13 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     // TODO: This exception should be handled gracefully, not sent around the
     // TryBackoff ad infinitum.
     if (sourceIdentifiers.isEmpty) {
-      throw new UnableToMintIdentifierException("No source identifiers supplied!")
+      throw new UnableToMintIdentifierException(
+        "No source identifiers supplied!")
     }
     Future {
       blocking {
-        info(s"About to search for existing ID matching $identifiers and $ontologyType")
+        info(
+          s"About to search for existing ID matching $identifiers and $ontologyType")
         val i = identifiers.i
         val query = withSQL {
           select
@@ -57,7 +59,6 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
                 identifierScheme = "miro-image-number"
               )
             }
-
             .map { sql: ConditionSQLBuilder[String] =>
               addConditionForLookingUpID(
                 sql = sql,
@@ -88,15 +89,19 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    * If we find a Sierra record with (Miro = abcd, Sierra = IVDC), we want
    * to find this record even though it doesn't have a complete match.
    */
-  private def addConditionForLookingUpID(sql: ConditionSQLBuilder[String],
-                                         sourceIdentifiers: List[SourceIdentifier],
-                                         column: SQLSyntax,
-                                         identifierScheme: String): ConditionSQLBuilder[String] = {
-    val sourceID = sourceIdentifiers.filter { _.identifierScheme == identifierScheme }
+  private def addConditionForLookingUpID(
+    sql: ConditionSQLBuilder[String],
+    sourceIdentifiers: List[SourceIdentifier],
+    column: SQLSyntax,
+    identifierScheme: String): ConditionSQLBuilder[String] = {
+    val sourceID = sourceIdentifiers.filter {
+      _.identifierScheme == identifierScheme
+    }
     if (sourceID.isEmpty) {
       sql
     } else {
-      sql.and.withRoundBracket( _.eq(column, sourceID.head.value).or.isNull(column) )
+      sql.and.withRoundBracket(
+        _.eq(column, sourceID.head.value).or.isNull(column))
     }
   }
 
