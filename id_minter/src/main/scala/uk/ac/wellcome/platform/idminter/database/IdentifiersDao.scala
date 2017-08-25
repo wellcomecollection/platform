@@ -17,7 +17,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
   implicit val session = AutoSession(db.settingsProvider)
 
   def lookupMiroID(miroID: String,
-                   ontologyType: String = "Work"): Future[Option[Identifier]] =
+                   ontologyType: String): Future[Option[Identifier]] =
     Future {
       blocking {
         info(s"About to search for MiroID $miroID in Identifiers")

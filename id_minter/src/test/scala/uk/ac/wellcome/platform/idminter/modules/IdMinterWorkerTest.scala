@@ -73,7 +73,7 @@ class IdMinterWorkerTest
   it(
     "should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
     val miroId = "1234"
-    when(identifiersDao.lookupMiroID(miroId))
+    when(identifiersDao.lookupMiroID(miroId, ontologyType = "TestNull"))
       .thenReturn(Future.successful(None))
     when(identifiersDao.saveIdentifier(any[Identifier]))
       .thenReturn(Future.failed(new Exception("cannot insert")))

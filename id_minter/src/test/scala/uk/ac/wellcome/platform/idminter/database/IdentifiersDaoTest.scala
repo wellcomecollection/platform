@@ -20,11 +20,17 @@ class IdentifiersDaoTest
     it("should return a future of Some[Identifier] if it can find a MiroID in the DB") {
       val identifier = Identifier(
         CanonicalID = "A sand snail",
-        MiroID = "A soft shell"
+        MiroID = "A soft shell",
+        ontologyType = "TestWork"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
-      whenReady(identifiersDao.lookupMiroID(identifier.MiroID)) { maybeIdentifier =>
+      val lookupFuture = identifiersDao.lookupMiroID(
+        miroID = identifier.MiroID,
+        ontologyType = identifier.ontologyType
+      )
+
+      whenReady(lookupFuture) { maybeIdentifier =>
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe identifier
       }
@@ -32,7 +38,8 @@ class IdentifiersDaoTest
 
     it("should return a future of None if looking up a non-existent Miro ID") {
       assertLookupMiroIDFindsNothing(
-        miroID = "A missing mouse"
+        miroID = "A missing mouse",
+        ontologyType = "TestWork"
       )
     }
 
@@ -156,7 +163,7 @@ class IdentifiersDaoTest
     }
 
   /** Helper method.  Do a Miro ID lookup and check that it fails. */
-  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String = "Work") = {
+  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String) = {
     val lookupFuture = identifiersDao.lookupMiroID(
       miroID = miroID,
       ontologyType = ontologyType

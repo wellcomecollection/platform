@@ -8,7 +8,7 @@ import scalikejdbc._
 case class Identifier(
   CanonicalID: String,
   MiroID: String,
-  ontologyType: String = "Work"
+  ontologyType: String
 )
 
 object Identifier {
