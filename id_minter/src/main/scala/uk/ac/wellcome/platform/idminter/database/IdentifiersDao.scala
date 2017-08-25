@@ -64,6 +64,18 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
               )
             }
 
+            .map { sql: ConditionSQLBuilder[String] =>
+              println(s"${sql}")
+              sql
+            }
+
+            // TODO: Might be nice to log the SQL query we're making as a
+            // debug statement
+            // .map { sql: ConditionSQLBuilder[String] =>
+            //   info(s"Executing SQL query '${sql.value}'")
+            //   sql
+            // }
+
         }.map(Identifier(i)).single.apply()
       }
     }
@@ -92,7 +104,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     if (sourceID.isEmpty) {
       sql
     } else {
-      sql.and.eq(column, sourceID.head.value).or.isNull(column)
+      sql.and.withRoundBracket( _.eq(column, sourceID.head.value).or.isNull(column) )
     }
   }
 
@@ -118,7 +130,8 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
             .namedValues(
               identifiers.column.CanonicalID -> identifier.CanonicalID,
               identifiers.column.ontologyType -> identifier.ontologyType,
-              identifiers.column.MiroID -> identifier.MiroID
+              identifiers.column.MiroID -> identifier.MiroID,
+              identifiers.column.CalmAltRefNo -> identifier.CalmAltRefNo
             )
         }.update().apply()
       }

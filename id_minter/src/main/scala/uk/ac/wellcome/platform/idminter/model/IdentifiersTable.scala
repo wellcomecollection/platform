@@ -8,8 +8,8 @@ import scalikejdbc._
 case class Identifier(
   ontologyType: String = "Work",
   CanonicalID: String,
-  MiroID: String,
-  CalmAltRefNo: Option[String] = Some(null)
+  MiroID: String = null,
+  CalmAltRefNo: String = null
 )
 
 object Identifier {
@@ -18,7 +18,7 @@ object Identifier {
       ontologyType = rs.string(p.resultName.ontologyType),
       CanonicalID = rs.string(p.resultName.CanonicalID),
       MiroID = rs.string(p.resultName.MiroID),
-      CalmAltRefNo = Some(rs.string(p.resultName.CalmAltRefNo))
+      CalmAltRefNo = rs.string(p.resultName.CalmAltRefNo)
     )
 }
 
