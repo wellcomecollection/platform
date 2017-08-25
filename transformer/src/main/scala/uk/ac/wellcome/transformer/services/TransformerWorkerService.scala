@@ -23,6 +23,7 @@ import uk.ac.wellcome.models.transformable.{
 import com.twitter.inject.Logging
 
 import uk.ac.wellcome.sqs.SQSMessageReceiver
+import uk.ac.wellcome.transformer.SQSMessageReceiverBuilder
 
 
 import scala.concurrent.Future
@@ -35,33 +36,11 @@ class TransformerWorkerService @Inject()(
   transformableParser: TransformableParser[Transformable]
 ) extends SQSWorker(reader, system, metrics) with Logging {
 
-  private val messageReceiver = new SQSMessageReceiver(
+  private val messageReceiver = SQSMessageReceiverBuilder.buildReceiver(
     snsWriter = writer,
-    messageProcessor = messageProcessor,
+    parser = transformableParser,
     metricsSender = metrics
   )
-
-  def messageProcessor(message: SQSMessage): Try[Work] =
-    for {
-      transformableRecord <- transformableParser.extractTransformable(
-        message)
-      cleanRecord <- transformTransformable(transformableRecord)
-    } yield cleanRecord
-
-  def transformTransformable(transformable: Transformable): Try[Work] = {
-    transformable.transform map { transformed =>
-      info(s"Transformed record $transformed")
-      transformed
-    } recover {
-      case e: ShouldNotTransformException =>
-        info("Work does not meet transform requirements.", e)
-        throw SQSReaderGracefulException(e)
-      case e: Throwable =>
-        // TODO: Send to dead letter queue or just error
-        error("Failed to perform transform to unified item", e)
-        throw e
-    }
-  }
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     messageReceiver.receiveMessage(message).map(_ => ())

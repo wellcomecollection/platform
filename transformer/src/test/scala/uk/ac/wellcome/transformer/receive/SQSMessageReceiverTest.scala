@@ -79,6 +79,7 @@ class SQSMessageReceiverTest
   }
 
   it("should return a failed future if it's unable to parse the SQS message") {
+    val snsWriter = mockSNSWriter
     val recordReceiver = SQSMessageReceiverBuilder.buildReceiver(
       snsWriter = snsWriter,
       parser = new CalmParser(),
@@ -94,6 +95,7 @@ class SQSMessageReceiverTest
 
   it(
     "should return a failed future if it's unable to transform the transformable object") {
+    val snsWriter = mockSNSWriter
     val recordReceiver = SQSMessageReceiverBuilder.buildReceiver(
       snsWriter = snsWriter,
       parser = new CalmParser(),
@@ -109,6 +111,7 @@ class SQSMessageReceiverTest
 
   it(
     "should return a successful future if it meets a ShouldNotTransformException") {
+    val snsWriter = mockSNSWriter
     val recordReceiver = SQSMessageReceiverBuilder.buildReceiver(
       snsWriter = snsWriter,
       parser = new MiroParser(),
@@ -127,9 +130,10 @@ class SQSMessageReceiverTest
 
   it("should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
+    val snsWriter = mockSNSWriter
     val recordReceiver = SQSMessageReceiverBuilder.buildReceiver(
       snsWriter = snsWriter,
-      parser = new CalmParser(),
+      parser = new MiroParser(),
       metricsSender = metricsSender
     )
 
