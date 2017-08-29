@@ -22,10 +22,11 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
       "generate-id",
       () =>
         findMiroID(work) match {
-          case Some(identifier) => retrieveOrGenerateCanonicalId(
-            identifier,
-            ontologyType = work.ontologyType
-          )
+          case Some(identifier) =>
+            retrieveOrGenerateCanonicalId(
+              identifier,
+              ontologyType = work.ontologyType
+            )
           case None =>
             error(s"Item $work did not contain a MiroID")
             Future.failed(
