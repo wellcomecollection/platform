@@ -209,11 +209,12 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
-.docker/lambda_deps: .docker/python3.6_ci
+.docker/_lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
+	mkdir -p .docker && touch .docker/_lambda_deps
 
 ## Run a plan
-terraform-plan: .docker/terraform_ci .docker/lambda_deps
+terraform-plan: .docker/terraform_ci .docker/_lambda_deps
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply
