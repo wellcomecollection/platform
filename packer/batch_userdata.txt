@@ -26,7 +26,7 @@ cloud-init-per once recreate_docker_dir mkdir /var/lib/docker
 cloud-init-per once create_overlay_mountpoint mkdir /var/lib/docker/overlay
 
 # Mount overlay device
-cloud-init-per once mount_docker_overlay mount /dev/xvdcz /var/lib/docker/overlay
+cloud-init-per instance mount_docker_overlay mount /dev/xvdcz /var/lib/docker/overlay
 
 # Set Docker daemon options
 cloud-init-per once docker_storage_opts cat <<'EOF' > /etc/sysconfig/docker-storage
