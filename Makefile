@@ -23,10 +23,14 @@ clean:
 	pip3 install --upgrade boto3 docopt
 	mkdir -p .docker && touch .docker/_build_deps
 
+.docker/image_builder:
+	docker build -t image_builder -f builds/image_builder.Dockerfile builds
+	mkdir -p .docker && touch .docker/image_builder
+
 
 ## Build the image for gatling
-gatling-build: .docker/_build_deps
-	./scripts/build_docker_image.py --project=gatling
+gatling-build: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=gatling
 
 ## Deploy the image for gatling
 gatling-deploy: gatling-build
@@ -34,8 +38,8 @@ gatling-deploy: gatling-build
 
 
 ## Build the image for the cache cleaner
-cache_cleaner-build: .docker/_build_deps
-	./scripts/build_docker_image.py --project=cache_cleaner
+cache_cleaner-build: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build
@@ -43,8 +47,8 @@ cache_cleaner-deploy: cache_cleaner-build
 
 
 ## Build the image for tif-metadata
-tif-metadata-build: .docker/_build_deps
-	./scripts/build_docker_image.py --project=tif-metadata
+tif-metadata-build: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=tif-metadata
 
 ## Deploy the image for tif-metadata
 tif-metadata-deploy: tif-metadata-build
@@ -52,39 +56,39 @@ tif-metadata-deploy: tif-metadata-build
 
 
 ## Build the image for Loris
-loris-build: .docker/_build_deps
-	./scripts/build_docker_image.py --project=loris
+loris-build: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=loris
 
 ## Deploy the image for Loris
 loris-deploy: loris-build
 	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
 
 
-miro_adapter-build: .docker/_build_deps
-	./scripts/build_docker_image.py --project=miro_adapter --file=miro_adapter/Dockerfile
+miro_adapter-build: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
 
 miro_adapter-deploy: miro_adapter-build
 	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
 
 
-elasticdump-build: .docker/_build_deps
-	./scripts/build_docker_image.py --project=elasticdump
+elasticdump-build: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=elasticdump
 
 elasticdump-deploy: elasticdump-build
 	./scripts/deploy_docker_to_aws.py --project=elasticdump --infra-bucket=$(INFRA_BUCKET)
 
 
-nginx-build-api: .docker/_build_deps
-	./scripts/build_docker_image.py --project=nginx --variant=api
+nginx-build-api: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=api
 
-nginx-build-loris: .docker/_build_deps
-	./scripts/build_docker_image.py --project=nginx --variant=loris
+nginx-build-loris: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=loris
 
-nginx-build-services: .docker/_build_deps
-	./scripts/build_docker_image.py --project=nginx --variant=services
+nginx-build-services: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=services
 
-nginx-build-grafana: .docker/_build_deps
-	./scripts/build_docker_image.py --project=nginx --variant=grafana
+nginx-build-grafana: .docker/image_builder
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
@@ -147,22 +151,22 @@ sbt-test: \
 
 
 
-sbt-build-api: .docker/_build_deps sbt-test-api
+sbt-build-api: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-id_minter: .docker/_build_deps sbt-test-id_minter
+sbt-build-id_minter: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: .docker/_build_deps sbt-test-ingestor
+sbt-build-ingestor: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: .docker/_build_deps sbt-test-miro_adapter
+sbt-build-miro_adapter: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: .docker/_build_deps sbt-test-reindexer
+sbt-build-reindexer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: .docker/_build_deps sbt-test-transformer
+sbt-build-transformer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
@@ -205,11 +209,12 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
-.docker/lambda_deps: .docker/python3.6_ci
+.docker/_lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
+	mkdir -p .docker && touch .docker/_lambda_deps
 
 ## Run a plan
-terraform-plan: .docker/terraform_ci .docker/lambda_deps
+terraform-plan: .docker/terraform_ci .docker/_lambda_deps
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply
@@ -233,7 +238,7 @@ test-lambdas: .docker/python3.6_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
 format-terraform: .docker/terraform_ci
-	docker run -v $$(pwd):/data -e OP=fmt terraform_ci
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -e OP=fmt terraform_ci
 
 format-scala:
 	sbt scalafmt
