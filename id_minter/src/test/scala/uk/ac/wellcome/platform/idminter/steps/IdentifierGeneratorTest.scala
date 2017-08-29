@@ -83,14 +83,25 @@ class IdentifierGeneratorTest
   it(
     "should return a failed future if it fails inserting the identifier in the database") {
     val miroId = "1234"
-    val work =
-      Work(identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)),
-           title = "A fear of failing in a fox")
+    val sourceIdentifiers = List(
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        value = miroId
+      )
+    )
+    val work = Work(
+      identifiers = sourceIdentifiers,
+      title = "A fear of failing in a fox"
+    )
     val identifiersDao = mock[IdentifiersDao]
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao, metricsSender)
 
-    when(identifiersDao.lookupMiroID(miroId))
+    val lookupFuture = identifiersDao.lookupID(
+      sourceIdentifiers = sourceIdentifiers,
+      ontologyType = work.ontologyType
+    )
+    when(lookupFuture)
       .thenReturn(Future.successful(None))
     val expectedException = new Exception("Noooo")
     when(identifiersDao.saveIdentifier(any[Identifier]()))

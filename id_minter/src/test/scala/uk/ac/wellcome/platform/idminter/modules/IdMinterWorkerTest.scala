@@ -73,7 +73,24 @@ class IdMinterWorkerTest
   it(
     "should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
     val miroId = "1234"
-    when(identifiersDao.lookupMiroID(miroId))
+
+    val sourceIdentifiers = List(
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        value = miroId
+      )
+    )
+    val work = Work(
+      identifiers = sourceIdentifiers,
+      title = "Some fresh fruit for a flamingo"
+    )
+
+    val lookupFuture = identifiersDao.lookupID(
+      sourceIdentifiers = sourceIdentifiers,
+      ontologyType = work.ontologyType
+    )
+
+    when(lookupFuture)
       .thenReturn(Future.successful(None))
     when(identifiersDao.saveIdentifier(any[Identifier]))
       .thenReturn(Future.failed(new Exception("cannot insert")))
@@ -83,11 +100,7 @@ class IdMinterWorkerTest
         SQSMessage(
           Some("subject"),
           JsonUtil
-            .toJson(
-              Work(
-                identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)),
-                title = "Some fresh fruit for a flamingo"
-              ))
+            .toJson(work)
             .get,
           "topic",
           "messageType",
