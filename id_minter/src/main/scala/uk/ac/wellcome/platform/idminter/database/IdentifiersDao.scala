@@ -120,6 +120,11 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
       ontologyType = ontologyType
     )
 
+  /* Save an identifier into the database.
+   *
+   * Note that this will copy _all_ the fields on `Identifier`, nulling any
+   * fields which aren't set on `Identifier`.
+   */
   def saveIdentifier(identifier: Identifier): Future[Int] = {
     val insertIntoDbFuture = Future {
       blocking {
