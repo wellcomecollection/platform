@@ -9,7 +9,7 @@ cloud-init-per once remove_devicemapper_devs dmsetup remove_all
 
 # Set Docker daemon options
 cloud-init-per once docker_storage_opts cat <<'EOF' > /etc/sysconfig/docker-storage
-DOCKER_STORAGE_OPTIONS="--storage-driver overlay2 --storage-opt dm.basesize=20G"
+DOCKER_STORAGE_OPTIONS="--storage-driver overlay2"
 EOF
 
 --==BOUNDARY==--
