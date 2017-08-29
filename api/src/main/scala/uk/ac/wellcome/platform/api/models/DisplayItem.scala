@@ -10,6 +10,7 @@ import uk.ac.wellcome.models.Item
 )
 case class DisplayItem(
   @ApiModelProperty(
+    dataType = "String",
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
