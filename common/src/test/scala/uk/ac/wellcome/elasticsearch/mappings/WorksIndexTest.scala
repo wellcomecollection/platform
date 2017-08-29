@@ -6,7 +6,7 @@ import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -31,15 +31,27 @@ class WorksIndexTest
   it("should create an index where it's possible to insert and retrieve a valid Work json") {
     createAndWaitIndexIsCreated()
 
+    val identifiers = List(
+      SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber,
+                       value = "4321"))
     val workJson = JsonUtil
       .toJson(
         Work(
           canonicalId = Some("1234"),
-          identifiers = List(
-                        SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber,
-                                         value = "4321")),
-                      title = "A magical menagerie for magpies")
+          identifiers = identifiers,
+          title = "A magical menagerie for magpies",
+          items = List(
+            Item(
+              canonicalId = Some("56789"),
+              identifiers = identifiers,
+              locations = List(
+                Location(
+                  locationType = "iiif",
+                  url = Some("https://iiif.wellcomecollection.org/image"),
+                  license = License_CCBY))
+            ))
         )
+      )
       .get
 
     elasticClient.execute(indexInto(indexName / itemType).doc(workJson))
@@ -47,10 +59,12 @@ class WorksIndexTest
     eventually {
       val hits = elasticClient
         .execute(search(s"$indexName/$itemType").matchAllQuery())
-        .map { _.hits.hits }
+        .map {
+          _.hits.hits
+        }
         .await
       hits should have size 1
-      hits.head.sourceAsString shouldBe workJson
+      shouldBeSameJson(hits.head.sourceAsString, workJson)
     }
   }
 
@@ -63,7 +77,7 @@ class WorksIndexTest
 
     whenReady(eventualIndexResponse.failed) { exception =>
       exception shouldBe a[ResponseException]
-      // TODO: this should be more specific
+    // TODO: this should be more specific
     }
   }
 
@@ -80,6 +94,11 @@ class WorksIndexTest
         .execute(getMapping(indexName))
         .await
     }
+  }
+
+  private def shouldBeSameJson(actualJson: String, workJson: String): Any = {
+    JsonUtil.fromJson[Work](actualJson) shouldBe JsonUtil.fromJson[Work](
+      workJson)
   }
 
   private def createIndexAndInsertDocument() = {

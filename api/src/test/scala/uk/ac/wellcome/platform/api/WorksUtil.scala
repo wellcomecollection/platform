@@ -22,7 +22,8 @@ trait WorksUtil {
           description = s"${idx}-${description}",
           lettering = s"${idx}-${lettering}",
           createdDate = Period(s"${idx}-${period.label}"),
-          creator = Agent(s"${idx}-${agent.label}")
+          creator = Agent(s"${idx}-${agent.label}"),
+          List(defaultItem)
       ))
 
   def workWith(canonicalId: String, title: String): Work =
@@ -59,20 +60,61 @@ trait WorksUtil {
       thumbnail = Some(thumbnail)
     )
 
-  def workWith(
-    canonicalId: String,
-     title: String,
-     description: String,
-     lettering: String,
-     createdDate: Period,
-     creator: Agent
-  ): Work = Work(
+  def workWith(canonicalId: String,
+               title: String,
+               description: String,
+               lettering: String,
+               createdDate: Period,
+               creator: Agent,
+               items: List[Item]): Work = Work(
     canonicalId = Some(canonicalId),
-    identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+    identifiers =
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
     title = title,
     description = Some(description),
     lettering = Some(lettering),
     createdDate = Some(createdDate),
-    creators = List(creator)
+    creators = List(creator),
+    items = items
   )
+
+  def defaultItem: Item = {
+    itemWith(
+      Some("item-canonical-id"),
+      defaultSourceIdentifier,
+      defaultLocation
+    )
+  }
+
+  def defaultSourceIdentifier = {
+    SourceIdentifier("miro-image-number", "M0000001")
+  }
+
+  def defaultLocation: Location = {
+    locationWith(
+      Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+      License_CCBY)
+  }
+
+  def itemWith(canonicalId: Option[String],
+               identifier: SourceIdentifier,
+               location: Location): Item = {
+    Item(
+      canonicalId = canonicalId,
+      List(
+        identifier
+      ),
+      List(
+        location
+      )
+    )
+  }
+
+  def locationWith(url: Option[String], license: BaseLicense): Location = {
+    Location(
+      "iiif-image",
+      url,
+      license
+    )
+  }
 }

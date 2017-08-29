@@ -30,5 +30,6 @@ class DisplayLocationTest extends FunSpec with Matchers {
       label = licenseLabel,
       url = licenseUrl
     )
+    displayLocation.ontologyType shouldBe "Location"
   }
 }
