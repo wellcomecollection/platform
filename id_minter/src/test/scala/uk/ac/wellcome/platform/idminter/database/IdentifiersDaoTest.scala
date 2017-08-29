@@ -372,15 +372,4 @@ class IdentifiersDaoTest
     whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
       result shouldBe 1
     }
-
-  /* Helper method.  Do a Miro ID lookup and check that it fails. */
-  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String = "Work") = {
-    val lookupFuture = identifiersDao.lookupMiroID(
-      miroID = miroID,
-      ontologyType = ontologyType
-    )
-    whenReady(lookupFuture) { maybeIdentifier =>
-      maybeIdentifier shouldNot be(defined)
-    }
-  }
 }
