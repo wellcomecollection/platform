@@ -26,13 +26,6 @@
         "delete_on_termination": true,
         "device_name": "/dev/xvda",
         "encrypted": false,
-        "volume_size": 8,
-        "volume_type": "gp2"
-      },
-      {
-        "delete_on_termination": true,
-        "device_name": "/dev/xvdcz",
-        "encrypted": false,
         "volume_size": 100,
         "volume_type": "gp2"
       }

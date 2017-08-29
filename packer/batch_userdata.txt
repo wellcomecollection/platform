@@ -18,16 +18,6 @@ Content-Type: text/cloud-boothook; charset="us-ascii"
 # Get rid of devmapper devs
 cloud-init-per once remove_devicemapper_devs dmsetup remove_all
 
-# Recreate partition
-cloud-init-per once docker_overlay_fs mkfs -F -t ext4 -L docker -i 4096 /dev/xvdcz
-
-cloud-init-per once delete_docker_dir rm -rf /var/lib/docker
-cloud-init-per once recreate_docker_dir mkdir /var/lib/docker
-cloud-init-per once create_overlay_mountpoint mkdir /var/lib/docker/overlay
-
-# Mount overlay device
-cloud-init-per instance mount_docker_overlay mount /dev/xvdcz /var/lib/docker/overlay
-
 # Set Docker daemon options
 cloud-init-per once docker_storage_opts cat <<'EOF' > /etc/sysconfig/docker-storage
 DOCKER_STORAGE_OPTIONS="--storage-driver overlay --storage-opt dm.basesize=20G"
