@@ -64,7 +64,7 @@ class IdentifierGeneratorTest
         select.from(identifiersTable as i).where.eq(i.MiroID, "1234")
       }.map(Identifier(i)).single.apply()
       maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe Identifier(id, "1234")
+      maybeIdentifier.get shouldBe Identifier(CanonicalID = id, MiroID = "1234")
     }
   }
 
