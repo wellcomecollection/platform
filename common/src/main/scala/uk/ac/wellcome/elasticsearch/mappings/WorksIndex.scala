@@ -25,9 +25,8 @@ class WorksIndex @Inject()(client: HttpClient,
     textField("url")
   )
 
-  val identifiers = objectField("identifiers").fields(
-    keywordField("identifierScheme"),
-    keywordField("value"))
+  val identifiers = objectField("identifiers")
+    .fields(keywordField("identifierScheme"), keywordField("value"))
 
   def location(fieldName: String = "locations") =
     objectField(fieldName).fields(
