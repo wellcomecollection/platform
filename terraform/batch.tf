@@ -5,7 +5,7 @@ module "aws_batch_compute" {
   key_name           = "${var.key_name}"
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
   vpc_id             = "${module.vpc_batch.vpc_id}"
-  image_id           = "ami-6dfd0614"
+  image_id           = "ami-39ea1140"
 }
 
 module "aws_batch_queue" {
