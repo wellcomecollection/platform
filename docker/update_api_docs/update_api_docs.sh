@@ -13,8 +13,10 @@ curl --request PUT \
   --data "{
     \"url\": \"$SWAGGER_URL\",
     \"options\": {
-      \"removeExtraEndpoints\": true,
-      \"removeExtraModels\": true
+      \"removeExtraSchemas\": true,
+      \"removeExtraTextSections\": true,
+      \"removeExtraTraits\": true,
+      \"removeExtraEndpoints\": true
     }
   }"
 echo
