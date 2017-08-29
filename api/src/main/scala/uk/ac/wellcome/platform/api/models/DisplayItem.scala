@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.Item
 case class DisplayItem(
   @ApiModelProperty(
     readOnly = true,
-    value = "The canonical identifier given to a thing.") id: String,
+    value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayIdentifier]",
     value =
@@ -29,7 +29,7 @@ case class DisplayItem(
 object DisplayItem {
   def apply(item: Item, includesIdentifiers: Boolean): DisplayItem =
     DisplayItem(
-      id = item.id,
+      id = item.canonicalId,
       identifiers =
         if (includesIdentifiers)
           Some(item.identifiers.map(DisplayIdentifier(_)))
