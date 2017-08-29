@@ -108,18 +108,6 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     }
   }
 
-  def lookupMiroID(miroID: String,
-                   ontologyType: String = "Work"): Future[Option[Identifier]] =
-    lookupID(
-      sourceIdentifiers = List(
-        SourceIdentifier(
-          identifierScheme = "miro-image-number",
-          value = miroID
-        )
-      ),
-      ontologyType = ontologyType
-    )
-
   /* Save an identifier into the database.
    *
    * Note that this will copy _all_ the fields on `Identifier`, nulling any
