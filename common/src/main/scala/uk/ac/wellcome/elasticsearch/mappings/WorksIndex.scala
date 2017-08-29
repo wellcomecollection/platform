@@ -25,10 +25,8 @@ class WorksIndex @Inject()(client: HttpClient,
     textField("url")
   )
 
-  val identifiers = objectField("identifiers").fields(
-    keywordField("identifierScheme"),
-    keywordField("value"),
-    keywordField("type"))
+  val identifiers = objectField("identifiers")
+    .fields(keywordField("identifierScheme"), keywordField("value"))
 
   def location(fieldName: String = "locations") =
     objectField(fieldName).fields(
@@ -49,8 +47,10 @@ class WorksIndex @Inject()(client: HttpClient,
   )
 
   val items = objectField("items").fields(
+    keywordField("canonicalId"),
     identifiers,
-    location()
+    location(),
+    keywordField("type")
   )
 
   val mappingDefinition = putMapping(indexName / itemType)

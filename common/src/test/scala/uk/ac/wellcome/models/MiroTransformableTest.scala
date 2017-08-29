@@ -451,6 +451,34 @@ class MiroTransformableSubjectsTest
     )
   }
 
+  it("should create an Item for each Work") {
+    val title = "A woodcut of a Weevil"
+    val longTitle = "A wonderful woodcut of a weird weevil"
+    val descriptionBody = "Woodcut, by A.R. Thropod.  Welsh.  1789."
+    val description = s"$longTitle\\n\\n$descriptionBody"
+    val work = transformWork(
+      data = s"""
+        "image_title": "$title",
+        "image_image_desc": "$description"
+      """)
+
+    val item = work.items.head
+
+    item shouldBe Item(
+      None,
+      List(
+        SourceIdentifier("miro-image-number","M0000001")
+      ),
+      List(
+        Location(
+          "iiif-image",
+          Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          License_CCBY
+        )
+      )
+    )
+  }
+
   private def transformRecordAndCheckSubjects(
     data: String,
     expectedSubjects: List[Concept] = List()

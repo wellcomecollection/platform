@@ -8,7 +8,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 class ApiWorksTest
-  extends FunSpec
+    extends FunSpec
     with FeatureTestMixin
     with IndexedElasticSearchLocal
     with WorksUtil {
@@ -28,7 +28,7 @@ class ApiWorksTest
 
   val apiPrefix = "catalogue/v0"
 
-  val emptyJsonResult = s"""
+  private val emptyJsonResult = s"""
                            |{
                            |  "@context": "https://localhost:8888/$apiPrefix/context.json",
                            |  "type": "ResultList",
@@ -38,6 +38,43 @@ class ApiWorksTest
                            |  "results": []
                            |}""".stripMargin
 
+  private def items(work: Work) = {
+    work.items
+      .map { it =>
+        s"""{
+         "id": "${it.canonicalId.get}",
+         "type": "${it.ontologyType}",
+         "locations": [
+           ${locations(it)}
+         ]
+       }"""
+      }
+      .mkString(",")
+  }
+
+  private def locations(it: Item) = {
+    it.locations
+      .map { location =>
+        s"""{
+           "type": "${location.ontologyType}",
+           "locationType": "${location.locationType}",
+           "url": "${location.url.get}",
+           "license": ${license(location)}
+           }"""
+
+      }
+      .mkString(",")
+  }
+
+  private def license(location: Location) = {
+    s"""{
+         "label": "${location.license.label}",
+         "licenseType": "${location.license.licenseType}",
+         "type": "${location.license.ontologyType}",
+         "url": "${location.license.url}"
+         }"""
+  }
+
   it("should return a list of works") {
 
     val works = createWorks(3)
@@ -45,6 +82,7 @@ class ApiWorksTest
     insertIntoElasticSearch(works: _*)
 
     eventually {
+
       server.httpGet(
         path = s"/$apiPrefix/works",
         andExpect = Status.Ok,
@@ -72,7 +110,9 @@ class ApiWorksTest
                           |     }],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "items": [
+                          |       ${items(works(0))}
+                          |     ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -90,7 +130,9 @@ class ApiWorksTest
                           |     }],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "items": [
+                          |       ${items(works(1))}
+                          |     ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -108,7 +150,9 @@ class ApiWorksTest
                           |     }],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "items": [
+                          |       ${items(works(2))}
+                          |     ]
                           |   }
                           |  ]
                           |}
@@ -118,13 +162,55 @@ class ApiWorksTest
   }
 
   it("should return a single work when requested with id") {
+    val work = workWith(canonicalId = canonicalId,
+                        title = title,
+                        description = description,
+                        lettering = lettering,
+                        createdDate = period,
+                        creator = agent,
+                        List(defaultItem))
+
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/$canonicalId",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "$canonicalId",
+                          | "title": "$title",
+                          | "description": "$description",
+                          | "lettering": "$lettering",
+                          | "createdDate": {
+                          |   "type": "Period",
+                          |   "label": "${period.label}"
+                          | },
+                          | "creators": [{
+                          |   "type": "Agent",
+                          |   "label": "${agent.label}"
+                          | }],
+                          | "items": [${items(work)}],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it("should be able to render an item with no canonicalId") {
     val work = workWith(
       canonicalId = canonicalId,
       title = title,
       description = description,
       lettering = lettering,
       createdDate = period,
-      creator = agent
+      creator = agent,
+      List(
+        itemWith(canonicalId = None, defaultSourceIdentifier, defaultLocation))
     )
 
     insertIntoElasticSearch(work)
@@ -149,7 +235,14 @@ class ApiWorksTest
                           |   "type": "Agent",
                           |   "label": "${agent.label}"
                           | }],
-                          | "items": [ ],
+                          | "items": [
+                          |   {
+                          |    "type": "${work.items.head.ontologyType}",
+                          |    "locations": [
+                          |      ${locations(work.items.head)}
+                          |    ]
+                          |   }
+                          | ],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
@@ -192,7 +285,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(1).creators(0).label}"
                           |     }],
-                          |     "items": [ ],
+                          |     "items": [ ${items(works(1))}],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -228,7 +321,7 @@ class ApiWorksTest
                           |       "type": "Agent",
                           |       "label": "${works(0).creators(0).label}"
                           |     }],
-                          |     "items": [ ],
+                          |     "items": [${items(works(0))}],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -265,7 +358,7 @@ class ApiWorksTest
                           |       "label": "${works(2).creators(0).label}"
                           |     }],
                           |     "subjects": [ ],
-                          |      "items": [ ],
+                          |      "items": [${items(works(2))}],
                           |     "genres": [ ]
                           |   }]
                           |   }
@@ -276,8 +369,7 @@ class ApiWorksTest
     }
   }
 
-  it(
-    "should return a BadRequest when malformed query parameters are presented") {
+  it("should return a BadRequest when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -369,8 +461,7 @@ class ApiWorksTest
     )
   }
 
-  it(
-    "should return multiple errors if there's more than one invalid parameter") {
+  it("should return multiple errors if there's more than one invalid parameter") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=-60&page=-50",
       andExpect = Status.BadRequest,
@@ -482,7 +573,6 @@ class ApiWorksTest
       identifiers = List(),
       title = "A guppy in a greenhouse",
       genres = List(Concept("woodwork"), Concept("etching"))
-
     )
     insertIntoElasticSearch(workWithSubjects)
 
@@ -814,7 +904,8 @@ class ApiWorksTest
     }
   }
 
-  it("should include the thumbnail field if available and we use the thumbnail include") {
+  it(
+    "should include the thumbnail field if available and we use the thumbnail include") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",

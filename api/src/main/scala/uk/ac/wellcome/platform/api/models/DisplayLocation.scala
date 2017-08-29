@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.Location
 case class DisplayLocation(
   @ApiModelProperty(
     value = "The type of location that an item is accessible from.",
-    allowableValues = "thumbnail-image"
+    allowableValues = "thumbnail-image, iiif-image"
   ) locationType: String,
   @ApiModelProperty(
     value = "The title or other short name of a license"

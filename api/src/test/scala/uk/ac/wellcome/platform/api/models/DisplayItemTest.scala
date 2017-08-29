@@ -59,6 +59,22 @@ class DisplayItemTest extends FunSpec with Matchers {
     displayItem.id shouldBe item.id
     displayItem.locations shouldBe List(DisplayLocation(location))
     displayItem.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
+    displayItem.ontologyType shouldBe "Item"
+
+  }
+
+  it("should be able to render items with no canonicalId") {
+    val item = Item(canonicalId = None, identifiers = List(identifier),
+      locations = List(location))
+
+    val displayItem = DisplayItem(
+      item = item,
+      includesIdentifiers = true
+    )
+    displayItem.id shouldBe None
+    displayItem.locations shouldBe List(DisplayLocation(location))
+    displayItem.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
+    displayItem.ontologyType shouldBe "Item"
 
   }
 }
