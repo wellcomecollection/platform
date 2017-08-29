@@ -28,7 +28,7 @@ class ApiWorksTest
 
   val apiPrefix = "catalogue/v0"
 
-  val emptyJsonResult = s"""
+  private val emptyJsonResult = s"""
                            |{
                            |  "@context": "https://localhost:8888/$apiPrefix/context.json",
                            |  "type": "ResultList",
@@ -38,7 +38,7 @@ class ApiWorksTest
                            |  "results": []
                            |}""".stripMargin
 
-  def items(work: Work) = {
+  private def items(work: Work) = {
     work.items
       .map { it =>
         s"""{
@@ -162,14 +162,13 @@ class ApiWorksTest
   }
 
   it("should return a single work when requested with id") {
-    val work = workWith(
-      canonicalId = canonicalId,
-      title = title,
-      description = description,
-      lettering = lettering,
-      createdDate = period,
-      creator = agent
-    )
+    val work = workWith(canonicalId = canonicalId,
+                        title = title,
+                        description = description,
+                        lettering = lettering,
+                        createdDate = period,
+                        creator = agent,
+                        List(defaultItem))
 
     insertIntoElasticSearch(work)
 
@@ -194,6 +193,56 @@ class ApiWorksTest
                           |   "label": "${agent.label}"
                           | }],
                           | "items": [${items(work)}],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it("should be able to render an item with no canonicalId") {
+    val work = workWith(
+      canonicalId = canonicalId,
+      title = title,
+      description = description,
+      lettering = lettering,
+      createdDate = period,
+      creator = agent,
+      List(
+        itemWith(canonicalId = None, defaultSourceIdentifier, defaultLocation))
+    )
+
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/$canonicalId",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "$canonicalId",
+                          | "title": "$title",
+                          | "description": "$description",
+                          | "lettering": "$lettering",
+                          | "createdDate": {
+                          |   "type": "Period",
+                          |   "label": "${period.label}"
+                          | },
+                          | "creators": [{
+                          |   "type": "Agent",
+                          |   "label": "${agent.label}"
+                          | }],
+                          | "items": [
+                          |   {
+                          |    "type": "${work.items.head.ontologyType}",
+                          |    "locations": [
+                          |      ${locations(work.items.head)}
+                          |    ]
+                          |   }
+                          | ],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
