@@ -72,3 +72,8 @@ module "ecs_elasticdump_iam" {
   source = "./ecs_iam"
   name   = "elasticdump"
 }
+
+module "ecs_update_api_docs_iam" {
+  source = "./ecs_iam"
+  name   = "update_api_docs"
+}
