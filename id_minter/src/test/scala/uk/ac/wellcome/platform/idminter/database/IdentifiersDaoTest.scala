@@ -353,4 +353,34 @@ class IdentifiersDaoTest
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
     }
   }
+
+  /* Helper method.  Given two records, try to insert them both, and check
+   * that integrity checks in the database reject the second record.
+   */
+  private def assertInsertingDuplicateFails(identifier: Identifier,
+                                            duplicateIdentifier: Identifier) = {
+    assertInsertingIdentifierSucceeds(identifier)
+
+    val duplicateFuture = identifiersDao.saveIdentifier(duplicateIdentifier)
+    whenReady(duplicateFuture.failed) { exception =>
+      exception shouldBe a[SQLIntegrityConstraintViolationException]
+    }
+  }
+
+  /* Helper method.  Insert a record and check that it succeeds. */
+  private def assertInsertingIdentifierSucceeds(identifier: Identifier) =
+    whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
+      result shouldBe 1
+    }
+
+  /* Helper method.  Do a Miro ID lookup and check that it fails. */
+  private def assertLookupMiroIDFindsNothing(miroID: String, ontologyType: String = "Work") = {
+    val lookupFuture = identifiersDao.lookupMiroID(
+      miroID = miroID,
+      ontologyType = ontologyType
+    )
+    whenReady(lookupFuture) { maybeIdentifier =>
+      maybeIdentifier shouldNot be(defined)
+    }
+  }
 }
