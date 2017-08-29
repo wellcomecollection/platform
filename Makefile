@@ -151,22 +151,22 @@ sbt-test: \
 
 
 
-sbt-build-api: .docker/_build_deps sbt-test-api
+sbt-build-api: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-id_minter: .docker/_build_deps sbt-test-id_minter
+sbt-build-id_minter: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: .docker/_build_deps sbt-test-ingestor
+sbt-build-ingestor: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: .docker/_build_deps sbt-test-miro_adapter
+sbt-build-miro_adapter: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: .docker/_build_deps sbt-test-reindexer
+sbt-build-reindexer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: .docker/_build_deps sbt-test-transformer
+sbt-build-transformer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
