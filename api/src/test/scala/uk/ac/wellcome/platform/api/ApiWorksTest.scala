@@ -39,27 +39,40 @@ class ApiWorksTest
                            |}""".stripMargin
 
   def items(work: Work) = {
-    work.items.map { it =>
-      val location = it.locations.head
-      val license = location.license
-      s"""{
+    work.items
+      .map { it =>
+        s"""{
          "id": "${it.canonicalId.get}",
          "type": "${it.ontologyType}",
          "locations": [
-           {
-             "type": "${location.ontologyType}",
-             "locationType": "${location.locationType}",
-             "url": "${location.url.get}",
-             "license": {
-               "label": "${license.label}",
-               "licenseType": "${license.licenseType}",
-               "type": "${license.ontologyType}",
-               "url": "${license.url}"
-             }
-           }
+           ${locations(it)}
          ]
        }"""
-    }.mkString(",")
+      }
+      .mkString(",")
+  }
+
+  private def locations(it: Item) = {
+    it.locations
+      .map { location =>
+        s"""{
+           "type": "${location.ontologyType}",
+           "locationType": "${location.locationType}",
+           "url": "${location.url.get}",
+           "license": ${license(location)}
+           }"""
+
+      }
+      .mkString(",")
+  }
+
+  private def license(location: Location) = {
+    s"""{
+         "label": "${location.license.label}",
+         "licenseType": "${location.license.licenseType}",
+         "type": "${location.license.ontologyType}",
+         "url": "${location.license.url}"
+         }"""
   }
 
   it("should return a list of works") {
