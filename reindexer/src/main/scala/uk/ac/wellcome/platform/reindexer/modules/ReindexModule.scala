@@ -24,24 +24,35 @@ object ReindexModule extends TwitterModule with TryBackoff {
   val targetTableName: Flag[String] = flag[String](
     name = "reindex.target.tableName",
     help = "Reindex target table name")
+  val targetReindexShard: Flag[String] = flag[String](
+    name = "reindex.target.reindexShard",
+    help = "Reindex shard to use",
+    default = "default"
+  )
 
   @Singleton
   @Provides
   def providesMiroReindexTargetService(
     dynamoDBClient: AmazonDynamoDB,
     metricsSender: MetricsSender): ReindexTargetService[MiroTransformable] =
-    new MiroReindexTargetService(dynamoDBClient,
-                                 targetTableName(),
-                                 metricsSender)
+    new MiroReindexTargetService(
+      dynamoDBClient = dynamoDBClient,
+      metricsSender = metricsSender,
+      targetTableName = targetTableName(),
+      targetReindexShard = targetReindexShard()
+    )
 
   @Singleton
   @Provides
   def providesCalmReindexTargetService(
     dynamoDBClient: AmazonDynamoDB,
     metricsSender: MetricsSender): ReindexTargetService[CalmTransformable] =
-    new CalmReindexTargetService(dynamoDBClient,
-                                 targetTableName(),
-                                 metricsSender)
+    new CalmReindexTargetService(
+      dynamoDBClient = dynamoDBClient,
+      metricsSender = metricsSender,
+      targetTableName = targetTableName(),
+      targetReindexShard = targetReindexShard()
+    )
 
   override def singletonStartup(injector: Injector) {
     val tableName = targetTableName()
