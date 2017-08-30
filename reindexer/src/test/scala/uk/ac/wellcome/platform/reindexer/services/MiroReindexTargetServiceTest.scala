@@ -19,6 +19,16 @@ class MiroReindexTargetServiceTest
     with MockitoSugar
     with ExtendedPatience {
 
+  val metricsSender: MetricsSender =
+    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
+
+  val reindexTargetService =
+    new MiroReindexTargetService(
+      dynamoDBClient = dynamoDbClient,
+      targetTableName = "MiroData",
+      metricsSender = metricsSender
+    )
+
   it("should update the correct index to the requested version") {
 
     val currentVersion = 1
@@ -56,12 +66,6 @@ class MiroReindexTargetServiceTest
       Scanamo.put(dynamoDbClient)(miroDataTableName))
 
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
-
-    val metricsSender: MetricsSender =
-      new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
-
-    val reindexTargetService =
-      new MiroReindexTargetService(dynamoDbClient, "MiroData", metricsSender)
 
     whenReady(reindexTargetService.runReindex(reindexAttempt)) {
       reindexAttempt =>
