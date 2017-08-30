@@ -22,12 +22,81 @@ class MiroReindexTargetServiceTest
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
-  val reindexTargetService =
-    new MiroReindexTargetService(
-      dynamoDBClient = dynamoDbClient,
-      targetTableName = "MiroData",
-      metricsSender = metricsSender
+  it("should only update images in the specified ReindexShard") {
+    val currentVersion = 1
+    val requestedVersion = 2
+
+    val inShardMiroTransformables = List(
+      MiroTransformable(
+        MiroID = "Image_A1",
+        MiroCollection = "Images-A",
+        data = s""""{"image_title": "An almanac about armadillos"}""",
+        ReindexShard = "Images-A",
+        ReindexVersion = currentVersion
+      ),
+      MiroTransformable(
+        MiroID = "Image_A2",
+        MiroCollection = "Images-A",
+        data = s""""{"image_title": "Asking after an aardvark"}""",
+        ReindexShard = "Images-A",
+        ReindexVersion = currentVersion
+      )
     )
+
+    val diffShardMiroTransformables = List(
+      MiroTransformable(
+        MiroID = "Image_B1",
+        MiroCollection = "Images-B",
+        data = s""""{"image_title": "Buying books about beavers"}""",
+        ReindexShard = "Images-B",
+        ReindexVersion = currentVersion
+      ),
+      MiroTransformable(
+        MiroID = "Image_C1",
+        MiroCollection = "Images-C",
+        data = s""""{"image_title": "Calling a crafty caterpillar"}""",
+        ReindexShard = "Images-C",
+        ReindexVersion = currentVersion
+      )
+    )
+
+    val miroTransformableList = inShardMiroTransformables ++ diffShardMiroTransformables
+
+    val reindex = Reindex(miroDataTableName, requestedVersion, currentVersion)
+    val reindexAttempt = ReindexAttempt(reindex)
+    val expectedReindexAttempt = reindexAttempt.copy(
+      reindex = reindex,
+      successful = true,
+      attempt = 1
+    )
+
+    miroTransformableList.foreach(
+      Scanamo.put(dynamoDbClient)(miroDataTableName))
+
+    Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
+
+    val reindexTargetService =
+      new MiroReindexTargetService(
+        dynamoDBClient = dynamoDbClient,
+        targetTableName = "MiroData",
+        targetReindexShard = inShardMiroTransformables.head.ReindexShard,
+        metricsSender = metricsSender
+      )
+
+    whenReady(reindexTargetService.runReindex(reindexAttempt)) {
+      reindexAttempt =>
+        reindexAttempt shouldBe expectedReindexAttempt
+        val reindexVersions = Scanamo
+          .scan[MiroTransformable](dynamoDbClient)(miroDataTableName)
+          .map {
+            case Right(miroTranformable) => miroTranformable.ReindexVersion
+          }
+
+        reindexVersions.filter { _ == currentVersion }.length shouldBe diffShardMiroTransformables.length
+        reindexVersions.filter { _ == requestedVersion }.length shouldBe inShardMiroTransformables.length
+    }
+
+  }
 
   it("should update the correct index to the requested version") {
 
@@ -39,7 +108,7 @@ class MiroReindexTargetServiceTest
         MiroID = "Image1",
         MiroCollection = "Images-A",
         data = s"""{"image_title": "title"}""",
-        ReindexVersion = 1
+        ReindexVersion = currentVersion
       )
     )
 
@@ -67,6 +136,13 @@ class MiroReindexTargetServiceTest
 
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
+    val reindexTargetService =
+      new MiroReindexTargetService(
+        dynamoDBClient = dynamoDbClient,
+        targetTableName = "MiroData",
+        metricsSender = metricsSender
+      )
+
     whenReady(reindexTargetService.runReindex(reindexAttempt)) {
       reindexAttempt =>
         reindexAttempt shouldBe expectedReindexAttempt
@@ -76,6 +152,5 @@ class MiroReindexTargetServiceTest
             case Right(miroTranformable) => miroTranformable.ReindexVersion
           } should contain only requestedVersion
     }
-
   }
 }
