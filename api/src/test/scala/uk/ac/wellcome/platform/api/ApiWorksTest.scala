@@ -251,7 +251,7 @@ class ApiWorksTest
                           | "id": "${work.canonicalId.get}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "items": [ ${items(work)} ],
+                          | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
