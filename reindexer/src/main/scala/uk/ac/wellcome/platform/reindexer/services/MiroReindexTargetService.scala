@@ -19,8 +19,7 @@ class MiroReindexTargetService @Inject()(
       metricsSender = metricsSender,
       targetTableName = targetTableName,
       targetReindexShard = targetReindexShard
-    )
-{
+    ) {
   protected val scanamoUpdate: ScanamoUpdate =
     Scanamo.update[MiroTransformable](dynamoDBClient)(targetTableName)
 
