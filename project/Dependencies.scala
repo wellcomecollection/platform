@@ -38,6 +38,12 @@ object Dependencies {
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0"
   )
+
+  val monocleDependencies: Seq[ModuleID] = Seq(
+    "com.github.kenbot" %%  "goggles-dsl"     % "1.0",
+    "com.github.kenbot" %%  "goggles-macros"  % "1.0"
+  )
+
   val esDependencies: Seq[ModuleID] = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
@@ -80,7 +86,7 @@ object Dependencies {
   val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
   val idminterDependencies
-    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
+    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies ++ monocleDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 }

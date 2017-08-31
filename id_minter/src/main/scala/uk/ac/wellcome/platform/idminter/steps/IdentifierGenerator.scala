@@ -12,6 +12,8 @@ import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+import scala.util.Try
+
 class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
                                     metricsSender: MetricsSender)
     extends Logging
@@ -23,33 +25,32 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
       () =>
         findMiroID(work) match {
           case Some(identifier) =>
-            retrieveOrGenerateCanonicalId(
-              identifier,
-              ontologyType = work.ontologyType
-            )
+            Future {
+              retrieveOrGenerateCanonicalId(
+                identifier,
+                ontologyType = work.ontologyType
+              ).get
+            }
           case None =>
             error(s"Item $work did not contain a MiroID")
-            Future.failed(
-              new Exception(s"Item $work did not contain a MiroID"))
+            Future.failed(new Exception(s"Item $work did not contain a MiroID"))
       }
     )
   }
 
   private def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier,
-    ontologyType: String): Future[String] = {
+    ontologyType: String): Try[String] = {
     identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
-      case Some(id) => {
+      case Some(id) =>
         metricsSender.incrementCount("found-old-id")
-        Future.successful(id.CanonicalID)
-      }
-      case None => {
+        Try(id.CanonicalID)
+      case None =>
         val result = generateAndSaveCanonicalId(identifier.value)
 
         metricsSender.incrementCount("generated-new-id")
 
         result
-      }
     }
   }
 
@@ -61,7 +62,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
     maybeSourceIdentifier
   }
 
-  private def generateAndSaveCanonicalId(miroId: String): Future[String] = {
+  private def generateAndSaveCanonicalId(miroId: String): Try[String] = {
     val canonicalId = Identifiable.generate
     identifiersDao
       .saveIdentifier(Identifier(MiroID = miroId, CanonicalID = canonicalId))
