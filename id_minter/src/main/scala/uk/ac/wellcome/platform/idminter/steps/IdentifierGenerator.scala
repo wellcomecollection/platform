@@ -19,47 +19,19 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
     extends Logging
     with TwitterModuleFlags {
 
-  def generateId(work: Work): Future[String] = {
-    metricsSender.timeAndCount(
-      "generate-id",
-      () =>
-        findMiroID(work) match {
-          case Some(identifier) =>
-            Future {
-              retrieveOrGenerateCanonicalId(
-                identifier,
-                ontologyType = work.ontologyType
-              ).get
-            }
-          case None =>
-            error(s"Item $work did not contain a MiroID")
-            Future.failed(new Exception(s"Item $work did not contain a MiroID"))
-      }
-    )
-  }
-
-  private def retrieveOrGenerateCanonicalId(
-    identifier: SourceIdentifier,
-    ontologyType: String): Try[String] = {
+  def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier,
+                                    ontologyType: String): Try[String] = {
     identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
       case Some(id) =>
         metricsSender.incrementCount("found-old-id")
         Try(id.CanonicalID)
       case None =>
         val result = generateAndSaveCanonicalId(identifier.value)
-
-        metricsSender.incrementCount("generated-new-id")
+        if (result.isSuccess)
+          metricsSender.incrementCount("generated-new-id")
 
         result
     }
-  }
-
-  private def findMiroID(work: Work): Option[SourceIdentifier] = {
-    val maybeSourceIdentifier =
-      work.identifiers.find(identifier =>
-        identifier.identifierScheme == IdentifierSchemes.miroImageNumber)
-    info(s"SourceIdentifier: $maybeSourceIdentifier")
-    maybeSourceIdentifier
   }
 
   private def generateAndSaveCanonicalId(miroId: String): Try[String] = {
@@ -70,4 +42,38 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
         canonicalId
       }
   }
+}
+
+class SomethingSomethin @Inject()(metricsSender: MetricsSender,
+                                  identifierGenerator: IdentifierGenerator)
+    extends Logging {
+  def generateId(work: Work): Future[String] = {
+    metricsSender.timeAndCount(
+      "generate-id",
+      () =>
+        findMiroID(work) match {
+          case Some(identifier) =>
+            Future {
+              identifierGenerator
+                .retrieveOrGenerateCanonicalId(
+                  identifier,
+                  ontologyType = work.ontologyType
+                )
+                .get
+            }
+          case None =>
+            error(s"Item $work did not contain a MiroID")
+            Future.failed(new Exception(s"Item $work did not contain a MiroID"))
+      }
+    )
+  }
+
+  private def findMiroID(work: Work): Option[SourceIdentifier] = {
+    val maybeSourceIdentifier =
+      work.identifiers.find(identifier =>
+        identifier.identifierScheme == IdentifierSchemes.miroImageNumber)
+    info(s"SourceIdentifier: $maybeSourceIdentifier")
+    maybeSourceIdentifier
+  }
+
 }
