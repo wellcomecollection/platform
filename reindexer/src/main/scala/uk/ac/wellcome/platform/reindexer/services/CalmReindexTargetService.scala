@@ -19,8 +19,7 @@ class CalmReindexTargetService @Inject()(
       metricsSender = metricsSender,
       targetTableName = targetTableName,
       targetReindexShard = targetReindexShard
-    )
-{
+    ) {
   protected val scanamoUpdate: ScanamoUpdate =
     Scanamo.update[CalmTransformable](dynamoDBClient)(targetTableName)
 
