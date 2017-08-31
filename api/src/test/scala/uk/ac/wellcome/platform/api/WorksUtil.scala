@@ -38,12 +38,14 @@ trait WorksUtil {
   def workWith(
     canonicalId: String,
     title: String,
-    identifiers: List[SourceIdentifier]
+    identifiers: List[SourceIdentifier] = List(),
+    items: List[Item] = List()
   ): Work =
     Work(
       canonicalId = Some(canonicalId),
       identifiers = identifiers,
-      title = title
+      title = title,
+      items = items
     )
 
   def identifiedWorkWith(
