@@ -29,7 +29,7 @@ case object WorksIncludes {
     val includesList = queryParam.split(",").toList
     val unrecognisedIncludes = includesList
       .filterNot(recognisedIncludes.contains)
-    if (unrecognisedIncludes.length == 0) {
+    if (unrecognisedIncludes.isEmpty) {
       WorksIncludes(
         identifiers = includesList.contains("identifiers"),
         thumbnail = includesList.contains("thumbnail"),
