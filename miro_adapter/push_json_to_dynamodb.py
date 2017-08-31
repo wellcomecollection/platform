@@ -22,7 +22,7 @@ import time
 import boto3
 import docopt
 
-from utils import chunked_s3_reader
+from utils import read_json_lines_from_s3
 
 
 def push_to_dynamodb(table_name, collection_name, image_data):
@@ -55,18 +55,8 @@ if __name__ == '__main__':
     bucket = args['--bucket']
     json_key = args['--json']
 
-    def generate_images():
-        for document in chunked_s3_reader(
-            bucket=bucket,
-            key=json_key,
-            delimiter=b'\n'
-        ):
-            if document:
-                data = json.loads(document)
-                yield data
-
     push_to_dynamodb(
         table_name=args['--table'],
         collection_name=args['--collection'],
-        image_data=generate_images()
+        image_data=read_json_lines_from_s3(bucket=bucket, key=json_key)
     )

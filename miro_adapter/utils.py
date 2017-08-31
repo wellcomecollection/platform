@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+import json
+
 import boto3
 from lxml import etree
 
@@ -105,6 +107,16 @@ def read_image_chunks_from_s3(bucket, key):
         # opening <image> tag, and include it on the result.
         chunk = chunk.split(b'<image>')[-1]
         yield b'<image>' + chunk
+
+
+def read_json_lines_from_s3(bucket, key):
+    """
+    Read a document which contains one JSON document per line, and parse the
+    JSON before passing to the caller.
+    """
+    for doc in chunked_s3_reader(bucket=bucket, key=key, delimiter=b'\n'):
+        if doc:
+            yield json.loads(doc)
 
 
 def generate_images(bucket, key):
