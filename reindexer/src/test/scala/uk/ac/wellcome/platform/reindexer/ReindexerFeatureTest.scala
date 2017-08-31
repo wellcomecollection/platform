@@ -23,7 +23,8 @@ class ReindexerFeatureTest
       flags = Map(
         "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
         "aws.dynamo.calmData.tableName" -> "MiroData",
-        "reindex.target.tableName" -> "MiroData"
+        "reindex.target.tableName" -> "MiroData",
+        "reindex.target.reindexShard" -> "default"
       ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
     )
 
