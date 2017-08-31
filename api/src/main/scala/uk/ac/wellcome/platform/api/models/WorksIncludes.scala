@@ -10,7 +10,8 @@ import com.fasterxml.jackson.databind.{
 
 case class WorksIncludes(
   identifiers: Boolean = false,
-  thumbnail: Boolean = false
+  thumbnail: Boolean = false,
+  items: Boolean = false
 )
 
 class WorksIncludesParsingException(msg: String)
@@ -18,7 +19,7 @@ class WorksIncludesParsingException(msg: String)
 
 case object WorksIncludes {
 
-  val recognisedIncludes = List("identifiers", "thumbnail")
+  val recognisedIncludes = List("identifiers", "thumbnail", "items")
 
   /// Parse an ?includes query-parameter string.
   ///
@@ -31,7 +32,8 @@ case object WorksIncludes {
     if (unrecognisedIncludes.length == 0) {
       WorksIncludes(
         identifiers = includesList.contains("identifiers"),
-        thumbnail = includesList.contains("thumbnail")
+        thumbnail = includesList.contains("thumbnail"),
+        items = includesList.contains("items")
       )
     } else {
       val errorMessage = if (unrecognisedIncludes.length == 1) {
