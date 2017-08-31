@@ -66,23 +66,45 @@ def fix_miro_xml_entities(xml_string):
     return xml_string
 
 
-def read_image_chunks_from_s3(bucket, key):
+def chunked_s3_reader(bucket, key, delimiter):
     """
-    Loading an entire XML file at once would be prohibitively expensive,
-    but we only need one <image> ... </image> block at a time.
+    Read a file from S3, generating everything up to ``delimiter`` in each
+    iteration.  This avoids loading the whole file into memory.
     """
     client = boto3.client('s3')
     obj = client.get_object(Bucket=bucket, Key=key)
     running = b''
     while True:
         new_data = obj['Body'].read(1024)
+
+        # If a read from S3 doesn't return any new data, then we're at the
+        # end of the file.  Give up anything else we've got, then return.
         if not new_data:
+            yield running
             break
+
         running += new_data
-        if b'</image>' in running:
-            curr, running = running.split(b'</image>')
-            curr = curr.split(b'<image>')[-1]
-            yield (b'<image>' + curr + b'</image>')
+        if delimiter in running:
+            curr, running = running.split(delimiter)
+            yield curr + delimiter
+
+
+def read_image_chunks_from_s3(bucket, key):
+    """
+    Loading an entire XML file at once would be prohibitively expensive,
+    but we only need one <image> ... </image> block at a time.
+    """
+    for chunk in chunked_s3_reader(bucket=bucket, key=key):
+
+        # The last chunk of data from the file will be some XML closing matter,
+        # which is uninteresting.
+        if b'<image>' not in curr:
+            continue
+
+        # We want to return complete XML blocks, so we split looking for the
+        # opening <image> tag, and include it on the result.
+        curr = curr.split(b'<image>')[-1]
+        yield b'<image>' + curr
 
 
 def generate_images(bucket, key):
