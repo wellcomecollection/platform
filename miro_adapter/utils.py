@@ -94,17 +94,17 @@ def read_image_chunks_from_s3(bucket, key):
     Loading an entire XML file at once would be prohibitively expensive,
     but we only need one <image> ... </image> block at a time.
     """
-    for chunk in chunked_s3_reader(bucket=bucket, key=key):
+    for chunk in chunked_s3_reader(bucket=bucket, key=key, delimiter=b'</image>'):
 
         # The last chunk of data from the file will be some XML closing matter,
         # which is uninteresting.
-        if b'<image>' not in curr:
+        if b'<image>' not in chunk:
             continue
 
         # We want to return complete XML blocks, so we split looking for the
         # opening <image> tag, and include it on the result.
-        curr = curr.split(b'<image>')[-1]
-        yield b'<image>' + curr
+        chunk = chunk.split(b'<image>')[-1]
+        yield b'<image>' + chunk
 
 
 def generate_images(bucket, key):
