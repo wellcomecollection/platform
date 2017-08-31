@@ -12,7 +12,5 @@ COPY requirements.txt /requirements.txt
 RUN pip3 install -r requirements.txt
 
 COPY . /miro_adapter
-RUN rm -rf /miro_adapter/__pycache__
-RUN rm -rf /miro_adapter/*.pyc
 
 CMD ["/miro_adapter/run.sh"]
