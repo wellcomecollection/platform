@@ -16,6 +16,9 @@ clean:
 .docker/python3.6_ci:
 	./scripts/build_ci_docker_image.py --project python3.6_ci
 
+.docker/packer_ci:
+	./scripts/build_ci_docker_image.py --project packer_ci
+
 .docker/terraform_ci:
 	./scripts/build_ci_docker_image.py --project terraform_ci
 
@@ -228,6 +231,12 @@ terraform-plan: .docker/terraform_ci .docker/_lambda_deps
 terraform-apply: .docker/terraform_ci
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
+
+# Packer
+
+## Build AMIs from packer config
+packer-build: .docker/packer_ci
+	docker run -v $$HOME/.aws:/root/.aws -v $$(pwd)/packer:/data packer_ci:latest
 
 
 # Tasks for running linting #

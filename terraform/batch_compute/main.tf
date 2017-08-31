@@ -1,9 +1,9 @@
 module "compute_environment_iam" {
-  source = "./batch_iam"
+  source = "batch_iam"
 }
 
 module "compute_environment_tpl" {
-  source = "./compute_environment"
+  source = "compute_environment"
   name   = "${var.name}"
 
   ec2_key_pair = "${var.key_name}"
@@ -16,6 +16,7 @@ module "compute_environment_tpl" {
 
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
   vpc_id             = "${var.vpc_id}"
+  image_id           = "${var.image_id}"
 }
 
 resource "null_resource" "export_rendered_template" {

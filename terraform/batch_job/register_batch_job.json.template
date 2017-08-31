@@ -9,12 +9,6 @@
     "jobRoleArn": "${job_role_arn}",
     "environment": ${environment_vars},
     "readonlyRootFilesystem": false,
-    "mountPoints": [
-      {
-        "sourceVolume": "ephemera",
-        "containerPath": "/tmp"
-      }
-    ],
     "volumes": [
         {
             "host": {
@@ -23,5 +17,6 @@
             "name": "ephemera"
         }
     ]
-  }
+  },
+  "retryStrategy": {"attempts": 3}
 }
