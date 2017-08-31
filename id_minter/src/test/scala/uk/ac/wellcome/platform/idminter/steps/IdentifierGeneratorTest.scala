@@ -14,15 +14,28 @@ import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
+
+class SomethingSomethinTest
+    extends FunSpec
+    with ScalaFutures
+    with Matchers
+    with BeforeAndAfterEach
+    with MockitoSugar {
+
+  private val metricsSender =
+    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
+  val something = new SomethingSomethin(
+    metricsSender,
+    mock[IdentifierGenerator]
+  )
+
+}
 
 class IdentifierGeneratorTest
     extends FunSpec
     with IdentifiersMysqlLocal
-    with ScalaFutures
     with Matchers
-    with BeforeAndAfterEach
     with MockitoSugar {
 
   private val metricsSender =
@@ -41,48 +54,43 @@ class IdentifierGeneratorTest
                      identifiersTable.column.ontologyType -> "Work")
     }.update().apply()
 
-    val work =
-      Work(identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234")),
-           title = "Searching for a sea slug")
-    val futureId = identifierGenerator.generateId(work)
+    val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
+      "Work")
 
-    whenReady(futureId) { id =>
-      id shouldBe "5678"
-    }
+    triedId shouldBe Success("5678")
   }
 
   it(
     "should generate an id and save it in the database if a record doesn't already exist") {
-    val work =
-      Work(identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234")),
-           title = "A novel name for a nightingale")
-    val futureId = identifierGenerator.generateId(work)
+    val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
+      "Work")
 
-    whenReady(futureId) { id =>
-      id should not be (empty)
-      val i = identifiersTable.i
-      val maybeIdentifier = withSQL {
-        select.from(identifiersTable as i).where.eq(i.MiroID, "1234")
-      }.map(Identifier(i)).single.apply()
-      maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe Identifier(CanonicalID = id, MiroID = "1234")
-    }
-  }
-
-  it("should reject an item with no miroId in the list of Identifiers") {
-    val work =
-      Work(
-        identifiers = List(SourceIdentifier("not-a-miro-image-number", "1234")),
-        title = "The rejection of a robin")
-    val futureId = identifierGenerator.generateId(work)
-
-    whenReady(futureId.failed) { exception =>
-      exception.getMessage shouldBe s"Item $work did not contain a MiroID"
-    }
+    triedId shouldBe a[Success[String]]
+    val id = triedId.get
+    id should not be (empty)
+    val i = identifiersTable.i
+    val maybeIdentifier = withSQL {
+      select.from(identifiersTable as i).where.eq(i.MiroID, "1234")
+    }.map(Identifier(i)).single.apply()
+    maybeIdentifier shouldBe defined
+    maybeIdentifier.get shouldBe Identifier(CanonicalID = id, MiroID = "1234")
   }
 
   it(
-    "should return a failed future if it fails inserting the identifier in the database") {
+    "should fail if the identifier does not contain a known identifierScheme in the list of Identifiers") {
+    val triedGeneratingId = identifierGenerator.retrieveOrGenerateCanonicalId(
+      SourceIdentifier("not-a-miro-image-number", "1234"),
+      "Work")
+
+    triedGeneratingId shouldBe a[Failure[Exception]]
+    val exception = triedGeneratingId.get.asInstanceOf[Exception]
+    exception.getMessage shouldBe s"identifier list did not contain a known identifierScheme"
+  }
+
+  it(
+    "should return a failure if it fails inserting the identifier in the database") {
     val miroId = "1234"
     val sourceIdentifiers = List(
       SourceIdentifier(
@@ -108,9 +116,10 @@ class IdentifierGeneratorTest
     when(identifiersDao.saveIdentifier(any[Identifier]()))
       .thenReturn(Failure(expectedException))
 
-    whenReady(identifierGenerator.generateId(work).failed) { exception =>
-      exception shouldBe expectedException
-    }
-
+    val triedGeneratingId =
+      identifierGenerator.retrieveOrGenerateCanonicalId(sourceIdentifiers.head,
+                                                        "Work")
+    triedGeneratingId shouldBe a[Failure[Exception]]
+    triedGeneratingId.failed.get shouldBe expectedException
   }
 }
