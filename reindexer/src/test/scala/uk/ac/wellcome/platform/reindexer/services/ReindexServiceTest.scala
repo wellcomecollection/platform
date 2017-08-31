@@ -40,7 +40,11 @@ class ReindexServiceTest
         dynamoConfigs,
         "CalmData"
       ),
-      new CalmReindexTargetService(dynamoDbClient, "CalmData", metricsSender),
+      new CalmReindexTargetService(
+        dynamoDBClient = dynamoDbClient,
+        targetTableName = "CalmData",
+        metricsSender = metricsSender
+      ),
       new MetricsSender("reindexer-tests", mock[AmazonCloudWatch])
     )
 
