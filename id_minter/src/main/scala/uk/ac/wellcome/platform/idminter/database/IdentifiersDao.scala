@@ -5,13 +5,13 @@ import javax.inject.Singleton
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import scalikejdbc._
-
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.{Future, blocking}
+import scala.util.Try
 
 case class UnableToMintIdentifierException(message: String)
     extends Exception(message)
@@ -29,16 +29,15 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    * source identifiers.
    */
   def lookupID(sourceIdentifiers: List[SourceIdentifier],
-               ontologyType: String): Future[Option[Identifier]] = {
+               ontologyType: String): Try[Option[Identifier]] = {
 
     // TODO: This exception should be handled gracefully, not sent around the
     // TryBackoff ad infinitum.
-    if (sourceIdentifiers.isEmpty) {
-      Future.failed(
-        new UnableToMintIdentifierException("No source identifiers supplied!")
-      )
-    } else {
-      Future {
+    Try {
+      if (sourceIdentifiers.isEmpty) {
+        throw UnableToMintIdentifierException("No source identifiers supplied!")
+      } else {
+
         blocking {
           info(
             s"About to search for existing ID matching $identifiers and $ontologyType")
@@ -77,6 +76,34 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     }
   }
 
+  /* Save an identifier into the database.
+   *
+   * Note that this will copy _all_ the fields on `Identifier`, nulling any
+   * fields which aren't set on `Identifier`.
+   */
+  def saveIdentifier(identifier: Identifier): Try[Int] = {
+    val insertIntoDbFuture = Try {
+      blocking {
+        info(s"putting new identifier $identifier")
+        withSQL {
+          insert
+            .into(identifiers)
+            .namedValues(
+              identifiers.column.CanonicalID -> identifier.CanonicalID,
+              identifiers.column.ontologyType -> identifier.ontologyType,
+              identifiers.column.MiroID -> identifier.MiroID,
+              identifiers.column.CalmAltRefNo -> identifier.CalmAltRefNo
+            )
+        }.update().apply()
+      }
+    }
+    if (insertIntoDbFuture.isFailure) {
+      insertIntoDbFuture.failed.foreach(e =>
+        error(s"Failed inserting identifier $identifier in database", e))
+    }
+    insertIntoDbFuture
+  }
+
   /* For a given source identifier scheme (e.g. "miro-image-number") and a
    * corresponding column in the SQL database (e.g. i.MiroID), add a condition
    * to the SQL query that looks for matching identifiers.
@@ -106,33 +133,5 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
       sql.and.withRoundBracket(
         _.eq(column, sourceID.head.value).or.isNull(column))
     }
-  }
-
-  /* Save an identifier into the database.
-   *
-   * Note that this will copy _all_ the fields on `Identifier`, nulling any
-   * fields which aren't set on `Identifier`.
-   */
-  def saveIdentifier(identifier: Identifier): Future[Int] = {
-    val insertIntoDbFuture = Future {
-      blocking {
-        info(s"putting new identifier $identifier")
-        withSQL {
-          insert
-            .into(identifiers)
-            .namedValues(
-              identifiers.column.CanonicalID -> identifier.CanonicalID,
-              identifiers.column.ontologyType -> identifier.ontologyType,
-              identifiers.column.MiroID -> identifier.MiroID,
-              identifiers.column.CalmAltRefNo -> identifier.CalmAltRefNo
-            )
-        }.update().apply()
-      }
-    }
-    insertIntoDbFuture.onFailure {
-      case e: Exception =>
-        error(s"Failed inserting identifier $identifier in database", e)
-    }
-    insertIntoDbFuture
   }
 }
