@@ -16,7 +16,8 @@ object Common {
       "-Yinline",
       "-Xverify",
       "-feature",
-      "-language:postfixOps"
+      "-language:postfixOps",
+      "-Yrangepos"
     ),
     parallelExecution in Test := false
   ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings

@@ -11,15 +11,13 @@ import scalikejdbc.interpolation.SQLSyntax
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.database.{
-  FieldDescription,
-  IdentifiersDao
-}
+import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class IdMinterWorkerTest
     extends FunSpec
@@ -85,15 +83,15 @@ class IdMinterWorkerTest
       title = "Some fresh fruit for a flamingo"
     )
 
-    val lookupFuture = identifiersDao.lookupID(
+    val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
       ontologyType = work.ontologyType
     )
 
-    when(lookupFuture)
-      .thenReturn(Future.successful(None))
+    when(triedLookup)
+      .thenReturn(Success(None))
     when(identifiersDao.saveIdentifier(any[Identifier]))
-      .thenReturn(Future.failed(new Exception("cannot insert")))
+      .thenReturn(Failure(new Exception("cannot insert")))
 
     val message = JsonUtil
       .toJson(

@@ -10,6 +10,8 @@ import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
+import scala.util.{Failure, Success}
+
 class IdentifiersDaoTest
     extends FunSpec
     with IdentifiersMysqlLocal
@@ -19,7 +21,8 @@ class IdentifiersDaoTest
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
   describe("lookupID") {
-    it("should return a future of Some[Identifier] if it can find a matching MiroID in the DB") {
+    it(
+      "should return a future of Some[Identifier] if it can find a matching MiroID in the DB") {
       val identifier = Identifier(
         CanonicalID = "A turtle turns to try to taste",
         MiroID = "A tangerine",
@@ -27,19 +30,21 @@ class IdentifiersDaoTest
       )
       assertInsertingIdentifierSucceeds(identifier)
 
-      val sourceIdentifiers = List(SourceIdentifier(
-        identifierScheme = IdentifierSchemes.miroImageNumber,
-        value = identifier.MiroID
-      ))
+      val sourceIdentifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.miroImageNumber,
+          value = identifier.MiroID
+        ))
 
-      val lookupFuture = identifiersDao.lookupID(
+      val triedLookup = identifiersDao.lookupID(
         sourceIdentifiers = sourceIdentifiers,
         ontologyType = identifier.ontologyType
       )
-      whenReady(lookupFuture) { maybeIdentifier =>
-        maybeIdentifier shouldBe defined
-        maybeIdentifier.get shouldBe identifier
-      }
+
+      triedLookup shouldBe a[Success[Option[String]]]
+      val maybeIdentifier = triedLookup.get
+      maybeIdentifier shouldBe defined
+      maybeIdentifier.get shouldBe identifier
     }
   }
 
@@ -53,7 +58,8 @@ class IdentifiersDaoTest
     value = "MS.290"
   )
 
-  describe("lookupID should return a future of Some[Identifier] if it can find a matching ID") {
+  describe(
+    "lookupID should return a future of Some[Identifier] if it can find a matching ID") {
     it("Matching Miro ID, Calm ID and ontology type") {
       val identifier = Identifier(
         CanonicalID = "h2s6hz29",
@@ -101,7 +107,8 @@ class IdentifiersDaoTest
         )
     }
 
-    it("Only a Miro ID in the database, but searching for both Miro and Calm IDs") {
+    it(
+      "Only a Miro ID in the database, but searching for both Miro and Calm IDs") {
       val identifier = Identifier(
         CanonicalID = "hydmw9zy",
         MiroID = miroSourceIdentifier.value,
@@ -117,7 +124,8 @@ class IdentifiersDaoTest
     }
   }
 
-  describe("lookupID should return a future of None if it can't find a matching ID") {
+  describe(
+    "lookupID should return a future of None if it can't find a matching ID") {
     it("empty database, looking for a Miro ID") {
       assertLookupIDFindsNothing(
         sourceIdentifiers = List(miroSourceIdentifier)
@@ -245,28 +253,30 @@ class IdentifiersDaoTest
     }
   }
 
-  private def assertLookupIDFindsMatch(sourceIdentifiers: List[SourceIdentifier],
-                                       ontologyType: String = "TestWork",
-                                       identifier: Identifier) = {
-    val lookupFuture = identifiersDao.lookupID(
+  private def assertLookupIDFindsMatch(
+    sourceIdentifiers: List[SourceIdentifier],
+    ontologyType: String = "TestWork",
+    identifier: Identifier) = {
+    val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
       ontologyType = ontologyType
     )
-    whenReady(lookupFuture) { maybeIdentifier =>
-      maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe identifier
-    }
+    triedLookup shouldBe a[Success[Option[String]]]
+    val maybeIdentifier = triedLookup.get
+    maybeIdentifier shouldBe defined
+    maybeIdentifier.get shouldBe identifier
   }
 
-  private def assertLookupIDFindsNothing(sourceIdentifiers: List[SourceIdentifier],
-                                         ontologyType: String = "TestWork") {
-    val lookupFuture = identifiersDao.lookupID(
+  private def assertLookupIDFindsNothing(
+    sourceIdentifiers: List[SourceIdentifier],
+    ontologyType: String = "TestWork") {
+    val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
       ontologyType = ontologyType
     )
-    whenReady(lookupFuture) { maybeIdentifier =>
-      maybeIdentifier shouldNot be(defined)
-    }
+    triedLookup shouldBe a[Success[Option[String]]]
+    val maybeIdentifier = triedLookup.get
+    maybeIdentifier shouldNot be(defined)
   }
 
   describe("saveIdentifier") {
@@ -276,21 +286,18 @@ class IdentifiersDaoTest
         MiroID = "A picture of pangolins",
         ontologyType = "Work"
       )
-      val future = identifiersDao.saveIdentifier(identifier)
+      identifiersDao.saveIdentifier(identifier)
+      val maybeIdentifier = withSQL {
+        select
+          .from(identifiersTable as identifiersTable.i)
+          .where
+          .eq(identifiersTable.i.MiroID, identifier.MiroID)
+          .and
+          .eq(identifiersTable.i.CanonicalID, identifier.CanonicalID)
+      }.map(Identifier(identifiersTable.i)).single.apply()
 
-      whenReady(future) { _ =>
-        val maybeIdentifier = withSQL {
-          select
-            .from(identifiersTable as identifiersTable.i)
-            .where
-            .eq(identifiersTable.i.MiroID, identifier.MiroID)
-            .and
-            .eq(identifiersTable.i.CanonicalID, identifier.CanonicalID)
-        }.map(Identifier(identifiersTable.i)).single.apply()
-
-        maybeIdentifier shouldBe defined
-        maybeIdentifier.get shouldBe identifier
-      }
+      maybeIdentifier shouldBe defined
+      maybeIdentifier.get shouldBe identifier
     }
 
     it("should fail to insert a record with a duplicate CanonicalID") {
@@ -308,7 +315,8 @@ class IdentifiersDaoTest
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
     }
 
-    it("should allow saving two records with the same MiroID but different ontologyType") {
+    it(
+      "should allow saving two records with the same MiroID but different ontologyType") {
       val identifier = new Identifier(
         CanonicalID = "A mountain of muesli",
         MiroID = "A maize made of maze",
@@ -323,7 +331,8 @@ class IdentifiersDaoTest
       assertInsertingIdentifierSucceeds(secondIdentifier)
     }
 
-    it("should allow saving two records with different MiroID but the same ontologyType") {
+    it(
+      "should allow saving two records with different MiroID but the same ontologyType") {
       val identifier = new Identifier(
         CanonicalID = "Overflowing with okra",
         MiroID = "Olive oil in an orchard",
@@ -338,7 +347,8 @@ class IdentifiersDaoTest
       assertInsertingIdentifierSucceeds(secondIdentifier)
     }
 
-    it("should reject inserting two records with the same MiroID and ontologyType") {
+    it(
+      "should reject inserting two records with the same MiroID and ontologyType") {
       val identifier = new Identifier(
         CanonicalID = "A surplus of strawberries",
         MiroID = "Sunflower seeds in a sack",
@@ -361,15 +371,14 @@ class IdentifiersDaoTest
                                             duplicateIdentifier: Identifier) = {
     assertInsertingIdentifierSucceeds(identifier)
 
-    val duplicateFuture = identifiersDao.saveIdentifier(duplicateIdentifier)
-    whenReady(duplicateFuture.failed) { exception =>
-      exception shouldBe a[SQLIntegrityConstraintViolationException]
-    }
+    val triedSave = identifiersDao.saveIdentifier(duplicateIdentifier)
+    triedSave shouldBe a[Failure[SQLIntegrityConstraintViolationException]]
   }
 
   /* Helper method.  Insert a record and check that it succeeds. */
-  private def assertInsertingIdentifierSucceeds(identifier: Identifier) =
-    whenReady(identifiersDao.saveIdentifier(identifier)) { result =>
-      result shouldBe 1
-    }
+  private def assertInsertingIdentifierSucceeds(identifier: Identifier) = {
+    val triedSave = identifiersDao.saveIdentifier(identifier)
+    triedSave shouldBe a[Success[String]]
+    triedSave shouldBe Success(1)
+  }
 }

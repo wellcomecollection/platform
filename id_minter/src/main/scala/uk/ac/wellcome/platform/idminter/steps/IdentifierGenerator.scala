@@ -12,45 +12,60 @@ import uk.ac.wellcome.platform.idminter.utils.Identifiable
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+import scala.util.Try
+
 class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
                                     metricsSender: MetricsSender)
     extends Logging
     with TwitterModuleFlags {
 
+  def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier,
+                                    ontologyType: String): Try[String] = {
+    identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
+      case Some(id) =>
+        metricsSender.incrementCount("found-old-id")
+        Try(id.CanonicalID)
+      case None =>
+        val result = generateAndSaveCanonicalId(identifier.value)
+        if (result.isSuccess)
+          metricsSender.incrementCount("generated-new-id")
+
+        result
+    }
+  }
+
+  private def generateAndSaveCanonicalId(miroId: String): Try[String] = {
+    val canonicalId = Identifiable.generate
+    identifiersDao
+      .saveIdentifier(Identifier(MiroID = miroId, CanonicalID = canonicalId))
+      .map { _ =>
+        canonicalId
+      }
+  }
+}
+
+class SomethingSomethin @Inject()(metricsSender: MetricsSender,
+                                  identifierGenerator: IdentifierGenerator)
+    extends Logging {
   def generateId(work: Work): Future[String] = {
     metricsSender.timeAndCount(
       "generate-id",
       () =>
         findMiroID(work) match {
           case Some(identifier) =>
-            retrieveOrGenerateCanonicalId(
-              identifier,
-              ontologyType = work.ontologyType
-            )
+            Future {
+              identifierGenerator
+                .retrieveOrGenerateCanonicalId(
+                  identifier,
+                  ontologyType = work.ontologyType
+                )
+                .get
+            }
           case None =>
             error(s"Item $work did not contain a MiroID")
-            Future.failed(
-              new Exception(s"Item $work did not contain a MiroID"))
+            Future.failed(new Exception(s"Item $work did not contain a MiroID"))
       }
     )
-  }
-
-  private def retrieveOrGenerateCanonicalId(
-    identifier: SourceIdentifier,
-    ontologyType: String): Future[String] = {
-    identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
-      case Some(id) => {
-        metricsSender.incrementCount("found-old-id")
-        Future.successful(id.CanonicalID)
-      }
-      case None => {
-        val result = generateAndSaveCanonicalId(identifier.value)
-
-        metricsSender.incrementCount("generated-new-id")
-
-        result
-      }
-    }
   }
 
   private def findMiroID(work: Work): Option[SourceIdentifier] = {
@@ -61,12 +76,4 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
     maybeSourceIdentifier
   }
 
-  private def generateAndSaveCanonicalId(miroId: String): Future[String] = {
-    val canonicalId = Identifiable.generate
-    identifiersDao
-      .saveIdentifier(Identifier(MiroID = miroId, CanonicalID = canonicalId))
-      .map { _ =>
-        canonicalId
-      }
-  }
 }
