@@ -39,8 +39,8 @@ if __name__ == '__main__':
     release_id = CURRENT_COMMIT
 
     if variant is not None:
-        tag = '%s_%s:%s' % (project, variant, release_id)
         release_name = '%s_%s' % (project, variant)
+        tag = '%s:%s' % (release_name, release_id)
     else:
         tag = '%s:%s' % (project, release_id)
         release_name = project
@@ -49,12 +49,13 @@ if __name__ == '__main__':
 
     print('*** Building the new image')
 
-    cmd = ['docker', 'build', '--file', dockerfile, '--tag', tag]
+    cmd = ['docker', 'build', '--file', dockerfile, '--tag', release_name]
     if variant is not None:
         cmd.extend(['--build-arg', 'variant=%s' % variant])
     cmd.append(os.path.dirname(dockerfile))
-
     subprocess.check_call(cmd)
+
+    subprocess.check_call(['docker', 'tag', release_name, tag])
 
     print('*** Saving the release ID to .releases')
     write_release_id(project=release_name, release_id=release_id)
