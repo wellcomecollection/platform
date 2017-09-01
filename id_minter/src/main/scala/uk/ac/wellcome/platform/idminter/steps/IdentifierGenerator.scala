@@ -6,7 +6,10 @@ import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, UnableToMintIdentifierException}
+import uk.ac.wellcome.platform.idminter.database.{
+  IdentifiersDao,
+  UnableToMintIdentifierException
+}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
@@ -15,12 +18,14 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.util.Try
 
-class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
-                                    metricsSender: MetricsSender,
-                                    @Flag("known.identifierSchemes") knownIdentifierSchemes: String)
+class IdentifierGenerator @Inject()(
+  identifiersDao: IdentifiersDao,
+  metricsSender: MetricsSender,
+  @Flag("known.identifierSchemes") knownIdentifierSchemes: String)
     extends Logging
     with TwitterModuleFlags {
-  private val knownIdentifierSchemeList = knownIdentifierSchemes.split(",").map(_.trim).toList
+  private val knownIdentifierSchemeList =
+    knownIdentifierSchemes.split(",").map(_.trim).toList
 
   def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
                                     ontologyType: String): Try[String] = {
@@ -36,7 +41,8 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
             metricsSender.incrementCount("found-old-id")
             Try(id.CanonicalID)
           case None =>
-            val result = generateAndSaveCanonicalId(idsWithKnownSchemes, ontologyType)
+            val result =
+              generateAndSaveCanonicalId(idsWithKnownSchemes, ontologyType)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
@@ -46,8 +52,8 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
     }.flatten
   }
 
-  private def generateAndSaveCanonicalId(
-    identifiers: List[SourceIdentifier], ontologyType: String): Try[String] = {
+  private def generateAndSaveCanonicalId(identifiers: List[SourceIdentifier],
+                                         ontologyType: String): Try[String] = {
     val canonicalId = Identifiable.generate
     identifiersDao
       .saveIdentifier(
@@ -72,36 +78,22 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
   }
 }
 
-class SomethingSomethin @Inject()(metricsSender: MetricsSender,
-                                  identifierGenerator: IdentifierGenerator)
+class IdEmbedder @Inject()(metricsSender: MetricsSender,
+                           identifierGenerator: IdentifierGenerator)
     extends Logging {
-  def generateId(work: Work): Future[String] = {
+  def embedId(work: Work): Future[Work] = {
     metricsSender.timeAndCount(
       "generate-id",
       () =>
-        findMiroID(work) match {
-          case Some(identifier) =>
-            Future {
-              identifierGenerator
-                .retrieveOrGenerateCanonicalId(
-                  List(identifier),
-                  ontologyType = work.ontologyType
-                )
-                .get
-            }
-          case None =>
-            error(s"Item $work did not contain a MiroID")
-            Future.failed(new Exception(s"Item $work did not contain a MiroID"))
+        Future {
+          val canonicalId = identifierGenerator
+            .retrieveOrGenerateCanonicalId(
+              work.identifiers,
+              ontologyType = work.ontologyType
+            )
+            .get
+          work.copy(canonicalId = Some(canonicalId))
       }
     )
   }
-
-  private def findMiroID(work: Work): Option[SourceIdentifier] = {
-    val maybeSourceIdentifier =
-      work.identifiers.find(identifier =>
-        identifier.identifierScheme == IdentifierSchemes.miroImageNumber)
-    info(s"SourceIdentifier: $maybeSourceIdentifier")
-    maybeSourceIdentifier
-  }
-
 }
