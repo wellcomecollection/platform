@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -10,7 +9,7 @@ import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
@@ -46,7 +45,7 @@ class IdentifierGeneratorTest
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable),
     metricsSender,
-    knownIdentifierSchemes)
+    knownIdentifierSchemes.mkString(","))
 
   it(
     "should search the miro id in the database and return the canonical id if it finds it") {
@@ -105,7 +104,7 @@ class IdentifierGeneratorTest
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao,
                               metricsSender,
-                              knownIdentifierSchemes)
+                              knownIdentifierSchemes.mkString(","))
 
     val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
