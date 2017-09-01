@@ -23,16 +23,16 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
     extends Logging
     with TwitterModuleFlags {
 
-  def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier,
+  def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
                                     ontologyType: String): Try[String] = {
     Try {
-      if (knownIdentifierSchemes.contains(identifier.identifierScheme)) {
-        identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
+      if (knownIdentifierSchemes.contains(identifiers.head.identifierScheme)) {
+        identifiersDao.lookupID(identifiers, ontologyType).flatMap {
           case Some(id) =>
             metricsSender.incrementCount("found-old-id")
             Try(id.CanonicalID)
           case None =>
-            val result = generateAndSaveCanonicalId(identifier.value)
+            val result = generateAndSaveCanonicalId(identifiers.head.value)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
@@ -67,7 +67,7 @@ class SomethingSomethin @Inject()(metricsSender: MetricsSender,
             Future {
               identifierGenerator
                 .retrieveOrGenerateCanonicalId(
-                  identifier,
+                  List(identifier),
                   ontologyType = work.ontologyType
                 )
                 .get
