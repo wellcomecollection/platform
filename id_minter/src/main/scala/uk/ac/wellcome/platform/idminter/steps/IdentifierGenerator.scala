@@ -5,7 +5,10 @@ import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.database.{
+  IdentifiersDao,
+  UnableToMintIdentifierException
+}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
@@ -15,23 +18,31 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.util.Try
 
 class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
-                                    metricsSender: MetricsSender)
+                                    metricsSender: MetricsSender,
+                                    knownIdentifierSchemes: List[String])
     extends Logging
     with TwitterModuleFlags {
 
   def retrieveOrGenerateCanonicalId(identifier: SourceIdentifier,
                                     ontologyType: String): Try[String] = {
-    identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
-      case Some(id) =>
-        metricsSender.incrementCount("found-old-id")
-        Try(id.CanonicalID)
-      case None =>
-        val result = generateAndSaveCanonicalId(identifier.value)
-        if (result.isSuccess)
-          metricsSender.incrementCount("generated-new-id")
+    Try {
+      if (knownIdentifierSchemes.contains(identifier.identifierScheme)) {
+        identifiersDao.lookupID(List(identifier), ontologyType).flatMap {
+          case Some(id) =>
+            metricsSender.incrementCount("found-old-id")
+            Try(id.CanonicalID)
+          case None =>
+            val result = generateAndSaveCanonicalId(identifier.value)
+            if (result.isSuccess)
+              metricsSender.incrementCount("generated-new-id")
 
-        result
-    }
+            result
+        }
+      } else {
+        throw UnableToMintIdentifierException(
+          "identifiers list did not contain a known identifierScheme")
+      }
+    }.flatten
   }
 
   private def generateAndSaveCanonicalId(miroId: String): Try[String] = {

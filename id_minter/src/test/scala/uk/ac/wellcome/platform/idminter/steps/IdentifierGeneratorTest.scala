@@ -40,9 +40,11 @@ class IdentifierGeneratorTest
 
   private val metricsSender =
     new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
+  private val knownIdentifierSchemes = List(IdentifierSchemes.miroImageNumber)
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable),
-    metricsSender)
+    metricsSender,
+    knownIdentifierSchemes)
 
   it(
     "should search the miro id in the database and return the canonical id if it finds it") {
@@ -81,12 +83,12 @@ class IdentifierGeneratorTest
   it(
     "should fail if the identifier does not contain a known identifierScheme in the list of Identifiers") {
     val triedGeneratingId = identifierGenerator.retrieveOrGenerateCanonicalId(
-      SourceIdentifier("not-a-miro-image-number", "1234"),
+      SourceIdentifier("not-a-known-identifier-scheme", "1234"),
       "Work")
 
     triedGeneratingId shouldBe a[Failure[Exception]]
-    val exception = triedGeneratingId.get.asInstanceOf[Exception]
-    exception.getMessage shouldBe s"identifier list did not contain a known identifierScheme"
+    val exception = triedGeneratingId.failed.get.asInstanceOf[Exception]
+    exception.getMessage shouldBe s"identifiers list did not contain a known identifierScheme"
   }
 
   it(
@@ -104,7 +106,7 @@ class IdentifierGeneratorTest
     )
     val identifiersDao = mock[IdentifiersDao]
     val identifierGenerator =
-      new IdentifierGenerator(identifiersDao, metricsSender)
+      new IdentifierGenerator(identifiersDao, metricsSender, knownIdentifierSchemes)
 
     val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,

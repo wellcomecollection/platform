@@ -8,9 +8,8 @@ import scalikejdbc._
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.blocking
 import scala.util.Try
 
 case class UnableToMintIdentifierException(message: String)
