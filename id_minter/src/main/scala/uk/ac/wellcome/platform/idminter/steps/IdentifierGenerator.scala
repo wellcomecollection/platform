@@ -37,7 +37,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
             metricsSender.incrementCount("found-old-id")
             Try(id.CanonicalID)
           case None =>
-            val result = generateAndSaveCanonicalId(idsWithKnownSchemes)
+            val result = generateAndSaveCanonicalId(idsWithKnownSchemes, ontologyType)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
@@ -48,7 +48,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
   }
 
   private def generateAndSaveCanonicalId(
-    identifiers: List[SourceIdentifier]): Try[String] = {
+    identifiers: List[SourceIdentifier], ontologyType: String): Try[String] = {
     val canonicalId = Identifiable.generate
     identifiersDao
       .saveIdentifier(
@@ -57,7 +57,8 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
             findIdentifierWith(identifiers, IdentifierSchemes.miroImageNumber),
           CalmAltRefNo =
             findIdentifierWith(identifiers, IdentifierSchemes.calmAltRefNo),
-          CanonicalID = canonicalId
+          CanonicalID = canonicalId,
+          ontologyType = ontologyType
         ))
       .map { _ =>
         canonicalId

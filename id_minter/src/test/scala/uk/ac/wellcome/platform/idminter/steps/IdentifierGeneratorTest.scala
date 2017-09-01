@@ -160,4 +160,24 @@ class IdentifierGeneratorTest
                                             MiroID = miroId,
                                             CalmAltRefNo = calmAltRefNo)
   }
+
+  it("should preserve the ontologyType when generating a new identifier") {
+    val ontologyType = "Item"
+    val miroId = "1234"
+    val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)),
+      ontologyType)
+
+    triedId shouldBe a[Success[String]]
+    val id = triedId.get
+    id should not be (empty)
+    val i = identifiersTable.i
+    val maybeIdentifier = withSQL {
+      select.from(identifiersTable as i).where.eq(i.MiroID, miroId)
+    }.map(Identifier(i)).single.apply()
+    maybeIdentifier shouldBe defined
+    maybeIdentifier.get shouldBe Identifier(CanonicalID = id,
+                                            MiroID = miroId,
+                                            ontologyType = ontologyType)
+  }
 }
