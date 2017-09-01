@@ -5,16 +5,13 @@ import com.twitter.inject.annotations.Flag
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   UnableToMintIdentifierException
 }
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
-
-import scala.concurrent.Future
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.util.Try
 
@@ -75,25 +72,5 @@ class IdentifierGenerator @Inject()(
     identifiers
       .find(identifier => identifier.identifierScheme == identifierScheme)
       .fold[String](null)(identifier => identifier.value)
-  }
-}
-
-class IdEmbedder @Inject()(metricsSender: MetricsSender,
-                           identifierGenerator: IdentifierGenerator)
-    extends Logging {
-  def embedId(work: Work): Future[Work] = {
-    metricsSender.timeAndCount(
-      "generate-id",
-      () =>
-        Future {
-          val canonicalId = identifierGenerator
-            .retrieveOrGenerateCanonicalId(
-              work.identifiers,
-              ontologyType = work.ontologyType
-            )
-            .get
-          work.copy(canonicalId = Some(canonicalId))
-      }
-    )
   }
 }
