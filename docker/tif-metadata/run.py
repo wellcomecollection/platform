@@ -2,14 +2,14 @@
 # -*- encoding: utf-8 -*-
 """
 Usage:
-  run.py --bucket-name=<BUCKET_NAME> --key=<KEY> [--delete-original]
+  run.py --bucket-name=<BUCKET_NAME> --key=<KEY> [--no-fail-on-error]
   run.py -h | --help
 
 Options:
   -h --help                     Show this message.
   --bucket-name=<BUCKET_NAME>   Name of the bucket where the job json file resides.
   --key=<KEY>                   Key of the job json file.
-  --delete-original             Delete the original source key.
+  --no-fail-on-error            Do not exit with on-zero exit code if metadata application fails
 
 """
 
@@ -86,14 +86,29 @@ def wait(process, success_message, failure_message):
         print(success_message)
 
 
-def embed_image_metadata(task, local_image_path):
+def embed_image_metadata(task, local_image_path, no_fail_on_error, debug=False):
     xmp_metadata = task["metadata"]["xmp"]
+
     arguments = [build_exiftool_argument(key, value) for key, value in xmp_metadata.items() if value is not None]
     sep_arguments = ["exiftool", "-m", "-sep", ","] + arguments
     sep_arguments.append(local_image_path)
 
+    if debug:
+        print('Running:')
+        print(' '.join(sep_arguments))
+        exit(0)
+
     if subprocess.call(sep_arguments) != 0:
-        raise Exception("Failed embedding metadata!")
+        if no_fail_on_error:
+            task_id = task['id']
+            outfile_name = f'/failed_tasks/{task_id}.json'
+
+            print(f'Writing failed task {task} to {outfile_name}')
+
+            with open(outfile_name, 'w') as outfile:
+                json.dump(task, outfile)
+        else:
+            raise Exception("Failed embedding metadata!")
     else:
         print(f"Metadata embedded successfully for {build_s3_source(task)}")
 
@@ -113,7 +128,7 @@ def main():
 
     job_bucket = args["--bucket-name"]
     job_s3_key = args["--key"]
-    delete_original = bool(args['--delete-original'])
+    no_fail_on_error = bool(args['--no-fail-on-error'])
     parallelism = 10
 
     print(f"Downloading {job_s3_key}")
@@ -135,7 +150,7 @@ def main():
         print("Finished downloading s3 files!")
 
         for task, local_image_path in images:
-            embed_image_metadata(task, local_image_path)
+            embed_image_metadata(task, local_image_path, no_fail_on_error)
 
         for split_images in split(parallelism, images):
             upload_in_parallel(split_images)
