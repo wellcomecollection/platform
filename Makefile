@@ -27,6 +27,10 @@ clean:
 	docker build -t image_builder -f builds/image_builder.Dockerfile builds
 	mkdir -p .docker && touch .docker/image_builder
 
+.docker/miro_adapter_tests:
+	docker build -t miro_adapter_tests -f miro_adapter/miro_adapter_tests.Dockerfile miro_adapter
+	mkdir -p .docker && touch .docker/miro_adapter_tests
+
 
 ## Build the image for gatling
 gatling-build: .docker/image_builder
@@ -66,6 +70,11 @@ loris-deploy: loris-build
 
 miro_adapter-build: .docker/image_builder
 	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
+
+miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
+	rm -rf $$(pwd)/miro_adapter/__pycache__
+	rm -rf $$(pwd)/miro_adapter/*.pyc
+	docker run -v $$(pwd)/miro_adapter:/miro_adapter miro_adapter_tests
 
 miro_adapter-deploy: miro_adapter-build
 	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
