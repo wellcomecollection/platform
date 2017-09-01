@@ -26,32 +26,49 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
   def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
                                     ontologyType: String): Try[String] = {
     Try {
-      if (knownIdentifierSchemes.contains(identifiers.head.identifierScheme)) {
-        identifiersDao.lookupID(identifiers, ontologyType).flatMap {
+      val idsWithKnownSchemes = identifiers.filter(identifier =>
+        knownIdentifierSchemes.contains(identifier.identifierScheme))
+      if (idsWithKnownSchemes.isEmpty) {
+        throw UnableToMintIdentifierException(
+          "identifiers list did not contain a known identifierScheme")
+      } else {
+        identifiersDao.lookupID(idsWithKnownSchemes, ontologyType).flatMap {
           case Some(id) =>
             metricsSender.incrementCount("found-old-id")
             Try(id.CanonicalID)
           case None =>
-            val result = generateAndSaveCanonicalId(identifiers.head.value)
+            val result = generateAndSaveCanonicalId(idsWithKnownSchemes)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
             result
         }
-      } else {
-        throw UnableToMintIdentifierException(
-          "identifiers list did not contain a known identifierScheme")
       }
     }.flatten
   }
 
-  private def generateAndSaveCanonicalId(miroId: String): Try[String] = {
+  private def generateAndSaveCanonicalId(
+    identifiers: List[SourceIdentifier]): Try[String] = {
     val canonicalId = Identifiable.generate
     identifiersDao
-      .saveIdentifier(Identifier(MiroID = miroId, CanonicalID = canonicalId))
+      .saveIdentifier(
+        Identifier(
+          MiroID =
+            findIdentifierWith(identifiers, IdentifierSchemes.miroImageNumber),
+          CalmAltRefNo =
+            findIdentifierWith(identifiers, IdentifierSchemes.calmAltRefNo),
+          CanonicalID = canonicalId
+        ))
       .map { _ =>
         canonicalId
       }
+  }
+
+  private def findIdentifierWith(identifiers: List[SourceIdentifier],
+                                 identifierScheme: String): String = {
+    identifiers
+      .find(identifier => identifier.identifierScheme == identifierScheme)
+      .fold[String](null)(identifier => identifier.value)
   }
 }
 

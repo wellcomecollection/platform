@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
+import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -40,7 +41,8 @@ class IdentifierGeneratorTest
 
   private val metricsSender =
     new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
-  private val knownIdentifierSchemes = List(IdentifierSchemes.miroImageNumber)
+  private val knownIdentifierSchemes =
+    List(IdentifierSchemes.miroImageNumber, IdentifierSchemes.calmAltRefNo)
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable),
     metricsSender,
@@ -93,16 +95,17 @@ class IdentifierGeneratorTest
 
   it(
     "should return a failure if it fails inserting the identifier in the database") {
-    val miroId = "1234"
     val sourceIdentifiers = List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.miroImageNumber,
-        value = miroId
+        value = "1234"
       )
     )
     val identifiersDao = mock[IdentifiersDao]
     val identifierGenerator =
-      new IdentifierGenerator(identifiersDao, metricsSender, knownIdentifierSchemes)
+      new IdentifierGenerator(identifiersDao,
+                              metricsSender,
+                              knownIdentifierSchemes)
 
     val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
@@ -119,5 +122,42 @@ class IdentifierGeneratorTest
                                                         "Work")
     triedGeneratingId shouldBe a[Failure[Exception]]
     triedGeneratingId.failed.get shouldBe expectedException
+  }
+
+  it("""should filter identifiers using the known
+      IdentifierSchemes before sending them to the dao""") {
+
+    val miroId = "1234"
+    val calmAltRefNo = "5678"
+    val knownSchemeIdentifiers = List(
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        value = miroId
+      ),
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.calmAltRefNo,
+        value = calmAltRefNo
+      )
+    )
+    val sourceIdentifiers = knownSchemeIdentifiers :+ SourceIdentifier(
+      identifierScheme = "not-a-known-identifier-scheme",
+      value = "jshfgh"
+    )
+
+    val triedId =
+      identifierGenerator.retrieveOrGenerateCanonicalId(sourceIdentifiers,
+                                                        "Work")
+
+    triedId shouldBe a[Success[String]]
+    val id = triedId.get
+    id should not be (empty)
+    val i = identifiersTable.i
+    val maybeIdentifier = withSQL {
+      select.from(identifiersTable as i).where.eq(i.MiroID, miroId)
+    }.map(Identifier(i)).single.apply()
+    maybeIdentifier shouldBe defined
+    maybeIdentifier.get shouldBe Identifier(CanonicalID = id,
+                                            MiroID = miroId,
+                                            CalmAltRefNo = calmAltRefNo)
   }
 }
