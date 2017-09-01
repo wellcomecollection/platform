@@ -14,6 +14,7 @@ case class DisplayLocation(
     allowableValues = "thumbnail-image, iiif-image"
   ) locationType: String,
   @ApiModelProperty(
+    dataType = "String",
     value = "The title or other short name of a license"
   ) url: Option[String] = None,
   @ApiModelProperty(

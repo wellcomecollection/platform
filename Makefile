@@ -78,6 +78,13 @@ elasticdump-deploy: elasticdump-build
 	./scripts/deploy_docker_to_aws.py --project=elasticdump --infra-bucket=$(INFRA_BUCKET)
 
 
+api_docs-build: .docker/_build_deps
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=update_api_docs
+
+api_docs-deploy: api_docs-build
+	./scripts/deploy_docker_to_aws.py --project=update_api_docs --infra-bucket=$(INFRA_BUCKET)
+
+
 nginx-build-api: .docker/image_builder
 	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=api
 

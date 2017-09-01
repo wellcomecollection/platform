@@ -21,7 +21,8 @@ class StartupTest
     flags = Map(
       "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
       "aws.dynamo.miroData.tableName" -> "MiroData",
-      "reindex.target.tableName" -> "MiroData"
+      "reindex.target.tableName" -> "MiroData",
+      "reindex.target.reindexShard" -> "default"
     ) ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag
   )
 

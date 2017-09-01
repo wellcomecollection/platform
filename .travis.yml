@@ -117,3 +117,4 @@ env:
     - TASK=loris-build
     - TASK=miro_adapter-build
     - TASK=elasticdump-build
+    - TASK=api_docs-build
