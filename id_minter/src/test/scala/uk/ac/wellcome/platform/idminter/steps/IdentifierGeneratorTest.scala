@@ -57,7 +57,7 @@ class IdentifierGeneratorTest
     }.update().apply()
 
     val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234")),
       "Work")
 
     triedId shouldBe Success("5678")
@@ -66,7 +66,7 @@ class IdentifierGeneratorTest
   it(
     "should generate an id and save it in the database if a record doesn't already exist") {
     val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234")),
       "Work")
 
     triedId shouldBe a[Success[String]]
@@ -83,7 +83,7 @@ class IdentifierGeneratorTest
   it(
     "should fail if the identifier does not contain a known identifierScheme in the list of Identifiers") {
     val triedGeneratingId = identifierGenerator.retrieveOrGenerateCanonicalId(
-      SourceIdentifier("not-a-known-identifier-scheme", "1234"),
+      List(SourceIdentifier("not-a-known-identifier-scheme", "1234")),
       "Work")
 
     triedGeneratingId shouldBe a[Failure[Exception]]
@@ -100,17 +100,13 @@ class IdentifierGeneratorTest
         value = miroId
       )
     )
-    val work = Work(
-      identifiers = sourceIdentifiers,
-      title = "A fear of failing in a fox"
-    )
     val identifiersDao = mock[IdentifiersDao]
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao, metricsSender, knownIdentifierSchemes)
 
     val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
-      ontologyType = work.ontologyType
+      ontologyType = "Work"
     )
     when(triedLookup)
       .thenReturn(Success(None))
@@ -119,7 +115,7 @@ class IdentifierGeneratorTest
       .thenReturn(Failure(expectedException))
 
     val triedGeneratingId =
-      identifierGenerator.retrieveOrGenerateCanonicalId(sourceIdentifiers.head,
+      identifierGenerator.retrieveOrGenerateCanonicalId(sourceIdentifiers,
                                                         "Work")
     triedGeneratingId shouldBe a[Failure[Exception]]
     triedGeneratingId.failed.get shouldBe expectedException
