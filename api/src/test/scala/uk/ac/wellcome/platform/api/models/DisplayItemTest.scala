@@ -56,7 +56,7 @@ class DisplayItemTest extends FunSpec with Matchers {
       includesIdentifiers = true
     )
 
-    displayItem.id shouldBe item.id
+    displayItem.id shouldBe item.canonicalId
     displayItem.locations shouldBe List(DisplayLocation(location))
     displayItem.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
     displayItem.ontologyType shouldBe "Item"
