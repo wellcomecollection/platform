@@ -10,8 +10,10 @@ import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+import io.circe.parser._
 
 import scala.concurrent.Future
+import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
   idEmbedder: IdEmbedder,
@@ -23,15 +25,11 @@ class IdMinterWorkerService @Inject()(
 
   val snsSubject = "identified-item"
 
-  private def toWorkJson(work: Work, canonicalId: String) = {
-    JsonUtil.toJson(work.copy(canonicalId = Some(canonicalId))).get
-  }
-
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
-      work <- WorkExtractor.toWork(message)
-      workWithCanonicalId <- idEmbedder.embedId(work)
-      _ <- writer.writeMessage(JsonUtil.toJson(workWithCanonicalId).get,
+      json <- Future.fromTry(Try(parse(message.body).right.get))
+      workWithCanonicalId <- idEmbedder.embedId(json)
+      _ <- writer.writeMessage(workWithCanonicalId.toString(),
                                Some(snsSubject))
     } yield ()
 

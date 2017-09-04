@@ -7,7 +7,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
+import io.circe._
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
+import io.circe.optics.JsonPath._
 
 import scala.util.Try
 
@@ -38,7 +43,7 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
       .thenReturn(Try(newCanonicalId))
 
-    val newWorkFuture = idEmbedder.embedId(json = originalWork)
+    val newWorkFuture = idEmbedder.embedId(json = originalWork.asJson)
 
     whenReady(newWorkFuture) {newWork =>
       newWork shouldBe originalWork.copy(canonicalId = Some(newCanonicalId))
@@ -56,7 +61,7 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
       .thenReturn(Try(throw expectedException))
 
-    val newWorkFuture = idEmbedder.embedId(json = originalWork)
+    val newWorkFuture = idEmbedder.embedId(json = originalWork.asJson)
 
     whenReady(newWorkFuture.failed) {exception =>
       exception shouldBe expectedException
@@ -94,9 +99,10 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(originalItem2.identifiers, originalItem2.ontologyType))
       .thenReturn(Try(newItemCanonicalId2))
 
-    val eventualWork = idEmbedder.embedId(originalWork)
+    val eventualWork = idEmbedder.embedId(originalWork.asJson)
 
-    whenReady(eventualWork) { work =>
+    whenReady(eventualWork) { json =>
+      val work = decode[Work](json.toString()).right.get
       work.items.head shouldBe originalItem1.copy(
         canonicalId = Some(newItemCanonicalId1))
       work.items.tail.head shouldBe originalItem2.copy(

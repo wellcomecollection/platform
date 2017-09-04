@@ -2,14 +2,13 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import io.circe.Json
-import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import io.circe._
+import io.circe.{Json, _}
 import io.circe.generic.auto._
+import io.circe.optics.JsonPath.root
 import io.circe.parser._
-import io.circe.syntax._
+import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
