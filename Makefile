@@ -26,6 +26,12 @@ clean:
 .docker/image_builder:
 	./scripts/build_ci_docker_image.py --project=image_builder --dir=builds --file=builds/image_builder.Dockerfile
 
+.docker/publish_service_to_aws:
+	./scripts/build_ci_docker_image.py \
+		--project=publish_service_to_aws \
+		--dir=builds \
+		--file=builds/publish_service_to_aws.Dockerfile
+
 .docker/miro_adapter_tests:
 	./scripts/build_ci_docker_image.py --project=miro_adapter_tests --dir=miro_adapter --file=miro_adapter/miro_adapter_tests.Dockerfile
 
