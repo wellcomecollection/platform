@@ -24,7 +24,10 @@ clean:
 	mkdir -p .docker && touch .docker/_build_deps
 
 .docker/image_builder:
-	./scripts/build_ci_docker_image.py --project=image_builder --dir=builds --file=builds/image_builder.Dockerfile
+	./scripts/build_ci_docker_image.py \
+		--project=image_builder \
+		--dir=builds \
+		--file=builds/image_builder.Dockerfile
 
 .docker/publish_service_to_aws:
 	./scripts/build_ci_docker_image.py \
@@ -33,7 +36,10 @@ clean:
 		--file=builds/publish_service_to_aws.Dockerfile
 
 .docker/miro_adapter_tests:
-	./scripts/build_ci_docker_image.py --project=miro_adapter_tests --dir=miro_adapter --file=miro_adapter/miro_adapter_tests.Dockerfile
+	./scripts/build_ci_docker_image.py \
+		--project=miro_adapter_tests \
+		--dir=miro_adapter \
+		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
 
 ## Build the image for gatling
