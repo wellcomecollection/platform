@@ -33,7 +33,8 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao,
             }
           case None =>
             error(s"Item $work did not contain a MiroID")
-            Future.failed(new Exception(s"Item $work did not contain a MiroID"))
+            Future.failed(
+              new Exception(s"Item $work did not contain a MiroID"))
       }
     )
   }
