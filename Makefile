@@ -44,7 +44,7 @@ clean:
 
 ## Build the image for gatling
 gatling-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=gatling
+	PROJECT=gatling ./builds/build_image.sh
 
 ## Deploy the image for gatling
 gatling-deploy: gatling-build .docker/publish_service_to_aws
@@ -52,7 +52,7 @@ gatling-deploy: gatling-build .docker/publish_service_to_aws
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=cache_cleaner
+	PROJECT=cache_cleaner ./builds/build_image.sh
 
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build .docker/publish_service_to_aws
@@ -61,7 +61,7 @@ cache_cleaner-deploy: cache_cleaner-build .docker/publish_service_to_aws
 
 ## Build the image for tif-metadata
 tif-metadata-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=tif-metadata
+	PROJECT=tif-metadata ./builds/build_image.sh
 
 ## Deploy the image for tif-metadata
 tif-metadata-deploy: tif-metadata-build .docker/publish_service_to_aws
@@ -70,7 +70,7 @@ tif-metadata-deploy: tif-metadata-build .docker/publish_service_to_aws
 
 ## Build the image for Loris
 loris-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=loris
+	PROJECT=loris ./builds/build_image.sh
 
 ## Deploy the image for Loris
 loris-deploy: loris-build .docker/publish_service_to_aws
@@ -78,7 +78,7 @@ loris-deploy: loris-build .docker/publish_service_to_aws
 
 
 miro_adapter-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
+	PROJECT=miro_adapter FILE=miro_adapter/Dockerfile ./builds/build_image.sh
 
 miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
 	rm -rf $$(pwd)/miro_adapter/__pycache__
@@ -90,30 +90,30 @@ miro_adapter-deploy: miro_adapter-build .docker/publish_service_to_aws
 
 
 elasticdump-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=elasticdump
+	PROJECT=elasticdump ./builds/build_image.sh
 
 elasticdump-deploy: elasticdump-build .docker/publish_service_to_aws
 	PROJECT=elasticdump ./builds/publish_service.sh
 
 
 api_docs-build: .docker/_build_deps
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=update_api_docs
+	PROJECT=update_api_docs ./builds/build_image.sh
 
 api_docs-deploy: api_docs-build .docker/publish_service_to_aws
-	PROJECT=api_docs ./builds/publish_service.sh
+	PROJECT=update_api_docs ./builds/publish_service.sh
 
 
 nginx-build-api: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=api
+	PROJECT=nginx VARIANT=api ./builds/build_image.sh
 
 nginx-build-loris: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=loris
+	PROJECT=nginx VARIANT=loris ./builds/build_image.sh
 
 nginx-build-services: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=services
+	PROJECT=nginx VARIANT=services ./builds/build_image.sh
 
 nginx-build-grafana: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=grafana
+	PROJECT=nginx VARIANT=grafana ./builds/build_image.sh
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
