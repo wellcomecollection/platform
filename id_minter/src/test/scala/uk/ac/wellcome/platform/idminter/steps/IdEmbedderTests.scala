@@ -7,12 +7,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
 
 import scala.util.Try
 
 class IdEmbedderTests
-  extends FunSpec
+    extends FunSpec
     with ScalaFutures
     with Matchers
     with BeforeAndAfterEach
@@ -40,7 +40,7 @@ class IdEmbedderTests
 
     val newWorkFuture = idEmbedder.embedId(work = originalWork)
 
-    whenReady(newWorkFuture) {newWork =>
+    whenReady(newWorkFuture) { newWork =>
       newWork shouldBe originalWork.copy(canonicalId = Some(newCanonicalId))
     }
   }
@@ -58,9 +58,51 @@ class IdEmbedderTests
 
     val newWorkFuture = idEmbedder.embedId(work = originalWork)
 
-    whenReady(newWorkFuture.failed) {exception =>
+    whenReady(newWorkFuture.failed) { exception =>
       exception shouldBe expectedException
     }
+  }
+
+  it("should add canonicalIds to all items") {
+    val identifiers =
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, value = "1234"))
+    val originalItem1 =
+      Item(canonicalId = None, identifiers = identifiers, locations = List())
+    val originalItem2 =
+      Item(
+        canonicalId = None,
+        identifiers = List(
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, value = "1235")),
+        locations = List())
+    val originalWork =
+      Work(identifiers = identifiers,
+           title = "crap",
+           canonicalId = None,
+           items = List(originalItem1, originalItem2))
+    val newItemCanonicalId1 = "item1-canonical-id"
+    val newItemCanonicalId2 = "item1-canonical-id"
+    when(
+      mockIdentifierGenerator
+        .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
+      .thenReturn(Try("work-canonical-id"))
+    when(
+      mockIdentifierGenerator
+        .retrieveOrGenerateCanonicalId(originalItem1.identifiers, originalItem1.ontologyType))
+      .thenReturn(Try(newItemCanonicalId1))
+    when(
+      mockIdentifierGenerator
+        .retrieveOrGenerateCanonicalId(originalItem2.identifiers, originalItem2.ontologyType))
+      .thenReturn(Try(newItemCanonicalId2))
+
+    val eventualWork = idEmbedder.embedId(originalWork)
+
+    whenReady(eventualWork) { work =>
+      work.items.head shouldBe originalItem1.copy(
+        canonicalId = Some(newItemCanonicalId1))
+      work.items.tail.head shouldBe originalItem2.copy(
+        canonicalId = Some(newItemCanonicalId2))
+    }
+
   }
 
 }

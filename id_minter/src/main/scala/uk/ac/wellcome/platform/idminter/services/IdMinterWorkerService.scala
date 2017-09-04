@@ -23,10 +23,6 @@ class IdMinterWorkerService @Inject()(
 
   val snsSubject = "identified-item"
 
-  private def toWorkJson(work: Work, canonicalId: String) = {
-    JsonUtil.toJson(work.copy(canonicalId = Some(canonicalId))).get
-  }
-
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       work <- WorkExtractor.toWork(message)

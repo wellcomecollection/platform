@@ -5,6 +5,8 @@ case class UnidentifiableException()
 
 trait Identifiable {
   val canonicalId: Option[String]
+  val identifiers: List[SourceIdentifier]
+  val ontologyType: String
   def id: String = canonicalId.getOrElse(
     throw UnidentifiableException()
   )
