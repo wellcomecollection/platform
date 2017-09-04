@@ -11,25 +11,23 @@ clean:
 	rm -rf .docker
 
 .docker/jslint_ci:
-	./scripts/build_ci_docker_image.py --project jslint_ci
+	./scripts/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
 
 .docker/python3.6_ci:
-	./scripts/build_ci_docker_image.py --project python3.6_ci
+	./scripts/build_ci_docker_image.py --project=python3.6_ci --dir=docker/python3.6_ci
 
 .docker/terraform_ci:
-	./scripts/build_ci_docker_image.py --project terraform_ci
+	./scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
 
 .docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
 	mkdir -p .docker && touch .docker/_build_deps
 
 .docker/image_builder:
-	docker build -t image_builder -f builds/image_builder.Dockerfile builds
-	mkdir -p .docker && touch .docker/image_builder
+	./scripts/build_ci_docker_image.py --project=image_builder --dir=builds --file=builds/image_builder.Dockerfile
 
 .docker/miro_adapter_tests:
-	docker build -t miro_adapter_tests -f miro_adapter/miro_adapter_tests.Dockerfile miro_adapter
-	mkdir -p .docker && touch .docker/miro_adapter_tests
+	./scripts/build_ci_docker_image.py --project=miro_adapter_tests --dir=miro_adapter --file=miro_adapter/miro_adapter_tests.Dockerfile
 
 
 ## Build the image for gatling
