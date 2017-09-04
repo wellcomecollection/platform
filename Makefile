@@ -106,13 +106,6 @@ nginx-build-services: .docker/image_builder
 nginx-build-grafana: .docker/image_builder
 	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=grafana
 
-## Build images for all of our nginx proxies
-nginx-build:	\
-	nginx-build-api \
-	nginx-build-loris \
-	nginx-build-services \
-    nginx-build-grafana
-
 
 
 nginx-deploy-api: nginx-build-api
@@ -126,13 +119,6 @@ nginx-deploy-services: nginx-build-services
 
 nginx-deploy-grafana: nginx-build-grafana
 	./scripts/deploy_docker_to_aws.py --project=nginx_grafana --infra-bucket=$(INFRA_BUCKET)
-
-## Push images for all of our nginx proxies
-nginx-deploy:	\
-	nginx-deploy-api \
-	nginx-deploy-loris \
-	nginx-deploy-services \
-	nginx-deploy-grafana
 
 
 
@@ -148,22 +134,11 @@ sbt-test-id_minter:
 sbt-test-ingestor:
 	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
 
-sbt-test-miro_adapter:
-	sbt 'project miro_adapter' ';dockerComposeUp;test;dockerComposeStop'
-
 sbt-test-reindexer:
 	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
 
 sbt-test-transformer:
 	sbt 'project transformer' ';dockerComposeUp;test;dockerComposeStop'
-
-sbt-test: \
-	sbt-test-api	\
-	sbt-test-id_minter \
-	sbt-test-ingestor   \
-	sbt-test-miro_adapter \
-	sbt-test-reindexer	\
-	sbt-test-transformer
 
 
 
@@ -176,22 +151,11 @@ sbt-build-id_minter: .docker/_build_deps
 sbt-build-ingestor: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=miro_adapter
-
 sbt-build-reindexer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=reindexer
 
 sbt-build-transformer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=transformer
-
-sbt-build: \
-	sbt-build-api	\
-	sbt-build-id_minter \
-	sbt-build-ingestor   \
-	sbt-build-miro_adapter \
-	sbt-build-reindexer	\
-	sbt-build-transformer
 
 
 
@@ -204,22 +168,11 @@ sbt-deploy-id_minter: sbt-build-id_minter
 sbt-deploy-ingestor: sbt-build-ingestor
 	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
 
-sbt-deploy-miro_adapter: sbt-build-miro_adapter
-	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
-
 sbt-deploy-reindexer: sbt-build-reindexer
 	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
 
 sbt-deploy-transformer: sbt-build-transformer
 	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
-
-sbt-deploy: \
-	sbt-deploy-api	\
-	sbt-deploy-id_minter \
-	sbt-deploy-ingestor   \
-	sbt-deploy-miro_adapter \
-	sbt-deploy-reindexer	\
-	sbt-deploy-transformer
 
 
 
