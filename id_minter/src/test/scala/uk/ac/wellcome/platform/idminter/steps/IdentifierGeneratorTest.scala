@@ -15,6 +15,7 @@ import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class IdentifierGeneratorTest
     extends FunSpec
@@ -97,15 +98,15 @@ class IdentifierGeneratorTest
     val identifierGenerator =
       new IdentifierGenerator(identifiersDao, metricsSender)
 
-    val lookupFuture = identifiersDao.lookupID(
+    val triedLookup = identifiersDao.lookupID(
       sourceIdentifiers = sourceIdentifiers,
       ontologyType = work.ontologyType
     )
-    when(lookupFuture)
-      .thenReturn(Future.successful(None))
+    when(triedLookup)
+      .thenReturn(Success(None))
     val expectedException = new Exception("Noooo")
     when(identifiersDao.saveIdentifier(any[Identifier]()))
-      .thenReturn(Future.failed(expectedException))
+      .thenReturn(Failure(expectedException))
 
     whenReady(identifierGenerator.generateId(work).failed) { exception =>
       exception shouldBe expectedException
