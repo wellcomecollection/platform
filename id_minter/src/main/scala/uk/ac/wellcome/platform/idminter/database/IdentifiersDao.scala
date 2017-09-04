@@ -34,7 +34,8 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     // TryBackoff ad infinitum.
     Try {
       if (sourceIdentifiers.isEmpty) {
-        throw UnableToMintIdentifierException("No source identifiers supplied!")
+        throw UnableToMintIdentifierException(
+          "No source identifiers supplied!")
       } else {
 
         blocking {
