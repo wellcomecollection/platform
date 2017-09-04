@@ -92,3 +92,13 @@ module "elasticdump" {
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
   ]
 }
+
+module "update_api_docs" {
+  source        = "./ecs_script_task"
+  task_name     = "update_api_docs"
+  app_uri       = "${module.ecr_repository_update_api_docs.repository_url}:${var.release_ids["update_api_docs"]}"
+  task_role_arn = "${module.ecs_update_api_docs_iam.task_role_arn}"
+
+  cpu    = 1024
+  memory = 1024
+}

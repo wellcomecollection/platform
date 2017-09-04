@@ -8,13 +8,16 @@ QUEUE_URL="https://sqs.eu-west-1.amazonaws.com/760097843905/tif_conversion_queue
 while true
 do
   MESSAGE="$(aws sqs receive-message --max-number-of-messages=1 --queue-url="$QUEUE_URL")"
+
   if [[ "$MESSAGE" == "" ]]
   then
     sleep 1
     continue
   fi
+
   BODY=$(echo "$MESSAGE" | jq -r '.Messages[0].Body')
   KEY=$(echo "$BODY" | jq -r '.key')
+
   echo "*** Processing $KEY at $(date)"
 
   pushd $(mktemp -d)
