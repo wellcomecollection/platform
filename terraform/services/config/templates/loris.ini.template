@@ -63,7 +63,7 @@ dither_bitonal_images = False
 target_formats = ['jpg','png','gif','webp']
 
     [[png]]
-    impl = 'JPG_Transformer'
+    impl = 'PNG_Transformer'
 
     [[jpg]]
     impl = 'JPG_Transformer'
