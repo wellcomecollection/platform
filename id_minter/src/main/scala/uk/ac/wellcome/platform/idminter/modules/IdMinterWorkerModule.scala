@@ -12,10 +12,9 @@ object IdMinterWorkerModule extends TwitterModule {
   val tableName = flag[String]("aws.rds.identifiers.table",
                                "",
                                "Name of the identifiers table")
-  flag[String](
-    "known.identifierSchemes",
-    "",
-    "List of identifierSchemes to lookup in the Identifiers table")
+  flag[String]("known.identifierSchemes",
+               "",
+               "List of identifierSchemes to lookup in the Identifiers table")
 
   override def singletonStartup(injector: Injector) {
     val tableProvisioner = injector.instance[TableProvisioner]
