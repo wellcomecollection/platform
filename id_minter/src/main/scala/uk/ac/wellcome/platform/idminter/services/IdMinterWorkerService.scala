@@ -14,11 +14,11 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.concurrent.Future
 
 class IdMinterWorkerService @Inject()(
-                                       idEmbedder: IdEmbedder,
-                                       writer: SNSWriter,
-                                       reader: SQSReader,
-                                       system: ActorSystem,
-                                       metrics: MetricsSender
+  idEmbedder: IdEmbedder,
+  writer: SNSWriter,
+  reader: SQSReader,
+  system: ActorSystem,
+  metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
   val snsSubject = "identified-item"
