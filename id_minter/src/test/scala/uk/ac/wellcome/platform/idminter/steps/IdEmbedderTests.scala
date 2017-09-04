@@ -22,7 +22,7 @@ class IdEmbedderTests
     new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
   private val mockIdentifierGenerator: IdentifierGenerator =
     mock[IdentifierGenerator]
-  val something = new IdEmbedder(
+  val idEmbedder = new IdEmbedder(
     metricsSender,
     mockIdentifierGenerator
   )
@@ -38,7 +38,7 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
       .thenReturn(Try(newCanonicalId))
 
-    val newWorkFuture = something.embedId(work = originalWork)
+    val newWorkFuture = idEmbedder.embedId(work = originalWork)
 
     whenReady(newWorkFuture) {newWork =>
       newWork shouldBe originalWork.copy(canonicalId = Some(newCanonicalId))
@@ -56,7 +56,7 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
       .thenReturn(Try(throw expectedException))
 
-    val newWorkFuture = something.embedId(work = originalWork)
+    val newWorkFuture = idEmbedder.embedId(work = originalWork)
 
     whenReady(newWorkFuture.failed) {exception =>
       exception shouldBe expectedException
