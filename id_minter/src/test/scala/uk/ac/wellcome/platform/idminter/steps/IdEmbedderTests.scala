@@ -38,7 +38,7 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
       .thenReturn(Try(newCanonicalId))
 
-    val newWorkFuture = idEmbedder.embedId(work = originalWork)
+    val newWorkFuture = idEmbedder.embedId(json = originalWork)
 
     whenReady(newWorkFuture) {newWork =>
       newWork shouldBe originalWork.copy(canonicalId = Some(newCanonicalId))
@@ -56,11 +56,53 @@ class IdEmbedderTests
         .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
       .thenReturn(Try(throw expectedException))
 
-    val newWorkFuture = idEmbedder.embedId(work = originalWork)
+    val newWorkFuture = idEmbedder.embedId(json = originalWork)
 
     whenReady(newWorkFuture.failed) {exception =>
       exception shouldBe expectedException
     }
+  }
+
+  it("should add canonicalIds to all items") {
+    val identifiers =
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, value = "1234"))
+    val originalItem1 =
+      Item(canonicalId = None, identifiers = identifiers, locations = List())
+    val originalItem2 =
+      Item(
+        canonicalId = None,
+        identifiers = List(
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, value = "1235")),
+        locations = List())
+    val originalWork =
+      Work(identifiers = identifiers,
+        title = "crap",
+        canonicalId = None,
+        items = List(originalItem1, originalItem2))
+    val newItemCanonicalId1 = "item1-canonical-id"
+    val newItemCanonicalId2 = "item1-canonical-id"
+    when(
+      mockIdentifierGenerator
+        .retrieveOrGenerateCanonicalId(identifiers, originalWork.ontologyType))
+      .thenReturn(Try("work-canonical-id"))
+    when(
+      mockIdentifierGenerator
+        .retrieveOrGenerateCanonicalId(originalItem1.identifiers, originalItem1.ontologyType))
+      .thenReturn(Try(newItemCanonicalId1))
+    when(
+      mockIdentifierGenerator
+        .retrieveOrGenerateCanonicalId(originalItem2.identifiers, originalItem2.ontologyType))
+      .thenReturn(Try(newItemCanonicalId2))
+
+    val eventualWork = idEmbedder.embedId(originalWork)
+
+    whenReady(eventualWork) { work =>
+      work.items.head shouldBe originalItem1.copy(
+        canonicalId = Some(newItemCanonicalId1))
+      work.items.tail.head shouldBe originalItem2.copy(
+        canonicalId = Some(newItemCanonicalId2))
+    }
+
   }
 
 }

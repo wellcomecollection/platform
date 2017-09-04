@@ -16,6 +16,8 @@ object Dependencies {
     val elastic4s = "5.4.1"
     val scanamo = "0.9.4"
     val jacksonYamlVersion = "2.8.8"
+    val monocleVersion = "1.5.0-cats-M1"
+    val circeVersion = "0.8.0"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -42,6 +44,13 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
+  )
+
+  val circeDependencies = Seq(
+    "io.circe" %% "circe-core" % versions.circeVersion,
+    "io.circe" %% "circe-generic"% versions.circeVersion,
+    "io.circe" %% "circe-parser"% versions.circeVersion,
+    "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val commonDependencies: Seq[ModuleID] = Seq(
@@ -80,7 +89,7 @@ object Dependencies {
   val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
   val idminterDependencies
-    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
+    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies ++ circeDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 }
