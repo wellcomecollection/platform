@@ -6,7 +6,7 @@ LABEL description "A Docker image for building Docker images for the Wellcome Di
 RUN apk update
 RUN apk add docker git python3
 
-RUN pip3 install docopt
+RUN pip3 install docopt boto3
 
 COPY . /builds
 

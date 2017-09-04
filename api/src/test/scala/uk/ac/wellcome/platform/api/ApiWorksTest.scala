@@ -38,42 +38,58 @@ class ApiWorksTest
                            |  "results": []
                            |}""".stripMargin
 
-  private def items(work: Work) = {
-    work.items
+  private def items(its: List[Item]) =
+    its
       .map { it =>
         s"""{
-         "id": "${it.canonicalId.get}",
-         "type": "${it.ontologyType}",
-         "locations": [
-           ${locations(it)}
-         ]
-       }"""
+          "id": "${it.canonicalId.get}",
+          "type": "${it.ontologyType}",
+          "locations": [
+            ${locations(it.locations)}
+          ]
+        }"""
       }
       .mkString(",")
-  }
 
-  private def locations(it: Item) = {
-    it.locations
-      .map { location =>
-        s"""{
-           "type": "${location.ontologyType}",
-           "locationType": "${location.locationType}",
-           "url": "${location.url.get}",
-           "license": ${license(location)}
-           }"""
-
-      }
+  private def locations(locations: List[Location]) =
+    locations
+      .map { location(_) }
       .mkString(",")
-  }
 
-  private def license(location: Location) = {
+  private def location(loc: Location) =
     s"""{
-         "label": "${location.license.label}",
-         "licenseType": "${location.license.licenseType}",
-         "type": "${location.license.ontologyType}",
-         "url": "${location.license.url}"
-         }"""
-  }
+      "type": "${loc.ontologyType}",
+      "locationType": "${loc.locationType}",
+      "url": "${loc.url.get}",
+      "license": ${license(loc.license)}
+    }"""
+
+  private def license(license: BaseLicense) =
+    s"""{
+      "label": "${license.label}",
+      "licenseType": "${license.licenseType}",
+      "type": "${license.ontologyType}",
+      "url": "${license.url}"
+    }"""
+
+  private def identifier(identifier: SourceIdentifier) =
+    s"""{
+      "type": "Identifier",
+      "identifierScheme": "${identifier.identifierScheme}",
+      "value": "${identifier.value}"
+    }"""
+
+  private def agent(ag: Agent) =
+    s"""{
+      "type": "Agent",
+      "label": "${ag.label}"
+    }"""
+
+  private def period(p: Period) =
+    s"""{
+      "type": "Period",
+      "label": "${p.label}"
+    }"""
 
   it("should return a list of works") {
 
@@ -100,19 +116,10 @@ class ApiWorksTest
                           |     "title": "${works(0).title}",
                           |     "description": "${works(0).description.get}",
                           |     "lettering": "${works(0).lettering.get}",
-                          |     "createdDate": {
-                          |       "type": "Period",
-                          |       "label": "${works(0).createdDate.get.label}"
-                          |     },
-                          |     "creators": [{
-                          |       "type": "Agent",
-                          |       "label": "${works(0).creators(0).label}"
-                          |     }],
+                          |     "createdDate": ${period(works(0).createdDate.get)},
+                          |     "creators": [ ${agent(works(0).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [
-                          |       ${items(works(0))}
-                          |     ]
+                          |     "genres": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -120,19 +127,10 @@ class ApiWorksTest
                           |     "title": "${works(1).title}",
                           |     "description": "${works(1).description.get}",
                           |     "lettering": "${works(1).lettering.get}",
-                          |     "createdDate": {
-                          |       "type": "Period",
-                          |       "label": "${works(1).createdDate.get.label}"
-                          |     },
-                          |     "creators": [{
-                          |       "type": "Agent",
-                          |       "label": "${works(1).creators(0).label}"
-                          |     }],
+                          |     "createdDate": ${period(works(1).createdDate.get)},
+                          |     "creators": [ ${agent(works(1).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [
-                          |       ${items(works(1))}
-                          |     ]
+                          |     "genres": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -140,19 +138,10 @@ class ApiWorksTest
                           |     "title": "${works(2).title}",
                           |     "description": "${works(2).description.get}",
                           |     "lettering": "${works(2).lettering.get}",
-                          |     "createdDate": {
-                          |       "type": "Period",
-                          |       "label": "${works(2).createdDate.get.label}"
-                          |     },
-                          |     "creators": [{
-                          |       "type": "Agent",
-                          |       "label": "${works(2).creators(0).label}"
-                          |     }],
+                          |     "createdDate": ${period(works(2).createdDate.get)},
+                          |     "creators": [ ${agent(works(2).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [
-                          |       ${items(works(2))}
-                          |     ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -184,15 +173,8 @@ class ApiWorksTest
                           | "title": "$title",
                           | "description": "$description",
                           | "lettering": "$lettering",
-                          | "createdDate": {
-                          |   "type": "Period",
-                          |   "label": "${period.label}"
-                          | },
-                          | "creators": [{
-                          |   "type": "Agent",
-                          |   "label": "${agent.label}"
-                          | }],
-                          | "items": [${items(work)}],
+                          | "createdDate": ${period(work.createdDate.get)},
+                          | "creators": [ ${agent(work.creators(0))} ],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
@@ -205,44 +187,71 @@ class ApiWorksTest
     val work = workWith(
       canonicalId = canonicalId,
       title = title,
-      description = description,
-      lettering = lettering,
-      createdDate = period,
-      creator = agent,
-      List(
-        itemWith(canonicalId = None, defaultSourceIdentifier, defaultLocation))
+      items = List(
+        itemWith(
+          canonicalId = None,
+          identifier = defaultSourceIdentifier,
+          location = defaultLocation
+        )
+      )
     )
 
     insertIntoElasticSearch(work)
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/$canonicalId",
+        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "$canonicalId",
+                          | "id": "${work.canonicalId.get}",
                           | "title": "$title",
-                          | "description": "$description",
-                          | "lettering": "$lettering",
-                          | "createdDate": {
-                          |   "type": "Period",
-                          |   "label": "${period.label}"
-                          | },
-                          | "creators": [{
-                          |   "type": "Agent",
-                          |   "label": "${agent.label}"
-                          | }],
+                          | "creators": [ ],
                           | "items": [
                           |   {
                           |    "type": "${work.items.head.ontologyType}",
                           |    "locations": [
-                          |      ${locations(work.items.head)}
+                          |      ${locations(work.items.head.locations)}
                           |    ]
                           |   }
                           | ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it("should be able to render an item if the items include is present") {
+    val work = workWith(
+      canonicalId = "b4heraz7",
+      title = "Inside an irate igloo",
+      items = List(
+        itemWith(
+          canonicalId = Some("c3a599u5"),
+          identifier = defaultSourceIdentifier,
+          location = defaultLocation
+        )
+      )
+    )
+
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.canonicalId.get}",
+                          | "title": "${work.title}",
+                          | "creators": [ ],
+                          | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
@@ -277,15 +286,8 @@ class ApiWorksTest
                           |     "title": "${works(1).title}",
                           |     "description": "${works(1).description.get}",
                           |     "lettering": "${works(1).lettering.get}",
-                          |     "createdDate": {
-                          |       "type": "Period",
-                          |       "label": "${works(1).createdDate.get.label}"
-                          |     },
-                          |     "creators": [{
-                          |       "type": "Agent",
-                          |       "label": "${works(1).creators(0).label}"
-                          |     }],
-                          |     "items": [ ${items(works(1))}],
+                          |     "createdDate": ${period(works(1).createdDate.get)},
+                          |     "creators": [ ${agent(works(1).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -313,15 +315,8 @@ class ApiWorksTest
                           |     "title": "${works(0).title}",
                           |     "description": "${works(0).description.get}",
                           |     "lettering": "${works(0).lettering.get}",
-                          |     "createdDate": {
-                          |       "type": "Period",
-                          |       "label": "${works(0).createdDate.get.label}"
-                          |     },
-                          |     "creators": [{
-                          |       "type": "Agent",
-                          |       "label": "${works(0).creators(0).label}"
-                          |     }],
-                          |     "items": [${items(works(0))}],
+                          |     "createdDate": ${period(works(0).createdDate.get)},
+                          |     "creators": [ ${agent(works(0).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
                           |   }]
@@ -349,16 +344,9 @@ class ApiWorksTest
                           |     "title": "${works(2).title}",
                           |     "description": "${works(2).description.get}",
                           |     "lettering": "${works(2).lettering.get}",
-                          |     "createdDate": {
-                          |       "type": "Period",
-                          |       "label": "${works(2).createdDate.get.label}"
-                          |     },
-                          |     "creators": [{
-                          |       "type": "Agent",
-                          |       "label": "${works(2).creators(0).label}"
-                          |     }],
+                          |     "createdDate": ${period(works(2).createdDate.get)},
+                          |     "creators": [ ${agent(works(2).creators(0))} ],
                           |     "subjects": [ ],
-                          |      "items": [${items(works(2))}],
                           |     "genres": [ ]
                           |   }]
                           |   }
@@ -513,8 +501,7 @@ class ApiWorksTest
                           |     "title": "${work1.title}",
                           |     "creators": [],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -558,8 +545,7 @@ class ApiWorksTest
                           |        "label": "gardening"
                           |      }
                           |     ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -603,8 +589,7 @@ class ApiWorksTest
                           |         "type": "Concept",
                           |         "label": "etching"
                           |       }
-                          |     ],
-                          |     "items": [ ]
+                          |     ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -655,32 +640,18 @@ class ApiWorksTest
                           |     "id": "${work1.id}",
                           |     "title": "${work1.title}",
                           |     "creators": [ ],
-                          |     "identifiers": [
-                          |       {
-                          |         "type": "Identifier",
-                          |         "identifierScheme": "${identifier1.identifierScheme}",
-                          |         "value": "${identifier1.value}"
-                          |       }
-                          |     ],
+                          |     "identifiers": [ ${identifier(identifier1)} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
                           |     "id": "${work2.id}",
                           |     "title": "${work2.title}",
                           |     "creators": [ ],
-                          |     "identifiers": [
-                          |       {
-                          |         "type": "Identifier",
-                          |         "identifierScheme": "${identifier2.identifierScheme}",
-                          |         "value": "${identifier2.value}"
-                          |       }
-                          |     ],
+                          |     "identifiers": [ ${identifier(identifier2)} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -691,14 +662,14 @@ class ApiWorksTest
 
   it(
     "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
-    val identifier = SourceIdentifier(
+    val srcIdentifier = SourceIdentifier(
       identifierScheme = "An Insectoid Identifier",
       value = "Test1234"
     )
     val work = workWith(
       canonicalId = "1234",
       title = "An insect huddled in an igloo",
-      identifiers = List(identifier)
+      identifiers = List(srcIdentifier)
     )
     insertIntoElasticSearch(work)
 
@@ -713,16 +684,9 @@ class ApiWorksTest
                           | "id": "${work.id}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [
-                          |   {
-                          |     "type": "Identifier",
-                          |     "identifierScheme": "${identifier.identifierScheme}",
-                          |     "value": "${identifier.value}"
-                          |   }
-                          | ],
+                          | "identifiers": [ ${identifier(srcIdentifier)} ],
                           | "subjects": [ ],
-                          | "genres": [ ],
-                          | "items": [ ]
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -755,8 +719,7 @@ class ApiWorksTest
                           | "title": "${work.title}",
                           | "creators": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ],
-                          | "items": [ ]
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -774,8 +737,7 @@ class ApiWorksTest
                           | "title": "${work_alt.title}",
                           | "creators": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ],
-                          | "items": [ ]
+                          | "genres": [ ]
                           |}
           """.stripMargin
       )
@@ -814,8 +776,7 @@ class ApiWorksTest
                           |     "title": "${work.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -841,8 +802,7 @@ class ApiWorksTest
                           |     "title": "${work_alt.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
@@ -921,9 +881,6 @@ class ApiWorksTest
     )
     insertIntoElasticSearch(work)
 
-    val thumbnail: Location = work.thumbnail.get
-    val license: BaseLicense = thumbnail.license
-
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?includes=thumbnail",
@@ -943,18 +900,7 @@ class ApiWorksTest
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "items": [ ],
-                          |     "thumbnail": {
-                          |       "type": "Location",
-                          |       "locationType": "${thumbnail.locationType}",
-                          |       "url": "${thumbnail.url.get}",
-                          |       "license": {
-                          |         "type": "License",
-                          |         "licenseType": "${license.licenseType}",
-                          |         "label": "${license.label}",
-                          |         "url": "${license.url}"
-                          |       }
-                          |     }
+                          |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }
                           |  ]
                           |}
@@ -996,8 +942,7 @@ class ApiWorksTest
                           |     "title": "${work.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "items": [ ]
+                          |     "genres": [ ]
                           |   }
                           |  ]
                           |}
