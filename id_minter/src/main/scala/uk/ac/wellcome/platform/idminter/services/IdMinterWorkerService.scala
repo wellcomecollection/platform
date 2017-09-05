@@ -37,7 +37,7 @@ class IdMinterWorkerService @Inject()(
       parse(message.body) match {
         case Right(json) => json
         case Left(exception) =>
-          error(s"error parseing message into json: $exception")
+          error(s"error parsing message into json: $exception")
           throw exception
       }
     }
