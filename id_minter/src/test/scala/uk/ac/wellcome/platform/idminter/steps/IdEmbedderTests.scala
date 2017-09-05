@@ -1,18 +1,16 @@
 package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import org.mockito.Mockito.when
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
-import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
-import io.circe._
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
-import io.circe.optics.JsonPath._
+import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
+import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
 
 import scala.util.Try
 

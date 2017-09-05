@@ -5,11 +5,13 @@ import com.twitter.inject.Logging
 import io.circe.{Json, _}
 import io.circe.generic.auto._
 import io.circe.optics.JsonPath.root
+import io.circe.optics.JsonTraversalPath
 import io.circe.parser._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+import scala.annotation.tailrec
 import scala.concurrent.Future
 
 class IdEmbedder @Inject()(metricsSender: MetricsSender,
@@ -20,13 +22,22 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
       "generate-id",
       () =>
         Future {
-          val newJson = json.mapObject(addIdentifierToJsonObject)
-          root.items.each.json.modify(addIdentifierToJson)(newJson)
+          iterate(root.each, addIdentifierToJson(json))
       }
     )
   }
+  
+  @tailrec
+  private def iterate(rootChildrenPath: JsonTraversalPath, json: Json):Json = {
+    if (rootChildrenPath.json.nonEmpty(json)) {
+      val newJson =
+        rootChildrenPath.json.modify(addIdentifierToJson)(json)
+      iterate(rootChildrenPath.each, newJson)
+    }
+    else json
+  }
 
-  private def addIdentifierToJson(json: Json) = {
+  private def addIdentifierToJson(json: Json):Json = {
     if (json.isObject) {
       json.mapObject(obj =>
         addIdentifierToJsonObject(obj))
