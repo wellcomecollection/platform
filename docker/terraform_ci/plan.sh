@@ -35,13 +35,6 @@ echo "}" >> "$RELEASE_IDS_FILE"
 terraform init
 terraform get
 
-# These compiled pyc files are ephemeral, but because they're rebuilt on
-# a regular basis, they can confuse Terraform about whether the Lambda code
-# has changed.  They can be rebuilt easily (and automatically), so just
-# delete them before running `plan`.
-find /data/lambdas -name '*.pyc' -delete
-find /data/lambdas -path '*.dist-info/*' -delete
-
 terraform plan -var-file="$RELEASE_IDS_FILE" -out terraform.plan
 
 echo "Please review the above plan. If you are happy then run 'make terraform-apply"
