@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.api
 
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.platform.api.models.DisplayWork
 
 trait WorksUtil {
 
@@ -14,52 +13,110 @@ trait WorksUtil {
   val period = Period("the past")
   val agent = Agent("a person")
 
-  def convertWorkToDisplayWork(work: IdentifiedWork) = DisplayWork(
-    work.canonicalId,
-    work.work.title,
-    work.work.description,
-    work.work.lettering,
-    work.work.createdDate,
-    work.work.creators
-  )
-
-  def createIdentifiedWorks(count: Int): Seq[IdentifiedWork] =
+  def createWorks(count: Int): Seq[Work] =
     (1 to count).map(
       (idx: Int) =>
-        identifiedWorkWith(
+        workWith(
           canonicalId = s"${idx}-${canonicalId}",
           title = s"${idx}-${title}",
           description = s"${idx}-${description}",
           lettering = s"${idx}-${lettering}",
           createdDate = Period(s"${idx}-${period.label}"),
-          creator = Agent(s"${idx}-${agent.label}")
+          creator = Agent(s"${idx}-${agent.label}"),
+          List(defaultItem)
       ))
 
-  def identifiedWorkWith(canonicalId: String, title: String): IdentifiedWork =
-    IdentifiedWork(canonicalId,
-                   Work(identifiers =
-                          List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-                        title = title))
-
-  def identifiedWorkWith(canonicalId: String,
-                         title: String,
-                         identifiers: List[SourceIdentifier]): IdentifiedWork =
-    IdentifiedWork(canonicalId, Work(identifiers = identifiers, title = title))
-
-  def identifiedWorkWith(canonicalId: String,
-                         title: String,
-                         description: String,
-                         lettering: String,
-                         createdDate: Period,
-                         creator: Agent): IdentifiedWork = IdentifiedWork(
-    canonicalId = canonicalId,
-    work = Work(
-      identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-      title = title,
-      description = Some(description),
-      lettering = Some(lettering),
-      createdDate = Some(createdDate),
-      creators = List(creator)
+  def workWith(canonicalId: String, title: String): Work =
+    Work(
+      canonicalId = Some(canonicalId),
+      identifiers = List(
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+      ),
+      title = title
     )
+
+  def workWith(
+    canonicalId: String,
+    title: String,
+    identifiers: List[SourceIdentifier] = List(),
+    items: List[Item] = List()
+  ): Work =
+    Work(
+      canonicalId = Some(canonicalId),
+      identifiers = identifiers,
+      title = title,
+      items = items
+    )
+
+  def identifiedWorkWith(
+    canonicalId: String,
+    title: String,
+    thumbnail: Location
+  ): Work =
+    Work(
+      canonicalId = Some(canonicalId),
+      identifiers = List(
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+      ),
+      title = title,
+      thumbnail = Some(thumbnail)
+    )
+
+  def workWith(canonicalId: String,
+               title: String,
+               description: String,
+               lettering: String,
+               createdDate: Period,
+               creator: Agent,
+               items: List[Item]): Work = Work(
+    canonicalId = Some(canonicalId),
+    identifiers =
+      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+    title = title,
+    description = Some(description),
+    lettering = Some(lettering),
+    createdDate = Some(createdDate),
+    creators = List(creator),
+    items = items
   )
+
+  def defaultItem: Item = {
+    itemWith(
+      Some("item-canonical-id"),
+      defaultSourceIdentifier,
+      defaultLocation
+    )
+  }
+
+  def defaultSourceIdentifier = {
+    SourceIdentifier("miro-image-number", "M0000001")
+  }
+
+  def defaultLocation: Location = {
+    locationWith(
+      Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+      License_CCBY)
+  }
+
+  def itemWith(canonicalId: Option[String],
+               identifier: SourceIdentifier,
+               location: Location): Item = {
+    Item(
+      canonicalId = canonicalId,
+      List(
+        identifier
+      ),
+      List(
+        location
+      )
+    )
+  }
+
+  def locationWith(url: Option[String], license: BaseLicense): Location = {
+    Location(
+      "iiif-image",
+      url,
+      license
+    )
+  }
 }

@@ -1,12 +1,10 @@
 package uk.ac.wellcome.platform.api.services
 
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.api.WorksUtil
-import uk.ac.wellcome.platform.api.models.DisplayWork
+import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ElasticsearchServiceTest
     extends FunSpec
@@ -19,15 +17,15 @@ class ElasticsearchServiceTest
     new ElasticSearchService(indexName, itemType, elasticClient)
 
   it("should sort results from Elasticsearch in the correct order") {
-    val work1 = identifiedWorkWith(
+    val work1 = workWith(
       canonicalId = "000Z",
       title = "Amid an Aegean"
     )
-    val work2 = identifiedWorkWith(
+    val work2 = workWith(
       canonicalId = "000Y",
       title = "Before a Bengal"
     )
-    val work3 = identifiedWorkWith(
+    val work3 = workWith(
       canonicalId = "000X",
       title = "Circling a Cheetah"
     )
@@ -39,8 +37,8 @@ class ElasticsearchServiceTest
     )
     whenReady(sortedSearchResultByCanonicalId) { result =>
       val works = result.hits.hits.map { DisplayWork(_) }
-      works.head shouldBe DisplayWork(work3.canonicalId, work3.work.title)
-      works.last shouldBe DisplayWork(work1.canonicalId, work1.work.title)
+      works.head shouldBe DisplayWork(work3.id, work3.title)
+      works.last shouldBe DisplayWork(work1.id, work1.title)
     }
 
     // TODO: canonicalID is the only user-defined field that we can sort on.
@@ -94,11 +92,11 @@ class ElasticsearchServiceTest
     )
   }
 
-  private def populateElasticsearch(): List[DisplayWork] = {
-    val works = createIdentifiedWorks(10)
+  private def populateElasticsearch(worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] = {
+    val works = createWorks(10)
     insertIntoElasticSearch(works: _*)
 
-    works.map(convertWorkToDisplayWork).sortBy(_.id).toList
+    works.map(DisplayWork(_, worksIncludes)).sortBy(_.id).toList
   }
 
   private def assertSliceIsCorrect(

@@ -11,8 +11,6 @@ RUN apk add build-base libxml2-dev libxslt-dev python3 python3-dev
 COPY requirements.txt /requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY miro_adapter.py /miro_adapter.py
-COPY utils.py /utils.py
-COPY run.sh /run.sh
+COPY . /miro_adapter
 
-CMD ["/run.sh"]
+CMD ["/miro_adapter/run.sh"]

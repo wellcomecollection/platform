@@ -8,11 +8,6 @@ module "ecs_monitoring_iam" {
   name   = "monitoring"
 }
 
-module "ecs_calm_adapter_iam" {
-  source = "./ecs_iam"
-  name   = "calm_adapter"
-}
-
 module "ecs_miro_reindexer_iam" {
   source = "./ecs_iam"
   name   = "miro_reindexer"
@@ -66,4 +61,14 @@ module "batch_tif_conversion_iam" {
 module "ecs_miro_adapter_iam" {
   source = "./ecs_iam"
   name   = "miro_adapter"
+}
+
+module "ecs_elasticdump_iam" {
+  source = "./ecs_iam"
+  name   = "elasticdump"
+}
+
+module "ecs_update_api_docs_iam" {
+  source = "./ecs_iam"
+  name   = "update_api_docs"
 }

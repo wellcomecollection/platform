@@ -75,3 +75,13 @@ module "ecr_repository_miro_adapter" {
   source = "./ecr"
   name   = "miro_adapter"
 }
+
+module "ecr_repository_elasticdump" {
+  source = "./ecr"
+  name   = "elasticdump"
+}
+
+module "ecr_repository_update_api_docs" {
+  source = "./ecr"
+  name   = "update_api_docs"
+}

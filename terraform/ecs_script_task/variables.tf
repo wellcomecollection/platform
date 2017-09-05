@@ -33,12 +33,15 @@ variable "container_path" {
 variable "env_vars" {
   description = "Environment variables to pass to the container"
   type        = "list"
+  default     = []
 }
 
 variable "cpu" {
   description = "vCPU units to provision for the script"
+  default     = 1024
 }
 
 variable "memory" {
   description = "Memory units to provision for the script"
+  default     = 1024
 }

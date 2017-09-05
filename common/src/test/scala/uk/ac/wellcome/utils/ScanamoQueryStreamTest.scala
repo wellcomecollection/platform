@@ -6,7 +6,7 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.models.MiroTransformable
+import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.test.utils.DynamoDBLocal
 
 import scala.collection.mutable.ListBuffer

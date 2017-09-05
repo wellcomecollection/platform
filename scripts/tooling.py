@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+import errno
 import os
-import shlex
 import subprocess
 
 
@@ -35,28 +35,6 @@ def changed_files(commit_range):
     return files
 
 
-def ecr_repo_uri_from_name(ecr_client, name):
-    """
-    Given the name of an ECR repo (e.g. uk.ac.wellcome/api), return the URI
-    for the repo.
-    """
-    resp = ecr_client.describe_repositories(repositoryNames=[name])
-    try:
-        return resp['repositories'][0]['repositoryUri']
-    except (KeyError, IndexError) as e:
-        raise RuntimeError('Unable to look up repo URI for %r: %s' % (name, e))
-
-
-def ecr_login():
-    """
-    Authenticates for pushing to ECR.
-    """
-    command = subprocess.check_output([
-        'aws', 'ecr', 'get-login', '--no-include-email'
-    ]).decode('ascii')
-    subprocess.check_call(shlex.split(command))
-
-
 def write_release_id(project, release_id):
     """
     Write a release ID to the .releases directory in the root of the repo.
@@ -67,3 +45,15 @@ def write_release_id(project, release_id):
     release_file = os.path.join(releases_dir, project)
     with open(release_file, 'w') as f:
         f.write(release_id)
+
+
+def mkdir_p(path):
+    """Create a directory if it doesn't already exist."""
+    # https://stackoverflow.com/a/600612/1558022
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise

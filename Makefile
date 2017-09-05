@@ -1,76 +1,118 @@
-INFRA_BUCKET = platform-infra
+export INFRA_BUCKET = platform-infra
 
 
-## Build the image used for jslint
-docker-build-jslint:
-	docker build ./docker/jslint_ci --tag jslint_ci
+# Build the Docker images used for CI tasks.
+#
+# The script sticks a record that the image has been built in .docker, so the
+# image isn't rebuilt unless you run 'make clean' first.  This makes CI tasks
+# slightly less chatty when run locally.
 
-## Build the image used for Python 3.6 work
-docker-build-python36:
-	docker build ./docker/python3.6_ci --tag python3.6_ci
+clean:
+	rm -rf .docker
 
-## Build the image for terraform
-docker-build-terraform:
-	docker build ./docker/terraform_ci --tag terraform_ci
+.docker/jslint_ci:
+	./scripts/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
+
+.docker/python3.6_ci:
+	./scripts/build_ci_docker_image.py --project=python3.6_ci --dir=docker/python3.6_ci
+
+.docker/terraform_ci:
+	./scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
+
+.docker/_build_deps:
+	pip3 install --upgrade boto3 docopt
+	mkdir -p .docker && touch .docker/_build_deps
+
+.docker/image_builder:
+	./scripts/build_ci_docker_image.py \
+		--project=image_builder \
+		--dir=builds \
+		--file=builds/image_builder.Dockerfile
+
+.docker/publish_service_to_aws:
+	./scripts/build_ci_docker_image.py \
+		--project=publish_service_to_aws \
+		--dir=builds \
+		--file=builds/publish_service_to_aws.Dockerfile
+
+.docker/miro_adapter_tests:
+	./scripts/build_ci_docker_image.py \
+		--project=miro_adapter_tests \
+		--dir=miro_adapter \
+		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
 
 ## Build the image for gatling
-gatling-build: install-docker-build-deps
-	./scripts/build_docker_image.py --project=gatling
+gatling-build: .docker/image_builder
+	PROJECT=gatling ./builds/build_image.sh
 
 ## Deploy the image for gatling
-gatling-deploy: gatling-build
-	./scripts/deploy_docker_to_aws.py --project=gatling --infra-bucket=$(INFRA_BUCKET)
-
+gatling-deploy: gatling-build .docker/publish_service_to_aws
+	PROJECT=gatling ./builds/publish_service.sh
 
 ## Build the image for the cache cleaner
-cache_cleaner-build: install-docker-build-deps
-	./scripts/build_docker_image.py --project=cache_cleaner
+cache_cleaner-build: .docker/image_builder
+	PROJECT=cache_cleaner ./builds/build_image.sh
 
 ## Deploy the image for the cache cleaner
-cache_cleaner-deploy: cache_cleaner-build
-	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
+cache_cleaner-deploy: cache_cleaner-build .docker/publish_service_to_aws
+	PROJECT=cache_cleaner ./builds/publish_service.sh
 
 
 ## Build the image for tif-metadata
-tif-metadata-build: install-docker-build-deps
-	./scripts/build_docker_image.py --project=tif-metadata
+tif-metadata-build: .docker/image_builder
+	PROJECT=tif-metadata ./builds/build_image.sh
 
 ## Deploy the image for tif-metadata
-tif-metadata-deploy: tif-metadata-build
-	./scripts/deploy_docker_to_aws.py --project=tif-metadata --infra-bucket=$(INFRA_BUCKET)
+tif-metadata-deploy: tif-metadata-build .docker/publish_service_to_aws
+	PROJECT=tif-metadata ./builds/publish_service.sh
 
 
 ## Build the image for Loris
-loris-build: install-docker-build-deps
-	./scripts/build_docker_image.py --project=loris
+loris-build: .docker/image_builder
+	PROJECT=loris ./builds/build_image.sh
 
 ## Deploy the image for Loris
-loris-deploy: loris-build
-	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
+loris-deploy: loris-build .docker/publish_service_to_aws
+	PROJECT=loris ./builds/publish_service.sh
 
 
-miro_adapter-build: install-docker-build-deps
-	./scripts/build_docker_image.py --project=miro_adapter --file=miro_adapter/Dockerfile
+miro_adapter-build: .docker/image_builder
+	PROJECT=miro_adapter FILE=miro_adapter/Dockerfile ./builds/build_image.sh
 
-miro_adapter-deploy: miro_adapter-build
-	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
+	rm -rf $$(pwd)/miro_adapter/__pycache__
+	rm -rf $$(pwd)/miro_adapter/*.pyc
+	docker run -v $$(pwd)/miro_adapter:/miro_adapter miro_adapter_tests
+
+miro_adapter-deploy: miro_adapter-build .docker/publish_service_to_aws
+	PROJECT=miro_adapter ./builds/publish_service.sh
 
 
-install-docker-build-deps:
-	pip3 install --upgrade boto3 docopt
+elasticdump-build: .docker/image_builder
+	PROJECT=elasticdump ./builds/build_image.sh
 
-nginx-build-api: install-docker-build-deps
-	./scripts/build_docker_image.py --project=nginx --variant=api
+elasticdump-deploy: elasticdump-build .docker/publish_service_to_aws
+	PROJECT=elasticdump ./builds/publish_service.sh
 
-nginx-build-loris: install-docker-build-deps
-	./scripts/build_docker_image.py --project=nginx --variant=loris
+api_docs-build: .docker/image_builder
+	PROJECT=update_api_docs ./builds/build_image.sh
 
-nginx-build-services: install-docker-build-deps
-	./scripts/build_docker_image.py --project=nginx --variant=services
+api_docs-deploy: api_docs-build .docker/publish_service_to_aws
+	PROJECT=update_api_docs ./builds/publish_service.sh
 
-nginx-build-grafana: install-docker-build-deps
-	./scripts/build_docker_image.py --project=nginx --variant=grafana
+
+nginx-build-api: .docker/image_builder
+	PROJECT=nginx VARIANT=api ./builds/build_image.sh
+
+nginx-build-loris: .docker/image_builder
+	PROJECT=nginx VARIANT=loris ./builds/build_image.sh
+
+nginx-build-services: .docker/image_builder
+	PROJECT=nginx VARIANT=services ./builds/build_image.sh
+
+nginx-build-grafana: .docker/image_builder
+	PROJECT=nginx VARIANT=grafana ./builds/build_image.sh
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
@@ -81,17 +123,17 @@ nginx-build:	\
 
 
 
-nginx-deploy-api: nginx-build-api
-	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-api: nginx-build-api .docker/publish_service_to_aws
+	PROJECT=nginx_api ./builds/publish_service.sh
 
-nginx-deploy-loris: nginx-build-loris
-	./scripts/deploy_docker_to_aws.py --project=nginx_loris --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-loris: nginx-build-loris .docker/publish_service_to_aws
+	PROJECT=nginx_loris ./builds/publish_service.sh
 
-nginx-deploy-services: nginx-build-services
-	./scripts/deploy_docker_to_aws.py --project=nginx_services --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-services: nginx-build-services .docker/publish_service_to_aws
+	PROJECT=nginx_services ./builds/publish_service.sh
 
-nginx-deploy-grafana: nginx-build-grafana
-	./scripts/deploy_docker_to_aws.py --project=nginx_grafana --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-grafana: nginx-build-grafana .docker/publish_service_to_aws
+	PROJECT=nginx_grafana ./builds/publish_service.sh
 
 ## Push images for all of our nginx proxies
 nginx-deploy:	\
@@ -133,22 +175,22 @@ sbt-test: \
 
 
 
-sbt-build-api: install-docker-build-deps sbt-test-api
+sbt-build-api: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=api
 
-sbt-build-id_minter: install-docker-build-deps sbt-test-id_minter
+sbt-build-id_minter: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=id_minter
 
-sbt-build-ingestor: install-docker-build-deps sbt-test-ingestor
+sbt-build-ingestor: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: install-docker-build-deps sbt-test-miro_adapter
+sbt-build-miro_adapter: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=miro_adapter
 
-sbt-build-reindexer: install-docker-build-deps sbt-test-reindexer
+sbt-build-reindexer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=reindexer
 
-sbt-build-transformer: install-docker-build-deps sbt-test-transformer
+sbt-build-transformer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=transformer
 
 sbt-build: \
@@ -161,29 +203,25 @@ sbt-build: \
 
 
 
-sbt-deploy-api: sbt-build-api
-	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-api: sbt-build-api .docker/publish_service_to_aws
+	PROJECT=api ./builds/publish_service.sh
 
-sbt-deploy-id_minter: sbt-build-id_minter
-	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-id_minter: sbt-build-id_minter .docker/publish_service_to_aws
+	PROJECT=id_minter ./builds/publish_service.sh
 
-sbt-deploy-ingestor: sbt-build-ingestor
-	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-ingestor: sbt-build-ingestor .docker/publish_service_to_aws
+	PROJECT=ingestor ./builds/publish_service.sh
 
-sbt-deploy-miro_adapter: sbt-build-miro_adapter
-	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-reindexer: sbt-build-reindexer .docker/publish_service_to_aws
+	PROJECT=reindexer ./builds/publish_service.sh
 
-sbt-deploy-reindexer: sbt-build-reindexer
-	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
-
-sbt-deploy-transformer: sbt-build-transformer
-	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-transformer: sbt-build-transformer .docker/publish_service_to_aws
+	PROJECT=transformer ./builds/publish_service.sh
 
 sbt-deploy: \
 	sbt-deploy-api	\
 	sbt-deploy-id_minter \
 	sbt-deploy-ingestor   \
-	sbt-deploy-miro_adapter \
 	sbt-deploy-reindexer	\
 	sbt-deploy-transformer
 
@@ -191,35 +229,36 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
-install-lambda-deps: docker-build-python36
+.docker/_lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
+	mkdir -p .docker && touch .docker/_lambda_deps
 
 ## Run a plan
-terraform-plan: docker-build-terraform install-lambda-deps
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh terraform_ci:latest
+terraform-plan: .docker/terraform_ci .docker/_lambda_deps
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply
-terraform-apply: docker-build-terraform
-		docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
+terraform-apply: .docker/terraform_ci
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 
 # Tasks for running linting #
 
 ## Run JSON linting over the ontologies directory
-lint-ontologies: docker-build-jslint
+lint-ontologies: .docker/jslint_ci
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
 ## Run flake8 linting over our Python code
-lint-python: docker-build-python36
+lint-python: .docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
 ## Run tests for our Lambda code
-test-lambdas: docker-build-python36
+test-lambdas: .docker/python3.6_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
-format-terraform:
-	terraform fmt
+format-terraform: .docker/terraform_ci
+	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -e OP=fmt terraform_ci
 
 format-scala:
 	sbt scalafmt
@@ -232,7 +271,7 @@ check-format: format
 	git diff --exit-code
 
 
-.PHONY: help
+.PHONY: clean help
 
 ## Display this help text
 help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383502660

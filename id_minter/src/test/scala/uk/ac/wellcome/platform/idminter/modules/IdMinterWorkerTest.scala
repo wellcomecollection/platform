@@ -11,15 +11,12 @@ import scalikejdbc.interpolation.SQLSyntax
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.database.{
-  FieldDescription,
-  IdentifiersDao
-}
+import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class IdMinterWorkerTest
     extends FunSpec
@@ -73,21 +70,34 @@ class IdMinterWorkerTest
   it(
     "should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
     val miroId = "1234"
-    when(identifiersDao.findSourceIdInDb(miroId))
-      .thenReturn(Future.successful(None))
+
+    val sourceIdentifiers = List(
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        value = miroId
+      )
+    )
+    val work = Work(
+      identifiers = sourceIdentifiers,
+      title = "Some fresh fruit for a flamingo"
+    )
+
+    val triedLookup = identifiersDao.lookupID(
+      sourceIdentifiers = sourceIdentifiers,
+      ontologyType = work.ontologyType
+    )
+
+    when(triedLookup)
+      .thenReturn(Success(None))
     when(identifiersDao.saveIdentifier(any[Identifier]))
-      .thenReturn(Future.failed(new Exception("cannot insert")))
+      .thenReturn(Failure(new Exception("cannot insert")))
 
     val message = JsonUtil
       .toJson(
         SQSMessage(
           Some("subject"),
           JsonUtil
-            .toJson(
-              Work(
-                identifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)),
-                title = "Some fresh fruit for a flamingo"
-              ))
+            .toJson(work)
             .get,
           "topic",
           "messageType",

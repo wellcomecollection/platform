@@ -75,17 +75,7 @@ cache:
     - "/home/travis/docker/"
 
 script:
-  - |
-    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
-    then
-      if [[ "$TASK" != "sbt-test-common" && "$TASK" != "test-lambdas" ]]
-      then
-        TASK="${TASK/build/deploy}"
-        TASK="${TASK/test/deploy}"
-      fi
-    fi
-    echo "Task is $TASK"
-    make "$TASK"
+  - ./scripts/travis_run.sh
 
 env:
   global:
@@ -115,4 +105,6 @@ env:
     - TASK=tif-metadata-build
     - TASK=gatling-build
     - TASK=loris-build
-    - TASK=miro_adapter-build
+    - TASK=miro_adapter-test
+    - TASK=elasticdump-build
+    - TASK=api_docs-build

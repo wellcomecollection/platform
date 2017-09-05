@@ -181,7 +181,7 @@ module "api_romulus" {
   enable_alb_alarm = "${var.production_api == "romulus" ? 1 : 0}"
 
   cpu    = 1792
-  memory = 1840
+  memory = 2048
 
   desired_count = "${var.production_api == "romulus" ? var.api_task_count : var.api_task_count_stage}"
 
@@ -232,7 +232,7 @@ module "api_remus" {
   enable_alb_alarm = "${var.production_api == "remus" ? 1 : 0}"
 
   cpu    = 1792
-  memory = 1840
+  memory = 2048
 
   desired_count = "${var.production_api == "remus" ? var.api_task_count : var.api_task_count_stage}"
 
@@ -274,7 +274,7 @@ module "loris" {
   host_name          = "iiif-origin.wellcomecollection.org"
 
   cpu    = 1792
-  memory = 1840
+  memory = 4096
 
   desired_count = 4
 

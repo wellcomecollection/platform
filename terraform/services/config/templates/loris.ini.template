@@ -28,6 +28,10 @@ enable_caching = False
 redirect_canonical_image_request = False
 redirect_id_slash_to_info = True
 
+# Because we run Loris behind a proxy, change the paths that appear in the
+# info.json so they reflect the URL of our proxy, not the origin.
+proxy_path = 'https://iiif.wellcomecollection.org/image/'
+
 # Allow arbitrary resizing of images.  This means that when next.wc.org request
 # different sizes of image, if they inadvertently request an image that's too
 # large, Loris doesn't 404.
@@ -63,7 +67,7 @@ dither_bitonal_images = False
 target_formats = ['jpg','png','gif','webp']
 
     [[png]]
-    impl = 'JPG_Transformer'
+    impl = 'PNG_Transformer'
 
     [[jpg]]
     impl = 'JPG_Transformer'
