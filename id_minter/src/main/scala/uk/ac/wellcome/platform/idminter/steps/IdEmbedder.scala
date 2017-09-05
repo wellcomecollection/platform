@@ -56,8 +56,7 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
     } else obj
   }
 
-  private def parseSourceIdentifiers(
-    obj: JsonObject): List[SourceIdentifier] = {
+  private def parseSourceIdentifiers(obj: JsonObject): List[SourceIdentifier] = {
     decode[List[SourceIdentifier]](obj("identifiers").get.toString()) match {
       case Right(identifiers) => identifiers
       case Left(exception: Error) =>
