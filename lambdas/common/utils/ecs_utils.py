@@ -1,4 +1,4 @@
-z# -*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 
 import operator
 from botocore.exceptions import ClientError

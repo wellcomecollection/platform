@@ -16,8 +16,8 @@ import os
 
 import boto3
 
-from deployment_utils import get_deployments_from_dynamo
-from sns_utils import publish_sns_message
+from utils.deployment_utils import get_deployments_from_dynamo
+from utils.sns_utils import publish_sns_message
 
 
 def _old_deployment(age_boundary_mins, deployment):

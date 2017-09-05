@@ -5,11 +5,10 @@ from mock import Mock
 from moto import mock_ecs
 import pytest
 
-import ecs_utils
+from utils import ecs_utils
 
 
 cluster_name = 'my_cluster'
-
 service_name = 'my_service'
 
 
