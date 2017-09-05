@@ -8,14 +8,14 @@ class WorkTest extends FunSpec with Matchers {
   val identifiedWorkJson: String =
     """
       |{
-      |  "canonicalId": "canonicalId",
+      |  "title": "title",
       |  "identifiers": [
       |    {
       |      "identifierScheme": "identifierScheme",
       |      "value": "value"
       |    }
       |  ],
-      |  "title": "title",
+      |  "canonicalId": "canonicalId",
       |  "description": "description",
       |  "lettering": "lettering",
       |  "createdDate": {
@@ -81,13 +81,13 @@ class WorkTest extends FunSpec with Matchers {
   val unidentifiedWorkJson: String =
     """
       |{
+      |  "title": "title",
       |  "identifiers": [
       |    {
       |      "identifierScheme": "identifierScheme",
       |      "value": "value"
       |    }
       |  ],
-      |  "title": "title",
       |  "description": "description",
       |  "lettering": "lettering",
       |  "createdDate": {
