@@ -4,8 +4,8 @@
 Push a Docker image to ECR and upload a release ID to S3.
 
 Usage:
-  deploy_docker_to_aws.py --project=<name> --infra-bucket=<bucket>
-  deploy_docker_to_aws.py -h | --help
+  publish_service_to_aws.py --project=<name> --infra-bucket=<bucket>
+  publish_service_to_aws.py -h | --help
 
 Options:
   -h --help                Show this screen.
