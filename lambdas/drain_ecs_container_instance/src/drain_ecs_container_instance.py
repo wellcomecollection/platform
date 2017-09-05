@@ -13,7 +13,7 @@ import time
 
 import boto3
 
-from sns_utils import publish_sns_message
+from utils.sns_utils import publish_sns_message
 
 
 def set_container_instance_to_draining(

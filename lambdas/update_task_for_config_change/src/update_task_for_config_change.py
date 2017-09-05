@@ -14,7 +14,7 @@ import re
 
 import boto3
 
-from ecs_utils import (
+from utils.ecs_utils import (
     clone_task_definition,
     get_latest_task_definition,
     identify_cluster_by_app_name

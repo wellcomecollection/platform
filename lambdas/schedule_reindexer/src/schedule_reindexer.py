@@ -8,8 +8,8 @@ This script is triggered by updates to the reindexer DynamoDB table.
 
 import os
 
-from dynamo_utils import DynamoEvent
-from sns_utils import publish_sns_message
+from utils.dynamo_utils import DynamoEvent
+from utils.sns_utils import publish_sns_message
 
 
 def get_service_name(reindexers, table_name):

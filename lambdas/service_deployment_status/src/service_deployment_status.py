@@ -11,7 +11,7 @@ import os
 
 import boto3
 
-from ecs_utils import (
+from utils.ecs_utils import (
     EcsThrottleException
 )
 

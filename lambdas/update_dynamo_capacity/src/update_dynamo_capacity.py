@@ -13,7 +13,7 @@ import json
 
 import boto3
 
-from dynamo_utils import change_dynamo_capacity
+from utils.dynamo_utils import change_dynamo_capacity
 
 
 def update_dynamo_capacity(client, event):

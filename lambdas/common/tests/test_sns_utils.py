@@ -3,7 +3,7 @@ import json
 
 import boto3
 
-import sns_utils
+from utils import sns_utils
 
 
 def test_publish_sns_message(sns_sqs):

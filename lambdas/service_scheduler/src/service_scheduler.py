@@ -8,7 +8,7 @@ one of our adapters.  It receives a blob of JSON from a CloudWatch timed
 event, and publishes that to the service scheduler topic.
 """
 
-from sns_utils import publish_sns_message
+from utils.sns_utils import publish_sns_message
 
 
 def main(event, _):
