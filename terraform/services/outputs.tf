@@ -13,3 +13,7 @@ output "role_name" {
 output "host_name" {
   value = "${var.host_name}"
 }
+
+output "config_key" {
+  value = "${var.config_key}"
+}

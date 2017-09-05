@@ -4,28 +4,23 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.Indexable
 import uk.ac.wellcome.utils.JsonUtil
 
-/** An identifier received from one of the original sources */
-case class SourceIdentifier(identifierScheme: String, value: String)
-
-case class IdentifiedWork(canonicalId: String, work: Work)
-
-/** A representation of a work in our ontology, without a
-  *  canonical identifier.
-  */
-case class Work(
-  identifiers: List[SourceIdentifier],
-  title: String,
-  description: Option[String] = None,
-  lettering: Option[String] = None,
-  createdDate: Option[Period] = None,
-  subjects: List[Concept] = List(),
-  creators: List[Agent] = List(),
-  genres: List[Concept] = List()
-) {
-  @JsonProperty("type") val ldType: String = "Work"
+/** A representation of a work in our ontology */
+case class Work(title: String,
+                identifiers: List[SourceIdentifier],
+                canonicalId: Option[String] = None,
+                description: Option[String] = None,
+                lettering: Option[String] = None,
+                createdDate: Option[Period] = None,
+                subjects: List[Concept] = Nil,
+                creators: List[Agent] = Nil,
+                genres: List[Concept] = Nil,
+                thumbnail: Option[Location] = None,
+                items: List[Item] = Nil)
+    extends Identifiable {
+  @JsonProperty("type") val ontologyType: String = "Work"
 }
 
-object IdentifiedWork extends Indexable[IdentifiedWork] {
-  override def json(t: IdentifiedWork): String =
+case object Work extends Indexable[Work] {
+  override def json(t: Work): String =
     JsonUtil.toJson(t).get
 }

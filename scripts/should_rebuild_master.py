@@ -30,6 +30,15 @@ def should_run_deploy(changed_files, task):
             'Changes to docker/scala_service mean we should deploy'
         )
 
+    # Rebuild tif-metadata if docker base changes
+    if (
+        task.startswith('tif-metadata') and
+        any(f.startswith('docker/tif-metadata') for f in changed_files)
+    ):
+        raise ShouldRebuild(
+            'Changes to docker/tif-metadata mean we should deploy'
+        )
+
     # Rebuild loris if docker base changes
     if (
         task.startswith('loris') and

@@ -8,9 +8,9 @@ RUN pip install boto3
 
 RUN pip install pytest
 
-RUN pip install moto
+RUN pip install moto==1.0.1
 
-RUN pip install simplejson 
+RUN pip install simplejson
 
 COPY run.sh /app/run.sh
 

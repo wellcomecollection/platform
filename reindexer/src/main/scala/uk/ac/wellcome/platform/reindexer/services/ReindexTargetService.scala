@@ -10,7 +10,7 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.update.UpdateExpression
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Reindexable
+import uk.ac.wellcome.models.transformable.Reindexable
 import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexStatus}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -19,7 +19,8 @@ import scala.concurrent.Future
 abstract class ReindexTargetService[T <: Reindexable[String]](
   dynamoDBClient: AmazonDynamoDB,
   metricsSender: MetricsSender,
-  targetTableName: String)
+  targetTableName: String,
+  targetReindexShard: String)
     extends Logging {
 
   type ScanamoQueryResult = Either[DynamoReadError, T]
@@ -72,7 +73,7 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
       Some(gsiName),
       Query(
         AndQueryCondition(
-          KeyEquals('ReindexShard, "default"),
+          KeyEquals('ReindexShard, targetReindexShard),
           KeyIs('ReindexVersion, LT, requestedVersion)
         )),
       ScanamoQueryOptions.default

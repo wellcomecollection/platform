@@ -178,7 +178,7 @@ class MiroTransformableTest
     with MiroTransformableWrapper {
 
   it("should throw an error if there isn't a title field") {
-    assertTransformMiroRecordFails(data = """{
+    assertTransformWorkFails(data = """{
       "image_cleared": "Y",
       "image_copyright_cleared": "Y"
     }""")
@@ -313,6 +313,17 @@ class MiroTransformableTest
     work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
+  it("should pass through the lettering field if available") {
+    val lettering = "A lifelong lament for lemurs"
+    val work = transformWork(
+      data = s"""
+        "image_title": "Lemurs and lemons",
+        "image_supp_lettering": "$lettering"
+      """
+    )
+    work.lettering shouldBe Some(lettering)
+  }
+
   it(
     "should correct HTML-encoded entities in the input JSON") {
     val work = transformWork(
@@ -327,7 +338,7 @@ class MiroTransformableTest
   }
 
   it("should not pass through records with a missing image_cleared field") {
-    assertTransformMiroRecordFails(data = """{
+    assertTransformWorkFails(data = """{
       "image_title": "Missives on museums",
       "image_copyright_cleared": "Y"
     }""")
@@ -335,7 +346,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with a missing image_copyright_cleared field") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "A caricature of cats",
       "image_cleared": "Y"
@@ -344,7 +355,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with missing image_cleared and missing image_copyright_cleared field") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "Drawings of dromedaries"
     }""")
@@ -352,7 +363,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with an image_cleared value that isn't 'Y'") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "Confidential colourings of crocodiles",
       "image_cleared": "N",
@@ -362,7 +373,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records with image_copyright_cleared field that isn't 'Y'") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
       "image_title": "Proprietary poetry about porcupines",
       "image_cleared": "Y",
@@ -372,7 +383,7 @@ class MiroTransformableTest
 
   it(
     "should not pass through records that are missing technical metadata") {
-    assertTransformMiroRecordFails(
+    assertTransformWorkFails(
       data = """{
         "image_title": "Touching a toxic tree is truly tragic",
         "image_cleared": "Y",
@@ -380,20 +391,6 @@ class MiroTransformableTest
         "image_tech_file_size": []
       }"""
     )
-  }
-
-  private def assertTransformMiroRecordFails(
-    data: String = """{"image_title": "A failed fumble in the fire"}""",
-    miroID: String = "M0000001",
-    miroCollection: String = "TestCollection"
-  ) = {
-    val miroTransformable = MiroTransformable(
-      MiroID = miroID,
-      MiroCollection = miroCollection,
-      data = data
-    )
-
-    miroTransformable.transform.isSuccess shouldBe false
   }
 }
 
@@ -450,6 +447,34 @@ class MiroTransformableSubjectsTest
       """,
       expectedSubjects = List(
         Concept("humour"), Concept("marine creatures")
+      )
+    )
+  }
+
+  it("should create an Item for each Work") {
+    val title = "A woodcut of a Weevil"
+    val longTitle = "A wonderful woodcut of a weird weevil"
+    val descriptionBody = "Woodcut, by A.R. Thropod.  Welsh.  1789."
+    val description = s"$longTitle\\n\\n$descriptionBody"
+    val work = transformWork(
+      data = s"""
+        "image_title": "$title",
+        "image_image_desc": "$description"
+      """)
+
+    val item = work.items.head
+
+    item shouldBe Item(
+      None,
+      List(
+        SourceIdentifier("miro-image-number","M0000001")
+      ),
+      List(
+        Location(
+          "iiif-image",
+          Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          License_CCBY
+        )
       )
     )
   }
@@ -520,5 +545,60 @@ class MiroTransformableGenresTest
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
+  }
+}
+
+
+
+class MiroTransformableThumbnailTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
+
+  it("should reject records that don't have usage data") {
+    assertTransformWorkFails(
+      data = """{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        "image_tech_file_size": ["1000000"],
+        "image_title": "Understand that using this umbrella is unauthorised"
+      }"""
+    )
+  }
+
+  it("should reject records with unrecognised usage data") {
+    assertTransformWorkFails(
+      data = """{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "Y",
+        "image_tech_file_size": ["1000000"],
+        "image_use_restrictions": "Poetic license, normally reserved for playwrights and not suitable in practice",
+        "image_title": "Plagiarised poetry by a penguin"
+      }"""
+    )
+  }
+
+  it("should create a thumbnail if the license is present") {
+    transformRecordAndCheckThumbnail(
+      data = s"""
+        "image_use_restrictions": "CC-BY-NC",
+        "image_title": "A thumb-sized tarantula"
+      """,
+      MiroID = "MT0001234",
+      expectedThumbnail = Location(
+        locationType = "thumbnail-image",
+        url = Some("https://iiif.wellcomecollection.org/image/MT0001234.jpg/full/300,/0/default.jpg"),
+        license = License_CCBYNC
+      )
+    )
+  }
+
+  private def transformRecordAndCheckThumbnail(
+    data: String,
+    MiroID: String,
+    expectedThumbnail: Location
+  ) = {
+    val transformedWork = transformWork(data = data, MiroID = MiroID)
+    transformedWork.thumbnail.get shouldBe expectedThumbnail
   }
 }

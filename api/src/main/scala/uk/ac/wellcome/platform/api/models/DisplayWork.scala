@@ -44,12 +44,49 @@ case class DisplayWork(
     Concept] = List(),
   @ApiModelProperty(value =
     "Relates a work to the genre that describes the work's content.") genres: List[
-    Concept] = List()) {
+    Concept] = List(),
+  @ApiModelProperty(
+    dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
+    value =
+      "Relates any thing to the location of a representative thumbnail image"
+  ) thumbnail: Option[DisplayLocation] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
+    value = "List of items related to this work."
+  ) items: Option[List[DisplayItem]] = None
+) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 
 case object DisplayWork {
+
+  def apply(work: Work, includes: WorksIncludes): DisplayWork = {
+    DisplayWork(
+      id = work.id,
+      title = work.title,
+      description = work.description,
+      lettering = work.lettering,
+      createdDate = work.createdDate,
+      // Wrapping this in Option to catch null value from Jackson
+      creators = Option(work.creators).getOrElse(Nil),
+      subjects = Option(work.subjects).getOrElse(Nil),
+      genres = Option(work.genres).getOrElse(Nil),
+      identifiers =
+        if (includes.identifiers)
+          Some(work.identifiers.map(DisplayIdentifier(_)))
+        else None,
+      thumbnail =
+        if (includes.thumbnail)
+          work.thumbnail.map(DisplayLocation(_))
+        else None,
+      items =
+        if (includes.items)
+          Some(work.items.map(DisplayItem(_, includes.identifiers)))
+        else None
+    )
+
+  }
 
   def apply(hit: SearchHit): DisplayWork =
     apply(hit, includes = WorksIncludes())
@@ -63,42 +100,9 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    val identifiedWork =
-      JsonUtil.fromJson[IdentifiedWork](document).get
+    val work =
+      JsonUtil.fromJson[Work](document).get
 
-    DisplayWork(
-      id = identifiedWork.canonicalId,
-      title = identifiedWork.work.title,
-      description = identifiedWork.work.description,
-      lettering = identifiedWork.work.lettering,
-      createdDate = identifiedWork.work.createdDate,
-      // Wrapping this in Option to catch null value from Jackson
-      creators = Option(identifiedWork.work.creators).getOrElse(Nil),
-      subjects = Option(identifiedWork.work.subjects).getOrElse(Nil),
-      genres = Option(identifiedWork.work.genres).getOrElse(Nil),
-      identifiers =
-        if (includes.identifiers)
-          Some(identifiedWork.work.identifiers.map(DisplayIdentifier(_)))
-        else None
-    )
+    DisplayWork(work, includes)
   }
-}
-
-@ApiModel(
-  value = "Identifier",
-  description =
-    "A unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-)
-case class DisplayIdentifier(
-  @ApiModelProperty(value =
-    "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system.") identifierScheme: String,
-  @ApiModelProperty(value = "The value of the thing. e.g. an identifier") value: String) {
-  @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") val ontologyType: String = "Identifier"
-}
-
-object DisplayIdentifier {
-  def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifier =
-    DisplayIdentifier(identifierScheme = sourceIdentifier.identifierScheme,
-                      value = sourceIdentifier.value)
 }
