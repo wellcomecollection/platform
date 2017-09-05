@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
+import io.circe.Json
 import io.circe.parser._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -25,10 +26,20 @@ class IdMinterWorkerService @Inject()(
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
-      json <- Future.fromTry(Try(parse(message.body).right.get))
+      json <- Future.fromTry(parseMessageIntoJson(message))
       workWithCanonicalId <- idEmbedder.embedId(json)
       _ <- writer.writeMessage(workWithCanonicalId.toString(),
                                Some(snsSubject))
     } yield ()
 
+  private def parseMessageIntoJson(message: SQSMessage): Try[Json] = {
+    Try {
+      parse(message.body) match {
+        case Right(json) => json
+        case Left(exception) =>
+          error(s"error parseing message into json: $exception")
+          throw exception
+      }
+    }
+  }
 }

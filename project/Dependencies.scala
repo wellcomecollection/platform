@@ -16,7 +16,6 @@ object Dependencies {
     val elastic4s = "5.4.1"
     val scanamo = "0.9.4"
     val jacksonYamlVersion = "2.8.8"
-    val monocleVersion = "1.5.0-cats-M1"
     val circeVersion = "0.8.0"
   }
 

@@ -2,11 +2,11 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import io.circe.{Json, _}
 import io.circe.generic.auto._
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe.parser._
+import io.circe.{Json, _}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -44,8 +44,7 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
 
   private def addIdentifierToJsonObject(obj: JsonObject): JsonObject = {
     if (obj.contains("identifiers")) {
-      val sourceIdentifiers = decode[List[SourceIdentifier]](
-        obj("identifiers").get.toString()).right.get
+      val sourceIdentifiers = parseSourceIdentifiers(obj)
       val ontologyType = obj("type").get.asString.get
       val canonicalId = identifierGenerator
         .retrieveOrGenerateCanonicalId(
@@ -55,5 +54,16 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
         .get
       ("canonicalId", Json.fromString(canonicalId)) +: obj
     } else obj
+  }
+
+  private def parseSourceIdentifiers(
+    obj: JsonObject): List[SourceIdentifier] = {
+    decode[List[SourceIdentifier]](obj("identifiers").get.toString()) match {
+      case Right(identifiers) => identifiers
+      case Left(exception: Error) =>
+        error(s"Error parsing source identifiers: $exception")
+        throw exception
+    }
+
   }
 }

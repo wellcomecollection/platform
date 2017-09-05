@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.idminter.steps
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.circe.parser._
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
@@ -53,8 +52,6 @@ class IdEmbedderTests
       json = parse(JsonUtil.toJson(originalWork).get).right.get)
 
     val expectedWork = originalWork.copy(canonicalId = Some(newCanonicalId))
-
-    val mapper = new ObjectMapper()
 
     whenReady(newWorkFuture) { newWorkJson =>
       assertJsonStringsAreEqual(newWorkJson.toString(),
@@ -135,18 +132,18 @@ class IdEmbedderTests
   describe(
     "Documents with no Identifiable objects should pass through unchanged") {
     it("an empty map") {
-      assertWalkerDoesNothing("""{}""")
+      assertIdEmbedderDoesNothing("""{}""")
     }
 
     it("a map with some string keys") {
-      assertWalkerDoesNothing("""{
+      assertIdEmbedderDoesNothing("""{
         "so": "sofia",
         "sk": "skopje"
       }""")
     }
 
     it("a map with some list objects") {
-      assertWalkerDoesNothing("""{
+      assertIdEmbedderDoesNothing("""{
         "te": "tehran",
         "ta": [
           "tallinn",
@@ -156,7 +153,7 @@ class IdEmbedderTests
     }
 
     it("a complex nested structure") {
-      assertWalkerDoesNothing("""{
+      assertIdEmbedderDoesNothing("""{
         "u": "ulan bator",
         "v": [
           "vatican city",
@@ -180,27 +177,17 @@ class IdEmbedderTests
     }
   }
 
-  // An in-memory canonical ID generator for use in testing.  This allows us
-  // to write lots of fast tests for the tree-walking logic, and we can have
-  // fewer, slower tests that make database calls.
-  def generateCanonicalId(sourceIdentifiers: List[SourceIdentifier],
-                          ontologyType: String): String = {
-    val sourceIdentifiersStrings = sourceIdentifiers.map { _.toString }
-    List(ontologyType, sourceIdentifiersStrings.mkString(";"))
-      .mkString("==")
-  }
-
   describe("Documents with Identifiable structures should be updated correctly") {
     it("identify a document that is itself Identifiable") {
       val sourceIdentifiers = List(SourceIdentifier("australia", "sydney"))
       val ontologyType = "false capitals"
-      val newCanonicalId = generateCanonicalId(sourceIdentifiers, ontologyType)
+      val newCanonicalId = generateMockCanonicalId(sourceIdentifiers, ontologyType)
 
       setUpIdentifierGeneratorMock(sourceIdentifiers,
                                    ontologyType,
                                    newCanonicalId)
 
-      assertWalkerAddsCanonicalIdCorrectly(s"""
+      assertIdEmbedderAddsCanonicalIdCorrectly(s"""
       {
         "canonicalId": "$newCanonicalId",
         "identifiers": [{
@@ -216,11 +203,11 @@ class IdEmbedderTests
       val sourceIdentifiers =
         List(SourceIdentifier("westeros", "king's landing"))
       val ontologyType = "fictional cities"
-      val newCanonicalId = generateCanonicalId(sourceIdentifiers, ontologyType)
+      val newCanonicalId = generateMockCanonicalId(sourceIdentifiers, ontologyType)
       setUpIdentifierGeneratorMock(sourceIdentifiers,
                                    ontologyType,
                                    newCanonicalId)
-      assertWalkerAddsCanonicalIdCorrectly(s"""
+      assertIdEmbedderAddsCanonicalIdCorrectly(s"""
       {
         "ke": null,
         "ki": "kiev",
@@ -244,7 +231,7 @@ class IdEmbedderTests
       )
       val ontologyTypeA = "ghost towns"
 
-      val newCanonicalIdA = generateCanonicalId(sourceIdentifiersA, ontologyTypeA)
+      val newCanonicalIdA = generateMockCanonicalId(sourceIdentifiersA, ontologyTypeA)
       setUpIdentifierGeneratorMock(sourceIdentifiersA,ontologyTypeA, newCanonicalIdA)
 
       val sourceIdentifiersB = List(
@@ -253,7 +240,7 @@ class IdEmbedderTests
       )
       val ontologyTypeB = "mythological places"
 
-      val newCanonicalIdB = generateCanonicalId(sourceIdentifiersB, ontologyTypeB)
+      val newCanonicalIdB = generateMockCanonicalId(sourceIdentifiersB, ontologyTypeB)
       setUpIdentifierGeneratorMock(sourceIdentifiersB,ontologyTypeB, newCanonicalIdB)
 
       val sourceIdentifiersC = List(
@@ -262,10 +249,10 @@ class IdEmbedderTests
       )
       val ontologyTypeC = "cities that were renamed"
 
-      val newCanonicalIdC = generateCanonicalId(sourceIdentifiersC, ontologyTypeC)
+      val newCanonicalIdC = generateMockCanonicalId(sourceIdentifiersC, ontologyTypeC)
       setUpIdentifierGeneratorMock(sourceIdentifiersC,ontologyTypeC, newCanonicalIdC)
 
-      assertWalkerAddsCanonicalIdCorrectly(s"""
+      assertIdEmbedderAddsCanonicalIdCorrectly(s"""
       {
         "items": [
           {
@@ -329,6 +316,13 @@ class IdEmbedderTests
     }
   }
 
+  def generateMockCanonicalId(sourceIdentifiers: List[SourceIdentifier],
+                              ontologyType: String): String = {
+    val sourceIdentifiersStrings = sourceIdentifiers.map { _.toString }
+    List(ontologyType, sourceIdentifiersStrings.mkString(";"))
+      .mkString("==")
+  }
+
   private def setUpIdentifierGeneratorMock(
     sourceIdentifiers: List[SourceIdentifier],
     ontologyType: String,
@@ -339,9 +333,9 @@ class IdEmbedderTests
       .thenReturn(Try(newCanonicalId))
   }
 
-  // Strip the canonical ID from a JSON string, then run it through the walker
+  // Strip the canonical ID from a JSON string, then run it through the idEmbedder
   // and check it's reinserted correctly.
-  private def assertWalkerAddsCanonicalIdCorrectly(jsonString: String) = {
+  private def assertIdEmbedderAddsCanonicalIdCorrectly(jsonString: String) = {
     val unidentifiedString = jsonString.lines
       .filterNot { _.contains("canonicalId") }
       .mkString("\n")
@@ -353,7 +347,7 @@ class IdEmbedderTests
     }
   }
 
-  private def assertWalkerDoesNothing(jsonString: String) = {
+  private def assertIdEmbedderDoesNothing(jsonString: String) = {
     val eventualJson = idEmbedder.embedId(parse(jsonString).right.get)
     whenReady(eventualJson) { json =>
       assertJsonStringsAreEqual(json.toString(), jsonString)
