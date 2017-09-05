@@ -1,4 +1,4 @@
-INFRA_BUCKET = platform-infra
+export INFRA_BUCKET = platform-infra
 
 
 # Build the Docker images used for CI tasks.
@@ -11,100 +11,109 @@ clean:
 	rm -rf .docker
 
 .docker/jslint_ci:
-	./scripts/build_ci_docker_image.py --project jslint_ci
+	./scripts/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
 
 .docker/python3.6_ci:
-	./scripts/build_ci_docker_image.py --project python3.6_ci
+	./scripts/build_ci_docker_image.py --project=python3.6_ci --dir=docker/python3.6_ci
 
 .docker/terraform_ci:
-	./scripts/build_ci_docker_image.py --project terraform_ci
+	./scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
 
 .docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
 	mkdir -p .docker && touch .docker/_build_deps
 
 .docker/image_builder:
-	docker build -t image_builder -f builds/image_builder.Dockerfile builds
-	mkdir -p .docker && touch .docker/image_builder
+	./scripts/build_ci_docker_image.py \
+		--project=image_builder \
+		--dir=builds \
+		--file=builds/image_builder.Dockerfile
+
+.docker/publish_service_to_aws:
+	./scripts/build_ci_docker_image.py \
+		--project=publish_service_to_aws \
+		--dir=builds \
+		--file=builds/publish_service_to_aws.Dockerfile
 
 .docker/miro_adapter_tests:
-	docker build -t miro_adapter_tests -f miro_adapter/miro_adapter_tests.Dockerfile miro_adapter
-	mkdir -p .docker && touch .docker/miro_adapter_tests
+	./scripts/build_ci_docker_image.py \
+		--project=miro_adapter_tests \
+		--dir=miro_adapter \
+		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
 
 ## Build the image for gatling
 gatling-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=gatling
+	PROJECT=gatling ./builds/build_image.sh
 
 ## Deploy the image for gatling
-gatling-deploy: gatling-build
-	./scripts/deploy_docker_to_aws.py --project=gatling --infra-bucket=$(INFRA_BUCKET)
-
+gatling-deploy: gatling-build .docker/publish_service_to_aws
+	PROJECT=gatling ./builds/publish_service.sh
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=cache_cleaner
+	PROJECT=cache_cleaner ./builds/build_image.sh
 
 ## Deploy the image for the cache cleaner
-cache_cleaner-deploy: cache_cleaner-build
-	./scripts/deploy_docker_to_aws.py --project=cache_cleaner --infra-bucket=$(INFRA_BUCKET)
+cache_cleaner-deploy: cache_cleaner-build .docker/publish_service_to_aws
+	PROJECT=cache_cleaner ./builds/publish_service.sh
 
 
 ## Build the image for tif-metadata
 tif-metadata-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=tif-metadata
+	PROJECT=tif-metadata ./builds/build_image.sh
 
 ## Deploy the image for tif-metadata
-tif-metadata-deploy: tif-metadata-build
-	./scripts/deploy_docker_to_aws.py --project=tif-metadata --infra-bucket=$(INFRA_BUCKET)
+tif-metadata-deploy: tif-metadata-build .docker/publish_service_to_aws
+	PROJECT=tif-metadata ./builds/publish_service.sh
 
 
 ## Build the image for Loris
 loris-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=loris
+	PROJECT=loris ./builds/build_image.sh
 
 ## Deploy the image for Loris
-loris-deploy: loris-build
-	./scripts/deploy_docker_to_aws.py --project=loris --infra-bucket=$(INFRA_BUCKET)
+loris-deploy: loris-build .docker/publish_service_to_aws
+	PROJECT=loris ./builds/publish_service.sh
 
 
 miro_adapter-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
+	PROJECT=miro_adapter FILE=miro_adapter/Dockerfile ./builds/build_image.sh
 
 miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
 	rm -rf $$(pwd)/miro_adapter/__pycache__
 	rm -rf $$(pwd)/miro_adapter/*.pyc
 	docker run -v $$(pwd)/miro_adapter:/miro_adapter miro_adapter_tests
 
-miro_adapter-deploy: miro_adapter-build
-	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+miro_adapter-deploy: miro_adapter-build .docker/publish_service_to_aws
+	PROJECT=miro_adapter ./builds/publish_service.sh
 
 
 elasticdump-build: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=elasticdump
+	PROJECT=elasticdump ./builds/build_image.sh
 
-elasticdump-deploy: elasticdump-build
-	./scripts/deploy_docker_to_aws.py --project=elasticdump --infra-bucket=$(INFRA_BUCKET)
+elasticdump-deploy: elasticdump-build .docker/publish_service_to_aws
+	PROJECT=elasticdump ./builds/publish_service.sh
 
 
 api_docs-build: .docker/_build_deps
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=update_api_docs
+	PROJECT=update_api_docs ./builds/build_image.sh
 
-api_docs-deploy: api_docs-build
-	./scripts/deploy_docker_to_aws.py --project=update_api_docs --infra-bucket=$(INFRA_BUCKET)
+api_docs-deploy: api_docs-build .docker/publish_service_to_aws
+	PROJECT=update_api_docs ./builds/publish_service.sh
 
 
 nginx-build-api: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=api
+	PROJECT=nginx VARIANT=api ./builds/build_image.sh
 
 nginx-build-loris: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=loris
+	PROJECT=nginx VARIANT=loris ./builds/build_image.sh
 
 nginx-build-services: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=services
+	PROJECT=nginx VARIANT=services ./builds/build_image.sh
 
 nginx-build-grafana: .docker/image_builder
-	docker run -v /var/run/docker.sock:/var/run/docker.sock -v $$(pwd):/repo image_builder --project=nginx --variant=grafana
+	PROJECT=nginx VARIANT=grafana ./builds/build_image.sh
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
@@ -115,17 +124,17 @@ nginx-build:	\
 
 
 
-nginx-deploy-api: nginx-build-api
-	./scripts/deploy_docker_to_aws.py --project=nginx_api --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-api: nginx-build-api .docker/publish_service_to_aws
+	PROJECT=nginx_api ./builds/publish_service.sh
 
-nginx-deploy-loris: nginx-build-loris
-	./scripts/deploy_docker_to_aws.py --project=nginx_loris --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-loris: nginx-build-loris .docker/publish_service_to_aws
+	PROJECT=nginx_loris ./builds/publish_service.sh
 
-nginx-deploy-services: nginx-build-services
-	./scripts/deploy_docker_to_aws.py --project=nginx_services --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-services: nginx-build-services .docker/publish_service_to_aws
+	PROJECT=nginx_services ./builds/publish_service.sh
 
-nginx-deploy-grafana: nginx-build-grafana
-	./scripts/deploy_docker_to_aws.py --project=nginx_grafana --infra-bucket=$(INFRA_BUCKET)
+nginx-deploy-grafana: nginx-build-grafana .docker/publish_service_to_aws
+	PROJECT=nginx_grafana ./builds/publish_service.sh
 
 ## Push images for all of our nginx proxies
 nginx-deploy:	\
@@ -195,29 +204,25 @@ sbt-build: \
 
 
 
-sbt-deploy-api: sbt-build-api
-	./scripts/deploy_docker_to_aws.py --project=api --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-api: sbt-build-api .docker/publish_service_to_aws
+	PROJECT=api ./builds/publish_service.sh
 
-sbt-deploy-id_minter: sbt-build-id_minter
-	./scripts/deploy_docker_to_aws.py --project=id_minter --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-id_minter: sbt-build-id_minter .docker/publish_service_to_aws
+	PROJECT=id_minter ./builds/publish_service.sh
 
-sbt-deploy-ingestor: sbt-build-ingestor
-	./scripts/deploy_docker_to_aws.py --project=ingestor --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-ingestor: sbt-build-ingestor .docker/publish_service_to_aws
+	PROJECT=ingestor ./builds/publish_service.sh
 
-sbt-deploy-miro_adapter: sbt-build-miro_adapter
-	./scripts/deploy_docker_to_aws.py --project=miro_adapter --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-reindexer: sbt-build-reindexer .docker/publish_service_to_aws
+	PROJECT=reindexer ./builds/publish_service.sh
 
-sbt-deploy-reindexer: sbt-build-reindexer
-	./scripts/deploy_docker_to_aws.py --project=reindexer --infra-bucket=$(INFRA_BUCKET)
-
-sbt-deploy-transformer: sbt-build-transformer
-	./scripts/deploy_docker_to_aws.py --project=transformer --infra-bucket=$(INFRA_BUCKET)
+sbt-deploy-transformer: sbt-build-transformer .docker/publish_service_to_aws
+	PROJECT=transformer ./builds/publish_service.sh
 
 sbt-deploy: \
 	sbt-deploy-api	\
 	sbt-deploy-id_minter \
 	sbt-deploy-ingestor   \
-	sbt-deploy-miro_adapter \
 	sbt-deploy-reindexer	\
 	sbt-deploy-transformer
 
