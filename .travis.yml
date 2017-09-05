@@ -75,17 +75,7 @@ cache:
     - "/home/travis/docker/"
 
 script:
-  - |
-    make "$TASK"
-    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
-    then
-      if [[ "$TASK" != "sbt-test-common" && "$TASK" != "test-lambdas" ]]
-      then
-        TASK="${TASK/build/deploy}"
-        TASK="${TASK/test/deploy}"
-        make "$TASK"
-      fi
-    fi
+  - ./scripts/travis_run.sh
 
 env:
   global:

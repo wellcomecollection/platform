@@ -95,8 +95,7 @@ elasticdump-build: .docker/image_builder
 elasticdump-deploy: elasticdump-build .docker/publish_service_to_aws
 	PROJECT=elasticdump ./builds/publish_service.sh
 
-
-api_docs-build: .docker/_build_deps
+api_docs-build: .docker/image_builder
 	PROJECT=update_api_docs ./builds/build_image.sh
 
 api_docs-deploy: api_docs-build .docker/publish_service_to_aws
