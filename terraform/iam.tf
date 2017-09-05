@@ -8,11 +8,6 @@ module "ecs_monitoring_iam" {
   name   = "monitoring"
 }
 
-module "ecs_calm_adapter_iam" {
-  source = "./ecs_iam"
-  name   = "calm_adapter"
-}
-
 module "ecs_miro_reindexer_iam" {
   source = "./ecs_iam"
   name   = "miro_reindexer"

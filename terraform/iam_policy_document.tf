@@ -1,3 +1,15 @@
+data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "allow_calm_db_all" {
   statement {
     actions = [
@@ -8,19 +20,6 @@ data "aws_iam_policy_document" "allow_calm_db_all" {
 
     resources = [
       "${aws_dynamodb_table.calm_table.arn}",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "allow_table_capacity_changes" {
-  statement {
-    actions = [
-      "dynamodb:DescribeTable",
-      "dynamodb:UpdateTable",
-    ]
-
-    resources = [
-      "*",
     ]
   }
 }
@@ -50,18 +49,6 @@ data "aws_iam_policy_document" "reindex_target_miro" {
   }
 }
 
-data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
-  statement {
-    actions = [
-      "cloudwatch:PutMetricData",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "allow_cloudwatch_read_metrics" {
   statement {
     actions = [
@@ -71,36 +58,6 @@ data "aws_iam_policy_document" "allow_cloudwatch_read_metrics" {
       "cloudwatch:GetMetricData",
       "cloudwatch:GetMetricStatistics",
       "cloudwatch:ListMetrics",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "update_ecs_service_size" {
-  statement {
-    actions = [
-      "ecs:UpdateService",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "stop_running_tasks" {
-  statement {
-    actions = [
-      "ecs:DescribeServices",
-      "ecs:DescribeTaskDefinition",
-      "ecs:ListClusters",
-      "ecs:ListServices",
-      "ecs:RegisterTaskDefinition",
-      "ecs:UpdateService",
-      "iam:PassRole",
     ]
 
     resources = [
@@ -210,20 +167,6 @@ data "aws_iam_policy_document" "miro_images_sync" {
   }
 }
 
-data "aws_iam_policy_document" "s3_put_dashboard_status" {
-  statement {
-    actions = [
-      "s3:PutObject",
-      "s3:GetObjectACL",
-      "s3:PutObjectACL",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.dashboard.arn}/data/*",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "s3_put_gatling_reports" {
   statement {
     actions = [
@@ -234,28 +177,6 @@ data "aws_iam_policy_document" "s3_put_gatling_reports" {
 
     resources = [
       "${aws_s3_bucket.dashboard.arn}/gatling/*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "s3_put_infra_tmp" {
-  statement {
-    actions = [
-      "s3:*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.infra.arn}/tmp/*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      "arn:aws:s3:::*",
     ]
   }
 }
@@ -282,78 +203,6 @@ data "aws_iam_policy_document" "s3_read_miro_data" {
 
     resources = [
       "${aws_s3_bucket.miro-data.arn}",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "write_ec2_tags" {
-  statement {
-    actions = [
-      "ec2:createTags",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "complete_lifecycle_hook" {
-  statement {
-    actions = ["autoscaling:CompleteLifecycleAction"]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "ecs_list_container_tasks" {
-  statement {
-    actions = [
-      "ecs:UpdateContainerInstancesState",
-      "ecs:ListTasks",
-      "ecs:DescribeContainerInstances",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "ec2_describe_instances" {
-  statement {
-    actions = [
-      "ec2:DescribeInstances",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "send_asg_heartbeat" {
-  statement {
-    actions = [
-      "autoscaling:RecordLifecycleActionHeartbeat",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "deployments_table" {
-  statement {
-    actions = [
-      "dynamodb:*",
-    ]
-
-    resources = [
-      "${aws_dynamodb_table.deployments.arn}",
     ]
   }
 }
