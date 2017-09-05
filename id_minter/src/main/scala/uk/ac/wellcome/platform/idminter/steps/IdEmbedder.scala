@@ -28,7 +28,7 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
   }
   
   @tailrec
-  private def iterate(rootChildrenPath: JsonTraversalPath, json: Json):Json = {
+  private def iterate(rootChildrenPath: JsonTraversalPath, json: Json): Json = {
     if (rootChildrenPath.json.nonEmpty(json)) {
       val newJson =
         rootChildrenPath.json.modify(addIdentifierToJson)(json)
@@ -37,7 +37,7 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
     else json
   }
 
-  private def addIdentifierToJson(json: Json):Json = {
+  private def addIdentifierToJson(json: Json): Json = {
     if (json.isObject) {
       json.mapObject(obj =>
         addIdentifierToJsonObject(obj))
@@ -45,12 +45,14 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
     else json
   }
 
-  private def addIdentifierToJsonObject(obj: JsonObject) = {
+  private def addIdentifierToJsonObject(obj: JsonObject): JsonObject = {
     if (obj.contains("identifiers")) {
+      val sourceIdentifiers = decode[List[SourceIdentifier]](obj("identifiers").get.toString()).right.get
+      val ontologyType = obj("type").get.asString.get
       val canonicalId = identifierGenerator
         .retrieveOrGenerateCanonicalId(
-          decode[List[SourceIdentifier]](obj("identifiers").get.toString()).right.get,
-          ontologyType = obj("ontologyType").get.toString()
+          identifiers = sourceIdentifiers,
+          ontologyType = ontologyType
         )
         .get
       ("canonicalId", Json.fromString(canonicalId)) +: obj
