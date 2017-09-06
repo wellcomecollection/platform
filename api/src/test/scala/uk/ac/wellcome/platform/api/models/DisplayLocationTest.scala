@@ -15,11 +15,7 @@ class DisplayLocationTest extends FunSpec with Matchers {
     val internalLocation = Location(
       locationType = locationType,
       url = thumbnailUrl,
-      license = License(
-        licenseType = licenseType,
-        label = licenseLabel,
-        url = licenseUrl
-      )
+      license = License_CCBY
     )
     val displayLocation = DisplayLocation(internalLocation)
 

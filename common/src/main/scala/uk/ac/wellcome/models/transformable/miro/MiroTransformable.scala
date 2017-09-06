@@ -180,7 +180,7 @@ case class MiroTransformable(MiroID: String,
     *  TODO: Update these mappings based on the final version of Christy's
     *        document.
     */
-  private def chooseLicense(useRestrictions: String): BaseLicense =
+  private def chooseLicense(useRestrictions: String): License =
     useRestrictions match {
 
       // Certain strings map directly onto license types
