@@ -240,7 +240,6 @@ terraform-main-apply: .docker/terraform_ci
 
 .docker/_lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
-	mkdir -p .docker && touch .docker/_lambda_deps
 
 ## Run a plan on lambda stack
 terraform-lambda-plan: .docker/terraform_ci .docker/_lambda_deps
