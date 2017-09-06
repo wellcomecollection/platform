@@ -23,7 +23,6 @@ class LicenseDeserialiser extends JsonDeserializer[License] {
                            ctxt: DeserializationContext): License = {
     val node: JsonNode = p.getCodec.readTree(p)
     val licenseType = node.get("licenseType").asText
-    println(s"got licenseType: $licenseType")
     createLicense(licenseType)
   }
 

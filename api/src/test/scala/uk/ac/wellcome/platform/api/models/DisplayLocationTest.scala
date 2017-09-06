@@ -8,9 +8,6 @@ class DisplayLocationTest extends FunSpec with Matchers {
   it("should read a Location as a DisplayLocation correctly") {
     val thumbnailUrl = Some("https://iiif.example.org/V0000001/default.jpg")
     val locationType = "thumbnail-image"
-    val licenseType = "CC-Test"
-    val licenseLabel = "A fictional license for testing"
-    val licenseUrl = "http://creativecommons.org/licenses/test/-1.0/"
 
     val internalLocation = Location(
       locationType = locationType,
@@ -22,9 +19,9 @@ class DisplayLocationTest extends FunSpec with Matchers {
     displayLocation.locationType shouldBe locationType
     displayLocation.url shouldBe thumbnailUrl
     displayLocation.license shouldBe DisplayLicense(
-      licenseType = licenseType,
-      label = licenseLabel,
-      url = licenseUrl
+      licenseType = License_CCBY.licenseType,
+      label = License_CCBY.label,
+      url = License_CCBY.url
     )
     displayLocation.ontologyType shouldBe "Location"
   }
