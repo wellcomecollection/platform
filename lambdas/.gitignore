@@ -1,4 +1,1 @@
-*.dist-info
-six.py
-*/structlog/*
-*/simplejson/*
+platform-lambda.tfvars

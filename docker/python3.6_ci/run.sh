@@ -13,12 +13,15 @@ then
 elif [[ "$OP" == "test" ]]
 then
   echo "Testing Lambdas"
+
   ./install_lambda_deps.sh
-  find . -maxdepth 2 -name "test_*.py" | xargs py.test
+  ./test_lambdas.sh
+
 elif [[ "$OP" == "install-deps" ]]
 then
   echo "Installing Lambda dependencies"
   ./install_lambda_deps.sh
+
 else
   echo "Unrecognised operation: $OP! Stopping."
   exit 1

@@ -100,7 +100,7 @@ env:
     - TASK=sbt-test-ingestor
     - TASK=sbt-test-id_minter
     - TASK=sbt-test-reindexer
-    - TASK=test-lambdas
+    - TASK=lambdas-test
     - TASK=nginx-build
     - TASK=tif-metadata-build
     - TASK=gatling-build
