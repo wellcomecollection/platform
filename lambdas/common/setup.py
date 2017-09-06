@@ -13,9 +13,8 @@ setup(
     url='https://github.com/wellcometrust/platform-api/lambdas/common',
     python_requires='>=3.6',
     install_requires=[
-        'simplejson==3.11.1',
-        'six==1.10.0',
-        'structlog==17.2.0',
-        'boto3>=1.4.5'
+        # Strictly speaking, boto3 is a dependency, but it's pre-installed
+        # in AWS Lambda so we omit it here.
+        # 'boto3>=1.4.5',
     ]
 )
