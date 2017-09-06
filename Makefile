@@ -70,7 +70,7 @@ tif-metadata-deploy: tif-metadata-build .docker/publish_service_to_aws
 
 ## Build the image for Loris
 loris-build: .docker/image_builder
-	PROJECT=loris ./builds/build_image.sh
+	PROJECT=loris FILE=loris/Dockerfile ./builds/build_image.sh
 
 ## Deploy the image for Loris
 loris-deploy: loris-build .docker/publish_service_to_aws
