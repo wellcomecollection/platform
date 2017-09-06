@@ -183,55 +183,13 @@ class ApiWorksTest
     }
   }
 
-  it("should be able to render an item with no canonicalId") {
-    val work = workWith(
-      canonicalId = canonicalId,
-      title = title,
-      items = List(
-        itemWith(
-          canonicalId = None,
-          identifier = defaultSourceIdentifier,
-          location = defaultLocation
-        )
-      )
-    )
-
-    insertIntoElasticSearch(work)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          | "type": "Work",
-                          | "id": "${work.canonicalId.get}",
-                          | "title": "$title",
-                          | "creators": [ ],
-                          | "items": [
-                          |   {
-                          |    "type": "${work.items.head.ontologyType}",
-                          |    "locations": [
-                          |      ${locations(work.items.head.locations)}
-                          |    ]
-                          |   }
-                          | ],
-                          | "subjects": [ ],
-                          | "genres": [ ]
-                          |}
-          """.stripMargin
-      )
-    }
-  }
-
   it("should be able to render an item if the items include is present") {
     val work = workWith(
       canonicalId = "b4heraz7",
       title = "Inside an irate igloo",
       items = List(
         itemWith(
-          canonicalId = Some("c3a599u5"),
+          canonicalId = "c3a599u5",
           identifier = defaultSourceIdentifier,
           location = defaultLocation
         )

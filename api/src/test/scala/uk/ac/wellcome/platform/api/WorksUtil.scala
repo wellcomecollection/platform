@@ -82,7 +82,7 @@ trait WorksUtil {
 
   def defaultItem: Item = {
     itemWith(
-      Some("item-canonical-id"),
+      "item-canonical-id",
       defaultSourceIdentifier,
       defaultLocation
     )
@@ -98,11 +98,11 @@ trait WorksUtil {
       License_CCBY)
   }
 
-  def itemWith(canonicalId: Option[String],
+  def itemWith(canonicalId: String,
                identifier: SourceIdentifier,
                location: Location): Item = {
     Item(
-      canonicalId = canonicalId,
+      canonicalId = Some(canonicalId),
       List(
         identifier
       ),
