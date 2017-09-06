@@ -10,12 +10,7 @@ class DisplayLicenseTest extends FunSpec with Matchers {
     val label = "A fictional license for testing"
     val url = "http://creativecommons.org/licenses/test/-1.0/"
 
-    val internalLicense = License(
-      licenseType = licenseType,
-      label = label,
-      url = url
-    )
-    val displayLicense = DisplayLicense(internalLicense)
+    val displayLicense = DisplayLicense(License_CCBY)
 
     displayLicense.licenseType shouldBe licenseType
     displayLicense.label shouldBe label

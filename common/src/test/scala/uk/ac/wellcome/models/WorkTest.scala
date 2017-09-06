@@ -150,16 +150,10 @@ class WorkTest extends FunSpec with Matchers {
       |}
     """.stripMargin.replaceAll("\\s", "")
 
-  val license = License(
-    licenseType = "license",
-    label = "label",
-    url = "http://www.example.com"
-  )
-
   val location = Location(
     locationType = "location",
     url = None,
-    license = license
+    license = License_CCBY
   )
 
   val identifier = SourceIdentifier(

@@ -64,7 +64,7 @@ class ApiWorksTest
       "license": ${license(loc.license)}
     }"""
 
-  private def license(license: BaseLicense) =
+  private def license(license: License) =
     s"""{
       "label": "${license.label}",
       "licenseType": "${license.licenseType}",
@@ -830,11 +830,7 @@ class ApiWorksTest
       thumbnail = Location(
         locationType = "thumbnail-image",
         url = Some("https://iiif.example.org/1234/default.jpg"),
-        license = License(
-          licenseType = "CC-test",
-          label = "A fictional license for testing",
-          url = "http://creativecommons.org/licenses/test/-1.0/"
-        )
+        license = License_CCBY
       )
     )
     insertIntoElasticSearch(work)
@@ -873,11 +869,7 @@ class ApiWorksTest
       title = "An otter omitted from an occasion in Oslo",
       thumbnail = Location(
         locationType = "thumbnail-image",
-        license = License(
-          licenseType = "CC-toast",
-          label = "A fictional license for toasting",
-          url = "http://creativecommons.org/licenses/toast/-slice/"
-        )
+        license = License_CCBY
       )
     )
     insertIntoElasticSearch(work)

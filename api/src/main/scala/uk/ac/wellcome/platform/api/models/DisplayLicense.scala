@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.BaseLicense
+import uk.ac.wellcome.models.License
 
 @ApiModel(
   value = "License",
@@ -27,7 +27,7 @@ case class DisplayLicense(
 }
 
 case object DisplayLicense {
-  def apply(license: BaseLicense): DisplayLicense = DisplayLicense(
+  def apply(license: License): DisplayLicense = DisplayLicense(
     licenseType = license.licenseType,
     label = license.label,
     url = license.url
