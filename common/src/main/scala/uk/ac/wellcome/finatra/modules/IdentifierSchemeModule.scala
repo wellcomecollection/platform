@@ -13,4 +13,6 @@ object IdentifierSchemes {
   val calmPlaceholder = "calm-placeholder"
 
   val calmAltRefNo = "calm-altrefno"
+
+  val sierraSystemNumber = "sierra-system-number"
 }
