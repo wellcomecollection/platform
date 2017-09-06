@@ -1,4 +1,5 @@
-export INFRA_BUCKET = platform-infra
+include builds.Makefile
+include loris/Makefile
 
 
 # Build the Docker images used for CI tasks.
@@ -22,18 +23,6 @@ clean:
 .docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
 	mkdir -p .docker && touch .docker/_build_deps
-
-.docker/image_builder:
-	./scripts/build_ci_docker_image.py \
-		--project=image_builder \
-		--dir=builds \
-		--file=builds/image_builder.Dockerfile
-
-.docker/publish_service_to_aws:
-	./scripts/build_ci_docker_image.py \
-		--project=publish_service_to_aws \
-		--dir=builds \
-		--file=builds/publish_service_to_aws.Dockerfile
 
 .docker/miro_adapter_tests:
 	./scripts/build_ci_docker_image.py \
@@ -66,15 +55,6 @@ tif-metadata-build: .docker/image_builder
 ## Deploy the image for tif-metadata
 tif-metadata-deploy: tif-metadata-build .docker/publish_service_to_aws
 	PROJECT=tif-metadata ./builds/publish_service.sh
-
-
-## Build the image for Loris
-loris-build: .docker/image_builder
-	PROJECT=loris FILE=loris/Dockerfile ./builds/build_image.sh
-
-## Deploy the image for Loris
-loris-deploy: loris-build .docker/publish_service_to_aws
-	PROJECT=loris ./builds/publish_service.sh
 
 
 miro_adapter-build: .docker/image_builder
