@@ -12,7 +12,7 @@ case class DisplayItem(
   @ApiModelProperty(
     dataType = "String",
     readOnly = true,
-    value = "The canonical identifier given to a thing.") id: Option[String],
+    value = "The canonical identifier given to a thing.") id: String,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayIdentifier]",
     value =
@@ -30,7 +30,7 @@ case class DisplayItem(
 object DisplayItem {
   def apply(item: Item, includesIdentifiers: Boolean): DisplayItem =
     DisplayItem(
-      id = item.canonicalId,
+      id = item.id,
       identifiers =
         if (includesIdentifiers)
           Some(item.identifiers.map(DisplayIdentifier(_)))
