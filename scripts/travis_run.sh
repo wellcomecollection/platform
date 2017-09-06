@@ -13,7 +13,6 @@ then
   then
     TASK="${TASK/build/deploy}"
     TASK="${TASK/test/deploy}"
-    TASK="${TASK/test/deploy}"
     make "$TASK"
   elif [[ "$TASK" == "loris-build" ]]
   then
