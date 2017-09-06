@@ -22,9 +22,9 @@ then
 
     set +o errexit
 
-    echo "Extracting ouput to $OUTPUT_LOCATION"
+    echo "Extracting output to $OUTPUT_LOCATION"
     terraform output --json > "$OUTPUT_LOCATION"
-    
+
     echo "Sending succesful apply notification."
     /app/notify.sh $TOPIC_ARN "$OUTPUT_LOCATION"
 
