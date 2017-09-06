@@ -102,7 +102,7 @@ class Alarm:
             group = 'platform/loris'
             search_term = '"HTTP/1.0 500"'
         elif self.name.startswith('lambda'):
-            lambda_name = alarm.name.split('-')[1]
+            lambda_name = self.name.split('-')[1]
             group = f'/aws/lambda/{lambda_name}'
             search_term = 'Traceback'
         elif self.name == 'api_romulus-alb-target-500-errors':
