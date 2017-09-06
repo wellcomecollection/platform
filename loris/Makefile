@@ -8,7 +8,7 @@ endif
 loris-build: $(ROOT)/.docker/image_builder
 	PROJECT=loris FILE=loris/Dockerfile $(ROOT)/builds/build_image.sh
 
-loris-serve: loris-build
+loris-run: loris-build
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 		--publish 8888:8888 \
 		--env INFRA_BUCKET=$(INFRA_BUCKET) \
@@ -19,4 +19,4 @@ loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=loris $(ROOT)/builds/publish_service.sh
 
 
-.PHONY: loris-build loris-serve loris-publish
+.PHONY: loris-build loris-run loris-publish
