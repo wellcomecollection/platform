@@ -1,3 +1,6 @@
+# This Makefile contains tasks and underlying pieces that are shared
+# across our other Makefiles.
+
 export INFRA_BUCKET = platform-infra
 
 ROOT = $(shell git rev-parse --show-toplevel)

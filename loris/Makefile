@@ -1,7 +1,7 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
 ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/builds.Makefile
+	include $(ROOT)/shared.Makefile
 endif
 
 
