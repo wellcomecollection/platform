@@ -230,7 +230,7 @@ sbt-deploy: \
 # Tasks for running terraform #
 
 ## Run a plan on main stack
-terraform-main-plan: .docker/terraform_ci
+terraform-main-plan: uptodate-git .docker/terraform_ci
 	docker run -v $$(pwd)/terraform:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply on main stack
@@ -242,7 +242,7 @@ terraform-main-apply: .docker/terraform_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
 
 ## Run a plan on lambda stack
-terraform-lambda-plan: .docker/terraform_ci .docker/_lambda_deps
+terraform-lambda-plan: uptodate-git .docker/terraform_ci .docker/_lambda_deps
 	docker run -v $$(pwd)/terraform:/terraform -v $$(pwd)/lambdas:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
 ## Run an apply on lambda stack
@@ -260,9 +260,14 @@ lint-ontologies: .docker/jslint_ci
 lint-python: .docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
+## Check a git repo is up to date with remote master
+uptodate-git: .docker/python3.6_ci
+	docker run -v $$HOME/.ssh:/root/.ssh -v $$(pwd):/data -e OP=is-master-head python3.6_ci:latest
+
 ## Run tests for our Lambda code
 lambdas-test: .docker/python3.6_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
+
 
 format-terraform: .docker/terraform_ci
 	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -e OP=fmt terraform_ci

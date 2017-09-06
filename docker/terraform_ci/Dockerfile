@@ -14,7 +14,6 @@ ENV TERRAFORM_VERSION=0.10.2
 COPY install_terraform.sh /install_terraform.sh
 RUN /install_terraform.sh
 
-COPY is_up_to_date_with_master.py /app/is_up_to_date_with_master.py
 COPY plan.sh /app/plan.sh
 COPY run.sh /app/run.sh
 COPY notify.sh /app/notify.sh
