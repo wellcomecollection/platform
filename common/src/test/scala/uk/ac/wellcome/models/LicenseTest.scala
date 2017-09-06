@@ -17,16 +17,10 @@ class LicenseTest extends FunSpec with Matchers {
     assertDeserialisationSucceededForType[License]()
   }
 
-  it("should deserialise a JSON string as a BaseLicense") {
-    // Because BaseLicense is an abstract type, Jackson can't deserialise it
-    // without an annotation from us.
-    assertDeserialisationSucceededForType[License]()
-  }
-
   def assertDeserialisationSucceededForType[T <: License]()(implicit m: Manifest[T]) = {
-    val licenseType = "CC-Test"
-    val label = "A fictional license for testing"
-    val url = "http://creativecommons.org/licenses/test/-1.0/"
+    val licenseType = License_CC0.licenseType
+    val label = License_CC0.label
+    val url = License_CC0.url
 
     val jsonString = s"""
       {
