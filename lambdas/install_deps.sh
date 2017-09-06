@@ -22,16 +22,6 @@ build_lambda() {
 
   echo "*** Installing $COMMON_LIB dependencies for $lambda_dir"
   pip3 install $COMMON_LIB --target "$target_dir" --upgrade >> pip_install.log
-
-  if [[ -f "$lambda_dir/requirements.txt" ]]
-  then
-    echo "*** Found a requirements.txt"
-    pip3 install --requirement "$lambda_dir/requirements.txt" --target "$target_dir" --upgrade >> pip_install.log
-  else
-    echo "*** No requirements.txt found, skipping"
-  fi
-
-  echo ""
 }
 
 for dir in $(find "$LAMBDA_DIR" \( ! -regex '.*/\..*' \) -mindepth 1 -maxdepth 1 -type d )
