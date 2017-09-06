@@ -308,7 +308,7 @@ module "grafana" {
   nginx_uri                = "${module.ecr_repository_nginx_grafana.repository_url}:${var.release_ids["nginx_grafana"]}"
   healthcheck_path         = "/api/health"
   secondary_container_port = "3000"
-  app_uri                  = "grafana/grafana"
+  app_uri                  = "grafana/grafana:4.4.3"
 
   volume_name      = "grafana"
   volume_host_path = "${module.monitoring_userdata.efs_mount_directory}/grafana"
