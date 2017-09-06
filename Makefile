@@ -229,18 +229,26 @@ sbt-deploy: \
 
 # Tasks for running terraform #
 
+## Run a plan on main stack
+terraform-main-plan: .docker/terraform_ci
+	docker run -v $$(pwd)/terraform:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
+
+## Run an apply on main stack
+terraform-main-apply: .docker/terraform_ci
+	docker run -v $$(pwd)/terraform:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
+
+
 .docker/_lambda_deps: .docker/python3.6_ci
 	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
 	mkdir -p .docker && touch .docker/_lambda_deps
 
-## Run a plan
-terraform-plan: .docker/terraform_ci .docker/_lambda_deps
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
+## Run a plan on lambda stack
+terraform-lambda-plan: .docker/terraform_ci .docker/_lambda_deps
+	docker run -v $$(pwd)/terraform:/terraform -v $$(pwd)/lambdas:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
 
-## Run an apply
-terraform-apply: .docker/terraform_ci
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
-
+## Run an apply on lambda stack
+terraform-lambda-apply: .docker/terraform_ci
+	docker run -v $$(pwd)/terraform:/terraform -v $$(pwd)/lambdas:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 # Tasks for running linting #
@@ -254,7 +262,7 @@ lint-python: .docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
 ## Run tests for our Lambda code
-test-lambdas: .docker/python3.6_ci
+lambdas-test: .docker/python3.6_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
 
 format-terraform: .docker/terraform_ci

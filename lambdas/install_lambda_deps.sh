@@ -12,7 +12,6 @@ set -o nounset
 LAMBDA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 COMMON_LIB="$LAMBDA_DIR/common"
 
-
 # Install dependencies for a given Lambda directory
 build_lambda() {
   lambda_dir="$1/src"
@@ -22,7 +21,6 @@ build_lambda() {
   cp -r $lambda_dir $target_dir
 
   echo "*** Installing $COMMON_LIB dependencies for $lambda_dir"
-
   pip3 install $COMMON_LIB --target "$target_dir" --upgrade >> pip_install.log
 
   if [[ -f "$lambda_dir/requirements.txt" ]]

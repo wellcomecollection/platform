@@ -7,8 +7,8 @@ the event to an SNS topic
 import json
 import os
 
-from dynamo_utils import DynamoEvent
-from sns_utils import publish_sns_message
+from utils.dynamo_utils import DynamoEvent
+from utils.sns_utils import publish_sns_message
 
 
 def main(event, _):
