@@ -21,7 +21,7 @@ build_lambda() {
   cp -r $lambda_dir $target_dir
 
   echo "*** Installing $COMMON_LIB dependencies for $lambda_dir"
-  pip3 install $COMMON_LIB --target "$target_dir" --upgrade >> pip_install.log
+  cp -r "$COMMON_LIB/utils" "$target_dir"
 }
 
 for dir in $(find "$LAMBDA_DIR" \( ! -regex '.*/\..*' \) -mindepth 1 -maxdepth 1 -type d )
