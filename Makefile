@@ -1,4 +1,4 @@
-include builds.Makefile
+include shared.Makefile
 include loris/Makefile
 
 
