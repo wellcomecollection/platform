@@ -10,8 +10,6 @@ RUN pip install pytest
 
 RUN pip install moto==1.0.1
 
-RUN pip install simplejson
-
 COPY is_up_to_date_with_master.py /app/is_up_to_date_with_master.py
 
 COPY run.sh /app/run.sh
