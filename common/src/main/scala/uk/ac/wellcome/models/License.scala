@@ -3,7 +3,11 @@ package uk.ac.wellcome.models
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode}
+import com.fasterxml.jackson.databind.{
+  DeserializationContext,
+  JsonDeserializer,
+  JsonNode
+}
 
 @JsonDeserialize(using = classOf[LicenseDeserialiser])
 sealed trait License {
@@ -14,14 +18,16 @@ sealed trait License {
 }
 
 class LicenseDeserialiser extends JsonDeserializer[License] {
-  override def deserialize(p: JsonParser, ctxt: DeserializationContext): License = {
+
+  override def deserialize(p: JsonParser,
+                           ctxt: DeserializationContext): License = {
     val node: JsonNode = p.getCodec.readTree(p)
     val licenseType = node.get("licenseType").asText
     println(s"got licenseType: $licenseType")
     createLicense(licenseType)
   }
-  private def createLicense(
-                     licenseType: String): License = {
+
+  private def createLicense(licenseType: String): License = {
     licenseType match {
       case s: String if s == License_CCBY.licenseType => License_CCBY
       case s: String if s == License_CCBYNC.licenseType => License_CCBYNC
