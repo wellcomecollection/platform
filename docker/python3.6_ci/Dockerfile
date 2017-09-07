@@ -13,6 +13,7 @@ RUN pip install moto==1.0.1
 COPY is_up_to_date_with_master.py /app/is_up_to_date_with_master.py
 
 COPY run.sh /app/run.sh
+COPY test.sh /app/test.sh
 
 WORKDIR /data
 
