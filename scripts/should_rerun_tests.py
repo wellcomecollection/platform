@@ -22,7 +22,7 @@ def should_run_tests(changed_files, task):
     """
     Given a set of changed files, check if we need to run tests.
     """
-    if task in ('check-format', 'lint-lambdas', 'lint-ontologies'):
+    if task in 'check-format':
         raise ShouldRebuild('Linting/formatting tasks should always run')
 
     if 'Makefile' in changed_files:
