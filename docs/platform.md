@@ -35,3 +35,40 @@ There are 3 kinds of project currently in use:
     - Purpose of project
     - High level technical overview of services (how it interacts with other services, dependencies)
 
+## Continuous Integration
+
+Currently our project builds in [Travis CI](https://travis-ci.org/wellcometrust/platform).
+
+Add your `Make` tasks to the build matrix in `/.travis.yml`.
+
+```yml
+env:
+  global:
+    - ...
+  matrix:
+    - TASK=my_project-test
+    - TASK=...
+```
+
+## Monitoring
+
+### CloudWatch Metrics
+
+We use Grafana at: [https://monitoring.wellcomecollection.org](https://monitoring.wellcomecollection.org)
+
+This is available only to Wellcome internal IP addresses.
+
+You can build your own dashboards based on CloudWatch data that will be persisted when saved.
+
+### ECS Service dashboard
+
+ECS Cluster and Service status can be reviewed using our [ECS Dashboard](https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash/index.html).
+
+The dashboard will update automatically to include new services and clusters within the `digital-platform` AWS Account.
+
+### Slack Bot
+
+CloudWatch Alarms can be directed to the `post_to_slack` lambda via an SNS topic.
+
+Alerts will appear in the `#digital-platform` Wellcome Slack channel.
+
