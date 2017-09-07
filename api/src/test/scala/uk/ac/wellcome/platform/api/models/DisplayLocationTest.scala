@@ -18,11 +18,7 @@ class DisplayLocationTest extends FunSpec with Matchers {
 
     displayLocation.locationType shouldBe locationType
     displayLocation.url shouldBe thumbnailUrl
-    displayLocation.license shouldBe DisplayLicense(
-      licenseType = License_CCBY.licenseType,
-      label = License_CCBY.label,
-      url = License_CCBY.url
-    )
+    displayLocation.license shouldBe DisplayLicense(internalLocation.license)
     displayLocation.ontologyType shouldBe "Location"
   }
 }
