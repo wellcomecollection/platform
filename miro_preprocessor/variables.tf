@@ -12,7 +12,7 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "dash_bucket" {
-  description = "S3 bucket hosting our dashboard"
-  default     = "wellcome-platform-dash"
+variable "release_ids" {
+  description = "Release tags for Miro preprocessor"
+  type        = "map"
 }
