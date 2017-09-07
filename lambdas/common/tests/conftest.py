@@ -3,6 +3,10 @@ from moto import mock_ec2, mock_autoscaling, mock_ecs, mock_sns, mock_sqs
 import pytest
 
 
+def pytest_runtest_setup(item):
+    set_region()
+
+
 @pytest.fixture()
 def set_region():
     # Need this otherwise boto complains about missing region
