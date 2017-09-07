@@ -259,7 +259,7 @@ format: \
 	format-terraform \
 	format-scala
 
-check-format: format lint-python
+check-format: format lint-python lint-ontologies
 	git diff --exit-code
 
 
