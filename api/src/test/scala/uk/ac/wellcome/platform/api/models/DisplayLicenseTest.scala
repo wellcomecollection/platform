@@ -6,20 +6,11 @@ import uk.ac.wellcome.models._
 class DisplayLicenseTest extends FunSpec with Matchers {
 
   it("should read a License as a DisplayLicense correctly") {
-    val licenseType = "CC-Test"
-    val label = "A fictional license for testing"
-    val url = "http://creativecommons.org/licenses/test/-1.0/"
+    val displayLicense = DisplayLicense(License_CCBY)
 
-    val internalLicense = License(
-      licenseType = licenseType,
-      label = label,
-      url = url
-    )
-    val displayLicense = DisplayLicense(internalLicense)
-
-    displayLicense.licenseType shouldBe licenseType
-    displayLicense.label shouldBe label
-    displayLicense.url shouldBe url
+    displayLicense.licenseType shouldBe License_CCBY.licenseType
+    displayLicense.label shouldBe License_CCBY.label
+    displayLicense.url shouldBe License_CCBY.url
     displayLicense.ontologyType shouldBe "License"
   }
 }

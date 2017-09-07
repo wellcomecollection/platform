@@ -1,12 +1,13 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 
-class ItemTest extends FunSpec with Matchers {
+class ItemTest extends FunSpec with Matchers with JsonTestUtil {
 
   val identifiedItemJson: String =
-    """
+    s"""
       |{
       |  "canonicalId": "canonicalId",
       |  "identifiers": [
@@ -19,9 +20,9 @@ class ItemTest extends FunSpec with Matchers {
       |    {
       |      "locationType": "location",
       |      "license": {
-      |        "licenseType": "license",
-      |        "label": "label",
-      |        "url": "http://www.example.com",
+      |        "licenseType": "${License_CCBY.licenseType}",
+      |        "label": "${License_CCBY.label}",
+      |        "url": "${License_CCBY.url}",
       |        "type": "License"
       |      },
       |      "type": "Location"
@@ -29,10 +30,10 @@ class ItemTest extends FunSpec with Matchers {
       |  ],
       |  "type": "Item"
       |}
-    """.stripMargin.replaceAll("\\s", "")
+    """.stripMargin
 
   val unidentifiedItemJson: String =
-    """
+    s"""
       |{
       |  "identifiers": [
       |    {
@@ -44,9 +45,9 @@ class ItemTest extends FunSpec with Matchers {
       |    {
       |      "locationType": "location",
       |      "license": {
-      |        "licenseType": "license",
-      |        "label": "label",
-      |        "url": "http://www.example.com",
+      |        "licenseType": "${License_CCBY.licenseType}",
+      |        "label": "${License_CCBY.label}",
+      |        "url": "${License_CCBY.url}",
       |        "type": "License"
       |      },
       |      "type": "Location"
@@ -54,18 +55,12 @@ class ItemTest extends FunSpec with Matchers {
       |  ],
       |  "type": "Item"
       |}
-    """.stripMargin.replaceAll("\\s", "")
-
-  val license = License(
-    licenseType = "license",
-    label = "label",
-    url = "http://www.example.com"
-  )
+    """.stripMargin
 
   val location = Location(
     locationType = "location",
     url = None,
-    license = license
+    license = License_CCBY
   )
 
   val identifier = SourceIdentifier(
@@ -89,7 +84,7 @@ class ItemTest extends FunSpec with Matchers {
     val result = JsonUtil.toJson(unidentifiedItem)
 
     result.isSuccess shouldBe true
-    result.get shouldBe unidentifiedItemJson
+    assertJsonStringsAreEqual(result.get, unidentifiedItemJson)
   }
 
   it("should deserialize a JSON string as a unidentified Item") {
@@ -103,7 +98,7 @@ class ItemTest extends FunSpec with Matchers {
     val result = JsonUtil.toJson(identifiedItem)
 
     result.isSuccess shouldBe true
-    result.get shouldBe identifiedItemJson
+    assertJsonStringsAreEqual(result.get, identifiedItemJson)
   }
 
   it("should deserialize a JSON string as a identified Item") {
