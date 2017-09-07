@@ -3,7 +3,7 @@ package uk.ac.wellcome.metrics
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.PutMetricDataRequest
 import org.mockito.ArgumentCaptor
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -16,7 +16,7 @@ class MetricsSenderTest
     extends FunSpec
     with MockitoSugar
     with Matchers
-    with ScalaFutures {
+    with ScalaFutures with Eventually{
 
   import org.mockito.Matchers.any
   import org.mockito.Mockito._
@@ -35,18 +35,20 @@ class MetricsSenderTest
 
       whenReady(future) { result =>
         result shouldBe expectedResult
+        eventually {
 
-        verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
+          verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
-        capture.getAllValues.exists { request: PutMetricDataRequest =>
-          val item = request.getMetricData()
-          (item.head.getValue == 1.0) && item.head.getMetricName == "success"
-        } shouldBe true
+          capture.getAllValues.exists { request: PutMetricDataRequest =>
+            val item = request.getMetricData()
+            (item.head.getValue == 1.0) && item.head.getMetricName == "success"
+          } shouldBe true
 
-        capture.getAllValues.exists { request: PutMetricDataRequest =>
-          val item = request.getMetricData()
-          (item.head.getValue > 100) && (item.head.getMetricName == "bar")
-        } shouldBe true
+          capture.getAllValues.exists { request: PutMetricDataRequest =>
+            val item = request.getMetricData()
+            (item.head.getValue > 100) && (item.head.getMetricName == "bar")
+          } shouldBe true
+        }
       }
     }
 
@@ -61,16 +63,18 @@ class MetricsSenderTest
       val future = metricsSender.timeAndCount(metricName, timedFunction)
 
       whenReady(future.failed) { _ =>
-        verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
+        eventually {
+          verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
-        capture.getAllValues.exists { request: PutMetricDataRequest =>
-          val item = request.getMetricData
-          (item.head.getValue == 1.0) && item.head.getMetricName == "failure"
-        } shouldBe true
+          capture.getAllValues.exists { request: PutMetricDataRequest =>
+            val item = request.getMetricData
+            (item.head.getValue == 1.0) && item.head.getMetricName == "failure"
+          } shouldBe true
 
-        capture.getAllValues.exists { request: PutMetricDataRequest =>
-          request.getMetricData.head.getMetricName == "bar"
-        } shouldBe true
+          capture.getAllValues.exists { request: PutMetricDataRequest =>
+            request.getMetricData.head.getMetricName == "bar"
+          } shouldBe true
+        }
       }
     }
   }
@@ -86,8 +90,10 @@ class MetricsSenderTest
       val metricFuture = metricsSender.incrementCount("foo", expectedValue)
 
       whenReady(metricFuture) { _ =>
-        verify(amazonCloudWatch).putMetricData(capture.capture())
-        capture.getValue.getMetricData.head.getValue shouldBe expectedValue
+        eventually {
+          verify(amazonCloudWatch).putMetricData(capture.capture())
+          capture.getValue.getMetricData.head.getValue shouldBe expectedValue
+        }
       }
     }
 
@@ -119,8 +125,10 @@ class MetricsSenderTest
       val metricFuture = metricsSender.sendTime("foo", expectedValue)
 
       whenReady(metricFuture) { _ =>
-        verify(amazonCloudWatch).putMetricData(capture.capture())
-        capture.getValue.getMetricData.head.getValue shouldBe expectedValue.length
+        eventually {
+          verify(amazonCloudWatch).putMetricData(capture.capture())
+          capture.getValue.getMetricData.head.getValue shouldBe expectedValue.length
+        }
       }
     }
 
