@@ -217,10 +217,6 @@ case class MiroTransformable(MiroID: String,
       ))
   }
 
-  // The ID in the Miro record is an 8-digit number with a check digit
-  // (which may be x), but the system number is 7-digits, sans checksum.
-  val innopacIDregex = """^([0-9]{7})[0-9xX]$""".r
-
   def getIdentifiers(miroData: MiroTransformableData): List[SourceIdentifier] = {
     val miroIDList = List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
@@ -233,7 +229,10 @@ case class MiroTransformable(MiroID: String,
     // IDs but different prefixes.
     val sierraList: List[SourceIdentifier] = miroData.innopacID match {
       case Some(s) => {
-        val regexMatch = innopacIDregex.unapplySeq(s)
+
+        // The ID in the Miro record is an 8-digit number with a check digit
+        // (which may be x), but the system number is 7-digits, sans checksum.
+        val regexMatch = """^([0-9]{7})[0-9xX]$""".r.unapplySeq(s)
         regexMatch match {
           case Some(s) =>
             s.map { id =>
