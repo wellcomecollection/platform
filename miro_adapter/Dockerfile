@@ -13,4 +13,4 @@ RUN pip3 install -r requirements.txt
 
 COPY . /miro_adapter
 
-CMD ["/miro_adapter/run.sh"]
+CMD ["/miro_adapter/run_miro_adapter.sh"]

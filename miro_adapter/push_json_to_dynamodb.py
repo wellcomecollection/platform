@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Parse image records from a Miro export and push them into a DynamoDB table.
+Read the Miro JSON records from S3, and push them to DynamoDB.
 
 Usage:
-  miro_adapter.py --table=<TABLE> --collection=<COLLECTION> --bucket=<BUCKET> --key=<KEY>
+  miro_adapter.py --table=<TABLE> --collection=<COLLECTION> --bucket=<BUCKET> --json=<KEY>
   miro_adapter.py -h | --help
 
 Options:
   -h --help                   Show this screen.
   --table=<TABLE>             DynamoDB table to write the Miro data to.
   --collection=<COLLECTION>   Name of the associated Miro images collection.
-  --bucket=<BUCKET>           S3 bucket containing the Miro XML dumps.
-  --key=<KEY>                 Key of the Miro XML dump in the S3 bucket.
+  --bucket=<BUCKET>           S3 bucket containing the Miro JSON dumps.
+  --json=<KEY>                Key of the Miro JSON dump in the S3 bucket.
 
 """
 
@@ -22,7 +22,7 @@ import time
 import boto3
 import docopt
 
-from utils import generate_images
+from utils import read_json_lines_from_s3
 
 
 def push_to_dynamodb(table_name, collection_name, image_data):
@@ -40,7 +40,7 @@ def push_to_dynamodb(table_name, collection_name, image_data):
                 Item={
                     'MiroID': image['image_no_calc'],
                     'MiroCollection': collection_name,
-                    'ReindexShard': 'default',
+                    'ReindexShard': collection_name,
                     'ReindexVersion': 1,
                     'data': json.dumps(image, separators=(',', ':'))
                 }
@@ -51,9 +51,12 @@ def push_to_dynamodb(table_name, collection_name, image_data):
 
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
-    image_data = generate_images(bucket=args['--bucket'], key=args['--key'])
+
+    bucket = args['--bucket']
+    json_key = args['--json']
+
     push_to_dynamodb(
         table_name=args['--table'],
         collection_name=args['--collection'],
-        image_data=image_data
+        image_data=read_json_lines_from_s3(bucket=bucket, key=json_key)
     )
