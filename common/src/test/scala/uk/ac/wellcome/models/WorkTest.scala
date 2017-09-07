@@ -1,12 +1,21 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 
-class WorkTest extends FunSpec with Matchers {
+class WorkTest extends FunSpec with Matchers with JsonTestUtil {
+
+  private val license_CCBYJson =
+    s"""{
+            "licenseType": "${License_CCBY.licenseType}",
+            "label": "${License_CCBY.label}",
+            "url": "${License_CCBY.url}",
+            "type": "License"
+          }"""
 
   val identifiedWorkJson: String =
-    """
+    s"""
       |{
       |  "title": "title",
       |  "identifiers": [
@@ -42,12 +51,7 @@ class WorkTest extends FunSpec with Matchers {
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
-      |    "license": {
-      |      "licenseType": "license",
-      |      "label": "label",
-      |      "url": "http://www.example.com",
-      |      "type": "License"
-      |    },
+      |    "license": $license_CCBYJson,
       |    "type": "Location"
       |  },
       |  "items": [
@@ -62,12 +66,7 @@ class WorkTest extends FunSpec with Matchers {
       |      "locations": [
       |        {
       |          "locationType": "location",
-      |          "license": {
-      |            "licenseType": "license",
-      |            "label": "label",
-      |            "url": "http://www.example.com",
-      |            "type": "License"
-      |          },
+      |          "license": $license_CCBYJson,
       |          "type": "Location"
       |        }
       |      ],
@@ -76,10 +75,10 @@ class WorkTest extends FunSpec with Matchers {
       |  ],
       |  "type": "Work"
       |}
-    """.stripMargin.replaceAll("\\s", "")
+    """.stripMargin
 
   val unidentifiedWorkJson: String =
-    """
+    s"""
       |{
       |  "title": "title",
       |  "identifiers": [
@@ -114,12 +113,7 @@ class WorkTest extends FunSpec with Matchers {
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
-      |    "license": {
-      |      "licenseType": "license",
-      |      "label": "label",
-      |      "url": "http://www.example.com",
-      |      "type": "License"
-      |    },
+      |    "license": $license_CCBYJson,
       |    "type": "Location"
       |  },
       |  "items": [
@@ -134,12 +128,7 @@ class WorkTest extends FunSpec with Matchers {
       |      "locations": [
       |        {
       |          "locationType": "location",
-      |          "license": {
-      |            "licenseType": "license",
-      |            "label": "label",
-      |            "url": "http://www.example.com",
-      |            "type": "License"
-      |          },
+      |          "license": $license_CCBYJson,
       |          "type": "Location"
       |        }
       |      ],
@@ -148,18 +137,12 @@ class WorkTest extends FunSpec with Matchers {
       |  ],
       |  "type": "Work"
       |}
-    """.stripMargin.replaceAll("\\s", "")
-
-  val license = License(
-    licenseType = "license",
-    label = "label",
-    url = "http://www.example.com"
-  )
+    """.stripMargin
 
   val location = Location(
     locationType = "location",
     url = None,
-    license = license
+    license = License_CCBY
   )
 
   val identifier = SourceIdentifier(
@@ -204,7 +187,7 @@ class WorkTest extends FunSpec with Matchers {
     val result = JsonUtil.toJson(unidentifiedWork)
 
     result.isSuccess shouldBe true
-    result.get shouldBe unidentifiedWorkJson
+    assertJsonStringsAreEqual(result.get, unidentifiedWorkJson)
   }
 
   it("should deserialize a JSON string as a unidentified Work") {
@@ -220,7 +203,7 @@ class WorkTest extends FunSpec with Matchers {
     print(result)
 
     result.isSuccess shouldBe true
-    result.get shouldBe identifiedWorkJson
+    assertJsonStringsAreEqual(result.get, identifiedWorkJson)
   }
 
   it("should deserialize a JSON string as a identified Item") {

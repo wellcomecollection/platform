@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 case class Location(
   locationType: String,
   url: Option[String] = None,
-  license: BaseLicense
+  license: License
 ) {
   @JsonProperty("type") val ontologyType: String = "Location"
 }
