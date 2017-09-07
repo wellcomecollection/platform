@@ -10,10 +10,6 @@ class DisplayItemTest extends FunSpec with Matchers {
     val thumbnailUrl = Some("https://iiif.example.org/V0000001/default.jpg")
     val locationType = "thumbnail-image"
 
-    val licenseType = "CC-Test"
-    val licenseLabel = "A fictional license for testing"
-    val licenseUrl = "http://creativecommons.org/licenses/test/-1.0/"
-
     Location(
       locationType = locationType,
       url = thumbnailUrl,
