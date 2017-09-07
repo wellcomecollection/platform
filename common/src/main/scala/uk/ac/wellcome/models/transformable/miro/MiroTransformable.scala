@@ -235,12 +235,14 @@ case class MiroTransformable(MiroID: String,
       case Some(s) => {
         val regexMatch = innopacIDregex.unapplySeq(s)
         regexMatch match {
-          case Some(s) => s.map { id =>
-            SourceIdentifier(IdentifierSchemes.sierraSystemNumber, s"b$id")
-          }
-          case _ => throw new RuntimeException(
-            s"Expected 8-digit INNOPAC ID or nothing, got ${miroData.innopacID}"
-          )
+          case Some(s) =>
+            s.map { id =>
+              SourceIdentifier(IdentifierSchemes.sierraSystemNumber, s"b$id")
+            }
+          case _ =>
+            throw new RuntimeException(
+              s"Expected 8-digit INNOPAC ID or nothing, got ${miroData.innopacID}"
+            )
         }
       }
       case None => List()
