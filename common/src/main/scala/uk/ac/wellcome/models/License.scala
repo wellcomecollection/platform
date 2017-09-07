@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.{
   JsonDeserializer,
   JsonNode
 }
+import com.twitter.inject.Logging
 
 @JsonDeserialize(using = classOf[LicenseDeserialiser])
 sealed trait License {
@@ -17,7 +18,7 @@ sealed trait License {
   @JsonProperty("type") val ontologyType: String = "License"
 }
 
-class LicenseDeserialiser extends JsonDeserializer[License] {
+class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
 
   override def deserialize(p: JsonParser,
                            ctxt: DeserializationContext): License = {
@@ -33,6 +34,10 @@ class LicenseDeserialiser extends JsonDeserializer[License] {
       case s: String if s == License_CCBYNCND.licenseType => License_CCBYNCND
       case s: String if s == License_CC0.licenseType => License_CC0
       case s: String if s == License_PDM.licenseType => License_PDM
+      case licenseType =>
+        val errorMessage = s"$licenseType is not a valid licenseType"
+        error(errorMessage)
+        throw new Exception(errorMessage)
     }
   }
 }
