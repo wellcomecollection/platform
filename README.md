@@ -1,7 +1,7 @@
 # Digital Platform
 The new Wellcome Collection digital platform, exploring approaches to building an API that searches our archive collections.
 
-[![Build Status](https://travis-ci.org/wellcometrust/platform-api.svg?branch=master)](https://travis-ci.org/wellcometrust/platform-api)
+[![Build Status](https://travis-ci.org/wellcometrust/platform.svg?branch=master)](https://travis-ci.org/wellcometrust/platform)
 
 ## What's the "Wellcome digital platform"?
 
