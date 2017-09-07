@@ -217,15 +217,46 @@ case class MiroTransformable(MiroID: String,
       ))
   }
 
+  def getIdentifiers(miroData: MiroTransformableData): List[SourceIdentifier] = {
+    val miroIDList = List(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
+    )
+
+    // Add the Sierra system number from the INNOPAC ID, if it's present.
+    //
+    // We add a b-prefix because everything in Miro is a bibliographic record,
+    // but there are other types in Sierra (e.g. item, holding) with matching
+    // IDs but different prefixes.
+    val sierraList: List[SourceIdentifier] = miroData.innopacID match {
+      case Some(s) => {
+
+        // The ID in the Miro record is an 8-digit number with a check digit
+        // (which may be x), but the system number is 7-digits, sans checksum.
+        val regexMatch = """^([0-9]{7})[0-9xX]$""".r.unapplySeq(s)
+        regexMatch match {
+          case Some(s) =>
+            s.map { id =>
+              SourceIdentifier(IdentifierSchemes.sierraSystemNumber, s"b$id")
+            }
+          case _ =>
+            throw new RuntimeException(
+              s"Expected 8-digit INNOPAC ID or nothing, got ${miroData.innopacID}"
+            )
+        }
+      }
+      case None => List()
+    }
+
+    miroIDList ++ sierraList
+  }
+
   override def transform: Try[Work] = Try {
 
     val miroData = MiroTransformableData.create(data)
     val (title, description) = getTitleAndDescription(miroData)
-    val identifiers =
-      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
 
     Work(
-      identifiers = identifiers,
+      identifiers = getIdentifiers(miroData),
       title = title,
       description = description,
       createdDate = getCreatedDate(miroData),
