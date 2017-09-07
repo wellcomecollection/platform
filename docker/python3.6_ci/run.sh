@@ -3,35 +3,55 @@
 set -o errexit
 set -o nounset
 
-if [[ "$OP" == "lint" ]]
-then
+function install_dependencies {
+  echo "Installing dependencies ..."
+
+  if [ -e ./install_deps.sh ]
+  then
+    ./install_deps.sh
+    echo "Done."
+  else
+    echo "No install_deps.sh present."
+  fi
+}
+
+function lint_python {
   echo "Linting ..."
 
   flake8 --exclude six.py,six-*,structlog*,simplejson* **/*.py --ignore=E501
 
   echo "Done."
-elif [[ "$OP" == "test" ]]
-then
+}
+
+function run_tests {
   echo "Testing ..."
 
-  ./install_deps.sh
-  ./test_lambdas.sh
+  install_dependencies
+  /app/test.sh "$FIND_MATCH_PATHS"
 
   echo "Done."
-elif [[ "$OP" == "install-deps" ]]
-then
-  echo "Installing dependencies ..."
+}
 
-  ./install_deps.sh
-
-  echo "Done."
-elif [[ "$OP" == "is-master-head" ]]
-then
+function check_is_master {
   echo "Checking up to date with master ..."
 
   /app/is_up_to_date_with_master.py
 
   echo "Done."
+}
+
+if [[ "$OP" == "lint" ]]
+then
+  lint_python
+elif [[ "$OP" == "test" ]]
+then
+  run_tests
+elif [[ "$OP" == "install-deps" ]]
+then
+  install_dependencies
+elif [[ "$OP" == "is-master-head" ]]
+then
+  check_is_master
 else
   echo "Unrecognised operation: $OP! Stopping."
 
