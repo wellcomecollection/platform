@@ -1,5 +1,5 @@
 module "loris_cache_cleaner" {
-  source           = "./ecs_script_task"
+  source           = "../terraform/ecs_script_task"
   task_name        = "loris_cache_cleaner"
   app_uri          = "${module.ecr_repository_cache_cleaner.repository_url}:${var.release_ids["cache_cleaner"]}"
   task_role_arn    = "${module.ecs_cache_cleaner_iam.task_role_arn}"
@@ -16,7 +16,7 @@ module "loris_cache_cleaner" {
 }
 
 module "gatling_loris" {
-  source        = "./ecs_script_task"
+  source        = "../terraform/ecs_script_task"
   task_name     = "gatling_loris"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
@@ -31,7 +31,7 @@ module "gatling_loris" {
 }
 
 module "gatling_catalogue_api" {
-  source        = "./ecs_script_task"
+  source        = "../terraform/ecs_script_task"
   task_name     = "gatling_catalogue_api"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
@@ -46,7 +46,7 @@ module "gatling_catalogue_api" {
 }
 
 module "gatling_digital_experience" {
-  source        = "./ecs_script_task"
+  source        = "../terraform/ecs_script_task"
   task_name     = "gatling_digital_experience"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
@@ -61,7 +61,7 @@ module "gatling_digital_experience" {
 }
 
 module "miro_adapter" {
-  source        = "./ecs_script_task"
+  source        = "../terraform/ecs_script_task"
   task_name     = "miro_adapter"
   app_uri       = "${module.ecr_repository_miro_adapter.repository_url}:${var.release_ids["miro_adapter"]}"
   task_role_arn = "${module.ecs_miro_adapter_iam.task_role_arn}"
@@ -78,7 +78,7 @@ module "miro_adapter" {
 }
 
 module "elasticdump" {
-  source        = "./ecs_script_task"
+  source        = "../terraform/ecs_script_task"
   task_name     = "elasticdump"
   app_uri       = "${module.ecr_repository_elasticdump.repository_url}:${var.release_ids["elasticdump"]}"
   task_role_arn = "${module.ecs_elasticdump_iam.task_role_arn}"
@@ -94,7 +94,7 @@ module "elasticdump" {
 }
 
 module "update_api_docs" {
-  source        = "./ecs_script_task"
+  source        = "../terraform/ecs_script_task"
   task_name     = "update_api_docs"
   app_uri       = "${module.ecr_repository_update_api_docs.repository_url}:${var.release_ids["update_api_docs"]}"
   task_role_arn = "${module.ecs_update_api_docs_iam.task_role_arn}"

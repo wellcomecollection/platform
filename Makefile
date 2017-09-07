@@ -1,6 +1,6 @@
 include shared.Makefile
 include loris/Makefile
-
+include shared_infra/Makefile
 
 # Build the Docker images used for CI tasks.
 #
@@ -190,18 +190,6 @@ sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
 
 sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=transformer ./builds/publish_service.sh
-
-
-
-# Tasks for running terraform #
-
-## Run a plan on main stack
-terraform-main-plan: uptodate-git .docker/terraform_ci
-	docker run -v $$(pwd)/terraform:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
-
-## Run an apply on main stack
-terraform-main-apply: .docker/terraform_ci
-	docker run -v $$(pwd)/terraform:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
 
 
 .docker/_lambda_deps: .docker/python3.6_ci

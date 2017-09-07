@@ -1,5 +1,5 @@
 module "es_ingest_queue" {
-  source          = "./sqs"
+  source          = "../terraform/sqs"
   queue_name      = "es_ingest_queue"
   aws_region      = "${var.aws_region}"
   account_id      = "${data.aws_caller_identity.current.account_id}"
@@ -8,7 +8,7 @@ module "es_ingest_queue" {
 }
 
 module "id_minter_queue" {
-  source          = "./sqs"
+  source          = "../terraform/sqs"
   queue_name      = "id_minter_queue"
   aws_region      = "${var.aws_region}"
   account_id      = "${data.aws_caller_identity.current.account_id}"
@@ -17,7 +17,7 @@ module "id_minter_queue" {
 }
 
 module "miro_transformer_queue" {
-  source          = "./sqs"
+  source          = "../terraform/sqs"
   queue_name      = "miro_transformer_queue"
   aws_region      = "${var.aws_region}"
   account_id      = "${data.aws_caller_identity.current.account_id}"
@@ -26,7 +26,7 @@ module "miro_transformer_queue" {
 }
 
 module "calm_transformer_queue" {
-  source          = "./sqs"
+  source          = "../terraform/sqs"
   queue_name      = "calm_transformer_queue"
   aws_region      = "${var.aws_region}"
   account_id      = "${data.aws_caller_identity.current.account_id}"

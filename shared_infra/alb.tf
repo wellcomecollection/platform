@@ -1,5 +1,5 @@
 module "services_alb" {
-  source  = "./ecs_alb"
+  source  = "../terraform/ecs_alb"
   name    = "services"
   subnets = ["${module.vpc_services.subnets}"]
 
@@ -13,7 +13,7 @@ module "services_alb" {
 }
 
 module "monitoring_alb" {
-  source  = "./ecs_alb"
+  source  = "../terraform/ecs_alb"
   name    = "monitoring"
   subnets = ["${module.vpc_monitoring.subnets}"]
 
@@ -27,7 +27,7 @@ module "monitoring_alb" {
 }
 
 module "api_alb" {
-  source  = "./ecs_alb"
+  source  = "../terraform/ecs_alb"
   name    = "api"
   subnets = ["${module.vpc_api.subnets}"]
 
