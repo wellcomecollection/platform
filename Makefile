@@ -246,7 +246,7 @@ uptodate-git: .docker/python3.6_ci
 
 ## Run tests for our Lambda code
 lambdas-test: .docker/python3.6_ci
-	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test python3.6_ci:latest
+	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test -e FIND_MATCH_PATHS='./*/target common/tests' python3.6_ci:latest
 
 
 format-terraform: .docker/terraform_ci
@@ -259,7 +259,7 @@ format: \
 	format-terraform \
 	format-scala
 
-check-format: format
+check-format: format lint-python
 	git diff --exit-code
 
 

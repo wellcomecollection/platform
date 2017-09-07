@@ -13,7 +13,10 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             return obj.isoformat()
 
         if isinstance(obj, decimal.Decimal):
-            return str(obj)
+            if float(obj).is_integer():
+                return int(obj)
+            else:
+                return float(obj)
 
         return json.JSONEncoder.default(self, obj)
 
@@ -30,8 +33,7 @@ def publish_sns_message(topic_arn, message):
         Message=json.dumps({
             'default': json.dumps(
                 message,
-                cls=EnhancedJSONEncoder,
-                iterable_as_array=True
+                cls=EnhancedJSONEncoder
             )
         })
     )
