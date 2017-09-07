@@ -4,8 +4,6 @@
 set -o errexit
 set -o nounset
 
-LORIS_COMMIT="400bc3979a7dc3ff938abff84665c2731f750a69"
-
 # Install dependencies.  We don't include Apache because we're running
 # Loris with UWSGI and nginx, not Apache.
 apt-get install -y libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
