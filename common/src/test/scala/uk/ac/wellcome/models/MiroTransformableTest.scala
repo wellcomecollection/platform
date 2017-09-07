@@ -210,6 +210,12 @@ class MiroTransformableTest
     )
   }
 
+  it("should reject records with an invalid INNOPAC ID") {
+    assertTransformWorkFails(buildJSONForWork(
+      """"image_innopac_id": "this is neither numeric nor the right length""""
+    ))
+  }
+
   it("should have an empty list if no image_creator field is present") {
     val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
     work.creators shouldBe List[Agent]()
