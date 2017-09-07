@@ -1,6 +1,11 @@
 include shared.Makefile
 include loris/Makefile
+<<<<<<< HEAD
 include shared_infra/Makefile
+=======
+include lambdas/Makefile
+
+>>>>>>> Add Makefile for Lambdas
 
 # Build the Docker images used for CI tasks.
 #
@@ -192,17 +197,6 @@ sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to
 	PROJECT=transformer ./builds/publish_service.sh
 
 
-.docker/_lambda_deps: .docker/python3.6_ci
-	docker run -v $$(pwd)/lambdas:/data -e OP=install-deps python3.6_ci:latest
-
-## Run a plan on lambda stack
-terraform-lambda-plan: uptodate-git .docker/terraform_ci .docker/_lambda_deps
-	docker run -v $$(pwd)/terraform:/terraform -v $$(pwd)/lambdas:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=plan terraform_ci:latest
-
-## Run an apply on lambda stack
-terraform-lambda-apply: .docker/terraform_ci
-	docker run -v $$(pwd)/terraform:/terraform -v $$(pwd)/lambdas:/data -v $$HOME/.aws:/root/.aws -v $$HOME/.ssh:/root/.ssh -e OP=apply terraform_ci:latest
-
 
 # Tasks for running linting #
 
@@ -217,10 +211,6 @@ lint-python: .docker/python3.6_ci
 ## Check a git repo is up to date with remote master
 uptodate-git: .docker/python3.6_ci
 	docker run -v $$HOME/.ssh:/root/.ssh -v $$(pwd):/data -e OP=is-master-head python3.6_ci:latest
-
-## Run tests for our Lambda code
-lambdas-test: .docker/python3.6_ci
-	docker run -v $$(pwd)/lambdas:/data -e OP=test -e FIND_MATCH_PATHS='./*/target common/tests' python3.6_ci:latest
 
 
 format-terraform: .docker/terraform_ci
