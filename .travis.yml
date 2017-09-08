@@ -57,6 +57,7 @@ cache:
     - "id_minter/target"
     - "ingestor/target"
     - "transformer/target"
+    - "reindexer/target"
     - "/home/travis/docker/"
 
 script:
