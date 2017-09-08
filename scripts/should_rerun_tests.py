@@ -35,7 +35,7 @@ def should_run_tests(changed_files, task):
             'Changes to the Travis config always trigger a full run'
         )
 
-    if any(f.startswith('scripts/') for f in changed_files):
+    if any(f.startswith(('scripts/', 'builds/')) for f in changed_files):
         raise ShouldRebuild(
             'Changes to the build scripts always trigger a full run'
         )
