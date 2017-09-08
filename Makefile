@@ -232,7 +232,7 @@ uptodate-git: .docker/python3.6_ci
 
 ## Run tests for our Lambda code
 lambdas-test: .docker/python3.6_ci
-	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test -e FIND_MATCH_PATHS='./*/target common/tests' python3.6_ci:latest
+	docker run -v $$(pwd)/lambdas:/data -e OP=test -e FIND_MATCH_PATHS='./*/target common/tests' python3.6_ci:latest
 
 
 format-terraform: .docker/terraform_ci

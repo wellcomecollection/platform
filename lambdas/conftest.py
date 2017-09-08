@@ -19,7 +19,7 @@ def set_region():
     # After investigation this is not related to moto
     session = boto3.Session()
     region = session.region_name
-    boto3.setup_default_session(region_name=region)
+    boto3.setup_default_session(region_name='eu-west-1')
 
 
 @pytest.fixture()
@@ -38,7 +38,7 @@ def moto_start(set_region):
 
 
 @pytest.fixture()
-def sns_sqs(moto_start):
+def sns_sqs(set_region, moto_start):
     fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
     queue_name = "test-queue"
