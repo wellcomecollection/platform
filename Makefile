@@ -20,16 +20,17 @@ clean:
 .docker/terraform_ci:
 	./scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
 
-.docker/_build_deps:
-	pip3 install --upgrade boto3 docopt
-	mkdir -p .docker && touch .docker/_build_deps
-
 .docker/miro_adapter_tests:
 	./scripts/build_ci_docker_image.py \
 		--project=miro_adapter_tests \
 		--dir=miro_adapter \
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
+.docker/sbt_image_builder:
+	./scripts/build_ci_docker_image.py \
+		--project=sbt_image_builder \
+		--dir=builds \
+		--file=builds/sbt_image_builder.Dockerfile
 
 ## Build the image for gatling
 gatling-build: $(ROOT)/.docker/image_builder
@@ -151,20 +152,20 @@ sbt-test: \
 
 
 
-sbt-build-api: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=api
+sbt-build-api: .docker/sbt_image_builder
+	PROJECT=api ./builds/run_sbt_image_build.sh
 
-sbt-build-id_minter: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=id_minter
+sbt-build-id_minter: .docker/sbt_image_builder
+	PROJECT=id_minter ./builds/run_sbt_image_build.sh
 
-sbt-build-ingestor: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=ingestor
+sbt-build-ingestor: .docker/sbt_image_builder
+	PROJECT=ingestor ./builds/run_sbt_image_build.sh
 
-sbt-build-reindexer: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=reindexer
+sbt-build-reindexer: .docker/sbt_image_builder
+	PROJECT=reindexer ./builds/run_sbt_image_build.sh
 
-sbt-build-transformer: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=transformer
+sbt-build-transformer: .docker/sbt_image_builder
+	PROJECT=transformer ./builds/run_sbt_image_build.sh
 
 sbt-build: \
 	sbt-build-api	\
@@ -189,13 +190,6 @@ sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
 
 sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=transformer ./builds/publish_service.sh
-
-sbt-deploy: \
-	sbt-deploy-api	\
-	sbt-deploy-id_minter \
-	sbt-deploy-ingestor   \
-	sbt-deploy-reindexer	\
-	sbt-deploy-transformer
 
 
 
@@ -242,7 +236,7 @@ lambdas-test: .docker/python3.6_ci
 
 
 format-terraform: .docker/terraform_ci
-	./scripts/run_docker_with_aws_credentials.sh run -v $$(pwd):/data -e OP=fmt terraform_ci
+	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd):/data -e OP=fmt terraform_ci
 
 format-scala:
 	sbt scalafmt
