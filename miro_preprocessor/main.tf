@@ -1,9 +1,9 @@
 # Add your resorces here!
-module "miro_preprocessor" {
+module "xml_to_json_converter" {
   source        = "../terraform/ecs_script_task"
-  task_name     = "miro_preprocessor"
-  app_uri       = "${module.ecr_repository_miro_preprocessor.repository_url}:${var.release_ids["miro_adapter"]}"
-  task_role_arn = "${module.ecs_miro_preprocessor_iam.task_role_arn}"
+  task_name     = "xml_to_json_converter"
+  app_uri       = "${module.ecr_repository_xml_to_json_converter.repository_url}:${var.release_ids["xml_to_json_converter"]}"
+  task_role_arn = "${module.ecs_xml_to_json_converter_iam.task_role_arn}"
 
   # This script has to load the XML files into memory, so make sure it
   # has plenty of overhead.
@@ -15,18 +15,18 @@ module "miro_preprocessor" {
   ]
 }
 
-module "ecs_miro_preprocessor_iam" {
+module "ecs_xml_to_json_converter_iam" {
   source = "../terraform/ecs_iam"
-  name   = "miro_preprocessor"
+  name   = "xml_to_json_converter"
 }
 
-module "ecr_repository_miro_preprocessor" {
+module "ecr_repository_xml_to_json_converter" {
   source = "../terraform/ecr"
-  name   = "miro_preprocessor"
+  name   = "xml_to_json_converter"
 }
 
-resource "aws_iam_role_policy" "miro_preprocessor_read_from_s3" {
-  role   = "${module.ecs_miro_preprocessor_iam.task_role_name}"
+resource "aws_iam_role_policy" "xml_to_json_converter_read_from_s3" {
+  role   = "${module.ecs_xml_to_json_converter_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
 }
 
