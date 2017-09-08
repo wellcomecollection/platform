@@ -5,6 +5,8 @@ of the API can be found elsewhere (TODO: Link).
 
 *   [Docs for developers](developers.md) – tools, setup, etc.
 
+*   [Creating a new service](platform.md)
+
 *   [Architecture diagram](architecture.md)
 
 *   **Adapters:**
