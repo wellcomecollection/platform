@@ -9,17 +9,11 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture()
 def set_region():
-    # Need this otherwise boto complains about missing region
-    # in sns_utils.pblish_sns_message when trying to create client
-    # with sns = boto3.client('sns') (despite region being set with
-    # the environment variable AWS_DEFAULT_REGION, which should be
-    # read by default by boto)
-    # Weirdly enough it doesn't complain in this file when it tries
-    # to do the same thing.
-    # After investigation this is not related to moto
-    session = boto3.Session()
-    region = session.region_name
-    boto3.setup_default_session(region_name=region)
+    # Without this, boto3 is complaining about not having a region defined
+    # in tests (despite one being set in the Travis env variables and passed
+    # into the image).
+    # TODO: Investigate this properly.
+    boto3.setup_default_session(region_name='eu-west-1')
 
 
 @pytest.fixture()
@@ -38,7 +32,7 @@ def moto_start(set_region):
 
 
 @pytest.fixture()
-def sns_sqs(moto_start):
+def sns_sqs(set_region, moto_start):
     fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
     queue_name = "test-queue"

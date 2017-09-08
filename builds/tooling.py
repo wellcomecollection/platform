@@ -13,6 +13,10 @@ ROOT = subprocess.check_output([
 CURRENT_COMMIT = subprocess.check_output([
     'git', 'rev-parse', 'HEAD']).decode('ascii').strip()
 
+# Environment from environment environment variable!
+DEFAULT_BUILD_ENV = 'dev'
+PLATFORM_ENV = os.getenv('PLATFORM_ENV', DEFAULT_BUILD_ENV)
+
 
 def write_release_id(project, release_id):
     """

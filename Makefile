@@ -20,20 +20,21 @@ clean:
 .docker/terraform_ci:
 	./scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
 
-.docker/_build_deps:
-	pip3 install --upgrade boto3 docopt
-	mkdir -p .docker && touch .docker/_build_deps
-
 .docker/miro_adapter_tests:
 	./scripts/build_ci_docker_image.py \
 		--project=miro_adapter_tests \
 		--dir=miro_adapter \
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
+.docker/sbt_image_builder:
+	./scripts/build_ci_docker_image.py \
+		--project=sbt_image_builder \
+		--dir=builds \
+		--file=builds/sbt_image_builder.Dockerfile
 
 ## Build the image for gatling
 gatling-build: $(ROOT)/.docker/image_builder
-	PROJECT=gatling ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=gatling
 
 ## Deploy the image for gatling
 gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
@@ -41,7 +42,7 @@ gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: $(ROOT)/.docker/image_builder
-	PROJECT=cache_cleaner ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
@@ -50,7 +51,7 @@ cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
 
 ## Build the image for tif-metadata
 tif-metadata-build: $(ROOT)/.docker/image_builder
-	PROJECT=tif-metadata ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=tif-metadata
 
 ## Deploy the image for tif-metadata
 tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
@@ -58,7 +59,7 @@ tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
 
 
 miro_adapter-build: $(ROOT)/.docker/image_builder
-	PROJECT=miro_adapter FILE=miro_adapter/Dockerfile ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
 
 miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
 	rm -rf $$(pwd)/miro_adapter/__pycache__
@@ -70,29 +71,29 @@ miro_adapter-deploy: miro_adapter-build $(ROOT)/.docker/publish_service_to_aws
 
 
 elasticdump-build: $(ROOT)/.docker/image_builder
-	PROJECT=elasticdump ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=elasticdump
 
 elasticdump-deploy: elasticdump-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=elasticdump ./builds/publish_service.sh
 
 api_docs-build: $(ROOT)/.docker/image_builder
-	PROJECT=update_api_docs ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=update_api_docs
 
 api_docs-deploy: api_docs-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=update_api_docs ./builds/publish_service.sh
 
 
 nginx-build-api: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=api ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=api
 
 nginx-build-loris: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=loris ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=loris
 
 nginx-build-services: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=services ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=services
 
 nginx-build-grafana: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=grafana ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
@@ -136,9 +137,6 @@ sbt-test-id_minter:
 sbt-test-ingestor:
 	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
 
-sbt-test-miro_adapter:
-	sbt 'project miro_adapter' ';dockerComposeUp;test;dockerComposeStop'
-
 sbt-test-reindexer:
 	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
 
@@ -149,35 +147,30 @@ sbt-test: \
 	sbt-test-api	\
 	sbt-test-id_minter \
 	sbt-test-ingestor   \
-	sbt-test-miro_adapter \
 	sbt-test-reindexer	\
 	sbt-test-transformer
 
 
 
-sbt-build-api: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=api
+sbt-build-api: .docker/sbt_image_builder
+	PROJECT=api ./builds/run_sbt_image_build.sh
 
-sbt-build-id_minter: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=id_minter
+sbt-build-id_minter: .docker/sbt_image_builder
+	PROJECT=id_minter ./builds/run_sbt_image_build.sh
 
-sbt-build-ingestor: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=ingestor
+sbt-build-ingestor: .docker/sbt_image_builder
+	PROJECT=ingestor ./builds/run_sbt_image_build.sh
 
-sbt-build-miro_adapter: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=miro_adapter
+sbt-build-reindexer: .docker/sbt_image_builder
+	PROJECT=reindexer ./builds/run_sbt_image_build.sh
 
-sbt-build-reindexer: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=reindexer
-
-sbt-build-transformer: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=transformer
+sbt-build-transformer: .docker/sbt_image_builder
+	PROJECT=transformer ./builds/run_sbt_image_build.sh
 
 sbt-build: \
 	sbt-build-api	\
 	sbt-build-id_minter \
 	sbt-build-ingestor   \
-	sbt-build-miro_adapter \
 	sbt-build-reindexer	\
 	sbt-build-transformer
 
@@ -197,13 +190,6 @@ sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
 
 sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=transformer ./builds/publish_service.sh
-
-sbt-deploy: \
-	sbt-deploy-api	\
-	sbt-deploy-id_minter \
-	sbt-deploy-ingestor   \
-	sbt-deploy-reindexer	\
-	sbt-deploy-transformer
 
 
 
@@ -246,11 +232,11 @@ uptodate-git: .docker/python3.6_ci
 
 ## Run tests for our Lambda code
 lambdas-test: .docker/python3.6_ci
-	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd)/lambdas:/data -e OP=test -e FIND_MATCH_PATHS='./*/target common/tests' python3.6_ci:latest
+	docker run -v $$(pwd)/lambdas:/data -e OP=test -e FIND_MATCH_PATHS='./*/target common/tests' python3.6_ci:latest
 
 
 format-terraform: .docker/terraform_ci
-	./scripts/run_docker_with_aws_credentials.sh run -v $$(pwd):/data -e OP=fmt terraform_ci
+	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd):/data -e OP=fmt terraform_ci
 
 format-scala:
 	sbt scalafmt
