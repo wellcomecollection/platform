@@ -6,7 +6,9 @@ endif
 
 
 loris-build: $(ROOT)/.docker/image_builder
-	PROJECT=loris FILE=loris/Dockerfile $(ROOT)/builds/build_image.sh
+	$(ROOT)/scripts/run_docker_in_docker.sh image_builder \
+		--project=loris \
+		--file=loris/Dockerfile
 
 loris-run: loris-build
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \

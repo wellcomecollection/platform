@@ -26,7 +26,7 @@ build_lambda() {
 
 for dir in $(find "$LAMBDA_DIR" \( ! -regex '.*/\..*' \) -mindepth 1 -maxdepth 1 -type d )
 do
-  if [ "$COMMON_LIB" != "$dir" ]; then
+  if [[ "$COMMON_LIB" != "$dir" && "$(basename $dir)" != "__pycache__" ]]; then
     build_lambda "$dir"
   fi
 done
