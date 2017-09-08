@@ -5,7 +5,7 @@
 .lambda_hashes.json
 terraform.plan
 .terraform
-terraform/releases
+shared_infra/releases
 terraform.tfvars
 release_ids.tfvars
 terraform.tfstate.backup
