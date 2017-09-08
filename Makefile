@@ -250,7 +250,7 @@ lambdas-test: .docker/python3.6_ci
 
 
 format-terraform: .docker/terraform_ci
-	docker run -v $$(pwd):/data -v $$HOME/.aws:/root/.aws -e OP=fmt terraform_ci
+	./scripts/run_docker_with_aws_credentials.sh run -v $$(pwd):/data -e OP=fmt terraform_ci
 
 format-scala:
 	sbt scalafmt
