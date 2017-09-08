@@ -136,9 +136,6 @@ sbt-test-id_minter:
 sbt-test-ingestor:
 	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
 
-sbt-test-miro_adapter:
-	sbt 'project miro_adapter' ';dockerComposeUp;test;dockerComposeStop'
-
 sbt-test-reindexer:
 	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
 
@@ -149,7 +146,6 @@ sbt-test: \
 	sbt-test-api	\
 	sbt-test-id_minter \
 	sbt-test-ingestor   \
-	sbt-test-miro_adapter \
 	sbt-test-reindexer	\
 	sbt-test-transformer
 
@@ -164,9 +160,6 @@ sbt-build-id_minter: .docker/_build_deps
 sbt-build-ingestor: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=ingestor
 
-sbt-build-miro_adapter: .docker/_build_deps
-	./scripts/build_sbt_image.py --project=miro_adapter
-
 sbt-build-reindexer: .docker/_build_deps
 	./scripts/build_sbt_image.py --project=reindexer
 
@@ -177,7 +170,6 @@ sbt-build: \
 	sbt-build-api	\
 	sbt-build-id_minter \
 	sbt-build-ingestor   \
-	sbt-build-miro_adapter \
 	sbt-build-reindexer	\
 	sbt-build-transformer
 
