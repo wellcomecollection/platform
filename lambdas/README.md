@@ -1,13 +1,7 @@
 # lambdas
 
-This directory contains the source code for our AWS Lambdas.
+This directory contains the  AWS Lambdas pacakged up as a single "service".
 
-## common library
+## Overview
 
-Because of the slightly esoteric way we build our Lambdas, to add a file from the common lib to a package, you need to create a symlink from the right location.
-
-```
-$ cd /path/to/platform-infra
-$ cd lambdas/name-of-lambda
-$ ln -s ../common/sns_utils.py .
-```
+The lambdas in this directory comprise supporting functions for a number of the other services in this project. Ultimately they should be moved into the service they support rathr than being represented here.
