@@ -9,14 +9,6 @@ import subprocess
 ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
-# Hash of the current commit
-CURRENT_COMMIT = subprocess.check_output([
-    'git', 'rev-parse', 'HEAD']).decode('ascii').strip()
-
-# Environment from environment environment variable!
-DEFAULT_BUILD_ENV = 'dev'
-PLATFORM_ENV = os.getenv('PLATFORM_ENV', DEFAULT_BUILD_ENV)
-
 
 def changed_files(commit_range):
     """
@@ -33,18 +25,6 @@ def changed_files(commit_range):
         if filepath:
             files.add(filepath)
     return files
-
-
-def write_release_id(project, release_id):
-    """
-    Write a release ID to the .releases directory in the root of the repo.
-    """
-    releases_dir = os.path.join(ROOT, '.releases')
-    os.makedirs(releases_dir, exist_ok=True)
-
-    release_file = os.path.join(releases_dir, project)
-    with open(release_file, 'w') as f:
-        f.write(release_id)
 
 
 def mkdir_p(path):
