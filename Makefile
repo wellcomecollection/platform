@@ -33,7 +33,7 @@ clean:
 
 ## Build the image for gatling
 gatling-build: $(ROOT)/.docker/image_builder
-	PROJECT=gatling ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=gatling
 
 ## Deploy the image for gatling
 gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
@@ -41,7 +41,7 @@ gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: $(ROOT)/.docker/image_builder
-	PROJECT=cache_cleaner ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
@@ -50,7 +50,7 @@ cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
 
 ## Build the image for tif-metadata
 tif-metadata-build: $(ROOT)/.docker/image_builder
-	PROJECT=tif-metadata ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=tif-metadata
 
 ## Deploy the image for tif-metadata
 tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
@@ -58,7 +58,7 @@ tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
 
 
 miro_adapter-build: $(ROOT)/.docker/image_builder
-	PROJECT=miro_adapter FILE=miro_adapter/Dockerfile ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
 
 miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
 	rm -rf $$(pwd)/miro_adapter/__pycache__
@@ -70,29 +70,29 @@ miro_adapter-deploy: miro_adapter-build $(ROOT)/.docker/publish_service_to_aws
 
 
 elasticdump-build: $(ROOT)/.docker/image_builder
-	PROJECT=elasticdump ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=elasticdump
 
 elasticdump-deploy: elasticdump-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=elasticdump ./builds/publish_service.sh
 
 api_docs-build: $(ROOT)/.docker/image_builder
-	PROJECT=update_api_docs ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=update_api_docs
 
 api_docs-deploy: api_docs-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=update_api_docs ./builds/publish_service.sh
 
 
 nginx-build-api: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=api ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=api
 
 nginx-build-loris: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=loris ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=loris
 
 nginx-build-services: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=services ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=services
 
 nginx-build-grafana: $(ROOT)/.docker/image_builder
-	PROJECT=nginx VARIANT=grafana ./builds/build_image.sh
+	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
