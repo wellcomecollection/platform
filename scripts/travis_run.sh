@@ -8,7 +8,7 @@ make "$TASK"
 if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
 then
   if [[ "$TASK" != "sbt-test-common" &&
-        "$TASK" != "test-lambdas" &&
+        "$TASK" != "lambdas-test" &&
         "$TASK" != "loris-build" ]]
   then
     TASK="${TASK/build/deploy}"
