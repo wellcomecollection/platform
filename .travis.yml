@@ -46,21 +46,6 @@ install:
   # See https://github.com/travis-ci/travis-ci/issues/6534
   - sudo sysctl -w vm.max_map_count=262144
 
-  # Ensure terraform is installed
-  - |
-    if [[ "$TASK" == "check-format" ]]
-    then
-      repo_dir=$(pwd)
-      cd /tmp
-      curl https://releases.hashicorp.com/terraform/0.9.11/terraform_0.9.11_linux_amd64.zip -o terraform.zip
-      unzip -o terraform.zip
-      sudo mv terraform /usr/bin/terraform
-      cd $repo_dir
-    fi
-
-  # Install the AWS CLI tools
-  - pip install awscli
-
 cache:
   directories:
     - "~/.sbt"
