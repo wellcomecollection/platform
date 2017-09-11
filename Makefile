@@ -2,6 +2,7 @@ include shared.Makefile
 include loris/Makefile
 include lambdas/Makefile
 include shared_infra/Makefile
+include miro_preprocessor/Makefile
 
 
 ## Build the image for gatling
