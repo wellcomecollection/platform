@@ -4,10 +4,6 @@ module "xml_to_json_converter" {
   app_uri       = "${module.ecr_repository_xml_to_json_converter.repository_url}:${var.release_ids["xml_to_json_converter"]}"
   task_role_arn = "${module.ecs_xml_to_json_converter_iam.task_role_arn}"
 
-  # This script has to load the XML files into memory, so make sure it
-  # has plenty of overhead.
-  memory = 2000
-
   env_vars = [
     "{\"name\": \"BUCKET\", \"value\": \"${data.terraform_remote_state.platform.bucket_miro_data_id}\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
@@ -29,16 +25,32 @@ resource "aws_iam_role_policy" "xml_to_json_converter_read_from_s3" {
   policy = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
 }
 
+resource "aws_iam_role_policy" "xml_to_json_converter_read_from_s3" {
+  role   = "${module.ecs_xml_to_json_converter_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.s3_write_miro_data.json}"
+}
+
 data "aws_iam_policy_document" "s3_read_miro_data" {
   statement {
     actions = [
       "s3:Get*",
       "s3:List*",
+    ]
+
+    resources = [
+      "${data.terraform_remote_state.platform.bucket_miro_data_arn}/source",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "s3_write_miro_data" {
+  statement {
+    actions = [
       "s3:Put*",
     ]
 
     resources = [
-      "${data.terraform_remote_state.platform.bucket_miro_data_arn}",
+      "${data.terraform_remote_state.platform.bucket_miro_data_arn}/json",
     ]
   }
 }

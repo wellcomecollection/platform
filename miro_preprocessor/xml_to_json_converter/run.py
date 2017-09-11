@@ -30,8 +30,8 @@ import docopt
 from utils import generate_images
 
 
-def main(bucket, source_key, destination_key):
-    image_data = generate_images(bucket=bucket, key=source_key)
+def main(bucket, src_key, dst_key):
+    image_data = generate_images(bucket=bucket, key=src_key)
 
     tmp_json = tempfile.mktemp()
     os.makedirs(os.path.dirname(tmp_json), exist_ok=True)
@@ -45,7 +45,7 @@ def main(bucket, source_key, destination_key):
     s3 = boto3.client('s3')
     s3.upload_file(
         Bucket=bucket,
-        Key=destination_key,
+        Key=dst_key,
         Filename=tmp_json
     )
 
@@ -54,7 +54,9 @@ def main(bucket, source_key, destination_key):
 
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
+
     bucket = args['--bucket']
-    source_key = args['--src']
-    destination_key = args['--dst']
-    main(bucket, source_key, destination_key)
+    src_key = args['--src']
+    dst_key = args['--dst']
+
+    main(bucket, src_key, dst_key)

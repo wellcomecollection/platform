@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 
-import pytest
 from textwrap import dedent
 
 import boto3
 from moto import mock_s3
+import pytest
 
 import run
 

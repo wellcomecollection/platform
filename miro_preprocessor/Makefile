@@ -10,7 +10,7 @@ xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_bu
 		-v $(ROOT):/repo \
 		image_builder:latest \
 		--project=xml_to_json_converter \
-		--file=/repo/miro_preprocessor/xml_to_json_converter.Dockerfile
+		--file=miro_preprocessor/xml_to_json_converter.Dockerfile
 
 xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -47,7 +47,7 @@ miro_preprocessor-terraform-apply: $(ROOT)/.docker/terraform_ci
 	terraform_ci:latest
 
 miro_preprocessor-run:
-	echo "Not implemented!"
+	$(error Not implemented!)
 
 
 .PHONY: miro_preprocessor-build miro_preprocessor-test miro_preprocessor-run miro_preprocessor-publish
