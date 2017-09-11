@@ -1,4 +1,3 @@
-# Add your resorces here!
 module "xml_to_json_converter" {
   source        = "../terraform/ecs_script_task"
   task_name     = "xml_to_json_converter"
