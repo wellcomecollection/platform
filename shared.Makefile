@@ -44,4 +44,4 @@ $(ROOT)/.docker/miro_adapter_tests:
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
 clean:
-	rm -rf .docker
+	rm -rf $(ROOT)/.docker
