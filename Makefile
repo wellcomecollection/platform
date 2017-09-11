@@ -1,11 +1,8 @@
 include shared.Makefile
 include loris/Makefile
-<<<<<<< HEAD
-include shared_infra/Makefile
-=======
 include lambdas/Makefile
+include shared_infra/Makefile
 
->>>>>>> Add Makefile for Lambdas
 
 ## Build the image for gatling
 gatling-build: $(ROOT)/.docker/image_builder
