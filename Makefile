@@ -188,7 +188,7 @@ uptodate-git: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$HOME/.ssh:/root/.ssh -v $$(pwd):/data -e OP=is-master-head python3.6_ci:latest
 
 
-format-terraform: .docker/terraform_ci
+format-terraform: $(ROOT)/.docker/terraform_ci
 	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd):/data -e OP=fmt terraform_ci
 
 format-scala:
