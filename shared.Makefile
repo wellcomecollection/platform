@@ -44,4 +44,3 @@ $(ROOT)/.docker/miro_adapter_tests:
 
 clean:
 	rm -rf $(ROOT)/.docker
-

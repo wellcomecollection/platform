@@ -13,7 +13,7 @@ def test_publish_sns_message(sns_sqs):
     test_message = {
         'string': 'a',
         'number': 1,
-        'date':  datetime.strptime(
+        'date': datetime.strptime(
             'Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p'
         )
     }

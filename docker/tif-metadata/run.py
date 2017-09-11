@@ -133,7 +133,7 @@ def main():
 
     print(f"Downloading {job_s3_key}")
     client = boto3.client("s3")
-    
+
     job_filename = os.path.basename(job_s3_key)
     client.download_file(Bucket=job_bucket,
                          Key=job_s3_key,

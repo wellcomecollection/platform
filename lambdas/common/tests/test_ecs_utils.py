@@ -51,7 +51,8 @@ def test_get_cluster_arns():
 def test_get_cluster_arns_throws_EcsThrottleException():
     mock_ecs_client = Mock()
     mock_ecs_client.list_clusters.side_effect = ClientError(
-        error_response={'Error': {
+        error_response={
+            'Error': {
                 'Code': 'ThrottlingException'
             }
         },

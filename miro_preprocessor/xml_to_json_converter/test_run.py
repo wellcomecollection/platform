@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-from textwrap import dedent
-
 import boto3
 from moto import mock_s3
 import pytest
@@ -38,7 +36,7 @@ def test_creates_txt_with_all_images_json(set_region):
             <image_int_default></image_int_default>
             <image_artwork_date_from>01/01/2000</image_artwork_date_from>
             <image_artwork_date_to>31/12/2000</image_artwork_date_to>
-        </image>   
+        </image>
         <image>
             <image_no_calc>A0000002</image_no_calc>
             <image_int_default></image_int_default>
@@ -48,15 +46,15 @@ def test_creates_txt_with_all_images_json(set_region):
             <image_creator>
                 <_>Caspar Bauhin</_>
             </image_creator>
-        </image>   
+        </image>
         <image>
             <image_no_calc>A0000003</image_no_calc>
             <image_artwork_date_from>02/02/2000</image_artwork_date_from>
             <image_artwork_date_to>13/11/2000</image_artwork_date_to>
             <image_image_desc>Test Description of Image</image_image_desc>
         </image>
-    </rmxml>        
-    """
+    </rmxml>"""
+
     expected_txt_file = b"""{"image_no_calc":"A0000001","image_int_default":null,"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000"}
 {"image_no_calc":"A0000002","image_int_default":null,"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"]}
 {"image_no_calc":"A0000003","image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image"}

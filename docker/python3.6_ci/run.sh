@@ -18,7 +18,7 @@ function install_dependencies {
 function lint_python {
   echo "Linting ..."
 
-  flake8 --exclude six.py,six-*,structlog*,simplejson* **/*.py --ignore=E501
+  flake8 --exclude target  --ignore=E501
 
   echo "Done."
 }
