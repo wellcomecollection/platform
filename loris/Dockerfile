@@ -9,6 +9,10 @@ RUN pip install awscli
 
 ENV LORIS_COMMIT 1e5de1f8b4dedcd80506c1f531fc76caec8ad504
 
+# This is an sRGB color profile downloaded from
+# http://www.color.org/srgbprofiles.xalter
+COPY sRGB2014.icc /usr/share/color/icc/colord/sRGB2014.icc
+
 COPY install_loris.sh /install_loris.sh
 RUN /install_loris.sh
 
