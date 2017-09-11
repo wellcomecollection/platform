@@ -4,6 +4,7 @@ import json
 
 import boto3
 from lxml import etree
+from lazyreader import lazyread
 
 
 def _render_value(value):
@@ -75,20 +76,8 @@ def chunked_s3_reader(bucket, key, delimiter):
     """
     client = boto3.client('s3')
     obj = client.get_object(Bucket=bucket, Key=key)
-    running = b''
-    while True:
-        new_data = obj['Body'].read(1024)
-
-        # If a read from S3 doesn't return any new data, then we're at the
-        # end of the file.  Give up anything else we've got, then return.
-        if not new_data:
-            yield running
-            break
-
-        running += new_data
-        if delimiter in running:
-            curr, running = running.split(delimiter)
-            yield curr + delimiter
+    for chunk in lazyread(obj['Body'], delimiter=b'</image>'):
+        yield chunk
 
 
 def read_image_chunks_from_s3(bucket, key):
