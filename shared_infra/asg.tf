@@ -1,5 +1,5 @@
 module "services_cluster_asg" {
-  source                = "./ecs_asg"
+  source                = "../terraform/ecs_asg"
   asg_name              = "service-cluster"
   subnet_list           = ["${module.vpc_services.subnets}"]
   key_name              = "${var.key_name}"
@@ -19,7 +19,7 @@ module "services_cluster_asg" {
 }
 
 module "monitoring_cluster_asg" {
-  source                = "./ecs_asg"
+  source                = "../terraform/ecs_asg"
   asg_name              = "monitoring-cluster"
   subnet_list           = ["${module.vpc_monitoring.subnets}"]
   key_name              = "${var.key_name}"
@@ -36,7 +36,7 @@ module "monitoring_cluster_asg" {
 }
 
 module "api_cluster_asg" {
-  source                = "./ecs_asg"
+  source                = "../terraform/ecs_asg"
   asg_name              = "api-cluster"
   subnet_list           = ["${module.vpc_api.subnets}"]
   key_name              = "${var.key_name}"

@@ -1,5 +1,5 @@
 module "scheduled_task_gatling_catalogue_api" {
-  source = "./ecs_task_schedule"
+  source = "../terraform/ecs_task_schedule"
 
   cloudwatch_event_rule_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
   cluster_arn                = "${aws_ecs_cluster.services.id}"
@@ -7,7 +7,7 @@ module "scheduled_task_gatling_catalogue_api" {
 }
 
 module "scheduled_task_gatling_loris" {
-  source = "./ecs_task_schedule"
+  source = "../terraform/ecs_task_schedule"
 
   cloudwatch_event_rule_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
   cluster_arn                = "${aws_ecs_cluster.services.id}"

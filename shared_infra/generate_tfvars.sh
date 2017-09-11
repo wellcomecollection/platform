@@ -13,11 +13,11 @@ aws s3 cp s3://platform-infra/terraform.tfvars .
 
 # Download releases from S3
 mkdir -p releases
-aws s3 cp s3://platform-infra/releases releases --recursive
+aws s3 cp s3://platform-infra/releases .releases --recursive
 
 # Build a tfvars file containing the release ids
 echo "release_ids = {" >> "$TF_VARS"
-for f in releases/*;
+for f in .releases/*;
 do
   echo "Processing $f: $(cat $f)"
   echo "  $(basename $f) = \"$(cat $f)\"" >> "$TF_VARS"
