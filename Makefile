@@ -36,7 +36,7 @@ tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
 miro_adapter-build: $(ROOT)/.docker/image_builder
 	./scripts/run_docker_in_docker.sh image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
 
-miro_adapter-test: miro_adapter-build .docker/miro_adapter_tests
+miro_adapter-test: miro_adapter-build $(ROOT)/.docker/miro_adapter_tests
 	rm -rf $$(pwd)/miro_adapter/__pycache__
 	rm -rf $$(pwd)/miro_adapter/*.pyc
 	docker run -v $$(pwd)/miro_adapter:/miro_adapter miro_adapter_tests
