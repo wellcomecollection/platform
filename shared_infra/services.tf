@@ -1,5 +1,5 @@
 module "miro_reindexer" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "miro_reindexer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_miro_reindexer_iam.task_role_arn}"
@@ -43,7 +43,7 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "ingestor"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_ingestor_iam.task_role_arn}"
@@ -83,7 +83,7 @@ module "ingestor" {
 }
 
 module "transformer" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "transformer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_transformer_iam.task_role_arn}"
@@ -117,7 +117,7 @@ module "transformer" {
 }
 
 module "id_minter" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "id_minter"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_id_minter_iam.task_role_arn}"
@@ -164,7 +164,7 @@ data "template_file" "es_cluster_host_romulus" {
 }
 
 module "api_romulus" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "api_romulus"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
@@ -215,7 +215,7 @@ data "template_file" "es_cluster_host_remus" {
 }
 
 module "api_remus" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "api_remus"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
@@ -257,7 +257,7 @@ module "api_remus" {
 }
 
 module "loris" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
@@ -291,7 +291,7 @@ module "loris" {
 }
 
 module "grafana" {
-  source             = "./services"
+  source             = "../terraform/services"
   name               = "grafana"
   cluster_id         = "${aws_ecs_cluster.monitoring.id}"
   task_role_arn      = "${module.ecs_grafana_iam.task_role_arn}"

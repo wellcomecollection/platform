@@ -1,5 +1,5 @@
 module "identifiers_rds_cluster" {
-  source                   = "./rds"
+  source                   = "../terraform/rds"
   cluster_identifier       = "identifiers"
   database_name            = "identifiers"
   username                 = "${var.rds_username}"
