@@ -9,6 +9,7 @@ relevant changes compared to master.
 Exits with code 1 if we should deploy, 0 otherwise.
 """
 
+import os
 import subprocess
 import sys
 

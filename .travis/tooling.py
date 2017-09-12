@@ -14,7 +14,7 @@ def changed_files(*args):
     :param commit_range: Arguments to pass to ``git diff``.
     """
     files = set()
-    command = ['git', 'diff', '--name-only'] + list(commit_range)
+    command = ['git', 'diff', '--name-only'] + list(args)
     diff_output = subprocess.check_output(command).decode('ascii')
     for line in diff_output.splitlines():
         filepath = line.strip()

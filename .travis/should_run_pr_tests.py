@@ -9,6 +9,7 @@ compared to master.
 Exits with code 1 if we should run tests, 0 otherwise.
 """
 
+import os
 import subprocess
 import sys
 
