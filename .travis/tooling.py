@@ -54,7 +54,7 @@ def are_there_job_relevant_changes(changed_files, task):
     if any(task.startswith(d) for d in docker_images):
         reasons.extend(_are_there_docker_relevant_changes(changed_files, task))
 
-    for project in ['miro_adapter', 'loris']:
+    for project in ['miro_adapter', 'loris', 'miro_preprocessor']:
         if task.startswith(project):
             if any(f.startswith('%s/' % project) for f in changed_files):
                 reasons.append('Changes to %s/' % project)
