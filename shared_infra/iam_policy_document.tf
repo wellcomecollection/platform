@@ -194,19 +194,6 @@ data "aws_iam_policy_document" "s3_read_miro_images" {
   }
 }
 
-data "aws_iam_policy_document" "s3_read_miro_data" {
-  statement {
-    actions = [
-      "s3:Get*",
-      "s3:List*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.miro-data.arn}",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "s3_tif_derivative" {
   statement {
     actions = [

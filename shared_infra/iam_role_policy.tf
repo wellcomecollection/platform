@@ -106,18 +106,6 @@ resource "aws_iam_role_policy" "batch_tif_conversion_s3_tif_derivative" {
   policy = "${data.aws_iam_policy_document.s3_tif_derivative.json}"
 }
 
-# Policies for the Miro adapter
-
-resource "aws_iam_role_policy" "miro_adapter_read_from_s3" {
-  role   = "${module.ecs_miro_adapter_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
-}
-
-resource "aws_iam_role_policy" "miro_adapter_dynamodb_access" {
-  role   = "${module.ecs_miro_adapter_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.reindex_target_miro.json}"
-}
-
 # Policies for the Elasticdump task
 
 resource "aws_iam_role_policy" "elasticdump_read_ingestor_config_from_s3" {
