@@ -11,7 +11,7 @@ apt-get install -y libffi-dev libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
 
 # Download and install the Loris code itself
 apt-get install -y unzip wget
-wget "https://github.com/loris-imageserver/loris/archive/$LORIS_COMMIT.zip"
+wget "https://github.com/$LORIS_GITHUB_USER/loris/archive/$LORIS_COMMIT.zip"
 unzip "$LORIS_COMMIT.zip"
 rm "$LORIS_COMMIT.zip"
 apt-get remove -y unzip wget
