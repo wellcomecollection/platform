@@ -7,6 +7,18 @@ import pytest
 import run
 
 
+@pytest.yield_fixture(scope="function")
+def s3_fixture():
+    mock_s3().start()
+
+    client = boto3.client("s3")
+    resource = boto3.resource("s3")
+
+    yield client, resource
+
+    mock_s3().stop()
+
+
 @pytest.fixture()
 def set_region():
     # Need this otherwise boto complains about missing region
@@ -22,13 +34,13 @@ def set_region():
     boto3.setup_default_session(region_name=region)
 
 
-@mock_s3
-def test_creates_txt_with_all_images_json(set_region):
-    s3_client = boto3.client("s3")
+@pytest.fixture()
+def xml_file_contents(s3_fixture, set_region):
+    s3_client = s3_fixture[0]
     bucket = "test-bucket"
-    source_key = "images-AAA.xml"
-    destination_key = "images-AAA.txt"
-    xml_file_contents = """
+    src_key = "images-AAA.xml"
+
+    file_contents = """
     <?xml version="1.0" encoding="iso-8859-1" standalone="yes"?>
     <rmxml version="1.1">
         <image>
@@ -55,15 +67,65 @@ def test_creates_txt_with_all_images_json(set_region):
         </image>
     </rmxml>"""
 
+    s3_client.create_bucket(ACL="private", Bucket=bucket)
+    s3_client.put_object(ACL="private", Bucket=bucket, Body=file_contents, Key=src_key)
+
+    return {
+        "bucket": bucket,
+        "src_key": src_key,
+        "file_contents": file_contents
+    }
+
+
+def test_creates_txt_with_all_images_json(s3_fixture, xml_file_contents):
+    s3_client = s3_fixture[0]
+    bucket = xml_file_contents["bucket"]
+
+    src_key = xml_file_contents["src_key"]
+    dst_key = "images-AAA.txt"
+
     expected_txt_file = b"""{"image_no_calc":"A0000001","image_int_default":null,"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000"}
 {"image_no_calc":"A0000002","image_int_default":null,"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"]}
 {"image_no_calc":"A0000003","image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image"}
 """
 
-    s3_client.create_bucket(ACL="private", Bucket=bucket)
-    s3_client.put_object(ACL="private", Bucket=bucket, Body=xml_file_contents, Key=source_key)
+    run.main(bucket, src_key, dst_key)
 
-    run.main(bucket, source_key, destination_key)
-
-    get_file_request = s3_client.get_object(Bucket=bucket, Key=destination_key)
+    get_file_request = s3_client.get_object(Bucket=bucket, Key=dst_key)
     assert get_file_request['Body'].read() == expected_txt_file
+
+
+def test_creates_json_file_for_each_image(s3_fixture, xml_file_contents):
+    s3_client = s3_fixture[0]
+    bucket = xml_file_contents["bucket"]
+    prefix = "json"
+
+    dst_key = "images-AAA.txt"
+    src_key = xml_file_contents["src_key"]
+
+    expected_json_objects = {
+        "json/A0000001.json": """{"image_no_calc":"A0000001","image_int_default":null,"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000"}""",
+        "json/A0000002.json": """{"image_no_calc":"A0000002","image_int_default":null,"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"]}""",
+        "json/A0000003.json": """{"image_no_calc":"A0000003","image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image"}"""
+    }
+
+    run.main(bucket, src_key, dst_key, prefix)
+
+    response = s3_client.list_objects(
+        Bucket=bucket,
+        Prefix=prefix
+    )
+
+    keys = [obj["Key"] for obj in response["Contents"]]
+
+    for key, value in expected_json_objects.items():
+        assert key in keys
+
+        get_object_response = s3_client.get_object(
+            Bucket=bucket,
+            Key=key
+        )
+
+        actual_value = get_object_response["Body"].read()
+
+        assert value.encode() == actual_value
