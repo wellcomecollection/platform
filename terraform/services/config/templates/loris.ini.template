@@ -72,7 +72,7 @@ target_formats = ['jpg','png','gif','webp']
     [[jpg]]
     impl = 'JPG_Transformer'
     map_profile_to_srgb = True
-    srgb_profile_fp = /usr/share/color/icc/colord/sRGB2014.icc
+    srgb_profile_fp = '/usr/share/color/icc/colord/sRGB2014.icc'
 
     [[tif]]
     impl = 'TIF_Transformer'
