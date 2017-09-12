@@ -157,3 +157,32 @@ def describe_service(ecs_client, cluster_arn, service_arn):
         cluster=_name_from_arn(cluster_arn),
         services=[_name_from_arn(service_arn)]
     )['services'][0]
+
+
+def run_task(
+        ecs_client,
+        cluster_name,
+        task_definition,
+        started_by,
+        container_name="app",
+        command=[]):
+    """
+    Run a given command against a named container in a task definition on a particular cluster.
+
+    Returns the response from calling run_task
+    """
+    return ecs_client.run_task(
+        cluster=cluster_name,
+        taskDefinition=task_definition,
+        overrides={
+            'containerOverrides': [
+                {
+                    'name': container_name,
+                    'command': command
+                },
+            ],
+            'taskRoleArn': 'string'
+        },
+        count=1,
+        startedBy=started_by,
+    )
