@@ -43,7 +43,6 @@ def parse_max_cache_size_arg(value):
     return int(value)
 
 
-
 def main():
     args = docopt.docopt(__doc__)
 

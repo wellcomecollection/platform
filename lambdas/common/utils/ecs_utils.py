@@ -21,7 +21,7 @@ def identify_cluster_by_app_name(client, app_name):
             #
             # Our ECS cluster is configured so that the name of the ECS cluster
             # matches the name of the config in S3.  It would be more robust
-            #z to use the describeService API, but this saves us a couple of
+            # to use the describeService API, but this saves us a couple of
             # calls on our API quota so we skip it.
             _, service_name = service_arn.split('/')
             if service_name == app_name:

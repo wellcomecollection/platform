@@ -23,7 +23,6 @@ $(ROOT)/.docker/publish_service_to_aws:
 		--dir=builds \
 		--file=builds/publish_service_to_aws.Dockerfile
 
-
 $(ROOT)/.docker/jslint_ci:
 	./scripts/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
 

@@ -5,7 +5,6 @@ import mock
 import pytest
 
 import post_to_slack
-from mock import patch
 
 
 def _assert_field_contains(field, title, value):
