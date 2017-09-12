@@ -6,8 +6,8 @@ set -o nounset
 
 # Install dependencies.  We don't include Apache because we're running
 # Loris with UWSGI and nginx, not Apache.
-apt-get install -y libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
-    liblcms2-dev liblcms2-utils libtiff5-dev libwebp-dev
+apt-get install -y libffi-dev libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
+    liblcms2-dev liblcms2-utils libssl-dev libtiff5-dev libwebp-dev
 
 # Download and install the Loris code itself
 apt-get install -y unzip wget
