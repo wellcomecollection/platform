@@ -339,10 +339,18 @@ class ApiWorksTest
 
   it(
     "should return a not found error when requesting a single work with a non existing id") {
+    val badId = "non-existing-id"
     server.httpGet(
-      path = s"/$apiPrefix/works/non-existing-id",
+      path = s"/$apiPrefix/works/$badId",
       andExpect = Status.NotFound,
-      withJsonBody = ""
+      withJsonBody = s"""{
+        "@context": "https://localhost:8888/catalogue/v0/context.json",
+        "type": "Error",
+        "errorType": "http",
+        "httpStatus": 404,
+        "label": "Not Found",
+        "description": "Work not found for identifier $badId"
+      }"""
     )
   }
 
