@@ -4,7 +4,7 @@ import os
 import boto3
 from moto import mock_dynamodb2
 
-import sns_to_dynamo
+import miro_image_info_to_dynamo
 
 
 @mock_dynamodb2
@@ -117,7 +117,7 @@ def test_should_insert_the_json_into_dynamo():
         }]
     }
 
-    sns_to_dynamo.main(event, None)
+    miro_image_info_to_dynamo.main(event, None)
 
     dynamodb_response = table.get_item(Key={'MiroID': miro_id, 'MiroCollection': collection})
 
