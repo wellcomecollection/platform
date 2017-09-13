@@ -8,6 +8,11 @@ import subprocess
 import sys
 
 
+# Root of the Git repository
+ROOT = subprocess.check_output([
+    'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
+
+
 def changed_files(*args):
     """
     Returns a set of changed files in a given commit range.
@@ -55,7 +60,7 @@ def are_there_job_relevant_changes(changed_files, task):
     if any(task.startswith(d) for d in docker_images):
         reasons.extend(_are_there_docker_relevant_changes(changed_files, task))
 
-    for project in ['miro_adapter', 'loris', 'miro_preprocessor']:
+    for project in os.listdir(ROOT):
         if task.startswith(project):
             if any(f.startswith('%s/' % project) for f in changed_files):
                 reasons.append('Changes to %s/' % project)
