@@ -150,6 +150,7 @@ def test_describe_service_throws_EcsThrottleException():
     with pytest.raises(ecs_utils.EcsThrottleException):
         ecs_utils.describe_service(mock_ecs_client, 'foo/bar', 'bat/baz')
 
+
 @mock_ec2
 @mock_ecs
 def test_run_task():

@@ -61,5 +61,3 @@ def test_extract_json_message():
     extracted_object = sns_utils.extract_json_message(example_event)
 
     assert example_object == extracted_object
-
-
