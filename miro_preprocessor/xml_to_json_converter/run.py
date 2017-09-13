@@ -40,7 +40,7 @@ def main(bucket, src_key, dst_key, js_path="json"):
 
     with open(tmp_json, 'w') as f:
         for img in image_data:
-            img_json_dump = json.dumps(img, separators=(',', ':'))
+            img_json_dump = json.dumps(img, separators=(',', ':'), sort_keys=True)
 
             image_id = img["image_no_calc"]
             json_object_key = f'{js_path}/{image_id}.json'

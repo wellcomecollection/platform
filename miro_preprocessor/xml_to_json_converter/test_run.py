@@ -84,14 +84,15 @@ def test_creates_txt_with_all_images_json(s3_fixture, xml_file_contents):
     src_key = xml_file_contents["src_key"]
     dst_key = "images-AAA.txt"
 
-    expected_txt_file = b"""{"image_no_calc":"A0000001","image_int_default":null,"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000"}
-{"image_no_calc":"A0000002","image_int_default":null,"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"]}
-{"image_no_calc":"A0000003","image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image"}
+    expected_txt_file = b"""{"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000","image_int_default":null,"image_no_calc":"A0000001"}
+{"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"],"image_int_default":null,"image_no_calc":"A0000002"}
+{"image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image","image_no_calc":"A0000003"}
 """
 
     run.main(bucket, src_key, dst_key)
 
     get_file_request = s3_client.get_object(Bucket=bucket, Key=dst_key)
+
     assert get_file_request['Body'].read() == expected_txt_file
 
 
@@ -104,9 +105,9 @@ def test_creates_json_file_for_each_image(s3_fixture, xml_file_contents):
     src_key = xml_file_contents["src_key"]
 
     expected_json_objects = {
-        "json/A0000001.json": """{"image_no_calc":"A0000001","image_int_default":null,"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000"}""",
-        "json/A0000002.json": """{"image_no_calc":"A0000002","image_int_default":null,"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"]}""",
-        "json/A0000003.json": """{"image_no_calc":"A0000003","image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image"}"""
+        "json/A0000001.json": b'{"image_artwork_date_from":"01/01/2000","image_artwork_date_to":"31/12/2000","image_int_default":null,"image_no_calc":"A0000001"}',
+        "json/A0000003.json": b'{"image_artwork_date_from":"02/02/2000","image_artwork_date_to":"13/11/2000","image_image_desc":"Test Description of Image","image_no_calc":"A0000003"}',
+        "json/A0000002.json": b'{"image_artwork_date_from":"01/02/2000","image_artwork_date_to":"13/12/2000","image_barcode":"10000000","image_creator":["Caspar Bauhin"],"image_int_default":null,"image_no_calc":"A0000002"}'
     }
 
     run.main(bucket, src_key, dst_key, prefix)
@@ -118,14 +119,12 @@ def test_creates_json_file_for_each_image(s3_fixture, xml_file_contents):
 
     keys = [obj["Key"] for obj in response["Contents"]]
 
-    for key, value in expected_json_objects.items():
-        assert key in keys
-
-        get_object_response = s3_client.get_object(
+    def _get_body(key):
+        return s3_client.get_object(
             Bucket=bucket,
             Key=key
-        )
+        )["Body"].read()
 
-        actual_value = get_object_response["Body"].read()
+    actual_json_objects = {key: _get_body(key) for key in keys}
 
-        assert value.encode() == actual_value
+    assert expected_json_objects == actual_json_objects

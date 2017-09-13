@@ -24,23 +24,27 @@ $(ROOT)/.docker/publish_service_to_aws:
 		--file=builds/publish_service_to_aws.Dockerfile
 
 $(ROOT)/.docker/jslint_ci:
-	./scripts/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
+	$(ROOT)/scripts/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
 
 $(ROOT)/.docker/python3.6_ci:
-	./scripts/build_ci_docker_image.py --project=python3.6_ci --dir=docker/python3.6_ci
+	$(ROOT)/scripts/build_ci_docker_image.py --project=python3.6_ci --dir=docker/python3.6_ci
 
 $(ROOT)/.docker/terraform_ci:
-	./scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
+	$(ROOT)/scripts/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
 
 $(ROOT)/.docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
-	mkdir -p .docker && touch .docker/_build_deps
+	mkdir -p $(ROOT)/.docker && touch $(ROOT)/.docker/_build_deps
 
 $(ROOT)/.docker/miro_adapter_tests:
-	./scripts/build_ci_docker_image.py \
+	$(ROOT)/scripts/build_ci_docker_image.py \
 		--project=miro_adapter_tests \
 		--dir=miro_adapter \
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
+
+## Run flake8 linting over our Python code
+lint-python: $(ROOT)/.docker/python3.6_ci
+	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
 clean:
 	rm -rf $(ROOT)/.docker
