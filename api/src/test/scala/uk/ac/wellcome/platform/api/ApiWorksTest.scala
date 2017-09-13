@@ -928,4 +928,25 @@ class ApiWorksTest
       )
     }
   }
+
+  it("should return a Bad Request error if you try to page beyond the first 10000 items") {
+    queries = List("page=10000", "pageSize=100&page=101", "page=126&pageSize=80")
+    queries.foreach { query =>
+      println(s"Testing query=$query")
+      eventually {
+        server.httpGet(
+          path = s"/$apiPrefix/works?$query",
+          andExpect = Status.BadRequest,
+          withJsonBody = s"""{
+            "@context": "https://localhost:8888/catalogue/v0/context.json",
+            "type": "Error",
+            "errorType": "http",
+            "httpStatus": 400,
+            "label": "Bad Request",
+            "description": "Only the first 10000 works are available in the API."
+          }"""
+        )
+      }
+    }
+  }
 }
