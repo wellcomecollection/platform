@@ -40,7 +40,7 @@ def are_there_job_relevant_changes(changed_files, task):
         reasons.append('Linting/formatting tasks always run')
 
     if 'Makefile' in changed_files:
-        reasons.append('Changes to the Makefilerun')
+        reasons.append('Changes to the Makefile')
 
     if any(f.startswith('.travis') for f in changed_files):
         reasons.append('Changes to the Travis config')
