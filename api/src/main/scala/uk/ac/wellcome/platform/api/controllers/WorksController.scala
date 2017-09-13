@@ -11,6 +11,7 @@ import scala.collection.JavaConverters._
 import uk.ac.wellcome.models.Error
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.{
+  DisplayError,
   DisplayResultList,
   DisplayWork,
   WorksIncludes
@@ -129,7 +130,8 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
               description = s"Work not found for identifier ${request.id}"
             )
             response.notFound.json(
-              ResultResponse(context = contextUri, result = DisplayError(result))
+              ResultResponse(context = contextUri,
+                             result = DisplayError(result))
             )
           }
         }
