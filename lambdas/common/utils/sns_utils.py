@@ -39,3 +39,11 @@ def publish_sns_message(topic_arn, message):
     )
     print(f'SNS response = {resp!r}')
     assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
+
+
+def extract_json_message(event):
+    """
+    Extracts a JSON message from an SNS event sent to a lambda
+    """
+    message = event['Records'][0]['Sns']['Message']
+    return json.loads(message)

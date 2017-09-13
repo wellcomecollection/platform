@@ -1,8 +1,10 @@
-import boto3
+import json
 
+import boto3
 from botocore.exceptions import ClientError
 from mock import Mock
-from moto import mock_ecs
+from moto import mock_ecs, mock_ec2
+from moto.ec2 import utils as moto_ec2_utils
 import pytest
 
 from utils import ecs_utils
@@ -147,3 +149,51 @@ def test_describe_service_throws_EcsThrottleException():
 
     with pytest.raises(ecs_utils.EcsThrottleException):
         ecs_utils.describe_service(mock_ecs_client, 'foo/bar', 'bat/baz')
+
+
+@mock_ec2
+@mock_ecs
+def test_run_task():
+    ecs_client = boto3.client('ecs')
+    ec2 = boto3.resource('ec2', region_name='us-east-1')
+
+    cluster_response = ecs_client.create_cluster(clusterName=cluster_name)
+    cluster_arn = cluster_response['cluster']['clusterArn']
+
+    test_instance = ec2.create_instances(
+        ImageId="ami-1234abcd",
+        MinCount=1,
+        MaxCount=1,
+    )[0]
+
+    instance_id_document = json.dumps(
+        moto_ec2_utils.generate_instance_identity_document(test_instance)
+    )
+
+    ecs_client.register_container_instance(
+        cluster=cluster_name,
+        instanceIdentityDocument=instance_id_document
+    )
+
+    task_definition_response = ecs_client.register_task_definition(
+        family='my_family',
+        containerDefinitions=[]
+    )
+    task_definition_arn = (
+        task_definition_response['taskDefinition']['taskDefinitionArn']
+    )
+
+    started_by = "started_by"
+
+    response = ecs_utils.run_task(
+        ecs_client,
+        cluster_name,
+        task_definition_arn,
+        started_by)
+
+    assert len(response["failures"]) == 0
+    assert len(response["tasks"]) == 1
+
+    assert response["tasks"][0]["taskDefinitionArn"] == task_definition_arn
+    assert response["tasks"][0]["clusterArn"] == cluster_arn
+    assert response["tasks"][0]["startedBy"] == started_by

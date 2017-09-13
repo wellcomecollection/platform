@@ -37,3 +37,27 @@ def test_publish_sns_message(sns_sqs):
     actual_decoded_message = json.loads(inner_message)
 
     assert actual_decoded_message == expected_decoded_message
+
+
+def test_extract_json_message():
+    example_object = {
+        "foo": "bar",
+        "baz": ["bat", 0, 0.1, {"boo": "beep"}]
+    }
+
+    example_object_json = json.dumps(example_object)
+
+    example_event = {
+        "Records": [
+            {
+                "Sns": {
+                    "Message": example_object_json
+                }
+
+            }
+        ]
+    }
+
+    extracted_object = sns_utils.extract_json_message(example_event)
+
+    assert example_object == extracted_object
