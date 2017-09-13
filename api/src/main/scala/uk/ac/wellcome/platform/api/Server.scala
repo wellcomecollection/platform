@@ -42,6 +42,10 @@ class Server extends HttpServer {
     name = "api.prefix",
     default = "/" + apiName() + "/" + apiVersion(),
     help = "API path prefix")
+  private final val esMaxResultWindow = flag(
+    name = "es.maxResultWindow",
+    default = 10000,
+    help = "Max result window size in Elasticsearch")
 
   flag[String](name = "es.index", default = "records", help = "ES index name")
   flag[String](name = "es.type", default = "item", help = "ES document type")
