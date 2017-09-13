@@ -928,5 +928,4 @@ class ApiWorksTest
       )
     }
   }
-  }
 }
