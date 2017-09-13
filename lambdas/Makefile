@@ -14,7 +14,7 @@ endif
 ## Run tests for our Lambda code
 lambdas-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
-		-v $$(pwd)/lambdas:/data \
+		-v $(ROOT)/lambdas:/data \
 		-e OP=test \
 		-e FIND_MATCH_PATHS='./*/target common/tests' \
 		python3.6_ci:latest

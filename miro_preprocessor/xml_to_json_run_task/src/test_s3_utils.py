@@ -1,4 +1,4 @@
-from utils import s3_utils
+import s3_utils
 
 import dateutil.parser
 
@@ -40,8 +40,6 @@ def s3_event():
                         "sequencer": "foo"
                     }
                 }
-            },
-            {
             }
         ]
     }
@@ -49,6 +47,7 @@ def s3_event():
 
 def test_parse_s3_event():
     e = s3_event()
+
     parsed_events = s3_utils.parse_s3_record(e)
     expected_datetime = dateutil.parser.parse("1970-01-01T00:00:00.000Z")
 

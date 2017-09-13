@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 """
-Foo
+Lambda to run the Miro XML to JSON task when receiving an S3 event.
 """
 
 import os
@@ -10,6 +10,7 @@ import boto3
 
 import s3_utils
 import sns_utils
+
 
 def command_for_xml_to_json_task(event, cluster_name, container_name, task_definition):
     bucket_name = event["bucket_name"]
@@ -30,12 +31,14 @@ def command_for_xml_to_json_task(event, cluster_name, container_name, task_defin
         "command": cmd,
     }
 
+
 def post_to_sns(sns_client, topic_arn, cmd):
     return sns_utils.publish_sns_message(
         sns_client,
         topic_arn,
         cmd
     )
+
 
 def main(event, _):
     print(f'event = {event!r}')

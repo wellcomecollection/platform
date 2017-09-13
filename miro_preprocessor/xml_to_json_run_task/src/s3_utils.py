@@ -15,6 +15,7 @@ def _extract_s3_event(record):
         "versionId": record["s3"]["object"]["versionId"]
     }
 
+
 def parse_s3_record(event):
     """
     Extracts a simple subset of an S3 update event.
