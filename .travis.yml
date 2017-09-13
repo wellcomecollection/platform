@@ -11,34 +11,48 @@ branches:
   only:
     - master
 
-before_install:
-  - git fetch origin
+# Because we have a lot of Travis jobs, we try to avoid running unnecessary
+# tests and deploys.  This speeds up our builds, minimises deployment churn,
+# and reduces contention on our Travis infrastructure.
+#
+# How we decide what to build:
+#
+#                   | Relevant changes | No relevant changes
+#    ---------------+------------------+---------------------
+#     pull request  | Run tests        | Don't run tests
+#                   | Don't deploy     | Don't deploy
+#    ---------------+------------------+---------------------
+#     master        | Run tests        | Run tests
+#                   | Deploy to AWS    | Don't deploy
+#
+# We always run tests on master so we get consistent build results, that's
+# less important on master where results are transient.
+#
+# Where appropriate, we use 'exit 0' to bail out of the build early.
+# See "How does this work?" in the Travis docs for why this works.
+# https://docs.travis-ci.com/user/customizing-the-build/
 
-  # If this is a pull request branch, we only do anything if there are
-  # interesting changes between this branch and master.
-  #
-  # Using 'exit' in a build step will terminate the rest of the build:
-  # https://docs.travis-ci.com/user/customizing-the-build/#How-does-this-work%3F-(Or%2C-why-you-should-not-use-exit-in-build-steps)
+before_install:
+
   - |
-    if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]
-    then
-      if python3 ./scripts/should_rerun_tests.py
-      then
-        echo "No changes that require us to re-run tests, skipping to the end"
-        exit 0
+    SHOULD_RUN_TESTS=true
+    if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]; then
+      if ! python3 .travis/should_run_pr_tests.py; then
+        SHOULD_RUN_TESTS=false
       fi
     fi
 
-  # If this is a push branch (i.e. a build on master), we only do anything
-  # if there are interesting changes since the last time we built.
   - |
-    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]
-    then
-      if python3 ./scripts/should_rebuild_master.py
-      then
-        echo "No changes that require us to re-build, skipping to the end"
-        exit 0
+    SHOULD_DEPLOY=false
+    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]; then
+      if python3 .travis/should_deploy_travis_from_master.py; then
+        SHOULD_DEPLOY=true
       fi
+    fi
+
+  - |
+    if [[ "$SHOULD_RUN_TESTS" == "false" ]]; then
+      exit 0
     fi
 
 install:
@@ -61,7 +75,24 @@ cache:
     - "/home/travis/docker/"
 
 script:
-  - ./scripts/travis_run.sh
+  - make "$TASK"
+
+after_success:
+  - |
+    if [[ "$SHOULD_DEPLOY" == "false" ]]; then
+      exit 0
+    fi
+
+  # Rename the task for the deploy step.
+  # TODO: Make the naming scheme more consistent!
+  - |
+    if [[ "$TASK" == "loris-build" ]]; then
+      make loris-publish
+    else
+      TASK="${TASK/build/deploy}"
+      TASK="${TASK/test/deploy}"
+      make "$TASK"
+    fi
 
 env:
   global:
