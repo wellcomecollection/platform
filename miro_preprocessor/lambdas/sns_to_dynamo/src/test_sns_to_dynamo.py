@@ -1,15 +1,14 @@
+import json
 import os
 
 import boto3
-from moto import mock_sns, mock_dynamodb2
+from moto import mock_dynamodb2
 
 import sns_to_dynamo
 
 
-@mock_sns
 @mock_dynamodb2
 def test_should_insert_the_json_into_dynamo():
-    sns_client = boto3.client('sns')
     dynamodb_client = boto3.client('dynamodb')
 
     table_name = "TestMiroData"
@@ -74,9 +73,6 @@ def test_should_insert_the_json_into_dynamo():
         }
     )
 
-    create_topic_response = sns_client.create_topic(Name="test_miro_catalogue_api_topic")
-    topic_arn = create_topic_response['TopicArn']
-
     miro_id = "A0000002"
     image_json = f"""{{
         "image_no_calc": "{miro_id}",
@@ -87,16 +83,34 @@ def test_should_insert_the_json_into_dynamo():
         "image_creator":["Caspar Bauhin"]
     }}"""
 
-    sns_client.publish(
-        TopicArn=topic_arn,
-        Message=image_json)
-
     os.environ = {
-        "SNS_TOPIC_ARN": topic_arn,
         "TABLE_NAME": table_name
     }
 
-    sns_to_dynamo.main()
+    event = {
+        'Records': [{
+            'EventSource': 'aws:sns',
+            'EventVersion': '1.0',
+            'EventSubscriptionArn':
+                'arn:aws:sns:region:account_id:alb_server_error_alarm:stuff',
+            'Sns': {
+                'Type': 'Notification',
+                'MessageId': 'b20eb72b-ffc7-5d09-9636-e6f65d67d10f',
+                'TopicArn':
+                    'arn:aws:sns:region:account_id:alb_server_error_alarm',
+                'Subject':
+                    'ALARM: "api-alb-target-500-errors" in EU - Ireland',
+                'Message': json.dumps(image_json),
+                'Timestamp': '2017-07-10T15:42:24.307Z',
+                'SignatureVersion': '1',
+                'Signature': 'signature',
+                'SigningCertUrl': 'https://certificate.pem',
+                'UnsubscribeUrl': 'https://unsubscribe-url',
+                'MessageAttributes': {}}
+        }]
+    }
+
+    sns_to_dynamo.main(event, None)
 
     dynamodb_response = dynamodb_client.get_item(
         TableName=table_name,
