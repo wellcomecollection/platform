@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.api.models.DisplayError
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
-class ExceptionMapper @Inject()(
+class GeneralExceptionMapper @Inject()(
   response: ResponseBuilder,
   @Flag("api.context") apiContext: String,
   @Flag("api.host") apiHost: String,
