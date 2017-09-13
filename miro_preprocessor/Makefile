@@ -1,9 +1,14 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
 ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
+include $(ROOT)/shared.Makefile
 endif
 
+.docker/_lambda_deps: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		-v $$(pwd)/lambdas:/data \
+		-e OP=install-deps \
+		python3.6_ci:latest
 
 xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_builder
 	$(ROOT)/scripts/run_docker_in_docker.sh \
@@ -26,7 +31,15 @@ xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publi
 		--project=xml_to_json_converter \
 		--infra-bucket=platform-infra
 
-miro_preprocessor-test: xml_to_json_converter-test
+lambdas-test: .docker/_lambda_deps $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	-v $$(pwd)/lambdas:/data \
+	-e OP=test \
+	-e FIND_MATCH_PATHS='./*/target common/tests' \
+	python3.6_ci:latest
+
+miro_preprocessor-test: xml_to_json_converter-test \
+	lambdas-test
 
 miro_preprocessor-build: xml_to_json_converter-build
 
