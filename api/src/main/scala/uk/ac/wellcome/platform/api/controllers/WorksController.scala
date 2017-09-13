@@ -30,6 +30,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                                 @Flag("api.host") apiHost: String,
                                 @Flag("api.scheme") apiScheme: String,
                                 @Flag("api.pageSize") defaultPageSize: Int,
+                                @Flag("es.maxResultWindow") esMaxResultWindow: Int,
                                 worksService: WorksService)
     extends Controller
     with SwaggerSupport {
@@ -75,35 +76,45 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
 
-      val works = request.query match {
-        case Some(queryString) =>
-          worksService.searchWorks(
-            queryString,
-            pageSize = pageSize,
-            pageNumber = request.page,
-            includes = request.includes.getOrElse(WorksIncludes()),
-            index = request._index
-          )
-        case None =>
-          worksService.listWorks(
-            pageSize = pageSize,
-            pageNumber = request.page,
-            includes = request.includes.getOrElse(WorksIncludes()),
-            index = request._index
+      if (pageSize * request.page > esMaxResultWindow) {
+        val result = Error(
+          variant = "http-400",
+          description = Some(s"Only the first $esMaxResultWindow works are available in the API.")
+        )
+        response.notFound.json(
+          ResultResponse(context = contextUri, result = DisplayError(result))
+        )
+      } else {
+        val works = request.query match {
+          case Some(queryString) =>
+            worksService.searchWorks(
+              queryString,
+              pageSize = pageSize,
+              pageNumber = request.page,
+              includes = request.includes.getOrElse(WorksIncludes()),
+              index = request._index
+            )
+          case None =>
+            worksService.listWorks(
+              pageSize = pageSize,
+              pageNumber = request.page,
+              includes = request.includes.getOrElse(WorksIncludes()),
+              index = request._index
+            )
+        }
+
+        works
+          .map(
+            displayResultList => {
+              ResultListResponse.create(
+                contextUri,
+                displayResultList,
+                request,
+                s"${apiScheme}://${apiHost}"
+              )
+            }
           )
       }
-
-      works
-        .map(
-          displayResultList => {
-            ResultListResponse.create(
-              contextUri,
-              displayResultList,
-              request,
-              s"${apiScheme}://${apiHost}"
-            )
-          }
-        )
     }
 
     getWithDoc("/works/:id") { doc =>
