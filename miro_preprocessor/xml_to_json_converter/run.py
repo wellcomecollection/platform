@@ -30,19 +30,32 @@ import docopt
 from utils import generate_images
 
 
-def main(bucket, src_key, dst_key):
+def main(bucket, src_key, dst_key, js_path="json"):
     image_data = generate_images(bucket=bucket, key=src_key)
 
     tmp_json = tempfile.mktemp()
     os.makedirs(os.path.dirname(tmp_json), exist_ok=True)
+
+    s3 = boto3.client('s3')
+
     with open(tmp_json, 'w') as f:
         for img in image_data:
+            img_json_dump = json.dumps(img, separators=(',', ':'), sort_keys=True)
+
+            image_id = img["image_no_calc"]
+            json_object_key = f'{js_path}/{image_id}.json'
+            byte_encoded_json_dump = img_json_dump.encode()
+
+            s3.put_object(
+                Bucket=bucket,
+                Key=json_object_key,
+                Body=byte_encoded_json_dump
+            )
 
             # Adding the separators omits unneeded whitespace in the JSON,
             # giving us smaller files.
-            f.write(json.dumps(img, separators=(',', ':')) + '\n')
+            f.write(img_json_dump + '\n')
 
-    s3 = boto3.client('s3')
     s3.upload_file(
         Bucket=bucket,
         Key=dst_key,

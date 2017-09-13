@@ -177,10 +177,6 @@ sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to
 lint-ontologies: $(ROOT)/.docker/jslint_ci
 	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
 
-## Run flake8 linting over our Python code
-lint-python: $(ROOT)/.docker/python3.6_ci
-	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
-
 ## Check a git repo is up to date with remote master
 uptodate-git: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$HOME/.ssh:/root/.ssh -v $$(pwd):/data -e OP=is-master-head python3.6_ci:latest
