@@ -127,7 +127,8 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           case None => {
             val result = Error(
               variant = "http-404",
-              description = s"Work not found for identifier ${request.id}"
+              description =
+                Some(s"Work not found for identifier ${request.id}")
             )
             response.notFound.json(
               ResultResponse(context = contextUri,
