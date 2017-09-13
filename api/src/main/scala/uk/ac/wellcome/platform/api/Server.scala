@@ -13,7 +13,7 @@ import com.twitter.finatra.json.utils.CamelCasePropertyNamingStrategy
 import io.swagger.models.Swagger
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
-import uk.ac.wellcome.platform.api.finatra.exceptions.ExceptionMapper
+import uk.ac.wellcome.platform.api.finatra.exceptions.GeneralExceptionMapper
 import uk.ac.wellcome.platform.api.models.WorksIncludesDeserializerModule
 
 object ServerMain extends Server
@@ -60,6 +60,6 @@ class Server extends HttpServer {
       .add[ContextController]
       .add[SwaggerController]
       .add[WorksController]
-      .exceptionMapper[ExceptionMapper]
+      .exceptionMapper[GeneralExceptionMapper]
   }
 }
