@@ -19,7 +19,7 @@ from tooling import are_there_job_relevant_changes, changed_files
 if __name__ == '__main__':
     subprocess.check_call(['git', 'fetch', 'origin'])
 
-    changed_files = changed_files('HEAD', 'master')
+    changed_files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
     task = os.environ['TASK']
 
     if task in [
