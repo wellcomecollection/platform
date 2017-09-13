@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import sys
 
 
 def changed_files(*args):
@@ -87,3 +88,17 @@ def _are_there_docker_relevant_changes(changed_files, task):
     image = task.split('-')[0]
     if any(f.startswith('docker/%s/' % image) for f in changed_files):
         return ['Changes to docker/%s' % image]
+
+
+def make_decision(changed_files, task, action):
+    reasons = are_there_job_relevant_changes(
+        changed_files=changed_files, task=task
+    )
+    if reasons:
+        print('*** Reasons to %s for this change:' % action)
+        for r in reasons:
+            print('***   - %s' % r)
+        sys.exit(1)
+    else:
+        print('*** No reasons to %s for this change!' % action)
+        sys.exit(0)

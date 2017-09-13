@@ -11,9 +11,8 @@ Exits with code 1 if we should run tests, 0 otherwise.
 
 import os
 import subprocess
-import sys
 
-from tooling import are_there_job_relevant_changes, changed_files
+from tooling import changed_files, make_decision
 
 
 if __name__ == '__main__':
@@ -22,14 +21,8 @@ if __name__ == '__main__':
     changed_files = changed_files('HEAD', 'master')
     task = os.environ['TASK']
 
-    reasons = are_there_job_relevant_changes(
-        changed_files=changed_files, task=task
+    make_decision(
+        changed_files=changed_files,
+        task=task,
+        action='run tests'
     )
-    if reasons:
-        print('*** Reasons to run Travis tests on this PR:')
-        for r in reasons:
-            print('***   - %s' % r)
-        sys.exit(1)
-    else:
-        print('*** No reasons to run Travis tests on this PR!')
-        sys.exit(0)

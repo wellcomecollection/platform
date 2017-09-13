@@ -13,13 +13,10 @@ import os
 import subprocess
 import sys
 
-from tooling import are_there_job_relevant_changes, changed_files
+from tooling import changed_files, make_decision
 
 
 if __name__ == '__main__':
-    subprocess.check_call(['git', 'fetch', 'origin'])
-
-    changed_files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
     task = os.environ['TASK']
 
     if task in [
@@ -30,14 +27,11 @@ if __name__ == '__main__':
         print('*** Task %s does not have a deploy step')
         sys.exit(0)
 
-    reasons = are_there_job_relevant_changes(
-        changed_files=changed_files, task=task
+    subprocess.check_call(['git', 'fetch', 'origin'])
+    changed_files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
+
+    make_decision(
+        changed_files=changed_files,
+        task=task,
+        action='run a deploy'
     )
-    if reasons:
-        print('*** Reasons to run the deploy step on this change:')
-        for r in reasons:
-            print('***   - %s' % r)
-        sys.exit(1)
-    else:
-        print('*** No reasons to deploy this change!')
-        sys.exit(0)
