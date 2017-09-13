@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 case class Error(
   errorType: String,
-  httpStatus: Option[Int],
+  httpStatus: Option[Int] = None,
   label: String,
-  description: Option[String]
+  description: Option[String] = None
 ) {
   @JsonProperty("type") val ontologyType: String = "Error"
 }
