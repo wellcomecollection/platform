@@ -930,7 +930,11 @@ class ApiWorksTest
   }
 
   it("should return a Bad Request error if you try to page beyond the first 10000 items") {
-    queries = List("page=10000", "pageSize=100&page=101", "page=126&pageSize=80")
+    val queries = List(
+      "page=10000",
+      "pageSize=100&page=101",
+      "page=126&pageSize=80"
+    )
     queries.foreach { query =>
       println(s"Testing query=$query")
       eventually {
