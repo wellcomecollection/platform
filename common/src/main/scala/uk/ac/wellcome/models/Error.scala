@@ -12,14 +12,21 @@ case class Error(
 }
 
 case object Error {
-  def apply(variant: String, description: String): Error = {
+  def apply(variant: String, description: Option[String]): Error = {
     variant match {
       case "http-404" =>
         Error(
           errorType = "http",
           httpStatus = Some(404),
           label = "Not Found",
-          description = Some(description)
+          description = description
+        )
+      case "http-500" =>
+        Error(
+          errorType = "http",
+          httpStatus = Some(500),
+          label = "Internal Server Error",
+          description = description
         )
       case unknownVariant =>
         throw new Exception(s"$unknownVariant is not a valid error variant")
