@@ -1,35 +1,48 @@
 import json
 import os
+import re
+
 import boto3
 
 
 def main(event, _):
     print(f'Received event:\n{event}')
+    s3_client = boto3.client("s3")
+    dynamodb_client = boto3.client('dynamodb')
 
-    client = boto3.client('dynamodb')
-    table_name = os.environ["TABLE_NAME"]
+    bucket_name = os.environ["MIRO_S3_BUCKET"]
+
     image_info = json.loads(event['Records'][0]['Sns']['Message'])
     image_data = image_info['image_data']
     collection = image_info['collection']
+    miro_id = image_data['image_no_calc']
+    result = re.match(r"(?P<shard>[a-zA-Z]+[0-9]{4})", miro_id)
+    key = f"fullsize/{result.group('shard')}000/{miro_id}.jpg"
 
-    print('Pushing image with ID %s' % (image_data['image_no_calc']))
-    client.put_item(
-        TableName=table_name,
-        Item={
-            'MiroID': {
-                'S': image_data['image_no_calc']
-            },
-            'MiroCollection': {
-                'S': collection
-            },
-            'ReindexShard': {
-                'S': 'default'
-            },
-            'ReindexVersion': {
-                'N': str(1)
-            },
-            'data': {
-                'S': json.dumps(image_data, separators=(',', ':'))
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=key)
+
+        table_name = os.environ["TABLE_NAME"]
+        print('Pushing image with ID %s' % (miro_id))
+        dynamodb_client.put_item(
+            TableName=table_name,
+            Item={
+                'MiroID': {
+                    'S': miro_id
+                },
+                'MiroCollection': {
+                    'S': collection
+                },
+                'ReindexShard': {
+                    'S': 'default'
+                },
+                'ReindexVersion': {
+                    'N': str(1)
+                },
+                'data': {
+                    'S': json.dumps(image_data, separators=(',', ':'))
+                }
             }
-        }
-    )
+        )
+    except Exception as _:
+        pass
