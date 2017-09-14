@@ -29,7 +29,7 @@ xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publi
 xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
 		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
-		-e OP=test -e FIND_MATCH_PATHS='/data/src' \
+		-e OP=test-lambda -e FIND_MATCH_PATHS='/data/src' \
 		python3.6_ci:latest
 
 xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
