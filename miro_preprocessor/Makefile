@@ -9,11 +9,11 @@ xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_bu
 		-v $(ROOT):/repo \
 		image_builder:latest \
 		--project=xml_to_json_converter \
-		--file=miro_preprocessor/xml_to_json_converter.Dockerfile
+		--file=miro_preprocessor/xml_to_json_converter/Dockerfile
 
 xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		-v $(ROOT)/miro_preprocessor/xml_to_json_converter:/data \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_converter/src:/data \
 		-e OP=test -e FIND_MATCH_PATHS='/data' \
 		python3.6_ci:latest
 
@@ -25,6 +25,11 @@ xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publi
 		--project=xml_to_json_converter \
 		--infra-bucket=platform-infra
 
+xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
+		-e OP=test -e FIND_MATCH_PATHS='/data/src' \
+		python3.6_ci:latest
 miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 	-v $(ROOT)/miro_preprocessor/miro_image_to_dynamo:/data \
@@ -32,14 +37,19 @@ miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
 	-e FIND_MATCH_PATHS='./*/target common/tests' \
 	python3.6_ci:latest
 
-miro_preprocessor-test: xml_to_json_converter-test \
-	miro_image_to_dynamo-test
+xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
+		-e OP=build-lambda \
+		python3.6_ci:latest
 
-miro_preprocessor-build: xml_to_json_converter-build
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test
+
+miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build
 
 miro_preprocessor-publish: xml_to_json_converter-publish
 
-miro_preprocessor-terraform-plan: $(ROOT)/.docker/terraform_ci
+miro_preprocessor-terraform-plan: $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
