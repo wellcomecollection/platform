@@ -25,13 +25,13 @@ class ElasticsearchResponseExceptionMapper @Inject()(
 
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
-  private def userError(message: String): DisplayError = {
-    error(s"Sending HTTP 400 for $message")
+  private def userError(message: String, exception: Exception): DisplayError = {
+    error(s"Sending HTTP 400 for $message", exception)
     DisplayError(Error(variant = "http-400", description = Some(message)))
   }
 
-  private def serverError(message: String): DisplayError = {
-    error(s"Sending HTTP 500 for $message")
+  private def serverError(message: String, exception: Exception): DisplayError = {
+    error(s"Sending HTTP 500 for $message", exception)
     DisplayError(Error(variant = "http-500", description = None))
   }
 
@@ -90,12 +90,11 @@ class ElasticsearchResponseExceptionMapper @Inject()(
         case s: JsonNode => reasonToError(s.asText)
         case _ =>
           serverError(
-            s"Unable to find error reason in Elasticsearch response ${exception.getMessage}")
+            s"Unable to find error reason in Elasticsearch response", exception)
       }
     } catch {
       case e: Exception =>
-        serverError(
-          s"Error ($e) parsing Elasticsearch response ${exception.getMessage}")
+        serverError(s"Error ($e) parsing Elasticsearch response", exception)
     }
   }
 
