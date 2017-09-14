@@ -23,7 +23,7 @@ class GeneralExceptionMapper @Inject()(response: ResponseBuilder,
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
   override def toResponse(request: Request, exception: Exception): Response = {
-    error(s"Sending HTTP 500", exception)
+    error(s"Sending HTTP 500 for ${exception.getMessage}")
     val result = DisplayError(
       Error(
         variant = "http-500",
