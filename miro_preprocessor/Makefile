@@ -10,11 +10,11 @@ xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_bu
 		-v $(ROOT):/repo \
 		image_builder:latest \
 		--project=xml_to_json_converter \
-		--file=miro_preprocessor/xml_to_json_converter.Dockerfile
+		--file=miro_preprocessor/xml_to_json_converter/Dockerfile
 
 xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		-v $(ROOT)/miro_preprocessor/xml_to_json_converter:/data \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_converter/src:/data \
 		-e OP=test -e FIND_MATCH_PATHS='/data' \
 		python3.6_ci:latest
 
@@ -28,7 +28,7 @@ xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publi
 
 xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task/src:/data \
 		-e OP=test -e FIND_MATCH_PATHS='/data' \
 		python3.6_ci:latest
 

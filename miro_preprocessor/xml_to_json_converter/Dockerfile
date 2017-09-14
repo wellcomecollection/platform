@@ -7,9 +7,9 @@ RUN apk update
 # Required for lxml
 RUN apk add build-base libxml2-dev libxslt-dev python3-dev
 
-COPY xml_to_json_converter/requirements.txt /requirements.txt
+COPY requirements.txt /requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY xml_to_json_converter /app
+COPY src /app
 
 ENTRYPOINT ["/app/run.py"]
