@@ -14,6 +14,13 @@ case class Error(
 case object Error {
   def apply(variant: String, description: Option[String]): Error = {
     variant match {
+      case "http-400" =>
+        Error(
+          errorType = "http",
+          httpStatus = Some(400),
+          label = "Bad Request",
+          description = description
+        )
       case "http-404" =>
         Error(
           errorType = "http",
