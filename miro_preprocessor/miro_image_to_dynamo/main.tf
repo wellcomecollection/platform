@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "allow_s3_read_miro_data_put" {
     ]
 
     resources = [
-      "${var.s3_bucket_arn}",
+      "${var.s3_bucket_arn}/fullsize",
     ]
   }
 }
