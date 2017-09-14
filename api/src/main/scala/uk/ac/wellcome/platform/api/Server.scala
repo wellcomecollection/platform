@@ -14,7 +14,7 @@ import io.swagger.models.Swagger
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
-  ElasticsearchExceptionMapper,
+  ElasticsearchResponseExceptionMapper,
   GeneralExceptionMapper
 }
 import uk.ac.wellcome.platform.api.models.WorksIncludesDeserializerModule
@@ -64,6 +64,6 @@ class Server extends HttpServer {
       .add[SwaggerController]
       .add[WorksController]
       .exceptionMapper[GeneralExceptionMapper]
-      .exceptionMapper[ElasticsearchExceptionMapper]
+      .exceptionMapper[ElasticsearchResponseExceptionMapper]
   }
 }
