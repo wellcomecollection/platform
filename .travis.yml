@@ -83,7 +83,6 @@ cache:
 script:
   - make "$TASK"
 
-after_success:
   - |
     if [[ "$SHOULD_DEPLOY" == "false" ]]; then
       echo "SHOULD_DEPLOY is false, so exiting before running a deploy"
