@@ -50,7 +50,7 @@ def main(event, _):
 
     sns_client = boto3.client('sns')
 
-    s3_events =  s3_utils.parse_s3_record(event=event)
+    s3_events = s3_utils.parse_s3_record(event=event)
     task_commands = [command_for_xml_to_json_task(
         event,
         cluster_name,

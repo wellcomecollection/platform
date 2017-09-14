@@ -61,4 +61,3 @@ def test_parse_s3_event():
     }]
 
     assert parsed_events == expected_events
-

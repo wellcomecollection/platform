@@ -4,7 +4,6 @@ import os
 
 import boto3
 import json
-from moto import mock_s3, mock_sns
 
 import xml_to_json_run_task
 
@@ -45,7 +44,7 @@ def test_xml_to_json_run_task(sns_sqs):
     os.environ["CONTAINER_NAME"] = container_name
     os.environ["TASK_DEFINITION_ARN"] = task_definition_arn
 
-    xml_to_json_run_task.main(e,{})
+    xml_to_json_run_task.main(e, {})
 
     messages = sqs_client.receive_message(
         QueueUrl=queue_url,
