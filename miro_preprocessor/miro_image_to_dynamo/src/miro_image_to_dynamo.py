@@ -24,10 +24,12 @@ def main(event, _):
         s3_client.head_object(Bucket=bucket_name, Key=key)
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == '404':
+            print(f"No image found for MiroId {miro_id}: skipping")
             pass
         else:
             raise
     else:
+        print(f"Image found for MiroId {miro_id}: sending to Dynamodb")
         table_name = os.environ["TABLE_NAME"]
         print('Pushing image with ID %s' % (miro_id))
         dynamodb_client.put_item(
