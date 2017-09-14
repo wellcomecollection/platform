@@ -1,9 +1,7 @@
 package uk.ac.wellcome.platform.api.finatra.exceptions
 
 import javax.inject.{Inject, Singleton}
-import scala.util.{Failure, Success}
 
-import com.fasterxml.jackson.core.{JsonParseException, JsonParser}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
