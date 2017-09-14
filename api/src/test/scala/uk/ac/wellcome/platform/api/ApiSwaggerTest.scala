@@ -5,7 +5,7 @@ import com.twitter.finagle.http.{Response, Status}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.Work
 
 class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
 
@@ -28,6 +28,11 @@ class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
     tree.at("/schemes").toString should be("[\"http\"]")
     tree.at("/info/version").toString should be("\"v99\"")
     tree.at("/basePath").toString should be("\"/test/v99\"")
+  }
+
+  it("should include the DisplayError model") {
+    val tree = readTree("/test/v99/swagger.json")
+    tree.at("/definitions/Error/type").toString should be("\"object\"")
   }
 
   def readTree(path: String): JsonNode = {
