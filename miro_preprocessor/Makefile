@@ -55,7 +55,7 @@ miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build 
 
 miro_preprocessor-publish: xml_to_json_converter-publish
 
-miro_preprocessor-terraform-plan: $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build miro_image_to_dynamo-build
+miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build miro_image_to_dynamo-build
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
