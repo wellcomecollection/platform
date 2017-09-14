@@ -23,7 +23,7 @@ You can invoke the task as follows:
 aws ecs run-task --cluster=services_cluster \
      --task-definition=update_api_docs_task_definition \
      --overrides="{
-       "containerOverrides": [
+       \"containerOverrides\": [
          {
            \"name\": \"app\",
            \"environment\": [
