@@ -28,17 +28,23 @@ xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publi
 
 xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task/src:/data \
-		-e OP=test -e FIND_MATCH_PATHS='/data' \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
+		-e OP=test -e FIND_MATCH_PATHS='/data/src' \
 		python3.6_ci:latest
 
-miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task
+xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
+		-e OP=build-lambda \
+		python3.6_ci:latest
 
-miro_preprocessor-build: xml_to_json_converter-build
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test
+
+miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build
 
 miro_preprocessor-publish: xml_to_json_converter-publish
 
-miro_preprocessor-terraform-plan: $(ROOT)/.docker/terraform_ci
+miro_preprocessor-terraform-plan: $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
