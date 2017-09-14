@@ -54,6 +54,7 @@ before_install:
 
   - |
     if [[ "$SHOULD_RUN_TESTS" == "false" ]]; then
+      echo "SHOULD_RUN_TESTS is false, so exiting before running tests"
       exit 0
     fi
 
@@ -82,6 +83,7 @@ script:
 after_success:
   - |
     if [[ "$SHOULD_DEPLOY" == "false" ]]; then
+      echo "SHOULD_DEPLOY is false, so exiting before running a deploy"
       exit 0
     fi
 
