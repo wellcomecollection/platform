@@ -1,4 +1,4 @@
-module "miro_image_to_dynamo" {
+module "miro_image_to_dynamo_lambda" {
   source = "../../terraform/lambda"
   source_dir = "${path.module}/target"
   description = "Push image json into DynamoDB"
@@ -12,18 +12,18 @@ module "miro_image_to_dynamo" {
 
 module "miro_image_to_dynamo" {
   source = "../../terraform/lambda/trigger_sns"
-  lambda_function_name = "${module.miro_image_to_dynamo.function_name}"
+  lambda_function_name = "${module.miro_image_to_dynamo_lambda.function_name}"
   sns_trigger_arn = "${var.miro_image_to_dynamo_topic_arn}"
-  lambda_function_arn = "${module.miro_image_to_dynamo.arn}"
+  lambda_function_arn = "${module.miro_image_to_dynamo_lambda.arn}"
 }
 
 resource "aws_iam_role_policy" "miro_image_to_dynamo" {
   name   = "miro_image_to_dynamo_policy"
-  role   = "${module.miro_image_to_dynamo.role_name}"
-  policy = "${data.aws_iam_policy_document.allow_miro_data_put.json}"
+  role   = "${module.miro_image_to_dynamo_lambda.role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_read_miro_data_put.json}"
 }
 
-data "aws_iam_policy_document" "allow_miro_data_put" {
+data "aws_iam_policy_document" "allow_s3_read_miro_data_put" {
   statement {
     actions = [
       "dynamodb:PutItem",
