@@ -5,7 +5,7 @@ import boto3
 from moto import mock_dynamodb2, mock_s3
 import pytest
 
-import miro_image_info_to_dynamo
+import miro_image_to_dynamo
 
 
 @pytest.fixture
@@ -142,7 +142,7 @@ def test_should_insert_the_json_into_dynamo(miro_table, s3_miro_data_bucket):
         }]
     }
 
-    miro_image_info_to_dynamo.main(event, None)
+    miro_image_to_dynamo.main(event, None)
 
     dynamodb_response = table.get_item(Key={'MiroID': miro_id, 'MiroCollection': collection})
 
@@ -199,7 +199,7 @@ def test_should_not_insert_into_dynamodb_if_image_does_not_exist_in_s3(miro_tabl
         }]
     }
 
-    miro_image_info_to_dynamo.main(event, None)
+    miro_image_to_dynamo.main(event, None)
 
     dynamodb_response = table.get_item(Key={'MiroID': miro_id, 'MiroCollection': collection})
 
