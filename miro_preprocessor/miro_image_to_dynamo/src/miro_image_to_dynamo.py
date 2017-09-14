@@ -3,7 +3,7 @@ import os
 import re
 
 import boto3
-
+from botocore.exceptions import ClientError
 
 def main(event, _):
     print(f'Received event:\n{event}')
@@ -21,7 +21,12 @@ def main(event, _):
 
     try:
         s3_client.head_object(Bucket=bucket_name, Key=key)
-
+    except ClientError as client_error:
+        if client_error.response['Error']['Code'] == '404':
+            pass
+        else:
+            raise
+    else:
         table_name = os.environ["TABLE_NAME"]
         print('Pushing image with ID %s' % (miro_id))
         dynamodb_client.put_item(
@@ -44,5 +49,3 @@ def main(event, _):
                 }
             }
         )
-    except Exception as _:
-        pass
