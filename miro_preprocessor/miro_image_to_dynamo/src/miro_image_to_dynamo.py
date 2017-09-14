@@ -5,6 +5,7 @@ import re
 import boto3
 from botocore.exceptions import ClientError
 
+
 def main(event, _):
     print(f'Received event:\n{event}')
     s3_client = boto3.client("s3")
