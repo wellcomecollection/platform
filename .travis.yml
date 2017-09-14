@@ -46,7 +46,7 @@ before_install:
   - |
     SHOULD_DEPLOY=false
     if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]; then
-      python3 .travis/should_deploy_travis_from_master.py
+      python3 .travis/should_deploy_from_master.py
       if (( $? == 1 )); then
         SHOULD_DEPLOY=true
       fi
