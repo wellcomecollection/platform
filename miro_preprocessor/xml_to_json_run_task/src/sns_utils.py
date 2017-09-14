@@ -35,7 +35,7 @@ def publish_sns_message(sns_client, topic_arn, message):
         })
     )
 
-    print(f'SNS response = {resp!r}')
-    assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
+    print(f'SNS response = {response!r}')
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
     return response

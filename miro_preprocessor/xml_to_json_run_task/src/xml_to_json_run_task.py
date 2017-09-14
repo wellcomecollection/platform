@@ -14,7 +14,7 @@ import sns_utils
 
 def command_for_xml_to_json_task(event, cluster_name, container_name, task_definition):
     bucket_name = event["bucket_name"]
-    object_src = event["object_src"]
+    object_src = event["object_key"]
     object_dst = f'{object_src}.txt'
 
     cmd = [
