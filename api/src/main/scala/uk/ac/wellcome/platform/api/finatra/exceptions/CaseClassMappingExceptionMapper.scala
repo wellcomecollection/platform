@@ -24,13 +24,15 @@ class CaseClassMappingExceptionWrapper @Inject()(
 
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
-  override def toResponse(request: Request, e: CaseClassMappingException): Response = {
+  override def toResponse(request: Request,
+                          e: CaseClassMappingException): Response = {
     val errorString = e.errors
       .map { _.getMessage }
       .toList
       .mkString(", ")
     error(s"Sending HTTP 400 for $errorString")
-    val result = DisplayError(Error(variant = "http-400", description = Some(errorString)))
+    val result = DisplayError(
+      Error(variant = "http-400", description = Some(errorString)))
     val errorResponse = ResultResponse(context = contextUri, result = result)
 
     response.badRequest.json(errorResponse)
