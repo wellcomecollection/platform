@@ -58,6 +58,9 @@ before_install:
       exit 0
     fi
 
+  - echo "SHOULD_RUN_TESTS = $SHOULD_RUN_TESTS"
+  - echo "SHOULD_DEPLOY    = $SHOULD_DEPLOY"
+
 install:
   # We need this for the Elasticsearch Docker container to start
   # See https://github.com/travis-ci/travis-ci/issues/6534
