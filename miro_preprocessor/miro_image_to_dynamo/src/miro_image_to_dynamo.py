@@ -17,7 +17,7 @@ def main(event, _):
     image_data = image_info['image_data']
     collection = image_info['collection']
     miro_id = image_data['image_no_calc']
-    result = re.match(r"(?P<shard>[a-zA-Z]+[0-9]{4})", miro_id)
+    result = re.match(r"(?P<shard>[A-Z]+[0-9]{4})", miro_id)
     key = f"fullsize/{result.group('shard')}000/{miro_id}.jpg"
 
     try:
