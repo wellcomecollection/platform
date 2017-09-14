@@ -37,7 +37,8 @@ before_install:
   - |
     SHOULD_RUN_TESTS=true
     if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]; then
-      if ! python3 .travis/should_run_pr_tests.py; then
+      python3 .travis/should_run_pr_tests.py
+      if (( $? == 0 )); then
         SHOULD_RUN_TESTS=false
       fi
     fi
@@ -45,7 +46,8 @@ before_install:
   - |
     SHOULD_DEPLOY=false
     if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]; then
-      if python3 .travis/should_deploy_travis_from_master.py; then
+      python3 .travis/should_deploy_travis_from_master.py
+      if (( $? == 1 )); then
         SHOULD_DEPLOY=true
       fi
     fi
