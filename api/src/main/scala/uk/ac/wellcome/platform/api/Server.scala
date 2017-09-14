@@ -13,7 +13,10 @@ import com.twitter.finatra.json.utils.CamelCasePropertyNamingStrategy
 import io.swagger.models.Swagger
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
-import uk.ac.wellcome.platform.api.finatra.exceptions.GeneralExceptionMapper
+import uk.ac.wellcome.platform.api.finatra.exceptions.{
+  ElasticsearchExceptionMapper,
+  GeneralExceptionMapper
+}
 import uk.ac.wellcome.platform.api.models.WorksIncludesDeserializerModule
 
 object ServerMain extends Server
@@ -42,10 +45,6 @@ class Server extends HttpServer {
     name = "api.prefix",
     default = "/" + apiName() + "/" + apiVersion(),
     help = "API path prefix")
-  private final val esMaxResultWindow = flag(
-    name = "es.maxResultWindow",
-    default = 10000,
-    help = "Max result window size in Elasticsearch")
 
   flag[String](name = "es.index", default = "records", help = "ES index name")
   flag[String](name = "es.type", default = "item", help = "ES document type")
@@ -65,5 +64,6 @@ class Server extends HttpServer {
       .add[SwaggerController]
       .add[WorksController]
       .exceptionMapper[GeneralExceptionMapper]
+      .exceptionMapper[ElasticsearchExceptionMapper]
   }
 }
