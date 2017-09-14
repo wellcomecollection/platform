@@ -7,7 +7,7 @@ RUN apt-get install -y python python-pip python-setuptools python-dev \
 
 RUN pip install awscli
 
-ENV LORIS_COMMIT d2b70cc7a9011ed9b17a189374ad5c77641d8124
+ENV LORIS_COMMIT 18f0ed38b544e84227d26c0b69815115493d38fa
 ENV LORIS_GITHUB_USER alexwlchan
 
 COPY install_loris.sh /install_loris.sh

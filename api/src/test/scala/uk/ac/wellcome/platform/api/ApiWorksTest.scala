@@ -339,10 +339,18 @@ class ApiWorksTest
 
   it(
     "should return a not found error when requesting a single work with a non existing id") {
+    val badId = "non-existing-id"
     server.httpGet(
-      path = s"/$apiPrefix/works/non-existing-id",
+      path = s"/$apiPrefix/works/$badId",
       andExpect = Status.NotFound,
-      withJsonBody = ""
+      withJsonBody = s"""{
+        "@context": "https://localhost:8888/catalogue/v0/context.json",
+        "type": "Error",
+        "errorType": "http",
+        "httpStatus": 404,
+        "label": "Not Found",
+        "description": "Work not found for identifier $badId"
+      }"""
     )
   }
 
@@ -901,4 +909,23 @@ class ApiWorksTest
     }
   }
 
+  it("should return an Internal Server Error if you trigger an internal exception") {
+    // Strictly speaking, looking up a non-existent index should be a
+    // 400 Bad Request or maybe 404 Not Found, not a 500 error -- but this test
+    // just needs to reliably trigger an internal exception, and for now
+    // this code path will do.
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?_index=foobarbaz",
+        andExpect = Status.InternalServerError,
+        withJsonBody = s"""{
+          "@context": "https://localhost:8888/catalogue/v0/context.json",
+          "type": "Error",
+          "errorType": "http",
+          "httpStatus": 500,
+          "label": "Internal Server Error"
+        }"""
+      )
+    }
+  }
 }

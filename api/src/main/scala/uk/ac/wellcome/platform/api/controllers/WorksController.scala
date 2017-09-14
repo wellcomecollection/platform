@@ -8,8 +8,10 @@ import com.twitter.inject.annotations.Flag
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import scala.collection.JavaConverters._
+import uk.ac.wellcome.models.Error
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.{
+  DisplayError,
   DisplayResultList,
   DisplayWork,
   WorksIncludes
@@ -114,7 +116,6 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
-      // val includes = WorksIncludes(request.includes)
       worksService
         .findWorkById(request.id,
                       request.includes.getOrElse(WorksIncludes()),
@@ -123,7 +124,17 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           case Some(result) =>
             response.ok.json(
               ResultResponse(context = contextUri, result = result))
-          case None => response.notFound
+          case None => {
+            val result = Error(
+              variant = "http-404",
+              description =
+                Some(s"Work not found for identifier ${request.id}")
+            )
+            response.notFound.json(
+              ResultResponse(context = contextUri,
+                             result = DisplayError(result))
+            )
+          }
         }
     }
 

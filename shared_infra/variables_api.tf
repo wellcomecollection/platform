@@ -17,12 +17,12 @@ variable "production_api" {
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "0.0.1-9556f9000c69b435a320feea6f045a27057998fc_prod"
+  default     = "0.0.1-77e89a2374a35b4d49bac455f26e29a0a4fce9f8_dev"
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "9556f9000c69b435a320feea6f045a27057998fc"
+  default     = "1e1e03187d78c1a747ef6917ca65f45e486e3240"
 }
 
 variable "pinned_remus_api" {
