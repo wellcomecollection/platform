@@ -91,6 +91,16 @@ class ApiWorksTest
       "label": "${p.label}"
     }"""
 
+  private def badRequest(description: String) =
+    s"""{
+      "@context": "https://localhost:8888/catalogue/v0/context.json",
+      "type": "Error",
+      "errorType": "http",
+      "httpStatus": 400,
+      "label": "Bad Request",
+      "description": "$description"
+    }"""
+
   it("should return a list of works") {
 
     val works = createWorks(3)
@@ -319,13 +329,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
-      withJsonBody = """
-                       |{
-                       |  "errors" : [
-                       |    "pageSize: 'penguin' is not a valid Integer"
-                       |  ]
-                       |}
-                     """.stripMargin
+      withJsonBody = badRequest("pageSize: 'penguin' is not a valid Integer")
     )
   }
 
@@ -360,8 +364,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody =
-        s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
+      withJsonBody = badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
     )
   }
 
@@ -371,28 +374,27 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody =
-        s"""{"errors":["pageSize: [$pageSize] is not less than or equal to 100"]}"""
+      withJsonBody = badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
     )
   }
 
   it(
     "should return an HTTP Bad Request error if the user asks for zero-length pages") {
+    val pageSize = 0
     server.httpGet(
-      path = s"/$apiPrefix/works?pageSize=0",
+      path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody =
-        s"""{"errors":["pageSize: [0] is not greater than or equal to 1"]}"""
+      withJsonBody = badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
     )
   }
 
   it(
     "should return an HTTP Bad Request error if the user asks for a negative page size") {
+    val pageSize = -50
     server.httpGet(
-      path = s"/$apiPrefix/works?pageSize=-50",
+      path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody =
-        s"""{"errors":["pageSize: [-50] is not greater than or equal to 1"]}"""
+      withJsonBody = badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
     )
   }
 
@@ -400,8 +402,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?page=0",
       andExpect = Status.BadRequest,
-      withJsonBody =
-        s"""{"errors":["page: [0] is not greater than or equal to 1"]}"""
+      withJsonBody = badRequest("page: [0] is not greater than or equal to 1")
     )
   }
 
@@ -410,8 +411,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
-      withJsonBody =
-        s"""{"errors":["page: [-50] is not greater than or equal to 1"]}"""
+      withJsonBody = badRequest("page: [-50] is not greater than or equal to 1")
     )
   }
 
@@ -419,14 +419,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=-60&page=-50",
       andExpect = Status.BadRequest,
-      withJsonBody = s"""
-                        |{
-                        |  "errors": [
-                        |    "page: [-50] is not greater than or equal to 1",
-                        |    "pageSize: [-60] is not greater than or equal to 1"
-                        |  ]
-                        |}
-      """.stripMargin
+      withJsonBody = badRequest("page: [-50] is not greater than or equal to 1, pageSize: [-60] is not greater than or equal to 1")
     )
   }
 
@@ -782,8 +775,7 @@ class ApiWorksTest
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo",
         andExpect = Status.BadRequest,
-        withJsonBody =
-          """{"errors" : ["includes: 'foo' is not a valid include"]}"""
+        withJsonBody = badRequest("includes: 'foo' is not a valid include")
       )
     }
   }
@@ -794,8 +786,7 @@ class ApiWorksTest
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,bar",
         andExpect = Status.BadRequest,
-        withJsonBody =
-          """{"errors" : ["includes: 'foo', 'bar' are not valid includes"]}"""
+        withJsonBody = badRequest("includes: 'foo', 'bar' are not valid includes")
       )
     }
   }
@@ -806,8 +797,7 @@ class ApiWorksTest
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
         andExpect = Status.BadRequest,
-        withJsonBody =
-          """{"errors" : ["includes: 'foo', 'bar' are not valid includes"]}"""
+        withJsonBody = badRequest("includes: 'foo', 'bar' are not valid includes")
       )
     }
   }
@@ -824,8 +814,7 @@ class ApiWorksTest
       server.httpGet(
         path = s"/$apiPrefix/works/${work.id}?includes=foo",
         andExpect = Status.BadRequest,
-        withJsonBody =
-          """{"errors" : ["includes: 'foo' is not a valid include"]}"""
+        withJsonBody = badRequest("includes: 'foo' is not a valid include")
       )
     }
   }
@@ -926,6 +915,24 @@ class ApiWorksTest
           "label": "Internal Server Error"
         }"""
       )
+    }
+  }
+
+  it("should return a Bad Request error if you try to page beyond the first 10000 items") {
+    val queries = List(
+      "page=10000",
+      "pageSize=100&page=101",
+      "page=126&pageSize=80"
+    )
+    queries.foreach { query =>
+      println(s"Testing query=$query")
+      eventually {
+        server.httpGet(
+          path = s"/$apiPrefix/works?$query",
+          andExpect = Status.BadRequest,
+          withJsonBody = badRequest("Only the first 10000 works are available in the API.")
+        )
+      }
     }
   }
 }
