@@ -55,6 +55,9 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .description("Returns a paginated list of works")
         .tag("Works")
         .responseWith[DisplayResultList](200, "ResultList[Work]")
+        .responseWith[DisplayError](400, "Bad Request Error")
+        .responseWith[DisplayError](404, "Not Found Error")
+        .responseWith[DisplayError](500, "Internal Server Error")
         .queryParam[Int]("page",
                          "The page to return from the result list",
                          required = false)
@@ -113,6 +116,9 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .tag("Works")
         .routeParam[String]("id", "The work to return", required = true)
         .responseWith[DisplayWork](200, "Work")
+        .responseWith[DisplayError](400, "Bad Request Error")
+        .responseWith[DisplayError](404, "Not Found Error")
+        .responseWith[DisplayError](500, "Internal Server Error")
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
