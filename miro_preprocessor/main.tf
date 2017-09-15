@@ -1,56 +1,24 @@
 module "xml_to_json_converter" {
-  source        = "../terraform/ecs_script_task"
-  task_name     = "xml_to_json_converter"
-  app_uri       = "${module.ecr_repository_xml_to_json_converter.repository_url}:${var.release_ids["xml_to_json_converter"]}"
-  task_role_arn = "${module.ecs_xml_to_json_converter_iam.task_role_arn}"
+  source = "xml_to_json_converter"
 
-  env_vars = [
-    "{\"name\": \"BUCKET\", \"value\": \"${data.terraform_remote_state.platform.bucket_miro_data_id}\"}",
-    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
-  ]
+  bucket_miro_data_id = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  release_ids         = "${var.release_ids}"
+
+  s3_read_miro_data_json  = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
+  s3_write_miro_data_json = "${data.aws_iam_policy_document.s3_write_miro_data.json}"
 }
 
-module "ecs_xml_to_json_converter_iam" {
-  source = "../terraform/ecs_iam"
-  name   = "xml_to_json_converter"
-}
+module "xml_to_json_run_task" {
+  source = "xml_to_json_run_task"
 
-module "ecr_repository_xml_to_json_converter" {
-  source = "../terraform/ecr"
-  name   = "xml_to_json_converter"
-}
+  bucket_miro_data_id    = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  bucket_miro_data_arn   = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
+  lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
 
-resource "aws_iam_role_policy" "xml_to_json_converter_read_from_s3" {
-  role   = "${module.ecs_xml_to_json_converter_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
-}
+  s3_read_miro_data_json = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
 
-resource "aws_iam_role_policy" "xml_to_json_converter_read_from_s3" {
-  role   = "${module.ecs_xml_to_json_converter_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.s3_write_miro_data.json}"
-}
-
-data "aws_iam_policy_document" "s3_read_miro_data" {
-  statement {
-    actions = [
-      "s3:Get*",
-      "s3:List*",
-    ]
-
-    resources = [
-      "${data.terraform_remote_state.platform.bucket_miro_data_arn}/source",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "s3_write_miro_data" {
-  statement {
-    actions = [
-      "s3:Put*",
-    ]
-
-    resources = [
-      "${data.terraform_remote_state.platform.bucket_miro_data_arn}/json",
-    ]
-  }
+  container_name      = "${module.xml_to_json_converter.container_name}"
+  topic_arn           = "${data.terraform_remote_state.lambda.run_ecs_task_topic_arn}"
+  cluster_name        = "${data.terraform_remote_state.platform.ecs_services_cluster_name}"
+  task_definition_arn = "${module.xml_to_json_converter.task_definition_arn}"
 }
