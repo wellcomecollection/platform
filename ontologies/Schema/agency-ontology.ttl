@@ -1,0 +1,132 @@
+@prefix wag: <http://wellcomecollection.org/ontologies/agency/> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://wellcomecollection.org/ontologies/agency>
+    rdf:type owl:Ontology ;
+    dcterms:title "Agency"@en ;
+    dcterms:created "2017-08-16"^^xsd:date ;
+    dcterms:description "A agency ontology describing people, organisations and their relationships"@en .
+
+###### classes ###  
+    
+wag:Person rdf:type owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A person"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .
+    
+wag:Organisation rdf:type owl:Class ;
+    rdfs:label "Organisation"@en ;
+    rdfs:comment "An organisation"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .
+    
+wag:Agent rdf:type owl:Class ;
+    rdfs:label "Agent"@en ;
+    rdfs:comment "A agent"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .  
+    
+wag:Position rdf:type owl:Class ;
+    rdfs:label "Position"@en ;
+    rdfs:comment "A postition"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> . 
+    
+wag:Gender rdf:type owl:Class ;
+    rdfs:label "Gender"@en ;
+    rdfs:comment "A persons gender"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> . 
+
+wag:Place rdf:type owl:Class ;
+    rdfs:label "Place"@en ;
+    rdfs:comment "A place"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .
+    
+wag:Award rdf:type owl:Class ;
+    rdfs:label "Award"@en ;
+    rdfs:comment "An award"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> . 
+    
+wag:RecievedAward rdf:type owl:Class ;
+    rdfs:label "RecievedAward"@en ;
+    rdfs:comment "A recieved award"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .                              
+     
+    
+#### object properties ####
+
+wag:occupation rdf:type owl:ObjectProperty ;
+    rdfs:label "occupation"@en ;
+    rdfs:comment "Relates a person to an occupation."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .
+    
+wag:fieldOfStudy rdf:type owl:ObjectProperty ;
+    rdfs:label "fieldOfStudy"@en ;
+    rdfs:comment "Relates a person to a field of study."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> . 
+    
+wag:educatedAt rdf:type owl:ObjectProperty ;
+    rdfs:label "educatedAt"@en ;
+    rdfs:comment "Relates a person to a place of education."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Organisation ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .        
+    
+wag:memberOf rdf:type owl:ObjectProperty ;
+    rdfs:label "memberOf"@en ;
+    rdfs:comment "Relates a person to a membership of an organisation."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Organisation ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .            
+
+wag:placeOfBirth rdf:type owl:ObjectProperty ;
+    rdfs:label "placeOfBirth"@en ;
+    rdfs:comment "Relates a person to there place of birth."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Place ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> . 
+    
+wag:gender rdf:type owl:ObjectProperty ;
+    rdfs:label "gender"@en ;
+    rdfs:comment "Relates a person to their identified gender."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Gender ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .      
+    
+wag:position rdf:type owl:ObjectProperty ;
+    rdfs:label "position"@en ;
+    rdfs:comment "Relates a person to a held position."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range wag:Position ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .      
+        
+wag:positionAt rdf:type owl:ObjectProperty ;
+    rdfs:label "positionAt"@en ;
+    rdfs:comment "Relates a persons position to an organisation at which it was held."@en ;
+    rdfs:domain wag:Position ;
+    rdfs:range wag:Organisation ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .         
+    
+####### data properties #####
+
+wag:dateOfBirth rdf:type owl:DatatypeProperty ;
+    rdfs:label "dateOfBirth"@en ;
+    rdfs:comment "The date a person was born."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range xsd:date ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .
+    
+wag:dateOfDeath rdf:type owl:DatatypeProperty ;
+    rdfs:label "dateOfBirth"@en ;
+    rdfs:comment "The date a person was born."@en ;
+    rdfs:domain wag:Person ;
+    rdfs:range xsd:date ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .     
+    
+                     
+    

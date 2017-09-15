@@ -166,7 +166,7 @@ wwork:level rdf:type owl:DatatypeProperty ;
     rdfs:domain wwork:Work ;
     rdfs:range xsd:integer ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
-    
+
 wwork:alternativeTitle rdf:type owl:DatatypeProperty ;
     rdfs:label "alternativeTitle"@en ;
     rdfs:comment "Alternative title for a work, usually used for published material: former title, variant forms, translation of main title, etc."@en ;
