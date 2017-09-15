@@ -15,7 +15,7 @@ from utils.ecs_utils import (
     EcsThrottleException
 )
 
-from deployment_utils import (
+from utils.deployment_utils import (
     get_deployments_from_ecs,
     get_deployments_from_dynamo,
     put_deployment_in_dynamo,
