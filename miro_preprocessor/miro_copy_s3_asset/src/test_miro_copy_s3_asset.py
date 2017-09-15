@@ -2,11 +2,9 @@ import json
 import os
 
 import boto3
-from botocore.exceptions import ClientError
 from moto import mock_s3
-import pytest
 
-import miro_move_s3_asset
+import miro_copy_s3_asset
 
 
 def assert_sns_message_forwarded(image_json, queue_url, sqs_client):
@@ -94,7 +92,7 @@ def test_should_copy_an_asset_into_a_different_bucket_and_forward_the_message(sn
         "TOPIC_ARN": topic_arn
     }
 
-    miro_move_s3_asset.main(event, None)
+    miro_copy_s3_asset.main(event, None)
 
     s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
     assert s3_response['Body'].read() == image_body
@@ -157,7 +155,7 @@ def test_should_not_forward_the_message_if_the_asset_does_not_exist(sns_sqs):
         "TOPIC_ARN": topic_arn
     }
 
-    miro_move_s3_asset.main(event, None)
+    miro_copy_s3_asset.main(event, None)
 
     assert_bucket_is_empty(destination_bucket_name, s3_client)
 

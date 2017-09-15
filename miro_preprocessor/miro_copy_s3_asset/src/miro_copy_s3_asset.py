@@ -32,6 +32,7 @@ def main(event, _):
             raise
     else:
         destination_key = f"{shard}/{miro_id}.jpg"
+
         s3_client.copy(
             CopySource={
                 'Bucket': source_bucket_name,
@@ -39,6 +40,7 @@ def main(event, _):
             },
             Bucket=destination_bucket_name,
             Key=destination_key)
+
         sns_utils.publish_sns_message(
             sns_client,
             topic_arn,
