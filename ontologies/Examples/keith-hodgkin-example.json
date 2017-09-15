@@ -1,0 +1,85 @@
+{
+  "id": "d22e2opp",
+  "type": "Person",
+  "label": "Hodgkin, Keith, 1918-1999",
+  "gender": "Male",
+  "dateOfBirth": "1918" ,
+  "dateOfDeath": "1999" ,
+  "nationality":
+    {
+      "id": "x2n20d1io",
+      "label": "United Kingdom" ,
+      "type": "Place"	
+    } ,
+  "placeOfBirth":
+      {
+      "id": "dj901290",
+      "label": "Sussex" ,
+      "type": "Place"	
+      } ,
+  "languageSpoken": "English",
+  "occupation":
+    {
+      "id": "dj903jg",
+      "label": "General Practitioner",
+      "type": "Concept"
+    } ,
+  "position": [
+    {
+      "label": "Student House Surgeon and work in Hugh Cairns's Neurosurgical Unit",
+      "start": "1939",
+      "end": "1943" ,
+      "positionAt": "Radcliffe Infirmary, Oxford"
+    },
+    {
+      "label": "Surgeon Lieutenant",
+      "start": "1943",
+      "end": "1946" ,
+      "positionAt": "Royal Navy"
+    },
+    {
+      "label": "Hospital pathologist",
+      "start": "1948",
+      "end": "1949",
+      "positionAt": "Oxford Hospital"
+    },
+    {
+      "label": "General Practice",
+      "start": "1949",
+      "end": "1950",
+      "positionAt": "Stockton"
+    },
+    {
+      "label": "General Practice",
+      "start": "1950",
+      "end": "1973",
+      "positionAt": "Redcar"
+    },
+    {
+      "label": "Visiting Professor,",
+      "start": "1973",
+      "end": "1999",
+      "positionAt": "Glasgow Medical School "
+    }
+  ],
+  "educatedAt": "Magdalen College, Oxford ",
+  "description": "Keith Hodgkin worked as a General Practitioner from 1949, soon after the establishment of the NHS, and became very interested in methods of record keeping, believing that good record keeping practice would not only improve standards of patient care and facilitate the work of the GP but could also be used in research. In 1963 he published Towards Earlier Diagnosis, which described general practice work to students, with appendices detailing the records he kept in parallel with the NHS patient record notes. Diagnoses were recorded on the patient's notes, and ringed for entry into a day book and for indexing into a central diagnostic register which used the International Classification of Diseases. An age/sex register of all practice patients was also kept, and regularly updated. Hodgkin was instrumental in the formation of a group of four practices in the North East, which co-operated in research projects using their practice records. Studies carried out by the group included a five year survey on patients with ulcer-type dyspepsia, funded by the Medical Research Council.",
+  "identifiers": [
+    {
+      "type": "Identifier",
+      "identifierScheme": "wikidata",
+      "value": "Q29642974"
+    }
+  ],
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/V0042826ER.jpg/full/300,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  }
+}
