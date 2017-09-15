@@ -52,13 +52,13 @@ miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 miro_move_s3_asset-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 	-v $(ROOT)/miro_preprocessor/miro_move_s3_asset/src:/data \
-	-e OP=test -e FIND_MATCH_PATHS='/data' \
+	-e OP=test \
 	python3.6_ci:latest
 
 miro_move_s3_asset-build: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 	-v $(ROOT)/miro_preprocessor/miro_move_s3_asset/src:/data \
-	-e OP=build-lambda -e FIND_MATCH_PATHS='/data' \
+	-e OP=build-lambda \
 	python3.6_ci:latest
 
 miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test miro_move_s3_asset-test
