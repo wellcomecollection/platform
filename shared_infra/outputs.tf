@@ -101,3 +101,19 @@ output "bucket_miro_data_id" {
 output "bucket_miro_data_arn" {
   value = "${aws_s3_bucket.miro-data.arn}"
 }
+
+output "bucket_miro_images_sync_arn" {
+  value = "${aws_s3_bucket.miro-images-sync.arn}"
+}
+
+output "bucket_miro_images_sync_id" {
+  value = "${aws_s3_bucket.miro-images-sync.id}"
+}
+
+output "table_miro_data_arn" {
+  value = "${aws_dynamodb_table.miro_table.arn}"
+}
+
+output "table_miro_data_name" {
+  value = "${aws_dynamodb_table.miro_table.name}"
+}

@@ -46,5 +46,9 @@ $(ROOT)/.docker/miro_adapter_tests:
 lint-python: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
 
+## Check a git repo is up to date with remote master
+uptodate-git: $(ROOT)/.docker/python3.6_ci
+	docker run -v $$HOME/.ssh:/root/.ssh -v $(ROOT):/data -e OP=is-master-head python3.6_ci:latest
+
 clean:
 	rm -rf $(ROOT)/.docker
