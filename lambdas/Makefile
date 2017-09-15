@@ -1,7 +1,7 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
 ifneq ($(ROOT), $(shell pwd))
-include $(ROOT)/shared.Makefile
+	include $(ROOT)/shared.Makefile
 endif
 
 
@@ -22,18 +22,18 @@ lambdas-test: $(ROOT)/.docker/python3.6_ci
 ## Run a plan on lambda stack
 lambdas-terraform--plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambda_deps
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
-	-v $$(pwd)/terraform:/terraform \
-	-v $$(pwd)/lambdas:/data \
+	-v $(ROOT)/terraform:/terraform \
+	-v $(ROOT)/lambdas:/data \
 	-e OP=plan \
 	terraform_ci:latest
 
 ## Run an apply on lambda stack
 lambdas-terraform-apply: $(ROOT)/.docker/terraform_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
-	-v $$(pwd)/terraform:/terraform \
-	-v $$(pwd)/lambdas:/data \
+	-v $(ROOT)/terraform:/terraform \
+	-v $(ROOT)/lambdas:/data \
 	-e OP=apply \
 	terraform_ci:latest
 
 
-.PHONY: lambdas-test terraform-lambda-plan terraform-lambda-apply
+.PHONY: lambdas-test lambdas-terraform--plan lambdas-terraform-apply

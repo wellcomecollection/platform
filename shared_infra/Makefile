@@ -22,4 +22,4 @@ shared-terraform-apply: $(ROOT)/.docker/terraform_ci
 		terraform_ci:latest
 
 
-.PHONY: terraform-shared-plan terraform-shared-apply
+.PHONY: shared-terraform-plan shared-terraform-apply
