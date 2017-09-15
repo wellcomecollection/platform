@@ -3,6 +3,14 @@
 set -o errexit
 set -o nounset
 
+function build_lambda {
+  echo "Attempting to build lambda ..."
+
+  /app/build_lambda.sh
+
+  echo "Done."
+}
+
 function install_dependencies {
   echo "Installing dependencies ..."
 
@@ -27,6 +35,7 @@ function run_tests {
   echo "Testing ..."
 
   install_dependencies
+  FIND_MATCH_PATHS=${FIND_MATCH_PATHS:-/data}
   /app/test.sh "$FIND_MATCH_PATHS"
 
   echo "Done."
@@ -49,6 +58,9 @@ then
 elif [[ "$OP" == "install-deps" ]]
 then
   install_dependencies
+elif [[ "$OP" == "build-lambda" ]]
+then
+  build_lambda
 elif [[ "$OP" == "is-master-head" ]]
 then
   check_is_master

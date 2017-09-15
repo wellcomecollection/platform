@@ -4,7 +4,7 @@
     "essential": true,
     "image": "${app_uri}",
     "memory": ${memory},
-    "name": "app",
+    "name": "${name}",
     "environment": ${environment_vars},
     "logConfiguration": {
       "logDriver": "awslogs",
