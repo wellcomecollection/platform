@@ -5,11 +5,15 @@ import re
 import boto3
 from botocore.exceptions import ClientError
 
+import sns_utils
+
 
 def main(event, _):
+    sns_client = boto3.client("sns")
     s3_client = boto3.client("s3")
     source_bucket_name = os.environ["S3_SOURCE_BUCKET"]
     destination_bucket_name = os.environ["S3_DESTINATION_BUCKET"]
+    topic_arn = os.environ["TOPIC_ARN"]
 
     image_info = json.loads(event['Records'][0]['Sns']['Message'])
     image_data = image_info['image_data']
@@ -28,7 +32,15 @@ def main(event, _):
             raise
     else:
         destination_key = f"{shard}/{miro_id}.jpg"
-        s3_client.copy(CopySource={
-            'Bucket': source_bucket_name,
-            'Key': key
-        }, Bucket=destination_bucket_name, Key=destination_key)
+        s3_client.copy(
+            CopySource={
+                'Bucket': source_bucket_name,
+                'Key': key
+            },
+            Bucket=destination_bucket_name,
+            Key=destination_key)
+        sns_utils.publish_sns_message(
+            sns_client,
+            topic_arn,
+            image_info
+        )
