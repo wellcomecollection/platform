@@ -38,14 +38,16 @@ object ReindexStatus {
   }
 
   def succeed(): Unit =
-    agent.send(currentStatus =>
-      ReindexStatus(JobStatus.Success,
-                    currentStatus.recordsProcessed,
-                    currentStatus.batch))
+    agent.send(
+      currentStatus =>
+        ReindexStatus(JobStatus.Success,
+                      currentStatus.recordsProcessed,
+                      currentStatus.batch))
 
   def fail(): Unit =
-    agent.send(currentStatus =>
-      ReindexStatus(JobStatus.Failure,
-                    currentStatus.recordsProcessed,
-                    currentStatus.batch))
+    agent.send(
+      currentStatus =>
+        ReindexStatus(JobStatus.Failure,
+                      currentStatus.recordsProcessed,
+                      currentStatus.batch))
 }
