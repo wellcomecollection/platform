@@ -1,0 +1,106 @@
+[
+{
+  "id": "d22e2opp",
+  "type": "Concept",
+  "label": "Caricatures" ,
+  "altLabel": "Pictorial humor" ,
+  "level": "2" ,
+  "scopeNote": "Images that portray in a critical or facetious way a real individual or group, or a figure representing a social, political, ethnic, or racial type. The effect is usually achieved through distortion or exaggeration of the features or form.",
+  "usageNote": "Applied within MARC as: Genre/Format (MARC 155/655)",  
+  "identifiers": {
+      "type": "Identifier",
+      "identifierScheme": "lctgm",
+      "value": "tgm001698" 
+   } ,
+   "broader" :
+   {
+      "id": "g45e6uip" ,
+      "type": "Concept",
+      "label": "Pictures" ,
+      "level": "1"  
+   } ,
+   "narrower" :
+   {
+      "id": "f7336uio" ,
+      "type": "Concept",
+      "label": "Ethnic Stereo types" ,
+      "level": "3"  
+   } 
+} ,
+{
+  "id": "d22e2opp",
+  "type": "Concept",
+  "label": "Caricatures and cartoons" ,
+  "altLabel": "Pictorial humor" ,
+  "level": "2" ,
+  "scopeNote": "Images that portray in a critical or facetious way a real individual or group, or a figure representing a social, political, ethnic, or racial type. The effect is usually achieved through distortion or exaggeration of the features or form.",
+  "usageNote": "Applied within MARC as: Genre/Format (MARC 155/655)",  
+  "identifiers": {
+      "type": "Identifier",
+      "identifierScheme": "lcsh",
+      "value": "sh99001244" 
+   } ,
+   "broader" :
+   [
+   {
+      "id": "t45t3kpp" ,
+      "type": "Concept",
+      "label": "Humor" ,
+      "level": "1"  
+   } ,
+      {
+      "id": "g47g7ipp" ,	
+      "type": "Concept",
+      "label": "Pictorial works" ,
+      "level": "1"  
+   }
+   ] ,
+   "narrower" :
+   [   
+   	{
+   	  "id": "2dj90jop" ,
+      "type": "Concept",
+      "label": "Comic books" ,
+      "level": "3"  
+   } ,
+   {
+   	  "id": "dj0919dj" ,
+      "type": "Concept",
+      "label": "Biography--Caricatures and cartoons" ,
+      "level": "3"  
+   } 
+   ]	
+} ,
+{
+  "id": "d22e2opp",
+  "type": "Concept",
+  "label": "Caricatures and cartoons" ,
+  "altLabel": "Pictorial humor" ,
+  "level": "3" ,
+  "scopeNote": "Images that portray in a critical or facetious way a real individual or group, or a figure representing a social, political, ethnic, or racial type. The effect is usually achieved through distortion or exaggeration of the features or form.",
+  "usageNote": "Applied within MARC as: Genre/Format (MARC 155/655)",  
+  "identifiers": {
+      "type": "Identifier",
+      "identifierScheme": "lcsh",
+      "value": "sh99001244" 
+   } ,
+   "broader" :
+   [
+   {
+   	  "id": "dj93djd0" ,
+      "type": "Concept",
+      "label": "Book Illustrations" ,
+      "level": "2"  
+   } ,
+      {
+      "id": "sso1md1j" ,	
+      "type": "Concept",
+      "label": "Pictorial works" ,
+      "level": "2"  
+   }
+   ] ,	
+}
+] 
+
+
+
