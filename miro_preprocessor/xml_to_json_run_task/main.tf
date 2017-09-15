@@ -26,6 +26,6 @@ module "trigger_application_restart_on_config_change" {
   lambda_function_arn  = "${module.lambda_xml_to_json_run_task.arn}"
   s3_bucket_arn        = "${var.bucket_miro_data_arn}"
   s3_bucket_id         = "${var.bucket_miro_data_id}"
-  filter_prefix        = "/source/"
+  filter_prefix        = "source/"
   filter_suffix        = ".xml"
 }
