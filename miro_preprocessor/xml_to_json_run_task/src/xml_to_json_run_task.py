@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-
 """
 Lambda to call the RunTask API for the Miro XML-to-JSON ECS task when a file in S3 is updated.
 """
