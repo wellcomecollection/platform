@@ -14,7 +14,7 @@ xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_bu
 xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
 		-v $(ROOT)/miro_preprocessor/xml_to_json_converter/src:/data \
-		-e OP=test -e FIND_MATCH_PATHS='/data' \
+		-e OP=test \
 		python3.6_ci:latest
 
 xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publish_service_to_aws
@@ -27,8 +27,8 @@ xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publi
 
 xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
-		-e OP=test -e FIND_MATCH_PATHS='/data/src' \
+		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task/src:/data \
+		-e OP=test \
 		python3.6_ci:latest
 
 xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
@@ -36,6 +36,7 @@ xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
 		-v $(ROOT)/miro_preprocessor/xml_to_json_run_task:/data \
 		-e OP=build-lambda \
 		python3.6_ci:latest
+
 
 miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \

@@ -64,6 +64,12 @@ module "post_to_slack" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
+module "run_ecs_task" {
+  source = "./run_ecs_task"
+
+  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
+}
+
 module "schedule_reindexer" {
   source = "./schedule_reindexer"
 

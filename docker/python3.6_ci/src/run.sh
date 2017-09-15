@@ -35,6 +35,7 @@ function run_tests {
   echo "Testing ..."
 
   install_dependencies
+  FIND_MATCH_PATHS=${FIND_MATCH_PATHS:-/data}
   /app/test.sh "$FIND_MATCH_PATHS"
 
   echo "Done."

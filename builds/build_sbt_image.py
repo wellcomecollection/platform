@@ -4,13 +4,12 @@
 Build a Docker image for one of our sbt applications.
 
 Usage:
-  build_sbt_image.py --project=<PROJECT> [--version=<VERSION>] [--env=<BUILD_ENV>]
+  build_sbt_image.py --project=<PROJECT> [--env=<BUILD_ENV>]
   build_sbt_image.py -h | --help
 
 Options:
   -h --help                  Show this screen.
   --project=<PROJECT>        Name of the sbt project (e.g. api, transformer)
-  --version=<VERSION>        Version to use in the release ID
   --env=<BUILD_ENV>          Build environment (dev, prod, etc.)
 
 """
@@ -29,21 +28,17 @@ from tooling import (
 )
 
 
-DEFAULT_VERSION = '0.0.1'
-
-
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
     # Read arguments from docopt
     project = args['--project']
-    version = args['--version'] or DEFAULT_VERSION
     build_env = args['--env'] or PLATFORM_ENV
 
     print('*** Building sbt Docker image for %s' % project)
 
     # Construct the release ID and the tag
-    release_id = '%s-%s_%s' % (version, CURRENT_COMMIT, build_env)
+    release_id = '%s_%s' % (CURRENT_COMMIT, build_env)
     tag = '%s:%s' % (project, release_id)
     print('*** Image will be tagged %s' % tag)
 

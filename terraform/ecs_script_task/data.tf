@@ -10,5 +10,6 @@ data "template_file" "definition" {
     environment_vars = "[${join(",", var.env_vars)}]"
     cpu              = "${var.cpu}"
     memory           = "${var.memory}"
+    name             = "${var.name}"
   }
 }
