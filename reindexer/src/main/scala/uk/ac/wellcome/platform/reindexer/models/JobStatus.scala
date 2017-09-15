@@ -30,21 +30,24 @@ object ReindexStatus {
   def init(): Unit = agent.send(ReindexStatus(JobStatus.Init))
 
   def progress(units: Int, batch: Int = 0): Unit = {
-    val currentCount = currentStatus.recordsProcessed + units
-    val currentBatch = currentStatus.batch + batch
-
-    agent.send(ReindexStatus(JobStatus.Working, currentCount, currentBatch))
+    agent.send(currentStatus => {
+      val currentCount = currentStatus.recordsProcessed + units
+      val currentBatch = currentStatus.batch + batch
+      ReindexStatus(JobStatus.Working, currentCount, currentBatch)
+    })
   }
 
   def succeed(): Unit =
     agent.send(
-      ReindexStatus(JobStatus.Success,
-                    currentStatus.recordsProcessed,
-                    currentStatus.batch))
+      currentStatus =>
+        ReindexStatus(JobStatus.Success,
+                      currentStatus.recordsProcessed,
+                      currentStatus.batch))
 
   def fail(): Unit =
     agent.send(
-      ReindexStatus(JobStatus.Failure,
-                    currentStatus.recordsProcessed,
-                    currentStatus.batch))
+      currentStatus =>
+        ReindexStatus(JobStatus.Failure,
+                      currentStatus.recordsProcessed,
+                      currentStatus.batch))
 }

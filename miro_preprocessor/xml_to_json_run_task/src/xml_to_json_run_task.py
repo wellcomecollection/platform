@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
-
 """
-Lambda to run the Miro XML to JSON task when receiving an S3 event.
+Lambda to call the RunTask API for the Miro XML-to-JSON ECS task when a file in S3 is updated.
 """
 
 import os
@@ -20,7 +19,7 @@ def command_for_xml_to_json_task(event, cluster_name, container_name, task_defin
     cmd = [
         f'--bucket={bucket_name}',
         f'--src={object_src}',
-        f'--src={object_dst}'
+        f'--dst={object_dst}'
     ]
 
     return {
@@ -30,14 +29,6 @@ def command_for_xml_to_json_task(event, cluster_name, container_name, task_defin
         "started_by": "xml_to_json_run_task",
         "command": cmd,
     }
-
-
-def post_to_sns(sns_client, topic_arn, cmd):
-    return sns_utils.publish_sns_message(
-        sns_client,
-        topic_arn,
-        cmd
-    )
 
 
 def main(event, _):
@@ -58,4 +49,9 @@ def main(event, _):
         task_definition
     ) for event in s3_events]
 
-    [post_to_sns(sns_client, topic_arn, cmd) for cmd in task_commands]
+    for cmd in task_commands:
+        sns_utils.publish_sns_message(
+            sns_client,
+            topic_arn,
+            cmd
+        )

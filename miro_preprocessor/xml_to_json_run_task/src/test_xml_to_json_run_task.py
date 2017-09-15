@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-
 import os
 
 import boto3
@@ -65,7 +64,7 @@ def test_xml_to_json_run_task(sns_sqs):
         "command": [
             '--bucket=bucket-name',
             '--src=object-key',
-            '--src=object-key.txt'
+            '--dst=object-key.txt'
         ]
     }
 

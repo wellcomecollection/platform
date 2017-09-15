@@ -18,26 +18,81 @@ wcon:Concept rdf:type owl:Class ;
     rdfs:comment "A concept"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .   
 
-
+wcon:ConceptScheme rdf:type owl:Class ;
+    rdfs:label "Concept"@en ;
+    rdfs:comment "A group of concepts"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .
+        
+wcon:QualifiedConcept rdf:type owl:Class ;
+    rdfs:label "QualifiedConcept"@en ;
+    rdfs:comment "A qualified concept"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .        
     
 #### object properties ####
 
-wcon:broaderConcept rdf:type owl:ObjectProperty ;
-    rdfs:label "broaderConcept"@en ;
+wcon:broader rdf:type owl:ObjectProperty ;
+    rdfs:label "broader"@en ;
     rdfs:comment "Relates a concept to a broader concept."@en ;
     rdfs:domain wcon:Concept ;
     rdfs:range wcon:Concept ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .
 
-wcon:narrowerConcept rdf:type owl:ObjectProperty ;
-    rdfs:label "narrowerConcept"@en ;
+wcon:narrower rdf:type owl:ObjectProperty ;
+    rdfs:label "narrower"@en ;
     rdfs:comment "Relates a concept to a narrower concept."@en ;
     rdfs:domain wcon:Concept ;
     rdfs:range wcon:Concept ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .
     
+wcon:concept rdf:type owl:ObjectProperty ;
+    rdfs:label "concept"@en ;
+    rdfs:comment "Relates a qualified concept to the a concept that is being qualified."@en ;
+    rdfs:domain wcon:QualifiedConcept ;
+    rdfs:range wcon:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
+    
+wcon:qualifies rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifies"@en ;
+    rdfs:comment "Relates a qualified concept to a list concepts that qualify the concept."@en ;
+    rdfs:domain wcon:QualifiedConcept ;
+    rdfs:range wcon:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .     
+    
+wcon:inScheme rdf:type owl:ObjectProperty ;
+    rdfs:label "inScheme"@en ;
+    rdfs:comment "Relates a qualified concept to the a concept that is being qualified."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range wcon:ConceptScheme ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .        
+    
     
 ####### data properties #####
 
-           
+wcon:scopeNote rdf:type owl:DatatypeProperty ;
+    rdfs:label "scopeNote"@en ;
+    rdfs:comment "A description of what the concept means or its coverage."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wcon:editoiralNote rdf:type owl:DatatypeProperty ;
+    rdfs:label "editoiralNote"@en ;
+    rdfs:comment "A description of how the concept should be applied."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wcon:level rdf:type owl:DatatypeProperty ;
+    rdfs:label "level"@en ;
+    rdfs:comment "The level of the concept in a hierarchy."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range xsd:integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+    
+wcon:altLabel rdf:type owl:DatatypeProperty ;
+    rdfs:label "altLabel"@en ;
+    rdfs:comment "An alternative label for the concept."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                       
     

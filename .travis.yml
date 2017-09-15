@@ -94,6 +94,8 @@ script:
   - |
     if [[ "$TASK" == "loris-build" ]]; then
       make loris-publish
+    elif [[ "$TASK" == "miro_preprocessor-test" ]]; then
+      make miro_preprocessor-publish
     else
       TASK="${TASK/build/deploy}"
       TASK="${TASK/test/deploy}"

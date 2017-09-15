@@ -64,13 +64,24 @@
   },
   "genres": [
     {
+      "id": "a24s7qf3",
       "label": "Caricatures",
       "type": "Concept",
       "identifiers": [
         {
           "type": "Identifier",
           "identifierScheme": "lctgm",
-          "value": "Caricatures"
+          "value": "tgm001698"
+        },
+        {
+          "type": "Identifier",
+          "identifierScheme": "mesh",
+          "value": "D019492"
+        },
+        {
+          "type": "Identifier",
+          "identifierScheme": "lcsh",
+          "value": "sh99001244"
         }
       ]
     },
@@ -120,6 +131,36 @@
           "value": "D019492"
         }
       ]
+    },
+    {
+      "label": "Gases - Adverse Effects - 1800 - London",
+      "type": "QualifiedConcept",
+      "concept": {
+        "id": "jd921000",
+        "label": "Gases",
+        "type": "Concept",
+        "identifiers": [
+          {
+            "type": "Identifier",
+            "identifierScheme": "lcsh",
+            "value": "sh85053380"
+          }
+        ]
+      },
+      "qualifiers": [
+        {
+          "label": "Adverse effects",
+          "type": "Concept"
+        },
+        {
+          "label": "1800",
+          "type": "Period"
+        },
+        {
+          "label": "London",
+          "type": "Place"
+        }
+      ]
     }
   ],
   "items": [
@@ -127,6 +168,21 @@
       "id": "b28gh7z4n",
       "type": "Item",
       "locations": [
+        {
+          "type": "Location",
+          "locationType": "sicon",
+          "label": "Closed Store Iconographic",
+          "shelfmark": "1L9N",
+          "accessStatus": {
+            "id": "open",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "online-access",
+            "label": "Online access",
+            "type": "AccessProcess"
+          }
+        },
         {
           "type": "Location",
           "locationType": "iiif-image",
