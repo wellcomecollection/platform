@@ -20,7 +20,7 @@ lambdas-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Run a plan on lambda stack
-lambdas-terraform--plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambda_deps
+lambdas-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambda_deps
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 	-v $(ROOT)/terraform:/terraform \
 	-v $(ROOT)/lambdas:/data \
