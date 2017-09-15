@@ -49,13 +49,25 @@ miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 		-e OP=build-lambda \
 		python3.6_ci:latest
 
-miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test
+miro_move_s3_asset-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	-v $(ROOT)/miro_preprocessor/miro_move_s3_asset/src:/data \
+	-e OP=test -e FIND_MATCH_PATHS='/data' \
+	python3.6_ci:latest
 
-miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build miro_image_to_dynamo-build
+miro_move_s3_asset-build: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	-v $(ROOT)/miro_preprocessor/miro_move_s3_asset/src:/data \
+	-e OP=build-lambda -e FIND_MATCH_PATHS='/data' \
+	python3.6_ci:latest
+
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test miro_move_s3_asset-test
+
+miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build miro_image_to_dynamo-build miro_move_s3_asset-build
 
 miro_preprocessor-publish: xml_to_json_converter-publish
 
-miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build miro_image_to_dynamo-build
+miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build miro_image_to_dynamo-build miro_move_s3_asset-build
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
