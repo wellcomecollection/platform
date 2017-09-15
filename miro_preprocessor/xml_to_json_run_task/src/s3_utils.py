@@ -12,7 +12,7 @@ def _extract_s3_event(record):
         "bucket_name": record["s3"]["bucket"]["name"],
         "object_key": record["s3"]["object"]["key"],
         "size": record["s3"]["object"]["size"],
-        "versionId": record["s3"]["object"]["versionId"]
+        "versionId": record["s3"]["object"].get("versionId")
     }
 
 
