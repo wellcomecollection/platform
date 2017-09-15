@@ -6,6 +6,32 @@ import boto3
 from botocore.exceptions import ClientError
 
 
+def put_into_dynamodb(dynamodb_client, miro_id, collection, image_data):
+    print(f"Image found for MiroId {miro_id}: sending to Dynamodb")
+    table_name = os.environ["TABLE_NAME"]
+    print('Pushing image with ID %s' % (miro_id))
+    dynamodb_client.put_item(
+        TableName=table_name,
+        Item={
+            'MiroID': {
+                'S': miro_id
+            },
+            'MiroCollection': {
+                'S': collection
+            },
+            'ReindexShard': {
+                'S': 'default'
+            },
+            'ReindexVersion': {
+                'N': str(1)
+            },
+            'data': {
+                'S': json.dumps(image_data, separators=(',', ':'))
+            }
+        }
+    )
+
+
 def main(event, _):
     print(f'Received event:\n{event}')
     s3_client = boto3.client("s3")
@@ -29,26 +55,4 @@ def main(event, _):
         else:
             raise
     else:
-        print(f"Image found for MiroId {miro_id}: sending to Dynamodb")
-        table_name = os.environ["TABLE_NAME"]
-        print('Pushing image with ID %s' % (miro_id))
-        dynamodb_client.put_item(
-            TableName=table_name,
-            Item={
-                'MiroID': {
-                    'S': miro_id
-                },
-                'MiroCollection': {
-                    'S': collection
-                },
-                'ReindexShard': {
-                    'S': 'default'
-                },
-                'ReindexVersion': {
-                    'N': str(1)
-                },
-                'data': {
-                    'S': json.dumps(image_data, separators=(',', ':'))
-                }
-            }
-        )
+        put_into_dynamodb(dynamodb_client, miro_id, collection, image_data)
