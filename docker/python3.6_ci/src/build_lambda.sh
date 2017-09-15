@@ -8,7 +8,7 @@ target_dir="target"
 
 if [ -d $lambda_dir ]
 then
-  echo "Building ./target directory for lambda."
+  echo "Building target directory for lambda."
 
 
   rm -rf $target_dir
@@ -22,6 +22,6 @@ then
     echo "No requirements.txt present. Skipping."
   fi
 else
-  echo "No ./src directory found! Exiting."
+  echo "No src directory found! Exiting."
   exit 1
 fi

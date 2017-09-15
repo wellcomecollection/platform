@@ -6,4 +6,4 @@ variable "s3_read_miro_data_json" {}
 variable "topic_arn" {}
 variable "cluster_name" {}
 variable "container_name" {}
-variable "task_defintion_arn" {}
+variable "task_definition_arn" {}

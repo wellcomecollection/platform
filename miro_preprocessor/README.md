@@ -19,4 +19,6 @@ This task downloads and converts a Miro formatted XML dump to JSON and puts it a
 
 A lambda which is triggered by an S3 upload of a new Miro xml dump.
 
+The default location monitored is the miro data bucket at `/source/*.xml`.
+
 This lambda starts the xml_to_json_converter task and hands it the correct command.

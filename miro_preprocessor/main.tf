@@ -17,8 +17,8 @@ module "xml_to_json_run_task" {
 
   s3_read_miro_data_json = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
 
-  task_defintion_arn = "${module.xml_to_json_converter.task_arn}"
-  container_name     = "${module.xml_to_json_converter.container_name}"
-  topic_arn          = "${data.terraform_remote_state.lambda.run_ecs_task_topic_arn}"
-  cluster_name       = "${data.terraform_remote_state.platform.ecs_services_cluster_name}"
+  container_name      = "${module.xml_to_json_converter.container_name}"
+  topic_arn           = "${data.terraform_remote_state.lambda.run_ecs_task_topic_arn}"
+  cluster_name        = "${data.terraform_remote_state.platform.ecs_services_cluster_name}"
+  task_definition_arn = "${module.xml_to_json_converter.task_definition_arn}"
 }

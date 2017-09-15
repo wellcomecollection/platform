@@ -13,7 +13,7 @@ module "lambda_xml_to_json_run_task" {
     TOPIC_ARN           = "${var.topic_arn}"
     CLUSTER_NAME        = "${var.cluster_name}"
     CONTAINER_NAME      = "${var.container_name}"
-    TASK_DEFINITION_ARN = "${var.task_defintion_arn}"
+    TASK_DEFINITION_ARN = "${var.task_definition_arn}"
   }
 }
 
