@@ -45,3 +45,8 @@ variable "memory" {
   description = "Memory units to provision for the script"
   default     = 1024
 }
+
+variable "name" {
+  description = "Name of container in task description"
+  default     = "app"
+}

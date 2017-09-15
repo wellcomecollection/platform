@@ -1,5 +1,5 @@
 import boto3
-from moto import mock_ec2, mock_autoscaling, mock_ecs, mock_sns, mock_sqs
+from moto import mock_sns, mock_sqs
 import pytest
 
 
@@ -18,15 +18,9 @@ def set_region():
 
 @pytest.fixture()
 def moto_start(set_region):
-    mock_autoscaling().start()
-    mock_ec2().start()
-    mock_ecs().start()
     mock_sns().start()
     mock_sqs().start()
     yield
-    mock_autoscaling().stop()
-    mock_ec2().stop()
-    mock_ecs().stop()
     mock_sns().stop()
     mock_sqs().stop()
 
@@ -35,8 +29,10 @@ def moto_start(set_region):
 def sns_sqs(set_region, moto_start):
     fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
+
     queue_name = "test-queue"
     topic_name = "test-topic"
+
     print(f"Creating topic {topic_name} and queue {queue_name}")
 
     fake_sns_client.create_topic(Name=topic_name)

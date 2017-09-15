@@ -3,11 +3,13 @@
 set -o errexit
 set -o nounset
 
-if [ -d "src" ]
+lambda_dir="src"
+target_dir="target"
+
+if [ -d $lambda_dir ]
 then
   echo "Building ./target directory for lambda."
-  lambda_dir="src"
-  target_dir="target"
+
 
   rm -rf $target_dir
   cp -r $lambda_dir $target_dir

@@ -2,19 +2,9 @@ FROM python:3.6
 
 VOLUME ["/data"]
 
-RUN pip install flake8
+COPY src /app
 
-RUN pip install boto3
-
-RUN pip install pytest
-
-RUN pip install moto==1.0.1
-
-COPY is_up_to_date_with_master.py /app/is_up_to_date_with_master.py
-
-COPY build_lambda.sh /app/build_lambda.sh
-COPY run.sh /app/run.sh
-COPY test.sh /app/test.sh
+RUN pip install -r /app/requirements.txt
 
 WORKDIR /data
 
