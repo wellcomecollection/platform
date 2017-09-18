@@ -26,14 +26,17 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
   private def userError(message: String, exception: Exception): DisplayError = {
-    error(s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
-          exception)
+    error(
+      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
     DisplayError(Error(variant = "http-400", description = Some(message)))
   }
 
-  private def serverError(message: String, exception: Exception): DisplayError = {
-    error(s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
-          exception)
+  private def serverError(message: String,
+                          exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
     DisplayError(Error(variant = "http-500", description = None))
   }
 
@@ -52,10 +55,16 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   /* Elasticsearch errors have a "root_cause" with a reason -- given such
    * a reason, return an appropriate DisplayError.
    */
-  private def reasonToError(reason: String): String =
+  private def reasonToError(reason: String,
+                            exception: Exception): DisplayError =
     reason match {
-      case resultSizePattern(size) => s"Only the first $size works are available in the API."
-      case _ => "Unknown reason for error in Elasticsearch response: $reason"
+      case resultSizePattern(size) =>
+        userError(s"Only the first $size works are available in the API.",
+                  exception)
+      case _ =>
+        serverError(
+          "Unknown reason for error in Elasticsearch response: $reason",
+          exception)
     }
 
   private def toError(request: Request,
@@ -90,7 +99,7 @@ class ElasticsearchResponseExceptionMapper @Inject()(
         .get(0)
         .get("reason")
       reason match {
-        case s: JsonNode => serverError(reasonToError(s.asText), exception)
+        case s: JsonNode => reasonToError(s.asText, exception)
         case _ =>
           serverError("Unable to find error reason in Elasticsearch response",
                       exception)
