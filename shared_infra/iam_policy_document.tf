@@ -5,7 +5,7 @@ data "aws_iam_policy_document" "alb_logs" {
     ]
 
     resources = [
-      "${aws_s3_bucket.alb-logs.arn}/*",
+      "arn:aws:s3:::wellcomecollection-alb-logs/*",
     ]
 
     principals {
