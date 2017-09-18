@@ -7,3 +7,4 @@ variable "topic_arn" {}
 variable "cluster_name" {}
 variable "container_name" {}
 variable "task_definition_arn" {}
+variable "run_ecs_task_topic_publish_policy" {}
