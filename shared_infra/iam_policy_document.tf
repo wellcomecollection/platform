@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "alb_logs" {
     ]
 
     principals {
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = ["arn:aws:iam::156460612806:root"]
       type = "AWS"
     }
   }
