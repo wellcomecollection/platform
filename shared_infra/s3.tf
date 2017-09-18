@@ -67,7 +67,7 @@ resource "aws_s3_bucket" "mets-ingest" {
 }
 
 resource "aws_s3_bucket" "alb-logs" {
-  bucket = "alb_logs"
+  bucket = "wellcomecollection-alb-logs"
   acl    = "private"
 
   lifecycle {
