@@ -4,8 +4,8 @@ module "xml_to_json_converter" {
   bucket_miro_data_id = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
   release_ids         = "${var.release_ids}"
 
-  s3_read_miro_data_json  = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
-  s3_write_miro_data_json = "${data.aws_iam_policy_document.s3_write_miro_data.json}"
+  s3_read_miro_data_json  = "${data.aws_iam_publish_policy_document.s3_read_miro_data.json}"
+  s3_write_miro_data_json = "${data.aws_iam_publish_policy_document.s3_write_miro_data.json}"
 }
 
 module "xml_to_json_run_task" {
@@ -15,7 +15,7 @@ module "xml_to_json_run_task" {
   bucket_miro_data_arn   = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
   lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
 
-  s3_read_miro_data_json = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
+  s3_read_miro_data_json = "${data.aws_iam_publish_policy_document.s3_read_miro_data.json}"
 
   container_name      = "${module.xml_to_json_converter.container_name}"
   topic_arn           = "${data.terraform_remote_state.lambda.run_ecs_task_topic_arn}"
@@ -39,4 +39,17 @@ module "miro_image_to_dynamo" {
   miro_data_table_arn            = "${data.terraform_remote_state.platform.table_miro_data_arn}"
   miro_data_table_name           = "${data.terraform_remote_state.platform.table_miro_data_name}"
   lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+}
+
+module "miro_image_sorter" {
+  source = "image_sorter"
+
+  lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+
+  topic_cold_store_arn                 = "${module.cold_store_topic.arn}"
+  topic_cold_store_publish_policy      = "${module.cold_store_topic.publish_policy}"
+  topic_tandem_vault_arn               = "${module.tandem_vault_topic.arn}"
+  topic_tandem_vault_publish_policy    = "${module.tandem_vault_topic.publish_policy}"
+  topic_digital_library_arn            = "${module.digital_library_topic.arn}"
+  topic_digital_library_publish_policy = "${module.digital_library_topic.publish_policy}"
 }
