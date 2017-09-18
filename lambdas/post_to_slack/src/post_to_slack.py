@@ -107,10 +107,10 @@ class Alarm:
             search_term = 'Traceback'
         elif self.name == 'api_romulus-alb-target-500-errors':
             group = 'platform/api_romulus'
-            search_term = 'Unhandled Exception'
+            search_term = '"HTTP 500"'
         elif self.name == 'api_remus-alb-target-500-errors':
             group = 'platform/api_remus'
-            search_term = 'Unhandled Exception'
+            search_term = '"HTTP 500"'
         else:
             return
 
