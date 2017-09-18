@@ -70,6 +70,8 @@ resource "aws_s3_bucket" "alb-logs" {
   bucket = "wellcomecollection-alb-logs"
   acl    = "private"
 
+  policy = "${data.aws_iam_policy_document.alb_logs.json}"
+
   lifecycle {
     prevent_destroy = true
   }
@@ -96,8 +98,6 @@ resource "aws_s3_bucket" "wellcomecollection-mets-ingest" {
 resource "aws_s3_bucket" "cloudfront-logs" {
   bucket = "wellcome-platform-cloudfront-logs"
   acl    = "private"
-
-  policy = "${data.aws_iam_policy_document.alb_logs.json}"
 
   lifecycle {
     prevent_destroy = true
