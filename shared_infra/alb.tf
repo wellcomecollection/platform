@@ -10,6 +10,8 @@ module "services_alb" {
 
   certificate_domain = "services.wellcomecollection.org"
   vpc_id             = "${module.vpc_services.vpc_id}"
+
+  alb_access_log_bucket = "${aws_s3_bucket.alb-logs.id}"
 }
 
 module "monitoring_alb" {
@@ -24,6 +26,8 @@ module "monitoring_alb" {
 
   certificate_domain = "monitoring.wellcomecollection.org"
   vpc_id             = "${module.vpc_monitoring.vpc_id}"
+
+  alb_access_log_bucket = "${aws_s3_bucket.alb-logs.id}"
 }
 
 module "api_alb" {
@@ -38,4 +42,6 @@ module "api_alb" {
 
   certificate_domain = "api.wellcomecollection.org"
   vpc_id             = "${module.vpc_api.vpc_id}"
+
+  alb_access_log_bucket = "${aws_s3_bucket.alb-logs.id}"
 }
