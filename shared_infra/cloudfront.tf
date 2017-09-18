@@ -27,6 +27,10 @@ resource "aws_cloudfront_distribution" "loris" {
       cookies {
         forward = "none"
       }
+
+      headers {
+        forward = "User-Agent"
+      }
     }
 
     viewer_protocol_policy = "redirect-to-https"
