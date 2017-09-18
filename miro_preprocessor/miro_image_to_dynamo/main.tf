@@ -6,7 +6,7 @@ module "miro_image_to_dynamo_lambda" {
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
   environment_variables = {
-    TABLE_NAME     = "${var.miro_data_table_name}"
+    TABLE_NAME = "${var.miro_data_table_name}"
   }
 }
 

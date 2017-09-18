@@ -25,11 +25,6 @@ module "xml_to_json_run_task" {
   run_ecs_task_topic_publish_policy = "${data.terraform_remote_state.lambda.run_ecs_task_topic_publish_policy}"
 }
 
-module "topic_miro_copy_s3_asset" {
-  source = "../terraform/sns"
-  name   = "miro_copy_s3_asset"
-}
-
 module "topic_miro_image_to_dynamo" {
   source = "../terraform/sns"
   name   = "miro_image_to_dynamo"
@@ -45,12 +40,18 @@ module "miro_image_to_dynamo" {
 }
 
 module "miro_copy_s3_asset" {
-  source = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn = "${module.topic_miro_copy_s3_asset.arn}"
-  lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+  source                         = "miro_copy_s3_asset"
+  topic_miro_copy_s3_asset_arn   = "${module.catalogue_api_topic.arn}"
+  lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
   topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
-  bucket_miro_images_public_arn = "${data.terraform_remote_state.platform.bucket_miro_images_public_arn}"
+  bucket_miro_images_public_arn  = "${data.terraform_remote_state.platform.bucket_miro_images_public_arn}"
   bucket_miro_images_public_name = "${data.terraform_remote_state.platform.bucket_miro_images_public_id}"
-  bucket_miro_images_sync_arn = "${data.terraform_remote_state.platform.bucket_miro_images_sync_arn}"
-  bucket_miro_images_sync_name = "${data.terraform_remote_state.platform.bucket_miro_images_sync_id}"
+  bucket_miro_images_sync_arn    = "${data.terraform_remote_state.platform.bucket_miro_images_sync_arn}"
+  bucket_miro_images_sync_name   = "${data.terraform_remote_state.platform.bucket_miro_images_sync_id}"
+}
+
+resource "aws_iam_role_policy" "miro_copy_s3_asset_sns_publish" {
+  name   = "miro_copy_s3_asset_sns_publish_policy"
+  role   = "${module.miro_copy_s3_asset.role_name}"
+  policy = "${module.topic_miro_image_to_dynamo.publish_policy}"
 }

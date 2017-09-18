@@ -57,7 +57,7 @@ miro_copy_s3_asset-test: $(ROOT)/.docker/python3.6_ci
 
 miro_copy_s3_asset-build: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
-	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset/src:/data \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset:/data \
 	-e OP=build-lambda \
 	python3.6_ci:latest
 
