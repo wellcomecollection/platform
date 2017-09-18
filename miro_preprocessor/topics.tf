@@ -8,7 +8,7 @@ module "tandem_vault_topic" {
   name   = "miro_tandem_vault"
 }
 
-module "digital_library_topic" {
+module "catalogue_api_topic" {
   source = "../terraform/sns"
-  name   = "miro_digital_library"
+  name   = "miro_catalogue_api"
 }
