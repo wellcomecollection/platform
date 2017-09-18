@@ -1,4 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
+LORIS = $(ROOT)/loris
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
@@ -20,5 +21,18 @@ loris-run: loris-build
 loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=loris $(ROOT)/builds/publish_service.sh
 
+loris-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+		--volume $(LORIS)/terraform:/data \
+		--volume $(ROOT)/terraform:/terraform \
+		--env OP=plan \
+		terraform_ci:latest
+
+loris-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+		--volume $(LORIS)/terraform:/data \
+		--volume $(ROOT)/terraform:/terraform \
+		--env OP=apply \
+		terraform_ci:latest
 
 .PHONY: loris-build loris-run loris-publish
