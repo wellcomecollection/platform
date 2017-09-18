@@ -27,7 +27,7 @@ def fetch_s3_metadata(bucket, key):
 
 
 def main(event, _):
-    print(f'Received event:\n{event}')
+    print(f'Received event: {event!r}')
 
     # Parse environment config
     topic_cold_store = os.environ['TOPIC_COLD_STORE']
@@ -42,6 +42,7 @@ def main(event, _):
 
     # Decide where to put it, then send the metadata to SNS
     decision = sort_image(metadata)
+    print(f'Sorting this image into {decision}')
 
     topic_arns = {
         Decision.cold_store: topic_cold_store,
