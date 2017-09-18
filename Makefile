@@ -3,6 +3,7 @@ include loris/Makefile
 include lambdas/Makefile
 include shared_infra/Makefile
 include miro_preprocessor/Makefile
+include ontologies/Makefile
 
 
 ## Build the image for gatling
@@ -170,24 +171,6 @@ sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to
 	PROJECT=transformer ./builds/publish_service.sh
 
 
-
-# Tasks for running linting #
-
-## Run JSON linting over the ontologies directory
-lint-ontologies: $(ROOT)/.docker/jslint_ci
-	docker run -v $$(pwd)/ontologies:/data jslint_ci:latest
-
-## Check a git repo is up to date with remote master
-uptodate-git: $(ROOT)/.docker/python3.6_ci
-	docker run -v $$HOME/.ssh:/root/.ssh -v $$(pwd):/data -e OP=is-master-head python3.6_ci:latest
-
-
-format-terraform: $(ROOT)/.docker/terraform_ci
-	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd):/data -e OP=fmt terraform_ci
-
-format-scala:
-	sbt scalafmt
-
 format: \
 	format-terraform \
 	format-scala
@@ -196,7 +179,7 @@ check-format: format lint-python lint-ontologies
 	git diff --exit-code
 
 
-.PHONY: clean help
+.PHONY: help format check-format
 
 ## Display this help text
 help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383502660
