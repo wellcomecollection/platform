@@ -30,8 +30,17 @@ import docopt
 from utils import generate_images
 
 
+def _wrap_image_data(collection, image_data):
+    return {
+        "collection": collection,
+        "image_data": image_data
+    }
+
+
 def main(bucket, src_key, dst_key, js_path="json"):
     image_data = generate_images(bucket=bucket, key=src_key)
+
+    collection = src_key.split(".")[0]
 
     tmp_json = tempfile.mktemp()
     os.makedirs(os.path.dirname(tmp_json), exist_ok=True)
@@ -40,10 +49,18 @@ def main(bucket, src_key, dst_key, js_path="json"):
 
     with open(tmp_json, 'w') as f:
         for img in image_data:
-            img_json_dump = json.dumps(img, separators=(',', ':'), sort_keys=True)
+            img_json_dump = json.dumps(
+                _wrap_image_data(
+                    collection=collection,
+                    image_data=img
+                ),
+                separators=(',', ':'),
+                sort_keys=True
+            )
 
             image_id = img["image_no_calc"]
             json_object_key = f'{js_path}/{image_id}.json'
+
             byte_encoded_json_dump = img_json_dump.encode()
 
             s3.put_object(
