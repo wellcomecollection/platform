@@ -13,7 +13,7 @@ def test_parse_s3_event(s3_put_event):
 
 
 @mock_s3
-def test_fetch_s3_metadata():
+def test_fetch_s3_data():
     client = boto3.client('s3', region_name='eu-west-1')
     client.create_bucket(Bucket='miro-data')
 
@@ -28,4 +28,4 @@ def test_fetch_s3_metadata():
         Body=json.dumps(metadata)
     )
 
-    assert fetch_s3_metadata(bucket='miro-data', key='metadata.json') == metadata
+    assert fetch_s3_data(bucket='miro-data', key='metadata.json') == metadata
