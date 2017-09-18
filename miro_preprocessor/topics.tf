@@ -1,3 +1,8 @@
+module "miro_image_to_dynamo_topic" {
+  source = "../terraform/sns"
+  name   = "miro_image_to_dynamo_topic"
+}
+
 module "cold_store_topic" {
   source = "../terraform/sns"
   name   = "miro_cold_store"
