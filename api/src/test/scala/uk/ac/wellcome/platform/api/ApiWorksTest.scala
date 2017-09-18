@@ -101,6 +101,28 @@ class ApiWorksTest
       "description": "$description"
     }"""
 
+  private def concept(con: Concept) =
+    s"""
+    {
+      "type": "${con.ontologyType}",
+      "label": "${con.label}"
+    }
+    """
+
+  private def concepts(concepts: List[Concept]) =
+    concepts
+      .map { concept(_) }
+      .mkString(",")
+
+  private def resultList(pageSize: Int = 10, totalPages: Int = 1, totalResults: Int = 1) =
+    s"""
+      "@context": "https://localhost:8888/$apiPrefix/context.json",
+      "type": "ResultList",
+      "pageSize": $pageSize,
+      "totalPages": $totalPages,
+      "totalResults": $totalResults
+    """
+
   it("should return a list of works") {
 
     val works = createWorks(3)
@@ -114,11 +136,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 3,
+                          |  ${resultList(totalResults = 3)},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -240,11 +258,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 1,
-                          |  "totalPages": 3,
-                          |  "totalResults": 3,
+                          |  ${resultList(pageSize = 1, totalPages = 3, totalResults = 3)},
                           |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
                           |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
                           |  "results": [
@@ -270,11 +284,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 1,
-                          |  "totalPages": 3,
-                          |  "totalResults": 3,
+                          |  ${resultList(pageSize = 1, totalPages = 3, totalResults = 3)},
                           |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
@@ -299,11 +309,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 1,
-                          |  "totalPages": 3,
-                          |  "totalResults": 3,
+                          |  ${resultList(pageSize = 1, totalPages = 3, totalResults = 3)},
                           |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
@@ -448,11 +454,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -483,27 +485,14 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.id}",
                           |     "title": "${workWithSubjects.title}",
                           |     "creators": [],
-                          |     "subjects": [
-                          |      {
-                          |        "type": "Concept",
-                          |        "label": "fish"
-                          |      },
-                          |      {
-                          |        "type": "Concept",
-                          |        "label": "gardening"
-                          |      }
-                          |     ],
+                          |     "subjects": [ ${concepts(workWithSubjects.subjects) } ],
                           |     "genres": [ ]
                           |   }
                           |  ]
@@ -527,11 +516,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -539,16 +524,7 @@ class ApiWorksTest
                           |     "title": "${workWithSubjects.title}",
                           |     "creators": [],
                           |     "subjects": [ ],
-                          |     "genres": [
-                          |       {
-                          |         "type": "Concept",
-                          |         "label": "woodwork"
-                          |       },
-                          |       {
-                          |         "type": "Concept",
-                          |         "label": "etching"
-                          |       }
-                          |     ]
+                          |     "genres": [ ${concepts(workWithSubjects.genres)} ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -588,11 +564,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 2,
+                          |  ${resultList(totalResults = 2)},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -704,7 +676,7 @@ class ApiWorksTest
   }
 
   it(
-    "should be able to search different Elasticsearch indices based on the ?index query parameter") {
+    "should be able to search different Elasticsearch indices based on the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A wombat wallowing under a willow"
@@ -723,11 +695,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -749,11 +717,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -804,15 +768,9 @@ class ApiWorksTest
 
   it(
     "should return a Bad Request error if asked for an invalid include on an individual work") {
-    val work = workWith(
-      canonicalId = "1234",
-      title = "A emu and an elephant"
-    )
-    insertIntoElasticSearch(work)
-
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.id}?includes=foo",
+        path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
         andExpect = Status.BadRequest,
         withJsonBody = badRequest("includes: 'foo' is not a valid include")
       )
@@ -838,11 +796,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",
@@ -877,11 +831,7 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          |  "type": "ResultList",
-                          |  "pageSize": 10,
-                          |  "totalPages": 1,
-                          |  "totalResults": 1,
+                          |  ${resultList()},
                           |  "results": [
                           |   {
                           |     "type": "Work",

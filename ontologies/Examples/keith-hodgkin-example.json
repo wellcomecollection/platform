@@ -3,39 +3,43 @@
   "type": "Person",
   "label": "Hodgkin, Keith, 1918-1999",
   "gender": "Male",
-  "dateOfBirth": "1918" ,
-  "dateOfDeath": "1999" ,
-  "nationality":
-    {
-      "id": "x2n20d1io",
-      "label": "United Kingdom" ,
-      "type": "Place"	
-    } ,
-  "placeOfBirth":
-      {
-      "id": "dj901290",
-      "label": "Sussex" ,
-      "type": "Place"	
-      } ,
-  "languageSpoken": "English",
-  "occupation":
-    {
-      "id": "dj903jg",
-      "label": "General Practitioner",
-      "type": "Concept"
-    } ,
+  "dateOfBirth": "1918",
+  "dateOfDeath": "1999",
+  "nationality": {
+    "id": "h8d3h283f",
+    "label": "British",
+    "type": "Concept"
+  },
+  "placeOfBirth": {
+    "id": "dj901290",
+    "label": "Sussex",
+    "type": "Place"
+  },
+  "occupation": {
+    "id": "dj903jg",
+    "label": "General Practitioner",
+    "type": "Concept"
+  },
   "position": [
     {
       "label": "Student House Surgeon and work in Hugh Cairns's Neurosurgical Unit",
       "start": "1939",
-      "end": "1943" ,
-      "positionAt": "Radcliffe Infirmary, Oxford"
+      "end": "1943",
+      "positionAt": {
+        "id": "jd190j90",
+        "label": "Radcliffe Infirmary, Oxford",
+        "type": "Organisation"
+      }
     },
     {
       "label": "Surgeon Lieutenant",
       "start": "1943",
-      "end": "1946" ,
-      "positionAt": "Royal Navy"
+      "end": "1946",
+      "positionAt": {
+        "id": "dj901290",
+        "label": "Royal Navy",
+        "type": "Organisation"
+      }
     },
     {
       "label": "Hospital pathologist",

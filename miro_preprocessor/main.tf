@@ -21,6 +21,8 @@ module "xml_to_json_run_task" {
   topic_arn           = "${data.terraform_remote_state.lambda.run_ecs_task_topic_arn}"
   cluster_name        = "${data.terraform_remote_state.platform.ecs_services_cluster_name}"
   task_definition_arn = "${module.xml_to_json_converter.task_definition_arn}"
+
+  run_ecs_task_topic_publish_policy = "${data.terraform_remote_state.lambda.run_ecs_task_topic_publish_policy}"
 }
 
 module "topic_miro_copy_s3_asset" {
