@@ -10,11 +10,6 @@ module "ecr_repository_nginx_grafana" {
   name   = "nginx_grafana"
 }
 
-module "ecr_repository_nginx_loris" {
-  source = "../terraform/ecr"
-  name   = "nginx_loris"
-}
-
 module "ecr_repository_nginx_services" {
   source = "../terraform/ecr"
   name   = "nginx_services"
@@ -43,11 +38,6 @@ module "ecr_repository_ingestor" {
 module "ecr_repository_reindexer" {
   source = "../terraform/ecr"
   name   = "reindexer"
-}
-
-module "ecr_repository_loris" {
-  source = "../terraform/ecr"
-  name   = "loris"
 }
 
 module "ecr_repository_cache_cleaner" {
