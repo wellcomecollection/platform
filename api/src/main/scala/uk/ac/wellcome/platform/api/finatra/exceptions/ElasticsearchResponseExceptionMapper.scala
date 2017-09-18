@@ -63,7 +63,7 @@ class ElasticsearchResponseExceptionMapper @Inject()(
                   exception)
       case _ =>
         serverError(
-          "Unknown reason for error in Elasticsearch response: $reason",
+          s"Unknown reason for error in Elasticsearch response: $reason",
           exception)
     }
 
