@@ -67,11 +67,14 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 
 miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test
 
-miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build
+miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build
+
+miro_preprocessor-build: xml_to_json_converter-build miro_preprocessor-build-lambdas
 
 miro_preprocessor-publish: xml_to_json_converter-publish
 
-miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci xml_to_json_run_task-build miro_image_to_dynamo-build
+
+miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci miro_preprocessor-build-lambdas
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
