@@ -1,3 +1,22 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "alb_logs" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.alb-logs.arn}/*",
+    ]
+
+    principals {
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      type = "AWS"
+    }
+  }
+}
+
 data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   statement {
     actions = [
