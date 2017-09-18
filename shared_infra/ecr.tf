@@ -1,11 +1,5 @@
 # One repository per application (see http://stackoverflow.com/a/37543992 and https://github.com/docker/docker/blob/master/image/spec/v1.2.md)
 
-# Kept around for migration purposes.  TODO: Retire this repo.
-module "ecr_repository_nginx" {
-  source = "../terraform/ecr"
-  name   = "nginx"
-}
-
 module "ecr_repository_nginx_api" {
   source = "../terraform/ecr"
   name   = "nginx_api"
@@ -14,11 +8,6 @@ module "ecr_repository_nginx_api" {
 module "ecr_repository_nginx_grafana" {
   source = "../terraform/ecr"
   name   = "nginx_grafana"
-}
-
-module "ecr_repository_nginx_loris" {
-  source = "../terraform/ecr"
-  name   = "nginx_loris"
 }
 
 module "ecr_repository_nginx_services" {
@@ -49,11 +38,6 @@ module "ecr_repository_ingestor" {
 module "ecr_repository_reindexer" {
   source = "../terraform/ecr"
   name   = "reindexer"
-}
-
-module "ecr_repository_loris" {
-  source = "../terraform/ecr"
-  name   = "loris"
 }
 
 module "ecr_repository_cache_cleaner" {
