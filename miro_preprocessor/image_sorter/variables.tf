@@ -16,10 +16,13 @@ variable "topic_tandem_vault_publish_policy" {
   description = "JSON policy for pushing to `topic_tandem_vault_arn`"
 }
 
-variable "topic_digital_library_arn" {
-  description = "ARN for the SNS topic for sending to the Digital Library"
+variable "topic_catalogue_api_arn" {
+  description = "ARN for the SNS topic for sending to the Catalogue API"
 }
 
-variable "topic_digital_library_publish_policy" {
-  description = "JSON policy for pushing to `topic_digital_library_arn`"
+variable "topic_catalogue_api_publish_policy" {
+  description = "JSON policy for pushing to `topic_catalogue_api_arn`"
 }
+
+variable "s3_miro_data_id" {}
+variable "s3_miro_data_arn" {}

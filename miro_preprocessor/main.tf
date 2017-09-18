@@ -46,12 +46,13 @@ module "miro_image_sorter" {
 
   lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
 
-  s3_miro_data_id = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  s3_miro_data_id  = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  s3_miro_data_arn = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
 
-  topic_cold_store_arn                 = "${module.cold_store_topic.arn}"
-  topic_cold_store_publish_policy      = "${module.cold_store_topic.publish_policy}"
-  topic_tandem_vault_arn               = "${module.tandem_vault_topic.arn}"
-  topic_tandem_vault_publish_policy    = "${module.tandem_vault_topic.publish_policy}"
-  topic_digital_library_arn            = "${module.digital_library_topic.arn}"
-  topic_digital_library_publish_policy = "${module.digital_library_topic.publish_policy}"
+  topic_cold_store_arn               = "${module.cold_store_topic.arn}"
+  topic_cold_store_publish_policy    = "${module.cold_store_topic.publish_policy}"
+  topic_tandem_vault_arn             = "${module.tandem_vault_topic.arn}"
+  topic_tandem_vault_publish_policy  = "${module.tandem_vault_topic.publish_policy}"
+  topic_catalogue_api_arn            = "${module.catalogue_api_topic.arn}"
+  topic_catalogue_api_publish_policy = "${module.catalogue_api_topic.publish_policy}"
 }
