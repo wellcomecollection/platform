@@ -107,10 +107,10 @@ class Alarm:
             search_term = 'Traceback'
         elif self.name == 'api_romulus-alb-target-500-errors':
             group = 'platform/api_romulus'
-            search_term = 'Unhandled Exception'
+            search_term = '"HTTP 500"'
         elif self.name == 'api_remus-alb-target-500-errors':
             group = 'platform/api_remus'
-            search_term = 'Unhandled Exception'
+            search_term = '"HTTP 500"'
         else:
             return
 
@@ -128,8 +128,26 @@ class Alarm:
         )
 
 
+def to_bitly(url, access_token):
+    """
+    Try to shorten a URL with bit.ly.  If it fails, just return the
+    original URL.
+    """
+    resp = requests.get(
+        'https://api-ssl.bitly.com/v3/user/link_save',
+        params={'access_token': access_token, 'longUrl': url}
+    )
+    try:
+        return resp.json()['data']['link_save']['link']
+    except KeyError:
+        return url
+
+
 def main(event, _):
     print(f'event = {event!r}')
+
+    bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
+
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
 
     slack_data = {'username': 'cloudwatch-alert',
@@ -148,6 +166,10 @@ def main(event, _):
 
     cloudwatch_url = alarm.cloudwatch_url()
     if cloudwatch_url is not None:
+        cloudwatch_url = to_bitly(
+            url=cloudwatch_url,
+            access_token=bitly_access_token
+        )
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch URL',
             'value': cloudwatch_url
