@@ -13,7 +13,7 @@ module "miro_image_to_dynamo_lambda" {
 module "miro_image_to_dynamo" {
   source               = "../../terraform/lambda/trigger_sns"
   lambda_function_name = "${module.miro_image_to_dynamo_lambda.function_name}"
-  sns_trigger_arn      = "${var.miro_image_to_dynamo_topic_arn}"
+  sns_trigger_arn      = "${var.topic_miro_image_to_dynamo_arn}"
   lambda_function_arn  = "${module.miro_image_to_dynamo_lambda.arn}"
 }
 
