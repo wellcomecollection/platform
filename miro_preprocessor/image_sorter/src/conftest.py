@@ -46,4 +46,3 @@ def s3_put_event():
         }
       ]
     }
-
