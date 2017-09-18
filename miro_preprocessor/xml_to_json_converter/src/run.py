@@ -29,11 +29,13 @@ import docopt
 
 from utils import generate_images
 
+
 def _wrap_image_data(collection, image_data):
     return {
         "collection": collection,
         "image_data": image_data
     }
+
 
 def main(bucket, src_key, dst_key, js_path="json"):
     image_data = generate_images(bucket=bucket, key=src_key)
