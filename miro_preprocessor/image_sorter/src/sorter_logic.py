@@ -20,4 +20,5 @@ class Undecidable(Exception):
 
 
 def sort_image(metadata):
+    # TODO: Logic goes here!
     raise Undecidable(f'Reached the default fallthrough for {metadata!r}')
