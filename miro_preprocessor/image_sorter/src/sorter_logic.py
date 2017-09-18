@@ -12,13 +12,15 @@ import enum
 class Decision(enum.Enum):
     cold_store = 'cold_store'
     tandem_vault = 'tandem_vault'
-    digital_library = 'digital_library'
+    catalogue_api = 'catalogue_api'
 
 
 class Undecidable(Exception):
     pass
 
 
-def sort_image(metadata):
+def sort_image(collection, image_data):
     # TODO: Logic goes here!
-    raise Undecidable(f'Reached the default fallthrough for {metadata!r}')
+    raise Undecidable(
+        f'No decision for collection={collection!r}, image_data={image_data!r}'
+    )

@@ -23,4 +23,3 @@ module "trigger_image_sorter_on_json_upload" {
   filter_prefix        = "json/"
   filter_suffix        = ".json"
 }
-
