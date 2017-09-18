@@ -42,13 +42,32 @@ $(ROOT)/.docker/miro_adapter_tests:
 		--dir=miro_adapter \
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
-## Run flake8 linting over our Python code
+
+
+# Project utility tasks
+
+## Run flake8 linting over the current directory
 lint-python: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
+
+## Run JSON linting over the current directory
+lint-js: $(ROOT)/.docker/jslint_ci
+	docker run -v $$(pwd):/data jslint_ci:latest
 
 ## Check a git repo is up to date with remote master
 uptodate-git: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$HOME/.ssh:/root/.ssh -v $(ROOT):/data -e OP=is-master-head python3.6_ci:latest
 
+## Format terraform in the current directory
+format-terraform: $(ROOT)/.docker/terraform_ci
+	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd):/data -e OP=fmt terraform_ci
+
+## Format scala in the current directory
+format-scala:
+	sbt scalafmt
+
+
 clean:
 	rm -rf $(ROOT)/.docker
+
+.PHONY: lint-python lint-js uptodate-git format-terraform format-scala
