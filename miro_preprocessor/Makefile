@@ -54,7 +54,7 @@ miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 image_sorter-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
 		--volume $(ROOT)/miro_preprocessor/image_sorter:/data \
-		--env OP=build-latest \
+		--env OP=build-lambda \
 		python3.6_ci:latest
 
 image_sorter-test: $(ROOT)/.docker/python3.6_ci
