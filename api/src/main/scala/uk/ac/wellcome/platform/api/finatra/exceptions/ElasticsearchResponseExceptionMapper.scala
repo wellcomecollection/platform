@@ -25,13 +25,18 @@ class ElasticsearchResponseExceptionMapper @Inject()(
 
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
-  private def userError(message: String): DisplayError = {
-    error(s"Sending HTTP 400 for $message")
+  private def userError(message: String, exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
     DisplayError(Error(variant = "http-400", description = Some(message)))
   }
 
-  private def serverError(message: String): DisplayError = {
-    error(s"Sending HTTP 500 for $message")
+  private def serverError(message: String,
+                          exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
     DisplayError(Error(variant = "http-500", description = None))
   }
 
@@ -50,13 +55,16 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   /* Elasticsearch errors have a "root_cause" with a reason -- given such
    * a reason, return an appropriate DisplayError.
    */
-  private def reasonToError(reason: String): DisplayError =
+  private def reasonToError(reason: String,
+                            exception: Exception): DisplayError =
     reason match {
       case resultSizePattern(size) =>
-        userError(s"Only the first $size works are available in the API.")
+        userError(s"Only the first $size works are available in the API.",
+                  exception)
       case _ =>
         serverError(
-          s"Unknown reason for error in Elasticsearch response: $reason")
+          "Unknown reason for error in Elasticsearch response: $reason",
+          exception)
     }
 
   private def toError(request: Request,
@@ -66,20 +74,24 @@ class ElasticsearchResponseExceptionMapper @Inject()(
     // `message` attribute of ElasticsearchException.  Try to read it as JSON,
     // so we can check if this was a user error -- but if parsing fails, it's
     // enough to return a 500 error.
-    //
-    // Annoyingly, the exact format of message is
-    //
-    //    POST http://localhost:9200/path: HTTP/1.1 500 Internal Server Error
-    //    {"error":{...}}
-    //
-    // so we need to read the second line to get the actual JSON.
-    val mapper = new ObjectMapper()
-    val jsonDocument = exception.getMessage
-      .split("\n")
-      .tail
-      .head
 
     try {
+      // Annoyingly, the exact format of message is
+      //
+      //    POST http://localhost:9200/path: HTTP/1.1 500 Internal Server Error
+      //    {"error":{...}}
+      //
+      // so we need to read the second line to get the actual JSON.
+      //
+      // Except when it isn't!  Sometimes these exceptions don't include
+      // a JSON response, so there's only a single-line message -- then `.head`
+      // fails: "NoSuchElementException: next on empty iterator".
+      val mapper = new ObjectMapper()
+      val jsonDocument = exception.getMessage
+        .split("\n")
+        .tail
+        .head
+
       val exceptionData = mapper.readTree(jsonDocument)
       val reason = exceptionData
         .get("error")
@@ -87,15 +99,14 @@ class ElasticsearchResponseExceptionMapper @Inject()(
         .get(0)
         .get("reason")
       reason match {
-        case s: JsonNode => reasonToError(s.asText)
+        case s: JsonNode => reasonToError(s.asText, exception)
         case _ =>
-          serverError(
-            s"Unable to find error reason in Elasticsearch response ${exception.getMessage}")
+          serverError("Unable to find error reason in Elasticsearch response",
+                      exception)
       }
     } catch {
       case e: Exception =>
-        serverError(
-          s"Error ($e) parsing Elasticsearch response ${exception.getMessage}")
+        serverError(s"Error ($e) parsing Elasticsearch response", exception)
     }
   }
 
