@@ -180,8 +180,7 @@ def run_task(
                     'name': container_name,
                     'command': command
                 },
-            ],
-            'taskRoleArn': 'string'
+            ]
         },
         count=1,
         startedBy=started_by,
