@@ -23,14 +23,14 @@ loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
 
 loris-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
-		--volume $(LORIS):/data \
+		--volume $(LORIS)/terraform:/data \
 		--volume $(ROOT)/terraform:/terraform \
 		--env OP=plan \
 		terraform_ci:latest
 
 loris-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
-		--volume $(LORIS):/data \
+		--volume $(LORIS)/terraform:/data \
 		--volume $(ROOT)/terraform:/terraform \
 		--env OP=apply \
 		terraform_ci:latest
