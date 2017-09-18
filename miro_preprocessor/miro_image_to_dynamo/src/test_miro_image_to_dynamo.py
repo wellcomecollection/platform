@@ -95,7 +95,8 @@ def test_should_insert_the_json_into_dynamo(miro_table, s3_miro_data_bucket):
     s3_client.put_object(
         Bucket=bucket_name,
         ACL='private',
-        Body=b'baba',Key="fullsize/A0000000/A0000002.jpg")
+        Body=b'baba',
+        Key="fullsize/A0000000/A0000002.jpg")
     table = miro_table
 
     miro_id = "A0000002"
