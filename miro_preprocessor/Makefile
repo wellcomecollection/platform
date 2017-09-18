@@ -50,9 +50,24 @@ miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 		-e OP=build-lambda \
 		python3.6_ci:latest
 
-miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test
 
-miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build miro_image_to_dynamo-build
+image_sorter-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(ROOT)/miro_preprocessor/image_sorter:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
+image_sorter-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+		--volume $(ROOT)/miro_preprocessor/image_sorter/src:/data \
+		--env OP=test \
+		--env FIND_MATCH_PATHS="/data" \
+		python3.6_ci:latest
+
+
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test
+
+miro_preprocessor-build: xml_to_json_converter-build xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build
 
 miro_preprocessor-publish: xml_to_json_converter-publish
 
