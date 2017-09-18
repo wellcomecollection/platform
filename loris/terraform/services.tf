@@ -1,6 +1,6 @@
 module "loris" {
   source             = "../terraform/services"
-  name               = "loris-new"
+  name               = "loris"
   cluster_id         = "${data.terraform_remote_state.platform.ecs_cluster_api_id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
   vpc_id             = "${data.terraform_remote_state.platform.vpc_api_id}"
@@ -12,7 +12,7 @@ module "loris" {
   config_key         = "config/${var.build_env}/loris.ini"
   path_pattern       = "/image*"
   healthcheck_path   = "/image/"
-  alb_priority       = "115"
+  alb_priority       = "109"
   host_name          = "iiif-origin.wellcomecollection.org"
 
   cpu    = 1792
