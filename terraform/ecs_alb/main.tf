@@ -6,6 +6,11 @@ resource "aws_alb" "ecs_service" {
   lifecycle {
     prevent_destroy = true
   }
+
+  access_logs {
+    bucket = "${var.alb_access_log_bucket}"
+    prefix = "${var.name}"
+  }
 }
 
 resource "aws_alb_listener" "https" {

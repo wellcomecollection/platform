@@ -23,3 +23,7 @@ variable "health_check_path" {
 variable "vpc_id" {
   description = "ID of VPC to create ALB in"
 }
+
+variable "alb_access_log_bucket" {
+  description = "S3 Bucket into which to place access log"
+}
