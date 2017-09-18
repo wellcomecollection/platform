@@ -28,9 +28,7 @@ resource "aws_cloudfront_distribution" "loris" {
         forward = "none"
       }
 
-      headers {
-        forward = "User-Agent"
-      }
+      headers = ["User-Agent"]
     }
 
     viewer_protocol_policy = "redirect-to-https"
