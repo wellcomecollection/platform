@@ -12,13 +12,13 @@ module "loris" {
   config_key         = "config/${var.build_env}/loris.ini"
   path_pattern       = "/image*"
   healthcheck_path   = "/image/"
-  alb_priority       = "109"
+  alb_priority       = "115"
   host_name          = "iiif-origin.wellcomecollection.org"
 
   cpu    = 1792
   memory = 4096
 
-  desired_count = 1
+  desired_count = 4
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
