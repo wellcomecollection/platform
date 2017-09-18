@@ -1,6 +1,6 @@
 resource "aws_iam_role_policy" "allow_s3_reads" {
   role   = "${module.image_sorter_lambda.role_name}"
-  policy = "${var.s3_miro_data_read_policy}"
+  policy = "${data.aws_iam_policy_document.s3_read_miro_json.json}"
 }
 
 resource "aws_iam_role_policy" "allow_sns_publish_cold_store" {
