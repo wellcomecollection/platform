@@ -19,7 +19,7 @@ def parse_s3_event(event):
     return records[0]['s3']['object']['key']
 
 
-def fetch_s3_metadata(bucket, key):
+def fetch_s3_data(bucket, key):
     client = boto3.client('s3')
     resp = client.get_object(Bucket=bucket, Key=key)
     json_str = resp['Body'].read()
@@ -32,16 +32,19 @@ def main(event, _):
     # Parse environment config
     topic_cold_store = os.environ['TOPIC_COLD_STORE']
     topic_tandem_vault = os.environ['TOPIC_TANDEM_VAULT']
-    topic_catalogue_api = os.environ['TOPIC_DIGITAL_LIBRARY']
+    topic_catalogue_api = os.environ['TOPIC_CATALOGUE_API']
 
     s3_bucket = os.environ['S3_MIRODATA_ID']
     s3_key = parse_s3_event(event)
 
     # Fetch the metadata from S3
-    metadata = fetch_s3_metadata(bucket=s3_bucket, key=s3_key)
+    print(f'Bucket = {s3_bucket}, key = {s3_key}')
+    data = fetch_s3_data(bucket=s3_bucket, key=s3_key)
 
     # Decide where to put it, then send the metadata to SNS
-    decision = sort_image(metadata)
+    collection = data['collection']
+    image_data = data['image_data']
+    decision = sort_image(collection=collection, image_data=image_data)
     print(f'Sorting this image into {decision}')
 
     topic_arns = {
