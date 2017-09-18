@@ -9,6 +9,7 @@ module "lambda_post_to_slack" {
 
   environment_variables = {
     SLACK_INCOMING_WEBHOOK = "${var.slack_webhook}"
+    BITLY_ACCESS_TOKEN     = "${var.bitly_access_token}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"

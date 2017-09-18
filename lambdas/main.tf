@@ -60,6 +60,7 @@ module "post_to_slack" {
   ec2_instance_terminating_for_too_long_alarm_arn = "${data.terraform_remote_state.platform.ec2_instance_terminating_for_too_long_alarm_arn}"
   slack_webhook                                   = "${var.slack_webhook}"
   alb_server_error_alarm_arn                      = "${data.terraform_remote_state.platform.alb_server_error_alarm_arn}"
+  bitly_access_token                              = "${var.bitly_access_token}"
 
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
