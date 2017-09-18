@@ -25,11 +25,6 @@ module "xml_to_json_run_task" {
   run_ecs_task_topic_publish_policy = "${data.terraform_remote_state.lambda.run_ecs_task_topic_publish_policy}"
 }
 
-module "topic_miro_image_to_dynamo" {
-  source = "../terraform/sns"
-  name   = "miro_image_to_dynamo"
-}
-
 module "miro_image_to_dynamo" {
   source = "miro_image_to_dynamo"
 
