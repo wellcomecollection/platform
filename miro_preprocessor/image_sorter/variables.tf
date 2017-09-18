@@ -26,3 +26,4 @@ variable "topic_catalogue_api_publish_policy" {
 
 variable "s3_miro_data_id" {}
 variable "s3_miro_data_arn" {}
+variable "s3_miro_data_read_policy" {}

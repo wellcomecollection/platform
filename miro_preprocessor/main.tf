@@ -46,8 +46,9 @@ module "miro_image_sorter" {
 
   lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
 
-  s3_miro_data_id  = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
-  s3_miro_data_arn = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
+  s3_miro_data_id          = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  s3_miro_data_arn         = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
+  s3_miro_data_read_policy = "${data.s3_read_miro_json.json}"
 
   topic_cold_store_arn               = "${module.cold_store_topic.arn}"
   topic_cold_store_publish_policy    = "${module.cold_store_topic.publish_policy}"
