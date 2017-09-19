@@ -53,11 +53,6 @@ module "batch_tif_conversion_iam" {
   name   = "tif_conversion"
 }
 
-module "ecs_miro_adapter_iam" {
-  source = "../terraform/ecs_iam"
-  name   = "miro_adapter"
-}
-
 module "ecs_elasticdump_iam" {
   source = "../terraform/ecs_iam"
   name   = "elasticdump"
