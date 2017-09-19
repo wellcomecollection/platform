@@ -9,7 +9,10 @@ class DynamoEvent:
 
     @property
     def new_image(self):
-        return self.event['Records'][0]['dynamodb']['NewImage']
+        if 'NewImage' in self.event['Records'][0]['dynamodb']:
+            return self.event['Records'][0]['dynamodb']['NewImage']
+        else:
+            return None
 
     @property
     def source_arn(self):
@@ -17,11 +20,13 @@ class DynamoEvent:
 
     @property
     def simplified_new_image(self):
-        image = self.event['Records'][0]['dynamodb']['NewImage']
+        image = self.new_image
 
-        td = TypeDeserializer()
-
-        return {k: td.deserialize(v) for k, v in image.items()}
+        if image is not None:
+            td = TypeDeserializer()
+            return {k: td.deserialize(v) for k, v in image.items()}
+        else:
+            return None
 
 
 def _is_capacity_different(x, desired_capacity):

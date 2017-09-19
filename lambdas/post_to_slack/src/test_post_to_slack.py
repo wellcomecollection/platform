@@ -15,7 +15,10 @@ def _assert_field_contains(field, title, value):
 @mock.patch('post_to_slack.requests.post')
 def test_post_to_slack(mock_post):
     url = "http://blah.com"
+
     os.environ['SLACK_INCOMING_WEBHOOK'] = url
+    os.environ['BITLY_ACCESS_TOKEN'] = "foo"
+
     mock_post.return_value.ok = True
 
     alarm_name = "api-alb-target-500-errors"
