@@ -20,7 +20,9 @@ class Undecidable(Exception):
 
 
 def sort_image(collection, image_data):
-    # TODO: Logic goes here!
+    # For now reproduce the behaviour of the miro_adapter and send all images to the catalogue API.
+    return Decision.catalogue_api
+
     raise Undecidable(
         f'No decision for collection={collection!r}, image_data={image_data!r}'
     )
