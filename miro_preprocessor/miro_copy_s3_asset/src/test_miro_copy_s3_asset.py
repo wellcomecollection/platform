@@ -175,36 +175,3 @@ def test_should_replace_asset_if_already_exists_with_different_content(
     assert s3_response['Body'].read() == image_body
 
     assert_sns_message_forwarded(image_json, queue_url, sqs_client)
-
-
-def test_should_not_copy_asset_if_already_exists_with_same_checksum(create_source_and_destination_buckets, sns_sqs,
-                                                                    sns_image_json_event):
-    sqs_client = boto3.client("sqs")
-    s3_client = boto3.client("s3")
-    source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
-    topic_arn, queue_url = sns_sqs
-    miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
-
-    s3_client.put_object(
-        Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"fullsize/A0000000/{miro_id}.jpg")
-
-    destination_key = f"A0000000/{miro_id}.jpg"
-    s3_client.put_object(
-        Bucket=destination_bucket_name,
-        ACL='public-read',
-        Body=image_body, Key=destination_key)
-
-    os.environ = {
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "TOPIC_ARN": topic_arn
-    }
-
-    with patch("miro_copy_s3_asset.copy_image_asset") as mock_copy_function:
-        miro_copy_s3_asset.main(event, None)
-        assert not mock_copy_function.called
-
-    assert_sns_message_forwarded(image_json, queue_url, sqs_client)
