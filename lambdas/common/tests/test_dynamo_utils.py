@@ -24,8 +24,9 @@ remove_event = {'Records': [
     }]
 }
 
+
 def test_getting_new_image_where_not_available_returns_none():
     dynamo_event = dynamo_utils.DynamoEvent(remove_event)
 
-    assert dynamo_event.simplified_new_image == None
-    assert dynamo_event.new_image == None
+    assert dynamo_event.simplified_new_image is None
+    assert dynamo_event.new_image is None

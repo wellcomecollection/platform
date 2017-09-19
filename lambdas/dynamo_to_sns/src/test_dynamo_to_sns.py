@@ -52,7 +52,8 @@ def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
 
     print(messages)
 
-    assert messages.get("Messages") == None
+    assert messages.get("Messages") is None
+
 
 def test_dynamo_to_sns(sns_sqs):
     sqs_client = boto3.client('sqs')
