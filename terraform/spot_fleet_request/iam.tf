@@ -19,8 +19,9 @@ resource "aws_iam_role" "fleet_role" {
 data "aws_iam_policy_document" "spot_fleet_permissions" {
   statement {
     actions = [
-      "ec2:DescribeImages",
-      "ec2:DescribeSubnet",
+      "ec2:Describe*",
+      "ec2:RequestSpotInstances",
+      "iam:PassRole",
     ]
 
     resources = [
