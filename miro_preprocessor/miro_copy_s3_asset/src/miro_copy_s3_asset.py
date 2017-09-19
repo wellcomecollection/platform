@@ -17,18 +17,26 @@ def copy_and_forward_message(s3_client,
                              destination_bucket_name,
                              destination_key,
                              topic_arn):
-    s3_client.copy_object(
-        CopySourceIfNoneMatch=source_etag,
-        CopySource={
-            'Bucket': source_bucket_name,
-            'Key': source_key
-        },
-        Bucket=destination_bucket_name,
-        Key=destination_key)
+    try:
+        s3_client.copy_object(
+            CopySourceIfNoneMatch=source_etag,
+            CopySource={
+                'Bucket': source_bucket_name,
+                'Key': source_key
+            },
+            Bucket=destination_bucket_name,
+            Key=destination_key)
+    except ClientError as client_error:
+        if client_error.response['Error']['Code'] == '412':
+            print(f"Image {destination_bucket_name}/{destination_key} already exists with same ETag: skipping copy")
+            pass
+        else:
+            raise
+
     sns_utils.publish_sns_message(
-        sns_client,
-        topic_arn,
-        image_info)
+            sns_client,
+            topic_arn,
+            image_info)
 
 
 def get_content_md5(head_response):
