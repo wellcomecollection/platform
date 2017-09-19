@@ -57,6 +57,7 @@ def copy_image_asset(s3_client,
 
 
 def main(event, _):
+    print(f"Received event:\n{event}")
     sns_client = boto3.client("sns")
     s3_client = boto3.client("s3")
     source_bucket_name = os.environ["S3_SOURCE_BUCKET"]
