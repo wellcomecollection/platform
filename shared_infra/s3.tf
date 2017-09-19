@@ -23,6 +23,7 @@ resource "aws_s3_bucket" "miro-images-sync" {
   }
 }
 
+# This bucket needs to be removed when we transition to using wellcomecollection-miro-images-public
 resource "aws_s3_bucket" "miro_images_public" {
   bucket = "miro-images-public"
   acl    = "public-read"
@@ -64,6 +65,11 @@ resource "aws_s3_bucket" "mets-ingest" {
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_s3_bucket" "wellcomecollection-miro-images-public" {
+  bucket = "wellcomecollection-miro-images-public"
+  acl    = "public-read"
 }
 
 resource "aws_s3_bucket" "alb-logs" {
