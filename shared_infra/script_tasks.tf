@@ -36,6 +36,11 @@ module "gatling_catalogue_api" {
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
 
+  # In the Catalogue API tests, we've seen issues where Gatling fails to
+  # create enough SSL connections.  Giving it more memory is an attempt to
+  # alleviate these issues.
+  memory = 1800
+
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.CatalogueApiSimulation\"}",
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
@@ -50,11 +55,6 @@ module "gatling_digital_experience" {
   task_name     = "gatling_digital_experience"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
-
-  # In the Catalogue API tests, we've seen issues where Gatling fails to
-  # create enough SSL connections.  Giving it more memory is an attempt to
-  # alleviate these issues.
-  memory = 1800
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.DigitalExperienceImageSearch\"}",
