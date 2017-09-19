@@ -2,146 +2,189 @@
   "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
   "id": "298yw4g",
   "type": "Work",
-  "identifiers": 
-    [
-      {
-        "label": "b13106818",
-        "authority": "Sierra"
-      }
-    ],
-  "label": "The lancet",
-	"alternativeTitle": 
-	[
-		{
-			"label": "Lancet British edition",
-			"type": "keyTitle"
-		},
-		{
-			"label": "Lancet (London, England)",
-			"type": "uniformTitle"
-		}
-	],	
-  "publishers": 
-    [
-      {
-        "label": "J. Onwhyn",
-        "type": "Agent"
-      }
-    ],
-  "placeOfPublication": 
-     [
-       {
-        "label": "London",
-        "type": "Place"
-      }
-    ],
-  "publicationDate": 
+  "workType": {
+    "id": "journals",
+    "type": "WorkType",
+    "label": "Journals"
+  },
+  "identifiers": [
     {
-      "label": "1823",
-      "type": "Period"
-    },
-  "designation": "Vol. 1, no. 1 (Oct 5, 1823)-",
-  "issn": 
-  	[
-  		{
-  			"label": "0140-6736"
-  		},
-  		{
-  			"label": "0023-7507"
-  		},
-		{
-  			"label": "1474-547X"
-  		}
+      "label": "b13106818",
+      "authority": "Sierra"
+    }
   ],
-  "workType": "Journals",
-  "format": "Periodicals",
-  "frequency": 
-  	[
-  		{
-  			"label": "Frequency: weekly",
-			"type": "current"
-  		}
-  	],
-  "subjects": 
-    [
-     {
-        "label": "Medicine",
-        "authority": "MeSH" 
-      },
-      {
-        "label": "Medicine",
+  "title": "The lancet",
+  "alternativeTitle": [
+    {
+      "label": "Lancet British edition",
+      "type": "keyTitle"
+    },
+    {
+      "label": "Lancet (London, England)",
+      "type": "uniformTitle"
+    }
+  ],
+  "publishers": [
+    {
+      "label": "J. Onwhyn",
+      "type": "Person"
+    }
+  ],
+  "placeOfPublication": [
+    {
+      "label": "London",
+      "type": "Place"
+    }
+  ],
+  "publicationDate": {
+    "label": "1823",
+    "type": "Period"
+  },
+  "designation": "Vol. 1, no. 1 (Oct 5, 1823)-",
+  "issn": [
+    {
+      "label": "0140-6736"
+    },
+    {
+      "label": "0023-7507"
+    },
+    {
+      "label": "1474-547X"
+    }
+  ],
+  "genre": {
+    "label": "Periodicals",
+    "type": "Concept"
+  },
+  "frequency": [
+    {
+      "label": "Weekly",
+      "type": "Frequency"
+    }
+  ],
+  "subjects": [
+    {
+      "label": "Medicine",
+      "type": "Concept",
+      "indentifers": {
+        "id": "D81290",
+        "type": "Identifier",
+        "authority": "mesh"
+      }
+    },
+    {
+      "label": "Medicine",
+      "type": "Concept",
+      "indentifers": {
+        "id": "266288",
+        "type": "Identifier",
         "authority": "fast"
       }
-    ],
-  "generalNotes":
-    [
-		{
-			"label": "Subtitle: <1917- , \"A journal of British and foreign medicine, surgery, obstetrics, physiology, chemistry, pharmacology, public health, and news\""
-		},
-		{
-			"label": "Issued 1842-1901 also in an American edition (called: London lancet, 1842-1892; Lancet, 1895-1897; New York lancet, 1898-1901) and in a North American edition, July 1966-"
-		},
-		{
-			"label": "Editors: <1834-1850>, Thomas Wakley; <1917- , Samuel Squire Sprigge; <-1990, Gordon Reeves; 1991- , Robin Fox"
-      	}
-    ],
-	"numbering": "Volume designation varies",
-	"supplement": "Has special issues: \"2000\", published in 1999; \"Perspectives\", published in 2000", 
-	"relatedMaterialNote": 
-		[
-			{
-				"label": "Available in print and electronic formats."
-			},
-			{
-				"label": "Related to: London lancet"
-			},
-			{
-				"label": "Related to: London lancet (New York, N.Y.)"
-			},
-			{
-				"label": "Related to: New York lancet (New York, N.Y.)"
-			},
-			{
-				"label": "Lancet (North American ed.)"
-			},
-			{
-				"label": "Lancet (Deutsche Ausg.)"
-			}
-		],
-	"creators":
-		[
-			{
-				"label": "Reeves, W.G."
-			},
-			{
-				"label": "Fox, Robin, 1934-"
-			},
-			{
-				"label": "Wakley, Thomas, 1795-1862"
-			},
-			{
-				"label": "Sprigge, S. Squire (Samuel Squire)"
-			}
-		],
-	
-  "items":
-    [
-      {
-       "id": "dhu458qh",
-       "type": "item",
-       "identifiers": 
-        [
-          {
-            "label": "i13328396",
-            "authority": "Sierra"
+    }
+  ],
+  "generalNotes": [
+    {
+      "label": "Subtitle: <1917- , \"A journal of British and foreign medicine, surgery, obstetrics, physiology, chemistry, pharmacology, public health, and news\""
+    },
+    {
+      "label": "Issued 1842-1901 also in an American edition (called: London lancet, 1842-1892; Lancet, 1895-1897; New York lancet, 1898-1901) and in a North American edition, July 1966-"
+    },
+    {
+      "label": "Editors: <1834-1850>, Thomas Wakley; <1917- , Samuel Squire Sprigge; <-1990, Gordon Reeves; 1991- , Robin Fox"
+    }
+  ],
+  "numbering": "Volume designation varies",
+  "supplement": "Has special issues: \"2000\", published in 1999; \"Perspectives\", published in 2000",
+  "relatedMaterialNote": [
+    {
+      "label": "Available in print and electronic formats."
+    },
+    {
+      "label": "Related to: London lancet"
+    },
+    {
+      "label": "Related to: London lancet (New York, N.Y.)"
+    },
+    {
+      "label": "Related to: New York lancet (New York, N.Y.)"
+    },
+    {
+      "label": "Lancet (North American ed.)"
+    },
+    {
+      "label": "Lancet (Deutsche Ausg.)"
+    }
+  ],
+  "creators": [
+    {
+      "label": "Reeves, W.G."
+    },
+    {
+      "label": "Fox, Robin, 1934-"
+    },
+    {
+      "label": "Wakley, Thomas, 1795-1862"
+    },
+    {
+      "label": "Sprigge, S. Squire (Samuel Squire)"
+    }
+  ],
+  "items": [
+    {
+      "id": "dhu458qh",
+      "type": "Item",
+      "identifiers": [
+        {
+          "label": "i13328396",
+          "authority": "Sierra"
+        }
+      ],
+      "volume": "1823, v.1 2 ed. 1824" ,
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "journals",
+          "label": "Journals",
+          "shelfmark": "/LAN",
+          "accessStatus": {
+            "id": "Available",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "open-shelves",
+            "label": "Open Shelves",
+            "type": "AccessProcess"
           }
-        ],
-       "physicalDescription": "volumes: illustrations.  Dimensions: 22-27 cm",
-       "status": "Available",
-	   "access": "Open Shelves",
-       "classmark": "/LAN",
-       "wellcomeBarcode": "22101500309",
-	   "volume": "1823, v.1 2 ed. 1824"
-      }
-    ]
+        }
+      ]
+    },
+    {
+      "id": "dhu458qh",
+      "type": "Holding",
+      "label": "v.385:no.9972 (2015) - v.385:no.9973 (2015)",
+      "identifiers": [
+        {
+          "label": "c10628396",
+          "authority": "Sierra"
+        }
+      ],
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "journals",
+          "label": "Journals",
+          "shelfmark": "/LAN",
+          "accessStatus": {
+            "id": "Available",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "open-shelves",
+            "label": "Open Shelves",
+            "type": "AccessProcess"
+          }
+        }
+      ]
+    }
+  ]
 }
