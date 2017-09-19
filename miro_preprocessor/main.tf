@@ -55,8 +55,8 @@ module "miro_copy_s3_asset" {
   topic_miro_copy_s3_asset_arn   = "${module.catalogue_api_topic.arn}"
   lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
   topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
-  bucket_miro_images_public_arn  = "${data.terraform_remote_state.platform.bucket_miro_images_public_arn}"
-  bucket_miro_images_public_name = "${data.terraform_remote_state.platform.bucket_miro_images_public_id}"
+  bucket_miro_images_public_arn  = "${data.terraform_remote_state.platform.bucket_wellcomecollectio_miro_images_public_arn}"
+  bucket_miro_images_public_name = "${data.terraform_remote_state.platform.bucket_wellcomecollectio_miro_images_public_id}"
   bucket_miro_images_sync_arn    = "${data.terraform_remote_state.platform.bucket_miro_images_sync_arn}"
   bucket_miro_images_sync_name   = "${data.terraform_remote_state.platform.bucket_miro_images_sync_id}"
 }
