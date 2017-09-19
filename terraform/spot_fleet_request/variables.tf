@@ -3,6 +3,7 @@ variable "instance_type" {}
 variable "image_id" {}
 variable "key_name" {}
 variable "user_data" {}
+variable "instance_profile_name" {}
 
 variable "availability_zone" {
   default = "eu-west-1"
