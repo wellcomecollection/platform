@@ -44,6 +44,7 @@ def main(event, _):
     # Decide where to put it, then send the metadata to SNS
     collection = data['collection']
     image_data = data['image_data']
+
     decision = sort_image(collection=collection, image_data=image_data)
     print(f'Sorting this image into {decision}')
 
