@@ -8,6 +8,36 @@ from botocore.exceptions import ClientError
 import sns_utils
 
 
+def copy_and_forward_message(s3_client,
+                             sns_client,
+                             image_info,
+                             source_bucket_name,
+                             source_key,
+                             source_head_response,
+                             destination_bucket_name,
+                             destination_key,
+                             topic_arn):
+    try:
+        destination_head_response = s3_client.head_object(Bucket=destination_bucket_name, Key=destination_key)
+    except ClientError as client_error:
+        if client_error.response['Error']['Code'] == '404':
+            print(
+                f"Destination bucket has no image: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
+            copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
+            pass
+        else:
+            raise
+    else:
+        if not get_content_md5(source_head_response) == get_content_md5(destination_head_response):
+            print(
+                f"Destination bucket has image with different hash: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
+            copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
+    sns_utils.publish_sns_message(
+        sns_client,
+        topic_arn,
+        image_info)
+
+
 def get_content_md5(source_head_response):
     return source_head_response['ResponseMetadata']['HTTPHeaders']['Content-MD5']
 
@@ -46,21 +76,12 @@ def main(event, _):
             raise
     else:
         destination_key = f"{shard}/{miro_id}.jpg"
-        try:
-            destination_head_response = s3_client.head_object(Bucket=destination_bucket_name, Key=destination_key)
-        except ClientError as client_error:
-            if client_error.response['Error']['Code'] == '404':
-                print(f"Destination bucket has no image: copying from {source_bucket_name}/{key} to {destination_bucket_name}/{destination_key}")
-                copy_image_asset(s3_client, source_bucket_name, key, destination_bucket_name, destination_key)
-                pass
-            else:
-                raise
-        else:
-            if not get_content_md5(source_head_response) == get_content_md5(destination_head_response):
-                print(f"Destination bucket has image with different hash: copying from {source_bucket_name}/{key} to {destination_bucket_name}/{destination_key}")
-                copy_image_asset(s3_client, source_bucket_name, key, destination_bucket_name, destination_key)
-
-        sns_utils.publish_sns_message(
-            sns_client,
-            topic_arn,
-            image_info)
+        copy_and_forward_message(s3_client,
+                                 sns_client,
+                                 image_info,
+                                 source_bucket_name,
+                                 key,
+                                 source_head_response,
+                                 destination_bucket_name,
+                                 destination_key,
+                                 topic_arn)
