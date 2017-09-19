@@ -27,21 +27,24 @@ def copy_and_forward_message(s3_client,
             Bucket=destination_bucket_name,
             Key=destination_key)
     except ClientError as client_error:
-        if client_error.response['Error']['Code'] == '412':
+        if is_precondition_failed(client_error) and condition_is_etag_matching(client_error):
             print(f"Image {destination_bucket_name}/{destination_key} already exists with same ETag: skipping copy")
             pass
         else:
             raise
 
     sns_utils.publish_sns_message(
-            sns_client,
-            topic_arn,
-            image_info)
+        sns_client,
+        topic_arn,
+        image_info)
 
 
-def get_content_md5(head_response):
-    print(head_response)
-    return head_response['ResponseMetadata']['HTTPHeaders']['Content-MD5']
+def condition_is_etag_matching(client_error):
+    return client_error.response['Error']['Condition'] == 'x-amz-copy-source-If-None-Match'
+
+
+def is_precondition_failed(client_error):
+    return client_error.response['Error']['Code'] == 'PreconditionFailed'
 
 
 def main(event, _):

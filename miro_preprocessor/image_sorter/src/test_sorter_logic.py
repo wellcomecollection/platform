@@ -6,7 +6,6 @@ from sorter_logic import Decision, Undecidable, sort_image
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    ('Images-A', {}),
 ])
 def test_is_undecidable(collection, image_data):
     """These examples are undecidable."""
