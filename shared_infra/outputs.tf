@@ -110,6 +110,14 @@ output "bucket_miro_images_sync_id" {
   value = "${aws_s3_bucket.miro-images-sync.id}"
 }
 
+output "bucket_miro_images_public_arn" {
+  value = "${aws_s3_bucket.miro_images_public.arn}"
+}
+
+output "bucket_miro_images_public_id" {
+  value = "${aws_s3_bucket.miro_images_public.id}"
+}
+
 output "table_miro_data_arn" {
   value = "${aws_dynamodb_table.miro_table.arn}"
 }
