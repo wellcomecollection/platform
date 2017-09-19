@@ -53,4 +53,4 @@ def main(event, _):
         Decision.catalogue_api: topic_catalogue_api
     }
 
-    publish_sns_message(topic_arn=topic_arns[decision], message=metadata)
+    publish_sns_message(topic_arn=topic_arns[decision], message=data)

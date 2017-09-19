@@ -3,7 +3,6 @@ import os
 
 import boto3
 from moto import mock_s3
-from unittest.mock import patch
 import pytest
 
 import miro_copy_s3_asset

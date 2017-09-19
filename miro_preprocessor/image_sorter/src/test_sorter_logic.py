@@ -10,7 +10,7 @@ from sorter_logic import Decision, Undecidable, sort_image
 def test_is_undecidable(collection, image_data):
     """These examples are undecidable."""
     with pytest.raises(Undecidable):
-        sort_image(metadata)
+        sort_image(image_data)
 
 
 @pytest.mark.parametrize('collection, image_data', [

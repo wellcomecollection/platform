@@ -5,7 +5,7 @@ import json
 import boto3
 from moto import mock_s3
 
-from miro_image_sorter import fetch_s3_metadata, parse_s3_event
+from miro_image_sorter import fetch_s3_data, parse_s3_event
 
 
 def test_parse_s3_event(s3_put_event):
