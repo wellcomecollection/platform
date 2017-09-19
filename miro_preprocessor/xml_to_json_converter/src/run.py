@@ -38,6 +38,7 @@ def _wrap_image_data(collection, image_data):
 
 
 def main(bucket, src_key, dst_key, js_path="json"):
+    print(f"Starting to process s3://{bucket}/{src_key}.")
     image_data = generate_images(bucket=bucket, key=src_key)
 
     collection = src_key.split(".")[0]
@@ -46,6 +47,8 @@ def main(bucket, src_key, dst_key, js_path="json"):
     os.makedirs(os.path.dirname(tmp_json), exist_ok=True)
 
     s3 = boto3.client('s3')
+
+    image_data_count = 1
 
     with open(tmp_json, 'w') as f:
         for img in image_data:
@@ -59,6 +62,7 @@ def main(bucket, src_key, dst_key, js_path="json"):
             )
 
             image_id = img["image_no_calc"]
+
             json_object_key = f'{js_path}/{image_id}.json'
 
             byte_encoded_json_dump = img_json_dump.encode()
@@ -69,15 +73,21 @@ def main(bucket, src_key, dst_key, js_path="json"):
                 Body=byte_encoded_json_dump
             )
 
+            print(f"Put image {image_id} ({image_data_count}) to s3://{bucket}/{json_object_key}")
+
             # Adding the separators omits unneeded whitespace in the JSON,
             # giving us smaller files.
             f.write(img_json_dump + '\n')
+
+            image_data_count += 1
 
     s3.upload_file(
         Bucket=bucket,
         Key=dst_key,
         Filename=tmp_json
     )
+
+    print(f"Put s3://{bucket}/{dst_key}. Done.")
 
     os.unlink(tmp_json)
 
