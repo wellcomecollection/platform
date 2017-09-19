@@ -13,41 +13,51 @@ def copy_and_forward_message(s3_client,
                              image_info,
                              source_bucket_name,
                              source_key,
-                             source_etag,
                              destination_bucket_name,
                              destination_key,
+                             source_head_response,
                              topic_arn):
     try:
-        s3_client.copy_object(
-            CopySourceIfNoneMatch=source_etag,
-            CopySource={
-                'Bucket': source_bucket_name,
-                'Key': source_key
-            },
-            Bucket=destination_bucket_name,
-            Key=destination_key)
+        destination_head_response = s3_client.head_object(Bucket=destination_bucket_name, Key=destination_key)
     except ClientError as client_error:
-        if is_precondition_failed(client_error) and condition_is_etag_matching(client_error):
-            print(f"Image {destination_bucket_name}/{destination_key} already exists with same ETag: skipping copy")
+        if client_error.response['Error']['Code'] == '404':
+            print(
+                f"Destination bucket has no image: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
+            copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
             pass
         else:
             raise
-
+    else:
+        if not get_etag(source_head_response) == get_etag(destination_head_response):
+            print(
+                f"Destination bucket has image with different hash: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
+            copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
     sns_utils.publish_sns_message(
         sns_client,
         topic_arn,
         image_info)
 
 
-def condition_is_etag_matching(client_error):
-    return client_error.response['Error']['Condition'] == 'x-amz-copy-source-If-None-Match'
+def get_etag(head_response):
+    return head_response['ETag']
 
 
-def is_precondition_failed(client_error):
-    return client_error.response['Error']['Code'] == 'PreconditionFailed'
+def copy_image_asset(s3_client,
+                     source_bucket_name,
+                     source_key,
+                     destination_bucket_name,
+                     destination_key):
+    s3_client.copy_object(
+        CopySource={
+            'Bucket': source_bucket_name,
+            'Key': source_key
+        },
+        Bucket=destination_bucket_name,
+        Key=destination_key)
 
 
 def main(event, _):
+    print(f"Received event:\n{event}")
     sns_client = boto3.client("sns")
     s3_client = boto3.client("s3")
     source_bucket_name = os.environ["S3_SOURCE_BUCKET"]
@@ -76,7 +86,7 @@ def main(event, _):
                                  image_info,
                                  source_bucket_name,
                                  key,
-                                 source_head_response['ETag'],
                                  destination_bucket_name,
                                  destination_key,
+                                 source_head_response,
                                  topic_arn)
