@@ -1,0 +1,121 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "298yw4g",
+  "type": "Work",
+  "workType": {
+    "id": "pictures",
+    "type": "WorkType",
+    "label": "Pictures"
+  },
+  "identifiers": [
+    {
+      "label": "b28852011",
+      "authority": "Sierra"
+    }
+  ],
+  "title": "The first twenty Presidents of the United States of America. Steel engravings",
+  "alternativeTitle": [
+    {
+      "label": "Title printed in gilt on leather portfolio : Presidents of the United States. Steel plate portraits with fac-simile autographs",
+      "type": "VariantTitle"
+    }
+  ],
+  "physicalDescription" : "21 sheets (20 prints and printed list of contents) : steel engraving ; sheets 17.5 x 12.5 cm + leather portfolio" ,
+  "publicationDate": {
+    "label": "1881",
+    "type": "Period"
+  },
+  "genre": {
+    "label": "Portrait prints",
+    "type": "Concept"
+  },
+  "subjects": [
+    {
+      "label": "Presidents -- United States",
+      "type": "QualifiedConcept",
+      "concept": {
+         "label": "Presidents" ,
+         "type": "Concept" ,
+         "indentifers": {
+           "id": "sh85106459",
+           "type": "Identifier",
+           "authority": "lcsd"
+      }       
+      } 
+      "qualifiers"
+         {
+            "label": "United States" ,
+            "type": "Concept" 
+         }
+    }
+  ],
+  "generalNotes": [
+    {
+      "label": "The present set of twenty engravings must have been published between March and September 1881, during the presidency of James A. Garfield. In 1882, after Garfield's assassination, the publisher brought out a revised edition containing 21 portraits, including Garfield's successor (Chester A. Arthur), using the same leather case as the present edition. Mr Ralph Trautmann of 312 Broadway has now ready a collection of steel plate portraits which ought to have sale during the autumn and holiday season. They are on ivory finished cards 5 x 7 inches of assorted tints with corners and edges beveled and gilt. Each portrait is accompanied by facsimile of autograph. There are four sets each neat leather case with descriptive index card and retailing $2.50. Set A contains portraits of all the Presidents Washington to Arthur twenty one in number. Set B twenty likenesses of eminent authors and poets. Set C before us the Heroes of 1776 to the number of twenty. Set D returns to the wide field of authors and poets giving additional twenty. --The American bookseller,' Vol. 13 Sept. 15, 1882Engravings printed in black on colour-printed sheets with gilt edges and rounded corners, in a burgundy leather portfolio with title stamped in gilt" ,
+      "type" : "GeneralNote"
+    },
+  ],
+  "lettering": "Twenty fine steel plate engravings of the Presidents of the United States of America",
+  "creators": [
+    {
+      "label": "Ralph Trautmann"
+    }
+  ],
+  "items": [
+    {
+      "id": "dhu458qh",
+      "type": "Item",
+      "identifiers": [
+        {
+          "label": "i13328396",
+          "authority": "Sierra"
+        }
+      ],
+      "volume": "Portfolio no. [1] George Washington" ,
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "sicon",
+          "label": "Closed stores Iconographic",
+          "shelfmark": "2885201i",
+          "accessStatus": {
+            "id": "Available",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "online-request",
+            "label": "Online Request",
+            "type": "AccessProcess"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dhu458qh",
+      "type": "Holding",
+      "label": "20 prints and printed list of contents in a leather portfolio",
+      "identifiers": [
+        {
+          "label": "c10628396",
+          "authority": "Sierra"
+        }
+      ],
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "sicon",
+          "label": "Closed stores Iconographic",
+          "accessStatus": {
+            "id": "Available",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "online-request",
+            "label": "Online Request",
+            "type": "AccessProcess"
+          }
+        }
+      ]
+    }
+  ]
+}

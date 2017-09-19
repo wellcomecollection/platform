@@ -17,6 +17,12 @@ wloc:Item rdf:type owl:Class ;
     rdfs:label "Item"@en ;
     rdfs:comment "An item"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
+    
+wloc:Holding rdf:type owl:Class ;
+    rdfs:subClassof "Item" ;
+    rdfs:label "Holding"@en ;
+    rdfs:comment "A holding contains the information about what copies are owned and where they are held—for bibliographic items in both physical and electronic forms."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
 
 wloc:Location rdf:type owl:Class ;
     rdfs:label "Location"@en ;
@@ -92,7 +98,26 @@ wloc:licenseType rdf:type owl:ObjectProperty ;
     rdfs:comment "Relates a license to the a license type."@en ;
     rdfs:domain wloc:License ;
     rdfs:range wloc:LicenseType ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .                                   
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .   
+    
+##### Object properties ####
+
+
+wag:identity rdf:type owl:DatatypeProperty ;
+    rdfs:label "identity"@en ;
+    rdfs:comment "The identity of the copy."@en ;
+    rdfs:domain wag:Holding ;
+    rdfs:range rdf:LangString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
+
+wag:volume rdf:type owl:DatatypeProperty ;
+    rdfs:label "volume"@en ;
+    rdfs:comment "The specific volume of the series."@en ;
+    rdfs:domain wag:Item ;
+    rdfs:range rdf:LangString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .      
+    
+                                         
     
     
     
