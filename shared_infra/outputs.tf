@@ -110,12 +110,21 @@ output "bucket_miro_images_sync_id" {
   value = "${aws_s3_bucket.miro-images-sync.id}"
 }
 
+# This should be removed when they are superseded by bucket_wellcomecollectio_miro_images_public_* below
 output "bucket_miro_images_public_arn" {
   value = "${aws_s3_bucket.miro_images_public.arn}"
 }
 
 output "bucket_miro_images_public_id" {
   value = "${aws_s3_bucket.miro_images_public.id}"
+}
+
+output "bucket_wellcomecollectio_miro_images_public_arn" {
+  value = "${aws_s3_bucket.wellcomecollection-miro-images-public.arn}"
+}
+
+output "bucket_wellcomecollectio_miro_images_public_id" {
+  value = "${aws_s3_bucket.wellcomecollection-miro-images-public.id}"
 }
 
 output "table_miro_data_arn" {
