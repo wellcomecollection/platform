@@ -1,0 +1,92 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "298yw4g",
+  "type": "Work",
+  "workType": {
+    "id": "books",
+    "type": "WorkType",
+    "label": "Books"
+  },
+  "identifiers": [
+    {
+      "label": "b1265600",
+      "authority": "Sierra"
+    }
+  ],
+  "title": "A dictionary of archaic and provincial words, obsolete phrases, proverbs, and ancient customs, from the fourteenth century / ",
+  "publishers": [
+    {
+      "label": "Reeves and Turner",
+      "type": "Organisation"
+    }
+  ],
+    "placeOfPublication": [
+    {
+      "label": "London",
+      "type": "Place"
+    }
+  ],
+  "publicationDate": {
+    "label": "1889",
+    "type": "Period"
+  },  
+  "designation": "11th ed",
+  "genre": {
+    "label": "Dictionary",
+    "type": "Concept"
+  },
+  "subjects": [
+    {
+      "label": "English Language--Provincialisms",
+      "type": "QualifiedConcept",
+      "concept": {
+         "label": "English Language" ,
+         "type": "Concept" ,
+         "indentifers": {
+           "id": "D81290",
+           "type": "Identifier",
+           "authority": "mesh"
+      }       
+      } 
+      "qualifiers"
+         {
+            "label": "Provincialisms" ,
+            "type": "Concept" 
+         }
+    }
+  ],
+  "creators": [
+    {
+      "label": "James Orchard Halliwell"
+    }
+  ],
+  "items": [
+    {
+      "id": "dhu458qh",
+      "type": "Holding",
+      "label" : "Complete set" ,
+      "identifiers": [
+        {
+          "label": "c13328396",
+          "authority": "Sierra"
+        }
+      ],
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "open-shelves",
+          "label": "Open shelves",
+          "accessStatus": {
+            "id": "Available",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "open-shelves",
+            "label": "Open Shelves",
+            "type": "AccessProcess"
+          }
+        }
+      ]
+    }
+  ]
+}
