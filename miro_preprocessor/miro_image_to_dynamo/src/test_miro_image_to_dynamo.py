@@ -8,10 +8,6 @@ import pytest
 import miro_image_to_dynamo
 
 
-def pytest_runtest_setup(item):
-    set_region()
-
-
 @pytest.fixture()
 def set_region():
     # Without this, boto3 is complaining about not having a region defined
@@ -22,7 +18,7 @@ def set_region():
 
 
 @pytest.fixture
-def miro_table():
+def miro_table(set_region):
     mock_dynamodb2().start()
     dynamodb = boto3.resource('dynamodb')
 
