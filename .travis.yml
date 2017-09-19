@@ -128,7 +128,6 @@ env:
     - TASK=tif-metadata-build
     - TASK=gatling-build
     - TASK=loris-build
-    - TASK=miro_adapter-test
     - TASK=elasticdump-build
     - TASK=api_docs-build
     - TASK=miro_preprocessor-test
