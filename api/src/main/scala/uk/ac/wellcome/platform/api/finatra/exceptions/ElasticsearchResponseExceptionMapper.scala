@@ -53,44 +53,63 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   //     efficient way to request large data sets. This limit can be set by
   //     changing the [index.max_result_window] index level setting.
   //
-  // In this case, we return a 400 Bad Request error, but we rephrase it
-  // to be shorter and to avoid talking about Elasticsearch concepts.
+  // When returning a 400 to the user, we wrap this error to avoid talking
+  // about internal Elasticsearch concepts.
   val resultSizePattern =
     """Result window is too large, from \+ size must be less than or equal to: \[([0-9]+)\]""".r.unanchored
-
-  /* Elasticsearch errors have a "root_cause" with a reason -- given such
-   * a reason, return an appropriate DisplayError.
-   */
 
   private def jsonToError(jsonDocument: String,
                           exception: Exception): DisplayError = {
     val mapper = new ObjectMapper()
     val exceptionData = mapper.readTree(jsonDocument)
-    val reason = exceptionData
-      .get("error")
-      .get("root_cause")
-      .get(0)
-      .get("reason")
 
-    reason match {
-      case s: JsonNode => s.asText match {
-        case resultSizePattern(size) =>
-          userError(s"Only the first $size works are available in the API.",
-                    exception)
-        case _ =>
-          serverError(
-            s"Unknown reason for error in Elasticsearch response: $reason",
-            exception)
+    val esError = exceptionData.get("error")
+    val esErrorType = esError
+      .get("type")
+      .asText
+
+    esErrorType match {
+      // This occurs if the user requests a non-existent index as ?_index=foo.
+      // We return this as a 404 error to the user.
+      case "index_not_found_exception" => {
+        val index = esError
+          .get("index")
+          .asText
+        notFound(s"There is no index $index", exception)
       }
-      case _ =>
-        serverError("Unable to find error reason in Elasticsearch response",
-                    exception)
+
+      // This may occur if the user requests an overly large page of results.
+      // We return this as a 400 error to the user.
+      case "search_phase_execution_exception" => {
+        val reason = esError
+          .get("root_cause")
+          .get(0)
+          .get("reason")
+          .asText
+
+        resultSizePattern.findFirstMatchIn(reason) match {
+          case Some(s) => {
+            val size = s.group(1)
+            userError(s"Only the first $size works are available in the API.",
+                      exception)
+          }
+          case _ => {
+            serverError(s"Unknown error in search phase execution: $reason",
+                        exception)
+          }
+        }
+      }
+
+      // Anything else should bubble up as a 500, as it's at least somewhat
+      // unexpected and worthy of further investigation.
+      case _ => {
+        serverError("Unknown error", exception)
+      }
     }
   }
 
   private def toError(request: Request,
                       exception: ResponseException): DisplayError = {
-
     // Elasticsearch returns errors as JSON documents, which are stored in the
     // `message` attribute of ElasticsearchException.  Try to read it as JSON,
     // so we can check if this was a user error -- but if parsing fails, it's
