@@ -10,6 +10,8 @@ module "miro_copy_s3_asset_lambda" {
     "S3_DESTINATION_BUCKET" = "${var.bucket_miro_images_public_name}"
     "TOPIC_ARN"             = "${var.topic_miro_image_to_dynamo_arn}"
   }
+
+  timeout = "30"
 }
 
 module "miro_copy_s3_asset_trigger" {
