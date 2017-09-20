@@ -17,15 +17,10 @@ module "lambda_xml_to_json_run_task" {
   }
 }
 
-# Triggers the lambda on updates to files matching /source/*.xml
-
-module "trigger_application_restart_on_config_change" {
-  source = "../../terraform/lambda/trigger_s3"
-
-  lambda_function_name = "${module.lambda_xml_to_json_run_task.function_name}"
-  lambda_function_arn  = "${module.lambda_xml_to_json_run_task.arn}"
-  s3_bucket_arn        = "${var.bucket_miro_data_arn}"
-  s3_bucket_id         = "${var.bucket_miro_data_id}"
-  filter_prefix        = "source/"
-  filter_suffix        = ".xml"
+resource "aws_lambda_permission" "allow_lambda" {
+  statement_id  = "AllowExecutionFromS3Bucket_${module.lambda_xml_to_json_run_task.function_name}_${var.bucket_miro_data_id}"
+  action        = "lambda:InvokeFunction"
+  function_name = "${module.lambda_xml_to_json_run_task.function_name}"
+  principal     = "s3.amazonaws.com"
+  source_arn    = "${var.bucket_miro_data_arn}"
 }

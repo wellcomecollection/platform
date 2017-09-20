@@ -66,3 +66,20 @@ resource "aws_iam_role_policy" "miro_copy_s3_asset_sns_publish" {
   role   = "${module.miro_copy_s3_asset.role_name}"
   policy = "${module.topic_miro_image_to_dynamo.publish_policy}"
 }
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+
+  lambda_function {
+    lambda_function_arn = "${module.xml_to_json_run_task.arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix        = "source/"
+    filter_suffix        = ".xml"
+  }
+  lambda_function {
+    lambda_function_arn = "${module.miro_image_sorter.arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix        = "json/"
+    filter_suffix        = ".json"
+  }
+}
