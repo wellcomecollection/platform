@@ -1,0 +1,158 @@
+@prefix werror:   <http://wellcomecollection.org/ontologies/errors/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://wellcomecollection.org/ontologies/errors>
+    rdf:type owl:Ontology ;
+    dcterms:title "Errors ontology"@en ;
+    dcterms:created "2017-09-14"^^xsd:date ;
+    dcterms:description "Ontology describing the properties of errors"@en .
+
+#######  Classes #####
+
+werror:Error rdf:type owl:Class ;
+    rdfs:label "Error"@en ;
+    rdfs:comment "An individual error, mistake, or unintended outcome."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
+
+#######  Object properties #####
+
+wwork:items rdf:type owl:ObjectProperty ;
+    rdfs:label "items"@en ;
+    rdfs:comment "Relates the general bibliographic description of a work to specific instances of it, each item forming a unique incarnation of that work.  Item here corresponds to the bottom layer of FRBR."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Item ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+
+wwork:isPartOf rdf:type owl:ObjectProperty ;
+    rdfs:label "isPartOf"@en ;
+    rdfs:comment "Relates an entity to one of which it forms a part."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Work ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:isCopyOf rdf:type owl:ObjectProperty ;
+    rdfs:label "isCopyOf"@en ;
+    rdfs:comment "Relates an entity to one of which it forms a copy - that is, a transcription or other duplication.  (This property is used when it results in the creation of a new bibliographic entity and not simply for second instances of a particular work.) "@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Work ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:isOriginalOf rdf:type owl:ObjectProperty ;
+    rdfs:label "isOriginalOf"@en ;
+    rdfs:comment "Relates an entity to one that forms a copy of it.  (This property is used when it results in the creation of a new bibliographic entity and not simply for second instances of a particular work.) "@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Work ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:creators rdf:type owl:ObjectProperty ;
+    rdfs:label "creators"@en ;
+    rdfs:comment "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Agent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:publishers rdf:type owl:ObjectProperty ;
+    rdfs:label "publishers"@en ;
+    rdfs:comment "Relates a published work to its publisher."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Agent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:placeOfPublication rdf:type owl:ObjectProperty ;
+    rdfs:label "placeOfPublication"@en ;
+    rdfs:comment "Relates a work to its place of publication."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Place ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:placeOfCreation rdf:type owl:ObjectProperty ;
+    rdfs:label "placeOfCreation"@en ;
+    rdfs:comment "Relates a work to its place of creation; typically this will be used for unpublished works, whilst published works will instead use the property hasPublicationLocation."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Place ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:subjects rdf:type owl:ObjectProperty ;
+    rdfs:label "subjects"@en ;
+    rdfs:comment "Relates a work to the general thesaurus-based concept that describes the work's content."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:genres rdf:type owl:ObjectProperty ;
+    rdfs:label "genres"@en ;
+    rdfs:comment "Relates a work to the genre that describes the work's content."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:workType rdf:type owl:ObjectProperty ;
+    rdfs:label "workType"@en ;
+    rdfs:comment "Relates a Work to the general WorkType that describes the work's form: published text, painting, and so on."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:WorkType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:publicationDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "publicationDate"@en ;
+    rdfs:comment "Relates the publication of a work to a date, when the work has been formally published.  This date is not identical with the property createdDate: for example, a work may be created at a particular time but only published after the author's death, or a work may be published in a modern edition long after first publication.  An extreme example would be the works of Aristotle, all of which are created some centuries BCE but not published in the formal sense for many centuries after this"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Period ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:createdDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "createdDate"@en ;
+    rdfs:comment "Relates the creation of a work to a date, when the date of creation does not cover a range"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Period ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+#######  Data properties #####
+
+
+wwork:modifiedDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "modifiedDate"@en ;
+    rdfs:comment "Relates the last recorded modification of a work to a date"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range xsd:dateTime ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:title rdf:type owl:DatatypeProperty ;
+    rdfs:label "title"@en ;
+    rdfs:comment "The title or other short label of a work, including labels not present in the actual work or item but applied by the cataloguer for the purposes of search or description."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:level rdf:type owl:DatatypeProperty ;
+    rdfs:label "level"@en ;
+    rdfs:comment "Indicates the position of a work within a hierarchy of works: for example, Collection, Series, Item etc. The terminology used here will typically be drawn from external systems and may not necessarily correspond directly to the terminology of this ontology: for instance, in archive catalogues the term Item may be used to describe an entity that combines properties assigned in this ontology to the Work and Item classes."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range xsd:integer ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:alternativeTitle rdf:type owl:DatatypeProperty ;
+    rdfs:label "alternativeTitle"@en ;
+    rdfs:comment "Alternative title for a work, usually used for published material: former title, variant forms, translation of main title, etc."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:lettering rdf:type owl:DatatypeProperty ;
+    rdfs:label "lettering"@en ;
+    rdfs:comment "Recording written text on a (usually visual) work."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:physicalDescription rdf:type owl:DatatypeProperty ;
+    rdfs:label "physicalDescription"@en ;
+    rdfs:comment "A description of specific physical characteristics of the item - condition, dimensions, details of cover or binding, etc. - or, in the case of digital objects, any notes relating to this digital manifestation over and above notes of file format."@en ;
+    rdfs:domain wwork:Item ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
