@@ -48,10 +48,8 @@ def main(bucket, src_key, dst_key, js_path="json"):
 
     s3 = boto3.client('s3')
 
-    image_data_count = 1
-
     with open(tmp_json, 'w') as f:
-        for img in image_data:
+        for count, img in enumerate(image_data, start=1):
             img_json_dump = json.dumps(
                 _wrap_image_data(
                     collection=collection,
@@ -73,13 +71,11 @@ def main(bucket, src_key, dst_key, js_path="json"):
                 Body=byte_encoded_json_dump
             )
 
-            print(f"Put image {image_id} ({image_data_count}) to s3://{bucket}/{json_object_key}")
+            print(f"Put image {image_id} ({count}) to s3://{bucket}/{json_object_key}")
 
             # Adding the separators omits unneeded whitespace in the JSON,
             # giving us smaller files.
             f.write(img_json_dump + '\n')
-
-            image_data_count += 1
 
     s3.upload_file(
         Bucket=bucket,
