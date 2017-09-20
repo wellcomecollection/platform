@@ -51,7 +51,12 @@ wag:Award rdf:type owl:Class ;
 wag:RecievedAward rdf:type owl:Class ;
     rdfs:label "RecievedAward"@en ;
     rdfs:comment "A recieved award"@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .                              
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .
+    
+wag:Concept rdf:type owl:Class ;
+    rdfs:label "RecievedAward"@en ;
+    rdfs:comment "A recieved award"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .                                  
      
     
 #### object properties ####
