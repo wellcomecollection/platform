@@ -25,22 +25,25 @@ class ElasticsearchResponseExceptionMapper @Inject()(
 
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
-  private def userError(message: String, exception: Exception): DisplayError = {
+  private def sendError(message: String,
+                        exception: Exception,
+                        status: Int): DisplayError = {
     error(
-      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
+      s"Sending HTTP $status from ElasticsearchResponseExceptionMapper ($message)",
       exception)
-    DisplayError(Error(variant = "http-400", description = Some(message)))
+    DisplayError(Error(variant = s"http-$status", description = Some(message)))
   }
 
-  private def serverError(message: String,
-                          exception: Exception): DisplayError = {
-    error(
-      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
-      exception)
-    DisplayError(Error(variant = "http-500", description = None))
-  }
+  private def userError(message: String, exception: Exception): DisplayError =
+    sendError(message = message, exception = exception, status = 400)
 
-  // One possible error is of the form:
+  private def notFound(message: String, exception: Exception): DisplayError = {
+    sendError(message = message, exception = exception, status = 404)
+
+  private def serverError(message: String, exception: Exception): DisplayError = {
+    sendError(message = message, exception = exception, status = 500)
+
+  // This error is of the form:
   //
   //     Result window is too large, from + size must be less than or equal
   //     to: [10000] but was [100000]. See the scroll api for a more
@@ -89,7 +92,6 @@ class ElasticsearchResponseExceptionMapper @Inject()(
     // `message` attribute of ElasticsearchException.  Try to read it as JSON,
     // so we can check if this was a user error -- but if parsing fails, it's
     // enough to return a 500 error.
-
     try {
       // Annoyingly, the exact format of message is
       //
