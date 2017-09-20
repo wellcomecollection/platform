@@ -868,6 +868,28 @@ class ApiWorksTest
     }
   }
 
+  it("should return an Internal Server error if you try to search a malformed index") {
+    // We need to do something that reliably triggers an internal exception
+    // in the Elasticsearch handler.
+    //
+    // Elasticsearch has a number of "private" indexes, which don't have
+    // a canonicalId field to sort on.  Trying to query one of these will
+    // trigger one such exception!
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?_index=.watches",
+        andExpect = Status.InternalServerError,
+        withJsonBody = s"""{
+          "@context": "https://localhost:8888/catalogue/v0/context.json",
+          "type": "Error",
+          "errorType": "http",
+          "httpStatus": 500,
+          "label": "Internal Server Error"
+        }"""
+      )
+    }
+  }
+
   it("should return a Bad Request error if you try to page beyond the first 10000 items") {
     val queries = List(
       "page=10000",
