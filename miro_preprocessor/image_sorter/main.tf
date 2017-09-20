@@ -13,13 +13,10 @@ module "image_sorter_lambda" {
   }
 }
 
-module "trigger_image_sorter_on_json_upload" {
-  source = "../../terraform/lambda/trigger_s3"
-
-  lambda_function_name = "${module.image_sorter_lambda.function_name}"
-  lambda_function_arn  = "${module.image_sorter_lambda.arn}"
-  s3_bucket_arn        = "${var.s3_miro_data_arn}"
-  s3_bucket_id         = "${var.s3_miro_data_id}"
-  filter_prefix        = "json/"
-  filter_suffix        = ".json"
+resource "aws_lambda_permission" "allow_lambda" {
+  statement_id  = "AllowExecutionFromS3Bucket_${module.image_sorter_lambda.function_name}_${var.s3_miro_data_id}"
+  action        = "lambda:InvokeFunction"
+  function_name = "${module.image_sorter_lambda.function_name}"
+  principal     = "s3.amazonaws.com"
+  source_arn    = "${var.s3_miro_data_arn}"
 }
