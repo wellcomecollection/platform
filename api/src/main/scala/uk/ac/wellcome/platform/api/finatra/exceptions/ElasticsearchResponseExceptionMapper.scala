@@ -25,23 +25,26 @@ class ElasticsearchResponseExceptionMapper @Inject()(
 
   val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
 
-  private def sendError(message: String,
-                        exception: Exception,
-                        status: Int): DisplayError = {
+  private def userError(message: String, exception: Exception): DisplayError = {
     error(
-      s"Sending HTTP $status from ElasticsearchResponseExceptionMapper ($message)",
+      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
       exception)
-    DisplayError(Error(variant = s"http-$status", description = Some(message)))
+    DisplayError(Error(variant = s"http-400", description = Some(message)))
   }
 
-  private def userError(message: String, exception: Exception): DisplayError =
-    sendError(message = message, exception = exception, status = 400)
+  private def notFound(message: String, exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 404 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
+    DisplayError(Error(variant = s"http-404", description = Some(message)))
+  }
 
-  private def notFound(message: String, exception: Exception): DisplayError =
-    sendError(message = message, exception = exception, status = 404)
-
-  private def serverError(message: String, exception: Exception): DisplayError =
-    sendError(message = message, exception = exception, status = 500)
+  private def serverError(message: String, exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
+    DisplayError(Error(variant = s"http-500", description = None))
+  }
 
   // This error is of the form:
   //
@@ -121,6 +124,7 @@ class ElasticsearchResponseExceptionMapper @Inject()(
     val errorResponse = ResultResponse(context = contextUri, result = result)
     result.httpStatus.get match {
       case 500 => response.internalServerError.json(errorResponse)
+      case 404 => response.notFound.json(errorResponse)
       case 400 => response.badRequest.json(errorResponse)
     }
   }
