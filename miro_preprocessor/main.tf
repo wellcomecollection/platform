@@ -73,13 +73,14 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   lambda_function {
     lambda_function_arn = "${module.xml_to_json_run_task.arn}"
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix        = "source/"
-    filter_suffix        = ".xml"
+    filter_prefix       = "source/"
+    filter_suffix       = ".xml"
   }
+
   lambda_function {
     lambda_function_arn = "${module.miro_image_sorter.arn}"
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix        = "json/"
-    filter_suffix        = ".json"
+    filter_prefix       = "json/"
+    filter_suffix       = ".json"
   }
 }
