@@ -31,6 +31,7 @@ data "aws_iam_policy_document" "allow_s3_copy" {
   statement {
     actions = [
       "s3:GetObject",
+      "s3:ListBucket",
     ]
 
     resources = [
@@ -42,6 +43,7 @@ data "aws_iam_policy_document" "allow_s3_copy" {
     actions = [
       "s3:PutObject",
       "s3:GetObject",
+      "s3:ListBucket",
     ]
 
     resources = [
