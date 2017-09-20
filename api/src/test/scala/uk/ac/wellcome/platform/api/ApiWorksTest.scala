@@ -123,6 +123,16 @@ class ApiWorksTest
       "totalResults": $totalResults
     """
 
+  private def notFound(description: String) =
+    s"""{
+      "@context": "https://localhost:8888/catalogue/v0/context.json",
+      "type": "Error",
+      "errorType": "http",
+      "httpStatus": 404,
+      "label": "Not Found",
+      "description": "$description"
+    }"""
+
   it("should return a list of works") {
 
     val works = createWorks(3)
@@ -353,14 +363,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works/$badId",
       andExpect = Status.NotFound,
-      withJsonBody = s"""{
-        "@context": "https://localhost:8888/catalogue/v0/context.json",
-        "type": "Error",
-        "errorType": "http",
-        "httpStatus": 404,
-        "label": "Not Found",
-        "description": "Work not found for identifier $badId"
-      }"""
+      withJsonBody = notFound(s"Work not found for identifier $badId")
     )
   }
 
