@@ -1,0 +1,7 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "errorType": "http",
+  "httpStatus": 500,
+  "label": "Internal Server Error",
+  "type": "Error"
+}
