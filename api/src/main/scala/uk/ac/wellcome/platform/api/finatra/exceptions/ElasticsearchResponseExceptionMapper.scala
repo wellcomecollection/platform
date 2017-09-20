@@ -37,10 +37,10 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   private def userError(message: String, exception: Exception): DisplayError =
     sendError(message = message, exception = exception, status = 400)
 
-  private def notFound(message: String, exception: Exception): DisplayError = {
+  private def notFound(message: String, exception: Exception): DisplayError =
     sendError(message = message, exception = exception, status = 404)
 
-  private def serverError(message: String, exception: Exception): DisplayError = {
+  private def serverError(message: String, exception: Exception): DisplayError =
     sendError(message = message, exception = exception, status = 500)
 
   // This error is of the form:
