@@ -58,6 +58,7 @@ class ElasticsearchResponseExceptionMapper @Inject()(
 
   private def jsonToError(jsonDocument: String,
                           exception: Exception): DisplayError = {
+    val mapper = new ObjectMapper()
     val exceptionData = mapper.readTree(jsonDocument)
     val reason = exceptionData
       .get("error")
@@ -101,12 +102,11 @@ class ElasticsearchResponseExceptionMapper @Inject()(
       // a JSON response, so there's only a single-line message -- then `.head`
       // fails: "NoSuchElementException: next on empty iterator".  I think
       // this happens when the cluster doesn't reply, but I'm not sure.
-      val mapper = new ObjectMapper()
       val jsonDocument = exception.getMessage
         .split("\n")
         .tail
         .head
-      jsonToError(jsonDocument)
+      jsonToError(jsonDocument = jsonDocument, exception = exception)
     } catch {
       case e: Exception =>
         serverError(s"Error ($e) parsing Elasticsearch response", exception)
