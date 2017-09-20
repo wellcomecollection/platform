@@ -11,6 +11,8 @@ module "image_sorter_lambda" {
     TOPIC_TANDEM_VAULT  = "${var.topic_tandem_vault_arn}"
     TOPIC_CATALOGUE_API = "${var.topic_catalogue_api_arn}"
   }
+
+  timeout = "30"
 }
 
 resource "aws_lambda_permission" "allow_lambda" {
