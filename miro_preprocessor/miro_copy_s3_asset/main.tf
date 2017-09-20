@@ -31,7 +31,6 @@ data "aws_iam_policy_document" "allow_s3_copy" {
   statement {
     actions = [
       "s3:GetObject",
-      "s3:ListBucket",
     ]
 
     resources = [
@@ -41,9 +40,19 @@ data "aws_iam_policy_document" "allow_s3_copy" {
 
   statement {
     actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "${var.bucket_miro_images_sync_arn}",
+      "${var.bucket_miro_images_public_arn}",
+    ]
+  }
+
+  statement {
+    actions = [
       "s3:PutObject",
       "s3:GetObject",
-      "s3:ListBucket",
     ]
 
     resources = [
