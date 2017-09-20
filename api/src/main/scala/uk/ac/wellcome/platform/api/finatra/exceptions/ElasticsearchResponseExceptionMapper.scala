@@ -55,17 +55,31 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   /* Elasticsearch errors have a "root_cause" with a reason -- given such
    * a reason, return an appropriate DisplayError.
    */
-  private def reasonToError(reason: String,
-                            exception: Exception): DisplayError =
+
+  private def jsonToError(jsonDocument: String,
+                          exception: Exception): DisplayError = {
+    val exceptionData = mapper.readTree(jsonDocument)
+    val reason = exceptionData
+      .get("error")
+      .get("root_cause")
+      .get(0)
+      .get("reason")
+
     reason match {
-      case resultSizePattern(size) =>
-        userError(s"Only the first $size works are available in the API.",
-                  exception)
+      case s: JsonNode => s.asText match {
+        case resultSizePattern(size) =>
+          userError(s"Only the first $size works are available in the API.",
+                    exception)
+        case _ =>
+          serverError(
+            s"Unknown reason for error in Elasticsearch response: $reason",
+            exception)
+      }
       case _ =>
-        serverError(
-          s"Unknown reason for error in Elasticsearch response: $reason",
-          exception)
+        serverError("Unable to find error reason in Elasticsearch response",
+                    exception)
     }
+  }
 
   private def toError(request: Request,
                       exception: ResponseException): DisplayError = {
@@ -85,25 +99,14 @@ class ElasticsearchResponseExceptionMapper @Inject()(
       //
       // Except when it isn't!  Sometimes these exceptions don't include
       // a JSON response, so there's only a single-line message -- then `.head`
-      // fails: "NoSuchElementException: next on empty iterator".
+      // fails: "NoSuchElementException: next on empty iterator".  I think
+      // this happens when the cluster doesn't reply, but I'm not sure.
       val mapper = new ObjectMapper()
       val jsonDocument = exception.getMessage
         .split("\n")
         .tail
         .head
-
-      val exceptionData = mapper.readTree(jsonDocument)
-      val reason = exceptionData
-        .get("error")
-        .get("root_cause")
-        .get(0)
-        .get("reason")
-      reason match {
-        case s: JsonNode => reasonToError(s.asText, exception)
-        case _ =>
-          serverError("Unable to find error reason in Elasticsearch response",
-                      exception)
-      }
+      jsonToError(jsonDocument)
     } catch {
       case e: Exception =>
         serverError(s"Error ($e) parsing Elasticsearch response", exception)
