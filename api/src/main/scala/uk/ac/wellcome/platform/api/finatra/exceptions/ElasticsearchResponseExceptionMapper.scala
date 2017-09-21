@@ -29,21 +29,22 @@ class ElasticsearchResponseExceptionMapper @Inject()(
     error(
       s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
       exception)
-    DisplayError(Error(variant = s"http-400", description = Some(message)))
+    DisplayError(Error(variant = "http-400", description = Some(message)))
   }
 
   private def notFound(message: String, exception: Exception): DisplayError = {
     error(
       s"Sending HTTP 404 from ElasticsearchResponseExceptionMapper ($message)",
       exception)
-    DisplayError(Error(variant = s"http-404", description = Some(message)))
+    DisplayError(Error(variant = "http-404", description = Some(message)))
   }
 
-  private def serverError(message: String, exception: Exception): DisplayError = {
+  private def serverError(message: String,
+                          exception: Exception): DisplayError = {
     error(
       s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
       exception)
-    DisplayError(Error(variant = s"http-500", description = None))
+    DisplayError(Error(variant = "http-500", description = None))
   }
 
   // This error is of the form:
