@@ -39,7 +39,7 @@ module "gatling_catalogue_api" {
   # In the Catalogue API tests, we've seen issues where Gatling fails to
   # create enough SSL connections.  Giving it more memory is an attempt to
   # alleviate these issues.
-  memory = 1800
+  memory = 2048
 
   env_vars = [
     "{\"name\": \"SIMULATION\", \"value\": \"testing.load.CatalogueApiSimulation\"}",
@@ -104,6 +104,6 @@ module "update_api_docs" {
   app_uri       = "${module.ecr_repository_update_api_docs.repository_url}:${var.release_ids["update_api_docs"]}"
   task_role_arn = "${module.ecs_update_api_docs_iam.task_role_arn}"
 
-  cpu    = 1024
-  memory = 1024
+  cpu    = 256
+  memory = 256
 }
