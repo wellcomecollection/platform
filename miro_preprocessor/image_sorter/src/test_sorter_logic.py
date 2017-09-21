@@ -92,6 +92,39 @@ def test_is_undecidable(collection, image_data):
         "image_general_use": "N",
         "image_innopac_id": "12345678"
     }),
+    ('source/images-L', {
+        "image_title": None,
+        "image_pub_title": None,
+        "image_pub_periodical": None,
+        "image_library_dept": "Paperclips and hairnets",
+        "image_tech_captured_mode": "Frog retina",
+        "image_copyright_cleared": "N",
+        "image_access_restrictions": "CC-BY",
+        "image_general_use": "N",
+        "image_innopac_id": "1234567"
+    }),
+    ('source/images-V', {
+        "image_title": None,
+        "image_pub_title": None,
+        "image_pub_periodical": None,
+        "image_library_dept": "Paperclips and hairnets",
+        "image_tech_captured_mode": "Frog retina",
+        "image_copyright_cleared": "N",
+        "image_access_restrictions": "CC-BY",
+        "image_general_use": "N",
+        "image_innopac_id": "1234567"
+    }),
+    ('source/images-M', {
+        "image_title": None,
+        "image_pub_title": None,
+        "image_pub_periodical": None,
+        "image_library_dept": "Paperclips and hairnets",
+        "image_tech_captured_mode": "Frog retina",
+        "image_copyright_cleared": "N",
+        "image_access_restrictions": "CC-BY",
+        "image_general_use": "N",
+        "image_innopac_id": "1234567"
+    }),
 ])
 def test_is_cold_store(collection, image_data):
     """These examples all end up in cold store."""
