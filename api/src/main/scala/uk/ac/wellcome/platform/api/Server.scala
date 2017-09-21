@@ -41,7 +41,7 @@ class Server extends HttpServer {
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
   private final val apiVersion =
-    flag(name = "api.version", default = "v0", help = "API version path part")
+    flag(name = "api.version", default = "v1", help = "API version path part")
   private final val apiPrefix = flag(
     name = "api.prefix",
     default = "/" + apiName() + "/" + apiVersion(),

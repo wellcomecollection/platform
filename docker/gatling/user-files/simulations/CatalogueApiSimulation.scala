@@ -16,7 +16,7 @@ class CatalogueApiSimulation extends Simulation {
     .getOrElse(defaultDuration)
 
   val httpConf = http
-    .baseURL("https://api.wellcomecollection.org/catalogue/v0")
+    .baseURL("https://api.wellcomecollection.org/catalogue/v1")
     .inferHtmlResources()
 
   val searchFeeder = csv("terms.csv").random

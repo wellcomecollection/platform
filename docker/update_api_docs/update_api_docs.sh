@@ -3,7 +3,7 @@
 set -o errexit
 set -o nounset
 
-SWAGGER_URL="${SWAGGER_URL:-https://api.wellcomecollection.org/catalogue/v0/swagger.json}"
+SWAGGER_URL="${SWAGGER_URL:-https://api.wellcomecollection.org/catalogue/v1/swagger.json}"
 
 echo "*** Making the IMPORT request"
 curl --request PUT \

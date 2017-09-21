@@ -15,7 +15,7 @@ The task takes three parameters:
 *   `VERSION_ID` -- the [version identifier][version] for the docs
 *   `API_SECRET` -- your API secret, as provided by [the Stoplight API][auth].
 *   `SWAGGER_URL` -- the URL of the Swagger file to use.
-    This defaults to <https://api.wellcomecollection.org/catalogue/v0/swagger.json>.
+    This defaults to <https://api.wellcomecollection.org/catalogue/v1/swagger.json>.
 
 You can invoke the task as follows:
 
