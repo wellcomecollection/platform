@@ -125,7 +125,7 @@ class ApiWorksTest
 
   private def notFound(description: String) =
     s"""{
-      "@context": "https://localhost:8888/catalogue/v0/context.json",
+      "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
       "errorType": "http",
       "httpStatus": 404,
