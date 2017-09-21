@@ -77,10 +77,6 @@ class Decision(enum.Enum):
     catalogue_api = 'catalogue_api'
 
 
-class Undecidable(Exception):
-    pass
-
-
 def sort_image(collection, image_data):
     # def _normalise_string(s):
     #     if s is not None:

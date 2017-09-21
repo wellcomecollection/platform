@@ -29,15 +29,6 @@ def collection_image_data(**kwargs):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    # TODO: Write some examples...
-])
-def test_is_undecidable(collection, image_data):
-    """These examples are undecidable."""
-    with pytest.raises(Undecidable):
-        sort_image(collection, image_data)
-
-
-@pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='source/images-F'),
     collection_image_data(collection='source/images-L', image_library_dept="Archives and Manuscripts"),
     collection_image_data(collection='source/images-V', image_library_dept="Archives and Manuscripts"),
