@@ -7,16 +7,16 @@ from sorter_logic import Decision, Undecidable, sort_image
 
 def collection_image_data(**kwargs):
     image = {
-        'collection': 'source/images-A',
+        'collection': 'source/images-M',
         'image_data': {
             "image_title": "Image Title",
             "image_pub_title": "Image Pub Title",
             "image_pub_periodical": "Lost socks monthly",
             "image_library_dept": "Paperclips and hairnets",
             "image_tech_captured_mode": "Frog retina",
-            "image_copyright_cleared": "N",
+            "image_copyright_cleared": "Y",
             "image_access_restrictions": "CC-BY",
-            "image_general_use": "N",
+            "image_general_use": "Y",
             "image_innopac_id": "12345678"
         }}
     collection = image['collection']
@@ -75,8 +75,13 @@ def test_is_tandem_vault(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    # TODO: Write some examples...
+    collection_image_data(),
+    collection_image_data(image_innopac_id="1234567x"),
+    collection_image_data(image_title=None,
+                          image_pub_title=None,
+                          image_pub_periodical=None,
+                          image_innopac_id="1234567x")
 ])
 def test_is_digital_library(collection, image_data):
     """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == Decision.digital_library
+    assert sort_image(collection, image_data) == Decision.catalogue_api

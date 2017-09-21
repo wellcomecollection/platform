@@ -56,7 +56,7 @@ class Rules:
 
     @property
     def is_innopac_id_8_digits(self):
-        return self._search(r"[0-9]{8}", "image_innopac_id") is not None
+        return self._search(r"[0-9]{7}[0-9|x]{1}", "image_innopac_id") is not None
 
     @property
     def is_title_blank(self):
@@ -131,7 +131,5 @@ def sort_image(collection, image_data):
             (r.is_l_or_m_or_v_collection and r.image_tech_captured_mode_is_videodisc) or \
             (r.is_l_or_m_or_v_collection and not r.is_innopac_id_8_digits and r.is_title_blank and r.is_image_pub_title_blank and r.is_image_pub_periodical_blank):
         return Decision.cold_store
-
-    raise Undecidable(
-        f'No decision for collection={collection!r}, image_data={image_data!r}'
-    )
+    else:
+        return Decision.catalogue_api
