@@ -124,7 +124,7 @@ class Alarm:
         return self._build_cloudwatch_url(search_term, group, start, end)
 
     @staticmethod
-    def _build_cloudwatch_url(search_term, group start, end):
+    def _build_cloudwatch_url(search_term, group, start, end):
         return (
             'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
             '?region=eu-west-1'
