@@ -10,6 +10,45 @@ import enum
 import re
 
 
+class Rules:
+    def __init__(self, collection, image_data):
+        self.collection = collection
+        self.image_data = image_data
+
+    @staticmethod
+    def _normalise_string(s):
+        if s is not None:
+            s = s.lower()
+        if s == "":
+            s = None
+        return s
+
+    def _get(self, key):
+        return self._normalise_string(self.image_data.get(key))
+
+    def _compare(self, key, value):
+        return self._get(key) == self._normalise_string(value)
+
+    def _is_collection(self, collection_name):
+        return self._normalise_string(self.collection) == f"source/images-{collection_name}"
+
+    @property
+    def is_f_collection(self):
+        return self._is_collection("f")
+
+    @property
+    def is_l_or_m_or_v_collection(self):
+        return self._is_collection("l") or self._is_collection("v") or self._is_collection("m")
+
+    @property
+    def image_library_dept_is_Archives_and_Manuscripts(self):
+        return self._compare("image_library_dept", "Archives and Manuscripts")
+
+    @property
+    def image_tech_captured_mode_is_videodisc(self):
+        return self._compare("image_tech_captured_mode", "videodisc")
+
+
 class Decision(enum.Enum):
     cold_store = 'cold_store'
     tandem_vault = 'tandem_vault'
@@ -87,10 +126,11 @@ def sort_image(collection, image_data):
 
     print(c)
     print(image_data)
+    rules = Rules(collection, image_data)
 
-    if c["All Images-F"] or \
-            (c["Collection is L,V or M"] and c["image_library_dept is Archives and Manuscripts"]) or \
-            (c["Collection is L,V or M"] and c["image_tech_captured_mode is videodisc"]):
+    if rules.is_f_collection or \
+            (rules.is_l_or_m_or_v_collection and rules.image_library_dept_is_Archives_and_Manuscripts) or \
+            (rules.is_l_or_m_or_v_collection and rules.image_tech_captured_mode_is_videodisc):
         return Decision.cold_store
 
     raise Undecidable(
