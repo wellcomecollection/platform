@@ -104,16 +104,27 @@ class Alarm:
         elif self.name.startswith('lambda'):
             lambda_name = self.name.split('-')[1]
             group = f'/aws/lambda/{lambda_name}'
-            search_term = 'Traceback'
+
+            # For Lambdas, we could have a Traceback, or we could have a
+            # timeout.  Return both, because there's no way to do an OR search
+            # in the CloudWatch console.
+            url1 = self._build_cloudwatch_url('Traceback', group, start, end)
+            url2 = self._build_cloudwatch_url('Task timed out after', group, start, end)
+            return f'{url1} / {url2}'
+
         elif self.name == 'api_romulus-alb-target-500-errors':
             group = 'platform/api_romulus'
-            search_term = 'Unhandled Exception'
+            search_term = '"HTTP 500"'
         elif self.name == 'api_remus-alb-target-500-errors':
             group = 'platform/api_remus'
-            search_term = 'Unhandled Exception'
+            search_term = '"HTTP 500"'
         else:
             return
 
+        return self._build_cloudwatch_url(search_term, group, start, end)
+
+    @staticmethod
+    def _build_cloudwatch_url(search_term, group, start, end):
         return (
             'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
             '?region=eu-west-1'
@@ -128,8 +139,26 @@ class Alarm:
         )
 
 
+def to_bitly(url, access_token):
+    """
+    Try to shorten a URL with bit.ly.  If it fails, just return the
+    original URL.
+    """
+    resp = requests.get(
+        'https://api-ssl.bitly.com/v3/user/link_save',
+        params={'access_token': access_token, 'longUrl': url}
+    )
+    try:
+        return resp.json()['data']['link_save']['link']
+    except KeyError:
+        return url
+
+
 def main(event, _):
     print(f'event = {event!r}')
+
+    bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
+
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
 
     slack_data = {'username': 'cloudwatch-alert',
@@ -148,6 +177,10 @@ def main(event, _):
 
     cloudwatch_url = alarm.cloudwatch_url()
     if cloudwatch_url is not None:
+        cloudwatch_url = to_bitly(
+            url=cloudwatch_url,
+            access_token=bitly_access_token
+        )
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch URL',
             'value': cloudwatch_url

@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "alb_logs" {
 
     principals {
       identifiers = ["arn:aws:iam::156460612806:root"]
-      type = "AWS"
+      type        = "AWS"
     }
   }
 }
@@ -194,19 +194,6 @@ data "aws_iam_policy_document" "s3_put_gatling_reports" {
 
     resources = [
       "${aws_s3_bucket.dashboard.arn}/gatling/*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "s3_read_miro_images" {
-  statement {
-    actions = [
-      "s3:Get*",
-      "s3:List*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.miro_images_public.arn}",
     ]
   }
 }

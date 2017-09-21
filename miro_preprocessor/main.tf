@@ -28,9 +28,7 @@ module "xml_to_json_run_task" {
 module "miro_image_to_dynamo" {
   source = "miro_image_to_dynamo"
 
-  miro_image_to_dynamo_topic_arn = "${module.miro_image_to_dynamo_topic.arn}"
-  s3_bucket_arn                  = "${data.terraform_remote_state.platform.bucket_miro_images_sync_arn}"
-  s3_bucket_name                 = "${data.terraform_remote_state.platform.bucket_miro_images_sync_id}"
+  topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
   miro_data_table_arn            = "${data.terraform_remote_state.platform.table_miro_data_arn}"
   miro_data_table_name           = "${data.terraform_remote_state.platform.table_miro_data_name}"
   lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
@@ -50,4 +48,39 @@ module "miro_image_sorter" {
   topic_tandem_vault_publish_policy  = "${module.tandem_vault_topic.publish_policy}"
   topic_catalogue_api_arn            = "${module.catalogue_api_topic.arn}"
   topic_catalogue_api_publish_policy = "${module.catalogue_api_topic.publish_policy}"
+}
+
+module "miro_copy_s3_asset" {
+  source                         = "miro_copy_s3_asset"
+  topic_miro_copy_s3_asset_arn   = "${module.catalogue_api_topic.arn}"
+  lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+  topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
+  bucket_miro_images_public_arn  = "${data.terraform_remote_state.platform.bucket_wellcomecollectio_miro_images_public_arn}"
+  bucket_miro_images_public_name = "${data.terraform_remote_state.platform.bucket_wellcomecollectio_miro_images_public_id}"
+  bucket_miro_images_sync_arn    = "${data.terraform_remote_state.platform.bucket_miro_images_sync_arn}"
+  bucket_miro_images_sync_name   = "${data.terraform_remote_state.platform.bucket_miro_images_sync_id}"
+}
+
+resource "aws_iam_role_policy" "miro_copy_s3_asset_sns_publish" {
+  name   = "miro_copy_s3_asset_sns_publish_policy"
+  role   = "${module.miro_copy_s3_asset.role_name}"
+  policy = "${module.topic_miro_image_to_dynamo.publish_policy}"
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+
+  lambda_function {
+    lambda_function_arn = "${module.xml_to_json_run_task.arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "source/"
+    filter_suffix       = ".xml"
+  }
+
+  lambda_function {
+    lambda_function_arn = "${module.miro_image_sorter.arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "json/"
+    filter_suffix       = ".json"
+  }
 }

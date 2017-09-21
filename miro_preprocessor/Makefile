@@ -37,7 +37,6 @@ xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
 		-e OP=build-lambda \
 		python3.6_ci:latest
 
-
 miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
 	-v $(ROOT)/miro_preprocessor/miro_image_to_dynamo/src:/data \
@@ -49,6 +48,18 @@ miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 		-v $(ROOT)/miro_preprocessor/miro_image_to_dynamo:/data \
 		-e OP=build-lambda \
 		python3.6_ci:latest
+
+miro_copy_s3_asset-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset/src:/data \
+	-e OP=test \
+	python3.6_ci:latest
+
+miro_copy_s3_asset-build: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset:/data \
+	-e OP=build-lambda \
+	python3.6_ci:latest
 
 
 image_sorter-build: $(ROOT)/.docker/python3.6_ci
@@ -65,9 +76,9 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 
-miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test miro_copy_s3_asset-test
 
-miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build
+miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build miro_copy_s3_asset-build
 
 miro_preprocessor-build: xml_to_json_converter-build miro_preprocessor-build-lambdas
 

@@ -123,6 +123,16 @@ class ApiWorksTest
       "totalResults": $totalResults
     """
 
+  private def notFound(description: String) =
+    s"""{
+      "@context": "https://localhost:8888/catalogue/v0/context.json",
+      "type": "Error",
+      "errorType": "http",
+      "httpStatus": 404,
+      "label": "Not Found",
+      "description": "$description"
+    }"""
+
   it("should return a list of works") {
 
     val works = createWorks(3)
@@ -353,14 +363,7 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works/$badId",
       andExpect = Status.NotFound,
-      withJsonBody = s"""{
-        "@context": "https://localhost:8888/catalogue/v0/context.json",
-        "type": "Error",
-        "errorType": "http",
-        "httpStatus": 404,
-        "label": "Not Found",
-        "description": "Work not found for identifier $badId"
-      }"""
+      withJsonBody = notFound(s"Work not found for identifier $badId")
     )
   }
 
@@ -848,14 +851,26 @@ class ApiWorksTest
     }
   }
 
-  it("should return an Internal Server Error if you trigger an internal exception") {
-    // Strictly speaking, looking up a non-existent index should be a
-    // 400 Bad Request or maybe 404 Not Found, not a 500 error -- but this test
-    // just needs to reliably trigger an internal exception, and for now
-    // this code path will do.
+  it("should return Not Found if you look up a non-existent index") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?_index=foobarbaz",
+        andExpect = Status.NotFound,
+        withJsonBody = notFound("There is no index foobarbaz")
+      )
+    }
+  }
+
+  it("should return an Internal Server error if you try to search a malformed index") {
+    // We need to do something that reliably triggers an internal exception
+    // in the Elasticsearch handler.
+    //
+    // Elasticsearch has a number of "private" indexes, which don't have
+    // a canonicalId field to sort on.  Trying to query one of these will
+    // trigger one such exception!
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?_index=.watches",
         andExpect = Status.InternalServerError,
         withJsonBody = s"""{
           "@context": "https://localhost:8888/catalogue/v0/context.json",

@@ -4,6 +4,7 @@ module "lambda_gatling_to_cloudwatch" {
 
   name        = "gatling_to_cloudwatch"
   description = "Record gatling results as CloudWatch metrics"
+  timeout     = 5
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 }

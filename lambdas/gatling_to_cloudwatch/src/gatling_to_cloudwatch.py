@@ -45,11 +45,12 @@ def send_assertions_to_cloudwatch(client, event):
         [_generate_metric(a, timestamp) for a in assertions]
     )
 
-    _send_metric(
+    resp = _send_metric(
         client=client,
         namespace=namespace,
         metric_data=metric_data
     )
+    print(f'resp = {resp}')
 
 
 def main(event, _):
