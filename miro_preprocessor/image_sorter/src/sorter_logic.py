@@ -40,6 +40,9 @@ def sort_image(collection, image_data):
     def _is_blank(key):
         return _get(key) is None
 
+    def _is_collection(collection_name):
+        return _normalise_string(collection) == f"source/images-{collection_name}"
+
     title_matches = [
         _normalise_string("Awaiting description"),
         _normalise_string("Awaiting removal from MIRO as a duplicate"),
@@ -50,9 +53,12 @@ def sort_image(collection, image_data):
         _normalise_string("No neg")
     ]
 
-    checks = {
+    c = {
         "All Images-F": (
-            _normalise_string(collection) == "images-f"
+            _is_collection("f")
+        ),
+        "Collection is L,V or M": (
+            _is_collection("l") or _is_collection("v") or _is_collection("m")
         ),
         "image_library_dept is Archives and Manuscripts": (
             _compare("image_library_dept", "Archives and Manuscripts")
@@ -79,10 +85,12 @@ def sort_image(collection, image_data):
         ),
     }
 
-    print(checks)
+    print(c)
     print(image_data)
 
-    if any(checks.values()):
+    if c["All Images-F"] or \
+            (c["Collection is L,V or M"] and c["image_library_dept is Archives and Manuscripts"]) or \
+            (c["Collection is L,V or M"] and c["image_tech_captured_mode is videodisc"]):
         return Decision.cold_store
 
     raise Undecidable(
