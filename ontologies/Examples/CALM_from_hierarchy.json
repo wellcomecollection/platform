@@ -1,5 +1,5 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "n9gfw78",
   "type": "Work",
   "identifiers": [
