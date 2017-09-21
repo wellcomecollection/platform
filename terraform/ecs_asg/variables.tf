@@ -63,3 +63,7 @@ variable "publish_to_sns_policy" {
 variable "alarm_topic_arn" {
   description = "ARN of the topic where to send notification for DLQs not being empty"
 }
+
+variable "image_id" {
+  description = "ID of the AMI to use on the instances"
+}
