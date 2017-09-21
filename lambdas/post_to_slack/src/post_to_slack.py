@@ -104,7 +104,14 @@ class Alarm:
         elif self.name.startswith('lambda'):
             lambda_name = self.name.split('-')[1]
             group = f'/aws/lambda/{lambda_name}'
-            search_term = 'Traceback'
+
+            # For Lambdas, we could have a Traceback, or we could have a
+            # timeout.  Return both, because there's no way to do an OR search
+            # in the CloudWatch console.
+            url1 = self._build_cloudwatch_url('Traceback', group, start, end)
+            url2 = self._build_cloudwatch_url('Task timed out after', group, start, end)
+            return f'{url1} / {url2}'
+
         elif self.name == 'api_romulus-alb-target-500-errors':
             group = 'platform/api_romulus'
             search_term = '"HTTP 500"'
@@ -114,6 +121,10 @@ class Alarm:
         else:
             return
 
+        return self._build_cloudwatch_url(search_term, group, start, end)
+
+    @staticmethod
+    def _build_cloudwatch_url(search_term, group start, end):
         return (
             'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
             '?region=eu-west-1'
