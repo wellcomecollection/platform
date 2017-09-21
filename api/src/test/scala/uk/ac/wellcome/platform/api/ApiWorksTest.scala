@@ -26,7 +26,7 @@ class ApiWorksTest
       )
     )
 
-  val apiPrefix = "catalogue/v0"
+  val apiPrefix = "catalogue/v1"
 
   private val emptyJsonResult = s"""
                            |{
@@ -93,7 +93,7 @@ class ApiWorksTest
 
   private def badRequest(description: String) =
     s"""{
-      "@context": "https://localhost:8888/catalogue/v0/context.json",
+      "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
       "errorType": "http",
       "httpStatus": 400,
@@ -873,7 +873,7 @@ class ApiWorksTest
         path = s"/$apiPrefix/works?_index=.watches",
         andExpect = Status.InternalServerError,
         withJsonBody = s"""{
-          "@context": "https://localhost:8888/catalogue/v0/context.json",
+          "@context": "https://localhost:8888/$apiPrefix/context.json",
           "type": "Error",
           "errorType": "http",
           "httpStatus": 500,
