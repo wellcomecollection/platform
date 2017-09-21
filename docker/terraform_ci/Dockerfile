@@ -10,7 +10,7 @@ RUN apk --no-cache update && \
 
 # Install terraform.  This is the last build step because it changes with
 # new Terraform releases, and we can cache the layers above.
-ENV TERRAFORM_VERSION=0.10.2
+ENV TERRAFORM_VERSION=0.10.6
 COPY install_terraform.sh /install_terraform.sh
 RUN /install_terraform.sh
 
