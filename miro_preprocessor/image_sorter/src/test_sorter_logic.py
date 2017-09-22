@@ -110,6 +110,20 @@ def test_is_digital_library(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
+    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+])
+def test_is_catalogue_api(collection, image_data):
+    """These examples all end up in the Digital Library."""
+    assert sort_image(collection, image_data) == [Decision.catalogue_api]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_cleared="N"),
+    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_cleared=None),
+    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_use_restrictions="Super-restricted"),
+    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_use_restrictions=None),
 ])
 def test_is_no_decision(collection, image_data):
     """These examples all end up in the Digital Library."""
