@@ -65,23 +65,6 @@ module "gatling_digital_experience" {
   ]
 }
 
-module "miro_adapter" {
-  source        = "../terraform/ecs_script_task"
-  task_name     = "miro_adapter"
-  app_uri       = "${module.ecr_repository_miro_adapter.repository_url}:${var.release_ids["miro_adapter"]}"
-  task_role_arn = "${module.ecs_miro_adapter_iam.task_role_arn}"
-
-  # This script has to load the XML files into memory, so make sure it
-  # has plenty of overhead.
-  memory = 2000
-
-  env_vars = [
-    "{\"name\": \"TABLE\", \"value\": \"${aws_dynamodb_table.miro_table.id}\"}",
-    "{\"name\": \"BUCKET\", \"value\": \"${aws_s3_bucket.miro-data.id}\"}",
-    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
-  ]
-}
-
 module "elasticdump" {
   source        = "../terraform/ecs_script_task"
   task_name     = "elasticdump"
