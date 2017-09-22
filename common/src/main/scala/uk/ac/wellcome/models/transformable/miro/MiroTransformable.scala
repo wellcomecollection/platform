@@ -149,7 +149,7 @@ case class MiroTransformable(MiroID: String,
   }
 
   def getCreatedDate(miroData: MiroTransformableData): Option[Period] =
-    if(collectionIsV(MiroCollection)) {
+    if (collectionIsV(MiroCollection)) {
       miroData.artworkDate.map { Period(_) }
     } else {
       None
