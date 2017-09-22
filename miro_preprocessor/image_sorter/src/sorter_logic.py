@@ -111,8 +111,12 @@ class Rules:
             return False
 
     @property
-    def is_not_copyright_cleared(self):
-        return self._get('image_copyright_cleared') == 'N'
+    def is_copyright_cleared(self):
+        return self._get('image_copyright_cleared') == 'Y'
+
+    @property
+    def is_cleared(self):
+        return self._get('image_cleared') == 'Y'
 
     @property
     def is_not_general_use(self):
@@ -122,10 +126,21 @@ class Rules:
     def has_access_restrictions(self):
         return not (self._is_blank("image_access_restrictions") or self._key_matches("image_access_restrictions",
                                                                                      self._cc_accesses))
+    @property
+    def has_not_use_restrictions(self):
+        return not self._is_blank("image_use_restrictions") and self._key_matches("image_use_restrictions", self._cc_accesses)
 
     @property
     def is_not_for_public_access(self):
-        return self.is_not_copyright_cleared or self.is_not_general_use or self.has_access_restrictions
+        return (not self.is_copyright_cleared) or self.is_not_general_use or self.has_access_restrictions
+
+    @property
+    def is_for_public_access(self):
+        return not self.is_not_for_public_access
+
+    @property
+    def satisfies_api_filters(self):
+        return self.is_copyright_cleared and self.is_cleared and self.has_not_use_restrictions
 
     @property
     def is_cold_store(self):
@@ -144,6 +159,15 @@ class Rules:
                self.is_collection("L") and self.is_after_first_march_2016 or \
                self.is_collection("L", "M", "V") and self.is_not_for_public_access
 
+    @property
+    def is_digital_library(self):
+        return not self.image_library_dept_is_Public_programmes \
+               and self.is_for_public_access and self.is_innopac_id_8_digits
+
+    @property
+    def is_catalogue_api(self):
+        return (not self.is_tandem_vault or self.is_digital_library) and self.satisfies_api_filters
+
 
 class Decision(enum.Enum):
     cold_store = 'cold_store'
@@ -154,6 +178,7 @@ class Decision(enum.Enum):
 
 
 def sort_image(collection, image_data):
+    print(collection)
     print(image_data)
     r = Rules(collection, image_data)
 
@@ -165,7 +190,14 @@ def sort_image(collection, image_data):
     if r.is_tandem_vault:
         decisions.append(Decision.tandem_vault)
 
-    if not r.is_tandem_vault:
+    if r.is_digital_library:
+        decisions.append(Decision.digital_library)
+
+    if r.is_catalogue_api:
         decisions.append(Decision.catalogue_api)
 
+    if not r.is_catalogue_api and not r.is_digital_library and not r.is_tandem_vault:
+        decisions.append(Decision.none)
+
+    print(decisions)
     return decisions
