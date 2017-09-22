@@ -27,7 +27,7 @@ def _aws_credentials_args():
     try:
         print('*** Trying environment variables for AWS config...')
         return [
-            '--env', 'AWS_SECRET_KEY_ID=%s' % os.environ['AWS_SECRET_KEY_ID'],
+            '--env', 'AWS_ACCESS_KEY_ID=%s' % os.environ['AWS_SECRET_KEY_ID'],
             '--env', 'AWS_SECRET_ACCESS_KEY=%s' % os.environ['AWS_SECRET_ACCESS_KEY'],
             '--env', 'AWS_REGION=%s' % os.environ['AWS_REGION'],
             '--env', 'AWS_DEFAULT_REGION=%s' % os.environ['AWS_DEFAULT_REGION'],
