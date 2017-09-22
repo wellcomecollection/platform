@@ -7,12 +7,13 @@ endif
 
 
 loris-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/scripts/run_docker_in_docker.sh image_builder \
+	$(ROOT)/builds/docker_run.py --dind -- \
+		image_builder \
 		--project=loris \
 		--file=loris/Dockerfile
 
 loris-run: loris-build
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		--publish 8888:8888 \
 		--env INFRA_BUCKET=$(INFRA_BUCKET) \
 		--env CONFIG_KEY=config/prod/loris.ini \
@@ -22,14 +23,14 @@ loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=loris $(ROOT)/builds/publish_service.sh
 
 loris-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(LORIS)/terraform:/data \
 		--volume $(ROOT)/terraform:/terraform \
 		--env OP=plan \
 		terraform_ci:latest
 
 loris-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(LORIS)/terraform:/data \
 		--volume $(ROOT)/terraform:/terraform \
 		--env OP=apply \
