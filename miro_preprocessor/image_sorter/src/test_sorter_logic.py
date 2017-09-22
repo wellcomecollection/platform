@@ -99,6 +99,13 @@ def test_is_tandem_vault(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
+])
+def test_is_digital_library(collection, image_data):
+    """These examples all end up in the Digital Library."""
+    assert sort_image(collection, image_data) == [Decision.digital_library]
+
+
+@pytest.mark.parametrize('collection, image_data', [
     collection_image_data(),
     collection_image_data(image_innopac_id="1234567x"),
     collection_image_data(image_title=None,
@@ -123,6 +130,34 @@ def test_is_tandem_vault(collection, image_data):
     collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND"),
     collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND"),
 ])
-def test_is_digital_library(collection, image_data):
+def test_is_catalogue_api(collection, image_data):
     """These examples all end up in the Digital Library."""
     assert sort_image(collection, image_data) == [Decision.catalogue_api]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+])
+def test_is_no_decision(collection, image_data):
+    """These examples all end up in the Digital Library."""
+    assert sort_image(collection, image_data) == [Decision.none]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+])
+def test_is_digital_library_and_tandem_vault(collection, image_data):
+    """These examples all end up in the Digital Library."""
+    assert sort_image(collection, image_data) == [Decision.tandem_vault, Decision.digital_library]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+])
+def test_is_digital_library_and_catalogue_api(collection, image_data):
+    """These examples all end up in the Digital Library."""
+    assert sort_image(collection, image_data) == [Decision.digital_library, Decision.catalogue_api]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+])
+def test_is_tandem_vault_and_digital_library_and_catalogue_api(collection, image_data):
+    """These examples all end up in the Digital Library."""
+    assert sort_image(collection, image_data) == [Decision.tandem_vault, Decision.digital_library, Decision.catalogue_api]
