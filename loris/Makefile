@@ -7,7 +7,8 @@ endif
 
 
 loris-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/scripts/run_docker_in_docker.sh image_builder \
+	$(ROOT)/builds/docker_run.py --dind -- \
+		image_builder \
 		--project=loris \
 		--file=loris/Dockerfile
 
