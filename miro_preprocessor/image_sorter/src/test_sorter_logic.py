@@ -6,9 +6,7 @@ from sorter_logic import Decision, Undecidable, sort_image
 
 
 def collection_image_data(**kwargs):
-    image = {
-        'collection': 'source/images-M',
-        'image_data': {
+    image_data = {
             "image_title": "Image Title",
             "image_pub_title": "Image Pub Title",
             "image_pub_periodical": "Lost socks monthly",
@@ -18,11 +16,10 @@ def collection_image_data(**kwargs):
             "image_access_restrictions": "CC-BY",
             "image_general_use": "Y",
             "image_innopac_id": "12345678"
-        }}
-    collection = image['collection']
+        }
+    collection = 'source/images-M'
     if 'collection' in kwargs.keys():
         collection = kwargs.pop('collection')
-    image_data = image['image_data']
     image_data.update(kwargs)
 
     return collection, image_data
