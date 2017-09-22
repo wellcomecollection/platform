@@ -26,7 +26,7 @@ $(ROOT)/.docker/ecs_dashboard:
 		--dir=$(MONITORING)/ecs_dashboard \
 		--file=$(MONITORING)/ecs_dashboard/Dockerfile
 
-ecs_dashboard-build: $(ROOT)/.docker/ecs_dashboard
+ecs_dashboard-deploy: $(ROOT)/.docker/ecs_dashboard
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(MONITORING)/ecs_dashboard:/dashboard \
 		--env BUCKET_NAME=wellcome-platform-dash \
@@ -34,4 +34,4 @@ ecs_dashboard-build: $(ROOT)/.docker/ecs_dashboard
 		ecs_dashboard
 
 
-.PHONY: monitoring-terraform-plan monitoring-terraform-apply ecs_dashboard-build
+.PHONY: monitoring-terraform-plan monitoring-terraform-apply ecs_dashboard-deploy
