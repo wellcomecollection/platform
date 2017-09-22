@@ -2,7 +2,7 @@
 
 import pytest
 
-from sorter_logic import Decision, Undecidable, sort_image
+from sorter_logic import Decision, sort_image
 
 
 def collection_image_data(**kwargs):
@@ -45,6 +45,21 @@ def collection_image_data(**kwargs):
                           image_innopac_id="1234567"),
     collection_image_data(collection='source/images-M',
                           image_title=None,
+                          image_pub_title=None,
+                          image_pub_periodical=None,
+                          image_innopac_id="1234567"),
+    collection_image_data(collection='source/images-L',
+                          image_title="-",
+                          image_pub_title=None,
+                          image_pub_periodical=None,
+                          image_innopac_id="1234567"),
+    collection_image_data(collection='source/images-V',
+                          image_title="-",
+                          image_pub_title=None,
+                          image_pub_periodical=None,
+                          image_innopac_id="1234567"),
+    collection_image_data(collection='source/images-M',
+                          image_title="-",
                           image_pub_title=None,
                           image_pub_periodical=None,
                           image_innopac_id="1234567"),

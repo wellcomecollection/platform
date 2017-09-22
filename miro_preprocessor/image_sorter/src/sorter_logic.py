@@ -15,6 +15,10 @@ class Rules:
         self.collection = collection
         self.image_data = image_data
 
+    _empty_title_strings = [
+        "-"
+    ]
+
     @staticmethod
     def _normalise_string(s):
         if s is not None:
@@ -37,6 +41,9 @@ class Rules:
 
     def _is_blank(self, key):
         return self._get(key) is None
+
+    def _key_matches(self, key, string_list):
+        return any([self._compare(key, string) for string in string_list])
 
     @property
     def is_f_collection(self):
@@ -61,6 +68,10 @@ class Rules:
     @property
     def is_title_blank(self):
         return self._is_blank("image_title")
+
+    @property
+    def is_title_empty(self):
+        return self.is_title_blank or self._key_matches('image_title', self._empty_title_strings)
 
     @property
     def is_image_pub_title_blank(self):
@@ -120,12 +131,11 @@ def sort_image(collection, image_data):
 
     print(image_data)
     r = Rules(collection, image_data)
-    print(r)
 
     if r.is_f_collection or \
             (r.is_l_or_m_or_v_collection and r.image_library_dept_is_Archives_and_Manuscripts) or \
             (r.is_l_or_m_or_v_collection and r.image_tech_captured_mode_is_videodisc) or \
-            (r.is_l_or_m_or_v_collection and not r.is_innopac_id_8_digits and r.is_title_blank and r.is_image_pub_title_blank and r.is_image_pub_periodical_blank):
+            (r.is_l_or_m_or_v_collection and not r.is_innopac_id_8_digits and r.is_title_empty and r.is_image_pub_title_blank and r.is_image_pub_periodical_blank):
         return Decision.cold_store
     else:
         return Decision.catalogue_api
