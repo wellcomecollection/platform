@@ -97,19 +97,18 @@ env:
     #  * CONFIG_BUCKET
     - secure: Pet60dG/PQe1O2/zYQutmbvNKSQdLwEyfHnp4aSbzOoqADR08AOTA6CrMswv+Zs4qBHzxeXAMxgkFM0UpXdNPlw/HQ4FAhstStJFVkoPhWSo5/rbZutkOtWtgBI2+wD/Z0t4n7Tq2h0tW2+IvG/4kCG7qbp6VYOzw1yZzHhT/E2j/S7J/YFTYzMpsYpA35192XMqdzg7dygzUiC+yeYMps4iu4UkbCgAJ19h9vT68E5IpCOyTai4P7HAFiLQ9p+5465g1whU+U0JMWEktGLCjGCblNGnr8YyIh/+IUUue9Kagkr8PXh22OM3/rhsBAgg5qeNO0sujcBq0WJH1dyAFV56Vn/smZS/cQ3EqXg2knfcZWKMHXKLqqdOy4jcPg9A6NIlBnwpC8nC085OpYrnMyyPwaBMg2OpF+Rr6xFzLDglHYmPuO74yJSPqakkLyJbdHDZ4VPOEKseOCWdBaBo8rJXzL9AProDRpFkeA4onpqgFNt5pbY4judgklnnBZLAqk9lCfotk2YCTyHxKJ1X5XV+N9zvPRvD/c/8dMm9VqVKHyuxS71hOPL9y5B+1zYACxbVxgc/Qw/UklOGduaLDPPOtyuTsE59c98lXpFCk/f0txM0CLxQA4pjGQ9x6apx8Eyr5D3I/bAvascujAtMWdtGjd2x4Ez454Huy/krQpE=
   matrix:
+    - TASK=check-format
+    - TASK=sbt-test-common
+    - TASK=sbt-test-api
+    - TASK=sbt-test-transformer
+    - TASK=sbt-test-ingestor
+    - TASK=sbt-test-id_minter
+    - TASK=sbt-test-reindexer
+    - TASK=lambdas-test
     - TASK=nginx-build
-    # - TASK=check-format
-    # - TASK=sbt-test-common
-    # - TASK=sbt-test-api
-    # - TASK=sbt-test-transformer
-    # - TASK=sbt-test-ingestor
-    # - TASK=sbt-test-id_minter
-    # - TASK=sbt-test-reindexer
-    # - TASK=lambdas-test
-    # - TASK=nginx-build
-    # - TASK=tif-metadata-build
-    # - TASK=gatling-build
-    # - TASK=loris-build
-    # - TASK=elasticdump-build
-    # - TASK=api_docs-build
-    # - TASK=miro_preprocessor-test
+    - TASK=tif-metadata-build
+    - TASK=gatling-build
+    - TASK=loris-build
+    - TASK=elasticdump-build
+    - TASK=api_docs-build
+    - TASK=miro_preprocessor-test
