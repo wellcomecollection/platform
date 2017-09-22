@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import errno
 import os
 import shlex
 import subprocess
@@ -50,3 +51,15 @@ def ecr_login():
         'aws', 'ecr', 'get-login', '--no-include-email'
     ]).decode('ascii')
     subprocess.check_call(shlex.split(command))
+
+
+def mkdir_p(path):
+    """Create a directory if it doesn't already exist."""
+    # https://stackoverflow.com/a/600612/1558022
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise

@@ -13,7 +13,7 @@ endif
 
 ## Run tests for our Lambda code
 lambdas-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		-v $(ROOT)/lambdas:/data \
 		-e OP=test \
 		-e FIND_MATCH_PATHS='./*/target common/tests' \
@@ -21,7 +21,7 @@ lambdas-test: $(ROOT)/.docker/python3.6_ci
 
 ## Run a plan on lambda stack
 lambdas-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambda_deps
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/terraform:/terraform \
 	-v $(ROOT)/lambdas:/data \
 	-e OP=plan \
@@ -29,7 +29,7 @@ lambdas-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambd
 
 ## Run an apply on lambda stack
 lambdas-terraform-apply: $(ROOT)/.docker/terraform_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/terraform:/terraform \
 	-v $(ROOT)/lambdas:/data \
 	-e OP=apply \
