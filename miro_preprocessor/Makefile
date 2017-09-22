@@ -5,7 +5,7 @@ include $(ROOT)/shared.Makefile
 endif
 
 xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_builder
-	$(ROOT)/scripts/run_docker_in_docker.sh \
+	$(ROOT)/builds/docker_run.py --dind -- \
 		-v $(ROOT):/repo \
 		image_builder:latest \
 		--project=xml_to_json_converter \
@@ -18,7 +18,7 @@ xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publish_service_to_aws
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	    -v /var/run/docker.sock:/var/run/docker.sock \
 		-v $(ROOT):/repo \
 		publish_service_to_aws:latest \
@@ -38,25 +38,25 @@ xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/miro_preprocessor/miro_image_to_dynamo/src:/data \
 	-e OP=test -e FIND_MATCH_PATHS='/data' \
 	python3.6_ci:latest
 
 miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		-v $(ROOT)/miro_preprocessor/miro_image_to_dynamo:/data \
-		-e OP=build-lambda \
-		python3.6_ci:latest
+	-v $(ROOT)/miro_preprocessor/miro_image_to_dynamo:/data \
+	-e OP=build-lambda \
+	python3.6_ci:latest
 
 miro_copy_s3_asset-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset/src:/data \
 	-e OP=test \
 	python3.6_ci:latest
 
 miro_copy_s3_asset-build: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset:/data \
 	-e OP=build-lambda \
 	python3.6_ci:latest
@@ -69,7 +69,7 @@ image_sorter-build: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 image_sorter-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT)/miro_preprocessor/image_sorter/src:/data \
 		--env OP=test \
 		--env FIND_MATCH_PATHS="/data" \
@@ -86,14 +86,14 @@ miro_preprocessor-publish: xml_to_json_converter-publish
 
 
 miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci miro_preprocessor-build-lambdas
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
 		-e OP=plan \
 		terraform_ci:latest
 
 miro_preprocessor-terraform-apply: $(ROOT)/.docker/terraform_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/miro_preprocessor:/data \
 	-v $(ROOT)/terraform:/terraform \
 	-e OP=apply \

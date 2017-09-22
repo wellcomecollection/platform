@@ -55,11 +55,6 @@ module "ecr_repository_tif-metadata" {
   name   = "tif-metadata"
 }
 
-module "ecr_repository_miro_adapter" {
-  source = "../terraform/ecr"
-  name   = "miro_adapter"
-}
-
 module "ecr_repository_elasticdump" {
   source = "../terraform/ecr"
   name   = "elasticdump"

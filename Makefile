@@ -8,7 +8,7 @@ include ontologies/Makefile
 
 ## Build the image for gatling
 gatling-build: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=gatling
+	./builds/docker_run.py --dind -- image_builder --project=gatling
 
 ## Deploy the image for gatling
 gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
@@ -16,7 +16,7 @@ gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=cache_cleaner
+	./builds/docker_run.py --dind -- image_builder --project=cache_cleaner
 
 ## Deploy the image for the cache cleaner
 cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
@@ -25,49 +25,37 @@ cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
 
 ## Build the image for tif-metadata
 tif-metadata-build: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=tif-metadata
+	./builds/docker_run.py --dind -- image_builder --project=tif-metadata
 
 ## Deploy the image for tif-metadata
 tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=tif-metadata ./builds/publish_service.sh
 
 
-miro_adapter-build: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=miro_adapter --file=miro_adapter/Dockerfile
-
-miro_adapter-test: miro_adapter-build $(ROOT)/.docker/miro_adapter_tests
-	rm -rf $$(pwd)/miro_adapter/__pycache__
-	rm -rf $$(pwd)/miro_adapter/*.pyc
-	docker run -v $$(pwd)/miro_adapter:/miro_adapter miro_adapter_tests
-
-miro_adapter-deploy: miro_adapter-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=miro_adapter ./builds/publish_service.sh
-
-
 elasticdump-build: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=elasticdump
+	./builds/docker_run.py --dind -- image_builder --project=elasticdump
 
 elasticdump-deploy: elasticdump-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=elasticdump ./builds/publish_service.sh
 
 api_docs-build: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=update_api_docs
+	./builds/docker_run.py --dind -- image_builder --project=update_api_docs
 
 api_docs-deploy: api_docs-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=update_api_docs ./builds/publish_service.sh
 
 
 nginx-build-api: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=api
+	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=api
 
 nginx-build-loris: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=loris
+	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=loris
 
 nginx-build-services: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=services
+	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=services
 
 nginx-build-grafana: $(ROOT)/.docker/image_builder
-	./scripts/run_docker_in_docker.sh image_builder --project=nginx --variant=grafana
+	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=grafana
 
 ## Build images for all of our nginx proxies
 nginx-build:	\
@@ -126,7 +114,7 @@ sbt-test: \
 
 
 .docker/sbt_image_builder:
-	./scripts/build_ci_docker_image.py \
+	./builds/build_ci_docker_image.py \
 		--project=sbt_image_builder \
 		--dir=builds \
 		--file=builds/sbt_image_builder.Dockerfile

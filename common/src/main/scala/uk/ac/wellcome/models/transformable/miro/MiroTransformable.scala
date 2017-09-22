@@ -19,6 +19,8 @@ case class MiroTransformable(MiroID: String,
     RangeKey("MiroCollection", MiroCollection)
   )
 
+  def collectionIsV(c: String) = c.toLowerCase.contains("images-v")
+
   /*
    * Populate the title and description.  The rules are as follows:
    *
@@ -49,6 +51,7 @@ case class MiroTransformable(MiroID: String,
    */
   private def getTitleAndDescription(
     miroData: MiroTransformableData): (String, Option[String]) = {
+
     val candidateDescription: String = miroData.description match {
       case Some(s) => {
         if (s == "--" || s == "-") miroData.academicDescription.getOrElse("")
@@ -61,8 +64,9 @@ case class MiroTransformable(MiroID: String,
     val titleIsTruncatedDescription = candidateTitle
       .startsWith(miroData.title.get)
 
-    val useDescriptionAsTitle = (titleIsTruncatedDescription &&
-      MiroCollection == "Images-V") || (miroData.title.get == "-" || miroData.title.get == "--")
+    val useDescriptionAsTitle =
+      (titleIsTruncatedDescription && collectionIsV(MiroCollection)) ||
+        (miroData.title.get == "-" || miroData.title.get == "--")
 
     val title = if (useDescriptionAsTitle) {
       candidateTitle
@@ -145,9 +149,10 @@ case class MiroTransformable(MiroID: String,
   }
 
   def getCreatedDate(miroData: MiroTransformableData): Option[Period] =
-    MiroCollection match {
-      case "Images-V" => miroData.artworkDate.map { Period(_) }
-      case _ => None
+    if (collectionIsV(MiroCollection)) {
+      miroData.artworkDate.map { Period(_) }
+    } else {
+      None
     }
 
   private def buildImageApiURL(miroID: String, templateName: String): String = {
