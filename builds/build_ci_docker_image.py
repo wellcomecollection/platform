@@ -3,7 +3,8 @@
 """
 Builds a Docker image for use in CI or a local Make task.
 
-This script has to work with as few deps installed as possible, so:
+This script does _not_ run inside a container, so it has to work on any
+system.  This means:
  1. No third-party Python libraries!
  2. Python 2 and Python 3 compatible.
 
