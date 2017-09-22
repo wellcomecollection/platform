@@ -112,16 +112,10 @@ class Alarm:
             url2 = self._build_cloudwatch_url('Task timed out after', group, start, end)
             return f'{url1} / {url2}'
 
-        elif (
-            self.name.startswith('api_romulus') and
-            self.name.endswith('alb-target-500-errors')
-        ):
-            group = 'platform/api_romulus'
+        elif self.name == 'api_romulus_v1-alb-target-500-errors':
+            group = 'platform/api_romulus_v1'
             search_term = '"HTTP 500"'
-        elif (
-            self.name.startswith('api_remus') and
-            self.name.endswith('alb-target-500-errors')
-        ):
+        elif self.name == 'api_remus-alb-target-500-errors':
             group = 'platform/api_remus'
             search_term = '"HTTP 500"'
         else:
