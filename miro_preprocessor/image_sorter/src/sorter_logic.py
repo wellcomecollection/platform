@@ -67,17 +67,8 @@ class Rules:
     def _parse_date(self, date_string):
         return dateutil.parser.parse(date_string, dayfirst=True)
 
-    @property
-    def is_f_collection(self):
-        return self._is_collection("F")
-
-    @property
-    def is_l_collection(self):
-        return self._is_collection("L")
-
-    @property
-    def is_l_or_m_or_v_collection(self):
-        return self._is_collection("L") or self._is_collection("V") or self._is_collection("M")
+    def is_collection(self, *args):
+        return any([self._is_collection(collection) for collection in args])
 
     @property
     def image_library_dept_is_Archives_and_Manuscripts(self):
@@ -136,26 +127,45 @@ class Rules:
     def is_not_for_public_access(self):
         return self.is_not_copyright_cleared or self.is_not_general_use or self.has_access_restrictions
 
+    @property
+    def is_cold_store(self):
+        return self.is_collection("F") or \
+               (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
+               (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
+               (self.is_collection("L", "M", "V") and
+                not self.is_innopac_id_8_digits and
+                self.is_title_empty and
+                self.is_image_pub_title_blank and
+                self.is_image_pub_periodical_blank)
+
+    @property
+    def is_tandem_vault(self):
+        return self.image_library_dept_is_Public_programmes or \
+               self.is_collection("L") and self.is_after_first_march_2016 or \
+               self.is_collection("L", "M", "V") and self.is_not_for_public_access
+
 
 class Decision(enum.Enum):
     cold_store = 'cold_store'
     tandem_vault = 'tandem_vault'
+    digital_library = 'digital_library'
     catalogue_api = 'catalogue_api'
+    none = 'none'
 
 
 def sort_image(collection, image_data):
     print(image_data)
     r = Rules(collection, image_data)
-    print(r.is_not_for_public_access)
 
-    if r.is_f_collection or \
-            (r.is_l_or_m_or_v_collection and r.image_library_dept_is_Archives_and_Manuscripts) or \
-            (r.is_l_or_m_or_v_collection and r.image_tech_captured_mode_is_videodisc) or \
-            (r.is_l_or_m_or_v_collection and not r.is_innopac_id_8_digits and r.is_title_empty and r.is_image_pub_title_blank and r.is_image_pub_periodical_blank):
-        return Decision.cold_store
-    elif r.image_library_dept_is_Public_programmes or \
-                    r.is_l_collection and r.is_after_first_march_2016 or \
-                    r.is_l_or_m_or_v_collection and r.is_not_for_public_access:
-        return Decision.tandem_vault
-    else:
-        return Decision.catalogue_api
+    decisions = []
+
+    if r.is_cold_store:
+        return [Decision.cold_store]
+
+    if r.is_tandem_vault:
+        decisions.append(Decision.tandem_vault)
+
+    if not r.is_tandem_vault:
+        decisions.append(Decision.catalogue_api)
+
+    return decisions

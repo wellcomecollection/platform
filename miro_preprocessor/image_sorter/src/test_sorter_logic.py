@@ -74,7 +74,7 @@ def image_with_no_info(collection, image_title):
 ])
 def test_is_cold_store(collection, image_data):
     """These examples all end up in cold store."""
-    assert sort_image(collection, image_data) == Decision.cold_store
+    assert sort_image(collection, image_data) == [Decision.cold_store]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -95,7 +95,7 @@ def test_is_cold_store(collection, image_data):
 ])
 def test_is_tandem_vault(collection, image_data):
     """These examples all end up in Tandem Vault."""
-    assert sort_image(collection, image_data) == Decision.tandem_vault
+    assert sort_image(collection, image_data) == [Decision.tandem_vault]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -125,4 +125,4 @@ def test_is_tandem_vault(collection, image_data):
 ])
 def test_is_digital_library(collection, image_data):
     """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == Decision.catalogue_api
+    assert sort_image(collection, image_data) == [Decision.catalogue_api]
