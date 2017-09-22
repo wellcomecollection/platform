@@ -16,7 +16,15 @@ class Rules:
         self.image_data = image_data
 
     _empty_title_strings = [
-        "-"
+        "-",
+        "--",
+        "Awaiting description",
+        "Awaiting removal from MIRO as duplicate",
+        "Awaiting captions and consent form",
+        "Awaiting catalogue details",
+        "Awaiting caption info",
+        "No info available about this object",
+        "No neg"
     ]
 
     @staticmethod
@@ -89,45 +97,6 @@ class Decision(enum.Enum):
 
 
 def sort_image(collection, image_data):
-    # def _normalise_string(s):
-    #     if s is not None:
-    #         s = s.lower()
-    #     if s == "":
-    #         s = None
-    #     return s
-    #
-    # def _get(key):
-    #     return _normalise_string(image_data.get(key))
-    #
-    # def _compare(key, value):
-    #     return _get(key) == _normalise_string(value)
-    #
-    # def _search(regex, key):
-    #     return re.search(regex, _get(key))
-    #
-    # def _is_blank(key):
-    #     return _get(key) is None
-    #
-    # def _is_collection(collection_name):
-    #     return _normalise_string(collection) == f"source/images-{collection_name}"
-    #
-    # title_matches = [
-    #     _normalise_string("Awaiting description"),
-    #     _normalise_string("Awaiting removal from MIRO as a duplicate"),
-    #     _normalise_string("Awaiting captions and consent form"),
-    #     _normalise_string("Awaiting catalogue details"),
-    #     _normalise_string("Awaiting caption info"),
-    #     _normalise_string("No info available for this object"),
-    #     _normalise_string("No neg")
-    # ]
-    #
-    # c = {
-    #     "image_title is not one of title_matches": (
-    #         any(
-    #             [_compare("image_title", s) for s in title_matches]
-    #         ) or _search("-{1,2}", "image_title")
-    #     ),
-    # }
 
     print(image_data)
     r = Rules(collection, image_data)
