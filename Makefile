@@ -3,16 +3,9 @@ include loris/Makefile
 include lambdas/Makefile
 include shared_infra/Makefile
 include miro_preprocessor/Makefile
+include monitoring/Makefile
 include ontologies/Makefile
 
-
-## Build the image for gatling
-gatling-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=gatling
-
-## Deploy the image for gatling
-gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=gatling ./builds/publish_service.sh
 
 ## Build the image for the cache cleaner
 cache_cleaner-build: $(ROOT)/.docker/image_builder
