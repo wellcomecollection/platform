@@ -5,6 +5,7 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+
 monitoring-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(MONITORING)/terraform:/data \
@@ -34,4 +35,15 @@ ecs_dashboard-deploy: $(ROOT)/.docker/ecs_dashboard
 		ecs_dashboard
 
 
-.PHONY: monitoring-terraform-plan monitoring-terraform-apply ecs_dashboard-deploy
+gatling-build: $(ROOT)/.docker/image_builder
+	./builds/docker_run.py --dind -- image_builder \
+		--project=gatling \
+		--file=monitoring/gatling/Dockerfile
+
+gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
+	PROJECT=gatling ./builds/publish_service.sh
+
+
+.PHONY: monitoring-terraform-plan monitoring-terraform-apply \
+	ecs_dashboard-deploy \
+	gatling-build gatling-deploy
