@@ -217,7 +217,7 @@ data "template_file" "es_cluster_host_remus" {
 
 module "api_remus_v1" {
   source             = "../terraform/services"
-  name               = "api_remus"
+  name               = "api_remus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
