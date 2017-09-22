@@ -128,3 +128,12 @@ def test_creates_json_file_for_each_image(s3_fixture, xml_file_contents):
     actual_json_objects = {key: _get_body(key) for key in keys}
 
     assert expected_json_objects == actual_json_objects
+
+
+def test_build_collection_id():
+    src_key = "source/Images-V.xml"
+    expected_collection_id = "Images-V"
+
+    actual_collection_id = run._build_collection_id(src_key)
+
+    assert expected_collection_id == actual_collection_id
