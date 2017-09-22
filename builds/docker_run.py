@@ -24,16 +24,16 @@ def _aws_credentials_args():
     Returns the arguments to add to ``docker run`` for sharing AWS credentials
     with the running container.
     """
-    try:
+    if 'AWS_ACCESS_KEY_ID' in os.environ:
         print('*** Trying environment variables for AWS config...')
         return [
-            '--env', 'AWS_ACCESS_KEY_ID=%s' % os.environ['AWS_SECRET_KEY_ID'],
-            '--env', 'AWS_SECRET_ACCESS_KEY=%s' % os.environ['AWS_SECRET_ACCESS_KEY'],
-            '--env', 'AWS_REGION=%s' % os.environ['AWS_REGION'],
-            '--env', 'AWS_DEFAULT_REGION=%s' % os.environ['AWS_DEFAULT_REGION'],
+            '--env', 'AWS_ACCESS_KEY_ID=%s' % os.environ.get('AWS_SECRET_KEY_ID', ''),
+            '--env', 'AWS_SECRET_ACCESS_KEY=%s' % os.environ.get('AWS_SECRET_ACCESS_KEY', ''),
+            '--env', 'AWS_REGION=%s' % os.environ.get('AWS_REGION', ''),
+            '--env', 'AWS_DEFAULT_REGION=%s' % os.environ.get('AWS_DEFAULT_REGION', ''),
         ]
-    except KeyError as err:
-        print('*** Missing environment variable (%r), using ~/.aws' % err)
+    else:
+        print('*** Missing environment variable, using ~/.aws')
         aws_path = os.path.join(os.environ['HOME'], '.aws')
         return ['--volume', '%s:/root/.aws' % aws_path]
 
