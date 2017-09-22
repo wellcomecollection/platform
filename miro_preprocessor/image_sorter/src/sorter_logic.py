@@ -28,6 +28,13 @@ class Rules:
         "No neg"
     ]
 
+    _cc_accesses = [
+        "CC-0",
+        "CC-BY",
+        "CC-BY-NC",
+        "CC-BY-NC-ND",
+    ]
+
     @staticmethod
     def _normalise_string(s):
         if s is not None:
@@ -46,7 +53,7 @@ class Rules:
         return self._get_normalised(key) == self._normalise_string(value)
 
     def _is_collection(self, collection_name):
-        return self._normalise_string(self.collection) == self._normalise_string(f"source/images-{collection_name}")
+        return self._normalise_string(self.collection) == self._normalise_string(f"images-{collection_name}")
 
     def _search(self, regex, key):
         return re.search(regex, self._get_normalised(key))
@@ -117,8 +124,17 @@ class Rules:
         return self._get('image_copyright_cleared') == 'N'
 
     @property
-    def is_access_restricted(self):
-        return self.is_not_copyright_cleared
+    def is_not_general_use(self):
+        return self._get('image_general_use') == 'N'
+
+    @property
+    def has_access_restrictions(self):
+        return not (self._is_blank("image_access_restrictions") or self._key_matches("image_access_restrictions",
+                                                                                     self._cc_accesses))
+
+    @property
+    def is_not_for_public_access(self):
+        return self.is_not_copyright_cleared or self.is_not_general_use or self.has_access_restrictions
 
 
 class Decision(enum.Enum):
@@ -130,7 +146,7 @@ class Decision(enum.Enum):
 def sort_image(collection, image_data):
     print(image_data)
     r = Rules(collection, image_data)
-    print(r.is_access_restricted)
+    print(r.is_not_for_public_access)
 
     if r.is_f_collection or \
             (r.is_l_or_m_or_v_collection and r.image_library_dept_is_Archives_and_Manuscripts) or \
@@ -138,8 +154,8 @@ def sort_image(collection, image_data):
             (r.is_l_or_m_or_v_collection and not r.is_innopac_id_8_digits and r.is_title_empty and r.is_image_pub_title_blank and r.is_image_pub_periodical_blank):
         return Decision.cold_store
     elif r.image_library_dept_is_Public_programmes or \
-            r.is_l_collection and r.is_after_first_march_2016 or \
-            r.is_l_or_m_or_v_collection and r.is_access_restricted:
+                    r.is_l_collection and r.is_after_first_march_2016 or \
+                    r.is_l_or_m_or_v_collection and r.is_not_for_public_access:
         return Decision.tandem_vault
     else:
         return Decision.catalogue_api
