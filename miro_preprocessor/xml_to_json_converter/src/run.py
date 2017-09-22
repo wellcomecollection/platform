@@ -37,11 +37,15 @@ def _wrap_image_data(collection, image_data):
     }
 
 
+def _build_collection_id(src_key):
+    return src_key.split(".")[0].split("/")[-1]
+
+
 def main(bucket, src_key, dst_key, js_path="json"):
     print(f"Starting to process s3://{bucket}/{src_key}.")
     image_data = generate_images(bucket=bucket, key=src_key)
 
-    collection = src_key.split(".")[0]
+    collection = _build_collection_id(src_key)
 
     tmp_json = tempfile.mktemp()
     os.makedirs(os.path.dirname(tmp_json), exist_ok=True)
