@@ -50,7 +50,7 @@ def are_there_job_relevant_changes(changed_files, task):
     if any(f.startswith('.travis') for f in changed_files):
         reasons.append('Changes to the Travis config')
 
-    if any(f.startswith(('scripts/', 'builds/')) for f in changed_files):
+    if any(f.startswith('builds/') for f in changed_files):
         reasons.append('Changes to the build scripts')
 
     if task.startswith('sbt-'):
