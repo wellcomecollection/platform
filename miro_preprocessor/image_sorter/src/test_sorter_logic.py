@@ -78,7 +78,14 @@ def test_is_cold_store(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    # TODO: Write some examples...
+    collection_image_data(collection='source/images-L', image_library_dept="Public programmes"),
+    collection_image_data(collection='source/images-V', image_library_dept="Public programmes"),
+    collection_image_data(collection='source/images-M', image_library_dept="Public programmes"),
+    collection_image_data(collection='source/images-L', image_tech_scanned_date="02/03/2016"),
+    collection_image_data(collection='source/images-L', image_tech_scanned_date="30/06/2018"),
+    collection_image_data(collection='source/images-L', image_copyright_cleared="N"),
+    collection_image_data(collection='source/images-V', image_copyright_cleared="N"),
+    collection_image_data(collection='source/images-M', image_copyright_cleared="N")
 ])
 def test_is_tandem_vault(collection, image_data):
     """These examples all end up in Tandem Vault."""
@@ -91,7 +98,9 @@ def test_is_tandem_vault(collection, image_data):
     collection_image_data(image_title=None,
                           image_pub_title=None,
                           image_pub_periodical=None,
-                          image_innopac_id="1234567x")
+                          image_innopac_id="1234567x"),
+    collection_image_data(collection='source/images-L', image_tech_scanned_date="01/03/2016"),
+    collection_image_data(collection='source/images-L', image_tech_scanned_date="29/02/2016"),
 ])
 def test_is_digital_library(collection, image_data):
     """These examples all end up in the Digital Library."""
