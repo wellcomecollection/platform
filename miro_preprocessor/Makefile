@@ -5,7 +5,7 @@ include $(ROOT)/shared.Makefile
 endif
 
 xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_builder
-	$(ROOT)/scripts/run_docker_in_docker.sh \
+	$(ROOT)/builds/docker_run.py --dind -- \
 		-v $(ROOT):/repo \
 		image_builder:latest \
 		--project=xml_to_json_converter \
