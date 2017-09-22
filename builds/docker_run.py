@@ -25,13 +25,15 @@ def _aws_credentials_args():
     with the running container.
     """
     try:
+        print('*** Trying environment variables for AWS config...')
         return [
             '--env', 'AWS_SECRET_KEY_ID=%s' % os.environ['AWS_SECRET_KEY_ID'],
             '--env', 'AWS_SECRET_ACCESS_KEY=%s' % os.environ['AWS_SECRET_ACCESS_KEY'],
             '--env', 'AWS_REGION=%s' % os.environ['AWS_REGION'],
             '--env', 'AWS_DEFAULT_REGION=%s' % os.environ['AWS_DEFAULT_REGION'],
         ]
-    except KeyError:
+    except KeyError as err:
+        print('*** Missing environment variable (%r), using ~/.aws' % err)
         aws_path = os.path.join(os.environ['HOME'], '.aws')
         return ['--volume', '%s:/root/.aws' % aws_path]
 
