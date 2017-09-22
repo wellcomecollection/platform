@@ -19,4 +19,19 @@ monitoring-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 		--env OP=apply \
 		terraform_ci:latest
 
-.PHONY: monitoring-terraform-plan monitoring-terraform-apply
+
+$(ROOT)/.docker/ecs_dashboard:
+	$(ROOT)/builds/build_ci_docker_image.py \
+		--project=ecs_dashboard \
+		--dir=$(MONITORING)/ecs_dashboard \
+		--file=$(MONITORING)/ecs_dashboard/Dockerfile
+
+ecs_dashboard-build: $(ROOT)/.docker/ecs_dashboard
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(MONITORING)/ecs_dashboard:/dashboard \
+		--env BUCKET_NAME=wellcome-platform-dash \
+		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash/ \
+		ecs_dashboard
+
+
+.PHONY: monitoring-terraform-plan monitoring-terraform-apply ecs_dashboard-build

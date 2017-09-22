@@ -2,7 +2,7 @@
 
 This directory has the source and Terraform code for our monitoring infrastructure.
 
-## Services dashboard
+## ECS dashboard
 
 We have a dashboard which reports the state of our ECS clusters.
 For each cluster, it shows:
