@@ -2,7 +2,7 @@
 
 import pytest
 
-from sorter_logic import Decision, sort_image
+from sorter_logic import Decision, InvalidCollectionException, sort_image
 
 
 def collection_image_data(**kwargs):
@@ -120,10 +120,14 @@ def test_is_catalogue_api(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_cleared="N"),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_cleared=None),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_use_restrictions="Super-restricted"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh", image_use_restrictions=None),
+    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+                          image_cleared="N"),
+    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+                          image_cleared=None),
+    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+                          image_use_restrictions="Super-restricted"),
+    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+                          image_use_restrictions=None),
 ])
 def test_is_no_decision(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -134,7 +138,8 @@ def test_is_no_decision(collection, image_data):
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared="N"),
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared=None),
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions=None),
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="Super-restricted"),
+    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016",
+                          image_use_restrictions="Super-restricted"),
 ])
 def test_is_digital_library_and_tandem_vault(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -181,4 +186,11 @@ def test_is_digital_library_and_catalogue_api(collection, image_data):
 ])
 def test_is_tandem_vault_and_digital_library_and_catalogue_api(collection, image_data):
     """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.tandem_vault, Decision.digital_library, Decision.catalogue_api]
+    assert sort_image(collection, image_data) == [Decision.tandem_vault, Decision.digital_library,
+                                                  Decision.catalogue_api]
+
+
+def test_raise_exception_if_collection_is_not_flvm():
+    collection, image_data = collection_image_data(collection="images-A")
+    with pytest.raises(InvalidCollectionException):
+        sort_image(collection, image_data)
