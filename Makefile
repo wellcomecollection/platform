@@ -114,7 +114,7 @@ sbt-test: \
 
 
 .docker/sbt_image_builder:
-	./scripts/build_ci_docker_image.py \
+	./builds/build_ci_docker_image.py \
 		--project=sbt_image_builder \
 		--dir=builds \
 		--file=builds/sbt_image_builder.Dockerfile
