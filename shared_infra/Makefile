@@ -7,7 +7,7 @@ endif
 
 ## Run a plan on main stack
 shared-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		-v $(ROOT)/terraform:/terraform \
 		-v $(ROOT)/shared_infra:/data \
 		-e OP=plan \
@@ -15,7 +15,7 @@ shared-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 
 ## Run an apply on main stack
 shared-terraform-apply: $(ROOT)/.docker/terraform_ci
-	$(ROOT)/scripts/run_docker_with_aws_credentials.sh \
+	$(ROOT)/builds/docker_run.py --aws -- \
 		-v $(ROOT)/terraform:/terraform \
 		-v $(ROOT)/shared_infra:/data \
 		-e OP=apply \

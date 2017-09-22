@@ -60,7 +60,9 @@ uptodate-git: $(ROOT)/.docker/python3.6_ci
 
 ## Format terraform in the current directory
 format-terraform: $(ROOT)/.docker/terraform_ci
-	./scripts/run_docker_with_aws_credentials.sh -v $$(pwd):/data -e OP=fmt terraform_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $$(pwd):/data \
+		--env OP=fmt terraform_ci
 
 ## Format scala in the current directory
 format-scala:
