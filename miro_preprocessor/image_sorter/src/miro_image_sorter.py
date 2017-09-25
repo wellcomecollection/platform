@@ -33,6 +33,8 @@ def main(event, _):
     topic_cold_store = os.environ['TOPIC_COLD_STORE']
     topic_tandem_vault = os.environ['TOPIC_TANDEM_VAULT']
     topic_catalogue_api = os.environ['TOPIC_CATALOGUE_API']
+    topic_none = os.environ['TOPIC_NONE']
+    topic_digital_library = os.environ['TOPIC_DIGITAL_LIBRARY']
 
     s3_bucket = os.environ['S3_MIRODATA_ID']
     s3_key = parse_s3_event(event)
@@ -46,13 +48,15 @@ def main(event, _):
     image_data = data['image_data']
 
     decisions = sort_image(collection=collection, image_data=image_data)
-    print(f'Sorting this image into {decision}')
 
     topic_arns = {
         Decision.cold_store: topic_cold_store,
         Decision.tandem_vault: topic_tandem_vault,
-        Decision.catalogue_api: topic_catalogue_api
+        Decision.catalogue_api: topic_catalogue_api,
+        Decision.none: topic_none,
+        Decision.digital_library: topic_digital_library
     }
 
     for decision in decisions:
+        print(f'Sorting this image into {decision}')
         publish_sns_message(topic_arn=topic_arns[decision], message=data)
