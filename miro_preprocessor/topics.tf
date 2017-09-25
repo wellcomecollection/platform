@@ -17,3 +17,13 @@ module "catalogue_api_topic" {
   source = "../terraform/sns"
   name   = "miro_catalogue_api"
 }
+
+module "digital_library_topic" {
+  source = "../terraform/sns"
+  name   = "miro_digital_library"
+}
+
+module "none_topic" {
+  source = "../terraform/sns"
+  name   = "miro_none"
+}
