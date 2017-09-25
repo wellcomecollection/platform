@@ -13,11 +13,10 @@ def collection_image_data(**kwargs):
         "image_library_dept": "Paperclips and hairnets",
         "image_tech_captured_mode": "Frog retina",
         "image_copyright_cleared": "Y",
-        "image_access_restrictions": "CC-BY",
+        "image_use_restrictions": "CC-BY",
         "image_general_use": "Y",
         "image_innopac_id": "12345678",
-        "image_cleared": "Y",
-        "image_use_restrictions": "CC-BY"
+        "image_cleared": "Y"
     }
     collection = 'images-M'
     if 'collection' in kwargs.keys():
@@ -83,15 +82,21 @@ def test_is_cold_store(collection, image_data):
     collection_image_data(collection='images-L', image_library_dept="Public programmes"),
     collection_image_data(collection='images-V', image_library_dept="Public programmes"),
     collection_image_data(collection='images-M', image_library_dept="Public programmes"),
+    collection_image_data(collection='images-L',
+                          image_tech_scanned_date="02/03/2016",
+                          image_use_restrictions="Restricted"),
+    collection_image_data(collection='images-L', image_use_restrictions=None),
+    collection_image_data(collection='images-V', image_use_restrictions=None),
+    collection_image_data(collection='images-M', image_use_restrictions=None),
     collection_image_data(collection='images-L', image_copyright_cleared="N"),
     collection_image_data(collection='images-V', image_copyright_cleared="N"),
     collection_image_data(collection='images-M', image_copyright_cleared="N"),
     collection_image_data(collection='images-L', image_general_use="N"),
     collection_image_data(collection='images-V', image_general_use="N"),
     collection_image_data(collection='images-M', image_general_use="N"),
-    collection_image_data(collection='images-L', image_access_restrictions="Top-secret"),
-    collection_image_data(collection='images-V', image_access_restrictions="Top-secret"),
-    collection_image_data(collection='images-M', image_access_restrictions="Top-secret")
+    collection_image_data(collection='images-L', image_use_restrictions="Top-secret"),
+    collection_image_data(collection='images-V', image_use_restrictions="Top-secret"),
+    collection_image_data(collection='images-M', image_use_restrictions="Top-secret")
 ])
 def test_is_tandem_vault(collection, image_data):
     """These examples all end up in Tandem Vault."""
@@ -99,10 +104,10 @@ def test_is_tandem_vault(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-L', image_use_restrictions=None),
-    collection_image_data(collection='images-L', image_use_restrictions="Super-restricted"),
+    collection_image_data(collection='images-L', image_use_restrictions="None"),
+    collection_image_data(collection='images-V', image_use_restrictions="None"),
+    collection_image_data(collection='images-M', image_use_restrictions="None"),
     collection_image_data(collection='images-L', image_cleared="N"),
-    collection_image_data(collection='images-L', image_cleared=None),
 ])
 def test_is_digital_library(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -110,9 +115,9 @@ def test_is_digital_library(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
 ])
 def test_is_catalogue_api(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -120,14 +125,10 @@ def test_is_catalogue_api(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
                           image_cleared="N"),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
                           image_cleared=None),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
-                          image_use_restrictions="Super-restricted"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
-                          image_use_restrictions=None),
 ])
 def test_is_no_decision(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -137,9 +138,7 @@ def test_is_no_decision(collection, image_data):
 @pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared="N"),
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared=None),
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions=None),
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016",
-                          image_use_restrictions="Super-restricted"),
+    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="None"),
 ])
 def test_is_digital_library_and_tandem_vault(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -159,21 +158,18 @@ def test_is_digital_library_and_tandem_vault(collection, image_data):
                           image_innopac_id="12345678"),
     collection_image_data(collection='images-L', image_tech_scanned_date="01/03/2016"),
     collection_image_data(collection='images-L', image_tech_scanned_date="29/02/2016"),
-    collection_image_data(collection='images-L', image_access_restrictions=None),
-    collection_image_data(collection='images-V', image_access_restrictions=None),
-    collection_image_data(collection='images-M', image_access_restrictions=None),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-0"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-0"),
-    collection_image_data(collection='images-M', image_access_restrictions="CC-0"),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-BY"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY"),
-    collection_image_data(collection='images-M', image_access_restrictions="CC-BY"),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC"),
-    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC"),
-    collection_image_data(collection='images-L', image_access_restrictions="CC-BY-NC-ND"),
-    collection_image_data(collection='images-V', image_access_restrictions="CC-BY-NC-ND"),
-    collection_image_data(collection='images-M', image_access_restrictions="CC-BY-NC-ND"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-0"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-0"),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-0"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY"),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC"),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND"),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND"),
 ])
 def test_is_digital_library_and_catalogue_api(collection, image_data):
     """These examples all end up in the Digital Library."""

@@ -33,6 +33,7 @@ class Rules:
         "CC-BY",
         "CC-BY-NC",
         "CC-BY-NC-ND",
+        "None"
     ]
 
     @staticmethod
@@ -123,25 +124,28 @@ class Rules:
         return self._get('image_general_use') == 'N'
 
     @property
-    def has_access_restrictions(self):
-        return not (self._is_blank("image_access_restrictions") or self._key_matches("image_access_restrictions",
-                                                                                     self._cc_accesses))
-
-    @property
-    def has_not_use_restrictions(self):
-        return not self._is_blank("image_use_restrictions") and self._key_matches("image_use_restrictions", self._cc_accesses)
+    def has_use_restrictions(self):
+        return not self._key_matches("image_use_restrictions", self._cc_accesses)
 
     @property
     def is_not_for_public_access(self):
-        return (not self.is_copyright_cleared) or self.is_not_general_use or self.has_access_restrictions
+        return (not self.is_copyright_cleared) or self.is_not_general_use or self.has_use_restrictions
 
     @property
     def is_for_public_access(self):
         return not self.is_not_for_public_access
 
     @property
+    def use_restrictions_are_none(self):
+        return self._get_normalised("image_use_restrictions") == "none"
+
+    @property
     def satisfies_api_filters(self):
-        return self.is_copyright_cleared and self.is_cleared and self.has_not_use_restrictions
+        return \
+            self.is_copyright_cleared and \
+            self.is_cleared and \
+            (not self.has_use_restrictions) and \
+            (not self.use_restrictions_are_none)
 
     @property
     def is_cold_store(self):
