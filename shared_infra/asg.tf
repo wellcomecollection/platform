@@ -8,11 +8,14 @@ module "services_cluster_asg" {
   vpc_id                = "${module.vpc_services.vpc_id}"
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
 
-  asg_desired = "1"
-  asg_max     = "2"
+  asg_desired = "2"
+  asg_max     = "4"
 
   image_id      = "${data.aws_ami.stable_coreos.id}"
-  instance_type = "t2.small"
+  instance_type = "m4.xlarge"
+
+  use_spot      = 1
+  spot_price    = "0.1"
 
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
