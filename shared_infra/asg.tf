@@ -14,8 +14,8 @@ module "services_cluster_asg" {
   image_id      = "${data.aws_ami.stable_coreos.id}"
   instance_type = "m4.xlarge"
 
-  use_spot      = 1
-  spot_price    = "0.1"
+  use_spot   = 1
+  spot_price = "0.1"
 
   sns_topic_arn         = "${module.ec2_terminating_topic.arn}"
   publish_to_sns_policy = "${module.ec2_terminating_topic.publish_policy}"
