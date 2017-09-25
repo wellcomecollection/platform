@@ -45,7 +45,7 @@ def main(event, _):
     collection = data['collection']
     image_data = data['image_data']
 
-    decision = sort_image(collection=collection, image_data=image_data)
+    decisions = sort_image(collection=collection, image_data=image_data)
     print(f'Sorting this image into {decision}')
 
     topic_arns = {
@@ -54,4 +54,5 @@ def main(event, _):
         Decision.catalogue_api: topic_catalogue_api
     }
 
-    publish_sns_message(topic_arn=topic_arns[decision], message=data)
+    for decision in decisions:
+        publish_sns_message(topic_arn=topic_arns[decision], message=data)

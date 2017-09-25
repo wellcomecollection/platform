@@ -75,7 +75,7 @@ resource "aws_dynamodb_table" "calm_table" {
 resource "aws_dynamodb_table" "miro_table" {
   name             = "MiroData"
   read_capacity    = 1
-  write_capacity   = 1
+  write_capacity   = 500
   hash_key         = "MiroID"
   range_key        = "MiroCollection"
   stream_enabled   = true
@@ -106,12 +106,12 @@ resource "aws_dynamodb_table" "miro_table" {
     hash_key        = "ReindexShard"
     range_key       = "ReindexVersion"
     read_capacity   = 1
-    write_capacity  = 1
+    write_capacity  = 500
     projection_type = "ALL"
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
 
     ignore_changes = [
       "read_capacity",
