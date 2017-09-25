@@ -69,7 +69,7 @@ class Rules:
         return dateutil.parser.parse(date_string, dayfirst=True)
 
     def is_collection(self, *args):
-        return any([self._is_collection(collection) for collection in args])
+        return any(self._is_collection(collection) for collection in args)
 
     @property
     def image_library_dept_is_Archives_and_Manuscripts(self):
@@ -85,7 +85,7 @@ class Rules:
 
     @property
     def is_innopac_id_8_digits(self):
-        return self._search(r"[0-9]{7}[0-9|x]{1}", "image_innopac_id") is not None
+        return self._search(r"[0-9]{7}[0-9xX]{1}", "image_innopac_id") is not None
 
     @property
     def is_title_blank(self):
@@ -107,7 +107,7 @@ class Rules:
     def is_after_first_march_2016(self):
         scanned_date = self._get("image_tech_scanned_date")
         if scanned_date is not None:
-            return self._parse_date(scanned_date) > self._parse_date("01/03/2016")
+            return self._parse_date(scanned_date) > self._parse_date("1 March 2016")
         else:
             return False
 
@@ -194,7 +194,10 @@ def sort_image(collection, image_data):
     decisions = []
 
     if not r.is_collection("F", "L", "V", "M"):
-        raise InvalidCollectionException
+        raise InvalidCollectionException({
+            "collection": collection,
+            "image_data": image_data
+        })
 
     if r.is_cold_store:
         return [Decision.cold_store]
