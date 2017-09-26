@@ -10,8 +10,8 @@ RUN apk update && apk add curl
 RUN curl --location --output coursier \
     https://github.com/alexarchambault/coursier/raw/master/coursier
 RUN chmod +x coursier
-RUN mv coursier /usr/local/bin/coursier
-RUN ./coursier bootstrap com.geirsson:scalafmt-cli_2.12:1.2.0 \
+RUN mv coursier /usr/local/bin
+RUN coursier bootstrap com.geirsson:scalafmt-cli_2.12:1.2.0 \
   -o /usr/local/bin/scalafmt --standalone --main org.scalafmt.cli.Cli
 
 VOLUME /repo
