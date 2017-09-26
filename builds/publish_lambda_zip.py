@@ -38,15 +38,14 @@ def create_zip(src, dst):
 
     Based on https://stackoverflow.com/a/14569017/1558022
     """
-    name = f'{dst}.zip'
-    with zipfile.ZipFile(name, 'w', zipfile.ZIP_DEFLATED) as zf:
+    with zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as zf:
         abs_src = os.path.abspath(src)
         for dirname, subdirs, files in os.walk(src):
             for filename in files:
                 absname = os.path.abspath(os.path.join(dirname, filename))
                 arcname = absname[len(abs_src) + 1:]
                 zf.write(absname, arcname)
-    return name
+    return dst
 
 
 def build_lambda_local(path, name):
@@ -75,7 +74,7 @@ def build_lambda_local(path, name):
     if os.path.exists(reqs_file):
         print(f'*** Installing dependencies from requirements.txt')
         subprocess.check_call([
-            'pip', 'install', '--requirement', reqs_file, '--target', target
+            'pip3', 'install', '--requirement', reqs_file, '--target', target
         ])
     else:
         print(f'*** No requirements.txt found')
@@ -93,7 +92,7 @@ if __name__ == '__main__':
     bucket = args['--bucket']
 
     client = boto3.client('s3')
-    name = os.path.basename(key) + '.zip'
+    name = os.path.basename(key)
     filename = build_lambda_local(path=path, name=name)
 
     print(f'*** Uploading {filename} to S3')
