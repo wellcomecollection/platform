@@ -6,6 +6,6 @@ set -o nounset
 ROOT=$(git rev-parse --show-toplevel)
 
 $ROOT/builds/docker_run.py --dind -- \
-	--volume ~/.sbt:/root/.sbt \
+  --volume ~/.sbt:/root/.sbt \
   --volume ~/.ivy2:/root/.ivy2 \
   sbt_test "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
