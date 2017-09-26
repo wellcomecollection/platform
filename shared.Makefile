@@ -42,6 +42,11 @@ $(ROOT)/.docker/miro_adapter_tests:
 		--dir=miro_adapter \
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
+$(ROOT)/.docker/publish_lambda_zip:
+	$(ROOT)/builds/build_ci_docker_image.py \
+		--project=publish_lambda_zip \
+		--dir=builds \
+		--file=builds/publish_lambda_zip.Dockerfile
 
 
 # Project utility tasks
