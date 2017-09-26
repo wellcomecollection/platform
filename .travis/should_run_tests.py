@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+from __future__ import print_function
+
 from tooling import changed_files, fprint as print, make_decision
 
 
