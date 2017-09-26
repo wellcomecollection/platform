@@ -85,7 +85,7 @@ class Rules:
 
     @property
     def is_innopac_id_8_digits(self):
-        return self._search(r"[0-9]{7}[0-9xX]{1}", "image_innopac_id") is not None
+        return self._get("image_innopac_id") is not None and self._search(r"[0-9]{7}[0-9xX]{1}", "image_innopac_id") is not None
 
     @property
     def is_title_blank(self):
