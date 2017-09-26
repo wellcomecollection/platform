@@ -4,17 +4,14 @@ variable "asg_name" {
 
 variable "asg_min" {
   description = "Minimum number of instances"
-  default     = "1"
 }
 
 variable "asg_desired" {
   description = "Desired number of instances"
-  default     = "1"
 }
 
 variable "asg_max" {
   description = "Max number of instances"
-  default     = "2"
 }
 
 variable "subnet_list" {
