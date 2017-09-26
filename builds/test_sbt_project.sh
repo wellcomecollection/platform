@@ -8,4 +8,5 @@ ROOT=$(git rev-parse --show-toplevel)
 $ROOT/builds/docker_run.py --dind -- \
   --volume ~/.sbt:/root/.sbt \
   --volume ~/.ivy2:/root/.ivy2 \
+  --net host \
   sbt_test "project $PROJECT" ";dockerComposeUp;test;dockerComposeStop"
