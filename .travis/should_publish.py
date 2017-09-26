@@ -26,7 +26,7 @@ def should_publish(task, travis_event_type):
         'sbt-test-common',
         'lambdas-test',
     ]:
-        print('*** Task %s does not have a publish step')
+        print('*** Task %s does not have a publish step' % task)
         return False
 
     subprocess.check_call(['git', 'fetch', 'origin'])
