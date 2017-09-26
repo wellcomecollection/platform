@@ -12,6 +12,10 @@ ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
 
+def fprint(*args, **kwargs):
+    print(*args, **kwargs, flush=True)
+
+
 def changed_files(*args):
     """
     Returns a set of changed files in a given commit range.

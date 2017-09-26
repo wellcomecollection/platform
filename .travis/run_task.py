@@ -25,7 +25,7 @@ import sys
 
 from should_publish import should_publish
 from should_run_tests import should_run_tests
-from tooling import make
+from tooling import make, fprint as print
 
 
 def main():
