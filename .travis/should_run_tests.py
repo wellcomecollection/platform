@@ -1,8 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import os
-import subprocess
-
 from tooling import changed_files, make_decision
 
 
@@ -19,10 +16,8 @@ def should_run_tests(task, travis_event_type):
 
     assert travis_event_type == 'pull_request'
 
-    changed_files = changed_files('HEAD', 'master')
-
     return make_decision(
-        changed_files=changed_files,
+        changed_files=changed_files('HEAD', 'master'),
         task=task,
         action='run tests'
     )
