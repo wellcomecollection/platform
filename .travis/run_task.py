@@ -20,6 +20,8 @@ less important on master where results are transient.
 
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
