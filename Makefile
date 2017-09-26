@@ -86,28 +86,22 @@ nginx-deploy:	\
 		--file=builds/sbt_test.Dockerfile
 
 sbt-test-common: .docker/sbt_test
-	./builds/docker_run.py --dind -- --tty sbt_test \
-		'project common' ';dockerComposeUp;test;dockerComposeStop'
+	PROJECT=common ./builds/test_sbt_project.sh
 
 sbt-test-api: .docker/sbt_test
-	./builds/docker_run.py --dind -- --tty sbt_test \
-		'project api' ';dockerComposeUp;test;dockerComposeStop'
+	PROJECT=api ./builds/test_sbt_project.sh
 
 sbt-test-id_minter: .docker/sbt_test
-	./builds/docker_run.py --dind -- --tty sbt_test \
-		'project id_minter' ';dockerComposeUp;test;dockerComposeStop'
+	PROJECT=id_minter ./builds/test_sbt_project.sh
 
 sbt-test-ingestor: .docker/sbt_test
-	./builds/docker_run.py --dind -- --tty sbt_test \
-		'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
+	PROJECT=ingestor ./builds/test_sbt_project.sh
 
 sbt-test-reindexer: .docker/sbt_test
-	./builds/docker_run.py --dind -- --tty sbt_test \
-		'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
+	PROJECT=reindexer ./builds/test_sbt_project.sh
 
 sbt-test-transformer: .docker/sbt_test
-	./builds/docker_run.py --dind -- --tty sbt_test \
-		'project transformer' ';dockerComposeUp;test;dockerComposeStop'
+	PROJECT=transformer ./builds/test_sbt_project.sh
 
 
 .docker/sbt_image_builder:
