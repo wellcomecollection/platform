@@ -49,8 +49,8 @@ module "api_cluster_asg" {
   user_data             = "${module.api_userdata.rendered}"
   vpc_id                = "${module.vpc_api.vpc_id}"
 
-  asg_desired = "4"
-  asg_max     = "8"
+  asg_desired = "3"
+  asg_max     = "6"
 
   image_id      = "${data.aws_ami.stable_coreos.id}"
   instance_type = "t2.xlarge"
