@@ -14,7 +14,7 @@ ROOT = subprocess.check_output([
 
 
 def fprint(*args, **kwargs):
-    if kwargs['file'] == sys.stderr:
+    if kwargs.get('file') == sys.stderr:
         kwargs['file'] = sys.stderr.flush()
     else:
         kwargs['file'] = sys.stdout.flush()
