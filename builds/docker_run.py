@@ -70,8 +70,8 @@ if __name__ == '__main__':
         cmd += ['--volume', '/var/run/docker.sock:/var/run/docker.sock']
 
     if namespace.share_sbt_dirs:
-        cmd += ['--volume', '~/.sbt:/root/.sbt']
-        cmd += ['--volume', '~/.ivy2:/root/.ivy2']
+        cmd += ['--volume', '%s/.sbt:/root/.sbt' % os.environ['HOME']]
+        cmd += ['--volume', '%s/.ivy2:/root/.ivy2' % os.environ['HOME']]
 
     if additional_args[0] == '--':
         additional_args = additional_args[1:]
