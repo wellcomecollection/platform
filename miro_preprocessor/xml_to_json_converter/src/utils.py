@@ -62,7 +62,7 @@ def fix_miro_xml_entities(xml_string):
     TODO: Process these properly (what do they contain in the original Miro?)
     """
     bad_values = {
-        b'\x1b', b'\x7f', b'\x1f', b'\x14',
+        b'\x13', b'\x14', b'\x18', b'\x19', b'\x1b', b'\x1f', b'\x7f'
     }
     for v in bad_values:
         xml_string = xml_string.replace(v, b'_')
