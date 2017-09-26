@@ -103,7 +103,11 @@ def make_decision(changed_files, task, action):
         print('*** Reasons to %s for this change:' % action)
         for r in reasons:
             print('***   - %s' % r)
-        sys.exit(1)
+        return True
     else:
         print('*** No reasons to %s for this change!' % action)
-        sys.exit(0)
+        return False
+
+
+def make(task):
+    subprocess.check_call(['make', task])
