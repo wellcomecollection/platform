@@ -51,7 +51,7 @@ templates = 'wordpress,s3,prismic'
     url = 'https://wellcomecollection.files.wordpress.com/%s'
 
     [[s3]]
-    url = 'http://s3-eu-west-1.amazonaws.com/miro-images-public/%s'
+    url = 'http://s3-eu-west-1.amazonaws.com/wellcomecollection-miro-images-public/%s'
 
     [[prismic]]
     url = 'https://prismic-io.s3.amazonaws.com/wellcomecollection/%s'
