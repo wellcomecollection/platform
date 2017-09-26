@@ -1,6 +1,5 @@
 module "lambda_schedule_reindexer" {
-  source     = "../../terraform/lambda"
-  source_dir = "${path.module}/target"
+  source = "../../terraform/lambda"
 
   name        = "schedule_reindexer"
   description = "Schedules the reindexer based on the ReindexerTracker table"
@@ -15,6 +14,7 @@ module "lambda_schedule_reindexer" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/schedule_reindexer.zip"
 }
 
 module "trigger_reindexer_lambda" {
