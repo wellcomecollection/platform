@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-This script builds a deployment ZIP for every Lambda in the repository,
-and uploads it to Amazon S3.  It handles copying in the common lib, and
-installing any necessary dependencies.
+Build a deployment ZIP for a Lambda, and upload it to Amazon S3.
+
+Usage:
+  publish_lambda_zip.py <PATH> --bucket=<BUCKET> --key=<KEY>
+  publish_lambda_zip.py -h | --help
+
+Options:
+  <PATH>                Path to the source code for the Lambda
+  --bucket=<BUCKET>     Name of the Amazon S3 bucket
+  --key=<KEY>           Key for the upload ZIP file
+
 """
 
 import os
@@ -13,6 +21,7 @@ import tempfile
 import zipfile
 
 import boto3
+import docopt
 
 
 ROOT = subprocess.check_output([
@@ -76,42 +85,20 @@ def build_lambda_local(path, name):
     return create_zip(target, os.path.join(ZIP_DIR, name))
 
 
-def upload_zip_to_s3(client, filename):
+if __name__ == '__main__':
+    args = docopt.docopt(__doc__)
+
+    path = args['<PATH>']
+    key = args['--key']
+    bucket = args['--bucket']
+
+    client = boto3.client('s3')
+    name = os.path.basename(key) + '.zip'
+    filename = build_lambda_local(path=path, name=name)
+
     print(f'*** Uploading {filename} to S3')
     client.upload_file(
-        Bucket='platform-infra',
+        Bucket=bucket,
         Filename=filename,
-        Key=f'lambdas/{os.path.basename(filename)}'
+        Key=key
     )
-
-
-def find_lambdas():
-    """
-    Finds all the Lambdas in the repository.  This is:
-
-    *   Any directory in $ROOT/lambdas that isn't a __pycache__ or the
-        common lib
-    *   Any directory elsewhere in root whose name ends with '.l' or '.L'
-
-    """
-    for p in os.listdir(os.path.join(ROOT, 'lambdas')):
-        path = os.path.join(ROOT, 'lambdas', p)
-        if not os.path.isdir(path) or p.startswith(('.', '__pycache__', 'common')):
-            continue
-        yield os.path.join(path, 'src'), os.path.basename(path)
-
-    for root, dirnames, _ in os.walk(ROOT):
-        if root.startswith(os.path.join(ROOT, 'lambdas')):
-            continue
-        for d in dirnames:
-            if d.endswith(('.l', '.L', '.λ')):
-                safe_name = d.replace('.l', '').replace('.L', '').replace('.λ', '')
-                yield os.path.join(root, d), safe_name
-
-
-if __name__ == '__main__':
-    client = boto3.client('s3')
-
-    for path, name in find_lambdas():
-        filename = build_lambda_local(path=path, name=name)
-        upload_zip_to_s3(client=client, filename=filename)
