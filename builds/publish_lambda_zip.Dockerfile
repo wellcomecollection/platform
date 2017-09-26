@@ -8,6 +8,7 @@ RUN apk add git python3
 RUN pip3 install boto3 docopt
 
 COPY publish_lambda_zip.py /publish_lambda_zip.py
+COPY tooling.py /tooling.py
 
 VOLUME /repo
 WORKDIR /repo
