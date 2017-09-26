@@ -4,9 +4,9 @@ module "lambda_update_ecs_service_size" {
   source      = "../../terraform/lambda"
   name        = "update_ecs_service_size"
   description = "Update the desired count of an ECS service"
-  source_dir  = "${path.module}/target"
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/update_ecs_service_size.zip"
 }
 
 module "trigger_update_ecs_service_size" {

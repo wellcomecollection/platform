@@ -3,7 +3,6 @@ module "lambda_update_service_list" {
   name        = "update_service_list"
   description = "Publish ECS service status summary to S3"
   timeout     = 10
-  source_dir  = "${path.module}/target"
 
   environment_variables = {
     BUCKET_NAME     = "${var.bucket_dashboard_id}"
@@ -12,6 +11,7 @@ module "lambda_update_service_list" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/update_service_list.zip"
 }
 
 module "trigger_update_service_list" {
