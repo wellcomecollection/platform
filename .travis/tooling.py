@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import sys
 
 
 # Root of the Git repository
@@ -13,7 +14,10 @@ ROOT = subprocess.check_output([
 
 
 def fprint(*args, **kwargs):
-    kwargs['flush'] = True
+    if kwargs['file'] == sys.stderr:
+        kwargs['file'] = sys.stderr.flush()
+    else:
+        kwargs['file'] = sys.stdout.flush()
     print(*args, **kwargs)
 
 
