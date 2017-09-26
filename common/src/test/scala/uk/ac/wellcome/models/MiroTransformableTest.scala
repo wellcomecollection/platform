@@ -177,13 +177,6 @@ class MiroTransformableTest
     with Matchers
     with MiroTransformableWrapper {
 
-  it("should throw an error if there isn't a title field") {
-    assertTransformWorkFails(data = """{
-      "image_cleared": "Y",
-      "image_copyright_cleared": "Y"
-    }""")
-  }
-
   it("should pass through the Miro identifier") {
     val MiroID = "M0000005_test"
     val work = transformWork(
@@ -198,7 +191,8 @@ class MiroTransformableTest
     val innopacID = s"${sierraNumber}2"
     val miroID = "V0000832_test"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A bouncing bundle of bison",
         "image_innopac_id": "$innopacID"
       """,
@@ -210,19 +204,14 @@ class MiroTransformableTest
     )
   }
 
-  it("should reject records with an invalid INNOPAC ID") {
-    assertTransformWorkFails(buildJSONForWork(
-      """"image_innopac_id": "this is neither numeric nor the right length""""
-    ))
-  }
-
   it("should have an empty list if no image_creator field is present") {
     val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
     work.creators shouldBe List[Agent]()
   }
 
   it("should have an empty list if the image_creator field is empty") {
-    val work = transformWork(data = s"""
+    val work = transformWork(data =
+      s"""
       "image_title": "A box of beavers",
       "image_creator": []
     """)
@@ -232,7 +221,8 @@ class MiroTransformableTest
   it("should pass through a single value in the image_creator field") {
     val creator = "Researcher Rosie"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A radio for a racoon",
         "image_creator": ["$creator"]
       """
@@ -245,14 +235,15 @@ class MiroTransformableTest
     val creator2 = "Cat-wrangler Carol"
     val creator3 = "Dog-owner Derek"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A book about badgers",
         "image_creator": ["$creator1", "$creator2", "$creator3"]
       """
     )
     work.creators shouldBe List(Agent(creator1),
-                                Agent(creator2),
-                                Agent(creator3))
+      Agent(creator2),
+      Agent(creator3))
   }
 
   it("should have no description if no image_image_desc field is present") {
@@ -263,7 +254,8 @@ class MiroTransformableTest
   it("should pass through the value of the description field") {
     val description = "A new novel about northern narwhals in November"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A note on narwhals",
         "image_image_desc": "$description"
       """
@@ -274,7 +266,8 @@ class MiroTransformableTest
   it("should pass through the value of the creation date on V records") {
     val date = "1820-1848"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A description of a dalmation",
         "image_image_desc": "A description of a dalmation with dots",
         "image_artwork_date": "$date"
@@ -287,7 +280,8 @@ class MiroTransformableTest
   it("should not pass through the value of the creation date on non-V records") {
     val date = "1820-1848"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A diary about a dodo",
         "image_artwork_date": "$date"
       """,
@@ -300,7 +294,8 @@ class MiroTransformableTest
     "should use the image_creator_secondary field if image_creator is not present") {
     val secondaryCreator = "Scientist Sarah"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "Samples of a shark",
         "image_secondary_creator": ["$secondaryCreator"]
       """
@@ -313,13 +308,14 @@ class MiroTransformableTest
     val secondaryCreator1 = "Gamekeeper Gordon"
     val secondaryCreator2 = "Herpetologist Harriet"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "Verdant and vivid",
         "image_secondary_creator": ["$secondaryCreator1", "$secondaryCreator2"]
       """
     )
     work.creators shouldBe List(Agent(secondaryCreator1),
-                                Agent(secondaryCreator2))
+      Agent(secondaryCreator2))
   }
 
   it(
@@ -327,7 +323,8 @@ class MiroTransformableTest
     val creator = "Mycologist Morgan"
     val secondaryCreator = "Manufacturer Mel"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "Musings on mice",
         "image_creator": ["$creator"],
         "image_secondary_creator": ["$secondaryCreator"]
@@ -339,7 +336,8 @@ class MiroTransformableTest
   it("should pass through the lettering field if available") {
     val lettering = "A lifelong lament for lemurs"
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "Lemurs and lemons",
         "image_supp_lettering": "$lettering"
       """
@@ -350,7 +348,8 @@ class MiroTransformableTest
   it(
     "should correct HTML-encoded entities in the input JSON") {
     val work = transformWork(
-      data = s"""
+      data =
+        s"""
         "image_title": "A caf&#233; for cats",
         "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"]
       """
@@ -359,65 +358,7 @@ class MiroTransformableTest
     work.title shouldBe "A café for cats"
     work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
   }
-
-  it("should not pass through records with a missing image_cleared field") {
-    assertTransformWorkFails(data = """{
-      "image_title": "Missives on museums",
-      "image_copyright_cleared": "Y"
-    }""")
-  }
-
-  it(
-    "should not pass through records with a missing image_copyright_cleared field") {
-    assertTransformWorkFails(
-      data = """{
-      "image_title": "A caricature of cats",
-      "image_cleared": "Y"
-    }""")
-  }
-
-  it(
-    "should not pass through records with missing image_cleared and missing image_copyright_cleared field") {
-    assertTransformWorkFails(
-      data = """{
-      "image_title": "Drawings of dromedaries"
-    }""")
-  }
-
-  it(
-    "should not pass through records with an image_cleared value that isn't 'Y'") {
-    assertTransformWorkFails(
-      data = """{
-      "image_title": "Confidential colourings of crocodiles",
-      "image_cleared": "N",
-      "image_copyright_cleared": "Y"
-    }""")
-  }
-
-  it(
-    "should not pass through records with image_copyright_cleared field that isn't 'Y'") {
-    assertTransformWorkFails(
-      data = """{
-      "image_title": "Proprietary poetry about porcupines",
-      "image_cleared": "Y",
-      "image_copyright_cleared": "N"
-    }""")
-  }
-
-  it(
-    "should not pass through records that are missing technical metadata") {
-    assertTransformWorkFails(
-      data = """{
-        "image_title": "Touching a toxic tree is truly tragic",
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        "image_tech_file_size": []
-      }"""
-    )
-  }
 }
-
-
 
 /** Tests that the Miro transformer extracts the "subjects" field correctly.
  *
@@ -568,60 +509,5 @@ class MiroTransformableGenresTest
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
-  }
-}
-
-
-
-class MiroTransformableThumbnailTest
-    extends FunSpec
-    with Matchers
-    with MiroTransformableWrapper {
-
-  it("should reject records that don't have usage data") {
-    assertTransformWorkFails(
-      data = """{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        "image_tech_file_size": ["1000000"],
-        "image_title": "Understand that using this umbrella is unauthorised"
-      }"""
-    )
-  }
-
-  it("should reject records with unrecognised usage data") {
-    assertTransformWorkFails(
-      data = """{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        "image_tech_file_size": ["1000000"],
-        "image_use_restrictions": "Poetic license, normally reserved for playwrights and not suitable in practice",
-        "image_title": "Plagiarised poetry by a penguin"
-      }"""
-    )
-  }
-
-  it("should create a thumbnail if the license is present") {
-    transformRecordAndCheckThumbnail(
-      data = s"""
-        "image_use_restrictions": "CC-BY-NC",
-        "image_title": "A thumb-sized tarantula"
-      """,
-      MiroID = "MT0001234",
-      expectedThumbnail = Location(
-        locationType = "thumbnail-image",
-        url = Some("https://iiif.wellcomecollection.org/image/MT0001234.jpg/full/300,/0/default.jpg"),
-        license = License_CCBYNC
-      )
-    )
-  }
-
-  private def transformRecordAndCheckThumbnail(
-    data: String,
-    MiroID: String,
-    expectedThumbnail: Location
-  ) = {
-    val transformedWork = transformWork(data = data, MiroID = MiroID)
-    transformedWork.thumbnail.get shouldBe expectedThumbnail
   }
 }
