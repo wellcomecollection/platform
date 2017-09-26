@@ -1,8 +1,6 @@
 package uk.ac.wellcome.test.utils
 
 import org.scalatest.{Matchers, Suite}
-
-import scala.util.Try
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 
@@ -37,18 +35,4 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get
   }
-
-  def assertTransformWorkFails(
-      data: String,
-      miroID: String = "M0000001",
-      miroCollection: String = "TestCollection"
-    ) = {
-      val miroTransformable = MiroTransformable(
-        MiroID = miroID,
-        MiroCollection = miroCollection,
-        data = data
-      )
-
-      miroTransformable.transform.isSuccess shouldBe false
-    }
 }
