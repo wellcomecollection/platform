@@ -8,9 +8,9 @@ module "cloudformation_stack" {
   asg_name              = "${var.asg_name}"
   launch_config_name    = "${module.launch_config.name}"
 
-  asg_max = "2"
+  asg_max     = "2"
   asg_desired = "1"
-  asg_min = "0"
+  asg_min     = "0"
 }
 
 module "launch_config" {
