@@ -50,6 +50,10 @@ def parse_args():
         '--dind', dest='docker_in_docker', action='store_const', const=True,
         help='Whether to allow this container to run Docker'
     )
+    parser.add_argument(
+        '--sbt', dest='share_sbt_dirs', action='store_const', const=True,
+        help='Whether to share sbt directories with the running container'
+    )
     return parser.parse_known_args()
 
 
@@ -64,6 +68,10 @@ if __name__ == '__main__':
     if namespace.docker_in_docker:
         cmd += ['--volume', '%s:/repo' % ROOT]
         cmd += ['--volume', '/var/run/docker.sock:/var/run/docker.sock']
+
+    if namespace.share_sbt_dirs:
+        cmd += ['--volume', '~/.sbt:/root/.sbt']
+        cmd += ['--volume', '~/.ivy2:/root/.ivy2']
 
     if additional_args[0] == '--':
         additional_args = additional_args[1:]

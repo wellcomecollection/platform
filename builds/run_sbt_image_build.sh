@@ -5,7 +5,5 @@ set -o nounset
 
 ROOT=$(git rev-parse --show-toplevel)
 
-$ROOT/builds/docker_run.py --dind -- \
-	--volume ~/.sbt:/root/.sbt \
-  --volume ~/.ivy2:/root/.ivy2 \
+$ROOT/builds/docker_run.py --dind --sbt -- \
   sbt_image_builder --project="$PROJECT"
