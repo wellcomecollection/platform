@@ -57,7 +57,10 @@ class Rules:
         return self._normalise_string(self.collection) == self._normalise_string(f"images-{collection_name}")
 
     def _search(self, regex, key):
-        return re.search(regex, self._get_normalised(key))
+        if self._get_normalised(key) is None:
+            return None
+        else:
+            return re.search(regex, self._get_normalised(key))
 
     def _is_blank(self, key):
         return self._get_normalised(key) is None
@@ -145,7 +148,8 @@ class Rules:
             self.is_copyright_cleared and \
             self.is_cleared and \
             (not self.has_use_restrictions) and \
-            (not self.use_restrictions_are_none)
+            (not self.use_restrictions_are_none) and \
+            (self._get("image_innopac_id") is None or self.is_innopac_id_8_digits)
 
     @property
     def is_cold_store(self):
