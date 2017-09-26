@@ -2,10 +2,6 @@ package uk.ac.wellcome.models.transformable.miro
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.apache.commons.lang.StringEscapeUtils
-import uk.ac.wellcome.models.transformable.{
-  FieldIssues,
-  ShouldNotTransformException
-}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.{Failure, Success, Try}
@@ -31,7 +27,7 @@ case class MiroTransformableData(
   @JsonProperty("image_innopac_id") innopacID: Option[String]
 )
 
-case object MiroTransformableData extends MiroTransformChecks {
+case object MiroTransformableData {
 
   /* Some of the Miro fields were imported from Sierra, and had special
    * characters replaced by HTML-encoded entities when copied across.
@@ -57,16 +53,6 @@ case object MiroTransformableData extends MiroTransformChecks {
         case Success(miroData) => miroData
         case Failure(e) => throw e
       }
-
-    val failures: List[FieldIssues] =
-      checks
-        .map(_(miroTransformableData))
-        .filter(_.nonEmpty)
-        .flatten
-
-    if (failures.nonEmpty) {
-      throw ShouldNotTransformException(failures)
-    }
 
     miroTransformableData
   }

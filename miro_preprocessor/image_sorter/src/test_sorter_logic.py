@@ -115,9 +115,9 @@ def test_is_digital_library(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
 ])
 def test_is_catalogue_api(collection, image_data):
     """These examples all end up in the Digital Library."""
@@ -129,6 +129,11 @@ def test_is_catalogue_api(collection, image_data):
                           image_cleared="N"),
     collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
                           image_cleared=None),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None,
+                          image_cleared=None),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
 ])
 def test_is_no_decision(collection, image_data):
     """These examples all end up in the Digital Library."""
