@@ -41,4 +41,4 @@ lambdas-terraform-apply: $(ROOT)/.docker/terraform_ci
 	terraform_ci:latest
 
 
-.PHONY: lambdas-test lambdas-terraform--plan lambdas-terraform-apply
+.PHONY: lambdas-publish lambdas-test lambdas-terraform--plan lambdas-terraform-apply

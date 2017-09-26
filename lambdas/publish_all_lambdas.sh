@@ -12,5 +12,5 @@ do
   $ROOT/builds/docker_run.py --aws -- \
     --volume $ROOT:/repo \
     publish_lambda_zip \
-    "lambdas/$name/src" --key="lambdas/$name" --bucket="$INFRA_BUCKET"
+    "lambdas/$name/src" --key="lambdas/lambdas/$name.zip" --bucket="$INFRA_BUCKET"
 done
