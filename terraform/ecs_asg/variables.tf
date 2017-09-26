@@ -67,3 +67,11 @@ variable "alarm_topic_arn" {
 variable "image_id" {
   description = "ID of the AMI to use on the instances"
 }
+
+variable "use_spot" {
+  default = 0
+}
+
+variable spot_price {
+  default = "0"
+}
