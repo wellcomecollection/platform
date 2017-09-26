@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "wellcomecollection-miro-images-public" {
     ]
 
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["*"]
     }
   }
