@@ -1,8 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-import os
 import subprocess
-import sys
 
 from tooling import changed_files, make_decision
 
@@ -29,10 +27,9 @@ def should_publish(task, travis_event_type):
         return False
 
     subprocess.check_call(['git', 'fetch', 'origin'])
-    changed_files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
 
     return make_decision(
-        changed_files=changed_files,
+        changed_files=changed_files(os.environ['TRAVIS_COMMIT_RANGE']),
         task=task,
         action='run a publish'
     )
