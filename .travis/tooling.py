@@ -93,6 +93,8 @@ def _are_there_docker_relevant_changes(changed_files, task):
     image = task.split('-')[0]
     if any(f.startswith('docker/%s/' % image) for f in changed_files):
         return ['Changes to docker/%s' % image]
+    else:
+        return []
 
 
 def make_decision(changed_files, task, action):
