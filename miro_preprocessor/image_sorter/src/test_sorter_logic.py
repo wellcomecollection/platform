@@ -129,6 +129,8 @@ def test_is_catalogue_api(collection, image_data):
                           image_cleared="N"),
     collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
                           image_cleared=None),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None,
+                          image_cleared=None),
 ])
 def test_is_no_decision(collection, image_data):
     """These examples all end up in the Digital Library."""
