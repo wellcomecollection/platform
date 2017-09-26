@@ -14,6 +14,7 @@ Options:
 
 """
 
+import hashlib
 import os
 import shutil
 import subprocess
@@ -21,7 +22,10 @@ import tempfile
 import zipfile
 
 import boto3
+from botocore.exceptions import ClientError
 import docopt
+
+from tooling import compare_zip_files
 
 
 ROOT = subprocess.check_output([
@@ -42,6 +46,8 @@ def create_zip(src, dst):
         abs_src = os.path.abspath(src)
         for dirname, subdirs, files in os.walk(src):
             for filename in files:
+                if filename.startswith('.'):
+                    continue
                 absname = os.path.abspath(os.path.join(dirname, filename))
                 arcname = absname[len(abs_src) + 1:]
                 zf.write(absname, arcname)
@@ -58,7 +64,7 @@ def build_lambda_local(path, name):
     print(f'*** Building Lambda ZIP for {name}')
     target = tempfile.mkdtemp()
 
-    # Copy all the associated files to the Lambda directory
+    # Copy all the associated files to the Lambda directory.
     for f in os.listdir(path):
         if not f.startswith(('test_', '.', 'requirements.txt')):
             shutil.copy(
@@ -84,6 +90,32 @@ def build_lambda_local(path, name):
     return create_zip(target, os.path.join(ZIP_DIR, name))
 
 
+def upload_to_s3(client, filename, bucket, key):
+    print(f'*** Uploading {filename} to S3')
+
+    # Download the file from S3, and compare it to the locally built ZIP.
+    # If they have the same contents, we can save uploading to S3 (and skip
+    # deploying a new version).
+    _, tempname = tempfile.mkstemp()
+    try:
+        client.download_file(Bucket=bucket, Key=key, Filename=tempname)
+    except ClientError as err:
+        if err.response['Error']['Code'] == '404':
+            print('*** No existing S3 object found, so uploading new file')
+        else:
+            raise
+    else:
+        if compare_zip_files(filename, tempname):
+            print('*** Uploaded ZIP is already the most up-to-date code')
+        else:
+            print('*** Differences between uploaded and built ZIP, re-uploading')
+            client.upload_file(
+                Bucket=bucket,
+                Filename=filename,
+                Key=key
+            )
+
+
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
@@ -95,9 +127,4 @@ if __name__ == '__main__':
     name = os.path.basename(key)
     filename = build_lambda_local(path=path, name=name)
 
-    print(f'*** Uploading {filename} to S3')
-    client.upload_file(
-        Bucket=bucket,
-        Filename=filename,
-        Key=key
-    )
+    upload_to_s3(client=client, filename=filename, bucket=bucket, key=key)
