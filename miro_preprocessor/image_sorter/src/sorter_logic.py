@@ -57,7 +57,10 @@ class Rules:
         return self._normalise_string(self.collection) == self._normalise_string(f"images-{collection_name}")
 
     def _search(self, regex, key):
-        return re.search(regex, self._get_normalised(key))
+        if self._get_normalised(key) is None:
+            return None
+        else:
+            return re.search(regex, self._get_normalised(key))
 
     def _is_blank(self, key):
         return self._get_normalised(key) is None
@@ -85,7 +88,7 @@ class Rules:
 
     @property
     def is_innopac_id_8_digits(self):
-        return self._get("image_innopac_id") is not None and self._search(r"[0-9]{7}[0-9xX]{1}", "image_innopac_id") is not None
+        return self._search(r"[0-9]{7}[0-9xX]{1}", "image_innopac_id") is not None
 
     @property
     def is_title_blank(self):
