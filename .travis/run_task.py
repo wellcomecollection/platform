@@ -21,7 +21,6 @@ less important on master where results are transient.
 """
 
 import os
-import subprocess
 import sys
 
 from should_publish import should_publish
@@ -33,7 +32,6 @@ def main():
     travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
     task = os.environ['TASK']
 
-
     if should_run_tests(task=task, travis_event_type=travis_event_type):
         print("*** We're going to run tests")
     else:
@@ -41,7 +39,6 @@ def main():
         return 0
 
     make(task)
-
 
     if should_publish(task=task, travis_event_type=travis_event_type):
         print("*** We're going to run the publish task")
@@ -54,7 +51,7 @@ def main():
     elif task == 'miro_preprocessor-test':
         make('miro_preprocessor-publish')
     else:
-        task = TASK.replace('build', 'deploy').replace('test', 'deploy')
+        task = task.replace('build', 'deploy').replace('test', 'deploy')
         make(task)
 
     return 0
