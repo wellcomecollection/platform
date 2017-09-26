@@ -145,7 +145,8 @@ class Rules:
             self.is_copyright_cleared and \
             self.is_cleared and \
             (not self.has_use_restrictions) and \
-            (not self.use_restrictions_are_none)
+            (not self.use_restrictions_are_none) and \
+            (self._get("image_innopac_id") is None or self.is_innopac_id_8_digits)
 
     @property
     def is_cold_store(self):
