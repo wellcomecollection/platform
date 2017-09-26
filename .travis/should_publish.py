@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-from tooling import changed_files, make_decision
+from tooling import changed_files, fprint as print, make_decision
 
 
 def should_publish(task, travis_event_type):

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from tooling import changed_files, make_decision
+from tooling import changed_files, fprint as print, make_decision
 
 
 def should_run_tests(task, travis_event_type):
