@@ -1,17 +1,17 @@
 output "instance_sg_id" {
-  value = "${aws_security_group.instance_sg.id}"
+  value = "${module.launch_config.instance_sg_id}"
 }
 
 output "loadbalancer_sg_https_id" {
-  value = "${aws_security_group.https.id}"
+  value = "${module.launch_config.loadbalancer_sg_https_id}"
 }
 
 output "loadbalancer_sg_http_id" {
-  value = "${aws_security_group.http.id}"
+  value = "${module.launch_config.loadbalancer_sg_http_id}"
 }
 
 output "asg_name" {
-  value = "${aws_cloudformation_stack.ecs_asg.outputs["AsgName"]}"
+  value = "${module.cloudformation_stack.asg_name}"
 }
 
 output "asg_desired" {
