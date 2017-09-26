@@ -13,6 +13,14 @@ ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
 
+def fprint(*args, **kwargs):
+    if kwargs.get('file') == sys.stderr:
+        kwargs['file'] = sys.stderr.flush()
+    else:
+        kwargs['file'] = sys.stdout.flush()
+    print(*args, **kwargs)
+
+
 def changed_files(*args):
     """
     Returns a set of changed files in a given commit range.
@@ -93,6 +101,8 @@ def _are_there_docker_relevant_changes(changed_files, task):
     image = task.split('-')[0]
     if any(f.startswith('docker/%s/' % image) for f in changed_files):
         return ['Changes to docker/%s' % image]
+    else:
+        return []
 
 
 def make_decision(changed_files, task, action):
@@ -103,7 +113,11 @@ def make_decision(changed_files, task, action):
         print('*** Reasons to %s for this change:' % action)
         for r in reasons:
             print('***   - %s' % r)
-        sys.exit(1)
+        return True
     else:
         print('*** No reasons to %s for this change!' % action)
-        sys.exit(0)
+        return False
+
+
+def make(task):
+    subprocess.check_call(['make', task])
