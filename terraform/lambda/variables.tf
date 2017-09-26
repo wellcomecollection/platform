@@ -6,15 +6,11 @@ variable "description" {
   description = "Description of the Lambda function"
 }
 
-variable "source_dir" {
-  description = "Path to the directory containing the Lambda source code"
-}
-
 variable "environment_variables" {
   description = "Environment variables to pass to the Lambda"
   type        = "map"
 
-  # environment cannot be emtpy so we need to pass at least one value
+  # environment cannot be empty so we need to pass at least one value
   default = {
     EMPTY_VARIABLE = ""
   }
@@ -27,4 +23,13 @@ variable "timeout" {
 
 variable "alarm_topic_arn" {
   description = "ARN of the topic where to send notification for lambda errors"
+}
+
+variable "s3_bucket" {
+  description = "The S3 bucket containing the function's deployment package"
+  default     = "platform-infra"
+}
+
+variable "s3_key" {
+  description = "The S3 key of the function's deployment package"
 }

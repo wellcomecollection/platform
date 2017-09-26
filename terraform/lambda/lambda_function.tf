@@ -1,18 +1,20 @@
-data "archive_file" "lambda_zip_file" {
-  type        = "zip"
-  source_dir  = "${var.source_dir}"
-  output_path = "${var.source_dir}/../${var.name}.zip"
+data "aws_s3_bucket_object" "package" {
+  bucket = "${var.s3_bucket}"
+  key    = "${var.s3_key}"
 }
 
 resource "aws_lambda_function" "lambda_function" {
-  description      = "${var.description}"
-  filename         = "${data.archive_file.lambda_zip_file.output_path}"
-  function_name    = "${var.name}"
-  role             = "${aws_iam_role.iam_role.arn}"
-  handler          = "${var.name}.main"
-  runtime          = "python3.6"
-  source_code_hash = "${data.archive_file.lambda_zip_file.output_base64sha256}"
-  timeout          = "${var.timeout}"
+  description   = "${var.description}"
+  function_name = "${var.name}"
+
+  s3_bucket         = "${var.s3_bucket}"
+  s3_key            = "${var.s3_key}"
+  s3_object_version = "${data.aws_s3_bucket_object.package.version_id}"
+
+  role    = "${aws_iam_role.iam_role.arn}"
+  handler = "${var.name}.main"
+  runtime = "python3.6"
+  timeout = "${var.timeout}"
 
   dead_letter_config = {
     target_arn = "${aws_sqs_queue.lambda_dlq.arn}"
