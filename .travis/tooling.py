@@ -13,7 +13,8 @@ ROOT = subprocess.check_output([
 
 
 def fprint(*args, **kwargs):
-    print(*args, **kwargs, flush=True)
+    kwargs['flush'] = True
+    print(*args, **kwargs)
 
 
 def changed_files(*args):
