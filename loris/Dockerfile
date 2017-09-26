@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-RUN apt-get update
+RUN apt-get update --fix-missing
 
 RUN apt-get install -y python python-pip python-setuptools python-dev \
     uwsgi uwsgi-plugin-python

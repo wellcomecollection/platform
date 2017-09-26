@@ -1,0 +1,16 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+     - "8888:8888"
+    environment:
+      - INFRA_BUCKET=platform-infra
+      - CONFIG_KEY=config/prod/loris.ini
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
+  nginx:
+    image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_loris:deafb2075ec0eccf9f7f9034722f6465e07b7203"
+    ports:
+     - "9000:9000"
