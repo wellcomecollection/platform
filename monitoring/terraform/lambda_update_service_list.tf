@@ -7,7 +7,7 @@ module "lambda_update_service_list" {
   timeout     = 10
 
   environment_variables = {
-    BUCKET_NAME     = "${data.terraform_remote_state.platform.bucket_dashboard_id}"
+    BUCKET_NAME     = "${aws_s3_bucket.dashboard.id}"
     OBJECT_KEY      = "data/ecs_status.json"
     ASSUMABLE_ROLES = "${join(",", var.dashboard_assumable_roles)}"
   }

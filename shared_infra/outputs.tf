@@ -26,10 +26,6 @@ output "dynamodb_table_reindex_tracker_stream_arn" {
   value = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
 }
 
-output "load_test_results_arn" {
-  value = "${module.load_test_results.arn}"
-}
-
 output "ec2_terminating_topic_arn" {
   value = "${module.ec2_terminating_topic.arn}"
 }
@@ -76,14 +72,6 @@ output "bucket_infra_arn" {
 
 output "bucket_infra_id" {
   value = "${aws_s3_bucket.infra.id}"
-}
-
-output "bucket_dashboard_arn" {
-  value = "${aws_s3_bucket.dashboard.arn}"
-}
-
-output "bucket_dashboard_id" {
-  value = "${aws_s3_bucket.dashboard.id}"
 }
 
 output "bucket_miro_data_id" {
@@ -147,4 +135,8 @@ output "ecs_ami_id" {
 
 output "bucket_alb_logs_id" {
   value = "${aws_s3_bucket.alb-logs.id}"
+}
+
+output "aws_ecs_cluster_services_id" {
+  value = "${aws_ecs_cluster.services.id}"
 }
