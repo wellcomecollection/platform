@@ -1,6 +1,6 @@
 FROM hashicorp/terraform:0.10.6
 
-RUN apk update && apk add git python3
+RUN apk update && apk add git jq python3
 RUN pip3 install awscli
 
 COPY plan.sh /app/plan.sh
