@@ -169,6 +169,6 @@ output "api_alb_cloudwatch_id" {
   value = "${module.api_alb.cloudwatch_id}"
 }
 
-output "api_userdata_efs_mount_directory" {
-  value = "${module.api_userdata.efs_mount_directory}"
+output "ecs_ami_id" {
+  value = "${data.aws_ami.stable_coreos.id}"
 }
