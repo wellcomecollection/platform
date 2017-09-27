@@ -53,7 +53,7 @@ monitoring_lambdas-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 monitoring_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in gatling_to_cloudwatch post_to_slack;							\
+	for l in gatling_to_cloudwatch post_to_slack update_service_list;		\
 	do																		\
 		$(ROOT)/builds/docker_run.py --aws -- 								\
 			--volume $(ROOT):/repo 											\

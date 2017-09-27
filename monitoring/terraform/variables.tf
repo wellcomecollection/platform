@@ -10,3 +10,8 @@ variable "slack_webhook" {
 variable "bitly_access_token" {
   description = "Access token for the bit.ly API"
 }
+
+variable "dashboard_assumable_roles" {
+  description = "Assumable roles for the ECS dashboard"
+  type        = "list"
+}

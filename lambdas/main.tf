@@ -103,22 +103,6 @@ module "update_ecs_service_size" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "update_service_list" {
-  source = "./update_service_list"
-
-  dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
-
-  every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
-
-  iam_policy_document_describe_services_json = "${data.aws_iam_policy_document.describe_services.json}"
-
-  bucket_dashboard_id  = "${data.terraform_remote_state.platform.bucket_dashboard_id}"
-  bucket_dashboard_arn = "${data.terraform_remote_state.platform.bucket_dashboard_arn}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "update_task_for_config_change" {
   source = "./update_task_for_config_change"
 
