@@ -1,6 +1,9 @@
-import boto3
+# -*- encoding: utf-8 -*-
+
 from datetime import datetime
 import json
+
+import boto3
 
 
 def _send_metric(client, namespace, metric_data):

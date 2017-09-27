@@ -31,14 +31,6 @@ module "ecs_ec2_instance_tagger" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "gatling_to_cloudwatch" {
-  source = "./gatling_to_cloudwatch"
-
-  load_test_results_arn = "${data.terraform_remote_state.platform.load_test_results_arn}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "notify_old_deploys" {
   source = "./notify_old_deploys"
 

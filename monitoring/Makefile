@@ -53,10 +53,11 @@ monitoring_lambdas-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 monitoring_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in post_to_slack; do						\
-		$(ROOT)/builds/docker_run.py --aws -- 		\
-			--volume $(ROOT):/repo 					\
-			publish_lambda_zip 						\
+	for l in gatling_to_cloudwatch post_to_slack;							\
+	do																		\
+		$(ROOT)/builds/docker_run.py --aws -- 								\
+			--volume $(ROOT):/repo 											\
+			publish_lambda_zip 												\
 			"monitoring/$$l" --key="lambdas/monitoring/$$l.zip" --bucket="$(INFRA_BUCKET)"; \
 	done
 
