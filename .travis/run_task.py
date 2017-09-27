@@ -52,6 +52,8 @@ def main():
         make('loris-publish')
     elif task == 'miro_preprocessor-test':
         make('miro_preprocessor-publish')
+    elif task == 'lambdas-test':
+        make('lambdas-publish')
     else:
         task = task.replace('build', 'deploy').replace('test', 'deploy')
         make(task)
