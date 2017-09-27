@@ -108,13 +108,15 @@ def upload_to_s3(client, filename, bucket, key):
     else:
         if compare_zip_files(filename, tempname):
             print('*** Uploaded ZIP is already the most up-to-date code')
+            return
         else:
             print('*** Differences between uploaded and built ZIP, re-uploading')
-            client.upload_file(
-                Bucket=bucket,
-                Filename=filename,
-                Key=key
-            )
+
+    client.upload_file(
+        Bucket=bucket,
+        Filename=filename,
+        Key=key
+    )
 
 
 if __name__ == '__main__':
