@@ -1,9 +1,7 @@
 FROM ubuntu:14.04
 
-RUN apt-get update
-RUN apt-get install --yes
-
-RUN apt-get install -y python python-pip python-setuptools python-dev \
+RUN apt-get update && \
+    apt-get install --yes python python-pip python-setuptools python-dev \
     uwsgi uwsgi-plugin-python
 
 RUN pip install awscli
