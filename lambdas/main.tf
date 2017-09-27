@@ -25,8 +25,8 @@ module "ecs_ec2_instance_tagger" {
   bucket_infra_id  = "${data.terraform_remote_state.platform.bucket_infra_id}"
   bucket_infra_arn = "${data.terraform_remote_state.platform.bucket_infra_arn}"
 
-  ecs_container_instance_state_change_name = "${data.terraform_remote_state.platform.ecs_container_instance_state_change_name}"
-  ecs_container_instance_state_change_arn  = "${data.terraform_remote_state.platform.ecs_container_instance_state_change_arn}"
+  ecs_container_instance_state_change_name = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.name}"
+  ecs_container_instance_state_change_arn  = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.arn}"
 
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }

@@ -26,14 +26,6 @@ output "dynamodb_table_reindex_tracker_stream_arn" {
   value = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
 }
 
-output "ecs_container_instance_state_change_arn" {
-  value = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.arn}"
-}
-
-output "ecs_container_instance_state_change_name" {
-  value = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.name}"
-}
-
 output "load_test_results_arn" {
   value = "${module.load_test_results.arn}"
 }
