@@ -1,12 +1,12 @@
 module "lambda_drain_ecs_container_instance" {
-  source     = "../../terraform/lambda"
-  source_dir = "${path.module}/target"
+  source = "../../terraform/lambda"
 
   name        = "drain_ecs_container_instance"
   description = "Drain ECS container instance when the corresponding EC2 instance is being terminated"
   timeout     = 60
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/drain_ecs_container_instance.zip"
 }
 
 module "trigger_drain_ecs_container_instance" {

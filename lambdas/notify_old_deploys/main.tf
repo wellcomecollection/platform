@@ -1,8 +1,7 @@
 # Lambda for publishing out of date deployments to SNS
 
 module "lambda_notify_old_deploys" {
-  source     = "../../terraform/lambda"
-  source_dir = "${path.module}/target"
+  source = "../../terraform/lambda"
 
   name        = "notify_old_deploys"
   description = "For publishing out of date deployments to SNS"
@@ -14,6 +13,7 @@ module "lambda_notify_old_deploys" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/notify_old_deploys.zip"
 }
 
 module "trigger_notify_old_deploys" {
