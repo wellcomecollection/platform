@@ -64,7 +64,7 @@ def build_lambda_local(path, name):
 
     # Copy all the associated files to the Lambda directory.
     for f in os.listdir(path):
-        if not f.startswith(('test_', '.', 'requirements.txt')):
+        if not f.startswith(('test_', '.', 'requirements.txt', '__pycache__')):
             shutil.copy(
                 src=os.path.join(path, f),
                 dst=os.path.join(target, os.path.basename(f))
