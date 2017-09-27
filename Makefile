@@ -79,31 +79,29 @@ nginx-deploy:	\
 	nginx-deploy-grafana
 
 
+.docker/sbt_test:
+	./builds/build_ci_docker_image.py \
+		--project=sbt_test \
+		--dir=builds \
+		--file=builds/sbt_test.Dockerfile
 
-sbt-test-common:
-	sbt 'project common' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-common: .docker/sbt_test
+	PROJECT=common ./builds/test_sbt_project.sh
 
-sbt-test-api:
-	sbt 'project api' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-api: .docker/sbt_test
+	PROJECT=api ./builds/test_sbt_project.sh
 
-sbt-test-id_minter:
-	sbt 'project id_minter' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-id_minter: .docker/sbt_test
+	PROJECT=id_minter ./builds/test_sbt_project.sh
 
-sbt-test-ingestor:
-	sbt 'project ingestor' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-ingestor: .docker/sbt_test
+	PROJECT=ingestor ./builds/test_sbt_project.sh
 
-sbt-test-reindexer:
-	sbt 'project reindexer' ';dockerComposeUp;test;dockerComposeStop'
+sbt-test-reindexer: .docker/sbt_test
+	PROJECT=reindexer ./builds/test_sbt_project.sh
 
-sbt-test-transformer:
-	sbt 'project transformer' ';dockerComposeUp;test;dockerComposeStop'
-
-sbt-test: \
-	sbt-test-api	\
-	sbt-test-id_minter \
-	sbt-test-ingestor   \
-	sbt-test-reindexer	\
-	sbt-test-transformer
+sbt-test-transformer: .docker/sbt_test
+	PROJECT=transformer ./builds/test_sbt_project.sh
 
 
 .docker/sbt_image_builder:
@@ -126,13 +124,6 @@ sbt-build-reindexer: .docker/sbt_image_builder
 
 sbt-build-transformer: .docker/sbt_image_builder
 	PROJECT=transformer ./builds/run_sbt_image_build.sh
-
-sbt-build: \
-	sbt-build-api	\
-	sbt-build-id_minter \
-	sbt-build-ingestor   \
-	sbt-build-reindexer	\
-	sbt-build-transformer
 
 
 

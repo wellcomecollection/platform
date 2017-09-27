@@ -1,4 +1,4 @@
-language: scala
+language: sh
 
 sudo: required
 
@@ -10,56 +10,6 @@ dist: trusty
 branches:
   only:
     - master
-
-# Because we have a lot of Travis jobs, we try to avoid running unnecessary
-# tests and deploys.  This speeds up our builds, minimises deployment churn,
-# and reduces contention on our Travis infrastructure.
-#
-# How we decide what to build:
-#
-#                   | Relevant changes | No relevant changes
-#    ---------------+------------------+---------------------
-#     pull request  | Run tests        | Don't run tests
-#                   | Don't deploy     | Don't deploy
-#    ---------------+------------------+---------------------
-#     master        | Run tests        | Run tests
-#                   | Deploy to AWS    | Don't deploy
-#
-# We always run tests on master so we get consistent build results, that's
-# less important on master where results are transient.
-#
-# Where appropriate, we use 'exit 0' to bail out of the build early.
-# See "How does this work?" in the Travis docs for why this works.
-# https://docs.travis-ci.com/user/customizing-the-build/
-
-before_install:
-
-  - |
-    SHOULD_RUN_TESTS=true
-    if [[ "$TRAVIS_EVENT_TYPE" == "pull_request" ]]; then
-      python3 .travis/should_run_pr_tests.py
-      if (( $? == 0 )); then
-        SHOULD_RUN_TESTS=false
-      fi
-    fi
-
-  - |
-    SHOULD_DEPLOY=false
-    if [[ "$TRAVIS_EVENT_TYPE" == "push" ]]; then
-      python3 .travis/should_deploy_from_master.py
-      if (( $? == 1 )); then
-        SHOULD_DEPLOY=true
-      fi
-    fi
-
-  - |
-    if [[ "$SHOULD_RUN_TESTS" == "false" ]]; then
-      echo "SHOULD_RUN_TESTS is false, so exiting before running tests"
-      exit 0
-    fi
-
-  - echo "SHOULD_RUN_TESTS = $SHOULD_RUN_TESTS"
-  - echo "SHOULD_DEPLOY    = $SHOULD_DEPLOY"
 
 install:
   # We need this for the Elasticsearch Docker container to start
@@ -81,7 +31,7 @@ cache:
     - "/home/travis/docker/"
 
 script:
-  - .travis/run_task.sh $TASK $SHOULD_DEPLOY
+  - .travis/run_task.py
 
 env:
   global:
