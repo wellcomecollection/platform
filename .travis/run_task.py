@@ -49,14 +49,18 @@ def main():
         return 0
 
     if task == 'loris-build':
-        make('loris-publish')
+        publish_task = 'loris-publish'
     elif task == 'miro_preprocessor-test':
-        make('miro_preprocessor-publish')
+        publish_task = 'miro_preprocessor-publish'
     elif task == 'lambdas-test':
-        make('lambdas-publish')
+        publish_task = 'lambdas-publish'
     else:
-        task = task.replace('build', 'deploy').replace('test', 'deploy')
-        make(task)
+        publish_task = (task
+            .replace('build', 'deploy')
+            .replace('test', 'deploy')
+        )
+
+    make(publish_task)
 
     return 0
 
