@@ -35,7 +35,7 @@ You'll then have a development version of Loris running at <http://localhost:888
 
 ## Testing Loris with nginx
 
-In order to test Loris with it's nginx config this project provides a `docker-compose.yml`
+In order to test Loris with its nginx config this project provides a `docker-compose.yml`
 
 This can be run using (substituting env variables as necessary):
 
@@ -58,8 +58,8 @@ You can then query the local version of loris (in order to avoid redirects it's 
 
 ```sh
 curl \
-    -A ELB-HealthChecker/2.0 \
-    -v \
-    -L \
-    http://localhost:9000/image/V0017087.jpg/full/300,/0/default.jpg > default.jpg
+    --user-agent ELB-HealthChecker/2.0 \
+    --verbose \
+    --output default.jpg \
+    http://localhost:9000/image/V0017087.jpg/full/300,/0/default.jpg
 ```
