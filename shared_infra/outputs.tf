@@ -172,3 +172,7 @@ output "api_alb_cloudwatch_id" {
 output "ecs_ami_id" {
   value = "${data.aws_ami.stable_coreos.id}"
 }
+
+output "bucket_alb_logs_id" {
+  value = "${aws_s3_bucket.alb-logs.id}"
+}
