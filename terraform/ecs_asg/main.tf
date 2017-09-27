@@ -25,4 +25,5 @@ module "launch_config" {
   use_spot              = "${var.use_spot}"
   spot_price            = "${var.spot_price}"
   instance_type         = "${var.instance_type}"
+  admin_cidr_ingress    = "${var.admin_cidr_ingress}"
 }
