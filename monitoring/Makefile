@@ -61,11 +61,6 @@ monitoring_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
 	done
 
 
-monitoring-test: monitoring_lambdas-test
-
-monitoring-publish: monitoring_lambdas-publish
-
-
 .PHONY: monitoring-terraform-plan monitoring-terraform-apply \
 	ecs_dashboard-deploy \
 	gatling-build gatling-deploy \
