@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 ROOT="$(git rev-parse --show-toplevel)"
 RELEASE_DIR="$ROOT/.releases"
