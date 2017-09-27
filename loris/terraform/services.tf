@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "../terraform/services"
+  source             = "../../terraform/services"
   name               = "loris"
   cluster_id         = "${data.terraform_remote_state.platform.ecs_cluster_api_id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
@@ -58,7 +58,7 @@ module "loris-2" {
   deployment_maximum_percent         = "200"
 
   volume_name      = "loris"
-  volume_host_path = "${data.terraform_remote_state.platform.api_userdata_efs_mount_directory}/loris"
+  volume_host_path = "${module.loris_userdata.efs_mount_directory}/loris"
   container_path   = "/mnt/loris"
 
   loadbalancer_cloudwatch_id   = "${data.terraform_remote_state.platform.api_alb_cloudwatch_id}"
