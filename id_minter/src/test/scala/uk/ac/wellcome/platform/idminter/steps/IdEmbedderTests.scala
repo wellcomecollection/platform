@@ -25,7 +25,7 @@ class IdEmbedderTests
     with PatienceConfiguration {
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
     timeout = scaled(Span(1, Seconds)),
-    interval = scaled(Span(15, Millis))
+    interval = scaled(Span(25, Millis))
   )
 
   private val metricsSender =

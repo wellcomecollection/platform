@@ -64,9 +64,16 @@ format-terraform: $(ROOT)/.docker/terraform_ci
 		--volume $$(pwd):/data \
 		--env OP=fmt terraform_ci
 
-## Format scala in the current directory
-format-scala:
-	sbt scalafmt
+$(ROOT)/.docker/scalafmt:
+	$(ROOT)/builds/build_ci_docker_image.py \
+		--project=scalafmt \
+		--dir=builds \
+		--file=builds/scalafmt.Dockerfile
+
+format-scala: $(ROOT)/.docker/scalafmt
+	$(ROOT)/builds/docker_run.py --sbt -- \
+		--volume $(ROOT):/repo \
+		scalafmt
 
 
 clean:

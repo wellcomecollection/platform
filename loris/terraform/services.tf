@@ -40,13 +40,13 @@ module "loris-2" {
   vpc_id             = "${data.terraform_remote_state.platform.vpc_api_id}"
   app_uri            = "${module.ecr_loris.repository_url}:${var.release_ids["loris"]}"
   nginx_uri          = "${module.ecr_nginx_loris.repository_url}:${var.release_ids["nginx_loris"]}"
-  listener_https_arn = "${data.terraform_remote_state.platform.api_alb_listener_https_arn}"
-  listener_http_arn  = "${data.terraform_remote_state.platform.api_alb_listener_http_arn}"
+  listener_https_arn = "${module.loris_alb.listener_https_arn}"
+  listener_http_arn  = "${module.loris_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
   config_key         = "config/${var.build_env}/loris.ini"
   path_pattern       = "/image*"
   healthcheck_path   = "/image/"
-  alb_priority       = "110"
+  alb_priority       = "100"
   host_name          = "iiif-2.wellcomecollection.org"
 
   cpu    = 1792
