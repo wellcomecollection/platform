@@ -4,7 +4,6 @@ import errno
 import os
 import shlex
 import subprocess
-import zipfile
 
 
 # Root of the Git repository
