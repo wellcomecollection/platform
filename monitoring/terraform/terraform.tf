@@ -18,3 +18,13 @@ data "terraform_remote_state" "platform" {
     region = "eu-west-1"
   }
 }
+
+data "terraform_remote_state" "lambdas" {
+  backend = "s3"
+
+  config {
+    bucket = "platform-infra"
+    key    = "platform-lambda.tfstate"
+    region = "eu-west-1"
+  }
+}
