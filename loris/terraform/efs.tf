@@ -1,5 +1,5 @@
 module "loris_efs" {
-  name                         = "loris_cache_2"
+  name                         = "loris_cache"
   source                       = "../../terraform/efs"
   vpc_id                       = "${data.terraform_remote_state.platform.vpc_api_id}"
   subnets                      = "${data.terraform_remote_state.platform.vpc_api_subnets}"
