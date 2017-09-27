@@ -24,7 +24,6 @@ def should_publish(task, travis_event_type):
     if task in [
         'check-format',
         'sbt-test-common',
-        'lambdas-test',
     ]:
         print('*** Task %s does not have a publish step' % task)
         return False
