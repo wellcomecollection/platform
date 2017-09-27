@@ -14,7 +14,6 @@ Options:
 
 """
 
-import hashlib
 import os
 import shutil
 import subprocess
@@ -51,7 +50,6 @@ def create_zip(src, dst):
                 absname = os.path.abspath(os.path.join(dirname, filename))
                 arcname = absname[len(abs_src) + 1:]
                 zf.write(absname, arcname)
-    return dst
 
 
 def build_lambda_local(path, name):
@@ -87,7 +85,10 @@ def build_lambda_local(path, name):
 
     print(f'*** Creating zip bundle for {name}')
     os.makedirs(ZIP_DIR, exist_ok=True)
-    return create_zip(target, os.path.join(ZIP_DIR, name))
+    src = target
+    dst = os.path.join(ZIP_DIR, name)
+    create_zip(src=src, dst=dst)
+    return dst
 
 
 def upload_to_s3(client, filename, bucket, key):

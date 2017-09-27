@@ -71,11 +71,12 @@ def compare_zip_files(zf1, zf2):
 
     This ignores file metadata (e.g. creation time), and just looks at
     filenames and CRC-32 checksums.
+
+    This requires zipcmp to be available.
     """
-    with zipfile.ZipFile(zf1) as zf:
-        info1 = {f.filename: f.CRC for f in zf.infolist()}
-
-    with zipfile.ZipFile(zf2) as zf:
-        info2 = {f.filename: f.CRC for f in zf.infolist()}
-
-    return info1 == info2
+    try:
+        subprocess.check_call(['zipcmp', '-q', zf1, zf2])
+    except subprocess.CalledProcessError:
+        return False
+    else:
+        return True
