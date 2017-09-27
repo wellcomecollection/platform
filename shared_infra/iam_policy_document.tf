@@ -112,22 +112,23 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
-      "ecr:GetAuthorizationToken",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-
-  statement {
-    actions = [
       "s3:PutObject",
       "s3:GetObject",
     ]
 
     resources = [
+      "${aws_s3_bucket.infra.arn}/lambdas/*",
       "${aws_s3_bucket.infra.arn}/releases/*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "sns:ListTopic",
+    ]
+
+    resources = [
+      "*",
     ]
   }
 }

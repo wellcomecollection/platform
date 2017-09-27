@@ -1,8 +1,7 @@
 # Lambda for posting on slack when an alarm is triggered
 
 module "lambda_post_to_slack" {
-  source     = "../../terraform/lambda"
-  source_dir = "${path.module}/target"
+  source = "../../terraform/lambda"
 
   name        = "post_to_slack"
   description = "Post notification to Slack when an alarm is triggered"
@@ -13,6 +12,7 @@ module "lambda_post_to_slack" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/post_to_slack.zip"
 }
 
 module "trigger_post_to_slack_dlqs_not_empty" {

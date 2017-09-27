@@ -1,6 +1,5 @@
 module "lambda_dynamo_to_sns" {
-  source     = "../../terraform/lambda"
-  source_dir = "${path.module}/target"
+  source = "../../terraform/lambda"
 
   name        = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
@@ -15,6 +14,7 @@ module "lambda_dynamo_to_sns" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/dynamo_to_sns.zip"
 }
 
 module "trigger_dynamo_to_sns_miro" {

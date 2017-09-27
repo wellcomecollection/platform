@@ -1,8 +1,7 @@
 # Lambda for tagging EC2 instances with ECS cluster/container instance id
 
 module "lambda_ecs_ec2_instance_tagger" {
-  source     = "../../terraform/lambda"
-  source_dir = "${path.module}/target"
+  source = "../../terraform/lambda"
 
   name        = "ecs_ec2_instance_tagger"
   description = "Tag an EC2 instance with ECS cluster/container instance id"
@@ -14,6 +13,7 @@ module "lambda_ecs_ec2_instance_tagger" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/lambdas/ecs_ec2_instance_tagger.zip"
 }
 
 module "trigger_ecs_ec2_instance_tagger" {

@@ -21,7 +21,10 @@ import tempfile
 import zipfile
 
 import boto3
+from botocore.exceptions import ClientError
 import docopt
+
+from tooling import compare_zip_files
 
 
 ROOT = subprocess.check_output([
@@ -38,15 +41,15 @@ def create_zip(src, dst):
 
     Based on https://stackoverflow.com/a/14569017/1558022
     """
-    name = f'{dst}.zip'
-    with zipfile.ZipFile(name, 'w', zipfile.ZIP_DEFLATED) as zf:
+    with zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as zf:
         abs_src = os.path.abspath(src)
         for dirname, subdirs, files in os.walk(src):
             for filename in files:
+                if filename.startswith('.'):
+                    continue
                 absname = os.path.abspath(os.path.join(dirname, filename))
                 arcname = absname[len(abs_src) + 1:]
                 zf.write(absname, arcname)
-    return name
 
 
 def build_lambda_local(path, name):
@@ -59,7 +62,7 @@ def build_lambda_local(path, name):
     print(f'*** Building Lambda ZIP for {name}')
     target = tempfile.mkdtemp()
 
-    # Copy all the associated files to the Lambda directory
+    # Copy all the associated files to the Lambda directory.
     for f in os.listdir(path):
         if not f.startswith(('test_', '.', 'requirements.txt')):
             shutil.copy(
@@ -75,14 +78,43 @@ def build_lambda_local(path, name):
     if os.path.exists(reqs_file):
         print(f'*** Installing dependencies from requirements.txt')
         subprocess.check_call([
-            'pip', 'install', '--requirement', reqs_file, '--target', target
+            'pip3', 'install', '--requirement', reqs_file, '--target', target
         ])
     else:
         print(f'*** No requirements.txt found')
 
     print(f'*** Creating zip bundle for {name}')
     os.makedirs(ZIP_DIR, exist_ok=True)
-    return create_zip(target, os.path.join(ZIP_DIR, name))
+    src = target
+    dst = os.path.join(ZIP_DIR, name)
+    create_zip(src=src, dst=dst)
+    return dst
+
+
+def upload_to_s3(client, filename, bucket, key):
+    print(f'*** Uploading {filename} to S3')
+
+    # Download the file from S3, and compare it to the locally built ZIP.
+    # If they have the same contents, we can save uploading to S3 (and skip
+    # deploying a new version).
+    _, tempname = tempfile.mkstemp()
+    try:
+        client.download_file(Bucket=bucket, Key=key, Filename=tempname)
+    except ClientError as err:
+        if err.response['Error']['Code'] == '404':
+            print('*** No existing S3 object found, so uploading new file')
+        else:
+            raise
+    else:
+        if compare_zip_files(filename, tempname):
+            print('*** Uploaded ZIP is already the most up-to-date code')
+        else:
+            print('*** Differences between uploaded and built ZIP, re-uploading')
+            client.upload_file(
+                Bucket=bucket,
+                Filename=filename,
+                Key=key
+            )
 
 
 if __name__ == '__main__':
@@ -93,12 +125,7 @@ if __name__ == '__main__':
     bucket = args['--bucket']
 
     client = boto3.client('s3')
-    name = os.path.basename(key) + '.zip'
+    name = os.path.basename(key)
     filename = build_lambda_local(path=path, name=name)
 
-    print(f'*** Uploading {filename} to S3')
-    client.upload_file(
-        Bucket=bucket,
-        Filename=filename,
-        Key=key
-    )
+    upload_to_s3(client=client, filename=filename, bucket=bucket, key=key)
