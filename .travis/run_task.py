@@ -54,6 +54,8 @@ def main():
         publish_task = 'miro_preprocessor-publish'
     elif task == 'lambdas-test':
         publish_task = 'lambdas-publish'
+    elif task == 'monitoring_lambdas-test':
+        publish_task = 'monitoring_lambdas-publish'
     else:
         publish_task = task.replace('build', 'deploy')
         publish_task = task.replace('test', 'deploy')

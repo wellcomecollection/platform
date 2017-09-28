@@ -64,7 +64,7 @@ def build_lambda_local(path, name):
 
     # Copy all the associated files to the Lambda directory.
     for f in os.listdir(path):
-        if not f.startswith(('test_', '.', 'requirements.txt')):
+        if not f.startswith(('test_', '.', 'requirements.txt', '__pycache__')):
             shutil.copy(
                 src=os.path.join(path, f),
                 dst=os.path.join(target, os.path.basename(f))
@@ -108,13 +108,15 @@ def upload_to_s3(client, filename, bucket, key):
     else:
         if compare_zip_files(filename, tempname):
             print('*** Uploaded ZIP is already the most up-to-date code')
+            return
         else:
             print('*** Differences between uploaded and built ZIP, re-uploading')
-            client.upload_file(
-                Bucket=bucket,
-                Filename=filename,
-                Key=key
-            )
+
+    client.upload_file(
+        Bucket=bucket,
+        Filename=filename,
+        Key=key
+    )
 
 
 if __name__ == '__main__':

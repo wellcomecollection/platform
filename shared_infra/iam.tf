@@ -43,11 +43,6 @@ module "ecs_cache_cleaner_iam" {
   name   = "cache_cleaner"
 }
 
-module "ecs_gatling_iam" {
-  source = "../terraform/ecs_iam"
-  name   = "gatling"
-}
-
 module "batch_tif_conversion_iam" {
   source = "../terraform/ecs_iam"
   name   = "tif_conversion"

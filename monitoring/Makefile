@@ -1,5 +1,6 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 MONITORING = $(ROOT)/monitoring
+INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
@@ -44,6 +45,25 @@ gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=gatling ./builds/publish_service.sh
 
 
+monitoring_lambdas-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+		-v $(MONITORING):/data \
+		-e OP=test \
+		-e FIND_MATCH_PATHS='./*' \
+		python3.6_ci:latest
+
+monitoring_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
+	for l in gatling_to_cloudwatch post_to_slack update_service_list;		\
+	do																		\
+		$(ROOT)/builds/docker_run.py --aws -- 								\
+			--volume $(ROOT):/repo 											\
+			publish_lambda_zip 												\
+			"monitoring/$$l" --key="lambdas/monitoring/$$l.zip" --bucket="$(INFRA_BUCKET)"; \
+	done
+
+
 .PHONY: monitoring-terraform-plan monitoring-terraform-apply \
 	ecs_dashboard-deploy \
-	gatling-build gatling-deploy
+	gatling-build gatling-deploy \
+	monitoring_lambdas-test monitoring_lambdas-publish \
+	monitoring-test monitoring-publish

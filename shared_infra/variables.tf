@@ -26,11 +26,6 @@ variable "infra_bucket" {
   default     = "platform-infra"
 }
 
-variable "dash_bucket" {
-  description = "S3 bucket hosting our dashboard"
-  default     = "wellcome-platform-dash"
-}
-
 variable "build_env" {
   description = "Build environment (prod, dev, stage, ...)"
   default     = "prod"
