@@ -24,7 +24,7 @@ class IdEmbedderTests
     with JsonTestUtil
     with PatienceConfiguration {
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(1, Seconds)),
+    timeout = scaled(Span(3, Seconds)),
     interval = scaled(Span(50, Millis))
   )
 
