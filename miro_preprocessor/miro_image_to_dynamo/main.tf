@@ -1,7 +1,8 @@
 module "miro_image_to_dynamo_lambda" {
-  source          = "../../terraform/lambda"
-  source_dir      = "${path.module}/target"
-  description     = "Push image json into DynamoDB"
+  source = "../../terraform/lambda"
+  s3_key = "lambdas/miro_preprocessor/miro_image_to_dynamo.zip"
+
+  description     = "Push image JSON into DynamoDB"
   name            = "miro_image_to_dynamo"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
