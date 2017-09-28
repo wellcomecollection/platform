@@ -208,3 +208,15 @@ data "aws_iam_policy_document" "s3_upload_to_to_elasticdump_directory" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "s3_upload_to_to_elasticdump_directory" {
+  statement {
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.transfer.arn}/r3store/*",
+    ]
+  }
+}
