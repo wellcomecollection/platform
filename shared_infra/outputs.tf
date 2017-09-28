@@ -1,15 +1,3 @@
-output "terraform_apply_topic" {
-  value = "${module.terminal_failure_alarm.arn}"
-}
-
-output "mets_ingest_arn" {
-  value = "${aws_s3_bucket.mets-ingest.arn}"
-}
-
-output "wellcomecollection_mets_ingest_arn" {
-  value = "${aws_s3_bucket.wellcomecollection-mets-ingest.arn}"
-}
-
 output "miro_table_stream_arn" {
   value = "${aws_dynamodb_table.miro_table.stream_arn}"
 }
@@ -93,10 +81,6 @@ output "bucket_miro_images_sync_id" {
 # This should be removed when they are superseded by bucket_wellcomecollectio_miro_images_public_* below
 output "bucket_miro_images_public_arn" {
   value = "${aws_s3_bucket.miro_images_public.arn}"
-}
-
-output "bucket_miro_images_public_id" {
-  value = "${aws_s3_bucket.miro_images_public.id}"
 }
 
 output "bucket_wellcomecollectio_miro_images_public_arn" {
