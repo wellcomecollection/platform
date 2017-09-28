@@ -21,13 +21,22 @@ class ReindexTrackerServiceTest
     "calm" -> DynamoConfig("applicationName", "streamArn", calmDataTableName))
 
   it(
-    "should return the index in need of reindexing"
+    "should return the index and shard in need of reindexing"
   ) {
-    val expectedReindex = Reindex("CalmData", "default", 2, 1)
-    val anotherReindex = Reindex("MiroData", "default", 2, 1)
+    val expectedTable = "CalmData"
+    val expectedShard = "new_shard"
+
+    val anotherTable = "MiroData"
+    val anotherShard = "another_shard"
+
+    val expectedReindex = Reindex(expectedTable, expectedShard, 2, 1)
+    val anotherReindex = Reindex(anotherTable, anotherShard, 2, 1)
+
     val reindexList = List(
       expectedReindex,
-      anotherReindex
+      Reindex(expectedTable, anotherShard, 2, 1),
+      Reindex(anotherTable, expectedShard, 2, 1),
+      Reindex(anotherTable, anotherShard, 2, 1)
     )
 
     reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
@@ -35,8 +44,8 @@ class ReindexTrackerServiceTest
     val reindexTrackerService = new ReindexTrackerService(
       dynamoDbClient,
       dynamoConfigs,
-      "CalmData",
-      reindexShard
+      expectedTable,
+      expectedShard
     )
 
     val op = reindexTrackerService.getIndexForReindex
