@@ -127,7 +127,7 @@ class ReindexServiceTest
 
     whenReady(reindexService.run) { _ =>
       Scanamo.get[Reindex](dynamoDbClient)(reindexTableName)(
-        'TableName -> "CalmData") shouldBe Some(
+        'TableName -> "CalmData" and 'ReindexShard -> reindexShard) shouldBe Some(
         Right(reindex.copy(CurrentVersion = requestedVersion)))
     }
 
