@@ -19,7 +19,7 @@ class ReindexTrackerService @Inject()(
   dynamoConfigs: Map[String, DynamoConfig],
   @Flag("reindex.target.tableName") reindexTargetTableName: String,
   @Flag("reindex.target.reindexShard") targetReindexShard: String
- ) extends Logging {
+) extends Logging {
 
   private val reindexTrackerTableConfigId = "reindex"
 
@@ -44,7 +44,8 @@ class ReindexTrackerService @Inject()(
 
   def getIndexForReindex: Future[Option[Reindex]] =
     getIndices.map {
-      case Reindex(tableName, reindexShard, requested, current) if requested > current => {
+      case Reindex(tableName, reindexShard, requested, current)
+          if requested > current => {
         info(
           s"ReindexTracker found out of sync table: $tableName, ($requested > $current)")
         Some(Reindex(tableName, reindexShard, requested, current))
