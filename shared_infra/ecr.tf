@@ -45,11 +45,6 @@ module "ecr_repository_cache_cleaner" {
   name   = "cache_cleaner"
 }
 
-module "ecr_repository_gatling" {
-  source = "../terraform/ecr"
-  name   = "gatling"
-}
-
 module "ecr_repository_tif-metadata" {
   source = "../terraform/ecr"
   name   = "tif-metadata"

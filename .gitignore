@@ -6,8 +6,7 @@
 terraform.plan
 .terraform
 shared_infra/.releases
-terraform.tfvars
-release_ids.tfvars
+*.tfvars
 terraform.tfstate.backup
 .releases
 .docker

@@ -9,19 +9,3 @@ resource "aws_cloudwatch_event_rule" "every_minute" {
   description         = "Fires every minute"
   schedule_expression = "rate(1 minute)"
 }
-
-resource "aws_cloudwatch_event_rule" "ecs_container_instance_state_change" {
-  name        = "ecs_container_instance_state_change"
-  description = "Capture any ECS Container Instance state change"
-
-  event_pattern = <<PATTERN
-{
-  "source": [
-    "aws.ecs"
-  ],
-  "detail-type": [
-    "ECS Container Instance State Change"
-  ]
-}
-PATTERN
-}
