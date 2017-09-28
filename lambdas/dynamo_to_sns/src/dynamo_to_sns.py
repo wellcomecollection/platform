@@ -7,20 +7,31 @@ the event to an SNS topic
 import json
 import os
 
-from utils.dynamo_utils import DynamoEvent
+from utils.dynamo_utils import DynamoImageFactory
 from utils.sns_utils import publish_sns_message
+
+
+def _publish_image(record, topic_arn):
+    new_image = record.simplified_new_image
+
+    print(new_image)
+
+    if new_image is not None:
+        publish_sns_message(topic_arn, new_image)
 
 
 def main(event, _):
     print(f'Received event:\n{event}')
 
-    dynamo_event = DynamoEvent(event)
     stream_topic_map = json.loads(os.environ["STREAM_TOPIC_MAP"])
 
-    topic_arn = stream_topic_map[dynamo_event.source_arn]
-    new_image = dynamo_event.simplified_new_image
+    for record in DynamoImageFactory.create(event):
 
-    print(new_image)
+        print(record)
 
-    if new_image is not None:
-        publish_sns_message(topic_arn, dynamo_event.simplified_new_image)
+        topic_arn = stream_topic_map[record.source_arn]
+
+        _publish_image(
+            record,
+            topic_arn
+        )

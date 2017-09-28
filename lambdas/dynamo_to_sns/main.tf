@@ -20,6 +20,8 @@ module "lambda_dynamo_to_sns" {
 module "trigger_dynamo_to_sns_miro" {
   source = "../../terraform/lambda/trigger_dynamo"
 
+  batch_size = "10"
+
   stream_arn    = "${var.miro_table_stream_arn}"
   function_arn  = "${module.lambda_dynamo_to_sns.arn}"
   function_role = "${module.lambda_dynamo_to_sns.role_name}"
