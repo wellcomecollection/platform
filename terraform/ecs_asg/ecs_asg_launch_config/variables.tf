@@ -28,11 +28,9 @@ variable "user_data" {
 
 variable "public_ip" {
   description = "Associate public IP address?"
-  default     = true
 }
 
 variable "admin_cidr_ingress" {
-  default     = "0.0.0.0/0"
   description = "CIDR for SSH access to EC2 instances"
 }
 
@@ -42,3 +40,12 @@ variable "random_key" {
 
 variable "use_spot" {}
 variable spot_price {}
+
+
+variable "ebs_device_name" {
+}
+
+variable "ebs_size" {
+}
+variable "ebs_volume_type" {
+}

@@ -28,7 +28,7 @@ module "loris_cluster_asg_ebs" {
   vpc_id                = "${data.terraform_remote_state.platform.vpc_api_id}"
 
   asg_desired = "1"
-  asg_max     = "1"
+  asg_max     = "2"
 
   image_id      = "${data.terraform_remote_state.platform.ecs_ami_id}"
   instance_type = "t2.xlarge"
@@ -36,4 +36,8 @@ module "loris_cluster_asg_ebs" {
   sns_topic_arn         = "${data.terraform_remote_state.platform.ec2_terminating_topic_arn}"
   publish_to_sns_policy = "${data.terraform_remote_state.platform.ec2_terminating_topic_publish_policy}"
   alarm_topic_arn       = "${data.terraform_remote_state.platform.ec2_instance_terminating_for_too_long_alarm_arn}"
+
+  ebs_device_name = "/dev/xvdb"
+  ebs_size = 60
+
 }

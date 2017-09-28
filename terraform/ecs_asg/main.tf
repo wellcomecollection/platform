@@ -26,4 +26,8 @@ module "launch_config" {
   spot_price            = "${var.spot_price}"
   instance_type         = "${var.instance_type}"
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
+  ebs_device_name = "${var.ebs_device_name}"
+  ebs_size = "${var.ebs_size}"
+  public_ip = "${var.public_ip}"
+  ebs_volume_type = "${var.ebs_volume_type}"
 }

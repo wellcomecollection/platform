@@ -75,3 +75,14 @@ variable "use_spot" {
 variable spot_price {
   default = "0"
 }
+
+variable "ebs_device_name" {
+  default = ""
+}
+
+variable "ebs_size" {
+  default = 8
+}
+variable "ebs_volume_type" {
+  default = "standard"
+}
