@@ -3,11 +3,6 @@ module "ecs_services_iam" {
   name   = "services"
 }
 
-module "ecs_monitoring_iam" {
-  source = "../terraform/ecs_iam"
-  name   = "monitoring"
-}
-
 module "ecs_miro_reindexer_iam" {
   source = "../terraform/ecs_iam"
   name   = "miro_reindexer"
@@ -31,11 +26,6 @@ module "ecs_ingestor_iam" {
 module "ecs_api_iam" {
   source = "../terraform/ecs_iam"
   name   = "api"
-}
-
-module "ecs_grafana_iam" {
-  source = "../terraform/ecs_iam"
-  name   = "grafana"
 }
 
 module "ecs_cache_cleaner_iam" {
