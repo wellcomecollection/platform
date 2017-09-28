@@ -1,6 +1,7 @@
 module "image_sorter_lambda" {
-  source          = "../../terraform/lambda"
-  source_dir      = "${path.module}/target"
+  source = "../../terraform/lambda"
+  s3_key = "lambdas/miro_preprocessor/image_sorter.zip"
+
   description     = "Sort blobs of Miro image metadata into different SNS topics"
   name            = "miro_image_sorter"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"

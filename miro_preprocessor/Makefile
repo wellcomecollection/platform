@@ -1,4 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
+INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 include $(ROOT)/shared.Makefile
@@ -75,6 +76,15 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" \
 		python3.6_ci:latest
 
+miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
+	for l in image_sorter miro_copy_s3_asset miro_image_to_dynamo xml_to_json_run_task; \
+	do																		\
+		$(ROOT)/builds/docker_run.py --aws -- 								\
+			--volume $(ROOT):/repo 											\
+			publish_lambda_zip 												\
+			"miro_preprocessor/$$l/src" --key="lambdas/miro_preprocessor/$$l.zip" --bucket="$(INFRA_BUCKET)"; \
+	done
+
 
 miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test miro_copy_s3_asset-test
 
@@ -82,10 +92,10 @@ miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo
 
 miro_preprocessor-build: xml_to_json_converter-build miro_preprocessor-build-lambdas
 
-miro_preprocessor-publish: xml_to_json_converter-publish
+miro_preprocessor-publish: xml_to_json_converter-publish miro_preprocessor_lambdas-publish
 
 
-miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci miro_preprocessor-build-lambdas
+miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		-v $(ROOT)/miro_preprocessor:/data \
 		-v $(ROOT)/terraform:/terraform \
