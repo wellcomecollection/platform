@@ -185,18 +185,6 @@ data "aws_iam_policy_document" "miro_images_sync" {
   }
 }
 
-data "aws_iam_policy_document" "s3_tif_derivative" {
-  statement {
-    actions = [
-      "s3:*",
-    ]
-
-    resources = [
-      "arn:aws:s3:::wellcomecollection-tif-derivatives/*",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "s3_read_ingestor_config" {
   statement {
     actions = [
