@@ -48,7 +48,7 @@ class CalmReindexTargetServiceTest
     val expectedCalmTransformableList =
       outOfdateCalmTransformableList.map(_.copy(ReindexVersion = 2))
 
-    val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName, reindexShard, requestedVersion, currentVersion)
 
     calmTransformableList.foreach(
       Scanamo.put(dynamoDbClient)(calmDataTableName))

@@ -55,7 +55,7 @@ class ReindexModuleTest
         reindexTargetService)
     maybeServer = Some(server)
 
-    val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName, reindexShard, requestedVersion, currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     when(reindexTargetService.runReindex(ReindexAttempt(reindex, false, 0)))

@@ -23,10 +23,11 @@ class ReindexTrackerServiceTest
   it(
     "should return the index in need of reindexing"
   ) {
-    val expectedReindex = Reindex("CalmData", 2, 1)
+    val expectedReindex = Reindex("CalmData", "default", 2, 1)
+    val anotherReindex = Reindex("MiroData", "default", 2, 1)
     val reindexList = List(
       expectedReindex,
-      Reindex("MiroData", 1, 1)
+      anotherReindex
     )
 
     reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
@@ -34,7 +35,8 @@ class ReindexTrackerServiceTest
     val reindexTrackerService = new ReindexTrackerService(
       dynamoDbClient,
       dynamoConfigs,
-      "CalmData"
+      "CalmData",
+      reindexShard
     )
 
     val op = reindexTrackerService.getIndexForReindex

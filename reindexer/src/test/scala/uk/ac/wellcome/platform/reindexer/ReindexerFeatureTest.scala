@@ -44,7 +44,7 @@ class ReindexerFeatureTest
     })
 
     val reindexList = List(
-      Reindex(miroDataTableName, requestedVersion, currentVersion)
+      Reindex(miroDataTableName, reindexShard, requestedVersion, currentVersion)
     )
 
     itemsToPut.foreach(Scanamo.put(dynamoDbClient)(miroDataTableName))
