@@ -1,6 +1,7 @@
 module "miro_copy_s3_asset_lambda" {
-  source          = "../../terraform/lambda"
-  source_dir      = "${path.module}/target"
+  source = "../../terraform/lambda"
+  s3_key = "lambdas/miro_preprocessor/miro_copy_s3_asset.zip"
+
   description     = "Copy miro images to another s3 bucket"
   name            = "miro_copy_s3_asset"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
