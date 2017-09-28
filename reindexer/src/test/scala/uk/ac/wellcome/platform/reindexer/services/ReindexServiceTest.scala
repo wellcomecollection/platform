@@ -38,7 +38,8 @@ class ReindexServiceTest
       new ReindexTrackerService(
         dynamoDbClient,
         dynamoConfigs,
-        "CalmData"
+        "CalmData",
+        reindexShard
       ),
       new CalmReindexTargetService(
         dynamoDBClient = dynamoDbClient,
@@ -71,7 +72,7 @@ class ReindexServiceTest
     calmTransformableList.foreach(
       Scanamo.put(dynamoDbClient)(calmDataTableName))
 
-    val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName, reindexShard, requestedVersion, currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexService = createReindexService
@@ -87,7 +88,7 @@ class ReindexServiceTest
   it("should retry while the target reports that there are not updated items") {
     val calmReindexTargetService = mock[CalmReindexTargetService]
 
-    val reindex = Reindex(calmDataTableName, requestedVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName, reindexShard, requestedVersion, currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val calmTransformableList = List(
@@ -117,7 +118,8 @@ class ReindexServiceTest
       new ReindexTrackerService(
         dynamoDbClient,
         dynamoConfigs,
-        "CalmData"
+        "CalmData",
+        reindexShard
       ),
       calmReindexTargetService,
       new MetricsSender("reindexer-tests", mock[AmazonCloudWatch])
@@ -132,7 +134,7 @@ class ReindexServiceTest
   }
 
   it("should report successful when there is no work to do") {
-    val reindex = Reindex(calmDataTableName, currentVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName, reindexShard, currentVersion, currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexService = createReindexService
