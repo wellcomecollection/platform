@@ -15,3 +15,13 @@ variable "dashboard_assumable_roles" {
   description = "Assumable roles for the ECS dashboard"
   type        = "list"
 }
+
+variable "release_ids" {
+  description = "Release tags for platform apps"
+  type        = "map"
+}
+
+variable "dash_bucket" {
+  description = "S3 bucket hosting our dashboard"
+  default     = "wellcome-platform-dash"
+}

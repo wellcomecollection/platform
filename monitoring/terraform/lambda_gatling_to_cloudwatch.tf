@@ -13,5 +13,5 @@ module "trigger_gatling_to_cloudwatch" {
   source               = "../../terraform/lambda/trigger_sns"
   lambda_function_name = "${module.lambda_gatling_to_cloudwatch.function_name}"
   lambda_function_arn  = "${module.lambda_gatling_to_cloudwatch.arn}"
-  sns_trigger_arn      = "${data.terraform_remote_state.platform.load_test_results_arn}"
+  sns_trigger_arn      = "${module.load_test_results.arn}"
 }
