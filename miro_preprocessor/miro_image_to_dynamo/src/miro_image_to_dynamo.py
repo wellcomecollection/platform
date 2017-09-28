@@ -18,7 +18,7 @@ def put_into_dynamodb(dynamodb_client, miro_id, collection, image_data):
                 'S': collection
             },
             'ReindexShard': {
-                'S': 'default'
+                'S': collection
             },
             'ReindexVersion': {
                 'N': str(1)

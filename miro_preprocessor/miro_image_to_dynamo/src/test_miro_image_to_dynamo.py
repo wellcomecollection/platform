@@ -140,5 +140,5 @@ def test_should_insert_the_json_into_dynamo(miro_table):
 
     assert json.loads(dynamodb_response['Item']['data']) == image_data
     assert dynamodb_response['Item']['MiroCollection'] == collection
-    assert dynamodb_response['Item']['ReindexShard'] == "default"
+    assert dynamodb_response['Item']['ReindexShard'] == collection
     assert dynamodb_response['Item']['ReindexVersion'] == 1
