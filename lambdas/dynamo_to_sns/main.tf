@@ -4,6 +4,7 @@ module "lambda_dynamo_to_sns" {
   name        = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
   timeout     = 30
+  memory_size = 256
 
   environment_variables = {
     STREAM_TOPIC_MAP = <<EOF

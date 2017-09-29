@@ -33,3 +33,7 @@ variable "s3_bucket" {
 variable "s3_key" {
   description = "The S3 key of the function's deployment package"
 }
+
+variable "memory_size" {
+  default = 128
+}
