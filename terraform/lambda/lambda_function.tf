@@ -16,6 +16,8 @@ resource "aws_lambda_function" "lambda_function" {
   runtime = "python3.6"
   timeout = "${var.timeout}"
 
+  memory_size = "${var.memory_size}"
+
   dead_letter_config = {
     target_arn = "${aws_sqs_queue.lambda_dlq.arn}"
   }
