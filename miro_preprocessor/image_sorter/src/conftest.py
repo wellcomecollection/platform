@@ -71,7 +71,9 @@ def _create_topic_and_queue(sns_client, sqs_client, name):
 
     sns_client.create_topic(Name=topic_name)
     response = sns_client.list_topics()
-    topic_arn = response["Topics"][0]['TopicArn']
+
+    topics = [topic for topic in response["Topics"] if name in topic["TopicArn"]]
+    topic_arn = topics[0]['TopicArn']
 
     queue = sqs_client.create_queue(QueueName=queue_name)
 
