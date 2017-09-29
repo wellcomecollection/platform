@@ -36,9 +36,31 @@ coreos:
        After=format-ebs-volume.service
        Before=amazon-ecs-agent.service
        [Mount]
-       What=/dev/xvdb
+       What=${ebs_block_device}
        Where=/mnt/ebs
        Type=ext4
+   - name: cache-cleaner.service
+     command: start
+     content: |
+        [Unit]
+        Description=Cache cleaner service
+        Requires=mnt-ebs.mount
+        [Service]
+        ExecStart=/usr/bin/docker run --name loris-cache-cleaner \
+                                     --volume /mnt/ebs:/data \
+                                     --env=MAX_AGE=30 \
+                                     --env=MAX_SIZE=40G \
+                                     --log-driver=awslogs \
+                                     --log-opt awslogs-region=${aws_region} \
+                                     --log-opt awslogs-group=${ebs_cache_cleaner_group_name} \
+                                     wellcome/cache-cleaner:latest
+   - name: cache-cleaner.timer
+     command: start
+     content: |
+        [Unit]
+        Description=Run cache-cleaner.service every 10 minutes
+        [Timer]
+        OnCalendar=*:0/10
    - name: amazon-ecs-agent.service
      command: start
      runtime: true
@@ -46,6 +68,7 @@ coreos:
        [Unit]
        Description=AWS ECS Agent
        Documentation=https://docs.aws.amazon.com/AmazonECS/latest/developerguide/
+       Requires=cache-cleaner.service
        Requires=docker.socket
        After=docker.socket
 

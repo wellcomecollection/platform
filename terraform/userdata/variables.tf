@@ -15,3 +15,7 @@ variable "efs_filesystem_id" {
 variable "ebs_block_device" {
   default = "no_name_set"
 }
+
+variable "cache_cleaner_cloudwatch_log_group" {
+  default = ""
+}
