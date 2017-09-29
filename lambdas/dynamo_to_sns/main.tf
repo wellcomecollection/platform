@@ -4,7 +4,7 @@ module "lambda_dynamo_to_sns" {
   name        = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
   timeout     = 30
-  memory_size = 256
+  memory_size = 512
 
   environment_variables = {
     STREAM_TOPIC_MAP = <<EOF
@@ -21,7 +21,7 @@ module "lambda_dynamo_to_sns" {
 module "trigger_dynamo_to_sns_miro" {
   source = "../../terraform/lambda/trigger_dynamo"
 
-  batch_size = "20"
+  batch_size = "50"
 
   stream_arn    = "${var.miro_table_stream_arn}"
   function_arn  = "${module.lambda_dynamo_to_sns.arn}"
