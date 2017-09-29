@@ -67,11 +67,6 @@ resource "aws_s3_bucket" "mets-ingest" {
   }
 }
 
-resource "aws_s3_bucket" "wellcomecollection-miro-images-public" {
-  bucket = "wellcomecollection-miro-images-public"
-  acl    = "public-read"
-}
-
 resource "aws_s3_bucket" "alb-logs" {
   bucket = "wellcomecollection-alb-logs"
   acl    = "private"
