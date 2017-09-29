@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 
-ROOT="$(git rev-parse --show-toplevel)"
-RELEASE_DIR="$ROOT/.releases"
+RELEASE_DIR=".releases"
 
 # Name of tfvars file
 TF_VARS=terraform.tfvars
