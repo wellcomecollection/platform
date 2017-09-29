@@ -40,6 +40,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
   val reindexTableName = "ReindexTracker"
+  val reindexShard = "default"
 
   deleteTables()
   createReindexTable()
@@ -90,7 +91,10 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
       case Right(reindex) =>
         dynamoDbClient.deleteItem(
           reindexTableName,
-          Map("TableName" -> new AttributeValue(reindex.TableName)))
+          Map(
+            "TableName" -> new AttributeValue(reindex.TableName),
+            "ReindexShard" -> new AttributeValue(reindex.ReindexShard)
+          ))
       case a =>
         throw new Exception(
           s"Unable to clear the table $reindexTableName error $a")
@@ -252,9 +256,17 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
         .withKeySchema(new KeySchemaElement()
           .withAttributeName("TableName")
           .withKeyType(KeyType.HASH))
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("ReindexShard")
+          .withKeyType(KeyType.RANGE))
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("TableName")
+            .withAttributeType("S")
+        )
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("ReindexShard")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
