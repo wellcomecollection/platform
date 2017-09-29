@@ -125,11 +125,17 @@ resource "aws_dynamodb_table" "reindex_tracker" {
   read_capacity    = 1
   write_capacity   = 1
   hash_key         = "TableName"
+  range_key        = "ReindexShard"
   stream_enabled   = true
   stream_view_type = "NEW_IMAGE"
 
   attribute {
     name = "TableName"
+    type = "S"
+  }
+
+  attribute {
+    name = "ReindexShard"
     type = "S"
   }
 

@@ -17,8 +17,9 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 class ReindexTrackerService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   dynamoConfigs: Map[String, DynamoConfig],
-  @Flag("reindex.target.tableName") reindexTargetTableName: String)
-    extends Logging {
+  @Flag("reindex.target.tableName") reindexTargetTableName: String,
+  @Flag("reindex.target.reindexShard") targetReindexShard: String
+) extends Logging {
 
   private val reindexTrackerTableConfigId = "reindex"
 
@@ -43,10 +44,11 @@ class ReindexTrackerService @Inject()(
 
   def getIndexForReindex: Future[Option[Reindex]] =
     getIndices.map {
-      case Reindex(tableName, requested, current) if requested > current => {
+      case Reindex(tableName, reindexShard, requested, current)
+          if requested > current => {
         info(
           s"ReindexTracker found out of sync table: $tableName, ($requested > $current)")
-        Some(Reindex(tableName, requested, current))
+        Some(Reindex(tableName, reindexShard, requested, current))
       }
       case _ => {
         info(s"ReindexTracker found no out of sync tables.")
@@ -56,7 +58,9 @@ class ReindexTrackerService @Inject()(
 
   private def getIndices: Future[Reindex] = Future {
     Scanamo.exec(dynamoDBClient)(
-      reindexTable.get('TableName -> reindexTargetTableName)) match {
+      reindexTable.get(
+        'TableName -> reindexTargetTableName and 'ReindexShard -> targetReindexShard
+      )) match {
       case Some(Right(reindex)) => {
         info(s"ReindexTracker found $reindex matching $reindexTargetTableName")
         reindex
