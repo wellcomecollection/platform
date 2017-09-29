@@ -27,8 +27,8 @@ module "loris_cluster_asg_ebs" {
   user_data             = "${module.loris_userdata_ebs.rendered}"
   vpc_id                = "${data.terraform_remote_state.platform.vpc_api_id}"
 
-  asg_desired = "1"
-  asg_max     = "2"
+  asg_desired = "2"
+  asg_max     = "4"
 
   image_id      = "${data.terraform_remote_state.platform.ecs_ami_id}"
   instance_type = "t2.xlarge"

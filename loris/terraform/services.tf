@@ -50,7 +50,7 @@ module "loris_ebs" {
   cpu    = 1792
   memory = 4096
 
-  desired_count = 1
+  desired_count = 4
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
