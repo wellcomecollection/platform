@@ -83,14 +83,6 @@ output "bucket_miro_images_public_arn" {
   value = "${aws_s3_bucket.miro_images_public.arn}"
 }
 
-output "bucket_wellcomecollectio_miro_images_public_arn" {
-  value = "${aws_s3_bucket.wellcomecollection-miro-images-public.arn}"
-}
-
-output "bucket_wellcomecollectio_miro_images_public_id" {
-  value = "${aws_s3_bucket.wellcomecollection-miro-images-public.id}"
-}
-
 output "table_miro_data_arn" {
   value = "${aws_dynamodb_table.miro_table.arn}"
 }
