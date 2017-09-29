@@ -8,7 +8,7 @@ data "template_file" "template" {
     ecs_agent_version            = "latest"
     ecs_log_group_name           = "${aws_cloudwatch_log_group.ecs_agent.name}"
     efs_filesystem_id            = "${var.efs_filesystem_id}"
-    efs_mount_directory          = "/mnt/efs"
+    efs_mount_directory          = "${local.mount_directory}"
     ebs_block_device             = "${var.ebs_block_device}"
     ebs_cache_cleaner_group_name = "${var.cache_cleaner_cloudwatch_log_group}"
   }
