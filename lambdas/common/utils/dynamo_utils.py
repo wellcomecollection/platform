@@ -3,20 +3,26 @@
 from boto3.dynamodb.types import TypeDeserializer
 
 
-class DynamoEvent:
-    def __init__(self, event):
-        self.event = event
+class DynamoImageFactory:
+    @staticmethod
+    def create(event):
+        return [DynamoImage(
+            record['dynamodb'],
+            record['eventSourceARN']
+        )for record in event['Records'] if 'NewImage' in record['dynamodb']]
+
+
+class DynamoImage:
+    def __init__(self, record, source_arn):
+        self.record = record
+        self.source_arn = source_arn
 
     @property
     def new_image(self):
-        if 'NewImage' in self.event['Records'][0]['dynamodb']:
-            return self.event['Records'][0]['dynamodb']['NewImage']
+        if 'NewImage' in self.record:
+            return self.record['NewImage']
         else:
             return None
-
-    @property
-    def source_arn(self):
-        return self.event['Records'][0]['eventSourceARN']
 
     @property
     def simplified_new_image(self):
