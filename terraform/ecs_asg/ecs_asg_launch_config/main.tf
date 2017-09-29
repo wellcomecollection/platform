@@ -38,7 +38,7 @@ resource "aws_launch_configuration" "spot_launch_config" {
 }
 
 resource "aws_launch_configuration" "ebs_launch_config" {
-  count      = "${var.ebs_device_name == "" ? 0 : 1}"
+  count = "${var.ebs_device_name == "" ? 0 : 1}"
 
   security_groups = [
     "${aws_security_group.instance_sg.id}",

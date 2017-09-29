@@ -13,6 +13,7 @@ module "loris_alb" {
 
   alb_access_log_bucket = "${data.terraform_remote_state.platform.bucket_alb_logs_id}"
 }
+
 module "loris_alb_ebs" {
   source  = "../../terraform/ecs_alb"
   name    = "loris-ebs"

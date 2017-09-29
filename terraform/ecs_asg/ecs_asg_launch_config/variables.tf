@@ -41,11 +41,8 @@ variable "random_key" {
 variable "use_spot" {}
 variable spot_price {}
 
+variable "ebs_device_name" {}
 
-variable "ebs_device_name" {
-}
+variable "ebs_size" {}
 
-variable "ebs_size" {
-}
-variable "ebs_volume_type" {
-}
+variable "ebs_volume_type" {}

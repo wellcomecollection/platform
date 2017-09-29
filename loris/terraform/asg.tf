@@ -38,6 +38,5 @@ module "loris_cluster_asg_ebs" {
   alarm_topic_arn       = "${data.terraform_remote_state.platform.ec2_instance_terminating_for_too_long_alarm_arn}"
 
   ebs_device_name = "/dev/xvdb"
-  ebs_size = 60
-
+  ebs_size        = 60
 }

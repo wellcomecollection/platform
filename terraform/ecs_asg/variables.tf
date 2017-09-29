@@ -83,6 +83,7 @@ variable "ebs_device_name" {
 variable "ebs_size" {
   default = 8
 }
+
 variable "ebs_volume_type" {
   default = "standard"
 }

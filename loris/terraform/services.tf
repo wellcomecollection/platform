@@ -42,7 +42,7 @@ module "loris_ebs" {
   listener_https_arn = "${module.loris_alb_ebs.listener_https_arn}"
   listener_http_arn  = "${module.loris_alb_ebs.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/loris.ini"
+  config_key         = "config/${var.build_env}/loris-ebs.ini"
   path_pattern       = "/image*"
   healthcheck_path   = "/image/"
   alb_priority       = "101"
