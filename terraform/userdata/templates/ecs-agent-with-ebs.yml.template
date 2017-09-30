@@ -46,6 +46,7 @@ coreos:
         Description=Cache cleaner service
         Requires=mnt-ebs.mount
         [Service]
+        ExecStartPre=/bin/bash -c '(/usr/bin/docker rm loris-cache-cleaner || echo "No container named loris-cache-cleaner")'
         ExecStart=/usr/bin/docker run --name loris-cache-cleaner \
                                      --volume /mnt/ebs:/data \
                                      --env=MAX_AGE=30 \
