@@ -19,3 +19,11 @@ variable "ebs_block_device" {
 variable "cache_cleaner_cloudwatch_log_group" {
   default = ""
 }
+
+variable "ebs_cache_max_age_days" {
+  default = ""
+}
+
+variable "ebs_cache_max_size" {
+  default = ""
+}
