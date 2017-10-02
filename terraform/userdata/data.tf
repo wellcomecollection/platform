@@ -11,6 +11,8 @@ data "template_file" "template" {
     efs_mount_directory          = "${local.mount_directory}"
     ebs_block_device             = "${var.ebs_block_device}"
     ebs_cache_cleaner_group_name = "${var.cache_cleaner_cloudwatch_log_group}"
+    ebs_cache_max_age_days       = "${var.ebs_cache_max_age_days}"
+    ebs_cache_max_size           = "${var.ebs_cache_max_size}"
   }
 }
 

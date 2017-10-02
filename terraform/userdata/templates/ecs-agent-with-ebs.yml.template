@@ -49,8 +49,8 @@ coreos:
         ExecStartPre=/bin/bash -c '(/usr/bin/docker rm loris-cache-cleaner || echo "No container named loris-cache-cleaner")'
         ExecStart=/usr/bin/docker run --name loris-cache-cleaner \
                                      --volume /mnt/ebs:/data \
-                                     --env=MAX_AGE=30 \
-                                     --env=MAX_SIZE=40G \
+                                     --env=MAX_AGE=${ebs_cache_max_age_days} \
+                                     --env=MAX_SIZE=${ebs_cache_max_size} \
                                      --log-driver=awslogs \
                                      --log-opt awslogs-region=${aws_region} \
                                      --log-opt awslogs-group=${ebs_cache_cleaner_group_name} \

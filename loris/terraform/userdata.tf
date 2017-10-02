@@ -9,4 +9,6 @@ module "loris_userdata_ebs" {
   cluster_name                       = "${aws_ecs_cluster.loris_ebs.name}"
   ebs_block_device                   = "/dev/xvdb"
   cache_cleaner_cloudwatch_log_group = "${aws_cloudwatch_log_group.cache_cleaner_log_group.name}"
+  ebs_cache_max_age_days             = "30"
+  ebs_cache_max_size                 = "40G"
 }
