@@ -104,3 +104,13 @@ resource "aws_s3_bucket" "cloudfront-logs" {
     prevent_destroy = true
   }
 }
+
+/* Used for transferring files to/from third-parties */
+resource "aws_s3_bucket" "transfer" {
+  bucket = "wellcomecollection-transfer"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}

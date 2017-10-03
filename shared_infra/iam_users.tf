@@ -44,3 +44,7 @@ resource "aws_iam_user_policy" "wellcomecollection_mets_ingest_read_write" {
   user   = "${aws_iam_user.mets_ingest_read_write.name}"
   policy = "${data.aws_iam_policy_document.s3_wellcomecollection_mets_ingest_bucket_read_write.json}"
 }
+
+resource "aws_iam_user" "r3store" {
+  name = "r3store"
+}

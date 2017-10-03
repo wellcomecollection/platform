@@ -95,3 +95,8 @@ resource "aws_iam_role_policy" "elasticdump_upload_files_to_s3" {
   role   = "${module.ecs_elasticdump_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.s3_upload_to_to_elasticdump_directory.json}"
 }
+
+resource "aws_iam_role_policy" "r3store_transfer_bucket" {
+  role   = "${aws_iam_user.r3store.name}"
+  policy = "${data.aws_iam_policy_document.s3_upload_to_to_elasticdump_directory.json}"
+}
