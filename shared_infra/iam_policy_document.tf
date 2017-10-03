@@ -133,32 +133,6 @@ data "aws_iam_policy_document" "travis_permissions" {
   }
 }
 
-data "aws_iam_policy_document" "s3_mets_ingest_bucket_read_write" {
-  statement {
-    actions = [
-      "s3:*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.mets-ingest.arn}/*",
-      "${aws_s3_bucket.mets-ingest.arn}",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "s3_wellcomecollection_mets_ingest_bucket_read_write" {
-  statement {
-    actions = [
-      "s3:*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.wellcomecollection-mets-ingest.arn}/*",
-      "${aws_s3_bucket.wellcomecollection-mets-ingest.arn}",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "miro_images_sync" {
   statement {
     # Easier than listing the _many_ permissions required for s3 sync to work
