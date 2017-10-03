@@ -39,4 +39,6 @@ module "loris_cluster_asg_ebs" {
 
   ebs_device_name = "/dev/xvdb"
   ebs_size        = 60
+  ebs_volume_type = "io1"
+  ebs_iops        = "200"
 }
