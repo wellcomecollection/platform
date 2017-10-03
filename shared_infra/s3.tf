@@ -58,15 +58,6 @@ resource "aws_s3_bucket" "infra" {
   }
 }
 
-resource "aws_s3_bucket" "mets-ingest" {
-  bucket = "mets-ingest"
-  acl    = "private"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
 resource "aws_s3_bucket" "alb-logs" {
   bucket = "wellcomecollection-alb-logs"
   acl    = "private"
@@ -84,15 +75,6 @@ resource "aws_s3_bucket" "alb-logs" {
     expiration {
       days = 30
     }
-  }
-}
-
-resource "aws_s3_bucket" "wellcomecollection-mets-ingest" {
-  bucket = "wellcomecollection-mets-ingest"
-  acl    = "private"
-
-  lifecycle {
-    prevent_destroy = true
   }
 }
 
