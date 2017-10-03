@@ -47,7 +47,7 @@ def main(event, _):
     collection = data['collection']
     image_data = data['image_data']
 
-    decisions = sort_image(collection=collection, image_data=image_data)
+    decisions = sort_image(collection=collection, image_data=image_data, exceptions=[])
 
     topic_arns = {
         Decision.cold_store: topic_cold_store,
