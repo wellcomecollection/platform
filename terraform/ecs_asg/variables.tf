@@ -87,3 +87,7 @@ variable "ebs_size" {
 variable "ebs_volume_type" {
   default = "standard"
 }
+
+variable "ebs_iops" {
+  default = ""
+}

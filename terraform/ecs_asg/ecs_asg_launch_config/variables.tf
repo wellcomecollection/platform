@@ -46,3 +46,5 @@ variable "ebs_device_name" {}
 variable "ebs_size" {}
 
 variable "ebs_volume_type" {}
+
+variable "ebs_iops" {}
