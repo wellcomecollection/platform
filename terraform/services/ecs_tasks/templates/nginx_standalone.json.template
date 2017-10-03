@@ -1,0 +1,30 @@
+[
+  {
+    "name": "nginx",
+    "image": "${nginx_uri}",
+    "cpu": ${cpu},
+    "memory": ${memory},
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": ${primary_container_port},
+        "hostPort": 0,
+        "protocol": "tcp"
+      }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "${nginx_log_group_name}",
+            "awslogs-region": "${log_group_region}"
+        }
+    },
+    "environment": ${environment_vars},
+    "mountPoints": [
+      {
+        "sourceVolume": "${volume_name}",
+        "containerPath": "${container_path}"
+      }
+    ]
+  }
+]
