@@ -11,8 +11,9 @@ variable "vpc_id" {
   description = "ID of VPC to to create EFS mount in"
 }
 
-variable "efs_access_security_group_id" {
-  description = "ID of the security group of the EC2 instaces that need to access the EFS"
+variable "efs_access_security_group_ids" {
+  description = "IDs of the security groups of the EC2 instaces that need to access the EFS"
+  type = "list"
 }
 
 variable "performance_mode" {

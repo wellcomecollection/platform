@@ -20,8 +20,6 @@ resource "aws_security_group" "efs_mnt" {
     from_port = 2049
     to_port   = 2049
 
-    security_groups = [
-      "${var.efs_access_security_group_id}",
-    ]
+    security_groups = ["${var.efs_access_security_group_ids}"]
   }
 }
