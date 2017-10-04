@@ -3,9 +3,9 @@ resource "aws_alb" "ecs_service" {
   subnets         = ["${var.subnets}"]
   security_groups = ["${var.loadbalancer_security_groups}"]
 
-  lifecycle {
-    prevent_destroy = true
-  }
+//  lifecycle {
+//    prevent_destroy = true
+//  }
 
   access_logs {
     bucket = "${var.alb_access_log_bucket}"
