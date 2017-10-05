@@ -1,9 +1,9 @@
-module "ecs_loris_iam" {
+module "ecs_api_iam" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs_iam?ref=v1.0.0"
-  name   = "loris"
+  name   = "api"
 }
 
-module "ecs_cache_cleaner_iam" {
+module "ecs_update_api_docs_iam" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs_iam?ref=v1.0.0"
-  name   = "cache_cleaner"
+  name   = "update_api_docs"
 }
