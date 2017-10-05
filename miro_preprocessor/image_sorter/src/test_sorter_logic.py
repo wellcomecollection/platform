@@ -209,7 +209,12 @@ def test_is_tandem_vault_and_digital_library_and_catalogue_api(collection, image
                        image_library_dept="Archives and Manuscripts"),
      [exception(miro_id="V0002006", tandem_vault="true", catalogue_api="true", digital_library="true")],
      [Decision.tandem_vault, Decision.catalogue_api,
-      Decision.digital_library])
+      Decision.digital_library]),
+    ('images-L',
+     update_image_data(image_no_calc="V0002006",
+                       image_library_dept="Archives and Manuscripts"),
+     [exception(miro_id="V0002006", tandem_vault="false", catalogue_api="true", digital_library="true")],
+     [Decision.catalogue_api, Decision.digital_library])
 ])
 def test_exceptions_should_override_rules(collection, image_data, exceptions, expected_decisions):
     assert sort_image(collection, image_data, exceptions) == expected_decisions

@@ -196,7 +196,7 @@ def _get_decisions_from_exceptions(exceptions, image_data):
         print(exception)
         if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
             for key, value in exception.items():
-                if value is not None:
+                if value is not None and not value.strip().lower() == "false":
                     decisions.append(getattr(Decision, key))
     return decisions
 
