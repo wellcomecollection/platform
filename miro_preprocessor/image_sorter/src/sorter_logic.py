@@ -191,14 +191,10 @@ class InvalidCollectionException(Exception):
 
 
 def _get_decisions_from_exceptions(exceptions, image_data):
-    decisions = []
     for exception in exceptions:
-        print(exception)
         if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
-            for key, value in exception.items():
-                if value is not None and not value.strip().lower() == "false":
-                    decisions.append(getattr(Decision, key))
-    return decisions
+            return [getattr(Decision, key) for key, value in exception.items()
+                    if value is not None and not value.strip().lower() == "false"]
 
 
 def _get_decisions_from_rules(collection, image_data):

@@ -50,7 +50,8 @@ def main(event, _):
     print(f'Bucket = {s3_bucket}, exceptions_key = {s3_exceptions_key}')
 
     exceptions = fetch_s3_data(s3_bucket, s3_exceptions_key)
-    print(exceptions.decode())
+    exceptions_decoded = exceptions.decode()
+    print(exceptions_decoded)
 
     data = fetch_json_s3_data(bucket=s3_bucket, key=s3_key)
 
@@ -58,7 +59,9 @@ def main(event, _):
     collection = data['collection']
     image_data = data['image_data']
 
-    decisions = sort_image(collection=collection, image_data=image_data, exceptions=csv.DictReader(StringIO(exceptions.decode())))
+    decisions = sort_image(collection=collection,
+                           image_data=image_data,
+                           exceptions=csv.DictReader(StringIO(exceptions_decoded)))
 
     topic_arns = {
         Decision.cold_store: topic_cold_store,
