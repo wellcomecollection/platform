@@ -1,7 +1,7 @@
 # Lambda for tagging EC2 instances with ECS cluster/container instance id
 
 module "lambda_ecs_ec2_instance_tagger" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "ecs_ec2_instance_tagger"
   description = "Tag an EC2 instance with ECS cluster/container instance id"
@@ -17,7 +17,7 @@ module "lambda_ecs_ec2_instance_tagger" {
 }
 
 module "trigger_ecs_ec2_instance_tagger" {
-  source                  = "../../terraform/lambda/trigger_cloudwatch"
+  source                  = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
   lambda_function_name    = "${module.lambda_ecs_ec2_instance_tagger.function_name}"
   lambda_function_arn     = "${module.lambda_ecs_ec2_instance_tagger.arn}"
   cloudwatch_trigger_arn  = "${var.ecs_container_instance_state_change_arn}"

@@ -1,7 +1,7 @@
 # Lambda for updating ECS service size
 
 module "lambda_update_ecs_service_size" {
-  source      = "../../terraform/lambda"
+  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   name        = "update_ecs_service_size"
   description = "Update the desired count of an ECS service"
 
@@ -10,7 +10,7 @@ module "lambda_update_ecs_service_size" {
 }
 
 module "trigger_update_ecs_service_size" {
-  source = "../../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_update_ecs_service_size.function_name}"
   lambda_function_arn  = "${module.lambda_update_ecs_service_size.arn}"

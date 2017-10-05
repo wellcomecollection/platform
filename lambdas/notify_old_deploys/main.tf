@@ -1,7 +1,7 @@
 # Lambda for publishing out of date deployments to SNS
 
 module "lambda_notify_old_deploys" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "notify_old_deploys"
   description = "For publishing out of date deployments to SNS"
@@ -17,7 +17,7 @@ module "lambda_notify_old_deploys" {
 }
 
 module "trigger_notify_old_deploys" {
-  source = "../../terraform/lambda/trigger_cloudwatch"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
 
   lambda_function_name    = "${module.lambda_notify_old_deploys.function_name}"
   lambda_function_arn     = "${module.lambda_notify_old_deploys.arn}"

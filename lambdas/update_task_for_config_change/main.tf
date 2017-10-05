@@ -1,7 +1,7 @@
 # Lambda for restarting applications when their config changes
 
 module "lambda_update_task_for_config_change" {
-  source      = "../../terraform/lambda"
+  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   name        = "update_task_for_config_change"
   description = "Trigger a task definition change and restart on config change."
 
