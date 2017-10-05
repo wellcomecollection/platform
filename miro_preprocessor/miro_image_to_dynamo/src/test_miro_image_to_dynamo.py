@@ -108,8 +108,10 @@ def test_should_insert_the_json_into_dynamo(miro_table):
         'image_data': image_data
     })
 
+    reindex_version = 10
     os.environ = {
         "TABLE_NAME": table.table_name,
+        "REINDEX_VERSION": reindex_version,
     }
 
     event = {
@@ -141,4 +143,4 @@ def test_should_insert_the_json_into_dynamo(miro_table):
     assert json.loads(dynamodb_response['Item']['data']) == image_data
     assert dynamodb_response['Item']['MiroCollection'] == collection
     assert dynamodb_response['Item']['ReindexShard'] == collection
-    assert dynamodb_response['Item']['ReindexVersion'] == 1
+    assert dynamodb_response['Item']['ReindexVersion'] == reindex_version

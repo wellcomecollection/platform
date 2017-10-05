@@ -7,6 +7,7 @@ import boto3
 def put_into_dynamodb(dynamodb_client, miro_id, collection, image_data):
     print(f"Image found for MiroId {miro_id}: sending to Dynamodb")
     table_name = os.environ["TABLE_NAME"]
+    reindex_version = os.environ["REINDEX_VERSION"]
     print('Pushing image with ID %s' % (miro_id))
     dynamodb_client.put_item(
         TableName=table_name,
@@ -21,7 +22,7 @@ def put_into_dynamodb(dynamodb_client, miro_id, collection, image_data):
                 'S': collection
             },
             'ReindexVersion': {
-                'N': str(1)
+                'N': str(reindex_version)
             },
             'data': {
                 'S': json.dumps(image_data, separators=(',', ':'))
