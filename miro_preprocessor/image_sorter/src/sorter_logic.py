@@ -154,24 +154,24 @@ class Rules:
     @property
     def is_cold_store(self):
         return self.is_collection("F") or \
-               (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
-               (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
-               (self.is_collection("L", "M", "V") and
-                not self.is_innopac_id_8_digits and
-                self.is_title_empty and
-                self.is_image_pub_title_blank and
-                self.is_image_pub_periodical_blank)
+            (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
+            (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
+            (self.is_collection("L", "M", "V") and
+             not self.is_innopac_id_8_digits and
+             self.is_title_empty and
+             self.is_image_pub_title_blank and
+             self.is_image_pub_periodical_blank)
 
     @property
     def is_tandem_vault(self):
         return self.image_library_dept_is_Public_programmes or \
-               self.is_collection("L") and self.is_after_first_march_2016 or \
-               self.is_collection("L", "M", "V") and self.is_not_for_public_access
+            self.is_collection("L") and self.is_after_first_march_2016 or \
+            self.is_collection("L", "M", "V") and self.is_not_for_public_access
 
     @property
     def is_digital_library(self):
         return not self.image_library_dept_is_Public_programmes \
-               and self.is_for_public_access and self.is_innopac_id_8_digits
+            and self.is_for_public_access and self.is_innopac_id_8_digits
 
     @property
     def is_catalogue_api(self):
@@ -193,7 +193,8 @@ class InvalidCollectionException(Exception):
 def _get_decisions_from_exceptions(exceptions, image_data):
     decisions = []
     for exception in exceptions:
-        if exception.pop("miro_id") == image_data["image_no_calc"]:
+        print(exception)
+        if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
             for key, value in exception.items():
                 if value is not None:
                     decisions.append(getattr(Decision, key))

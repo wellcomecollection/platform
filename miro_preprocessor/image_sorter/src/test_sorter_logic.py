@@ -48,6 +48,7 @@ def exception(**kwargs):
     exception.update(kwargs)
     return exception
 
+
 @pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='images-F'),
     collection_image_data(collection='images-L', image_library_dept="Archives and Manuscripts"),
