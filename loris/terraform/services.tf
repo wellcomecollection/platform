@@ -80,7 +80,7 @@ module "loris_m4" {
   healthcheck_path   = "/image/"
   alb_priority       = "101"
 
-  cpu    = 1900
+  cpu    = 2560
   memory = 3276
 
   desired_count = 2
