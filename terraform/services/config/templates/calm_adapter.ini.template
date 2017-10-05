@@ -1,4 +1,0 @@
--aws.dynamo.calmData.tableName=${table_name}
--aws.sns.topic.arn=${sns_arn}
--warmupTime=30
--aws.dynamo.warmup.writeCapacity=10

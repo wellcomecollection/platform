@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "../../terraform/services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
@@ -32,7 +32,7 @@ module "loris" {
 }
 
 module "loris_ebs" {
-  source             = "../../terraform/services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
   name               = "loris-ebs"
   cluster_id         = "${aws_ecs_cluster.loris_ebs.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"

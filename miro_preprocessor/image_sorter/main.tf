@@ -1,5 +1,5 @@
 module "image_sorter_lambda" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/miro_preprocessor/image_sorter.zip"
 
   description     = "Sort blobs of Miro image metadata into different SNS topics"

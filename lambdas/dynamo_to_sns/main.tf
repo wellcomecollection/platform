@@ -1,5 +1,5 @@
 module "lambda_dynamo_to_sns" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
@@ -19,7 +19,7 @@ module "lambda_dynamo_to_sns" {
 }
 
 module "trigger_dynamo_to_sns_miro" {
-  source = "../../terraform/lambda/trigger_dynamo"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_dynamo?ref=v1.0.0"
 
   batch_size = "50"
 
