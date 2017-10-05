@@ -80,10 +80,10 @@ module "loris_m4" {
   healthcheck_path   = "/image/"
   alb_priority       = "101"
 
-  cpu    = 1792
-  memory = 4096
+  cpu    = 1900
+  memory = 3276
 
-  desired_count = 4
+  desired_count = 2
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
