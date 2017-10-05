@@ -6,7 +6,23 @@ from sorter_logic import Decision, InvalidCollectionException, sort_image
 
 
 def collection_image_data(**kwargs):
+    image_data = update_image_data(**kwargs)
+    collection = kwargs.pop('collection', 'images-M')
+
+    return collection, image_data
+
+
+def image_with_no_info(collection, image_title):
+    return collection_image_data(collection=collection,
+                                 image_title=image_title,
+                                 image_pub_title=None,
+                                 image_pub_periodical=None,
+                                 image_innopac_id="1234567")
+
+
+def update_image_data(**kwargs):
     image_data = {
+        "image_no_calc": "V1234567",
         "image_title": "Image Title",
         "image_pub_title": "Image Pub Title",
         "image_pub_periodical": "Lost socks monthly",
@@ -18,20 +34,19 @@ def collection_image_data(**kwargs):
         "image_innopac_id": "12345678",
         "image_cleared": "Y"
     }
-    collection = 'images-M'
-    if 'collection' in kwargs.keys():
-        collection = kwargs.pop('collection')
     image_data.update(kwargs)
+    return image_data
 
-    return collection, image_data
 
-
-def image_with_no_info(collection, image_title):
-    return collection_image_data(collection=collection,
-                                 image_title=image_title,
-                                 image_pub_title=None,
-                                 image_pub_periodical=None,
-                                 image_innopac_id="1234567")
+def exception(**kwargs):
+    exception = {
+        "cold_store": None,
+        "tandem_vault": None,
+        "catalogue_api": None,
+        "digital_library": None,
+    }
+    exception.update(kwargs)
+    return exception
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -74,8 +89,7 @@ def image_with_no_info(collection, image_title):
     image_with_no_info(collection='images-M', image_title="No neg"),
 ])
 def test_is_cold_store(collection, image_data):
-    """These examples all end up in cold store."""
-    assert sort_image(collection, image_data) == [Decision.cold_store]
+    assert sort_image(collection, image_data, []) == [Decision.cold_store]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -99,8 +113,7 @@ def test_is_cold_store(collection, image_data):
     collection_image_data(collection='images-M', image_use_restrictions="Top-secret")
 ])
 def test_is_tandem_vault(collection, image_data):
-    """These examples all end up in Tandem Vault."""
-    assert sort_image(collection, image_data) == [Decision.tandem_vault]
+    assert sort_image(collection, image_data, []) == [Decision.tandem_vault]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -110,8 +123,7 @@ def test_is_tandem_vault(collection, image_data):
     collection_image_data(collection='images-L', image_cleared="N"),
 ])
 def test_is_digital_library(collection, image_data):
-    """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.digital_library]
+    assert sort_image(collection, image_data, []) == [Decision.digital_library]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -120,8 +132,7 @@ def test_is_digital_library(collection, image_data):
     collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
 ])
 def test_is_catalogue_api(collection, image_data):
-    """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.catalogue_api]
+    assert sort_image(collection, image_data, []) == [Decision.catalogue_api]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -136,8 +147,7 @@ def test_is_catalogue_api(collection, image_data):
     collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
 ])
 def test_is_no_decision(collection, image_data):
-    """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.none]
+    assert sort_image(collection, image_data, []) == [Decision.none]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -146,8 +156,7 @@ def test_is_no_decision(collection, image_data):
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="None"),
 ])
 def test_is_digital_library_and_tandem_vault(collection, image_data):
-    """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.tandem_vault, Decision.digital_library]
+    assert sort_image(collection, image_data, []) == [Decision.tandem_vault, Decision.digital_library]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -177,8 +186,7 @@ def test_is_digital_library_and_tandem_vault(collection, image_data):
     collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND"),
 ])
 def test_is_digital_library_and_catalogue_api(collection, image_data):
-    """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.digital_library, Decision.catalogue_api]
+    assert sort_image(collection, image_data, []) == [Decision.digital_library, Decision.catalogue_api]
 
 
 @pytest.mark.parametrize('collection, image_data', [
@@ -186,12 +194,33 @@ def test_is_digital_library_and_catalogue_api(collection, image_data):
     collection_image_data(collection='images-L', image_tech_scanned_date="30/06/2018"),
 ])
 def test_is_tandem_vault_and_digital_library_and_catalogue_api(collection, image_data):
-    """These examples all end up in the Digital Library."""
-    assert sort_image(collection, image_data) == [Decision.tandem_vault, Decision.digital_library,
-                                                  Decision.catalogue_api]
+    assert sort_image(collection, image_data, []) == [Decision.tandem_vault, Decision.digital_library,
+                                                      Decision.catalogue_api]
+
+
+@pytest.mark.parametrize('collection, image_data, exceptions, expected_decisions', [
+    ('images-L',
+     update_image_data(image_no_calc="V0002006",
+                       image_tech_scanned_date="02/03/2016"),
+     [exception(miro_id="V0002006", cold_store="true")],
+     [Decision.cold_store]),
+    ('images-L',
+     update_image_data(image_no_calc="V0002006",
+                       image_library_dept="Archives and Manuscripts"),
+     [exception(miro_id="V0002006", tandem_vault="true", catalogue_api="true", digital_library="true")],
+     [Decision.tandem_vault, Decision.catalogue_api,
+      Decision.digital_library]),
+    ('images-L',
+     update_image_data(image_no_calc="V0002006",
+                       image_library_dept="Archives and Manuscripts"),
+     [exception(miro_id="V0002006", tandem_vault="false", catalogue_api="true", digital_library="true")],
+     [Decision.catalogue_api, Decision.digital_library])
+])
+def test_exceptions_should_override_rules(collection, image_data, exceptions, expected_decisions):
+    assert sort_image(collection, image_data, exceptions) == expected_decisions
 
 
 def test_raise_exception_if_collection_is_not_flvm():
     collection, image_data = collection_image_data(collection="images-A")
     with pytest.raises(InvalidCollectionException):
-        sort_image(collection, image_data)
+        sort_image(collection, image_data, [])

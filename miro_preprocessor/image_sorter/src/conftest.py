@@ -106,8 +106,6 @@ def image_sorter_sns_sqs(set_region, moto_start):
     digital_library_topic, digital_library_queue = _create_topic_and_queue(
         fake_sns_client, fake_sqs_client, "digital_library")
 
-    print(cold_store_queue)
-
     yield {
         "cold_store": {
             "topic": cold_store_topic,
