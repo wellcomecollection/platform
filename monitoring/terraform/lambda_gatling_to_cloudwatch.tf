@@ -10,7 +10,7 @@ module "lambda_gatling_to_cloudwatch" {
 }
 
 module "trigger_gatling_to_cloudwatch" {
-  source               = "../../terraform/lambda/trigger_sns"
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
   lambda_function_name = "${module.lambda_gatling_to_cloudwatch.function_name}"
   lambda_function_arn  = "${module.lambda_gatling_to_cloudwatch.arn}"
   sns_trigger_arn      = "${module.load_test_results.arn}"

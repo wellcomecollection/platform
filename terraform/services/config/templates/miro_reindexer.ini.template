@@ -1,4 +1,0 @@
--aws.dynamo.miroData.tableName=MiroData
--aws.dynamo.reindexTracker.tableName=ReindexTracker
--reindex.target.tableName=MiroData
--aws.metrics.namespace=${metrics_namespace}

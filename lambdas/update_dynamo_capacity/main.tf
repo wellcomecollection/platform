@@ -1,5 +1,5 @@
 module "lambda_update_dynamo_capacity" {
-  source      = "../../terraform/lambda"
+  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   name        = "update_dynamo_capacity"
   description = "Update the capacity of a DynamoDB table"
 
@@ -8,7 +8,7 @@ module "lambda_update_dynamo_capacity" {
 }
 
 module "trigger_update_dynamo_capacity" {
-  source = "../../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_update_dynamo_capacity.function_name}"
   lambda_function_arn  = "${module.lambda_update_dynamo_capacity.arn}"

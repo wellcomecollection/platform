@@ -1,5 +1,5 @@
 module "miro_image_to_dynamo_lambda" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/miro_preprocessor/miro_image_to_dynamo.zip"
 
   description     = "Push image JSON into DynamoDB"
@@ -14,7 +14,7 @@ module "miro_image_to_dynamo_lambda" {
 }
 
 module "miro_image_to_dynamo" {
-  source               = "../../terraform/lambda/trigger_sns"
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
   lambda_function_name = "${module.miro_image_to_dynamo_lambda.function_name}"
   sns_trigger_arn      = "${var.topic_miro_image_to_dynamo_arn}"
   lambda_function_arn  = "${module.miro_image_to_dynamo_lambda.arn}"

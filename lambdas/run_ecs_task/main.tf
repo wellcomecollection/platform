@@ -1,7 +1,7 @@
 # Lambda for publishing ECS service schedules to an SNS topic
 
 module "lambda_run_ecs_task" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "run_ecs_task"
   description = "Run an ECS task from a message published to SNS"
@@ -11,7 +11,7 @@ module "lambda_run_ecs_task" {
 }
 
 module "trigger_run_ecs_task" {
-  source = "../../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_run_ecs_task.function_name}"
   lambda_function_arn  = "${module.lambda_run_ecs_task.arn}"

@@ -1,6 +1,6 @@
 module "loris_efs" {
   name                         = "loris_cache"
-  source                       = "../../terraform/efs"
+  source                       = "git::https://github.com/wellcometrust/terraform.git//efs?ref=v1.0.0"
   vpc_id                       = "${data.terraform_remote_state.platform.vpc_api_id}"
   subnets                      = "${data.terraform_remote_state.platform.vpc_api_subnets}"
   efs_access_security_group_id = "${module.loris_cluster_asg.instance_sg_id}"

@@ -1,7 +1,7 @@
 # Lambda for tracking deployment status in dynamo db
 
 module "lambda_service_deployment_status" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "service_deployment_status"
   description = "Lambda for tracking deployment status in dynamo db"
@@ -16,7 +16,7 @@ module "lambda_service_deployment_status" {
 }
 
 module "trigger_service_deployment_status" {
-  source = "../../terraform/lambda/trigger_cloudwatch"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
 
   lambda_function_name    = "${module.lambda_service_deployment_status.function_name}"
   lambda_function_arn     = "${module.lambda_service_deployment_status.arn}"
