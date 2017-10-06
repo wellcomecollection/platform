@@ -168,11 +168,13 @@ class Rules:
             self.is_collection("L") and self.is_after_first_march_2016 or \
             self.is_collection("L", "M", "V") and self.is_not_for_public_access
 
+    # TODO: Remove `and self.is_innopac_id_8_digits`
     @property
     def is_digital_library(self):
         return not self.image_library_dept_is_Public_programmes \
             and self.is_for_public_access and self.is_innopac_id_8_digits
 
+    # TODO: Remove `not self.is_tandem_vault` AND `self.satisfies_api_filters`
     @property
     def is_catalogue_api(self):
         return (not self.is_tandem_vault or self.is_digital_library) and self.satisfies_api_filters
@@ -190,11 +192,27 @@ class InvalidCollectionException(Exception):
     pass
 
 
-def _get_decisions_from_exceptions(exceptions, image_data):
+def _get_decisions_from_id_exceptions(exceptions, image_data):
     for exception in exceptions:
         if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
             return [getattr(Decision, key) for key, value in exception.items()
                     if value is not None and not value.strip().lower() == "false"]
+
+
+def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
+    collections = exceptions.fieldnames
+    collection = collection.split('-')[-1]
+
+    if collection in collections:
+        contrib_codes = [row[collection] for row in exceptions]
+
+        if image_data['image_source_code'] in contrib_codes:
+            return [Decision.catalogue_api]
+        else:
+            return [Decision.cold_store]
+
+    else:
+        return None
 
 
 def _get_decisions_from_rules(collection, image_data):
@@ -222,14 +240,28 @@ def _get_decisions_from_rules(collection, image_data):
         decisions.append(Decision.none)
 
     print(decisions)
+
     return decisions
 
 
-def sort_image(collection, image_data, exceptions):
+def _assess_rules(rule_list):
+    for rule in rule_list:
+        decisions = rule()
+
+        print(decisions)
+
+        if decisions is not None:
+            return decisions
+
+
+def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
     print(collection)
     print(image_data)
 
-    decisions = _get_decisions_from_exceptions(exceptions, image_data)
-    if not decisions:
-        decisions = _get_decisions_from_rules(collection, image_data)
+    decisions = _assess_rules([
+        lambda: _get_decisions_from_id_exceptions(id_exceptions, image_data),
+        lambda: _get_decisions_from_contrib_exceptions(collection, contrib_exceptions, image_data),
+        lambda: _get_decisions_from_rules(collection, image_data)
+    ])
+
     return decisions
