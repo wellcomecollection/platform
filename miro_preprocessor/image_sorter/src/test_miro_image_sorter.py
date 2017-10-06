@@ -4,6 +4,7 @@ import json
 
 import boto3
 from moto import mock_s3
+import pytest
 import os
 
 from miro_image_sorter import fetch_json_s3_data, parse_s3_event, main
@@ -246,5 +247,13 @@ def test_image_sorter_exceptions(image_sorter_sns_sqs, s3_put_event):
     main(s3_put_event, None)
 
     cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
-
     assert cold_store_msg == metadata
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["tandem_vault"]["queue"])
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["digital_library"]["queue"])
