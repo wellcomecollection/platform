@@ -153,7 +153,7 @@ class Rules:
 
     @property
     def is_cold_store(self):
-        return self.is_collection("F") or \
+        return self.is_collection("F", "AS", "FP") or \
             (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
             (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
             (self.is_collection("L", "M", "V") and
