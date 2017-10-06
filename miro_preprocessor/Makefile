@@ -98,14 +98,12 @@ miro_preprocessor-publish: xml_to_json_converter-publish miro_preprocessor_lambd
 miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		-v $(ROOT)/miro_preprocessor:/data \
-		-v $(ROOT)/terraform:/terraform \
 		-e OP=plan \
 		terraform_ci:latest
 
 miro_preprocessor-terraform-apply: $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/miro_preprocessor:/data \
-	-v $(ROOT)/terraform:/terraform \
 	-e OP=apply \
 	terraform_ci:latest
 
