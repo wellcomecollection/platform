@@ -270,5 +270,6 @@ def test_drain_ecs_instance_if_running_tasks(
         MaxNumberOfMessages=1
     )
     message_body = messages['Messages'][0]['Body']
+    inner_message = json.loads(message_body)['Message']
 
-    assert json.loads(message_body)['default'] == json.dumps(message)
+    assert json.loads(inner_message)['default'] == json.dumps(message)
