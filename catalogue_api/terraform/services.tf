@@ -17,7 +17,7 @@ module "api_romulus_v1" {
   nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_romulus_api_nginx != "" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
-  infra_bucket       = "${var.infra_bucket}"
+  infra_bucket       = "${local.bucket_infra_id}"
   config_key         = "config/${var.build_env}/api_romulus_v1.ini"
   path_pattern       = "/catalogue/v1/*"
   alb_priority       = "114"
@@ -46,8 +46,8 @@ module "api_romulus_v1" {
   }
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
-  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }
 
 data "template_file" "es_cluster_host_remus" {
@@ -69,7 +69,7 @@ module "api_remus_v1" {
   nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api_nginx != "" ? var.pinned_remus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
-  infra_bucket       = "${var.infra_bucket}"
+  infra_bucket       = "${local.bucket_infra_id}"
   config_key         = "config/${var.build_env}/api_remus_v1.ini"
   path_pattern       = "/catalogue/v1/*"
   alb_priority       = "113"
@@ -98,6 +98,6 @@ module "api_remus_v1" {
   }
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${module.alb_server_error_alarm.arn}"
-  client_error_alarm_topic_arn = "${module.alb_client_error_alarm.arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }

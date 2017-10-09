@@ -1,17 +1,17 @@
-module "gatling_loris" {
-  source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"
-  task_name     = "gatling_loris"
-  app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
-  task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
-
-  env_vars = [
-    "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
-    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
-    "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
-    "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
-    "{\"name\": \"S3_BUCKET\", \"value\": \"${aws_s3_bucket.dashboard.id}\"}",
-  ]
-}
+//module "gatling_loris" {
+//  source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"
+//  task_name     = "gatling_loris"
+//  app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
+//  task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
+//
+//  env_vars = [
+//    "{\"name\": \"SIMULATION\", \"value\": \"testing.load.LorisSimulation\"}",
+//    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+//    "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
+//    "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
+//    "{\"name\": \"S3_BUCKET\", \"value\": \"${aws_s3_bucket.dashboard.id}\"}",
+//  ]
+//}
 
 module "gatling_catalogue_api" {
   source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"

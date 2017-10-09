@@ -30,11 +30,6 @@ variable "release_ids" {
   type        = "map"
 }
 
-variable "infra_bucket" {
-  description = "S3 bucket storing our configuration"
-  default     = "platform-infra"
-}
-
 variable "build_env" {
   description = "Build environment (prod, dev, stage, ...)"
   default     = "prod"

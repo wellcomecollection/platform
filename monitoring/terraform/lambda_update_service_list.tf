@@ -12,7 +12,7 @@ module "lambda_update_service_list" {
     ASSUMABLE_ROLES = "${join(",", var.dashboard_assumable_roles)}"
   }
 
-  alarm_topic_arn = "${data.terraform_remote_state.lambdas.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
 }
 
 module "trigger_update_service_list" {

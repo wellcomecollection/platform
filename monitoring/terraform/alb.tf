@@ -11,5 +11,5 @@ module "monitoring_alb" {
   certificate_domain = "monitoring.wellcomecollection.org"
   vpc_id             = "${module.vpc_monitoring.vpc_id}"
 
-  alb_access_log_bucket = "${var.alb_logs_id}"
+  alb_access_log_bucket = "${local.bucket_alb_logs_id}"
 }

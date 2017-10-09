@@ -62,10 +62,3 @@ variable "grafana_admin_user" {
 variable "grafana_admin_password" {
   description = "The password of the default Grafana admin"
 }
-
-variable "alb_logs_id" {}
-variable "ec2_terminating_topic_arn" {}
-variable "ec2_instance_terminating_for_too_long_alarm_arn" {}
-variable "ec2_terminating_topic_publish_policy" {}
-variable "alb_server_error_alarm_arn" {}
-variable "alb_client_error_alarm_arn" {}
