@@ -12,5 +12,4 @@ locals {
   bucket_infra_id  = "${data.terraform_remote_state.shared_infra.bucket_infra_id}"
 
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
-
 }
