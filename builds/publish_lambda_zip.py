@@ -30,7 +30,7 @@ from tooling import compare_zip_files
 ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
-UTILS_LIB = os.path.join(ROOT, 'lambdas', 'common', 'utils')
+UTILS_LIB = os.path.join(ROOT, 'shared_infra', 'lambdas', 'common', 'utils')
 
 ZIP_DIR = os.path.join(ROOT, '.lambda_zips')
 

@@ -11,5 +11,5 @@ module "api_alb" {
   certificate_domain = "api.wellcomecollection.org"
   vpc_id             = "${module.vpc_api.vpc_id}"
 
-  alb_access_log_bucket = "${aws_s3_bucket.alb-logs.id}"
+  alb_access_log_bucket = "${local.bucket_alb_logs_id}"
 }

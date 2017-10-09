@@ -5,7 +5,7 @@ resource "aws_iam_role_policy" "lambda_gatling_to_cloudwatch_put_metric" {
 
 resource "aws_iam_role_policy" "update_service_list_describe_services" {
   role   = "${module.lambda_update_service_list.role_name}"
-  policy = "${data.terraform_remote_state.lambdas.iam_policy_document_describe_services}"
+  policy = "${data.terraform_remote_state.shared_infra.iam_policy_document_describe_services}"
 }
 
 resource "aws_iam_role_policy" "update_service_list_push_to_s3" {

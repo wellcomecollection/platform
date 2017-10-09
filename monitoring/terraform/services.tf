@@ -34,6 +34,6 @@ module "grafana" {
   is_config_managed = false
 
   loadbalancer_cloudwatch_id   = "${module.monitoring_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }

@@ -1,20 +1,3 @@
-data "aws_iam_policy_document" "alb_logs" {
-  statement {
-    actions = [
-      "s3:PutObject",
-    ]
-
-    resources = [
-      "arn:aws:s3:::wellcomecollection-alb-logs/*",
-    ]
-
-    principals {
-      identifiers = ["arn:aws:iam::156460612806:root"]
-      type        = "AWS"
-    }
-  }
-}
-
 data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   statement {
     actions = [
@@ -52,40 +35,6 @@ data "aws_iam_policy_document" "describe_services" {
       "ecs:DescribeTaskDefinition",
       "ecs:ListClusters",
       "ecs:ListServices",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "travis_permissions" {
-  statement {
-    actions = [
-      "ecr:*",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.infra.arn}/lambdas/*",
-      "${aws_s3_bucket.infra.arn}/releases/*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "sns:ListTopic",
     ]
 
     resources = [
