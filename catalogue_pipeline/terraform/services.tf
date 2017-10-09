@@ -29,8 +29,8 @@ module "miro_reindexer" {
   }
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }
 
 data "template_file" "es_cluster_host_ingestor" {
@@ -78,8 +78,8 @@ module "ingestor" {
   }
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }
 
 module "transformer" {
@@ -112,8 +112,8 @@ module "transformer" {
   }
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }
 
 module "id_minter" {
@@ -150,6 +150,6 @@ module "id_minter" {
   }
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
+  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }

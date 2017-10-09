@@ -3,7 +3,7 @@ module "transformer_trybackoff" {
   metric_name      = "TransformerWorkerService_TerminalFailure"
   name             = "TransformerWorkerService_TerminalFailure"
   namespace        = "miro-transformer"
-  alarm_action_arn = "${var.terminal_failure_alarm_arn}"
+  alarm_action_arn = "${local.terminal_failure_alarm_arn}"
 }
 
 module "ingestor_trybackoff" {
@@ -11,7 +11,7 @@ module "ingestor_trybackoff" {
   metric_name      = "IngestorWorkerService_TerminalFailure"
   name             = "IngestorWorkerService_TerminalFailure"
   namespace        = "ingestor"
-  alarm_action_arn = "${var.terminal_failure_alarm_arn}"
+  alarm_action_arn = "${local.terminal_failure_alarm_arn}"
 }
 
 module "id-minter_trybackoff" {
@@ -19,5 +19,5 @@ module "id-minter_trybackoff" {
   metric_name      = "IdMinterWorkerService_TerminalFailure"
   name             = "IdMinterWorkerService_TerminalFailure"
   namespace        = "id-minter"
-  alarm_action_arn = "${var.terminal_failure_alarm_arn}"
+  alarm_action_arn = "${local.terminal_failure_alarm_arn}"
 }
