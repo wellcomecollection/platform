@@ -1,5 +1,5 @@
 module "image_sorter_lambda" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/miro_preprocessor/image_sorter.zip"
 
   description     = "Sort blobs of Miro image metadata into different SNS topics"
@@ -8,6 +8,7 @@ module "image_sorter_lambda" {
 
   environment_variables = {
     S3_MIRODATA_ID        = "${var.s3_miro_data_id}"
+    S3_EXCEPTIONS_KEY     = "${var.s3_exceptions_key}"
     TOPIC_COLD_STORE      = "${var.topic_cold_store_arn}"
     TOPIC_TANDEM_VAULT    = "${var.topic_tandem_vault_arn}"
     TOPIC_CATALOGUE_API   = "${var.topic_catalogue_api_arn}"

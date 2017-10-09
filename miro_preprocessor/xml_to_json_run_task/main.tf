@@ -1,7 +1,7 @@
 # Lambda for publishing ECS service schedules to an SNS topic
 
 module "lambda_xml_to_json_run_task" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/miro_preprocessor/xml_to_json_run_task.zip"
 
   name        = "xml_to_json_run_task"

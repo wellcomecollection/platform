@@ -1,5 +1,5 @@
 module "loris_cluster_asg" {
-  source                = "../../terraform/ecs_asg"
+  source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=v1.0.0"
   asg_name              = "loris-cluster"
   subnet_list           = ["${data.terraform_remote_state.platform.vpc_api_subnets}"]
   key_name              = "${var.key_name}"
@@ -19,7 +19,7 @@ module "loris_cluster_asg" {
 }
 
 module "loris_cluster_asg_ebs" {
-  source                = "../../terraform/ecs_asg"
+  source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=v1.0.0"
   asg_name              = "loris-cluster-ebs"
   subnet_list           = ["${data.terraform_remote_state.platform.vpc_api_subnets}"]
   key_name              = "${var.key_name}"

@@ -1,5 +1,5 @@
 module "miro_copy_s3_asset_lambda" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/miro_preprocessor/miro_copy_s3_asset.zip"
 
   description     = "Copy miro images to another s3 bucket"
@@ -16,7 +16,7 @@ module "miro_copy_s3_asset_lambda" {
 }
 
 module "miro_copy_s3_asset_trigger" {
-  source               = "../../terraform/lambda/trigger_sns"
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
   lambda_function_name = "${module.miro_copy_s3_asset_lambda.function_name}"
   sns_trigger_arn      = "${var.topic_miro_copy_s3_asset_arn}"
   lambda_function_arn  = "${module.miro_copy_s3_asset_lambda.arn}"

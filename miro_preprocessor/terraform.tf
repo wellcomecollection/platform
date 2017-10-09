@@ -19,6 +19,16 @@ data "terraform_remote_state" "platform" {
   }
 }
 
+data "terraform_remote_state" "loris" {
+  backend = "s3"
+
+  config {
+    bucket = "platform-infra"
+    key    = "platform-loris.tfstate"
+    region = "eu-west-1"
+  }
+}
+
 data "terraform_remote_state" "lambda" {
   backend = "s3"
 

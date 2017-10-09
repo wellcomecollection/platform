@@ -1,5 +1,5 @@
 module "loris_alb" {
-  source  = "../../terraform/ecs_alb"
+  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_alb?ref=v1.0.0"
   name    = "loris"
   subnets = ["${data.terraform_remote_state.platform.vpc_api_subnets}"]
 
@@ -15,7 +15,7 @@ module "loris_alb" {
 }
 
 module "loris_alb_ebs" {
-  source  = "../../terraform/ecs_alb"
+  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_alb?ref=v1.0.0"
   name    = "loris-ebs"
   subnets = ["${data.terraform_remote_state.platform.vpc_api_subnets}"]
 

@@ -1,5 +1,5 @@
 module "lambda_schedule_reindexer" {
-  source = "../../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "schedule_reindexer"
   description = "Schedules the reindexer based on the ReindexerTracker table"
@@ -18,7 +18,7 @@ module "lambda_schedule_reindexer" {
 }
 
 module "trigger_reindexer_lambda" {
-  source = "../../terraform/lambda/trigger_dynamo"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_dynamo?ref=v1.0.0"
 
   stream_arn    = "${var.dynamodb_table_reindex_tracker_stream_arn}"
   function_arn  = "${module.lambda_schedule_reindexer.arn}"

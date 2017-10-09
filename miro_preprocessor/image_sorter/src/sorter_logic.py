@@ -153,7 +153,7 @@ class Rules:
 
     @property
     def is_cold_store(self):
-        return self.is_collection("F") or \
+        return self.is_collection("F", "AS", "FP") or \
             (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
             (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
             (self.is_collection("L", "M", "V") and
@@ -190,33 +190,46 @@ class InvalidCollectionException(Exception):
     pass
 
 
-def sort_image(collection, image_data):
-    print(collection)
-    print(image_data)
-    r = Rules(collection, image_data)
+def _get_decisions_from_exceptions(exceptions, image_data):
+    for exception in exceptions:
+        if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
+            return [getattr(Decision, key) for key, value in exception.items()
+                    if value is not None and not value.strip().lower() == "false"]
 
+
+def _get_decisions_from_rules(collection, image_data):
     decisions = []
-
-    if not r.is_collection("F", "L", "V", "M"):
+    r = Rules(collection, image_data)
+    if not r.is_collection("F", "L", "V", "M", "FP", "AS"):
         raise InvalidCollectionException({
             "collection": collection,
             "image_data": image_data
         })
 
     if r.is_cold_store:
-        return [Decision.cold_store]
+        decisions = [Decision.cold_store]
 
-    if r.is_tandem_vault:
+    if not r.is_cold_store and r.is_tandem_vault:
         decisions.append(Decision.tandem_vault)
 
-    if r.is_digital_library:
+    if not r.is_cold_store and r.is_digital_library:
         decisions.append(Decision.digital_library)
 
-    if r.is_catalogue_api:
+    if not r.is_cold_store and r.is_catalogue_api:
         decisions.append(Decision.catalogue_api)
 
-    if not r.is_catalogue_api and not r.is_digital_library and not r.is_tandem_vault:
+    if not r.is_cold_store and not r.is_catalogue_api and not r.is_digital_library and not r.is_tandem_vault:
         decisions.append(Decision.none)
 
     print(decisions)
+    return decisions
+
+
+def sort_image(collection, image_data, exceptions):
+    print(collection)
+    print(image_data)
+
+    decisions = _get_decisions_from_exceptions(exceptions, image_data)
+    if not decisions:
+        decisions = _get_decisions_from_rules(collection, image_data)
     return decisions
