@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+import csv
+from io import StringIO
 import json
 import os
 
@@ -22,8 +24,11 @@ def parse_s3_event(event):
 def fetch_s3_data(bucket, key):
     client = boto3.client('s3')
     resp = client.get_object(Bucket=bucket, Key=key)
-    json_str = resp['Body'].read()
-    return json.loads(json_str)
+    return resp['Body'].read()
+
+
+def fetch_json_s3_data(bucket, key):
+    return json.loads(fetch_s3_data(bucket, key))
 
 
 def main(event, _):
@@ -37,17 +42,25 @@ def main(event, _):
     topic_digital_library = os.environ['TOPIC_DIGITAL_LIBRARY']
 
     s3_bucket = os.environ['S3_MIRODATA_ID']
+    s3_exceptions_key = os.environ['S3_EXCEPTIONS_KEY']
     s3_key = parse_s3_event(event)
 
     # Fetch the metadata from S3
     print(f'Bucket = {s3_bucket}, key = {s3_key}')
-    data = fetch_s3_data(bucket=s3_bucket, key=s3_key)
+    print(f'Bucket = {s3_bucket}, exceptions_key = {s3_exceptions_key}')
+
+    exceptions = fetch_s3_data(s3_bucket, s3_exceptions_key)
+    exceptions_decoded = exceptions.decode()
+
+    data = fetch_json_s3_data(bucket=s3_bucket, key=s3_key)
 
     # Decide where to put it, then send the metadata to SNS
     collection = data['collection']
     image_data = data['image_data']
 
-    decisions = sort_image(collection=collection, image_data=image_data)
+    decisions = sort_image(collection=collection,
+                           image_data=image_data,
+                           exceptions=csv.DictReader(StringIO(exceptions_decoded)))
 
     topic_arns = {
         Decision.cold_store: topic_cold_store,
