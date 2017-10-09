@@ -4,9 +4,10 @@ import json
 
 import boto3
 from moto import mock_s3
+import pytest
 import os
 
-from miro_image_sorter import fetch_s3_data, parse_s3_event, main
+from miro_image_sorter import fetch_json_s3_data, parse_s3_event, main
 
 
 def test_parse_s3_event(s3_put_event):
@@ -14,7 +15,7 @@ def test_parse_s3_event(s3_put_event):
 
 
 @mock_s3
-def test_fetch_s3_data():
+def test_fetch_json_s3_data():
     client = boto3.client('s3', region_name='eu-west-1')
     client.create_bucket(Bucket='miro-data')
 
@@ -29,7 +30,7 @@ def test_fetch_s3_data():
         Body=json.dumps(metadata)
     )
 
-    assert fetch_s3_data(bucket='miro-data', key='metadata.json') == metadata
+    assert fetch_json_s3_data(bucket='miro-data', key='metadata.json') == metadata
 
 
 def _get_msg(sqs_client, queue_url):
@@ -72,6 +73,7 @@ def collection_image_data(**kwargs):
 
 def _setup_os_environ(bucket_name, sns_sqs):
     os.environ['S3_MIRODATA_ID'] = bucket_name
+    os.environ['S3_EXCEPTIONS_KEY'] = "exceptions.csv"
     os.environ['TOPIC_COLD_STORE'] = sns_sqs["cold_store"]["topic"]
     os.environ['TOPIC_TANDEM_VAULT'] = sns_sqs["tandem_vault"]["topic"]
     os.environ['TOPIC_CATALOGUE_API'] = sns_sqs["catalogue_api"]["topic"]
@@ -99,6 +101,11 @@ def test_image_sorter_catalogue_api_digital_library(image_sorter_sns_sqs, s3_put
         Body=json.dumps(metadata)
     )
 
+    exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
+
+    s3_client.put_object(Bucket=bucket_name,
+                         Key='exceptions.csv',
+                         Body=exceptions_csv_body)
     main(s3_put_event, None)
 
     catalogue_api_msg = _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
@@ -129,6 +136,11 @@ def test_image_sorter_tandem_vault(image_sorter_sns_sqs, s3_put_event):
         Body=json.dumps(metadata)
     )
 
+    exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
+
+    s3_client.put_object(Bucket=bucket_name,
+                         Key='exceptions.csv',
+                         Body=exceptions_csv_body)
     main(s3_put_event, None)
 
     tandem_value_msg = _get_msg(sqs_client, sns_sqs["tandem_vault"]["queue"])
@@ -157,6 +169,11 @@ def test_image_sorter_cold_store(image_sorter_sns_sqs, s3_put_event):
         Body=json.dumps(metadata)
     )
 
+    exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
+
+    s3_client.put_object(Bucket=bucket_name,
+                         Key='exceptions.csv',
+                         Body=exceptions_csv_body)
     main(s3_put_event, None)
 
     cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
@@ -187,9 +204,56 @@ def test_image_sorter_none(image_sorter_sns_sqs, s3_put_event):
         Key='metadata.json',
         Body=json.dumps(metadata)
     )
+    exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
+
+    s3_client.put_object(Bucket=bucket_name,
+                         Key='exceptions.csv',
+                         Body=exceptions_csv_body)
 
     main(s3_put_event, None)
 
     none_msg = _get_msg(sqs_client, sns_sqs["none"]["queue"])
 
     assert none_msg == metadata
+
+
+@mock_s3
+def test_image_sorter_exceptions(image_sorter_sns_sqs, s3_put_event):
+    bucket_name = "miro-data"
+
+    sqs_client = boto3.client('sqs')
+
+    sns_sqs = image_sorter_sns_sqs
+    _setup_os_environ(bucket_name, sns_sqs)
+
+    s3_client = boto3.client('s3', region_name='eu-west-1')
+    s3_client.create_bucket(Bucket=bucket_name)
+    miro_id = "V1234567"
+    metadata = collection_image_data(
+        image_no_calc=miro_id)
+
+    s3_client.put_object(
+        Bucket=bucket_name,
+        Key='metadata.json',
+        Body=json.dumps(metadata)
+    )
+
+    exceptions_csv_body = f"""miro_id,cold_store,tandem_vault,digital_library,catalogue_api\n{miro_id},true,,,"""
+
+    s3_client.put_object(Bucket=bucket_name,
+                         Key='exceptions.csv',
+                         Body=exceptions_csv_body)
+
+    main(s3_put_event, None)
+
+    cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
+    assert cold_store_msg == metadata
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["tandem_vault"]["queue"])
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["digital_library"]["queue"])

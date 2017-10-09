@@ -40,5 +40,6 @@ variable "topic_none_publish_policy" {
   description = "JSON policy for pushing to `topic_none_arn`"
 }
 
+variable "s3_exceptions_key" {}
 variable "s3_miro_data_id" {}
 variable "s3_miro_data_arn" {}
