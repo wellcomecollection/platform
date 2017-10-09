@@ -39,10 +39,10 @@ module "miro_image_sorter" {
 
   lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
 
-  s3_miro_data_id   = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
-  s3_miro_data_arn  = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
+  s3_miro_data_id  = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  s3_miro_data_arn = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
 
-  s3_id_exceptions_key = "source/exceptions.csv"
+  s3_id_exceptions_key      = "source/exceptions.csv"
   s3_contrib_exceptions_key = "source/contrib.csv"
 
   topic_cold_store_arn                 = "${module.cold_store_topic.arn}"
