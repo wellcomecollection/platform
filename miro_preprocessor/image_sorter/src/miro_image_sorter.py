@@ -48,8 +48,6 @@ def main(event, _):
     topic_tandem_vault = os.environ['TOPIC_TANDEM_VAULT']
     topic_catalogue_api = os.environ['TOPIC_CATALOGUE_API']
     topic_none = os.environ['TOPIC_NONE']
-    topic_digital_library = os.environ['TOPIC_DIGITAL_LIBRARY']
-
     s3_bucket = os.environ['S3_MIRODATA_ID']
     s3_id_exceptions_key = os.environ['S3_ID_EXCEPTIONS_KEY']
     s3_contributor_exceptions_key = os.environ['S3_CONTRIB_EXCEPTIONS_KEY']
@@ -76,7 +74,6 @@ def main(event, _):
         Decision.tandem_vault: topic_tandem_vault,
         Decision.catalogue_api: topic_catalogue_api,
         Decision.none: topic_none,
-        Decision.digital_library: topic_digital_library
     }
 
     for decision in decisions:

@@ -45,7 +45,6 @@ def _setup_os_environ(bucket_name, sns_sqs):
     os.environ['TOPIC_TANDEM_VAULT'] = sns_sqs["tandem_vault"]["topic"]
     os.environ['TOPIC_CATALOGUE_API'] = sns_sqs["catalogue_api"]["topic"]
     os.environ['TOPIC_NONE'] = sns_sqs["none"]["topic"]
-    os.environ['TOPIC_DIGITAL_LIBRARY'] = sns_sqs["digital_library"]["topic"]
 
 
 def _setup(
@@ -56,10 +55,10 @@ def _setup(
         sns_sqs=None):
 
     if id_exceptions_csv_body is None:
-        id_exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
+        id_exceptions_csv_body = "miro_id,cold_store,tandem_vault,catalogue_api"
 
     if contrib_exceptions_csv_body is None:
-        contrib_exceptions_csv_body = "A,B,C,L,N,W"
+        contrib_exceptions_csv_body = "XA,XB,XC,XL,XN,XW"
 
     if sns_sqs is not None:
         _setup_os_environ(bucket_name, sns_sqs)
@@ -84,26 +83,22 @@ def _get_msg(sqs_client, queue_url):
 
 
 def collection_image_data(**kwargs):
-    collection = 'images-M'
     image_data = {
+        "image_no_calc": "V1234567",
         "image_title": "Image Title",
         "image_pub_title": "Image Pub Title",
         "image_pub_periodical": "Lost socks monthly",
         "image_library_dept": "Paperclips and hairnets",
         "image_tech_captured_mode": "Frog retina",
         "image_copyright_cleared": "Y",
-        "image_access_restrictions": "CC-BY",
+        "image_use_restrictions": "CC-BY",
         "image_general_use": "Y",
         "image_innopac_id": "12345678",
         "image_cleared": "Y",
-        "image_use_restrictions": "CC-BY",
-        "image_source_code": "___"
+        "image_source_code": "XXX"
     }
-
-    if 'collection' in kwargs.keys():
-        collection = kwargs.pop('collection')
-
     image_data.update(kwargs)
+    collection = kwargs.pop('collection', 'images-M')
 
     return {
         "collection": collection,
@@ -129,7 +124,7 @@ def test_fetch_json_s3_data():
 
 
 @mock_s3
-def test_image_sorter_catalogue_api_digital_library(image_sorter_sns_sqs, s3_put_event):
+def test_image_sorter_catalogue_api(image_sorter_sns_sqs, s3_put_event):
     sqs_client = boto3.client('sqs')
     sns_sqs = image_sorter_sns_sqs
     s3_client = boto3.client('s3', region_name='eu-west-1')
@@ -145,10 +140,8 @@ def test_image_sorter_catalogue_api_digital_library(image_sorter_sns_sqs, s3_put
     main(s3_put_event, None)
 
     catalogue_api_msg = _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
-    digital_library_msg = _get_msg(sqs_client, sns_sqs["digital_library"]["queue"])
 
     assert catalogue_api_msg == metadata
-    assert digital_library_msg == metadata
 
 
 @mock_s3
@@ -234,7 +227,7 @@ def test_image_sorter_id_exceptions(image_sorter_sns_sqs, s3_put_event):
     metadata = collection_image_data(
         image_no_calc=miro_id)
 
-    id_exceptions_csv_body = f"""miro_id,cold_store,tandem_vault,digital_library,catalogue_api\n{miro_id},true,,,"""
+    id_exceptions_csv_body = f"""miro_id,cold_store,tandem_vault,catalogue_api\n{miro_id},true,,"""
 
     _setup(
         s3_client=s3_client,
@@ -307,6 +300,3 @@ def test_image_sorter_contrib_exceptions_no_match(image_sorter_sns_sqs, s3_put_e
 
     with pytest.raises(KeyError):
         _get_msg(sqs_client, sns_sqs["tandem_vault"]["queue"])
-
-    with pytest.raises(KeyError):
-        _get_msg(sqs_client, sns_sqs["digital_library"]["queue"])
