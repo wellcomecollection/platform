@@ -40,10 +40,10 @@ def update_image_data(**kwargs):
 
 def exception(**kwargs):
     exception = {
-        "cold_store": None,
-        "tandem_vault": None,
-        "catalogue_api": None,
-        "digital_library": None,
+        "cold_store": "",
+        "tandem_vault": "",
+        "catalogue_api": "",
+        "digital_library": "",
     }
     exception.update(kwargs)
     return exception

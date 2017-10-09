@@ -51,7 +51,6 @@ def main(event, _):
 
     exceptions = fetch_s3_data(s3_bucket, s3_exceptions_key)
     exceptions_decoded = exceptions.decode()
-    print(exceptions_decoded)
 
     data = fetch_json_s3_data(bucket=s3_bucket, key=s3_key)
 
