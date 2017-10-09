@@ -42,3 +42,23 @@ module "loris_cluster_asg_ebs" {
   ebs_volume_type = "io1"
   ebs_iops        = "2000"
 }
+
+module "loris_cluster_asg_m4" {
+  source                = "../../terraform/ecs_asg"
+  asg_name              = "loris-cluster-m4"
+  subnet_list           = ["${data.terraform_remote_state.platform.vpc_api_subnets}"]
+  key_name              = "${var.key_name}"
+  instance_profile_name = "${module.ecs_loris_iam.instance_profile_name}"
+  user_data             = "${module.loris_userdata_m4.rendered}"
+  vpc_id                = "${data.terraform_remote_state.platform.vpc_api_id}"
+
+  asg_desired = "1"
+  asg_max     = "4"
+
+  image_id      = "${data.terraform_remote_state.platform.ecs_ami_id}"
+  instance_type = "c4.xlarge"
+
+  sns_topic_arn         = "${data.terraform_remote_state.platform.ec2_terminating_topic_arn}"
+  publish_to_sns_policy = "${data.terraform_remote_state.platform.ec2_terminating_topic_publish_policy}"
+  alarm_topic_arn       = "${data.terraform_remote_state.platform.ec2_instance_terminating_for_too_long_alarm_arn}"
+}

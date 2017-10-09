@@ -4,6 +4,12 @@ module "loris_userdata" {
   efs_filesystem_id = "${module.loris_efs.efs_id}"
 }
 
+module "loris_userdata_m4" {
+  source            = "../../terraform/userdata"
+  cluster_name      = "${aws_ecs_cluster.loris_m4.name}"
+  efs_filesystem_id = "${module.loris_efs.efs_id}"
+}
+
 module "loris_userdata_ebs" {
   source                             = "git::https://github.com/wellcometrust/terraform.git//userdata?ref=v1.0.0"
   cluster_name                       = "${aws_ecs_cluster.loris_ebs.name}"
