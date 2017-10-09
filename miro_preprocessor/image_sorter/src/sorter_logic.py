@@ -194,7 +194,7 @@ def _get_decisions_from_exceptions(exceptions, image_data):
     for exception in exceptions:
         if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
             return [getattr(Decision, key) for key, value in exception.items()
-                    if value is not None and not value.strip().lower() == "false"]
+                    if value is not "" and not value.strip().lower() == "false"]
 
 
 def _get_decisions_from_rules(collection, image_data):
