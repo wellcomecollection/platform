@@ -54,7 +54,7 @@ resource "aws_cloudfront_distribution" "loris" {
 
   logging_config {
     include_cookies = false
-    bucket          = "${data.terraform_remote_state.platform.cloudfront_logs_domain_name}"
+    bucket          = "${local.cloudfront_logs_domain_name}"
     prefix          = "loris"
   }
 }
