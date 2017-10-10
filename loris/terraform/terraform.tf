@@ -14,7 +14,7 @@ data "terraform_remote_state" "shared_infra" {
 
   config {
     bucket = "platform-infra"
-    key    = "platform-lambda"
+    key    = "platform-lambda.tfstate"
     region = "eu-west-1"
   }
 }
