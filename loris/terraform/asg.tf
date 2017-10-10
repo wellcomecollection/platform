@@ -49,7 +49,7 @@ module "loris_cluster_asg_ebs_large" {
   subnet_list           = ["${local.vpc_api_subnets}"]
   key_name              = "${var.key_name}"
   instance_profile_name = "${module.ecs_loris_iam.instance_profile_name}"
-  user_data             = "${module.loris_userdata_ebs.rendered}"
+  user_data             = "${module.loris_userdata_ebs_large.rendered}"
   vpc_id                = "${local.vpc_api_id}"
 
   asg_desired = "2"

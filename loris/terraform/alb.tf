@@ -32,7 +32,7 @@ module "loris_alb_ebs" {
 
 module "loris_alb_ebs_large" {
   source  = "git::https://github.com/wellcometrust/terraform.git//ecs_alb?ref=v1.0.0"
-  name    = "loris-ebs-large"
+  name    = "loris-ebs-l"
   subnets = ["${local.vpc_api_subnets}"]
 
   loadbalancer_security_groups = [
