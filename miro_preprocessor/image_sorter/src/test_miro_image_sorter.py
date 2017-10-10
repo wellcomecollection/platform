@@ -76,9 +76,9 @@ def _get_msg(sqs_client, queue_url):
     )
 
     message_body = messages['Messages'][0]['Body']
-
+    inner_message = json.loads(message_body)['Message']
     return json.loads(
-        json.loads(message_body)['default']
+        json.loads(inner_message)['default']
     )
 
 
