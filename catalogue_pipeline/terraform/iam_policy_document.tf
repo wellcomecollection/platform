@@ -1,17 +1,3 @@
-data "aws_iam_policy_document" "allow_calm_db_all" {
-  statement {
-    actions = [
-      "dynamodb:DescribeTable",
-      "dynamodb:PutItem",
-      "dynamodb:UpdateTable",
-    ]
-
-    resources = [
-      "${aws_dynamodb_table.calm_table.arn}",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "reindex_tracker_table" {
   statement {
     actions = [
