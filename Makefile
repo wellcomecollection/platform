@@ -144,6 +144,8 @@ sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to
 	PROJECT=transformer ./builds/publish_service.sh
 
 
+sbt-deploy-services: sbt-deploy-id_minter sbt-deploy-ingestor sbt-deploy-reindexer sbt-deploy-transformer
+
 format: \
 	format-terraform \
 	format-scala
