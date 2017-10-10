@@ -4,12 +4,14 @@
 Sends slack notifications for alarms events
 """
 
+import collections
 import datetime as dt
 import json
 import os
 import re
 from urllib.parse import quote
 
+import boto3
 from botocore.vendored import requests
 
 
@@ -118,7 +120,7 @@ class Alarm:
             return f'/aws/lambda/{lambda_name}'
         elif self.name == 'api_romulus_v1-alb-target-500-errors':
             return 'platform/api_romulus_v1'
-        elif self.name == 'api_remus-alb-target-500-errors':
+        elif self.name == 'api_remus_v1-alb-target-500-errors':
             return 'platform/api_remus_v1'
         else:
             raise CloudWatchException(
@@ -157,7 +159,6 @@ class Alarm:
                 )
                 for search_term in self.cloudwatch_search_terms
             ]
-            return self._build_cloudwatch_url(search_term, self.group, start, end)
         except CloudWatchException as exc:
             print(f'Error in cloudwatch_urls: {exc}')
             return []
@@ -171,11 +172,9 @@ class Alarm:
         messages = []
 
         try:
-            group = self.cloudwatch_log_group
-            timeframe = self.cloudwatch_timeframe
-
             # CloudWatch wants these parameters specified as seconds since
             # 1 Jan 1970 00:00:00, so convert to that first.
+            timeframe = self.cloudwatch_timeframe
             epoch = dt.datetime(1970, 1, 1, 0, 0, 0)
             startTime = int((timeframe.start - epoch).total_seconds() * 1000)
             endTime = int((timeframe.end - epoch).total_seconds() * 1000)
@@ -194,7 +193,8 @@ class Alarm:
 
         except Exception as exc:
             print(f'Error in cloudwatch_messages: {exc}')
-            return messages
+
+        return messages
 
     @staticmethod
     def _build_cloudwatch_url(search_term, group, timeframe):
@@ -251,24 +251,37 @@ def main(event, _):
                       ]
                   }]}
 
+    messages = alarm.cloudwatch_messages()
+    if messages:
+
+        # Discard the timestamp from messages in our Scala apps, and
+        # deduplicate to avoid taking up lots of space in Slack.
+        filtered_messages = []
+        for m in messages:
+            m = re.sub(
+                r'[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3} \[ForkJoinPool-[0-9]+-worker-[0-9]+\]',
+                '', m
+            )
+            filtered_messages.append(m)
+        filtered_messages = set(filtered_messages)
+
+        cloudwatch_message_str = '\n'.join(filtered_messages)
+        slack_data['attachments'][0]['fields'].append({
+            'title': 'CloudWatch messages',
+            'value': cloudwatch_message_str
+        })
+
     cloudwatch_urls = alarm.cloudwatch_urls()
     if cloudwatch_urls:
         cloudwatch_url_str = ' / '.join([
             to_bitly(url=url, access_token=bitly_access_token)
             for url in cloudwatch_urls
-        ]
+        ])
         slack_data['attachments'][0]['fields'].append({
-            'title': 'CloudWatch URL',
             'value': cloudwatch_url_str
         })
 
-    messages = alarm.cloudwatch_messages()
-    if cloudwatch_messages:
-        cloudwatch_message_str = '\n'.join(messages)
-        slack_data['attachments'][0]['fields'].append({
-            'title': 'CloudWatch messages',
-            'value': cloudwatch_messages
-        })
+    print('Sending message %s' % json.dumps(slack_data))
 
     response = requests.post(
         os.environ["SLACK_INCOMING_WEBHOOK"],
