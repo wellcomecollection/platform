@@ -1,12 +1,12 @@
 module "lambda_gatling_to_cloudwatch" {
-  source = "../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/monitoring/gatling_to_cloudwatch.zip"
 
   name        = "gatling_to_cloudwatch"
   description = "Record gatling results as CloudWatch metrics"
   timeout     = 5
 
-  alarm_topic_arn = "${data.terraform_remote_state.lambdas.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
 
 module "trigger_gatling_to_cloudwatch" {

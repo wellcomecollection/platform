@@ -19,7 +19,7 @@ data "terraform_remote_state" "platform" {
   }
 }
 
-data "terraform_remote_state" "lambdas" {
+data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 
   config {

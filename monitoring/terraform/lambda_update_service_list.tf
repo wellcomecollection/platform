@@ -1,5 +1,5 @@
 module "lambda_update_service_list" {
-  source = "../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/monitoring/update_service_list.zip"
 
   name        = "update_service_list"
@@ -12,11 +12,11 @@ module "lambda_update_service_list" {
     ASSUMABLE_ROLES = "${join(",", var.dashboard_assumable_roles)}"
   }
 
-  alarm_topic_arn = "${data.terraform_remote_state.lambdas.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
 }
 
 module "trigger_update_service_list" {
-  source = "../terraform/lambda/trigger_cloudwatch"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
 
   lambda_function_name    = "${module.lambda_update_service_list.function_name}"
   lambda_function_arn     = "${module.lambda_update_service_list.arn}"

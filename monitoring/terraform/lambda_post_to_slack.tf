@@ -1,5 +1,5 @@
 module "lambda_post_to_slack" {
-  source = "../terraform/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/monitoring/post_to_slack.zip"
 
   name        = "post_to_slack"
@@ -10,45 +10,45 @@ module "lambda_post_to_slack" {
     BITLY_ACCESS_TOKEN     = "${var.bitly_access_token}"
   }
 
-  alarm_topic_arn = "${data.terraform_remote_state.lambdas.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
 
 module "trigger_post_to_slack_dlqs_not_empty" {
-  source = "../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${data.terraform_remote_state.platform.dlq_alarm_arn}"
+  sns_trigger_arn      = "${local.dlq_alarm_arn}"
 }
 
 module "trigger_post_to_slack_esg_not_terminating" {
-  source = "../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${data.terraform_remote_state.platform.ec2_instance_terminating_for_too_long_alarm_arn}"
+  sns_trigger_arn      = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
 }
 
 module "trigger_post_to_slack_server_error_alb" {
-  source = "../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${data.terraform_remote_state.platform.alb_server_error_alarm_arn}"
+  sns_trigger_arn      = "${local.alb_server_error_alarm_arn}"
 }
 
 module "trigger_post_to_slack_lambda_error" {
-  source = "../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${data.terraform_remote_state.lambdas.lambda_error_alarm_arn}"
+  sns_trigger_arn      = "${local.lambda_error_alarm_arn}"
 }
 
 module "trigger_post_to_slack_terminal_failure" {
-  source = "../terraform/lambda/trigger_sns"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${data.terraform_remote_state.platform.terminal_failure_alarm_arn}"
+  sns_trigger_arn      = "${local.terminal_failure_alarm_arn}"
 }
