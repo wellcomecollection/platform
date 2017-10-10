@@ -144,7 +144,6 @@ class Alarm:
 
         return timeframe(start=start, end=end)
 
-
     def cloudwatch_urls(self):
         """
         Return some CloudWatch URLs that might be useful to check.
