@@ -29,6 +29,10 @@ DATAPOINT_RE = re.compile(r'''
 ''', flags=re.VERBOSE)
 
 
+class CloudWatchException(Exception):
+    pass
+
+
 class Alarm:
     def __init__(self, json_message):
         self.message = json.loads(json_message)
@@ -117,49 +121,50 @@ class Alarm:
         elif self.name == 'api_remus-alb-target-500-errors':
             return 'platform/api_remus_v1'
         else:
-            raise KeyError(
+            raise CloudWatchException(
                 "I don't know where to look for logs for %r" % self.alarm
             )
 
-    def cloudwatch_url(self):
+    @property
+    def cloudwatch_timeframe(self):
         """
-        Sometimes there's enough data in the alarm to make an educated guess
-        about useful CloudWatch logs to check.  This method tries to do that.
+        Try to work out a likely timeframe for CloudWatch errors.
         """
+        timeframe = collections.namedtuple('timeframe', ['start', 'end'])
         match = DATAPOINT_RE.search(self.state_reason)
         if match is None:
-            return
+            raise CloudWatchException(
+                "I can't find a timeframe for reason %r" % self.reason
+            )
 
         timestamp = match.group('timestamp')
         time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
         start = time - dt.timedelta(seconds=300)
         end = time + dt.timedelta(seconds=300)
 
-        if self.name == 'loris-alb-target-500-errors':
-            search_term = '"HTTP/1.0 500"'
-        elif self.name.startswith('lambda'):
-            # For Lambdas, we could have a Traceback, or we could have a
-            # timeout.  Return both, because there's no way to do an OR search
-            # in the CloudWatch console.
-            url1 = self._build_cloudwatch_url('Traceback', self.group, start, end)
-            url2 = self._build_cloudwatch_url('Task timed out after', self.group, start, end)
-            return f'{url1} / {url2}'
+        return timeframe(start=start, end=end)
 
-        elif self.name == 'api_romulus_v1-alb-target-500-errors':
-            search_term = '"HTTP 500"'
-        elif self.name == 'api_remus-alb-target-500-errors':
-            search_term = '"HTTP 500"'
-        else:
-            return
 
+    def cloudwatch_urls(self):
+        """
+        Return some CloudWatch URLs that might be useful to check.
+        """
         try:
+            group = self.cloudwatch_log_group
+            timeframe = self.cloudwatch_timeframe
+            return [
+                self._build_cloudwatch_url(
+                    search_term=search_term, group=group, timeframe=timeframe
+                )
+                for search_term in self.cloudwatch_search_terms
+            ]
             return self._build_cloudwatch_url(search_term, self.group, start, end)
-        except KeyError as err:
-            print(err)
-            return
+        except CloudWatchException as exc:
+            print(exc)
+            return []
 
     @staticmethod
-    def _build_cloudwatch_url(search_term, group, start, end):
+    def _build_cloudwatch_url(search_term, group, timeframe):
         return (
             'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
             '?region=eu-west-1'
@@ -169,8 +174,8 @@ class Alarm:
             f'filter={quote(search_term)};'
 
             # And add the date parameters to filter to the exact time
-            f'start={start.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-            f'end={end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
+            f'start={timeframe.start.strftime("%Y-%m-%dT%H:%M:%SZ")};'
+            f'end={timeframe.end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
         )
 
 
@@ -213,15 +218,15 @@ def main(event, _):
                       ]
                   }]}
 
-    cloudwatch_url = alarm.cloudwatch_url()
-    if cloudwatch_url is not None:
-        cloudwatch_url = to_bitly(
-            url=cloudwatch_url,
-            access_token=bitly_access_token
-        )
+    cloudwatch_urls = alarm.cloudwatch_urls()
+    if cloudwatch_urls:
+        cloudwatch_url_str = ' / '.join([
+            to_bitly(url=url, access_token=bitly_access_token)
+            for url in cloudwatch_urls
+        ]
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch URL',
-            'value': cloudwatch_url
+            'value': cloudwatch_url_str
         })
 
     response = requests.post(
