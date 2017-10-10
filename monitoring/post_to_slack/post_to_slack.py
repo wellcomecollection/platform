@@ -237,19 +237,20 @@ def main(event, _):
 
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
 
-    slack_data = {'username': 'cloudwatch-alert',
-                  "icon_emoji": ":rotating_light:",
-                  "attachments": [{
-                      'color': 'danger',
-                      'fallback': alarm.name,
-                      "title": alarm.name,
-                      "fields": [
-                          {
-                              "title": "Reason",
-                              "value": alarm.human_reason() or alarm.state_reason
-                          },
-                      ]
-                  }]}
+    slack_data = {
+        'username': 'cloudwatch-alert',
+        'icon_emoji': ':rotating_light:',
+        'attachments': [
+            {
+                'color': 'danger',
+                'fallback': alarm.name,
+                'title': alarm.name,
+                'fields': [{
+                    'value': alarm.human_reason() or alarm.state_reason
+                }]
+            }
+        ]
+    }
 
     messages = alarm.cloudwatch_messages()
     if messages:
