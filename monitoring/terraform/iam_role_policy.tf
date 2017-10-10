@@ -30,6 +30,11 @@ resource "aws_iam_role_policy" "update_service_list_read_from_webplatform" {
 EOF
 }
 
+resource "aws_iam_role_policy" "post_to_slack_get_cloudwatch" {
+  role   = "${module.lambda_post_to_slack.role_name}"
+  policy = "${data.aws_iam_policy_document.cloudwatch_allow_filterlogs.json}"
+}
+
 resource "aws_iam_role_policy" "gatling_push_to_s3" {
   role   = "${module.ecs_gatling_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.s3_put_gatling_reports.json}"

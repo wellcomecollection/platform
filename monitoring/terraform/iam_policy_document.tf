@@ -54,3 +54,15 @@ data "aws_iam_policy_document" "s3_put_gatling_reports" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "cloudwatch_allow_filterlogs" {
+  statement {
+    actions = [
+      "logs:FilterLogEvents",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
