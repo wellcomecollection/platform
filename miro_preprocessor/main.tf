@@ -51,8 +51,6 @@ module "miro_image_sorter" {
   topic_tandem_vault_publish_policy    = "${module.tandem_vault_topic.publish_policy}"
   topic_catalogue_api_arn              = "${module.catalogue_api_topic.arn}"
   topic_catalogue_api_publish_policy   = "${module.catalogue_api_topic.publish_policy}"
-  topic_digital_library_arn            = "${module.digital_library_topic.arn}"
-  topic_digital_library_publish_policy = "${module.digital_library_topic.publish_policy}"
   topic_none_arn                       = "${module.none_topic.arn}"
   topic_none_publish_policy            = "${module.none_topic.publish_policy}"
 }

@@ -24,14 +24,6 @@ variable "topic_catalogue_api_publish_policy" {
   description = "JSON policy for pushing to `topic_catalogue_api_arn`"
 }
 
-variable "topic_digital_library_arn" {
-  description = "ARN for the SNS topic for identifying Digital Library images"
-}
-
-variable "topic_digital_library_publish_policy" {
-  description = "JSON policy for pushing to `topic_digital_library_arn`"
-}
-
 variable "topic_none_arn" {
   description = "ARN for the SNS topic for identifying uncategorisable images"
 }

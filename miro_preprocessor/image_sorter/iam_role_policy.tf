@@ -18,11 +18,6 @@ resource "aws_iam_role_policy" "allow_sns_publish_catalogue_api" {
   policy = "${var.topic_catalogue_api_publish_policy}"
 }
 
-resource "aws_iam_role_policy" "allow_sns_publish_digital_library" {
-  role   = "${module.image_sorter_lambda.role_name}"
-  policy = "${var.topic_digital_library_publish_policy}"
-}
-
 resource "aws_iam_role_policy" "allow_sns_publish_none" {
   role   = "${module.image_sorter_lambda.role_name}"
   policy = "${var.topic_none_publish_policy}"
