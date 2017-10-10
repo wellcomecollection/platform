@@ -1,56 +1,68 @@
 language: sh
+
 sudo: required
+
 services:
-- docker
+  - docker
+
 dist: trusty
+
 branches:
   only:
-  - master
+    - master
+
 install:
-- sudo sysctl -w vm.max_map_count=262144
+  # We need this for the Elasticsearch Docker container to start
+  # See https://github.com/travis-ci/travis-ci/issues/6534
+  - sudo sysctl -w vm.max_map_count=262144
+
 cache:
   directories:
-  - ~/.sbt
-  - ~/.ivy2
-  - project/target/resolution-cache
-  - project/target/streams
-  - api/target
-  - common/target
-  - id_minter/target
-  - ingestor/target
-  - transformer/target
-  - reindexer/target
-  - /home/travis/docker/
+    - ~/.sbt
+    - ~/.ivy2
+    - project/target/resolution-cache
+    - project/target/streams
+    - api/target
+    - common/target
+    - id_minter/target
+    - ingestor/target
+    - transformer/target
+    - reindexer/target
+    - /home/travis/docker/
+
 script:
-- .travis/run_task.py
+  - .travis/run_task.py
+
 env:
   global:
-  - AWS_REGION=eu-west-1
-  - AWS_DEFAULT_REGION=eu-west-1
-  - PLATFORM_ENV=prod
-  - CONFIG_BUCKET=platform-infra
-  - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
+    - AWS_REGION=eu-west-1
+    - AWS_DEFAULT_REGION=eu-west-1
+    - PLATFORM_ENV=prod
+    - CONFIG_BUCKET=platform-infra
+    - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
 
-  # This secure environment variable contains an encrypted version of
-  # the following environment variables:
-  #  * AWS_ACCESS_KEY_ID
-  #  * AWS_SECRET_ACCESS_KEY
-  - secure: XG1Z07+J3/ivV4aSkyac8oEEhWmZGAd5Tiia4jJtdtLdy7R8eNMu+UBVCCRQ76Z/eEi4vIiE5Xs+XBEUDJnUFfFyYGFndP1huFv2/FHg/dUXWSUt62EYLZCJIXoswa350TjvubvNn2Ekm/QCDhda8euH+iqmjj/4rfiRYcqWtdUQ0bnz1jf7BurD+UahAmC7lxxnmdne0engJ1b/S+Hph+sOBdhJYyjdMS4Z1ImjuzulQ+OJhdHAFc0CMFAIsVVH1pPvHWccpDnecXZf+EPXh292cBELOaf0TjiY/Ws+SjLNVOXc36ShZZDo7cO+m3br2Bwo9lNqFMJwsHrt8i1VqAu7V1c3icTukXPi6Rh5Pwo9xhiAkC8uvhhp8iahRLedf6f+89qSCCfUVSt4LpnpCfgQG4VUxisAsd5fwUkuNIy9czQSCoD74hZC2PI+Syb5jPlX072bw3SODlhFKqksRxlWVlY293FaWg7pbASxwJcx8+/fiwxYfp9jF95PFEIeTeM2QU9joCDe+fmM5z9XhaQtSIbm8cqE7lClKBZfHjLKvx4N55HbR31bRfGTo4ZbItwsZuKUpg5vzoB09oT48Jo9GDi2+yr8sMEpQlobpOSgEtmxbZNuSDMWCpj8HJeMy8Vcp8q/NhyEyrTrR6tVmu8iLn7Y6sJ/QtMXwYNN07I=
+    # This secure environment variable contains an encrypted version of
+    # the following environment variables:
+    #  * AWS_ACCESS_KEY_ID
+    #  * AWS_SECRET_ACCESS_KEY
+    - secure: XG1Z07+J3/ivV4aSkyac8oEEhWmZGAd5Tiia4jJtdtLdy7R8eNMu+UBVCCRQ76Z/eEi4vIiE5Xs+XBEUDJnUFfFyYGFndP1huFv2/FHg/dUXWSUt62EYLZCJIXoswa350TjvubvNn2Ekm/QCDhda8euH+iqmjj/4rfiRYcqWtdUQ0bnz1jf7BurD+UahAmC7lxxnmdne0engJ1b/S+Hph+sOBdhJYyjdMS4Z1ImjuzulQ+OJhdHAFc0CMFAIsVVH1pPvHWccpDnecXZf+EPXh292cBELOaf0TjiY/Ws+SjLNVOXc36ShZZDo7cO+m3br2Bwo9lNqFMJwsHrt8i1VqAu7V1c3icTukXPi6Rh5Pwo9xhiAkC8uvhhp8iahRLedf6f+89qSCCfUVSt4LpnpCfgQG4VUxisAsd5fwUkuNIy9czQSCoD74hZC2PI+Syb5jPlX072bw3SODlhFKqksRxlWVlY293FaWg7pbASxwJcx8+/fiwxYfp9jF95PFEIeTeM2QU9joCDe+fmM5z9XhaQtSIbm8cqE7lClKBZfHjLKvx4N55HbR31bRfGTo4ZbItwsZuKUpg5vzoB09oT48Jo9GDi2+yr8sMEpQlobpOSgEtmxbZNuSDMWCpj8HJeMy8Vcp8q/NhyEyrTrR6tVmu8iLn7Y6sJ/QtMXwYNN07I=
 
   matrix:
-  - TASK=check-format
-  - TASK=sbt-test-common
-  - TASK=sbt-test-api
-  - TASK=sbt-test-transformer
-  - TASK=sbt-test-ingestor
-  - TASK=sbt-test-id_minter
-  - TASK=sbt-test-reindexer
-  - TASK=lambdas-test
-  - TASK=nginx-build
-  - TASK=tif-metadata-build
-  - TASK=loris-build
-  - TASK=elasticdump-build
-  - TASK=api_docs-build
-  - TASK=miro_preprocessor-test
-  - TASK=gatling-build
-  - TASK=monitoring_lambdas-test
+    - TASK=check-format
+    - TASK=sbt-test-common
+    - TASK=sbt-test-api
+    - TASK=sbt-test-transformer
+    - TASK=sbt-test-ingestor
+    - TASK=sbt-test-id_minter
+    - TASK=sbt-test-reindexer
+    - TASK=lambdas-test
+    - TASK=nginx-build
+    - TASK=tif-metadata-build
+    - TASK=loris-build
+    - TASK=elasticdump-build
+    - TASK=api_docs-build
+    - TASK=miro_preprocessor-test
+
+    # Monitoring stack
+    - TASK=gatling-build
+    - TASK=monitoring_lambdas-test
