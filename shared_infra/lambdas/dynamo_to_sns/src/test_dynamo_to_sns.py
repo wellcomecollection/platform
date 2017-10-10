@@ -113,4 +113,5 @@ def test_dynamo_to_sns(sns_sqs):
         MaxNumberOfMessages=1
     )
     message_body = messages['Messages'][0]['Body']
-    assert json.loads(message_body)['default'] == json.dumps(expected_image)
+    inner_message = json.loads(message_body)['Message']
+    assert json.loads(inner_message)['default'] == json.dumps(expected_image)

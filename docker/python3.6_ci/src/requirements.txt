@@ -1,4 +1,4 @@
 flake8
 boto3
 pytest
-moto==1.0.1
+moto==1.1.21
