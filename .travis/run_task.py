@@ -48,14 +48,15 @@ def main():
         print("*** We don't need the publish task, exiting early")
         return 0
 
-    if task == 'loris-build':
-        publish_task = 'loris-publish'
-    elif task == 'miro_preprocessor-test':
-        publish_task = 'miro_preprocessor-publish'
-    elif task == 'lambdas-test':
-        publish_task = 'lambdas-publish'
-    elif task == 'monitoring_lambdas-test':
-        publish_task = 'monitoring_lambdas-publish'
+    if task in [
+        'loris-build',
+        'cache_cleaner-build',
+        'miro_preprocessor-test',
+        'lambdas-test',
+        'monitoring_lambdas-test',
+    ]:
+        publish_task = task.replace('build', 'publish')
+        publish_task = publish_task.replace('test', 'publish')
     else:
         publish_task = task.replace('build', 'deploy')
         publish_task = task.replace('test', 'deploy')

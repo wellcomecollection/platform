@@ -36,4 +36,15 @@ loris-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 		--env OP=apply \
 		terraform_ci:latest
 
+
+cache_cleaner-build: $(ROOT)/.docker/image_builder
+	./builds/docker_run.py --dind -- \
+		image_builder \
+		--project=cache_cleaner \
+		--file=loris/cache_cleaner/Dockerfile
+
+cache_cleaner-publish: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
+	PROJECT=cache_cleaner ./builds/publish_service.sh
+
+
 .PHONY: loris-build loris-run loris-publish
