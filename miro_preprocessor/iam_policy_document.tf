@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "s3_read_miro_data" {
     ]
 
     resources = [
-      "${data.terraform_remote_state.platform.bucket_miro_data_arn}/source",
+      "${local.bucket_miro_data_arn}/source",
     ]
   }
 }
@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "s3_write_miro_data" {
     ]
 
     resources = [
-      "${data.terraform_remote_state.platform.bucket_miro_data_arn}/*",
+      "${local.bucket_miro_data_arn}/*",
     ]
   }
 }
