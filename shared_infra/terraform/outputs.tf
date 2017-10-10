@@ -53,3 +53,11 @@ output "bucket_infra_id" {
 output "bucket_alb_logs_id" {
   value = "${aws_s3_bucket.alb-logs.id}"
 }
+
+output "travis_ci_aws_id" {
+  value = "${aws_iam_access_key.travis_ci.id}"
+}
+
+output "travis_ci_aws_secret" {
+  value = "${aws_iam_access_key.travis_ci.encrypted_secret}"
+}

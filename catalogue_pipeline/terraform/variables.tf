@@ -39,11 +39,3 @@ variable "es_config_ingestor" {
   type        = "map"
   default     = {}
 }
-
-variable "ec2_terminating_topic_arn" {}
-variable "ec2_instance_terminating_for_too_long_alarm_arn" {}
-variable "ec2_terminating_topic_publish_policy" {}
-variable "alb_server_error_alarm_arn" {}
-variable "alb_client_error_alarm_arn" {}
-variable "dlq_alarm_arn" {}
-variable "terminal_failure_alarm_arn" {}

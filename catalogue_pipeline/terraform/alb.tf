@@ -11,5 +11,5 @@ module "services_alb" {
   certificate_domain = "services.wellcomecollection.org"
   vpc_id             = "${module.vpc_services.vpc_id}"
 
-  alb_access_log_bucket = "${var.alb_logs_id}"
+  alb_access_log_bucket = "${local.bucket_alb_logs_id}"
 }

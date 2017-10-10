@@ -17,7 +17,7 @@ module "services_cluster_asg" {
   use_spot   = 1
   spot_price = "0.1"
 
-  sns_topic_arn         = "${var.ec2_terminating_topic_arn}"
-  publish_to_sns_policy = "${var.ec2_terminating_topic_publish_policy}"
-  alarm_topic_arn       = "${var.ec2_instance_terminating_for_too_long_alarm_arn}"
+  sns_topic_arn         = "${local.ec2_terminating_topic_arn}"
+  publish_to_sns_policy = "${local.ec2_terminating_topic_publish_policy}"
+  alarm_topic_arn       = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
 }

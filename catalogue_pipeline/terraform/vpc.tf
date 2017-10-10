@@ -4,5 +4,3 @@ module "vpc_services" {
   az_count   = "2"
   name       = "services"
 }
-
-variable "alb_logs_id" {}
