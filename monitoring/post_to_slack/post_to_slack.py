@@ -159,8 +159,42 @@ class Alarm:
             ]
             return self._build_cloudwatch_url(search_term, self.group, start, end)
         except CloudWatchException as exc:
-            print(exc)
+            print(f'Error in cloudwatch_urls: {exc}')
             return []
+
+    def cloudwatch_messages(self):
+        """
+        Try to find some CloudWatch messages that might be relevant.
+        """
+        client = boto3.client('logs')
+
+        messages = []
+
+        try:
+            group = self.cloudwatch_log_group
+            timeframe = self.cloudwatch_timeframe
+
+            # CloudWatch wants these parameters specified as seconds since
+            # 1 Jan 1970 00:00:00, so convert to that first.
+            epoch = dt.datetime(1970, 1, 1, 0, 0, 0)
+            startTime = int((timeframe.start - epoch).total_seconds() * 1000)
+            endTime = int((timeframe.end - epoch).total_seconds() * 1000)
+
+            # We only get the first page of results.  If there's more than
+            # one page, we have so many errors that not getting them all
+            # in the Slack alarm is the least of our worries!
+            for term in self.cloudwatch_search_terms:
+                resp = client.filter_log_events(
+                    logGroupName=self.cloudwatch_log_group,
+                    startTime=startTime,
+                    endTime=endTime,
+                    filterPattern=term
+                )
+                messages.extend([e['message'] for e in resp['events']])
+
+        except Exception as exc:
+            print(f'Error in cloudwatch_messages: {exc}')
+            return messages
 
     @staticmethod
     def _build_cloudwatch_url(search_term, group, timeframe):
@@ -226,6 +260,14 @@ def main(event, _):
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch URL',
             'value': cloudwatch_url_str
+        })
+
+    messages = alarm.cloudwatch_messages()
+    if cloudwatch_messages:
+        cloudwatch_message_str = '\n'.join(messages)
+        slack_data['attachments'][0]['fields'].append({
+            'title': 'CloudWatch messages',
+            'value': cloudwatch_messages
         })
 
     response = requests.post(
