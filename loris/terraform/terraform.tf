@@ -9,7 +9,17 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "platform" {
+data "terraform_remote_state" "shared_infra" {
+  backend = "s3"
+
+  config {
+    bucket = "platform-infra"
+    key    = "platform-lambda"
+    region = "eu-west-1"
+  }
+}
+
+data "terraform_remote_state" "catalogue_api" {
   backend = "s3"
 
   config {
@@ -18,3 +28,4 @@ data "terraform_remote_state" "platform" {
     region = "eu-west-1"
   }
 }
+
