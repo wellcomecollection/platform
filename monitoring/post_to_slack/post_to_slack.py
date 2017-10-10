@@ -84,6 +84,43 @@ class Alarm:
             else:
                 return f'The ALB spotted multiple 500 errors ({value}) in {service} {display_time}.'
 
+    # Sometimes there's enough data in the alarm to make an educated guess
+    # about useful CloudWatch logs to check, so we include that in the alarm.
+    # The methods and properties below pull out the relevant info.
+
+    @property
+    def cloudwatch_search_terms(self):
+        """
+        Returns a list of potentially useful search terms in CloudWatch.
+        """
+        if self.name == 'loris-alb-target-500-errors':
+            return ['"HTTP/1.0 500"']
+        elif self.name.startswith('lambda'):
+            return ['Traceback', 'Task timed out after']
+        elif self.name.startswith('api_'):
+            return ['"HTTP 500"']
+        else:
+            return []
+
+    @property
+    def cloudwatch_log_group(self):
+        """
+        Returns the CloudWatch log group most likely to contain the error.
+        """
+        if self.name == 'loris-alb-target-500-errors':
+            return 'platform/loris'
+        elif self.name.startswith('lambda'):
+            lambda_name = self.name.split('-')[1]
+            return f'/aws/lambda/{lambda_name}'
+        elif self.name == 'api_romulus_v1-alb-target-500-errors':
+            return 'platform/api_romulus_v1'
+        elif self.name == 'api_remus-alb-target-500-errors':
+            return 'platform/api_remus_v1'
+        else:
+            raise KeyError(
+                "I don't know where to look for logs for %r" % self.alarm
+            )
+
     def cloudwatch_url(self):
         """
         Sometimes there's enough data in the alarm to make an educated guess
@@ -99,29 +136,27 @@ class Alarm:
         end = time + dt.timedelta(seconds=300)
 
         if self.name == 'loris-alb-target-500-errors':
-            group = 'platform/loris'
             search_term = '"HTTP/1.0 500"'
         elif self.name.startswith('lambda'):
-            lambda_name = self.name.split('-')[1]
-            group = f'/aws/lambda/{lambda_name}'
-
             # For Lambdas, we could have a Traceback, or we could have a
             # timeout.  Return both, because there's no way to do an OR search
             # in the CloudWatch console.
-            url1 = self._build_cloudwatch_url('Traceback', group, start, end)
-            url2 = self._build_cloudwatch_url('Task timed out after', group, start, end)
+            url1 = self._build_cloudwatch_url('Traceback', self.group, start, end)
+            url2 = self._build_cloudwatch_url('Task timed out after', self.group, start, end)
             return f'{url1} / {url2}'
 
         elif self.name == 'api_romulus_v1-alb-target-500-errors':
-            group = 'platform/api_romulus_v1'
             search_term = '"HTTP 500"'
         elif self.name == 'api_remus-alb-target-500-errors':
-            group = 'platform/api_remus'
             search_term = '"HTTP 500"'
         else:
             return
 
-        return self._build_cloudwatch_url(search_term, group, start, end)
+        try:
+            return self._build_cloudwatch_url(search_term, self.group, start, end)
+        except KeyError as err:
+            print(err)
+            return
 
     @staticmethod
     def _build_cloudwatch_url(search_term, group, start, end):
