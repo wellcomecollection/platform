@@ -124,7 +124,7 @@ class Alarm:
             return 'platform/api_remus_v1'
         else:
             raise CloudWatchException(
-                "I don't know where to look for logs for %r" % self.alarm
+                "I don't know where to look for logs for %r" % self.name
             )
 
     @property
