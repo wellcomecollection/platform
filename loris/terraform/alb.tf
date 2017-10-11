@@ -28,6 +28,7 @@ module "loris_alb_ebs" {
   vpc_id             = "${local.vpc_api_id}"
 
   alb_access_log_bucket = "${local.bucket_alb_logs_id}"
+  alb_access_log_bucket = "${local.bucket_alb_logs_id}"
 }
 
 module "loris_alb_ebs_large" {

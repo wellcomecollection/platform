@@ -59,7 +59,7 @@ module "loris_ebs" {
   volume_host_path = "${module.loris_userdata_ebs.efs_mount_directory}/loris"
   container_path   = "/mnt/loris"
 
-  loadbalancer_cloudwatch_id   = "${module.loris_alb_ebs.cloudwatch_id}"
+  loadbalancer_cloudwatch_id   = "${module.loris_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
   client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }

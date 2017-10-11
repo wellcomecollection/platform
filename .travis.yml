@@ -58,10 +58,13 @@ env:
     - TASK=lambdas-test
     - TASK=nginx-build
     - TASK=tif-metadata-build
-    - TASK=loris-build
     - TASK=elasticdump-build
     - TASK=api_docs-build
     - TASK=miro_preprocessor-test
+
+    # Loris stack
+    - TASK=loris-build
+    - TASK=cache_cleaner-build
 
     # Monitoring stack
     - TASK=gatling-build
