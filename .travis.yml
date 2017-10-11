@@ -69,3 +69,10 @@ env:
     # Monitoring stack
     - TASK=gatling-build
     - TASK=monitoring_lambdas-test
+
+# This has a Slack API token for posting messages about build failures to
+# our team channel.  It was created by following the "Setup Instructions" at
+# https://wellcome.slack.com/services/B7HD6DUT0#service_setup.
+notifications:
+  slack:
+    secure: XOqr5bsa/A0Ne1My2+c240Q1GUQfqs7/xWLC+e8yDVRDmspTbouTYMtYDG2htLG/pUCUBdeOWdUVDabSetwSHqM4+xvwAtnm9KcNFT1KumVQ/8ZeEVHgrr6sAdI/OzT01JEzvm4cbGTtn/lDc4rZ6DrLeMwvul0dIZMC5PNrMt0qsByj5JtlVU+ih3qZ0fYypeLp4AG7rmpFOaiVPAlXdxpkqtojwP8Q6vDdBA36H24ifiT/snu0Gg3zcR3KCVhTJYNsTe7fNNRffVd/Tl5tBwicx5o+pCf+q+hlfFSw4l3/TnzDlIG5uCccLZVcLdwnnOwQofzjJ7bZPRPbLAa6ynbWTFagwSYzZC3JPfWeyP+I136mK7HqlTG/gD1hUisa/qGUfC9EQIxrg3CXmPj9iGFUhLCUFPR0EUUAfkjcoFUqlPf8EyetE7swBV8d3ngsbfG8H8w42lR60d8f9EhP0N6enWwDRVLky4/PETK7zLPPK42pBy/rIwDpCgYQ7QpetQQyoMM0f5hsTXGUrNZadYN9e6iaJBhKuIggeDUrK7hw4v1bAihzRhPYOWJU+dc7mGoSsJFnPHExyXWu51qejhGoGu9BFu1uI3Unb5Gdb17umYxOm96P5pvR3DC4QoEEVMa7CIOgvKVGhflPqtUaY3Sah2fs0Y6tZfVDsdmwxgo=
