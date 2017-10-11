@@ -59,7 +59,7 @@ def _setup(
         id_exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
 
     if contrib_exceptions_csv_body is None:
-        contrib_exceptions_csv_body = "XA,XB,XC,XL,XN,XW"
+        contrib_exceptions_csv_body = "A,B,C,L,N,W"
 
     if sns_sqs is not None:
         _setup_os_environ(bucket_name, sns_sqs)
