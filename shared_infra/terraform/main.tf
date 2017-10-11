@@ -7,17 +7,17 @@ module "drain_ecs_container_instance" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-//module "dynamo_to_sns" {
-//  source = "../lambdas/dynamo_to_sns"
-//
-//  miro_transformer_topic_arn = "${data.terraform_remote_state.platform.miro_transformer_topic_arn}"
-//  miro_table_stream_arn      = "${data.terraform_remote_state.platform.miro_table_stream_arn}"
-//
-//  miro_transformer_topic_publish_policy = "${data.terraform_remote_state.platform.miro_transformer_topic_publish_policy}"
-//  calm_transformer_topic_publish_policy = "${data.terraform_remote_state.platform.calm_transformer_topic_publish_policy}"
-//
-//  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-//}
+module "dynamo_to_sns" {
+  source = "../lambdas/dynamo_to_sns"
+
+  miro_transformer_topic_arn = "${local.miro_transformer_topic_arn}"
+  miro_table_stream_arn      = "${local.miro_table_stream_arn}"
+
+  miro_transformer_topic_publish_policy = "${local.miro_transformer_topic_publish_policy}"
+  calm_transformer_topic_publish_policy = "${local.calm_transformer_topic_publish_policy}"
+
+  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
+}
 
 module "ecs_ec2_instance_tagger" {
   source = "../lambdas/ecs_ec2_instance_tagger"
@@ -50,21 +50,21 @@ module "run_ecs_task" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-//module "schedule_reindexer" {
-//  source = "../lambdas/schedule_reindexer"
-//
-//  dynamodb_table_reindex_tracker_stream_arn = "${data.terraform_remote_state.platform.dynamodb_table_reindex_tracker_stream_arn}"
-//  ecs_services_cluster_name                 = "${data.terraform_remote_state.platform.ecs_services_cluster_name}"
-//  dynamodb_table_miro_table_name            = "${data.terraform_remote_state.platform.dynamodb_table_miro_table_name}"
-//
-//  dynamo_capacity_topic_arn            = "${module.dynamo_capacity_topic.arn}"
-//  dynamo_capacity_topic_publish_policy = "${module.dynamo_capacity_topic.publish_policy}"
-//
-//  service_scheduler_topic_arn            = "${module.service_scheduler_topic.arn}"
-//  service_scheduler_topic_publish_policy = "${module.service_scheduler_topic.publish_policy}"
-//
-//  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-//}
+module "schedule_reindexer" {
+  source = "../lambdas/schedule_reindexer"
+
+  dynamodb_table_reindex_tracker_stream_arn = "${local.dynamodb_table_reindex_tracker_stream_arn}"
+  ecs_services_cluster_name                 = "${local.ecs_services_cluster_name}"
+  dynamodb_table_miro_table_name            = "${local.dynamodb_table_miro_table_name}"
+
+  dynamo_capacity_topic_arn            = "${module.dynamo_capacity_topic.arn}"
+  dynamo_capacity_topic_publish_policy = "${module.dynamo_capacity_topic.publish_policy}"
+
+  service_scheduler_topic_arn            = "${module.service_scheduler_topic.arn}"
+  service_scheduler_topic_publish_policy = "${module.service_scheduler_topic.publish_policy}"
+
+  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
+}
 
 module "service_deployment_status" {
   source = "../lambdas/service_deployment_status"

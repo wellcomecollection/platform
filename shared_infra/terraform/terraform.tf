@@ -9,12 +9,12 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "platform" {
+data "terraform_remote_state" "catalogue_pipeline" {
   backend = "s3"
 
   config {
     bucket = "platform-infra"
-    key    = "platform.tfstate"
+    key    = "platform-pipeline.tfstate"
     region = "eu-west-1"
   }
 }
