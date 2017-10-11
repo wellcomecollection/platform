@@ -41,6 +41,14 @@ function run_tests {
   echo "Done."
 }
 
+function build_lock_file {
+  echo "Building lock file ..."
+
+  pip-compile
+
+  echo "Done."
+}
+
 function check_is_master {
   echo "Checking up to date with master ..."
 
@@ -64,6 +72,9 @@ then
 elif [[ "$OP" == "is-master-head" ]]
 then
   check_is_master
+elif [[ "$OP" == "build-lock-file" ]]
+then
+  build_lock_file
 else
   echo "Unrecognised operation: $OP! Stopping."
 
