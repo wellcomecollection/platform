@@ -25,5 +25,5 @@ useradd -d /var/www/loris -s /sbin/false loris
 pip install --upgrade pip
 
 cd "loris-$LORIS_COMMIT"
-pip install -r requirements.txt
+pip install -r /requirements.txt
 python setup.py install
