@@ -11,7 +11,7 @@ module "api_cluster_asg" {
   asg_max     = "4"
 
   image_id      = "${data.aws_ami.stable_coreos.id}"
-  instance_type = "t2.xlarge"
+  instance_type = "t2.large"
 
   sns_topic_arn         = "${local.ec2_terminating_topic_arn}"
   publish_to_sns_policy = "${local.ec2_terminating_topic_publish_policy}"
