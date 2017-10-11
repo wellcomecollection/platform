@@ -45,16 +45,14 @@ module "miro_image_sorter" {
   s3_id_exceptions_key      = "source/exceptions.csv"
   s3_contrib_exceptions_key = "source/contrib.csv"
 
-  topic_cold_store_arn                 = "${module.cold_store_topic.arn}"
-  topic_cold_store_publish_policy      = "${module.cold_store_topic.publish_policy}"
-  topic_tandem_vault_arn               = "${module.tandem_vault_topic.arn}"
-  topic_tandem_vault_publish_policy    = "${module.tandem_vault_topic.publish_policy}"
-  topic_catalogue_api_arn              = "${module.catalogue_api_topic.arn}"
-  topic_catalogue_api_publish_policy   = "${module.catalogue_api_topic.publish_policy}"
-  topic_digital_library_arn            = "${module.digital_library_topic.arn}"
-  topic_digital_library_publish_policy = "${module.digital_library_topic.publish_policy}"
-  topic_none_arn                       = "${module.none_topic.arn}"
-  topic_none_publish_policy            = "${module.none_topic.publish_policy}"
+  topic_cold_store_arn               = "${module.cold_store_topic.arn}"
+  topic_cold_store_publish_policy    = "${module.cold_store_topic.publish_policy}"
+  topic_tandem_vault_arn             = "${module.tandem_vault_topic.arn}"
+  topic_tandem_vault_publish_policy  = "${module.tandem_vault_topic.publish_policy}"
+  topic_catalogue_api_arn            = "${module.catalogue_api_topic.arn}"
+  topic_catalogue_api_publish_policy = "${module.catalogue_api_topic.publish_policy}"
+  topic_none_arn                     = "${module.none_topic.arn}"
+  topic_none_publish_policy          = "${module.none_topic.publish_policy}"
 }
 
 module "miro_copy_s3_asset" {

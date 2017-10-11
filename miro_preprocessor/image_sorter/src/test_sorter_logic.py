@@ -9,7 +9,7 @@ from sorter_logic import Decision, InvalidCollectionException, sort_image
 
 def _empty_id_exceptions():
     csvfile = StringIO(
-        """miro_id,cold_store,tandem_vault,digital_library,catalogue_api\n,V0000000,false,false,false,false,false"""
+        """miro_id,cold_store,tandem_vault,catalogue_api\n,V0000000,false,false,false,false,false"""
     )
 
     return csv.DictReader(csvfile)
@@ -62,7 +62,6 @@ def id_exception(**kwargs):
         "cold_store": "",
         "tandem_vault": "",
         "catalogue_api": "",
-        "digital_library": "",
     }
     exception.update(kwargs)
     return exception
@@ -110,10 +109,15 @@ def id_exception(**kwargs):
     image_with_no_info(collection='images-M', image_title="No neg"),
 ])
 def test_is_cold_store(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.cold_store]
+    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [
+        Decision.cold_store]
 
 
 @pytest.mark.parametrize('collection, image_data', [
+    collection_image_data(collection='images-L', image_use_restrictions="None"),
+    collection_image_data(collection='images-V', image_use_restrictions="None"),
+    collection_image_data(collection='images-M', image_use_restrictions="None"),
+    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="None"),
     collection_image_data(collection='images-L', image_library_dept="Public programmes"),
     collection_image_data(collection='images-V', image_library_dept="Public programmes"),
     collection_image_data(collection='images-M', image_library_dept="Public programmes"),
@@ -134,53 +138,15 @@ def test_is_cold_store(collection, image_data):
     collection_image_data(collection='images-M', image_use_restrictions="Top-secret")
 ])
 def test_is_tandem_vault(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.tandem_vault]
+    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [
+        Decision.tandem_vault]
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-L', image_use_restrictions="None"),
-    collection_image_data(collection='images-V', image_use_restrictions="None"),
-    collection_image_data(collection='images-M', image_use_restrictions="None"),
     collection_image_data(collection='images-L', image_cleared="N"),
-])
-def test_is_digital_library(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.digital_library]
-
-
-@pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
     collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
     collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
-])
-def test_is_catalogue_api(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.catalogue_api]
-
-
-@pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
-                          image_cleared="N"),
-    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
-                          image_cleared=None),
-    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None,
-                          image_cleared=None),
-    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
-])
-def test_is_no_decision(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.none]
-
-
-@pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared="N"),
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared=None),
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="None"),
-])
-def test_is_digital_library_and_tandem_vault(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.tandem_vault, Decision.digital_library]
-
-
-@pytest.mark.parametrize('collection, image_data', [
     collection_image_data(),
     collection_image_data(image_innopac_id="1234567x"),
     collection_image_data(image_title=None,
@@ -205,22 +171,43 @@ def test_is_digital_library_and_tandem_vault(collection, image_data):
     collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND"),
     collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND"),
     collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None,
+                          image_cleared=None),
 ])
-def test_is_digital_library_and_catalogue_api(collection, image_data):
-    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.digital_library, Decision.catalogue_api]
+def test_is_catalogue_api(collection, image_data):
+    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [
+        Decision.catalogue_api]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+                          image_cleared="N"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh",
+                          image_cleared=None),
+    collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+    collection_image_data(collection='images-V', image_use_restrictions="CC-BY-NC-ND", image_innopac_id="blahbluh"),
+])
+def test_is_no_decision(collection, image_data):
+    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.none]
+
+
+@pytest.mark.parametrize('collection, image_data', [
+    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared="N"),
+    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared=None),
+])
+def test_is_catalogue_api_and_tandem_vault(collection, image_data):
+    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [
+        Decision.tandem_vault, Decision.catalogue_api]
 
 
 @pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016"),
     collection_image_data(collection='images-L', image_tech_scanned_date="30/06/2018"),
 ])
-def test_is_tandem_vault_and_digital_library_and_catalogue_api(collection, image_data):
-    assert sort_image(
-        collection,
-        image_data,
-        _empty_id_exceptions(),
-        _empty_contrib_exceptions()
-    ) == [Decision.tandem_vault, Decision.digital_library, Decision.catalogue_api]
+def test_is_tandem_vault_and_catalogue_api(collection, image_data):
+    assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [
+        Decision.tandem_vault, Decision.catalogue_api]
 
 
 @pytest.mark.parametrize('collection, image_data, id_exceptions, expected_decisions', [
@@ -232,14 +219,13 @@ def test_is_tandem_vault_and_digital_library_and_catalogue_api(collection, image
     ('images-L',
      update_image_data(image_no_calc="V0002006",
                        image_library_dept="Archives and Manuscripts"),
-     [id_exception(miro_id="V0002006", tandem_vault="true", catalogue_api="true", digital_library="true")],
-     [Decision.tandem_vault, Decision.catalogue_api,
-      Decision.digital_library]),
+     [id_exception(miro_id="V0002006", tandem_vault="true", catalogue_api="true")],
+     [Decision.tandem_vault, Decision.catalogue_api]),
     ('images-L',
      update_image_data(image_no_calc="V0002006",
                        image_library_dept="Archives and Manuscripts"),
-     [id_exception(miro_id="V0002006", tandem_vault="false", catalogue_api="true", digital_library="true")],
-     [Decision.catalogue_api, Decision.digital_library])
+     [id_exception(miro_id="V0002006", tandem_vault="false", catalogue_api="true")],
+     [Decision.catalogue_api])
 ])
 def test_id_exceptions_should_override_rules(collection, image_data, id_exceptions, expected_decisions):
     assert sort_image(collection, image_data, id_exceptions, _empty_contrib_exceptions()) == expected_decisions
