@@ -32,8 +32,7 @@ class Rules:
         "CC-0",
         "CC-BY",
         "CC-BY-NC",
-        "CC-BY-NC-ND",
-        "None"
+        "CC-BY-NC-ND"
     ]
 
     @staticmethod
@@ -119,10 +118,6 @@ class Rules:
         return self._get('image_copyright_cleared') == 'Y'
 
     @property
-    def is_cleared(self):
-        return self._get('image_cleared') == 'Y'
-
-    @property
     def is_not_general_use(self):
         return self._get('image_general_use') == 'N'
 
@@ -137,19 +132,6 @@ class Rules:
     @property
     def is_for_public_access(self):
         return not self.is_not_for_public_access
-
-    @property
-    def use_restrictions_are_none(self):
-        return self._get_normalised("image_use_restrictions") == "none"
-
-    @property
-    def satisfies_api_filters(self):
-        return \
-            self.is_copyright_cleared and \
-            self.is_cleared and \
-            (not self.has_use_restrictions) and \
-            (not self.use_restrictions_are_none) and \
-            (self._get("image_innopac_id") is None or self.is_innopac_id_8_digits)
 
     @property
     def is_cold_store(self):
@@ -170,20 +152,14 @@ class Rules:
 
     # TODO: Remove `and self.is_innopac_id_8_digits`
     @property
-    def is_digital_library(self):
-        return not self.image_library_dept_is_Public_programmes \
-            and self.is_for_public_access and self.is_innopac_id_8_digits
-
-    # TODO: Remove `not self.is_tandem_vault` AND `self.satisfies_api_filters`
-    @property
     def is_catalogue_api(self):
-        return (not self.is_tandem_vault or self.is_digital_library) and self.satisfies_api_filters
+        return not self.image_library_dept_is_Public_programmes \
+            and self.is_for_public_access and (self._get("image_innopac_id") is None or self.is_innopac_id_8_digits)
 
 
 class Decision(enum.Enum):
     cold_store = 'cold_store'
     tandem_vault = 'tandem_vault'
-    digital_library = 'digital_library'
     catalogue_api = 'catalogue_api'
     none = 'none'
 
@@ -205,8 +181,9 @@ def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
 
     if collection in collections:
         contrib_codes = [row[collection] for row in exceptions]
+        image_source_code = image_data['image_source_code']
 
-        if image_data['image_source_code'] in contrib_codes:
+        if image_source_code in contrib_codes:
             return [Decision.catalogue_api]
         else:
             return [Decision.cold_store]
@@ -230,13 +207,10 @@ def _get_decisions_from_rules(collection, image_data):
     if not r.is_cold_store and r.is_tandem_vault:
         decisions.append(Decision.tandem_vault)
 
-    if not r.is_cold_store and r.is_digital_library:
-        decisions.append(Decision.digital_library)
-
     if not r.is_cold_store and r.is_catalogue_api:
         decisions.append(Decision.catalogue_api)
 
-    if not r.is_cold_store and not r.is_catalogue_api and not r.is_digital_library and not r.is_tandem_vault:
+    if not r.is_cold_store and not r.is_catalogue_api and not r.is_tandem_vault:
         decisions.append(Decision.none)
 
     print(decisions)
