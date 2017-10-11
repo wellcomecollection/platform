@@ -113,6 +113,10 @@ def test_is_cold_store(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
+    collection_image_data(collection='images-L', image_use_restrictions="None"),
+    collection_image_data(collection='images-V', image_use_restrictions="None"),
+    collection_image_data(collection='images-M', image_use_restrictions="None"),
+    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="None"),
     collection_image_data(collection='images-L', image_library_dept="Public programmes"),
     collection_image_data(collection='images-V', image_library_dept="Public programmes"),
     collection_image_data(collection='images-M', image_library_dept="Public programmes"),
@@ -137,9 +141,6 @@ def test_is_tandem_vault(collection, image_data):
 
 
 @pytest.mark.parametrize('collection, image_data', [
-    collection_image_data(collection='images-L', image_use_restrictions="None"),
-    collection_image_data(collection='images-V', image_use_restrictions="None"),
-    collection_image_data(collection='images-M', image_use_restrictions="None"),
     collection_image_data(collection='images-L', image_cleared="N"),
     collection_image_data(collection='images-M', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
     collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None),
@@ -191,7 +192,6 @@ def test_is_no_decision(collection, image_data):
 @pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared="N"),
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_cleared=None),
-    collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016", image_use_restrictions="None"),
 ])
 def test_is_catalogue_api_and_tandem_vault(collection, image_data):
     assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.tandem_vault, Decision.catalogue_api]

@@ -32,8 +32,7 @@ class Rules:
         "CC-0",
         "CC-BY",
         "CC-BY-NC",
-        "CC-BY-NC-ND",
-        "None"
+        "CC-BY-NC-ND"
     ]
 
     @staticmethod
