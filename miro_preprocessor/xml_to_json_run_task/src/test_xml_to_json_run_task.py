@@ -51,10 +51,9 @@ def test_xml_to_json_run_task(sns_sqs):
     )
 
     message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
 
     actual_message = json.loads(
-        json.loads(inner_message)['default']
+        json.loads(message_body)['default']
     )
 
     expected_message = {

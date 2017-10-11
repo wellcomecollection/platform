@@ -59,7 +59,7 @@ def _setup(
         id_exceptions_csv_body = "miro_id,cold_store,tandem_vault,digital_library,catalogue_api"
 
     if contrib_exceptions_csv_body is None:
-        contrib_exceptions_csv_body = "A,B,C,L,N,W"
+        contrib_exceptions_csv_body = "A,B,C,N,W"
 
     if sns_sqs is not None:
         _setup_os_environ(bucket_name, sns_sqs)
@@ -77,9 +77,9 @@ def _get_msg(sqs_client, queue_url):
     )
 
     message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
+
     return json.loads(
-        json.loads(inner_message)['default']
+        json.loads(message_body)['default']
     )
 
 
@@ -261,7 +261,7 @@ def test_image_sorter_contrib_exceptions_match(image_sorter_sns_sqs, s3_put_even
         collection="images-A"
     )
 
-    contrib_exceptions_csv_body = f"""A,B,C,L,N,W\nFOO,,,,,"""
+    contrib_exceptions_csv_body = f"""A,B,C,N,W\nFOO,,,,,"""
 
     _setup(
         s3_client=s3_client,
@@ -288,7 +288,7 @@ def test_image_sorter_contrib_exceptions_no_match(image_sorter_sns_sqs, s3_put_e
         collection="images-A"
     )
 
-    contrib_exceptions_csv_body = f"""A,B,C,L,N,W\nFOO,,,,,"""
+    contrib_exceptions_csv_body = f"""A,B,C,N,W\nFOO,,,,,"""
 
     _setup(
         s3_client=s3_client,
