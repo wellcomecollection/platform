@@ -31,6 +31,15 @@ def fetch_json_s3_data(bucket, key):
     return json.loads(fetch_s3_data(bucket, key))
 
 
+def fetch_csv_s3_data(bucket, key):
+    data = fetch_s3_data(bucket, key)
+    data_decoded = data.decode()
+
+    print(data_decoded)
+
+    return csv.DictReader(StringIO(data_decoded))
+
+
 def main(event, _):
     print(f'Received event: {event!r}')
 
@@ -42,15 +51,14 @@ def main(event, _):
     topic_digital_library = os.environ['TOPIC_DIGITAL_LIBRARY']
 
     s3_bucket = os.environ['S3_MIRODATA_ID']
-    s3_exceptions_key = os.environ['S3_EXCEPTIONS_KEY']
+    s3_id_exceptions_key = os.environ['S3_ID_EXCEPTIONS_KEY']
+    s3_contributor_exceptions_key = os.environ['S3_CONTRIB_EXCEPTIONS_KEY']
     s3_key = parse_s3_event(event)
 
-    # Fetch the metadata from S3
-    print(f'Bucket = {s3_bucket}, key = {s3_key}')
-    print(f'Bucket = {s3_bucket}, exceptions_key = {s3_exceptions_key}')
+    print(f'os.environ = {os.environ}')
 
-    exceptions = fetch_s3_data(s3_bucket, s3_exceptions_key)
-    exceptions_decoded = exceptions.decode()
+    id_exceptions = fetch_csv_s3_data(bucket=s3_bucket, key=s3_id_exceptions_key)
+    contrib_exceptions = fetch_csv_s3_data(bucket=s3_bucket, key=s3_contributor_exceptions_key)
 
     data = fetch_json_s3_data(bucket=s3_bucket, key=s3_key)
 
@@ -60,7 +68,8 @@ def main(event, _):
 
     decisions = sort_image(collection=collection,
                            image_data=image_data,
-                           exceptions=csv.DictReader(StringIO(exceptions_decoded)))
+                           id_exceptions=id_exceptions,
+                           contrib_exceptions=contrib_exceptions)
 
     topic_arns = {
         Decision.cold_store: topic_cold_store,
