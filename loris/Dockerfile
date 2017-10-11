@@ -21,6 +21,8 @@ COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
 COPY run_loris.sh /
 
+ENV LORIS_CONF_FILE /opt/loris/etc/loris2.conf
+
 EXPOSE 8888
 
 CMD ["/run_loris.sh"]
