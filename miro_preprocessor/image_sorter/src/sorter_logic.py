@@ -181,8 +181,9 @@ def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
 
     if collection in collections:
         contrib_codes = [row[collection] for row in exceptions]
+        image_source_code = image_data['image_source_code']
 
-        if image_data['image_source_code'] in contrib_codes:
+        if image_source_code in contrib_codes:
             return [Decision.catalogue_api]
         else:
             return [Decision.cold_store]
