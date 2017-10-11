@@ -65,7 +65,7 @@ module "loris_ebs" {
 }
 
 module "loris_ebs_large" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services"
   name               = "loris-ebs-large"
   cluster_id         = "${aws_ecs_cluster.loris_ebs_large.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
