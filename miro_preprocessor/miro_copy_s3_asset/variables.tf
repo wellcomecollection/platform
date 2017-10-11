@@ -6,7 +6,9 @@ variable "topic_miro_copy_s3_asset_arn" {}
 
 variable "bucket_destination_asset_arn" {}
 
-variable "topic_forward_sns_message_arn" {}
+variable "topic_forward_sns_message_arn" {
+  default = ""
+}
 
 variable "bucket_source_asset_name" {}
 
