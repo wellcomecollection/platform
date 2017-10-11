@@ -1,0 +1,8 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "errorType": "http",
+  "httpStatus": 404,
+  "label": "Not Found",
+  "description": "Work not found for identifier xyz123",
+  "type": "Error"
+}
