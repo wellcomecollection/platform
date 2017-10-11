@@ -254,19 +254,38 @@ def main(event, _):
 
     messages = alarm.cloudwatch_messages()
     if messages:
-
-        # Discard the timestamp from messages in our Scala apps, and
-        # deduplicate to avoid taking up lots of space in Slack.
-        filtered_messages = []
+        cleaned_messages = []
         for m in messages:
+
+            # Scala messages have a prefix of the form
+            #
+            #     14:02:47.249 [ForkJoinPool-2-worker-17]
+            #
+            # which usually doesn't have any useful debugging information.
+            # Bin it!
             m = re.sub(
-                r'[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3} \[ForkJoinPool-[0-9]+-worker-[0-9]+\]',
+                r'\d{2}:\d{2}:\d{2}\.\d{3} \[ForkJoinPool-\d+-worker-\d+\] ',
                 '', m
             )
-            filtered_messages.append(m)
-        filtered_messages = set(filtered_messages)
 
-        cloudwatch_message_str = '\n'.join(filtered_messages)
+            # Loris messages have a prefix of the form
+            #
+            #     [pid: 86|app: 0|req: 195/3682] 172.17.0.5 () {40 vars in 879
+            #       bytes} [Tue Oct 10 19:37:06 2017]
+            #
+            # which usually doesn't contain useful debugging information.
+            # Discard it!
+            m = re.sub(
+                r'\[pid: \d+\|app: \d+\|req: \d+/\d+\] '
+                r'\d+\.\d+\.\d+\.\d+ \(\) '
+                r'{\d+ vars in \d+ bytes} '
+                r'\[[A-Za-z0-9: ]+\]', '', m
+            )
+
+            cleaned_messages.append(m.strip())
+        cleaned_messages = set(cleaned_messages)
+
+        cloudwatch_message_str = '\n'.join(cleaned_messages)
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch messages',
             'value': cloudwatch_message_str
