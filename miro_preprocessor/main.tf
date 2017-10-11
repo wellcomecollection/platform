@@ -57,9 +57,9 @@ module "miro_image_sorter" {
 }
 
 module "miro_copy_s3_asset" {
-  source                         = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn   = "${module.catalogue_api_topic.arn}"
-  topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
+  source                                  = "miro_copy_s3_asset"
+  topic_miro_copy_s3_catalogue_assets_arn = "${module.catalogue_api_topic.arn}"
+  topic_miro_image_to_dynamo_arn          = "${module.topic_miro_image_to_dynamo.arn}"
 
   lambda_error_alarm_arn         = "${local.lambda_error_alarm_arn}"
   bucket_miro_images_public_arn  = "${local.bucket_miro_images_public_arn}"

@@ -2,7 +2,7 @@ variable "bucket_miro_images_sync_arn" {}
 
 variable "lambda_error_alarm_arn" {}
 
-variable "topic_miro_copy_s3_asset_arn" {}
+variable "topic_miro_copy_s3_catalogue_assets_arn" {}
 
 variable "bucket_miro_images_public_arn" {}
 

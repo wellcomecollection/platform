@@ -1,9 +1,9 @@
-module "miro_copy_s3_asset_lambda" {
+module "miro_copy_s3_catalogue_derivative_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
   s3_key = "lambdas/miro_preprocessor/miro_copy_s3_asset.zip"
 
-  description     = "Copy miro images to another s3 bucket"
-  name            = "miro_copy_s3_asset"
+  description     = "Copy licensed miro derivatives to Loris s3 bucket"
+  name            = "miro_copy_s3_catalogue_derivative"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
   environment_variables = {
@@ -15,20 +15,20 @@ module "miro_copy_s3_asset_lambda" {
   timeout = "30"
 }
 
-module "miro_copy_s3_asset_trigger" {
+module "miro_copy_s3_catalogue_derivative_trigger" {
   source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-  lambda_function_name = "${module.miro_copy_s3_asset_lambda.function_name}"
-  sns_trigger_arn      = "${var.topic_miro_copy_s3_asset_arn}"
-  lambda_function_arn  = "${module.miro_copy_s3_asset_lambda.arn}"
+  lambda_function_name = "${module.miro_copy_s3_catalogue_derivative_lambda.function_name}"
+  sns_trigger_arn      = "${var.topic_miro_copy_s3_catalogue_assets_arn}"
+  lambda_function_arn  = "${module.miro_copy_s3_catalogue_derivative_lambda.arn}"
 }
 
-resource "aws_iam_role_policy" "miro_copy_s3_asset" {
-  name   = "miro_copy_s3_asset_policy"
-  role   = "${module.miro_copy_s3_asset_lambda.role_name}"
-  policy = "${data.aws_iam_policy_document.allow_s3_copy.json}"
+resource "aws_iam_role_policy" "miro_copy_s3_catalogue_derivative" {
+  name   = "miro_copy_s3_catalogue_derivative"
+  role   = "${module.miro_copy_s3_catalogue_derivative_lambda.role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_catalogue_derivative_copy.json}"
 }
 
-data "aws_iam_policy_document" "allow_s3_copy" {
+data "aws_iam_policy_document" "allow_s3_catalogue_derivative_copy" {
   statement {
     actions = [
       "s3:GetObject",
