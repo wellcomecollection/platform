@@ -18,17 +18,17 @@ install:
 
 cache:
   directories:
-    - "~/.sbt"
-    - "~/.ivy2"
-    - "project/target/resolution-cache"
-    - "project/target/streams"
-    - "api/target"
-    - "common/target"
-    - "id_minter/target"
-    - "ingestor/target"
-    - "transformer/target"
-    - "reindexer/target"
-    - "/home/travis/docker/"
+    - ~/.sbt
+    - ~/.ivy2
+    - project/target/resolution-cache
+    - project/target/streams
+    - api/target
+    - common/target
+    - id_minter/target
+    - ingestor/target
+    - transformer/target
+    - reindexer/target
+    - /home/travis/docker/
 
 script:
   - .travis/run_task.py
@@ -38,14 +38,15 @@ env:
     - AWS_REGION=eu-west-1
     - AWS_DEFAULT_REGION=eu-west-1
     - PLATFORM_ENV=prod
+    - CONFIG_BUCKET=platform-infra
+    - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
 
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
     #  * AWS_ACCESS_KEY_ID
     #  * AWS_SECRET_ACCESS_KEY
-    #  * AWS_ECR_REPO
-    #  * CONFIG_BUCKET
-    - secure: Pet60dG/PQe1O2/zYQutmbvNKSQdLwEyfHnp4aSbzOoqADR08AOTA6CrMswv+Zs4qBHzxeXAMxgkFM0UpXdNPlw/HQ4FAhstStJFVkoPhWSo5/rbZutkOtWtgBI2+wD/Z0t4n7Tq2h0tW2+IvG/4kCG7qbp6VYOzw1yZzHhT/E2j/S7J/YFTYzMpsYpA35192XMqdzg7dygzUiC+yeYMps4iu4UkbCgAJ19h9vT68E5IpCOyTai4P7HAFiLQ9p+5465g1whU+U0JMWEktGLCjGCblNGnr8YyIh/+IUUue9Kagkr8PXh22OM3/rhsBAgg5qeNO0sujcBq0WJH1dyAFV56Vn/smZS/cQ3EqXg2knfcZWKMHXKLqqdOy4jcPg9A6NIlBnwpC8nC085OpYrnMyyPwaBMg2OpF+Rr6xFzLDglHYmPuO74yJSPqakkLyJbdHDZ4VPOEKseOCWdBaBo8rJXzL9AProDRpFkeA4onpqgFNt5pbY4judgklnnBZLAqk9lCfotk2YCTyHxKJ1X5XV+N9zvPRvD/c/8dMm9VqVKHyuxS71hOPL9y5B+1zYACxbVxgc/Qw/UklOGduaLDPPOtyuTsE59c98lXpFCk/f0txM0CLxQA4pjGQ9x6apx8Eyr5D3I/bAvascujAtMWdtGjd2x4Ez454Huy/krQpE=
+    - secure: XG1Z07+J3/ivV4aSkyac8oEEhWmZGAd5Tiia4jJtdtLdy7R8eNMu+UBVCCRQ76Z/eEi4vIiE5Xs+XBEUDJnUFfFyYGFndP1huFv2/FHg/dUXWSUt62EYLZCJIXoswa350TjvubvNn2Ekm/QCDhda8euH+iqmjj/4rfiRYcqWtdUQ0bnz1jf7BurD+UahAmC7lxxnmdne0engJ1b/S+Hph+sOBdhJYyjdMS4Z1ImjuzulQ+OJhdHAFc0CMFAIsVVH1pPvHWccpDnecXZf+EPXh292cBELOaf0TjiY/Ws+SjLNVOXc36ShZZDo7cO+m3br2Bwo9lNqFMJwsHrt8i1VqAu7V1c3icTukXPi6Rh5Pwo9xhiAkC8uvhhp8iahRLedf6f+89qSCCfUVSt4LpnpCfgQG4VUxisAsd5fwUkuNIy9czQSCoD74hZC2PI+Syb5jPlX072bw3SODlhFKqksRxlWVlY293FaWg7pbASxwJcx8+/fiwxYfp9jF95PFEIeTeM2QU9joCDe+fmM5z9XhaQtSIbm8cqE7lClKBZfHjLKvx4N55HbR31bRfGTo4ZbItwsZuKUpg5vzoB09oT48Jo9GDi2+yr8sMEpQlobpOSgEtmxbZNuSDMWCpj8HJeMy8Vcp8q/NhyEyrTrR6tVmu8iLn7Y6sJ/QtMXwYNN07I=
+
   matrix:
     - TASK=check-format
     - TASK=sbt-test-common
@@ -57,11 +58,21 @@ env:
     - TASK=lambdas-test
     - TASK=nginx-build
     - TASK=tif-metadata-build
-    - TASK=loris-build
     - TASK=elasticdump-build
     - TASK=api_docs-build
     - TASK=miro_preprocessor-test
 
+    # Loris stack
+    - TASK=loris-build
+    - TASK=cache_cleaner-build
+
     # Monitoring stack
     - TASK=gatling-build
     - TASK=monitoring_lambdas-test
+
+# This has a Slack API token for posting messages about build failures to
+# our team channel.  It was created by following the "Setup Instructions" at
+# https://wellcome.slack.com/services/B7HD6DUT0#service_setup.
+notifications:
+  slack:
+    secure: XOqr5bsa/A0Ne1My2+c240Q1GUQfqs7/xWLC+e8yDVRDmspTbouTYMtYDG2htLG/pUCUBdeOWdUVDabSetwSHqM4+xvwAtnm9KcNFT1KumVQ/8ZeEVHgrr6sAdI/OzT01JEzvm4cbGTtn/lDc4rZ6DrLeMwvul0dIZMC5PNrMt0qsByj5JtlVU+ih3qZ0fYypeLp4AG7rmpFOaiVPAlXdxpkqtojwP8Q6vDdBA36H24ifiT/snu0Gg3zcR3KCVhTJYNsTe7fNNRffVd/Tl5tBwicx5o+pCf+q+hlfFSw4l3/TnzDlIG5uCccLZVcLdwnnOwQofzjJ7bZPRPbLAa6ynbWTFagwSYzZC3JPfWeyP+I136mK7HqlTG/gD1hUisa/qGUfC9EQIxrg3CXmPj9iGFUhLCUFPR0EUUAfkjcoFUqlPf8EyetE7swBV8d3ngsbfG8H8w42lR60d8f9EhP0N6enWwDRVLky4/PETK7zLPPK42pBy/rIwDpCgYQ7QpetQQyoMM0f5hsTXGUrNZadYN9e6iaJBhKuIggeDUrK7hw4v1bAihzRhPYOWJU+dc7mGoSsJFnPHExyXWu51qejhGoGu9BFu1uI3Unb5Gdb17umYxOm96P5pvR3DC4QoEEVMa7CIOgvKVGhflPqtUaY3Sah2fs0Y6tZfVDsdmwxgo=

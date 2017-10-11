@@ -1,7 +1,7 @@
 module "xml_to_json_converter" {
   source = "xml_to_json_converter"
 
-  bucket_miro_data_id = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  bucket_miro_data_id = "${local.bucket_miro_data_id}"
   release_ids         = "${var.release_ids}"
 
   s3_read_miro_data_json  = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
@@ -11,36 +11,36 @@ module "xml_to_json_converter" {
 module "xml_to_json_run_task" {
   source = "xml_to_json_run_task"
 
-  bucket_miro_data_id    = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
-  bucket_miro_data_arn   = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
-  lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+  bucket_miro_data_id    = "${local.bucket_miro_data_id}"
+  bucket_miro_data_arn   = "${local.bucket_miro_data_arn}"
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
   s3_read_miro_data_json = "${data.aws_iam_policy_document.s3_read_miro_data.json}"
 
   container_name      = "${module.xml_to_json_converter.container_name}"
-  topic_arn           = "${data.terraform_remote_state.lambda.run_ecs_task_topic_arn}"
-  cluster_name        = "${data.terraform_remote_state.platform.ecs_services_cluster_name}"
+  topic_arn           = "${local.run_ecs_task_topic_arn}"
+  cluster_name        = "${local.ecs_services_cluster_name}"
   task_definition_arn = "${module.xml_to_json_converter.task_definition_arn}"
 
-  run_ecs_task_topic_publish_policy = "${data.terraform_remote_state.lambda.run_ecs_task_topic_publish_policy}"
+  run_ecs_task_topic_publish_policy = "${local.run_ecs_task_topic_publish_policy}"
 }
 
 module "miro_image_to_dynamo" {
   source = "miro_image_to_dynamo"
 
   topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
-  miro_data_table_arn            = "${data.terraform_remote_state.platform.table_miro_data_arn}"
-  miro_data_table_name           = "${data.terraform_remote_state.platform.table_miro_data_name}"
-  lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+  miro_data_table_arn            = "${local.table_miro_data_arn}"
+  miro_data_table_name           = "${local.table_miro_data_name}"
+  lambda_error_alarm_arn         = "${local.lambda_error_alarm_arn}"
 }
 
 module "miro_image_sorter" {
   source = "image_sorter"
 
-  lambda_error_alarm_arn = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
-  s3_miro_data_id  = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
-  s3_miro_data_arn = "${data.terraform_remote_state.platform.bucket_miro_data_arn}"
+  s3_miro_data_id  = "${local.bucket_miro_data_id}"
+  s3_miro_data_arn = "${local.bucket_miro_data_arn}"
 
   s3_id_exceptions_key      = "source/exceptions.csv"
   s3_contrib_exceptions_key = "source/contrib.csv"
@@ -60,12 +60,13 @@ module "miro_image_sorter" {
 module "miro_copy_s3_asset" {
   source                         = "miro_copy_s3_asset"
   topic_miro_copy_s3_asset_arn   = "${module.catalogue_api_topic.arn}"
-  lambda_error_alarm_arn         = "${data.terraform_remote_state.lambda.lambda_error_alarm_arn}"
   topic_miro_image_to_dynamo_arn = "${module.topic_miro_image_to_dynamo.arn}"
-  bucket_miro_images_public_arn  = "${data.terraform_remote_state.loris.bucket_wellcomecollectio_miro_images_public_arn}"
-  bucket_miro_images_public_name = "${data.terraform_remote_state.loris.bucket_wellcomecollectio_miro_images_public_id}"
-  bucket_miro_images_sync_arn    = "${data.terraform_remote_state.platform.bucket_miro_images_sync_arn}"
-  bucket_miro_images_sync_name   = "${data.terraform_remote_state.platform.bucket_miro_images_sync_id}"
+
+  lambda_error_alarm_arn         = "${local.lambda_error_alarm_arn}"
+  bucket_miro_images_public_arn  = "${local.bucket_miro_images_public_arn}"
+  bucket_miro_images_public_name = "${local.bucket_miro_images_public_name}"
+  bucket_miro_images_sync_arn    = "${local.bucket_miro_images_sync_arn}"
+  bucket_miro_images_sync_name   = "${local.bucket_miro_images_sync_name}"
 }
 
 resource "aws_iam_role_policy" "miro_copy_s3_asset_sns_publish" {
@@ -75,7 +76,7 @@ resource "aws_iam_role_policy" "miro_copy_s3_asset_sns_publish" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = "${data.terraform_remote_state.platform.bucket_miro_data_id}"
+  bucket = "${local.bucket_miro_data_id}"
 
   lambda_function {
     lambda_function_arn = "${module.xml_to_json_run_task.arn}"

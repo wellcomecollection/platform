@@ -7,11 +7,6 @@ import pytest
 import post_to_slack
 
 
-def _assert_field_contains(field, title, value):
-    assert field['title'] == title
-    assert field['value'] == value
-
-
 @mock.patch('post_to_slack.requests.post')
 def test_post_to_slack(mock_post):
     url = "http://blah.com"
@@ -101,12 +96,7 @@ def test_post_to_slack(mock_post):
     assert attachment['fallback'] == alarm_name
     assert attachment['title'] == alarm_name
     assert len(attachment['fields']) == 1
-
-    _assert_field_contains(
-        field=attachment['fields'][0],
-        title='Reason',
-        value=reason
-    )
+    assert attachment['fields'][0]['value'] == reason
 
 
 class TestAlarm:

@@ -1,19 +1,11 @@
 include shared.Makefile
 include loris/Makefile
-include lambdas/Makefile
 include shared_infra/Makefile
+include catalogue_api/Makefile
+include catalogue_pipeline/Makefile
 include miro_preprocessor/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
-
-
-## Build the image for the cache cleaner
-cache_cleaner-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=cache_cleaner
-
-## Deploy the image for the cache cleaner
-cache_cleaner-deploy: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=cache_cleaner ./builds/publish_service.sh
 
 
 ## Build the image for tif-metadata
@@ -141,7 +133,6 @@ sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
 
 sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=transformer ./builds/publish_service.sh
-
 
 format: \
 	format-terraform \

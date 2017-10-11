@@ -4,6 +4,7 @@ import json
 
 import boto3
 from moto import mock_s3
+import pytest
 import os
 
 from miro_image_sorter import fetch_json_s3_data, parse_s3_event, main
@@ -76,9 +77,9 @@ def _get_msg(sqs_client, queue_url):
     )
 
     message_body = messages['Messages'][0]['Body']
-
+    inner_message = json.loads(message_body)['Message']
     return json.loads(
-        json.loads(message_body)['default']
+        json.loads(inner_message)['default']
     )
 
 
@@ -299,5 +300,13 @@ def test_image_sorter_contrib_exceptions_no_match(image_sorter_sns_sqs, s3_put_e
     main(s3_put_event, None)
 
     cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
-
     assert cold_store_msg == metadata
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["tandem_vault"]["queue"])
+
+    with pytest.raises(KeyError):
+        _get_msg(sqs_client, sns_sqs["digital_library"]["queue"])
