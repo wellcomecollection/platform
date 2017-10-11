@@ -34,7 +34,7 @@ if __name__ == '__main__':
     else:
         dockerfile = os.path.join(ROOT, 'docker', project, 'Dockerfile')
 
-    print('*** Building image for %s' % project)
+    print('*** Building image for %s' % project, flush=True)
 
     release_id = CURRENT_COMMIT
 
@@ -45,9 +45,9 @@ if __name__ == '__main__':
         tag = '%s:%s' % (project, release_id)
         release_name = project
 
-    print('*** Image will be tagged %s' % tag)
+    print('*** Image will be tagged %s' % tag, flush=True)
 
-    print('*** Building the new image')
+    print('*** Building the new image', flush=True)
 
     cmd = ['docker', 'build', '--file', dockerfile, '--tag', release_name]
     if variant is not None:
@@ -57,5 +57,5 @@ if __name__ == '__main__':
 
     subprocess.check_call(['docker', 'tag', release_name, tag])
 
-    print('*** Saving the release ID to .releases')
+    print('*** Saving the release ID to .releases', flush=True)
     write_release_id(project=release_name, release_id=release_id)
