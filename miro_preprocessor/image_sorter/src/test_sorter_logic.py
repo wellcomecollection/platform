@@ -260,7 +260,7 @@ def test_contrib_exceptions_should_override_rules(collection, image_data, contri
     assert sort_image(collection, image_data, _empty_id_exceptions(), contrib_exceptions) == expected_decisions
 
 
-def test_raise_exception_if_collection_is_not_f_l_v_m_fp_as():
+def test_raise_exception_if_collection_is_not_f_v_m_fp_as():
     collection, image_data = collection_image_data(collection="images-A")
     with pytest.raises(InvalidCollectionException):
         sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions())
