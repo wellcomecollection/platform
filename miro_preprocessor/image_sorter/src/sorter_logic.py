@@ -150,6 +150,7 @@ class Rules:
             self.is_collection("L") and self.is_after_first_march_2016 or \
             self.is_collection("L", "M", "V") and self.is_not_for_public_access
 
+    # TODO: Remove `and self.is_innopac_id_8_digits`
     @property
     def is_catalogue_api(self):
         return not self.image_library_dept_is_Public_programmes \

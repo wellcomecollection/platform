@@ -172,6 +172,7 @@ def test_is_tandem_vault(collection, image_data):
     collection_image_data(collection='images-L', image_use_restrictions="CC-BY-NC-ND", image_innopac_id=None,
                           image_cleared=None),
 ])
+
 def test_is_catalogue_api(collection, image_data):
     assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.catalogue_api]
 
@@ -201,6 +202,7 @@ def test_is_catalogue_api_and_tandem_vault(collection, image_data):
     collection_image_data(collection='images-L', image_tech_scanned_date="02/03/2016"),
     collection_image_data(collection='images-L', image_tech_scanned_date="30/06/2018"),
 ])
+
 def test_is_tandem_vault_and_catalogue_api(collection, image_data):
     assert sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions()) == [Decision.tandem_vault, Decision.catalogue_api]
 
@@ -256,6 +258,7 @@ def _create_csv(s):
      _create_csv("""A,B\nAAA,BBB\nDDD,CCC"""),
      [Decision.catalogue_api])
 ])
+
 def test_contrib_exceptions_should_override_rules(collection, image_data, contrib_exceptions, expected_decisions):
     assert sort_image(collection, image_data, _empty_id_exceptions(), contrib_exceptions) == expected_decisions
 

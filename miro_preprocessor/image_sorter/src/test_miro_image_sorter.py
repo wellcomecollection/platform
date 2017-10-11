@@ -84,6 +84,7 @@ def _get_msg(sqs_client, queue_url):
 
 
 def collection_image_data(**kwargs):
+    collection = 'images-M'
     image_data = {
         "image_no_calc": "V1234567",
         "image_title": "Image Title",
@@ -98,7 +99,7 @@ def collection_image_data(**kwargs):
         "image_cleared": "Y",
         "image_source_code": "XXX"
     }
-    image_data.update(kwargs)
+
     collection = kwargs.pop('collection', 'images-M')
 
     return {
