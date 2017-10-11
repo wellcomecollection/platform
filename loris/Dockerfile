@@ -1,8 +1,13 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 RUN apt-get update && \
-    apt-get install --yes python python-pip python-setuptools python-dev \
-    uwsgi uwsgi-plugin-python
+    apt-get install --yes python uwsgi uwsgi-plugin-python wget
+
+# Install pip.  We don't use pip from the Ubuntu package repositories
+# because it tends to be out-of-date and using it gets issues like:
+# https://github.com/pyca/cryptography/issues/3959
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python ./get-pip.py
 
 RUN pip install awscli
 

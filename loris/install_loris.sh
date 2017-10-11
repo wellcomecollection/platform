@@ -22,12 +22,6 @@ apt-get remove -y unzip wget
 echo "*** Creating Loris user"
 useradd -d /var/www/loris -s /sbin/false loris
 
-# Upgrading pip to ensure we get a recent version as Ubuntu gives us a very old one
-# Otherwise we run into issues where deps rely on more recent versions e.g.
-# https://github.com/pyca/cryptography/issues/3959
-echo "*** Upgrading pip"
-pip install --upgrade pip
-
 echo "*** Installing Loris dependencies"
 pip install -r /requirements.txt
 
