@@ -68,7 +68,7 @@ def parse_s3_event(event):
     assert len(records) == 1
     changed_object_key = records[0]['s3']['object']['key']
     match = re.match(r'^config/prod/(?P<app>[a-z_]+)\.ini', changed_object_key)
-    assert match is not None
+    assert match is not None, changed_object_key
     return match.group('app')
 
 
