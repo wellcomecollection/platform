@@ -82,5 +82,5 @@ def main(event, _):
         publish_sns_message(
             topic_arn=topic_arns[decision],
             message=data,
-            subject="foop"
+            subject=decision.value
         )
