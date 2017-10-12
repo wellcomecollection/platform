@@ -10,7 +10,7 @@ module "miro_image_to_dynamo_lambda" {
 
   environment_variables = {
     TABLE_NAME      = "${var.miro_data_table_name}"
-    REINDEX_VERSION = 2
+    REINDEX_VERSION = 1
   }
 }
 
