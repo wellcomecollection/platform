@@ -44,7 +44,7 @@ module "loris_cluster_asg_ebs" {
 }
 
 module "loris_cluster_asg_ebs_large" {
-  source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=v1.0.0"
+  source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=loris-experiments"
   asg_name              = "loris-cluster-ebs-large"
   subnet_list           = ["${local.vpc_api_subnets}"]
   key_name              = "${var.key_name}"
@@ -66,4 +66,6 @@ module "loris_cluster_asg_ebs_large" {
   ebs_size        = 180
   ebs_volume_type = "io1"
   ebs_iops        = "2000"
+
+  root_ebs_iops = "true"
 }
