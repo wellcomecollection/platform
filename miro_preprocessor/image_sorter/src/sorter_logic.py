@@ -223,7 +223,7 @@ def _get_decisions_from_rules(collection, image_data):
     if not r.is_cold_store and not r.is_catalogue_api and not r.is_tandem_vault:
         decisions.append(Decision.none)
 
-    print(decisions)
+    print(f'_get_decisions_from_rules = {decisions}')
 
     return decisions
 
@@ -232,15 +232,15 @@ def _assess_rules(rule_list):
     for rule in rule_list:
         decisions = rule()
 
-        print(decisions)
+        print(f'_assess_rules = {decisions}')
 
         if decisions is not None:
             return decisions
 
 
 def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
-    print(collection)
-    print(image_data)
+    print(f'collection = {collection}')
+    print(f'image_data = {image_data}')
 
     decisions = _assess_rules([
         lambda: _get_decisions_from_id_exceptions(id_exceptions, image_data),
