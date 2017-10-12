@@ -6,5 +6,6 @@ RUN pip install -r /requirements.txt
 WORKDIR /data
 VOLUME ["/data"]
 
+COPY src /app
 
-ENTRYPOINT ["/app/run.sh"]
+ENTRYPOINT /app/run.sh
