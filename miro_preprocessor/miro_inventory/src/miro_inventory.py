@@ -38,17 +38,13 @@ def _generate_auth_token(username, password):
 
 
 def _post_to_es(es_cluster_url, es_index, es_type, es_username, es_password, payload):
-    token = _generate_auth_token(es_username, es_password)
     post_url = f'{es_cluster_url}/{es_index}/{es_type}'
-
     print(f'POSTing to {post_url}')
-
-    ascii_token = token.decode('ascii')
 
     return requests.post(
         post_url,
         data=payload,
-        headers={'Authorization': f'Basic {ascii_token}'}
+        auth=(es_username, es_password)
     )
 
 
