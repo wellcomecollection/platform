@@ -70,6 +70,7 @@ def id_exception(**kwargs):
 @pytest.mark.parametrize('collection, image_data', [
     collection_image_data(collection='images-AS'),
     collection_image_data(collection='images-FP'),
+    collection_image_data(collection='images-D'),
     collection_image_data(collection='images-F'),
     collection_image_data(collection='images-L', image_library_dept="Archives and Manuscripts"),
     collection_image_data(collection='images-V', image_library_dept="Archives and Manuscripts"),

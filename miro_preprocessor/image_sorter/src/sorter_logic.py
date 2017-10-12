@@ -135,7 +135,7 @@ class Rules:
 
     @property
     def is_cold_store(self):
-        return self.is_collection("F", "AS", "FP") or \
+        return self.is_collection("D", "F", "AS", "FP") or \
             (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
             (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
             (self.is_collection("L", "M", "V") and
@@ -195,7 +195,7 @@ def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
 def _get_decisions_from_rules(collection, image_data):
     decisions = []
     r = Rules(collection, image_data)
-    if not r.is_collection("F", "L", "V", "M", "FP", "AS"):
+    if not r.is_collection("D", "F", "L", "V", "M", "FP", "AS"):
         raise InvalidCollectionException({
             "collection": collection,
             "image_data": image_data
