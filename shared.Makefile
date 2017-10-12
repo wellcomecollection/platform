@@ -62,11 +62,11 @@ lint-js: $(ROOT)/.docker/jslint_ci
 uptodate-git: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$HOME/.ssh:/root/.ssh -v $(ROOT):/data -e OP=is-master-head python3.6_ci:latest
 
-## Format terraform in the current directory
-format-terraform: $(ROOT)/.docker/terraform_ci
+format-terraform:
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $$(pwd):/data \
-		--env OP=fmt terraform_ci
+		--volume $(ROOT):/repo \
+		--workdir /repo \
+		hashicorp/terraform:light fmt
 
 $(ROOT)/.docker/scalafmt:
 	$(ROOT)/builds/build_ci_docker_image.py \
