@@ -161,6 +161,12 @@ class TestAlarm:
         'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg => generated 260 bytes in 197 msecs (HTTP/1.0 500) 3 headers in 147 bytes (1 switches on core 0)',
         'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg => generated 260 bytes in 197 msecs (HTTP/1.0 500)'
     ),
+
+    # We strip the timestamp and Lambda ID from timeout errors
+    (
+        '2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task timed out after 10.01 seconds',
+        'Task timed out after 10.01 seconds'
+    ),
 ])
 def test_simplify_message(message, expected):
     assert post_to_slack.simplify_message(message) == expected
