@@ -237,6 +237,8 @@ def _assess_rules(rule_list):
         if decisions is not None:
             return decisions
 
+    return []
+
 
 def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
     print(f'collection = {collection}')
@@ -247,5 +249,12 @@ def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
         lambda: _get_decisions_from_contrib_exceptions(collection, contrib_exceptions, image_data),
         lambda: _get_decisions_from_rules(collection, image_data)
     ])
+
+    # Wellcome Images Awards winners *always* go to Tandem Vault, in addition
+    # to any other rules we might have applied.
+    if decision.tandem_vault not in decisions:
+        r = Rules(collection=collection, image_data=image_data)
+        if r.is_a_wellcome_image_awards_winner:
+            decisions.append(decision.tandem_vault)
 
     return decisions
