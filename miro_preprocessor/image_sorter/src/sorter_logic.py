@@ -134,6 +134,13 @@ class Rules:
         return not self.is_not_for_public_access
 
     @property
+    def is_a_wellcome_image_awards_winner(self):
+        return self._key_matches(
+            'image_award',
+            ['Biomedical Image Awards', 'Wellcome Image Awards']
+        )
+
+    @property
     def is_cold_store(self):
         return self.is_collection("F", "AS", "FP") or \
             (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
@@ -146,9 +153,12 @@ class Rules:
 
     @property
     def is_tandem_vault(self):
-        return self.image_library_dept_is_Public_programmes or \
-            self.is_collection("L") and self.is_after_first_march_2016 or \
-            self.is_collection("L", "M", "V") and self.is_not_for_public_access
+        return (
+            self.image_library_dept_is_Public_programmes or
+            self.is_collection("L") and self.is_after_first_march_2016 or
+            self.is_collection("L", "M", "V") and self.is_not_for_public_access or
+            self.is_a_wellcome_image_awards_winner
+        )
 
     # TODO: Remove `and self.is_innopac_id_8_digits`
     @property
