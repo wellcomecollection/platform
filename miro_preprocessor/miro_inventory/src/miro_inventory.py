@@ -3,7 +3,6 @@
 Lambda which passes on miro_image data from a SNS topic to an Elasticsearch cluster
 """
 
-import base64
 import json
 import os
 
@@ -30,11 +29,6 @@ def _generate_indexable_json(event, id_field):
         'subject': subject,
         'message': message
     })
-
-
-def _generate_auth_token(username, password):
-    plaintext = f'{username}:{password}'
-    return base64.b64encode(plaintext.encode())
 
 
 def _post_to_es(es_cluster_url, es_index, es_type, es_username, es_password, payload):
