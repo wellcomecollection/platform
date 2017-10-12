@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+# TODO: Flip this to using micktwomey/pip-tools when that's updated
+# with a newer version of pip-tools.
 $(LORIS)/requirements.txt: $(LORIS)/requirements.in $(ROOT)/.docker/python3.6_ci
 	docker run \
 		-v $(LORIS):/data \
