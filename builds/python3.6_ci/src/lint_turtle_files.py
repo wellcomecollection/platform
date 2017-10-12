@@ -10,6 +10,7 @@ It exits with code 0 if all files are valid, 1 if not.
 
 import logging
 import os
+import sys
 
 import daiquiri
 import rdflib
@@ -42,7 +43,7 @@ def parse_turtle(path):
 
         failures.append(path)
     else:
-        logger.info("Successfully parsed Turtle!")
+        logger.info("Successfully parsed Turtle! ")
 
 
 if __name__ == '__main__':
@@ -57,3 +58,10 @@ if __name__ == '__main__':
                 continue
 
             parse_turtle(path)
+
+    if failures:
+        logger.error("Failures in the following files: %s", ", ".join(failures))
+        sys.exit(1)
+    else:
+        logger.info("✨  All Turtle files passed linting! ✨")
+        sys.exit(0)

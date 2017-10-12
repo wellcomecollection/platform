@@ -6,7 +6,7 @@ endif
 
 
 lint-turtle: $(ROOT)/.docker/python3.6_ci
-	docker run --volume $(ROOT):/data --env OP=lint-turtle python3.6_ci
+	docker run --volume $(ROOT)/ontologies:/data --env OP=lint-turtle --tty python3.6_ci
 
 lint-json: $(ROOT)/.docker/jslint_ci
 	docker run --volume $(ROOT)/ontologies:/data jslint_ci:latest
