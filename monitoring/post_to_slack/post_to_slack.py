@@ -243,7 +243,7 @@ def simplify_message(message):
     #     14:02:47.249 [ForkJoinPool-2-worker-17]
     #
     # Bin it!
-    messages = re.sub(
+    message = re.sub(
         r'\d{2}:\d{2}:\d{2}\.\d{3} \[ForkJoinPool-\d+-worker-\d+\] ', '',
         message
     )
