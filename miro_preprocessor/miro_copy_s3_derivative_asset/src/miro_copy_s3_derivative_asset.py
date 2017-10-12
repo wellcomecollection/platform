@@ -1,11 +1,12 @@
 import json
 import os
-import re
 
 import boto3
 from botocore.exceptions import ClientError
 
+from miro_utils import MiroImage
 import sns_utils
+import s3_utils
 
 
 def copy_and_forward_message(s3_client,
@@ -17,45 +18,12 @@ def copy_and_forward_message(s3_client,
                              destination_key,
                              source_hash,
                              topic_arn):
-    copy_asset_if_not_exists(s3_client, source_hash, destination_bucket_name, destination_key,
+    s3_utils.copy_asset_if_not_exists(s3_client, source_hash, destination_bucket_name, destination_key,
                              source_bucket_name, source_key)
     sns_utils.publish_sns_message(
         sns_client,
         topic_arn,
         image_info)
-
-
-def copy_asset_if_not_exists(s3_client, source_hash, destination_bucket_name, destination_key,
-                             source_bucket_name, source_key):
-    try:
-        destination_head_response = s3_client.head_object(Bucket=destination_bucket_name, Key=destination_key)
-    except ClientError as client_error:
-        if client_error.response['Error']['Code'] == '404':
-            print(
-                f"Destination bucket has no image: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
-            copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
-            pass
-        else:
-            raise
-    else:
-        if not source_hash == destination_head_response['ETag']:
-            print(
-                f"Destination bucket has image with different hash: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
-            copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
-
-
-def copy_image_asset(s3_client,
-                     source_bucket_name,
-                     source_key,
-                     destination_bucket_name,
-                     destination_key):
-    s3_client.copy_object(
-        CopySource={
-            'Bucket': source_bucket_name,
-            'Key': source_key
-        },
-        Bucket=destination_bucket_name,
-        Key=destination_key)
 
 
 def main(event, _):
@@ -67,27 +35,24 @@ def main(event, _):
     topic_arn = os.environ["TOPIC_ARN"]
 
     image_info = json.loads(event['Records'][0]['Sns']['Message'])
-    image_data = image_info['image_data']
-    miro_id = image_data['image_no_calc']
-    result = re.match(r"(?P<shard>[A-Z]+[0-9]{4})", miro_id)
-    shard = f"{result.group('shard')}000"
-    key = f"fullsize/{shard}/{miro_id}.jpg"
+    miro_image = MiroImage(image_info)
+    source_key = f"fullsize/{miro_image.image_path}"
 
     try:
-        source_head_response = s3_client.head_object(Bucket=source_bucket_name, Key=key)
+        source_head_response = s3_client.head_object(Bucket=source_bucket_name, Key=source_key)
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == '404':
-            print(f"No image found for MiroId {miro_id}: skipping")
+            print(f"No image found for MiroId {miro_image.miro_id}: skipping")
             pass
         else:
             raise
     else:
-        destination_key = f"{shard}/{miro_id}.jpg"
+        destination_key = miro_image.image_path
         copy_and_forward_message(s3_client,
                                  sns_client,
                                  image_info,
                                  source_bucket_name,
-                                 key,
+                                 source_key,
                                  destination_bucket_name,
                                  destination_key,
                                  source_head_response['ETag'],
