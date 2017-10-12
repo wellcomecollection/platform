@@ -134,6 +134,13 @@ class Rules:
         return not self.is_not_for_public_access
 
     @property
+    def is_a_wellcome_image_awards_winner(self):
+        return self._key_matches(
+            'image_award',
+            ['Biomedical Image Awards', 'Wellcome Image Awards']
+        )
+
+    @property
     def is_cold_store(self):
         return self.is_collection("D", "F", "AS", "FP") or \
             (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
@@ -146,9 +153,12 @@ class Rules:
 
     @property
     def is_tandem_vault(self):
-        return self.image_library_dept_is_Public_programmes or \
-            self.is_collection("L") and self.is_after_first_march_2016 or \
-            self.is_collection("L", "M", "V") and self.is_not_for_public_access
+        return (
+            self.image_library_dept_is_Public_programmes or
+            self.is_collection("L") and self.is_after_first_march_2016 or
+            self.is_collection("L", "M", "V") and self.is_not_for_public_access or
+            self.is_a_wellcome_image_awards_winner
+        )
 
     # TODO: Remove `and self.is_innopac_id_8_digits`
     @property
@@ -213,7 +223,7 @@ def _get_decisions_from_rules(collection, image_data):
     if not r.is_cold_store and not r.is_catalogue_api and not r.is_tandem_vault:
         decisions.append(Decision.none)
 
-    print(decisions)
+    print(f'_get_decisions_from_rules = {decisions}')
 
     return decisions
 
@@ -222,20 +232,29 @@ def _assess_rules(rule_list):
     for rule in rule_list:
         decisions = rule()
 
-        print(decisions)
+        print(f'_assess_rules = {decisions}')
 
         if decisions is not None:
             return decisions
 
+    return []
+
 
 def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
-    print(collection)
-    print(image_data)
+    print(f'collection = {collection}')
+    print(f'image_data = {image_data}')
 
     decisions = _assess_rules([
         lambda: _get_decisions_from_id_exceptions(id_exceptions, image_data),
         lambda: _get_decisions_from_contrib_exceptions(collection, contrib_exceptions, image_data),
         lambda: _get_decisions_from_rules(collection, image_data)
     ])
+
+    # Wellcome Images Awards winners *always* go to Tandem Vault, in addition
+    # to any other rules we might have applied.
+    if Decision.tandem_vault not in decisions:
+        r = Rules(collection=collection, image_data=image_data)
+        if r.is_a_wellcome_image_awards_winner:
+            decisions.append(Decision.tandem_vault)
 
     return decisions

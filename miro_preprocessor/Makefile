@@ -73,7 +73,7 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT)/miro_preprocessor/image_sorter/src:/data \
 		--env OP=test \
-		--env FIND_MATCH_PATHS="/data" \
+		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
 miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
