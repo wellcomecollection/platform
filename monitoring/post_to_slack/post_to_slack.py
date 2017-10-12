@@ -270,6 +270,17 @@ def simplify_message(message):
         r'\d+ headers in \d+ bytes \(\d+ switches on core \d+\)', '', message
     )
 
+    # Lambda timeouts have an opaque prefix:
+    #
+    #     2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task
+    #     timed out after 10.01 seconds
+    #
+    # Drop it!
+    message = re.sub(
+        r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z '
+        r'[0-9a-f-]+ (?=Task timed out)', '', message
+    )
+
     return message.strip()
 
 
