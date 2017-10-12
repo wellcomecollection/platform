@@ -252,9 +252,9 @@ def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
 
     # Wellcome Images Awards winners *always* go to Tandem Vault, in addition
     # to any other rules we might have applied.
-    if decision.tandem_vault not in decisions:
+    if Decision.tandem_vault not in decisions:
         r = Rules(collection=collection, image_data=image_data)
         if r.is_a_wellcome_image_awards_winner:
-            decisions.append(decision.tandem_vault)
+            decisions.append(Decision.tandem_vault)
 
     return decisions
