@@ -2,7 +2,7 @@ variable "bucket_source_asset_arn" {}
 
 variable "lambda_error_alarm_arn" {}
 
-variable "topic_miro_copy_s3_asset_arn" {}
+variable "topic_miro_copy_s3_derivative_asset_arn" {}
 
 variable "bucket_destination_asset_arn" {}
 

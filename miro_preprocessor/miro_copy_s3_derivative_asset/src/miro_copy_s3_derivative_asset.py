@@ -15,8 +15,18 @@ def copy_and_forward_message(s3_client,
                              source_key,
                              destination_bucket_name,
                              destination_key,
-                             source_head_response,
+                             source_hash,
                              topic_arn):
+    copy_asset_if_not_exists(s3_client, source_hash, destination_bucket_name, destination_key,
+                             source_bucket_name, source_key)
+    sns_utils.publish_sns_message(
+        sns_client,
+        topic_arn,
+        image_info)
+
+
+def copy_asset_if_not_exists(s3_client, source_hash, destination_bucket_name, destination_key,
+                             source_bucket_name, source_key):
     try:
         destination_head_response = s3_client.head_object(Bucket=destination_bucket_name, Key=destination_key)
     except ClientError as client_error:
@@ -28,18 +38,10 @@ def copy_and_forward_message(s3_client,
         else:
             raise
     else:
-        if not get_etag(source_head_response) == get_etag(destination_head_response):
+        if not source_hash == destination_head_response['ETag']:
             print(
                 f"Destination bucket has image with different hash: copying from {source_bucket_name}/{source_key} to {destination_bucket_name}/{destination_key}")
             copy_image_asset(s3_client, source_bucket_name, source_key, destination_bucket_name, destination_key)
-    sns_utils.publish_sns_message(
-        sns_client,
-        topic_arn,
-        image_info)
-
-
-def get_etag(head_response):
-    return head_response['ETag']
 
 
 def copy_image_asset(s3_client,
@@ -88,5 +90,5 @@ def main(event, _):
                                  key,
                                  destination_bucket_name,
                                  destination_key,
-                                 source_head_response,
+                                 source_head_response['ETag'],
                                  topic_arn)
