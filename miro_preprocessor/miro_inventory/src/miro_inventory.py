@@ -9,6 +9,7 @@ import os
 
 from botocore.vendored import requests
 
+
 # Super naive jsonpath!
 def _extract_id_field(o, id_field):
     path = id_field.split(".")

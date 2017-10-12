@@ -8,7 +8,6 @@ from unittest import mock
 
 import miro_inventory
 
-
 miro_id = "A0000002"
 
 collection = "Images-C"
