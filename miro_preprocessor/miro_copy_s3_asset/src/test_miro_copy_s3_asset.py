@@ -16,6 +16,7 @@ def assert_sns_message_forwarded(image_json, queue_url, sqs_client):
     )
     message_body = messages['Messages'][0]['Body']
     inner_message = json.loads(message_body)['Message']
+
     actual_message = json.loads(inner_message)['default']
     assert actual_message == image_json
 

@@ -24,14 +24,6 @@ variable "topic_catalogue_api_publish_policy" {
   description = "JSON policy for pushing to `topic_catalogue_api_arn`"
 }
 
-variable "topic_digital_library_arn" {
-  description = "ARN for the SNS topic for identifying Digital Library images"
-}
-
-variable "topic_digital_library_publish_policy" {
-  description = "JSON policy for pushing to `topic_digital_library_arn`"
-}
-
 variable "topic_none_arn" {
   description = "ARN for the SNS topic for identifying uncategorisable images"
 }
@@ -40,6 +32,8 @@ variable "topic_none_publish_policy" {
   description = "JSON policy for pushing to `topic_none_arn`"
 }
 
-variable "s3_exceptions_key" {}
+variable "s3_id_exceptions_key" {}
+variable "s3_contrib_exceptions_key" {}
+
 variable "s3_miro_data_id" {}
 variable "s3_miro_data_arn" {}
