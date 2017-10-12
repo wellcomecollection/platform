@@ -90,7 +90,7 @@ miro_inventory-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in image_sorter miro_copy_s3_asset miro_image_to_dynamo xml_to_json_run_task; \
+	for l in image_sorter miro_copy_s3_asset miro_image_to_dynamo xml_to_json_run_task miro_inventory-build; \
 	do																		\
 		$(ROOT)/builds/docker_run.py --aws -- 								\
 			--volume $(ROOT):/repo 											\
