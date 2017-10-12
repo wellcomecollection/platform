@@ -77,7 +77,7 @@ def test_miro_inventory(mock_get):
     mock_get.assert_called_with(
         'https://example.com/index/type',
         data='{"id": "A0000002", "subject": "catalogue_api", "message": {"collection": "Images-C", "image_data": {"image_no_calc": "A0000002", "image_int_default": null, "image_artwork_date_from": "01/02/2000", "image_artwork_date_to": "13/12/2000", "image_barcode": "10000000", "image_creator": ["Caspar Bauhin"]}}}',
-        headers={'Authorization': "Basic Zm9vOmZvbw=="}
+        auth=('foo', 'foo')
     )
 
 
