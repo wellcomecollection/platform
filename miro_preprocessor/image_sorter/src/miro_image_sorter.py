@@ -77,5 +77,10 @@ def main(event, _):
     }
 
     for decision in decisions:
+
         print(f'Sorting this image into {decision}')
-        publish_sns_message(topic_arn=topic_arns[decision], message=data)
+        publish_sns_message(
+            topic_arn=topic_arns[decision],
+            message=data,
+            subject="foop"
+        )
