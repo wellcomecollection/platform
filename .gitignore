@@ -7,7 +7,9 @@ terraform.plan
 .terraform
 shared_infra/.releases
 *.tfvars
-terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
 .releases
 .docker
 .lambda_zips
