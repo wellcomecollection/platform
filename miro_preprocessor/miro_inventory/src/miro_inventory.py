@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 """
-Description
+Lambda which passes on miro_image data from a SNS topic to an Elasticsearch cluster
 """
 
 import base64
