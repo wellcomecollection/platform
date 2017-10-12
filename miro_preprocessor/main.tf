@@ -67,15 +67,14 @@ module "miro_copy_catalogue_derivative" {
   bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
   bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
 
-  destination_key_prefix = ""
   lambda_description     = "Copy catalogue miro derivatives to Loris s3 bucket"
   lambda_name            = "miro_copy_catalogue_derivative"
   source_key_prefix      = "fullsize/"
 }
 
 module "miro_copy_catalogue_master" {
-  source                        = "miro_copy_s3_derivative_asset"
-  topic_miro_copy_s3_derivative_asset_arn  = "${module.catalogue_api_topic.arn}"
+  source                        = "miro_copy_s3_master_asset"
+  topic_miro_copy_s3_master_asset_arn  = "${module.catalogue_api_topic.arn}"
 
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
   bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
