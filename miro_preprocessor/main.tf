@@ -57,8 +57,8 @@ module "miro_image_sorter" {
 }
 
 module "miro_copy_catalogue_derivative" {
-  source                        = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn  = "${module.catalogue_api_topic.arn}"
+  source                        = "miro_copy_s3_derivative_asset"
+  topic_miro_copy_s3_derivative_asset_arn  = "${module.catalogue_api_topic.arn}"
   topic_forward_sns_message_arn = "${module.topic_miro_image_to_dynamo.arn}"
 
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
@@ -74,8 +74,8 @@ module "miro_copy_catalogue_derivative" {
 }
 
 module "miro_copy_catalogue_master" {
-  source                        = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn  = "${module.catalogue_api_topic.arn}"
+  source                        = "miro_copy_s3_derivative_asset"
+  topic_miro_copy_s3_derivative_asset_arn  = "${module.catalogue_api_topic.arn}"
 
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
   bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
@@ -89,8 +89,8 @@ module "miro_copy_catalogue_master" {
   source_key_prefix      = "Wellcome_Images_Archive/"
 }
 
-resource "aws_iam_role_policy" "miro_copy_s3_asset_sns_publish" {
-  name   = "miro_copy_s3_asset_sns_publish_policy"
+resource "aws_iam_role_policy" "miro_copy_s3_derivative_asset_sns_publish" {
+  name   = "miro_copy_s3_derivative_asset_sns_publish_policy"
   role   = "${module.miro_copy_catalogue_derivative.role_name}"
   policy = "${module.topic_miro_image_to_dynamo.publish_policy}"
 }
