@@ -261,6 +261,15 @@ def simplify_message(message):
         r'\[[A-Za-z0-9: ]+\]', '', message
     )
 
+    # Loris messages also have an uninteresting suffix:
+    #
+    #     3 headers in 147 bytes (1 switches on core 0)
+    #
+    # Throw it away!
+    message = re.sub(
+        r'\d+ headers in \d+ bytes \(\d+ switches on core \d+\)', '', message
+    )
+
     return message.strip()
 
 

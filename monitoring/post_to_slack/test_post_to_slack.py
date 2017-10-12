@@ -154,7 +154,13 @@ class TestAlarm:
     (
         'pid: 88|app: 0|req: 1871/9531] 172.17.0.4 () {46 vars in 937 bytes} [Wed Oct 11 22:42:03 2017] GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg => generated 260 bytes in 227 msecs (HTTP/1.0 500)',
         'GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg => generated 260 bytes in 227 msecs (HTTP/1.0 500)',
-    )
+    ),
+
+    # We strip UWSGI suffixes from Loris logs
+    (
+        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg => generated 260 bytes in 197 msecs (HTTP/1.0 500) 3 headers in 147 bytes (1 switches on core 0)',
+        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg => generated 260 bytes in 197 msecs (HTTP/1.0 500)'
+    ),
 ])
 def test_simplify_message(message, expected):
     assert post_to_slack.simplify_message(message) == expected
