@@ -90,3 +90,13 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
     filter_suffix       = ".json"
   }
 }
+
+module "miro_inventory" {
+  source = "miro_inventory"
+
+  cluster_url  = "${var.cluster_url}"
+  es_passsword = "${var.es_passsword}"
+  es_username  = "${var.es_username}"
+
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+}
