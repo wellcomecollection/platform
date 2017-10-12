@@ -270,3 +270,49 @@ def test_raise_exception_if_collection_is_not_f_v_m_fp_as():
     collection, image_data = collection_image_data(collection="images-A")
     with pytest.raises(InvalidCollectionException):
         sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions())
+
+
+class TestWellcomeImageAwards:
+
+    @pytest.mark.parametrize('collection', ['images-F', 'images-AS', 'images-V'])
+    @pytest.mark.parametrize('award', [
+        'Biomedical Image Awards',
+        'Wellcome Image Awards',
+    ])
+    def test_images_with_wia_go_to_tandem_vault(self, collection, award):
+        """
+        Images that wouldn't otherwise go to Tandem Vault end up there if
+        they have the right image_award field.
+        """
+        collection, image_data = collection_image_data(
+            collection=collection, image_award=award
+        )
+        result = sort_image(
+            collection=collection,
+            image_data=image_data,
+            id_exceptions=_empty_id_exceptions(),
+            contrib_exceptions=_empty_contrib_exceptions()
+        )
+        assert Decision.tandem_vault in result
+
+    @pytest.mark.parametrize('collection', ['images-F', 'images-L', 'images-V'])
+    @pytest.mark.parametrize('award', [
+        'Physical Image Awards',
+        'Nobel Prize',
+        'Wooden Spoon',
+    ])
+    def test_images_without_wia_dont_go_to_tandem_vault(self, collection, award):
+        """
+        Images that wouldn't otherwise go to Tandem Vault don't end up there
+        if they don't have the right image_award field.
+        """
+        collection, image_data = collection_image_data(
+            collection=collection, image_award=award
+        )
+        result = sort_image(
+            collection=collection,
+            image_data=image_data,
+            id_exceptions=_empty_id_exceptions(),
+            contrib_exceptions=_empty_contrib_exceptions()
+        )
+        assert Decision.tandem_vault not in result
