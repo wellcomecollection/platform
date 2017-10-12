@@ -99,4 +99,10 @@ module "miro_inventory" {
   es_username  = "${var.es_username}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  none_topic_arn            = "${module.none_topic.arn}"
+  catalogue_api_topic_arn   = "${module.catalogue_api_topic.arn}"
+  tandem_vault_topic_arn    = "${module.tandem_vault_topic.arn}"
+  cold_store_topic_arn      = "${module.cold_store_topic.arn}"
+  digital_library_topic_arn = "${module.digital_library_topic.arn}"
 }

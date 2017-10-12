@@ -18,3 +18,43 @@ module "miro_inventory_lambda" {
     ID_FIELD = "image_data.image_no_calc"
   }
 }
+
+module "miro_inventory_lambda_trigger_cold_store_topic" {
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
+  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
+
+  sns_trigger_arn = "${var.cold_store_topic_arn}"
+}
+
+module "miro_inventory_lambda_trigger_tandem_vault_topic" {
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
+  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
+
+  sns_trigger_arn = "${var.tandem_vault_topic_arn}"
+}
+
+module "miro_inventory_lambda_trigger_catalogue_api_topic" {
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
+  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
+
+  sns_trigger_arn = "${var.catalogue_api_topic_arn}"
+}
+
+module "miro_inventory_lambda_trigger_digital_library_topic" {
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
+  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
+
+  sns_trigger_arn = "${var.digital_library_topic_arn}"
+}
+
+module "miro_inventory_lambda_trigger_none_topic" {
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
+  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
+
+  sns_trigger_arn = "${var.none_topic_arn}"
+}
