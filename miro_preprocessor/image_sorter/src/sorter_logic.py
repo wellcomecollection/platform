@@ -188,8 +188,8 @@ def _get_decisions_from_id_exceptions(exceptions, image_data):
     # duplicate image records for some explicit AIDS posters.  All the
     # posters are available, so we delete these records.  They all have
     # image numbers in the L sequence ending with "FX", e.g. "L0052198FX".
-    # if re.match(r'^L\d+FX$', image_data['image_no_calc']):
-    #     return [Decision.cold_store]
+    if re.match(r'^L\d+FX$', image_data['image_no_calc']):
+        return [Decision.cold_store]
 
 
 def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
