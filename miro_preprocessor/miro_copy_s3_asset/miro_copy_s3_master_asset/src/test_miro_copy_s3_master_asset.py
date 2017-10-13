@@ -78,9 +78,9 @@ def test_should_copy_an_asset_into_a_different_bucket(
     s3_client.put_object(
         Bucket=source_bucket_name,
         ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jpg")
+        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jpg"
+    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
 
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
@@ -126,9 +126,9 @@ def test_should_replace_asset_if_already_exists_with_different_content(
     s3_client.put_object(
         Bucket=source_bucket_name,
         ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jpg")
+        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jpg"
+    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
     s3_client.put_object(
         Bucket=destination_bucket_name,
         ACL='private',
