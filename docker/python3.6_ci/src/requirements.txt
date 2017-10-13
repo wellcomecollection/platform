@@ -1,4 +1,0 @@
-flake8
-boto3
-pytest
-moto==1.1.21
