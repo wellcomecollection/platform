@@ -76,8 +76,21 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
+miro_inventory-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(ROOT)/miro_preprocessor/miro_inventory:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
+miro_inventory-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(ROOT)/miro_preprocessor/miro_inventory/src:/data \
+		--env OP=test \
+		--env FIND_MATCH_PATHS="/data" \
+		python3.6_ci:latest
+
 miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in image_sorter miro_copy_s3_asset miro_image_to_dynamo xml_to_json_run_task; \
+	for l in image_sorter miro_copy_s3_asset miro_image_to_dynamo xml_to_json_run_task miro_inventory; \
 	do																		\
 		$(ROOT)/builds/docker_run.py --aws -- 								\
 			--volume $(ROOT):/repo 											\
@@ -86,9 +99,9 @@ miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
 	done
 
 
-miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test miro_copy_s3_asset-test
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test miro_copy_s3_asset-test miro_inventory-test
 
-miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build miro_copy_s3_asset-build
+miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build miro_copy_s3_asset-build miro_inventory-build
 
 miro_preprocessor-build: xml_to_json_converter-build miro_preprocessor-build-lambdas
 

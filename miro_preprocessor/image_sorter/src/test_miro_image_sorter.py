@@ -76,11 +76,17 @@ def _get_msg(sqs_client, queue_url):
     )
 
     message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
+    json_decoded_message = json.loads(message_body)
 
-    return json.loads(
-        json.loads(inner_message)['default']
-    )
+    inner_message = json_decoded_message['Message']
+    subject = json_decoded_message['Subject']
+
+    return {
+        "subject": subject,
+        "message": json.loads(
+            json.loads(inner_message)['default']
+        )
+    }
 
 
 def collection_image_data(**kwargs):
@@ -144,7 +150,7 @@ def test_image_sorter_catalogue_api(image_sorter_sns_sqs, s3_put_event):
 
     catalogue_api_msg = _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
 
-    assert catalogue_api_msg == metadata
+    assert catalogue_api_msg['message'] == metadata
 
 
 @mock_s3
@@ -166,7 +172,7 @@ def test_image_sorter_tandem_vault(image_sorter_sns_sqs, s3_put_event):
 
     tandem_value_msg = _get_msg(sqs_client, sns_sqs["tandem_vault"]["queue"])
 
-    assert tandem_value_msg == metadata
+    assert tandem_value_msg['message'] == metadata
 
 
 @mock_s3
@@ -190,7 +196,7 @@ def test_image_sorter_cold_store(image_sorter_sns_sqs, s3_put_event):
 
     cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
 
-    assert cold_store_msg == metadata
+    assert cold_store_msg['message'] == metadata
 
 
 @mock_s3
@@ -217,7 +223,7 @@ def test_image_sorter_none(image_sorter_sns_sqs, s3_put_event):
 
     none_msg = _get_msg(sqs_client, sns_sqs["none"]["queue"])
 
-    assert none_msg == metadata
+    assert none_msg['message'] == metadata
 
 
 @mock_s3
@@ -243,7 +249,7 @@ def test_image_sorter_id_exceptions(image_sorter_sns_sqs, s3_put_event):
 
     cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
 
-    assert cold_store_msg == metadata
+    assert cold_store_msg['message'] == metadata
 
 
 @mock_s3
@@ -270,7 +276,7 @@ def test_image_sorter_contrib_exceptions_match(image_sorter_sns_sqs, s3_put_even
 
     catalogue_api_msg = _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
 
-    assert catalogue_api_msg == metadata
+    assert catalogue_api_msg['message'] == metadata
 
 
 @mock_s3
@@ -296,7 +302,8 @@ def test_image_sorter_contrib_exceptions_no_match(image_sorter_sns_sqs, s3_put_e
     main(s3_put_event, None)
 
     cold_store_msg = _get_msg(sqs_client, sns_sqs["cold_store"]["queue"])
-    assert cold_store_msg == metadata
+
+    assert cold_store_msg['message'] == metadata
 
     with pytest.raises(KeyError):
         _get_msg(sqs_client, sns_sqs["catalogue_api"]["queue"])
