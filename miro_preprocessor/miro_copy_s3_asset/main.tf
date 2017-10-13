@@ -1,12 +1,17 @@
 module "miro_copy_s3_asset_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
-  s3_key = "lambdas/miro_preprocessor/miro_copy_s3_${local.lambda_s3_type}_asset.zip"
+  s3_key = "lambdas/miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_${local.lambda_s3_type}_asset.zip"
 
   description     = "${var.lambda_description}"
   name            = "${var.lambda_name}"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
-  environment_variables = "${local.environment_variables}"
+  environment_variables = {
+    "S3_SOURCE_BUCKET"      = "${var.bucket_source_asset_name}"
+    "S3_DESTINATION_BUCKET" = "${var.bucket_destination_name}"
+    "S3_DESTINATION_PREFIX"             = "${var.destination_key_prefix}"
+    "TOPIC_ARN"             = "${var.topic_forward_sns_message_arn}"
+  }
 
   timeout = "30"
 }
@@ -61,22 +66,4 @@ locals {
   source_prefix = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive": "fullsize/"}"
   destination_prefix = "${var.is_master_asset == "true" ? "${var.destination_key_prefix}" : ""}"
   lambda_s3_type = "${var.is_master_asset == "true" ? "master": "derivative"}"
-
-  shared_environment_variables = {
-    "S3_SOURCE_BUCKET"      = "${var.bucket_source_asset_name}"
-    "S3_DESTINATION_BUCKET" = "${var.bucket_destination_name}"
-  }
-
-  master_environment_variables = {
-    "S3_DESTINATION_PREFIX"             = "${var.destination_key_prefix}"
-  }
-
-  derivative_environment_variables = {
-    "TOPIC_ARN"             = "${var.topic_forward_sns_message_arn}"
-  }
-
-  merged_master_environment_variables = "${merge(local.shared_environment_variables, local.master_environment_variables)}"
-  merged_derivative_environment_variables = "${merge(local.shared_environment_variables, local.derivative_environment_variables)}"
-
-  environment_variables = "${var.is_master_asset == "true" ? "${local.merged_master_environment_variables}" : "${local.merged_derivative_environment_variables}"}"
 }
