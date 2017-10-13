@@ -1,11 +1,9 @@
-import json
 import re
 
 
 class MiroImage:
-    def __init__(self, image_info_json):
-        image_info = json.loads(image_info_json)
-        self.collection = image_info['collection']
+    def __init__(self, image_info):
+        self.collection = image_info['collection'].split("-")[-1]
         self.image_data = image_info['image_data']
 
     @property
