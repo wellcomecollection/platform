@@ -31,7 +31,7 @@ werror:label rdf:type owl:ObjectProperty ;
     rdfs:comment "The title or other short label of an error."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
 
-wwork:description rdf:type owl:ObjectProperty ;
+werror:description rdf:type owl:ObjectProperty ;
     rdfs:label "description"@en ;
     rdfs:comment "The specific characteristics or circumstances of this error - for example, missing or malformed input, problem conditions. This may explain how to fix this error, if possible."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .

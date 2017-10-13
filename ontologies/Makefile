@@ -5,9 +5,13 @@ ifneq ($(ROOT), $(shell pwd))
 endif
 
 
-## Lint the onotologies folder
-lint-ontologies: $(ROOT)/.docker/jslint_ci
-	docker run -v $(ROOT)/onotologies:/data jslint_ci:latest
+lint-turtle: $(ROOT)/.docker/python3.6_ci
+	docker run --volume $(ROOT)/ontologies:/data --env OP=lint-turtle --tty python3.6_ci
+
+lint-json: $(ROOT)/.docker/jslint_ci
+	docker run --volume $(ROOT)/ontologies:/data jslint_ci:latest
+
+lint-ontologies: lint-turtle lint-json
 
 
-.PHONY: lint-ontologies
+.PHONY: lint-turtle lint-json lint-ontologies
