@@ -36,7 +36,7 @@ def main(event, _):
 
     image_info = json.loads(event['Records'][0]['Sns']['Message'])
     miro_image = MiroImage(image_info)
-    source_key = f"fullsize/{miro_image.image_path}"
+    source_key = f"fullsize/{miro_image.image_path}.jpg"
 
     try:
         source_head_response = s3_client.head_object(Bucket=source_bucket_name, Key=source_key)
@@ -47,7 +47,7 @@ def main(event, _):
         else:
             raise
     else:
-        destination_key = miro_image.image_path
+        destination_key = f"{miro_image.image_path}.jpg"
         copy_and_forward_message(s3_client,
                                  sns_client,
                                  image_info,

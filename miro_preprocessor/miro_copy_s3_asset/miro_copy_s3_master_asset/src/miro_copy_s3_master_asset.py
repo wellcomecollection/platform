@@ -17,7 +17,7 @@ def main(event, _):
 
     image_info = json.loads(event['Records'][0]['Sns']['Message'])
     miro_image = MiroImage(image_info)
-    key = f"Wellcome_Images_Archive/{miro_image.collection} Images/{miro_image.image_path}"
+    key = f"Wellcome_Images_Archive/{miro_image.collection} Images/{miro_image.image_path}.jp2"
     print(key)
     try:
         source_head_response = s3_client.head_object(Bucket=source_bucket_name, Key=key)
@@ -28,6 +28,6 @@ def main(event, _):
         else:
             raise
     else:
-        destination_key = f"{destination_prefix}/{miro_image.image_path}"
+        destination_key = f"{destination_prefix}/{miro_image.image_path}.jp2"
         s3_utils.copy_asset_if_not_exists(s3_client, source_head_response['ETag'], destination_bucket_name, destination_key,
                                  source_bucket_name, key)

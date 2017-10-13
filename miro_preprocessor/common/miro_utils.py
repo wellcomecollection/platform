@@ -17,4 +17,4 @@ class MiroImage:
 
     @property
     def image_path(self):
-        return f"{self.shard}/{self.miro_id}.jpg"
+        return f"{self.shard}/{self.miro_id}"
