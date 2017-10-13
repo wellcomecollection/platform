@@ -50,15 +50,27 @@ miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 	-e OP=build-lambda \
 	python3.6_ci:latest
 
-miro_copy_s3_asset-test: $(ROOT)/.docker/python3.6_ci
+miro_copy_s3_derivative_asset-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset/src:/data \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_derivative_asset/src:/data \
 	-e OP=test \
 	python3.6_ci:latest
 
-miro_copy_s3_asset-build: $(ROOT)/.docker/python3.6_ci
+miro_copy_s3_master_asset-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset:/data \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_master_asset/src:/data \
+	-e OP=test \
+	python3.6_ci:latest
+
+miro_copy_s3_derivative_asset-build: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_derivative_asset:/data \
+	-e OP=build-lambda \
+	python3.6_ci:latest
+
+miro_copy_s3_master_asset-build: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+	-v $(ROOT)/miro_preprocessor/miro_copy_s3_master_asset:/data \
 	-e OP=build-lambda \
 	python3.6_ci:latest
 
@@ -77,7 +89,7 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in image_sorter miro_copy_s3_asset miro_image_to_dynamo xml_to_json_run_task; \
+	for l in image_sorter miro_copy_s3_derivative_asset miro_copy_s3_master_asset miro_image_to_dynamo xml_to_json_run_task; \
 	do																		\
 		$(ROOT)/builds/docker_run.py --aws -- 								\
 			--volume $(ROOT):/repo 											\
@@ -86,9 +98,9 @@ miro_preprocessor_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
 	done
 
 
-miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test miro_copy_s3_asset-test
+miro_preprocessor-test: xml_to_json_converter-test xml_to_json_run_task-test miro_image_to_dynamo-test image_sorter-test miro_copy_s3_derivative_asset-test miro_copy_s3_master_asset-test
 
-miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build miro_copy_s3_asset-build
+miro_preprocessor-build-lambdas: xml_to_json_run_task-build miro_image_to_dynamo-build image_sorter-build miro_copy_s3_derivative_asset-build miro_copy_s3_master_asset-build
 
 miro_preprocessor-build: xml_to_json_converter-build miro_preprocessor-build-lambdas
 
