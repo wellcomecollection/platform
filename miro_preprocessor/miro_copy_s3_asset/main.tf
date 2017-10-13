@@ -59,12 +59,11 @@ data "aws_iam_policy_document" "allow_s3_copy" {
     ]
 
     resources = [
-      "${var.bucket_destination_asset_arn}/${local.destination_prefix}*",
+      "${var.bucket_destination_asset_arn}/${var.destination_key_prefix}*",
     ]
   }
 }
 locals {
   source_prefix = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive": "fullsize/"}"
-  destination_prefix = "${var.is_master_asset == "true" ? "${var.destination_key_prefix}" : ""}"
   lambda_s3_type = "${var.is_master_asset == "true" ? "master": "derivative"}"
 }

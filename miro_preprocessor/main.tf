@@ -82,7 +82,7 @@ module "miro_copy_catalogue_master" {
   bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
   bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
 
-  destination_key_prefix = "library/"
+  destination_key_prefix = "library"
   lambda_description     = "Copy catalogue miro master assets to private s3 bucket"
   lambda_name            = "miro_copy_catalogue_master"
   is_master_asset = "true"
