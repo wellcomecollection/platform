@@ -222,7 +222,7 @@ def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
 def _get_decisions_from_rules(collection, image_data):
     decisions = []
     r = Rules(collection, image_data)
-    if not r.is_collection("D", "F", "L", "V", "M", "FP", "AS"):
+    if not r.is_collection("D", "F", "L", "V", "M", "FP", "AS", "S"):
         raise InvalidCollectionException({
             "collection": collection,
             "image_data": image_data
