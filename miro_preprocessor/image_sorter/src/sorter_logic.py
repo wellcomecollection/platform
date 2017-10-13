@@ -49,8 +49,18 @@ class Rules:
     def _get_normalised(self, key):
         return self._normalise_string(self._get(key))
 
+    def _compare_normalised(self, a, b):
+        return self._normalise_string(a) == self._normalise_string(b)
+
     def _compare(self, key, value):
-        return self._get_normalised(key) == self._normalise_string(value)
+        key_values = self._get(key)
+
+        if not isinstance(key_values, list):
+            key_values = [key_values]
+
+        return any(
+            self._compare_normalised(key_value, value) for key_value in key_values
+        )
 
     def _is_collection(self, collection_name):
         return self._normalise_string(self.collection) == self._normalise_string(f"images-{collection_name}")
