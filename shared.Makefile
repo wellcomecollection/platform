@@ -11,6 +11,8 @@ export INFRA_BUCKET = platform-infra
 
 ROOT = $(shell git rev-parse --show-toplevel)
 
+include $(ROOT)/builds/Makefile
+
 $(ROOT)/.docker/image_builder:
 	$(ROOT)/builds/build_ci_docker_image.py \
 		--project=image_builder \
@@ -25,9 +27,6 @@ $(ROOT)/.docker/publish_service_to_aws:
 
 $(ROOT)/.docker/jslint_ci:
 	$(ROOT)/builds/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
-
-$(ROOT)/.docker/python3.6_ci:
-	$(ROOT)/builds/build_ci_docker_image.py --project=python3.6_ci --dir=docker/python3.6_ci
 
 $(ROOT)/.docker/terraform_ci:
 	$(ROOT)/builds/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
@@ -63,11 +62,11 @@ lint-js: $(ROOT)/.docker/jslint_ci
 uptodate-git: $(ROOT)/.docker/python3.6_ci
 	docker run -v $$HOME/.ssh:/root/.ssh -v $(ROOT):/data -e OP=is-master-head python3.6_ci:latest
 
-## Format terraform in the current directory
-format-terraform: $(ROOT)/.docker/terraform_ci
+format-terraform:
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $$(pwd):/data \
-		--env OP=fmt terraform_ci
+		--volume $(ROOT):/repo \
+		--workdir /repo \
+		hashicorp/terraform:light fmt
 
 $(ROOT)/.docker/scalafmt:
 	$(ROOT)/builds/build_ci_docker_image.py \

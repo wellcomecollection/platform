@@ -230,6 +230,60 @@ def to_bitly(url, access_token):
     return ' / '.join([_to_bity_single_url(u) for u in url.split(' / ')])
 
 
+def simplify_message(message):
+    """
+    Sometimes a CloudWatch message includes information that we don't want
+    to appear in Slack -- e.g. date/time.
+
+    This function tries to strip out extra bits from the message, so we get
+    a tight and focused error appearing in Slack.
+    """
+    # Scala messages have a prefix that gives us a timestamp and thread info:
+    #
+    #     14:02:47.249 [ForkJoinPool-2-worker-17]
+    #
+    # Bin it!
+    message = re.sub(
+        r'\d{2}:\d{2}:\d{2}\.\d{3} \[ForkJoinPool-\d+-worker-\d+\] ', '',
+        message
+    )
+
+    # Loris messages have a bunch of origin and UWSGI information as a prefix:
+    #
+    #     [pid: 86|app: 0|req: 195/3682] 172.17.0.5 () {40 vars in 879
+    #       bytes} [Tue Oct 10 19:37:06 2017]
+    #
+    # Discard it!
+    message = re.sub(
+        r'\[pid: \d+\|app: \d+\|req: \d+/\d+\] '
+        r'\d+\.\d+\.\d+\.\d+ \(\) '
+        r'{\d+ vars in \d+ bytes} '
+        r'\[[A-Za-z0-9: ]+\]', '', message
+    )
+
+    # Loris messages also have an uninteresting suffix:
+    #
+    #     3 headers in 147 bytes (1 switches on core 0)
+    #
+    # Throw it away!
+    message = re.sub(
+        r'\d+ headers in \d+ bytes \(\d+ switches on core \d+\)', '', message
+    )
+
+    # Lambda timeouts have an opaque prefix:
+    #
+    #     2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task
+    #     timed out after 10.01 seconds
+    #
+    # Drop it!
+    message = re.sub(
+        r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z '
+        r'[0-9a-f-]+ (?=Task timed out)', '', message
+    )
+
+    return message.strip()
+
+
 def main(event, _):
     print(f'event = {event!r}')
 
@@ -254,38 +308,9 @@ def main(event, _):
 
     messages = alarm.cloudwatch_messages()
     if messages:
-        cleaned_messages = []
-        for m in messages:
-
-            # Scala messages have a prefix of the form
-            #
-            #     14:02:47.249 [ForkJoinPool-2-worker-17]
-            #
-            # which usually doesn't have any useful debugging information.
-            # Bin it!
-            m = re.sub(
-                r'\d{2}:\d{2}:\d{2}\.\d{3} \[ForkJoinPool-\d+-worker-\d+\] ',
-                '', m
-            )
-
-            # Loris messages have a prefix of the form
-            #
-            #     [pid: 86|app: 0|req: 195/3682] 172.17.0.5 () {40 vars in 879
-            #       bytes} [Tue Oct 10 19:37:06 2017]
-            #
-            # which usually doesn't contain useful debugging information.
-            # Discard it!
-            m = re.sub(
-                r'\[pid: \d+\|app: \d+\|req: \d+/\d+\] '
-                r'\d+\.\d+\.\d+\.\d+ \(\) '
-                r'{\d+ vars in \d+ bytes} '
-                r'\[[A-Za-z0-9: ]+\]', '', m
-            )
-
-            cleaned_messages.append(m.strip())
-        cleaned_messages = set(cleaned_messages)
-
-        cloudwatch_message_str = '\n'.join(cleaned_messages)
+        cloudwatch_message_str = '\n'.join(set([
+            simplify_message(m) for m in messages
+        ]))
         slack_data['attachments'][0]['fields'].append({
             'title': 'CloudWatch messages',
             'value': cloudwatch_message_str

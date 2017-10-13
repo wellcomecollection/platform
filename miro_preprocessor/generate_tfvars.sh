@@ -11,6 +11,9 @@ RELEASE_IDS_FILE="release_ids.tfvars"
 rm -f $TF_VARS
 rm -rf "$RELEASE_DIR"
 
+echo "Getting variables from S3"
+aws s3 cp s3://platform-infra/terraform-miro-preproc.tfvars terraform.tfvars
+
 # Download releases from S3
 mkdir -p "$RELEASE_DIR"
 aws s3 cp s3://platform-infra/releases "$RELEASE_DIR" --recursive

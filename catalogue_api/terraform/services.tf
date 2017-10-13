@@ -25,7 +25,7 @@ module "api_romulus_v1" {
 
   enable_alb_alarm = "${var.production_api == "romulus" ? 1 : 0}"
 
-  cpu    = 1792
+  cpu    = 1024
   memory = 2048
 
   desired_count = "${var.production_api == "romulus" ? var.api_task_count : var.api_task_count_stage}"
@@ -77,7 +77,7 @@ module "api_remus_v1" {
 
   enable_alb_alarm = "${var.production_api == "remus" ? 1 : 0}"
 
-  cpu    = 1792
+  cpu    = 1024
   memory = 2048
 
   desired_count = "${var.production_api == "remus" ? var.api_task_count : var.api_task_count_stage}"

@@ -1,23 +1,21 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -o errexit
 set -o nounset
 set -o xtrace
 
-CONF_FILE=/opt/loris/etc/loris.conf
-
-if [[ -f "$CONF_FILE" ]]
+if [[ -f "$LORIS_CONF_FILE" ]]
 then
   echo "Config is already present; skipping fetch from AWS..."
 else
   echo "Fetching config from AWS $INFRA_BUCKET/$CONFIG_KEY ..."
 
   aws s3 ls s3://$INFRA_BUCKET/$CONFIG_KEY
-  aws s3 cp s3://$INFRA_BUCKET/$CONFIG_KEY /opt/loris/etc/loris2.conf
+  aws s3 cp s3://$INFRA_BUCKET/$CONFIG_KEY "$LORIS_CONF_FILE"
 fi
 
 echo "=== config ==="
-cat /opt/loris/etc/loris2.conf
+cat "$LORIS_CONF_FILE"
 echo "=============="
 
 echo "Starting uwsgi..."

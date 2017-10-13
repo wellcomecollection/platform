@@ -7,13 +7,13 @@ module "image_sorter_lambda" {
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
   environment_variables = {
-    S3_MIRODATA_ID        = "${var.s3_miro_data_id}"
-    S3_EXCEPTIONS_KEY     = "${var.s3_exceptions_key}"
-    TOPIC_COLD_STORE      = "${var.topic_cold_store_arn}"
-    TOPIC_TANDEM_VAULT    = "${var.topic_tandem_vault_arn}"
-    TOPIC_CATALOGUE_API   = "${var.topic_catalogue_api_arn}"
-    TOPIC_DIGITAL_LIBRARY = "${var.topic_digital_library_arn}"
-    TOPIC_NONE            = "${var.topic_none_arn}"
+    S3_MIRODATA_ID            = "${var.s3_miro_data_id}"
+    S3_ID_EXCEPTIONS_KEY      = "${var.s3_id_exceptions_key}"
+    S3_CONTRIB_EXCEPTIONS_KEY = "${var.s3_contrib_exceptions_key}"
+    TOPIC_COLD_STORE          = "${var.topic_cold_store_arn}"
+    TOPIC_TANDEM_VAULT        = "${var.topic_tandem_vault_arn}"
+    TOPIC_CATALOGUE_API       = "${var.topic_catalogue_api_arn}"
+    TOPIC_NONE                = "${var.topic_none_arn}"
   }
 
   timeout = "30"
