@@ -272,17 +272,17 @@ def test_raise_exception_if_collection_is_not_f_v_m_fp_as():
         sort_image(collection, image_data, _empty_id_exceptions(), _empty_contrib_exceptions())
 
 
-@pytest.mark.parametrize('image_calc_no', [
+@pytest.mark.parametrize('image_no_calc', [
     'L0000001FX',
     'L1234567FX',
 ])
-def test_holding_image_dupes_are_expunged(image_calc_no):
+def test_holding_image_dupes_are_expunged(image_no_calc):
     """
     Images that wouldn't otherwise go to Cold Store end up there if they
     have the ID of a holding image.
     """
     collection, image_data = collection_image_data(
-        collection='images-L', image_calc_no=image_calc_no
+        collection='images-L', image_no_calc=image_no_calc
     )
     result = sort_image(
         collection=collection,
