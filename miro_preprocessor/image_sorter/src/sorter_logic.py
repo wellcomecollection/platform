@@ -6,7 +6,6 @@ It only has a single public function: ``sort_image``, which takes a Python
 dictionary and returns an instance of ``Decision``.
 """
 
-import collections
 import dateutil.parser
 import enum
 import re
@@ -37,14 +36,6 @@ class Rules:
     ]
 
     @staticmethod
-    def _is_a_list(obj):
-        return (
-            isinstance(obj, collections.Sequence) and (
-                not isinstance(obj, str)
-            )
-        )
-
-    @staticmethod
     def _normalise_string(s):
         if s is not None:
             s = s.lower().strip()
@@ -64,11 +55,11 @@ class Rules:
     def _compare(self, key, value):
         key_values = self._get(key)
 
-        if not Rules._is_a_list(key_values):
+        if not isinstance(key_values, list):
             key_values = [key_values]
 
         return any(
-            [self._compare_normalised(key_value, value) for key_value in key_values]
+            self._compare_normalised(key_value, value) for key_value in key_values
         )
 
     def _is_collection(self, collection_name):
