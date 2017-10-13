@@ -184,6 +184,13 @@ def _get_decisions_from_id_exceptions(exceptions, image_data):
             return [getattr(Decision, key) for key, value in exception.items()
                     if value is not "" and not value.strip().lower() == "false"]
 
+    # There are "holding images" in MIRO, which are thumbnails put into
+    # duplicate image records for some explicit AIDS posters.  All the
+    # posters are available, so we delete these records.  They all have
+    # image numbers in the L sequence ending with "FX", e.g. "L0052198FX".
+    if re.match(r'^L\d+FX$', image_data['image_no_calc']):
+        return [Decision.cold_store]
+
 
 def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
     collections = exceptions.fieldnames
