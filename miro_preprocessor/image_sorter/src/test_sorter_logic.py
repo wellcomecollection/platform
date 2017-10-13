@@ -277,7 +277,7 @@ class TestWellcomeImageAwards:
     @pytest.mark.parametrize('collection', ['images-F', 'images-AS', 'images-V'])
     @pytest.mark.parametrize('award', [
         'Biomedical Image Awards',
-        'Wellcome Image Awards',
+        ['Wellcome Image Awards']
     ])
     def test_images_with_wia_go_to_tandem_vault(self, collection, award):
         """
@@ -300,6 +300,7 @@ class TestWellcomeImageAwards:
         'Physical Image Awards',
         'Nobel Prize',
         'Wooden Spoon',
+        ['Medicine Man Catalogue']
     ])
     def test_images_without_wia_dont_go_to_tandem_vault(self, collection, award):
         """
