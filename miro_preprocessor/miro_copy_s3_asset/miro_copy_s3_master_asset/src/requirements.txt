@@ -1,0 +1,1 @@
+wellcome-lambda-utils==1.0.0
