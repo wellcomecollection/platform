@@ -68,13 +68,13 @@ module "miro_copy_catalogue_derivative" {
 
   lambda_description     = "Copy catalogue miro derivatives to Loris s3 bucket"
   lambda_name            = "miro_copy_catalogue_derivative"
-  is_master_asset = "false"
+  is_master_asset        = "false"
   destination_key_prefix = ""
 }
 
 module "miro_copy_catalogue_master" {
-  source                        = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn  = "${module.catalogue_api_topic.arn}"
+  source                       = "miro_copy_s3_asset"
+  topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
 
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
   bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
@@ -85,7 +85,7 @@ module "miro_copy_catalogue_master" {
   destination_key_prefix = "library"
   lambda_description     = "Copy catalogue miro master assets to private s3 bucket"
   lambda_name            = "miro_copy_catalogue_master"
-  is_master_asset = "true"
+  is_master_asset        = "true"
 }
 
 resource "aws_iam_role_policy" "miro_copy_s3_derivative_asset_sns_publish" {

@@ -1,6 +1,6 @@
 module "miro_copy_s3_asset_lambda" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=reusable-lambda-code"
-  s3_key = "lambdas/miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_${local.lambda_s3_type}_asset.zip"
+  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=reusable-lambda-code"
+  s3_key      = "lambdas/miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_${local.lambda_s3_type}_asset.zip"
   module_name = "miro_copy_s3_${local.lambda_s3_type}_asset"
 
   description     = "${var.lambda_description}"
@@ -10,7 +10,7 @@ module "miro_copy_s3_asset_lambda" {
   environment_variables = {
     "S3_SOURCE_BUCKET"      = "${var.bucket_source_asset_name}"
     "S3_DESTINATION_BUCKET" = "${var.bucket_destination_name}"
-    "S3_DESTINATION_PREFIX"             = "${var.destination_key_prefix}"
+    "S3_DESTINATION_PREFIX" = "${var.destination_key_prefix}"
     "TOPIC_ARN"             = "${var.topic_forward_sns_message_arn}"
   }
 
@@ -63,7 +63,8 @@ data "aws_iam_policy_document" "allow_s3_copy" {
     ]
   }
 }
+
 locals {
-  source_prefix = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive": "fullsize/"}"
+  source_prefix  = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive": "fullsize/"}"
   lambda_s3_type = "${var.is_master_asset == "true" ? "master": "derivative"}"
 }
