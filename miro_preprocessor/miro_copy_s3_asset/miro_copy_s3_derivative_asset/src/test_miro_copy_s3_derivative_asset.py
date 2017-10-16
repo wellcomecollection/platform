@@ -176,4 +176,3 @@ def test_should_replace_asset_if_already_exists_with_different_content(
     assert s3_response['Body'].read() == image_body
 
     assert_sns_message_forwarded(image_json, queue_url, sqs_client)
-

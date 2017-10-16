@@ -42,9 +42,9 @@ def main(event, _):
     source_identifier = S3_Identifier(source_bucket_name, source_key)
     destination_identifier = S3_Identifier(destination_bucket_name, destination_key)
     s3_utils.exec_if_key_exists(s3_client, source_identifier=source_identifier,
-                            function=partial(
-                                copy_and_forward_message,
-                                sns_client=sns_client,
-                                image_info=image_info,
-                                topic_arn=topic_arn,
-                                destination_identifier=destination_identifier))
+                                function=partial(
+                                    copy_and_forward_message,
+                                    sns_client=sns_client,
+                                    image_info=image_info,
+                                    topic_arn=topic_arn,
+                                    destination_identifier=destination_identifier))
