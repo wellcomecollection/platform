@@ -4,6 +4,7 @@ module "lambda_post_to_slack" {
 
   name        = "post_to_slack"
   description = "Post notification to Slack when an alarm is triggered"
+  timeout     = 10
 
   environment_variables = {
     SLACK_INCOMING_WEBHOOK = "${var.slack_webhook}"

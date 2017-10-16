@@ -6,7 +6,7 @@ module "miro_inventory_lambda" {
   name            = "miro_inventory"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
-  timeout = "30"
+  timeout = "120"
 
   environment_variables = {
     ES_CLUSTER_URL = "${var.cluster_url}"
