@@ -5,8 +5,8 @@ from moto import mock_s3
 import boto3
 import pytest
 
-from utils import s3_utils
-from utils.s3_utils import S3_Identifier
+from src.wellcome_lambda_utils import s3_utils
+from src.wellcome_lambda_utils.s3_utils import S3_Identifier
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def test_should_not_copy_asset_if_already_exists_with_same_checksum(create_sourc
     source_head_response = s3_client.head_object(Bucket=source_bucket_name, Key=source_key)
     source_identifier = S3_Identifier(source_bucket_name, source_key)
     destination_identifier = S3_Identifier(destination_bucket_name, destination_key)
-    with patch("utils.s3_utils._copy_image_asset") as mock_copy_function:
+    with patch("src.wellcome_lambda_utils.s3_utils._copy_image_asset") as mock_copy_function:
         s3_utils.copy_asset_if_not_exists(s3_client, source_head_response, source_identifier=source_identifier, destination_identifier=destination_identifier)
         assert not mock_copy_function.called
 
