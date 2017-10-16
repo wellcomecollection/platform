@@ -1,10 +1,11 @@
+from functools import partial
 import json
 import os
 
 import boto3
-from botocore.exceptions import ClientError
 
 from miro_utils import MiroImage
+from s3_utils import S3_Identifier
 import s3_utils
 
 
@@ -19,15 +20,8 @@ def main(event, _):
     miro_image = MiroImage(image_info)
     key = f"Wellcome_Images_Archive/{miro_image.collection} Images/{miro_image.image_path}.jp2"
     print(key)
-    try:
-        source_head_response = s3_client.head_object(Bucket=source_bucket_name, Key=key)
-    except ClientError as client_error:
-        if client_error.response['Error']['Code'] == '404':
-            print(f"No image found for MiroId {miro_image.miro_id}: skipping")
-            pass
-        else:
-            raise
-    else:
-        destination_key = f"{destination_prefix}/{miro_image.image_path}.jp2"
-        s3_utils.copy_asset_if_not_exists(s3_client, source_head_response['ETag'], destination_bucket_name, destination_key,
-                                 source_bucket_name, key)
+    destination_key = f"{destination_prefix}/{miro_image.image_path}.jp2"
+    source_identifier = S3_Identifier(source_bucket_name, key)
+    destination_identifier = S3_Identifier(destination_bucket_name, destination_key)
+    s3_utils.exec_if_key_exists(s3_client, source_identifier=source_identifier,
+                                function=partial(s3_utils.copy_asset_if_not_exists, destination_identifier=destination_identifier))
