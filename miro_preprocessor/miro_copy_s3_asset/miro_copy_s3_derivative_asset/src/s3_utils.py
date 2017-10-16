@@ -9,7 +9,7 @@ S3_Identifier = collections.namedtuple(
 
 
 def _copy_image_asset(s3_client, source_identifier, destination_identifier):
-    print(f": copying from {source_identifier.bucket_name}/{source_identifier.key} to {destination_identifier.bucket_name}/{destination_identifier.key}")
+    print(f"copying from {source_identifier.bucket_name}/{source_identifier.key} to {destination_identifier.bucket_name}/{destination_identifier.key}")
     s3_client.copy_object(
         CopySource={
             'Bucket': source_identifier.bucket_name,
