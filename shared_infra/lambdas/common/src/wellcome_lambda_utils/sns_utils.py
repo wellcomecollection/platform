@@ -4,8 +4,6 @@ import datetime
 import decimal
 import json
 
-import boto3
-
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -21,13 +19,12 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def publish_sns_message(topic_arn, message):
+def publish_sns_message(sns_client, topic_arn, message):
     """
     Given a topic ARN and a series of key-value pairs, publish the key-value
     data to the SNS topic.
     """
-    sns = boto3.client('sns')
-    resp = sns.publish(
+    response = sns_client.publish(
         TopicArn=topic_arn,
         MessageStructure='json',
         Message=json.dumps({
@@ -37,8 +34,11 @@ def publish_sns_message(topic_arn, message):
             )
         })
     )
-    print(f'SNS response = {resp!r}')
-    assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
+
+    print(f'SNS response = {response!r}')
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
+
+    return response
 
 
 def extract_json_message(event):
