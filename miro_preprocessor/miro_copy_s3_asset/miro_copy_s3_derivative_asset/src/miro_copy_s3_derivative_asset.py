@@ -4,10 +4,10 @@ import os
 
 import boto3
 
-from miro_utils import MiroImage
-import sns_utils
-from s3_utils import S3_Identifier
-import s3_utils
+from wellcome_lambda_utils.miro_utils import MiroImage
+from wellcome_lambda_utils import sns_utils
+from wellcome_lambda_utils.s3_utils import S3_Identifier
+from wellcome_lambda_utils import s3_utils
 
 
 def copy_and_forward_message(s3_client,
