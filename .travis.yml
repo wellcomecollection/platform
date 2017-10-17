@@ -62,6 +62,9 @@ env:
     - TASK=api_docs-build
     - TASK=miro_preprocessor-test
 
+    # lambda-utils package
+    - TASK=lambda_utils-test
+
     # Loris stack
     - TASK=loris-build
     - TASK=cache_cleaner-build
