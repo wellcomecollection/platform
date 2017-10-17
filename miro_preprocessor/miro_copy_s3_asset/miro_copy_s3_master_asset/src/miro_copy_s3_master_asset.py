@@ -1,5 +1,6 @@
 from functools import partial
 import json
+import math
 import os
 
 import boto3
@@ -7,6 +8,20 @@ import boto3
 from wellcome_lambda_utils.miro_utils import MiroImage
 from wellcome_lambda_utils.s3_utils import S3_Identifier
 from wellcome_lambda_utils import s3_utils
+
+
+class MiroKeyIdMismatchException(Exception):
+    pass
+
+
+def _select_best_key(keys, prefix):
+    exact_match = f"{prefix}.jp2"
+    if len(keys) == 1:
+        return keys[0]
+    elif exact_match in keys:
+        return exact_match
+    else:
+        raise MiroKeyIdMismatchException
 
 
 def main(event, _):
@@ -24,7 +39,8 @@ def main(event, _):
     list_response = s3_client.list_objects_v2(Bucket=source_bucket_name, Prefix=key_prefix)
 
     if 'Contents' in list_response.keys():
-        key = list_response['Contents'][0]['Key']
+        keys = [x['Key'] for x in list_response['Contents']]
+        key = _select_best_key(keys, key_prefix)
         source_identifier = S3_Identifier(source_bucket_name, key)
         destination_identifier = S3_Identifier(destination_bucket_name, destination_key)
         s3_utils.exec_if_key_exists(s3_client, source_identifier=source_identifier,
