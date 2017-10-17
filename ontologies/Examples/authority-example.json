@@ -1,0 +1,46 @@
+{
+  "id": "d22e2opp",
+  "type": "Person",
+  "label": "Bolívar; Simón (1783-1830); General",
+  "altLabel": "Bolívar Palacios, Simón ",
+  "dateOfExistance": {
+    "label": "1783-1830 " ,
+    "type": "Period"
+  } ,
+  "gender": "Male",
+  "nationality": "Venezuelan",
+  "description": "Simon Bolivar (1783-1830) was born in Caracas but , after becoming an orphan at 9, grew up in Europe where he was influenced by the Enlightenment and the French Revolution",
+  "identifiers": [
+    {
+    "type": "Identifier",
+    "identifierScheme": "wellcome-authority-files",
+    "value": "GB0120-ISAAR446"
+  },
+      {
+    "type": "Identifier",
+    "identifierScheme": "viaf",
+    "value": "35731693"
+  },
+        {
+    "type": "Identifier",
+    "identifierScheme": "lc-names",
+    "value": "n79065448"
+  },
+  {
+    "type": "Identifier",
+    "identifierScheme": "wikidata",
+    "value": "Q8605"
+  }
+  ] ,
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/V0042826ER.jpg/full/300,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  }
+}

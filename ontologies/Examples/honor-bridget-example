@@ -1,0 +1,85 @@
+{
+  "id": "d22e2opp",
+  "type": "Person",
+  "label": "Honor Fell",
+  "gender": "Female",
+  "dateOfBirth": "1900-05-22" ,
+  "dateOfDeath": "1986-04-22" ,
+  "nationality":
+    {
+      "id": "x2n20d1io",
+      "label": "United Kingdom" ,
+      "type": "Place"	
+    } ,
+  "placeOfBirth":
+      {
+      "id": "02sd2jh5",
+      "label": "Fowthorpe" ,
+      "type": "Place"	
+      } ,
+  "occupation": [
+    {
+      "id": "x2n0x290",
+      "label": "Immunologist",
+      "type": "Concept"
+    }
+  ],
+  "fieldOfStudy": {
+    "id": "2h19d1j",
+    "label": "Immunology",
+    "type": "Concept"
+  },
+  "memberOf": [
+    "Royal Society",
+    "American Academy of Arts and Sciences"
+  ],
+  "awardRecieved": [
+    {
+      "label": "Dame Commander of the Order of the British Empire",
+      "year": "2006"
+    },
+    {
+      "label": "Fellow of the Royal Society",
+      "year": "2006"
+    }
+  ],
+  "position": [
+    {
+      "label": "Director",
+      "start": "1929",
+      "end": "1970" ,
+      "positionAt": "Strangeways Research Laboratory"
+    },
+    {
+      "label": "Senior Beit Fellow",
+      "start": "1928",
+      "start": "1928",
+      "positionAt": "Strangeways Research Laboratory"
+    }
+  ],
+  "educatedAt": "University of Edinburgh",
+  "description": "Director of the Strangeways Research Laboratory, 1929-1970. There is very considerable overlap between this material and that in the papers of the Strangeways Laboratory (SA/SRL), in the light of Dame Honor's very long connection with the Strangeways from 1923; as Director, 1929-1970. Her important individual contributions to biology are discussed in detail in the Biographical Memoir produced by Dame Janet Vaughan for the Royal Society. She was also associated with a number of other bodies in related research fields and had an international reputation.",
+  "identifiers": [
+    {
+      "type": "Identifier",
+      "identifierScheme": "viaf",
+      "value": "31531052"
+    },
+    {
+      "type": "Identifier",
+      "identifierScheme": "wikidata",
+      "value": "Q5896784"
+    }
+  ],
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/V0042826ER.jpg/full/300,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  }
+}
