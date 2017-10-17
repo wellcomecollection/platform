@@ -19,23 +19,22 @@ def _copy_image_asset(s3_client, source_identifier, destination_identifier):
         Key=destination_identifier.key)
 
 
+def _is_same_etag(destination_head_response, source_head_response):
+    return source_head_response['ETag'] == destination_head_response['ETag']
+
+
 def copy_asset_if_not_exists(s3_client, source_head_response, source_identifier, destination_identifier):
     try:
         destination_head_response = s3_client.head_object(Bucket=destination_identifier.bucket_name,
                                                           Key=destination_identifier.key)
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == '404':
-            print(
-                f"Destination bucket has no image")
-            _copy_image_asset(s3_client, source_identifier, destination_identifier)
+            print(f"Destination bucket has no image")
             pass
         else:
             raise
-    else:
-        if not source_head_response['ETag'] == destination_head_response['ETag']:
-            print(
-                f"Destination bucket has image with different hash")
-            _copy_image_asset(s3_client, source_identifier, destination_identifier)
+    if not destination_head_response or not _is_same_etag(destination_head_response, source_head_response):
+        _copy_image_asset(s3_client, source_identifier, destination_identifier)
 
 
 def exec_if_key_exists(s3_client, source_identifier, function):
