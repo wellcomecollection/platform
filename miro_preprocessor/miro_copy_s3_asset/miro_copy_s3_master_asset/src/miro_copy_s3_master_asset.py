@@ -20,7 +20,7 @@ def _select_best_key(keys, prefix):
     elif exact_match in keys:
         return exact_match
     else:
-        raise MiroKeyIdMismatchException
+        raise MiroKeyIdMismatchException(f"Unable to match prefix {prefix} with keys {keys}")
 
 
 def main(event, _):
