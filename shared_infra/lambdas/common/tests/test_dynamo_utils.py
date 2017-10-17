@@ -1,4 +1,4 @@
-from utils import dynamo_utils
+from src.wellcome_lambda_utils import dynamo_utils
 
 event_source_arn = "arn:aws:dynamodb:us-east-1:123456789012:table/BarkTable/stream/2016-11-16T20:42:48.104"
 

@@ -7,7 +7,7 @@ from moto import mock_ecs, mock_ec2
 from moto.ec2 import utils as moto_ec2_utils
 import pytest
 
-from utils import ecs_utils
+from src.wellcome_lambda_utils import ecs_utils
 
 
 cluster_name = 'my_cluster'
