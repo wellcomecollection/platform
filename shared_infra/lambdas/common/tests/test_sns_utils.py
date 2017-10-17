@@ -3,10 +3,11 @@ import json
 
 import boto3
 
-from utils import sns_utils
+from src.wellcome_lambda_utils import sns_utils
 
 
 def test_publish_sns_message(sns_sqs):
+    sns_client = boto3.client('sns')
     sqs_client = boto3.client('sqs')
     topic_arn, queue_url = sns_sqs
 
@@ -24,7 +25,7 @@ def test_publish_sns_message(sns_sqs):
         'date': '2005-06-01T13:33:00'
     }
 
-    sns_utils.publish_sns_message(topic_arn, test_message)
+    sns_utils.publish_sns_message(sns_client, topic_arn, test_message)
 
     messages = sqs_client.receive_message(
         QueueUrl=queue_url,
