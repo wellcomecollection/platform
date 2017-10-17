@@ -5,7 +5,7 @@
   "altLabel": "Bolívar Palacios, Simón ",
   "dateOfExistance": {
     "label": "1783-1830 " ,
-    "type": "Period" ,
+    "type": "Period"
   } ,
   "gender": "Male",
   "nationality": "Venezuelan",
@@ -30,7 +30,7 @@
     "type": "Identifier",
     "identifierScheme": "wikidata",
     "value": "Q8605"
-  }, 
+  }
   ] ,
   "thumbnail": {
     "type": "Location",
@@ -44,5 +44,3 @@
     }
   }
 }
-
-
