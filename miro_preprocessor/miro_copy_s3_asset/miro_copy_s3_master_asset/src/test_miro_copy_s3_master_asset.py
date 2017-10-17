@@ -6,6 +6,7 @@ from moto import mock_s3
 import pytest
 
 import miro_copy_s3_master_asset
+from miro_copy_s3_master_asset import MiroKeyIdMismatchException
 
 
 def assert_bucket_is_empty(destination_bucket_name, s3_client):
@@ -171,3 +172,63 @@ def test_should_copy_an_asset_if_is_only_prefix_match(
 
     s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
     assert s3_response['Body'].read() == image_body
+
+
+def test_should_copy_the_exact_matching_key_if_more_than_one_prefix(
+        create_source_and_destination_buckets,
+        sns_image_json_event):
+    s3_client = boto3.client("s3")
+    source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
+    miro_id, image_json, event = sns_image_json_event
+    image_body = b'baba'
+    destination_prefix = "library"
+    s3_client.put_object(
+        Bucket=source_bucket_name,
+        ACL='private',
+        Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2")
+
+    s3_client.put_object(
+        Bucket=source_bucket_name,
+        ACL='private',
+        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
+
+    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
+
+    os.environ = {
+        "S3_SOURCE_BUCKET": source_bucket_name,
+        "S3_DESTINATION_BUCKET": destination_bucket_name,
+        "S3_DESTINATION_PREFIX": destination_prefix,
+    }
+
+    miro_copy_s3_master_asset.main(event, None)
+
+    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
+    assert s3_response['Body'].read() == image_body
+
+
+def test_should_rains_an_exception_if_multiple_non_exact_matches(
+        create_source_and_destination_buckets,
+        sns_image_json_event):
+    s3_client = boto3.client("s3")
+    source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
+    miro_id, image_json, event = sns_image_json_event
+    image_body = b'baba'
+    destination_prefix = "library"
+    s3_client.put_object(
+        Bucket=source_bucket_name,
+        ACL='private',
+        Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2")
+
+    s3_client.put_object(
+        Bucket=source_bucket_name,
+        ACL='private',
+        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2")
+
+    os.environ = {
+        "S3_SOURCE_BUCKET": source_bucket_name,
+        "S3_DESTINATION_BUCKET": destination_bucket_name,
+        "S3_DESTINATION_PREFIX": destination_prefix,
+    }
+
+    with pytest.raises(MiroKeyIdMismatchException):
+        miro_copy_s3_master_asset.main(event, None)
