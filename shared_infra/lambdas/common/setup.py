@@ -15,7 +15,7 @@ setup(
     package_dir={'': SOURCE},
     version='1.0.0',
     install_requires=['boto'],
-    python_requires='>=3',
+    python_requires='>=3.6',
     description='Common lib for lambdas',
     author='Wellcome digital platform',
     author_email='wellcomedigitalplatform@wellcome.ac.uk',
