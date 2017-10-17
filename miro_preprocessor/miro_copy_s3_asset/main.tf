@@ -1,5 +1,5 @@
 module "miro_copy_s3_asset_lambda" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=reusable-lambda-code"
+  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.3"
   s3_key      = "lambdas/miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_${local.lambda_s3_type}_asset.zip"
   module_name = "miro_copy_s3_${local.lambda_s3_type}_asset"
 
