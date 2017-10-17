@@ -1,6 +1,5 @@
 from functools import partial
 import json
-import math
 import os
 
 import boto3
