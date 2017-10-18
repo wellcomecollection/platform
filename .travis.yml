@@ -79,7 +79,7 @@ env:
     - TASK=deployment_tracking-test
     - TASK=ecs_dashboard-test
     - TASK=load_test-test
-    - TASK=post_to_slack-test
+    - TASK=monitoring-test
 
 
 # This has a Slack API token for posting messages about build failures to

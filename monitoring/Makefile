@@ -33,6 +33,12 @@ post_to_slack-publish: $(ROOT)/.docker/publish_lambda_zip
 		--key="lambdas/monitoring/post_to_slack.zip" \
 		--bucket="$(INFRA_BUCKET)"; \
 
+## Test monitoring
+monitoring-test: post_to_slack-test
+
+## Publish monitoring
+monitoring-deploy: post_to_slack-publish
+
 ## Terraform plan on monitoring stack
 monitoring-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
@@ -48,4 +54,6 @@ monitoring-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 		terraform_ci:latest
 
 
-.PHONY: post_to_slack-build post_to_slack-test post_to_slack-publish monitoring-terraform-plan monitoring-terraform-apply
+.PHONY: post_to_slack-build post_to_slack-test post_to_slack-publish \
+		monitoring-terraform-plan monitoring-terraform-apply \
+		monitoring-test monitoring-deploy

@@ -14,7 +14,7 @@ $(ROOT)/.docker/ecs_dashboard:
 		--file=$(ECS_DASHBOARD)/client/Dockerfile
 
 ## Publish ecs_dashboard client to S3
-ecs_dashboard-deploy: $(ROOT)/.docker/ecs_dashboard
+ecs_dashboard_client-deploy: $(ROOT)/.docker/ecs_dashboard
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ECS_DASHBOARD)/client:/dashboard \
 		--env BUCKET_NAME=wellcome-platform-dash \
@@ -51,7 +51,7 @@ ecs_dashboard-build: update_service_list-build
 ecs_dashboard-test: update_service_list-test
 
 ## Publish all for ecs_dashboard
-ecs_dashboard-publish: update_service_list-publish
+ecs_dashboard-deploy: update_service_list-publish
 
 .PHONY: ecs_dashboard-deploy update_service_list-build update_service_list-test update_service_list-publish \
-		ecs_dashboard-build ecs_dashboard-test ecs_dashboard-publish
+		ecs_dashboard-build ecs_dashboard-test ecs_dashboard_client-deploy
