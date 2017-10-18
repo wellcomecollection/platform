@@ -14,4 +14,14 @@ lambda_utils-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" \
 		python3.6_ci:latest
 
-lambda_utils-publish:
+lambda_utils-build:
+	docker run \
+		--volume $(LAMBDA_UTILS):/src \
+		--workdir /src \
+		python:3-alpine python setup.py sdist
+
+lambda_utils-publish: lambda_utils-build
+	docker run \
+		--volume $(LAMBDA_UTILS):/src \
+		--workdir /src \
+		greengloves/twine:1.9.1 upload dist/*.tar.gz
