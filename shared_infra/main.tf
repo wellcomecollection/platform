@@ -8,7 +8,7 @@ module "drain_ecs_container_instance" {
 }
 
 module "dynamo_to_sns" {
-  source = "../lambdas/dynamo_to_sns"
+  source = "dynamo_to_sns"
 
   miro_transformer_topic_arn = "${local.miro_transformer_topic_arn}"
   miro_table_stream_arn      = "${local.miro_table_stream_arn}"

@@ -50,18 +50,16 @@ shared_infra-publish: drain_ecs_container_instance-publish \
                       update_task_for_config_change-publish
 
 ## Run a plan on shared_infra stack
-shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambda_deps
+shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(SHARED_INFRA)/terraform:/data \
-	-v $(SHARED_INFRA)/lambdas:/lambdas \
+	-v $(SHARED_INFRA):/data \
 	-e OP=plan \
 	terraform_ci:latest
 
 ## Run an apply on shared_infra stack
 shared_infra-terraform-apply: $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(SHARED_INFRA)/terraform:/data \
-	-v $(SHARED_INFRA)/lambdas:/lambdas \
+	-v $(SHARED_INFRA):/data \
 	-e OP=apply \
 	terraform_ci:latest
 
