@@ -3,7 +3,11 @@ variable "cluster_id" {}
 variable "vpc_id" {}
 variable "listener_https_arn" {}
 variable "listener_http_arn" {}
-variable "release_ids" {}
+
+variable "release_ids" {
+  type = "map"
+}
+
 variable "efs_mount_directory" {}
 variable "grafana_anonymous_enabled" {}
 variable "grafana_anonymous_role" {}

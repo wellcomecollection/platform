@@ -10,12 +10,14 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+## Build post_to_slack lambda
 post_to_slack-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
 		--volume $(MONITORING)/post_to_slack:/data \
 		--env OP=build-lambda \
 		python3.6_ci:latest
 
+## Test post_to_slack lambda
 post_to_slack-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(MONITORING)/post_to_slack/src:/data \
@@ -23,22 +25,25 @@ post_to_slack-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
-post_to_slack-publish: $(ROOT)/.docker/publish_lambda_zip \
+## Publish post_to_slack lambda
+post_to_slack-publish: $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
-		publish_lambda_zip "post_to_slack/src" \
+		publish_lambda_zip "monitoring/post_to_slack/src" \
 		--key="lambdas/monitoring/post_to_slack.zip" \
 		--bucket="$(INFRA_BUCKET)"; \
 
+## Terraform plan on monitoring stack
 monitoring-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING)/terraform:/data \
+		--volume $(MONITORING):/data \
 		--env OP=plan \
 		terraform_ci:latest
 
+## Terraform apply on monitoring stack
 monitoring-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING)/terraform:/data \
+		--volume $(MONITORING):/data \
 		--env OP=apply \
 		terraform_ci:latest
 

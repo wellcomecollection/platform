@@ -6,13 +6,14 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
-
+## Build notify_old_deploys lambda
 notify_old_deploys-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
 		--volume $(DEPLOYMENT_TRACKING)/notify_old_deploys:/data \
 		--env OP=build-lambda \
 		python3.6_ci:latest
 
+## Test notify_old_deploys lambda
 notify_old_deploys-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(DEPLOYMENT_TRACKING)/notify_old_deploys/src:/data \
@@ -20,35 +21,44 @@ notify_old_deploys-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
-notify_old_deploys-publish: $(ROOT)/.docker/publish_lambda_zip \
+## Publish notify_old_deploys lambda
+notify_old_deploys-publish: $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
-		publish_lambda_zip "notify_old_deploys/src" \
-		--key="lambdas/ecs_dashboard/notify_old_deploys.zip" \
+		publish_lambda_zip "monitoring/deployment_tracking/notify_old_deploys/src" \
+		--key="lambdas/deployment_tracking/notify_old_deploys.zip" \
 		--bucket="$(INFRA_BUCKET)"; \
 
+## Build service_deployment_status lambda
 service_deployment_status-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
-		--volume $(DEPLOYMENT_TRACKING)/notify_old_deploys:/data \
+		--volume $(DEPLOYMENT_TRACKING)/service_deployment_status:/data \
 		--env OP=build-lambda \
 		python3.6_ci:latest
 
+## Test service_deployment_status lambda
 service_deployment_status-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(DEPLOYMENT_TRACKING)/notify_old_deploys/src:/data \
+		--volume $(DEPLOYMENT_TRACKING)/service_deployment_status/src:/data \
 		--env OP=test \
 		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
-service_deployment_status-publish: $(ROOT)/.docker/publish_lambda_zip \
+## Publish service_deployment_status lambda
+service_deployment_status-publish: $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
-		publish_lambda_zip "notify_old_deploys/src" \
-		--key="lambdas/ecs_dashboard/notify_old_deploys.zip" \
+		publish_lambda_zip "monitoring/deployment_tracking/service_deployment_status/src" \
+		--key="lambdas/deployment_tracking/service_deployment_status.zip" \
 		--bucket="$(INFRA_BUCKET)"; \
 
+## Build all for deployment_tracking
 deployment_tracking-build: notify_old_deploys-build service_deployment_status-build
+
+## Test all for deployment_tracking
 deployment_tracking-test: notify_old_deploys-test service_deployment_status-test
+
+## Publish all for deployment_tracking
 deployment_tracking-publish: notify_old_deploys-publish service_deployment_status-publish
 
 .PHONY: notify_old_deploys-build notify_old_deploys-test notify_old_deploys-publish \

@@ -13,7 +13,7 @@ module "lambda_notify_old_deploys" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
-  s3_key          = "lambdas/lambdas/notify_old_deploys.zip"
+  s3_key          = "lambdas/deployment_tracking/notify_old_deploys.zip"
 }
 
 module "trigger_notify_old_deploys" {
