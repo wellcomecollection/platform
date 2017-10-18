@@ -185,6 +185,7 @@ def test_should_copy_the_exact_matching_key(
     s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
     assert s3_response['Body'].read() == image_body
 
+
 def test_should_copy_the_exact_matching_key_capital_file_extension(
         create_source_and_destination_buckets,
         sns_image_json_event):
