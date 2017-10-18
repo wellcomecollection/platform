@@ -1,6 +1,7 @@
 from functools import partial
 import json
 import os
+import re
 
 import boto3
 
@@ -13,12 +14,22 @@ class MiroKeyIdMismatchException(Exception):
     pass
 
 
+def find_exact_match_before_hyphen(keys, prefix):
+    for key in keys:
+        if re.match(prefix + r"-.*\.jp2", key) is not None:
+            return key
+    return None
+
+
 def _select_best_key(keys, prefix):
     exact_match = f"{prefix}.jp2"
     if len(keys) == 1:
         return keys[0]
     elif exact_match in keys:
         return exact_match
+    matching_key = find_exact_match_before_hyphen(keys, prefix)
+    if matching_key is not None:
+        return matching_key
     else:
         raise MiroKeyIdMismatchException(f"Unable to match prefix {prefix} with keys {keys}")
 
