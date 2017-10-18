@@ -7,6 +7,8 @@ import pytest
 
 import miro_copy_s3_derivative_asset
 
+destination_prefix = ""
+
 
 def assert_sns_message_forwarded(image_json, queue_url, sqs_client):
     messages = sqs_client.receive_message(
@@ -107,6 +109,7 @@ def test_should_copy_an_asset_into_a_different_bucket_and_forward_the_message(
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
+        "S3_DESTINATION_PREFIX": destination_prefix,
         "TOPIC_ARN": topic_arn
     }
 
@@ -131,6 +134,7 @@ def test_should_not_forward_the_message_if_the_asset_does_not_exist(
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
+        "S3_DESTINATION_PREFIX": destination_prefix,
         "TOPIC_ARN": topic_arn
     }
 
@@ -167,6 +171,7 @@ def test_should_replace_asset_if_already_exists_with_different_content(
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
+        "S3_DESTINATION_PREFIX": destination_prefix,
         "TOPIC_ARN": topic_arn
     }
 

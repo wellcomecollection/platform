@@ -56,36 +56,34 @@ module "miro_image_sorter" {
 }
 
 module "miro_copy_catalogue_derivative" {
-  source                        = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn  = "${module.catalogue_api_topic.arn}"
-  topic_forward_sns_message_arn = "${module.topic_miro_image_to_dynamo.arn}"
-
+  source                       = "miro_copy_s3_asset"
+  topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
-  bucket_destination_asset_arn = "${local.bucket_miro_images_public_arn}"
-  bucket_destination_name      = "${local.bucket_miro_images_public_name}"
   bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
   bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
 
-  lambda_description     = "Copy catalogue miro derivatives to Loris s3 bucket"
-  lambda_name            = "miro_copy_catalogue_derivative"
-  is_master_asset        = "false"
-  destination_key_prefix = ""
+  bucket_destination_asset_arn  = "${local.bucket_miro_images_public_arn}"
+  bucket_destination_name       = "${local.bucket_miro_images_public_name}"
+  lambda_description            = "Copy catalogue miro derivatives to Loris s3 bucket"
+  lambda_name                   = "miro_copy_catalogue_derivative"
+  is_master_asset               = "false"
+  destination_key_prefix        = ""
+  topic_forward_sns_message_arn = "${module.topic_miro_image_to_dynamo.arn}"
 }
 
 module "miro_copy_catalogue_master" {
   source                       = "miro_copy_s3_asset"
   topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
-
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
-  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
-  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
   bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
   bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
 
-  destination_key_prefix = "library"
-  lambda_description     = "Copy catalogue miro master assets to private s3 bucket"
-  lambda_name            = "miro_copy_catalogue_master"
-  is_master_asset        = "true"
+  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
+  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  lambda_description           = "Copy catalogue miro master assets to private s3 bucket"
+  lambda_name                  = "miro_copy_catalogue_master"
+  is_master_asset              = "true"
+  destination_key_prefix       = "library/"
 }
 
 resource "aws_iam_role_policy" "miro_copy_s3_derivative_asset_sns_publish" {
