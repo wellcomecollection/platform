@@ -40,12 +40,14 @@ env:
     - PLATFORM_ENV=prod
     - CONFIG_BUCKET=platform-infra
     - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
+    - PYPI_USERNAME=wellcomedigitalplatform
 
     # This secure environment variable contains an encrypted version of
     # the following environment variables:
     #  * AWS_ACCESS_KEY_ID
     #  * AWS_SECRET_ACCESS_KEY
-    - secure: XG1Z07+J3/ivV4aSkyac8oEEhWmZGAd5Tiia4jJtdtLdy7R8eNMu+UBVCCRQ76Z/eEi4vIiE5Xs+XBEUDJnUFfFyYGFndP1huFv2/FHg/dUXWSUt62EYLZCJIXoswa350TjvubvNn2Ekm/QCDhda8euH+iqmjj/4rfiRYcqWtdUQ0bnz1jf7BurD+UahAmC7lxxnmdne0engJ1b/S+Hph+sOBdhJYyjdMS4Z1ImjuzulQ+OJhdHAFc0CMFAIsVVH1pPvHWccpDnecXZf+EPXh292cBELOaf0TjiY/Ws+SjLNVOXc36ShZZDo7cO+m3br2Bwo9lNqFMJwsHrt8i1VqAu7V1c3icTukXPi6Rh5Pwo9xhiAkC8uvhhp8iahRLedf6f+89qSCCfUVSt4LpnpCfgQG4VUxisAsd5fwUkuNIy9czQSCoD74hZC2PI+Syb5jPlX072bw3SODlhFKqksRxlWVlY293FaWg7pbASxwJcx8+/fiwxYfp9jF95PFEIeTeM2QU9joCDe+fmM5z9XhaQtSIbm8cqE7lClKBZfHjLKvx4N55HbR31bRfGTo4ZbItwsZuKUpg5vzoB09oT48Jo9GDi2+yr8sMEpQlobpOSgEtmxbZNuSDMWCpj8HJeMy8Vcp8q/NhyEyrTrR6tVmu8iLn7Y6sJ/QtMXwYNN07I=
+    #  * PYPI_PASSWORD
+    - secure: MsHfrrjKhSm93vQmTsBebF2vxusaFgS1T8IKIAKIxXshQ2mV8CO9mM9Nnq8dxk5Nx6v17RQEplTJ3sn7ZfyJ956SpXMGyTjT4c2YqbCblBTFgTlAsXrE/qZYA+OURNhIQDc1reYDzp3HGP8LUYqssEVDpWOwcNok+9xBvaTquIvRK1yOD0WeEiawF+lBnjOreFKLsqQHSA4uBoVdyvSPSXXAEEQQBrxE34zGUXPM1Nt2/yNH4IzRZOBi39oX64WhPrTKx9Sdv5C4bvw3DyjZizJ+Hn0Rz5riS3R/uNph5Nfg96KLnAdF2Wj/1WrDMzSiu6Lrije3I56pyJAbKLBXrkRYRKhzR6mJr0R8oL9kM70AFsh2u+bTwik9UL5al0fAMJhAM5RgEE8vFfXoxeV7oF05qOPMJe+zno/HdIcjARiIJkUmYeRHPhZpgqK19JA+079MbiyZB9c1XyxNKT1mbY02nF/lNHD5UXIF2amnLYGkKYoylxP9zJvyN87sFy5eITCGYj6V3mTvSz5KPCpcDZS11k2DhD3iKLvkc4Zw+DoRiIZwuS/YStkX/aAtvSEnvSVUt7GkA4Kj6+hOJBzPeJMq/oHCmMhef2aFHvLMXaz1BQkBMKvIl085NuuXKKj8PbnkBEaHwJQekpzX+gpqw65OJI/n32oiMTmYtEp3k2s=
 
   matrix:
     - TASK=check-format
