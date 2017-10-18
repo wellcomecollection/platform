@@ -54,6 +54,7 @@ def main():
         'miro_preprocessor-test',
         'lambdas-test',
         'monitoring_lambdas-test',
+        'lambda_utils-test',
     ]:
         publish_task = task.replace('build', 'publish')
         publish_task = publish_task.replace('test', 'publish')
