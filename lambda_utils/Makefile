@@ -2,10 +2,6 @@ export ROOT = $(shell git rev-parse --show-toplevel)
 export LAMBDA_UTILS = $(ROOT)/lambda_utils
 export INFRA_BUCKET = platform-infra
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 
 lambda_utils-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
@@ -27,3 +23,6 @@ lambda_utils-publish: lambda_utils-build
 		--env TWINE_USERNAME="$PYPI_USERNAME" \
 		--env TWINE_PASSWORD="$PYPI_PASSWORD" \
 		greengloves/twine:1.9.1 upload dist/*.tar.gz
+
+
+.PHONY: lambda_utils-test lambda_utils-build lambda_utils-publish
