@@ -24,4 +24,6 @@ lambda_utils-publish: lambda_utils-build
 	docker run \
 		--volume $(LAMBDA_UTILS):/src \
 		--workdir /src \
-		greengloves/twine:1.9.1 upload dist/*.tar.gz
+		greengloves/twine:1.9.1 upload dist/*.tar.gz \
+		--username "$PYPI_USERNAME" \
+		--password "$PYPI_PASSWORD"
