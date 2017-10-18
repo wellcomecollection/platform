@@ -14,20 +14,26 @@ class MiroKeyIdMismatchException(Exception):
     pass
 
 
-def find_exact_match_before_hyphen(keys, prefix):
+def _find_key_matching_regex(keys, regex):
     for key in keys:
-        if re.match(prefix + r"-.*\.jp2", key) is not None:
+        if re.match(regex, key) is not None:
             return key
     return None
 
 
+def _find_exact_match_before_hyphen(keys, prefix):
+    return _find_key_matching_regex(keys, prefix + r"-.*((\.jp2)|(\.JP2))")
+
+
+def _find_exact_match(keys, prefix):
+    return _find_key_matching_regex(keys, prefix + r"((\.jp2)|(\.JP2))")
+
+
 def _select_best_key(keys, prefix):
-    exact_match = f"{prefix}.jp2"
-    if len(keys) == 1:
-        return keys[0]
-    elif exact_match in keys:
+    exact_match = _find_exact_match(keys, prefix)
+    if exact_match is not None:
         return exact_match
-    matching_key = find_exact_match_before_hyphen(keys, prefix)
+    matching_key = _find_exact_match_before_hyphen(keys, prefix)
     if matching_key is not None:
         return matching_key
     else:
