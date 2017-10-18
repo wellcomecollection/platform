@@ -20,7 +20,7 @@ def main(event, _):
     miro_image = MiroImage(image_info)
     key = f"Wellcome_Images_Archive/{miro_image.collection} Images/{miro_image.image_path}.jp2"
     print(key)
-    destination_key = f"{destination_prefix}/{miro_image.image_path}.jp2"
+    destination_key = f"{destination_prefix}{miro_image.image_path}.jp2"
     source_identifier = S3_Identifier(source_bucket_name, key)
     destination_identifier = S3_Identifier(destination_bucket_name, destination_key)
     s3_utils.exec_if_key_exists(s3_client, source_identifier=source_identifier,
