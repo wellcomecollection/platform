@@ -76,14 +76,13 @@ def test_should_copy_an_asset_into_a_different_bucket(
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
-
+    destination_prefix = "library/"
     s3_client.put_object(
         Bucket=source_bucket_name,
         ACL='private',
         Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
+    destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
@@ -105,7 +104,7 @@ def test_should_not_crash_if_the_asset_does_not_exist(
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
 
-    destination_prefix = "library"
+    destination_prefix = "library/"
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
@@ -125,8 +124,7 @@ def test_should_replace_asset_if_already_exists_with_different_content(
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
-
+    destination_prefix = "library/"
     s3_client.put_bucket_versioning(Bucket=destination_bucket_name,
                                     VersioningConfiguration={'Status': 'Enabled'})
     s3_client.put_object(
@@ -134,7 +132,7 @@ def test_should_replace_asset_if_already_exists_with_different_content(
         ACL='private',
         Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
+    destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
     s3_client.put_object(
         Bucket=destination_bucket_name,
         ACL='private',
@@ -160,7 +158,7 @@ def test_should_copy_the_exact_matching_key(
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
+    destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
@@ -172,7 +170,7 @@ def test_should_copy_the_exact_matching_key(
         ACL='private',
         Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
+    destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
@@ -194,7 +192,7 @@ def test_should_copy_the_exact_matching_key_capital_file_extension(
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
+    destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
@@ -206,7 +204,7 @@ def test_should_copy_the_exact_matching_key_capital_file_extension(
         ACL='private',
         Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.JP2")
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
+    destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,
@@ -228,7 +226,7 @@ def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
+    destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
@@ -246,7 +244,7 @@ def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches
         "S3_DESTINATION_PREFIX": destination_prefix,
     }
 
-    destination_key = f"{destination_prefix}/A0000000/{miro_id}.jp2"
+    destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
     miro_copy_s3_master_asset.main(event, None)
     s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
@@ -262,7 +260,7 @@ def test_should_raise_an_exception_if_multiple_non_exact_matches(
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
+    destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
@@ -292,7 +290,7 @@ def test_should_raise_an_exception_if_only_match_is_not_exact_or_exact_before_hy
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
-    destination_prefix = "library"
+    destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,

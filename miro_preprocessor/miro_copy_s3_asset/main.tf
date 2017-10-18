@@ -65,6 +65,6 @@ data "aws_iam_policy_document" "allow_s3_copy" {
 }
 
 locals {
-  source_prefix  = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive": "fullsize/"}"
+  source_prefix  = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive/": "fullsize/"}"
   lambda_s3_type = "${var.is_master_asset == "true" ? "master": "derivative"}"
 }

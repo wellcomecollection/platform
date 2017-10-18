@@ -51,7 +51,7 @@ def main(event, _):
     miro_image = MiroImage(image_info)
     key_prefix = f"Wellcome_Images_Archive/{miro_image.collection} Images/{miro_image.image_path}"
     print(key_prefix)
-    destination_key = f"{destination_prefix}/{miro_image.image_path}.jp2"
+    destination_key = f"{destination_prefix}{miro_image.image_path}.jp2"
     list_response = s3_client.list_objects_v2(Bucket=source_bucket_name, Prefix=key_prefix)
 
     if 'Contents' in list_response.keys():
