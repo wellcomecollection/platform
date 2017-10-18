@@ -6,26 +6,50 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(SHARED_INFRA)/drain_ecs_container_instance/Makefile
+include $(SHARED_INFRA)/dynamo_to_sns/Makefile
+include $(SHARED_INFRA)/ecs_ec2_instance_tagger/Makefile
+include $(SHARED_INFRA)/run_ecs_task/Makefile
+include $(SHARED_INFRA)/schedule_reindexer/Makefile
+include $(SHARED_INFRA)/service_scheduler/Makefile
+include $(SHARED_INFRA)/update_dynamo_capacity/Makefile
+include $(SHARED_INFRA)/update_ecs_service_size/Makefile
+include $(SHARED_INFRA)/update_task_for_config_change/Makefile
 
-.docker/_lambda_deps: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		-v $(SHARED_INFRA)/lambdas:/data \
-		-e OP=install-deps \
-		python3.6_ci:latest
+## Tests for shared_infra
+shared_infra-test: drain_ecs_container_instance-test \
+                   dynamo_to_sns-test \
+                   ecs_ec2_instance_tagger-test \
+                   run_ecs_task-test \
+                   schedule_reindexer-test \
+                   service_scheduler-test \
+                   update_dynamo_capacity-test \
+                   update_ecs_service_size-test \
+                   update_task_for_config_change-test
 
-## Run tests for our Lambda code
-shared_infra-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		-v $(SHARED_INFRA)/lambdas:/data \
-		-e OP=test \
-		-e FIND_MATCH_PATHS='./*/target common/tests' \
-		python3.6_ci:latest
+## Build shared_infra
+shared_infra-build: drain_ecs_container_instance-build \
+                    dynamo_to_sns-build \
+                    ecs_ec2_instance_tagger-build \
+                    run_ecs_task-build \
+                    schedule_reindexer-build \
+                    service_scheduler-build \
+                    update_dynamo_capacity-build \
+                    update_ecs_service_size-build \
+                    update_task_for_config_change-build
 
-shared_infra-lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(SHARED_INFRA)/lambdas/publish_all_lambdas.sh
+## Publish shared_infra
+shared_infra-publish: drain_ecs_container_instance-publish \
+                      dynamo_to_sns-publish \
+                      ecs_ec2_instance_tagger-publish \
+                      run_ecs_task-publish \
+                      schedule_reindexer-publish \
+                      service_scheduler-publish \
+                      update_dynamo_capacity-publish \
+                      update_ecs_service_size-publish \
+                      update_task_for_config_change-publish
 
-
-## Run a plan on lambda stack
+## Run a plan on shared_infra stack
 shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_lambda_deps
 	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(SHARED_INFRA)/terraform:/data \
@@ -33,7 +57,7 @@ shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci .docker/_
 	-e OP=plan \
 	terraform_ci:latest
 
-## Run an apply on lambda stack
+## Run an apply on shared_infra stack
 shared_infra-terraform-apply: $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(SHARED_INFRA)/terraform:/data \
@@ -42,4 +66,4 @@ shared_infra-terraform-apply: $(ROOT)/.docker/terraform_ci
 	terraform_ci:latest
 
 
-.PHONY: lambdas-publish lambdas-test lambdas-terraform--plan lambdas-terraform-apply
+.PHONY: shared_infra-test shared_infra-build shared_infra-publish shared_infra-terraform-plan shared_infra-terraform-apply

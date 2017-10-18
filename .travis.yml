@@ -49,18 +49,26 @@ env:
 
   matrix:
     - TASK=check-format
-    - TASK=sbt-test-common
-    - TASK=sbt-test-api
-    - TASK=sbt-test-transformer
-    - TASK=sbt-test-ingestor
-    - TASK=sbt-test-id_minter
-    - TASK=sbt-test-reindexer
-    - TASK=lambdas-test
     - TASK=nginx-build
     - TASK=tif-metadata-build
     - TASK=elasticdump-build
     - TASK=api_docs-build
+
+    # Catalogue pipeline stack
+    - TASK=sbt-test-common
+    - TASK=sbt-test-transformer
+    - TASK=sbt-test-ingestor
+    - TASK=sbt-test-id_minter
+    - TASK=sbt-test-reindexer
+
+    # Catalogue API stack
+    - TASK=sbt-test-api
+
+    # Miro preprocessor stack
     - TASK=miro_preprocessor-test
+
+    # Shared infra stack
+    - TASK=shared_infra-build
 
     # Loris stack
     - TASK=loris-build

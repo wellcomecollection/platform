@@ -14,12 +14,12 @@ function build_lambda {
 function install_dependencies {
   echo "Installing dependencies ..."
 
-  if [ -e ./install_deps.sh ]
+  if [ -e /data/requirements.txt ]
   then
-    ./install_deps.sh
-    echo "Done."
+    echo "Found requirements.txt, installing."
+    pip install -r /data/requirements.txt
   else
-    echo "No install_deps.sh present."
+    echo "No requirements.txt present. Skipping."
   fi
 }
 
