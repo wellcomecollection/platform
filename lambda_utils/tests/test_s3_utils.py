@@ -1,8 +1,9 @@
 import os
 from unittest.mock import patch
 
-from moto import mock_s3
 import boto3
+from botocore.exceptions import ClientError
+from moto import mock_s3
 import pytest
 
 from src.wellcome_lambda_utils import s3_utils
@@ -85,3 +86,32 @@ def test_should_replace_asset_if_already_exists_with_different_content(
 
     s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
     assert s3_response['Body'].read() == image_body
+
+
+class TestIsObject(object):
+
+    @mock_s3
+    def test_detects_existing_object(self):
+        client = boto3.client('s3')
+
+        # Create a bucket and an object
+        client.create_bucket(Bucket='bukkit')
+
+        # First check we don't think the object exists
+        assert not s3_utils.is_object(bucket='bukkit', key='myfile.txt')
+        client.put_object(Bucket='bukkit', Key='myfile.txt', Body=b'hello world')
+
+        # Now check we can detect its existence
+        assert s3_utils.is_object(bucket='bukkit', key='myfile.txt')
+
+    @mock_s3
+    def test_does_not_detect_missing_object(self):
+        client = boto3.client('s3')
+        client.create_bucket(Bucket='bukkit')
+        assert not s3_utils.is_object(bucket='bukkit', key='doesnotexist.py')
+
+    @mock_s3
+    def test_other_errors_are_raised(self):
+        client = boto3.client('s3')
+        with pytest.raises(ClientError):
+            s3_utils.is_object(bucket='notabukkit', key='forbidden.txt')

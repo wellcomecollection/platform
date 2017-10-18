@@ -1,11 +1,28 @@
 import collections
 
+import boto3
 from botocore.exceptions import ClientError
 
 S3_Identifier = collections.namedtuple(
     'S3_Identifier',
     'bucket_name key'
 )
+
+
+def is_object(bucket, key):
+    """
+    Checks if an object exists in S3.  Returns True/False.
+    """
+    client = boto3.client('s3')
+    try:
+        client.head_object(Bucket=bucket, Key=key)
+    except ClientError as err:
+        if err.response['Error']['Code'] == '404':
+            return False
+        else:
+            raise
+    else:
+        return True
 
 
 def _copy_image_asset(s3_client, source_identifier, destination_identifier):
