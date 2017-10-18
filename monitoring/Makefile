@@ -2,68 +2,50 @@ ROOT = $(shell git rev-parse --show-toplevel)
 MONITORING = $(ROOT)/monitoring
 INFRA_BUCKET = platform-infra
 
+include $(MONITORING)/deployment_tracking/Makefile
+include $(MONITORING)/ecs_dashboard/Makefile
+include $(MONITORING)/load_test/Makefile
+
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+## Build post_to_slack lambda
+post_to_slack-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(MONITORING)/post_to_slack:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
 
+## Test post_to_slack lambda
+post_to_slack-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(MONITORING)/post_to_slack/src:/data \
+		--env OP=test \
+		--env FIND_MATCH_PATHS="/data" --tty \
+		python3.6_ci:latest
+
+## Publish post_to_slack lambda
+post_to_slack-publish: $(ROOT)/.docker/publish_lambda_zip
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(ROOT):/repo \
+		publish_lambda_zip "monitoring/post_to_slack/src" \
+		--key="lambdas/monitoring/post_to_slack.zip" \
+		--bucket="$(INFRA_BUCKET)"; \
+
+## Terraform plan on monitoring stack
 monitoring-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING)/terraform:/data \
-		--volume $(ROOT)/terraform:/terraform \
+		--volume $(MONITORING):/data \
 		--env OP=plan \
 		terraform_ci:latest
 
+## Terraform apply on monitoring stack
 monitoring-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING)/terraform:/data \
-		--volume $(ROOT)/terraform:/terraform \
+		--volume $(MONITORING):/data \
 		--env OP=apply \
 		terraform_ci:latest
 
 
-$(ROOT)/.docker/ecs_dashboard:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=ecs_dashboard \
-		--dir=$(MONITORING)/ecs_dashboard \
-		--file=$(MONITORING)/ecs_dashboard/Dockerfile
-
-ecs_dashboard-deploy: $(ROOT)/.docker/ecs_dashboard
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING)/ecs_dashboard:/dashboard \
-		--env BUCKET_NAME=wellcome-platform-dash \
-		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash/ \
-		ecs_dashboard
-
-
-gatling-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder \
-		--project=gatling \
-		--file=monitoring/gatling/Dockerfile
-
-gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=gatling ./builds/publish_service.sh
-
-
-monitoring_lambdas-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		-v $(MONITORING):/data \
-		-e OP=test \
-		-e FIND_MATCH_PATHS='./*' \
-		python3.6_ci:latest
-
-monitoring_lambdas-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in gatling_to_cloudwatch post_to_slack update_service_list;		\
-	do																		\
-		$(ROOT)/builds/docker_run.py --aws -- 								\
-			--volume $(ROOT):/repo 											\
-			publish_lambda_zip 												\
-			"monitoring/$$l" --key="lambdas/monitoring/$$l.zip" --bucket="$(INFRA_BUCKET)"; \
-	done
-
-
-.PHONY: monitoring-terraform-plan monitoring-terraform-apply \
-	ecs_dashboard-deploy \
-	gatling-build gatling-deploy \
-	monitoring_lambdas-test monitoring_lambdas-publish \
-	monitoring-test monitoring-publish
+.PHONY: post_to_slack-build post_to_slack-test post_to_slack-publish monitoring-terraform-plan monitoring-terraform-apply

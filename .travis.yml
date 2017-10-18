@@ -68,7 +68,11 @@ env:
 
     # Monitoring stack
     - TASK=gatling-build
-    - TASK=monitoring_lambdas-test
+    - TASK=deployment_tracking-test
+    - TASK=ecs_dashboard-test
+    - TASK=load_test-test
+    - TASK=post_to_slack-test
+
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
