@@ -83,7 +83,7 @@ module "miro_copy_catalogue_master" {
   lambda_description           = "Copy catalogue miro master assets to private s3 bucket"
   lambda_name                  = "miro_copy_catalogue_master"
   is_master_asset              = "true"
-  destination_key_prefix       = "library"
+  destination_key_prefix       = "library/"
 }
 
 resource "aws_iam_role_policy" "miro_copy_s3_derivative_asset_sns_publish" {

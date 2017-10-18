@@ -22,9 +22,9 @@ def copy_and_forward_message(s3_client,
                                       source_identifier=source_identifier,
                                       destination_identifier=destination_identifier)
     sns_utils.publish_sns_message(
-        sns_client,
-        topic_arn,
-        image_info)
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        message=image_info)
 
 
 def main(event, _):
@@ -33,12 +33,13 @@ def main(event, _):
     s3_client = boto3.client("s3")
     source_bucket_name = os.environ["S3_SOURCE_BUCKET"]
     destination_bucket_name = os.environ["S3_DESTINATION_BUCKET"]
+    destination_prefix = os.environ["S3_DESTINATION_PREFIX"]
     topic_arn = os.environ["TOPIC_ARN"]
 
     image_info = json.loads(event['Records'][0]['Sns']['Message'])
     miro_image = MiroImage(image_info)
     source_key = f"fullsize/{miro_image.image_path}.jpg"
-    destination_key = f"{miro_image.image_path}.jpg"
+    destination_key = f"{destination_prefix}{miro_image.image_path}.jpg"
     source_identifier = S3_Identifier(source_bucket_name, source_key)
     destination_identifier = S3_Identifier(destination_bucket_name, destination_key)
     s3_utils.exec_if_key_exists(s3_client, source_identifier=source_identifier,
