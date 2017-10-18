@@ -5,6 +5,7 @@ Lambda which passes on miro_image data from a SNS topic to an Elasticsearch clus
 
 import json
 import os
+import time
 
 from botocore.vendored import requests
 
@@ -75,4 +76,17 @@ def main(event, _):
         json.dumps(indexable)
     )
     print(f'_put_to_es response: {response}')
-    response.raise_for_status()
+
+    # A very common source of errors is a 429: Rate Limited Exceeded from
+    # the Elasticsearch cluster.  If we raise an exception here, the Lambda
+    # will be rescheduled almost immediately and go back around to put more
+    # load on the cluster.  So if we detect an error, insert an artificial
+    # delay to slow down the Lambda rescheduler, and reduce cluster pressure.
+    #
+    # Note: if this hits the timeout instead, the Lambda will still register
+    # as failed and be rescheduled, so this doesn't cause us to lose events.
+    try:
+        response.raise_for_status()
+    except Exception:
+        time.sleep(10)
+        raise
