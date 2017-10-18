@@ -31,19 +31,6 @@ module "ecs_ec2_instance_tagger" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "notify_old_deploys" {
-  source = "../lambdas/notify_old_deploys"
-
-  dynamodb_table_deployments_name            = "${aws_dynamodb_table.deployments.name}"
-  every_minute_arn                           = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  every_minute_name                          = "${aws_cloudwatch_event_rule.every_minute.name}"
-  old_deployments_arn                        = "${module.old_deployments.arn}"
-  iam_policy_document_deployments_table_json = "${data.aws_iam_policy_document.deployments_table.json}"
-  old_deployments_publish_policy             = "${module.old_deployments.publish_policy}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "run_ecs_task" {
   source = "../lambdas/run_ecs_task"
 
@@ -62,19 +49,6 @@ module "schedule_reindexer" {
 
   service_scheduler_topic_arn            = "${module.service_scheduler_topic.arn}"
   service_scheduler_topic_publish_policy = "${module.service_scheduler_topic.publish_policy}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
-module "service_deployment_status" {
-  source = "../lambdas/service_deployment_status"
-
-  dynamodb_table_deployments_name = "${aws_dynamodb_table.deployments.name}"
-  every_minute_arn                = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  every_minute_name               = "${aws_cloudwatch_event_rule.every_minute.name}"
-
-  iam_policy_document_deployments_table_json = "${data.aws_iam_policy_document.deployments_table.json}"
-  iam_policy_document_describe_services_json = "${data.aws_iam_policy_document.describe_services.json}"
 
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
