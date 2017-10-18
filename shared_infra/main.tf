@@ -37,22 +37,6 @@ module "run_ecs_task" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "schedule_reindexer" {
-  source = "schedule_reindexer"
-
-  dynamodb_table_reindex_tracker_stream_arn = "${local.dynamodb_table_reindex_tracker_stream_arn}"
-  ecs_services_cluster_name                 = "${local.ecs_services_cluster_name}"
-  dynamodb_table_miro_table_name            = "${local.dynamodb_table_miro_table_name}"
-
-  dynamo_capacity_topic_arn            = "${module.dynamo_capacity_topic.arn}"
-  dynamo_capacity_topic_publish_policy = "${module.dynamo_capacity_topic.publish_policy}"
-
-  service_scheduler_topic_arn            = "${module.service_scheduler_topic.arn}"
-  service_scheduler_topic_publish_policy = "${module.service_scheduler_topic.publish_policy}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "service_scheduler" {
   source = "service_scheduler"
 

@@ -10,7 +10,6 @@ include $(SHARED_INFRA)/drain_ecs_container_instance/Makefile
 include $(SHARED_INFRA)/dynamo_to_sns/Makefile
 include $(SHARED_INFRA)/ecs_ec2_instance_tagger/Makefile
 include $(SHARED_INFRA)/run_ecs_task/Makefile
-include $(SHARED_INFRA)/schedule_reindexer/Makefile
 include $(SHARED_INFRA)/service_scheduler/Makefile
 include $(SHARED_INFRA)/update_dynamo_capacity/Makefile
 include $(SHARED_INFRA)/update_ecs_service_size/Makefile
@@ -21,7 +20,6 @@ shared_infra-test: drain_ecs_container_instance-test \
                    dynamo_to_sns-test \
                    ecs_ec2_instance_tagger-test \
                    run_ecs_task-test \
-                   schedule_reindexer-test \
                    service_scheduler-test \
                    update_dynamo_capacity-test \
                    update_ecs_service_size-test \
@@ -32,7 +30,6 @@ shared_infra-build: drain_ecs_container_instance-build \
                     dynamo_to_sns-build \
                     ecs_ec2_instance_tagger-build \
                     run_ecs_task-build \
-                    schedule_reindexer-build \
                     service_scheduler-build \
                     update_dynamo_capacity-build \
                     update_ecs_service_size-build \
@@ -43,7 +40,6 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
                       dynamo_to_sns-publish \
                       ecs_ec2_instance_tagger-publish \
                       run_ecs_task-publish \
-                      schedule_reindexer-publish \
                       service_scheduler-publish \
                       update_dynamo_capacity-publish \
                       update_ecs_service_size-publish \
