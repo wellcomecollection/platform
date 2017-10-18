@@ -5,7 +5,7 @@ module "lambda_service_deployment_status" {
 
   name        = "service_deployment_status"
   description = "Lambda for tracking deployment status in dynamo db"
-  timeout     = 10
+  timeout     = 15
 
   environment_variables = {
     TABLE_NAME = "${var.dynamodb_table_deployments_name}"

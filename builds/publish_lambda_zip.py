@@ -30,8 +30,6 @@ from tooling import compare_zip_files
 ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
-UTILS_LIB = os.path.join(ROOT, 'shared_infra', 'lambdas', 'common', 'utils')
-
 ZIP_DIR = os.path.join(ROOT, '.lambda_zips')
 
 
@@ -69,9 +67,6 @@ def build_lambda_local(path, name):
                 src=os.path.join(path, f),
                 dst=os.path.join(target, os.path.basename(f))
             )
-
-    # Copy the contents of the Lambda common lib
-    shutil.copytree(UTILS_LIB, os.path.join(target, 'utils'))
 
     # Now install any additional pip dependencies.
     reqs_file = os.path.join(path, 'requirements.txt')
