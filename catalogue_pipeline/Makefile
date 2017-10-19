@@ -6,6 +6,16 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(CATALOGUE_PIPELINE)/schedule_reindexer/Makefile
+
+## Build catalogue_pipeline
+catalogue_pipeline-build: schedule_reindexer-build
+
+## Test catalogue_pipeline
+catalogue_pipeline-test: schedule_reindexer-test
+
+## Deploy catalogue_pipeline
+catalogue_pipeline-deploy: schedule_reindexer-publish
 
 catalogue_pipeline-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
