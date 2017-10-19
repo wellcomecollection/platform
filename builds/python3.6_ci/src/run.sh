@@ -41,23 +41,12 @@ function build_lock_file {
   echo "Done."
 }
 
-function check_is_master {
-  echo "Checking up to date with master ..."
-
-  /app/is_up_to_date_with_master.py
-
-  echo "Done."
-}
-
 if [[ "$OP" == "test" ]]
 then
   run_tests
 elif [[ "$OP" == "build-lambda" ]]
 then
   build_lambda
-elif [[ "$OP" == "is-master-head" ]]
-then
-  check_is_master
 elif [[ "$OP" == "build-lock-file" ]]
 then
   build_lock_file
