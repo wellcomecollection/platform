@@ -27,7 +27,7 @@ import sys
 
 from should_publish import should_publish
 from should_run_tests import should_run_tests
-from tooling import make, fprint as print
+from tooling import make, rreplace, fprint as print
 
 
 def main():
@@ -55,11 +55,12 @@ def main():
         'lambdas-test',
         'monitoring_lambdas-test',
     ]:
-        publish_task = task.replace('build', 'publish')
-        publish_task = publish_task.replace('test', 'publish')
+        verb = 'publish'
     else:
-        publish_task = task.replace('build', 'deploy')
-        publish_task = task.replace('test', 'deploy')
+        verb = 'deploy'
+
+    publish_task = task.rreplace('build', verb, count=1)
+    publish_task = task.rreplace('test', verb, count=1)
 
     make(publish_task)
 
