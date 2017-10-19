@@ -2,6 +2,7 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
   bucket = "wellcomecollection-images"
   acl    = "private"
 
+  # JP2 master assets (same set as catalogue API)
   lifecycle_rule {
     id     = "library"
     prefix = "library/"
@@ -14,6 +15,7 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     enabled = true
   }
 
+  # JP2 master assets
   lifecycle_rule {
     id     = "cold_store"
     prefix = "cold_store/"
@@ -26,6 +28,7 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     enabled = true
   }
 
+  # JP2 master assets
   lifecycle_rule {
     id     = "tandem_vault"
     prefix = "tandem_vault/"
