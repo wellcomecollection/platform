@@ -62,7 +62,7 @@ lint-js: $(ROOT)/.docker/jslint_ci
 
 ## Check a git repo is up to date with remote master
 uptodate-git: $(ROOT)/.docker/python3.6_ci
-	docker run -v $$HOME/.ssh:/root/.ssh -v $(ROOT):/data -e OP=is-master-head python3.6_ci:latest
+	$(ROOT)/builds/is_up_to_date_with_master.sh
 
 format-terraform:
 	$(ROOT)/builds/docker_run.py --aws -- \
