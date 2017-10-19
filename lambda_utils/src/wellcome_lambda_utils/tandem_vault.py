@@ -11,9 +11,9 @@ API_URL = 'https://wellcome.tandemvault.com/api/v1'
 
 class TandemVaultAPI(object):
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, sess=None):
         self.api_key = api_key
-        self.sess = requests.Session()
+        self.sess = sess or requests.Session()
 
     def create_upload_set(self, title):
         """
