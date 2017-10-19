@@ -52,9 +52,6 @@ function check_is_master {
 if [[ "$OP" == "test" ]]
 then
   run_tests
-elif [[ "$OP" == "install-deps" ]]
-then
-  install_dependencies
 elif [[ "$OP" == "build-lambda" ]]
 then
   build_lambda
