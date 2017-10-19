@@ -6,6 +6,7 @@ locals {
   alb_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_client_error_alarm_arn}"
   terminal_failure_alarm_arn = "${data.terraform_remote_state.shared_infra.terminal_failure_alarm_arn}"
+  lambda_error_alarm_arn     = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
   dlq_alarm_arn              = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   bucket_infra_arn = "${data.terraform_remote_state.shared_infra.bucket_infra_arn}"
