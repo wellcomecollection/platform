@@ -6,7 +6,6 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
-
 lambda_utils-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(LAMBDA_UTILS):/data \

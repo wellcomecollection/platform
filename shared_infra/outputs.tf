@@ -61,3 +61,19 @@ output "travis_ci_aws_id" {
 output "travis_ci_aws_secret" {
   value = "${aws_iam_access_key.travis_ci.encrypted_secret}"
 }
+
+output "dynamo_capacity_topic_arn" {
+  value = "${module.dynamo_capacity_topic.arn}"
+}
+
+output "dynamo_capacity_topic_publish_policy" {
+  value = "${module.dynamo_capacity_topic.publish_policy}"
+}
+
+output "service_scheduler_topic_arn" {
+  value = "${module.service_scheduler_topic.arn}"
+}
+
+output "service_scheduler_topic_publish_policy" {
+  value = "${module.service_scheduler_topic.publish_policy}"
+}

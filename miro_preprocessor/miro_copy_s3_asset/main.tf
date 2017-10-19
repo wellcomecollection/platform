@@ -1,15 +1,17 @@
 module "miro_copy_s3_asset_lambda" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
-  s3_key = "lambdas/miro_preprocessor/miro_copy_s3_asset.zip"
+  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.3"
+  s3_key      = "lambdas/miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_${local.lambda_s3_type}_asset.zip"
+  module_name = "miro_copy_s3_${local.lambda_s3_type}_asset"
 
-  description     = "Copy miro images to another s3 bucket"
-  name            = "miro_copy_s3_asset"
+  description     = "${var.lambda_description}"
+  name            = "${var.lambda_name}"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
   environment_variables = {
-    "S3_SOURCE_BUCKET"      = "${var.bucket_miro_images_sync_name}"
-    "S3_DESTINATION_BUCKET" = "${var.bucket_miro_images_public_name}"
-    "TOPIC_ARN"             = "${var.topic_miro_image_to_dynamo_arn}"
+    "S3_SOURCE_BUCKET"      = "${var.bucket_source_asset_name}"
+    "S3_DESTINATION_BUCKET" = "${var.bucket_destination_name}"
+    "S3_DESTINATION_PREFIX" = "${var.destination_key_prefix}"
+    "TOPIC_ARN"             = "${var.topic_forward_sns_message_arn}"
   }
 
   timeout = "30"
@@ -23,7 +25,7 @@ module "miro_copy_s3_asset_trigger" {
 }
 
 resource "aws_iam_role_policy" "miro_copy_s3_asset" {
-  name   = "miro_copy_s3_asset_policy"
+  name   = "${var.lambda_name}_policy"
   role   = "${module.miro_copy_s3_asset_lambda.role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_copy.json}"
 }
@@ -35,7 +37,7 @@ data "aws_iam_policy_document" "allow_s3_copy" {
     ]
 
     resources = [
-      "${var.bucket_miro_images_sync_arn}/fullsize/*",
+      "${var.bucket_source_asset_arn}/${local.source_prefix}*",
     ]
   }
 
@@ -45,8 +47,8 @@ data "aws_iam_policy_document" "allow_s3_copy" {
     ]
 
     resources = [
-      "${var.bucket_miro_images_sync_arn}",
-      "${var.bucket_miro_images_public_arn}",
+      "${var.bucket_source_asset_arn}",
+      "${var.bucket_destination_asset_arn}",
     ]
   }
 
@@ -57,7 +59,12 @@ data "aws_iam_policy_document" "allow_s3_copy" {
     ]
 
     resources = [
-      "${var.bucket_miro_images_public_arn}/*",
+      "${var.bucket_destination_asset_arn}/${var.destination_key_prefix}*",
     ]
   }
+}
+
+locals {
+  source_prefix  = "${var.is_master_asset == "true" ? "Wellcome_Images_Archive/": "fullsize/"}"
+  lambda_s3_type = "${var.is_master_asset == "true" ? "master": "derivative"}"
 }
