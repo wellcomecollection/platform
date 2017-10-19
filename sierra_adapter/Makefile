@@ -2,6 +2,10 @@ ROOT = $(shell git rev-parse --show-toplevel)
 SIERRA_ADAPTER = $(ROOT)/sierra_adapter
 
 
+$(SIERRA_ADAPTER)/adapter/requirements.txt: $(SIERRA_ADAPTER)/adapter/requirements.in
+	docker run --volume $(SIERRA_ADAPTER)/adapter:/src micktwomey/pip-tools
+
+
 sierra_adapter-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(SIERRA_ADAPTER)/terraform:/data \
