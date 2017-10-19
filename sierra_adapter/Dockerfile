@@ -1,6 +1,6 @@
 FROM python:3.6-alpine
 
-LABEL maintainer "Alex Chan <a.chan@wellcome.ac.uk>"
+LABEL maintainer "Wellcome Digital Platform <wellcomedigitalplatform@wellcome.ac.uk>"
 LABEL description "Copy records from the Sierra API into DynamoDB"
 
 COPY requirements.txt /
