@@ -24,6 +24,6 @@ miro_inventory-test: $(ROOT)/.docker/python3.6_ci
 miro_inventory-publish: $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/service_scheduler/src" \
+		publish_lambda_zip "miro_preprocessor/miro_inventory/src" \
 		--key="lambdas/miro_preprocessor/miro_inventory.zip" \
 		--bucket="$(INFRA_BUCKET)";
