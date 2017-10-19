@@ -59,8 +59,8 @@ def main():
     else:
         verb = 'deploy'
 
-    publish_task = task.rreplace('build', verb, count=1)
-    publish_task = task.rreplace('test', verb, count=1)
+    publish_task = rreplace(task, 'build', verb, count=1)
+    publish_task = rreplace(task, 'test', verb, count=1)
 
     make(publish_task)
 
