@@ -4,15 +4,10 @@ ROOT="$(git rev-parse --show-toplevel)"
 RELEASE_DIR="$ROOT/.releases"
 
 # Name of tfvars file
-TF_VARS=terraform.tfvars
 RELEASE_IDS_FILE="release_ids.tfvars"
 
 # Ensure we don't have stale variables from a previous run
-rm -f $TF_VARS
 rm -rf "$RELEASE_DIR"
-
-echo "Getting variables from S3"
-aws s3 cp s3://platform-infra/terraform-miro-preproc.tfvars terraform.tfvars
 
 # Download releases from S3
 mkdir -p "$RELEASE_DIR"
