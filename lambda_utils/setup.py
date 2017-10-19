@@ -13,7 +13,7 @@ setup(
     name='wellcome_lambda_utils',
     packages=find_packages(SOURCE),
     package_dir={'': SOURCE},
-    version='1.0.1',
+    version='1.0.2',
     install_requires=['boto'],
     python_requires='>=3.6',
     description='Common lib for lambdas',
