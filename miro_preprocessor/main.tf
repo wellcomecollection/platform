@@ -72,10 +72,10 @@ module "miro_copy_catalogue_derivative" {
 }
 
 module "miro_copy_catalogue_master" {
-  source                       = "miro_copy_s3_asset"
-  lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
-  bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
-  bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
+  source                   = "miro_copy_s3_asset"
+  lambda_error_alarm_arn   = "${local.lambda_error_alarm_arn}"
+  bucket_source_asset_arn  = "${local.bucket_miro_images_sync_arn}"
+  bucket_source_asset_name = "${local.bucket_miro_images_sync_name}"
 
   topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
 
@@ -88,10 +88,10 @@ module "miro_copy_catalogue_master" {
 }
 
 module "miro_copy_cold_store_master" {
-  source                       = "miro_copy_s3_asset"
-  lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
-  bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
-  bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
+  source                   = "miro_copy_s3_asset"
+  lambda_error_alarm_arn   = "${local.lambda_error_alarm_arn}"
+  bucket_source_asset_arn  = "${local.bucket_miro_images_sync_arn}"
+  bucket_source_asset_name = "${local.bucket_miro_images_sync_name}"
 
   topic_miro_copy_s3_asset_arn = "${module.cold_store_topic.arn}"
 
@@ -104,10 +104,10 @@ module "miro_copy_cold_store_master" {
 }
 
 module "miro_copy_tandem_vault_master" {
-  source                       = "miro_copy_s3_asset"
-  lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
-  bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
-  bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
+  source                   = "miro_copy_s3_asset"
+  lambda_error_alarm_arn   = "${local.lambda_error_alarm_arn}"
+  bucket_source_asset_arn  = "${local.bucket_miro_images_sync_arn}"
+  bucket_source_asset_name = "${local.bucket_miro_images_sync_name}"
 
   topic_miro_copy_s3_asset_arn = "${module.tandem_vault_topic.arn}"
 
