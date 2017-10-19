@@ -14,21 +14,13 @@ function build_lambda {
 function install_dependencies {
   echo "Installing dependencies ..."
 
-  if [ -e ./install_deps.sh ]
+  if [ -e /data/requirements.txt ]
   then
-    ./install_deps.sh
-    echo "Done."
+    echo "Found requirements.txt, installing."
+    pip install -r /data/requirements.txt
   else
-    echo "No install_deps.sh present."
+    echo "No requirements.txt present. Skipping."
   fi
-}
-
-function lint_python {
-  echo "Linting ..."
-
-  flake8 --exclude target  --ignore=E501
-
-  echo "Done."
 }
 
 function run_tests {
@@ -57,15 +49,9 @@ function check_is_master {
   echo "Done."
 }
 
-if [[ "$OP" == "lint" ]]
-then
-  lint_python
-elif [[ "$OP" == "test" ]]
+if [[ "$OP" == "test" ]]
 then
   run_tests
-elif [[ "$OP" == "install-deps" ]]
-then
-  install_dependencies
 elif [[ "$OP" == "build-lambda" ]]
 then
   build_lambda

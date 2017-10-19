@@ -121,3 +121,14 @@ def make_decision(changed_files, task, action):
 
 def make(task):
     subprocess.check_call(['make', task])
+
+
+def rreplace(string, old, new, count=None):
+    """
+    Replace ``old`` with ``new``, starting from the right.
+    """
+    # Split on the occurrences of ``old``, starting from the right
+    parts = string.rsplit(old, count)
+
+    # Then join back together with ``new``
+    return new.join(parts)

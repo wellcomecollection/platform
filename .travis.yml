@@ -49,21 +49,29 @@ env:
 
   matrix:
     - TASK=check-format
-    - TASK=sbt-test-common
-    - TASK=sbt-test-api
-    - TASK=sbt-test-transformer
-    - TASK=sbt-test-ingestor
-    - TASK=sbt-test-id_minter
-    - TASK=sbt-test-reindexer
-    - TASK=lambdas-test
     - TASK=nginx-build
     - TASK=tif-metadata-build
     - TASK=elasticdump-build
     - TASK=api_docs-build
+
+    # Catalogue pipeline stack
+    - TASK=sbt-test-common
+    - TASK=sbt-test-transformer
+    - TASK=sbt-test-ingestor
+    - TASK=sbt-test-id_minter
+    - TASK=sbt-test-reindexer
+
+    # Catalogue API stack
+    - TASK=sbt-test-api
+
+    # Miro preprocessor stack
     - TASK=miro_preprocessor-test
 
     # lambda-utils package
     - TASK=lambda_utils-test
+
+    # Shared infra stack
+    - TASK=shared_infra-build
 
     # Loris stack
     - TASK=loris-build
@@ -71,7 +79,11 @@ env:
 
     # Monitoring stack
     - TASK=gatling-build
-    - TASK=monitoring_lambdas-test
+    - TASK=deployment_tracking-test
+    - TASK=ecs_dashboard-test
+    - TASK=load_test-test
+    - TASK=monitoring-test
+
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
