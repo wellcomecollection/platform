@@ -14,7 +14,6 @@ from pprint import pprint
 
 import requests
 
-
 oauthkey = '<API_KEY>'
 oauthsec = '<API_SECRET>'
 
@@ -23,7 +22,6 @@ API_VERSION = 'sierra-api/v3'
 
 # Change this URL to whatever resource you want to retrieve
 URL = f'{BASE}/{API_VERSION}/branches'
-
 
 # Get an access token
 # https://sandbox.iii.com/docs/Content/zReference/authClient.htm
