@@ -24,11 +24,11 @@ miro_preprocessor-test: xml_to_json_converter-test \
                         miro_copy_s3_asset-test \
                         miro_inventory-test
 
-miro_preprocessor-deploy: xml_to_json_converter-publish \
-						  xml_to_json_run_task-publish \
-                          miro_image_to_dynamo-publish \
-                          miro_copy_s3_asset-publish \
-                          miro_inventory-publish
+miro_preprocessor-publish: xml_to_json_converter-publish \
+						   xml_to_json_run_task-publish \
+                           miro_image_to_dynamo-publish \
+                           miro_copy_s3_asset-publish \
+                           miro_inventory-publish
 
 miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
