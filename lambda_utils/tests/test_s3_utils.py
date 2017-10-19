@@ -9,7 +9,6 @@ from src.wellcome_lambda_utils import s3_utils
 
 
 class TestIsObject(object):
-
     @mock_s3
     def test_detects_existing_object(self):
         client = boto3.client('s3')
@@ -32,13 +31,11 @@ class TestIsObject(object):
 
     @mock_s3
     def test_other_errors_are_raised(self):
-        client = boto3.client('s3')
         with pytest.raises(ClientError):
             s3_utils.is_object(bucket='notabukkit', key='forbidden.txt')
 
 
 class TestCopyObject(object):
-
     @mock_s3
     def test_throws_error_if_src_does_not_exist(self):
         client = boto3.client('s3')
@@ -88,7 +85,7 @@ class TestCopyObject(object):
     ])
     def test_copies_file_if_dst_key_exists_but_not_lazy(
             self, lazy, expected_version
-        ):
+    ):
         client = boto3.client('s3')
 
         # First create the same file in both buckets.  We enable versioning
