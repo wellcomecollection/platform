@@ -145,7 +145,7 @@ case class MiroTransformable(MiroID: String,
       case None => List()
     }
 
-    physFormat ++ lcGenre
+    (physFormat ++ lcGenre).distinct
   }
 
   def getCreatedDate(miroData: MiroTransformableData): Option[Period] =
