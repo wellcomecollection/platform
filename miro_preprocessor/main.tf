@@ -73,10 +73,11 @@ module "miro_copy_catalogue_derivative" {
 
 module "miro_copy_catalogue_master" {
   source                       = "miro_copy_s3_asset"
-  topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
   lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
   bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
   bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
+
+  topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
 
   bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
   bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
@@ -84,6 +85,38 @@ module "miro_copy_catalogue_master" {
   lambda_name                  = "miro_copy_catalogue_master"
   is_master_asset              = "true"
   destination_key_prefix       = "library/"
+}
+
+module "miro_copy_cold_store_master" {
+  source                       = "miro_copy_s3_asset"
+  lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
+  bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
+  bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
+
+  topic_miro_copy_s3_asset_arn = "${module.cold_store_topic.arn}"
+
+  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
+  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  lambda_description           = "Copy cold store miro master assets to private s3 bucket"
+  lambda_name                  = "miro_copy_cold_store_master"
+  is_master_asset              = "true"
+  destination_key_prefix       = "cold_store/"
+}
+
+module "miro_copy_tandem_vault_master" {
+  source                       = "miro_copy_s3_asset"
+  lambda_error_alarm_arn       = "${local.lambda_error_alarm_arn}"
+  bucket_source_asset_arn      = "${local.bucket_miro_images_sync_arn}"
+  bucket_source_asset_name     = "${local.bucket_miro_images_sync_name}"
+
+  topic_miro_copy_s3_asset_arn = "${module.tandem_vault_topic.arn}"
+
+  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
+  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  lambda_description           = "Copy tandem vault miro master assets to private s3 bucket"
+  lambda_name                  = "miro_copy_tandem_vault_master"
+  is_master_asset              = "true"
+  destination_key_prefix       = "tandem_vault/"
 }
 
 resource "aws_iam_role_policy" "miro_copy_s3_derivative_asset_sns_publish" {
