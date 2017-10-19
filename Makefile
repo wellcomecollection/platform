@@ -6,7 +6,7 @@ include catalogue_pipeline/Makefile
 include miro_preprocessor/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
-
+include lambda_utils/Makefile
 
 ## Build the image for tif-metadata
 tif-metadata-build: $(ROOT)/.docker/image_builder
