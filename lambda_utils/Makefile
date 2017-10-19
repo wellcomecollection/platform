@@ -19,7 +19,7 @@ lambda_utils-build:
 		--workdir /src \
 		python:3-alpine python setup.py sdist
 
-lambda_utils-publish:
+lambda_utils-publish: lambda_utils-build
 	@# We check if we have a more up-to-date package than PyPI, and only trigger
 	@# the upload task if we do.
 	export PUBLISH_VERSION=$(shell curl "https://pypi.python.org/pypi/wellcome-lambda-utils/json" 2>/dev/null | jq -r '.info.version')
