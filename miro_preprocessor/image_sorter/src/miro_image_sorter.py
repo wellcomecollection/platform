@@ -8,7 +8,7 @@ import os
 import boto3
 
 from sorter_logic import Decision, sort_image
-from sns_utils import publish_sns_message
+from wellcome_lambda_utils.sns_utils import publish_sns_message
 
 
 def parse_s3_event(event):
