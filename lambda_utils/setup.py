@@ -14,7 +14,7 @@ setup(
     packages=find_packages(SOURCE),
     package_dir={'': SOURCE},
     version='1.0.3',
-    install_requires=['boto','dateutil'],
+    install_requires=['boto', 'dateutil'],
     python_requires='>=3.6',
     description='Common lib for lambdas',
     author='Wellcome digital platform',
