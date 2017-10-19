@@ -3,6 +3,8 @@
 Utilities for interacting with the Tandem Vault API.
 """
 
+import itertools
+
 import requests
 
 
@@ -31,6 +33,23 @@ class TandemVaultAPI(object):
         )
         resp.raise_for_status()
         return resp.json()['id']
+
+    def get_upload_sets(self):
+        """
+        Generates a list of all upload sets in Tandem Vault
+        """
+        for page in itertools.count(1):
+            resp = self.sess.get(
+                f'{API_URL}/upload_sets',
+                params={
+                    'api_key': self.api_key,
+                    'page': page
+                }
+            )
+            resp.raise_for_status()
+            if not resp.json():
+                break
+            yield from resp.json()
 
 
 api = TandemVaultAPI(api_key=API_KEY)
