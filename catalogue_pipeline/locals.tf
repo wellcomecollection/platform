@@ -11,5 +11,11 @@ locals {
   bucket_infra_arn = "${data.terraform_remote_state.shared_infra.bucket_infra_arn}"
   bucket_infra_id  = "${data.terraform_remote_state.shared_infra.bucket_infra_id}"
 
+  dynamo_capacity_topic_arn            = "${data.terraform_remote_state.shared_infra.dynamo_capacity_topic_arn}"
+  dynamo_capacity_topic_publish_policy = "${data.terraform_remote_state.shared_infra.dynamo_capacity_topic_publish_policy}"
+
+  service_scheduler_topic_arn            = "${data.terraform_remote_state.shared_infra.service_scheduler_topic_arn}"
+  service_scheduler_topic_publish_policy = "${data.terraform_remote_state.shared_infra.service_scheduler_topic_publish_policy}"
+
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 }
