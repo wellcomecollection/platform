@@ -10,9 +10,7 @@ To configure:
 
 """
 
-import json
 from pprint import pprint
-import sys
 
 import requests
 
@@ -36,7 +34,7 @@ access_token = resp.json()['access_token']
 # https://sandbox.iii.com/docs/Content/zReference/authClient.htm
 # https://sandbox.iii.com/docs/Content/zReference/operations.htm#XML
 headers = {
-    'Authorization': f'Bearer {access_token}'
+    'Authorization': f'Bearer {access_token}',
     'Accept': 'application/json',
 }
 

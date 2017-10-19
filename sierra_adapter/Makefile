@@ -17,6 +17,13 @@ sierra_adapter-adapter-build: $(ROOT)/.docker/image_builder
 		--project=sierra_adapter \
 		--file=sierra_adapter/adapter/Dockerfile
 
+sierra_adapter-adapter-test: sierra_adapter-adapter-build
+	docker build \
+		--tag sierra_adapter:test \
+		--file=$(SIERRA_ADAPTER)/adapter/test.Dockerfile \
+		$(SIERRA_ADAPTER)/adapter
+	docker run --tty sierra_adapter:test
+
 sierra_adapter-adapter-publish: $(ROOT)/.docker/publish_service_to_aws
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		publish_service_to_aws:latest \
