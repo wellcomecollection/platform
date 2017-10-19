@@ -50,9 +50,11 @@ $(ROOT)/.docker/publish_lambda_zip:
 
 # Project utility tasks
 
-## Run flake8 linting over the current directory
-lint-python: $(ROOT)/.docker/python3.6_ci
-	docker run -v $$(pwd):/data -e OP=lint python3.6_ci:latest
+lint-python:
+	docker run \
+		--volume $(ROOT):/data \
+		--workdir /data \
+		greengloves/flake8 --exclude target --ignore=E501
 
 ## Run JSON linting over the current directory
 lint-js: $(ROOT)/.docker/jslint_ci
