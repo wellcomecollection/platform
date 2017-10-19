@@ -8,20 +8,20 @@ ifneq ($(ROOT), $(shell pwd))
 endif
 
 
-$(SIERRA_ADAPTER)/adapter/requirements.txt: $(SIERRA_ADAPTER)/adapter/requirements.in
-	docker run --volume $(SIERRA_ADAPTER)/adapter:/src micktwomey/pip-tools
+$(SIERRA_ADAPTER)/requirements.txt: $(SIERRA_ADAPTER)/requirements.in
+	docker run --volume $(SIERRA_ADAPTER):/src micktwomey/pip-tools
 
-sierra_adapter-adapter-build: $(ROOT)/.docker/image_builder
+sierra_adapter-build: $(ROOT)/.docker/image_builder
 	$(ROOT)/builds/docker_run.py --dind -- \
 		image_builder:latest \
 		--project=sierra_adapter \
-		--file=sierra_adapter/adapter/Dockerfile
+		--file=sierra_adapter/Dockerfile
 
-sierra_adapter-adapter-test: sierra_adapter-adapter-build
+sierra_adapter-test: sierra_adapter-build
 	docker build \
 		--tag sierra_adapter:test \
-		--file=$(SIERRA_ADAPTER)/adapter/test.Dockerfile \
-		$(SIERRA_ADAPTER)/adapter
+		--file=$(SIERRA_ADAPTER)/test.Dockerfile \
+		$(SIERRA_ADAPTER)
 	docker run --tty sierra_adapter:test
 
 sierra_adapter-adapter-publish: $(ROOT)/.docker/publish_service_to_aws
