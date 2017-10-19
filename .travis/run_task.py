@@ -56,6 +56,7 @@ def main():
         'monitoring_lambdas-test',
         'lambda_utils-test',
         'sierra_adapter-adapter-build',
+        'sierra_adapter-test',
     ]:
         verb = 'publish'
     else:

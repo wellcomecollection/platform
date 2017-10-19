@@ -90,7 +90,7 @@ env:
     - TASK=monitoring-test
 
     # Sierra adapter stack
-    - TASK=sierra_adapter-adapter-build
+    - TASK=sierra_adapter-test
 
 
 # This has a Slack API token for posting messages about build failures to
