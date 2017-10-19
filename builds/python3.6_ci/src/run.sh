@@ -23,14 +23,6 @@ function install_dependencies {
   fi
 }
 
-function lint_python {
-  echo "Linting ..."
-
-  flake8 --exclude target  --ignore=E501
-
-  echo "Done."
-}
-
 function run_tests {
   echo "Testing ..."
 
@@ -57,10 +49,7 @@ function check_is_master {
   echo "Done."
 }
 
-if [[ "$OP" == "lint" ]]
-then
-  lint_python
-elif [[ "$OP" == "test" ]]
+if [[ "$OP" == "test" ]]
 then
   run_tests
 elif [[ "$OP" == "install-deps" ]]
