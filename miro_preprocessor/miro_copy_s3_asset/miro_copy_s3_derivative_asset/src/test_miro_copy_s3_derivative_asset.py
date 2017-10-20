@@ -166,7 +166,7 @@ def test_should_replace_asset_if_already_exists_with_different_content(
     s3_client.put_object(
         Bucket=destination_bucket_name,
         ACL='public-read',
-        Body=b"adjhgkjae", Key=destination_key)
+        Body=image_body, Key=destination_key)
 
     os.environ = {
         "S3_SOURCE_BUCKET": source_bucket_name,

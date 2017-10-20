@@ -85,6 +85,8 @@ module "miro_copy_catalogue_master" {
   lambda_name                  = "miro_copy_catalogue_master"
   is_master_asset              = "true"
   destination_key_prefix       = "library/"
+
+  topic_forward_sns_message_arn = "${module.s3_copy_catchall.arn}"
 }
 
 module "miro_copy_cold_store_master" {
@@ -101,6 +103,8 @@ module "miro_copy_cold_store_master" {
   lambda_name                  = "miro_copy_cold_store_master"
   is_master_asset              = "true"
   destination_key_prefix       = "cold_store/"
+
+  topic_forward_sns_message_arn = "${module.s3_copy_catchall.arn}"
 }
 
 module "miro_copy_tandem_vault_master" {
@@ -117,12 +121,32 @@ module "miro_copy_tandem_vault_master" {
   lambda_name                  = "miro_copy_tandem_vault_master"
   is_master_asset              = "true"
   destination_key_prefix       = "tandem_vault/"
+
+  topic_forward_sns_message_arn = "${module.s3_copy_catchall.arn}"
 }
 
-resource "aws_iam_role_policy" "miro_copy_s3_derivative_asset_sns_publish" {
+resource "aws_iam_role_policy" "miro_copy_catalogue_derivative_sns_publish" {
   name   = "miro_copy_s3_derivative_asset_sns_publish_policy"
   role   = "${module.miro_copy_catalogue_derivative.role_name}"
   policy = "${module.topic_miro_image_to_dynamo.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "miro_copy_catalogue_master_sns_publish" {
+  name   = "miro_copy_catalogue_master_sns_publish_policy"
+  role   = "${module.miro_copy_catalogue_master.role_name}"
+  policy = "${module.s3_copy_catchall.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "miro_copy_cold_store_master_sns_publish" {
+  name   = "miro_copy_cold_store_master_sns_publish_policy"
+  role   = "${module.miro_copy_cold_store_master.role_name}"
+  policy = "${module.s3_copy_catchall.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "miro_copy_tandem_vault_master_sns_publish" {
+  name   = "miro_copy_tandem_vault_master_sns_publish_policy"
+  role   = "${module.miro_copy_tandem_vault_master.role_name}"
+  policy = "${module.s3_copy_catchall.publish_policy}"
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
@@ -152,9 +176,9 @@ module "miro_inventory" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
-  none_topic_arn            = "${module.none_topic.arn}"
-  catalogue_api_topic_arn   = "${module.catalogue_api_topic.arn}"
-  tandem_vault_topic_arn    = "${module.tandem_vault_topic.arn}"
-  cold_store_topic_arn      = "${module.cold_store_topic.arn}"
-  digital_library_topic_arn = "${module.digital_library_topic.arn}"
+  # (If you modify this list, you'll have to update triggers on the miro_inventory module)
+  lambda_trigger_topic_arns = [
+    "${module.s3_copy_catchall.arn}",
+    "${module.topic_miro_image_to_dynamo.arn}",
+  ]
 }

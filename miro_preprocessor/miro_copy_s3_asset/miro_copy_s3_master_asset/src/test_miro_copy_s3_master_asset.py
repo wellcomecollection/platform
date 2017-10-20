@@ -65,14 +65,19 @@ def sns_image_json_event():
                 'MessageAttributes': {}}
         }]
     }
+
     return miro_id, image_json, event
 
 
 def test_should_copy_an_asset_into_a_different_bucket(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
@@ -88,6 +93,7 @@ def test_should_copy_an_asset_into_a_different_bucket(
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     miro_copy_s3_master_asset.main(event, None)
@@ -98,9 +104,13 @@ def test_should_copy_an_asset_into_a_different_bucket(
 
 def test_should_not_crash_if_the_asset_does_not_exist(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
 
@@ -109,6 +119,7 @@ def test_should_not_crash_if_the_asset_does_not_exist(
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     miro_copy_s3_master_asset.main(event, None)
@@ -118,9 +129,13 @@ def test_should_not_crash_if_the_asset_does_not_exist(
 
 def test_should_replace_asset_if_already_exists_with_different_content(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
@@ -142,6 +157,7 @@ def test_should_replace_asset_if_already_exists_with_different_content(
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     miro_copy_s3_master_asset.main(event, None)
@@ -152,9 +168,13 @@ def test_should_replace_asset_if_already_exists_with_different_content(
 
 def test_should_copy_the_exact_matching_key(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
@@ -176,6 +196,7 @@ def test_should_copy_the_exact_matching_key(
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     miro_copy_s3_master_asset.main(event, None)
@@ -186,9 +207,13 @@ def test_should_copy_the_exact_matching_key(
 
 def test_should_copy_the_exact_matching_key_capital_file_extension(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
@@ -210,6 +235,7 @@ def test_should_copy_the_exact_matching_key_capital_file_extension(
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     miro_copy_s3_master_asset.main(event, None)
@@ -220,9 +246,13 @@ def test_should_copy_the_exact_matching_key_capital_file_extension(
 
 def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
@@ -242,6 +272,7 @@ def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
@@ -253,9 +284,12 @@ def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches
 
 def test_should_raise_an_exception_if_multiple_non_exact_matches(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
 
     s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -276,6 +310,7 @@ def test_should_raise_an_exception_if_multiple_non_exact_matches(
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     with pytest.raises(MiroKeyIdMismatchException):
@@ -284,11 +319,16 @@ def test_should_raise_an_exception_if_multiple_non_exact_matches(
 
 def test_should_raise_an_exception_if_only_match_is_not_exact_or_exact_before_hyphen(
         create_source_and_destination_buckets,
-        sns_image_json_event):
+        sns_image_json_event,
+        sns_sqs):
+
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
+
+    topic_arn, queue_url = sns_sqs
+
     image_body = b'baba'
     destination_prefix = "library/"
 
@@ -301,6 +341,7 @@ def test_should_raise_an_exception_if_only_match_is_not_exact_or_exact_before_hy
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
     }
 
     with pytest.raises(MiroKeyIdMismatchException):
