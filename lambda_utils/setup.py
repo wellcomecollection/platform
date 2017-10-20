@@ -13,7 +13,7 @@ setup(
     name='wellcome_lambda_utils',
     packages=find_packages(SOURCE),
     package_dir={'': SOURCE},
-    version='1.0.6',
+    version='2017.10.20',
     install_requires=[
         'attrs>=17.2.0',
         'boto3',
