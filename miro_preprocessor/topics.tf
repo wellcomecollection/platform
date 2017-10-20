@@ -27,3 +27,8 @@ module "none_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
   name   = "miro_none"
 }
+
+module "none_topic_forward" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "miro_none"
+}
