@@ -43,5 +43,8 @@ sierra_adapter-terraform-apply: $(ROOT)/.docker/terraform_ci
 		--env OP=apply \
 		terraform_ci:latest
 
+sierra_adapter-publish:
+	echo "Nothing to do!"
+
 
 .PHONY: sierra_adapter-terraform-plan sierra_adapter-terraform-apply
