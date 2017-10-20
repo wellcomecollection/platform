@@ -3,15 +3,20 @@
 Utilities for interacting with the Tandem Vault API.
 """
 
+import logging
 import os
 import re
 from pprint import pprint
 
 import attr
 import boto3
+import daiquiri
 import dateutil.parser
 import requests
 
+daiquiri.setup(level=logging.INFO)
+
+logger = daiquiri.getLogger(__name__)
 
 API_URL = 'https://wellcome.tandemvault.com/api/v1'
 
@@ -61,11 +66,17 @@ class TandemVaultAPI(object):
         self.api_key = api_key
         self.sess = sess or requests.Session()
 
-    def upload_image_to_tv(self, src_bucket, src_key):
+    def upload_image_to_tv(self, s, src_key):
+        """
+        Given an image in one of our S3 buckets, create an asset for the
+        image in TV by uploading it.  Return the asset metadata.
+        """
         s3 = boto3.client('s3')
+        logger.info('Uploading image from S3: bucket=%s, key=%s', src_bucket, src_key)
         body = s3.get_object(Bucket=src_bucket, Key=src_key)['Body']
 
-        # Retrieve permissions for uploading to S3
+        # Retrieve an upload signature for uploading files to S3.
+        # https://tandemvault.com/docs/api/v1/assets/get_upload_signature.html
         resp = self.sess.post(
             f'{API_URL}/assets/get_upload_signature',
             params={
@@ -75,11 +86,12 @@ class TandemVaultAPI(object):
             }
         )
         resp.raise_for_status()
+        logger.debug('Response from POST /assets/get_upload_signature: %s', resp.text)
         upload_data = resp.json()
-        pprint(upload_data)
 
-        # Use the response from the previous request to upload the
-        # asset to S3
+        # Use the upload signature from the previous request to upload the
+        # file to S3.  This is a standard S3 POST upload:
+        # https://aws.amazon.com/articles/browser-uploads-to-s3-using-html-post-forms/
         resp = self.sess.post(
             'http://uploads.tandemstock.com.s3.amazonaws.com/',
             files={
@@ -96,10 +108,10 @@ class TandemVaultAPI(object):
             }
         )
         resp.raise_for_status()
-        s3_data = resp.text
-        pprint(s3_data)
+        logger.debug('Response from POST to uploads.tandemstock.s3: %s', resp.text)
 
-        # Now add the asset to Tandem Vault
+        # Now create an asset from the S3 upload location.
+        # https://tandemvault.com/docs/api/v1/assets/create.html
         prefix = miro_prefix(src_key)
         resp = self.sess.post(
             f'{API_URL}/assets',
@@ -110,12 +122,16 @@ class TandemVaultAPI(object):
             }
         )
         resp.raise_for_status()
+        logger.debug('Response from POST /assets: %s', resp.text)
         asset_data = resp.json()
         return asset_data
 
     def add_image_to_collection(self, asset_data):
         prefix = miro_prefix(asset_data['filename'])
         collection_id = miro_collections[prefix].collection_id
+
+        # Add an asset to a collection.
+        # https://tandemvault.com/docs/api/v1/collections/add_assets.html
         resp = self.sess.put(
             f'{API_URL}/collections/{collection_id}/add_assets',
             params={
@@ -123,8 +139,7 @@ class TandemVaultAPI(object):
                 'asset_ids': asset_data['id']
             }
         )
-        print(resp)
-        pprint(resp.text)
+        logger.debug('Response from PUT /add_assets: %s', resp.text)
         resp.raise_for_status()
 
 tv = TandemVaultAPI(API_KEY)
