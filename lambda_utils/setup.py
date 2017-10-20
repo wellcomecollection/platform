@@ -16,7 +16,8 @@ setup(
     version='1.0.6',
     install_requires=[
         'attrs>=17.2.0',
-        'boto',
+        'boto3',
+        'daiquiri>=1.3.0',
         'python-dateutil',
         'requests>=2.18.4',
     ],
