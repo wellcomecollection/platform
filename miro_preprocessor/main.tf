@@ -95,12 +95,12 @@ module "miro_copy_none_master" {
 
   topic_miro_copy_s3_asset_arn = "${module.none_topic.arn}"
 
-  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-miro-none.arn}"
-  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-miro-none.id}"
+  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
+  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
   lambda_description           = "Copy undecidable miro master assets to private s3 bucket"
   lambda_name                  = "miro_copy_none_master"
   is_master_asset              = "true"
-  destination_key_prefix       = ""
+  destination_key_prefix       = "none/"
 }
 
 module "miro_copy_cold_store_master" {

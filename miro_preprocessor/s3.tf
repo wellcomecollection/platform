@@ -42,12 +42,3 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     prevent_destroy = true
   }
 }
-
-resource "aws_s3_bucket" "wellcomecollection-miro-none" {
-  bucket = "wellcomecollection-miro-none"
-  acl    = "private"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
