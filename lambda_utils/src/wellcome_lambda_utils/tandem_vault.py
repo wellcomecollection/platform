@@ -127,6 +127,10 @@ class TandemVaultAPI(object):
         return asset_data
 
     def add_image_to_collection(self, asset_data):
+        """
+        Given information about an asset, add it to the Tandem Vault collection
+        for the appropriate Miro prefix.
+        """
         prefix = miro_prefix(asset_data['filename'])
         collection_id = miro_collections[prefix].collection_id
 
