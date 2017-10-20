@@ -87,7 +87,6 @@ module "miro_copy_catalogue_master" {
   destination_key_prefix       = "library/"
 }
 
-
 module "miro_copy_none_master" {
   source                   = "miro_copy_s3_asset"
   lambda_error_alarm_arn   = "${local.lambda_error_alarm_arn}"
