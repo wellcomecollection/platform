@@ -4,6 +4,7 @@ Utilities for interacting with the Tandem Vault API.
 """
 
 import collections
+from pprint import pprint
 
 import requests
 
@@ -11,21 +12,21 @@ import requests
 API_URL = 'https://wellcome.tandemvault.com/api/v1'
 
 
-Miro = collections.namedtuple('Miro', ['upload_set'])
+Miro = collections.namedtuple('Miro', ['upload_set', 'collection_id'])
 
-upload_sets = {
-    'A: Animal images': Miro(47806),
-    'AS: Family life': Miro(47807),
-    'B: External biomedical': Miro(47808),
-    'D: Footage': Miro(47809),
-    'F: Microfilm': Miro(47810),
-    'FP: Family life': Miro(47811),
-    'L: Library (historical)': Miro(47812),
-    'M: Library (historical)': Miro(47813),
-    'N: Clinical': Miro(47814),
-    'S: Slide collection': Miro(47815),
-    'V: Iconographic works': Miro(47816),
-    'W: Publishing group Intl health': Miro(47817),
+miro_collections = {
+    'A': Miro(47806, 111597),
+    'AS': Miro(47807, 111598),
+    'B': Miro(47808, 111600),
+    'D': Miro(47809, 111601),
+    'F': Miro(47810, 111603),
+    'FP': Miro(47811, 111604),
+    'L': Miro(47812, 111605),
+    'M': Miro(47813, 111606),
+    'N:': Miro(47814, 111607),
+    'S': Miro(47815, 111608),
+    'V': Miro(47816, 111609),
+    'W': Miro(47817, 1116011),
 }
 
 
@@ -52,23 +53,16 @@ class TandemVaultAPI(object):
         resp.raise_for_status()
         return resp.json()['id']
 
-
-titles = [
-    'A: Animal images',
-    'AS: Family life',
-    'B: External biomedical',
-    'D: Footage',
-    'F: Microfilm',
-    'FP: Family life',
-    'L: Library (historical)',
-    'M: Library (historical)',
-    'N: Clinical',
-    'S: Slide collection',
-    'V: Iconographic works',
-    'W: Publishing group Intl health',
-]
-
-
-api = TandemVaultAPI(api_key=API_KEY)
-for t in titles:
-    print(t, api.create_upload_set(title=t))
+    def create_collection(self, title):
+        # TODO: I could only get this to create lightboxes in the parent
+        # account, not collections.
+        resp = self.sess.post(
+            f'{API_URL}/collections',
+            params={
+                'api_key': self.api_key,
+                # 'collection': 'foo',
+                'collection[name]': title,
+            }
+        )
+        resp.raise_for_status()
+        pprint(resp.json())
