@@ -5,6 +5,7 @@ Utilities for interacting with the Tandem Vault API.
 
 import collections
 import os
+import re
 from pprint import pprint
 
 import boto3
@@ -35,6 +36,14 @@ miro_collections = {
 
 def seconds_since_epoch(dt_string):
     return dateutil.parser.parse(dt_string).epoch
+
+
+def miro_prefix(s3_key):
+    """
+    Given an S3 key (e.g. 'B0007000/B00070001.jpg'), return the Miro prefix.
+    """
+    filename = os.path.basename(s3_key)
+    return re.search(r'^[A-Z]+', filename).group(0)
 
 
 class TandemVaultAPI(object):
@@ -113,17 +122,33 @@ class TandemVaultAPI(object):
         pprint(s3_data)
 
         # Now add the asset to Tandem Vault
+        prefix = miro_prefix(src_key)
         resp = self.sess.post(
             f'{API_URL}/assets',
             params={
                 'api_key': self.api_key,
-                'upload_set_id': miro_collections['B'].upload_set_id,
+                'upload_set_id': miro_collections[prefix].upload_set_id,
                 'asset[filename]': os.path.basename(src_key),
             }
         )
         resp.raise_for_status()
         asset_data = resp.json()
-        pprint(asset_data)
+        return asset_data
+
+    def add_image_to_collection(self, asset_data):
+        prefix = miro_prefix(asset_data['filename'])
+        collection_id = miro_collections[prefix].collection_id
+        resp = self.sess.put(
+            f'{API_URL}/collections/{collection_id}/add_assets',
+            params={
+                'api_key': self.api_key,
+                'asset_ids': asset_data['id']
+            }
+        )
+        print(resp)
+        pprint(resp.text)
+        resp.raise_for_status()
 
 tv = TandemVaultAPI(API_KEY)
-tv.upload_image_to_tv('miro-images-sync', 'fullsize/B0008000/B0008752.jpg')
+asset_data = tv.upload_image_to_tv('miro-images-sync', 'fullsize/B0008000/B0008752.jpg')
+tv.add_image_to_collection(asset_data)
