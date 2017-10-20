@@ -22,8 +22,3 @@ def api():
     with Betamax(sess) as vcr:
         vcr.use_cassette('tandem_vault')
         yield tandem_vault.TandemVaultAPI(api_key, sess=sess)
-
-
-def test_can_create_upload_set(api):
-    set_id = api.create_upload_set(title='Alex test upload set')
-    assert isinstance(set_id, int)
