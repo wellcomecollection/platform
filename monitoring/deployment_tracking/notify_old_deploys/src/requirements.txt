@@ -1,1 +1,1 @@
-wellcome_lambda_utils==1.0.3
+wellcome_lambda_utils==1.0.6
