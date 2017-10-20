@@ -8,7 +8,7 @@ class MiroImage:
 
     def __repr__(self):
         image_info = {'collection': self.collection, 'image_data': self.image_data}
-        return f'{type(self).__name}(image_info={image_info!r})'
+        return f'(image_info={image_info!r})'
 
     @property
     def miro_id(self):

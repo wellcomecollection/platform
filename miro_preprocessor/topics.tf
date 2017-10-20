@@ -18,12 +18,12 @@ module "catalogue_api_topic" {
   name   = "miro_catalogue_api"
 }
 
-module "digital_library_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "miro_digital_library"
-}
-
 module "none_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
   name   = "miro_none"
+}
+
+module "s3_copy_catchall" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "s3_copy_catchall"
 }

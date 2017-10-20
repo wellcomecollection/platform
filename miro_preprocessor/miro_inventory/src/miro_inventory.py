@@ -34,7 +34,7 @@ def _generate_indexable_object(event, id_field):
     id = _extract_id(message, id_field)
 
     return {
-        'id': id,
+        'id': f'{id}_{subject}',
         'subject': subject,
         'message': message
     }
@@ -75,6 +75,7 @@ def main(event, _):
         es_password,
         json.dumps(indexable)
     )
+
     print(f'_put_to_es response: {response}')
 
     # A very common source of errors is a 429: Rate Limited Exceeded from
