@@ -14,8 +14,8 @@ module "loris" {
   healthcheck_path   = "/image/"
   alb_priority       = "100"
 
-  cpu    = 2560
-  memory = 3276
+  cpu    = 3960
+  memory = 7350
 
   desired_count = 4
 
@@ -47,8 +47,8 @@ module "loris_ebs" {
   healthcheck_path   = "/image/"
   alb_priority       = "101"
 
-  cpu    = 2560
-  memory = 3276
+  cpu    = 3960
+  memory = 7350
 
   desired_count = 4
 
