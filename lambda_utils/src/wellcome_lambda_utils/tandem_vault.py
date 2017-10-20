@@ -61,37 +61,6 @@ class TandemVaultAPI(object):
         self.api_key = api_key
         self.sess = sess or requests.Session()
 
-    def create_upload_set(self, title):
-        """
-        Create an upload set in TV, and return the upload set identifier.
-
-        Note: Upload set titles are not unique in TV, so calling this method
-        more than once will create multiple upload sets.
-        """
-        resp = self.sess.post(
-            f'{API_URL}/upload_sets',
-            params={
-                'api_key': self.api_key,
-                'upload_set[title]': title,
-            }
-        )
-        resp.raise_for_status()
-        return resp.json()['id']
-
-    def create_collection(self, title):
-        # TODO: I could only get this to create lightboxes in the parent
-        # account, not collections.
-        resp = self.sess.post(
-            f'{API_URL}/collections',
-            params={
-                'api_key': self.api_key,
-                # 'collection': 'foo',
-                'collection[name]': title,
-            }
-        )
-        resp.raise_for_status()
-        pprint(resp.json())
-
     def upload_image_to_tv(self, src_bucket, src_key):
         s3 = boto3.client('s3')
         body = s3.get_object(Bucket=src_bucket, Key=src_key)['Body']
