@@ -3,11 +3,11 @@
 Utilities for interacting with the Tandem Vault API.
 """
 
-import collections
 import os
 import re
 from pprint import pprint
 
+import attr
 import boto3
 import dateutil.parser
 import requests
@@ -16,21 +16,30 @@ import requests
 API_URL = 'https://wellcome.tandemvault.com/api/v1'
 
 
-Miro = collections.namedtuple('Miro', ['upload_set_id', 'collection_id'])
+@attr.s
+class MiroCollection:
+    """
+    Represents an old Miro collection, as stored in Tandem Vault.
+    """
+    upload_set_id = attr.ib()
+    collection_id = attr.ib()
 
+# These collections were created partially using the code below, partially
+# by hand.  Because they're a fixed set, we just hard-code the details here,
+# rather than trying to derive them programatically from the API.
 miro_collections = {
-    'A': Miro(47806, 111597),
-    'AS': Miro(47807, 111598),
-    'B': Miro(47808, 111600),
-    'D': Miro(47809, 111601),
-    'F': Miro(47810, 111603),
-    'FP': Miro(47811, 111604),
-    'L': Miro(47812, 111605),
-    'M': Miro(47813, 111606),
-    'N:': Miro(47814, 111607),
-    'S': Miro(47815, 111608),
-    'V': Miro(47816, 111609),
-    'W': Miro(47817, 1116011),
+    'A':  MiroCollection(47806, 111597),
+    'AS': MiroCollection(47807, 111598),
+    'B':  MiroCollection(47808, 111600),
+    'D':  MiroCollection(47809, 111601),
+    'F':  MiroCollection(47810, 111603),
+    'FP': MiroCollection(47811, 111604),
+    'L':  MiroCollection(47812, 111605),
+    'M':  MiroCollection(47813, 111606),
+    'N:': MiroCollection(47814, 111607),
+    'S':  MiroCollection(47815, 111608),
+    'V':  MiroCollection(47816, 111609),
+    'W':  MiroCollection(47817, 1116011),
 }
 
 
