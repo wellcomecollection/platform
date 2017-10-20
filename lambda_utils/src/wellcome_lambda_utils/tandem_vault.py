@@ -33,18 +33,18 @@ class MiroCollection:
 # by hand.  Because they're a fixed set, we just hard-code the details here,
 # rather than trying to derive them programatically from the API.
 miro_collections = {
-    'A':  MiroCollection(47806, 111597),
-    'AS': MiroCollection(47807, 111598),
-    'B':  MiroCollection(47808, 111600),
-    'D':  MiroCollection(47809, 111601),
-    'F':  MiroCollection(47810, 111603),
-    'FP': MiroCollection(47811, 111604),
-    'L':  MiroCollection(47812, 111605),
-    'M':  MiroCollection(47813, 111606),
-    'N:': MiroCollection(47814, 111607),
-    'S':  MiroCollection(47815, 111608),
-    'V':  MiroCollection(47816, 111609),
-    'W':  MiroCollection(47817, 1116011),
+    'A':  MiroCollection(47806, 111597),                                 # noqa
+    'AS': MiroCollection(47807, 111598),                                 # noqa
+    'B':  MiroCollection(47808, 111600),                                 # noqa
+    'D':  MiroCollection(47809, 111601),                                 # noqa
+    'F':  MiroCollection(47810, 111603),                                 # noqa
+    'FP': MiroCollection(47811, 111604),                                 # noqa
+    'L':  MiroCollection(47812, 111605),                                 # noqa
+    'M':  MiroCollection(47813, 111606),                                 # noqa
+    'N:': MiroCollection(47814, 111607),                                 # noqa
+    'S':  MiroCollection(47815, 111608),                                 # noqa
+    'V':  MiroCollection(47816, 111609),                                 # noqa
+    'W':  MiroCollection(47817, 1116011),                                # noqa
 }
 
 
@@ -149,6 +149,3 @@ class TandemVaultAPI(object):
         )
         logger.debug('Response from PUT /add_assets: %s', resp.text)
 
-tv = TandemVaultAPI(API_KEY)
-asset_data = tv.upload_image_to_tv('miro-images-sync', 'fullsize/B0008000/B0008752.jpg')
-tv.add_image_to_collection(asset_data)
