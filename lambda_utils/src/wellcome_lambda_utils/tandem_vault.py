@@ -66,6 +66,13 @@ class TandemVaultAPI(object):
         self.api_key = api_key
         self.sess = sess or requests.Session()
 
+        # This causes the Session to call ``raise_for_status()`` as soon
+        # as a response is received, so any failing request will throw an
+        # exception immediately.
+        def raise_error(resp, *args, **kwargs):
+            resp.raise_for_status()
+        self.sess.hooks['response'].append(raise_error)
+
     def upload_image_to_tv(self, s, src_key):
         """
         Given an image in one of our S3 buckets, create an asset for the
@@ -85,7 +92,6 @@ class TandemVaultAPI(object):
                 'content_type': 'image/jpeg',
             }
         )
-        resp.raise_for_status()
         logger.debug('Response from POST /assets/get_upload_signature: %s', resp.text)
         upload_data = resp.json()
 
@@ -107,7 +113,6 @@ class TandemVaultAPI(object):
                 'file': body,
             }
         )
-        resp.raise_for_status()
         logger.debug('Response from POST to uploads.tandemstock.s3: %s', resp.text)
 
         # Now create an asset from the S3 upload location.
@@ -121,7 +126,6 @@ class TandemVaultAPI(object):
                 'asset[filename]': os.path.basename(src_key),
             }
         )
-        resp.raise_for_status()
         logger.debug('Response from POST /assets: %s', resp.text)
         asset_data = resp.json()
         return asset_data
@@ -144,7 +148,6 @@ class TandemVaultAPI(object):
             }
         )
         logger.debug('Response from PUT /add_assets: %s', resp.text)
-        resp.raise_for_status()
 
 tv = TandemVaultAPI(API_KEY)
 asset_data = tv.upload_image_to_tv('miro-images-sync', 'fullsize/B0008000/B0008752.jpg')
