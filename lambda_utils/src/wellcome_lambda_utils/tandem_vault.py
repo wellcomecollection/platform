@@ -6,7 +6,6 @@ Utilities for interacting with the Tandem Vault API.
 import logging
 import os
 import re
-from pprint import pprint
 
 import attr
 import boto3
@@ -29,22 +28,23 @@ class MiroCollection:
     upload_set_id = attr.ib()
     collection_id = attr.ib()
 
+
 # These collections were created partially using the code below, partially
 # by hand.  Because they're a fixed set, we just hard-code the details here,
 # rather than trying to derive them programatically from the API.
 miro_collections = {
-    'A':  MiroCollection(47806, 111597),                                 # noqa
-    'AS': MiroCollection(47807, 111598),                                 # noqa
-    'B':  MiroCollection(47808, 111600),                                 # noqa
-    'D':  MiroCollection(47809, 111601),                                 # noqa
-    'F':  MiroCollection(47810, 111603),                                 # noqa
-    'FP': MiroCollection(47811, 111604),                                 # noqa
-    'L':  MiroCollection(47812, 111605),                                 # noqa
-    'M':  MiroCollection(47813, 111606),                                 # noqa
-    'N:': MiroCollection(47814, 111607),                                 # noqa
-    'S':  MiroCollection(47815, 111608),                                 # noqa
-    'V':  MiroCollection(47816, 111609),                                 # noqa
-    'W':  MiroCollection(47817, 1116011),                                # noqa
+    'A': MiroCollection(47806, 111597),  # noqa
+    'AS': MiroCollection(47807, 111598),  # noqa
+    'B': MiroCollection(47808, 111600),  # noqa
+    'D': MiroCollection(47809, 111601),  # noqa
+    'F': MiroCollection(47810, 111603),  # noqa
+    'FP': MiroCollection(47811, 111604),  # noqa
+    'L': MiroCollection(47812, 111605),  # noqa
+    'M': MiroCollection(47813, 111606),  # noqa
+    'N:': MiroCollection(47814, 111607),  # noqa
+    'S': MiroCollection(47815, 111608),  # noqa
+    'V': MiroCollection(47816, 111609),  # noqa
+    'W': MiroCollection(47817, 1116011),  # noqa
 }
 
 
@@ -61,7 +61,6 @@ def miro_prefix(s3_key):
 
 
 class TandemVaultAPI(object):
-
     def __init__(self, api_key, sess=None):
         self.api_key = api_key
         self.sess = sess or requests.Session()
@@ -71,6 +70,7 @@ class TandemVaultAPI(object):
         # exception immediately.
         def raise_error(resp, *args, **kwargs):
             resp.raise_for_status()
+
         self.sess.hooks['response'].append(raise_error)
 
     def upload_image_to_tv(self, s, src_key):
@@ -79,6 +79,9 @@ class TandemVaultAPI(object):
         image in TV by uploading it.  Return the asset metadata.
         """
         s3 = boto3.client('s3')
+        # TODO: Add reference to bucket
+        src_bucket = "not_a_real_bucket"
+
         logger.info('Uploading image from S3: bucket=%s, key=%s', src_bucket, src_key)
         body = s3.get_object(Bucket=src_bucket, Key=src_key)['Body']
 
@@ -148,4 +151,3 @@ class TandemVaultAPI(object):
             }
         )
         logger.debug('Response from PUT /add_assets: %s', resp.text)
-
