@@ -19,42 +19,20 @@ module "miro_inventory_lambda" {
   }
 }
 
-module "miro_inventory_lambda_trigger_cold_store_topic" {
+# This is awful, but we cannot count on modules
+# I don't think the required refactor to make this sensible is worth the time
+module "miro_inventory_lambda_trigger_topic_1" {
   source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
   lambda_function_name = "${module.miro_inventory_lambda.function_name}"
   lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
 
-  sns_trigger_arn = "${var.cold_store_topic_arn}"
+  sns_trigger_arn = "${var.lambda_trigger_topic_arns[0]}"
 }
 
-module "miro_inventory_lambda_trigger_tandem_vault_topic" {
+module "miro_inventory_lambda_trigger_topic_2" {
   source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
   lambda_function_name = "${module.miro_inventory_lambda.function_name}"
   lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
 
-  sns_trigger_arn = "${var.tandem_vault_topic_arn}"
-}
-
-module "miro_inventory_lambda_trigger_catalogue_api_topic" {
-  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
-  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
-
-  sns_trigger_arn = "${var.catalogue_api_topic_arn}"
-}
-
-module "miro_inventory_lambda_trigger_digital_library_topic" {
-  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
-  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
-
-  sns_trigger_arn = "${var.digital_library_topic_arn}"
-}
-
-module "miro_inventory_lambda_trigger_none_topic" {
-  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-  lambda_function_name = "${module.miro_inventory_lambda.function_name}"
-  lambda_function_arn  = "${module.miro_inventory_lambda.arn}"
-
-  sns_trigger_arn = "${var.none_topic_arn}"
+  sns_trigger_arn = "${var.lambda_trigger_topic_arns[1]}"
 }

@@ -7,8 +7,8 @@ import os
 
 import boto3
 
-import s3_utils
-import sns_utils
+from wellcome_lambda_utils import s3_utils
+from wellcome_lambda_utils import sns_utils
 
 
 def command_for_xml_to_json_task(event, cluster_name, container_name, task_definition):
