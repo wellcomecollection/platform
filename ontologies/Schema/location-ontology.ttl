@@ -103,21 +103,41 @@ wloc:licenseType rdf:type owl:ObjectProperty ;
 ##### Object properties ####
 
 
-wag:identity rdf:type owl:DatatypeProperty ;
+wloc:identity rdf:type owl:DatatypeProperty ;
     rdfs:label "identity"@en ;
-    rdfs:comment "The identity of the copy."@en ;
-    rdfs:domain wag:Holding ;
+    rdfs:comment "The identity of a holding copy. The purpose of it being held."@en ;
+    rdfs:domain wloc:Holding ;
     rdfs:range rdf:LangString ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
 
-wag:volume rdf:type owl:DatatypeProperty ;
+wloc:volume rdf:type owl:DatatypeProperty ;
     rdfs:label "volume"@en ;
     rdfs:comment "The specific volume of the series."@en ;
-    rdfs:domain wag:Item ;
+    rdfs:domain wloc:Holding ;
     rdfs:range rdf:LangString ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .      
     
-                                         
+wloc:frequency rdf:type owl:DatatypeProperty ;
+    rdfs:label "frequency"@en ;
+    rdfs:comment "The frequency with which a series is published."@en ;
+    rdfs:domain wloc:Holding ;
+    rdfs:range rdf:LangString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .     
+    
+wloc:boxes rdf:type owl:DatatypeProperty ;
+    rdfs:label "boxes"@en ;
+    rdfs:comment "The number of boxes asscoaited with a holding."@en ;
+    rdfs:domain wloc:Holding ;
+    rdfs:range rdf:Integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> . 
+    
+wloc:creditLine rdf:type owl:DatatypeProperty ;
+    rdfs:label "creditLine"@en ;
+    rdfs:comment "The attribution of credit for an item sourced at a location."@en ;
+    rdfs:domain wloc:Location ;
+    rdfs:range rdf:LangString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .      
+                                             
     
     
     

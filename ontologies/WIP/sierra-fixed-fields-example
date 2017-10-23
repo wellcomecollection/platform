@@ -3,9 +3,9 @@
   "id": "watu9tbc",
   "type": "Work",
   "workType": {
-    "id": "digital-images",
+    "id": "e-books",
     "type": "WorkType",
-    "label": "Digital Images"
+    "label": "E-books"
   },
   "thumbnail": {
     "type": "Location",
@@ -35,12 +35,54 @@
       "identifierScheme": "sierra-system-number"
     }
   ],
-  "title": "A lecture on pneumatics at the Royal Institution, London. Co",
-  "description": "A lecture on pneumatics at the Royal Institution, London. Coloured etching by J. Gillray, 1802.",
-  "lettering": "Scientific researches! -New discoveries in pneumaticks! -or- an experimental lecture on the powers of air.- Js. Gillray inv. & fect.",
+  "title": "The tuberculosis worker : a handbook on methods and programs of tuberculosis work",
+  "language": {
+    "id": "eng",
+    "label": "English",
+    "type": "Language"
+  },
   "creators": [
     {
-      "label": "James Gillray"
+      "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
+      "concept": {
+        "label": "Jacobs, Philip P",
+        "type": "Person",
+        "identifiers": [
+          {
+            "value": "2005016805",
+            "type": "Identifier",
+            "identifierScheme": "lc-names"
+          }
+        ]
+      },
+      "qualifiers": [
+                {
+          "": "fuller-form-of-name" ,        
+          "label": "Philip Peter",
+          "type": "Name"
+        } ,
+        {
+          "": "associated-time" ,
+          "label": "1879-1940",
+          "type": "Period"
+        } 
+      ]
+    }
+  ],
+  "countryOfPublication": {
+    "id": "mdu",
+    "label": "Maryland",
+    "type": "Place"
+  },
+  "publishYear": {
+    "label": "1923",
+    "type": "Year",
+    "value": "1932"
+  },
+  "placeOfPublication": [
+    {
+      "label": "[London] (St. James's Street)",
+      "type": "Place"
     }
   ],
   "publishers": [
@@ -48,12 +90,7 @@
       "label": "H. Humphrey,"
     }
   ],
-  "placeOfPublication": [
-    {
-      "label": "[London] (St. James's Street)",
-      "type": "Place"
-    }
-  ],
+//  "description": "N/A",
   "createdDate": {
     "label": "1802",
     "type": "Period"
@@ -63,24 +100,24 @@
     "type": "Period"
   },
   "imprint": {
-    "label": "[London] (St. James's Street) : H. Humphrey, May 23 1802." ,
-    "type": "Imprint" ,
+    "label": "Baltimore Williams & Wilkins 1923",
+    "type": "Imprint",
     "concept": {
-      "label": "[London] (St. James's Street)" ,
-      "type" : "Place" 
-    } ,
-    "qualifiers" : [
+      "label": "Baltimore",
+      "type": "Place"
+    },
+    "qualifiers": [
       {
         "imprintType": "publisher",
-        "label":  "Humphrey" ,
+        "label": "Williams & Wilkins",
         "type": "Organisation"
-      } ,
+      },
       {
-        "label":  "May 23" ,
+        "label": "1923",
         "type": "Period"
-      } 
+      }
     ]
-  } ,
+  },
   "genres": [
     {
       "id": "a24s7qf3",
@@ -109,102 +146,45 @@
       "type": "Concept"
     }
   ],
-  "physicalDescription": {
-    "type": "PhysicalDescription",
-    "label": "etching with watercolour 23cm",
-    "qualifiers": [
-      {
-        "type": "???",
-        "physicalDescriptionQualifierType": "dimension",
-        "label": "23cm",
-        "value": 23,
-        "unit": "cm"
-      }
-    ]
-  },
-
-    [
-      {
-      "label": "etching" ,
-      "physicalDescriptionType": "extent" 
-       } ,
-      {
-      "label": "with watercolour" ,
-      "physicalDescriptionType": "other-physical-details" 
-       } ,
-      {
-      "label": "23cm" ,
-      "physicalDescriptionType": "dimensions" 
-       } 
-     ] ,
-  } ,
+  "physicalDescription": 
+    {
+      "label": "314 pages 24cm" ,
+      "type": "PhysicalDescription" ,
+      "concept": {
+        "label": "314 pages" ,
+        "type": "extent"
+      } ,
+      "qualifiers": [
+        {
+          "label": "24cm" ,
+          "type": "dimensions" 
+        }
+      ] 
+    } ,
   "subjects": [
     {
       "id": "hd2891f",
-      "label": "Thomas Young [1773  - 1829 ]",
+      "label": "Tuberculosis prevention & control.",
       "type": "QualifiedConcept",
       "concept": {
-        "id": "Thomas Young",
-        "label": "Gases",
-        "type": "Person",
-        "identifiers": [
-          {
-            "type": "Identifier",
-            "identifierScheme": "lcsh",
-            "value": "sh85053380"
-          }
-        ] ,
-        "qualifiers": [
-        {
-          "label": "1773 - 1829",
-          "type": "Period"
-        }
-      ]
-      } ,
-
-    },
-    {
-      "id": "jd921000",
-      "label": "Caricatures",
-      "type": "Concept",
-      "identifiers": [
-        {
-          "type": "Identifier",
-          "identifierScheme": "mesh",
-          "value": "D019492"
-        }
-      ]
-    },
-    {
-      "label": "Gases - Adverse Effects - 1800 - London",
-      "type": "QualifiedConcept",
-      "concept": {
-        "id": "jd921000",
-        "label": "Gases",
+        "id": "",
+        "label": "Tuberculosis",
         "type": "Concept",
         "identifiers": [
           {
             "type": "Identifier",
-            "identifierScheme": "lcsh",
-            "value": "sh85053380"
+            "identifierScheme": "mesh",
+            "value": "D014376Q000517"
+          }
+        ],
+        "qualifiers": [
+          {
+            "label": "prevention & control.",
+            "type": "Concept"
           }
         ]
-      },
-      "qualifiers": [
-        {
-          "label": "Adverse effects",
-          "type": "Concept"
-        },
-        {
-          "label": "1800",
-          "type": "Period"
-        },
-        {
-          "label": "London",
-          "type": "Place"
-        }
-      ]
-    }
+      }
+    },
   ],
   "items": [
     {
@@ -230,7 +210,6 @@
           "type": "Location",
           "locationType": "iiif-image",
           "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
-          "creditLine": "Wellcome Library, London" ,
           "license": {
             "type": "License",
             "licenseType": "CC-BY",
