@@ -6,7 +6,7 @@ module "miro_image_to_dynamo_lambda" {
   name            = "miro_image_to_dynamo"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
-  timeout = "30"
+  timeout = "120"
 
   environment_variables = {
     TABLE_NAME      = "${var.miro_data_table_name}"
