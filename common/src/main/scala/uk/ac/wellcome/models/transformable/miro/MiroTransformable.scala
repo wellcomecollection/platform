@@ -67,7 +67,7 @@ case class MiroTransformable(MiroID: String,
     }
 
     val useDescriptionAsTitle =
-      (titleIsTruncatedDescription && collectionIsV(MiroCollection)) ||
+      (titleIsTruncatedDescription) ||
         (miroData.title.get == "-" || miroData.title.get == "--")
 
     val title = if (useDescriptionAsTitle) {
