@@ -19,7 +19,7 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def publish_sns_message(sns_client, topic_arn, message, subject=""):
+def publish_sns_message(sns_client, topic_arn, message, subject="default-subject"):
     """
     Given a topic ARN and a series of key-value pairs, publish the key-value
     data to the SNS topic.
