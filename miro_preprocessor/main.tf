@@ -103,6 +103,8 @@ module "miro_copy_none_master" {
   lambda_name                  = "miro_copy_none_master"
   is_master_asset              = "true"
   destination_key_prefix       = "none/"
+
+  topic_forward_sns_message_arn = "${module.s3_copy_catchall.arn}"
 }
 
 module "miro_copy_cold_store_master" {
