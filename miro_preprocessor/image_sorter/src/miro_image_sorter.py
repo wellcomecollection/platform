@@ -8,7 +8,7 @@ import os
 import boto3
 
 from sorter_logic import Decision, sort_image
-from sns_utils import publish_sns_message
+from wellcome_lambda_utils.sns_utils import publish_sns_message
 
 
 def parse_s3_event(event):
@@ -48,6 +48,7 @@ def main(event, _):
     topic_tandem_vault = os.environ['TOPIC_TANDEM_VAULT']
     topic_catalogue_api = os.environ['TOPIC_CATALOGUE_API']
     topic_none = os.environ['TOPIC_NONE']
+
     s3_bucket = os.environ['S3_MIRODATA_ID']
     s3_id_exceptions_key = os.environ['S3_ID_EXCEPTIONS_KEY']
     s3_contributor_exceptions_key = os.environ['S3_CONTRIB_EXCEPTIONS_KEY']

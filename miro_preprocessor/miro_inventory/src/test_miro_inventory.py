@@ -13,8 +13,9 @@ index = 'index'
 type = 'type'
 collection = "Images-C"
 cluster_url = 'https://example.com'
+subject = 'catalogue_api'
 
-put_url = f'{cluster_url}/{index}/{type}/{miro_id}'
+put_url = f'{cluster_url}/{index}/{type}/{miro_id}_{subject}'
 
 image_data = {
     'image_no_calc': miro_id,
@@ -50,7 +51,7 @@ event = {
             'MessageId': 'b20eb72b-ffc7-5d09-9636-e6f65d67d10f',
             'TopicArn':
                 'arn:aws:sns:region:account_id:sns',
-            'Subject': 'catalogue_api',
+            'Subject': subject,
             'Message': image_json,
             'Timestamp': '2017-07-10T15:42:24.307Z',
             'SignatureVersion': '1',
@@ -72,6 +73,8 @@ def mocked_requests_put(*args, **kwargs):
     if args[0] == put_url:
         return MockResponse(200)
 
+    print(f'{args[0]} != {put_url}')
+
     return MockResponse(500)
 
 
@@ -81,7 +84,7 @@ def test_miro_inventory(mock_get):
 
     mock_get.assert_called_with(
         put_url,
-        data='{"id": "A0000002", "subject": "catalogue_api", "message": {"collection": "Images-C", "image_data": {"image_no_calc": "A0000002", "image_int_default": null, "image_artwork_date_from": "01/02/2000", "image_artwork_date_to": "13/12/2000", "image_barcode": "10000000", "image_creator": ["Caspar Bauhin"]}}}',
+        data='{"id": "A0000002_catalogue_api", "subject": "catalogue_api", "message": {"collection": "Images-C", "image_data": {"image_no_calc": "A0000002", "image_int_default": null, "image_artwork_date_from": "01/02/2000", "image_artwork_date_to": "13/12/2000", "image_barcode": "10000000", "image_creator": ["Caspar Bauhin"]}}}',
         auth=('foo', 'foo')
     )
 
