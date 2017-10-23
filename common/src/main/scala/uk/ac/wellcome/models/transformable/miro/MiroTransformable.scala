@@ -61,11 +61,13 @@ case class MiroTransformable(MiroID: String,
     }
 
     val candidateTitle = candidateDescription.split("\n").head
-    val titleIsTruncatedDescription = candidateTitle
-      .startsWith(miroData.title.get)
+    val titleIsTruncatedDescription = miroData.title match {
+      case Some(title) => candidateTitle.startsWith(title)
+      case None => true
+    }
 
     val useDescriptionAsTitle =
-      (titleIsTruncatedDescription && collectionIsV(MiroCollection)) ||
+      (titleIsTruncatedDescription) ||
         (miroData.title.get == "-" || miroData.title.get == "--")
 
     val title = if (useDescriptionAsTitle) {
