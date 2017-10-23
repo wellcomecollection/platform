@@ -14,7 +14,7 @@ module "miro_copy_s3_asset_lambda" {
     "TOPIC_ARN"             = "${var.topic_forward_sns_message_arn}"
   }
 
-  timeout = "30"
+  timeout = "120"
 }
 
 module "miro_copy_s3_asset_trigger" {
