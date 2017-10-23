@@ -53,5 +53,6 @@ def main(event, _):
         sns_utils.publish_sns_message(
             sns_client,
             topic_arn,
-            cmd
+            cmd,
+            subject="xml_to_json_run_task"
         )
