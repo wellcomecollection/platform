@@ -155,6 +155,18 @@ class MiroTransformableTitleTest
     )
   }
 
+  it("should use the description if image_title is None") {
+    val description = "A noisy narwhal in November"
+    transformRecordAndCheckTitle(
+      data = s"""
+        "image_title": null,
+        "image_image_desc": "$description"
+      """,
+      expectedTitle = description,
+      expectedDescription = None
+    )
+  }
+
   private def transformRecordAndCheckTitle(
     data: String,
     expectedTitle: String,
