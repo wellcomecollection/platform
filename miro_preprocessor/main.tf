@@ -87,6 +87,22 @@ module "miro_copy_catalogue_master" {
   destination_key_prefix       = "library/"
 }
 
+module "miro_copy_none_master" {
+  source                   = "miro_copy_s3_asset"
+  lambda_error_alarm_arn   = "${local.lambda_error_alarm_arn}"
+  bucket_source_asset_arn  = "${local.bucket_miro_images_sync_arn}"
+  bucket_source_asset_name = "${local.bucket_miro_images_sync_name}"
+
+  topic_miro_copy_s3_asset_arn = "${module.none_topic.arn}"
+
+  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
+  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  lambda_description           = "Copy undecidable miro master assets to private s3 bucket"
+  lambda_name                  = "miro_copy_none_master"
+  is_master_asset              = "true"
+  destination_key_prefix       = "none/"
+}
+
 module "miro_copy_cold_store_master" {
   source                   = "miro_copy_s3_asset"
   lambda_error_alarm_arn   = "${local.lambda_error_alarm_arn}"
