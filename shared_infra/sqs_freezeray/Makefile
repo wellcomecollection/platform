@@ -10,4 +10,10 @@ sqs_freezeray-build: $(ROOT)/.docker/image_builder
 		--project=sqs_freezeray \
 		--file=shared_infra/sqs_freezeray/Dockerfile
 
+sqs_freezeray-publish: $(ROOT)/.docker/publish_service_to_aws
+	$(ROOT)/builds/docker_run.py --aws --dind -- \
+		publish_service_to_aws:latest \
+		--project=sqs_freezeray \
+		--infra-bucket=$(INFRA_BUCKET)
+
 .PHONY: sqs_freezeray-build
