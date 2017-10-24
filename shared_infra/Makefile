@@ -14,6 +14,7 @@ include $(SHARED_INFRA)/service_scheduler/Makefile
 include $(SHARED_INFRA)/update_dynamo_capacity/Makefile
 include $(SHARED_INFRA)/update_ecs_service_size/Makefile
 include $(SHARED_INFRA)/update_task_for_config_change/Makefile
+include $(SHARED_INFRA)/sqs_freezeray/Makefile
 
 ## Tests for shared_infra
 shared_infra-test: drain_ecs_container_instance-test \
