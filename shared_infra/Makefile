@@ -48,16 +48,16 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
 ## Run a plan on shared_infra stack
 shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(SHARED_INFRA):/data \
-	-e OP=plan \
-	terraform_ci:latest
+		--volume $(SHARED_INFRA)/terraform:/data \
+		--env OP=plan \
+		terraform_ci:latest
 
 ## Run an apply on shared_infra stack
 shared_infra-terraform-apply: $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(SHARED_INFRA):/data \
-	-e OP=apply \
-	terraform_ci:latest
+		--volume $(SHARED_INFRA)/terraform:/data \
+		--env OP=apply \
+		terraform_ci:latest
 
 
 .PHONY: shared_infra-test shared_infra-build shared_infra-deploy shared_infra-terraform-plan shared_infra-terraform-apply
