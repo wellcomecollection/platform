@@ -99,12 +99,11 @@ def write_all_messages_to_s3(bucket, key, queue_url):
 
 
 if __name__ == '__main__':
-
-    queue_url = 'https://sqs.eu-west-1.amazonaws.com/760097843905/alex-test-queue'
+    queue_url = os.environ['QUEUE_URL']
     queue_name = os.path.basename(queue_url)
 
     date_string = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     key = f'sqs/{queue_name}_{date_string}.txt'
-    bucket = 'platform-infra'
+    bucket = os.environ['S3_BUCKET']
 
     write_all_messages_to_s3(bucket=bucket, key=key, queue_url=queue_url)
