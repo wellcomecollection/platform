@@ -7,7 +7,7 @@ Shared library to help surface ECS deployment information.
 import collections
 import datetime
 
-from utils.ecs_utils import get_cluster_arns, get_service_arns, describe_service
+from wellcome_lambda_utils.ecs_utils import get_cluster_arns, get_service_arns, describe_service
 
 Deployment = collections.namedtuple(
     'Deployment',
