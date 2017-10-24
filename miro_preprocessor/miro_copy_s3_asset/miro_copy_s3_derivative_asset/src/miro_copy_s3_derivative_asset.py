@@ -3,9 +3,10 @@ import os
 
 import boto3
 
-from wellcome_lambda_utils.miro_utils import MiroImage
 from wellcome_lambda_utils import sns_utils
 from wellcome_lambda_utils import s3_utils
+
+from miro_utils import MiroImage
 
 
 def main(event, _):

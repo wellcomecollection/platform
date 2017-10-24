@@ -4,9 +4,10 @@ import re
 
 import boto3
 
-from wellcome_lambda_utils.miro_utils import MiroImage
 from wellcome_lambda_utils import s3_utils
 from wellcome_lambda_utils import sns_utils
+
+from miro_utils import MiroImage
 
 
 class MiroKeyIdMismatchException(Exception):
