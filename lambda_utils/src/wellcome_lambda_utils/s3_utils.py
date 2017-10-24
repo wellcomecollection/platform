@@ -87,7 +87,7 @@ def write_dicts_to_s3(bucket, key, dicts):
     # flag allows us to write more compact JSON, which makes things faster!
     # See https://twitter.com/raymondh/status/842777864193769472
     json_str = b'\n'.join([
-        json.dumps(m, sort_keys=True, separators=(',',':')).encode('ascii')
+        json.dumps(m, sort_keys=True, separators=(',', ':')).encode('ascii')
         for m in dicts
     ])
 
