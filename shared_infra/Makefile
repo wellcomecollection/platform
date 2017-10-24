@@ -14,6 +14,7 @@ include $(SHARED_INFRA)/service_scheduler/Makefile
 include $(SHARED_INFRA)/update_dynamo_capacity/Makefile
 include $(SHARED_INFRA)/update_ecs_service_size/Makefile
 include $(SHARED_INFRA)/update_task_for_config_change/Makefile
+include $(SHARED_INFRA)/sqs_freezeray/Makefile
 
 ## Tests for shared_infra
 shared_infra-test: drain_ecs_container_instance-test \
@@ -33,7 +34,8 @@ shared_infra-build: drain_ecs_container_instance-build \
                     service_scheduler-build \
                     update_dynamo_capacity-build \
                     update_ecs_service_size-build \
-                    update_task_for_config_change-build
+                    update_task_for_config_change-build \
+                    sqs_freezeray-build
 
 ## Publish shared_infra
 shared_infra-deploy: drain_ecs_container_instance-publish \
@@ -43,7 +45,8 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
                       service_scheduler-publish \
                       update_dynamo_capacity-publish \
                       update_ecs_service_size-publish \
-                      update_task_for_config_change-publish
+                      update_task_for_config_change-publish \
+                      sqs_freezeray-publish
 
 ## Run a plan on shared_infra stack
 shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
