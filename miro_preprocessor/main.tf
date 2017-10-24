@@ -167,6 +167,12 @@ resource "aws_iam_role_policy" "miro_copy_tandem_vault_master_sns_publish" {
   policy = "${module.s3_copy_catchall.publish_policy}"
 }
 
+resource "aws_iam_role_policy" "miro_copy_none_master_sns_publish" {
+  name   = "miro_copy_none_master_sns_publish_policy"
+  role   = "${module.miro_copy_none_master.role_name}"
+  policy = "${module.s3_copy_catchall.publish_policy}"
+}
+
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = "${local.bucket_miro_data_id}"
 
