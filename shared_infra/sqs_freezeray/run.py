@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
+import datetime as dt
+import os
 import json
 
 import boto3
@@ -40,7 +42,7 @@ def get_messages(queue_url, delete=False, batch_size=10):
                 QueueUrl=queue_url,
                 Entries=[
                     {'Id': m['MessageId'], 'ReceiptHandle': m['ReceiptHandle']}
-                    for m in messages
+                    for m in resp['Messages']
                 ]
             )
 
@@ -54,7 +56,6 @@ def write_to_s3(bucket, key, messages):
     client.put_object(Bucket=bucket, Key=key, Body=json_str)
 
 
-
 def write_all_messages_to_s3(bucket, key, queue_url):
     """
     Write all the messages from a queue to an S3 bucket.
@@ -66,6 +67,7 @@ def write_all_messages_to_s3(bucket, key, queue_url):
 
     generator = get_messages(queue_url=queue_url, delete=True, batch_size=10)
     for i, message in enumerate(generator):
+        messages.append(message)
 
         # Because messages are deleted after they're processed, and received
         # in batches of 10, we write to S3 after every 10 messages.  If the
@@ -79,8 +81,12 @@ def write_all_messages_to_s3(bucket, key, queue_url):
 
 
 if __name__ == '__main__':
-    bucket = 'platform-infra'
-    key = 'sqs/alex-test-queue.txt'
+
     queue_url = 'https://sqs.eu-west-1.amazonaws.com/760097843905/alex-test-queue'
+    queue_name = os.path.basename(queue_url)
+
+    date_string = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    key = f'sqs/{queue_name}_{date_string}.txt'
+    bucket = 'platform-infra'
 
     write_all_messages_to_s3(bucket=bucket, key=key, queue_url=queue_url)
