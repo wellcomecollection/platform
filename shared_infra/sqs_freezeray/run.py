@@ -104,6 +104,6 @@ if __name__ == '__main__':
 
     date_string = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     key = f'sqs/{queue_name}_{date_string}.txt'
-    bucket = os.environ['S3_BUCKET']
+    bucket = os.environ['BUCKET']
 
     write_all_messages_to_s3(bucket=bucket, key=key, queue_url=queue_url)
