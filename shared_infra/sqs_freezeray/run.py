@@ -15,9 +15,9 @@ daiquiri.setup(level=logging.INFO)
 logger = daiquiri.getLogger(__name__)
 
 
-def get_messages(queue_url, delete=False, batch_size=10):
+def get_messages(queue_url, burn_after_reading=False, batch_size=10):
     """
-    Gets messages from an SQS queue.  If ``delete`` is True, the
+    Gets messages from an SQS queue.  If ``burn_after_reading`` is True, the
     messages are also deleted after they've been read.
     """
     client = boto3.client('sqs')
@@ -42,7 +42,7 @@ def get_messages(queue_url, delete=False, batch_size=10):
         # If we're deleting the messages ourselves, we don't need to send
         # the ReceiptHandle to the caller (it's only used for deleting).
         # If not, we send the entire response.
-        if delete:
+        if burn_after_reading:
             for m in resp['Messages']:
                 yield {k: v for k, v in m.items() if k != 'ReceiptHandle'}
         else:
@@ -50,7 +50,7 @@ def get_messages(queue_url, delete=False, batch_size=10):
 
         # Now delete the messages from the queue, so they won't be read
         # on the next GET call.
-        if delete:
+        if burn_after_reading:
             logger.info(
                 'Deleting %d messages from %s',
                 len(resp['Messages']), queue_url)
@@ -75,7 +75,9 @@ def write_all_messages_to_s3(bucket, key, queue_url):
             len(messages), bucket, key)
         s3_utils.write_dicts_to_s3(bucket=bucket, key=key, dicts=messages)
 
-    generator = get_messages(queue_url=queue_url, delete=True, batch_size=10)
+    generator = get_messages(
+        queue_url=queue_url, burn_after_reading=True, batch_size=10
+    )
     for i, message in enumerate(generator):
         messages.append(message)
 
