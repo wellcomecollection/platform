@@ -8,6 +8,7 @@ import logging
 
 import boto3
 import daiquiri
+from wellcome_lambda_utils import s3_utils
 
 
 daiquiri.setup(level=logging.INFO)
@@ -68,9 +69,7 @@ def write_to_s3(bucket, key, messages):
     """
     Given a list of messages from SQS, write them, one-per-line, to S3.
     """
-    client = boto3.client('s3')
-    json_str = b'\n'.join([json.dumps(m).encode('ascii') for m in messages])
-    client.put_object(Bucket=bucket, Key=key, Body=json_str)
+    s3_utils.write_dicts_to_s3(bucket=bucket, key=key, dicts=messages)
 
 
 def write_all_messages_to_s3(bucket, key, queue_url):
