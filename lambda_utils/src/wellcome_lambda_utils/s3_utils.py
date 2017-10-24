@@ -75,3 +75,20 @@ def parse_s3_record(event):
     Extracts a simple subset of an S3 update event.
     """
     return [_extract_s3_event(record) for record in event["Records"]]
+
+
+def write_dicts_to_s3(bucket, key, dicts):
+    """
+    Given an iterable of dictionaries, convert them to JSON, one per line,
+    and write them to S3.
+    """
+    # We use sort_keys=True to ensure deterministic results.  The separators
+    # flag allows us to write more compact JSON, which makes things faster!
+    # See https://twitter.com/raymondh/status/842777864193769472
+    json_str = b'\n'.join([
+        json.dumps(m, sort_keys=True, separators=(',',':')).encode('ascii')
+        for m in dicts
+    ])
+
+    client = boto3.client('s3')
+    client.put_object(Bucket=bucket, Key=key, Body=json_str)
