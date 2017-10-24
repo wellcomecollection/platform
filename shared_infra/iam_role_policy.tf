@@ -1,0 +1,4 @@
+resource "aws_iam_role_policy" "sqs_freezeray_sqs_access" {
+  role   = "${module.ecs_sqs_freezeray_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.aws_iam_policy_document.json}"
+}

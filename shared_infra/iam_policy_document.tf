@@ -76,3 +76,16 @@ data "aws_iam_policy_document" "alb_logs" {
     }
   }
 }
+
+data "aws_iam_policy_document" "sqs_readwrite" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
