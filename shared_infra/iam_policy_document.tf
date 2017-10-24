@@ -89,3 +89,15 @@ data "aws_iam_policy_document" "sqs_readwrite" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "upload_sqs_freeze" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}/sqs/*",
+    ]
+  }
+}
