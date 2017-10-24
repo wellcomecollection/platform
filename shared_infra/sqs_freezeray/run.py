@@ -45,19 +45,22 @@ def get_messages(queue_url, delete_messages=False, batch_size=10):
             )
 
 
+def write_to_s3(bucket, key, messages):
+    """
+    Given a list of messages from SQS, write them, one-per-line, to S3.
+    """
+    client = boto3.client('s3')
+    json_str = b'\n'.join([json.dumps(m).encode('ascii') for m in messages])
+    client.put_object(Bucket=bucket, Key=key, Body=json_str)
+
+
+
 messages = []
 
 for m in get_messages('https://sqs.eu-west-1.amazonaws.com/760097843905/alex-test-queue', delete_messages=False):
-    messages.append(json.dumps(m).encode('ascii'))
+    messages.append(m)
 
-s3_client = boto3.client('s3')
 
-data = b'\n'.join(messages)
-s3_client.put_object(
-    Bucket='platform-infra',
-    Key='sqs/alex-test-queue.txt',
-    Body=data
-)
+write_to_s3(bucket='platform-infra', key='sqs/alex-test-queue.txt', messages=messages)
 
-from pprint import pprint
 print(data)
