@@ -3,7 +3,6 @@
 
 import datetime as dt
 import os
-import json
 import logging
 
 import boto3
@@ -40,7 +39,6 @@ def get_messages(queue_url, delete=False, batch_size=10):
             logger.info('No messages received from %s; aborting', queue_url)
             break
 
-
         # If we're deleting the messages ourselves, we don't need to send
         # the ReceiptHandle to the caller (it's only used for deleting).
         # If not, we send the entire response.
@@ -65,13 +63,6 @@ def get_messages(queue_url, delete=False, batch_size=10):
             )
 
 
-def write_to_s3(bucket, key, messages):
-    """
-    Given a list of messages from SQS, write them, one-per-line, to S3.
-    """
-    s3_utils.write_dicts_to_s3(bucket=bucket, key=key, dicts=messages)
-
-
 def write_all_messages_to_s3(bucket, key, queue_url):
     """
     Write all the messages from a queue to an S3 bucket.
@@ -82,7 +73,7 @@ def write_all_messages_to_s3(bucket, key, queue_url):
         logger.info(
             'Writing %d messages to s3://%s/%s',
             len(messages), bucket, key)
-        write_to_s3(bucket=bucket, key=key, messages=messages)
+        s3_utils.write_dicts_to_s3(bucket=bucket, key=key, dicts=messages)
 
     generator = get_messages(queue_url=queue_url, delete=True, batch_size=10)
     for i, message in enumerate(generator):
