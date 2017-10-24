@@ -184,5 +184,5 @@ def test_write_dicts_to_s3():
     )
 
     assert s3_utils.is_object(bucket='bukkit', key='dicts.txt')
-    body = client.get_object(Bucket='bukkit', Key='key')['Body'].read()
+    body = client.get_object(Bucket='bukkit', Key='dicts.txt')['Body'].read()
     assert body == b'{"a":1,"b":2}\n{"c":3,"d":4}'
