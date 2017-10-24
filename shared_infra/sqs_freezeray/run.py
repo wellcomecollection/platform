@@ -19,6 +19,7 @@ def get_messages(queue_url, delete=False, batch_size=10):
         # Note: 10 is currently the most messages you can read at once.
         resp = client.receive_message(
             QueueUrl=queue_url,
+            AttributeNames=['All'],
             MaxNumberOfMessages=batch_size
         )
 
@@ -76,8 +77,6 @@ def write_all_messages_to_s3(bucket, key, queue_url):
             write()
 
     write()
-
-
 
 
 if __name__ == '__main__':
