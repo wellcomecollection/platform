@@ -48,7 +48,7 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
 ## Run a plan on shared_infra stack
 shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(SHARED_INFRA):/data \
+		--volume $(SHARED_INFRA)/terraform:/data \
 		--env OP=plan \
 		terraform_ci:latest
 
