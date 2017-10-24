@@ -4,8 +4,15 @@
 import datetime as dt
 import os
 import json
+import logging
 
 import boto3
+import daiquiri
+
+
+daiquiri.setup(level=logging.INFO)
+
+logger = daiquiri.getLogger(__name__)
 
 
 def get_messages(queue_url, delete=False, batch_size=10):
@@ -24,8 +31,14 @@ def get_messages(queue_url, delete=False, batch_size=10):
         )
 
         # If there's nothing available, the queue is empty.  Abort!
-        if 'Messages' not in resp:
+        try:
+            logger.info(
+                'Received %d new messages from %s',
+                len(resp['Messages']), queue_url)
+        except KeyError:
+            logger.info('No messages received from %s; aborting', queue_url)
             break
+
 
         # If we're deleting the messages ourselves, we don't need to send
         # the ReceiptHandle to the caller (it's only used for deleting).
@@ -39,6 +52,9 @@ def get_messages(queue_url, delete=False, batch_size=10):
         # Now delete the messages from the queue, so they won't be read
         # on the next GET call.
         if delete:
+            logger.info(
+                'Deleting %d messages from %s',
+                len(resp['Messages']), queue_url)
             client.delete_message_batch(
                 QueueUrl=queue_url,
                 Entries=[
@@ -64,6 +80,9 @@ def write_all_messages_to_s3(bucket, key, queue_url):
     messages = []
 
     def write():
+        logger.info(
+            'Writing %d messages to s3://%s/%s',
+            len(messages), bucket, key)
         write_to_s3(bucket=bucket, key=key, messages=messages)
 
     generator = get_messages(queue_url=queue_url, delete=True, batch_size=10)
