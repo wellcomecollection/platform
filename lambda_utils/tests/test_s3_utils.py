@@ -171,3 +171,18 @@ def test_parse_s3_event():
     }]
 
     assert parsed_events == expected_events
+
+
+@mock_s3
+def test_write_dicts_to_s3():
+    client = boto3.client('s3')
+    client.create_bucket(Bucket='bukkit')
+
+    s3_utils.write_dicts_to_s3(
+        bucket='bukkit', key='dicts.txt',
+        dicts=[{'a': 1, 'b': 2}, {'c': 3, 'd': 4}]
+    )
+
+    assert s3_utils.is_object(bucket='bukkit', key='dicts.txt')
+    body = client.get_object(Bucket='bukkit', Key='dicts.txt')['Body'].read()
+    assert body == b'{"a":1,"b":2}\n{"c":3,"d":4}'
