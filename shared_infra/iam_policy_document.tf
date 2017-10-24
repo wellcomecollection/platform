@@ -76,3 +76,28 @@ data "aws_iam_policy_document" "alb_logs" {
     }
   }
 }
+
+data "aws_iam_policy_document" "sqs_readwrite" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "upload_sqs_freeze" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.infra.arn}/sqs/*",
+    ]
+  }
+}
