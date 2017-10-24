@@ -34,9 +34,6 @@ def fetch_json_s3_data(bucket, key):
 def fetch_csv_s3_data(bucket, key):
     data = fetch_s3_data(bucket, key)
     data_decoded = data.decode()
-
-    print(data_decoded)
-
     return csv.DictReader(StringIO(data_decoded))
 
 
