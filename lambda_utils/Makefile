@@ -6,8 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
-PUBLISH_VERSION := $(shell curl "https://pypi.python.org/pypi/wellcome-lambda-utils/json" 2>/dev/null | jq -r '.info.version')
-SETUP_VERSION := $(shell grep 'version' $(LAMBDA_UTILS)/setup.py | tr "'" ' ' | awk '{print $$2}')
+export PUBLISH_VERSION := $(shell curl "https://pypi.python.org/pypi/wellcome-lambda-utils/json" 2>/dev/null | jq -r '.info.version')
+export SETUP_VERSION := $(shell grep 'version' $(LAMBDA_UTILS)/setup.py | tr "'" ' ' | awk '{print $$2}')
 
 lambda_utils-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
