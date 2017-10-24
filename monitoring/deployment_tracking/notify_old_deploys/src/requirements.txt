@@ -1,1 +1,1 @@
-wellcome_lambda_utils==1.0.6
+wellcome_lambda_utils==2017.10.24
