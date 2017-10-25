@@ -235,6 +235,41 @@ case class MiroTransformable(MiroID: String,
     // but there are other types in Sierra (e.g. item, holding) with matching
     // IDs but different prefixes.
     val sierraList: List[SourceIdentifier] = miroData.innopacID match {
+
+      // There are a couple of INNOPAC IDs that were entered badly in Miro,
+      // where a digit was repeated.  In these cases, we hard-code the correct
+      // INNOPAC ID, but double-check with the Miro ID to ensure nothing
+      // faulty gets through!
+      case Some("113183382") => {
+        MiroID match {
+          case "L0001138EA" | "L0001138EB" =>
+            SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "b1318338")
+          case _ => throw new RuntimeException(
+            s"Unexpected Miro record with faulty INNOPAC ID 113183382: ${MiroID}"
+          )
+        }
+      }
+
+      case Some("150056628") => {
+        MiroID match {
+          case "L0035213" =>
+            SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "b15005628")
+          case _ => throw new RuntimeException(
+            s"Unexpected Miro record with faulty INNOPAC ID 150056628: ${MiroID}"
+          )
+        }
+      }
+
+      case Some("L 35411 \n\n15551040") => {
+        MiroID match {
+          case "L0035411" =>
+            SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "b1555104")
+          case _ => throw new RuntimeException(
+            s"Unexpected Miro record with faulty INNOPAC ID 'L 35411': ${MiroID}"
+          )
+        }
+      }
+
       case Some(s) => {
 
         // The ID in the Miro record is an 8-digit number with a check digit
