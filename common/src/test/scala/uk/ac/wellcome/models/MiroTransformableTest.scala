@@ -233,30 +233,6 @@ class MiroTransformableTest
         expectedSierraNumber = "b1234567"
       )
     }
-
-    it("with a hard-coded ID that's malformed in Miro (L0035213)") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "150056628",
-        expectedSierraNumber = "b15005628",
-        miroID = "L0035213"
-      )
-    }
-
-    it("with a hard-coded ID that's malformed in Miro (L0001138EA)") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "113183382",
-        expectedSierraNumber = "b1318338",
-        miroID = "L0001138EA"
-      )
-    }
-
-    it("with a hard-coded ID that's malformed in Miro (L0001138EB)") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "113183382",
-        expectedSierraNumber = "b1318338",
-        miroID = "L0001138EB"
-      )
-    }
   }
 
   it("should have an empty list if no image_creator field is present") {
