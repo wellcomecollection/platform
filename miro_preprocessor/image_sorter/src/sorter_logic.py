@@ -85,7 +85,7 @@ class Rules:
 
     @property
     def image_library_dept_is_Archives_and_Manuscripts(self):
-        return self._compare("image_library_dept", "Archives and Manuscripts")
+        return self._compare("image_library_dept", "Archives and Manuscripts") or self._compare("image_library_dept", "Archives & Manuscripts")
 
     @property
     def image_library_dept_is_Public_programmes(self):
