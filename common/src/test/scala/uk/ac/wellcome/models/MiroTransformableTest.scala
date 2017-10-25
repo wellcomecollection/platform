@@ -198,22 +198,13 @@ class MiroTransformableTest
     work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
   }
 
-  it("should pass through the INNOPAC ID, if present") {
-    val sierraNumber = "1161183"
-    val innopacID = s"${sierraNumber}2"
-    val miroID = "V0000832_test"
-    val work = transformWork(
-      data =
-        s"""
-        "image_title": "A bouncing bundle of bison",
-        "image_innopac_id": "$innopacID"
-      """,
-      MiroID = miroID
-    )
-    work.identifiers shouldBe List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, s"b${sierraNumber}")
-    )
+  describe("The INNOPAC ID should be passed through as the Sierra system number") {
+    it("plain numeric ID") {
+      transformRecordAndCheckSierraSystemNumber(
+        innopacId = "12345678",
+        expectedSierraNumber = "b1234567"
+      )
+    }
   }
 
   it("should have an empty list if no image_creator field is present") {
@@ -369,6 +360,24 @@ class MiroTransformableTest
 
     work.title shouldBe "A café for cats"
     work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
+  }
+
+  private def transformRecordAndCheckSierraSystemNumber(
+    innopacId: String,
+    expectedSierraNumber: String
+  ) = {
+    val miroID = "V0000832_test"
+    val work = transformWork(
+      data = s"""
+        "image_title": "A bouncing bundle of bison",
+        "image_innopac_id": "$innopacId"
+      """,
+      MiroID = miroID
+    )
+    work.identifiers shouldBe List(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, expectedSierraNumber)
+    )
   }
 }
 
