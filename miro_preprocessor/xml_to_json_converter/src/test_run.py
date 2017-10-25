@@ -77,7 +77,61 @@ def xml_file_contents(s3_fixture, set_region):
     }
 
 
-def test_creates_txt_with_all_images_json(s3_fixture, xml_file_contents):
+@pytest.fixture()
+def wrong_sierra_number_xml_file_contents(s3_fixture, set_region):
+    s3_client = s3_fixture[0]
+    bucket = "test-bucket"
+    src_key = "images-AAA.xml"
+
+    file_contents = """
+    <?xml version="1.0" encoding="iso-8859-1" standalone="yes"?>
+    <rmxml version="1.1">
+        <image>
+            <image_innopac_id>113183382</image_innopac_id>
+            <image_no_calc>L0001138EB</image_no_calc>
+        </image>
+        <image>
+            <image_innopac_id>113183382</image_innopac_id>
+            <image_no_calc>L0001138EA</image_no_calc>
+        </image>
+        <image>
+            <image_innopac_id>150056628</image_innopac_id>
+            <image_no_calc>L0035213</image_no_calc>
+        </image>
+    </rmxml>"""
+
+    s3_client.create_bucket(ACL="private", Bucket=bucket)
+    s3_client.put_object(ACL="private", Bucket=bucket, Body=file_contents, Key=src_key)
+
+    return {
+        "bucket": bucket,
+        "src_key": src_key,
+        "file_contents": file_contents
+    }
+
+
+def test_creates_txt_with_all_images_json(s3_fixture, wrong_sierra_number_xml_file_contents):
+    s3_client = s3_fixture[0]
+    bucket = wrong_sierra_number_xml_file_contents["bucket"]
+
+    src_key = wrong_sierra_number_xml_file_contents["src_key"]
+    dst_key = "images-AAA.txt"
+
+    expected_txt_file = b"""{"collection":"images-AAA","image_data":{"image_innopac_id":"1318338x","image_no_calc":"L0001138EB"}}
+{"collection":"images-AAA","image_data":{"image_innopac_id":"1318338x","image_no_calc":"L0001138EA"}}
+{"collection":"images-AAA","image_data":{"image_innopac_id":"1500562x","image_no_calc":"L0035213"}}
+"""
+
+    run.main(bucket, src_key, dst_key)
+
+    get_file_request = s3_client.get_object(Bucket=bucket, Key=dst_key)
+
+    read = get_file_request['Body'].read()
+    print(read)
+    assert read == expected_txt_file
+
+
+def test_fixes_errors_in_sierra_number(s3_fixture, xml_file_contents):
     s3_client = s3_fixture[0]
     bucket = xml_file_contents["bucket"]
 
