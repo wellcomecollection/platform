@@ -39,7 +39,7 @@ def fetch_csv_s3_data(bucket, key):
 
 def main(event, _):
     print(f'Received event: {event!r}')
-
+    sns_client = boto3.client('sns')
     # Parse environment config
     topic_cold_store = os.environ['TOPIC_COLD_STORE']
     topic_tandem_vault = os.environ['TOPIC_TANDEM_VAULT']
@@ -78,6 +78,7 @@ def main(event, _):
 
         print(f'Sorting this image into {decision}')
         publish_sns_message(
+            sns_client=sns_client,
             topic_arn=topic_arns[decision],
             message=data,
             subject=decision.value
