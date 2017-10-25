@@ -239,7 +239,19 @@ case class MiroTransformable(MiroID: String,
 
         // The ID in the Miro record is an 8-digit number with a check digit
         // (which may be x), but the system number is 7-digits, sans checksum.
-        val regexMatch = """^([0-9]{7})[0-9xX]$""".r.unapplySeq(s)
+        //
+        // Regex explanation:
+        //
+        //    ^                 start of string
+        //    (?:\.?[bB])?      non-capturing group, which trims 'b' or 'B'
+        //                      or '.b' or '.B' from the start of the string,
+        //                      but *not* a lone '.'
+        //    ([0-9]{7})        capturing group, the 7 digits of the system
+        //                      number
+        //    [0-9xX]           the final check digit, which may be X
+        //    $                 end of the string
+        //
+        val regexMatch = """^(?:\.?[bB])?([0-9]{7})[0-9xX]$""".r.unapplySeq(s)
         regexMatch match {
           case Some(s) =>
             s.map { id =>
