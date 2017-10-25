@@ -205,6 +205,34 @@ class MiroTransformableTest
         expectedSierraNumber = "b1234567"
       )
     }
+
+    it("with an x for a check digit") {
+      transformRecordAndCheckSierraSystemNumber(
+        innopacId = "1234567x",
+        expectedSierraNumber = "b1234567"
+      )
+    }
+
+    it("with a leading b on the b-number") {
+      transformRecordAndCheckSierraSystemNumber(
+        innopacId = "b12345678",
+        expectedSierraNumber = "b1234567"
+      )
+    }
+
+    it("with a leading B on the b-number") {
+      transformRecordAndCheckSierraSystemNumber(
+        innopacId = "b12345678",
+        expectedSierraNumber = "b1234567"
+      )
+    }
+
+    it("with a leading .b on the b-number") {
+      transformRecordAndCheckSierraSystemNumber(
+        innopacId = ".b12345678",
+        expectedSierraNumber = "b1234567"
+      )
+    }
   }
 
   it("should have an empty list if no image_creator field is present") {
