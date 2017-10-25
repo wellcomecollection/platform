@@ -393,7 +393,7 @@ class MiroTransformableTest
   private def transformRecordAndCheckSierraSystemNumber(
     innopacId: String,
     expectedSierraNumber: String,
-    miroID = "V0000832"
+    miroID: String = "V0000832"
   ) = {
     val work = transformWork(
       data = s"""
