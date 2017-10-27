@@ -7,7 +7,8 @@ module "miro_image_to_tandem_vault_lambda" {
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
   environment_variables = {
-
+    TANDEM_VAULT_API_KEY = "${var.tandem_vault_api_key}"
+    TANDEM_VAULT_API_URL = "${var.tandem_vault_api_url}"
   }
 }
 

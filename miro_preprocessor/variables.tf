@@ -19,3 +19,7 @@ variable "es_passsword" {
 variable "es_username" {
   description = "Username for acccess to miro inventory cluster"
 }
+
+variable "tandem_vault_api_key" {
+  description = "API key for access to Tandem Vault"
+}

@@ -212,4 +212,5 @@ module "miro_image_to_tandem_vault" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   topic_miro_image_to_tandem_vault_arn = "${module.tandem_vault_topic.arn}"
+  tandem_vault_api_key = "${var.tandem_vault_api_key}"
 }
