@@ -14,27 +14,29 @@ class MiroKeyIdMismatchException(Exception):
 
 
 def _find_key_matching_regex(keys, regex):
+    matching_keys = set()
     for key in keys:
-        if re.match(regex, key) is not None:
-            return key
-    return None
+        match = re.match(regex, key)
+        if match is not None:
+            matching_keys.add((key, match.group("extension").lower()))
+    return matching_keys
 
 
-def _find_exact_match_before_hyphen(keys, prefix):
-    return _find_key_matching_regex(keys, prefix + r"-.*((\.jp2)|(\.JP2))")
+def _find_exact_matches_before_hyphen(keys, prefix):
+    return _find_key_matching_regex(keys, prefix + r"-.+(?P<extension>\..+)")
 
 
-def _find_exact_match(keys, prefix):
-    return _find_key_matching_regex(keys, prefix + r"((\.jp2)|(\.JP2))")
+def _find_exact_matches(keys, prefix):
+    return _find_key_matching_regex(keys, prefix + r"(?P<extension>\..+)")
 
 
-def _select_best_key(keys, prefix):
-    exact_match = _find_exact_match(keys, prefix)
-    if exact_match is not None:
-        return exact_match
-    matching_key = _find_exact_match_before_hyphen(keys, prefix)
-    if matching_key is not None:
-        return matching_key
+def _select_best_keys(keys, prefix):
+    exact_matches = _find_exact_matches(keys, prefix)
+    if exact_matches:
+        return exact_matches
+    matching_keys = _find_exact_matches_before_hyphen(keys, prefix)
+    if matching_keys:
+        return matching_keys
     else:
         raise MiroKeyIdMismatchException(f"Unable to match prefix {prefix} with keys {keys}")
 
@@ -77,20 +79,21 @@ def main(event, _):
     keys = _list_matching_image_keys(s3_client, src_bucket, key_prefix)
 
     if keys is not None:
-        src_key = _select_best_key(keys, key_prefix)
-        dst_key = f"{destination_prefix}{miro_image.image_path}.jp2"
+        for src_key, extension in _select_best_keys(keys, key_prefix):
+            dst_key = f"{destination_prefix}{miro_image.image_path}{extension}"
+            print(dst_key)
 
-        if s3_utils.is_object(src_bucket, src_key):
-            s3_utils.copy_object(
-                src_bucket=src_bucket,
-                dst_bucket=dst_bucket,
-                src_key=src_key,
-                dst_key=dst_key
-            )
+            if s3_utils.is_object(src_bucket, src_key):
+                s3_utils.copy_object(
+                    src_bucket=src_bucket,
+                    dst_bucket=dst_bucket,
+                    src_key=src_key,
+                    dst_key=dst_key
+                )
 
-            sns_utils.publish_sns_message(
-                sns_client=sns_client,
-                topic_arn=topic_arn,
-                message=image_info,
-                subject=f'{subject}_master'
-            )
+                sns_utils.publish_sns_message(
+                    sns_client=sns_client,
+                    topic_arn=topic_arn,
+                    message=image_info,
+                    subject=f'{subject}_master'
+                )
