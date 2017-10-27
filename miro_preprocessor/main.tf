@@ -206,3 +206,10 @@ module "miro_inventory" {
     "${module.topic_miro_image_to_dynamo.arn}",
   ]
 }
+
+module "miro_image_to_tandem_vault" {
+  source = "miro_image_to_tandem_vault"
+
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  topic_miro_image_to_tandem_vault_arn = "${module.tandem_vault_topic.arn}"
+}
