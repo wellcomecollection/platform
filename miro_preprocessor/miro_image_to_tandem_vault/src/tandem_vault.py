@@ -28,17 +28,11 @@ class TandemVaultAPI(object):
 
         self.sess.hooks['response'].append(raise_error)
 
-    def upload_image_to_tv(self, src_key, upload_set_id):
+    def upload_image_to_tv(self, image, filename, upload_set_id):
         """
-        Given an image in one of our S3 buckets, create an asset for the
+        Given an image create an asset for the
         image in TV by uploading it.  Return the asset metadata.
         """
-        s3 = boto3.client('s3')
-        # TODO: Add reference to bucket
-        src_bucket = "not_a_real_bucket"
-
-        logger.info('Uploading image from S3: bucket=%s, key=%s', src_bucket, src_key)
-        body = s3.get_object(Bucket=src_bucket, Key=src_key)['Body']
 
         # Retrieve an upload signature for uploading files to S3.
         # https://tandemvault.com/docs/api/v1/assets/get_upload_signature.html
@@ -46,7 +40,7 @@ class TandemVaultAPI(object):
             f'{self.api_url}/assets/get_upload_signature',
             params={
                 'api_key': self.api_key,
-                'filename': os.path.basename(src_key),
+                'filename': os.path.basename(filename),
                 'content_type': 'image/jpeg',
             }
         )
@@ -66,9 +60,9 @@ class TandemVaultAPI(object):
                 'policy': upload_data['policy'],
                 'acl': 'private',
                 'key': upload_data['key'],
-                'filename': os.path.basename(src_key),
+                'filename': os.path.basename(filename),
                 'success_action_status': '201',
-                'file': body,
+                'file': image,
             }
         )
         logger.debug('Response from POST to uploads.tandemstock.s3: %s', resp.text)
