@@ -18,6 +18,7 @@ import tandem_vault
 class InvalidWIAYear(Exception):
     pass
 
+
 @attr.s
 class MiroCollection:
     """
@@ -61,17 +62,9 @@ wia_year = {
 }
 
 
-def _miro_prefix(s3_key):
-    """
-    Given an S3 key (e.g. 'B0007000/B00070001.jpg'), return the Miro prefix.
-    """
-    filename = os.path.basename(s3_key)
-    return re.search(r'^[A-Z]+', filename).group(0)
-
-
 def is_wia_award_winner(miro_image):
     if "Biomedical Image Awards" in miro_image.image_data['image_award']:
-      return True
+        return True
 
     if "Wellcome Image Awards" in miro_image.image_data['image_award']:
         return True
@@ -87,8 +80,7 @@ def determine_wia_collection(miro_image):
 
 
 def determine_miro_collection(miro_image):
-    prefix = _miro_prefix(miro_image.image_path)
-    return miro_collections[prefix].collection_id
+    return miro_collections[miro_image.collection].collection_id
 
 
 def extract_image_from_event(event):
