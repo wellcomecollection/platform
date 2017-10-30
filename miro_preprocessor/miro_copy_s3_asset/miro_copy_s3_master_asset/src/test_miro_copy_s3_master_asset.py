@@ -102,6 +102,48 @@ def test_should_copy_an_asset_into_a_different_bucket(
     assert s3_response['Body'].read() == image_body
 
 
+def test_should_copy_dt_and_tifs_into_a_different_bucket(
+        create_source_and_destination_buckets,
+        sns_image_json_event,
+        sns_sqs):
+
+    s3_client = boto3.client("s3")
+
+    topic_arn, queue_url = sns_sqs
+
+    source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
+    miro_id, image_json, event = sns_image_json_event
+    image_dt_body = b'aghte'
+    image_tif_body = b'baba'
+    destination_prefix = "library/"
+    s3_client.put_object(
+        Bucket=source_bucket_name,
+        ACL='private',
+        Body=image_dt_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.dt")
+    s3_client.put_object(
+        Bucket=source_bucket_name,
+        ACL='private',
+        Body=image_tif_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.tif")
+
+    destination_tif_key = f"{destination_prefix}A0000000/{miro_id}.tif"
+    destination_dt_key = f"{destination_prefix}A0000000/{miro_id}.dt"
+
+    os.environ = {
+        "S3_SOURCE_BUCKET": source_bucket_name,
+        "S3_DESTINATION_BUCKET": destination_bucket_name,
+        "S3_DESTINATION_PREFIX": destination_prefix,
+        "TOPIC_ARN": topic_arn
+    }
+
+    miro_copy_s3_master_asset.main(event, None)
+
+    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_tif_key)
+    assert s3_response['Body'].read() == image_tif_body
+
+    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_dt_key)
+    assert s3_response['Body'].read() == image_dt_body
+
+
 def test_should_not_crash_if_the_asset_does_not_exist(
         create_source_and_destination_buckets,
         sns_image_json_event,
