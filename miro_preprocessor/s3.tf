@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     prefix = "cold_store/"
 
     transition {
-      days          = 30
+      days          = 60
       storage_class = "GLACIER"
     }
 
@@ -39,6 +39,18 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     }
 
     enabled = true
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    enabled = true
+
+    noncurrent_version_expiration {
+      days = 30
+    }
   }
 
   lifecycle {
