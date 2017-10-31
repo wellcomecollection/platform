@@ -1,0 +1,223 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "watu9tbc",
+  "type": "Work",
+  "workType": {
+    "id": "e-books",
+    "type": "WorkType",
+    "label": "E-books"
+  },
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/V0042826ER.jpg/full/300,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "identifiers": [
+    {
+      "value": "V0006724",
+      "type": "Identifier",
+      "identifierScheme": "miro-image-number"
+    },
+    {
+      "value": "ICV No 6939",
+      "type": "Identifier",
+      "identifierScheme": "wellcome-library-videodisk-number"
+    },
+    {
+      "value": "b11579328",
+      "type": "Identifier",
+      "identifierScheme": "sierra-system-number"
+    }
+  ],
+  "title": "The tuberculosis worker : a handbook on methods and programs of tuberculosis work",
+  "language": {
+    "id": "eng",
+    "label": "English",
+    "type": "Language"
+  },
+  "creators": [
+    {
+      "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
+      "concept": {
+        "label": "Jacobs, Philip P",
+        "type": "Person",
+        "identifiers": [
+          {
+            "value": "2005016805",
+            "type": "Identifier",
+            "identifierScheme": "lc-names"
+          }
+        ]
+      },
+      "qualifiers": [
+                {
+          "": "fuller-form-of-name" ,        
+          "label": "Philip Peter",
+          "type": "Name"
+        } ,
+        {
+          "": "associated-time" ,
+          "label": "1879-1940",
+          "type": "Period"
+        } 
+      ]
+    }
+  ],
+  "countryOfPublication": {
+    "id": "mdu",
+    "label": "Maryland",
+    "type": "Place"
+  },
+  "publishYear": {
+    "label": "1923",
+    "type": "Year",
+    "value": "1932"
+  },
+  "placeOfPublication": [
+    {
+      "label": "[London] (St. James's Street)",
+      "type": "Place"
+    }
+  ],
+  "publishers": [
+    {
+      "label": "H. Humphrey,"
+    }
+  ],
+//  "description": "N/A",
+  "createdDate": {
+    "label": "1802",
+    "type": "Period"
+  },
+  "publicationDate": {
+    "label": "May 23 1802",
+    "type": "Period"
+  },
+  "imprint": {
+    "label": "Baltimore Williams & Wilkins 1923",
+    "type": "Imprint",
+    "concept": {
+      "label": "Baltimore",
+      "type": "Place"
+    },
+    "qualifiers": [
+      {
+        "imprintType": "publisher",
+        "label": "Williams & Wilkins",
+        "type": "Organisation"
+      },
+      {
+        "label": "1923",
+        "type": "Period"
+      }
+    ]
+  },
+  "genres": [
+    {
+      "id": "a24s7qf3",
+      "label": "Caricatures",
+      "type": "Concept",
+      "identifiers": [
+        {
+          "type": "Identifier",
+          "identifierScheme": "lctgm",
+          "value": "tgm001698"
+        },
+        {
+          "type": "Identifier",
+          "identifierScheme": "mesh",
+          "value": "D019492"
+        },
+        {
+          "type": "Identifier",
+          "identifierScheme": "lcsh",
+          "value": "sh99001244"
+        }
+      ]
+    },
+    {
+      "label": "Etching and water colour",
+      "type": "Concept"
+    }
+  ],
+  "physicalDescription": 
+    {
+      "label": "314 pages 24cm" ,
+      "type": "PhysicalDescription" ,
+      "concept": {
+        "label": "314 pages" ,
+        "type": "extent"
+      } ,
+      "qualifiers": [
+        {
+          "label": "24cm" ,
+          "type": "dimensions" 
+        }
+      ] 
+    } ,
+  "subjects": [
+    {
+      "id": "hd2891f",
+      "label": "Tuberculosis prevention & control.",
+      "type": "QualifiedConcept",
+      "concept": {
+        "id": "",
+        "label": "Tuberculosis",
+        "type": "Concept",
+        "identifiers": [
+          {
+            "type": "Identifier",
+            "identifierScheme": "mesh",
+            "value": "D014376Q000517"
+          }
+        ],
+        "qualifiers": [
+          {
+            "label": "prevention & control.",
+            "type": "Concept"
+          }
+        ]
+      }
+    },
+  ],
+  "items": [
+    {
+      "id": "b28gh7z4n",
+      "type": "Item",
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "sicon",
+          "label": "Closed Store Iconographic",
+          "shelfmark": "1L9N",
+          "accessStatus": {
+            "id": "open",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "online-access",
+            "label": "Online access",
+            "type": "AccessProcess"
+          }
+        },
+        {
+          "type": "Location",
+          "locationType": "iiif-image",
+          "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
+          "license": {
+            "type": "License",
+            "licenseType": "CC-BY",
+            "label": "Attribution 4.0 International (CC BY 4.0)",
+            "url": "http://creativecommons.org/licenses/by/4.0/"
+          }
+        }
+      ]
+    }
+  ]
+}
