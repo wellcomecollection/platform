@@ -13,6 +13,7 @@ import boto3
 from wellcome_lambda_utils.miro_utils import MiroImage
 
 import tandem_vault
+import tandem_vault_metadata
 
 
 class InvalidWIAYear(Exception):
@@ -97,8 +98,7 @@ def upload_asset(tandem_vault_api, s3_client, src_bucket, miro_image):
         Key=src_key
     )['Body']
 
-    prefix = _miro_prefix(src_key)
-    upload_set_id = miro_collections[prefix].upload_set_id
+    upload_set_id = miro_collections[miro_image.collection].upload_set_id
 
     return tandem_vault_api.upload_image_to_tv(
         image,
@@ -142,4 +142,9 @@ def main(event, _):
         tandem_vault_api.add_image_to_collection(asset_id, wia_collection_id)
 
     # Add metadata
-    # TODO: Add metadata!
+    metadata = tandem_vault_metadata.create_metadata(miro_image.image_data)
+    tandem_vault_api.add_image_metadata(asset_id, metadata)
+
+    # Add tags
+    tags = tandem_vault_metadata.create_tags(miro_image.image_data)
+    tandem_vault_api.add_image_tags(asset_id, tags)

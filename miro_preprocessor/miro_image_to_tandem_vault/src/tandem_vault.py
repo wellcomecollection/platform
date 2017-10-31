@@ -74,12 +74,41 @@ class TandemVaultAPI(object):
             params={
                 'api_key': self.api_key,
                 'upload_set_id': upload_set_id,
-                'asset[filename]': os.path.basename(src_key),
+                'asset[filename]': os.path.basename(filename),
             }
         )
         logger.debug('Response from POST /assets: %s', resp.text)
         asset_data = resp.json()
         return asset_data
+
+    def add_image_metadata(self, asset_id, metadata):
+        resp = self.sess.put(
+            f'{self.api_url}/assets/{asset_id}',
+            params={
+                'api_key': self.api_key,
+                'id': asset_id,
+                'asset[description]': metadata['caption'],
+                'asset[photographer]': metadata['creator'],
+                'asset[copyright]': metadata['copyright'],
+                'asset[notes]': metadata['notes'],
+                'asset[usage_terms]': metadata['usage_terms'],
+                'status': 'accepted',
+            }
+        )
+
+        logger.debug(f'Response from PUT /assets/{asset_id}: %s', resp.text)
+
+    def add_image_tags(self, asset_id, tags):
+        resp = self.sess.put(
+            f'{self.api_url}/assets/{asset_id}/add_tags',
+            params={
+                'api_key': self.api_key,
+                'id': asset_id,
+                'tags[]': tags,
+            }
+        )
+
+        logger.debug(f'Response from PUT /assets/{asset_id}/add_tags: %s', resp.text)
 
     def add_image_to_collection(self, asset_id, collection_id):
         """
