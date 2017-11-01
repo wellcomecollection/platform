@@ -3,7 +3,10 @@
 Module for creating metadata to feed Tandem Vault from Miro
 """
 
+import json
+
 import attr
+import boto3
 
 
 @attr.s
@@ -52,6 +55,40 @@ wia_year = {
     '2016': 110088,
     '2017': 110089,
 }
+
+
+CONTRIB_MAP = None
+
+
+def _contrib_map(bucket='miro-data', key='contrib_map.json'):
+    global CONTRIB_MAP
+    if CONTRIB_MAP is None:
+        s3 = boto3.resource('s3')
+
+        obj = s3.Object(bucket, key)
+        object_body = obj.get()['Body'].read().decode('utf-8')
+
+        CONTRIB_MAP = json.loads(object_body)
+
+    return CONTRIB_MAP
+
+
+def lookup_contributor(d):
+    contrib_map = _contrib_map()
+
+    if 'image_source_code' not in d:
+        return ""
+
+    contrib_code = d['image_source_code']
+
+    if contrib_code not in contrib_map:
+        return ""
+
+    contributor = contrib_map[contrib_code]
+    if not contributor:
+        return ""
+
+    return contributor
 
 
 def _is_in(d, a):
@@ -168,10 +205,17 @@ def create_caption(d):
 
 
 def create_copyright(d):
-    if 'Wellcome' in _is_in(d, 'image_credit_line'):
+    image_credit_line = _is_in(d, 'image_credit_line')
+
+    if 'Wellcome' in image_credit_line:
         return 'Wellcome Collection'
 
-    return _is_in(d, 'image_credit_line')
+    if not image_credit_line:
+        possible_creator = lookup_contributor(d)
+        if possible_creator:
+            return possible_creator
+
+    return ""
 
 
 def create_notes():
@@ -206,8 +250,10 @@ def create_tags(d):
 def create_creator(d):
     creators = _is_in(d, 'image_creator')
 
-    if creators is None:
-        return ""
+    if not creators:
+        possible_creator = lookup_contributor(d)
+        if possible_creator:
+            return possible_creator
 
     if not isinstance(creators, list):
         creators = [creators]
