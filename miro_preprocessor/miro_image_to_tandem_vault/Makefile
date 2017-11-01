@@ -17,7 +17,7 @@ miro_image_to_tandem_vault-test: $(ROOT)/.docker/python3.6_ci
 		--env OP=test \
 		python3.6_ci:latest
 
-miro_tandem_vault_uploader-publish: $(ROOT)/.docker/publish_service_to_aws
+miro_tandem_vault_uploader-publish: miro_tandem_vault_uploader-build $(ROOT)/.docker/publish_service_to_aws
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		publish_service_to_aws:latest \
 		--project=tandem_vault_uploader \
@@ -29,7 +29,7 @@ miro_tandem_vault_enrichment-build: $(ROOT)/.docker/image_builder
 		--project=tandem_vault_enrichment \
 		--file=miro_preprocessor/miro_image_to_tandem_vault/tandem_vault_enrichment.Dockerfile
 
-miro_tandem_vault_enrichment-publish: $(ROOT)/.docker/publish_service_to_aws
+miro_tandem_vault_enrichment-publish: miro_tandem_vault_enrichment-build $(ROOT)/.docker/publish_service_to_aws
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		publish_service_to_aws:latest \
 		--project=tandem_vault_enrichment \
