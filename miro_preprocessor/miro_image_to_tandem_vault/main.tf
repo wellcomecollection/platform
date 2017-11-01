@@ -13,13 +13,13 @@ resource "aws_iam_role_policy" "allow_uploader_sns_publish" {
   policy = "${module.enrich_image_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "allow_enricher_sqs_read" {
-  role   = "${module.ecs_tandem_vault_enricher_iam.task_role_name}"
+resource "aws_iam_role_policy" "allow_enrichment_sqs_read" {
+  role   = "${module.ecs_tandem_vault_enrichment_iam.task_role_name}"
   policy = "${module.enrich_image_queue.read_policy}"
 }
 
-resource "aws_iam_role_policy" "allow_enricher_s3_get" {
-  role   = "${module.ecs_tandem_vault_enricher_iam.task_role_name}"
+resource "aws_iam_role_policy" "allow_enrichment_s3_get" {
+  role   = "${module.ecs_tandem_vault_enrichment_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_get.json}"
 }
 
@@ -85,11 +85,11 @@ module "ecr_repository_tandem_vault_uploader" {
   name   = "tandem_vault_uploader"
 }
 
-module "tandem_vault_enricher" {
+module "tandem_vault_enrichment" {
   source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"
-  task_name     = "tandem_vault_enricher"
-  app_uri       = "${module.ecr_repository_tandem_vault_enricher.repository_url}:${var.release_ids["tandem_vault_enricher"]}"
-  task_role_arn = "${module.ecs_tandem_vault_enricher_iam.task_role_arn}"
+  task_name     = "tandem_vault_enrichment"
+  app_uri       = "${module.ecr_repository_tandem_vault_enrichment.repository_url}:${var.release_ids["tandem_vault_enrichment"]}"
+  task_role_arn = "${module.ecs_tandem_vault_enrichment_iam.task_role_arn}"
 
   env_vars = [
     "{\"name\": \"QUEUE_URL\", \"value\": \"${module.enrich_image_queue.id}\"}",
@@ -98,12 +98,12 @@ module "tandem_vault_enricher" {
   ]
 }
 
-module "ecs_tandem_vault_enricher_iam" {
+module "ecs_tandem_vault_enrichment_iam" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs_iam?ref=v1.0.0"
-  name   = "tandem_vault_enricher"
+  name   = "tandem_vault_enrichment"
 }
 
-module "ecr_repository_tandem_vault_enricher" {
+module "ecr_repository_tandem_vault_enrichment" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "tandem_vault_enricher"
+  name   = "tandem_vault_enrichment"
 }
