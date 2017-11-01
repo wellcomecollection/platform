@@ -484,9 +484,9 @@ class MiroTransformableSubjectsTest
       ),
       List(
         Location(
-          "iiif-image",
-          Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
-          License_CCBY
+          locationType = "iiif-image",
+          url = Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          license = License_CCBY
         )
       )
     )
