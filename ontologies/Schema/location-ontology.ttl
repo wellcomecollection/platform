@@ -118,7 +118,7 @@ wloc:volume rdf:type owl:DatatypeProperty ;
      rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
      
 wloc:copyright rdf:type owl:DatatypeProperty ;
-    rdfs:label "copyrigh"@en ;
+    rdfs:label "copyright"@en ;
     rdfs:comment "Attribution of copyright to a copyright holder."@en ;
     rdfs:domain wloc:Location ;
     rdfs:range rdf:langString ;
