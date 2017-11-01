@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
 Lambda for loading images and data into Tandem Vault
