@@ -24,7 +24,7 @@
    *     "label": "E-books"
    *     },
    *
-   * Note: will map to a controlled vocabulary terms in future
+   * Note: will map to a controlled vocabulry term in future
    */
 
    /* Populate wwork:identifiers . Rules:
@@ -331,65 +331,6 @@
    *      "unit": "cm" 
    *     } 
    */ 
-
-   /* Populate wwork:items. Rules:
-   *
-   * Note: this needs to be confirmed. Items point to bib records and not the other way round.
-   *
-   * 1. For all item (not bib records) records use "bibIds" to populate bib records with "items"
-   * 2. For item identfier use "id" with "identifierScheme" of "sierra-system-number"
-   * 3. Type as "Item"
-   * 4. For each "location" we get a code and name the code will match one from our list of locationTypes
-   * 5. "shelfmark" is populated from "call number"
-   * 6. "accessStatus" is populated from "status" "display"
-   * 7. "accessProcess" is populated from OPACMSG fixed field no=108
-   *
-   * Note: not sure how we populate access process is this something that is coded to the location type?
-   *
-   *"items": [
-   * {
-   *   "id": "b28gh7z4n",
-   *   "identifiers": [
-   *     {
-   *       "value": "i11579328",
-   *       "type": "Identifier",
-   *       "identifierScheme": "sierra-system-number"
-   *     }
-   *     ],
-   *   "type": "Item",
-   *   "locations": [
-   *     {
-   *       "type": "Location",
-   *       "locationType": "sicon",
-   *       "label": "Closed Store Iconographic",
-   *       "shelfmark": "1L9N",
-   *       "accessStatus": {
-   *         "id": "open",
-   *         "type": "AccessStatus"
-   *       },
-   *       "accessProcess": {
-   *         "id": "online-access",
-   *         "label": "Online access",
-   *         "type": "AccessProcess"
-   *       }
-   *     },
-   *     {
-   *       "type": "Location",
-   *       "locationType": "iiif-image",
-   *       "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
-   *       "license": {
-   *         "type": "License",
-   *         "licenseType": "CC-BY",
-   *         "label": "Attribution 4.0 International (CC BY 4.0)",
-   *         "url": "http://creativecommons.org/licenses/by/4.0/"
-   *       }
-   *     }
-   *   ]
-   * }
-   *]
-   *
-   * Note: will map to a controlled vocabulry term in future
-   */
 
 
 
