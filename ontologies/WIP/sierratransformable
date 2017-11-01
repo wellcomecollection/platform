@@ -27,6 +27,28 @@
    * Note: will map to a controlled vocabulry term in future
    */
 
+   /* Populate wwork:identifiers . Rules:
+   *
+   * 1. Need to look further at where these comes from and the ones we want
+   * 
+   * 
+   * Example: 
+   * "identifiers": [
+   * {
+   *   "value": "ICV No 6939",
+   *   "type": "Identifier",
+   *   "identifierScheme": "wellcome-library-videodisk-number"
+   * },
+   * {
+   *   "value": "b11579328",
+   *   "type": "Identifier",
+   *   "identifierScheme": "sierra-system-number"
+   * }
+   * ],
+   *
+   * 
+   */
+
 
    /* Populate wwork:language. Rules
    * 
@@ -65,35 +87,122 @@
    *
    * Example:
    *  "creators": [
-   * {
-   *   "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
-   *   "concept": {
-   *     "label": "Jacobs, Philip P",
-   *     "type": "Person",
-   *     "identifiers": [
-   *       {
-   *         "value": "2005016805",
-   *         "type": "Identifier",
-   *         "identifierScheme": "lcsh"
-   *       }
-   *     ]
-   *   },
-   *   "qualifiers": [
-   *             {
-   *      "qualifiedType": "fuller-form-of-name" ,        
-   *      "label": "Philip Peter",
-   *      "type": "Name"  
-   *     } ,
    *     {
-   *       "qualifiedType": "associated-time" ,
-   *       "label": "1879-1940",
-   *       "type": "Period"
-   *     } 
-   *   ]
-   * }
+   *        "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
+   *        "type": "QualifiedConcept" , 
+   *        "concept": {
+   *           "label": "Jacobs, Philip P",
+   *           "type": "Person",
+   *           "identifiers": [
+   *        {
+   *           "value": "2005016805",
+   *           "type": "Identifier",
+   *           "identifierScheme": "lcsh"
+   *        }
+   *        ]
+   *     },
+   *     "qualifiers": [
+   *        {
+   *           "qualifiedType": "fuller-form-of-name" ,        
+   *           "label": "Philip Peter",
+   *           "type": "Name"  
+   *        } ,
+   *        {
+   *           "qualifierType": "associated-time" ,
+   *           "label": "1879-1940",
+   *           "type": "Period"
+   *        } 
+   *     ]
+   *  }
    * ],
    *
    */
+
+   /* Populate wwork:genres. Rules:
+   * 
+   * 1. For all bibliographic records use "marcTag": "655"
+   * 2. If more than one subfield is populated then populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
+   * 3. if only "a" subfield is populated type as "Concept".   
+   * 4. If 655 is populated with a indentified concept from an authority (as indicated by use of second indicator) then populate id with Wellcome id for concept
+   * 5. populate platform "concept" with subfield "a".
+   * 6. When this concept has assocaited identifiers populate "identifiers" with value (subfield 0) and identity scheme (second indicator or if indicator 7 look to subfield 2) 
+   * 8. For each subfield, for subfields a-z ingnore 0-7, populate "qualifers" with a "label", type "Concept" (subfield "y" type as "Period" and type z as "Place") and populate "qualiferType" with the subfield name kebab-case.
+   * 
+   *
+   * Note: need to removing trailing punctuation on subfields
+   *
+   *
+   *"genres": [
+   * {
+   *   "label": "Caricatures 1952",
+   *   "type": "QualifiedConcept",
+   *   "concept" : {
+   *      "id": "a24s7qf3" ,
+   *      "label": "Caricatures" ,
+          "type": "Concept" , 
+   *      "identifiers": [
+   *        {
+   *         "type": "Identifier",
+   *         "identifierScheme": "lctgm",
+   *         "value": "tgm001698"
+   *        }
+   *      ] ,
+   *   "qualifiers": [
+   *     {
+   *      "qualifierType": "chronological-subdivision" ,        
+   *      "label": "1952",
+   *      "type": "Period"  
+   *     } 
+   *   ]
+   *],
+   *
+   */
+
+
+
+   /* Populate wwork:subjects. Rules:
+   * 
+   * 1. For all bibliographic records use "marcTag": "650".
+   * 2. If more than one subfield is populated. populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
+   * 3. if only "a" subfield is populated type as "Concept". 
+   * 4. populate platform "concept" with subfield "a".
+   * 5. When this concept has assocaited identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator or if indicator 7 look at subfield 2. 
+   * 6. For each subfield, for subfields a-z ingnore 0-7, populate "qualifers" with a "label", type "Concept" (except subfield "y" and "d" type as "Period" and type "c" and "z" as "Place") and populate "qualifierType" with the subfield name kebab-case.
+   * 
+   *
+   * Note: need to removing trailing punctuation on subfields
+   *
+   *
+   *"subjects": [
+   * {
+   *   "label": "Tuberculosis prevention & control.",
+   *   "type": "QualifiedConcept",
+   *   "concept": {
+   *     "id": "hd2891f",
+   *     "label": "Tuberculosis",
+   *     "type": "Concept",
+   *     "identifiers": [
+   *       {
+   *         "type": "Identifier",
+   *         "identifierScheme": "mesh",
+   *         "value": "D014376Q000517"
+   *       }
+   *     ],
+   *     "qualifiers": [
+   *       {
+   *         "qualifierType": "general-subdivision" ,
+   *         "label": "prevention & control",
+   *         "type": "Concept"
+   *       }
+   *     ]
+   *   }
+   * },
+   * ],
+   *
+   */
+
+
+
 
 
    /* Populate wwork:createdDate
@@ -176,7 +285,7 @@
    *
    * 1. For bibliographic records where "520" subfield "a" are populated .
    * 2. Populate "description"
-   * 3. If "520" subfield "b" is populated with summary expansion populate description. Note: should we have a long description property?
+   * 3. If "520" subfield "b" is populated with summary expansion populate description. Concatenate with summary from subfield "a".
    * 4. If record is of type art then populate with "245" subfield "6"
    *
    * Example:
@@ -196,14 +305,14 @@
    *     }  
    */   
 
-   /* wwwork:physicalDetails
+   /* wwwork:physicalDescription
    * 
    * 1. For bibliographic records where "300" subfield "b" are populated
    * 2. Populate "physcialDetails"
    * 3. 
    *
    * Example:
-   *   "physicalDetails": "illustrations"
+   *   "physicalDescription": "illustrations"
    *
    * Note: might this populated by a CV?
    */ 
@@ -222,6 +331,8 @@
    *      "unit": "cm" 
    *     } 
    */ 
+
+
 
 
 

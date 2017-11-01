@@ -11,10 +11,15 @@
     dcterms:created "2017-09-14"^^xsd:date ;
     dcterms:description "Ontology describing the properties of errors"@en .
 
+#######  Classes #####  
+
 werror:Error rdf:type owl:Class ;
     rdfs:label "Error"@en ;
     rdfs:comment "An individual error, mistake, or unintended outcome."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
+    
+#######  Object properties #####  
+
 
 werror:errorType rdf:type owl:ObjectProperty ;
     rdfs:label "errorType"@en ;
@@ -25,6 +30,9 @@ werror:httpStatus rdf:type owl:ObjectProperty ;
     rdfs:label "httpStatus"@en ;
     rdfs:comment "Relates an error to an IETF-defined HTTP response status code, if applicable."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
+
+
+#######  Data properties #####  
 
 werror:label rdf:type owl:ObjectProperty ;
     rdfs:label "label"@en ;
