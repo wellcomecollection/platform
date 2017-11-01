@@ -50,7 +50,7 @@ module "enrich_image_queue" {
   queue_name  = "enrich_image_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
-  topic_names = ["${module.enrich_image_topic.arn}"]
+  topic_names = ["${module.enrich_image_topic.name}"]
 
   alarm_topic_arn = "${var.dlq_alarm_arn}"
 }
