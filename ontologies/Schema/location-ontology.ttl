@@ -102,20 +102,24 @@ wloc:licenseType rdf:type owl:ObjectProperty ;
 
 ##### Object properties ####
 
-# @@AWLC Temporarily commented out, as `wag:` isn't defined anywhere else
-# in this file (and which has duplicate 'Object properties') so the Turtle
-# linter is happy.
-#
-# wag:identity rdf:type owl:DatatypeProperty ;
-#     rdfs:label "identity"@en ;
-#     rdfs:comment "The identity of the copy."@en ;
-#     rdfs:domain wag:Holding ;
-#     rdfs:range rdf:LangString ;
-#     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
-#
-# wag:volume rdf:type owl:DatatypeProperty ;
-#     rdfs:label "volume"@en ;
-#     rdfs:comment "The specific volume of the series."@en ;
-#     rdfs:domain wag:Item ;
-#     rdfs:range rdf:LangString ;
-#     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
+
+wloc:identity rdf:type owl:DatatypeProperty ;
+     rdfs:label "identity"@en ;
+     rdfs:comment "The identity of the copy."@en ;
+     rdfs:domain wloc:Holding ;
+     rdfs:range rdf:langString ;
+     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
+
+wloc:volume rdf:type owl:DatatypeProperty ;
+     rdfs:label "volume"@en ;
+     rdfs:comment "The specific volume of the series."@en ;
+     rdfs:domain wloc:Item ;
+     rdfs:range rdf:langString ;
+     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
+     
+wloc:copyright rdf:type owl:DatatypeProperty ;
+    rdfs:label "copyright"@en ;
+    rdfs:comment "Attribution of copyright to a copyright holder."@en ;
+    rdfs:domain wloc:Location ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .     
