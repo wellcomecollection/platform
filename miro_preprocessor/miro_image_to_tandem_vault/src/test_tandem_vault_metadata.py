@@ -4,7 +4,7 @@
 import tandem_vault_metadata
 
 image_data = {
-    #Caption
+    # Caption
     'image_no_calc': 'image_no_calc',
     'image_title': "image_title",
     'image_award': 'image_award',
@@ -27,15 +27,15 @@ image_data = {
     'image_tech_scanned_by': "image_tech_scanned_by",
     'image_transparency_held': "Yes",
     'image_related_images': "image_related_images",
-    #Usage
+    # Usage
     'image_use_restrictions': 'image_use_restrictions',
     'image_copyright_cleared': 'Y',
     'image_general_use': 'N',
-    #Creator
+    # Creator
     'image_creator': ["Bob Snappypic", "Jim Photoguy"],
-    #Credit
+    # Credit
     'image_credit_line': 'Wellcome Library',
-    #Tags
+    # Tags
     'image_subject_names': 'image_subject_names, WORD WORD, word-word',
     'image_keywords': 'image_keywords, Word, WORD',
     'image_lcsh_place': 'image_lcsh_place,  WORD',

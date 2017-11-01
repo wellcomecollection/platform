@@ -34,6 +34,7 @@ miro_collections = {
 class InvalidWIAYear(Exception):
     pass
 
+
 wia_year = {
     '1997': 110075,
     '1998': 110076,
@@ -54,7 +55,7 @@ wia_year = {
 
 
 def _is_in(d, a):
-    if not a in d:
+    if a not in d:
         return ""
     else:
         return d[a] or ""
@@ -108,7 +109,7 @@ def _show_only_if_match(d, a, match, prepend=""):
     return _followed_by_newline(d, a, prepend)
 
 
-def _or(s1,s2):
+def _or(s1, s2):
     if s1:
         return s1
 
@@ -159,7 +160,7 @@ def create_caption(d):
         _followed_by_newline(d, 'image_tech_scanned_by', "Photographer: ") +
         _show_only_if_match(d, 'image_transparency_held', 'Yes', 'Transparency held: '),
         _is_in(d, 'image_related_images'),
-        ]
+    ]
 
     print(parts)
 
