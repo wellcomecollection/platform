@@ -4,11 +4,10 @@
 import tandem_vault_metadata
 
 image_data = {
-    'image_no_calc': 'image_no_calc',
-    'image_award': 'image_award',
     #Caption
-    'image_no_number': "image_no_number",
+    'image_no_calc': 'image_no_calc',
     'image_title': "image_title",
+    'image_award': 'image_award',
     'image_innopac_id': "image_innopac_id",
     'image_pub_author': "image_pub_author",
     'image_pub_title': "image_pub_title",
@@ -50,7 +49,7 @@ expected_usage_text = \
     "May be sensitive or unsuitable for general use.\n"
 
 expected_caption_text = \
-    "image_no_number\n" + \
+    "image_no_calc\n" + \
     "image_title, Sierra record number: image_innopac_id\n" + \
     "image_pub_author, Bob Snappypic/Jim Photoguy, image_pub_title, image_pub_publisher, image_pub_date\n" + \
     "image_pub_periodical, image_pub_volume, image_pub_issue, image_pub_page_no, image_pub_plate\n" + \
