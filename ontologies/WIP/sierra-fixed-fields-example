@@ -57,12 +57,12 @@
       },
       "qualifiers": [
                 {
-          "": "fuller-form-of-name" ,        
+          "qualiferType": "fuller-form-of-name" ,        
           "label": "Philip Peter",
           "type": "Name"
         } ,
         {
-          "": "associated-time" ,
+          "qualiferType": "associated-time" ,
           "label": "1879-1940",
           "type": "Period"
         } 
@@ -108,7 +108,7 @@
     },
     "qualifiers": [
       {
-        "imprintType": "publisher",
+        "qualiferType": "publisher",
         "label": "Williams & Wilkins",
         "type": "Organisation"
       },
