@@ -1,27 +1,25 @@
-module "miro_image_to_tandem_vault_lambda" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
-  s3_key = "lambdas/miro_preprocessor/miro_image_to_dynamo.zip"
-
-  description     = "Push image JSON into DynamoDB"
-  name            = "miro_image_to_dynamo"
-  alarm_topic_arn = "${var.lambda_error_alarm_arn}"
-
-  environment_variables = {
-    TANDEM_VAULT_API_KEY = "${var.tandem_vault_api_key}"
-    TANDEM_VAULT_API_URL = "${var.tandem_vault_api_url}"
-    IMAGE_SRC_BUCKET = "${var.bucket_source_asset_name}"
-  }
+resource "aws_iam_role_policy" "allow_uploader_s3_get" {
+  role   = "${module.ecs_tandem_vault_uploader_iam.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_get.json}"
 }
 
-module "miro_image_to_tandem_vault_trigger" {
-  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-  lambda_function_name = "${module.miro_image_to_tandem_vault_lambda.function_name}"
-  sns_trigger_arn      = "${var.topic_miro_image_to_tandem_vault_arn}"
-  lambda_function_arn  = "${module.miro_image_to_tandem_vault_lambda.arn}"
+resource "aws_iam_role_policy" "allow_uploader_sqs_read" {
+  role   = "${module.ecs_tandem_vault_uploader_iam.task_role_name}"
+  policy = "${module.upload_image_queue.read_policy}"
 }
 
-resource "aws_iam_role_policy" "miro_image_to_tandem_vault_lambda" {
-  role   = "${module.miro_image_to_tandem_vault_lambda.role_name}"
+resource "aws_iam_role_policy" "allow_uploader_sns_publish" {
+  role   = "${module.ecs_tandem_vault_uploader_iam.task_role_name}"
+  policy = "${module.enrich_image_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "allow_enricher_sqs_read" {
+  role   = "${module.ecs_tandem_vault_enricher_iam.task_role_name}"
+  policy = "${module.enrich_image_queue.read_policy}"
+}
+
+resource "aws_iam_role_policy" "allow_enricher_s3_get" {
+  role   = "${module.ecs_tandem_vault_enricher_iam.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_get.json}"
 }
 
@@ -35,4 +33,77 @@ data "aws_iam_policy_document" "allow_s3_get" {
       "${var.bucket_source_asset_arn}/*",
     ]
   }
+}
+
+module "upload_image_queue" {
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.0.0"
+  queue_name  = "upload_image_queue"
+  aws_region  = "${var.aws_region}"
+  account_id  = "${var.account_id}"
+  topic_names = ["${var.topic_miro_image_to_tandem_vault_name}"]
+
+  alarm_topic_arn = "${var.dlq_alarm_arn}"
+}
+
+module "enrich_image_queue" {
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.0.0"
+  queue_name  = "enrich_image_queue"
+  aws_region  = "${var.aws_region}"
+  account_id  = "${var.account_id}"
+  topic_names = ["${module.enrich_image_topic.arn}"]
+
+  alarm_topic_arn = "${var.dlq_alarm_arn}"
+}
+
+module "enrich_image_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "enrich_image_topic"
+}
+
+module "tandem_vault_uploader" {
+  source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"
+  task_name     = "tandem_vault_uploader"
+  app_uri       = "${module.ecr_repository_tandem_vault_uploader.repository_url}:${var.release_ids["tandem_vault_uploader"]}"
+  task_role_arn = "${module.ecs_tandem_vault_uploader_iam.task_role_arn}"
+
+  env_vars = [
+    "{\"name\": \"QUEUE_URL\", \"value\": \"${module.enrich_image_queue.id}\"}",
+    "{\"name\": \"TOPIC_ARN\", \"value\": \"${module.enrich_image_topic.arn}\"}",
+    "{\"name\": \"TANDEM_VAULT_API_KEY\", \"value\": \"${var.tandem_vault_api_key}\"}",
+    "{\"name\": \"TANDEM_VAULT_API_URL\", \"value\": \"${var.tandem_vault_api_url}\"}",
+    "{\"name\": \"IMAGE_SRC_BUCKET\", \"value\": \"${var.bucket_source_asset_name}\"}",
+  ]
+}
+
+module "ecs_tandem_vault_uploader_iam" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs_iam?ref=v1.0.0"
+  name   = "tandem_vault_uploader"
+}
+
+module "ecr_repository_tandem_vault_uploader" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "tandem_vault_uploader"
+}
+
+module "tandem_vault_enricher" {
+  source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"
+  task_name     = "tandem_vault_enricher"
+  app_uri       = "${module.ecr_repository_tandem_vault_enricher.repository_url}:${var.release_ids["tandem_vault_enricher"]}"
+  task_role_arn = "${module.ecs_tandem_vault_enricher_iam.task_role_arn}"
+
+  env_vars = [
+    "{\"name\": \"QUEUE_URL\", \"value\": \"${module.enrich_image_queue.id}\"}",
+    "{\"name\": \"TANDEM_VAULT_API_KEY\", \"value\": \"${var.tandem_vault_api_key}\"}",
+    "{\"name\": \"TANDEM_VAULT_API_URL\", \"value\": \"${var.tandem_vault_api_url}\"}",
+  ]
+}
+
+module "ecs_tandem_vault_enricher_iam" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs_iam?ref=v1.0.0"
+  name   = "tandem_vault_enricher"
+}
+
+module "ecr_repository_tandem_vault_enricher" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "tandem_vault_enricher"
 }
