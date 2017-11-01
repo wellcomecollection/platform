@@ -216,7 +216,7 @@ module "miro_image_to_tandem_vault" {
 
   bucket_source_asset_arn               = "${local.bucket_miro_images_sync_arn}"
   bucket_source_asset_name              = "${local.bucket_miro_images_sync_name}"
-  dlq_alarm_arn                         = "local.dlq_alarm_arn"
+  dlq_alarm_arn                         = "${local.dlq_alarm_arn}"
   topic_miro_image_to_tandem_vault_name = "${module.tandem_vault_topic.name}"
   account_id                            = "${data.aws_caller_identity.current.account_id}"
   release_ids                           = "${var.release_ids}"
