@@ -81,3 +81,7 @@ def main():
         api.add_image_tags(asset_id, tags)
 
         sqs_reader.delete_current()
+
+
+if __name__ == '__main__':
+    main()
