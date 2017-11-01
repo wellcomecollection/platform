@@ -67,7 +67,8 @@ module "tandem_vault_uploader" {
   task_role_arn = "${module.ecs_tandem_vault_uploader_iam.task_role_arn}"
 
   env_vars = [
-    "{\"name\": \"QUEUE_URL\", \"value\": \"${module.enrich_image_queue.id}\"}",
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
+    "{\"name\": \"QUEUE_URL\", \"value\": \"${module.upload_image_queue.id}\"}",
     "{\"name\": \"TOPIC_ARN\", \"value\": \"${module.enrich_image_topic.arn}\"}",
     "{\"name\": \"TANDEM_VAULT_API_KEY\", \"value\": \"${var.tandem_vault_api_key}\"}",
     "{\"name\": \"TANDEM_VAULT_API_URL\", \"value\": \"${var.tandem_vault_api_url}\"}",
@@ -92,6 +93,7 @@ module "tandem_vault_enrichment" {
   task_role_arn = "${module.ecs_tandem_vault_enrichment_iam.task_role_arn}"
 
   env_vars = [
+    "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
     "{\"name\": \"QUEUE_URL\", \"value\": \"${module.enrich_image_queue.id}\"}",
     "{\"name\": \"TANDEM_VAULT_API_KEY\", \"value\": \"${var.tandem_vault_api_key}\"}",
     "{\"name\": \"TANDEM_VAULT_API_URL\", \"value\": \"${var.tandem_vault_api_url}\"}",
