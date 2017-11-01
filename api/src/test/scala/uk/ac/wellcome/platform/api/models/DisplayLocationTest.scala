@@ -21,4 +21,15 @@ class DisplayLocationTest extends FunSpec with Matchers {
     displayLocation.license shouldBe DisplayLicense(internalLocation.license)
     displayLocation.ontologyType shouldBe "Location"
   }
+
+  it("should read the copyright field from a Location correctly") {
+    val location = Location(
+      locationType = "thumbnail-image",
+      copyright = Some("Science Museum, Wellcome"),
+      license = License_CCBY
+    )
+    val displayLocation = DisplayLocation(location)
+
+    displayLocation.copyright shouldBe location.copyright
+  }
 }
