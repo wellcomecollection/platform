@@ -1,0 +1,78 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "watu9tbc",
+  "type": "Series",
+  "seriesType": {
+    "id": "?",
+    "type": "seriesType",
+    "label": "?"
+  },
+  "identifiers": [
+    {
+      "value": "9781999809003",
+      "type": "Identifier",
+      "identifierScheme": "prism-id"
+    }
+  ],
+  "title": "The Outsiders",
+  "language": {
+    "id": "eng",
+    "label": "English",
+    "type": "Language"
+  },
+  "numberInSeries": "6",
+  "season": {
+    "id": "d921j0ddj",
+    "label": "Epidemics",
+    "type": "Season"
+  },
+  "works": [
+    {
+      "id": "dh8191d8",
+      "type": "Work",
+      "workType": {
+        "id": "article",
+        "type": "WorkType",
+        "label": "Article"
+      },
+      "title": "The stranger who started an epidemic",
+      "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
+      "positionInSeries": "1",
+      "description": "The City of London, 1665. As the Great Plague hits the capital, John New faces a deadly dilemma.",
+      "thumbnail": {
+        "type": "Location",
+        "locationType": "thumbnail-image",
+        "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-01-13-v0010539.jpg/full/880,/0/default.jpg",
+        "license": {
+          "type": "License",
+          "licenseType": "CC-BY",
+          "label": "Attribution 4.0 International (CC BY 4.0)",
+          "url": "http://creativecommons.org/licenses/by/4.0/"
+        }
+      }
+    },
+    {
+      "id": "j90xj9qjq",
+      "workType": {
+        "id": "article",
+        "type": "WorkType",
+        "label": "Article"
+      },
+      "title": "The tradesman who confronted the pestilence",
+      "url": "https://wellcomecollection.org/articles/outsiders-the-tradesman",
+      "positionInSeries": "2",
+      "description": "The City of London, 1665. As the Great Plague hits the capital, John New faces a deadly dilemma.",
+      "thumbnail": {
+        "type": "Location",
+        "locationType": "thumbnail-image",
+        "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/600,/0/default.jpg",
+        "license": {
+          "type": "License",
+          "licenseType": "CC-BY",
+          "label": "Attribution 4.0 International (CC BY 4.0)",
+          "url": "http://creativecommons.org/licenses/by/4.0/"
+        }
+      }
+    }
+  ]
+}
