@@ -1,10 +1,13 @@
 package uk.ac.wellcome.models.transformable.miro
 
+import java.io.InputStream
+import scala.io.Source
+import scala.util.Try
+
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable._
-
-import scala.util.Try
+import uk.ac.wellcome.utils.JsonUtil
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
@@ -200,6 +203,23 @@ case class MiroTransformable(MiroID: String,
       case "Academics" => License_CCBYNC
     }
 
+  // This JSON resource gives us credit lines for contributor codes.
+  //
+  // It is constructed as a map with fields drawn from the `contributors.xml`
+  // export from Miro, with:
+  //
+  //     - `contributor_id` as the key
+  //     - `contributor_credit_line` as the value
+  //
+  // Note that the checked-in file has had some manual edits for consistency,
+  // and with a lot of the Wellcome-related strings replaced with
+  // "Wellcome Collection".
+  val stream: InputStream = getClass
+    .getResourceAsStream("/miro_contributor_map.json")
+  val contributorMap = JsonUtil.toMap[String](
+    Source.fromInputStream(stream)
+      .mkString).get
+
   /** Image credits in MIRO could be set in two ways:
     *
     *    - using the image_credit_line, which is per-image
@@ -213,7 +233,7 @@ case class MiroTransformable(MiroID: String,
     miroData.creditLine match {
       case Some(line) => Some(line)
       case None => miroData.sourceCode match {
-        case Some(code) => Some(MiroContributorMapper.contributorMap(code))
+        case Some(code) => Some(contributorMap(code))
         case None => None
       }
     }
