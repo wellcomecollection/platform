@@ -233,7 +233,7 @@ case class MiroTransformable(MiroID: String,
     miroData.creditLine match {
       case Some(line) => Some(line)
       case None => miroData.sourceCode match {
-        case Some(code) => Some(contributorMap(code))
+        case Some(code) => Some(contributorMap(code.toUpperCase))
         case None => None
       }
     }

@@ -619,6 +619,17 @@ class MiroTransformableCopyrightTest
     )
   }
 
+
+  it("should use the uppercased version of the source_code if necessary") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A loud and leafy lime",
+        "image_source_code": "wel"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
   private def transformRecordAndCheckCopyright(
     data: String,
     expectedCopyright: Option[String] = None
