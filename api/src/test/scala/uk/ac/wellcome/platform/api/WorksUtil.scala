@@ -113,10 +113,6 @@ trait WorksUtil {
   }
 
   def locationWith(url: Option[String], license: License): Location = {
-    Location(
-      "iiif-image",
-      url,
-      license
-    )
+    Location(locationType = "iiif-image", url = url, license = license)
   }
 }
