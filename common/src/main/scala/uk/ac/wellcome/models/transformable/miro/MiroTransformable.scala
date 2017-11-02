@@ -200,6 +200,22 @@ case class MiroTransformable(MiroID: String,
       case "Academics" => License_CCBYNC
     }
 
+  /** Image credits in MIRO could be set in two ways:
+    *
+    *    - using the image_credit_line, which is per-image
+    *    - using the image_source_code, which falls back to a contributor-level
+    *      credit line
+    *
+    * We prefer the per-image credit line, but use the contributor-level credit
+    * if unavailable.
+    */
+  private def getCopyright(miroData: MiroTransformableData): Option[String] = {
+    miroData.creditLine match {
+      case Some(s) => Some(s)
+      case None => None
+    }
+  }
+
   def getThumbnail(miroData: MiroTransformableData): Location = {
     Location(
       locationType = "thumbnail-image",
@@ -218,6 +234,7 @@ case class MiroTransformable(MiroID: String,
           Location(
             locationType = "iiif-image",
             url = Some(buildImageApiURL(MiroID, "info")),
+            copyright = getCopyright(miroData),
             license = chooseLicense(miroData.useRestrictions.get)
           )
         )
