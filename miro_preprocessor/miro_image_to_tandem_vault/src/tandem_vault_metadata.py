@@ -98,63 +98,60 @@ def lookup_contributor(d):
     return contributor
 
 
-def _is_in(d, a):
-    if a not in d:
+def _list_to_string(candidate_string, delimiter=", "):
+    if isinstance(candidate_string, list):
+        string_list = [o for o in candidate_string if isinstance(o, str)]
+        string_list = [o for o in string_list if o]
+
+        candidate_string = delimiter.join(string_list)
+
+    return candidate_string
+
+
+def _is_in(my_dict, key, delimiter=", "):
+    if key not in my_dict:
         return ""
-    else:
-        return d[a] or ""
+
+    if not my_dict[key]:
+        return ""
+
+    return _list_to_string(my_dict[key], delimiter)
 
 
-def _if_exists(d, a, prepend=""):
-    s = _is_in(d, a)
-
+def _prefix_string(s, prefix="", suffix=""):
     if not s:
         return ""
 
-    return f"{prepend}{s}"
+    return f"{prefix}{s}{suffix}"
 
 
-def _followed_by_comma(d, a, prepend="", delimiter=", "):
-    logger.info(a)
+def _if_exists(d, a, prefix=""):
     s = _is_in(d, a)
-
-    if isinstance(s, list):
-        s = delimiter.join(s)
-
-    if not s:
-        return ""
-
-    return f"{prepend}{s}, "
+    return _prefix_string(s, prefix)
 
 
-def _followed_by_newline(d, a, prepend="", delimiter=", "):
-    logger.info(a)
+def _followed_by_comma(d, a, prefix=""):
     s = _is_in(d, a)
-    if isinstance(s, list):
-        s = delimiter.join(s)
+    return _prefix_string(s, prefix, ', ')
 
-    if not s:
-        return ""
 
-    return f"{prepend}{s}\n"
+def _followed_by_newline(d, a, prefix="", delimiter=", "):
+    s = _is_in(d, a)
+    return _prefix_string(s, prefix, '\n')
 
 
 def _show_only_if_match_hide_value(d, a, match, text):
     s = _is_in(d, a)
-
     if s != match:
         return ""
+    return _prefix_string(text, '', '\n')
 
-    return f"{text}\n"
 
-
-def _show_only_if_match(d, a, match, prepend=""):
+def _show_only_if_match(d, a, match, prefix="", suffix=""):
     s = _is_in(d, a)
-
     if s != match:
         return ""
-
-    return _followed_by_newline(d, a, prepend)
+    return _prefix_string(s, prefix, '\n')
 
 
 def _or(s1, s2):
@@ -259,17 +256,14 @@ def create_tags(d):
 
 
 def create_creator(d):
-    creators = _is_in(d, 'image_creator')
+    creators = _is_in(d, 'image_creator', '/')
 
     if not creators:
         possible_creator = lookup_contributor(d)
         if possible_creator:
             return possible_creator
 
-    if not isinstance(creators, list):
-        creators = [creators]
-
-    return "/".join(creators)
+    return creators
 
 
 def create_metadata(image_data):
