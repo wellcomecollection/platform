@@ -1,1 +1,398 @@
 ThumbnailImage,thumbnail-image,Thumbnail Image
+2,acqi,Info Service acquisitions
+3,acql,Wellcome Library
+4,admi,administration
+5,arch,Archives Collection
+6,bwith,bound in above
+7,cwith,Contained in above
+8,dbiaa,Biomedical Ethics
+9,dcoaa,C&E
+10,dept,Wellcome Trust departments
+11,dhuaa,Human Resources
+12,digi,Digitised Collections
+13,digit,Digitised Collections
+14,dimgs,IMS
+15,dinad,IT:Admin
+16,dingo,IT:Governance
+17,dinop,IT:Operations
+18,dinsd,IT:Systems Development
+19,dints,IT:Training & Support
+20,dlnk,Digitised content
+21,dpleg,Legal Dept.
+22,dpoaa,Policy Unit
+23,dpuih,Grants Management
+24,elrm,E-Learning Room
+25,elro,Online
+26,enhl,Enquiry Hall
+27,epbo,Rare Books Collection
+28,exre,ON EXHIBITION RESERVE
+29,exres,On Exhibition
+30,foto,Medical Photo Library
+31,gblip,215 Information Point
+32,gibb,Wellcome Trust departments
+33,hamp,Offsite
+34,hgser,Offsite
+35,hgslr,Offsite (LSHTM journals)
+36,hicon,OBSOLETE Offsite Iconographic
+37,hmfac,REQUEST Moving image and sound collections
+38,homc,History of Medicine Collection
+39,home,Wellcome Library
+40,icno,Iconographic Collection
+41,illd,ILL Department
+42,info,Open shelves
+43,iscdr,Medicine & Society Collection CDROM
+44,isope,Medicine & Society Collection
+45,ispre,Closed stores Press Cuttings
+46,isref,OBSOLETE journals
+47,issta,Closed stores Medicine & Society
+48,isvid,Information Service Video
+49,ledw,Enquiry Desk
+50,medc,Medical Collection
+51,mfgmc,Closed stores Graves Med.AV col
+52,mfinc,Closed stores Inst.Neurol.Coll.
+53,mfohc,Closed stores Moving image and sound collections
+54,mfulc,Closed stores Univ.Lon. AV Coll
+55,mfvac,Closed stores Moving image and sound collections
+56,mfvl,Closed stores
+57,mfwcm,Well.Centre for Med.Sci.
+58,nist,Not In Stock
+59,ofacq,OBSOLETE Closed stores Staff Office Acq
+60,ofarw,Closed stores Archives Workroom
+61,ofch1,OBSOLETE Closed stores Staff Office 313
+62,ofcur,OBSOLETE Closed stores Staff Office CW
+63,ofdj1,OBSOLETE Closed stores Staff Office 320
+64,ofdp1,Closed stores Head of Library's Office
+65,ofep1,Closed stores Rare Books Staff Area
+66,ofep2,OBSOLETE Closed stores Staff Office 342
+67,ofep3,OBSOLETE Closed stores Staff Office 343
+68,ofexh,Closed stores Exhibitions Office
+69,ofgcc,Closed stores Collections Management Office
+70,ofinf,Closed stores Professional Collection
+71,ofjs1,"Closed stores Head, Research & Special Collections"
+72,oflh1,OBSOLETE Closed stores Staff Office 322
+73,oflis,OBSOLETE Closed stores Staff Office 258
+74,ofmfa,Closed stores MISC Office
+75,ofmpl,Closed stores MPL Office
+76,ofmsj,Closed stores 1st floor staff office
+77,ofna1,OBSOLETE Closed stores Staff Office 242
+78,ofns1,Closed stores Asian Collection Staff Area
+79,ofor3,Closed stores Outreach Officer
+80,ofpld,OBSOLETE Closed stores Staff Office 348
+81,ofra1,Closed stores Staff Office 325
+82,ofres,OBSOLETE Closed stores Readers Services Office
+83,ofrk1,Closed stores Digital Services
+84,ofsg1,OBSOLETE Closed stores Staff Office 223
+85,ofvds,Closed stores Human Resources Office
+86,ofvn1,OBSOLETE Closed stores Staff Office VN
+87,ofws1,Closed stores Iconographic Office
+88,ofzs1,OBSOLETE Closed stores Staff Office 311
+89,orio,Asian Collections
+90,poyn,Rare Materials Room
+91,resv,EXHIBITION RESERVE
+92,rm001,Room 3.42
+93,rmdda,Room 3.41
+94,sc#ac,Unrequestable Arch. & MSS
+95,sc#ra,Unrequestable A&MSS RAMC
+96,sc#wa,Unrequestable A&MSS WA
+97,sc#wf,Unrequestable A&MSS WF
+98,scmac,Closed stores Arch. & MSS
+99,scmra,Closed stores A&MSS RAMC
+100,scmwa,Closed stores A&MSS Well.Arch.
+101,scmwc,Archives & Mss Well.Coll.
+102,scmwf,Closed stores A&MSS Well.Found.
+103,scons,Conservation
+104,sehuf,Closed stores EPB Hunt.G.O/S
+105,sehun,Closed stores EPB Hunt.
+106,sehup,Closed stores EPB Hunt. pam
+107,sehux,Closed stores EPB Hunt. O/S
+108,semfc,RESTRICTED
+109,semfm,Closed stores EPB m/film
+110,semsa,Closed stores EPB MSL A
+111,semsb,Closed stores EPB MSL B
+112,semsc,Closed stores EPB MSL C
+113,semsd,Closed stores EPB MSL D
+114,semsf,Closed stores EPB MSL G. O/S
+115,semsl,Closed stores EPB MSL
+116,semss,Closed stores EPB MSL journals
+117,semst,Closed stores EPB MSL tracts
+118,sepaf,Closed stores EPB Amer.G.O/S
+119,sepah,Closed stores EPB Austro-Hung.
+120,sepal,Closed stores EBP Almanac
+121,sepam,Closed stores EPB American
+122,sepax,Closed stores EPB Amer. O/S
+123,sepba,Closed stores EPB / A
+124,sepbb,Closed stores EPB / B
+125,sepbc,Closed stores EPB / C
+126,sepbd,Closed stores EPB / D
+127,sepbf,Closed stores EPB G. O/S
+128,sepbi,Closed stores EPB Biog p.Vol
+129,sepbk,Closed stores EPB
+130,sepbl,Closed stores EPB Books for the Blind
+131,sepbn,Closed stores EPB Bindings
+132,sepbp,Closed stores EPB / P
+133,sepbr,Closed stores EPB Planchests
+134,sepcp,Closed stores EPB Cattle Plague
+135,sepcr,Closed stores EPB Crawford
+136,sepct,Closed stores EPB Cancer tracts
+137,sepen,Closed stores EPB Encycl
+138,sepep,Closed stores EPB Ephemera
+139,seper,Closed stores EPB Erotica
+140,sepin,Closed stores EPB Incunabula
+141,seraf,Closed stores EPB RAMC G. O/S
+142,seram,Closed stores EPB RAMC
+143,seras,Closed stores EPB RAMC journals
+144,serax,Closed stores EPB RAMC O/S
+145,sese2,Closed stores EPB dup journals
+146,seser,Closed stores EPB journals
+147,sesex,Closed stores EPB journals O/S
+148,sespc,Closed stores EPB Pamphlets O/S
+149,sesua,Closed stores EPB Suppl. A
+150,sesub,Closed stores EPB Suppl. B
+151,sesuc,Closed stores EPB Suppl. C
+152,sesud,Closed stores EPB Suppl. D
+153,sesup,Closed stores EPB Suppl. P
+154,sesus,Early Printed Books /Supp
+155,setra,Closed stores EPB Tracts
+156,sg#a2,Closed stores pams. (RMR)
+157,sg#am,Closed stores Med. pam (RMR)
+158,sg#ax,Closed stores Med. pam O/S (RMR)
+159,sg#bi,Closed stores Biog. pam (RMR)
+160,sg#c2,Closed stores pams. O/S (RMR)
+161,sg#e1,Closed stores mons. O/S (RMR)
+162,sg#e2,Closed stores mons. (RMR)
+163,sg#ed,Closed stores Med. (RMR)
+164,sg#ef,Closed stores Med. G. O/S (RMR)
+165,sg#ex,Closed stores Med. O/S (RMR)
+166,sg#f2,Closed stores Med G. O/S 2
+167,sg#hi,Closed stores Hist. pam (RMR)
+168,sg#i2,Closed stores Hist. 2 (RMR)
+169,sg#if,Closed stores Hist. G. O/S (RMR)
+170,sg#vo,Closed stores Pam. vol. (RMR)
+171,sg#x2,Closed stores Hist. O/S 2
+172,sgamc,Closed stores Americana
+173,sgame,Closed stores Amer. Ethnog.
+174,sgami,Closed stores Amerind
+175,sgamp,Temp. store Hist.
+176,sgams,Closed stores Amer. journals
+177,sganr,Closed stores ann. rep.
+178,sganx,Closed stores ann. rep. O/S
+179,sgbsc,Closed stores booksellers cat.
+180,sgcam,Closed stores Camden Soc.
+181,sgcra,Closed stores Thai mss
+182,sgdi2,OBSOLETE Closed stores diss. 2
+183,sgdir,OBSOLETE Closed stores directories
+184,sgdis,Closed stores diss.
+185,sgdix,Closed stores diss. O/S
+186,sgenc,Closed stores Hist. Encylop.
+187,sgeph,Closed stores ephemera
+188,sgero,Closed stores Erotica
+189,sgeth,Unavailable
+190,sggue,Closed stores Guerra Coll.
+191,sghac,Closed stores Hackett
+192,sghak,Closed stores Hakluyt Soc.
+193,sghf2,Closed stores Hist. G. O/S 2
+194,sghi2,Closed stores Hist. 2
+195,sghif,Closed stores Hist. G. O/S
+196,sghio,OBSOLETE Closed stores Hist. 2 (foa)
+197,sghip,OBSOLETE Closed stores Hist. 2 (RMR)
+198,sghx2,Closed stores Hist. O/S 2
+199,sgleo,Temp store Hist folios
+200,sglew,Closed stores Lewis
+201,sgmc2,Closed stores Conferences 2
+202,sgme1,Closed stores Med. 1
+203,sgme2,OBSOLETE Closed stores Med. 2
+204,sgmed,Closed stores Med.
+205,sgmef,Closed stores Med. G. O/S
+206,sgmex,Closed stores Med. O/S
+207,sgmf2,Closed stores Med. G. O/S 2
+208,sgmfc,By appointment
+209,sgmfm,Closed stores Med. microfilm
+210,sgmg2,Closed stores Garr. Mort 2
+211,sgmoh,Closed stores MOH reports (RMR)
+212,sgmon,Closed stores mons.
+213,sgmox,Closed stores mons. O/S
+214,sgmp1,OBSOLETE Closed stores Med. (RMR)
+215,sgmp2,OBSOLETE Closed stores Med. O/S (RMR)
+216,sgmp3,OBSOLETE Closed stores Med. G. O/S (RMR)
+217,sgmp4,OBSOLETE Closed stores Med. G O/S 2 (RMR)
+218,sgmx1,OBSOLETE Closed stores Med. O/S 1
+219,sgmx2,OBSOLETE Closed stores Med. O/S 2
+220,sgocc,Closed stores Occult
+221,sgpa1,OBSOLETE Closed stores Med. pam. (RR)
+222,sgpa2,Closed stores Med. pam 2
+223,sgpam,Closed stores Med. pam.
+224,sgpan,Closed stores pams.
+225,sgpax,Closed stores Med. pam O/S
+226,sgpbi,Closed stores Biog. pam
+227,sgpbx,Closed stores Biog. pam O/S
+228,sgphi,Closed stores Hist. pam
+229,sgphx,Closed stores Hist. pam O/S
+230,sgptb,Closed stores bound patents
+231,sgptu,Closed stores unbound patents
+232,sgpvo,Closed stores Pam. vol.
+233,sgpvx,Closed stores Pam vol. O/S
+234,sgpx2,OBSOLETE Closed stores Med. pam O/S 2
+235,sgpxn,Closed stores pams. O/S
+236,sgram,Closed stores RAMC
+237,sgras,Closed stores RAMC journals
+238,sgrax,Closed stores RAMC O/S
+239,sgrcs,Closed stores RCSE journals
+240,sgse2,Closed stores journals 2
+241,sgsee,Closed stores Hist. journals
+242,sgsen,Closed stores journals
+243,sgser,Closed stores journals
+244,sgsex,Closed stores journals O/S
+245,sgshe,Closed stores Shepherd
+246,sgsx2,OBSOLETE Closed stores journals O/S 2
+247,sgsxn,Closed stores journals O/S
+248,sgwel,Closed stores Wellcome Coll.
+249,sicon,Closed stores Iconographic
+250,smfac,"Closed stores Film, Video & Sound"
+251,sobab,Closed stores P.B. Arabic
+252,sobah,Closed stores P.B. Amharic
+253,sobak,Closed stores P.B. Akkadian
+254,sobam,Closed stores P.B. Aramaic
+255,sobar,Closed stores P.B. Armenian
+256,sobas,Closed stores P.B. Assyrian
+257,sobbe,Closed stores P.B. Bengali
+258,sobbh,Closed stores P.B. Bhili
+259,sobbu,Closed stores P.B. Burmese
+260,sobch,Closed stores P.B. Chinese
+261,sobco,Closed stores P.B. Coptic
+262,sobet,Closed stores P.B. Ethiopic
+263,sobge,Closed stores P.B. Georgian
+264,sobgu,Closed stores P.B. Gujurati
+265,sobhe,Closed stores P.B. Hebrew
+266,sobhg,Closed stores P.B. Hieroglyphic
+267,sobhi,Closed stores P.B. Hindi
+268,sobhr,Closed stores P.B. Hieratic
+269,sobin,Closed stores P.B. Indonesian
+270,sobja,Closed stores P.B. Japanese
+271,sobkl,Closed stores P.B. Kalmuck
+272,sobkn,Closed stores P.B. Kanarese
+273,sobko,Closed stores P.B. Korean
+274,sobla,Closed stores P.B. Ladakhi
+275,sobmd,Closed stores P.B. Malagasi
+276,sobmi,Closed stores P.B. Misc. Langs.
+277,sobml,Closed stores P.B. Malay
+278,sobmm,Closed stores P.B. Malayam
+279,sobmo,Closed stores P.B. Mongolian
+280,sobmr,Closed stores P.B. Marath
+281,sobne,Closed stores P.B. Nepali
+282,sobor,Closed stores P.B. Oriya
+283,sobpe,Closed stores P.B. Persian
+284,sobph,Closed stores P.B. Pahlavi
+285,sobpl,Closed stores P.B. Pali
+286,sobpr,Closed stores P.B. Prakrit
+287,sobps,Closed stores P.B. Pashto
+288,sobsa,Closed stores P.B. Sanskrit
+289,sobsi,Closed stores P.B. Singhalese
+290,sobsy,Closed stores P.B. Syriac
+291,sobta,Closed stores P.B. Tamil
+292,sobtb,Closed stores P.B. Tibetan
+293,sobte,P.B. Telugu
+294,sobtg,Closed stores P.B. Tigrinya
+295,sobth,Closed stores P.B. Thai
+296,sobtu,Closed stores P.B. Turkish
+297,sobui,Closed stores P.B. Uighur
+298,sobur,Closed stores P.B. Urdu
+299,sobuz,Closed stores P.B. Uzbek
+300,sobyi,Closed stores P.B. Yiddish
+301,sohob,Closed stores Orient. Hobson
+302,solie,Closed stores Orient. Lietard
+303,solsa,Closed stores Sanskrit litho
+304,somab,Closed stores Arabic mss
+305,sombu,Closed stores Burmese mss
+306,somch,Closed stores Chinese coll.
+307,somet,Closed stores Ethiopian mss
+308,somfm,Closed stores Oriental m/film
+309,somge,Closed stores Georgian mss
+310,somhe,Closed stores Hebrew mss
+311,somhi,Closed stores Hindi mss
+312,somja,Closed stores Japanese mss
+313,somml,Closed stores Malayan mss
+314,sompa,Closed stores Pali mss
+315,sompe,Closed stores Persian mss
+316,sompr,Closed stores Prakrit mss
+317,somsa,Closed stores Sanskrit mss alpha
+318,somsb,Closed stores Sanskrit mss beta
+319,somsc,Closed stores Sanskrit mss gamma
+320,somsd,Closed stores Sanskrit mss delta
+321,somse,Closed stores Sanskrit mss epsi
+322,somsi,Closed stores Sinhalese mss
+323,somsr,Closed stores Turkish Ottoman mss
+324,somsy,Closed stores Syriac mss
+325,somtb,Closed stores Tibetan mss
+326,sopam,Closed stores Oriental pam.
+327,sopme,Closed stores Orient. Mehta
+328,soref,Closed stores Orient. ref.
+329,sorex,Closed stores Orient. ref. O/S
+330,soser,Closed stores Oriental journals
+331,sotop,Closed stores Orient. Topog.
+332,sreg,SELF REGISTERED
+333,sslob,Closed stores Student Coll
+334,sslor,Closed stores Student Reprint
+335,stax,Closed stores
+336,swm#1,Unrequestable WMS 1
+337,swm#2,Unrequestable WMS 2
+338,swm#3,Unrequestable WMS 3
+339,swm#4,Unrequestable WMS 4
+340,swm#5,Unrequestable WMS 5
+341,swm#6,Unrequestable WMS 6
+342,swm#7,Unrequestable WMS 7
+343,swm#m,Unrequestable WMS Amer.
+344,swm#o,Unrequestable WMS MSL
+345,swmal,Closed stores WMS Als
+346,swmam,Closed stores WMS Amer.
+347,swmlo,Closed stores WMS MSL
+348,swms1,Closed stores WMS 1
+349,swms2,Closed stores WMS 2
+350,swms3,Closed stores WMS 3
+351,swms4,Closed stores WMS 4
+352,swms5,Closed stores WMS 5
+353,swms6,Closed stores WMS 6
+354,swms7,Closed stores WMS 7
+355,swmti,Closed stores WMS Ticehurst
+356,szmon,Closed stores prof. monographs
+357,szser,Closed stores prof. journals
+358,temp,temp. location
+359,temp1,At Digitisation
+360,temp2,Temporarily in use
+361,temp3,At Digitisation
+362,temp4,At Digitisation
+363,temp5,At Digitisation
+364,temp6,At Digitisation
+365,virm,Viewing Room
+366,wgcom,Closed stores computer media
+367,wghib,Biographies
+368,wghig,Gallery
+369,wghip,Rare Materials Room
+370,wghir,Reading Room
+371,wghxb,OBSOLETE Folios
+372,wghxg,Folios
+373,wghxp,OBSOLETE Folios
+374,wghxr,OBSOLETE Folios
+375,wgmem,Medical Collection
+376,wgmxm,OBSOLETE Medical Collection oversize
+377,wgpvm,History of Medicine
+378,wgsee,Journals
+379,wgsem,Journals
+380,wgser,Journals
+381,whml,Open shelves
+382,wmso,Western Mss Collection
+383,wqrfc,Quick Ref. Collection
+384,wqrfd,OBSOLETE Poynter Room [Desk]
+385,wqrfe,Enquiry Line
+386,wqrfp,Rare Materials Room Reference
+387,wqrfr,OBSOLETE Enquiry Hall
+388,wsdis,Closed stores Student diss
+389,wslob,Student Collection
+390,wslom,Student Coll (Med Lit)
+391,wslor,Student Coll.  reprints
+392,wslox,Student Coll. (oversize)
+393,wsref,Student Coll. (ref only)
+394,wsrer,Student Coll. reprints (ref only)
+395,wsrex,Student Coll. (Ref. O/S)
+396,zcql,Acquisitions Z39.50
+397,zzzzz,-
+

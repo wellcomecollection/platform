@@ -1,0 +1,48 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "watu9tbc",
+  "type": "Event",
+  "eventType": {
+    "id": "event",
+    "type": "EventType",
+    "label": "Event"
+  },
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://wellcomecollection.org/articles/Wa_Ody0AADIohQQo",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "identifiers": [
+    {
+      "value": "9781999809003",
+      "type": "Identifier",
+      "identifierScheme": "?"
+    }
+  ],
+  "title": "Saturday Studio: Emoji design",
+  "description": "Learn about the principles of graphic design by creating your own series of medical emojis.",
+  "series" : {
+    "id" : "1j09ddj90" ,
+    "label" : "Saturday Studio" ,
+    "url" : "https://wellcomecollection.org/saturdaystudio" 
+    } ,
+  "positionInSeries": "2" ,  
+  "audience": "Youth event",
+  "endDate": "21 October 2017",
+  "startDate": "21 October 2017",
+  "location": "Wellcome Studio",
+  "offer": {
+    "priceSpecification" : {
+      "price": "5",
+      "priceCurrency": "GBP" ,
+      "type": "PriceSpecification"
+    } ,
+    "url": "http://bookshop.blackwell.co.uk/bookshop/product/9781999809003"
+  }
+}
