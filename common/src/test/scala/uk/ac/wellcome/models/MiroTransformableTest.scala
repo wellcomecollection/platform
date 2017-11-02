@@ -587,6 +587,38 @@ class MiroTransformableCopyrightTest
     )
   }
 
+  it("shoudl use the image_credit_line field if present") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": "Wellcome Collection"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
+  it("should use the image_credit_line in preference to image_source_code") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": "Wellcome Collection",
+        "image_source_code": "CAM"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
+  it("should use image_source_code if image_credit_line is empty") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": null,
+        "image_source_code": "CAM"
+      """,
+      expectedCopyright = Some("Benedict Campbell")
+    )
+  }
+
   private def transformRecordAndCheckCopyright(
     data: String,
     expectedCopyright: Option[String] = None
