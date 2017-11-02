@@ -57,7 +57,7 @@
     {
       "id": "a24s7qf3",
       "label": "Postcards",
-      "type": "Concept",
+      "type": "Concept"
     }
   ],
   "physicalDescription": 
@@ -78,8 +78,8 @@
           "offer": {
             "price": "9.99" ,
             "priceCurrency": "GBP" ,
-            "url": "http://bookshop.blackwell.co.uk/bookshop/product/9781999809003" , 
-          }
+            "url": "http://bookshop.blackwell.co.uk/bookshop/product/9781999809003"
+          },
           "accessStatus": {
             "id": "Avaliable",
             "type": "AccessStatus"
@@ -89,7 +89,6 @@
             "label": "Order Online",
             "type": "AccessProcess"
           }
-        }
         }
       ]
     }
