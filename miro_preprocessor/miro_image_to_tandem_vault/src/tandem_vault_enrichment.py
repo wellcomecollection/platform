@@ -30,7 +30,7 @@ logger = daiquiri.getLogger(__name__)
 
 
 def is_wia_award_winner(miro_image):
-    if not "image_award" in miro_image.image_data:
+    if "image_award" not in miro_image.image_data:
         return False
     if not miro_image.image_data['image_award']:
         return False
