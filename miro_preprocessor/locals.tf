@@ -1,5 +1,6 @@
 locals {
   lambda_error_alarm_arn            = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
+  dlq_alarm_arn                     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   run_ecs_task_topic_arn            = "${data.terraform_remote_state.shared_infra.run_ecs_task_topic_arn}"
   run_ecs_task_topic_publish_policy = "${data.terraform_remote_state.shared_infra.run_ecs_task_topic_publish_policy}"
 

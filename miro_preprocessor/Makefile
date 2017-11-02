@@ -10,6 +10,7 @@ include $(MIRO_PREPROC)/xml_to_json_converter/Makefile
 include $(MIRO_PREPROC)/image_sorter/Makefile
 include $(MIRO_PREPROC)/xml_to_json_run_task/Makefile
 include $(MIRO_PREPROC)/miro_image_to_dynamo/Makefile
+include $(MIRO_PREPROC)/miro_image_to_tandem_vault/Makefile
 include $(MIRO_PREPROC)/miro_copy_s3_asset/Makefile
 include $(MIRO_PREPROC)/miro_inventory/Makefile
 
