@@ -8,6 +8,13 @@ import json
 import attr
 import boto3
 
+import logging
+import daiquiri
+
+
+daiquiri.setup(level=logging.INFO)
+logger = daiquiri.getLogger(__name__)
+
 
 @attr.s
 class MiroCollection:
@@ -107,8 +114,12 @@ def _if_exists(d, a, prepend=""):
     return f"{prepend}{s}"
 
 
-def _followed_by_comma(d, a, prepend=""):
+def _followed_by_comma(d, a, prepend="", delimiter=", "):
+    logger.info(a)
     s = _is_in(d, a)
+
+    if isinstance(s, list):
+        s = delimiter.join(s)
 
     if not s:
         return ""
@@ -117,8 +128,8 @@ def _followed_by_comma(d, a, prepend=""):
 
 
 def _followed_by_newline(d, a, prepend="", delimiter=", "):
+    logger.info(a)
     s = _is_in(d, a)
-
     if isinstance(s, list):
         s = delimiter.join(s)
 
@@ -199,7 +210,7 @@ def create_caption(d):
         _is_in(d, 'image_related_images'),
     ]
 
-    print(parts)
+    logger.info(parts)
 
     return "".join(parts)
 

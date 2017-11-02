@@ -5,9 +5,11 @@ Lambda for loading images and data into Tandem Vault
 """
 
 import json
+import logging
 import os
 
 import boto3
+import daiquiri
 
 from wellcome_lambda_utils.miro_utils import MiroImage
 
@@ -23,10 +25,17 @@ import tandem_vault_api
 import sqs_utils
 
 
+daiquiri.setup(level=logging.INFO)
+logger = daiquiri.getLogger(__name__)
+
+
 def is_wia_award_winner(miro_image):
+    if not "image_award" in miro_image.image_data:
+        return False
+    if not miro_image.image_data['image_award']:
+        return False
     if "Biomedical Image Awards" in miro_image.image_data['image_award']:
         return True
-
     if "Wellcome Image Awards" in miro_image.image_data['image_award']:
         return True
 
@@ -58,30 +67,33 @@ def main():
     sqs_reader = sqs_utils.SQSReader(sqs_client, queue_url)
 
     for message in sqs_reader:
-        outer_message = json.loads(message['Body'])
-        tandem_vault_upload_info = json.loads(outer_message['Message'])
+        try:
+            outer_message = json.loads(message['Body'])
+            tandem_vault_upload_info = json.loads(outer_message['Message'])
 
-        miro_image = MiroImage(tandem_vault_upload_info['image_info'])
-        asset_id = tandem_vault_upload_info['asset_id']
+            miro_image = MiroImage(tandem_vault_upload_info['image_info'])
+            asset_id = tandem_vault_upload_info['asset_id']
 
-        # Add to miro collection
-        miro_collection_id = miro_collections[miro_image.collection].collection_id
-        api.add_image_to_collection(asset_id, miro_collection_id)
+            # Add to miro collection
+            miro_collection_id = miro_collections[miro_image.collection].collection_id
+            api.add_image_to_collection(asset_id, miro_collection_id)
 
-        # Add to wia collection
-        if is_wia_award_winner(miro_image):
-            wia_collection_id = determine_wia_collection(miro_image.image_data)
-            api.add_image_to_collection(asset_id, wia_collection_id)
+            # Add to wia collection
+            if is_wia_award_winner(miro_image):
+                wia_collection_id = determine_wia_collection(miro_image.image_data)
+                api.add_image_to_collection(asset_id, wia_collection_id)
 
-        # Add metadata
-        metadata = create_metadata(miro_image.image_data)
-        api.add_image_metadata(asset_id, metadata)
+            # Add metadata
+            metadata = create_metadata(miro_image.image_data)
+            api.add_image_metadata(asset_id, metadata)
 
-        # Add tags
-        tags = create_tags(miro_image.image_data)
-        api.add_image_tags(asset_id, tags)
-
-        sqs_reader.delete_current()
+            # Add tags
+            tags = create_tags(miro_image.image_data)
+            api.add_image_tags(asset_id, tags)
+        except Exception:
+            logger.exception(f"Failed adding metadata for {miro_image}")
+        else:
+            sqs_reader.delete_current()
 
 
 if __name__ == '__main__':
