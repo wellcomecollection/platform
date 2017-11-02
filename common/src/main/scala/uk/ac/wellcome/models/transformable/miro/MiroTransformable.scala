@@ -213,7 +213,8 @@ case class MiroTransformable(MiroID: String,
   //
   // Note that the checked-in file has had some manual edits for consistency,
   // and with a lot of the Wellcome-related strings replaced with
-  // "Wellcome Collection".
+  // "Wellcome Collection".  There are also a handful of manual edits
+  // where the fields in Miro weren't filled in correctly.
   val stream: InputStream = getClass
     .getResourceAsStream("/miro_contributor_map.json")
   val contributorMap = JsonUtil.toMap[String](
