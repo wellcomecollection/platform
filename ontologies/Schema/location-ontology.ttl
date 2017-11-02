@@ -100,7 +100,7 @@ wloc:licenseType rdf:type owl:ObjectProperty ;
     rdfs:range wloc:LicenseType ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
 
-##### Object properties ####
+##### Data properties ####
 
 
 wloc:identity rdf:type owl:DatatypeProperty ;
