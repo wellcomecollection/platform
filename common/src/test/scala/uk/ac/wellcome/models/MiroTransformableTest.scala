@@ -587,7 +587,7 @@ class MiroTransformableCopyrightTest
     )
   }
 
-  it("shoudl use the image_credit_line field if present") {
+  it("should use the image_credit_line field if present") {
     transformRecordAndCheckCopyright(
       data = s"""
         "image_title": "A tumultuous transformation of trees",
