@@ -13,11 +13,9 @@ setup(
     name='wellcome_lambda_utils',
     packages=find_packages(SOURCE),
     package_dir={'': SOURCE},
-    version='2017.10.24a',
+    version='2017.10.27',
     install_requires=[
-        'attrs>=17.2.0',
         'boto3',
-        'daiquiri>=1.3.0',
         'python-dateutil',
         'requests>=2.18.4',
     ],
