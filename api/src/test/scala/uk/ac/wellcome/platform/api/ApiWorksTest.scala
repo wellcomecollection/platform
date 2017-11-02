@@ -256,6 +256,61 @@ class ApiWorksTest
     }
   }
 
+
+  it("should include copyright information in API responses") {
+    val location = Location(
+      locationType = "thumbnail-image",
+      copyright = Some("Wellcome Collection"),
+      license = License_CCBY
+    )
+    val item = Item(
+      canonicalId = Some("chu27a8"),
+      identifiers = List(),
+      locations = List(location)
+    )
+    val workWithCopyright = Work(
+      canonicalId = Some("yxh928a"),
+      title = "A scarf on a squirrel",
+      items = List(item)
+    )
+    insertIntoElasticSearch(workWithCopyright)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works?includes=items",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+          |{
+          |  ${resultList()},
+          |  "results": [
+          |   {
+          |     "type": "Work",
+          |     "id": "${workWithCopyright.id}",
+          |     "title": "${workWithCopyright.title}",
+          |     "creators": [ ],
+          |     "subjects": [ ],
+          |     "genres": [ ],
+          |     "items": [
+          |       {
+          |         "id": "${item.canonicalId.get}",
+          |         "type": "${item.ontologyType}",
+          |         "locations": [
+          |           {
+          |             "type": "${location.ontologyType}",
+          |             "locationType": "${location.locationType}",
+          |             "license": ${license(location.license)},
+          |             "copyright": "${location.copyright.get}"
+          |           }
+          |         ]
+          |       }
+          |     ]
+          |   }
+          |  ]
+          |}""".stripMargin
+      )
+    }
+  }
+
   it(
     "should return the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
     val works = createWorks(3)

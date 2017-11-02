@@ -18,6 +18,10 @@ case class DisplayLocation(
     value = "The title or other short name of a license"
   ) url: Option[String] = None,
   @ApiModelProperty(
+    dataType = "String",
+    value = "The copyright owner of the image"
+  ) copyright: Option[String] = None,
+  @ApiModelProperty(
     value =
       "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
   ) license: DisplayLicense
@@ -30,6 +34,7 @@ case object DisplayLocation {
   def apply(location: Location): DisplayLocation = DisplayLocation(
     locationType = location.locationType,
     url = location.url,
+    copyright = location.copyright,
     license = DisplayLicense(location.license)
   )
 }

@@ -484,9 +484,9 @@ class MiroTransformableSubjectsTest
       ),
       List(
         Location(
-          "iiif-image",
-          Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
-          License_CCBY
+          locationType = "iiif-image",
+          url = Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          license = License_CCBY
         )
       )
     )
@@ -571,5 +571,80 @@ class MiroTransformableGenresTest
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
+  }
+}
+
+
+
+class MiroTransformableCopyrightTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
+
+  it("should have no copyright line if there's not enough information") {
+    transformRecordAndCheckCopyright(
+      data = s""""image_title": "An image without any copyright?""""
+    )
+  }
+
+  it("should use the image_credit_line field if present") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": "Wellcome Collection"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
+  it("should use the image_credit_line in preference to image_source_code") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": "Wellcome Collection",
+        "image_source_code": "CAM"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
+  it("should use image_source_code if image_credit_line is empty") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": null,
+        "image_source_code": "CAM"
+      """,
+      expectedCopyright = Some("Benedict Campbell")
+    )
+  }
+
+
+  it("should use the uppercased version of the source_code if necessary") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A loud and leafy lime",
+        "image_source_code": "wel"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
+  it("should tidy up the credit line if necessary") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "Outside an odorous oak",
+        "image_credit_line": "The Wellcome Library, London"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
+  private def transformRecordAndCheckCopyright(
+    data: String,
+    expectedCopyright: Option[String] = None
+  ) = {
+    val transformedWork = transformWork(data = data)
+    transformedWork.items.head.locations.head.copyright shouldBe expectedCopyright
   }
 }
