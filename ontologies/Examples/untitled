@@ -1,0 +1,97 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "watu9tbc",
+  "type": "Work",
+  "workType": {
+    "id": "book",
+    "type": "WorkType",
+    "label": "Books"
+  },
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://wellcomecollection.org/sites/default/files/styles/book_image/public/graphic%20warnings.png?itok=gTM84RH8",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "identifiers": [
+    {
+      "value": "9781999809003",
+      "type": "Identifier",
+      "identifierScheme": "isbn"
+    }
+  ],
+  "title": "Graphic Warnings",
+  "language": {
+    "id": "eng",
+    "label": "English",
+    "type": "Language"
+  },
+  "countryOfPublication": {
+    "id": "uk",
+    "label": "UK",
+    "type": "Place"
+  },
+  "placeOfPublication": [
+    {
+      "label": "London, United Kingdom",
+      "type": "Place"
+    }
+  ],
+  "publishers": [
+    {
+      "label": "Wellcome"
+    }
+  ],
+  "description": "This set of 25 vintage postcards showcases the style and wit of 20th-century public health campaigns: iconic graphic design devised to admonish, amuse, inform and empower. Published to accompany the Wellcome Collection exhibition ‘Can Graphic Design Save Your Life?’, this fascinating collection of historical images highlights how graphic design has been used to shape behaviour and attitudes towards everything from the spread of germs to drink driving.",
+  "publicationDate": {
+    "label": "7th November 2017",
+    "type": "Period" ,
+    "date": "07/09/2017"
+  },
+  "genres": [
+    {
+      "id": "a24s7qf3",
+      "label": "Postcards",
+      "type": "Concept",
+    }
+  ],
+  "physicalDescription": 
+    {
+      "label": "  17cm x 12cm cards" ,
+      "type": "PhysicalDescription" 
+     } ,
+  "extent": "25 cards" ,  
+  "items": [
+    {
+      "id": "b28gh7z4n",
+      "type": "Item",
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "offer",
+          "label": "Order Online",
+          "offer": {
+            "price": "9.99" ,
+            "priceCurrency": "GBP" ,
+            "url": "http://bookshop.blackwell.co.uk/bookshop/product/9781999809003" , 
+          }
+          "accessStatus": {
+            "id": "Avaliable",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "order-online",
+            "label": "Order Online",
+            "type": "AccessProcess"
+          }
+        }
+        }
+      ]
+    }
+  ]
+}
