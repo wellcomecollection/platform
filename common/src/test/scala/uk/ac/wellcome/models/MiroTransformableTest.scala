@@ -573,3 +573,25 @@ class MiroTransformableGenresTest
     transformedWork.genres shouldBe expectedGenres
   }
 }
+
+
+
+class MiroTransformableCopyrightTest
+    extends FunSpec
+    with Matchers
+    with MiroTransformableWrapper {
+
+  it("should have no copyright line if there's not enough information") {
+    transformRecordAndCheckCopyright(
+      data = s""""image_title": "An image without any copyright?""""
+    )
+  }
+
+  private def transformRecordAndCheckCopyright(
+    data: String,
+    expectedCopyright: Option[String] = None
+  ) = {
+    val transformedWork = transformWork(data = data)
+    transformedWork.items.head.locations.head.copyright shouldBe expectedCopyright
+  }
+}
