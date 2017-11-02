@@ -298,7 +298,7 @@ class ApiWorksTest
           |           {
           |             "type": "${location.ontologyType}",
           |             "locationType": "${location.locationType}",
-          |             "license": "${license(location.license)}",
+          |             "license": ${license(location.license)},
           |             "copyright": "${location.copyright.get}"
           |           }
           |         ]
