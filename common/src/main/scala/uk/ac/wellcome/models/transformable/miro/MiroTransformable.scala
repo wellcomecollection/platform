@@ -211,8 +211,11 @@ case class MiroTransformable(MiroID: String,
     */
   private def getCopyright(miroData: MiroTransformableData): Option[String] = {
     miroData.creditLine match {
-      case Some(s) => Some(s)
-      case None => None
+      case Some(line) => Some(line)
+      case None => miroData.sourceCode match {
+        case Some(code) => Some(MiroContributorMapper.contributorMap(code))
+        case None => None
+      }
     }
   }
 
