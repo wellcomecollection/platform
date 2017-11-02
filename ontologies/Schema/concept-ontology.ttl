@@ -51,12 +51,19 @@ wcon:concept rdf:type owl:ObjectProperty ;
     rdfs:range wcon:Concept ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
     
-wcon:qualifies rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifies"@en ;
+wcon:qualifiers rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"@en ;
     rdfs:comment "Relates a qualified concept to a list concepts that qualify the concept."@en ;
     rdfs:domain wcon:QualifiedConcept ;
     rdfs:range wcon:Concept ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .     
+
+wcon:qualifierType rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifierType"@en ;
+    rdfs:comment "Relates a concept being used as a qualifier to the type of qualifier it is."@en ;
+    rdfs:domain wcon:Concept ;
+    rdfs:range wcon:QualifierType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
     
 wcon:inScheme rdf:type owl:ObjectProperty ;
     rdfs:label "inScheme"@en ;

@@ -90,7 +90,6 @@
       "label": "H. Humphrey,"
     }
   ],
-//  "description": "N/A",
   "createdDate": {
     "label": "1802",
     "type": "Period"
@@ -184,7 +183,7 @@
           }
         ]
       }
-    },
+    }
   ],
   "items": [
     {
