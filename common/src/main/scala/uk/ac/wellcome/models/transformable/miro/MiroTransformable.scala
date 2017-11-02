@@ -232,7 +232,36 @@ case class MiroTransformable(MiroID: String,
     */
   private def getCopyright(miroData: MiroTransformableData): Option[String] = {
     miroData.creditLine match {
-      case Some(line) => Some(line)
+
+      // Some of the credit lines are inconsistent or use old names for
+      // Wellcome, so we do a bunch of replacements and trimming to tidy
+      // them up.
+      case Some(line) => Some(line
+        .replaceAll("Adrian Wressell, Heart of England NHSFT", "Adrian Wressell, Heart of England NHS FT")
+        .replaceAll("Andrew Dilley,Jane Greening & Bruce Lynn", "Andrew Dilley, Jane Greening & Bruce Lynn")
+        .replaceAll("Andrew Dilley,Nicola DeLeon & Bruce Lynn", "Andrew Dilley, Nicola De Leon & Bruce Lynn")
+        .replaceAll("Ashley Prytherch, Royal Surrey County Hospital NHS Foundation Trust", "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
+        .replaceAll("David Gregory & Debbie Marshall", "David Gregory and Debbie Marshall")
+        .replaceAll("David Gregory&Debbie Marshall", "David Gregory and Debbie Marshall")
+        .replaceAll("Geraldine Thompson.", "Geraldine Thompson")
+        .replaceAll("John & Penny Hubley.", "John & Penny Hubley")
+        .replaceAll("oyal Army Medical Corps Muniment Collection, Wellcome Images", "Royal Army Medical Corps Muniment Collection, Wellcome Collection")
+        .replaceAll("Science Museum London", "Science Museum, London")
+        .replaceAll("The Wellcome Library, London", "Wellcome Collection")
+        .replaceAll("Wellcome Library, London", "Wellcome Collection")
+        .replaceAll("Wellcome Libary, London", "Wellcome Collection")
+        .replaceAll("Wellcome LIbrary, London", "Wellcome Collection")
+        .replaceAll("Wellcome Images", "Wellcome Collection")
+        .replaceAll("The Wellcome Library", "Wellcome Collection")
+        .replaceAll("Wellcome Library", "Wellcome Collection")
+        .replaceAll("Wellcome Collection London", "Wellcome Collection")
+        .replaceAll("Wellcome Collection, Londn", "Wellcome Collection")
+        .replaceAll("Wellcome Trust", "Wellcome Collection")
+        .replaceAll("'Wellcome Collection'", "Wellcome Collection")
+      )
+
+      // Otherwise we carry through the contributor codes, which have
+      // already been edited for consistency.
       case None => miroData.sourceCode match {
         case Some(code) => Some(contributorMap(code.toUpperCase))
         case None => None

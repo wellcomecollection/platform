@@ -630,6 +630,16 @@ class MiroTransformableCopyrightTest
     )
   }
 
+  it("should tidy up the credit line if necessary") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "Outside an odorous oak",
+        "image_credit_line": "The Wellcome Library, London"
+      """,
+      expectedCopyright = Some("Wellcome Collection")
+    )
+  }
+
   private def transformRecordAndCheckCopyright(
     data: String,
     expectedCopyright: Option[String] = None
