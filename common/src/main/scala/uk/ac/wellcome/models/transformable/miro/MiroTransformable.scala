@@ -348,13 +348,15 @@ case class MiroTransformable(MiroID: String,
     // put them all in the same identifier scheme, because we're not doing
     // any transformation or cleaning.
     val libraryRefsList: List[SourceIdentifier] =
-      zipMiroFields(
-        keys = miroData.libraryRefDepartment,
-        values = miroData.libraryRefId)
-      .map { case (label, value) => SourceIdentifier(
-        IdentifierSchemes.miroLibraryReference,
-        s"$label $value"
-      )}
+      zipMiroFields(keys = miroData.libraryRefDepartment,
+                    values = miroData.libraryRefId)
+        .map {
+          case (label, value) =>
+            SourceIdentifier(
+              IdentifierSchemes.miroLibraryReference,
+              s"$label $value"
+            )
+        }
 
     miroIDList ++ sierraList ++ libraryRefsList
   }
@@ -391,12 +393,14 @@ case class MiroTransformable(MiroID: String,
 
       // If only one of the fields is non-empty, for now we just raise
       // an exception -- this probably indicates an issue in the source data.
-      case (Some(k), None) => throw new RuntimeException(
-        s"Inconsistent k/v pairs: keys=$k, values=null"
-      )
-      case (None, Some(v)) => throw new RuntimeException(
-        s"Inconsistent k/v pairs: keys=null, values=$v"
-      )
+      case (Some(k), None) =>
+        throw new RuntimeException(
+          s"Inconsistent k/v pairs: keys=$k, values=null"
+        )
+      case (None, Some(v)) =>
+        throw new RuntimeException(
+          s"Inconsistent k/v pairs: keys=null, values=$v"
+        )
     }
 
   }
