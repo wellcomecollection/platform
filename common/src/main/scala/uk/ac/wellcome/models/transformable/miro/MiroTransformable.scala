@@ -344,7 +344,65 @@ case class MiroTransformable(MiroID: String,
       case None => List()
     }
 
-    miroIDList ++ sierraList
+    // Add any other legacy identifiers to this record.  Right now we
+    // put them all in the same identifier scheme, because we're not doing
+    // any transformation or cleaning.
+    val libraryRefsList: List[SourceIdentifier] =
+      zipMiroFields(keys = miroData.libraryRefDepartment,
+                    values = miroData.libraryRefId)
+        .map {
+          case (label, value) =>
+            SourceIdentifier(
+              IdentifierSchemes.miroLibraryReference,
+              s"$label $value"
+            )
+        }
+
+    miroIDList ++ sierraList ++ libraryRefsList
+  }
+
+  /** Some Miro fields contain keys/values in different fields.  For example:
+    *
+    *     "image_library_ref_department": ["ICV No", "External Reference"],
+    *     "image_library_ref_id": ["1234", "Sanskrit manuscript 5678"]
+    *
+    * This represents the mapping:
+    *
+    *     "ICV No"             -> "1234"
+    *     "External Reference" -> "Sanskrit manuscript 5678"
+    *
+    * This method takes two such fields, combines them, and returns a list
+    * of (key, value) tuples.  Note: we don't use a map because keys aren't
+    * guaranteed to be unique.
+    */
+  def zipMiroFields(keys: Option[List[String]],
+                    values: Option[List[String]]): List[(String, String)] = {
+    (keys, values) match {
+      case (Some(k), Some(v)) => {
+        if (k.length != v.length) {
+          throw new RuntimeException(
+            s"Different lengths! keys=$k, values=$v"
+          )
+        }
+
+        (k, v).zipped.toList
+      }
+
+      // If both fields are empty, we fall straight through.
+      case (None, None) => List()
+
+      // If only one of the fields is non-empty, for now we just raise
+      // an exception -- this probably indicates an issue in the source data.
+      case (Some(k), None) =>
+        throw new RuntimeException(
+          s"Inconsistent k/v pairs: keys=$k, values=null"
+        )
+      case (None, Some(v)) =>
+        throw new RuntimeException(
+          s"Inconsistent k/v pairs: keys=null, values=$v"
+        )
+    }
+
   }
 
   override def transform: Try[Work] = Try {
