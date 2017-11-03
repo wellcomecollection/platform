@@ -11,7 +11,6 @@ import boto3
 import logging
 import daiquiri
 
-
 daiquiri.setup(level=logging.INFO)
 logger = daiquiri.getLogger(__name__)
 
@@ -63,7 +62,6 @@ wia_year = {
     '2017': 110089,
 }
 
-
 CONTRIB_MAP = None
 
 
@@ -96,6 +94,39 @@ def lookup_contributor(d):
         return ""
 
     return contributor
+
+
+def _zip(d, a, b):
+    if (a not in d) or (b not in d):
+        return ""
+
+    if not (isinstance(d[a], list)) or (not isinstance(d[b], list)):
+        return ""
+
+    if len(d[a]) != len(d[b]):
+        return ""
+
+    if not (d[a] and d[b]):
+        return ""
+
+    zipped = zip(d[a], d[b])
+
+    def _check_zip(pair):
+        first = pair[0]
+        second = pair[1]
+
+        if first and second:
+            return True
+
+        return False
+
+    def _join(pair, delimiter):
+        first = pair[0]
+        second = pair[1]
+
+        return f'{first}{delimiter}{second}'
+
+    return ", ".join([_join(pair, " ") for pair in zipped if _check_zip(pair)]) + '\n'
 
 
 def _list_to_string(candidate_string, delimiter=", "):
@@ -197,7 +228,7 @@ def create_caption(d):
         _followed_by_comma(d, 'image_pub_page_no'),
         _followed_by_newline(d, 'image_pub_plate'),
         _followed_by_newline(d, 'image_image_desc') +
-        _followed_by_newline(d, 'image_library_ref_department') +
+        _zip(d, 'image_library_ref_department', 'image_library_ref_id') +
         _followed_by_newline(d, 'image_pub_archive') +
         _followed_by_newline(d, 'image_library_dept') +
         _followed_by_newline(d, 'image_award', "Used for exhibition: ") +
