@@ -42,13 +42,27 @@ def is_wia_award_winner(miro_image):
     return False
 
 
-def determine_wia_collection(image_data):
-    assert len(image_data['image_award_date']) == 1
+def determine_wia_collection(miro_image):
+    if "image_award_date" not in miro_image.image_data:
+        raise InvalidWIAYear(miro_image.image_data)
+    if not miro_image.image_data['image_award_date']:
+        raise InvalidWIAYear(miro_image.image_data)
 
-    if image_data['image_award_date'][0] in wia_year:
-        return wia_year[image_data['image_award_date'][0]]
+    if not isinstance(miro_image.image_data['image_award_date'], list):
+        award_years = [miro_image.image_data['image_award_date']]
+    else:
+        award_years = miro_image.image_data['image_award_date']
 
-    raise InvalidWIAYear(image_data)
+    award_years = list(set(award_years))
+    award_years = [award_year for award_year in award_years if award_year]
+
+    if not len(award_years) == 1:
+        raise InvalidWIAYear(miro_image.image_data)
+
+    if miro_image.image_data['image_award_date'][0] in wia_year:
+        return wia_year[miro_image.image_data['image_award_date'][0]]
+
+    raise InvalidWIAYear(miro_image.image_data)
 
 
 def main():
