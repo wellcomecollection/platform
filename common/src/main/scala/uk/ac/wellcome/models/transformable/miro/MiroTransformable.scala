@@ -344,7 +344,59 @@ case class MiroTransformable(MiroID: String,
       case None => List()
     }
 
-    miroIDList ++ sierraList
+    // Add any other legacy identifiers to this record.  Right now we
+    // put them all in the same identifier scheme, because we're not doing
+    // any transformation or cleaning.
+    //
+    // This data is supplied in two fields in Miro: a pair of lists, with
+    // the keys in one and the values in another.
+
+    // First we check that both fields are non-empty, then they're the same
+    // length, then finally we construct the identifiers.
+    val libraryRefsList: List[SourceIdentifier] = libraryRefDepartment match {
+      case Some(dept) => {
+        libraryRefId match {
+          case Some(ids) => {
+            // If the two lists have different lengths, we can't match
+            // labels to values.  Error out!
+            if (dept.length != ids.length) {
+              throw new RuntimeException(
+                s"Different lengths! library_ref_department=$dept but library_ref_id=$ids"
+              )
+            }
+
+            // Otherwise construct the lists as key-value pairs of IDs
+            (dept, ids).zipped
+              .map { (label, value) => SourceIdentifier(
+                IdentifierSchemes.miroLibraryReference, s"{label} {value}"
+              )}
+          }
+
+          // If there's something in the reference IDs but no labels for them,
+          // we throw an error.  The correct answer is *probably* to return
+          // unlabelled IDs, but this is sufficiently unusual to just throw
+          // an error now, and inspect/fix if it actually occurs.
+          case None => throw new RuntimeException(
+            s"library_ref_department=$dept but library_ref_id=null"
+          )
+        }
+      }
+
+      // If there's nothing in library_ref_department, we check
+      // the same holds for library_ref_id, and if so, we don't
+      // return any identifiers here.
+      case None => {
+        libraryRefId match {
+          case Some(ids) => throw new RuntimeException(
+            s"library_ref_department=null but library_ref_id=$ids"
+          )
+          case None => List()
+        }
+      }
+    }
+
+
+    miroIDList ++ sierraList ++ libraryRefsList
   }
 
   override def transform: Try[Work] = Try {

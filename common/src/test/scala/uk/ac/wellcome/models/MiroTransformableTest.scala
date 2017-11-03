@@ -279,6 +279,24 @@ class MiroTransformableTest
         """
       )
     }
+
+    it("with ref IDs null but department non-null") {
+      assertTransformWorkFails(
+        data = """
+          "image_library_ref_department": ["External Reference"],
+          "image_library_ref_id": null
+        """
+      )
+    }
+
+    it("with ref IDs non-null but department null") {
+      assertTransformWorkFails(
+        data = """
+          "image_library_ref_department": null,
+          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
+        """
+      )
+    }
   }
 
   it("should have an empty list if no image_creator field is present") {
