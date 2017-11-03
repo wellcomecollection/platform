@@ -1,14 +1,6 @@
 
+   /* Note: Before transforming any records we might need to look at the BCODE3 status
 
-   /* Populate wwork:title. The rules are as follows:
-   * 
-   * 1. For all bibliographic records use Sierra "title".
-   *
-   * Note: Sierra populates this field from field 245 subfield a and b.
-   *
-   * Example:
-   *  "title": "The tuberculosis worker : a handbook on methods and programs of tuberculosis work",
-   */
 
 
    /* Populate wwork:workType. Rules:
@@ -26,6 +18,7 @@
    *
    * Note: will map to a controlled vocabulary terms in future
    */
+
 
    /* Populate wwork:identifiers . Rules:
    *
@@ -47,6 +40,17 @@
    * ],
    *
    * 
+   */
+
+
+   /* Populate wwork:title. The rules are as follows:
+   * 
+   * 1. For all bibliographic records use Sierra "title".
+   *
+   * Note: Sierra populates this field from field 245 subfield a and b.
+   *
+   * Example:
+   *  "title": "The tuberculosis worker : a handbook on methods and programs of tuberculosis work",
    */
 
 
@@ -118,6 +122,7 @@
    *
    */
 
+
    /* Populate wwork:genres. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "655"
@@ -139,7 +144,7 @@
    *   "concept" : {
    *      "id": "a24s7qf3" ,
    *      "label": "Caricatures" ,
-          "type": "Concept" , 
+   *       "type": "Concept" , 
    *      "identifiers": [
    *        {
    *         "type": "Identifier",
@@ -209,7 +214,7 @@
    *
    * Note: no obvious mapping for created data as bibliographic records primarily focused on publication date. Where as art works, ephemera might not have a publication date
    *
-
+   *
    * Populate wwork:publicationDate. Rules:
    * 
    * 1. For bibliographic records where "260" is populated

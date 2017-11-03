@@ -207,8 +207,6 @@ def create_caption(d):
         _is_in(d, 'image_related_images'),
     ]
 
-    logger.info(parts)
-
     return "".join(parts)
 
 

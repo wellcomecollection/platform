@@ -88,6 +88,7 @@ def main():
             miro_image = MiroImage(tandem_vault_upload_info['image_info'])
             asset_id = tandem_vault_upload_info['asset_id']
 
+            logger.info(f"Adding metadata to {miro_image.miro_id}")
             # Add to miro collection
             miro_collection_id = miro_collections[miro_image.collection].collection_id
             api.add_image_to_collection(asset_id, miro_collection_id)
@@ -104,6 +105,7 @@ def main():
             # Add tags
             tags = create_tags(miro_image.image_data)
             api.add_image_tags(asset_id, tags)
+            logger.info(f"Successfully added metadata for {miro_image.miro_id}")
         except Exception:
             logger.exception(f"Failed adding metadata for {miro_image}")
         else:
