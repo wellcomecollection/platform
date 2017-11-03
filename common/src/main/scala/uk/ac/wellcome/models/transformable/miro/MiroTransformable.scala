@@ -353,48 +353,53 @@ case class MiroTransformable(MiroID: String,
 
     // First we check that both fields are non-empty, then they're the same
     // length, then finally we construct the identifiers.
-    val libraryRefsList: List[SourceIdentifier] = miroData.libraryRefDepartment match {
-      case Some(dept) => {
-        miroData.libraryRefId match {
-          case Some(ids) => {
-            // If the two lists have different lengths, we can't match
-            // labels to values.  Error out!
-            if (dept.length != ids.length) {
-              throw new RuntimeException(
-                s"Different lengths! library_ref_department=$dept but library_ref_id=$ids"
-              )
+    val libraryRefsList: List[SourceIdentifier] =
+      miroData.libraryRefDepartment match {
+        case Some(dept) => {
+          miroData.libraryRefId match {
+            case Some(ids) => {
+              // If the two lists have different lengths, we can't match
+              // labels to values.  Error out!
+              if (dept.length != ids.length) {
+                throw new RuntimeException(
+                  s"Different lengths! library_ref_department=$dept but library_ref_id=$ids"
+                )
+              }
+
+              // Otherwise construct the lists as key-value pairs of IDs
+              (dept, ids).zipped
+                .map { (label, value) =>
+                  SourceIdentifier(
+                    IdentifierSchemes.miroLibraryReference,
+                    s"$label $value"
+                  )
+                }
             }
 
-            // Otherwise construct the lists as key-value pairs of IDs
-            (dept, ids).zipped
-              .map { (label, value) => SourceIdentifier(
-                IdentifierSchemes.miroLibraryReference, s"$label $value"
-              )}
+            // If there's something in the reference IDs but no labels for them,
+            // we throw an error.  The correct answer is *probably* to return
+            // unlabelled IDs, but this is sufficiently unusual to just throw
+            // an error now, and inspect/fix if it actually occurs.
+            case None =>
+              throw new RuntimeException(
+                s"library_ref_department=$dept but library_ref_id=null"
+              )
           }
+        }
 
-          // If there's something in the reference IDs but no labels for them,
-          // we throw an error.  The correct answer is *probably* to return
-          // unlabelled IDs, but this is sufficiently unusual to just throw
-          // an error now, and inspect/fix if it actually occurs.
-          case None => throw new RuntimeException(
-            s"library_ref_department=$dept but library_ref_id=null"
-          )
+        // If there's nothing in library_ref_department, we check
+        // the same holds for library_ref_id, and if so, we don't
+        // return any identifiers here.
+        case None => {
+          miroData.libraryRefId match {
+            case Some(ids) =>
+              throw new RuntimeException(
+                s"library_ref_department=null but library_ref_id=$ids"
+              )
+            case None => List()
+          }
         }
       }
-
-      // If there's nothing in library_ref_department, we check
-      // the same holds for library_ref_id, and if so, we don't
-      // return any identifiers here.
-      case None => {
-        miroData.libraryRefId match {
-          case Some(ids) => throw new RuntimeException(
-            s"library_ref_department=null but library_ref_id=$ids"
-          )
-          case None => List()
-        }
-      }
-    }
-
 
     miroIDList ++ sierraList ++ libraryRefsList
   }
