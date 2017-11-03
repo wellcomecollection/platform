@@ -221,7 +221,7 @@ def create_caption(d):
         _followed_by_newline(d, 'image_title'),
         _followed_by_newline(
             {
-                'innopac_id':_prefix_b_number(_is_in(d, 'image_innopac_id'))
+                'innopac_id': _prefix_b_number(_is_in(d, 'image_innopac_id'))
             },
             'innopac_id',
             'Sierra record number: '
