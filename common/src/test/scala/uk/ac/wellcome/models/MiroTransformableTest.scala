@@ -235,6 +235,70 @@ class MiroTransformableTest
     }
   }
 
+  describe("non-MPL references should be passed through as identifiers") {
+    it("no references") {
+      transformRecordAndCheckMiroLibraryReferences(
+        data = """
+          "image_library_ref_department": null,
+          "image_library_ref_id": null
+        """,
+        expectedValues = List()
+      )
+    }
+
+    it("one reference") {
+      transformRecordAndCheckMiroLibraryReferences(
+        data = """
+          "image_library_ref_department": ["External Reference"],
+          "image_library_ref_id": ["Sanskrit ID 1924"]
+        """,
+        expectedValues = List(
+          "External Reference Sanskrit ID 1924"
+        )
+      )
+    }
+
+    it("two references") {
+      transformRecordAndCheckMiroLibraryReferences(
+        data = """
+          "image_library_ref_department": ["External Reference", "ICV No"],
+          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
+        """,
+        expectedValues = List(
+          "External Reference Sanskrit ID 1924",
+          "ICV No 1234"
+        )
+      )
+    }
+
+    it("with mismatched ref IDs/department") {
+      assertTransformWorkFails(
+        data = """
+          "image_library_ref_department": ["External Reference"],
+          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
+        """
+      )
+    }
+
+    it("with ref IDs null but department non-null") {
+      assertTransformWorkFails(
+        data = """
+          "image_library_ref_department": ["External Reference"],
+          "image_library_ref_id": null
+        """
+      )
+    }
+
+    it("with ref IDs non-null but department null") {
+      assertTransformWorkFails(
+        data = """
+          "image_library_ref_department": null,
+          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
+        """
+      )
+    }
+  }
+
   it("should have an empty list if no image_creator field is present") {
     val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
     work.creators shouldBe List[Agent]()
@@ -406,6 +470,26 @@ class MiroTransformableTest
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, expectedSierraNumber)
     )
+  }
+
+  private def transformRecordAndCheckMiroLibraryReferences(
+    data: String,
+    expectedValues: List[String]
+  ) = {
+    val work = transformWork(
+      data = s"""
+        "image_title": "A fanciful frolicking of fish",
+        $data
+      """,
+      MiroID = "V0175278"
+    )
+    val miroIDList = List(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "V0175278")
+    )
+    val libraryRefList = expectedValues.map {
+      SourceIdentifier(IdentifierSchemes.miroLibraryReference, _)
+    }
+    work.identifiers shouldBe (miroIDList ++ libraryRefList)
   }
 }
 
