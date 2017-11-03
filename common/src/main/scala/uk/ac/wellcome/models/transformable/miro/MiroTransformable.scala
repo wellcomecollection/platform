@@ -97,12 +97,12 @@ case class MiroTransformable(MiroID: String,
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
       zipMiroFields(keys = miroData.award, values = miroData.awardDate)
-      .filter {
-        case (label, _) => (
-          label == "WIA Overall Winner" ||
-          label == "Wellcome Image Awards" ||
-          label == "Biomedical Image Awards")
-      }
+        .filter {
+          case (label, _) =>
+            (label == "WIA Overall Winner" ||
+              label == "Wellcome Image Awards" ||
+              label == "Biomedical Image Awards")
+        }
 
     val wiaAwardsString = wiaAwardsData match {
       // Most images have no award, or only a single award string.
@@ -112,7 +112,8 @@ case class MiroTransformable(MiroID: String,
       // A handful of images have an award key pair for "WIA Overall Winner"
       // and "Wellcome Image Awards", both with the same year.  In this case,
       // we write a single sentence.
-      case List((_, year), (_, _)) => s" Wellcome Image Awards Overall Winner $year."
+      case List((_, year), (_, _)) =>
+        s" Wellcome Image Awards Overall Winner $year."
 
       // Any more than two award-related entries in these fields would be
       // unexpected, and we let it error as an unmatched case.
