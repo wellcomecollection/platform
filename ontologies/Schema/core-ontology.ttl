@@ -16,7 +16,17 @@
 wcore:Thing rdf:type owl:Class ;
     rdfs:label "Thing"@en ;
     rdfs:comment "A thing"@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .   
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> . 
+    
+wcore:Period rdf:type owl:Class ;
+    rdfs:label "Period"@en ;
+    rdfs:comment "A period of time"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> . 
+    
+wcore:Place rdf:type owl:Class ;
+    rdfs:label "Place"@en ;
+    rdfs:comment "A place"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .           
 
 wcore:Identifier rdf:type owl:Class ;
     rdfs:label "Identifier"@en ;
@@ -26,12 +36,12 @@ wcore:Identifier rdf:type owl:Class ;
 wcore:IdentifierScheme rdf:type owl:Class ;
     rdfs:label "IdentifierScheme" ;
     rdfs:comment "An indication of the origin of identifiers identity scheme: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
-    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .  
-
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> . 
+    
 wcore:Location rdf:type owl:Class ;
     rdfs:label "Location" ;
-    rdfs:comment "A location that provides access to an item."@en ;
-    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .      
+    rdfs:comment "The location of that an item can be retrieved."@en ;
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .           
     
 #### object properties ####
 
@@ -100,7 +110,23 @@ wcore:endDate rdf:type owl:DatatypeProperty ;
     rdfs:comment "Relates the creation of a work to an end date, when the date of creation covers a range"@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range xsd:dateTime ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .     
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wcore:year rdf:type owl:DatatypeProperty ;
+    rdfs:label "year"@en ;
+    rdfs:comment "Relates a period to a specific year"@en ;
+    rdfs:domain wcore:Period ;
+    rdfs:range xsd:integer ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wcore:date rdf:type owl:DatatypeProperty ;
+    rdfs:label "date"@en ;
+    rdfs:comment "Relates a period to a specific date in a year"@en ;
+    rdfs:domain wcore:Period ;
+    rdfs:range xsd:date ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+                
 
             
     
