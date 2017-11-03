@@ -367,7 +367,7 @@ class MiroTransformableTest
           "image_title": "Snakes!",
           "image_image_desc": "$description",
           "image_award": ["Award of Excellence"],
-          "image_award_date": ["1990"]
+          "image_award_date": [null]
         """
       )
       work.description shouldBe Some(description)
@@ -395,7 +395,7 @@ class MiroTransformableTest
           "image_title": "A giraffe trifecta",
           "image_image_desc": "$description",
           "image_award": ["Dirt, Wellcome Collection", "Biomedical Image Awards"],
-          "image_award_date": [None, "2002"]
+          "image_award_date": [null, "2002"]
         """
       )
       work.description shouldBe Some(description + " Biomedical Image Awards 2002.")

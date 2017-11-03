@@ -443,7 +443,6 @@ case class MiroTransformable(MiroID: String,
           s"Inconsistent k/v pairs: keys=null, values=$v"
         )
     }
-
   }
 
   override def transform: Try[Work] = Try {
