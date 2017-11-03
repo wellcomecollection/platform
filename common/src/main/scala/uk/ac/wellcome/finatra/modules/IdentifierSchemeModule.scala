@@ -15,4 +15,7 @@ object IdentifierSchemes {
   val calmAltRefNo = "calm-altrefno"
 
   val sierraSystemNumber = "sierra-system-number"
+
+  // Corresponds to
+  val miroLibraryReference = "miro-library-reference"
 }

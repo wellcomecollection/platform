@@ -235,6 +235,10 @@ class MiroTransformableTest
     }
   }
 
+  describe("non-MPL references should be passed through as identifiers") {
+    it("")
+  }
+
   it("should have an empty list if no image_creator field is present") {
     val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
     work.creators shouldBe List[Agent]()
@@ -406,6 +410,26 @@ class MiroTransformableTest
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, expectedSierraNumber)
     )
+  }
+
+  private def transformRecordAndCheckMiroLibraryReferences(
+    data: String,
+    expectedValues: List[String]
+  ) = {
+    val work = transformWork(
+      data = s"""
+        "image_title": "A fanciful frolicking of fish",
+        $data
+      """,
+      MiroID = "V0175278"
+    )
+    miroIDList = List(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "V0175278")
+    )
+    libraryRefList = expectedValues.map {
+      SourceIdentifier(IdentifierSchemes.miroLibraryReference)
+    }
+    work.identifiers shouldBe
   }
 }
 
