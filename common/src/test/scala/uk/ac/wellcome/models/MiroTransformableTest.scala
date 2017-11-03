@@ -367,7 +367,7 @@ class MiroTransformableTest
           "image_title": "Snakes!",
           "image_image_desc": "$description",
           "image_award": ["Award of Excellence"],
-          "image_award_date": [null]
+          "image_award_date": ["1990"]
         """
       )
       work.description shouldBe Some(description)
