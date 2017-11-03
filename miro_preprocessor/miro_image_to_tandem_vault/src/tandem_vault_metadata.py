@@ -224,7 +224,7 @@ def create_caption(d):
                 'innopac_id':_prefix_b_number(_is_in(d, 'image_innopac_id'))
             },
             'innopac_id',
-            'Sierra record number:'
+            'Sierra record number: '
         ),
         _followed_by_comma(d, 'image_pub_author'),
         _followed_by_comma({'creator': create_creator(d)}, 'creator'),
