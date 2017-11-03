@@ -204,7 +204,7 @@ def create_caption(d):
         _followed_by_newline(d, 'image_wellcome_publications', "Used for Wellcome publication: ") +
         _followed_by_newline(d, 'image_tech_scanned_by', "Photographer: ") +
         _show_only_if_match(d, 'image_transparency_held', 'Yes', 'Transparency held: '),
-        _is_in(d, 'image_related_images'),
+        _prefix_string(_is_in(d, 'image_related_images'), prefix="Related images: "),
     ]
 
     return "".join(parts)
