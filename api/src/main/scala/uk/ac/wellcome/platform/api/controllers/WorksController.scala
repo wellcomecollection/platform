@@ -65,9 +65,24 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           "pageSize",
           "The number of works to return per page (default: 10)",
           required = false)
-        .queryParam[String]("query",
-                            "Full-text search query",
-                            required = false)
+        .queryParam[String](
+          "query",
+          """Full-text search query, which will OR supplied terms by default.
+            |
+            |The following special characters can be used to change the search behaviour:
+            |
+            |- + signifies AND operation
+            |- | signifies OR operation
+            |- - negates a single token
+            |- " wraps a number of tokens to signify a phrase for searching
+            |- * at the end of a term signifies a prefix query
+            |- ( and ) signify precedence
+            |- ~N after a word signifies edit distance (fuzziness)
+            |- ~N after a phrase signifies slop amount
+            |
+            |To search for any of these special characters, they should be escaped with \.""".stripMargin,
+          required = false
+        )
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: we have an 'index' query param that
     // allows the user to pick which Elasticsearch index to use.  This is
