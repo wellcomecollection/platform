@@ -483,10 +483,10 @@ class MiroTransformableTest
       """,
       MiroID = "V0175278"
     )
-    miroIDList = List(
+    val miroIDList = List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, "V0175278")
     )
-    libraryRefList = expectedValues.map {
+    val libraryRefList = expectedValues.map {
       SourceIdentifier(IdentifierSchemes.miroLibraryReference, _)
     }
     work.identifiers shouldBe (miroIDList ++ libraryRefList)

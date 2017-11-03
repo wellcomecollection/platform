@@ -353,9 +353,9 @@ case class MiroTransformable(MiroID: String,
 
     // First we check that both fields are non-empty, then they're the same
     // length, then finally we construct the identifiers.
-    val libraryRefsList: List[SourceIdentifier] = libraryRefDepartment match {
+    val libraryRefsList: List[SourceIdentifier] = miroData.libraryRefDepartment match {
       case Some(dept) => {
-        libraryRefId match {
+        miroData.libraryRefId match {
           case Some(ids) => {
             // If the two lists have different lengths, we can't match
             // labels to values.  Error out!
@@ -368,7 +368,7 @@ case class MiroTransformable(MiroID: String,
             // Otherwise construct the lists as key-value pairs of IDs
             (dept, ids).zipped
               .map { (label, value) => SourceIdentifier(
-                IdentifierSchemes.miroLibraryReference, s"{label} {value}"
+                IdentifierSchemes.miroLibraryReference, s"$label $value"
               )}
           }
 
@@ -386,7 +386,7 @@ case class MiroTransformable(MiroID: String,
       // the same holds for library_ref_id, and if so, we don't
       // return any identifiers here.
       case None => {
-        libraryRefId match {
+        miroData.libraryRefId match {
           case Some(ids) => throw new RuntimeException(
             s"library_ref_department=null but library_ref_id=$ids"
           )
