@@ -42,27 +42,27 @@ def is_wia_award_winner(miro_image):
     return False
 
 
-def determine_wia_collection(miro_image):
-    if "image_award_date" not in miro_image.image_data:
-        raise InvalidWIAYear(miro_image.image_data)
-    if not miro_image.image_data['image_award_date']:
-        raise InvalidWIAYear(miro_image.image_data)
+def determine_wia_collection(image_data):
+    if "image_award_date" not in image_data:
+        raise InvalidWIAYear(image_data)
+    if not image_data['image_award_date']:
+        raise InvalidWIAYear(image_data)
 
-    if not isinstance(miro_image.image_data['image_award_date'], list):
-        award_years = [miro_image.image_data['image_award_date']]
+    if not isinstance(image_data['image_award_date'], list):
+        award_years = [image_data['image_award_date']]
     else:
-        award_years = miro_image.image_data['image_award_date']
+        award_years = image_data['image_award_date']
 
     award_years = list(set(award_years))
     award_years = [award_year for award_year in award_years if award_year]
 
     if not len(award_years) == 1:
-        raise InvalidWIAYear(miro_image.image_data)
+        raise InvalidWIAYear(image_data)
 
-    if miro_image.image_data['image_award_date'][0] in wia_year:
-        return wia_year[miro_image.image_data['image_award_date'][0]]
+    if award_years[0] in wia_year:
+        return wia_year[award_years[0]]
 
-    raise InvalidWIAYear(miro_image.image_data)
+    raise InvalidWIAYear(image_data)
 
 
 def main():
@@ -93,11 +93,6 @@ def main():
             miro_collection_id = miro_collections[miro_image.collection].collection_id
             api.add_image_to_collection(asset_id, miro_collection_id)
 
-            # Add to wia collection
-            if is_wia_award_winner(miro_image):
-                wia_collection_id = determine_wia_collection(miro_image.image_data)
-                api.add_image_to_collection(asset_id, wia_collection_id)
-
             # Add metadata
             metadata = create_metadata(miro_image.image_data)
             api.add_image_metadata(asset_id, metadata)
@@ -105,6 +100,12 @@ def main():
             # Add tags
             tags = create_tags(miro_image.image_data)
             api.add_image_tags(asset_id, tags)
+
+            # Add to wia collection
+            if is_wia_award_winner(miro_image):
+                wia_collection_id = determine_wia_collection(miro_image.image_data)
+                api.add_image_to_collection(asset_id, wia_collection_id)
+
             logger.info(f"Successfully added metadata for {miro_image.miro_id}")
         except Exception:
             logger.exception(f"Failed adding metadata for {miro_image}")

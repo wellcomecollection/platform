@@ -91,7 +91,6 @@ class TandemVaultAPI(object):
                 'asset[copyright]': metadata['copyright'],
                 'asset[notes]': metadata['notes'],
                 'asset[usage_terms]': metadata['usage'],
-                'status': 'accepted',
             }
         )
 

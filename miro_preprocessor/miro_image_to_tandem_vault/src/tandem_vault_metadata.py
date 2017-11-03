@@ -25,17 +25,17 @@ class MiroCollection:
 
 
 miro_collections = {
-    'A': MiroCollection(47806, 111597),  # noqa
+    'A': MiroCollection(50064, 111597),  # noqa
     'AS': MiroCollection(47807, 111598),  # noqa
-    'B': MiroCollection(49302, 111600),  # noqa
+    'B': MiroCollection(50067, 111600),  # noqa
     'D': MiroCollection(47809, 111601),  # noqa
     'F': MiroCollection(47810, 111603),  # noqa
     'FP': MiroCollection(47811, 111604),  # noqa
-    'L': MiroCollection(47812, 111605),  # noqa
-    'M': MiroCollection(47813, 111606),  # noqa
+    'L': MiroCollection(50073, 111605),  # noqa
+    'M': MiroCollection(50075, 111606),  # noqa
     'N:': MiroCollection(47814, 111607),  # noqa
     'S': MiroCollection(47815, 111608),  # noqa
-    'V': MiroCollection(47816, 111609),  # noqa
+    'V': MiroCollection(50077, 111609),  # noqa
     'W': MiroCollection(47817, 1116011),  # noqa
 }
 
@@ -235,7 +235,7 @@ def create_caption(d):
         _followed_by_newline(d, 'image_wellcome_publications', "Used for Wellcome publication: ") +
         _followed_by_newline(d, 'image_tech_scanned_by', "Photographer: ") +
         _show_only_if_match(d, 'image_transparency_held', 'Yes', 'Transparency held: '),
-        _is_in(d, 'image_related_images'),
+        _prefix_string(_is_in(d, 'image_related_images'), prefix="Related images: "),
     ]
 
     return "".join(parts)
