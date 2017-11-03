@@ -104,21 +104,15 @@ case class MiroTransformable(MiroID: String,
           label == "Biomedical Image Awards")
       }
 
-    val wiaAwardsString = wiaAwardsData.length match {
+    val wiaAwardsString = wiaAwardsData match {
       // Most images have no award, or only a single award string.
-      case 0 => ""
-      case 1 => {
-        val (label, year) = wiaAwardsData.head
-        s" $label $year."
-      }
+      case Nil => ""
+      case List((label, year)) => s" $label $year."
 
       // A handful of images have an award key pair for "WIA Overall Winner"
       // and "Wellcome Image Awards", both with the same year.  In this case,
       // we write a single sentence.
-      case 2 => {
-        val (_ , year) = wiaAwardsData.head
-        s" Wellcome Image Awards Overall Winner $year."
-      }
+      case List((_, year), (_, _)) => s" Wellcome Image Awards Overall Winner $year."
 
       // Any more than two award-related entries in these fields would be
       // unexpected, and we let it error as an unmatched case.
@@ -127,7 +121,7 @@ case class MiroTransformable(MiroID: String,
     // Finally, remove any leading/trailing from the description, and drop
     // the description if it's *only* whitespace.
     val description =
-      if ((rawDescription + wiaAwardsString).trim.isNotEmpty) {
+      if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
         Some((rawDescription + wiaAwardsString).trim)
       } else None
 
