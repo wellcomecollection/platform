@@ -35,4 +35,17 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     miroTransformable.transform.isSuccess shouldBe true
     miroTransformable.transform.get
   }
+
+  def assertTransformWorkFails(
+    data: String,
+    MiroID: String = "M0000001",
+    MiroCollection: String = "TestCollection"
+  ) = {
+    val miroTransformable = MiroTransformable(
+      MiroID = MiroID,
+      MiroCollection = MiroCollection,
+      data = buildJSONForWork(data)
+    )
+    miroTransformable.transform.isSuccess shouldBe false
+  }
 }
