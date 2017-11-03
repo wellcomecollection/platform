@@ -24,7 +24,9 @@ case class MiroTransformableData(
   @JsonProperty("image_tech_file_size") techFileSize: Option[List[String]],
   @JsonProperty("image_use_restrictions") useRestrictions: Option[String],
   @JsonProperty("image_supp_lettering") suppLettering: Option[String],
-  @JsonProperty("image_innopac_id") innopacID: Option[String]
+  @JsonProperty("image_innopac_id") innopacID: Option[String],
+  @JsonProperty("image_credit_line") creditLine: Option[String],
+  @JsonProperty("image_source_code") sourceCode: Option[String]
 )
 
 case object MiroTransformableData {
