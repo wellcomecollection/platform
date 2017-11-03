@@ -180,7 +180,7 @@ def create_usage(d):
 def create_caption(d):
     parts = [
         _followed_by_newline(d, 'image_no_calc'),
-        _followed_by_comma(d, 'image_title'),
+        _followed_by_newline(d, 'image_title'),
         _followed_by_newline(d, 'image_innopac_id', 'Sierra record number: '),
         _followed_by_comma(d, 'image_pub_author'),
         _followed_by_comma({'creator': create_creator(d)}, 'creator'),
