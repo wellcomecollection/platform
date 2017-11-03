@@ -270,7 +270,15 @@ class MiroTransformableTest
         )
       )
     }
-    // len(labels) != len(IDs) => failure
+
+    it("with mismatched ref IDs/department") {
+      assertTransformWorkFails(
+        data = """
+          "image_library_ref_department": ["External Reference"],
+          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
+        """
+      )
+    }
   }
 
   it("should have an empty list if no image_creator field is present") {
