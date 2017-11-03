@@ -236,14 +236,40 @@ class MiroTransformableTest
   }
 
   describe("non-MPL references should be passed through as identifiers") {
-    it("")
+    it("no references") {
+      transformRecordAndCheckMiroLibraryReferences(
+        data = """
+          "image_library_ref_department": null,
+          "image_library_ref_id": null
+        """,
+        expectedValues = List()
+      )
+    }
 
-    // No references
+    it("one reference") {
+      transformRecordAndCheckMiroLibraryReferences(
+        data = """
+          "image_library_ref_department": ["External Reference"],
+          "image_library_ref_id": ["Sanskrit ID 1924"]
+        """,
+        expectedValues = List(
+          "External Reference Sanskrit ID 1924"
+        )
+      )
+    }
 
-    // One reference
-
-    // Multiple references
-
+    it("two references") {
+      transformRecordAndCheckMiroLibraryReferences(
+        data = """
+          "image_library_ref_department": ["External Reference", "ICV No"],
+          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
+        """,
+        expectedValues = List(
+          "External Reference Sanskrit ID 1924",
+          "ICV No 1234"
+        )
+      )
+    }
     // len(labels) != len(IDs) => failure
   }
 
