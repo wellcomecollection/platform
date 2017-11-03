@@ -237,6 +237,14 @@ class MiroTransformableTest
 
   describe("non-MPL references should be passed through as identifiers") {
     it("")
+
+    // No references
+
+    // One reference
+
+    // Multiple references
+
+    // len(labels) != len(IDs) => failure
   }
 
   it("should have an empty list if no image_creator field is present") {
@@ -427,9 +435,9 @@ class MiroTransformableTest
       SourceIdentifier(IdentifierSchemes.miroImageNumber, "V0175278")
     )
     libraryRefList = expectedValues.map {
-      SourceIdentifier(IdentifierSchemes.miroLibraryReference)
+      SourceIdentifier(IdentifierSchemes.miroLibraryReference, _)
     }
-    work.identifiers shouldBe
+    work.identifiers shouldBe (miroIDList ++ libraryRefList)
   }
 }
 
