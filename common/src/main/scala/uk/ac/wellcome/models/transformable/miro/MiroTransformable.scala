@@ -127,7 +127,7 @@ case class MiroTransformable(MiroID: String,
     // Finally, remove any leading/trailing from the description, and drop
     // the description if it's *only* whitespace.
     val description =
-      if ((rawDescription + wiaAwardsString).trim.length > 0) {
+      if ((rawDescription + wiaAwardsString).trim.isNotEmpty) {
         Some((rawDescription + wiaAwardsString).trim)
       } else None
 
