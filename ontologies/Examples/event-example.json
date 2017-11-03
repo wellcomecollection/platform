@@ -34,8 +34,16 @@
     } ,
   "positionInSeries": "2" ,  
   "audience": "Youth event",
-  "endDate": "21 October 2017",
-  "startDate": "21 October 2017",
+  "endDate": {
+    "label" : "21 October 2017" ,
+    "type" : "Period" ,
+    "date" : "21-10-2017" 
+  } ,
+  "startDate": {
+    "label" : "21 October 2017" ,
+    "type" : "Period" ,
+    "date" : "21-10-2017"  
+  } ,
   "location": "Wellcome Studio",
   "offer": {
     "priceSpecification" : {

@@ -22,22 +22,18 @@
 
    /* Populate wwork:identifiers . Rules:
    *
-   * 1. Need to look further at where these comes from and the ones we want
-   * 
+   * 1. Marc field "035" subfield "a"
+   * 2. Populate "value" from "content". Strip "(UkLW)"
+   * 3. Default to "identifierScheme": "sierra-system-number"
    * 
    * Example: 
    * "identifiers": [
-   * {
-   *   "value": "ICV No 6939",
-   *   "type": "Identifier",
-   *   "identifierScheme": "wellcome-library-videodisk-number"
-   * },
    * {
    *   "value": "b11579328",
    *   "type": "Identifier",
    *   "identifierScheme": "sierra-system-number"
    * }
-   * ],
+   * ]
    *
    * 
    */
@@ -45,7 +41,7 @@
 
    /* Populate wwork:title. The rules are as follows:
    * 
-   * 1. For all bibliographic records use Sierra "title".
+   * 1. For all bibliographic records use bib record "title".
    *
    * Note: Sierra populates this field from field 245 subfield a and b.
    *
@@ -107,7 +103,7 @@
    *     },
    *     "qualifiers": [
    *        {
-   *           "qualifiedType": "fuller-form-of-name" ,        
+   *           "qualifierType": "fuller-form-of-name" ,        
    *           "label": "Philip Peter",
    *           "type": "Name"  
    *        } ,
@@ -215,6 +211,8 @@
    * Note: no obvious mapping for created data as bibliographic records primarily focused on publication date. Where as art works, ephemera might not have a publication date
    *
    *
+
+
    * Populate wwork:publicationDate. Rules:
    * 
    * 1. For bibliographic records where "260" is populated
@@ -222,13 +220,22 @@
    * 3. Type as "Period"
    * 4. Also all bibliographic records use "publishYear"
    * 5. Platform "year" populate from "publishYear"
-   * 
+   *
    *
    * Example: 
    *   "publicationDate": {
    *     "label": "May 23 1932",
+   *     "type": "Period" 
+   *  },
+   * 
+   *
+   * Example of how we might pull out year or date when we know it in the future:
+   * 
+   *   "publicationDate": {
+   *     "label": "May 23 1932",
    *     "type": "Period" ,
-   *     "year": "1932"
+   *     "year": "1932" ,
+   *     "date" : "05-23-1932"
    *  },
    */
 
@@ -237,25 +244,32 @@
    * 1. For bibliographic records where "260" is populated
    * 2. Platform "placeOfPublication" "label" populate with 260 subfield "a"
    * 3. Type as "Place"
-   * 4. Also for all bibliographic records use "country"
-   * 5. Platform "country" "id" is populated from "code"
-   * 6. Platform "country" "label" is populated from "name"
-   * 7. Type as "Country"
+   * 4. Also for all bibliographic records use fixed field "country" to populate "placeOfPublication" with..
+   * 5. Platform "id" is populated from "code"
+   * 6. Platform "label" is populated from "name"
+   * 7. Type as "Place"
    *
    * Note: American states seem to be valid entries for Marc countries: http://www.loc.gov/marc/countries/countries_code.html
    *
+   *
    * Example:
-   *   "placeOfPublication": [
-   *     {
-   *     "label": "[London] (St. James's Street)",
-   *     "type": "Place" ,
-   *     "country": {
-   *        "id": "mdu" ,
+   *
+   *    "placeOfPublication": [
+   *        {
+   *        "label": "[Maryland] (James Street)",
+   *        "type": "Place" 
+   *        } ,
+   *        {
+   *        "id": "j9210jdd" ,
    *        "label": "Maryland" ,
-   *        "type": "Country"
+   *        "type": "Place"
+   *        "identifiers" : {
+   *           "type" : "Identifier" ,
+   *           "identifierScheme": "marc-countries",
+   *           "value" : "mdu"
+   *         }
    *        }
-   *     }
-   *  ],
+   *       ],
    *
    */
 
@@ -280,7 +294,7 @@
    *
    *  1. For bibliographic records where "246" is popuated with any first indicator and a secound indicator of 6 
    *  2. Populate "letting" 
-   *  3. If record is archive, image or journals look at 749 but not subfield "6". Need to check how we identfiy these records. Archive will come through CALM anyway
+   *  3. If record is archive, image or journals look at 749 but not subfield "6". Need to check how we identify these records. Archive will come through CALM anyway
    * 
    * Example:
    *   "lettering": "Scientific researches! -New discoveries in pneumaticks! -or- an experimental lecture on the powers of air.- Js. Gillray inv. & fect.",
@@ -291,7 +305,7 @@
    * 1. For bibliographic records where "520" subfield "a" are populated .
    * 2. Populate "description"
    * 3. If "520" subfield "b" is populated with summary expansion populate description. Concatenate with summary from subfield "a".
-   * 4. If record is of type art then populate with "245" subfield "6"
+   * 4. If record is of type art then populate with "245" subfield "6". Dont know how we identfiy records as art works.
    *
    * Example:
    *   "description": "A lecture on pneumatics at the Royal Institution, London. Coloured etching by J. Gillray, 1802.",
@@ -302,12 +316,12 @@
    * 1. For bibliographic records where "300" subfield "a" are populated
    * 2. Populate "extent"
    * 
-   * Note: example includes how we could potentially populate a value and unit
+   * 
    *
    * Example:
-   *   "extent": {
-   *      "label": "314 pages"
-   *     }  
+   *   "extent": "314 pages"
+   *          
+   *      
    */   
 
    /* wwwork:physicalDescription
@@ -322,15 +336,19 @@
    * Note: might this populated by a CV?
    */ 
 
-   /* wwwork:dimension
+   /* wwwork:dimensions
    * 
-   * 1. For bibliographic records where "300" subfield "c" are populated
-   * 2. Populate "dimensions"
+   * 1. For bibliographic records where "300" subfield "c" are populated. Populate "dimensions"
+   * 
    * 
    * Note: example includes how we could potentially populate a value and unit. Though this is not pulled out in the MARC
    *
    * Example:
-   *   "dimension": {
+   *   "dimensions": "24cm"
+   *
+   *
+   * Example:
+   *   "dimensions": {
    *      "label": "24cm" ,
    *      "value": "24" ,
    *      "unit": "cm" 
@@ -339,17 +357,16 @@
 
    /* Populate wwork:items. Rules:
    *
-   * Note: this needs to be confirmed. Items point to bib records and not the other way round.
+   * Items point to bib records and not the other way round.
    *
-   * 1. For all item (not bib records) records use "bibIds" to populate bib records with "items"
-   * 2. For item identfier use "id" with "identifierScheme" of "sierra-system-number"
-   * 3. Type as "Item"
-   * 4. For each "location" we get a code and name the code will match one from our list of locationTypes
+   * 1. For all item records (not bib records) use "bibIds" to populate bib records with "items"
+   * 2. Type as "Item"
+   * 3. For item identfier use "id" from the item record to populate "value" and set the "identifierScheme" to "sierra-system-number". Types as "identfier"
+   * 4. For each "location" we get a code and name the code will match one from our list of locationTypes. "name" is used to populate our location "label".
    * 5. "shelfmark" is populated from "call number"
    * 6. "accessStatus" is populated from "status" "display"
-   * 7. "accessProcess" is populated from OPACMSG fixed field no=108
+   * 7. "accessProcess" is populated from OPACMSG fixed field no=108 note this might need to be asked for explicitly when pulling back records
    *
-   * Note: not sure how we populate access process is this something that is coded to the location type?
    *
    *"items": [
    * {
@@ -393,7 +410,6 @@
    * }
    *]
    *
-   * Note: will map to a controlled vocabulry term in future
    */
 
 

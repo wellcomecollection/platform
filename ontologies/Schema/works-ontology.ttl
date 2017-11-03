@@ -46,7 +46,17 @@ wwork:Concept rdf:type owl:Class ;
 wwork:Agent rdf:type owl:Class ;
     rdfs:label "Agent"@en ;
     rdfs:comment "A person, group, event or organisation."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wwork:Language rdf:type owl:Class ;
+    rdfs:label "Language"@en ;
+    rdfs:comment "A language recognised as one of those in the ISO 639-2 language codes."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wwork:Series rdf:type owl:Class ;
+    rdfs:label "Series"@en ;
+    rdfs:comment "A series of works."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .              
                 
 #######  Object properties ##### 
     
@@ -57,7 +67,6 @@ wwork:items rdf:type owl:ObjectProperty ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Item ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
- 
 
 wwork:isPartOf rdf:type owl:ObjectProperty ;
     rdfs:label "isPartOf"@en ;
@@ -141,7 +150,28 @@ wwork:createdDate rdf:type owl:DatatypeProperty ;
     rdfs:comment "Relates the creation of a work to a date, when the date of creation does not cover a range"@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Period ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .              
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:language rdf:type owl:DatatypeProperty ;
+    rdfs:label "language"@en ;
+    rdfs:comment "Relates a work to its primary language"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Language ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+    
+wwork:series rdf:type owl:DatatypeProperty ;
+    rdfs:label "series"@en ;
+    rdfs:comment "Relates a work to a series it is a part of"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Series ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wwork:works rdf:type owl:DatatypeProperty ;
+    rdfs:label "works"@en ;
+    rdfs:comment "Relates a series to works that are part of it"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Series ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                          
     
 #######  Data properties #####  
                         
@@ -184,6 +214,28 @@ wwork:lettering rdf:type owl:DatatypeProperty ;
 wwork:physicalDescription rdf:type owl:DatatypeProperty ;
     rdfs:label "physicalDescription"@en ;
     rdfs:comment "A description of specific physical characteristics of the item - condition, dimensions, details of cover or binding, etc. - or, in the case of digital objects, any notes relating to this digital manifestation over and above notes of file format."@en ;
-    rdfs:domain wwork:Item ;
+    rdfs:domain wwork:Work ;
     rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+    
+wwork:extent rdf:type owl:DatatypeProperty ;
+    rdfs:label "extent"@en ;
+    rdfs:comment "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:dimension rdf:type owl:DatatypeProperty ;
+    rdfs:label "dimension"@en ;
+    rdfs:comment "Expressed in centimeters, millimeters, or inches; may include a parenthetical qualifier giving the format of the item (e.g., (fol.), (8vo))."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wwork:positionInSeries rdf:type owl:DatatypeProperty ;
+    rdfs:label "positionInSeries"@en ;
+    rdfs:comment "Position in series or volume number."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range xsd:integer ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .            
+    
