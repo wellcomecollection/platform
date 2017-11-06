@@ -358,6 +358,64 @@ class MiroTransformableTest
     work.description shouldBe Some(description)
   }
 
+  describe("Wellcome Images Awards metadata") {
+    it("should do nothing for non-WIA metadata") {
+      val description = "Spotting sea snakes on sandbanks."
+      val work = transformWork(
+        data =
+          s"""
+          "image_title": "Snakes!",
+          "image_image_desc": "$description",
+          "image_award": ["Award of Excellence"],
+          "image_award_date": [null]
+        """
+      )
+      work.description shouldBe Some(description)
+    }
+
+    it("should add WIA metadata if present") {
+      val description = "Purple penguins play with paint."
+      val work = transformWork(
+        data =
+          s"""
+          "image_title": "Penguin feeding time",
+          "image_image_desc": "$description",
+          "image_award": ["Biomedical Image Awards"],
+          "image_award_date": ["2001"]
+        """
+      )
+      work.description shouldBe Some(description + " Biomedical Image Awards 2001.")
+    }
+
+    it("should only include WIA metadata") {
+      val description = "Giraffes can be grazing, galloping or graceful."
+      val work = transformWork(
+        data =
+          s"""
+          "image_title": "A giraffe trifecta",
+          "image_image_desc": "$description",
+          "image_award": ["Dirt, Wellcome Collection", "Biomedical Image Awards"],
+          "image_award_date": [null, "2002"]
+        """
+      )
+      work.description shouldBe Some(description + " Biomedical Image Awards 2002.")
+    }
+
+    it("should combine multiple WIA metadata fields if necessary") {
+      val description = "Amazed and awe-inspired by an adversarial aardvark."
+      val work = transformWork(
+        data =
+          s"""
+          "image_title": "Award-winning!",
+          "image_image_desc": "$description",
+          "image_award": ["WIA Overall Winner", "Wellcome Image Awards"],
+          "image_award_date": ["2015", "2015"]
+        """
+      )
+      work.description shouldBe Some(description + " Wellcome Image Awards Overall Winner 2015.")
+    }
+  }
+
   it("should pass through the value of the creation date on V records") {
     val date = "1820-1848"
     val work = transformWork(

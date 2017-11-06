@@ -29,7 +29,9 @@ case class MiroTransformableData(
   @JsonProperty("image_source_code") sourceCode: Option[String],
   @JsonProperty("image_library_ref_department") libraryRefDepartment: Option[
     List[String]],
-  @JsonProperty("image_library_ref_id") libraryRefId: Option[List[String]]
+  @JsonProperty("image_library_ref_id") libraryRefId: Option[List[String]],
+  @JsonProperty("image_award") award: Option[List[String]],
+  @JsonProperty("image_award_date") awardDate: Option[List[String]]
 )
 
 case object MiroTransformableData {
