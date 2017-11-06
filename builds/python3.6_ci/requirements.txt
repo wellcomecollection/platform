@@ -14,13 +14,11 @@ chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
 cookies==2.2.1            # via moto
 cryptography==2.1.1       # via moto
-daiquiri==1.3.0
 docker-pycreds==0.2.1     # via docker
 docker==2.5.1             # via moto
 docutils==0.14            # via botocore
 first==2.0.1              # via pip-tools
 idna==2.6                 # via cryptography, requests
-isodate==0.5.4            # via rdflib
 jinja2==2.9.6             # via moto
 jmespath==0.9.3           # via boto3, botocore
 markupsafe==1.0           # via jinja2
@@ -31,12 +29,10 @@ pip-tools==1.10.1
 py==1.4.34                # via pytest
 pyaml==17.10.0            # via moto
 pycparser==2.18           # via cffi
-pyparsing==2.2.0          # via rdflib
 pytest==3.2.3
 python-dateutil==2.6.1    # via botocore, moto
 pytz==2017.2              # via moto
 pyyaml==3.12              # via pyaml
-rdflib==4.2.2
 requests==2.18.4          # via docker, moto
 s3transfer==0.1.11        # via boto3
 six==1.11.0               # via cryptography, docker, docker-pycreds, mock, moto, pip-tools, python-dateutil, websocket-client
