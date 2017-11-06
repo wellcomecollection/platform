@@ -26,7 +26,7 @@ failures = []
 
 def parse_turtle(path):
     """
-    Try to parse the Turtle at a given path.  Raises a ValueError if it fails!
+    Try to parse the Turtle at a given path.
     """
     logger.info("Parsing Turtle at path %s", path)
     graph = rdflib.Graph()
