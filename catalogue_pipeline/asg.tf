@@ -8,6 +8,7 @@ module "services_cluster_asg" {
   vpc_id                = "${module.vpc_services.vpc_id}"
   admin_cidr_ingress    = "${var.admin_cidr_ingress}"
 
+  asg_min     = "0"
   asg_desired = "2"
   asg_max     = "4"
 
