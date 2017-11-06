@@ -10,9 +10,6 @@ class SQSReader:
         self.max_message = max_messages
 
     def __iter__(self):
-        return self
-
-    def __next__(self):
         while True:
             response = self.sqs_client.receive_message(
                 QueueUrl=self.queue_url,
@@ -24,8 +21,6 @@ class SQSReader:
                 for message in messages:
                     self._current_message = message
                     return message
-
-    next = __next__
 
     def delete_current(self):
         if self._current_message is not None:
