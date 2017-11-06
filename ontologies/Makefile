@@ -1,8 +1,13 @@
 ROOT = $(shell git rev-parse --show-toplevel)
+ONTOLOGIES = $(ROOT)/ontologies
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
+
+
+$(ONTOLOGIES)/lint_turtle/requirements.txt: $(ONTOLOGIES)/lint_turtle/requirements.in
+	docker run --rm --volume $(ONTOLOGIES)/lint_turtle:/src micktwomey/pip-tools
 
 
 lint-turtle: $(ROOT)/.docker/python3.6_ci
