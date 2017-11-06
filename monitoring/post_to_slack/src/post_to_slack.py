@@ -275,7 +275,7 @@ def simplify_message(message):
     #      => generated 271 bytes in 988 msecs
     #
     # Expunge-inate!
-    message = re.sub(r'=> generated \d+ bytes in \d+ msecs', '', message)
+    message = re.sub(r'=> generated \d+ bytes in \d+ msecs ', '', message)
 
     # Lambda timeouts have an opaque prefix:
     #
