@@ -85,9 +85,45 @@ case class MiroTransformable(MiroID: String,
       candidateDescription
     }
 
+    // Add any information about Wellcome Image Awards winners to the
+    // description.  We append a sentence to the description, using one
+    // of the following patterns:
+    //
+    //    Biomedical Image Awards 1997.
+    //    Wellcome Image Awards 2015.
+    //    Wellcome Image Awards 2016 Overall Winner.
+    //    Wellcome Image Awards 2017, Julie Dorrington Award Winner.
+    //
+    // For now, any other award data gets discarded.
+    val wiaAwardsData: List[(String, String)] =
+      zipMiroFields(keys = miroData.award, values = miroData.awardDate)
+        .filter {
+          case (label, _) =>
+            (label == "WIA Overall Winner" ||
+              label == "Wellcome Image Awards" ||
+              label == "Biomedical Image Awards")
+        }
+
+    val wiaAwardsString = wiaAwardsData match {
+      // Most images have no award, or only a single award string.
+      case Nil => ""
+      case List((label, year)) => s" $label $year."
+
+      // A handful of images have an award key pair for "WIA Overall Winner"
+      // and "Wellcome Image Awards", both with the same year.  In this case,
+      // we write a single sentence.
+      case List((_, year), (_, _)) =>
+        s" Wellcome Image Awards Overall Winner $year."
+
+      // Any more than two award-related entries in these fields would be
+      // unexpected, and we let it error as an unmatched case.
+    }
+
+    // Finally, remove any leading/trailing from the description, and drop
+    // the description if it's *only* whitespace.
     val description =
-      if (rawDescription.trim.length > 0) {
-        Some(rawDescription.trim)
+      if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
+        Some((rawDescription + wiaAwardsString).trim)
       } else None
 
     (title, description)
@@ -402,7 +438,6 @@ case class MiroTransformable(MiroID: String,
           s"Inconsistent k/v pairs: keys=null, values=$v"
         )
     }
-
   }
 
   override def transform: Try[Work] = Try {
