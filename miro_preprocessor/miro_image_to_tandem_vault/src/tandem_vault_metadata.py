@@ -265,7 +265,7 @@ def create_copyright(d):
         if possible_creator:
             return possible_creator
 
-    return ""
+    return image_credit_line
 
 
 def create_notes():

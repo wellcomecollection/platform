@@ -7,6 +7,7 @@ Lambda for loading images and data into Tandem Vault
 import json
 import logging
 import os
+import time
 
 import boto3
 import daiquiri
@@ -82,6 +83,7 @@ def main():
 
     for message in sqs_reader:
         try:
+            time.sleep(5)
             outer_message = json.loads(message['Body'])
             tandem_vault_upload_info = json.loads(outer_message['Message'])
 
