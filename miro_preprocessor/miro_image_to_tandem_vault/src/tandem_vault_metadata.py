@@ -8,6 +8,12 @@ import json
 import attr
 import boto3
 
+import logging
+import daiquiri
+
+daiquiri.setup(level=logging.INFO)
+logger = daiquiri.getLogger(__name__)
+
 
 @attr.s
 class MiroCollection:
@@ -19,17 +25,17 @@ class MiroCollection:
 
 
 miro_collections = {
-    'A': MiroCollection(47806, 111597),  # noqa
+    'A': MiroCollection(50064, 111597),  # noqa
     'AS': MiroCollection(47807, 111598),  # noqa
-    'B': MiroCollection(49302, 111600),  # noqa
+    'B': MiroCollection(50067, 111600),  # noqa
     'D': MiroCollection(47809, 111601),  # noqa
     'F': MiroCollection(47810, 111603),  # noqa
     'FP': MiroCollection(47811, 111604),  # noqa
-    'L': MiroCollection(47812, 111605),  # noqa
-    'M': MiroCollection(47813, 111606),  # noqa
+    'L': MiroCollection(50073, 111605),  # noqa
+    'M': MiroCollection(50075, 111606),  # noqa
     'N:': MiroCollection(47814, 111607),  # noqa
     'S': MiroCollection(47815, 111608),  # noqa
-    'V': MiroCollection(47816, 111609),  # noqa
+    'V': MiroCollection(50077, 111609),  # noqa
     'W': MiroCollection(47817, 1116011),  # noqa
 }
 
@@ -55,7 +61,6 @@ wia_year = {
     '2016': 110088,
     '2017': 110089,
 }
-
 
 CONTRIB_MAP = None
 
@@ -91,59 +96,93 @@ def lookup_contributor(d):
     return contributor
 
 
-def _is_in(d, a):
-    if a not in d:
+def _zip(d, a, b):
+    if (a not in d) or (b not in d):
         return ""
-    else:
-        return d[a] or ""
+
+    if not (isinstance(d[a], list)) or (not isinstance(d[b], list)):
+        return ""
+
+    if len(d[a]) != len(d[b]):
+        return ""
+
+    if not (d[a] and d[b]):
+        return ""
+
+    zipped = zip(d[a], d[b])
+
+    def _check_zip(pair):
+        first = pair[0]
+        second = pair[1]
+
+        if first and second:
+            return True
+
+        return False
+
+    def _join(pair, delimiter):
+        first = pair[0]
+        second = pair[1]
+
+        return f'{first}{delimiter}{second}'
+
+    return ", ".join([_join(pair, " ") for pair in zipped if _check_zip(pair)]) + '\n'
 
 
-def _if_exists(d, a, prepend=""):
-    s = _is_in(d, a)
+def _list_to_string(candidate_string, delimiter=", "):
+    if isinstance(candidate_string, list):
+        string_list = [o for o in candidate_string if isinstance(o, str)]
+        string_list = [o for o in string_list if o]
 
+        candidate_string = delimiter.join(string_list)
+
+    return candidate_string
+
+
+def _is_in(my_dict, key, delimiter=", "):
+    if key not in my_dict:
+        return ""
+
+    if not my_dict[key]:
+        return ""
+
+    return _list_to_string(my_dict[key], delimiter)
+
+
+def _prefix_string(s, prefix="", suffix=""):
     if not s:
         return ""
 
-    return f"{prepend}{s}"
+    return f"{prefix}{s}{suffix}"
 
 
-def _followed_by_comma(d, a, prepend=""):
+def _if_exists(d, a, prefix=""):
     s = _is_in(d, a)
-
-    if not s:
-        return ""
-
-    return f"{prepend}{s}, "
+    return _prefix_string(s, prefix)
 
 
-def _followed_by_newline(d, a, prepend="", delimiter=", "):
+def _followed_by_comma(d, a, prefix=""):
     s = _is_in(d, a)
+    return _prefix_string(s, prefix, ', ')
 
-    if isinstance(s, list):
-        s = delimiter.join(s)
 
-    if not s:
-        return ""
-
-    return f"{prepend}{s}\n"
+def _followed_by_newline(d, a, prefix="", delimiter=", "):
+    s = _is_in(d, a)
+    return _prefix_string(s, prefix, '\n')
 
 
 def _show_only_if_match_hide_value(d, a, match, text):
     s = _is_in(d, a)
-
     if s != match:
         return ""
+    return _prefix_string(text, '', '\n')
 
-    return f"{text}\n"
 
-
-def _show_only_if_match(d, a, match, prepend=""):
+def _show_only_if_match(d, a, match, prefix="", suffix=""):
     s = _is_in(d, a)
-
     if s != match:
         return ""
-
-    return _followed_by_newline(d, a, prepend)
+    return _prefix_string(s, prefix, '\n')
 
 
 def _or(s1, s2):
@@ -169,11 +208,24 @@ def create_usage(d):
     return "".join(parts)
 
 
+def _prefix_b_number(s):
+    if not s.startswith('b'):
+        return f'b{s}'
+
+    return s
+
+
 def create_caption(d):
     parts = [
         _followed_by_newline(d, 'image_no_calc'),
-        _followed_by_comma(d, 'image_title'),
-        _followed_by_newline(d, 'image_innopac_id', 'Sierra record number: '),
+        _followed_by_newline(d, 'image_title'),
+        _followed_by_newline(
+            {
+                'innopac_id': _prefix_b_number(_is_in(d, 'image_innopac_id'))
+            },
+            'innopac_id',
+            'Sierra record number: '
+        ),
         _followed_by_comma(d, 'image_pub_author'),
         _followed_by_comma({'creator': create_creator(d)}, 'creator'),
         _followed_by_comma(d, 'image_pub_title'),
@@ -189,17 +241,15 @@ def create_caption(d):
         _followed_by_comma(d, 'image_pub_page_no'),
         _followed_by_newline(d, 'image_pub_plate'),
         _followed_by_newline(d, 'image_image_desc') +
-        _followed_by_newline(d, 'image_library_ref_department') +
+        _zip(d, 'image_library_ref_department', 'image_library_ref_id') +
         _followed_by_newline(d, 'image_pub_archive') +
         _followed_by_newline(d, 'image_library_dept') +
         _followed_by_newline(d, 'image_award', "Used for exhibition: ") +
         _followed_by_newline(d, 'image_wellcome_publications', "Used for Wellcome publication: ") +
         _followed_by_newline(d, 'image_tech_scanned_by', "Photographer: ") +
         _show_only_if_match(d, 'image_transparency_held', 'Yes', 'Transparency held: '),
-        _is_in(d, 'image_related_images'),
+        _prefix_string(_is_in(d, 'image_related_images'), prefix="Related images: "),
     ]
-
-    print(parts)
 
     return "".join(parts)
 
@@ -248,17 +298,14 @@ def create_tags(d):
 
 
 def create_creator(d):
-    creators = _is_in(d, 'image_creator')
+    creators = _is_in(d, 'image_creator', '/')
 
     if not creators:
         possible_creator = lookup_contributor(d)
         if possible_creator:
             return possible_creator
 
-    if not isinstance(creators, list):
-        creators = [creators]
-
-    return "/".join(creators)
+    return creators
 
 
 def create_metadata(image_data):

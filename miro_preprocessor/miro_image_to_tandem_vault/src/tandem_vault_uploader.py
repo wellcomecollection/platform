@@ -2,9 +2,11 @@
 # -*- encoding: utf-8 -*-
 
 import json
+import logging
 import os
 
 import boto3
+import daiquiri
 
 from wellcome_lambda_utils.miro_utils import MiroImage
 from wellcome_lambda_utils import sns_utils
@@ -12,6 +14,9 @@ from wellcome_lambda_utils import sns_utils
 from tandem_vault_metadata import miro_collections
 import tandem_vault_api
 import sqs_utils
+
+daiquiri.setup(level=logging.INFO)
+logger = daiquiri.getLogger(__name__)
 
 
 def upload_asset(tandem_vault_api, s3_client, src_bucket, miro_image):
@@ -52,32 +57,34 @@ def main():
     sqs_reader = sqs_utils.SQSReader(sqs_client, queue_url)
 
     for message in sqs_reader:
-        outer_message = json.loads(message['Body'])
-        image_info = json.loads(outer_message['Message'])
+        try:
+            outer_message = json.loads(message['Body'])
+            image_info = json.loads(outer_message['Message'])
 
-        miro_image = MiroImage(image_info)
-        subject = outer_message['Subject']
+            miro_image = MiroImage(image_info)
+            subject = outer_message['Subject']
 
-        asset_data = upload_asset(
-            api,
-            s3_client,
-            src_bucket,
-            miro_image
-        )
+            asset_data = upload_asset(
+                api,
+                s3_client,
+                src_bucket,
+                miro_image
+            )
+        except Exception as e:
+            logger.exception("Failed uploading image to Tandem vault")
+        else:
+            asset_id = asset_data['id']
+            sns_utils.publish_sns_message(
+                sns_client=sns_client,
+                message={
+                    'asset_id': asset_id,
+                    'image_info': image_info
+                },
+                topic_arn=topic_arn,
+                subject=subject
+            )
 
-        asset_id = asset_data['id']
-
-        sns_utils.publish_sns_message(
-            sns_client=sns_client,
-            message={
-                'asset_id': asset_id,
-                'image_info': image_info
-            },
-            topic_arn=topic_arn,
-            subject=subject
-        )
-
-        sqs_reader.delete_current()
+            sqs_reader.delete_current()
 
 
 if __name__ == '__main__':

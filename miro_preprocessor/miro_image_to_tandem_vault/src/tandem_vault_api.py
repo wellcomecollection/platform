@@ -66,8 +66,6 @@ class TandemVaultAPI(object):
         )
         logger.debug('Response from POST to uploads.tandemstock.s3: %s', resp.text)
 
-        print(resp.text)
-
         # Now create an asset from the S3 upload location.
         # https://tandemvault.com/docs/api/v1/assets/create.html
         resp = self.sess.post(
@@ -93,7 +91,6 @@ class TandemVaultAPI(object):
                 'asset[copyright]': metadata['copyright'],
                 'asset[notes]': metadata['notes'],
                 'asset[usage_terms]': metadata['usage'],
-                'status': 'accepted',
             }
         )
 
