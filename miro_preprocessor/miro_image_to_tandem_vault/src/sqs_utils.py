@@ -20,7 +20,7 @@ class SQSReader:
                 messages = response["Messages"]
                 for message in messages:
                     self._current_message = message
-                    return message
+                    yield message
 
     def delete_current(self):
         if self._current_message is not None:
