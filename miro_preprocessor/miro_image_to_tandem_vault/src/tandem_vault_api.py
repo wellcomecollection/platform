@@ -27,6 +27,18 @@ class TandemVaultAPI(object):
 
         self.sess.hooks['response'].append(raise_error)
 
+    def get_assets(self, filename):
+        resp = self.sess.get(
+            f'{self.api_url}/assets',
+            params={
+                'api_key': self.api_key,
+                'filename': os.path.basename(filename)
+            }
+        )
+        logger.debug('Response from GET /assets: %s', resp.text)
+        asset_data = resp.json()
+        return asset_data
+
     def upload_image_to_tv(self, image, filename, upload_set_id):
         """
         Given an image create an asset for the
