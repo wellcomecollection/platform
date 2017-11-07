@@ -308,6 +308,7 @@ case class MiroTransformable(MiroID: String,
       case None =>
         miroData.sourceCode match {
           case Some(code) => Some(contributorMap(code.toUpperCase))
+          case Some("WEL") => None
           case None => None
         }
     }

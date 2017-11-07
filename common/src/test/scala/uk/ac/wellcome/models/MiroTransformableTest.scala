@@ -761,6 +761,16 @@ class MiroTransformableCopyrightTest
     )
   }
 
+  it("should provide no copyright if the image_source_code is WEL") {
+    transformRecordAndCheckCopyright(
+      data = s"""
+        "image_title": "A tumultuous transformation of trees",
+        "image_credit_line": null,
+        "image_source_code": "WEL"
+      """,
+      expectedCopyright = None
+    )
+  }
 
   it("should use the uppercased version of the source_code if necessary") {
     transformRecordAndCheckCopyright(
