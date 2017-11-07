@@ -38,7 +38,7 @@ def filter_old_deployments(deployments, age_boundary_mins):
 
 def publish_deployments(topic_arn, deployments):
     if deployments:
-        publish_sns_message(topic_arn, deployments)
+        publish_sns_message(topic_arn=topic_arn, message=deployments)
 
 
 def main(event, _):
