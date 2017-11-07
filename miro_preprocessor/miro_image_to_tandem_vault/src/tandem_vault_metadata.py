@@ -209,7 +209,7 @@ def create_usage(d):
 
 
 def _prefix_b_number(s):
-    if not s.startswith('b'):
+    if s and not s.startswith('b'):
         return f'b{s}'
 
     return s
