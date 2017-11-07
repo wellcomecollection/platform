@@ -44,27 +44,27 @@ variable "iiif_acm_cert_arn" {
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
+  default     = "remus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "06ec423fc0233ede77f7309f56f3ba598f4f49d0_dev"
+  default     = ""
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "1e1e03187d78c1a747ef6917ca65f45e486e3240"
+  default     = ""
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "a0be0d0dd9324db4300a887379ba853e1ea6525f_dev"
 }
 
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 variable "api_task_count_stage" {
