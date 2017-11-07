@@ -41,20 +41,22 @@ def _build_collection_id(src_key):
     return src_key.split(".")[0].split("/")[-1]
 
 
-# These are miro_ids and wrong innopac ids for which we know the correct innopac id, so let's hardcode it
 def _fix_sierra_number(image):
+    """
+    Correct INNOPAC IDs on a handful of records where we know the data
+    is incorrect.
+    """
     miro_id = image["image_no_calc"]
     sierra_id = image["image_innopac_id"]
+
     if sierra_id == "150056628" and miro_id == "L0035213":
         image["image_innopac_id"] = "1500562x"
-        print(image)
-        return image
-    elif sierra_id == "113183382" and (miro_id == "L0001138EB" or miro_id == "L0001138EA"):
+    elif sierra_id == "113183382" and miro_id in ("L0001138EA", "L0001138EB"):
         image["image_innopac_id"] = "1318338x"
-        print(image)
-        return image
+    elif sierra_id == 'L 35411 \n\n15551040' and miro_id == 'L0035411':
+        image['image_innopac_id'] = '15551040'
+
     print(image)
-    return image
 
 
 def main(bucket, src_key, dst_key, js_path="json"):
@@ -71,14 +73,19 @@ def main(bucket, src_key, dst_key, js_path="json"):
     with open(tmp_json, 'w') as f:
         for count, img in enumerate(image_data, start=1):
             if "image_innopac_id" in img.keys():
-                img = _fix_sierra_number(img)
+                _fix_sierra_number(img)
 
             img_json_dump = json.dumps(
                 _wrap_image_data(
                     collection=collection,
                     image_data=img
                 ),
+
+                # Adding the separators omits unneeded whitespace in the JSON,
+                # giving us smaller files.
                 separators=(',', ':'),
+
+                # Using sort_keys gives a deterministic JSON blob
                 sort_keys=True
             )
 
@@ -96,8 +103,6 @@ def main(bucket, src_key, dst_key, js_path="json"):
 
             print(f"Put image {image_id} ({count}) to s3://{bucket}/{json_object_key}")
 
-            # Adding the separators omits unneeded whitespace in the JSON,
-            # giving us smaller files.
             f.write(img_json_dump + '\n')
 
     s3.upload_file(
