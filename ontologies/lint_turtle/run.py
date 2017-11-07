@@ -25,9 +25,7 @@ failures = []
 
 
 def parse_turtle(path):
-    """
-    Try to parse the Turtle at a given path.  Raises a ValueError if it fails!
-    """
+    """Try to parse the Turtle at a given path."""
     logger.info("Parsing Turtle at path %s", path)
     graph = rdflib.Graph()
     try:
@@ -46,18 +44,22 @@ def parse_turtle(path):
         logger.info("Successfully parsed Turtle! ")
 
 
-if __name__ == '__main__':
-    for root, _, filenames in os.walk('.'):
+def find_turtle_files(path):
+    """Generates all the Turtle files under a given path."""
+    for root, _, filenames in os.walk(path):
         for f in filenames:
             if not f.endswith('.ttl'):
                 continue
-            path = os.path.join(root, f)
+            yield os.path.join(root, f)
 
-            if 'WIP' in path:
-                logger.info("Skipping path %s as WIP", path)
-                continue
 
-            parse_turtle(path)
+if __name__ == '__main__':
+    for path in find_turtle_files('.'):
+        if 'WIP' in path:
+            logger.info("Skipping path %s as WIP", path)
+            continue
+
+        parse_turtle(path)
 
     if failures:
         logger.error("Failures in the following files: %s", ", ".join(failures))
