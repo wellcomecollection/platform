@@ -270,6 +270,13 @@ def simplify_message(message):
         r'\d+ headers in \d+ bytes \(\d+ switches on core \d+\)', '', message
     )
 
+    # Loris logs tell us information that isn't helpful for debugging:
+    #
+    #      => generated 271 bytes in 988 msecs
+    #
+    # Expunge-inate!
+    message = re.sub(r'=> generated \d+ bytes in \d+ msecs ', '', message)
+
     # Lambda timeouts have an opaque prefix:
     #
     #     2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task

@@ -152,14 +152,20 @@ class TestAlarm:
 
     # We strip UWGSI and timestamp prefixes from Loris logs
     (
-        '[pid: 88|app: 0|req: 1871/9531] 172.17.0.4 () {46 vars in 937 bytes} [Wed Oct 11 22:42:03 2017] GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg => generated 260 bytes in 227 msecs (HTTP/1.0 500)',
-        'GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg => generated 260 bytes in 227 msecs (HTTP/1.0 500)',
+        '[pid: 88|app: 0|req: 1871/9531] 172.17.0.4 () {46 vars in 937 bytes} [Wed Oct 11 22:42:03 2017] GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg (HTTP/1.0 500)',
+        'GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg (HTTP/1.0 500)',
     ),
 
     # We strip UWSGI suffixes from Loris logs
     (
-        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg => generated 260 bytes in 197 msecs (HTTP/1.0 500) 3 headers in 147 bytes (1 switches on core 0)',
-        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg => generated 260 bytes in 197 msecs (HTTP/1.0 500)'
+        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg (HTTP/1.0 500) 3 headers in 147 bytes (1 switches on core 0)',
+        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg (HTTP/1.0 500)'
+    ),
+
+    # We strip byte count and timings from Loris logs
+    (
+        'GET //s3:L0009000/L0009709.jpg/full/282,/0/default.jpg => generated 271 bytes in 988 msecs (HTTP/1.0 500)',
+        'GET //s3:L0009000/L0009709.jpg/full/282,/0/default.jpg (HTTP/1.0 500)',
     ),
 
     # We strip the timestamp and Lambda ID from timeout errors
