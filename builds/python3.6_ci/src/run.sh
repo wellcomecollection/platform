@@ -50,9 +50,6 @@ then
 elif [[ "$OP" == "build-lock-file" ]]
 then
   build_lock_file
-elif [[ "$OP" == "lint-turtle" ]]
-then
-  /app/lint_turtle_files.py
 else
   echo "Unrecognised operation: $OP! Stopping."
 
