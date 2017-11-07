@@ -64,12 +64,27 @@ def main():
             miro_image = MiroImage(image_info)
             subject = outer_message['Subject']
 
-            asset_data = upload_asset(
-                api,
-                s3_client,
-                src_bucket,
-                miro_image
-            )
+            assets = api.get_assets(miro_image.miro_id)
+            num_assets = len(assets)
+
+            if num_assets > 1:
+                raise Exception(
+                    f"No exact match for {miro_image.miro_id} (found {num_assets} matches)."
+                )
+
+            if num_assets == 1:
+                logger.info(f"Found asset matching {miro_image.miro_id}, skipping upload.")
+                asset_data = assets[0]
+
+            if num_assets == 0:
+                logger.info(f"Uploading asset {miro_image.miro_id}")
+                asset_data = upload_asset(
+                    api,
+                    s3_client,
+                    src_bucket,
+                    miro_image
+                )
+
         except Exception as e:
             logger.exception("Failed uploading image to Tandem vault")
         else:
