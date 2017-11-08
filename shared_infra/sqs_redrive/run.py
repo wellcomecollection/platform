@@ -27,6 +27,8 @@ def delete_message(sqs_client, msg, queue_url):
 def main(sqs_client):
     source_queue_url = os.environ["SQS_SOURCE_URL"]
     target_queue_url = os.environ["SQS_TARGET_URL"]
+    logging.info(f"SQS_SOURCE_URL: {source_queue_url}")
+    logging.info(f"SQS_TARGET_URL: {target_queue_url}")
     while True:
         response = sqs_client.receive_message(
             QueueUrl=source_queue_url
