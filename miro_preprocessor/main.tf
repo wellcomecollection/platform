@@ -79,8 +79,8 @@ module "miro_copy_catalogue_master" {
 
   topic_miro_copy_s3_asset_arn = "${module.catalogue_api_topic.arn}"
 
-  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
-  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  bucket_destination_asset_arn = "${local.bucket_wellcomecollection_images_arn}"
+  bucket_destination_name      = "${local.bucket_wellcomecollection_images_name}"
   lambda_description           = "Copy catalogue miro master assets to private s3 bucket"
   lambda_name                  = "miro_copy_catalogue_master"
   is_master_asset              = "true"
@@ -97,8 +97,8 @@ module "miro_copy_none_master" {
 
   topic_miro_copy_s3_asset_arn = "${module.none_topic.arn}"
 
-  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
-  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  bucket_destination_asset_arn = "${local.bucket_wellcomecollection_images_arn}"
+  bucket_destination_name      = "${local.bucket_wellcomecollection_images_name}"
   lambda_description           = "Copy undecidable miro master assets to private s3 bucket"
   lambda_name                  = "miro_copy_none_master"
   is_master_asset              = "true"
@@ -115,8 +115,8 @@ module "miro_copy_cold_store_master" {
 
   topic_miro_copy_s3_asset_arn = "${module.cold_store_topic.arn}"
 
-  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
-  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  bucket_destination_asset_arn = "${local.bucket_wellcomecollection_images_arn}"
+  bucket_destination_name      = "${local.bucket_wellcomecollection_images_name}"
   lambda_description           = "Copy cold store miro master assets to private s3 bucket"
   lambda_name                  = "miro_copy_cold_store_master"
   is_master_asset              = "true"
@@ -133,8 +133,8 @@ module "miro_copy_tandem_vault_master" {
 
   topic_miro_copy_s3_asset_arn = "${module.tandem_vault_topic.arn}"
 
-  bucket_destination_asset_arn = "${aws_s3_bucket.wellcomecollection-images.arn}"
-  bucket_destination_name      = "${aws_s3_bucket.wellcomecollection-images.id}"
+  bucket_destination_asset_arn = "${local.bucket_wellcomecollection_images_arn}"
+  bucket_destination_name      = "${local.bucket_wellcomecollection_images_name}"
   lambda_description           = "Copy tandem vault miro master assets to private s3 bucket"
   lambda_name                  = "miro_copy_tandem_vault_master"
   is_master_asset              = "true"
