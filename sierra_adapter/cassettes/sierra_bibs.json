@@ -1,0 +1,110 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Content-Length": "0",
+          "Authorization": "Basic <SIERRA_OAUTH>"
+        },
+        "method": "POST",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\":\"<BEARER_TOKEN>\",\"token_type\":\"bearer\",\"expires_in\":3600}"
+        },
+        "headers": {
+          "Date": "Wed, 08 Nov 2017 15:47:31 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Set-Cookie": "jcontainerId=.jcontainer-public1; path=/iii/stage",
+          "Vary": "User-Agent",
+          "Keep-Alive": "timeout=5, max=100",
+          "Connection": "Keep-Alive",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/token"
+      },
+      "recorded_at": "2017-11-08T15:47:31"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Bearer <BEARER_TOKEN>",
+          "Accept": "application/json",
+          "Cookie": "jcontainerId=.jcontainer-public1"
+        },
+        "method": "GET",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B0%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"total\":29,\"entries\":[{\"id\":\"1312174\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1525866\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1529320\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1537414\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1537415\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1551217\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1571015\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1580074\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1592330\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1642265\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1642598\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1642986\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1643021\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1643141\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1644813\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1644851\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1650760\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1651019\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1651348\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1657760\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661460\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661866\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661983\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661984\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661991\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1663901\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1664189\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"2043097\",\"updatedDate\":\"2013-12-12T09:55:32Z\",\"createdDate\":\"2013-12-12T09:46:08Z\",\"deleted\":false,\"suppressed\":true,\"lang\":{\"code\":\"   \"},\"title\":\"An English folding almanac in Latin c. 1415-1420\",\"author\":\"\",\"materialType\":{\"code\":\"a\",\"value\":\"Books\"},\"bibLevel\":{\"code\":\"m\",\"value\":\"MONOGRAPH\"},\"country\":{\"code\":\"   \",\"name\":\"Undefined\"}},{\"id\":\"2043109\",\"deletedDate\":\"2014-01-31\",\"deleted\":true}]}"
+        },
+        "headers": {
+          "Date": "Wed, 08 Nov 2017 15:47:31 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B0%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "recorded_at": "2017-11-08T15:47:32"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Bearer <BEARER_TOKEN>",
+          "Accept": "application/json",
+          "Cookie": "jcontainerId=.jcontainer-public1"
+        },
+        "method": "GET",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B2043110%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"code\":107,\"specificCode\":0,\"httpStatus\":404,\"name\":\"Record not found\"}"
+        },
+        "headers": {
+          "Date": "Wed, 08 Nov 2017 15:47:32 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 404,
+          "message": "Not Found"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B2043110%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "recorded_at": "2017-11-08T15:47:32"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
