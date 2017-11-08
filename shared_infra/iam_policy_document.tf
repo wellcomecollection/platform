@@ -90,6 +90,20 @@ data "aws_iam_policy_document" "sqs_readwrite" {
   }
 }
 
+data "aws_iam_policy_document" "sqs_readwritesend" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "upload_sqs_freeze" {
   statement {
     actions = [
