@@ -6,7 +6,6 @@ include catalogue_pipeline/Makefile
 include miro_preprocessor/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
-include lambda_utils/Makefile
 include sierra_adapter/Makefile
 
 ## Build the image for tif-metadata
