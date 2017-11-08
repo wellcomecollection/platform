@@ -77,3 +77,11 @@ output "service_scheduler_topic_arn" {
 output "service_scheduler_topic_publish_policy" {
   value = "${module.service_scheduler_topic.publish_policy}"
 }
+
+output "bucket_wellcomecollection_images_name" {
+  value = "${aws_s3_bucket.wellcomecollection-images.id}"
+}
+
+output "bucket_wellcomecollection_images_arn" {
+  value = "${aws_s3_bucket.wellcomecollection-images.arn}"
+}
