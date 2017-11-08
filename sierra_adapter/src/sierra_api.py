@@ -1,8 +1,6 @@
 import logging
-import os
 import daiquiri
 import requests
-
 
 daiquiri.setup(level=logging.INFO)
 logger = daiquiri.getLogger(__name__)
@@ -40,10 +38,7 @@ class SierraAPI(object):
             'Accept': 'application/json',
         }
 
-    def _http_get(self, path, params=None):
-        if params is None:
-            params = {}
-
+    def _http_get(self, path, params):
         def _call():
             return self.sess.get(
                 f'{self.api_url}{path}',
@@ -59,8 +54,40 @@ class SierraAPI(object):
             else:
                 raise
 
-    def get_bibs(self):
-        yield from self._http_get(
-            path='/bibs',
-            params={'id': '[0,]'}
-        ).json()['entries']
+    def _get_objects_from_id(self, path, id, params):
+        id_param = {'id': f'[{id},]'}
+        merged_params = {
+            **id_param,
+            **params
+        }
+        try:
+            return self._http_get(
+                path=path,
+                params=merged_params
+            ).json()['entries']
+        except requests.HTTPError as err:
+
+            # When requesting a set of objects that is empty
+            # the API will return a 404, so substitute for an
+            # empty list.
+            if err.response.status_code == 404:
+                return []
+            else:
+                raise
+
+    def get_objects(self, path, params=None):
+        def _get(id):
+            return self._get_objects_from_id(
+                path=path,
+                id=id,
+                params=params
+            )
+
+        if params is None:
+            params = {}
+
+        objs = _get(0)
+
+        while objs:
+            yield from objs
+            objs = _get(int(objs[-1]['id']) + 1)
