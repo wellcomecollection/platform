@@ -21,8 +21,15 @@ def test_can_get_bibs_from_api():
         ).decode('utf-8')
     )
     with recorder.use_cassette('sierra_bibs'):
+        expected_length = 29
 
         api_url = 'https://libsys.wellcomelibrary.org/iii/sierra-api/v3'
         api = sierra_api.SierraAPI(api_url, oauthkey, oauthsec, session)
-        results = list(api.get_objects("/bibs", {'updatedDate':"[2013-12-10T17:16:35Z,2013-12-13T21:34:35Z]"}))
-        assert len(results) == 29
+
+        bibs = api.get_objects("/bibs", {'updatedDate':"[2013-12-10T17:16:35Z,2013-12-13T21:34:35Z]"})
+
+        actual_length = len(bibs)
+        assert actual_length == expected_length
+
+        results = list(bibs)
+        assert len(results) == expected_length
