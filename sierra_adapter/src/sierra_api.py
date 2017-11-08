@@ -61,10 +61,14 @@ class SierraAPI(object):
             **params
         }
         try:
-            return self._http_get(
+            json_response = self._http_get(
                 path=path,
                 params=merged_params
-            ).json()['entries']
+            ).json()
+
+            self._current_response = json_response
+
+            return self._current_response
         except requests.HTTPError as err:
 
             # When requesting a set of objects that is empty
@@ -76,6 +80,9 @@ class SierraAPI(object):
                 raise
 
     def get_objects(self, path, params=None):
+        if params is None:
+            params = {}
+
         def _get(id):
             return self._get_objects_from_id(
                 path=path,
@@ -83,11 +90,21 @@ class SierraAPI(object):
                 params=params
             )
 
-        if params is None:
-            params = {}
+        class ObjectIterable(object):
+            def __init__(_self):
+                _self.objs = _get(0)
 
-        objs = _get(0)
+            def __len__(_self):
+                return self._current_response['total']
 
-        while objs:
-            yield from objs
-            objs = _get(int(objs[-1]['id']) + 1)
+            def __iter__(_self):
+                yield from _self.objs['entries']
+                last_id = int(_self.objs['entries'][-1]['id']) + 1
+                _self.objs = _get(last_id)
+
+            def next(_self):
+                return next(_self._gen)
+
+        o = ObjectIterable()
+
+        return o
