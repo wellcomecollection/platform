@@ -4,6 +4,9 @@ locals {
   run_ecs_task_topic_arn            = "${data.terraform_remote_state.shared_infra.run_ecs_task_topic_arn}"
   run_ecs_task_topic_publish_policy = "${data.terraform_remote_state.shared_infra.run_ecs_task_topic_publish_policy}"
 
+  bucket_wellcomecollection_images_arn  = "${data.terraform_remote_state.shared_infra.bucket_wellcomecollection_images_arn}"
+  bucket_wellcomecollection_images_name = "${data.terraform_remote_state.shared_infra.bucket_wellcomecollection_images_name}"
+
   bucket_miro_images_public_arn  = "${data.terraform_remote_state.loris.bucket_wellcomecollectio_miro_images_public_arn}"
   bucket_miro_images_public_name = "${data.terraform_remote_state.loris.bucket_wellcomecollectio_miro_images_public_id}"
 
