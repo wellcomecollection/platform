@@ -8,14 +8,6 @@ include monitoring/Makefile
 include ontologies/Makefile
 include sierra_adapter/Makefile
 
-## Build the image for tif-metadata
-tif-metadata-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=tif-metadata
-
-## Deploy the image for tif-metadata
-tif-metadata-deploy: tif-metadata-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=tif-metadata ./builds/publish_service.sh
-
 
 elasticdump-build: $(ROOT)/.docker/image_builder
 	./builds/docker_run.py --dind -- image_builder --project=elasticdump
