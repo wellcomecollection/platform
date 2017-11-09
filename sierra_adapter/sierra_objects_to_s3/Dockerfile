@@ -4,6 +4,9 @@ LABEL maintainer "Wellcome Digital Platform <wellcomedigitalplatform@wellcome.ac
 LABEL description "Copy records from the Sierra API into DynamoDB"
 
 COPY requirements.txt /
+
+RUN apk add --no-cache gcc musl-dev
+
 RUN pip3 install -r /requirements.txt
 
 COPY src /app
