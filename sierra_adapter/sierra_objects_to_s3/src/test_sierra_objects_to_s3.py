@@ -80,3 +80,28 @@ def test_write_objects_to_s3(mock_s3_client):
         received_objects.append(parsed_body)
 
     assert objects == sorted(received_objects, key=itemgetter('id'))
+
+
+def test_main(mock_s3_client, recorder):
+    args = {
+        '--url': recorder['api_url'],
+        '--key': recorder['oauthkey'],
+        '--sec': recorder['oauthsec'],
+
+        '--type': '/bibs',
+
+        '--bucket': test_bucket_name,
+        '--path': 'example',
+
+        '--from': '2013-12-10T17:16:35Z',
+        '--to': '2013-12-13T21:34:35Z'
+    }
+
+    with recorder['betamax'].use_cassette('sierra_api'):
+        sierra_objects_to_s3.main(args, mock_s3_client, recorder['session'])
+
+        response = mock_s3_client.list_objects(
+            Bucket=test_bucket_name
+        )
+
+        assert len(response['Contents']) == 29

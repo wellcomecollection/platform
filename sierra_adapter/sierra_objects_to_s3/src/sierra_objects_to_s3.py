@@ -77,7 +77,7 @@ def write_objects_to_s3(s3_client, bucket, path, objects, id_key='id'):
         _write_object_to_s3(s3_client, bucket, key, object)
 
 
-def main(args, s3_client):
+def main(args, s3_client, sess=None):
     url = args['--url']
     key = args['--key']
     sec = args['--sec']
@@ -95,7 +95,8 @@ def main(args, s3_client):
     objects = sierra_api.SierraAPI(
         url,
         key,
-        sec
+        sec,
+        sess
     ).get_objects(
         path=object_type,
         params=params
