@@ -43,4 +43,5 @@ wresultlist:results rdf:type owl:ObjectProperty ;
     rdfs:label "results"@en ;
     rdfs:comment "The works which are included in this set of results."@en ;
     rdfs:domain wresultlist:ResultList ;
+  	rdfs:range ww:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
