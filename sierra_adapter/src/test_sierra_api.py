@@ -27,6 +27,7 @@ recorder = betamax.Betamax(
     cassette_library_dir='/cassettes'
 )
 
+
 def test_can_get_bibs_from_api():
     with recorder.use_cassette('sierra_bibs'):
         expected_length = 29
