@@ -12,7 +12,7 @@ def test_can_get_bibs_from_api():
     oauthkey = os.environ.get("SIERRA_OAUTH_KEY", "sierra_key")
     oauthsec = os.environ.get("SIERRA_OAUTH_SECRET", "sierra_secret")
     session = requests.Session()
-    recorder = betamax.Betamax(session, cassette_library_dir='cassettes')
+    recorder = betamax.Betamax(session, cassette_library_dir='/cassettes')
     config = Betamax.configure()
     config.define_cassette_placeholder(
         '<SIERRA_OAUTH>',

@@ -22,14 +22,15 @@ sierra_adapter-test: sierra_adapter-build
 		--tag sierra_adapter:test \
 		--file=$(SIERRA_ADAPTER)/test.Dockerfile \
 		$(SIERRA_ADAPTER)
-	docker run --tty sierra_adapter:test
+	docker run \
+		--volume $(SIERRA_ADAPTER)/cassettes:/cassettes \
+		--tty sierra_adapter:test
 
 sierra_adapter-adapter-publish: $(ROOT)/.docker/publish_service_to_aws
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		publish_service_to_aws:latest \
 		--project=sierra_adapter \
 		--infra-bucket=$(INFRA_BUCKET)
-
 
 sierra_adapter-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
