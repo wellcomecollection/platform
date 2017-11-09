@@ -10,6 +10,7 @@ certifi==2017.11.5        # via requests
 chardet==3.0.4            # via requests
 daiquiri==1.3.0
 dateparser==0.6.0         # via maya
+docopt==0.6.2
 docutils==0.14            # via botocore
 humanize==0.5.1           # via maya
 idna==2.6                 # via requests
