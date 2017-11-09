@@ -310,7 +310,7 @@ class MiroTransformableTest
     it("passes through a single value in the image_creator field") {
       val creator = "Researcher Rosie"
       transformRecordAndCheckCreators(
-        data =s"""
+        data = s"""
           "image_title": "A radio for a racoon",
           "image_creator": ["$creator"]
         """,
@@ -322,7 +322,6 @@ class MiroTransformableTest
       val creator1 = "Beekeeper Brian"
       val creator2 = "Cat-wrangler Carol"
       val creator3 = "Dog-owner Derek"
-      )
       transformRecordAndCheckCreators(
         data = s"""
           "image_title": "A radio for a racoon",
@@ -335,7 +334,7 @@ class MiroTransformableTest
     it("passes through a single value in the image_creator_secondary field") {
       val secondaryCreator = "Scientist Sarah"
       transformRecordAndCheckCreators(
-        data =s"""
+        data = s"""
           "image_title": "A radio for a racoon",
           "image_secondary_creator": ["$secondaryCreator"]
         """,
@@ -347,7 +346,7 @@ class MiroTransformableTest
       val secondaryCreator1 = "Gamekeeper Gordon"
       val secondaryCreator2 = "Herpetologist Harriet"
       transformRecordAndCheckCreators(
-        data =s"""
+        data = s"""
           "image_title": "Verdant and vivid",
           "image_secondary_creator": [
             "$secondaryCreator1", "$secondaryCreator2"
@@ -361,14 +360,45 @@ class MiroTransformableTest
       val creator = "Mycologist Morgan"
       val secondaryCreator = "Manufacturer Mel"
       transformRecordAndCheckCreators(
-        data =s"""
+        data = s"""
           "image_title": "Verdant and vivid",
           "image_creator": ["$creator"],
           "image_secondary_creator": ["$secondaryCreator"]
         """,
         expectedCreators = List(creator, secondaryCreator)
       )
+    }
 
+    it("passes through a value from the image_source_code field") {
+      transformRecordAndCheckCreators(
+        data = """
+          "image_title": "A gander and a goose are game for a goof",
+          "image_source_code": "GAV"
+        """,
+        expectedCreators = List("Isabella Gavazzi")
+      )
+    }
+
+    it("does not use the image_source_code field for Wellcome Collection") {
+      transformRecordAndCheckCreators(
+        data = """
+          "image_title": "Wandering wallabies within water",
+          "image_source_code": "WEL"
+        """,
+        expectedCreators = List()
+      )
+    }
+
+    it("does combine the image_creator and image_source_code fields") {
+      val creator = "Sally Snake"
+      transformRecordAndCheckCreators(
+        data = s"""
+          "image_title": "A gander and a goose are game for a goof",
+          "image_creator": "$creator",
+          "image_source_code": "SNL"
+        """,
+        expectedCreators = List(creator, "Sue Snell")
+      )
     }
   }
 
