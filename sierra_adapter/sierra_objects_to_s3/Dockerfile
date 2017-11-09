@@ -11,4 +11,4 @@ RUN pip3 install -r /requirements.txt
 
 COPY src /app
 
-ENTRYPOINT ["/app/run.py"]
+ENTRYPOINT ["/app/sierra_objects_to_s3.py"]
