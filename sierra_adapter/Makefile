@@ -3,10 +3,11 @@ INFRA_BUCKET = platform-infra
 
 SIERRA_ADAPTER = $(ROOT)/sierra_adapter
 
+include $(SIERRA_ADAPTER)/sierra_objects_to_s3/Makefile
+
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
-
 
 sierra_adapter-build: sierra_objects_to_s3-build
 sierra_adapter-test: sierra_objects_to_s3-test
