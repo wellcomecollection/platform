@@ -394,7 +394,7 @@ class MiroTransformableTest
       transformRecordAndCheckCreators(
         data = s"""
           "image_title": "A gander and a goose are game for a goof",
-          "image_creator": "$creator",
+          "image_creator": ["$creator"],
           "image_source_code": "SNL"
         """,
         expectedCreators = List(creator, "Sue Snell")
