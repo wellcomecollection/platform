@@ -299,46 +299,85 @@ class MiroTransformableTest
     }
   }
 
-  it("should have an empty list if no image_creator field is present") {
-    val work = transformWork(data = s""""image_title": "A guide to giraffes"""")
-    work.creators shouldBe List[Agent]()
+  describe("The creators field should be populated correctly") {
+    it("if not image_creator field is present") {
+      transformRecordAndCheckCreators(
+        data = s""""image_title": "A guide to giraffes"""",
+        expectedCreators = List()
+      )
+    }
+
+    it("passes through a single value in the image_creator field") {
+      val creator = "Researcher Rosie"
+      transformRecordAndCheckCreators(
+        data =s"""
+          "image_title": "A radio for a racoon",
+          "image_creator": ["$creator"]
+        """,
+        expectedCreators = List(creator)
+      )
+    }
+
+    it("passes through multiple values in the image_creator field") {
+      val creator1 = "Beekeeper Brian"
+      val creator2 = "Cat-wrangler Carol"
+      val creator3 = "Dog-owner Derek"
+      )
+      transformRecordAndCheckCreators(
+        data = s"""
+          "image_title": "A radio for a racoon",
+          "image_creator": ["$creator1", "$creator2", "$creator3"]
+        """,
+        expectedCreators = List(creator1, creator2, creator3)
+      )
+    }
+
+    it("passes through a single value in the image_creator_secondary field") {
+      val secondaryCreator = "Scientist Sarah"
+      transformRecordAndCheckCreators(
+        data =s"""
+          "image_title": "A radio for a racoon",
+          "image_secondary_creator": ["$secondaryCreator"]
+        """,
+        expectedCreators = List(secondaryCreator)
+      )
+    }
+
+    it("passes through multiple values in the image_creator_secondary field") {
+      val secondaryCreator1 = "Gamekeeper Gordon"
+      val secondaryCreator2 = "Herpetologist Harriet"
+      transformRecordAndCheckCreators(
+        data =s"""
+          "image_title": "Verdant and vivid",
+          "image_secondary_creator": [
+            "$secondaryCreator1", "$secondaryCreator2"
+          ]
+        """,
+        expectedCreators = List(secondaryCreator1, secondaryCreator2)
+      )
+    }
+
+    it("combines the image_creator and image_secondary_creator fields") {
+      val creator = "Mycologist Morgan"
+      val secondaryCreator = "Manufacturer Mel"
+      transformRecordAndCheckCreators(
+        data =s"""
+          "image_title": "Verdant and vivid",
+          "image_creator": ["$creator"],
+          "image_secondary_creator": ["$secondaryCreator"]
+        """,
+        expectedCreators = List(creator, secondaryCreator)
+      )
+
+    }
   }
 
-  it("should have an empty list if the image_creator field is empty") {
-    val work = transformWork(data =
-      s"""
-      "image_title": "A box of beavers",
-      "image_creator": []
-    """)
-    work.creators shouldBe List[Agent]()
-  }
-
-  it("should pass through a single value in the image_creator field") {
-    val creator = "Researcher Rosie"
-    val work = transformWork(
-      data =
-        s"""
-        "image_title": "A radio for a racoon",
-        "image_creator": ["$creator"]
-      """
-    )
-    work.creators shouldBe List(Agent(creator))
-  }
-
-  it("should pass through multiple values in the image_creator field") {
-    val creator1 = "Beekeeper Brian"
-    val creator2 = "Cat-wrangler Carol"
-    val creator3 = "Dog-owner Derek"
-    val work = transformWork(
-      data =
-        s"""
-        "image_title": "A book about badgers",
-        "image_creator": ["$creator1", "$creator2", "$creator3"]
-      """
-    )
-    work.creators shouldBe List(Agent(creator1),
-      Agent(creator2),
-      Agent(creator3))
+  private def transformRecordAndCheckCreators(
+    data: String,
+    expectedCreators: List[String]
+  ) = {
+    val transformedWork = transformWork(data = data)
+    transformedWork.creators shouldBe expectedCreators.map { Agent(_) }
   }
 
   it("should have no description if no image_image_desc field is present") {
@@ -441,49 +480,6 @@ class MiroTransformableTest
       MiroCollection = "Images-A"
     )
     work.createdDate shouldBe None
-  }
-
-  it(
-    "should use the image_creator_secondary field if image_creator is not present") {
-    val secondaryCreator = "Scientist Sarah"
-    val work = transformWork(
-      data =
-        s"""
-        "image_title": "Samples of a shark",
-        "image_secondary_creator": ["$secondaryCreator"]
-      """
-    )
-    work.creators shouldBe List(Agent(secondaryCreator))
-  }
-
-  it(
-    "should use all the values in the image_creator_secondary field if image_creator is not present") {
-    val secondaryCreator1 = "Gamekeeper Gordon"
-    val secondaryCreator2 = "Herpetologist Harriet"
-    val work = transformWork(
-      data =
-        s"""
-        "image_title": "Verdant and vivid",
-        "image_secondary_creator": ["$secondaryCreator1", "$secondaryCreator2"]
-      """
-    )
-    work.creators shouldBe List(Agent(secondaryCreator1),
-      Agent(secondaryCreator2))
-  }
-
-  it(
-    "should combine the values in the image_creator and image_secondary_creator fields if both present") {
-    val creator = "Mycologist Morgan"
-    val secondaryCreator = "Manufacturer Mel"
-    val work = transformWork(
-      data =
-        s"""
-        "image_title": "Musings on mice",
-        "image_creator": ["$creator"],
-        "image_secondary_creator": ["$secondaryCreator"]
-      """
-    )
-    work.creators shouldBe List(Agent(creator), Agent(secondaryCreator))
   }
 
   it("should pass through the lettering field if available") {
