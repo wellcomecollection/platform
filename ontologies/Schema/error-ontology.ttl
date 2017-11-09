@@ -11,35 +11,37 @@
     dcterms:created "2017-09-14"^^xsd:date ;
     dcterms:description "Ontology describing the properties of errors"@en .
 
-#######  Classes #####  
 
 werror:Error rdf:type owl:Class ;
     rdfs:label "Error"@en ;
     rdfs:comment "An individual error, mistake, or unintended outcome."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
-    
-#######  Object properties #####  
 
 
-werror:errorType rdf:type owl:ObjectProperty ;
+werror:errorType rdf:type owl:DatatypeProperty ;
     rdfs:label "errorType"@en ;
     rdfs:comment "The type of the error, for example, http."@en ;
+    rdfs:domain werror:Error ;
+  	rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
 
-werror:httpStatus rdf:type owl:ObjectProperty ;
+werror:httpStatus rdf:type owl:DatatypeProperty ;
     rdfs:label "httpStatus"@en ;
     rdfs:comment "Relates an error to an IETF-defined HTTP response status code, if applicable."@en ;
+    rdfs:domain werror:Error ;
+    rdfs:range xsd:integer ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
 
-
-#######  Data properties #####  
-
-werror:label rdf:type owl:ObjectProperty ;
+werror:label rdf:type owl:DatatypeProperty ;
     rdfs:label "label"@en ;
     rdfs:comment "The title or other short label of an error."@en ;
+    rdfs:domain werror:Error ;
+  	rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
 
-werror:description rdf:type owl:ObjectProperty ;
+werror:description rdf:type owl:DatatypeProperty ;
     rdfs:label "description"@en ;
     rdfs:comment "The specific characteristics or circumstances of this error - for example, missing or malformed input, problem conditions. This may explain how to fix this error, if possible."@en ;
+    rdfs:domain werror:Error ;
+  	rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/errors> .
