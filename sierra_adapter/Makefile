@@ -8,29 +8,9 @@ ifneq ($(ROOT), $(shell pwd))
 endif
 
 
-$(SIERRA_ADAPTER)/requirements.txt: $(SIERRA_ADAPTER)/requirements.in
-	docker run --volume $(SIERRA_ADAPTER):/src micktwomey/pip-tools
-
-sierra_adapter-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- \
-		image_builder:latest \
-		--project=sierra_adapter \
-		--file=sierra_adapter/Dockerfile
-
-sierra_adapter-test: sierra_adapter-build
-	docker build \
-		--tag sierra_adapter:test \
-		--file=$(SIERRA_ADAPTER)/test.Dockerfile \
-		$(SIERRA_ADAPTER)
-	docker run \
-		--volume $(SIERRA_ADAPTER)/cassettes:/cassettes \
-		--tty sierra_adapter:test
-
-sierra_adapter-adapter-publish: $(ROOT)/.docker/publish_service_to_aws
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
-		publish_service_to_aws:latest \
-		--project=sierra_adapter \
-		--infra-bucket=$(INFRA_BUCKET)
+sierra_adapter-build: sierra_objects_to_s3-build
+sierra_adapter-test: sierra_objects_to_s3-test
+sierra_adapter-adapter-publish: sierra_objects_to_s3-publish
 
 sierra_adapter-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
