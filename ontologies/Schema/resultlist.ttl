@@ -16,22 +16,29 @@ wresultlist:ResultList rdf:type owl:Class ;
     rdfs:comment "A collection of works."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
 
-wresultlist:pageSize rdf:type owl:ObjectProperty ;
+wresultlist:pageSize rdf:type owl:DatatypeProperty ;
     rdfs:label "pageSize"@en ;
     rdfs:comment "The number of works in a single page of results."@en ;
+    rdfs:range xsd:integer ;
+    rdfs:domain wresultlist:ResultList ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
 
-wresultlist:totalPages rdf:type owl:ObjectProperty ;
+wresultlist:totalPages rdf:type owl:DatatypeProperty ;
     rdfs:label "totalPages"@en ;
     rdfs:comment "The number of pages in this set of results."@en ;
+    rdfs:range xsd:integer ;
+    rdfs:domain wresultlist:ResultList ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
 
-wresultlist:totalResults rdf:type owl:ObjectProperty ;
+wresultlist:totalResults rdf:type owl:DatatypeProperty ;
     rdfs:label "totalResults"@en ;
     rdfs:comment "The total number of works in this set of results."@en ;
+    rdfs:range xsd:integer ;
+    rdfs:domain wresultlist:ResultList ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
 
 wresultlist:results rdf:type owl:ObjectProperty ;
     rdfs:label "results"@en ;
     rdfs:comment "The works which are included in this set of results."@en ;
+    rdfs:domain wresultlist:ResultList ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
