@@ -140,12 +140,23 @@ case class MiroTransformable(MiroID: String,
 
     // <image_secondary_creator>: what MIRO calls Secondary Creator, which
     // will also just have to map to our object property "hasCreator"
-    val secondaryCreators = miroData.secondaryCreator match {
+    val secondaryCreators: List[Agent] = miroData.secondaryCreator match {
       case Some(c) => c.map { Agent(_) }
       case None => List()
     }
 
-    primaryCreators ++ secondaryCreators
+    // We also add the contributor code for the non-historical images, but
+    // only if the contributor *isn't* Wellcome Collection.v
+    val contributorCreators: List[Agent] = miroData.sourceCode match {
+      case Some(code) =>
+        contributorMap(code.toUpperCase) match {
+          case "Wellcome Collection" => List()
+          case contributor => List(Agent(contributor))
+        }
+      case None => List()
+    }
+
+    primaryCreators ++ secondaryCreators ++ contributorCreators
   }
 
   /* Populate the subjects field.  This is based on two fields in the XML,
