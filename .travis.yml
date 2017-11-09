@@ -69,9 +69,6 @@ env:
     # Miro preprocessor stack
     - TASK=miro_preprocessor-test
 
-    # lambda-utils package
-    - TASK=lambda_utils-test
-
     # Shared infra stack
     - TASK=shared_infra-build
 
