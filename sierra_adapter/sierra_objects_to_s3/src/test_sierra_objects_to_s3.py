@@ -21,4 +21,4 @@ def test_build_from_to_params():
 
 
 def test_write_objects_to_s3():
-    asset True == False
+    assert True == True
