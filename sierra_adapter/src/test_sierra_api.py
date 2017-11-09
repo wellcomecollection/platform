@@ -1,8 +1,9 @@
+# -*- encoding: utf-8 -*-
+
 import base64
 import requests
 import os
 
-import betamax
 from betamax import Betamax
 import pytest
 
