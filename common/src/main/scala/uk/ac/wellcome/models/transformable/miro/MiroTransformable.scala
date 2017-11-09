@@ -148,10 +148,11 @@ case class MiroTransformable(MiroID: String,
     // We also add the contributor code for the non-historical images, but
     // only if the contributor *isn't* Wellcome Collection.v
     val contributorCreators: List[Agent] = miroData.sourceCode match {
-      case Some(code) => contributorMap(code.toUpperCase) match {
-        case "Wellcome Collection" => List()
-        case contributor => List(Agent(contributor))
-      }
+      case Some(code) =>
+        contributorMap(code.toUpperCase) match {
+          case "Wellcome Collection" => List()
+          case contributor => List(Agent(contributor))
+        }
       case None => List()
     }
 
