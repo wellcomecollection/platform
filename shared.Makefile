@@ -11,6 +11,8 @@ export INFRA_BUCKET = platform-infra
 
 ROOT = $(shell git rev-parse --show-toplevel)
 
+CURRENT_DIR = $(shell pwd)
+
 include $(ROOT)/builds/Makefile
 
 $(ROOT)/.docker/image_builder:
@@ -52,7 +54,7 @@ $(ROOT)/.docker/publish_lambda_zip:
 
 lint-python:
 	docker run \
-		--volume $(ROOT):/data \
+		--volume $(CURRENT_DIR):/data \
 		--workdir /data \
 		greengloves/flake8 --exclude target --ignore=E501
 
