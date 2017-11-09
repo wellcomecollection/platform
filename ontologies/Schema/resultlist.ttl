@@ -11,10 +11,12 @@
     dcterms:created "2017-11-07"^^xsd:date ;
     dcterms:description "Ontology describing the properties of a result list"@en .
 
+
 wresultlist:ResultList rdf:type owl:Class ;
     rdfs:label "Result list"@en ;
     rdfs:comment "A collection of works."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
+
 
 wresultlist:pageSize rdf:type owl:DatatypeProperty ;
     rdfs:label "pageSize"@en ;
