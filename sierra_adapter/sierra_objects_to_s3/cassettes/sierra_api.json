@@ -1,0 +1,211 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive",
+          "Content-Length": "0",
+          "Authorization": "Basic <SIERRA_OAUTH>"
+        },
+        "method": "POST",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\":\"<BEARER_TOKEN>\",\"token_type\":\"bearer\",\"expires_in\":3600}"
+        },
+        "headers": {
+          "Date": "Wed, 08 Nov 2017 15:47:31 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Set-Cookie": "jcontainerId=.jcontainer-public1; path=/iii/stage",
+          "Vary": "User-Agent",
+          "Keep-Alive": "timeout=5, max=100",
+          "Connection": "Keep-Alive",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/token"
+      },
+      "recorded_at": "2017-11-08T15:47:31"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Bearer <BEARER_TOKEN>",
+          "Accept": "application/json",
+          "Cookie": "jcontainerId=.jcontainer-public1"
+        },
+        "method": "GET",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B0%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"total\":29,\"entries\":[{\"id\":\"1312174\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1525866\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1529320\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1537414\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1537415\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1551217\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1571015\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1580074\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1592330\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1642265\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1642598\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1642986\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1643021\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1643141\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1644813\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1644851\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1650760\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1651019\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1651348\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1657760\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661460\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661866\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661983\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661984\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1661991\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1663901\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"1664189\",\"deletedDate\":\"2013-12-11\",\"deleted\":true},{\"id\":\"2043097\",\"updatedDate\":\"2013-12-12T09:55:32Z\",\"createdDate\":\"2013-12-12T09:46:08Z\",\"deleted\":false,\"suppressed\":true,\"lang\":{\"code\":\"   \"},\"title\":\"An English folding almanac in Latin c. 1415-1420\",\"author\":\"\",\"materialType\":{\"code\":\"a\",\"value\":\"Books\"},\"bibLevel\":{\"code\":\"m\",\"value\":\"MONOGRAPH\"},\"country\":{\"code\":\"   \",\"name\":\"Undefined\"}},{\"id\":\"2043109\",\"deletedDate\":\"2014-01-31\",\"deleted\":true}]}"
+        },
+        "headers": {
+          "Date": "Wed, 08 Nov 2017 15:47:31 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B0%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "recorded_at": "2017-11-08T15:47:32"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Bearer <BEARER_TOKEN>",
+          "Accept": "application/json",
+          "Cookie": "jcontainerId=.jcontainer-public1"
+        },
+        "method": "GET",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B2043110%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"code\":107,\"specificCode\":0,\"httpStatus\":404,\"name\":\"Record not found\"}"
+        },
+        "headers": {
+          "Date": "Wed, 08 Nov 2017 15:47:32 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 404,
+          "message": "Not Found"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/bibs?id=%5B2043110%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "recorded_at": "2017-11-08T15:47:32"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Basic <SIERRA_OAUTH>",
+          "Accept": "application/json",
+          "Content-Length": "0"
+        },
+        "method": "POST",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\":\"<BEARER_TOKEN>\",\"token_type\":\"bearer\",\"expires_in\":3600}"
+        },
+        "headers": {
+          "Date": "Thu, 09 Nov 2017 10:26:20 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Set-Cookie": "jcontainerId=.jcontainer-public2; path=/iii/stage",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/token"
+      },
+      "recorded_at": "2017-11-09T10:27:33"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Bearer <BEARER_TOKEN>",
+          "Accept": "application/json",
+          "Cookie": "jcontainerId=.jcontainer-public2"
+        },
+        "method": "GET",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/items?id=%5B0%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"total\":50,\"entries\":[{\"id\":\"1007176\",\"updatedDate\":\"2013-12-12T17:33:27Z\",\"createdDate\":\"1999-11-01T16:39:59Z\",\"deleted\":false,\"bibIds\":[\"1006132\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22102100695\",\"callNumber\":\"M16050\"},{\"id\":\"1010101\",\"updatedDate\":\"2013-12-11T15:59:45Z\",\"createdDate\":\"1999-11-01T17:03:05Z\",\"deleted\":false,\"bibIds\":[\"1008501\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22502930638\",\"callNumber\":\"M4259\"},{\"id\":\"1011398\",\"updatedDate\":\"2013-12-12T16:48:13Z\",\"createdDate\":\"1999-11-01T17:03:39Z\",\"deleted\":false,\"bibIds\":[\"1009751\"],\"location\":{\"code\":\"sgphi\",\"name\":\"Closed stores Hist. pam\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501997667\",\"callNumber\":\"/HOL\"},{\"id\":\"1029763\",\"updatedDate\":\"2013-12-13T15:50:26Z\",\"createdDate\":\"1999-11-01T17:37:13Z\",\"deleted\":false,\"bibIds\":[\"1025429\"],\"location\":{\"code\":\"sepbp\",\"name\":\"Closed stores EPB / P\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X180770\",\"callNumber\":\"61793/P\"},{\"id\":\"1032412\",\"updatedDate\":\"2013-12-11T09:56:07Z\",\"createdDate\":\"1999-11-01T17:38:46Z\",\"deleted\":false,\"bibIds\":[\"1027858\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X7293\",\"callNumber\":\"30218/B/1\"},{\"id\":\"1038145\",\"updatedDate\":\"2013-12-12T17:08:03Z\",\"createdDate\":\"1999-11-01T17:40:46Z\",\"deleted\":false,\"bibIds\":[\"1032288\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X11467\",\"callNumber\":\"24203/B/1\"},{\"id\":\"1054281\",\"updatedDate\":\"2013-12-11T09:56:07Z\",\"createdDate\":\"1999-11-01T18:36:16Z\",\"deleted\":false,\"bibIds\":[\"1046392\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101959877\",\"callNumber\":\"M18145\"},{\"id\":\"1055746\",\"updatedDate\":\"2013-12-12T17:06:02Z\",\"createdDate\":\"1999-11-02T15:32:00Z\",\"deleted\":false,\"bibIds\":[\"1047701\"],\"location\":{\"code\":\"sesub\",\"name\":\"Closed stores EPB Suppl. B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X135738\",\"callNumber\":\"58796/B\"},{\"id\":\"1071888\",\"updatedDate\":\"2013-12-13T09:20:37Z\",\"createdDate\":\"1999-11-05T16:57:00Z\",\"deleted\":false,\"bibIds\":[\"1061755\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X131130\",\"callNumber\":\"55017/B\"},{\"id\":\"1089991\",\"updatedDate\":\"2013-12-11T17:35:19Z\",\"createdDate\":\"1999-11-08T14:08:38Z\",\"deleted\":false,\"bibIds\":[\"1077596\"],\"location\":{\"code\":\"sepbp\",\"name\":\"Closed stores EPB / P\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X124628\",\"callNumber\":\"48105/P\"},{\"id\":\"1103512\",\"updatedDate\":\"2013-12-13T17:55:51Z\",\"createdDate\":\"1999-11-08T14:14:06Z\",\"deleted\":false,\"bibIds\":[\"1089488\"],\"location\":{\"code\":\"sgphi\",\"name\":\"Closed stores Hist. pam\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22200035820\",\"callNumber\":\"/MAC\"},{\"id\":\"1107382\",\"updatedDate\":\"2013-12-12T17:24:12Z\",\"createdDate\":\"1999-11-08T17:19:32Z\",\"deleted\":false,\"bibIds\":[\"1092472\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X101080\",\"callNumber\":\"4132/B/1\"},{\"id\":\"1115833\",\"updatedDate\":\"2013-12-13T09:20:39Z\",\"createdDate\":\"1999-11-12T11:13:20Z\",\"deleted\":false,\"bibIds\":[\"1100017\"],\"location\":{\"code\":\"sgpam\",\"name\":\"Closed stores Med. pam.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22500837342\",\"callNumber\":\"WA750 1884C79f\"},{\"id\":\"1123489\",\"updatedDate\":\"2013-12-13T17:13:55Z\",\"createdDate\":\"1999-11-12T12:28:04Z\",\"deleted\":false,\"bibIds\":[\"1106634\"],\"location\":{\"code\":\"sepbp\",\"name\":\"Closed stores EPB / P\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X147717\",\"callNumber\":\"45195/P\"},{\"id\":\"1141162\",\"updatedDate\":\"2013-12-11T09:56:06Z\",\"createdDate\":\"1999-11-15T14:22:26Z\",\"deleted\":false,\"bibIds\":[\"1122408\"],\"location\":{\"code\":\"sgmed\",\"name\":\"Closed stores Med.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22500481742\",\"callNumber\":\"QW180 1994M38a\"},{\"id\":\"1144152\",\"updatedDate\":\"2013-12-12T17:43:20Z\",\"createdDate\":\"1999-11-15T14:23:24Z\",\"deleted\":false,\"bibIds\":[\"1125287\"],\"location\":{\"code\":\"sghi2\",\"name\":\"Closed stores Hist. 2\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X48187\",\"callNumber\":\"ANM.6531\"},{\"id\":\"1145554\",\"updatedDate\":\"2013-12-12T19:55:20Z\",\"createdDate\":\"1999-11-15T14:23:57Z\",\"deleted\":false,\"bibIds\":[\"1126420\"],\"location\":{\"code\":\"sghi2\",\"name\":\"Closed stores Hist. 2\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22102051729\",\"callNumber\":\"IH /FUL\"},{\"id\":\"1152246\",\"updatedDate\":\"2013-12-13T12:07:09Z\",\"createdDate\":\"1999-11-15T18:58:38Z\",\"deleted\":false,\"bibIds\":[\"1132380\"],\"location\":{\"code\":\"sghi2\",\"name\":\"Closed stores Hist. 2\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101052034\",\"callNumber\":\"UM /GUB\"},{\"id\":\"1256777\",\"updatedDate\":\"2013-12-10T17:51:15Z\",\"createdDate\":\"1999-12-03T20:15:11Z\",\"deleted\":false,\"bibIds\":[\"1264850\",\"1365348\",\"1365401\",\"1365444\",\"1365474\",\"1366329\",\"1366461\",\"1366553\",\"1366875\",\"1366966\",\"1372096\",\"1375308\",\"1375358\",\"1375373\",\"1377338\",\"1377353\",\"1377657\",\"1377961\",\"1378240\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22500239033\",\"callNumber\":\"/LLO\"},{\"id\":\"1266734\",\"updatedDate\":\"2013-12-12T17:24:07Z\",\"createdDate\":\"1999-12-03T20:18:34Z\",\"deleted\":false,\"bibIds\":[\"1268917\"],\"location\":{\"code\":\"sghi2\",\"name\":\"Closed stores Hist. 2\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501277659\",\"callNumber\":\"IDQ.CA\"},{\"id\":\"1271529\",\"updatedDate\":\"2013-12-13T17:57:02Z\",\"createdDate\":\"1999-12-03T20:20:32Z\",\"deleted\":false,\"bibIds\":[\"1270967\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X35940\",\"callNumber\":\"17069/B\"},{\"id\":\"1271530\",\"updatedDate\":\"2013-12-13T17:55:22Z\",\"createdDate\":\"1999-12-03T20:20:32Z\",\"deleted\":false,\"bibIds\":[\"1270967\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X35941\",\"callNumber\":\"17069/B\"},{\"id\":\"1276787\",\"updatedDate\":\"2013-12-13T12:19:40Z\",\"createdDate\":\"1999-12-03T20:22:31Z\",\"deleted\":false,\"bibIds\":[\"1274442\",\"1378258\",\"1378702\",\"1378703\",\"1378704\",\"1378705\",\"1378706\",\"1378707\",\"1378708\",\"1378709\",\"1378710\",\"1378711\",\"1378712\",\"1378713\",\"1378714\",\"1378715\",\"1378716\",\"1378717\",\"1378718\",\"1378719\",\"1378720\",\"1378721\",\"1378722\",\"1378745\",\"1378746\",\"1378747\",\"1378748\",\"1378749\",\"1378750\",\"1378751\",\"1378752\",\"1378753\",\"1378754\",\"1378755\",\"1378756\",\"1378757\",\"1378758\",\"1378759\",\"1378760\",\"1378761\",\"1378762\",\"1378763\",\"1378764\",\"1378765\",\"1378766\",\"1378767\",\"1378768\",\"1378769\",\"1378770\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101503887\",\"callNumber\":\"/CAP\"},{\"id\":\"1293265\",\"updatedDate\":\"2013-12-10T17:35:52Z\",\"createdDate\":\"1999-12-06T12:13:05Z\",\"deleted\":false,\"bibIds\":[\"1283203\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X115999\",\"callNumber\":\"40401/B/2\"},{\"id\":\"1297002\",\"updatedDate\":\"2013-12-10T17:51:11Z\",\"createdDate\":\"1999-12-06T12:14:24Z\",\"deleted\":false,\"bibIds\":[\"1285117\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501243918\",\"callNumber\":\"/LON\"},{\"id\":\"1308571\",\"updatedDate\":\"2013-12-11T13:54:35Z\",\"createdDate\":\"1999-12-06T12:18:41Z\",\"deleted\":false,\"bibIds\":[\"1293113\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101504421\",\"callNumber\":\"/HIP\"},{\"id\":\"1310356\",\"updatedDate\":\"2013-12-13T15:47:17Z\",\"createdDate\":\"1999-12-06T12:19:00Z\",\"deleted\":false,\"bibIds\":[\"1294195\"],\"location\":{\"code\":\"sepbf\",\"name\":\"Closed stores EPB G. O/S\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X10142\",\"callNumber\":\"F.836 (B 380)\"},{\"id\":\"1310972\",\"updatedDate\":\"2013-12-12T16:22:02Z\",\"createdDate\":\"1999-12-06T16:34:28Z\",\"deleted\":false,\"bibIds\":[\"1294690\"],\"location\":{\"code\":\"sepbd\",\"name\":\"Closed stores EPB / D\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X97250\",\"callNumber\":\"1802/D\"},{\"id\":\"1326025\",\"updatedDate\":\"2013-12-12T17:30:26Z\",\"createdDate\":\"1999-12-06T16:41:07Z\",\"deleted\":false,\"bibIds\":[\"1306006\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101021693\",\"callNumber\":\"M16024\"},{\"id\":\"1326026\",\"updatedDate\":\"2013-12-12T17:30:49Z\",\"createdDate\":\"1999-12-06T16:41:07Z\",\"deleted\":false,\"bibIds\":[\"1306006\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101021700\",\"callNumber\":\"M16025\"},{\"id\":\"1326027\",\"updatedDate\":\"2013-12-12T17:31:13Z\",\"createdDate\":\"1999-12-06T16:41:07Z\",\"deleted\":false,\"bibIds\":[\"1306006\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22101021719\",\"callNumber\":\"M16026\"},{\"id\":\"1326028\",\"updatedDate\":\"2013-12-12T17:29:50Z\",\"createdDate\":\"1999-12-06T16:41:07Z\",\"deleted\":false,\"bibIds\":[\"1306006\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501811778\",\"callNumber\":\"M16027\"},{\"id\":\"1328269\",\"updatedDate\":\"2013-12-13T11:23:56Z\",\"createdDate\":\"1999-12-06T16:41:51Z\",\"deleted\":false,\"bibIds\":[\"1307381\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22900405426\",\"callNumber\":\"/GAL\"},{\"id\":\"1350653\",\"updatedDate\":\"2013-12-13T11:07:41Z\",\"createdDate\":\"1999-12-07T17:45:58Z\",\"deleted\":false,\"bibIds\":[\"1321788\"],\"location\":{\"code\":\"sgshe\",\"name\":\"Closed stores Shepherd\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22500705840\",\"callNumber\":\"/WOR\"},{\"id\":\"1356605\",\"updatedDate\":\"2013-12-12T14:42:15Z\",\"createdDate\":\"1999-12-08T12:39:07Z\",\"deleted\":false,\"bibIds\":[\"1326823\"],\"location\":{\"code\":\"sepbb\",\"name\":\"Closed stores EPB / B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"X158089\",\"callNumber\":\"6273/B\"},{\"id\":\"1357947\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1359288\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1359469\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1359583\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1359966\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1361636\",\"updatedDate\":\"2013-12-12T16:49:15Z\",\"createdDate\":\"1999-12-08T18:00:05Z\",\"deleted\":false,\"bibIds\":[\"1337718\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501111999\",\"callNumber\":\"M1044\"},{\"id\":\"1363099\",\"updatedDate\":\"2013-12-12T13:56:36Z\",\"createdDate\":\"1999-12-09T10:46:33Z\",\"deleted\":false,\"bibIds\":[\"1339084\"],\"location\":{\"code\":\"sgphi\",\"name\":\"Closed stores Hist. pam\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22500839643\",\"callNumber\":\"/MAC\"},{\"id\":\"1386238\",\"updatedDate\":\"2013-12-12T17:06:00Z\",\"createdDate\":\"2000-02-15T13:43:59Z\",\"deleted\":false,\"bibIds\":[\"1455971\"],\"location\":{\"code\":\"sesub\",\"name\":\"Closed stores EPB Suppl. B\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"R348869X2\",\"callNumber\":\"/DEV\"},{\"id\":\"1394371\",\"updatedDate\":\"2013-12-12T19:45:29Z\",\"createdDate\":\"2000-05-25T18:52:43Z\",\"deleted\":false,\"bibIds\":[\"1467672\"],\"location\":{\"code\":\"sgphi\",\"name\":\"Closed stores Hist. pam\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501287247\",\"callNumber\":\"/KLE\"},{\"id\":\"1401542\",\"updatedDate\":\"2013-12-13T14:01:19Z\",\"createdDate\":\"2000-06-05T19:56:16Z\",\"deleted\":false,\"bibIds\":[\"1474580\"],\"location\":{\"code\":\"sgpam\",\"name\":\"Closed stores Med. pam.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501435505\",\"callNumber\":\"M:WA100 1924B57b\"},{\"id\":\"1460095\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1461136\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1461844\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1461845\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1461846\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]}]}"
+        },
+        "headers": {
+          "Date": "Thu, 09 Nov 2017 10:26:21 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/items?id=%5B0%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "recorded_at": "2017-11-09T10:27:34"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "Bearer <BEARER_TOKEN>",
+          "Accept": "application/json",
+          "Cookie": "jcontainerId=.jcontainer-public2"
+        },
+        "method": "GET",
+        "uri": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/items?id=%5B1461847%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"total\":50,\"entries\":[{\"id\":\"1461851\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1461862\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1461864\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1462796\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1462800\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1464045\",\"updatedDate\":\"2013-12-12T13:56:07Z\",\"createdDate\":\"2001-06-19T13:57:41Z\",\"deleted\":false,\"bibIds\":[\"1536695\"],\"location\":{\"code\":\"sgphi\",\"name\":\"Closed stores Hist. pam\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501328220\",\"callNumber\":\"/RHO\"},{\"id\":\"1465307\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1470791\",\"updatedDate\":\"2013-12-13T15:18:14Z\",\"createdDate\":\"2001-10-18T13:40:26Z\",\"deleted\":false,\"bibIds\":[\"1982544\"],\"location\":{\"code\":\"sganr\",\"name\":\"Closed stores ann. rep.\"},\"status\":{\"code\":\"m\",\"display\":\"Missing\"},\"barcode\":\"22501009164\",\"callNumber\":\"Q28.BA1 P27\"},{\"id\":\"1471478\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1481937\",\"updatedDate\":\"2013-12-13T14:43:00Z\",\"createdDate\":\"2002-07-16T15:24:00Z\",\"deleted\":false,\"bibIds\":[\"1556974\"],\"location\":{\"code\":\"mfvac\",\"name\":\"Closed stores Moving image and sound collections\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22503076863\",\"callNumber\":\"1102V\"},{\"id\":\"1482836\",\"updatedDate\":\"2013-12-11T14:07:18Z\",\"createdDate\":\"2002-08-01T07:27:00Z\",\"deleted\":false,\"bibIds\":[\"1551416\"],\"location\":{\"code\":\"mfvac\",\"name\":\"Closed stores Moving image and sound collections\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22503089840\",\"callNumber\":\"1675V\"},{\"id\":\"1490463\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1490466\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1490495\",\"deletedDate\":\"2014-01-31\",\"deleted\":true,\"bibIds\":[]},{\"id\":\"1511592\",\"updatedDate\":\"2013-12-11T09:56:04Z\",\"createdDate\":\"2004-03-10T14:35:29Z\",\"deleted\":false,\"bibIds\":[\"1587716\"],\"location\":{\"code\":\"mfvac\",\"name\":\"Closed stores Moving image and sound collections\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501588877\",\"callNumber\":\"223A\"},{\"id\":\"1514562\",\"updatedDate\":\"2013-12-13T17:10:56Z\",\"createdDate\":\"2004-06-15T17:43:58Z\",\"deleted\":false,\"bibIds\":[\"1590707\"],\"location\":{\"code\":\"sgpam\",\"name\":\"Closed stores Med. pam.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501568274\",\"callNumber\":\"QH200 1890S97s\"},{\"id\":\"1569862\",\"updatedDate\":\"2013-12-12T18:00:09Z\",\"createdDate\":\"2005-04-20T14:30:40Z\",\"deleted\":false,\"bibIds\":[\"1645741\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22500712798\",\"callNumber\":\"M210\"},{\"id\":\"1577386\",\"updatedDate\":\"2013-12-12T10:18:51Z\",\"createdDate\":\"2005-11-24T10:55:32Z\",\"deleted\":false,\"bibIds\":[\"1305444\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501031781\",\"callNumber\":\"/JOU\"},{\"id\":\"1577388\",\"updatedDate\":\"2013-12-10T17:51:25Z\",\"createdDate\":\"2005-11-24T10:56:57Z\",\"deleted\":false,\"bibIds\":[\"1305444\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22501031807\",\"callNumber\":\"/JOU\"},{\"id\":\"1595455\",\"updatedDate\":\"2013-12-12T13:36:13Z\",\"createdDate\":\"2007-09-17T10:42:39Z\",\"deleted\":false,\"bibIds\":[\"1661070\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22503005182\",\"callNumber\":\"/ZIE\"},{\"id\":\"1601264\",\"updatedDate\":\"2013-12-11T11:16:14Z\",\"createdDate\":\"2008-06-02T14:35:20Z\",\"deleted\":false,\"bibIds\":[\"1576996\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22502763033\",\"callNumber\":\"/BUL\"},{\"id\":\"1603747\",\"updatedDate\":\"2013-12-10T17:43:52Z\",\"createdDate\":\"2008-08-29T17:11:15Z\",\"deleted\":false,\"bibIds\":[\"1667185\"],\"location\":{\"code\":\"sgpan\",\"name\":\"Closed stores pams.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22502787231\",\"callNumber\":\"P815\"},{\"id\":\"1606021\",\"updatedDate\":\"2013-12-13T17:21:02Z\",\"createdDate\":\"2008-10-30T10:23:23Z\",\"deleted\":false,\"bibIds\":[\"1658604\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22502775280\",\"callNumber\":\"/BUD\"},{\"id\":\"1608642\",\"updatedDate\":\"2013-12-12T14:20:33Z\",\"createdDate\":\"2009-01-23T10:50:22Z\",\"deleted\":false,\"bibIds\":[\"1672934\"],\"location\":{\"code\":\"wgmem\",\"name\":\"Medical Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22502777698\",\"callNumber\":\"HB74.P8 2008T53n\"},{\"id\":\"1611116\",\"updatedDate\":\"2013-12-10T17:51:19Z\",\"createdDate\":\"2009-03-31T10:13:00Z\",\"deleted\":false,\"bibIds\":[\"1223892\"],\"location\":{\"code\":\"wslob\",\"name\":\"Student Collection\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22503043747\",\"callNumber\":\"/LON\"},{\"id\":\"1612527\",\"updatedDate\":\"2013-12-12T18:01:15Z\",\"createdDate\":\"2009-05-12T11:09:44Z\",\"deleted\":false,\"bibIds\":[\"1676032\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22102385655\",\"callNumber\":\"M6361\"},{\"id\":\"1663709\",\"updatedDate\":\"2013-12-13T12:20:54Z\",\"createdDate\":\"2010-04-13T14:17:52Z\",\"deleted\":false,\"bibIds\":[\"1726316\"],\"location\":{\"code\":\"sgmon\",\"name\":\"Closed stores mons.\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22400032892\",\"callNumber\":\"M7635\"},{\"id\":\"1668304\",\"updatedDate\":\"2013-12-13T12:47:16Z\",\"createdDate\":\"2010-11-26T14:25:35Z\",\"deleted\":false,\"bibIds\":[\"1731394\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/GRU/31:Box 7\"},{\"id\":\"1703029\",\"updatedDate\":\"2013-12-12T19:45:56Z\",\"createdDate\":\"2012-01-10T16:20:18Z\",\"deleted\":false,\"bibIds\":[\"1794538\"],\"location\":{\"code\":\"sgpxn\",\"name\":\"Closed stores pams. O/S\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"22502707693\",\"callNumber\":\"+P150\"},{\"id\":\"1717108\",\"updatedDate\":\"2013-12-12T09:28:26Z\",\"createdDate\":\"2012-09-08T00:12:42Z\",\"deleted\":false,\"bibIds\":[\"1826151\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/FPW/E.13:Box 179\"},{\"id\":\"1723926\",\"updatedDate\":\"2013-12-13T15:48:23Z\",\"createdDate\":\"2012-09-08T02:08:43Z\",\"deleted\":false,\"bibIds\":[\"1836748\"],\"location\":{\"code\":\"swms4\",\"name\":\"Closed stores WMS 4\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"MS.5604\"},{\"id\":\"1726093\",\"updatedDate\":\"2013-12-12T09:28:26Z\",\"createdDate\":\"2012-09-08T02:31:13Z\",\"deleted\":false,\"bibIds\":[\"1839650\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/FPW/E.15:Box 179\"},{\"id\":\"1727666\",\"updatedDate\":\"2013-12-11T17:35:36Z\",\"createdDate\":\"2012-09-08T02:45:19Z\",\"deleted\":false,\"bibIds\":[\"1841626\"],\"location\":{\"code\":\"swms2\",\"name\":\"Closed stores WMS 2\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"MS.5600\"},{\"id\":\"1729540\",\"updatedDate\":\"2013-12-12T17:24:11Z\",\"createdDate\":\"2012-09-08T03:08:54Z\",\"deleted\":false,\"bibIds\":[\"1844283\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"WA/HMM/CO/Chr/A.110:Box 89\"},{\"id\":\"1730177\",\"updatedDate\":\"2013-12-13T15:52:48Z\",\"createdDate\":\"2012-09-08T03:19:16Z\",\"deleted\":false,\"bibIds\":[\"1845080\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/COL/E.7/7:Box 6\"},{\"id\":\"1745253\",\"updatedDate\":\"2013-12-13T09:20:40Z\",\"createdDate\":\"2012-09-08T05:49:16Z\",\"deleted\":false,\"bibIds\":[\"1864774\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/AMS/H.1/31:Box 63\"},{\"id\":\"1750178\",\"updatedDate\":\"2013-12-13T16:32:57Z\",\"createdDate\":\"2012-09-08T06:36:55Z\",\"deleted\":false,\"bibIds\":[\"1871811\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"GC/105/34\"},{\"id\":\"1751872\",\"updatedDate\":\"2013-12-12T17:24:03Z\",\"createdDate\":\"2012-09-08T06:51:51Z\",\"deleted\":false,\"bibIds\":[\"1873877\"],\"location\":{\"code\":\"swms3\",\"name\":\"Closed stores WMS 3\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"MS.7371\"},{\"id\":\"1756856\",\"updatedDate\":\"2013-12-13T15:06:12Z\",\"createdDate\":\"2012-09-08T07:36:12Z\",\"deleted\":false,\"bibIds\":[\"1879697\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/DWW/A/H/1-15:Box 5\"},{\"id\":\"1761870\",\"updatedDate\":\"2013-12-13T14:58:46Z\",\"createdDate\":\"2012-09-08T08:19:32Z\",\"deleted\":false,\"bibIds\":[\"1885626\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/DWW/H/1/1:Box 30\"},{\"id\":\"1772146\",\"updatedDate\":\"2013-12-12T18:56:58Z\",\"createdDate\":\"2012-09-08T09:57:26Z\",\"deleted\":false,\"bibIds\":[\"1899572\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"SA/LIS/M.6:Box 9\"},{\"id\":\"1773611\",\"updatedDate\":\"2013-12-12T12:26:40Z\",\"createdDate\":\"2012-09-08T10:12:50Z\",\"deleted\":false,\"bibIds\":[\"1901854\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/FOR/A.4:Box 1\"},{\"id\":\"1777912\",\"updatedDate\":\"2013-12-11T11:00:27Z\",\"createdDate\":\"2012-09-08T11:10:56Z\",\"deleted\":false,\"bibIds\":[\"1911848\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"SA/PHY/E/2/3:Box 65\"},{\"id\":\"1778185\",\"updatedDate\":\"2013-12-12T09:28:25Z\",\"createdDate\":\"2012-09-08T11:13:18Z\",\"deleted\":false,\"bibIds\":[\"1912218\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/MCS/A/67:Box 10\"},{\"id\":\"1783662\",\"updatedDate\":\"2013-12-11T09:56:09Z\",\"createdDate\":\"2012-09-08T12:04:45Z\",\"deleted\":false,\"bibIds\":[\"1920032\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/RHE/A/6/3:Box 4\"},{\"id\":\"1785337\",\"updatedDate\":\"2013-12-11T11:00:25Z\",\"createdDate\":\"2012-09-08T12:19:25Z\",\"deleted\":false,\"bibIds\":[\"1922206\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"SA/PHY/E/2/4:Box 65\"},{\"id\":\"1787654\",\"updatedDate\":\"2013-12-13T14:59:01Z\",\"createdDate\":\"2012-09-08T12:39:22Z\",\"deleted\":false,\"bibIds\":[\"1925328\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/DWW/A/A/128:Box 37\"},{\"id\":\"1787685\",\"updatedDate\":\"2013-12-11T09:56:09Z\",\"createdDate\":\"2012-09-08T12:39:37Z\",\"deleted\":false,\"bibIds\":[\"1925366\"],\"location\":{\"code\":\"swms3\",\"name\":\"Closed stores WMS 3\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"MS.7069\"},{\"id\":\"1793385\",\"updatedDate\":\"2013-12-13T09:20:40Z\",\"createdDate\":\"2012-09-08T13:43:20Z\",\"deleted\":false,\"bibIds\":[\"1933056\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"PP/EEP/E.5:Box 8\"},{\"id\":\"1794165\",\"updatedDate\":\"2013-12-13T12:47:18Z\",\"createdDate\":\"2012-09-08T14:04:09Z\",\"deleted\":false,\"bibIds\":[\"1933948\"],\"location\":{\"code\":\"scmac\",\"name\":\"Closed stores Arch. & MSS\"},\"status\":{\"code\":\"-\",\"display\":\"Available\"},\"barcode\":\"\",\"callNumber\":\"SA/PHY/Z/4/1/149-190:Box 143; SA/PHY/Z/4/1/149-190:O/S 25\"}]}"
+        },
+        "headers": {
+          "Date": "Thu, 09 Nov 2017 10:26:21 GMT",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Vary": "User-Agent",
+          "Transfer-Encoding": "chunked"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://libsys.wellcomelibrary.org/iii/sierra-api/v3/items?id=%5B1461847%2C%5D&updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D"
+      },
+      "recorded_at": "2017-11-09T10:27:35"
+    }
+
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
