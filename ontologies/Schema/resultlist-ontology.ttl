@@ -20,7 +20,7 @@ wresultlist:ResultList rdf:type owl:Class ;
 wresultlist:Thing rdf:type owl:Class ;
     rdfs:label "Thing"@en ;
     rdfs:comment "A thing"@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/wresultlist:> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/resultlist> .
 
 
 wresultlist:pageSize rdf:type owl:DatatypeProperty ;
