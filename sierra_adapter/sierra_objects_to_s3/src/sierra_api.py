@@ -40,10 +40,17 @@ class SierraAPI(object):
 
     def _http_get(self, path, params):
         def _call():
-            return self.sess.get(
+            get_url = f'{self.api_url}{path}'
+            resp = self.sess.get(
                 f'{self.api_url}{path}',
                 params=params
             )
+
+            logger.debug(
+                f'Response from GET {get_url}: {resp.text}'
+            )
+
+            return resp
 
         try:
             return _call()

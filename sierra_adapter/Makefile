@@ -8,23 +8,27 @@ ifneq ($(ROOT), $(shell pwd))
 endif
 
 
-$(SIERRA_ADAPTER)/requirements.txt: $(SIERRA_ADAPTER)/requirements.in
+$(SIERRA_ADAPTER)/sierra_objects_to_s3/requirements.txt: $(SIERRA_ADAPTER)/requirements.in
 	docker run --volume $(SIERRA_ADAPTER):/src micktwomey/pip-tools
 
-sierra_adapter-build: $(ROOT)/.docker/image_builder
+sierra_objects_to_s3-build: $(ROOT)/.docker/image_builder
 	$(ROOT)/builds/docker_run.py --dind -- \
 		image_builder:latest \
-		--project=sierra_adapter \
-		--file=sierra_adapter/Dockerfile
+		--project=sierra_objects_to_s3 \
+		--file=sierra_adapter/sierra_objects_to_s3/Dockerfile
 
-sierra_adapter-test: sierra_adapter-build
+sierra_adapter-build: sierra_objects_to_s3-build
+
+sierra_objects_to_s3-test: sierra_objects_to_s3-build
 	docker build \
-		--tag sierra_adapter:test \
-		--file=$(SIERRA_ADAPTER)/test.Dockerfile \
-		$(SIERRA_ADAPTER)
+		--tag sierra_objects_to_s3:test \
+		--file=$(SIERRA_ADAPTER)/sierra_objects_to_s3/test.Dockerfile \
+		$(SIERRA_ADAPTER)/sierra_objects_to_s3
 	docker run \
-		--volume $(SIERRA_ADAPTER)/cassettes:/cassettes \
-		--tty sierra_adapter:test
+		--volume $(SIERRA_ADAPTER)/sierra_objects_to_s3/cassettes:/cassettes \
+		--tty sierra_objects_to_s3:test
+
+sierra_adapter-test: sierra_objects_to_s3-test
 
 sierra_adapter-adapter-publish: $(ROOT)/.docker/publish_service_to_aws
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
