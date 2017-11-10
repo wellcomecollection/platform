@@ -5,10 +5,10 @@ LABEL description "Copy records from the Sierra API into DynamoDB"
 
 COPY requirements.txt /
 
-RUN apk add --no-cache gcc musl-dev
+RUN apk add --no-cache gcc musl-dev openssl-dev libffi-dev
 
 RUN pip3 install -r /requirements.txt
 
 COPY src /app
 
-ENTRYPOINT ["/app/run.py"]
+ENTRYPOINT ["/app/sierra_objects_to_s3.py"]
