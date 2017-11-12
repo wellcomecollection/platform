@@ -26,9 +26,10 @@ module "trigger_task_tracking" {
 }
 
 module "lambda_dynamo_to_sns" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.4"
 
-  name        = "dynamo_to_sns"
+  name        = "dynamo_to_sns_task_tracking"
+  module_name = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
 
   environment_variables = {
