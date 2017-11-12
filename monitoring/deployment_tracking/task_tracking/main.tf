@@ -25,10 +25,10 @@ module "trigger_task_tracking" {
   cloudwatch_trigger_name = "${var.every_minute_name}"
 }
 
-module "lambda_dynamo_to_sns_tasks" {
+module "lambda_dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
-  name        = "dynamo_to_sns_tasks"
+  name        = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
 
   environment_variables = {
@@ -43,12 +43,12 @@ module "lambda_dynamo_to_sns_tasks" {
   s3_key          = "lambdas/shared_infra/dynamo_to_sns.zip"
 }
 
-module "trigger_dynamo_to_sns_tasks" {
+module "trigger_dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_dynamo?ref=v1.0.0"
 
   batch_size = "50"
 
   stream_arn    = "${aws_dynamodb_table.tasks.stream_arn}"
-  function_arn  = "${module.lambda_dynamo_to_sns_tasks.arn}"
-  function_role = "${module.lambda_dynamo_to_sns_tasks.role_name}"
+  function_arn  = "${module.lambda_dynamo_to_sns.arn}"
+  function_role = "${module.lambda_dynamo_to_sns.role_name}"
 }
