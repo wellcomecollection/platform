@@ -64,7 +64,7 @@ task_tracking-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(DEPLOYMENT_TRACKING)/task_tracking/src:/data \
 		--env OP=test \
-		--env FIND_MATCH_PATHS="/data" --tty \"
+		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
 ## Publish task_tracking lambda

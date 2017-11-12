@@ -57,8 +57,6 @@ def _compare_tasks(current_tasks, last_tasks):
     additions_keys = current_tasks_keys - last_tasks_keys
     remaining_keys = last_tasks_keys & current_tasks_keys
 
-    unchanged_tasks = set(current_tasks) & set(last_tasks)
-
     deleted_tasks = [
         _find_in_tasks(last_tasks, deletion_key)
         for deletion_key in deletions_keys
@@ -69,14 +67,12 @@ def _compare_tasks(current_tasks, last_tasks):
         for additions_key in additions_keys
     ]
 
-    maybe_updated_tasks = [
+    updated_tasks = [
         _find_in_tasks(current_tasks, remaining_key)
         for remaining_key in remaining_keys
     ]
 
-    updated_tasks = list(
-        set(maybe_updated_tasks) - unchanged_tasks
-    )
+    updated_tasks = set(current_tasks) - set(updated_tasks)
 
     return {
         'deletions': deleted_tasks,
@@ -91,15 +87,24 @@ def _json_converter(o):
 
 
 def _put_task_in_dynamo(table, task):
-    return table.put_item(
-        Item={
-            'task_definition_arn': task.task_key.task_definition_arn,
-            'task_arn': task.task_key.task_arn,
-            'started_at': task.started_at,
-            'completed': task.completed,
-            'success': task.success
-        }
+    task_key = {
+        'task_definition_arn': task.task_key.task_definition_arn,
+        'task_arn': task.task_key.task_arn,
+    }
+
+    task_metadata = {
+        'started_at': task.started_at,
+        'completed': task.completed,
+        'success': task.success
+    }
+
+    filtered_task_metadata = dict(
+        (k, v) for k, v in task_metadata.items() if v
     )
+
+    item = {**task_key, **filtered_task_metadata}
+
+    return table.put_item(Item=item)
 
 
 def _delete_task_in_dynamo(table, task):
@@ -202,7 +207,7 @@ def main(event, _):
     tasks_from_dynamo = _get_tasks_from_dynamo(table)
 
     operations = _compare_tasks(tasks_from_ecs, tasks_from_dynamo)
+    print(f'operations = {operations!r}')
 
-    ops = _run_operations(operations, table)
-
-    print(f'ops = {ops!r}')
+    operation_resulsts = _run_operations(operations, table)
+    print(f'operation_resulsts = {operation_resulsts!r}')
