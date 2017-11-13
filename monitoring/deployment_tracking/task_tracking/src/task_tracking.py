@@ -149,6 +149,11 @@ def _run_operations(operations, table):
 def _get_describe_tasks_response(ecs_client, cluster_name):
     list_tasks_response = ecs_client.list_tasks(cluster=cluster_name)
 
+    if not list_tasks_response['taskArns']:
+        return {
+            'tasks': []
+        }
+
     return ecs_client.describe_tasks(
         cluster=cluster_name,
         tasks=list_tasks_response['taskArns']
