@@ -25,14 +25,22 @@ def _create_task_tuple_from_item(item):
     if 'startedAt' in item:
         started_at = maya.MayaDT.from_datetime(item['startedAt']).iso8601()
 
+    completed = None
+    if 'completed' in item:
+        completed = item['completed']
+
+    success = None
+    if 'success' in item:
+        success = item['success']
+
     return Task(
         TaskKey(
             item['task_arn'],
             item['task_definition_arn']
         ),
         started_at,
-        item['completed'],
-        item['success']
+        completed,
+        success
     )
 
 
