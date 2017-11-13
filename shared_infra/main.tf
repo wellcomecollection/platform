@@ -37,12 +37,6 @@ module "run_ecs_task" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "register_ecs_task" {
-  source = "register_ecs_task"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "service_scheduler" {
   source = "service_scheduler"
 
