@@ -222,5 +222,5 @@ def main(event, _):
     operations = _compare_tasks(tasks_from_ecs, tasks_from_dynamo)
     print(f'operations = {operations!r}')
 
-    operation_resulsts = _run_operations(operations, table)
-    print(f'operation_resulsts = {operation_resulsts!r}')
+    operation_results = _run_operations(operations, table)
+    print(f'operation_results = {operation_results!r}')

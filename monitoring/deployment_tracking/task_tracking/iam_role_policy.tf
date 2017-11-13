@@ -8,7 +8,7 @@ resource "aws_iam_role_policy" "task_tracking_tasks_table" {
   policy = "${data.aws_iam_policy_document.tasks_table.json}"
 }
 
-resource "aws_iam_role_policy" "dynamo_to_sns" {
-  role   = "${module.lambda_dynamo_to_sns.role_name}"
+resource "aws_iam_role_policy" "dynamo_event_to_sns" {
+  role   = "${module.lambda_dynamo_event_to_sns.role_name}"
   policy = "${module.task_updates_topic.publish_policy}"
 }

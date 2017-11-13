@@ -29,3 +29,14 @@ module "task_tracking" {
 
   lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
 }
+
+module "task_status_notifier" {
+  source = "task_status_notifier"
+
+  every_minute_name = "${var.every_minute_name}"
+  every_minute_arn  = "${var.every_minute_arn}"
+
+  sns_trigger_arn = "${module.task_tracking.task_updates_topic_arn}"
+
+  lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
+}
