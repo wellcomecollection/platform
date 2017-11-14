@@ -160,7 +160,7 @@ def _get_describe_tasks_response(ecs_client, cluster_name):
     )
 
 
-def _create_task_tuple_from_task(task):
+def create_task_tuple_from_task(task):
     def _get_completed_successfully(task):
         exit_codes = [
             container['exitCode'] for container in task['containers'] if ('exitCode' in container)
@@ -173,17 +173,15 @@ def _create_task_tuple_from_task(task):
 
                 return True
 
-        return None
+        return False
 
-    started_at = ""
+    started_at = None
     if 'startedAt' in task:
         started_at = maya.MayaDT.from_datetime(task['startedAt']).iso8601()
 
-    completed = _get_completed_successfully(task) is not None
+    completed = task['lastStatus'] == 'STOPPED'
 
-    success = False
-    if completed:
-        success = _get_completed_successfully(task)
+    success = _get_completed_successfully(task)
 
     return Task(
         TaskKey(
@@ -196,6 +194,11 @@ def _create_task_tuple_from_task(task):
     )
 
 
+def get_tasks_from_ecs(ecs_client, cluster_name):
+    describe_tasks_response = _get_describe_tasks_response(ecs_client, cluster_name)
+    return [create_task_tuple_from_task(task) for task in describe_tasks_response['tasks']]
+
+
 def main(event, _):
     print(f'event = {event!r}')
 
@@ -206,13 +209,11 @@ def main(event, _):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
-    describe_tasks_response = _get_describe_tasks_response(ecs_client, cluster_name)
-
-    tasks_from_ecs = [_create_task_tuple_from_task(task) for task in describe_tasks_response['tasks']]
+    tasks_from_ecs = get_tasks_from_ecs(ecs_client, cluster_name)
     tasks_from_dynamo = _get_tasks_from_dynamo(table)
 
     operations = _compare_tasks(tasks_from_ecs, tasks_from_dynamo)
     print(f'operations = {operations!r}')
 
-    operation_resulsts = _run_operations(operations, table)
-    print(f'operation_resulsts = {operation_resulsts!r}')
+    operation_results = _run_operations(operations, table)
+    print(f'operation_results = {operation_results!r}')
