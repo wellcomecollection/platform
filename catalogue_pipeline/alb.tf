@@ -6,6 +6,8 @@ module "services_alb" {
   loadbalancer_security_groups = [
     "${module.services_cluster_asg.loadbalancer_sg_https_id}",
     "${module.services_cluster_asg.loadbalancer_sg_http_id}",
+    "${module.services_cluster_asg_on_demand.loadbalancer_sg_https_id}",
+    "${module.services_cluster_asg_on_demand.loadbalancer_sg_http_id}",
   ]
 
   certificate_domain = "services.wellcomecollection.org"
