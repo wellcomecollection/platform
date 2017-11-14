@@ -30,6 +30,8 @@ module "deployment_tracking" {
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  task_tracking_cluster_name = "${local.aws_ecs_cluster_services_id}"
 }
 
 module "ecs_dashboard" {

@@ -52,14 +52,37 @@ service_deployment_status-publish: $(ROOT)/.docker/publish_lambda_zip
 		--key="lambdas/deployment_tracking/service_deployment_status.zip" \
 		--bucket="$(INFRA_BUCKET)"; \
 
+## Build task_tracking lambda
+task_tracking-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(DEPLOYMENT_TRACKING)/task_tracking:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
+## Test task_tracking lambda
+task_tracking-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(DEPLOYMENT_TRACKING)/task_tracking/src:/data \
+		--env OP=test \
+		--env FIND_MATCH_PATHS="/data" --tty \
+		python3.6_ci:latest
+
+## Publish task_tracking lambda
+task_tracking-publish: $(ROOT)/.docker/publish_lambda_zip
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(ROOT):/repo \
+		publish_lambda_zip "monitoring/deployment_tracking/task_tracking/src" \
+		--key="lambdas/deployment_tracking/task_tracking.zip" \
+		--bucket="$(INFRA_BUCKET)"; \
+
 ## Build all for deployment_tracking
-deployment_tracking-build: notify_old_deploys-build service_deployment_status-build
+deployment_tracking-build: notify_old_deploys-build service_deployment_status-build task_tracking-build
 
 ## Test all for deployment_tracking
-deployment_tracking-test: notify_old_deploys-test service_deployment_status-test
+deployment_tracking-test: notify_old_deploys-test service_deployment_status-test task_tracking-test
 
 ## Publish all for deployment_tracking
-deployment_tracking-deploy: notify_old_deploys-publish service_deployment_status-publish
+deployment_tracking-deploy: notify_old_deploys-publish service_deployment_status-publish task_tracking-publish
 
 .PHONY: notify_old_deploys-build notify_old_deploys-test notify_old_deploys-publish \
 		service_deployment_status-build service_deployment_status-test service_deployment_status-publish \

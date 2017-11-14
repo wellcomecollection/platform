@@ -1,9 +1,10 @@
-FROM alpine
+FROM python:3.6
 
 LABEL maintainer "Alex Chan <a.chan@wellcome.ac.uk>"
 LABEL description "A Docker image for publishing AWS Lambda ZIPs to S3"
 
-RUN apk update && apk add libzip-tools git python3
+RUN apt update
+RUN apt-get --yes install zipcmp
 RUN pip3 install boto3 docopt
 
 COPY publish_lambda_zip.py /publish_lambda_zip.py

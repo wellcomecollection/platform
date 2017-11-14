@@ -18,3 +18,14 @@ module "notify_old_deploys" {
 
   lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
 }
+
+module "task_tracking" {
+  source = "task_tracking"
+
+  cluster_name = "${var.task_tracking_cluster_name}"
+
+  every_minute_name = "${var.every_minute_name}"
+  every_minute_arn  = "${var.every_minute_arn}"
+
+  lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
+}
