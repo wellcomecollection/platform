@@ -25,7 +25,7 @@ module "services_cluster_asg" {
 
 module "services_cluster_asg_on_demand" {
   source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=v1.0.0"
-  asg_name              = "service-cluster_on_demand"
+  asg_name              = "service-cluster-on-demand"
   subnet_list           = ["${module.vpc_services.subnets}"]
   key_name              = "${var.key_name}"
   instance_profile_name = "${module.ecs_services_iam.instance_profile_name}"
