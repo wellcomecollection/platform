@@ -58,11 +58,8 @@ shared_infra-terraform-plan:
 	$(call terraform_plan,$(SHARED_INFRA))
 
 ## Run an apply on shared_infra stack
-shared_infra-terraform-apply: $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(SHARED_INFRA):/data \
-	-e OP=apply \
-	terraform_ci:latest
+shared_infra-terraform-apply:
+	$(call terraform_apply,$(SHARED_INFRA))
 
 
 .PHONY: shared_infra-test shared_infra-build shared_infra-deploy shared_infra-terraform-plan shared_infra-terraform-apply

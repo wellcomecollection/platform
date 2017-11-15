@@ -40,10 +40,7 @@ miro_preprocessor-publish: xml_to_json_converter-publish \
 miro_preprocessor-terraform-plan:
 	$(call terraform_plan,$(MIRO_PREPROC))
 
-miro_preprocessor-terraform-apply: $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(ROOT)/miro_preprocessor:/data \
-	-e OP=apply \
-	terraform_ci:latest
+miro_preprocessor-terraform-apply:
+	$(call terraform_apply,$(MIRO_PREPROC))
 
 .PHONY: miro_preprocessor-build miro_preprocessor-test miro_preprocessor-deploy

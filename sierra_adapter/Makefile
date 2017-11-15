@@ -21,8 +21,11 @@ sierra_adapter-publish:
 sierra_adapter-terraform-plan:
 	$(call terraform_plan,$(SIERRA_ADAPTER))
 
-sierra_adapter-terraform-apply: $(ROOT)/.docker/terraform_ci
+sierra_adapter-terraform-apply:
 	$(call terraform_apply,$(SIERRA_ADAPTER))
+
+sierra_adapter-publish:
+	echo "Nothing to do!"
 
 
 .PHONY: sierra_adapter-terraform-plan sierra_adapter-terraform-apply
