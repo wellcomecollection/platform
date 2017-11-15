@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 include $(MIRO_PREPROC)/xml_to_json_converter/Makefile
 include $(MIRO_PREPROC)/image_sorter/Makefile
 include $(MIRO_PREPROC)/xml_to_json_run_task/Makefile
@@ -35,11 +37,8 @@ miro_preprocessor-publish: xml_to_json_converter-publish \
                            miro_copy_s3_asset-publish \
                            miro_inventory-publish
 
-miro_preprocessor-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		-v $(ROOT)/miro_preprocessor:/data \
-		-e OP=plan \
-		terraform_ci:latest
+miro_preprocessor-terraform-plan:
+	$(call terraform_plan,$(MIRO_PREPROC))
 
 miro_preprocessor-terraform-apply: $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
