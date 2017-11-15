@@ -9,14 +9,14 @@ include ontologies/Makefile
 include sierra_adapter/Makefile
 
 
-elasticdump-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=elasticdump
+elasticdump-build:
+	$(call build_image,elasticdump,docker/elasticdump/Dockerfile)
 
 elasticdump-deploy: elasticdump-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=elasticdump ./builds/publish_service.sh
 
-api_docs-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=update_api_docs
+api_docs-build:
+	$(call build_image,update_api_docs,docker/update_api_docs/Dockerfile)
 
 api_docs-deploy: api_docs-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=update_api_docs ./builds/publish_service.sh

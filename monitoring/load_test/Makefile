@@ -9,12 +9,8 @@ endif
 include $(ROOT)/functions.Makefile
 
 ## Build docker image for gatling
-gatling-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- \
-		-v $(ROOT):/repo \
-		image_builder:latest \
-		--project=gatling \
-		--file=monitoring/load_test/gatling/Dockerfile
+gatling-build:
+	$(call build_image,gatling,monitoring/load_test/gatling/Dockerfile)
 
 ## Deploy docker image for gatling to ECR
 gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws

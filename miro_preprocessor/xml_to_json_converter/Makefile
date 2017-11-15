@@ -5,11 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
-xml_to_json_converter-build: xml_to_json_converter-test $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- \
-		image_builder:latest \
-		--project=xml_to_json_converter \
-		--file=miro_preprocessor/xml_to_json_converter/Dockerfile
+xml_to_json_converter-build:
+	$(call build_image,xml_to_json_converter,miro_preprocessor/xml_to_json_converter/Dockerfile)
 
 xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 	docker run \

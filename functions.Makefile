@@ -43,3 +43,15 @@ define publish_lambda
 		publish_lambda_zip \
 		"$(1)/src" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)"
 endef
+
+
+# Build and tag a Docker image.
+#
+# Args:
+#   $1 - Name of the image.
+#   $2 - Path to the Dockerfile, relative to the root of the repo.
+#
+define build_image
+	make $(ROOT)/.docker/image_builder
+	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=$(1) --file=$(2)
+endef
