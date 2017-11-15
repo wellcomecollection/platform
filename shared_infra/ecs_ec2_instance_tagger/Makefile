@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build ecs_ec2_instance_tagger lambda
 ecs_ec2_instance_tagger-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ ecs_ec2_instance_tagger-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish ecs_ec2_instance_tagger lambda
-ecs_ec2_instance_tagger-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/ecs_ec2_instance_tagger/src" \
-		--key="lambdas/shared_infra/ecs_ec2_instance_tagger.zip" \
-		--bucket="$(INFRA_BUCKET)";
+ecs_ec2_instance_tagger-publish:
+	$(call publish_lambda,shared_infra,ecs_ec2_instance_tagger)

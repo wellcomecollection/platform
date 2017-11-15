@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 
 $(ROOT)/.docker/ecs_dashboard:
 	$(ROOT)/builds/build_ci_docker_image.py \
@@ -37,12 +39,8 @@ update_service_list-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish update_service_list lambda
-update_service_list-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "monitoring/ecs_dashboard/update_service_list/src" \
-		--key="lambdas/ecs_dashboard/update_service_list.zip" \
-		--bucket="$(INFRA_BUCKET)"; \
+update_service_list-publish:
+	$(call publish_lambda,monitoring,ecs_dashboard/update_service_list)
 
 ## Build all for ecs_dashboard
 ecs_dashboard-build: update_service_list-build

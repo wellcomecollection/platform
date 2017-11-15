@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build miro_inventory lambda
 miro_inventory-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -21,9 +23,5 @@ miro_inventory-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish miro_inventory lambda
-miro_inventory-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "miro_preprocessor/miro_inventory/src" \
-		--key="lambdas/miro_preprocessor/miro_inventory.zip" \
-		--bucket="$(INFRA_BUCKET)";
+miro_inventory-publish:
+	$(call publish_lambda,miro_preprocessor,miro_inventory)

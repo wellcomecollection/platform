@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 miro_copy_s3_derivative_asset-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 	-v $(ROOT)/miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_derivative_asset/src:/data \
@@ -37,11 +39,6 @@ miro_copy_s3_asset-build: miro_copy_s3_master_asset-build miro_copy_s3_derivativ
 miro_copy_s3_asset-test: miro_copy_s3_derivative_asset-test miro_copy_s3_master_asset-test
 
 ## Publish miro_copy_s3_asset lambda
-miro_copy_s3_asset-publish: $(ROOT)/.docker/publish_lambda_zip
-	for l in miro_copy_s3_asset/miro_copy_s3_derivative_asset miro_copy_s3_asset/miro_copy_s3_master_asset; \
-    	do																		\
-    		$(ROOT)/builds/docker_run.py --aws -- 								\
-    			--volume $(ROOT):/repo 											\
-    			publish_lambda_zip 												\
-    			"miro_preprocessor/$$l/src" --key="lambdas/miro_preprocessor/$$l.zip" --bucket="$(INFRA_BUCKET)"; \
-    	done
+miro_copy_s3_asset-publish:
+	$(call publish_lambda,miro_preprocessor,miro_copy_s3_asset/miro_copy_s3_derivative_asset)
+	$(call publish_lambda,miro_preprocessor,miro_copy_s3_asset/miro_copy_s3_master_asset)

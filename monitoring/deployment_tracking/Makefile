@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build notify_old_deploys lambda
 notify_old_deploys-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,12 +24,8 @@ notify_old_deploys-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish notify_old_deploys lambda
-notify_old_deploys-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "monitoring/deployment_tracking/notify_old_deploys/src" \
-		--key="lambdas/deployment_tracking/notify_old_deploys.zip" \
-		--bucket="$(INFRA_BUCKET)"; \
+notify_old_deploys-publish:
+	$(call publish_lambda,monitoring,deployment_tracking/notify_old_deploys)
 
 ## Build service_deployment_status lambda
 service_deployment_status-build: $(ROOT)/.docker/python3.6_ci
@@ -45,12 +43,8 @@ service_deployment_status-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish service_deployment_status lambda
-service_deployment_status-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "monitoring/deployment_tracking/service_deployment_status/src" \
-		--key="lambdas/deployment_tracking/service_deployment_status.zip" \
-		--bucket="$(INFRA_BUCKET)"; \
+service_deployment_status-publish:
+	$(call publish_lambda,monitoring,deployment_tracking/service_deployment_status)
 
 ## Build all for deployment_tracking
 deployment_tracking-build: notify_old_deploys-build service_deployment_status-build
