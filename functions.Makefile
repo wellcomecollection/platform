@@ -14,7 +14,7 @@ define terraform_apply
 	make uptodate-git
 	make $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(SIERRA_ADAPTER)/terraform:/data \
+		--volume $(1):/data \
 		--env OP=apply \
 		terraform_ci:latest
 endef
