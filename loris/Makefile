@@ -4,7 +4,6 @@ LORIS = $(ROOT)/loris
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
-
 include $(ROOT)/functions.Makefile
 
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
@@ -39,8 +38,5 @@ loris-terraform-apply:
 cache_cleaner-build:
 	$(call build_image,cache_cleaner,loris/cache_cleaner/Dockerfile)
 
-cache_cleaner-publish: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
+cache_cleaner-publish: cache_cleaner-build
 	$(call publish_service,cache_cleaner)
-
-
-.PHONY: loris-build loris-run loris-publish
