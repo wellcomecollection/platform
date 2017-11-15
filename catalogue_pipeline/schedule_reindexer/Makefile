@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build schedule_reindexer lambda
 schedule_reindexer-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ schedule_reindexer-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish schedule_reindexer lambda
-schedule_reindexer-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "catalogue_pipeline/schedule_reindexer/src" \
-		--key="lambdas/catalogue_pipeline/schedule_reindexer.zip" \
-		--bucket="$(INFRA_BUCKET)";
+schedule_reindexer-publish:
+	$(call publish_lambda,catalogue_pipeline,schedule_reindexer)

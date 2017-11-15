@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build dynamo_to_sns lambda
 dynamo_to_sns-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ dynamo_to_sns-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish dynamo_to_sns lambda
-dynamo_to_sns-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/dynamo_to_sns/src" \
-		--key="lambdas/shared_infra/dynamo_to_sns.zip" \
-		--bucket="$(INFRA_BUCKET)";
+dynamo_to_sns-publish:
+	$(call publish_lambda,shared_infra,dynamo_to_sns)

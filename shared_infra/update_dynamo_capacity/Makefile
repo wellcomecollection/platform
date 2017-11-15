@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build update_dynamo_capacity lambda
 update_dynamo_capacity-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ update_dynamo_capacity-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish update_dynamo_capacity lambda
-update_dynamo_capacity-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/update_dynamo_capacity/src" \
-		--key="lambdas/shared_infra/update_dynamo_capacity.zip" \
-		--bucket="$(INFRA_BUCKET)";
+update_dynamo_capacity-publish:
+	$(call publish_lambda,shared_infra,update_dynamo_capacity)
