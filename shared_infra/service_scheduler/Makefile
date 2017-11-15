@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build service_scheduler lambda
 service_scheduler-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ service_scheduler-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish service_scheduler lambda
-service_scheduler-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/service_scheduler/src" \
-		--key="lambdas/shared_infra/service_scheduler.zip" \
-		--bucket="$(INFRA_BUCKET)";
+service_scheduler-publish:
+	$(call publish_lambda,shared_infra,service_scheduler)

@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build update_task_for_config_change lambda
 update_task_for_config_change-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ update_task_for_config_change-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish update_task_for_config_change lambda
-update_task_for_config_change-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/update_task_for_config_change/src" \
-		--key="lambdas/shared_infra/update_task_for_config_change.zip" \
-		--bucket="$(INFRA_BUCKET)";
+update_task_for_config_change-publish:
+	$(call publish_lambda,shared_infra,update_task_for_config_change)

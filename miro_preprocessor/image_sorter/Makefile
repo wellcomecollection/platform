@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build image_sorter lambda
 image_sorter-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -21,9 +23,5 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish image_sorter lambda
-image_sorter-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "miro_preprocessor/image_sorter/src" \
-		--key="lambdas/miro_preprocessor/image_sorter.zip" \
-		--bucket="$(INFRA_BUCKET)";
+image_sorter-publish:
+	$(call publish_lambda,miro_preprocessor,image_sorter)

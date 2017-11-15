@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build docker image for gatling
 gatling-build: $(ROOT)/.docker/image_builder
 	$(ROOT)/builds/docker_run.py --dind -- \
@@ -34,12 +36,8 @@ gatling_to_cloudwatch-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish gatling_to_cloudwatch lambda
-gatling_to_cloudwatch-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "monitoring/load_test/gatling_to_cloudwatch/src" \
-		--key="lambdas/load_test/gatling_to_cloudwatch.zip" \
-		--bucket="$(INFRA_BUCKET)";
+gatling_to_cloudwatch-publish:
+	$(call publish_lambda,monitoring,load_test/gatling_to_cloudwatch)
 
 ## Build all for load_test
 load_test-build: gatling-build gatling_to_cloudwatch-build

@@ -28,12 +28,8 @@ post_to_slack-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish post_to_slack lambda
-post_to_slack-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "monitoring/post_to_slack/src" \
-		--key="lambdas/monitoring/post_to_slack.zip" \
-		--bucket="$(INFRA_BUCKET)"; \
+post_to_slack-publish:
+	$(call publish_lambda,monitoring,post_to_slack)
 
 ## Test monitoring
 monitoring-test: post_to_slack-test

@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build update_ecs_service_size lambda
 update_ecs_service_size-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ update_ecs_service_size-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish update_ecs_service_size lambda
-update_ecs_service_size-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/update_ecs_service_size/src" \
-		--key="lambdas/shared_infra/update_ecs_service_size.zip" \
-		--bucket="$(INFRA_BUCKET)";
+update_ecs_service_size-publish:
+	$(call publish_lambda,shared_infra,update_ecs_service_size)
