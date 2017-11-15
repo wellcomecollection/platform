@@ -3,22 +3,25 @@
 Publish a new Sierra update window to SNS.
 """
 
+import datetime as dt
 import os
+import time
 
 import boto3
-import maya
 
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
 def build_window(minutes):
     """Construct the Sierra update window."""
-    end = maya.now()
-    start = end.subtract(minutes=minutes)
+    seconds = minutes * 60
+
+    end = time.time()
+    start = end - seconds
 
     return {
-        'start': start.iso8601(),
-        'end': end.iso8601(),
+        'start': dt.datetime.fromtimestamp(start).isoformat(),
+        'end': dt.datetime.fromtimestamp(end).isoformat(),
     }
 
 

@@ -17,8 +17,8 @@ mock_time.return_value = time.mktime(dt.datetime(2011, 6, 21).timetuple())
 @mock.patch('time.time', mock_time)
 def test_build_window():
     assert build_window(minutes=15) == {
-        'start': '2011-06-20T23:45:00Z',
-        'end': '2011-06-21T00:00:00Z',
+        'start': '2011-06-20T23:45:00',
+        'end': '2011-06-21T00:00:00',
     }
 
 
@@ -42,6 +42,6 @@ def test_end_to_end(sns_sqs):
     parsed_message = json.loads(json.loads(inner_message)['default'])
 
     assert parsed_message == {
-        'start': '2011-06-20T23:35:00Z',
-        'end': '2011-06-21T00:00:00Z',
+        'start': '2011-06-20T23:35:00',
+        'end': '2011-06-21T00:00:00',
     }
