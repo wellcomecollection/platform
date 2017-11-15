@@ -3,6 +3,14 @@
 set -o errexit
 set -o nounset
 
+function build_lambda {
+  echo "Attempting to build lambda ..."
+
+  /app/build_lambda.sh
+
+  echo "Done."
+}
+
 function install_dependencies {
   echo "Installing dependencies ..."
 
@@ -36,6 +44,9 @@ function build_lock_file {
 if [[ "$OP" == "test" ]]
 then
   run_tests
+elif [[ "$OP" == "build-lambda" ]]
+then
+  build_lambda
 elif [[ "$OP" == "build-lock-file" ]]
 then
   build_lock_file

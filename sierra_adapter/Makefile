@@ -24,5 +24,8 @@ sierra_adapter-terraform-plan:
 sierra_adapter-terraform-apply:
 	$(call terraform_apply,$(SIERRA_ADAPTER))
 
+sierra_adapter-publish:
+	echo "Nothing to do!"
+
 
 .PHONY: sierra_adapter-terraform-plan sierra_adapter-terraform-apply
