@@ -8,13 +8,6 @@ endif
 
 include $(ROOT)/functions.Makefile
 
-## Build update_ecs_service_size lambda
-update_ecs_service_size-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(SHARED_INFRA)/update_ecs_service_size:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
-
 ## Test update_ecs_service_size lambda
 update_ecs_service_size-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \

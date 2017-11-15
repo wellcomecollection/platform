@@ -8,13 +8,6 @@ endif
 
 include $(ROOT)/functions.Makefile
 
-## Build update_task_for_config_change lambda
-update_task_for_config_change-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(SHARED_INFRA)/update_task_for_config_change:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
-
 ## Test update_task_for_config_change lambda
 update_task_for_config_change-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
