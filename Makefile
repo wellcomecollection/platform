@@ -22,24 +22,25 @@ api_docs-deploy: api_docs-build
 	$(call publish_service,update_api_docs)
 
 
-nginx-build-api: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=api
 
-nginx-build-loris: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=loris
+define nginx_build_image
+	make $(ROOT)/.docker/image_builder
+	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=nginx --variant=$(1)
+endef
 
-nginx-build-services: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=services
+nginx-build-api:
+	$(call nginx_build_image,api)
 
-nginx-build-grafana: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=grafana
+nginx-build-loris:
+	$(call nginx_build_image,loris)
 
-## Build images for all of our nginx proxies
-nginx-build:	\
-	nginx-build-api \
-	nginx-build-loris \
-	nginx-build-services \
-    nginx-build-grafana
+nginx-build-services:
+	$(call nginx_build_image,services)
+
+nginx-build-grafana:
+	$(call nginx_build_image,grafana)
+
+nginx-build: nginx-build-api nginx-build-loris nginx-build-services nginx-build-grafana
 
 
 
@@ -55,12 +56,7 @@ nginx-deploy-services: nginx-build-services
 nginx-deploy-grafana: nginx-build-grafana
 	$(call publish_service,nginx_grafana)
 
-## Push images for all of our nginx proxies
-nginx-deploy:	\
-	nginx-deploy-api \
-	nginx-deploy-loris \
-	nginx-deploy-services \
-	nginx-deploy-grafana
+nginx-deploy: nginx-deploy-api nginx-deploy-loris nginx-deploy-services nginx-deploy-grafana
 
 
 .docker/sbt_test:
@@ -111,43 +107,22 @@ sbt-build-transformer: .docker/sbt_image_builder
 
 
 
-sbt-deploy-api: sbt-build-api $(ROOT)/.docker/publish_service_to_aws
+sbt-deploy-api: sbt-build-api
 	$(call publish_service,api)
 
-sbt-deploy-id_minter: sbt-build-id_minter $(ROOT)/.docker/publish_service_to_aws
+sbt-deploy-id_minter: sbt-build-id_minter
 	$(call publish_service,id_minter)
 
-sbt-deploy-ingestor: sbt-build-ingestor $(ROOT)/.docker/publish_service_to_aws
+sbt-deploy-ingestor: sbt-build-ingestor
 	$(call publish_service,ingestor)
 
-sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
+sbt-deploy-reindexer: sbt-build-reindexer
 	$(call publish_service,reindexer)
 
-sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
+sbt-deploy-transformer: sbt-build-transformer
 	$(call publish_service,transformer)
 
-format: \
-	format-terraform \
-	format-scala
+format: format-terraform format-scala
 
 check-format: format lint-python lint-ontologies
 	git diff --exit-code
-
-
-.PHONY: help format check-format
-
-## Display this help text
-help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383502660
-	$(info Available targets)
-	@awk '/^[a-zA-Z\-\_0-9\/]+:/ {                                      \
-		nb = sub( /^## /, "", helpMsg );                                \
-		if(nb == 0) {                                                   \
-			helpMsg = $$0;                                              \
-			nb = sub( /^[^:]*:.* ## /, "", helpMsg );                   \
-		}                                                               \
-		if (nb)                                                         \
-			printf "\033[1;31m%-" width "s\033[0m %s\n", $$1, helpMsg;  \
-	}                                                                   \
-	{ helpMsg = $$0 }'                                                  \
-	width=30                                                            \
-	$(MAKEFILE_LIST)

@@ -4,10 +4,8 @@ export CATALOGUE_PIPELINE = $(ROOT)/catalogue_pipeline
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
-
 include $(ROOT)/functions.Makefile
 
-## Test schedule_reindexer lambda
 schedule_reindexer-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(CATALOGUE_PIPELINE)/schedule_reindexer/src:/data \
@@ -15,6 +13,5 @@ schedule_reindexer-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
-## Publish schedule_reindexer lambda
 schedule_reindexer-publish:
 	$(call publish_lambda,catalogue_pipeline/schedule_reindexer)

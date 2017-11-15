@@ -1,5 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-INFRA_BUCKET = platform-infra
 SIERRA_WINDOW_GENERATOR = $(ROOT)/sierra_adapter/sierra_window_generator
 
 ifneq ($(ROOT), $(shell pwd))
