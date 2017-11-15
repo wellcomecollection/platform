@@ -14,8 +14,5 @@ xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
 		--env OP=test \
 		python3.6_ci:latest
 
-xml_to_json_converter-publish: xml_to_json_converter-build $(ROOT)/.docker/publish_service_to_aws
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
-		publish_service_to_aws:latest \
-		--project=xml_to_json_converter \
-		--infra-bucket=platform-infra
+xml_to_json_converter-publish: xml_to_json_converter-build
+	$(call publish_service,xml_to_json_converter)

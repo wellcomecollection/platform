@@ -13,8 +13,8 @@ gatling-build:
 	$(call build_image,gatling,monitoring/load_test/gatling/Dockerfile)
 
 ## Deploy docker image for gatling to ECR
-gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=gatling ./builds/publish_service.sh
+gatling-deploy: gatling-build
+	$(call publish_service,gatling)
 
 ## Test gatling_to_cloudwatch lambda
 gatling_to_cloudwatch-test: $(ROOT)/.docker/python3.6_ci
