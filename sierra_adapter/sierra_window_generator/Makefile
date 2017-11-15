@@ -6,5 +6,12 @@ ifneq ($(ROOT), $(shell pwd))
 endif
 
 
-$(SIERRA_WINDOW_GENERATOR)/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/requirements.in
+$(SIERRA_WINDOW_GENERATOR)/src/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/src/requirements.in
 	docker run --volume $(SIERRA_WINDOW_GENERATOR):/src micktwomey/pip-tools
+
+sierra_window_generator-test: $(ROOT)/.docker/python3.6_ci
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(SIERRA_WINDOW_GENERATOR)/src:/data \
+		--env OP=test \
+		--env FIND_MATCH_PATHS="/data" --tty \
+		python3.6_ci:latest
