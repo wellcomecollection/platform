@@ -8,6 +8,13 @@ endif
 
 include $(ROOT)/functions.Makefile
 
+## Build run_ecs_task lambda
+run_ecs_task-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(SHARED_INFRA)/run_ecs_task:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
 ## Test run_ecs_task lambda
 run_ecs_task-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
