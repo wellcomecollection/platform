@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build run_ecs_task lambda
 run_ecs_task-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ run_ecs_task-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish run_ecs_task lambda
-run_ecs_task-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/run_ecs_task/src" \
-		--key="lambdas/shared_infra/run_ecs_task.zip" \
-		--bucket="$(INFRA_BUCKET)";
+run_ecs_task-publish:
+	$(call publish_lambda,shared_infra,run_ecs_task)

@@ -6,6 +6,7 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
 include $(CATALOGUE_PIPELINE)/schedule_reindexer/Makefile
 
 ## Build catalogue_pipeline
@@ -17,17 +18,11 @@ catalogue_pipeline-test: schedule_reindexer-test
 ## Deploy catalogue_pipeline
 catalogue_pipeline-deploy: schedule_reindexer-publish
 
-catalogue_pipeline-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(CATALOGUE_PIPELINE):/data \
-		--env OP=plan \
-		terraform_ci:latest
+catalogue_pipeline-terraform-plan:
+	$(call terraform_plan,$(CATALOGUE_PIPELINE))
 
-catalogue_pipeline-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(CATALOGUE_PIPELINE):/data \
-		--env OP=apply \
-		terraform_ci:latest
+catalogue_pipeline-terraform-apply:
+	$(call terraform_apply,$(CATALOGUE_PIPELINE))
 
 
 .PHONY: catalogue_pipeline-terraform-plan catalogue_pipeline-terraform-apply

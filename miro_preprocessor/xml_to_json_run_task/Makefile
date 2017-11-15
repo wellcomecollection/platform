@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build xml_to_json_run_task lambda
 xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -21,9 +23,5 @@ xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish xml_to_json_run_task lambda
-xml_to_json_run_task-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "miro_preprocessor/xml_to_json_run_task/src" \
-		--key="lambdas/miro_preprocessor/xml_to_json_run_task.zip" \
-		--bucket="$(INFRA_BUCKET)";
+xml_to_json_run_task-publish:
+	$(call publish_lambda,miro_preprocessor,xml_to_json_run_task)

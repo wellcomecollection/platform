@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build drain_ecs_container_instance lambda
 drain_ecs_container_instance-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -22,9 +24,5 @@ drain_ecs_container_instance-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish drain_ecs_container_instance lambda
-drain_ecs_container_instance-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "shared_infra/drain_ecs_container_instance/src" \
-		--key="lambdas/shared_infra/drain_ecs_container_instance.zip" \
-		--bucket="$(INFRA_BUCKET)";
+drain_ecs_container_instance-publish:
+	$(call publish_lambda,shared_infra,drain_ecs_container_instance)

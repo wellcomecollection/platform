@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build miro_image_to_dynamo lambda
 miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -21,9 +23,5 @@ miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 ## Publish miro_image_to_dynamo lambda
-miro_image_to_dynamo-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "miro_preprocessor/miro_image_to_dynamo/src" \
-		--key="lambdas/miro_preprocessor/miro_image_to_dynamo.zip" \
-		--bucket="$(INFRA_BUCKET)";
+miro_image_to_dynamo-publish:
+	$(call publish_lambda,miro_preprocessor,miro_image_to_dynamo)
