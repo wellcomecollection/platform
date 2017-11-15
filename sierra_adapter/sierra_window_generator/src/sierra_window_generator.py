@@ -11,19 +11,31 @@ import maya
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
+def build_window(minutes):
+    """Construct the Sierra update window."""
+    end = maya.now()
+    start = end.subtract(minutes=minutes)
+
+    return {
+        'start': start.iso8601(),
+        'end': end.iso8601(),
+    }
+
+
 def main(event, _):
     print(f'event = {event!r}')
 
     topic_arn = os.environ['TOPIC_ARN']
-    window_start = os.environ['WINDOW_START']
+    window_length_minutes = int(os.environ['WINDOW_LENGTH_MINUTES'])
+    print(
+        f'topic_arn={topic_arn}, window_length_minutes={window_length_minutes}'
+    )
 
-    start = maya.when(window_start)
-    now = maya.now()
+    message = build_window(minutes=window_length_minutes)
 
-    message = {
-        'start': start.iso8601(),
-        'end': now.iso8601(),
-    }
-
-    client = boto3.client('sns')
-    publish_sns_message(client=client, topic_arn=topic_arn, message=message)
+    sns_client = boto3.client('sns')
+    publish_sns_message(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        message=message
+    )
