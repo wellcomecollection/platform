@@ -8,13 +8,6 @@ endif
 
 include $(ROOT)/functions.Makefile
 
-## Build service_scheduler lambda
-service_scheduler-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(SHARED_INFRA)/service_scheduler:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
-
 ## Test service_scheduler lambda
 service_scheduler-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
