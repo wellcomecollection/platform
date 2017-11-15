@@ -17,4 +17,4 @@ schedule_reindexer-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish schedule_reindexer lambda
 schedule_reindexer-publish:
-	$(call publish_lambda,catalogue_pipeline,schedule_reindexer)
+	$(call publish_lambda,catalogue_pipeline/schedule_reindexer)

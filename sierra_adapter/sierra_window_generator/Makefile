@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 
 $(SIERRA_WINDOW_GENERATOR)/src/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/src/requirements.in
 	docker run --volume $(SIERRA_WINDOW_GENERATOR):/src micktwomey/pip-tools
@@ -18,8 +20,4 @@ sierra_window_generator-test: $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 
 sierra_window_generator-publish: $(ROOT)/.docker/publish_lambda_zip
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT):/repo \
-		publish_lambda_zip "sierra_adapter/sierra_window_generator/src" \
-		--key="lambdas/sierra_adapter/sierra_window_generator.zip" \
-		--bucket="$(INFRA_BUCKET)";
+	$(call publish_lambda,sierra_adapter/sierra_window_generator)

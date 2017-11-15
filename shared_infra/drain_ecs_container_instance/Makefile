@@ -18,4 +18,4 @@ drain_ecs_container_instance-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish drain_ecs_container_instance lambda
 drain_ecs_container_instance-publish:
-	$(call publish_lambda,shared_infra,drain_ecs_container_instance)
+	$(call publish_lambda,shared_infra/drain_ecs_container_instance)

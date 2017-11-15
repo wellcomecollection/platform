@@ -30,7 +30,7 @@ gatling_to_cloudwatch-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish gatling_to_cloudwatch lambda
 gatling_to_cloudwatch-publish:
-	$(call publish_lambda,monitoring,load_test/gatling_to_cloudwatch)
+	$(call publish_lambda,monitoring/load_test/gatling_to_cloudwatch)
 
 ## Build all for load_test
 load_test-build: gatling-build

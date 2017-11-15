@@ -18,4 +18,4 @@ update_dynamo_capacity-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish update_dynamo_capacity lambda
 update_dynamo_capacity-publish:
-	$(call publish_lambda,shared_infra,update_dynamo_capacity)
+	$(call publish_lambda,shared_infra/update_dynamo_capacity)

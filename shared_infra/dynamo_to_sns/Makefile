@@ -18,4 +18,4 @@ dynamo_to_sns-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish dynamo_to_sns lambda
 dynamo_to_sns-publish:
-	$(call publish_lambda,shared_infra,dynamo_to_sns)
+	$(call publish_lambda,shared_infra/dynamo_to_sns)
