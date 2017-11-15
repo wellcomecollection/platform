@@ -6,13 +6,11 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
 
-## Run a plan on main stack
-catalogue_api-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		-v $(CATALOGUE_API)/terraform:/data \
-		-e OP=plan \
-		terraform_ci:latest
+
+catalogue_api-terraform-plan:
+	$(call terraform_plan,$(CATALOGUE_API)/terraform)
 
 ## Run an apply on main stack
 catalogue_api-terraform-apply: $(ROOT)/.docker/terraform_ci

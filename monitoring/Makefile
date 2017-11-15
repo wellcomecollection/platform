@@ -10,6 +10,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 ## Build post_to_slack lambda
 post_to_slack-build: $(ROOT)/.docker/python3.6_ci
 	docker run \
@@ -40,11 +42,8 @@ monitoring-test: post_to_slack-test
 monitoring-deploy: post_to_slack-publish
 
 ## Terraform plan on monitoring stack
-monitoring-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING):/data \
-		--env OP=plan \
-		terraform_ci:latest
+monitoring-terraform-plan:
+	$(call terraform_plan,$(MONITORING))
 
 ## Terraform apply on monitoring stack
 monitoring-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci

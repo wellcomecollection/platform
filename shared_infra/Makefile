@@ -6,6 +6,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 include $(SHARED_INFRA)/drain_ecs_container_instance/Makefile
 include $(SHARED_INFRA)/dynamo_to_sns/Makefile
 include $(SHARED_INFRA)/ecs_ec2_instance_tagger/Makefile
@@ -52,11 +54,8 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
                       sqs_redrive-publish
 
 ## Run a plan on shared_infra stack
-shared_infra-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-	-v $(SHARED_INFRA):/data \
-	-e OP=plan \
-	terraform_ci:latest
+shared_infra-terraform-plan:
+	$(call terraform_plan,$(SHARED_INFRA))
 
 ## Run an apply on shared_infra stack
 shared_infra-terraform-apply: $(ROOT)/.docker/terraform_ci

@@ -5,6 +5,8 @@ ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
 
+include $(ROOT)/functions.Makefile
+
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
 # with a newer version of pip-tools.
 $(LORIS)/requirements.txt: $(LORIS)/requirements.in $(ROOT)/.docker/python3.6_ci
@@ -30,12 +32,8 @@ loris-run: loris-build
 loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
 	PROJECT=loris $(ROOT)/builds/publish_service.sh
 
-loris-terraform-plan: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(LORIS)/terraform:/data \
-		--volume $(ROOT)/terraform:/terraform \
-		--env OP=plan \
-		terraform_ci:latest
+loris-terraform-plan:
+	$(call terraform_plan,$(LORIS)/terraform)
 
 loris-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
