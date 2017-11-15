@@ -21,11 +21,8 @@ catalogue_pipeline-deploy: schedule_reindexer-publish
 catalogue_pipeline-terraform-plan:
 	$(call terraform_plan,$(CATALOGUE_PIPELINE))
 
-catalogue_pipeline-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(CATALOGUE_PIPELINE):/data \
-		--env OP=apply \
-		terraform_ci:latest
+catalogue_pipeline-terraform-apply:
+	$(call terraform_apply,$(CATALOGUE_PIPELINE))
 
 
 .PHONY: catalogue_pipeline-terraform-plan catalogue_pipeline-terraform-apply

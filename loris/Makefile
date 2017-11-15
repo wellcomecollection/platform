@@ -35,12 +35,8 @@ loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
 loris-terraform-plan:
 	$(call terraform_plan,$(LORIS)/terraform)
 
-loris-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(LORIS)/terraform:/data \
-		--volume $(ROOT)/terraform:/terraform \
-		--env OP=apply \
-		terraform_ci:latest
+loris-terraform-apply:
+	$(call terraform_apply,$(LORIS)/terraform)
 
 
 cache_cleaner-build: $(ROOT)/.docker/image_builder

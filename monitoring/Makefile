@@ -46,11 +46,8 @@ monitoring-terraform-plan:
 	$(call terraform_plan,$(MONITORING))
 
 ## Terraform apply on monitoring stack
-monitoring-terraform-apply: uptodate-git $(ROOT)/.docker/terraform_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING):/data \
-		--env OP=apply \
-		terraform_ci:latest
+monitoring-terraform-apply:
+	$(call terraform_apply,$(MONITORING))
 
 
 .PHONY: post_to_slack-build post_to_slack-test post_to_slack-publish \
