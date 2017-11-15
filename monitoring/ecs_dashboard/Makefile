@@ -33,7 +33,7 @@ update_service_list-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish update_service_list lambda
 update_service_list-publish:
-	$(call publish_lambda,monitoring,ecs_dashboard/update_service_list)
+	$(call publish_lambda,monitoring/ecs_dashboard/update_service_list)
 
 ## Build all for ecs_dashboard
 ecs_dashboard-build:

@@ -18,4 +18,4 @@ update_task_for_config_change-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish update_task_for_config_change lambda
 update_task_for_config_change-publish:
-	$(call publish_lambda,shared_infra,update_task_for_config_change)
+	$(call publish_lambda,shared_infra/update_task_for_config_change)

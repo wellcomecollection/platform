@@ -16,4 +16,4 @@ xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish xml_to_json_run_task lambda
 xml_to_json_run_task-publish:
-	$(call publish_lambda,miro_preprocessor,xml_to_json_run_task)
+	$(call publish_lambda,miro_preprocessor/xml_to_json_run_task)

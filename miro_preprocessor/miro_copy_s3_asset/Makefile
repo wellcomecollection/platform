@@ -23,5 +23,5 @@ miro_copy_s3_asset-test: miro_copy_s3_derivative_asset-test miro_copy_s3_master_
 
 ## Publish miro_copy_s3_asset lambda
 miro_copy_s3_asset-publish:
-	$(call publish_lambda,miro_preprocessor,miro_copy_s3_asset/miro_copy_s3_derivative_asset)
-	$(call publish_lambda,miro_preprocessor,miro_copy_s3_asset/miro_copy_s3_master_asset)
+	$(call publish_lambda,miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_derivative_asset)
+	$(call publish_lambda,miro_preprocessor/miro_copy_s3_asset/miro_copy_s3_master_asset)
