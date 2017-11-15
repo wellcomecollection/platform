@@ -26,8 +26,8 @@ loris-run: loris-build
 		--env CONFIG_KEY=config/prod/loris.ini \
 		loris
 
-loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=loris $(ROOT)/builds/publish_service.sh
+loris-publish: loris-build
+	$(call publish_service,loris)
 
 loris-terraform-plan:
 	$(call terraform_plan,$(LORIS)/terraform)
@@ -40,7 +40,7 @@ cache_cleaner-build:
 	$(call build_image,cache_cleaner,loris/cache_cleaner/Dockerfile)
 
 cache_cleaner-publish: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=cache_cleaner ./builds/publish_service.sh
+	$(call publish_service,cache_cleaner)
 
 
 .PHONY: loris-build loris-run loris-publish

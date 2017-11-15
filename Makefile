@@ -12,14 +12,14 @@ include sierra_adapter/Makefile
 elasticdump-build:
 	$(call build_image,elasticdump,docker/elasticdump/Dockerfile)
 
-elasticdump-deploy: elasticdump-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=elasticdump ./builds/publish_service.sh
+elasticdump-deploy: elasticdump-build
+	$(call publish_service,elasticdump)
 
 api_docs-build:
 	$(call build_image,update_api_docs,docker/update_api_docs/Dockerfile)
 
-api_docs-deploy: api_docs-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=update_api_docs ./builds/publish_service.sh
+api_docs-deploy: api_docs-build
+	$(call publish_service,update_api_docs)
 
 
 nginx-build-api: $(ROOT)/.docker/image_builder
@@ -43,17 +43,17 @@ nginx-build:	\
 
 
 
-nginx-deploy-api: nginx-build-api $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_api ./builds/publish_service.sh
+nginx-deploy-api: nginx-build-api
+	$(call publish_service,nginx_api)
 
-nginx-deploy-loris: nginx-build-loris $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_loris ./builds/publish_service.sh
+nginx-deploy-loris: nginx-build-loris
+	$(call publish_service,nginx_loris)
 
-nginx-deploy-services: nginx-build-services $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_services ./builds/publish_service.sh
+nginx-deploy-services: nginx-build-services
+	$(call publish_service,nginx_services)
 
-nginx-deploy-grafana: nginx-build-grafana $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_grafana ./builds/publish_service.sh
+nginx-deploy-grafana: nginx-build-grafana
+	$(call publish_service,nginx_grafana)
 
 ## Push images for all of our nginx proxies
 nginx-deploy:	\
@@ -112,19 +112,19 @@ sbt-build-transformer: .docker/sbt_image_builder
 
 
 sbt-deploy-api: sbt-build-api $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=api ./builds/publish_service.sh
+	$(call publish_service,api)
 
 sbt-deploy-id_minter: sbt-build-id_minter $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=id_minter ./builds/publish_service.sh
+	$(call publish_service,id_minter)
 
 sbt-deploy-ingestor: sbt-build-ingestor $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=ingestor ./builds/publish_service.sh
+	$(call publish_service,ingestor)
 
 sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=reindexer ./builds/publish_service.sh
+	$(call publish_service,reindexer)
 
 sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=transformer ./builds/publish_service.sh
+	$(call publish_service,transformer)
 
 format: \
 	format-terraform \

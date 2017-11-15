@@ -23,8 +23,5 @@ sierra_objects_to_s3-test: sierra_objects_to_s3-build
 		--volume $(SIERRA_OBJECTS_TO_S3)/cassettes:/cassettes \
 		--tty sierra_objects_to_s3:test
 
-sierra_objects_to_s3-publish: $(ROOT)/.docker/publish_service_to_aws
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
-		publish_service_to_aws:latest \
-		--project=sierra_objects_to_s3 \
-		--infra-bucket=$(INFRA_BUCKET)
+sierra_objects_to_s3-publish:
+	$(call publish_service,sierra_objects_to_s3)

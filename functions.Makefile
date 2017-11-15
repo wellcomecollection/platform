@@ -1,5 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-
+INFRA_BUCKET = platform-infra
 
 # Run a 'terraform plan' step.
 #
@@ -54,4 +54,16 @@ endef
 define build_image
 	make $(ROOT)/.docker/image_builder
 	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=$(1) --file=$(2)
+endef
+
+
+# Publish a Docker image to ECR, and put its associated release ID in S3.
+#
+# Args:
+#   $1 - Name of the Docker image.
+#
+define publish_service
+	make $(ROOT)/.docker/publish_service_to_aws
+	$(ROOT)/builds/docker_run.py --aws --dind -- \
+		publish_service_to_aws --project="$(1)" --infra-bucket="$(INFRA_BUCKET)"
 endef
