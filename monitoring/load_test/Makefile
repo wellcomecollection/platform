@@ -9,16 +9,12 @@ endif
 include $(ROOT)/functions.Makefile
 
 ## Build docker image for gatling
-gatling-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- \
-		-v $(ROOT):/repo \
-		image_builder:latest \
-		--project=gatling \
-		--file=monitoring/load_test/gatling/Dockerfile
+gatling-build:
+	$(call build_image,gatling,monitoring/load_test/gatling/Dockerfile)
 
 ## Deploy docker image for gatling to ECR
-gatling-deploy: gatling-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=gatling ./builds/publish_service.sh
+gatling-deploy: gatling-build
+	$(call publish_service,gatling)
 
 ## Build gatling_to_cloudwatch lambda
 gatling_to_cloudwatch-build: $(ROOT)/.docker/python3.6_ci
@@ -37,7 +33,7 @@ gatling_to_cloudwatch-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish gatling_to_cloudwatch lambda
 gatling_to_cloudwatch-publish:
-	$(call publish_lambda,monitoring,load_test/gatling_to_cloudwatch)
+	$(call publish_lambda,monitoring/load_test/gatling_to_cloudwatch)
 
 ## Build all for load_test
 load_test-build: gatling-build gatling_to_cloudwatch-build

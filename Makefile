@@ -9,58 +9,54 @@ include ontologies/Makefile
 include sierra_adapter/Makefile
 
 
-elasticdump-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=elasticdump
+elasticdump-build:
+	$(call build_image,elasticdump,docker/elasticdump/Dockerfile)
 
-elasticdump-deploy: elasticdump-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=elasticdump ./builds/publish_service.sh
+elasticdump-deploy: elasticdump-build
+	$(call publish_service,elasticdump)
 
-api_docs-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=update_api_docs
+api_docs-build:
+	$(call build_image,update_api_docs,docker/update_api_docs/Dockerfile)
 
-api_docs-deploy: api_docs-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=update_api_docs ./builds/publish_service.sh
-
-
-nginx-build-api: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=api
-
-nginx-build-loris: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=loris
-
-nginx-build-services: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=services
-
-nginx-build-grafana: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- image_builder --project=nginx --variant=grafana
-
-## Build images for all of our nginx proxies
-nginx-build:	\
-	nginx-build-api \
-	nginx-build-loris \
-	nginx-build-services \
-    nginx-build-grafana
+api_docs-deploy: api_docs-build
+	$(call publish_service,update_api_docs)
 
 
 
-nginx-deploy-api: nginx-build-api $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_api ./builds/publish_service.sh
+define nginx_build_image
+	make $(ROOT)/.docker/image_builder
+	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=nginx --variant=$(1)
+endef
 
-nginx-deploy-loris: nginx-build-loris $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_loris ./builds/publish_service.sh
+nginx-build-api:
+	$(call nginx_build_image,api)
 
-nginx-deploy-services: nginx-build-services $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_services ./builds/publish_service.sh
+nginx-build-loris:
+	$(call nginx_build_image,loris)
 
-nginx-deploy-grafana: nginx-build-grafana $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=nginx_grafana ./builds/publish_service.sh
+nginx-build-services:
+	$(call nginx_build_image,services)
 
-## Push images for all of our nginx proxies
-nginx-deploy:	\
-	nginx-deploy-api \
-	nginx-deploy-loris \
-	nginx-deploy-services \
-	nginx-deploy-grafana
+nginx-build-grafana:
+	$(call nginx_build_image,grafana)
+
+nginx-build: nginx-build-api nginx-build-loris nginx-build-services nginx-build-grafana
+
+
+
+nginx-deploy-api: nginx-build-api
+	$(call publish_service,nginx_api)
+
+nginx-deploy-loris: nginx-build-loris
+	$(call publish_service,nginx_loris)
+
+nginx-deploy-services: nginx-build-services
+	$(call publish_service,nginx_services)
+
+nginx-deploy-grafana: nginx-build-grafana
+	$(call publish_service,nginx_grafana)
+
+nginx-deploy: nginx-deploy-api nginx-deploy-loris nginx-deploy-services nginx-deploy-grafana
 
 
 .docker/sbt_test:
@@ -111,43 +107,22 @@ sbt-build-transformer: .docker/sbt_image_builder
 
 
 
-sbt-deploy-api: sbt-build-api $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=api ./builds/publish_service.sh
+sbt-deploy-api: sbt-build-api
+	$(call publish_service,api)
 
-sbt-deploy-id_minter: sbt-build-id_minter $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=id_minter ./builds/publish_service.sh
+sbt-deploy-id_minter: sbt-build-id_minter
+	$(call publish_service,id_minter)
 
-sbt-deploy-ingestor: sbt-build-ingestor $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=ingestor ./builds/publish_service.sh
+sbt-deploy-ingestor: sbt-build-ingestor
+	$(call publish_service,ingestor)
 
-sbt-deploy-reindexer: sbt-build-reindexer $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=reindexer ./builds/publish_service.sh
+sbt-deploy-reindexer: sbt-build-reindexer
+	$(call publish_service,reindexer)
 
-sbt-deploy-transformer: sbt-build-transformer $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=transformer ./builds/publish_service.sh
+sbt-deploy-transformer: sbt-build-transformer
+	$(call publish_service,transformer)
 
-format: \
-	format-terraform \
-	format-scala
+format: format-terraform format-scala
 
 check-format: format lint-python lint-ontologies
 	git diff --exit-code
-
-
-.PHONY: help format check-format
-
-## Display this help text
-help: # Some kind of magic from https://gist.github.com/rcmachado/af3db315e31383502660
-	$(info Available targets)
-	@awk '/^[a-zA-Z\-\_0-9\/]+:/ {                                      \
-		nb = sub( /^## /, "", helpMsg );                                \
-		if(nb == 0) {                                                   \
-			helpMsg = $$0;                                              \
-			nb = sub( /^[^:]*:.* ## /, "", helpMsg );                   \
-		}                                                               \
-		if (nb)                                                         \
-			printf "\033[1;31m%-" width "s\033[0m %s\n", $$1, helpMsg;  \
-	}                                                                   \
-	{ helpMsg = $$0 }'                                                  \
-	width=30                                                            \
-	$(MAKEFILE_LIST)

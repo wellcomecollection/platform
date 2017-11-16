@@ -25,4 +25,4 @@ ecs_ec2_instance_tagger-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish ecs_ec2_instance_tagger lambda
 ecs_ec2_instance_tagger-publish:
-	$(call publish_lambda,shared_infra,ecs_ec2_instance_tagger)
+	$(call publish_lambda,shared_infra/ecs_ec2_instance_tagger)

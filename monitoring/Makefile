@@ -29,7 +29,7 @@ post_to_slack-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish post_to_slack lambda
 post_to_slack-publish:
-	$(call publish_lambda,monitoring,post_to_slack)
+	$(call publish_lambda,monitoring/post_to_slack)
 
 ## Test monitoring
 monitoring-test: post_to_slack-test

@@ -4,7 +4,6 @@ LORIS = $(ROOT)/loris
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
 endif
-
 include $(ROOT)/functions.Makefile
 
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
@@ -16,11 +15,8 @@ $(LORIS)/requirements.txt: $(LORIS)/requirements.in $(ROOT)/.docker/python3.6_ci
 		python3.6_ci:latest
 	touch $(LORIS)/requirements.txt
 
-loris-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- \
-		image_builder \
-		--project=loris \
-		--file=loris/Dockerfile
+loris-build:
+	$(call build_image,loris,loris/Dockerfile)
 
 loris-run: loris-build
 	$(ROOT)/builds/docker_run.py --aws -- \
@@ -29,8 +25,8 @@ loris-run: loris-build
 		--env CONFIG_KEY=config/prod/loris.ini \
 		loris
 
-loris-publish: loris-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=loris $(ROOT)/builds/publish_service.sh
+loris-publish: loris-build
+	$(call publish_service,loris)
 
 loris-terraform-plan:
 	$(call terraform_plan,$(LORIS)/terraform)
@@ -39,14 +35,8 @@ loris-terraform-apply:
 	$(call terraform_apply,$(LORIS)/terraform)
 
 
-cache_cleaner-build: $(ROOT)/.docker/image_builder
-	./builds/docker_run.py --dind -- \
-		image_builder \
-		--project=cache_cleaner \
-		--file=loris/cache_cleaner/Dockerfile
+cache_cleaner-build:
+	$(call build_image,cache_cleaner,loris/cache_cleaner/Dockerfile)
 
-cache_cleaner-publish: cache_cleaner-build $(ROOT)/.docker/publish_service_to_aws
-	PROJECT=cache_cleaner ./builds/publish_service.sh
-
-
-.PHONY: loris-build loris-run loris-publish
+cache_cleaner-publish: cache_cleaner-build
+	$(call publish_service,cache_cleaner)

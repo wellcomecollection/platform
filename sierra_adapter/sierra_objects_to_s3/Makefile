@@ -11,11 +11,8 @@ endif
 $(SIERRA_OBJECTS_TO_S3)/requirements.txt: $(SIERRA_OBJECTS_TO_S3)/requirements.in
 	docker run --volume $(SIERRA_OBJECTS_TO_S3):/src micktwomey/pip-tools
 
-sierra_objects_to_s3-build: $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- \
-		image_builder:latest \
-		--project=sierra_objects_to_s3 \
-		--file=sierra_adapter/sierra_objects_to_s3/Dockerfile
+sierra_objects_to_s3-build:
+	$(call build_image,sierra_objects_to_s3,sierra_adapter/sierra_objects_to_s3/Dockerfile)
 
 sierra_objects_to_s3-test: sierra_objects_to_s3-build
 	docker build \
@@ -26,8 +23,5 @@ sierra_objects_to_s3-test: sierra_objects_to_s3-build
 		--volume $(SIERRA_OBJECTS_TO_S3)/cassettes:/cassettes \
 		--tty sierra_objects_to_s3:test
 
-sierra_objects_to_s3-publish: $(ROOT)/.docker/publish_service_to_aws
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
-		publish_service_to_aws:latest \
-		--project=sierra_objects_to_s3 \
-		--infra-bucket=$(INFRA_BUCKET)
+sierra_objects_to_s3-publish:
+	$(call publish_service,sierra_objects_to_s3)

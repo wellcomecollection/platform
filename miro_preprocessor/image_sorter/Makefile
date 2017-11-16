@@ -24,4 +24,4 @@ image_sorter-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish image_sorter lambda
 image_sorter-publish:
-	$(call publish_lambda,miro_preprocessor,image_sorter)
+	$(call publish_lambda,miro_preprocessor/image_sorter)

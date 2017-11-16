@@ -24,4 +24,4 @@ miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish miro_image_to_dynamo lambda
 miro_image_to_dynamo-publish:
-	$(call publish_lambda,miro_preprocessor,miro_image_to_dynamo)
+	$(call publish_lambda,miro_preprocessor/miro_image_to_dynamo)
