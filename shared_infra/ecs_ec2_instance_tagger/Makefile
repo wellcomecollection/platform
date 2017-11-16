@@ -8,6 +8,13 @@ endif
 
 include $(ROOT)/functions.Makefile
 
+## Build ecs_ec2_instance_tagger lambda
+ecs_ec2_instance_tagger-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(SHARED_INFRA)/ecs_ec2_instance_tagger:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
 ## Test ecs_ec2_instance_tagger lambda
 ecs_ec2_instance_tagger-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
