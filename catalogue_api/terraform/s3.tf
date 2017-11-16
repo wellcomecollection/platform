@@ -23,12 +23,6 @@ resource "aws_s3_bucket" "miro-images-sync" {
   }
 }
 
-# This bucket needs to be removed when we transition to using wellcomecollection-miro-images-public
-resource "aws_s3_bucket" "miro_images_public" {
-  bucket = "miro-images-public"
-  acl    = "public-read"
-}
-
 resource "aws_s3_bucket" "cloudfront-logs" {
   bucket = "wellcome-platform-cloudfront-logs"
   acl    = "private"
