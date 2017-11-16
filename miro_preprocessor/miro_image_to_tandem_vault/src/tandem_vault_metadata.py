@@ -88,7 +88,7 @@ def lookup_contributor(d, contrib_map=None):
         return ''
 
     try:
-        contributor = contrib_map[contrib_code]
+        contributor = contrib_map[contrib_code.upper()]
     except KeyError:
         return ''
     else:
