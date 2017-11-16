@@ -60,7 +60,7 @@ def parse_args():
 if __name__ == '__main__':
     namespace, additional_args = parse_args()
 
-    cmd = ['docker', 'run']
+    cmd = ['docker', 'run', '--tty']
 
     if namespace.share_aws_creds:
         cmd += _aws_credentials_args()
