@@ -87,8 +87,12 @@ def lookup_contributor(d, contrib_map=None):
     except KeyError:
         return ''
 
+    # All the values in contrib_map are uppercase, but some of the
+    # Miro records have lowercase contrib codes.
+    contrib_code = contrib_code.upper()
+
     try:
-        contributor = contrib_map[contrib_code.upper()]
+        contributor = contrib_map[contrib_code]
     except KeyError:
         return ''
     else:
