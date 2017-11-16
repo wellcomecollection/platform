@@ -25,4 +25,4 @@ update_ecs_service_size-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish update_ecs_service_size lambda
 update_ecs_service_size-publish:
-	$(call publish_lambda,shared_infra,update_ecs_service_size)
+	$(call publish_lambda,shared_infra/update_ecs_service_size)

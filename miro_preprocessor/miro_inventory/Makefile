@@ -24,4 +24,4 @@ miro_inventory-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish miro_inventory lambda
 miro_inventory-publish:
-	$(call publish_lambda,miro_preprocessor,miro_inventory)
+	$(call publish_lambda,miro_preprocessor/miro_inventory)

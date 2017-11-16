@@ -25,4 +25,4 @@ service_scheduler-test: $(ROOT)/.docker/python3.6_ci
 
 ## Publish service_scheduler lambda
 service_scheduler-publish:
-	$(call publish_lambda,shared_infra,service_scheduler)
+	$(call publish_lambda,shared_infra/service_scheduler)
