@@ -12,6 +12,7 @@ include $(SHARED_INFRA)/drain_ecs_container_instance/Makefile
 include $(SHARED_INFRA)/dynamo_to_sns/Makefile
 include $(SHARED_INFRA)/ecs_ec2_instance_tagger/Makefile
 include $(SHARED_INFRA)/run_ecs_task/Makefile
+include $(SHARED_INFRA)/register_ecs_task/Makefile
 include $(SHARED_INFRA)/service_scheduler/Makefile
 include $(SHARED_INFRA)/update_dynamo_capacity/Makefile
 include $(SHARED_INFRA)/update_ecs_service_size/Makefile
