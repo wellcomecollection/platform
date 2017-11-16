@@ -65,9 +65,9 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
     message_data = json.loads(message)
 
     # Check this is an interesting message
-    if not 'AutoScalingGroupName' in message_data:
+    if 'AutoScalingGroupName' not in message_data:
         return
-    if not 'LifecycleHookName' in message_data:
+    if 'LifecycleHookName' not in message_data:
         return
 
     ec2_instance_id = message_data['EC2InstanceId']
