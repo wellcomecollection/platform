@@ -8,7 +8,7 @@ image_data = {
     'image_no_calc': 'image_no_calc',
     'image_title': "image_title",
     'image_award': 'image_award',
-    'image_innopac_id': "image_innopac_id",
+    'image_innopac_id': "<image_innopac_id>",
     'image_pub_author': "image_pub_author",
     'image_pub_title': "image_pub_title",
     'image_pub_publisher': "image_pub_publisher",
@@ -26,7 +26,7 @@ image_data = {
     'image_wellcome_publications': "image_wellcome_publications",
     'image_tech_scanned_by': "image_tech_scanned_by",
     'image_transparency_held': "Yes",
-    'image_related_images': "image_related_images",
+    'image_related_images': "<image_related_images>",
     # Usage
     'image_use_restrictions': 'image_use_restrictions',
     'image_copyright_cleared': 'Y',
@@ -48,20 +48,21 @@ expected_usage_text = \
     "Likely in copyright. Cleared for open access? Y\n" + \
     "May be sensitive or unsuitable for general use.\n"
 
-expected_caption_text = \
-    "image_no_calc\n" + \
-    "image_title, Sierra record number: image_innopac_id\n" + \
-    "image_pub_author, Bob Snappypic/Jim Photoguy, image_pub_title, image_pub_publisher, image_pub_date\n" + \
-    "image_pub_periodical, image_pub_volume, image_pub_issue, image_pub_page_no, image_pub_plate\n" + \
-    "image_image_desc\n" + \
-    "image_library_ref_department\n" + \
-    "image_pub_archive\n" + \
-    "image_library_dept\n" + \
-    "Used for exhibition: image_award\n" + \
-    "Used for Wellcome publication: image_wellcome_publications\n" + \
-    "Photographer: image_tech_scanned_by\n" + \
-    "Transparency held: Yes\n" + \
-    "image_related_images"
+expected_caption_text = '\n'.join([
+    "image_no_calc",
+    "image_title",
+    "Sierra record number: b<image_innopac_id>",
+    "image_pub_author, Bob Snappypic/Jim Photoguy, image_pub_title, image_pub_publisher, image_pub_date",
+    "image_pub_periodical, image_pub_volume, image_pub_issue, image_pub_page_no, image_pub_plate",
+    "image_image_desc",
+    "image_pub_archive",
+    "image_library_dept",
+    "Used for exhibition: image_award",
+    "Used for Wellcome publication: image_wellcome_publications",
+    "Photographer: image_tech_scanned_by",
+    "Transparency held: Yes",
+    "Related images: <image_related_images>",
+])
 
 expected_creator_text = "Bob Snappypic/Jim Photoguy"
 
