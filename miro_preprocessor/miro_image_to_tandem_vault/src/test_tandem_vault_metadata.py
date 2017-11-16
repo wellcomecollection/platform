@@ -89,11 +89,6 @@ expected_tags = [
 ]
 
 
-def test_create_usage():
-    actual_text = tandem_vault_metadata.create_usage(image_data)
-    assert actual_text == expected_usage_text
-
-
 def test_create_caption():
     actual_text = tandem_vault_metadata.create_caption(image_data)
     assert actual_text == expected_caption_text
@@ -146,6 +141,7 @@ def test_lookup_contributor(metadata, expected_contributor):
 
 
 @pytest.mark.parametrize('metadata, expected_usage', [
+    (image_data, expected_usage_text),
     ({}, ''),
     ({'image_use_restrictions': 'Can only be used on Tuesdays.'},
      'Can only be used on Tuesdays.\n'),
