@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import pytest
 
 import tandem_vault_metadata
 
@@ -128,3 +129,17 @@ def test_create_metadata():
         "copyright": expected_copyright_text,
         "notes": expected_notes_text
     }
+
+
+@pytest.mark.parametrize('metadata, expected_contributor', [
+    ({}, ''),
+    ({'image_source_code': 'doesnotexist'}, ''),
+    ({'image_source_code': 'ABC'}, ''),
+    ({'image_source_code': 'WEL'}, 'Wellcome Collection'),
+    ({'image_source_code': 'wel'}, 'Wellcome Collection'),
+])
+def test_lookup_contributor(metadata, expected_contributor):
+    actual_contributor = tandem_vault_metadata.lookup_contributor(
+        metadata, contrib_map={'WEL': 'Wellcome Collection'}
+    )
+    assert actual_contributor == expected_contributor

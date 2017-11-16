@@ -78,22 +78,25 @@ def _contrib_map(bucket='miro-data', key='contrib_map.json'):
     return CONTRIB_MAP
 
 
-def lookup_contributor(d):
-    contrib_map = _contrib_map()
+def lookup_contributor(d, contrib_map=None):
+    if contrib_map is None:
+        contrib_map = _contrib_map()
 
-    if 'image_source_code' not in d:
-        return ""
+    try:
+        contrib_code = d['image_source_code']
+    except KeyError:
+        return ''
 
-    contrib_code = d['image_source_code']
+    # All the values in contrib_map are uppercase, but some of the
+    # Miro records have lowercase contrib codes.
+    contrib_code = contrib_code.upper()
 
-    if contrib_code not in contrib_map:
-        return ""
-
-    contributor = contrib_map[contrib_code]
-    if not contributor:
-        return ""
-
-    return contributor
+    try:
+        contributor = contrib_map[contrib_code]
+    except KeyError:
+        return ''
+    else:
+        return contributor or ''
 
 
 def _zip(d, a, b):
