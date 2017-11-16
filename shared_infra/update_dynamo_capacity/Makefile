@@ -8,6 +8,13 @@ endif
 
 include $(ROOT)/functions.Makefile
 
+## Build update_dynamo_capacity lambda
+update_dynamo_capacity-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(SHARED_INFRA)/update_dynamo_capacity:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
 ## Test update_dynamo_capacity lambda
 update_dynamo_capacity-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
