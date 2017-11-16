@@ -36,16 +36,6 @@ def filter_old_deployments(deployments, age_boundary_mins):
     )
 
 
-def publish_deployments(topic_arn, deployments):
-    if deployments:
-        sns_client = boto3.client('sns')
-        publish_sns_message(
-            sns_client=sns_client,
-            topic_arn=topic_arn,
-            message=deployments
-        )
-
-
 def main(event, _):
     print(f'event = {event!r}')
 
@@ -53,11 +43,18 @@ def main(event, _):
     topic_arn = os.environ["TOPIC_ARN"]
     age_boundary_mins = int(os.environ["AGE_BOUNDARY_MINS"])
 
+    sns_client = boto3.client('sns')
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
     deployments = get_deployments_from_dynamo(table)
     old_deployments = filter_old_deployments(deployments, age_boundary_mins)
-    publish_deployments(topic_arn, old_deployments)
+
+    if deployments:
+        publish_sns_message(
+            sns_client=sns_client,
+            topic_arn=topic_arn,
+            message=deployments
+        )
 
     print(f'old_deployments = {old_deployments!r}')
