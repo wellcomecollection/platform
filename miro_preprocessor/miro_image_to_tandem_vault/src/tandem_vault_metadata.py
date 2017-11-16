@@ -204,7 +204,7 @@ def create_usage(d):
     try:
         if d['image_copyright_info']:
             parts.append(
-                'This image has additional copyright information. '
+                'This image may have additional copyright information. '
                 'Please contact digitisation@wellcome.ac.uk.\n\n'
             )
     except KeyError:

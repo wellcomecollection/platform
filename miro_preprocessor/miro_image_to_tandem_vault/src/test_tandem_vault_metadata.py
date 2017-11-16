@@ -155,7 +155,7 @@ def test_lookup_contributor(metadata, expected_contributor):
      'May be sensitive or unsuitable for general use.\n'),
     ({'image_copyright_info': 'Copyright (C) Henry Wellcome',
       'image_general_use': 'N'},
-     'This image has additional copyright information. '
+     'This image may have additional copyright information. '
      'Please contact digitisation@wellcome.ac.uk.\n\n'
      'May be sensitive or unsuitable for general use.\n'),
 ])
