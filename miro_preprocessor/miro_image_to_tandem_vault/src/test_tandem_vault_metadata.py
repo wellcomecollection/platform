@@ -143,3 +143,25 @@ def test_lookup_contributor(metadata, expected_contributor):
         metadata, contrib_map={'WEL': 'Wellcome Collection'}
     )
     assert actual_contributor == expected_contributor
+
+
+@pytest.mark.parametrize('metadata, expected_usage', [
+    ({}, ''),
+    ({'image_use_restrictions': 'Can only be used on Tuesdays.'},
+     'Can only be used on Tuesdays.\n'),
+    ({'image_copyright_cleared': 'Y'},
+     'Likely in copyright. Cleared for open access? Y\n'),
+    ({'image_use_restrictions': 'Must be displayed upside down',
+      'image_copyright_cleared': 'Y'},
+     'Must be displayed upside down\n'
+     'Likely in copyright. Cleared for open access? Y\n'),
+    ({'image_general_use': 'N'},
+     'May be sensitive or unsuitable for general use.\n'),
+    ({'image_copyright_info': 'Copyright (C) Henry Wellcome',
+      'image_general_use': 'N'},
+     'This image has additional copyright information. '
+     'Please contact digitisation@wellcome.ac.uk.\n\n'
+     'May be sensitive or unsuitable for general use.\n'),
+])
+def test_create_usage(metadata, expected_usage):
+    assert tandem_vault_metadata.create_usage(metadata) == expected_usage
