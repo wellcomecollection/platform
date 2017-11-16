@@ -10,9 +10,8 @@ import org.scalatest._
 
 trait SierraWireMock extends BeforeAndAfterAll { this: Suite =>
 
-  lazy val recordingMode = false
-  lazy val oauthKey ="key"
-  lazy val oauthSecret= "secret"
+  lazy val oauthKey = sys.env.getOrElse("SIERRA_KEY", "key")
+  lazy val oauthSecret = sys.env.getOrElse("SIERRA_SECRET", "secret")
 
   private val port = 8089
   private val host = "localhost"
@@ -22,26 +21,17 @@ trait SierraWireMock extends BeforeAndAfterAll { this: Suite =>
 
   final val sierraWireMockUrl = s"http://$host:$port"
 
-  override def beforeAll(): Unit = {
-    wireMockServer.start()
-    WireMock.configureFor(host, port)
-    if(recordingMode){
-      println("Configuring recording")
-      wireMockServer.startRecording(recordSpec()
-        .forTarget(sierraUrl)
-        .ignoreRepeatRequests()
-        .captureHeader("Authentication"))
-      stubFor(proxyAllTo(sierraUrl).atPriority(1))
-    }
+  wireMockServer.start()
+  WireMock.configureFor(host, port)
 
-    super.beforeAll()
-  }
+  stubFor(proxyAllTo(sierraUrl).atPriority(100))
 
   override def afterAll(): Unit = {
-    if(recordingMode) {
-      wireMockServer.stopRecording
-      wireMockServer.saveMappings()
-    }
+    wireMockServer.snapshotRecord(
+      recordSpec().ignoreRepeatRequests()
+        .forTarget(sierraUrl)
+        .captureHeader("Authorization")
+    )
     wireMockServer.stop()
 
     super.afterAll()
@@ -49,9 +39,9 @@ trait SierraWireMock extends BeforeAndAfterAll { this: Suite =>
 
 
   private def determineMappingsFolder = {
+//    Horrible hack to make tests run in intelliJ understand where to find the mappings folder
     val file = new File(".").getAbsoluteFile
     val files = file.listFiles().filter(_.isDirectory)
-    val strings = files.map(_.getName)
     if (files.exists((f: File) =>f.getName == "sierra_to_dynamo")) {
       "sierra_to_dynamo/src/test/resources"
     }

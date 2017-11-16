@@ -1,0 +1,27 @@
+{
+  "id" : "51eb9359-fc12-446b-9731-d69bc9c8f77e",
+  "name" : "items",
+  "request" : {
+    "url" : "/items",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer fake-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "items-51eb9359-fc12-446b-9731-d69bc9c8f77e.json",
+    "headers" : {
+      "Date" : "Thu, 16 Nov 2017 16:08:54 GMT",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Set-Cookie" : [ "jcontainerId=.jcontainer-public1; path=/iii/stage", "jcontainerId=.jcontainer-public1; path=/iii/patronio", "jcontainerId=.jcontainer-public1; path=/iii/rss", "jcontainerId=.jcontainer-public1; path=/iii/webrpt", "jcontainerId=.jcontainer-public1; path=/iii/upgrademgr", "jcontainerId=.jcontainer-public1; path=/iii/sierra-api", "jcontainerId=.jcontainer-public1; path=/sierra/admin", "jcontainerId=.jcontainer-public1; path=/sierra/dashboard", "jcontainerId=.jcontainer-public1; path=/sierra/shindig", "jcontainerId=.jcontainer-public1; path=/iii/ws/extlink", "jcontainerId=.jcontainer-public1; path=/sierra/ws/summit" ],
+      "Vary" : "User-Agent",
+      "Keep-Alive" : "timeout=5, max=99",
+      "Connection" : "Keep-Alive"
+    }
+  },
+  "uuid" : "51eb9359-fc12-446b-9731-d69bc9c8f77e",
+  "persistent" : true
+}
