@@ -199,14 +199,25 @@ def _or(s1, s2):
 
 
 def create_usage(d):
-    parts = [
+    parts = []
+
+    try:
+        if d['image_copyright_info']:
+            parts.append(
+                'This image may have additional copyright information. '
+                'Please contact digitisation@wellcome.ac.uk.\n\n'
+            )
+    except KeyError:
+        pass
+
+    parts.extend([
         _followed_by_newline(d, 'image_use_restrictions'),
         _followed_by_newline(d, 'image_copyright_cleared', "Likely in copyright. Cleared for open access? "),
         _show_only_if_match_hide_value(
             d, 'image_general_use', 'N',
             'May be sensitive or unsuitable for general use.'
         ),
-    ]
+    ])
 
     return "".join(parts)
 
