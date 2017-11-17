@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.sierra_dynamo.utils.SierraWireMock
 
-class SierraRetrieverTest extends FunSpec with Matchers with SierraWireMock{
+class SierraRetrieverTest extends FunSpec with Matchers with SierraWireMock {
   val sierraRetriever = new SierraRetriever(sierraWireMockUrl, oauthKey, oauthSecret)
 
   it("should retrieve records from sierra") {
@@ -30,5 +30,13 @@ class SierraRetrieverTest extends FunSpec with Matchers with SierraWireMock{
       .whenScenarioStateIs("token refreshed"))
 
     sierraRetriever.getObjects("bibs") shouldNot be (empty)
+  }
+
+  it("should stop refreshing the token if sierra keeps returning unauthorized status") {
+    stubFor(get(urlMatching("/bibs")).willReturn(aResponse().withStatus(401)))
+
+    intercept[RuntimeException]{
+      sierraRetriever.getObjects("bibs")
+    }
   }
 }

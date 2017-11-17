@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.scalatest._
 
-trait SierraWireMock extends BeforeAndAfterAll { this: Suite =>
+trait SierraWireMock extends BeforeAndAfterAll with BeforeAndAfterEach{ this: Suite =>
 
   lazy val oauthKey = sys.env.getOrElse("SIERRA_KEY", "key")
   lazy val oauthSecret = sys.env.getOrElse("SIERRA_SECRET", "secret")
