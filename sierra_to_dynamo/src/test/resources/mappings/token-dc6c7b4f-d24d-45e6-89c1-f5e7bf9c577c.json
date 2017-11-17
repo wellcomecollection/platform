@@ -1,0 +1,29 @@
+{
+  "id" : "dc6c7b4f-d24d-45e6-89c1-f5e7bf9c577c",
+  "name" : "token",
+  "request" : {
+    "url" : "/token",
+    "method" : "POST",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Basic a2V5OnNlY3JldA=="
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"access_token\":\"fake-token2\",\"token_type\":\"bearer\",\"expires_in\":3600}",
+    "headers" : {
+      "Date" : "Fri, 17 Nov 2017 13:18:23 GMT",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Set-Cookie" : [ "jcontainerId=.jcontainer-public1; path=/iii/stage", "jcontainerId=.jcontainer-public1; path=/iii/patronio", "jcontainerId=.jcontainer-public1; path=/iii/rss", "jcontainerId=.jcontainer-public1; path=/iii/webrpt", "jcontainerId=.jcontainer-public1; path=/iii/upgrademgr", "jcontainerId=.jcontainer-public1; path=/iii/sierra-api", "jcontainerId=.jcontainer-public1; path=/sierra/admin", "jcontainerId=.jcontainer-public1; path=/sierra/dashboard", "jcontainerId=.jcontainer-public1; path=/sierra/shindig", "jcontainerId=.jcontainer-public1; path=/iii/ws/extlink", "jcontainerId=.jcontainer-public1; path=/sierra/ws/summit" ],
+      "Vary" : "User-Agent",
+      "Keep-Alive" : "timeout=5, max=99",
+      "Connection" : "Keep-Alive"
+    }
+  },
+  "uuid" : "dc6c7b4f-d24d-45e6-89c1-f5e7bf9c577c",
+  "persistent" : true,
+  "scenarioName" : "scenario-token",
+  "requiredScenarioState" : "scenario-token-2"
+}

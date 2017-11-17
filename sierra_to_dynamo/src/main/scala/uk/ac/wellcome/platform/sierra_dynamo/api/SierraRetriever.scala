@@ -26,6 +26,9 @@ class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
 
         items.toStream append getObjects(str, params + ("id" -> s"[${lastId + 1},]"))
       case 404 => Stream.empty
+      case 401 =>
+        token = refreshToken()
+        getObjects(str, params)
     }
   }
 

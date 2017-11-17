@@ -1,5 +1,5 @@
 {
-  "id" : "ae2d687c-8e99-4d84-ac5d-57337300cfbc",
+  "id" : "8be78772-0670-4bf7-bc54-dd9997eb6c74",
   "name" : "token",
   "request" : {
     "url" : "/token",
@@ -14,7 +14,7 @@
     "status" : 200,
     "body" : "{\"access_token\":\"fake-token\",\"token_type\":\"bearer\",\"expires_in\":3600}",
     "headers" : {
-      "Date" : "Thu, 16 Nov 2017 16:08:54 GMT",
+      "Date" : "Fri, 17 Nov 2017 13:18:23 GMT",
       "Content-Type" : "application/json;charset=UTF-8",
       "Set-Cookie" : [ "jcontainerId=.jcontainer-public2; path=/iii/stage", "jcontainerId=.jcontainer-public2; path=/iii/patronio", "jcontainerId=.jcontainer-public2; path=/iii/rss", "jcontainerId=.jcontainer-public2; path=/iii/webrpt", "jcontainerId=.jcontainer-public2; path=/iii/upgrademgr", "jcontainerId=.jcontainer-public2; path=/iii/sierra-api", "jcontainerId=.jcontainer-public2; path=/sierra/admin", "jcontainerId=.jcontainer-public2; path=/sierra/dashboard", "jcontainerId=.jcontainer-public2; path=/sierra/shindig", "jcontainerId=.jcontainer-public2; path=/iii/ws/extlink", "jcontainerId=.jcontainer-public2; path=/sierra/ws/summit" ],
       "Vary" : "User-Agent",
@@ -22,6 +22,9 @@
       "Connection" : "Keep-Alive"
     }
   },
-  "uuid" : "ae2d687c-8e99-4d84-ac5d-57337300cfbc",
-  "persistent" : true
+  "uuid" : "8be78772-0670-4bf7-bc54-dd9997eb6c74",
+  "persistent" : true,
+  "scenarioName" : "scenario-token",
+  "requiredScenarioState" : "Started",
+  "newScenarioState" : "scenario-token-2"
 }
