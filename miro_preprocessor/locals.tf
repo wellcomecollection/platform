@@ -7,8 +7,8 @@ locals {
   bucket_wellcomecollection_images_arn  = "${data.terraform_remote_state.shared_infra.bucket_wellcomecollection_images_arn}"
   bucket_wellcomecollection_images_name = "${data.terraform_remote_state.shared_infra.bucket_wellcomecollection_images_name}"
 
-  bucket_miro_images_public_arn  = "${data.terraform_remote_state.loris.bucket_wellcomecollectio_miro_images_public_arn}"
-  bucket_miro_images_public_name = "${data.terraform_remote_state.loris.bucket_wellcomecollectio_miro_images_public_id}"
+  bucket_miro_images_public_arn  = "${data.terraform_remote_state.loris.bucket_wellcomecollection_miro_images_public_arn}"
+  bucket_miro_images_public_name = "${data.terraform_remote_state.loris.bucket_wellcomecollection_miro_images_public_id}"
 
   bucket_miro_images_sync_arn  = "${data.terraform_remote_state.catalogue_api.bucket_miro_images_sync_arn}"
   bucket_miro_images_sync_name = "${data.terraform_remote_state.catalogue_api.bucket_miro_images_sync_id}"
