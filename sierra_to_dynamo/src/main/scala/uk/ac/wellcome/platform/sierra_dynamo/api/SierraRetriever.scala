@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.sierra_dynamo.api
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 
+import scala.annotation.tailrec
+import scala.util.parsing.json.JSONArray
 import scalaj.http.Http
+import scala.collection.JavaConversions._
 
 
 class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
@@ -10,11 +13,16 @@ class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
 
   var token: String = refreshToken()
 
-  def getObjects(str: String): JsonNode = {
-    println(token)
-    val response = Http(s"$apiUrl/$str").header("Authorization", s"Bearer $token").header("Accept", "application/json").asString
+  def getObjects(str: String, params: Map[String,String] = Map.empty): Stream[JsonNode] = {
+    val response = Http(s"$apiUrl/$str").params(params)
+      .header("Authorization", s"Bearer $token")
+      .header("Accept", "application/json").asString
 
-    mapper.readTree(response.body).path("entries")
+    val list = mapper.readTree(response.body).path("entries").elements()
+    val items = list.toList
+    val lastId = items.last.path("id").asInt()+1
+
+    items.toStream append getObjects(str, params + ("id" -> s"[$lastId,]"))
   }
 
   private def refreshToken() = {

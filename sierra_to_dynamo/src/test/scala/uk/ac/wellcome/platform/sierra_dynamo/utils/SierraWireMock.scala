@@ -28,7 +28,7 @@ trait SierraWireMock extends BeforeAndAfterAll { this: Suite =>
 
   override def afterAll(): Unit = {
     wireMockServer.snapshotRecord(
-      recordSpec().ignoreRepeatRequests()
+      recordSpec()
         .forTarget(sierraUrl)
         .captureHeader("Authorization")
     )
