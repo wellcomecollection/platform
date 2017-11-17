@@ -14,11 +14,6 @@ output "bucket_miro_images_sync_id" {
   value = "${aws_s3_bucket.miro-images-sync.id}"
 }
 
-# This should be removed when they are superseded by bucket_wellcomecollectio_miro_images_public_* below
-output "bucket_miro_images_public_arn" {
-  value = "${aws_s3_bucket.miro_images_public.arn}"
-}
-
 # Outputs required for Loris
 
 output "cloudfront_logs_domain_name" {
