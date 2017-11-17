@@ -53,8 +53,6 @@ data "aws_iam_policy_document" "miro_images_sync" {
     resources = [
       "${aws_s3_bucket.miro-images-sync.arn}/*",
       "${aws_s3_bucket.miro-images-sync.arn}",
-      "${aws_s3_bucket.miro_images_public.arn}/*",
-      "${aws_s3_bucket.miro_images_public.arn}",
     ]
   }
 
