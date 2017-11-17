@@ -18,11 +18,15 @@ class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
       .header("Authorization", s"Bearer $token")
       .header("Accept", "application/json").asString
 
-    val list = mapper.readTree(response.body).path("entries").elements()
-    val items = list.toList
-    val lastId = items.last.path("id").asInt()+1
+    response.code match {
+      case 200 =>
+        val list = mapper.readTree(response.body).path("entries").elements()
+        val items = list.toList
+        val lastId = items.last.path("id").asInt()
 
-    items.toStream append getObjects(str, params + ("id" -> s"[$lastId,]"))
+        items.toStream append getObjects(str, params + ("id" -> s"[${lastId + 1},]"))
+      case 404 => Stream.empty
+    }
   }
 
   private def refreshToken() = {
