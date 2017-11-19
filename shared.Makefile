@@ -49,15 +49,16 @@ $(ROOT)/.docker/publish_lambda_zip:
 
 # Project utility tasks
 
+## Run Python linting over the current directory
 lint-python:
 	docker run \
 		--volume $(CURRENT_DIR):/data \
 		--workdir /data \
-		greengloves/flake8 --exclude target --ignore=E501
+		wellcome/flake8:latest --exclude target --ignore=E501
 
 ## Run JSON linting over the current directory
 lint-js: $(ROOT)/.docker/jslint_ci
-	docker run -v $$(pwd):/data jslint_ci:latest
+	docker run -v $(CURRENT_DIR):/data wellcome/jslint:latest
 
 ## Check a git repo is up to date with remote master
 uptodate-git: $(ROOT)/.docker/python3.6_ci
