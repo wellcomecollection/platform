@@ -15,12 +15,6 @@ CURRENT_DIR = $(shell pwd)
 
 include $(ROOT)/builds/Makefile
 
-$(ROOT)/.docker/image_builder:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=image_builder \
-		--dir=builds \
-		--file=builds/image_builder.Dockerfile
-
 $(ROOT)/.docker/publish_service_to_aws:
 	$(ROOT)/builds/build_ci_docker_image.py \
 		--project=publish_service_to_aws \

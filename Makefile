@@ -22,12 +22,6 @@ api_docs-deploy: api_docs-build
 	$(call publish_service,update_api_docs)
 
 
-
-define nginx_build_image
-	make $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=nginx --variant=$(1)
-endef
-
 nginx-build-api:
 	$(call nginx_build_image,api)
 

@@ -50,8 +50,25 @@ endef
 #   $2 - Path to the Dockerfile, relative to the root of the repo.
 #
 define build_image
-	make $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=$(1) --file=$(2)
+	$(ROOT)/builds/docker_run.py \
+	    --dind -- \
+	    wellcome/image_builder:latest \
+            --project=$(1) \
+            --file=$(2)
+endef
+
+
+# Build and tag a Docker image (specifically for ngnix).
+#
+# Args:
+#   $1 - Name of the variant.
+#
+define nginx_build_image
+	$(ROOT)/builds/docker_run.py \
+		--dind -- \
+		wellcome/image_builder:latest \
+            --project=nginx \
+            --variant=$(1)
 endef
 
 
@@ -65,3 +82,4 @@ define publish_service
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		publish_service_to_aws --project="$(1)" --infra-bucket="$(INFRA_BUCKET)"
 endef
+
