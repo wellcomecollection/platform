@@ -38,7 +38,7 @@ define publish_lambda
 	make $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
-		publish_lambda_zip \
+		wellcome/publish_lambda:latest \
 		"$(1)/src" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)"
 endef
 
