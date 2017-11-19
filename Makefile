@@ -7,12 +7,10 @@ include miro_preprocessor/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
 include sierra_adapter/Makefile
+include nginx/Makefile
 
 
-elasticdump-build:
-	$(call build_image,elasticdump,docker/elasticdump/Dockerfile)
-
-elasticdump-deploy: elasticdump-build
+elasticdump-deploy:
 	$(call publish_service,elasticdump)
 
 api_docs-build:
@@ -20,37 +18,6 @@ api_docs-build:
 
 api_docs-deploy: api_docs-build
 	$(call publish_service,update_api_docs)
-
-
-nginx-build-api:
-	$(call nginx_build_image,api)
-
-nginx-build-loris:
-	$(call nginx_build_image,loris)
-
-nginx-build-services:
-	$(call nginx_build_image,services)
-
-nginx-build-grafana:
-	$(call nginx_build_image,grafana)
-
-nginx-build: nginx-build-api nginx-build-loris nginx-build-services nginx-build-grafana
-
-
-
-nginx-deploy-api: nginx-build-api
-	$(call publish_service,nginx_api)
-
-nginx-deploy-loris: nginx-build-loris
-	$(call publish_service,nginx_loris)
-
-nginx-deploy-services: nginx-build-services
-	$(call publish_service,nginx_services)
-
-nginx-deploy-grafana: nginx-build-grafana
-	$(call publish_service,nginx_grafana)
-
-nginx-deploy: nginx-deploy-api nginx-deploy-loris nginx-deploy-services nginx-deploy-grafana
 
 
 .docker/sbt_test:
