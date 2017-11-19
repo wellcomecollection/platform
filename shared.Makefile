@@ -30,9 +30,6 @@ $(ROOT)/.docker/publish_service_to_aws:
 $(ROOT)/.docker/jslint_ci:
 	$(ROOT)/builds/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
 
-$(ROOT)/.docker/terraform_ci:
-	$(ROOT)/builds/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
-
 $(ROOT)/.docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
 	mkdir -p $(ROOT)/.docker && touch $(ROOT)/.docker/_build_deps
