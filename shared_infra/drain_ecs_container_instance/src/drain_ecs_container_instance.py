@@ -27,6 +27,7 @@ def set_container_instance_to_draining(
         ],
         status='DRAINING'
     )
+
     print(f'Updating container instance response:\n{resp}')
 
 
@@ -35,21 +36,25 @@ def continue_lifecycle_action(
         asg_group_name,
         ec2_instance_id,
         lifecycle_hook_name):
-
-    resp = asg_client.complete_lifecycle_action(
+    response = asg_client.complete_lifecycle_action(
         LifecycleHookName=lifecycle_hook_name,
         AutoScalingGroupName=asg_group_name,
         LifecycleActionResult='CONTINUE',
         InstanceId=ec2_instance_id)
-    print(f'resp = {resp!r}')
+
+    print(f'response = {response!r}')
 
 
 def get_ec2_tags(ec2_client, ec2_instance_id):
-    ec2_instance_info = ec2_client.describe_instances(InstanceIds=[
-        ec2_instance_id,
-    ])
+    ec2_instance_info = ec2_client.describe_instances(
+        InstanceIds=[
+            ec2_instance_id,
+        ]
+    )
+
     tags = ec2_instance_info['Reservations'][0]['Instances'][0]['Tags']
     tag_dict = {t['Key']: t['Value'] for t in tags}
+
     print(f'tag_dict = {tag_dict!r}')
     return tag_dict
 
@@ -59,8 +64,15 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
     message = event['Records'][0]['Sns']['Message']
     message_data = json.loads(message)
 
+    # Check this is an interesting message
+    if 'AutoScalingGroupName' not in message_data:
+        return
+    if 'LifecycleHookName' not in message_data:
+        return
+
     ec2_instance_id = message_data['EC2InstanceId']
     asg_group_name = message_data['AutoScalingGroupName']
+
     lifecycle_hook_name = message_data['LifecycleHookName']
     lifecycle_transition = message_data['LifecycleTransition']
     lifecycle_action_token = message_data['LifecycleActionToken']
@@ -84,6 +96,7 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
             cluster=cluster_arn,
             containerInstance=ecs_container_instance_arn
         )
+
         print(f"running tasks: {running_tasks['taskArns']}")
 
         if not running_tasks['taskArns']:
@@ -112,9 +125,11 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
                 set_container_instance_to_draining(
                     ecs_client,
                     cluster_arn,
-                    ecs_container_instance_arn)
+                    ecs_container_instance_arn
+                )
 
             time.sleep(30)
+
             publish_sns_message(
                 sns_client=sns_client,
                 topic_arn=topic_arn,
@@ -124,6 +139,7 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
 
 def main(event, _):
     print(f'event = {event!r}')
+
     asg_client = boto3.client("autoscaling")
     ec2_client = boto3.client("ec2")
     ecs_client = boto3.client('ecs')
