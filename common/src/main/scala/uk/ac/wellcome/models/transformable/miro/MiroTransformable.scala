@@ -276,7 +276,7 @@ case class MiroTransformable(MiroID: String,
     * We prefer the per-image credit line, but use the contributor-level credit
     * if unavailable.
     */
-  private def getCopyright(miroData: MiroTransformableData): Option[String] = {
+  private def getCredit(miroData: MiroTransformableData): Option[String] = {
     miroData.creditLine match {
 
       // Some of the credit lines are inconsistent or use old names for
@@ -342,7 +342,7 @@ case class MiroTransformable(MiroID: String,
           Location(
             locationType = "iiif-image",
             url = Some(buildImageApiURL(MiroID, "info")),
-            copyright = getCopyright(miroData),
+            credit = getCredit(miroData),
             license = chooseLicense(miroData.useRestrictions.get)
           )
         )

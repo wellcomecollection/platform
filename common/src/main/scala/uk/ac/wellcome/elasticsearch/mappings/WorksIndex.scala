@@ -37,7 +37,7 @@ class WorksIndex @Inject()(client: HttpClient,
       keywordField("type"),
       keywordField("locationType"),
       textField("url"),
-      textField("copyright"),
+      textField("credit"),
       license
     )
 
