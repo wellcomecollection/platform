@@ -35,7 +35,7 @@ post_to_slack-publish:
 monitoring-test: post_to_slack-test
 
 ## Publish monitoring
-monitoring-deploy: post_to_slack-publish
+monitoring-deploy: post_to_slack-publish deployment_tracking-deploy ecs_dashboard-deploy load_test-deploy
 
 ## Terraform plan on monitoring stack
 monitoring-terraform-plan:
