@@ -79,10 +79,6 @@ env:
     - TASK=cache_cleaner-build
 
     # Monitoring stack
-    - TASK=gatling-build
-    - TASK=deployment_tracking-test
-    - TASK=ecs_dashboard-test
-    - TASK=load_test-test
     - TASK=monitoring-test
 
     # Sierra adapter stack

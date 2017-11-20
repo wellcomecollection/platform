@@ -32,7 +32,7 @@ post_to_slack-publish:
 	$(call publish_lambda,monitoring/post_to_slack)
 
 ## Test monitoring
-monitoring-test: post_to_slack-test
+monitoring-test: post_to_slack-test deployment_tracking-test ecs_dashboard-test load_test-test
 
 ## Publish monitoring
 monitoring-deploy: post_to_slack-publish deployment_tracking-deploy ecs_dashboard-deploy load_test-deploy
