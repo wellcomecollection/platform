@@ -257,10 +257,10 @@ class ApiWorksTest
   }
 
 
-  it("should include copyright information in API responses") {
+  it("should include credit information in API responses") {
     val location = Location(
       locationType = "thumbnail-image",
-      copyright = Some("Wellcome Collection"),
+      credit = Some("Wellcome Collection"),
       license = License_CCBY
     )
     val item = Item(
@@ -299,7 +299,7 @@ class ApiWorksTest
           |             "type": "${location.ontologyType}",
           |             "locationType": "${location.locationType}",
           |             "license": ${license(location.license)},
-          |             "copyright": "${location.copyright.get}"
+          |             "credit": "${location.credit.get}"
           |           }
           |         ]
           |       }
