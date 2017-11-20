@@ -28,12 +28,12 @@ resource "aws_cloudfront_distribution" "loris" {
         forward = "none"
       }
 
-      headers = ["User-Agent"]
+      headers = [ ]
     }
 
     viewer_protocol_policy = "redirect-to-https"
 
-    min_ttl     = 0
+    min_ttl     = 7200
     default_ttl = 315576000
     max_ttl     = 315576000
   }
