@@ -18,7 +18,7 @@ lint-turtle: $(ROOT)/.docker/lint_turtle
 	docker run --rm --volume $(ONTOLOGIES):/data --tty lint_turtle
 
 lint-json:
-	docker run --volume $(ROOT)/ontologies:/data jslint_ci:latest
+	docker run --volume $(ROOT)/ontologies:/data wellcome/jslint:latest
 
 lint-ontologies: lint-turtle lint-json
 
