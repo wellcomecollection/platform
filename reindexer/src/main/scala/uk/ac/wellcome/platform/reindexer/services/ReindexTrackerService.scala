@@ -70,7 +70,7 @@ class ReindexTrackerService @Inject()(
           s"Unable to read from $reindexTrackerTableName: $dynamoReadError")
       case None =>
         throw new RuntimeException(
-          s"No table matching $reindexTargetTableName found")
+          s"No table matching tableName=$reindexTargetTableName and reindexShard=$targetReindexShard found")
     }
   }
 }
