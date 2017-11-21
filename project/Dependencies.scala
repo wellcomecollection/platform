@@ -97,6 +97,8 @@ object Dependencies {
     "org.scalaj" %% "scalaj-http" % "2.3.0",
     "org.scalatest" %% "scalatest" % versions.scalatest % Test,
     "ch.qos.logback" % "logback-classic" % versions.logback,
-    "org.slf4j" % "slf4j-api" % "1.7.25"
+    "org.slf4j" % "slf4j-api" % "1.7.25",
+    "com.typesafe.akka" %% "akka-stream" % "2.5.6",
+    "com.typesafe.akka" %% "akka-stream-testkit" % "2.5.6" % Test
   ) ++ circeDependencies
 }
