@@ -61,6 +61,17 @@ class SierraStreamSourceTest
     }
   }
 
+  it("should return a sensible error message if it fails to authorize with the sierra api") {
+    stubFor(get(urlMatching("/bibs")).willReturn(aResponse().withStatus(401)))
+
+    val eventualJson = SierraSource(sierraWireMockUrl, oauthKey, oauthSecret)("bibs").take(1).runWith(Sink.head[Json])
+
+    whenReady(eventualJson.failed) { ex =>
+      ex shouldBe a [RuntimeException]
+      ex.getMessage should include ("Unauthorized")
+    }
+  }
+
 }
 
 trait ExtendedPatience extends PatienceConfiguration {

@@ -29,39 +29,37 @@ class SierraSource(apiUrl: String, oauthKey: String, oauthSecret: String)(
 
       setHandler(out,
         new OutHandler {
-          override def onPull(): Unit = {
-            if (jsonList.isEmpty) {
-              val newParams = lastId match {
-                case Some(id) =>
-                  params + ("id" -> s"[${id + 1},]")
-                case None => params
-              }
-
-              val response = makeRequest(apiUrl, resourceType, token, newParams)
-
-              response.code match {
-                case 200 => refreshJsonListAndPush(response)
-                case 404 => complete(out)
-                case 401 =>
-                  token = refreshToken(apiUrl, oauthKey, oauthSecret)
-                  val newResponse = makeRequest(apiUrl, resourceType, token, newParams)
-
-                  newResponse.code match {
-                    case 200 => refreshJsonListAndPush(newResponse)
-                    case 404 => complete(out)
-                  }
-              }
-            }else {
-              removeFromListAndPush()
+          override def onPull(): Unit =
+            jsonList match {
+              case Nil => makeRequestAndPush()
+              case _ => removeFromListAndPush()
             }
-          }
         }
       )
 
-      private def removeFromListAndPush(): Unit = {
-        val json = jsonList.head
-        jsonList = jsonList.tail
-        push(out, json)
+      private def makeRequestAndPush(): Unit = {
+        val newParams = lastId match {
+          case Some(id) =>
+            params + ("id" -> s"[${id + 1},]")
+          case None => params
+        }
+
+        makeRequestAndHandleResponseCode(newParams, ifUnauthorized = {
+          token = refreshToken(apiUrl, oauthKey, oauthSecret)
+          makeRequestAndHandleResponseCode(newParams, ifUnauthorized = {
+            fail(out, new RuntimeException("Unauthorized!"))
+          })
+        })
+      }
+
+      private def makeRequestAndHandleResponseCode[T](newParams: Map[String, String], ifUnauthorized: => Unit) = {
+        val newResponse = makeRequest(apiUrl, resourceType, token, newParams)
+
+        newResponse.code match {
+          case 200 => refreshJsonListAndPush(newResponse)
+          case 404 => complete(out)
+          case 401 => ifUnauthorized
+        }
       }
 
       private def refreshJsonListAndPush(response: HttpResponse[String]): Unit = {
@@ -78,6 +76,12 @@ class SierraSource(apiUrl: String, oauthKey: String, oauthSecret: String)(
             .toInt)
 
         removeFromListAndPush()
+      }
+
+      private def removeFromListAndPush(): Unit = {
+        val json = jsonList.head
+        jsonList = jsonList.tail
+        push(out, json)
       }
 
       private def refreshToken(apiUrl: String,
