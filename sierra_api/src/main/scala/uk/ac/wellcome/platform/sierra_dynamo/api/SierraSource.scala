@@ -23,7 +23,6 @@ class SierraSource(apiUrl: String, oauthKey: String, oauthSecret: String)(
     new GraphStageLogic(shape) {
 
       var token: String = refreshToken(apiUrl, oauthKey, oauthSecret)
-
       var lastId: Option[Int] = None
       var jsonList: List[Json] = Nil
 
@@ -31,34 +30,35 @@ class SierraSource(apiUrl: String, oauthKey: String, oauthSecret: String)(
         new OutHandler {
           override def onPull(): Unit =
             jsonList match {
-              case Nil => makeRequestAndPush()
+              case Nil => makeSierraRequestAndPush()
               case _ => removeFromListAndPush()
             }
         }
       )
 
-      private def makeRequestAndPush(): Unit = {
+      private def makeSierraRequestAndPush(): Unit = {
         val newParams = lastId match {
           case Some(id) =>
             params + ("id" -> s"[${id + 1},]")
           case None => params
         }
 
-        makeRequestAndHandleResponseCode(newParams, ifUnauthorized = {
+        makeRequestWith(newParams, ifUnauthorized = {
           token = refreshToken(apiUrl, oauthKey, oauthSecret)
-          makeRequestAndHandleResponseCode(newParams, ifUnauthorized = {
+          makeRequestWith(newParams, ifUnauthorized = {
             fail(out, new RuntimeException("Unauthorized!"))
           })
         })
       }
 
-      private def makeRequestAndHandleResponseCode[T](newParams: Map[String, String], ifUnauthorized: => Unit) = {
+      private def makeRequestWith[T](newParams: Map[String, String], ifUnauthorized: => Unit): Unit = {
         val newResponse = makeRequest(apiUrl, resourceType, token, newParams)
 
         newResponse.code match {
           case 200 => refreshJsonListAndPush(newResponse)
           case 404 => complete(out)
           case 401 => ifUnauthorized
+          case _ => fail(out, new RuntimeException("Unexpected Error"))
         }
       }
 
