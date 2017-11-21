@@ -34,8 +34,11 @@ lazy val id_minter = doSharedSetup(project)
 lazy val reindexer = doSharedSetup(project)
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
-lazy val sierra_to_dynamo = doSharedSetup(project)
-  .settings(libraryDependencies ++= Dependencies.sierraToDynamoDbDependencies)
+lazy val sierra_api = project
+  .settings(Common.settings: _*)
+  .settings(Revolver.settings: _*)
+  .enablePlugins(JavaAppPackaging)
+  .settings(libraryDependencies ++= Dependencies.sierraApiDependencies)
 
 lazy val root = (project in file("."))
   .aggregate(common,
@@ -43,4 +46,4 @@ lazy val root = (project in file("."))
              ingestor,
              transformer,
              id_minter,
-             reindexer)
+             reindexer, sierra_api)

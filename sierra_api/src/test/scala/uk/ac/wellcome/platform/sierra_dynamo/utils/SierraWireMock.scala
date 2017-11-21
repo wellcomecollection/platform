@@ -24,7 +24,11 @@ trait SierraWireMock extends BeforeAndAfterAll with BeforeAndAfterEach{ this: Su
   wireMockServer.start()
   WireMock.configureFor(host, port)
 
-  stubFor(proxyAllTo(sierraUrl).atPriority(100))
+  override def beforeEach(): Unit = {
+    WireMock.reset()
+    stubFor(proxyAllTo(sierraUrl).atPriority(100))
+    super.beforeEach()
+  }
 
   override def afterAll(): Unit = {
     wireMockServer.snapshotRecord(
@@ -42,8 +46,8 @@ trait SierraWireMock extends BeforeAndAfterAll with BeforeAndAfterEach{ this: Su
 //    Horrible hack to make tests run in intelliJ understand where to find the mappings folder
     val file = new File(".").getAbsoluteFile
     val files = file.listFiles().filter(_.isDirectory)
-    if (files.exists((f: File) =>f.getName == "sierra_to_dynamo")) {
-      "sierra_to_dynamo/src/test/resources"
+    if (files.exists((f: File) =>f.getName == "sierra_api")) {
+      "sierra_api/src/test/resources"
     }
     else "src/test/resources"
   }

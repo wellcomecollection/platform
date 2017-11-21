@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_dynamo.api
 
-import com.github.tomakehurst.wiremock.client.WireMock
+import javax.servlet.http.HttpServletRequest
+
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.scalatest.{FunSpec, Matchers}

@@ -91,8 +91,12 @@ object Dependencies {
     : Seq[ModuleID] = commonDependencies ++ mysqlDependencies ++ circeDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
-  val sierraToDynamoDbDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
+
+  val sierraApiDependencies: Seq[ModuleID] = Seq(
     "com.github.tomakehurst" % "wiremock" % "2.11.0" % Test,
-    "org.scalaj" %% "scalaj-http" % "2.3.0"
-  )
+    "org.scalaj" %% "scalaj-http" % "2.3.0",
+    "org.scalatest" %% "scalatest" % versions.scalatest % Test,
+    "ch.qos.logback" % "logback-classic" % versions.logback,
+    "org.slf4j" % "slf4j-api" % "1.7.25"
+  ) ++ circeDependencies
 }

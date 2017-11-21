@@ -1,20 +1,25 @@
 package uk.ac.wellcome.platform.sierra_dynamo.api
 
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import io.circe._
+import io.circe.optics.JsonPath.root
+import io.circe.parser._
+import org.slf4j.LoggerFactory
 
-import scala.collection.JavaConversions._
+import scala.util.Try
 import scalaj.http.{Http, HttpResponse}
 
 class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
-  val mapper = new ObjectMapper()
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   var token: String = refreshToken()
   val maxRetries = 1
 
-  def getObjects(str: String,
+  def getObjects(resourceType: String,
                  params: Map[String, String] = Map.empty,
-                 refreshTokenAttempt: Int = 0): Stream[JsonNode] = {
-    val response = Http(s"$apiUrl/$str")
+                 refreshTokenAttempt: Int = 0): Stream[Json] = {
+
+
+    val response = Http(s"$apiUrl/$resourceType")
       .params(params)
       .header("Authorization", s"Bearer $token")
       .header("Accept", "application/json")
@@ -22,21 +27,25 @@ class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
 
     response.code match {
       case 200 =>
-        buildNodeStream(str, params, response)
+        buildNodeStream(resourceType, params, response)
       case 404 => Stream.empty
       case 401 =>
-        refreshTokenAndRetry(str, params, refreshTokenAttempt)
+        refreshTokenAndRetry(resourceType, params, refreshTokenAttempt)
+      case errorCode =>
+        logger.error(s"Received error response: $errorCode ${response.body}")
+        throw new RuntimeException(response.body)
     }
   }
 
   private def buildNodeStream(str: String,
                               params: Map[String, String],
                               response: HttpResponse[String]) = {
-    val list = mapper.readTree(response.body).path("entries").elements()
-    val items = list.toList
-    val lastId = items.last.path("id").asInt()
+    val json = parse(response.body).right.getOrElse(throw new RuntimeException("response was not json"))
 
-    items.toStream append getObjects(str,
+    val list = root.entries.each.json.getAll(json)
+    val lastId = root.id.string.getOption(list.last).getOrElse(throw new RuntimeException("id not found in item")).toInt
+
+    list.toStream append getObjects(str,
                                      params + ("id" -> s"[${lastId + 1},]"))
   }
 
@@ -54,7 +63,8 @@ class SierraRetriever(apiUrl: String, oauthKey: String, oauthSecret: String) {
   private def refreshToken() = {
     val tokenResponse =
       Http(s"$apiUrl/token").postForm.auth(oauthKey, oauthSecret).asString
-    mapper.readTree(tokenResponse.body).path("access_token").asText()
+    val json = parse(tokenResponse.body).right.getOrElse(throw new RuntimeException("response was not json"))
+    root.access_token.string.getOption(json).get
   }
 
 }
