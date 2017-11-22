@@ -1,0 +1,27 @@
+{
+  "id" : "98489466-8f22-4559-8d26-19ba2c013dea",
+  "name" : "bibs",
+  "request" : {
+    "url" : "/bibs",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer fake-token2"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "bibs-98489466-8f22-4559-8d26-19ba2c013dea.json",
+    "headers" : {
+      "Date" : "Fri, 17 Nov 2017 13:18:23 GMT",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Set-Cookie" : [ "jcontainerId=.jcontainer-public2; path=/iii/stage", "jcontainerId=.jcontainer-public2; path=/iii/patronio", "jcontainerId=.jcontainer-public2; path=/iii/rss", "jcontainerId=.jcontainer-public2; path=/iii/webrpt", "jcontainerId=.jcontainer-public2; path=/iii/upgrademgr", "jcontainerId=.jcontainer-public2; path=/iii/sierra-api", "jcontainerId=.jcontainer-public2; path=/sierra/admin", "jcontainerId=.jcontainer-public2; path=/sierra/dashboard", "jcontainerId=.jcontainer-public2; path=/sierra/shindig", "jcontainerId=.jcontainer-public2; path=/iii/ws/extlink", "jcontainerId=.jcontainer-public2; path=/sierra/ws/summit" ],
+      "Vary" : "User-Agent",
+      "Keep-Alive" : "timeout=5, max=98",
+      "Connection" : "Keep-Alive"
+    }
+  },
+  "uuid" : "98489466-8f22-4559-8d26-19ba2c013dea",
+  "persistent" : true
+}

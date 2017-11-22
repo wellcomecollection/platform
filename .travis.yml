@@ -83,6 +83,7 @@ env:
 
     # Sierra adapter stack
     - TASK=sierra_adapter-test
+    - TASK=sbt-test-sierra_api
 
 
 # This has a Slack API token for posting messages about build failures to

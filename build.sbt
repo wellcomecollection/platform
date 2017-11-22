@@ -34,10 +34,16 @@ lazy val id_minter = doSharedSetup(project)
 lazy val reindexer = doSharedSetup(project)
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
+lazy val sierra_api = project
+  .settings(Common.settings: _*)
+  .settings(Revolver.settings: _*)
+  .enablePlugins(JavaAppPackaging)
+  .settings(libraryDependencies ++= Dependencies.sierraApiDependencies)
+
 lazy val root = (project in file("."))
   .aggregate(common,
              api,
              ingestor,
              transformer,
              id_minter,
-             reindexer)
+             reindexer, sierra_api)

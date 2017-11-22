@@ -80,6 +80,9 @@ sbt-test-ingestor: .docker/sbt_test
 sbt-test-reindexer: .docker/sbt_test
 	PROJECT=reindexer ./builds/test_sbt_project.sh
 
+sbt-test-sierra_api: .docker/sbt_test
+	PROJECT=sierra_api ./builds/test_sbt_project.sh
+
 sbt-test-transformer: .docker/sbt_test
 	PROJECT=transformer ./builds/test_sbt_project.sh
 
