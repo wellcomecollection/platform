@@ -58,20 +58,6 @@ define build_image
 endef
 
 
-# Build and tag a Docker image (specifically for ngnix).
-#
-# Args:
-#   $1 - Name of the variant.
-#
-define nginx_build_image
-	$(ROOT)/builds/docker_run.py \
-		--dind -- \
-		wellcome/image_builder:latest \
-            --project=nginx \
-            --variant=$(1)
-endef
-
-
 # Publish a Docker image to ECR, and put its associated release ID in S3.
 #
 # Args:

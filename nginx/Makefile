@@ -8,6 +8,19 @@ endif
 
 include $(ROOT)/functions.Makefile
 
+# Build and tag a Docker image (specifically for ngnix).
+#
+# Args:
+#   $1 - Name of the variant.
+#
+define nginx_build_image
+	$(ROOT)/builds/docker_run.py \
+		--dind -- \
+		wellcome/image_builder:latest \
+            --project=nginx \
+            --variant=$(1)
+endef
+
 nginx-build-api:
 	$(call nginx_build_image,api)
 
