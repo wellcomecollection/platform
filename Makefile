@@ -13,13 +13,6 @@ include nginx/Makefile
 elasticdump-deploy:
 	$(call publish_service,elasticdump)
 
-api_docs-build:
-	$(call build_image,update_api_docs,docker/update_api_docs/Dockerfile)
-
-api_docs-deploy: api_docs-build
-	$(call publish_service,update_api_docs)
-
-
 .docker/sbt_test:
 	./builds/build_ci_docker_image.py \
 		--project=sbt_test \
