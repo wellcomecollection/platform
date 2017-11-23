@@ -10,9 +10,6 @@ include sierra_adapter/Makefile
 include nginx/Makefile
 
 
-elasticdump-deploy:
-	$(call publish_service,elasticdump)
-
 api_docs-build:
 	$(call build_image,update_api_docs,docker/update_api_docs/Dockerfile)
 
