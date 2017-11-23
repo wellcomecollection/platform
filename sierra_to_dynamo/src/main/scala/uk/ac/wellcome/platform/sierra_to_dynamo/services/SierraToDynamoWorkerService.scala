@@ -15,7 +15,9 @@ class SierraToDynamoWorkerService @Inject()(
   metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
-  override def processMessage(message: SQSMessage): Future[Unit] =
+  override def processMessage(message: SQSMessage): Future[Unit] = {
     println(message)
+    Future.successful(())
+  }
 
 }

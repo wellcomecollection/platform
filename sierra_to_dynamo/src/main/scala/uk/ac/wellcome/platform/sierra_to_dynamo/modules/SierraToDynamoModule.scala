@@ -2,26 +2,25 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
+import uk.ac.wellcome.platform.sierra_to_dynamo.services.SierraToDynamoWorkerService
 
-object SierraToDynamoModule extends TwitterModule with TryBackoff {
+object SierraToDynamoModule extends TwitterModule {
 
   override def singletonStartup(injector: Injector) {
-    info("Starting SierraToDynamo module")
+    val workerService = injector.instance[SierraToDynamoWorkerService]
 
-    val actorSystem = injector.instance[ActorSystem]
-    run(() => start(), actorSystem)
-  }
+    workerService.runSQSWorker()
 
-  private def start() = {
-
+    super.singletonStartup(injector)
   }
 
   override def singletonShutdown(injector: Injector) {
-    info("Terminating SierraToDynamo")
-    cancelRun()
+    info("Terminating Sierra to Dynamo worker")
+
     val system = injector.instance[ActorSystem]
+    val workerService = injector.instance[SierraToDynamoWorkerService]
+
+    workerService.cancelRun()
     system.terminate()
   }
 }

@@ -93,6 +93,6 @@ object Dependencies {
   val reindexerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies
 
   val sierraToDynamoDepedencies: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "sierra_streams_source" % "0.1"
+    "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
   )
 }
