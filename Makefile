@@ -85,6 +85,9 @@ sbt-deploy-reindexer: sbt-build-reindexer
 sbt-deploy-transformer: sbt-build-transformer
 	$(call publish_service,transformer)
 
+sbt-deploy-sierra_to_dynamo:
+	echo "Hello world"
+
 format: format-terraform format-scala
 
 check-format: format lint-python lint-ontologies
