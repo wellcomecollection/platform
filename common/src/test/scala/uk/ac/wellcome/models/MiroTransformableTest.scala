@@ -787,7 +787,6 @@ class MiroTransformableCopyrightTest
     )
   }
 
-
   it("should use the uppercased version of the source_code if necessary") {
     transformRecordAndCheckCredit(
       data = s"""
@@ -805,6 +804,17 @@ class MiroTransformableCopyrightTest
         "image_credit_line": "The Wellcome Library, London"
       """,
       expectedCredit = Some("Wellcome Collection")
+    )
+  }
+
+  it("should correctly handle special characters in the contributor map") {
+    transformRecordAndCheckCredit(
+      data = s"""
+        "image_title": "A fanciful flurry of firs",
+        "image_credit_line": null,
+        "image_source_code": "FEI"
+      """,
+      expectedCredit = Some("Fernán Federici")
     )
   }
 
