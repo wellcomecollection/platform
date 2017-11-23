@@ -1,7 +1,10 @@
 import sbt.Keys._
 
-def doSharedSetup(project: Project) =
+import java.io.File
+
+def doSharedSetup(project: Project, folder: String) =
   project
+    .in(new File(folder))
     .dependsOn(common % "compile->compile;test->test")
     .settings(Common.settings: _*)
     .settings(Finatra.settings: _*)
@@ -16,22 +19,22 @@ lazy val common = project
   .enablePlugins(DockerComposePlugin)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
-lazy val api = doSharedSetup(project)
+lazy val api = doSharedSetup(project, "catalogue_api/api")
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
 
-lazy val ingestor = doSharedSetup(project)
+lazy val ingestor = doSharedSetup(project, "catalogue_pipeline/ingestor")
   .settings(Search.settings: _*)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
-lazy val transformer = doSharedSetup(project)
+lazy val transformer = doSharedSetup(project, "catalogue_pipeline/transformer")
   .settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
-lazy val id_minter = doSharedSetup(project)
+lazy val id_minter = doSharedSetup(project, "catalogue_pipeline/id_minter")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
-lazy val reindexer = doSharedSetup(project)
+lazy val reindexer = doSharedSetup(project, "catalogue_pipeline/reindexer")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
 lazy val root = (project in file("."))
