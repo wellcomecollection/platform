@@ -54,8 +54,6 @@ env:
     - TASK=nginx-build
 
     # (Not under active development)
-    # - TASK=tif-metadata-build
-    # - TASK=elasticdump-build
     # - TASK=api_docs-build
 
     # Catalogue pipeline stack
