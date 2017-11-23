@@ -10,7 +10,7 @@ lint-turtle:
 		--rm \
 		--volume $(ONTOLOGIES):/data \
 		--tty \
-		wellcome/turtleline:latest
+		wellcome/turtlelint:latest
 
 lint-json:
 	docker run \
