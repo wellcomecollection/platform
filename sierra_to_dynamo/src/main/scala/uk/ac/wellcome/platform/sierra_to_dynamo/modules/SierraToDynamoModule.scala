@@ -5,10 +5,10 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.TryBackoff
 
-object ReindexModule extends TwitterModule with TryBackoff {
+object SierraToDynamoModule extends TwitterModule with TryBackoff {
 
   override def singletonStartup(injector: Injector) {
-    info("Starting Reindexer module")
+    info("Starting SierraToDynamo module")
 
     val actorSystem = injector.instance[ActorSystem]
     run(() => start(), actorSystem)
@@ -19,7 +19,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
   }
 
   override def singletonShutdown(injector: Injector) {
-    info("Terminating Reindexer")
+    info("Terminating SierraToDynamo")
     cancelRun()
     val system = injector.instance[ActorSystem]
     system.terminate()
