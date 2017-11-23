@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.reindexer.locals
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -22,7 +22,6 @@ trait DynamoDBLocal
   val reindexTableName = "ReindexTracker"
   val reindexShard = "default"
 
-  deleteTables()
   createReindexTable()
   private val miroDataTable: CreateTableResult = createMiroDataTable()
   private val calmDataTable: CreateTableResult = createCalmDataTable()
@@ -99,13 +98,6 @@ trait DynamoDBLocal
         throw new Exception(
           s"Unable to clear the table $calmDataTableName error $a")
     }
-
-  private def deleteTables() = {
-    dynamoDbClient
-      .listTables()
-      .getTableNames
-      .foreach(tableName => dynamoDbClient.deleteTable(tableName))
-  }
 
   private def reindexShardDef =
     new AttributeDefinition()
