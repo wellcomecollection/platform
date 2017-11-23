@@ -49,7 +49,7 @@ sbt-test-transformer: .docker/sbt_test
 		--file=builds/sbt_image_builder.Dockerfile
 
 sbt-build-api: .docker/sbt_image_builder
-	TARGET=catatlogue_api/api \
+	TARGET=catalogue_api/api \
 	PROJECT=api ./builds/run_sbt_image_build.sh
 
 sbt-build-id_minter: .docker/sbt_image_builder
