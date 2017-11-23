@@ -1,5 +1,5 @@
 module "services_alb" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_alb?ref=v1.0.0"
+  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_alb?ref=ecs-sqs-autoscaling-policy"
   name    = "services"
   subnets = ["${module.vpc_services.subnets}"]
 

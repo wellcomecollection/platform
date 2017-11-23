@@ -116,6 +116,19 @@ module "transformer" {
   client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 }
 
+
+module "id_minter_sqs_appautoscaling" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_sqs_appautoscaling?ref=ecs-sqs-autoscaling-policy"
+  name    = "id_minter"
+
+  queue_name   = "${module.id_minter_queue.id}"
+  cluster_name = "${aws_ecs_cluster.services.name}"
+  service_name = "${module.id_minter.service_name}"
+
+  min_capacity = 0
+  max_capacity = 1
+}
+
 module "id_minter" {
   source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
   name               = "id_minter"
