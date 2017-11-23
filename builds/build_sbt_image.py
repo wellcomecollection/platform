@@ -4,12 +4,13 @@
 Build a Docker image for one of our sbt applications.
 
 Usage:
-  build_sbt_image.py --project=<PROJECT> [--env=<BUILD_ENV>]
+  build_sbt_image.py --project=<PROJECT> --target=<TARGET> [--env=<BUILD_ENV>]
   build_sbt_image.py -h | --help
 
 Options:
   -h --help                  Show this screen.
   --project=<PROJECT>        Name of the sbt project (e.g. api, transformer)
+  --target=<TARGET>          Location of the target folder
   --env=<BUILD_ENV>          Build environment (dev, prod, etc.)
 
 """
@@ -33,6 +34,8 @@ if __name__ == '__main__':
 
     # Read arguments from docopt
     project = args['--project']
+    target = args['--target']
+
     build_env = args['--env'] or PLATFORM_ENV
 
     print('*** Building sbt Docker image for %s' % project)
@@ -45,7 +48,7 @@ if __name__ == '__main__':
     print('*** Building the Scala binaries')
     subprocess.check_call(['sbt', 'project %s' % project, 'stage'])
 
-    source_target = os.path.join(ROOT, project, 'target', 'universal', 'stage')
+    source_target = os.path.join(ROOT, target, 'universal', 'stage')
     docker_root = os.path.join(ROOT, 'docker', 'scala_service')
     dest_target = os.path.join(docker_root, 'target', project)
 
