@@ -6,7 +6,7 @@ mysql:
   environment:
       - "MYSQL_ROOT_PASSWORD=password"
 sns:
-  image: alicefuzier/fake-sns
+  image: wellcome/fake-sns
   ports:
     - "9292:9292"
 sqs:

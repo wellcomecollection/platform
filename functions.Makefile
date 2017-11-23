@@ -8,11 +8,10 @@ INFRA_BUCKET = platform-infra
 #
 define terraform_plan
 	make uptodate-git
-	make $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(1):/data \
 		--env OP=plan \
-		terraform_ci:latest
+		wellcome/terraform_wrapper:latest
 endef
 
 
@@ -23,11 +22,10 @@ endef
 #
 define terraform_apply
 	make uptodate-git
-	make $(ROOT)/.docker/terraform_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(1):/data \
 		--env OP=apply \
-		terraform_ci:latest
+		wellcome/terraform_wrapper:latest
 endef
 
 
@@ -40,7 +38,7 @@ define publish_lambda
 	make $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
-		publish_lambda_zip \
+		wellcome/publish_lambda:latest \
 		"$(1)/src" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)"
 endef
 
@@ -52,8 +50,11 @@ endef
 #   $2 - Path to the Dockerfile, relative to the root of the repo.
 #
 define build_image
-	make $(ROOT)/.docker/image_builder
-	$(ROOT)/builds/docker_run.py --dind -- image_builder --project=$(1) --file=$(2)
+	$(ROOT)/builds/docker_run.py \
+	    --dind -- \
+	    wellcome/image_builder:latest \
+            --project=$(1) \
+            --file=$(2)
 endef
 
 
@@ -67,3 +68,4 @@ define publish_service
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		publish_service_to_aws --project="$(1)" --infra-bucket="$(INFRA_BUCKET)"
 endef
+

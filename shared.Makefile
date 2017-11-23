@@ -15,23 +15,11 @@ CURRENT_DIR = $(shell pwd)
 
 include $(ROOT)/builds/Makefile
 
-$(ROOT)/.docker/image_builder:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=image_builder \
-		--dir=builds \
-		--file=builds/image_builder.Dockerfile
-
 $(ROOT)/.docker/publish_service_to_aws:
 	$(ROOT)/builds/build_ci_docker_image.py \
 		--project=publish_service_to_aws \
 		--dir=builds \
 		--file=builds/publish_service_to_aws.Dockerfile
-
-$(ROOT)/.docker/jslint_ci:
-	$(ROOT)/builds/build_ci_docker_image.py --project=jslint_ci --dir=docker/jslint_ci
-
-$(ROOT)/.docker/terraform_ci:
-	$(ROOT)/builds/build_ci_docker_image.py --project=terraform_ci --dir=docker/terraform_ci
 
 $(ROOT)/.docker/_build_deps:
 	pip3 install --upgrade boto3 docopt
@@ -43,24 +31,19 @@ $(ROOT)/.docker/miro_adapter_tests:
 		--dir=miro_adapter \
 		--file=miro_adapter/miro_adapter_tests.Dockerfile
 
-$(ROOT)/.docker/publish_lambda_zip:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=publish_lambda_zip \
-		--dir=builds \
-		--file=builds/publish_lambda_zip.Dockerfile
-
 
 # Project utility tasks
 
+## Run Python linting over the current directory
 lint-python:
 	docker run \
 		--volume $(CURRENT_DIR):/data \
 		--workdir /data \
-		greengloves/flake8 --exclude target --ignore=E501
+		wellcome/flake8:latest --exclude target --ignore=E501
 
 ## Run JSON linting over the current directory
 lint-js: $(ROOT)/.docker/jslint_ci
-	docker run -v $$(pwd):/data jslint_ci:latest
+	docker run -v $(CURRENT_DIR):/data wellcome/jslint:latest
 
 ## Check a git repo is up to date with remote master
 uptodate-git: $(ROOT)/.docker/python3.6_ci
