@@ -42,8 +42,10 @@ lint-python:
 		wellcome/flake8:latest --exclude target --ignore=E501
 
 ## Run JSON linting over the current directory
-lint-js: $(ROOT)/.docker/jslint_ci
-	docker run -v $(CURRENT_DIR):/data wellcome/jslint:latest
+lint-js:
+	docker run \
+	--volume $(CURRENT_DIR):/data \
+	wellcome/jslint:latest
 
 ## Check a git repo is up to date with remote master
 uptodate-git: $(ROOT)/.docker/python3.6_ci
@@ -55,16 +57,10 @@ format-terraform:
 		--workdir /repo \
 		hashicorp/terraform:light fmt
 
-$(ROOT)/.docker/scalafmt:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=scalafmt \
-		--dir=builds \
-		--file=builds/scalafmt.Dockerfile
-
-format-scala: $(ROOT)/.docker/scalafmt
+format-scala:
 	$(ROOT)/builds/docker_run.py --sbt -- \
 		--volume $(ROOT):/repo \
-		scalafmt
+		wellcome/scalafmt
 
 
 clean:
