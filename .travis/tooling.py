@@ -64,10 +64,6 @@ def are_there_job_relevant_changes(changed_files, task):
     if task.startswith('sbt-'):
         reasons.extend(_are_there_sbt_relevant_changes(changed_files, task))
 
-    docker_images = os.listdir('docker')
-    if any(task.startswith(d) for d in docker_images):
-        reasons.extend(_are_there_docker_relevant_changes(changed_files, task))
-
     for project in os.listdir(ROOT):
         if task.startswith(project):
             if any(f.startswith('%s/' % project) for f in changed_files):
