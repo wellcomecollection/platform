@@ -46,7 +46,7 @@ if __name__ == '__main__':
     subprocess.check_call(['sbt', 'project %s' % project, 'stage'])
 
     source_target = os.path.join(ROOT, project, 'target', 'universal', 'stage')
-    docker_root = os.path.join(ROOT, 'docker', 'scala_service')
+    docker_root = os.path.join(ROOT, 'builds', 'scala_service')
     dest_target = os.path.join(docker_root, 'target', project)
 
     print('*** Copying build artefacts to %s from %s' % (dest_target, source_target))
