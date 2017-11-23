@@ -8,7 +8,6 @@ This is not intended to be run regularly, just as a one-off script.
 
 import json
 import os
-import re
 import subprocess
 
 import boto3
