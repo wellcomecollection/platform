@@ -11,31 +11,11 @@ import uk.ac.wellcome.models.{CalmTransformable, Reindex}
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
-  private val port = 45678
-  private val dynamoDBEndPoint = "http://localhost:" + port
 
-  private val accessKey = "access"
-  private val secretKey = "secret"
-  val dynamoDbLocalEndpointFlags: Map[String, String] =
-    Map(
-      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
-      "aws.region" -> "localhost",
-      "aws.accessKey" -> accessKey,
-      "aws.secretKey" -> secretKey
-    )
-
-  private val dynamoDBLocalCredentialsProvider =
-    new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials(accessKey, secretKey))
-
-  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
-    .standard()
-    .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
+trait DynamoDBLocal
+    extends BeforeAndAfterEach
+    with DynamoDBLocalClients { this: Suite =>
 
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
@@ -51,13 +31,6 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
     miroDataTable.getTableDescription.getLatestStreamArn
   val calmDataStreamArn: String =
     calmDataTable.getTableDescription.getLatestStreamArn
-
-  val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
-    .standard()
-    .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
