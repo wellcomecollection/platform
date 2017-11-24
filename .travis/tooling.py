@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import os
+import re
 import subprocess
 import sys
 
@@ -61,7 +62,7 @@ def are_there_job_relevant_changes(changed_files, task):
     if any(f.startswith('builds/') for f in changed_files):
         reasons.append('Changes to the build scripts')
 
-    if task.startswith('sbt-'):
+    if any(task.startswith(p) for p in _sbt_projects()):
         reasons.extend(_are_there_sbt_relevant_changes(changed_files, task))
 
     for project in os.listdir(ROOT):
@@ -70,6 +71,14 @@ def are_there_job_relevant_changes(changed_files, task):
                 reasons.append('Changes to %s/' % project)
 
     return reasons
+
+
+def _sbt_projects():
+    """Returns a list of sbt project names."""
+    for line in open(os.path.join(ROOT, 'build.sbt')):
+        m = re.match(r'lazy val (?P<project>[a-z_]+)', line)
+        if (m is not None) and (m.group('project') != 'root'):
+            yield m.group('project')
 
 
 def _are_there_sbt_relevant_changes(changed_files, task):
