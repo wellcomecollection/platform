@@ -91,4 +91,8 @@ object Dependencies {
     : Seq[ModuleID] = commonDependencies ++ mysqlDependencies ++ circeDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies
+
+  val sierraToDynamoDepedencies: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
+  )
 }

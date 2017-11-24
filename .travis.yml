@@ -82,6 +82,8 @@ env:
     # Sierra adapter stack
     - TASK=sierra_adapter-test
 
+    - TASK=sbt-test-sierra_to_dynamo
+
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
