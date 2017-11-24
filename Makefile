@@ -42,23 +42,23 @@ sbt-test-transformer: .docker/sbt_test
 		--file=builds/sbt_image_builder.Dockerfile
 
 sbt-build-api: .docker/sbt_image_builder
-	TARGET=catalogue_api/api \
+	TARGET=catalogue_api/api/target \
 	PROJECT=api ./builds/run_sbt_image_build.sh
 
 sbt-build-id_minter: .docker/sbt_image_builder
-	TARGET=catalogue_pipeline/id_minter \
+	TARGET=catalogue_pipeline/id_minter/target \
 	PROJECT=id_minter ./builds/run_sbt_image_build.sh
 
 sbt-build-ingestor: .docker/sbt_image_builder
-	TARGET=catalogue_pipeline/ingestor \
+	TARGET=catalogue_pipeline/ingestor/target \
 	PROJECT=ingestor ./builds/run_sbt_image_build.sh
 
 sbt-build-reindexer: .docker/sbt_image_builder
-	TARGET=catalogue_pipeline/reindexer \
+	TARGET=catalogue_pipeline/reindexer/target \
 	PROJECT=reindexer ./builds/run_sbt_image_build.sh
 
 sbt-build-transformer: .docker/sbt_image_builder
-	TARGET=catalogue_pipeline/transformer \
+	TARGET=catalogue_pipeline/transformer/target \
 	PROJECT=transformer ./builds/run_sbt_image_build.sh
 
 
