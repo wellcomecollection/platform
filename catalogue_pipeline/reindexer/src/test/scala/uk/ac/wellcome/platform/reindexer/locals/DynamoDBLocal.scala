@@ -1,4 +1,4 @@
-package uk.ac.wellcome.reindexer.locals
+package uk.ac.wellcome.platform.reindexer.locals
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -8,6 +8,7 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
+import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
 
@@ -41,7 +42,7 @@ trait DynamoDBLocal
   def generateMiroTransformablesInBatches(
     numberOfBatches: Int,
     reindexVersion: Int = 1): List[MiroTransformable] = {
-    import DynamoConstants._
+    import uk.ac.wellcome.test.utils.DynamoConstants._
 
     val bigString = "_" * maxDynamoItemSizeinKb
     val numberofRequiredPuts = (numberOfBatches * maxDynamoQueryResultSizeInKb) / maxDynamoItemSizeinKb
