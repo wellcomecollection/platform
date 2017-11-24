@@ -35,7 +35,6 @@ endef
 #   $1 - Path to the Lambda source, relative to the root of the repo.
 #
 define publish_lambda
-	make $(ROOT)/.docker/publish_lambda_zip
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
 		wellcome/publish_lambda:latest \
