@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.platform.reindexer.locals
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -8,34 +8,15 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.models.{CalmTransformable, Reindex}
+import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
 
-  private val port = 45678
-  private val dynamoDBEndPoint = "http://localhost:" + port
 
-  private val accessKey = "access"
-  private val secretKey = "secret"
-  val dynamoDbLocalEndpointFlags: Map[String, String] =
-    Map(
-      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
-      "aws.region" -> "localhost",
-      "aws.accessKey" -> accessKey,
-      "aws.secretKey" -> secretKey
-    )
-
-  private val dynamoDBLocalCredentialsProvider =
-    new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials(accessKey, secretKey))
-
-  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
-    .standard()
-    .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
+trait DynamoDBLocal
+    extends BeforeAndAfterEach
+    with DynamoDBLocalClients { this: Suite =>
 
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"
@@ -52,13 +33,6 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   val calmDataStreamArn: String =
     calmDataTable.getTableDescription.getLatestStreamArn
 
-  val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
-    .standard()
-    .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
-
   override def beforeEach(): Unit = {
     super.beforeEach()
     clearMiroTable()
@@ -69,7 +43,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach { this: Suite =>
   def generateMiroTransformablesInBatches(
     numberOfBatches: Int,
     reindexVersion: Int = 1): List[MiroTransformable] = {
-    import DynamoConstants._
+    import uk.ac.wellcome.test.utils.DynamoConstants._
 
     val bigString = "_" * maxDynamoItemSizeinKb
     val numberofRequiredPuts = (numberOfBatches * maxDynamoQueryResultSizeInKb) / maxDynamoItemSizeinKb

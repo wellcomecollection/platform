@@ -1,6 +1,7 @@
-package uk.ac.wellcome.utils
+package uk.ac.wellcome.reindexer.models
 
 import java.util
+import scala.collection.JavaConverters._
 
 import cats.free.Free
 import com.amazonaws.services.dynamodbv2.model.{AttributeValue, QueryResult}
@@ -8,27 +9,11 @@ import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.ops.{ScanamoOps, ScanamoOpsA}
 import com.gu.scanamo.request.ScanamoQueryRequest
 import com.gu.scanamo.{DynamoFormat, ScanamoFree}
-import com.twitter.inject.Logging
-import scala.collection.JavaConverters._
 
-object ScanamoUtils extends Logging {
-  def logAndFilterLeft[Y](rows: List[Either[DynamoReadError, Y]]) = {
-    rows.foreach {
-      case Left(e: DynamoReadError) => error(e.toString)
-      case _ => Unit
-    }
-
-    rows
-      .filter {
-        case Right(_) => true
-        case Left(_) => false
-      }
-      .flatMap(_.right.toOption)
-  }
-}
-
-// This code is mostly cribbed from https://github.com/guardian/scanamo/blob/v0.9.4/src/main/scala/com/gu/scanamo/DynamoResultStream.scala#L13
-// We need access to the results in batches to prevent OOM while processing large results sets, so the source is modified to allow this.
+// This code is mostly cribbed from
+// https://github.com/guardian/scanamo/blob/v0.9.4/src/main/scala/com/gu/scanamo/DynamoResultStream.scala#L13
+// We need access to the results in batches to prevent OOM while processing
+// large results sets, so the source is modified to allow this.
 object ScanamoQueryStream {
   type EvaluationKey = java.util.Map[String, AttributeValue]
 

@@ -34,6 +34,10 @@ sbt-test-reindexer: .docker/sbt_test
 sbt-test-transformer: .docker/sbt_test
 	PROJECT=transformer ./builds/test_sbt_project.sh
 
+sbt-test-sierra_to_dynamo: .docker/sbt_test
+	PROJECT=sierra_to_dynamo ./builds/test_sbt_project.sh
+
+
 
 .docker/sbt_image_builder:
 	./builds/build_ci_docker_image.py \
@@ -61,6 +65,9 @@ sbt-build-transformer: .docker/sbt_image_builder
 	TARGET=catalogue_pipeline/transformer/target \
 	PROJECT=transformer ./builds/run_sbt_image_build.sh
 
+sbt-build-sierra_to_dynamo: .docker/sbt_test
+	PROJECT=sierra_to_dynamo ./builds/run_sbt_image_build.sh
+
 
 
 sbt-deploy-api: sbt-build-api
@@ -77,6 +84,9 @@ sbt-deploy-reindexer: sbt-build-reindexer
 
 sbt-deploy-transformer: sbt-build-transformer
 	$(call publish_service,transformer)
+
+sbt-deploy-sierra_to_dynamo:
+	echo "Hello world"
 
 format: format-terraform format-scala
 
