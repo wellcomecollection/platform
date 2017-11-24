@@ -117,16 +117,22 @@ module "transformer" {
 }
 
 
-module "id_minter_sqs_appautoscaling" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_sqs_appautoscaling?ref=ecs-sqs-autoscaling-policy"
+module "id_minter_appautoscaling" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/app/ecs?ref=ecs-sqs-autoscaling-policy"
+  name    = "id_minter"
+
+  cluster_name = "${aws_ecs_cluster.services.name}"
+  service_name = "${module.id_minter.service_name}"
+}
+
+module "id_minter_sqs_autoscaling_alarms" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/sqs?ref=ecs-sqs-autoscaling-policy"
   name    = "id_minter"
 
   queue_name   = "${module.id_minter_queue.id}"
-  cluster_name = "${aws_ecs_cluster.services.name}"
-  service_name = "${module.id_minter.service_name}"
 
-  min_capacity = 0
-  max_capacity = 1
+  scale_up_arn = "${module.id_minter_appautoscaling.scale_up_arn}"
+  scale_down_arn = "${module.id_minter_appautoscaling.scale_down_arn}"
 }
 
 module "id_minter" {
