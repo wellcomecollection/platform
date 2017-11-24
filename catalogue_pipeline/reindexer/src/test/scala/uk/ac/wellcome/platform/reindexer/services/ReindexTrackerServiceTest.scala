@@ -5,7 +5,8 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.Reindex
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.test.utils.{DynamoDBLocal, ExtendedPatience}
+import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ReindexTrackerServiceTest
     extends FunSpec
