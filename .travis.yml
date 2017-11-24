@@ -54,7 +54,7 @@ env:
     - TASK=nginx-build
 
     # Catalogue pipeline stack
-    - TASK=common-test
+    - TASK=sbt-common-test
     - TASK=transformer-test
     - TASK=ingestor-test
     - TASK=id_minter-test
