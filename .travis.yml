@@ -53,18 +53,16 @@ env:
     - TASK=check-format
     - TASK=nginx-build
 
-    # (Not under active development)
-    # - TASK=api_docs-build
-
     # Catalogue pipeline stack
-    - TASK=sbt-test-common
-    - TASK=sbt-test-transformer
-    - TASK=sbt-test-ingestor
-    - TASK=sbt-test-id_minter
-    - TASK=sbt-test-reindexer
+    - TASK=common-test
+    - TASK=transformer-test
+    - TASK=ingestor-test
+    - TASK=id_minter-test
+    - TASK=reindexer-test
 
     # Catalogue API stack
-    - TASK=sbt-test-api
+    - TASK=api-test
+    # - TASK=api_docs-build  # (not under active development)
 
     # Miro preprocessor stack  (not under active development)
     # - TASK=miro_preprocessor-test
@@ -82,7 +80,7 @@ env:
     # Sierra adapter stack
     - TASK=sierra_adapter-test
 
-    - TASK=sbt-test-sierra_to_dynamo
+    - TASK=sierra_to_dynamo-test
 
 
 # This has a Slack API token for posting messages about build failures to
