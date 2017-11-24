@@ -16,11 +16,8 @@ import uk.ac.wellcome.platform.reindexer.services.{
   ReindexService,
   ReindexTargetService
 }
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  DynamoDBLocal,
-  ExtendedPatience
-}
+import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 
 import scala.concurrent.Future
 

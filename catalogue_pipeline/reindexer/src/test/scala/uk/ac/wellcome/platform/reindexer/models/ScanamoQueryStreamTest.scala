@@ -1,4 +1,4 @@
-package uk.ac.wellcome.utils
+package uk.ac.wellcome.reindexer.models
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
@@ -7,7 +7,8 @@ import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.test.utils.DynamoDBLocal
+import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
+import uk.ac.wellcome.test.utils.DynamoConstants._
 
 import scala.collection.mutable.ListBuffer
 
@@ -18,8 +19,6 @@ class ScanamoQueryStreamTest
     with IntegrationPatience
     with DynamoDBLocal
     with Matchers {
-
-  import uk.ac.wellcome.test.utils.DynamoConstants._
 
   val bigString = "_" * maxDynamoItemSizeinKb
 

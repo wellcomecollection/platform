@@ -3,11 +3,8 @@ package uk.ac.wellcome.platform.reindexer
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  DynamoDBLocal,
-  StartupLogbackOverride
-}
+import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, StartupLogbackOverride}
 
 class StartupTest
     extends FeatureTest
