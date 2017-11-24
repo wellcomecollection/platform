@@ -27,8 +27,6 @@ trait DynamoDBLocalClients { this: Suite =>
       "aws.secretKey" -> secretKey
     )
 
-  deleteTables()
-
   private val dynamoDBLocalCredentialsProvider =
     new AWSStaticCredentialsProvider(
       new BasicAWSCredentials(accessKey, secretKey))
@@ -46,11 +44,4 @@ trait DynamoDBLocalClients { this: Suite =>
     .withEndpointConfiguration(
       new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
     .build()
-
-  private def deleteTables() = {
-    dynamoDbClient
-      .listTables()
-      .getTableNames
-      .foreach(tableName => dynamoDbClient.deleteTable(tableName))
-  }
 }
