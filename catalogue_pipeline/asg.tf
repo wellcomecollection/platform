@@ -1,3 +1,20 @@
+module "services_cluster_asg_autoscaling" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/asg?ref=ecs-sqs-autoscaling-policy"
+  name    = "id_minter"
+
+  scalegroup_name = "${module.services_cluster_asg.asg_name}"
+}
+
+module "services_cluster_asg_cpureservation_autoscaling_alarms" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/cpureservation?ref=ecs-sqs-autoscaling-policy"
+  name    = "id_minter"
+
+  cluster_name = "${aws_ecs_cluster.services.name}"
+
+  scale_up_arn = "${module.services_cluster_asg_autoscaling.scale_up_arn}"
+  scale_down_arn = "${module.services_cluster_asg_autoscaling.scale_down_arn}"
+}
+
 module "services_cluster_asg" {
   source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=v1.0.0"
   asg_name              = "service-cluster"
@@ -21,6 +38,23 @@ module "services_cluster_asg" {
   sns_topic_arn         = "${local.ec2_terminating_topic_arn}"
   publish_to_sns_policy = "${local.ec2_terminating_topic_publish_policy}"
   alarm_topic_arn       = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
+}
+
+module "services_cluster_asg_on_demand_autoscaling" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/asg?ref=ecs-sqs-autoscaling-policy"
+  name    = "id_minter_on_demand"
+
+  scalegroup_name = "${module.services_cluster_asg_on_demand.asg_name}"
+}
+
+module "services_cluster_asg_on_demand_asg_totalinstances_autoscaling_alarms" {
+  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/asg_totalinstances?ref=ecs-sqs-autoscaling-policy"
+  name    = "id_minter_on_demand"
+
+  asg_name = "${module.services_cluster_asg.asg_name}"
+
+  scale_up_arn = "${module.services_cluster_asg_autoscaling.scale_up_arn}"
+  scale_down_arn = "${module.services_cluster_asg_autoscaling.scale_down_arn}"
 }
 
 module "services_cluster_asg_on_demand" {
