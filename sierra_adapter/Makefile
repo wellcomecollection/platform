@@ -12,6 +12,17 @@ endif
 
 include $(ROOT)/functions.Makefile
 
+
+sierra_to_dynamo-test: $(ROOT)/.docker/sbt_test
+	PROJECT=sierra_to_dynamo $(ROOT)/builds/test_sbt_project.sh
+
+sierra_to_dynamo-build: $(ROOT)/.docker/sbt_test
+	PROJECT=sierra_to_dynamo $(ROOT)./builds/run_sbt_image_build.sh
+
+sierra_to_dynamo-deploy:
+	echo "Hello world"
+
+
 sierra_adapter-test: sierra_objects_to_s3-test sierra_window_generator-test
 sierra_adapter-adapter-publish: sierra_objects_to_s3-publish sierra_window_generator-publish
 
