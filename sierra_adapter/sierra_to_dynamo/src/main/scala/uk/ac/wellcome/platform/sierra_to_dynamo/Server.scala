@@ -16,11 +16,15 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.sierra_to_dynamo SierraToDynamo"
-  override val modules =
-    Seq(PlatformDynamoConfigModule,
-        DynamoClientModule,
-        SierraToDynamoModule,
-        AkkaModule)
+  override val modules = Seq(
+    PlatformDynamoConfigModule,
+    DynamoClientModule,
+    SierraToDynamoModule,
+    AmazonCloudWatchModule,
+    SQSConfigModule,
+    SQSClientModule,
+    AkkaModule
+  )
 
   override def configureHttp(router: HttpRouter) {
     router
