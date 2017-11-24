@@ -18,5 +18,5 @@ sierra_window_generator-test: $(ROOT)/.docker/python3.6_ci
 		--env FIND_MATCH_PATHS="/data" --tty \
 		python3.6_ci:latest
 
-sierra_window_generator-publish: $(ROOT)/.docker/publish_lambda_zip
+sierra_window_generator-publish:
 	$(call publish_lambda,sierra_adapter/sierra_window_generator)
