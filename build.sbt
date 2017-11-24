@@ -37,7 +37,7 @@ lazy val id_minter = doSharedSetup(project, "catalogue_pipeline/id_minter")
 lazy val reindexer = doSharedSetup(project, "catalogue_pipeline/reindexer")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
-lazy val sierra_to_dynamo = doSharedSetup(project)
+lazy val sierra_to_dynamo = doSharedSetup(project, "sierra_adapter/sierra_to_dynamo")
   .settings(libraryDependencies ++= Dependencies.sierraToDynamoDepedencies)
 
 lazy val root = (project in file("."))
