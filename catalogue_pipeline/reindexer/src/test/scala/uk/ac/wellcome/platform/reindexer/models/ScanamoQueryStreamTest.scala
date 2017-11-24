@@ -7,7 +7,7 @@ import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.reindexer.locals.ReindexTrackerDynamoDBLocal
+import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.DynamoConstants._
 
 import scala.collection.mutable.ListBuffer
@@ -17,7 +17,7 @@ class ScanamoQueryStreamTest
     with BeforeAndAfterEach
     with Eventually
     with IntegrationPatience
-    with ReindexTrackerDynamoDBLocal
+    with DynamoDBLocal
     with Matchers {
 
   val bigString = "_" * maxDynamoItemSizeinKb
