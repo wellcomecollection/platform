@@ -6,11 +6,11 @@ module "transformer_appautoscaling" {
   service_name = "${module.transformer.service_name}"
 }
 
-module "tarnsformer_sqs_autoscaling_alarms" {
+module "transformer_sqs_autoscaling_alarms" {
   source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/sqs?ref=ecs-sqs-autoscaling-policy"
   name    = "transformer"
 
-  queue_name   = "${module.transformer.id}"
+  queue_name   = "${module.miro_transformer_queue.id}"
 
   scale_up_arn = "${module.transformer_appautoscaling.scale_up_arn}"
   scale_down_arn = "${module.transformer_appautoscaling.scale_down_arn}"

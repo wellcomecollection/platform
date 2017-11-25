@@ -1,6 +1,6 @@
 module "ingestor_appautoscaling" {
   source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/app/ecs?ref=ecs-sqs-autoscaling-policy"
-  name    = "transformer"
+  name    = "ingestor"
 
   cluster_name = "${aws_ecs_cluster.services.name}"
   service_name = "${module.transformer.service_name}"
