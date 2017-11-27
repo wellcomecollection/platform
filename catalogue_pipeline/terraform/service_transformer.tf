@@ -1,18 +1,18 @@
 module "transformer_appautoscaling" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/app/ecs?ref=ecs-sqs-autoscaling-policy"
-  name    = "transformer"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/app/ecs?ref=v1.1.0"
+  name   = "transformer"
 
   cluster_name = "${aws_ecs_cluster.services.name}"
   service_name = "${module.transformer.service_name}"
 }
 
 module "transformer_sqs_autoscaling_alarms" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/sqs?ref=ecs-sqs-autoscaling-policy"
-  name    = "transformer"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/sqs?ref=v1.1.0"
+  name   = "transformer"
 
-  queue_name   = "${module.miro_transformer_queue.id}"
+  queue_name = "${module.miro_transformer_queue.name}"
 
-  scale_up_arn = "${module.transformer_appautoscaling.scale_up_arn}"
+  scale_up_arn   = "${module.transformer_appautoscaling.scale_up_arn}"
   scale_down_arn = "${module.transformer_appautoscaling.scale_down_arn}"
 }
 

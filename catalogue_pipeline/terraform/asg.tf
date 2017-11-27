@@ -1,17 +1,17 @@
 module "services_cluster_asg_autoscaling" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/asg?ref=ecs-sqs-autoscaling-policy"
-  name    = "services_spot"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/asg?ref=v1.1.0"
+  name   = "services_spot"
 
   scalegroup_name = "${module.services_cluster_asg.asg_name}"
 }
 
 module "services_cluster_asg_cpureservation_autoscaling_alarms" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/cpureservation?ref=ecs-sqs-autoscaling-policy"
-  name    = "services_spot"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/cpureservation?ref=v1.1.0"
+  name   = "services_spot"
 
   cluster_name = "${aws_ecs_cluster.services.name}"
 
-  scale_up_arn = "${module.services_cluster_asg_autoscaling.scale_up_arn}"
+  scale_up_arn   = "${module.services_cluster_asg_autoscaling.scale_up_arn}"
   scale_down_arn = "${module.services_cluster_asg_autoscaling.scale_down_arn}"
 }
 
@@ -41,20 +41,20 @@ module "services_cluster_asg" {
 }
 
 module "services_cluster_asg_on_demand_autoscaling" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/asg?ref=ecs-sqs-autoscaling-policy"
-  name    = "services_on_demand"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/asg?ref=v1.1.0"
+  name   = "services_on_demand"
 
   scalegroup_name = "${module.services_cluster_asg_on_demand.asg_name}"
 }
 
 module "services_cluster_asg_on_demand_asg_totalinstances_autoscaling_alarms" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/asg_totalinstances?ref=ecs-sqs-autoscaling-policy"
-  name    = "services_on_demand"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/asg_totalinstances?ref=v1.1.0"
+  name   = "services_on_demand"
 
   asg_name = "${module.services_cluster_asg.asg_name}"
 
-  scale_up_arn = "${module.services_cluster_asg_autoscaling.scale_up_arn}"
-  scale_down_arn = "${module.services_cluster_asg_autoscaling.scale_down_arn}"
+  scale_up_arn   = "${module.services_cluster_asg_on_demand_autoscaling.scale_up_arn}"
+  scale_down_arn = "${module.services_cluster_asg_on_demand_autoscaling.scale_down_arn}"
 }
 
 module "services_cluster_asg_on_demand" {
