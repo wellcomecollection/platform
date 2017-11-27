@@ -93,4 +93,5 @@ object Dependencies {
   )
 
   val sierraObjectMergerDepedencies: Seq[ModuleID] = commonDependencies ++ dynamoDependencies
+  ) ++ dynamoDependencies
 }

@@ -2,12 +2,12 @@ package uk.ac.wellcome.platform.sierra_object_merger.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.sierra_object_merger.services.SierraObjectMergerWorkerService
+import uk.ac.wellcome.platform.sierra_to_dynamo.services.SierraObjectMergerWorkerService
 
 object SierraObjectMergerModule extends TwitterModule {
 
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[SierraToDynamoWorkerService]
+    val workerService = injector.instance[SierraObjectMergerWorkerService]
 
     workerService.runSQSWorker()
 

@@ -13,13 +13,12 @@ sierra_to_dynamo-test: $(ROOT)/.docker/sbt_test
 sierra_to_dynamo-build: $(ROOT)/.docker/sbt_test
 	PROJECT=sierra_to_dynamo $(ROOT)./builds/run_sbt_image_build.sh
 
-sierra_to_dynamo-deploy:
+sierra_to_dynamo-publish:
 	echo "Hello world"
-
 
 sierra_adapter-test: sierra_window_generator-test sierra_to_dynamo-test
 
-sierra_adapter-publish: sierra_window_generator-publish sierra_to_dynamo-deploy
+sierra_adapter-publish: sierra_window_generator-publish sierra_to_dynamo-publish
 
 
 sierra_adapter-terraform-plan:
