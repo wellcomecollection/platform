@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_to_dynamo.sink
 
-import java.time.Instant
-
 import akka.Done
 import akka.stream.scaladsl.Sink
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
@@ -21,8 +19,7 @@ object SierraDynamoSink {
       val record = SierraRecord(
         id = JsonPath.root.id.string.getOption(json).get,
         data = json.noSpaces,
-        updatedDate =
-          Instant.parse(JsonPath.root.updatedDate.string.getOption(json).get)
+        updatedDate = JsonPath.root.updatedDate.string.getOption(json).get
       )
 
       val table = Table[SierraRecord](tableName)
