@@ -3,7 +3,7 @@ module "ingestor_appautoscaling" {
   name    = "ingestor"
 
   cluster_name = "${aws_ecs_cluster.services.name}"
-  service_name = "${module.transformer.service_name}"
+  service_name = "${module.ingestor.service_name}"
 }
 
 module "ingestor_sqs_autoscaling_alarms" {
