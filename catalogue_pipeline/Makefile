@@ -71,7 +71,7 @@ catalogue_pipeline-deploy: \
 
 
 catalogue_pipeline-terraform-plan:
-	$(call terraform_plan,$(CATALOGUE_PIPELINE))
+	$(call terraform_plan,$(CATALOGUE_PIPELINE)/terraform)
 
 catalogue_pipeline-terraform-apply:
-	$(call terraform_apply,$(CATALOGUE_PIPELINE))
+	$(call terraform_apply,$(CATALOGUE_PIPELINE)/terraform)
