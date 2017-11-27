@@ -15,20 +15,23 @@ import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
 import scala.concurrent.Future
 
 object SierraDynamoSink {
-  def apply(client: AmazonDynamoDB, tableName: String): Sink[Json, Future[Done]] = Sink.foreach(json => {
-    val record = SierraRecord(
-      id = JsonPath.root.id.string.getOption(json).get,
-      data = json.noSpaces,
-      updatedDate = Instant.parse(JsonPath.root.updatedDate.string.getOption(json).get)
-    )
-
-    val table = Table[SierraRecord](tableName)
-    val ops = table
-      .given(
-        not(attributeExists('id)) or
-          (attributeExists('id) and 'updatedDate < record.updatedDate.getEpochSecond)
+  def apply(client: AmazonDynamoDB,
+            tableName: String): Sink[Json, Future[Done]] =
+    Sink.foreach(json => {
+      val record = SierraRecord(
+        id = JsonPath.root.id.string.getOption(json).get,
+        data = json.noSpaces,
+        updatedDate =
+          Instant.parse(JsonPath.root.updatedDate.string.getOption(json).get)
       )
-      .put(record)
-    Scanamo.exec(client)(ops)
-  })
+
+      val table = Table[SierraRecord](tableName)
+      val ops = table
+        .given(
+          not(attributeExists('id)) or
+            (attributeExists('id) and 'updatedDate < record.updatedDate.getEpochSecond)
+        )
+        .put(record)
+      Scanamo.exec(client)(ops)
+    })
 }

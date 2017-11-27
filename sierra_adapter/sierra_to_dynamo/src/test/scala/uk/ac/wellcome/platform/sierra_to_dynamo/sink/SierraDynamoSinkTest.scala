@@ -21,17 +21,22 @@ import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDBLocal with Matchers with ExtendedPatience with MockitoSugar {
+class SierraDynamoSinkTest
+    extends FunSpec
+    with ScalaFutures
+    with SierraDynamoDBLocal
+    with Matchers
+    with ExtendedPatience
+    with MockitoSugar {
   implicit val system = ActorSystem()
   implicit val materialiser = ActorMaterializer()
 
   val sink = SierraDynamoSink(client = dynamoDbClient, tableName = tableName)
 
-  it("should ingest a json into DynamoDB"){
+  it("should ingest a json into DynamoDB") {
     val id = "100001"
     val updatedDate = "2013-12-13T12:43:16Z"
-    val json = parse(
-      s"""
+    val json = parse(s"""
         |{
         | "id": "$id",
         | "updatedDate": "$updatedDate"
@@ -40,8 +45,11 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
     val futureUnit = Source.single(json).runWith(sink)
 
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(Right(
-        SierraRecord(id = id, data = json.noSpaces, updatedDate = Instant.parse(updatedDate))))
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+        Right(
+          SierraRecord(id = id,
+                       data = json.noSpaces,
+                       updatedDate = Instant.parse(updatedDate))))
     }
   }
 
@@ -53,12 +61,12 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
     val newRecord = SierraRecord(
       id = id,
       updatedDate = Instant.parse(newUpdatedDate),
-      data = s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
+      data =
+        s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
     )
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
-    val oldJson = parse(
-      s"""
+    val oldJson = parse(s"""
          |{
          |  "id": "$id",
          |  "updatedDate": "$oldUpdatedDate",
@@ -68,7 +76,8 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
 
     val futureUnit = Source.single(oldJson).runWith(sink)
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(Right(newRecord))
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+        Right(newRecord))
     }
   }
 
@@ -80,12 +89,12 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
     val oldRecord = SierraRecord(
       id = id,
       updatedDate = Instant.parse(oldUpdatedDate),
-      data = s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
+      data =
+        s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
-    val newJson = parse(
-      s"""
+    val newJson = parse(s"""
          |{
          |  "id": "$id",
          |  "updatedDate": "$newUpdatedDate",
@@ -97,16 +106,17 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
     val newRecord = SierraRecord(
       id = id,
       updatedDate = Instant.parse(newUpdatedDate),
-      data = s"""{"id":"$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
+      data =
+        s"""{"id":"$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
     )
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(Right(newRecord))
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+        Right(newRecord))
     }
   }
 
   it("should fail the stream if the record contains invalid JSON") {
-    val invalidSierraJson = parse(
-      s"""
+    val invalidSierraJson = parse(s"""
          |{
          |  "missing": ["id", "updatedDate"],
          |  "reason": "This JSON will not pass!",
@@ -115,12 +125,13 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
        """.stripMargin).right.get
 
     val futureUnit = Source.single(invalidSierraJson).runWith(sink)
-    whenReady(futureUnit.failed) { _ => () }
+    whenReady(futureUnit.failed) { _ =>
+      ()
+    }
   }
 
   it("should fail the stream if DynamoDB returns an error") {
-    val json = parse(
-      s"""
+    val json = parse(s"""
          |{
          | "id": "500005",
          | "updatedDate": "2005-05-05T05:05:05Z"
@@ -129,10 +140,13 @@ class SierraDynamoSinkTest extends FunSpec with ScalaFutures with SierraDynamoDB
 
     val dynamoDbClient = mock[AmazonDynamoDB]
     val expectedException = new RuntimeException("AAAAAARGH!")
-    when(dynamoDbClient.putItem(any[PutItemRequest])).thenThrow(expectedException)
+    when(dynamoDbClient.putItem(any[PutItemRequest]))
+      .thenThrow(expectedException)
     val sink = SierraDynamoSink(dynamoDbClient, tableName)
 
     val futureUnit = Source.single(json).runWith(sink)
-    whenReady(futureUnit.failed) { ex => ex shouldBe expectedException }
+    whenReady(futureUnit.failed) { ex =>
+      ex shouldBe expectedException
+    }
   }
 }

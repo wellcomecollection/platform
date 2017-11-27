@@ -11,9 +11,10 @@ case class SierraRecord(
 )
 
 object SierraRecord {
-  implicit val instantLongFormat = DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
-    Instant.ofEpochSecond
-  )(
-    _.getEpochSecond
-  )
+  implicit val instantLongFormat =
+    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
+      Instant.ofEpochSecond
+    )(
+      _.getEpochSecond
+    )
 }
