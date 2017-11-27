@@ -19,6 +19,9 @@ $(ROOT)/.docker/sbt_test:
 sbt-common-test: $(ROOT)/.docker/sbt_test
 	PROJECT=common ./builds/test_sbt_project.sh
 
+sbt-common-publish:
+	echo "Nothing to do!"
+
 $(ROOT)/.docker/sbt_image_builder:
 	./builds/build_ci_docker_image.py \
 		--project=sbt_image_builder \
