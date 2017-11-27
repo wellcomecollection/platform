@@ -40,10 +40,17 @@ lazy val reindexer = doSharedSetup(project, "catalogue_pipeline/reindexer")
 lazy val sierra_to_dynamo = doSharedSetup(project, "sierra_adapter/sierra_to_dynamo")
   .settings(libraryDependencies ++= Dependencies.sierraToDynamoDepedencies)
 
+lazy val sierra_object_merger = doSharedSetup(project, "sierra_adapter/sierra_object_merger")
+  .settings(libraryDependencies ++= Dependencies.sierraObjectMergerDepedencies)
+
 lazy val root = (project in file("."))
-  .aggregate(common,
-             api,
-             ingestor,
-             transformer,
-             id_minter,
-             reindexer, sierra_to_dynamo)
+  .aggregate(
+    common,
+    api,
+    ingestor,
+    transformer,
+    id_minter,
+    reindexer,
+    sierra_to_dynamo,
+    sierra_object_merger
+  )
