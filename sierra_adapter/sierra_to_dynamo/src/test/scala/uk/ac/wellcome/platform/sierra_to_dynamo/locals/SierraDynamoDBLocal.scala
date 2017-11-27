@@ -46,9 +46,10 @@ trait SierraDynamoDBLocal
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(tableName)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
-          .withKeyType(KeyType.HASH))
+        .withKeySchema(
+          new KeySchemaElement()
+            .withAttributeName("id")
+            .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")
