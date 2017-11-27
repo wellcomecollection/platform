@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_to_dynamo.sink
 
-import java.time.Instant
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
@@ -44,12 +42,13 @@ class SierraDynamoSinkTest
       """.stripMargin).right.get
     val futureUnit = Source.single(json).runWith(sink)
 
+    val expectedRecord = SierraRecord(
+      id = id, data = json.noSpaces, updatedDate = updatedDate
+    )
+
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
-        Right(
-          SierraRecord(id = id,
-                       data = json.noSpaces,
-                       updatedDate = Instant.parse(updatedDate))))
+        Right(expectedRecord))
     }
   }
 
@@ -60,7 +59,7 @@ class SierraDynamoSinkTest
 
     val newRecord = SierraRecord(
       id = id,
-      updatedDate = Instant.parse(newUpdatedDate),
+      updatedDate = newUpdatedDate,
       data =
         s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
     )
@@ -88,7 +87,7 @@ class SierraDynamoSinkTest
 
     val oldRecord = SierraRecord(
       id = id,
-      updatedDate = Instant.parse(oldUpdatedDate),
+      updatedDate = oldUpdatedDate,
       data =
         s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
     )
@@ -105,7 +104,7 @@ class SierraDynamoSinkTest
     val futureUnit = Source.single(newJson).runWith(sink)
     val newRecord = SierraRecord(
       id = id,
-      updatedDate = Instant.parse(newUpdatedDate),
+      updatedDate = newUpdatedDate,
       data =
         s"""{"id":"$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
     )
