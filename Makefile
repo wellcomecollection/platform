@@ -19,7 +19,7 @@ $(ROOT)/.docker/sbt_test:
 sbt-common-test: $(ROOT)/.docker/sbt_test
 	PROJECT=common ./builds/test_sbt_project.sh
 
-sbt-common-publish:
+sbt-common-deploy:
 	echo "Nothing to do!"
 
 $(ROOT)/.docker/sbt_image_builder:
