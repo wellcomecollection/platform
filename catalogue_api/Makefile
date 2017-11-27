@@ -9,8 +9,27 @@ api_docs-build:
 api_docs-deploy: api_docs-build
 	$(call publish_service,update_api_docs)
 
+
+api-test: $(ROOT)/.docker/sbt_test
+	PROJECT=api ./builds/test_sbt_project.sh
+
+api-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=catalogue_api/api/target \
+	PROJECT=api ./builds/run_sbt_image_build.sh
+
+api-deploy: api-build
+	$(call publish_service,api)
+
+
 catalogue_api-terraform-plan:
 	$(call terraform_plan,$(CATALOGUE_API)/terraform)
 
 catalogue_api-terraform-apply:
 	$(call terraform_apply,$(CATALOGUE_API)/terraform)
+
+
+catalogue_api-build: api-build api_docs-build
+
+catalogue_api-test: api-test
+
+catalogue_api-deploy: api-deploy api_docs-deploy
