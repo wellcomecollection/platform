@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
+import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
@@ -23,11 +24,11 @@ trait SierraDynamoDBLocal
   }
 
   private def clearTable(): List[DeleteItemResult] =
-    Scanamo.scan[SierraData](dynamoDbClient)(tableName).map {
+    Scanamo.scan[SierraRecord](dynamoDbClient)(tableName).map {
       case Right(record) =>
         dynamoDbClient.deleteItem(
           tableName,
-          Map("ID" -> new AttributeValue(record.id))
+          Map("id" -> new AttributeValue(record.id))
         )
       case e =>
         throw new Exception(s"Unable to clear the table $tableName error $e")
@@ -46,11 +47,11 @@ trait SierraDynamoDBLocal
       new CreateTableRequest()
         .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("ID")
+          .withAttributeName("id")
           .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("ID")
+            .withAttributeName("id")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
