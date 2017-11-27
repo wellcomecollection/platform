@@ -1,5 +1,5 @@
 module "es_ingest_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.0.0"
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.1.0"
   queue_name  = "es_ingest_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
@@ -9,7 +9,7 @@ module "es_ingest_queue" {
 }
 
 module "id_minter_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.0.0"
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.1.0"
   queue_name  = "id_minter_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
@@ -19,7 +19,7 @@ module "id_minter_queue" {
 }
 
 module "miro_transformer_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.0.0"
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.1.0"
   queue_name  = "miro_transformer_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
