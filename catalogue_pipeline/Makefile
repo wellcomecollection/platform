@@ -5,11 +5,69 @@ include $(ROOT)/functions.Makefile
 include $(CATALOGUE_PIPELINE)/schedule_reindexer/Makefile
 
 
-catalogue_pipeline-build: schedule_reindexer-build
+id_minter-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=catalogue_pipeline/id_minter/target \
+	PROJECT=id_minter $(ROOT)/builds/run_sbt_image_build.sh
 
-catalogue_pipeline-test: schedule_reindexer-test
+ingestor-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=catalogue_pipeline/ingestor/target \
+	PROJECT=ingestor $(ROOT)/builds/run_sbt_image_build.sh
 
-catalogue_pipeline-deploy: schedule_reindexer-publish
+reindexer-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=catalogue_pipeline/reindexer/target \
+	PROJECT=reindexer $(ROOT)/builds/run_sbt_image_build.sh
+
+transformer-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=catalogue_pipeline/transformer/target \
+	PROJECT=transformer $(ROOT)/builds/run_sbt_image_build.sh
+
+
+id_minter-test: $(ROOT)/.docker/sbt_test
+	PROJECT=id_minter $(ROOT)/builds/test_sbt_project.sh
+
+ingestor-test: $(ROOT)/.docker/sbt_test
+	PROJECT=ingestor $(ROOT)/builds/test_sbt_project.sh
+
+reindexer-test: $(ROOT)/.docker/sbt_test
+	PROJECT=reindexer $(ROOT)/builds/test_sbt_project.sh
+
+transformer-test: $(ROOT)/.docker/sbt_test
+	PROJECT=transformer $(ROOT)/builds/test_sbt_project.sh
+
+
+id_minter-deploy: id_minter-build
+	$(call publish_service,id_minter)
+
+ingestor-deploy: ingestor-build
+	$(call publish_service,ingestor)
+
+reindexer-deploy: reindexer-build
+	$(call publish_service,reindexer)
+
+transformer-deploy: transformer-build
+	$(call publish_service,transformer)
+
+
+catalogue_pipeline-build: \
+	schedule_reindexer-build \
+	id_minter-build \
+	ingestor-build \
+	reindexer-build \
+	transformer-build
+
+catalogue_pipeline-test: \
+	schedule_reindexer-test \
+	id_minter-test \
+	ingestor-test \
+	reindexer-test \
+	transformer-test
+
+catalogue_pipeline-deploy: \
+	schedule_reindexer-publish \
+	id_minter-deploy \
+	ingestor-deploy \
+	reindexer-deploy \
+	transformer-deploy
 
 
 catalogue_pipeline-terraform-plan:
