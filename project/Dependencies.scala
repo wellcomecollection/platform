@@ -90,5 +90,5 @@ object Dependencies {
 
   val sierraToDynamoDepedencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
-  )
+  ) ++ dynamoDependencies
 }
