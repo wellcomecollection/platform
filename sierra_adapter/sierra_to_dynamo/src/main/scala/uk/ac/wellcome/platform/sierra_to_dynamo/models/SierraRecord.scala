@@ -17,4 +17,11 @@ object SierraRecord {
     )(
       _.getEpochSecond
     )
+
+  def apply(id: String, data: String, updatedDate: String): SierraRecord =
+    SierraRecord(
+      id = id,
+      data = data,
+      updatedDate = Instant.parse(updatedDate)
+    )
 }
