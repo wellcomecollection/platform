@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_object_merger
+package uk.ac.wellcome.platform.sierra_bib_merger
 
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer

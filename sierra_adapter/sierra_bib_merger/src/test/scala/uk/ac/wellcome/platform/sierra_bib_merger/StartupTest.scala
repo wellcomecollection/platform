@@ -1,9 +1,8 @@
-package uk.ac.wellcome.platform.sierra_object_merger
+package uk.ac.wellcome.platform.sierra_bib_merger
 
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import com.twitter.finagle.http.Status._
 import uk.ac.wellcome.test.utils.StartupLogbackOverride
 
 class StartupTest extends FeatureTest with StartupLogbackOverride {
