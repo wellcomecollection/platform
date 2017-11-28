@@ -17,7 +17,7 @@ module "transformer_sqs_autoscaling_alarms" {
 }
 
 module "transformer" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "transformer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_transformer_iam.task_role_arn}"
@@ -30,7 +30,9 @@ module "transformer" {
   alb_priority       = "100"
   healthcheck_path   = "/transformer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/transformer.ini"
+
+  config_key           = "config/${var.build_env}/transformer.ini"
+  config_template_path = "config/transformer.ini.template"
 
   cpu    = 256
   memory = 1024

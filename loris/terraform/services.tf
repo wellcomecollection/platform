@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
@@ -9,10 +9,13 @@ module "loris" {
   listener_https_arn = "${module.loris_alb.listener_https_arn}"
   listener_http_arn  = "${module.loris_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/loris.ini"
-  path_pattern       = "/image*"
-  healthcheck_path   = "/image/"
-  alb_priority       = "100"
+
+  config_key           = "config/${var.build_env}/loris.ini"
+  config_template_path = "config/loris.ini.template"
+
+  path_pattern     = "/image*"
+  healthcheck_path = "/image/"
+  alb_priority     = "100"
 
   cpu    = 3960
   memory = 7350

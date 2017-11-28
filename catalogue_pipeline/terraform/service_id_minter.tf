@@ -17,7 +17,7 @@ module "id_minter_sqs_autoscaling_alarms" {
 }
 
 module "id_minter" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "id_minter"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_id_minter_iam.task_role_arn}"
@@ -30,7 +30,9 @@ module "id_minter" {
   alb_priority       = "103"
   healthcheck_path   = "/id_minter/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/id_minter.ini"
+
+  config_key           = "config/${var.build_env}/id_minter.ini"
+  config_template_path = "config/id_minter.ini.template"
 
   cpu    = 256
   memory = 1024
