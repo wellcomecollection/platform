@@ -3,11 +3,10 @@ package uk.ac.wellcome.platform.sierra_bib_merger.locals
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
-
-case class MergedObject(id: String)
 
 trait DynamoDBLocal
   extends BeforeAndAfterEach
@@ -29,7 +28,7 @@ trait DynamoDBLocal
   }
 
   private def clearTable(): List[DeleteItemResult] =
-    Scanamo.scan[MergedObject](dynamoDbClient)(tableName).map {
+    Scanamo.scan[MergedSierraObject](dynamoDbClient)(tableName).map {
       case Right(item) =>
         dynamoDbClient.deleteItem(
           tableName,

@@ -1,10 +1,13 @@
 package uk.ac.wellcome.platform.reindexer.locals
 
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.model._
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder, AmazonDynamoDBStreams, AmazonDynamoDBStreamsClientBuilder}
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.models.Reindex
+import uk.ac.wellcome.models.{CalmTransformable, Reindex}
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
@@ -33,6 +36,7 @@ trait DynamoDBLocal
   override def beforeEach(): Unit = {
     super.beforeEach()
     clearMiroTable()
+    clearCalmTable()
     clearReindexTable()
   }
 
@@ -81,6 +85,20 @@ trait DynamoDBLocal
       case a =>
         throw new Exception(
           s"Unable to clear the table $miroDataTableName error $a")
+    }
+
+  private def clearCalmTable(): List[DeleteItemResult] =
+    Scanamo.scan[CalmTransformable](dynamoDbClient)(calmDataTableName).map {
+      case Right(calmTransformable) =>
+        dynamoDbClient.deleteItem(
+          calmDataTableName,
+          Map(
+            "RecordID" -> new AttributeValue(calmTransformable.RecordID),
+            "RecordType" -> new AttributeValue(calmTransformable.RecordType)
+          ))
+      case a =>
+        throw new Exception(
+          s"Unable to clear the table $calmDataTableName error $a")
     }
 
   private def deleteTables() = {

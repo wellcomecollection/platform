@@ -1,10 +1,13 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.SierraRecord
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
+import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
 import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -17,43 +20,81 @@ class SierraBibMergerWorkerServiceTest
 
   val bibMergerQueue: String = createQueueAndReturnUrl("test_bib_merger")
 
+  def bibRecordString(id: String, updatedDate: String) =
+    s"""
+      |{
+      |      "id": "$id",
+      |      "updatedDate": "$updatedDate",
+      |      "createdDate": "1999-11-01T16:36:51Z",
+      |      "deleted": false,
+      |      "suppressed": false,
+      |      "lang": {
+      |        "code": "ger",
+      |        "name": "German"
+      |      },
+      |      "title": "Lehrbuch und Atlas der Gastroskopie",
+      |      "author": "Schindler, Rudolf, 1888-",
+      |      "materialType": {
+      |        "code": "a",
+      |        "value": "Books"
+      |      },
+      |      "bibLevel": {
+      |        "code": "m",
+      |        "value": "MONOGRAPH"
+      |      },
+      |      "publishYear": 1923,
+      |      "catalogDate": "1999-01-01",
+      |      "country": {
+      |        "code": "gw ",
+      |        "name": "Germany"
+      |      }
+      |    }
+    """.stripMargin
+
   def defineServer: EmbeddedHttpServer = {
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
         "aws.region" -> "localhost",
-        "aws.sqs.queue.url" -> bibMergerQueue
+        "aws.sqs.queue.url" -> bibMergerQueue,
+        "bibMerger.dynamo.tableName" -> tableName
       )
     )
   }
 
-  def generateMessage(): SQSMessage = {
-    SQSMessage(
-      Some("subject"),
-      "message",
-      "topic",
-      "messageType",
-      "timestamp"
+  def generateSierraRecordMessageBody(id: String, updatedDate: String): String = {
+    val record = SierraRecord(
+      id,
+      bibRecordString(id, updatedDate),
+      updatedDate
     )
+
+    JsonUtil.toJson(record).get
   }
 
   private val server = defineServer
 
-  it("should fail") {
-    val message = JsonUtil
-      .toJson(generateMessage())
-      .get
+  it("should put a bib from SQS into Dynamo") {
+    val id = "1000017"
+    val updatedDate = "2015-12-09T12:04:09Z"
 
-    sqsClient.sendMessage(bibMergerQueue, message)
+    val messageBody = generateSierraRecordMessageBody(id, updatedDate)
+
+    sqsClient.sendMessage(bibMergerQueue, messageBody)
+
+    val expectedMergedSierraObject = MergedSierraObject(id)
 
     server.start()
 
     eventually {
-      false shouldBe true
+      val actualMergedSierraObject =
+        Scanamo.get[MergedSierraObject](dynamoDbClient)(tableName)(
+          'id -> id
+        ).get.right
+
+      actualMergedSierraObject shouldEqual expectedMergedSierraObject
     }
 
     server.close()
-
   }
-
 }
