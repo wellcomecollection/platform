@@ -1,6 +1,6 @@
 variable "resource_type" {}
 
-variable "windows_topic_arn" {}
+variable "windows_topic_name" {}
 
 variable "dlq_alarm_arn" {}
 
@@ -33,3 +33,5 @@ variable "release_id" {}
 variable "infra_bucket" {
   default = "platform-infra"
 }
+
+variable "account_id" {}
