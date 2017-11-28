@@ -25,12 +25,12 @@ module "sierra_to_dynamo_items" {
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
 
-  ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
-  release_id = "${var.release_ids["sierra_to_dynamo"]}"
-  alb_cloudwatch_id = "${local.services_alb_cloudwatch_id}"
-  alb_listener_http_arn = "${local.services_alb_listener_http_arn}"
+  ecr_repository_url     = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
+  release_id             = "${var.release_ids["sierra_to_dynamo"]}"
+  alb_cloudwatch_id      = "${local.services_alb_cloudwatch_id}"
+  alb_listener_http_arn  = "${local.services_alb_listener_http_arn}"
   alb_listener_https_arn = "${local.services_alb_listener_https_arn}"
-  vpc_id = "${local.services_vpc_id}"
+  vpc_id                 = "${local.services_vpc_id}"
 }
 
 module "sierra_to_dynamo_bibs" {
@@ -44,10 +44,10 @@ module "sierra_to_dynamo_bibs" {
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
 
-  ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
-  release_id = "${var.release_ids["sierra_to_dynamo"]}"
-  alb_cloudwatch_id = "${local.services_alb_cloudwatch_id}"
-  alb_listener_http_arn = "${local.services_alb_listener_http_arn}"
+  ecr_repository_url     = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
+  release_id             = "${var.release_ids["sierra_to_dynamo"]}"
+  alb_cloudwatch_id      = "${local.services_alb_cloudwatch_id}"
+  alb_listener_http_arn  = "${local.services_alb_listener_http_arn}"
   alb_listener_https_arn = "${local.services_alb_listener_https_arn}"
-  vpc_id = "${local.services_vpc_id}"
+  vpc_id                 = "${local.services_vpc_id}"
 }
