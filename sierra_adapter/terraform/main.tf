@@ -17,7 +17,7 @@ module "sierra_window_generator_bibs" {
 module "sierra_to_dynamo_items" {
   source            = "sierra_to_dynamo"
   resource_type     = "items"
-  windows_topic_arn = "${module.sierra_window_generator_items.topic_arn}"
+  windows_topic_name = "${module.sierra_window_generator_items.topic_name}"
   dlq_alarm_arn     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name      = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
   cluster_id        = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
@@ -32,12 +32,14 @@ module "sierra_to_dynamo_items" {
   alb_listener_http_arn  = "${local.services_alb_listener_http_arn}"
   alb_listener_https_arn = "${local.services_alb_listener_https_arn}"
   vpc_id                 = "${local.services_vpc_id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "sierra_to_dynamo_bibs" {
   source            = "sierra_to_dynamo"
   resource_type     = "bibs"
-  windows_topic_arn = "${module.sierra_window_generator_bibs.topic_arn}"
+  windows_topic_name = "${module.sierra_window_generator_bibs.topic_name}"
   dlq_alarm_arn     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name      = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
   cluster_id        = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
@@ -52,4 +54,6 @@ module "sierra_to_dynamo_bibs" {
   alb_listener_http_arn  = "${local.services_alb_listener_http_arn}"
   alb_listener_https_arn = "${local.services_alb_listener_https_arn}"
   vpc_id                 = "${local.services_vpc_id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }

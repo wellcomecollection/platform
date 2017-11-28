@@ -17,7 +17,7 @@ module "sqs_autoscaling_alarms" {
 }
 
 module "sierra_to_dynamo_service" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=s3-mystery"
   name               = "sierra_to_dynamo_${var.resource_type}"
   cluster_id         = "${var.cluster_id}"
   task_role_arn      = "${module.ecs_sierra_to_dynamo_iam.task_role_arn}"
