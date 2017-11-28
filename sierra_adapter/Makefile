@@ -22,7 +22,7 @@ sierra_adapter-publish: sierra_window_generator-publish sierra_to_dynamo-publish
 
 
 sierra_adapter-terraform-plan:
-	$(call terraform_plan,$(SIERRA_ADAPTER))
+	$(call terraform_plan,$(SIERRA_ADAPTER)/terraform)
 
 sierra_adapter-terraform-apply:
-	$(call terraform_apply,$(SIERRA_ADAPTER))
+	$(call terraform_apply,$(SIERRA_ADAPTER)/terraform)
