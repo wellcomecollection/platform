@@ -11,11 +11,12 @@ import io.circe.parser._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_to_dynamo.sink.SierraDynamoSink
-import uk.ac.wellcome.sierra.SierraSource
+import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.Try
 
 class SierraToDynamoWorkerService @Inject()(
@@ -39,10 +40,9 @@ class SierraToDynamoWorkerService @Inject()(
     } yield ()
 
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
-    val graph = SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret)(
+    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, ThrottleRate(30, 1.minute))(
       resourceType,
-      params).toMat(SierraDynamoSink(dynamoDbClient, dynamoTableName))(Keep.right)
-    graph.run()
+      params).runWith(SierraDynamoSink(dynamoDbClient, dynamoTableName))
   }
 
   private def extractUpdatedDateWindow(message: SQSMessage) =
