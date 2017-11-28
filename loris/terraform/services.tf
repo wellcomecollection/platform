@@ -13,9 +13,9 @@ module "loris" {
   config_key           = "config/${var.build_env}/loris.ini"
   config_template_path = "config/loris.ini.template"
 
-  path_pattern       = "/image*"
-  healthcheck_path   = "/image/"
-  alb_priority       = "100"
+  path_pattern     = "/image*"
+  healthcheck_path = "/image/"
+  alb_priority     = "100"
 
   cpu    = 3960
   memory = 7350
