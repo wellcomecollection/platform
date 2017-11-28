@@ -11,10 +11,11 @@ sierra_to_dynamo-test: $(ROOT)/.docker/sbt_test
 	PROJECT=sierra_to_dynamo $(ROOT)/builds/test_sbt_project.sh
 
 sierra_to_dynamo-build: $(ROOT)/.docker/sbt_test
-	PROJECT=sierra_to_dynamo $(ROOT)./builds/run_sbt_image_build.sh
+	TARGET=sierra_adapter/sierra_to_dynamo/target \
+	PROJECT=sierra_to_dynamo $(ROOT)/builds/run_sbt_image_build.sh
 
-sierra_to_dynamo-publish:
-	echo "Hello world"
+sierra_to_dynamo-publish: sierra_to_dynamo-build
+	$(call publish_service,sierra_to_dynamo)
 
 sierra_adapter-test: sierra_window_generator-test sierra_to_dynamo-test
 
