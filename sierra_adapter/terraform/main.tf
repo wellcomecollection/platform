@@ -13,3 +13,15 @@ module "sierra_window_generator_bibs" {
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   resource_type          = "bibs"
 }
+
+module "sierra_to_dynamo_items" {
+  source            = "sierra_to_dynamo"
+  resource_type     = "items"
+  windows_topic_arn = "${module.sierra_window_generator_items.topic_arn}"
+}
+
+module "sierra_to_dynamo_bibs" {
+  source            = "sierra_to_dynamo"
+  resource_type     = "bibs"
+  windows_topic_arn = "${module.sierra_window_generator_bibs.topic_arn}"
+}
