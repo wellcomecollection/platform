@@ -17,6 +17,8 @@ variable "build_env" {
   default = "prod"
 }
 
+variable "alb_priority" {}
+
 variable "alb_listener_http_arn" {}
 variable "alb_listener_https_arn" {}
 

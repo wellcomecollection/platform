@@ -27,7 +27,7 @@ module "sierra_to_dynamo_service" {
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
   path_pattern       = "/sierra_to_dynamo/${var.resource_type}/*"
-  alb_priority       = "100"
+  alb_priority       = "${var.alb_priority}"
   healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
 
