@@ -19,6 +19,8 @@ module "sierra_to_dynamo_items" {
   resource_type     = "items"
   windows_topic_arn = "${module.sierra_window_generator_items.topic_arn}"
   dlq_alarm_arn     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  cluster_name      = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_id        = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 }
 
 module "sierra_to_dynamo_bibs" {
@@ -26,4 +28,6 @@ module "sierra_to_dynamo_bibs" {
   resource_type     = "bibs"
   windows_topic_arn = "${module.sierra_window_generator_bibs.topic_arn}"
   dlq_alarm_arn     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  cluster_name      = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_id        = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 }
