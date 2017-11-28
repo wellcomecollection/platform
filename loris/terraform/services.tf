@@ -9,7 +9,10 @@ module "loris" {
   listener_https_arn = "${module.loris_alb.listener_https_arn}"
   listener_http_arn  = "${module.loris_alb.listener_http_arn}"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/loris.ini"
+
+  config_key           = "config/${var.build_env}/loris.ini"
+  config_template_path = "config/loris.ini.template"
+
   path_pattern       = "/image*"
   healthcheck_path   = "/image/"
   alb_priority       = "100"
