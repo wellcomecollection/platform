@@ -16,11 +16,29 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.duration._
 
-class SierraToDynamoWorkerServiceTest extends FunSpec with MockitoSugar with SQSLocal with Eventually with SierraDynamoDBLocal with Matchers with ExtendedPatience with BeforeAndAfterEach{
+class SierraToDynamoWorkerServiceTest
+    extends FunSpec
+    with MockitoSugar
+    with SQSLocal
+    with Eventually
+    with SierraDynamoDBLocal
+    with Matchers
+    with ExtendedPatience
+    with BeforeAndAfterEach {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
-  val worker = new SierraToDynamoWorkerService(new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)), ActorSystem(), mockMetrics)
+  val worker = new SierraToDynamoWorkerService(
+    new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+    ActorSystem(),
+    mockMetrics,
+    dynamoDbClient,
+    "http://localhost:8080",
+    "key",
+    "secret",
+    "items",
+    tableName
+  )
 
   override def afterEach(): Unit = {
     worker.cancelRun()
@@ -37,11 +55,8 @@ class SierraToDynamoWorkerServiceTest extends FunSpec with MockitoSugar with SQS
         |}
       """.stripMargin
 
-    val sqsMessage = SQSMessage(Some("subject"),
-      message,
-      "topic",
-      "messageType",
-      "timestamp")
+    val sqsMessage =
+      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
