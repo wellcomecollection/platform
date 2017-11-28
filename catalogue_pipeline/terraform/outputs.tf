@@ -49,3 +49,7 @@ output "services_alb_listener_http_arn" {
 output "services_alb_listener_https_arn" {
   value = "${module.services_alb.listener_https_arn}"
 }
+
+output "services_alb_cloudwatch_id" {
+  value = "${module.services_alb.cloudwatch_id}"
+}

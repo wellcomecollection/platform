@@ -20,7 +20,7 @@ module "sierra_to_dynamo_service" {
   source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
   name               = "sierra_to_dynamo_${var.resource_type}"
   cluster_id         = "${var.cluster_id}"
-  task_role_arn      = "${module.ecs_sierra_to_dynamo.task_role_arn}"
+  task_role_arn      = "${module.ecs_sierra_to_dynamo_iam.task_role_arn}"
   vpc_id             = "${var.vpc_id}"
   app_uri            = "${var.ecr_repository_url}:${var.release_id}"
   nginx_uri          = "${var.ecr_repository_url}:${var.release_id}"
