@@ -23,5 +23,11 @@ variable "alb_listener_https_arn" {}
 variable "alb_server_error_alarm_arn" {}
 variable "alb_client_error_alarm_arn" {}
 
+variable "alb_cloudwatch_id" {}
+
 variable "ecr_repository_url" {}
 variable "release_id" {}
+
+variable "infra_bucket" {
+  default = "platform-infra"
+}
