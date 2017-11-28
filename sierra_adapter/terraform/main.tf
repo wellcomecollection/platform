@@ -22,6 +22,7 @@ module "sierra_to_dynamo_items" {
   cluster_name      = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
   cluster_id        = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 
+  alb_priority               = 105
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
 
@@ -41,6 +42,7 @@ module "sierra_to_dynamo_bibs" {
   cluster_name      = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
   cluster_id        = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 
+  alb_priority               = 106
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
 
