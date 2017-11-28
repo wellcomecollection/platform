@@ -28,24 +28,23 @@ class SierraToDynamoWorkerServiceTest
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
-  val worker = new SierraToDynamoWorkerService(
-    new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-    ActorSystem(),
-    mockMetrics,
-    dynamoDbClient,
-    "http://localhost:8080",
-    "key",
-    "secret",
-    "items",
-    tableName
-  )
 
-  override def afterEach(): Unit = {
-    worker.cancelRun()
-    super.afterEach()
+  private def createSierraWorkerService(resourceType: String) = {
+    new SierraToDynamoWorkerService(
+      reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+      system = ActorSystem(),
+      metrics = mockMetrics,
+      dynamoDbClient = dynamoDbClient,
+      apiUrl = "http://localhost:8080",
+      sierraOauthKey = "key",
+      sierraOauthSecret = "secret",
+      resourceType = resourceType,
+      dynamoTableName = tableName
+    )
   }
 
   it("should read a window message from sqs, retrieve the items from sierra and insert into DynamoDb") {
+    val worker = createSierraWorkerService("items")
     worker.runSQSWorker()
     val message =
       """
@@ -63,5 +62,28 @@ class SierraToDynamoWorkerServiceTest
       // This comes from the wiremock recordings for sierra api response
       Scanamo.scan[SierraRecord](dynamoDbClient)(tableName) should have size 157
     }
+    worker.cancelRun()
+  }
+
+  it("should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
+    val worker = createSierraWorkerService("bibs")
+    worker.runSQSWorker()
+    val message =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
+    val sqsMessage =
+      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+
+    eventually {
+      // This comes from the wiremock recordings for sierra api response
+      Scanamo.scan[SierraRecord](dynamoDbClient)(tableName) should have size 29
+    }
+    worker.cancelRun()
   }
 }
