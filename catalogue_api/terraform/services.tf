@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_romulus" {
 }
 
 module "api_romulus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "api_romulus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
@@ -18,10 +18,13 @@ module "api_romulus_v1" {
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${local.bucket_infra_id}"
-  config_key         = "config/${var.build_env}/api_romulus_v1.ini"
-  path_pattern       = "/catalogue/v1/*"
-  alb_priority       = "114"
-  host_name          = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
+
+  config_key           = "config/${var.build_env}/api_romulus_v1.ini"
+  config_template_path = "config/api_romulus_v1.ini.template"
+
+  path_pattern = "/catalogue/v1/*"
+  alb_priority = "114"
+  host_name    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
 
   enable_alb_alarm = "${var.production_api == "romulus" ? 1 : 0}"
 
@@ -60,7 +63,7 @@ data "template_file" "es_cluster_host_remus" {
 }
 
 module "api_remus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "api_remus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
@@ -70,10 +73,13 @@ module "api_remus_v1" {
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
   infra_bucket       = "${local.bucket_infra_id}"
-  config_key         = "config/${var.build_env}/api_remus_v1.ini"
-  path_pattern       = "/catalogue/v1/*"
-  alb_priority       = "113"
-  host_name          = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
+
+  config_key           = "config/${var.build_env}/api_remus_v1.ini"
+  config_template_path = "config/api_remus_v1.ini.template"
+
+  path_pattern = "/catalogue/v1/*"
+  alb_priority = "113"
+  host_name    = "${var.production_api == "remus" ? var.api_host : var.api_host_stage}"
 
   enable_alb_alarm = "${var.production_api == "remus" ? 1 : 0}"
 
