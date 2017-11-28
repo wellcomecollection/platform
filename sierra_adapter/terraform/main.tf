@@ -19,8 +19,14 @@ module "sierra_to_dynamo_items" {
   resource_type     = "items"
   windows_topic_arn = "${module.sierra_window_generator_items.topic_arn}"
   dlq_alarm_arn     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name      = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
-  cluster_id        = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
+  cluster_name      = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_id        = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
+
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+
+  ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
+  release_id = "${var.release_ids["sierra_to_dynamo"]}"
 }
 
 module "sierra_to_dynamo_bibs" {
@@ -28,6 +34,12 @@ module "sierra_to_dynamo_bibs" {
   resource_type     = "bibs"
   windows_topic_arn = "${module.sierra_window_generator_bibs.topic_arn}"
   dlq_alarm_arn     = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name      = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
-  cluster_id        = "${date.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
+  cluster_name      = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_id        = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
+
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+
+  ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
+  release_id = "${var.release_ids["sierra_to_dynamo"]}"
 }
