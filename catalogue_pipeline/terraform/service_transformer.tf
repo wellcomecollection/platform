@@ -17,7 +17,7 @@ module "transformer_sqs_autoscaling_alarms" {
 }
 
 module "transformer" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "transformer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_transformer_iam.task_role_arn}"

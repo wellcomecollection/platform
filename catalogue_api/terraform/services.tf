@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_romulus" {
 }
 
 module "api_romulus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "api_romulus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
@@ -63,7 +63,7 @@ data "template_file" "es_cluster_host_remus" {
 }
 
 module "api_remus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "api_remus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   task_role_arn      = "${module.ecs_api_iam.task_role_arn}"

@@ -1,5 +1,5 @@
 module "miro_reindexer" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "miro_reindexer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_miro_reindexer_iam.task_role_arn}"

@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"

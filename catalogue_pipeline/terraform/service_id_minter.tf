@@ -17,7 +17,7 @@ module "id_minter_sqs_autoscaling_alarms" {
 }
 
 module "id_minter" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "id_minter"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_id_minter_iam.task_role_arn}"
