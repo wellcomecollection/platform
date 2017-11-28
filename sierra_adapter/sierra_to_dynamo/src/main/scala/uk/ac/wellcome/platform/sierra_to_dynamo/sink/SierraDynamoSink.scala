@@ -41,7 +41,7 @@ object SierraDynamoSink extends Logging {
       val ops = table
         .given(
           not(attributeExists('id)) or
-            (attributeExists('id) and 'updatedDate < record.modifiedDate.getEpochSecond)
+            (attributeExists('id) and 'modifiedDate < record.modifiedDate.getEpochSecond)
         )
         .put(record)
       Scanamo.exec(client)(ops) match {
