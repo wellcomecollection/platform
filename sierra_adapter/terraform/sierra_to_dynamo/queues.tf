@@ -5,5 +5,5 @@ module "windows_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${var.windows_topic_arn}"]
 
-  alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  alarm_topic_arn = "${var.dlq_alarm_arn}"
 }
