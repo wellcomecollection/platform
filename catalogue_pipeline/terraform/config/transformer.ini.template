@@ -1,0 +1,5 @@
+-aws.region=eu-west-1
+-aws.sqs.queue.url=${transformer_queue_id}
+-aws.sns.topic.arn=${sns_arn}
+-aws.metrics.namespace=${metrics_namespace}
+-transformer.source=${source_table_name}

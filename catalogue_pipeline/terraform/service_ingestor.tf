@@ -17,7 +17,7 @@ module "ingestor_sqs_autoscaling_alarms" {
 }
 
 module "ingestor" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "ingestor"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_ingestor_iam.task_role_arn}"
@@ -30,7 +30,9 @@ module "ingestor" {
   alb_priority       = "102"
   healthcheck_path   = "/ingestor/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/ingestor.ini"
+
+  config_key           = "config/${var.build_env}/ingestor.ini"
+  config_template_path = "config/ingestor.ini.template"
 
   cpu    = 256
   memory = 1024
