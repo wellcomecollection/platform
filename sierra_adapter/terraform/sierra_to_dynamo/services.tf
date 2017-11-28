@@ -17,7 +17,7 @@ module "sqs_autoscaling_alarms" {
 }
 
 module "sierra_to_dynamo_service" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
   name               = "sierra_to_dynamo_${var.resource_type}"
   cluster_id         = "${var.cluster_id}"
   task_role_arn      = "${module.ecs_sierra_to_dynamo_iam.task_role_arn}"
@@ -30,7 +30,9 @@ module "sierra_to_dynamo_service" {
   alb_priority       = "100"
   healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/sierra_to_dynamo_${var.resource_type}.ini"
+
+  config_key           = "config/${var.build_env}/transformer.ini"
+  config_template_path = "config/sierra_to_dynamo.ini.template"
 
   cpu    = 256
   memory = 1024

@@ -26,7 +26,7 @@ output "calm_transformer_topic_publish_policy" {
   value = "${module.calm_transformer_topic.publish_policy}"
 }
 
-output "aws_ecs_cluster_services_id" {
+output "ecs_services_cluster_id" {
   value = "${aws_ecs_cluster.services.id}"
 }
 
