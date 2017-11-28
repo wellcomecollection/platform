@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_object_merger
+package uk.ac.wellcome.platform.sierra_bib_merger
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
@@ -9,17 +9,17 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.sierra_object_merger.controllers.ManagementController
-import uk.ac.wellcome.platform.sierra_object_merger.modules._
+import uk.ac.wellcome.platform.sierra_bib_merger.modules._
+import uk.ac.wellcome.platform.sierra_bib_merger.controllers.ManagementController
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name = "uk.ac.wellcome.platform.sierra_object_merger SierraObjectMerger"
+  override val name = "uk.ac.wellcome.platform.sierra_bib_merger SierraBibMerger"
   override val modules = Seq(
     PlatformDynamoConfigModule,
     DynamoClientModule,
-    SierraObjectMergerModule,
+    SierraBibMergerModule,
     AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,
