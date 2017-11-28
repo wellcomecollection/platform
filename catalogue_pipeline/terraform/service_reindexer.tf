@@ -1,5 +1,5 @@
 module "miro_reindexer" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=template-agnostic-services"
   name               = "miro_reindexer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_miro_reindexer_iam.task_role_arn}"
@@ -12,7 +12,9 @@ module "miro_reindexer" {
   alb_priority       = "104"
   healthcheck_path   = "/miro_reindexer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
-  config_key         = "config/${var.build_env}/miro_reindexer.ini"
+
+  config_key           = "config/${var.build_env}/miro_reindexer.ini"
+  config_template_path = "config/miro_reindexer.ini.template"
 
   cpu    = 512
   memory = 1024
