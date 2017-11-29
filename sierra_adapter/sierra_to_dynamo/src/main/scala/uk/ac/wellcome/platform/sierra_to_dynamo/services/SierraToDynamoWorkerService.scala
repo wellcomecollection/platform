@@ -13,7 +13,6 @@ import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_to_dynamo.sink.SierraDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -33,6 +32,7 @@ class SierraToDynamoWorkerService @Inject()(
 
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()
+  implicit val executionContext = system.dispatcher
 
   val throttleRate = ThrottleRate(3, 1.second)
 
