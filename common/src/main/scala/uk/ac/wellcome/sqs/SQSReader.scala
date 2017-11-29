@@ -69,7 +69,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
         })
         .flatMap(_ => deleteMessage(message))
         .recover {
-          case e :SQSReaderGracefulException =>
+          case e: SQSReaderGracefulException =>
             warn(s"An error occurred while processing the message $message", e)
             ()
           case e: Throwable =>

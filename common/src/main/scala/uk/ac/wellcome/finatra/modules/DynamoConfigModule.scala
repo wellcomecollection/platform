@@ -7,32 +7,27 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 
 trait DynamoConfigModule extends TwitterModule {
-  val appNameTpl: String = "aws.dynamo.%s.streams.appName"
-  val arnTpl: String = "aws.dynamo.%s.streams.arn"
   val tableTpl: String = "aws.dynamo.%s.tableName"
 
-  def flags(tableName: String) = (
-    flag[String](appNameTpl.format(tableName), "", "Name of the Kinesis app"),
-    flag[String](arnTpl.format(tableName), "", "ARN of the DynamoDB stream"),
+  def flags(tableName: String) =
     flag[String](tableTpl.format(tableName), "", "Name of the DynamoDB table")
-  )
 }
 
 object PlatformDynamoConfigModule extends DynamoConfigModule {
 
-  val (miroAppName, miroArn, miroTable) = flags("miroData")
-  val (identAppName, identArn, identTable) = flags("identifiers")
-  val (calmAppName, calmArn, calmTable) = flags("calmData")
-  val (reindexAppName, reindexArn, reindexTable) = flags("reindexTracker")
+  val miroTable = flags("miroData")
+  val identTable = flags("identifiers")
+  val calmTable = flags("calmData")
+  val reindexTable = flags("reindexTracker")
 
   @Singleton
   @Provides
   def providesDynamoConfig(): Map[String, DynamoConfig] =
     Map(
-      "calm" -> DynamoConfig(calmAppName(), calmArn(), calmTable()),
-      "identifiers" -> DynamoConfig(identAppName(), identArn(), identTable()),
-      "miro" -> DynamoConfig(miroAppName(), miroArn(), miroTable()),
-      "reindex" -> DynamoConfig(reindexAppName(), reindexArn(), reindexTable())
+      "calm" -> DynamoConfig(calmTable()),
+      "identifiers" -> DynamoConfig(identTable()),
+      "miro" -> DynamoConfig(miroTable()),
+      "reindex" -> DynamoConfig(reindexTable())
     ).filterNot {
       case (_, v) => v.table.isEmpty
     }

@@ -26,7 +26,7 @@ output "calm_transformer_topic_publish_policy" {
   value = "${module.calm_transformer_topic.publish_policy}"
 }
 
-output "aws_ecs_cluster_services_id" {
+output "ecs_services_cluster_id" {
   value = "${aws_ecs_cluster.services.id}"
 }
 
@@ -36,4 +36,24 @@ output "table_miro_data_arn" {
 
 output "table_miro_data_name" {
   value = "${aws_dynamodb_table.miro_table.name}"
+}
+
+output "vpc_services_id" {
+  value = "${module.vpc_services.vpc_id}"
+}
+
+output "services_alb_listener_http_arn" {
+  value = "${module.services_alb.listener_http_arn}"
+}
+
+output "services_alb_listener_https_arn" {
+  value = "${module.services_alb.listener_https_arn}"
+}
+
+output "services_alb_cloudwatch_id" {
+  value = "${module.services_alb.cloudwatch_id}"
+}
+
+output "ecr_nginx_services_repository_url" {
+  value = "${module.ecr_repository_nginx_services.repository_url}"
 }

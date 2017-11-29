@@ -1,6 +1,6 @@
 variable "lambda_error_alarm_arn" {}
 variable "every_5_minutes_name" {}
-variable "aws_ecs_cluster_services_id" {}
+variable "ecs_services_cluster_id" {}
 
 variable "release_ids" {
   type = "map"
