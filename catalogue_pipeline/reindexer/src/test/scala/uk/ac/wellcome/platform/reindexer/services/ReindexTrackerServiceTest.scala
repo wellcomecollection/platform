@@ -16,8 +16,8 @@ class ReindexTrackerServiceTest
     with ExtendedPatience {
 
   val dynamoConfigs = Map(
-    "reindex" -> DynamoConfig("streamArn", reindexTableName),
-    "calm" -> DynamoConfig("streamArn", calmDataTableName))
+    "reindex" -> DynamoConfig(table = reindexTableName),
+    "calm" -> DynamoConfig(table = calmDataTableName))
 
   it(
     "should return the index and shard in need of reindexing"
