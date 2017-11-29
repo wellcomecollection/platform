@@ -11,5 +11,4 @@ sierra:
   ports:
     - "8080:8080"
   volumes:
-    - "./sierra_adapter/sierra_to_dynamo/src/test/resources/wiremock:/home/wiremock"
-
+    - "${ROOT}/sierra_adapter/sierra_to_dynamo/src/test/resources/wiremock:/home/wiremock"
