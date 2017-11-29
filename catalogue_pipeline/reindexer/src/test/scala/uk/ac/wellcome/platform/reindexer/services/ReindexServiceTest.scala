@@ -25,8 +25,8 @@ class ReindexServiceTest
     with MockitoSugar {
 
   val dynamoConfigs = Map(
-    "reindex" -> DynamoConfig("streamArn", reindexTableName),
-    "calm" -> DynamoConfig("streamArn", calmDataTableName)
+    "reindex" -> DynamoConfig(table = reindexTableName),
+    "calm" -> DynamoConfig(table = calmDataTableName)
   )
 
   val metricsSender: MetricsSender =

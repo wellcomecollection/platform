@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models.aws
 
-case class DynamoConfig(arn: String, table: String)
+case class DynamoConfig(table: String)
 
 case object DynamoConfig {
   def findWithTable(configs: List[DynamoConfig]): DynamoConfig =
