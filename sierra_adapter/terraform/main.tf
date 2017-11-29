@@ -37,6 +37,9 @@ module "sierra_to_dynamo_items" {
   ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
   release_id         = "${var.release_ids["sierra_to_dynamo"]}"
 
+  nginx_ecr_repository_url = "${local.ecr_nginx_services_repository_url}"
+  nginx_release_id         = "${var.release_ids["nginx_services"]}"
+
   vpc_id = "${local.services_vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
@@ -60,6 +63,9 @@ module "sierra_to_dynamo_bibs" {
 
   ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
   release_id         = "${var.release_ids["sierra_to_dynamo"]}"
+
+  nginx_ecr_repository_url = "${local.ecr_nginx_services_repository_url}"
+  nginx_release_id         = "${var.release_ids["nginx_services"]}"
 
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
