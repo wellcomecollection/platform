@@ -2,6 +2,7 @@ module "lambda_dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
 
   name        = "dynamo_to_sns_${var.name}"
+  module_name = "dynamo_to_sns"
   description = "Push new images form DynamoDB updates to SNS"
   timeout     = 30
   memory_size = 1024
