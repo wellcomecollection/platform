@@ -2,6 +2,7 @@ package uk.ac.wellcome.sqs
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs.model.Message
+import com.fasterxml.jackson.core.JsonParseException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -31,9 +32,9 @@ abstract class SQSWorker(sqsReader: SQSReader,
 
   private def extractMessage(sqsMessage: Message): Try[SQSMessage] =
     JsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover {
-      case e: Throwable =>
-        error("Invalid message structure (not via SNS?)", e)
-        throw e
+      case e: Exception =>
+        warn("Invalid message structure (not via SNS?)", e)
+        throw SQSReaderGracefulException(e)
     }
 
   override def terminalFailureHook(): Unit =
