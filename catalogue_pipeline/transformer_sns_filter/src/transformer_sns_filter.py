@@ -13,6 +13,8 @@ and republishes to a new SNS topic with just the contents of the
 
 """
 
+import os
+
 import boto3
 
 from wellcome_aws_utils.dynamo_event import create_dynamo_events

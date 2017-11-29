@@ -36,9 +36,10 @@ module "dynamo_to_sns" {
 }
 
 module "lambda_miro_transformer_filter" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.2.0"
 
   name        = "miro_transformer_filter"
+  module_name = "transformer_sns_filter"
   description = "Filters DynamoDB events for the transformer"
 
   environment_variables = {
