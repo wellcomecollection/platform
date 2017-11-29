@@ -82,7 +82,8 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     Future {
       blocking {
         sqsClient.deleteMessage(
-          new DeleteMessageRequest(sqsConfig.queueUrl, message.getReceiptHandle)
+          new DeleteMessageRequest(sqsConfig.queueUrl,
+                                   message.getReceiptHandle)
         )
         info(s"Deleted message ${message.getMessageId}")
       }
