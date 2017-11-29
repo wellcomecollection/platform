@@ -10,4 +10,6 @@ locals {
   services_vpc_id = "${data.terraform_remote_state.catalogue_pipeline.vpc_services_id}"
 
   lambda_error_alarm_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
+
+  ecr_nginx_services_repository_url = "${data.terraform_remote_state.catalogue_pipeline.ecr_nginx_services_repository_url}"
 }
