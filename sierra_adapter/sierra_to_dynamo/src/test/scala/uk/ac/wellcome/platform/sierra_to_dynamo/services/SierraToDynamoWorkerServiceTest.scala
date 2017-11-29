@@ -104,4 +104,33 @@ class SierraToDynamoWorkerServiceTest
     }
 
   }
+
+  it("should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
+    val worker = new SierraToDynamoWorkerService(
+      reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+      system = ActorSystem(),
+      metrics = mockMetrics,
+      dynamoDbClient = dynamoDbClient,
+      apiUrl = "http://localhost:8081",
+      sierraOauthKey = "key",
+      sierraOauthSecret = "secret",
+      resourceType = "items",
+      dynamoTableName = tableName
+    )
+
+    val message =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
+    val sqsMessage =
+      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+
+    whenReady(worker.processMessage(sqsMessage).failed) {ex =>
+      ex shouldNot be (a[SQSReaderGracefulException])
+    }
+  }
 }
