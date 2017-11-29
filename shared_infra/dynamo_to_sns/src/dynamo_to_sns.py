@@ -1,44 +1,34 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
 Receives DynamoDB events and publishes the new image from
 the event to an SNS topic
 """
+
 import json
 import os
 
 import boto3
 
-from wellcome_lambda_utils.dynamo_utils import DynamoImageFactory
-from wellcome_lambda_utils.sns_utils import publish_sns_message
-
-
-def _publish_image(record, topic_arn, sns_client):
-    new_image = record.simplified_new_image
-
-    print(new_image)
-
-    if new_image is not None:
-        publish_sns_message(
-            topic_arn=topic_arn,
-            message=new_image,
-            sns_client=sns_client
-        )
+from wellcome_aws_utils.dyanmo_event import create_dynamo_events
+from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
 def main(event, _):
     print(f'Received event:\n{event}')
 
-    sns_client = boto3.client('sns')
-    stream_topic_map = json.loads(os.environ["STREAM_TOPIC_MAP"])
+    client = boto3.client('sns')
+    topic_arn = os.environ['TOPIC_ARN']
 
-    for record in DynamoImageFactory.create(event):
-        print(record)
-
-        topic_arn = stream_topic_map[record.source_arn]
-
-        _publish_image(
-            record,
-            topic_arn,
-            sns_client
+    for dynamo_event in create_dynamo_events(event):
+        print(dynamo_event)
+        parsed_event = {
+            'event_type': dynamo_event.event_type.name,
+            'old_image': dynamo_event.old_image(deserialize_values=True),
+            'new_image': dynamo_event.new_image(deserialize_values=True),
+        }
+        json_message = json.dumps(parsed_event, separators=(',', ':'))
+        publish_sns_message(
+            topic_arn=topic_arn,
+            message=json_message,
+            client=client
         )

@@ -1,1 +1,1 @@
-wellcome_lambda_utils==1.0.0
+wellcome-aws-utils==2.0.0
