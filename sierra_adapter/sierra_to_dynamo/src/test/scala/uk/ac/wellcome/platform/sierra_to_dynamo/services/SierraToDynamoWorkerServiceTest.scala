@@ -39,7 +39,7 @@ class SierraToDynamoWorkerServiceTest
       sierraOauthKey = "key",
       sierraOauthSecret = "secret",
       resourceType = resourceType,
-      dynamoConfig = DynamoConfig("", "", tableName)
+      dynamoConfig = DynamoConfig(tableName)
     )
   }
 
@@ -115,7 +115,7 @@ class SierraToDynamoWorkerServiceTest
       sierraOauthKey = "key",
       sierraOauthSecret = "secret",
       resourceType = "items",
-      dynamoConfig = DynamoConfig("", "", tableName)
+      dynamoConfig = DynamoConfig(tableName)
     )
 
     val message =

@@ -6,9 +6,9 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import javax.inject.Singleton
 
 object SierraDynamoConfigModule extends DynamoConfigModule{
-  val (sierraToDynamoAppName, sierraToDynamoAppArn, sierraToDynamoAppTable) = flags("sierraToDynamo")
+  val sierraToDynamoAppTable = flags("sierraToDynamo")
 
   @Singleton
   @Provides
-  def providesDynamoConfig(): DynamoConfig = DynamoConfig(sierraToDynamoAppName(), sierraToDynamoAppArn(), sierraToDynamoAppTable())
+  def providesDynamoConfig(): DynamoConfig = DynamoConfig(sierraToDynamoAppTable())
 }
