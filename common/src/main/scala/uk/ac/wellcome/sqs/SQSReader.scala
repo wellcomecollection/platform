@@ -69,7 +69,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
         })
         .flatMap(_ => deleteMessage(message))
         .recover {
-          case e :SQSReaderGracefulException =>
+          case e: SQSReaderGracefulException =>
             warn(s"An error occurred while processing the message $message", e)
             ()
           case e: Throwable =>
@@ -82,8 +82,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     Future {
       blocking {
         sqsClient.deleteMessage(
-          new DeleteMessageRequest(sqsConfig.queueUrl,
-                                   message.getReceiptHandle)
+          new DeleteMessageRequest(sqsConfig.queueUrl, message.getReceiptHandle)
         )
         info(s"Deleted message ${message.getMessageId}")
       }
