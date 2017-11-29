@@ -17,7 +17,6 @@ import os
 
 import boto3
 
-from wellcome_aws_utils.dynamo_event import create_dynamo_events
 from wellcome_aws_utils.sns_utils import (
     extract_sns_messages_from_lambda_event, publish_sns_message
 )
