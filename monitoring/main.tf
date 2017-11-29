@@ -50,10 +50,10 @@ module "load_test" {
   bucket_dashboard_id  = "${module.ecs_dashboard.bucket_dashboard_id}"
   bucket_dashboard_arn = "${module.ecs_dashboard.bucket_dashboard_arn}"
 
-  release_ids                 = "${var.release_ids}"
-  every_5_minutes_name        = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
-  aws_region                  = "${var.aws_region}"
-  aws_ecs_cluster_services_id = "${local.aws_ecs_cluster_services_id}"
+  release_ids             = "${var.release_ids}"
+  every_5_minutes_name    = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
+  aws_region              = "${var.aws_region}"
+  ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }

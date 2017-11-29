@@ -11,6 +11,7 @@ define terraform_plan
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(1):/data \
 		--env OP=plan \
+		--env GET_PLATFORM_TFVARS=true \
 		wellcome/terraform_wrapper:latest
 endef
 
