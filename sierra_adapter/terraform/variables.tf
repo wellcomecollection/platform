@@ -6,3 +6,7 @@ variable "aws_region" {
 variable "release_ids" {
   type = "map"
 }
+
+variable "sierra_api_url" {}
+variable "sierra_oauth_key" {}
+variable "sierra_oauth_secret" {}
