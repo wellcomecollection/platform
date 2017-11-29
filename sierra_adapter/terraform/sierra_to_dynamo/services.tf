@@ -43,6 +43,13 @@ module "sierra_to_dynamo_service" {
   config_vars = {
     windows_queue_url = "${module.windows_queue.arn}"
     metrics_namespace = "sierra_to_dynamo-${var.resource_type}"
+
+    dynamo_table_name = "${aws_dynamodb_table.sierra_table.id}"
+
+    sierra_api_url       = "${var.sierra_api_url}"
+    sierra_oauth_key     = "${var.sierra_oauth_key}"
+    sierra_oauth_secret  = "${var.sierra_oauth_secret}"
+    sierra_resource_type = "${var.resource_type}"
   }
 
   loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"

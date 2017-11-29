@@ -33,6 +33,10 @@ module "sierra_to_dynamo_items" {
   alb_listener_https_arn = "${local.services_alb_listener_https_arn}"
   vpc_id                 = "${local.services_vpc_id}"
 
+  sierra_api_url      = "${var.sierra_api_url}"
+  sierra_oauth_key    = "${var.sierra_oauth_key}"
+  sierra_oauth_secret = "${var.sierra_oauth_secret}"
+
   account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
@@ -54,6 +58,10 @@ module "sierra_to_dynamo_bibs" {
   alb_listener_http_arn  = "${local.services_alb_listener_http_arn}"
   alb_listener_https_arn = "${local.services_alb_listener_https_arn}"
   vpc_id                 = "${local.services_vpc_id}"
+
+  sierra_api_url      = "${var.sierra_api_url}"
+  sierra_oauth_key    = "${var.sierra_oauth_key}"
+  sierra_oauth_secret = "${var.sierra_oauth_secret}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 }
