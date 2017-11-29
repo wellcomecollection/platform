@@ -5,10 +5,11 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
+import com.twitter.inject.annotations.Flag
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_to_dynamo.sink.SierraDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
@@ -23,11 +24,11 @@ class SierraToDynamoWorkerService @Inject()(
   system: ActorSystem,
   metrics: MetricsSender,
   dynamoDbClient: AmazonDynamoDB,
-  apiUrl: String,
-  sierraOauthKey: String,
-  sierraOauthSecret: String,
-  resourceType: String,
-  dynamoTableName: String
+  @Flag("sierra.apiUrl") apiUrl: String,
+  @Flag("sierra.oauthKey") sierraOauthKey: String,
+  @Flag("sierra.oauthSecret") sierraOauthSecret: String,
+  @Flag("sierra.resourceType") resourceType: String,
+  dynamoConfig: DynamoConfig
 ) extends SQSWorker(reader, system, metrics) {
 
   implicit val actorSystem = system
@@ -44,7 +45,7 @@ class SierraToDynamoWorkerService @Inject()(
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType,
-      params).runWith(SierraDynamoSink(dynamoDbClient, dynamoTableName))
+      params).runWith(SierraDynamoSink(dynamoDbClient, dynamoConfig.table))
   }
 
   private def extractUpdatedDateWindow(message: SQSMessage) =

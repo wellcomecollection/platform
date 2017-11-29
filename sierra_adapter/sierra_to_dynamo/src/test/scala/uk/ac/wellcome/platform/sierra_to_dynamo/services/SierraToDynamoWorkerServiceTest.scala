@@ -2,11 +2,11 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.services
 
 import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
+import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
@@ -39,7 +39,7 @@ class SierraToDynamoWorkerServiceTest
       sierraOauthKey = "key",
       sierraOauthSecret = "secret",
       resourceType = resourceType,
-      dynamoTableName = tableName
+      dynamoConfig = DynamoConfig("", "", tableName)
     )
   }
 
@@ -115,7 +115,7 @@ class SierraToDynamoWorkerServiceTest
       sierraOauthKey = "key",
       sierraOauthSecret = "secret",
       resourceType = "items",
-      dynamoTableName = tableName
+      dynamoConfig = DynamoConfig("", "", tableName)
     )
 
     val message =

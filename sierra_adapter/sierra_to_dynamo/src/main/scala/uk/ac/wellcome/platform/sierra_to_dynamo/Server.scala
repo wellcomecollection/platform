@@ -19,6 +19,7 @@ class Server extends HttpServer {
   override val modules = Seq(
     PlatformDynamoConfigModule,
     DynamoClientModule,
+    SierraDynamoConfigModule,
     SierraToDynamoModule,
     AmazonCloudWatchModule,
     SQSConfigModule,
