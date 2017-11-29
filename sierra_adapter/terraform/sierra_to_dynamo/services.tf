@@ -31,7 +31,7 @@ module "sierra_to_dynamo_service" {
   healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
 
-  config_key           = "config/${var.build_env}/transformer.ini"
+  config_key           = "config/${var.build_env}/sierra_to_adapter_${var.resource_type}.ini"
   config_template_path = "config/sierra_to_dynamo.ini.template"
 
   cpu    = 256
