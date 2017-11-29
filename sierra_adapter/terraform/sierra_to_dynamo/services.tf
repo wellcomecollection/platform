@@ -41,7 +41,7 @@ module "sierra_to_dynamo_service" {
   deployment_maximum_percent         = "200"
 
   config_vars = {
-    queue_arn         = "${module.windows_queue.arn}"
+    windows_queue_url = "${module.windows_queue.arn}"
     metrics_namespace = "sierra_to_dynamo-${var.resource_type}"
   }
 
