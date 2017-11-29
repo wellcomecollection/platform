@@ -5,10 +5,11 @@ import uk.ac.wellcome.finatra.modules.DynamoConfigModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 import javax.inject.Singleton
 
-object SierraDynamoConfigModule extends DynamoConfigModule{
+object SierraDynamoConfigModule extends DynamoConfigModule {
   val sierraToDynamoAppTable = flags("sierraToDynamo")
 
   @Singleton
   @Provides
-  def providesDynamoConfig(): DynamoConfig = DynamoConfig(sierraToDynamoAppTable())
+  def providesDynamoConfig(): DynamoConfig =
+    DynamoConfig(sierraToDynamoAppTable())
 }

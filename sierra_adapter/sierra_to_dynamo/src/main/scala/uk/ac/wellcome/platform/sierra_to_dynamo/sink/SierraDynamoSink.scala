@@ -17,8 +17,8 @@ import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
 import scala.concurrent.{ExecutionContext, Future}
 
 object SierraDynamoSink extends Logging {
-  def apply(client: AmazonDynamoDB,
-            tableName: String)(implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
+  def apply(client: AmazonDynamoDB, tableName: String)(
+    implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(json => {
       logger.debug(s"Inserting ${json.spaces4} in dynamo Db")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
@@ -45,14 +45,19 @@ object SierraDynamoSink extends Logging {
         )
         .put(record)
       Scanamo.exec(client)(ops) match {
-        case Right(_) => logger.info(s"${json.spaces4} saved successfully to dynamo Db")
-        case Left(error) => logger.warn(s"Failed saving ${json.spaces4} into DynamoDB", error)
+        case Right(_) =>
+          logger.info(s"${json.spaces4} saved successfully to dynamo Db")
+        case Left(error) =>
+          logger.warn(s"Failed saving ${json.spaces4} into DynamoDB", error)
       }
     })
 
   private def getDeletedDateTimeAtStartOfDay(json: Json) = {
     val formatter = DateTimeFormatter.ISO_DATE
-    LocalDate.parse(root.deletedDate.string.getOption(json).get, formatter).atStartOfDay().toInstant(ZoneOffset.UTC)
+    LocalDate
+      .parse(root.deletedDate.string.getOption(json).get, formatter)
+      .atStartOfDay()
+      .toInstant(ZoneOffset.UTC)
   }
 
   private def getId(json: Json) = {
