@@ -5,6 +5,7 @@ import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.SierraRecord
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
@@ -76,24 +77,32 @@ class SierraBibMergerWorkerServiceTest
 
   it("should put a bib from SQS into Dynamo") {
     val id = "1000017"
-    val updatedDate = "2015-12-09T12:04:09Z"
+    val updatedDate = "2013-12-13T12:43:16Z"
 
     val messageBody = generateSierraRecordMessageBody(id, updatedDate)
 
-    sqsClient.sendMessage(bibMergerQueue, messageBody)
+    val message = SQSMessage(
+      subject = None,
+      body = messageBody,
+      topic = "topic",
+      messageType = "messageType",
+      timestamp = "timestamp"
+    )
+
+    //sqsClient.sendMessage(bibMergerQueue, JsonUtil.toJson(message).get)
 
     val expectedMergedSierraObject = MergedSierraObject(id)
 
     server.start()
 
-    eventually {
+    //eventually {
       val actualMergedSierraObject =
         Scanamo.get[MergedSierraObject](dynamoDbClient)(tableName)(
           'id -> id
         ).get.right
 
       actualMergedSierraObject shouldEqual expectedMergedSierraObject
-    }
+    //}
 
     server.close()
   }
