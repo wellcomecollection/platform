@@ -35,10 +35,8 @@ class ReindexModuleTest
   val requestedVersion = 2
 
   val dynamoConfigs = Map(
-    "reindex" -> DynamoConfig("applicationName",
-                              "streamArn",
-                              reindexTableName),
-    "calm" -> DynamoConfig("applicationName", "streamArn", calmDataTableName)
+    "reindex" -> DynamoConfig(table = reindexTableName),
+    "calm" -> DynamoConfig(table = calmDataTableName)
   )
 
   var maybeServer: Option[EmbeddedHttpServer] = None
