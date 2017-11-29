@@ -3,14 +3,14 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.services
 import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
-import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -23,7 +23,8 @@ class SierraToDynamoWorkerServiceTest
     with Eventually
     with SierraDynamoDBLocal
     with Matchers
-    with ExtendedPatience{
+    with ExtendedPatience
+    with ScalaFutures{
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
@@ -84,5 +85,23 @@ class SierraToDynamoWorkerServiceTest
       Scanamo.scan[SierraRecord](dynamoDbClient)(tableName) should have size 29
     }
     worker.cancelRun()
+  }
+
+  it("should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
+    val worker = createSierraWorkerService("items")
+
+    val message =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z"
+        |}
+      """.stripMargin
+
+    val sqsMessage =
+      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+    whenReady(worker.processMessage(sqsMessage).failed) {ex =>
+      ex shouldBe a [SQSReaderGracefulException]
+    }
+
   }
 }

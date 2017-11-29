@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.services
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Keep
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import io.circe.optics.JsonPath.root
@@ -12,7 +11,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_to_dynamo.sink.SierraDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
-import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -36,11 +35,12 @@ class SierraToDynamoWorkerService @Inject()(
 
   val throttleRate = ThrottleRate(3, 1.second)
 
-  override def processMessage(message: SQSMessage): Future[Unit] =
+  def processMessage(message: SQSMessage): Future[Unit] =
     for {
       params <- extractUpdatedDateWindow(message)
       _ <- runSierraStream(params)
     } yield ()
+
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType,
@@ -53,5 +53,9 @@ class SierraToDynamoWorkerService @Inject()(
       val end = root.end.string.getOption(json).get
 
       Map("updatedDate" -> s"[$start,$end]")
+    }.recover {
+      case e: Exception =>
+        warn(s"Received a invalis message $message", e)
+        throw SQSReaderGracefulException(e)
     }
 }
