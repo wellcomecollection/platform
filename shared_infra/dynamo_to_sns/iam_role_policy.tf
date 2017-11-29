@@ -1,9 +1,16 @@
 resource "aws_iam_role_policy" "dynamo_to_miro_sns" {
   role   = "${module.lambda_dynamo_to_sns.role_name}"
-  policy = "${var.miro_transformer_topic_publish_policy}"
+  policy = "${data.aws_iam_policy_document.publish_to_topic.json}"
 }
 
-resource "aws_iam_role_policy" "dynamo_to_calm_sns" {
-  role   = "${module.lambda_dynamo_to_sns.role_name}"
-  policy = "${var.calm_transformer_topic_publish_policy}"
+data "aws_iam_policy_document" "publish_to_topic" {
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      "${var.dst_topic_arn}",
+    ]
+  }
 }

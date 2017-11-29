@@ -1,5 +1,9 @@
-variable "miro_table_stream_arn" {}
-variable "miro_transformer_topic_arn" {}
+variable "name" {}
+
+variable "src_stream_arn" {}
+variable "dst_topic_arn" {}
+variable "batch_size" {
+  default = 50
+}
+
 variable "lambda_error_alarm_arn" {}
-variable "calm_transformer_topic_publish_policy" {}
-variable "miro_transformer_topic_publish_policy" {}
