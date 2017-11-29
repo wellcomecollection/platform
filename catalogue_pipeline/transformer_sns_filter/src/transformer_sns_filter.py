@@ -25,6 +25,7 @@ def main(event, _):
     print(f'Received event:\n{event}')
 
     sns_client = boto3.client('sns')
+    topic_arn = os.environ['TOPIC_ARN']
 
     for sns_event in extract_sns_messages_from_lambda_event(event):
         publish_sns_message(

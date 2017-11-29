@@ -14,7 +14,7 @@ module "lambda_dynamo_to_sns" {
   s3_key          = "lambdas/shared_infra/dynamo_to_sns.zip"
 }
 
-module "trigger_dynamo_to_sns_miro" {
+module "trigger_dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_dynamo?ref=v1.0.0"
 
   batch_size = "${var.batch_size}"
