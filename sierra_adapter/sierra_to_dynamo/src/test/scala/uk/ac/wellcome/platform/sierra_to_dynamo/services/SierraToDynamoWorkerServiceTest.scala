@@ -23,8 +23,7 @@ class SierraToDynamoWorkerServiceTest
     with Eventually
     with SierraDynamoDBLocal
     with Matchers
-    with ExtendedPatience
-    with BeforeAndAfterEach {
+    with ExtendedPatience{
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]

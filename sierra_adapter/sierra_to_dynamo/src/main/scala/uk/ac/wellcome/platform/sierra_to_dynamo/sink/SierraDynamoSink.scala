@@ -14,12 +14,12 @@ import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object SierraDynamoSink extends Logging {
   def apply(client: AmazonDynamoDB,
-            tableName: String): Sink[Json, Future[Done]] =
-    Sink.foreach(json => {
+            tableName: String)(implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
+    Sink.foreachParallel(10)(json => {
       logger.debug(s"Inserting ${json.spaces4} in dynamo Db")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
