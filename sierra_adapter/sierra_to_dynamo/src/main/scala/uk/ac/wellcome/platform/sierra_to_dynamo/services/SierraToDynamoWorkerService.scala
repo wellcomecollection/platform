@@ -30,17 +30,19 @@ class SierraToDynamoWorkerService @Inject()(
   resourceType: String,
   dynamoTableName: String
 ) extends SQSWorker(reader, system, metrics) {
+
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()
+
+  val throttleRate = ThrottleRate(3, 1.second)
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       params <- extractUpdatedDateWindow(message)
       _ <- runSierraStream(params)
     } yield ()
-
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
-    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, ThrottleRate(30, 1.minute))(
+    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType,
       params).runWith(SierraDynamoSink(dynamoDbClient, dynamoTableName))
   }

@@ -28,6 +28,7 @@ class SierraDynamoSinkTest
     with MockitoSugar {
   implicit val system = ActorSystem()
   implicit val materialiser = ActorMaterializer()
+  implicit val executionContext = system.dispatcher
 
   val sink = SierraDynamoSink(client = dynamoDbClient, tableName = tableName)
 
