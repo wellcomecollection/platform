@@ -5,6 +5,10 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.sierra_to_dynamo.services.SierraToDynamoWorkerService
 
 object SierraToDynamoModule extends TwitterModule {
+  flag[String]("sierra.apiUrl", "", "Sierra API url")
+  flag[String]("sierra.oauthKey", "", "Sierra API oauth key")
+  flag[String]("sierra.oauthSecret", "", "Sierra API oauth secret")
+  flag[String]("sierra.resourceType", "", "Sierra API oauth secret")
 
   override def singletonStartup(injector: Injector) {
     val workerService = injector.instance[SierraToDynamoWorkerService]
