@@ -116,6 +116,32 @@ class SQSReaderTest
     assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
   }
 
+  it("should return a successful future but not delete the message if processing a message fails with SQSReaderGracefulException") {
+    val sqsConfig =
+      SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
+
+    val failingMessage = "This message will fail gracefully"
+    val messageStrings = List("This is the first message",
+      failingMessage,
+      "This is the final message")
+    messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+    val sqsReader =
+      new SQSReader(sqsClient, sqsConfig)
+
+    val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
+      if (message.getBody == failingMessage)
+        Future { throw SQSReaderGracefulException(new RuntimeException(s"$failingMessage is not valid")) }
+      else
+        Future.successful(message)
+    }
+
+    whenReady(futureMessages) { _ =>
+      // no need to assert anything. This is enough to assert that the future does not fail
+    }
+
+    assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
+  }
+
   private def assertNumberOfMessagesAfterVisibilityTimeoutIs(
     expectedNumberOfMessages: Int,
     sqsReader: SQSReader): Any = {
