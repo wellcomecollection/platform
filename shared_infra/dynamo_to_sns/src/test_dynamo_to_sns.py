@@ -11,12 +11,22 @@ def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
     topic_arn, queue_url = sns_sqs
     stream_arn = 'arn:aws:dynamodb:eu-west-1:123456789012:table/table-stream'
 
-    stream_arn_map = {
-        stream_arn: topic_arn
+    os.environ = {
+        'TOPIC_ARN': topic_arn
     }
 
-    os.environ = {
-        "STREAM_TOPIC_MAP": json.dumps(stream_arn_map)
+    old_image = {
+        'MiroID': {'S': 'V0000001'},
+        'MiroCollection': {'S': 'Images-V'},
+    }
+
+    expected_image = {
+        "event_type": "REMOVE",
+        "new_image": None,
+        "old_image": {
+            "MiroID": "V0000001",
+            "MiroCollection": "Images-V"
+        }
     }
 
     remove_event = {'Records': [
@@ -36,8 +46,9 @@ def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
                         'S': 'Images-V'
                     }
                 },
+                'OldImage': old_image,
                 'SequenceNumber': '545308300000000005226392296', 'SizeBytes': 36,
-                'StreamViewType': 'NEW_IMAGE'
+                'StreamViewType': 'OLD_IMAGE'
             },
             'eventSourceARN': stream_arn
         }]
@@ -50,9 +61,10 @@ def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
         MaxNumberOfMessages=1
     )
 
-    print(messages)
-
-    assert messages.get("Messages") is None
+    assert len(messages['Messages']) == 1
+    message_body = messages['Messages'][0]['Body']
+    inner_message = json.loads(message_body)['Message']
+    assert json.loads(json.loads(inner_message)['default']) == expected_image
 
 
 def test_dynamo_to_sns(sns_sqs):
@@ -69,11 +81,15 @@ def test_dynamo_to_sns(sns_sqs):
     }
 
     expected_image = {
-        'ReindexVersion': 0,
-        'ReindexShard': 'default',
-        'data': 'test-json-data',
-        'MiroID': 'V0010033',
-        'MiroCollection': 'Images-V'
+        "event_type": "MODIFY",
+        "old_image": None,
+        "new_image": {
+            "ReindexVersion": 0,
+            "ReindexShard": "default",
+            "data": "test-json-data",
+            "MiroID": "V0010033",
+            "MiroCollection": "Images-V"
+        }
     }
 
     event = {
@@ -99,11 +115,8 @@ def test_dynamo_to_sns(sns_sqs):
         ]
     }
 
-    stream_arn_map = {
-        stream_arn: topic_arn
-    }
     os.environ = {
-        "STREAM_TOPIC_MAP": json.dumps(stream_arn_map)
+        'TOPIC_ARN': topic_arn
     }
 
     dynamo_to_sns.main(event, None)
@@ -112,6 +125,7 @@ def test_dynamo_to_sns(sns_sqs):
         QueueUrl=queue_url,
         MaxNumberOfMessages=1
     )
+    assert len(messages['Messages']) == 1
     message_body = messages['Messages'][0]['Body']
     inner_message = json.loads(message_body)['Message']
     assert json.loads(inner_message)['default'] == json.dumps(expected_image)
