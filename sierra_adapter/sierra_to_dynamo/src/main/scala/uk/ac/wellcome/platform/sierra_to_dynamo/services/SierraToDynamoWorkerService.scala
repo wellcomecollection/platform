@@ -49,14 +49,17 @@ class SierraToDynamoWorkerService @Inject()(
   }
 
   private def extractUpdatedDateWindow(message: SQSMessage) =
-    Future.fromTry(Try(parse(message.body).right.get)).map { json =>
-      val start = root.start.string.getOption(json).get
-      val end = root.end.string.getOption(json).get
+    Future
+      .fromTry(Try(parse(message.body).right.get))
+      .map { json =>
+        val start = root.start.string.getOption(json).get
+        val end = root.end.string.getOption(json).get
 
-      Map("updatedDate" -> s"[$start,$end]")
-    }.recover {
-      case e: Exception =>
-        warn(s"Received a invalis message $message", e)
-        throw SQSReaderGracefulException(e)
-    }
+        Map("updatedDate" -> s"[$start,$end]")
+      }
+      .recover {
+        case e: Exception =>
+          warn(s"Received a invalis message $message", e)
+          throw SQSReaderGracefulException(e)
+      }
 }
