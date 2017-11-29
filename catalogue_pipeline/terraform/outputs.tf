@@ -1,11 +1,3 @@
-output "miro_table_stream_arn" {
-  value = "${aws_dynamodb_table.miro_table.stream_arn}"
-}
-
-output "miro_transformer_topic_arn" {
-  value = "${module.miro_transformer_topic.arn}"
-}
-
 output "dynamodb_table_miro_table_name" {
   value = "${aws_dynamodb_table.miro_table.name}"
 }
@@ -20,10 +12,6 @@ output "ecs_services_cluster_name" {
 
 output "miro_transformer_topic_publish_policy" {
   value = "${module.miro_transformer_topic.publish_policy}"
-}
-
-output "calm_transformer_topic_publish_policy" {
-  value = "${module.calm_transformer_topic.publish_policy}"
 }
 
 output "ecs_services_cluster_id" {

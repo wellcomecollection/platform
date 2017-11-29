@@ -7,18 +7,6 @@ module "drain_ecs_container_instance" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "dynamo_to_sns" {
-  source = "dynamo_to_sns"
-
-  miro_transformer_topic_arn = "${local.miro_transformer_topic_arn}"
-  miro_table_stream_arn      = "${local.miro_table_stream_arn}"
-
-  miro_transformer_topic_publish_policy = "${local.miro_transformer_topic_publish_policy}"
-  calm_transformer_topic_publish_policy = "${local.calm_transformer_topic_publish_policy}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "ecs_ec2_instance_tagger" {
   source = "ecs_ec2_instance_tagger"
 
