@@ -1,5 +1,5 @@
 module "lambda_dynamo_to_sns" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.2.0"
 
   name        = "dynamo_to_sns_${var.name}"
   module_name = "dynamo_to_sns"
