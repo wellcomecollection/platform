@@ -25,7 +25,8 @@ sierra_bib_merger-build: $(ROOT)/.docker/sbt_image_builder
 	PROJECT=sierra_bib_merger $(ROOT)/builds/run_sbt_image_build.sh
 
 sierra_bib_merger-publish: sierra_bib_merger-build
-	$(call publish_service,sierra_bib_merger)
+	echo "This does nothing yet!"
+	# $(call publish_service,sierra_bib_merger)
 
 
 sierra_adapter-test: \
