@@ -20,7 +20,7 @@ object SierraDynamoSink extends Logging {
   def apply(client: AmazonDynamoDB, tableName: String)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(json => {
-      logger.debug(s"Inserting ${json.spaces4} in dynamo Db")
+      logger.debug(s"Inserting ${json.noSpaces} in dynamo Db")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
@@ -46,9 +46,9 @@ object SierraDynamoSink extends Logging {
         .put(record)
       Scanamo.exec(client)(ops) match {
         case Right(_) =>
-          logger.info(s"${json.spaces4} saved successfully to dynamo Db")
+          logger.info(s"${json.noSpaces} saved successfully to DynamoDB")
         case Left(error) =>
-          logger.warn(s"Failed saving ${json.spaces4} into DynamoDB", error)
+          logger.warn(s"Failed saving ${json.noSpaces} into DynamoDB", error)
       }
     })
 
