@@ -59,6 +59,7 @@ class SierraBibMergerWorkerServiceTest
         "aws.sqs.queue.url" -> bibMergerQueue,
         "aws.dynamo.sierraBibMerger.tableName" -> tableName
       )
+      ) ++ sqsLocalFlags
     )
   }
 
@@ -67,6 +68,9 @@ class SierraBibMergerWorkerServiceTest
       id,
       bibRecordString(id, updatedDate),
       updatedDate
+      id = id,
+      data = bibRecordString(id, updatedDate),
+      modifiedDate = updatedDate
     )
 
     JsonUtil.toJson(record).get
