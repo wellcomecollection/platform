@@ -56,7 +56,6 @@ class SierraBibMergerWorkerServiceTest
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
-        "aws.region" -> "localhost",
         "aws.sqs.queue.url" -> bibMergerQueue,
         "bibMerger.dynamo.tableName" -> tableName
       )
