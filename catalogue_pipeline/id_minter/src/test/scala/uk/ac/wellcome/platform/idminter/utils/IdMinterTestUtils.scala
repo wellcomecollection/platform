@@ -18,7 +18,6 @@ trait IdMinterTestUtils
     with IdentifiersTableInfo
     with AmazonCloudWatchFlag
     with Matchers { this: Suite =>
-
   val ingestorTopicArn: String = createTopicAndReturnArn("test_ingestor")
   val idMinterQueue: String = createQueueAndReturnUrl("test_id_minter")
 

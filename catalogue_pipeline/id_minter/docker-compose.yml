@@ -4,7 +4,7 @@ mysql:
   # do not expose the default port cause it's already used on travis: https://github.com/travis-ci/travis-ci/issues/7008
     - "3307:3306"
   environment:
-    - "MYSQL_ROOT_PASSWORD=password"
+      - "MYSQL_ROOT_PASSWORD=password"
 sns:
   image: wellcome/fake-sns
   ports:
