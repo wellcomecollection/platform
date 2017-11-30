@@ -54,6 +54,10 @@ def parse_args():
         '--sbt', dest='share_sbt_dirs', action='store_const', const=True,
         help='Whether to share sbt directories with the running container'
     )
+    parser.add_argument(
+        '--root', dest='expose_host_root_folder', action='store_const', const=True,
+        help='Whether to expose the name of the root folder of the repository in the host'
+    )
     return parser.parse_known_args()
 
 
@@ -72,6 +76,9 @@ if __name__ == '__main__':
     if namespace.share_sbt_dirs:
         cmd += ['--volume', '%s/.sbt:/root/.sbt' % os.environ['HOME']]
         cmd += ['--volume', '%s/.ivy2:/root/.ivy2' % os.environ['HOME']]
+
+    if namespace.expose_host_root_folder:
+        cmd += ['-e', 'ROOT=%s' % ROOT]
 
     if additional_args[0] == '--':
         additional_args = additional_args[1:]
