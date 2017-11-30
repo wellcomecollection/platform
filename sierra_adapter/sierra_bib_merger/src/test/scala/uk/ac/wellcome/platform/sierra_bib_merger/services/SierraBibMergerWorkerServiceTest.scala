@@ -1,7 +1,9 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
+import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
+import com.gu.scanamo.query.UniqueKey
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
@@ -10,6 +12,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
+import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -21,6 +24,9 @@ class SierraBibMergerWorkerServiceTest
     with Matchers
     with SQSLocal
     with DynamoDBLocal {
+
+  implicit val system = ActorSystem()
+  implicit val executionContext = system.dispatcher
 
   val queueUrl = createQueueAndReturnUrl("test_bib_merger")
 
@@ -64,41 +70,29 @@ class SierraBibMergerWorkerServiceTest
       |    }
     """.stripMargin
 
-  def generateSierraRecordMessageBody(id: String, updatedDate: String): String = {
+  it("should put a bib from SQS into Dynamo") {
+    val id = "1000001"
+    sendMessageForBibToSQS(id = id, updatedDate = "2001-01-01T01:01:01Z")
+    val expectedMergedSierraObject = MergedSierraObject(id)
+
+    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraObject)
+  }
+
+  private def sendMessageForBibToSQS(id: String, updatedDate: String) = {
     val record = SierraRecord(
       id = id,
       data = bibRecordString(id, updatedDate),
       modifiedDate = updatedDate
     )
-
-    JsonUtil.toJson(record).get
-  }
-
-  it("should put a bib from SQS into Dynamo") {
-    val id = "1000017"
-    val updatedDate = "2013-12-13T12:43:16Z"
-
-    val messageBody = generateSierraRecordMessageBody(id, updatedDate)
+    val messageBody = JsonUtil.toJson(record).get
 
     val message = SQSMessage(
-      subject = None,
+      subject = Some("Test message sent by SierraBibMergerWorkerServiceTest"),
       body = messageBody,
       topic = "topic",
       messageType = "messageType",
-      timestamp = "timestamp"
+      timestamp = "2001-01-01T01:01:01Z"
     )
-
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
-
-    val expectedMergedSierraObject = MergedSierraObject(id)
-
-    eventually {
-      val actualMergedSierraObject =
-        Scanamo.get[MergedSierraObject](dynamoDbClient)(tableName)(
-          'id -> id
-        ).get
-
-      actualMergedSierraObject shouldEqual Right(expectedMergedSierraObject)
-    }
   }
 }
