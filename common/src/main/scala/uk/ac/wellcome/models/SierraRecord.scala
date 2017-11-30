@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_to_dynamo.models
+package uk.ac.wellcome.models
 
 import java.time.Instant
 

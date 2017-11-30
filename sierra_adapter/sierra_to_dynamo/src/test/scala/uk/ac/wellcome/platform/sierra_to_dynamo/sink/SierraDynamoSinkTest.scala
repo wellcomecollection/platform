@@ -15,8 +15,8 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
+import uk.ac.wellcome.models.SierraRecord
+import uk.ac.wellcome.models.SierraRecord._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraDynamoSinkTest
