@@ -15,7 +15,8 @@ import uk.ac.wellcome.platform.sierra_bib_merger.controllers.ManagementControlle
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name = "uk.ac.wellcome.platform.sierra_bib_merger SierraBibMerger"
+  override val name =
+    "uk.ac.wellcome.platform.sierra_bib_merger SierraBibMerger"
   override val modules = Seq(
     PlatformDynamoConfigModule,
     DynamoClientModule,
