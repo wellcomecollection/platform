@@ -26,7 +26,7 @@ module "trigger_reindexer_lambda" {
 }
 
 module "dynamo_to_sns" {
-  source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns?ref=dynamo_to_sns-redux"
+  source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
 
   name           = "MiroData"
   src_stream_arn = "${aws_dynamodb_table.miro_table.stream_arn}"

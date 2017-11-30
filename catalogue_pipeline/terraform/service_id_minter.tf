@@ -17,13 +17,12 @@ module "id_minter_sqs_autoscaling_alarms" {
 }
 
 module "id_minter" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.0"
   name               = "id_minter"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_id_minter_iam.task_role_arn}"
   vpc_id             = "${module.vpc_services.vpc_id}"
   app_uri            = "${module.ecr_repository_id_minter.repository_url}:${var.release_ids["id_minter"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_services.repository_url}:${var.release_ids["nginx_services"]}"
   listener_https_arn = "${module.services_alb.listener_https_arn}"
   listener_http_arn  = "${module.services_alb.listener_http_arn}"
   path_pattern       = "/id_minter/*"
@@ -54,4 +53,6 @@ module "id_minter" {
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
   client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
+
+  https_domain = "services.wellcomecollection.org"
 }
