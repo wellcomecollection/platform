@@ -59,7 +59,7 @@ class SierraToDynamoWorkerService @Inject()(
       }
       .recover {
         case e: Exception =>
-          warn(s"Received a invalis message $message", e)
+          warn(s"Received a invalid message $message", e)
           throw SQSReaderGracefulException(e)
       }
 }
