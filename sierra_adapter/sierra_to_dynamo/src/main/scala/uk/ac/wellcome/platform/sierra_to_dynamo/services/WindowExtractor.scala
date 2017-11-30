@@ -12,6 +12,8 @@ import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import scala.util.Try
 
 object WindowExtractor extends Logging {
+  private val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
+
   def extractWindow(jsonString: String): Try[String] =
     Try(parse(jsonString).right.get)
       .map { json =>
@@ -22,7 +24,7 @@ object WindowExtractor extends Logging {
         val endDateTime = parseStringToDateTime(end)
         if (startDateTime.isAfter(endDateTime) || startDateTime.isEqual(
               endDateTime))
-          throw new Exception(s"$start is after $end")
+          throw new Exception(s"$start must be before $end")
 
         s"[$start,$end]"
       }
@@ -36,8 +38,7 @@ object WindowExtractor extends Logging {
     root.selectDynamic(field).string.getOption(json).get
   }
 
-  private def parseStringToDateTime(start: String) = {
-    val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
-    LocalDateTime.parse(start, formatter)
+  private def parseStringToDateTime(dateTimeString: String) = {
+    LocalDateTime.parse(dateTimeString, formatter)
   }
 }

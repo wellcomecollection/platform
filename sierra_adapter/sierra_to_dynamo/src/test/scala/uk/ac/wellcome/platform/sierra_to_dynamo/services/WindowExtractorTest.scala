@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_to_dynamo.services
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 
 
@@ -18,7 +17,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
         |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).get shouldBe s"[$start,$end]"
-
   }
 
   it("should return a SQSReaderGracefulException if start is not a valid iso datetime") {
@@ -30,7 +28,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if start is a datetime but does not have a timezone") {
@@ -42,7 +39,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if end is not a valid iso datetime") {
@@ -54,7 +50,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if end is a datetime but does not have a timezone") {
@@ -66,7 +61,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if there is not a start datetime") {
@@ -77,7 +71,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if there is not an end datetime") {
@@ -88,7 +81,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if the start time is after the end time") {
@@ -100,7 +92,6 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
 
   it("should return a SQSReaderGracefulException if the start time is equal to the end time") {
@@ -112,7 +103,5 @@ class WindowExtractorTest extends FunSpec with Matchers{
          |}
       """.stripMargin
     WindowExtractor.extractWindow(jsonString).failed.get shouldBe a [SQSReaderGracefulException]
-
   }
-
 }
