@@ -8,8 +8,8 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
+import uk.ac.wellcome.models.SierraRecord
+import uk.ac.wellcome.models.SierraRecord._
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
