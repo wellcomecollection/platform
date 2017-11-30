@@ -21,19 +21,15 @@ class SierraBibMergerUpdaterService @Inject()(
    dynamoConfig: DynamoConfig) extends Logging {
 
   def update(mergedSierraObject: MergedSierraObject): Unit = {
-    println(s"@@AWLC about to PUT ${mergedSierraObject}")
 
     val table = Table[MergedSierraObject](dynamoConfig.table)
-    println(s"@@AWLC table = $table")
     val ops = table
       .put(mergedSierraObject)
-    println(s"@@AWLC ops = $ops")
-    val x = Scanamo.exec(dynamoDBClient)(ops) //match {
-    println(s"@@AWLC Scanamo result = $x")
-    //   case Right(_) =>
-    //     logger.info(s"$mergedSierraObject saved successfully to DynamoDB")
-    //   case Left(error) =>
-    //     logger.warn(s"Failed saving $mergedSierraObject to DynamoDB", error)
-    // }
+    val x = Scanamo.exec(dynamoDBClient)(ops) match {
+      case Right(_) =>
+        logger.info(s"$mergedSierraObject saved successfully to DynamoDB")
+      case Left(error) =>
+        logger.warn(s"Failed saving $mergedSierraObject to DynamoDB", error)
+    }
   }
 }

@@ -19,8 +19,6 @@ trait DynamoDBLocal
 
   private val table: CreateTableResult = createTable()
 
-  println(s"@@AWLC table = $table")
-
   val streamArn: String =
     table.getTableDescription.getLatestStreamArn
 

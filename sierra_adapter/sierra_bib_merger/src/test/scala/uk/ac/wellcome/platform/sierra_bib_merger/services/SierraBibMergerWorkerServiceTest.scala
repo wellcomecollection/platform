@@ -88,8 +88,7 @@ class SierraBibMergerWorkerServiceTest
       timestamp = "timestamp"
     )
 
-    val response = sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
-    println(s"@@AWLC response = $response")
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
 
     val expectedMergedSierraObject = MergedSierraObject(id)
 
