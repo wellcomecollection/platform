@@ -13,7 +13,7 @@ import io.circe.parser._
 import org.mockito.Mockito
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
 import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
@@ -28,6 +28,7 @@ class SierraDynamoSinkTest
     with MockitoSugar {
   implicit val system = ActorSystem()
   implicit val materialiser = ActorMaterializer()
+  implicit val executionContext = system.dispatcher
 
   val sink = SierraDynamoSink(client = dynamoDbClient, tableName = tableName)
 
@@ -43,7 +44,30 @@ class SierraDynamoSinkTest
     val futureUnit = Source.single(json).runWith(sink)
 
     val expectedRecord = SierraRecord(
-      id = id, data = json.noSpaces, updatedDate = updatedDate
+      id = id, data = json.noSpaces, modifiedDate = updatedDate
+    )
+
+    whenReady(futureUnit) { _ =>
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+        Right(expectedRecord))
+    }
+  }
+
+  it ("should be able to handle deleted items") {
+    val id = "1357947"
+    val deletedDate = "2014-01-31"
+    val json = parse(s"""{
+                       |    "id" : "$id",
+                       |    "deletedDate" : "$deletedDate",
+                       |    "deleted" : true,
+                       |    "bibIds" : [
+                       |    ]
+                       |}""".stripMargin).right.get
+
+    val futureUnit = Source.single(json).runWith(sink)
+
+    val expectedRecord = SierraRecord(
+      id = id, data = json.noSpaces, modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
     whenReady(futureUnit) { _ =>
@@ -59,7 +83,7 @@ class SierraDynamoSinkTest
 
     val newRecord = SierraRecord(
       id = id,
-      updatedDate = newUpdatedDate,
+      modifiedDate = newUpdatedDate,
       data =
         s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
     )
@@ -87,7 +111,7 @@ class SierraDynamoSinkTest
 
     val oldRecord = SierraRecord(
       id = id,
-      updatedDate = oldUpdatedDate,
+      modifiedDate = oldUpdatedDate,
       data =
         s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
     )
@@ -104,7 +128,7 @@ class SierraDynamoSinkTest
     val futureUnit = Source.single(newJson).runWith(sink)
     val newRecord = SierraRecord(
       id = id,
-      updatedDate = newUpdatedDate,
+      modifiedDate = newUpdatedDate,
       data =
         s"""{"id":"$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
     )

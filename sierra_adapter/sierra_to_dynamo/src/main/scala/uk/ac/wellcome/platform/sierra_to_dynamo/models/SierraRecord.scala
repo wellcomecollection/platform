@@ -7,7 +7,7 @@ import com.gu.scanamo.DynamoFormat
 case class SierraRecord(
   id: String,
   data: String,
-  updatedDate: Instant
+  modifiedDate: Instant
 )
 
 object SierraRecord {
@@ -18,10 +18,10 @@ object SierraRecord {
       _.getEpochSecond
     )
 
-  def apply(id: String, data: String, updatedDate: String): SierraRecord =
+  def apply(id: String, data: String, modifiedDate: String): SierraRecord =
     SierraRecord(
       id = id,
       data = data,
-      updatedDate = Instant.parse(updatedDate)
+      modifiedDate = Instant.parse(modifiedDate)
     )
 }
