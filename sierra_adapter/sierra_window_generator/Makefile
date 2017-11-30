@@ -9,7 +9,8 @@ include $(ROOT)/functions.Makefile
 
 
 $(SIERRA_WINDOW_GENERATOR)/src/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/src/requirements.in
-	docker run --volume $(SIERRA_WINDOW_GENERATOR):/src micktwomey/pip-tools
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(SIERRA_WINDOW_GENERATOR)/src:/src micktwomey/pip-tools
 
 sierra_window_generator-test: $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
