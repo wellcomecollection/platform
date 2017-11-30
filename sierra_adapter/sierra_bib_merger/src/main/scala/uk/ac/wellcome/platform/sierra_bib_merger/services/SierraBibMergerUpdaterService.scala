@@ -1,10 +1,12 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.PutItemResult
 import com.google.inject.Inject
-import com.gu.scanamo.ScanamoAsync
+import com.gu.scanamo.{Scanamo, Table}
+import com.gu.scanamo.syntax._
 import com.twitter.inject.annotations.Flag
+import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
@@ -14,11 +16,24 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
-   dynamoDBClient: AmazonDynamoDBAsync,
+   dynamoDBClient: AmazonDynamoDB,
    metrics: MetricsSender,
-   dynamoConfig: DynamoConfig) {
+   dynamoConfig: DynamoConfig) extends Logging {
 
-  def update(mergedSierraObject: MergedSierraObject): Future[PutItemResult] =
-    ScanamoAsync.put[MergedSierraObject](dynamoDBClient)(dynamoConfig.table)(mergedSierraObject)
+  def update(mergedSierraObject: MergedSierraObject): Unit = {
+    println(s"@@AWLC about to PUT ${mergedSierraObject}")
 
+    val table = Table[MergedSierraObject](dynamoConfig.table)
+    println(s"@@AWLC table = $table")
+    val ops = table
+      .put(mergedSierraObject)
+    println(s"@@AWLC ops = $ops")
+    val x = Scanamo.exec(dynamoDBClient)(ops) //match {
+    println(s"@@AWLC Scanamo result = $x")
+    //   case Right(_) =>
+    //     logger.info(s"$mergedSierraObject saved successfully to DynamoDB")
+    //   case Left(error) =>
+    //     logger.warn(s"Failed saving $mergedSierraObject to DynamoDB", error)
+    // }
+  }
 }

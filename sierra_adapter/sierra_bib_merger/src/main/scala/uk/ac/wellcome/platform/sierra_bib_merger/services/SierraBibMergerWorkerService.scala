@@ -19,14 +19,16 @@ class SierraBibMergerWorkerService @Inject()(
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
 ) extends SQSWorker(reader, system, metrics) {
 
-  override def processMessage(message: SQSMessage): Future[Unit] = {
-    (JsonUtil.fromJson[MergedSierraObject](message.body) match {
+  override def processMessage(message: SQSMessage): Future[Unit] =
+    JsonUtil.fromJson[MergedSierraObject](message.body) match {
       case Success(mergedSierraObject) => {
+        println(s"@@AWLC Success($mergedSierraObject)")
         sierraBibMergerUpdaterService.update(mergedSierraObject)
+        Future.successful(Unit)
       }
       case Failure(e) => {
+        println(s"@@AWLC Failure($e)")
         Future.successful(e)
       }
-    }).map(println).map(_ => Future.successful(Unit))
-  }
+    }
 }

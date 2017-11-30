@@ -3,23 +3,35 @@ package uk.ac.wellcome.platform.sierra_bib_merger.services
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
+import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.SierraRecord
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
-import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 
 class SierraBibMergerWorkerServiceTest
-  extends FunSpec
+    extends FunSpec
+    with FeatureTestMixin
+    with AmazonCloudWatchFlag
     with Matchers
     with SQSLocal
     with DynamoDBLocal {
 
-  val bibMergerQueue: String = createQueueAndReturnUrl("test_bib_merger")
+  val queueUrl = createQueueAndReturnUrl("test_bib_merger")
+
+  override protected def server = new EmbeddedHttpServer(
+    new Server(),
+    flags = Map(
+      "aws.sqs.queue.url" -> queueUrl,
+      "aws.sqs.waitTime" -> "1",
+      "aws.dynamo.sierraBibMerger.tableName" -> tableName
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+  )
 
   def bibRecordString(id: String, updatedDate: String) =
     s"""
@@ -52,22 +64,8 @@ class SierraBibMergerWorkerServiceTest
       |    }
     """.stripMargin
 
-  def defineServer: EmbeddedHttpServer = {
-    new EmbeddedHttpServer(
-      new Server(),
-      flags = Map(
-        "aws.sqs.queue.url" -> bibMergerQueue,
-        "aws.dynamo.sierraBibMerger.tableName" -> tableName
-      )
-      ) ++ sqsLocalFlags
-    )
-  }
-
   def generateSierraRecordMessageBody(id: String, updatedDate: String): String = {
     val record = SierraRecord(
-      id,
-      bibRecordString(id, updatedDate),
-      updatedDate
       id = id,
       data = bibRecordString(id, updatedDate),
       modifiedDate = updatedDate
@@ -75,8 +73,6 @@ class SierraBibMergerWorkerServiceTest
 
     JsonUtil.toJson(record).get
   }
-
-  private val server = defineServer
 
   it("should put a bib from SQS into Dynamo") {
     val id = "1000017"
@@ -92,21 +88,18 @@ class SierraBibMergerWorkerServiceTest
       timestamp = "timestamp"
     )
 
-    sqsClient.sendMessage(bibMergerQueue, JsonUtil.toJson(message).get)
+    val response = sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
+    println(s"@@AWLC response = $response")
 
     val expectedMergedSierraObject = MergedSierraObject(id)
-
-    server.start()
 
     eventually {
       val actualMergedSierraObject =
         Scanamo.get[MergedSierraObject](dynamoDbClient)(tableName)(
           'id -> id
-        ).get.right
+        ).get
 
-      actualMergedSierraObject shouldEqual expectedMergedSierraObject
+      actualMergedSierraObject shouldEqual Right(expectedMergedSierraObject)
     }
-
-    server.close()
   }
 }
