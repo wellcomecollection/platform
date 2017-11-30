@@ -48,8 +48,20 @@ transformer-deploy: transformer-build
 	$(call publish_service,transformer)
 
 
+transformer_sns_filter-build: $(ROOT)/.docker/python3.6_ci
+	docker run \
+		--volume $(CATALOGUE_PIPELINE)/transformer_sns_filter:/data \
+		--env OP=build-lambda \
+		python3.6_ci:latest
+
+transformer_sns_filter-publish:
+	$(call publish_lambda,catalogue_pipeline/transformer_sns_filter)
+
+
+
 catalogue_pipeline-build: \
 	schedule_reindexer-build \
+	transformer_sns_filter-build \
 	id_minter-build \
 	ingestor-build \
 	reindexer-build \
@@ -64,6 +76,7 @@ catalogue_pipeline-test: \
 
 catalogue_pipeline-deploy: \
 	schedule_reindexer-publish \
+	transformer_sns_filter-publish \
 	id_minter-deploy \
 	ingestor-deploy \
 	reindexer-deploy \

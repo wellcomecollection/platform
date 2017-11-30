@@ -70,8 +70,8 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     prefix = "cold_store/"
 
     transition {
-      days          = 60
-      storage_class = "GLACIER"
+      days          = 30
+      storage_class = "STANDARD_IA"
     }
 
     enabled = true
