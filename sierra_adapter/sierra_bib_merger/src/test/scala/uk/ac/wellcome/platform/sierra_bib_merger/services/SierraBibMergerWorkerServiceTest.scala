@@ -57,7 +57,7 @@ class SierraBibMergerWorkerServiceTest
       new Server(),
       flags = Map(
         "aws.sqs.queue.url" -> bibMergerQueue,
-        "bibMerger.dynamo.tableName" -> tableName
+        "aws.dynamo.sierraBibMerger.tableName" -> tableName
       )
     )
   }

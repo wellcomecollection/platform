@@ -8,27 +8,26 @@ import com.google.inject.Provides
 import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.platform.sierra_bib_merger.services.{SierraBibMergerUpdaterService, SierraBibMergerWorkerService}
+import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.sierra_bib_merger.services.{
+  SierraBibMergerUpdaterService, SierraBibMergerWorkerService
+}
 import uk.ac.wellcome.utils.TryBackoff
 
 object SierraBibMergerModule extends TwitterModule with TryBackoff {
 
   override lazy val continuous: Boolean = false
 
-  val tableName: Flag[String] = flag[String](
-    name = "bibMerger.dynamo.tableName",
-    help = "bibMerger dynamo table name"
-  )
-
   @Singleton
   @Provides
   def providesSierraBibMergerUpdaterService(
      dynamoDBClient: AmazonDynamoDBAsync,
-     metricsSender: MetricsSender): SierraBibMergerUpdaterService =
+     metricsSender: MetricsSender,
+     dynamoConfig: DynamoConfig): SierraBibMergerUpdaterService =
     new SierraBibMergerUpdaterService(
       dynamoDBClient = dynamoDBClient,
       metrics = metricsSender,
-      tableName = tableName()
+      dynamoConfig = dynamoConfig
     )
 
   override def singletonStartup(injector: Injector) {
