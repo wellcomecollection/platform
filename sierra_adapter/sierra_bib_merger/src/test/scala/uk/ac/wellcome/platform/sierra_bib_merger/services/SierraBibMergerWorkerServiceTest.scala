@@ -89,20 +89,20 @@ class SierraBibMergerWorkerServiceTest
       timestamp = "timestamp"
     )
 
-    //sqsClient.sendMessage(bibMergerQueue, JsonUtil.toJson(message).get)
+    sqsClient.sendMessage(bibMergerQueue, JsonUtil.toJson(message).get)
 
     val expectedMergedSierraObject = MergedSierraObject(id)
 
     server.start()
 
-    //eventually {
+    eventually {
       val actualMergedSierraObject =
         Scanamo.get[MergedSierraObject](dynamoDbClient)(tableName)(
           'id -> id
         ).get.right
 
       actualMergedSierraObject shouldEqual expectedMergedSierraObject
-    //}
+    }
 
     server.close()
   }
