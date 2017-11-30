@@ -5,9 +5,11 @@ Publish a new Sierra update window to SNS.
 
 import datetime as dt
 import os
-import time
 
 import boto3
+import pytz
+
+
 
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
@@ -16,12 +18,12 @@ def build_window(minutes):
     """Construct the Sierra update window."""
     seconds = minutes * 60
 
-    end = time.time()
-    start = end - seconds
+    end = pytz.utc.localize(dt.datetime.utcnow())
+    start = end - dt.timedelta(seconds=seconds)
 
     return {
-        'start': dt.datetime.fromtimestamp(start).isoformat(),
-        'end': dt.datetime.fromtimestamp(end).isoformat(),
+        'start': start.isoformat(),
+        'end': end.isoformat(),
     }
 
 

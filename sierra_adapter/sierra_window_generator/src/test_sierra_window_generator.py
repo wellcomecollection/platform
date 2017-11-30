@@ -10,19 +10,22 @@ import mock
 
 from sierra_window_generator import build_window, main
 
-mock_time = mock.Mock()
-mock_time.return_value = time.mktime(dt.datetime(2011, 6, 21).timetuple())
+
+class patched_datetime(dt.datetime):
+    @classmethod
+    def utcnow(cls):
+        return dt.datetime(2011, 6, 21, 0, 0, 0, 0)
 
 
-@mock.patch('time.time', mock_time)
+@mock.patch('datetime.datetime', patched_datetime)
 def test_build_window():
     assert build_window(minutes=15) == {
-        'start': '2011-06-20T23:45:00',
-        'end': '2011-06-21T00:00:00',
+        'start': '2011-06-20T23:45:00+00:00',
+        'end': '2011-06-21T00:00:00+00:00',
     }
 
 
-@mock.patch('time.time', mock_time)
+@mock.patch('datetime.datetime', patched_datetime)
 def test_end_to_end(sns_sqs):
     topic_arn, queue_url = sns_sqs
 
@@ -42,6 +45,6 @@ def test_end_to_end(sns_sqs):
     parsed_message = json.loads(json.loads(inner_message)['default'])
 
     assert parsed_message == {
-        'start': '2011-06-20T23:35:00',
-        'end': '2011-06-21T00:00:00',
+        'start': '2011-06-20T23:35:00+00:00',
+        'end': '2011-06-21T00:00:00+00:00',
     }
