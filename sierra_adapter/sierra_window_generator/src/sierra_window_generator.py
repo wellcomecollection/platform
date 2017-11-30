@@ -10,7 +10,6 @@ import boto3
 import pytz
 
 
-
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
