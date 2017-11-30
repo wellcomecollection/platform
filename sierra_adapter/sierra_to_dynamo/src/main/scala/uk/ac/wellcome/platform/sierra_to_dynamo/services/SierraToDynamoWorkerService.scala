@@ -38,7 +38,8 @@ class SierraToDynamoWorkerService @Inject()(
 
   def processMessage(message: SQSMessage): Future[Unit] =
     for {
-      params <- extractUpdatedDateWindow(message)
+      window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
+      params = Map("updatedDate" -> window)
       _ <- runSierraStream(params)
     } yield ()
 
@@ -47,19 +48,4 @@ class SierraToDynamoWorkerService @Inject()(
       resourceType,
       params).runWith(SierraDynamoSink(dynamoDbClient, dynamoConfig.table))
   }
-
-  private def extractUpdatedDateWindow(message: SQSMessage) =
-    Future
-      .fromTry(Try(parse(message.body).right.get))
-      .map { json =>
-        val start = root.start.string.getOption(json).get
-        val end = root.end.string.getOption(json).get
-
-        Map("updatedDate" -> s"[$start,$end]")
-      }
-      .recover {
-        case e: Exception =>
-          warn(s"Received a invalid message $message", e)
-          throw SQSReaderGracefulException(e)
-      }
 }
