@@ -6,17 +6,14 @@ import akka.stream.ActorMaterializer
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
-import io.circe.optics.JsonPath.root
-import io.circe.parser._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_to_dynamo.sink.SierraDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.Try
 
 class SierraToDynamoWorkerService @Inject()(
   reader: SQSReader,
