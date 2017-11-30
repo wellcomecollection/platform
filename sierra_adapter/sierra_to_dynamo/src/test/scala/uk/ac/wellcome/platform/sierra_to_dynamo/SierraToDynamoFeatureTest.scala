@@ -5,8 +5,8 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
+import uk.ac.wellcome.models.SierraRecord
+import uk.ac.wellcome.models.SierraRecord._
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import com.gu.scanamo.Scanamo

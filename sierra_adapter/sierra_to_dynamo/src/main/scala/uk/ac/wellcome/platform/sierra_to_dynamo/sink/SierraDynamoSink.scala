@@ -11,8 +11,8 @@ import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord
-import uk.ac.wellcome.platform.sierra_to_dynamo.models.SierraRecord._
+import uk.ac.wellcome.models.SierraRecord
+import uk.ac.wellcome.models.SierraRecord._
 
 import scala.concurrent.{ExecutionContext, Future}
 
