@@ -39,7 +39,9 @@ class SierraBibMergerWorkerServiceTest
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
-  def bibRecordString(id: String, updatedDate: String) =
+  def bibRecordString(id: String,
+                      updatedDate: String,
+                      title: String = "Lehrbuch und Atlas der Gastroskopie") =
     s"""
       |{
       |      "id": "$id",
@@ -51,7 +53,7 @@ class SierraBibMergerWorkerServiceTest
       |        "code": "ger",
       |        "name": "German"
       |      },
-      |      "title": "Lehrbuch und Atlas der Gastroskopie",
+      |      "title": "$title",
       |      "author": "Schindler, Rudolf, 1888-",
       |      "materialType": {
       |        "code": "a",
@@ -78,7 +80,18 @@ class SierraBibMergerWorkerServiceTest
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraObject)
   }
 
-  it("should put multiple bibs from SQS into DynamoDB") { }
+  it("should put multiple bibs from SQS into DynamoDB") {
+    val id1 = "1000001"
+    sendMessageForBibToSQS(id = id1, updatedDate = "2001-01-01T01:01:01Z")
+    val expectedMergedSierraObject1 = MergedSierraObject(id1)
+
+    val id2 = "2000002"
+    sendMessageForBibToSQS(id = id2, updatedDate = "2002-02-02T02:02:02Z")
+    val expectedMergedSierraObject2 = MergedSierraObject(id2)
+
+    dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraObject1)
+    dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraObject2)
+  }
 
   it("should update a bib in DynamoDB if a newer version is sent to SQS") { }
 
