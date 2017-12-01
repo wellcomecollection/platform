@@ -70,13 +70,19 @@ class SierraBibMergerWorkerServiceTest
       |    }
     """.stripMargin
 
-  it("should put a bib from SQS into Dynamo") {
+  it("should put a bib from SQS into DynamoDB") {
     val id = "1000001"
     sendMessageForBibToSQS(id = id, updatedDate = "2001-01-01T01:01:01Z")
     val expectedMergedSierraObject = MergedSierraObject(id)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraObject)
   }
+
+  it("should put multiple bibs from SQS into DynamoDB") { }
+
+  it("should update a bib in DynamoDB if a newer version is sent to SQS") { }
+
+  it("should not update a bib in DynamoDB if an older version is sent to SQS") { }
 
   private def sendMessageForBibToSQS(id: String, updatedDate: String) = {
     val record = SierraRecord(
