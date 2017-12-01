@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
+import scala.concurrent.duration._
+
 import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
@@ -7,11 +9,11 @@ import com.gu.scanamo.query.UniqueKey
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.SierraRecord
+import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
-import uk.ac.wellcome.models.MergedSierraObject
+import uk.ac.wellcome.models.MergedSierraRecord
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
@@ -79,9 +81,9 @@ class SierraBibMergerWorkerServiceTest
       updatedDate = "2001-01-01T01:01:01Z",
       title = "One ocelot on our oval"
     )
-    val expectedMergedSierraObject = MergedSierraObject(id)
+    val expectedMergedSierraRecord = MergedSierraRecord(id)
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraObject)
+    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraRecord)
   }
 
   it("should put multiple bibs from SQS into DynamoDB") {
@@ -91,7 +93,7 @@ class SierraBibMergerWorkerServiceTest
       updatedDate = "2001-01-01T01:01:01Z",
       title = "The first ferret of four"
     )
-    val expectedMergedSierraObject1 = MergedSierraObject(id1)
+    val expectedMergedSierraRecord1 = MergedSierraRecord(id1)
 
     val id2 = "2000002"
     sendMessageForBibToSQS(
@@ -99,10 +101,10 @@ class SierraBibMergerWorkerServiceTest
       updatedDate = "2002-02-02T02:02:02Z",
       title = "The second swan of a set"
     )
-    val expectedMergedSierraObject2 = MergedSierraObject(id2)
+    val expectedMergedSierraRecord2 = MergedSierraRecord(id2)
 
-    dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraObject1)
-    dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraObject2)
+    dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraRecord1)
+    dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraRecord2)
   }
 
   it("should update a bib in DynamoDB if a newer version is sent to SQS") {
@@ -112,7 +114,7 @@ class SierraBibMergerWorkerServiceTest
       title = "Old orangutans outside an office",
       updatedDate = "2003-03-03T03:03:03Z"
     )
-    val oldRecord = MergedSierraObject(id = id, bibData = oldData)
+    val oldRecord = MergedSierraRecord(id = id, bibData = oldData)
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
     val newTitle = "A number of new narwhals near Newmarket"
@@ -128,9 +130,9 @@ class SierraBibMergerWorkerServiceTest
       title = newTitle,
       updatedDate = newUpdatedDate
     )
-    val expectedSierraObject = MergedSierraObject(id = id, bibData = newData)
+    val expectedSierraRecord = MergedSierraRecord(id = id, bibData = newData)
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraObject)
+    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
   it("should not update a bib in DynamoDB if an older version is sent to SQS") {
@@ -140,7 +142,7 @@ class SierraBibMergerWorkerServiceTest
       title = "A presence of pristine porpoises",
       updatedDate = "2006-06-06T06:06:06Z"
     )
-    val newRecord = MergedSierraObject(id = id, bibData = newData)
+    val newRecord = MergedSierraRecord(id = id, bibData = newData)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     val oldTitle = "A small selection of sad shellfish"
@@ -156,17 +158,48 @@ class SierraBibMergerWorkerServiceTest
       title = oldTitle,
       updatedDate = oldUpdatedDate
     )
-    val expectedSierraObject = MergedSierraObject(id = id, bibData = newData)
+    val expectedSierraRecord = MergedSierraRecord(id = id, bibData = newData)
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraObject)
+    // Blocking in Scala is generally a bad idea; we do it here so there's
+    // enough time for this update to have gone through (if it was going to).
+    eventually { Thread.sleep(10 seconds) }
+
+    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
   it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
+    val id = "7000007"
+    val newRecord = MergedSierraRecord(id = id)
+    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
+    val title = "Inside an inquisitive igloo of ice imps"
+    val updatedDate = "2007-07-07T07:07:07Z"
+    val data = bibRecordString(
+      id = id,
+      title = title,
+      updatedDate = updatedDate
+    )
+    val record = SierraBibRecord(
+      id = id,
+      data = data,
+      modifiedDate = updatedDate
+    )
+
+    sendMessageForBibToSQS(
+      id = id,
+      title = title,
+      updatedDate = updatedDate
+    )
+    val expectedSierraRecord = MergedSierraRecord(
+      id = id,
+      bibData = Some(record)
+    )
+
+    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
   private def sendMessageForBibToSQS(id: String, updatedDate: String, title: String) = {
-    val record = SierraRecord(
+    val record = SierraBibRecord(
       id = id,
       data = bibRecordString(
         id = id,
