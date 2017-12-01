@@ -24,6 +24,7 @@ class SierraToDynamoWorkerService @Inject()(
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
   @Flag("sierra.resourceType") resourceType: String,
+  @Flag("sierra.fields") fields: String,
   dynamoConfig: DynamoConfig
 ) extends SQSWorker(reader, system, metrics) {
 
@@ -36,7 +37,7 @@ class SierraToDynamoWorkerService @Inject()(
   def processMessage(message: SQSMessage): Future[Unit] =
     for {
       window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
-      params = Map("updatedDate" -> window)
+      params = Map("updatedDate" -> window, "fields" -> fields)
       _ <- runSierraStream(params)
     } yield ()
 

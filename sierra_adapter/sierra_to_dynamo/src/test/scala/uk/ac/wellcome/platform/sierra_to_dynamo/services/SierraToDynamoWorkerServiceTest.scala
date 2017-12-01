@@ -24,12 +24,12 @@ class SierraToDynamoWorkerServiceTest
     with SierraDynamoDBLocal
     with Matchers
     with ExtendedPatience
-    with ScalaFutures{
+    with ScalaFutures {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
 
-  private def createSierraWorkerService(resourceType: String) = {
+  private def createSierraWorkerService(resourceType: String, fields: String) = {
     new SierraToDynamoWorkerService(
       reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
       system = ActorSystem(),
@@ -39,12 +39,15 @@ class SierraToDynamoWorkerServiceTest
       sierraOauthKey = "key",
       sierraOauthSecret = "secret",
       resourceType = resourceType,
-      dynamoConfig = DynamoConfig(tableName)
+      dynamoConfig = DynamoConfig(tableName),
+      fields = fields
     )
   }
 
   it("should read a window message from sqs, retrieve the items from sierra and insert into DynamoDb") {
-    val worker = createSierraWorkerService("items")
+    val worker = createSierraWorkerService(
+      resourceType = "items",
+      fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
     worker.runSQSWorker()
     val message =
       """
@@ -66,7 +69,9 @@ class SierraToDynamoWorkerServiceTest
   }
 
   it("should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
-    val worker = createSierraWorkerService("bibs")
+    val worker = createSierraWorkerService(
+      resourceType = "bibs",
+      fields = "updatedDate,deletedDate,deleted,suppressed,author,title")
     worker.runSQSWorker()
     val message =
       """
@@ -88,7 +93,7 @@ class SierraToDynamoWorkerServiceTest
   }
 
   it("should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
-    val worker = createSierraWorkerService("items")
+    val worker = createSierraWorkerService(resourceType = "items", fields = "")
 
     val message =
       """
@@ -99,8 +104,8 @@ class SierraToDynamoWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    whenReady(worker.processMessage(sqsMessage).failed) {ex =>
-      ex shouldBe a [SQSReaderGracefulException]
+    whenReady(worker.processMessage(sqsMessage).failed) { ex =>
+      ex shouldBe a[SQSReaderGracefulException]
     }
 
   }
@@ -115,6 +120,7 @@ class SierraToDynamoWorkerServiceTest
       sierraOauthKey = "key",
       sierraOauthSecret = "secret",
       resourceType = "items",
+      fields = "",
       dynamoConfig = DynamoConfig(tableName)
     )
 
@@ -129,8 +135,8 @@ class SierraToDynamoWorkerServiceTest
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
 
-    whenReady(worker.processMessage(sqsMessage).failed) {ex =>
-      ex shouldNot be (a[SQSReaderGracefulException])
+    whenReady(worker.processMessage(sqsMessage).failed) { ex =>
+      ex shouldNot be(a[SQSReaderGracefulException])
     }
   }
 }

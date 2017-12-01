@@ -44,7 +44,9 @@ class SierraDynamoSinkTest
     val futureUnit = Source.single(json).runWith(sink)
 
     val expectedRecord = SierraRecord(
-      id = id, data = json.noSpaces, modifiedDate = updatedDate
+      id = id,
+      data = json.noSpaces,
+      modifiedDate = updatedDate
     )
 
     whenReady(futureUnit) { _ =>
@@ -53,7 +55,7 @@ class SierraDynamoSinkTest
     }
   }
 
-  it ("should be able to handle deleted items") {
+  it("should be able to handle deleted items") {
     val id = "1357947"
     val deletedDate = "2014-01-31"
     val json = parse(s"""{
@@ -67,7 +69,9 @@ class SierraDynamoSinkTest
     val futureUnit = Source.single(json).runWith(sink)
 
     val expectedRecord = SierraRecord(
-      id = id, data = json.noSpaces, modifiedDate = s"${deletedDate}T00:00:00Z"
+      id = id,
+      data = json.noSpaces,
+      modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
     whenReady(futureUnit) { _ =>
