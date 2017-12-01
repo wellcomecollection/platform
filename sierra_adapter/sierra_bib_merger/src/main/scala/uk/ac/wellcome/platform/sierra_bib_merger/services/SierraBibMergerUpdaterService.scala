@@ -16,24 +16,43 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class SierraBibMergerUpdaterService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                                              metrics: MetricsSender,
-                                              dynamoConfig: DynamoConfig)
-    extends Logging {
+class SierraBibMergerUpdaterService @Inject()(
+  dynamoDBClient: AmazonDynamoDB,
+  metrics: MetricsSender,
+  dynamoConfig: DynamoConfig
+) extends Logging {
 
   def update(bibRecord: SierraBibRecord): Unit = {
-    val mergedRecord = MergedSierraRecord(bibRecord = bibRecord)
-    val table = Table[MergedSierraRecord](dynamoConfig.table)
-    val ops = table
-      .given(
-        not(attributeExists('id))
-      )
-      .put(mergedRecord)
-    val x = Scanamo.exec(dynamoDBClient)(ops) match {
-      case Right(_) =>
-        logger.info(s"$mergedRecord saved successfully to DynamoDB")
-      case Left(error) =>
-        logger.warn(s"Failed saving $mergedRecord to DynamoDB", error)
+
+    // First we read the existing record from the table
+    val existingRecord: MergedSierraRecord = Scanamo.get[MergedSierraRecord](dynamoDBClient)(dynamoConfig.table)('id -> bibRecord.id) match {
+
+      // TODO: Handle this properly!
+      case Some(record) => record.right.get
+      case None => MergedSierraRecord(id = bibRecord.id)
+    }
+
+    // Then we add the record we've received from the Sierra API, and
+    // optionally send that to DynamoDB.
+    val newRecord: Option[MergedSierraRecord] = existingRecord.mergeBibRecord(bibRecord)
+
+    newRecord match {
+      case Some(record) => {
+        val table = Table[MergedSierraRecord](dynamoConfig.table)
+        val ops = table
+          .given(
+            not(attributeExists('id)) or
+              (attributeExists('id) and 'version < record.version)
+          )
+          .put(record)
+        val x = Scanamo.exec(dynamoDBClient)(ops) match {
+          case Right(_) =>
+            logger.info(s"$record saved successfully to DynamoDB")
+          case Left(error) =>
+            logger.warn(s"Failed saving $record to DynamoDB", error)
+        }
+      }
+      case None => ()
     }
   }
 }

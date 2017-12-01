@@ -85,7 +85,7 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record)
-    val expectedMergedSierraRecord = MergedSierraRecord(bibRecord = record)
+    val expectedMergedSierraRecord = MergedSierraRecord(bibRecord = record, version = 2)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraRecord)
   }
@@ -102,7 +102,7 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record1)
-    val expectedMergedSierraRecord1 = MergedSierraRecord(bibRecord = record1)
+    val expectedMergedSierraRecord1 = MergedSierraRecord(bibRecord = record1, version = 2)
 
     val id2 = "2000002"
     val record2 = SierraBibRecord(
@@ -115,7 +115,7 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2002-02-02T02:02:02Z"
     )
     sendBibRecordToSQS(record2)
-    val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2)
+    val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2, version = 2)
 
     dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraRecord1)
     dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraRecord2)
@@ -149,7 +149,7 @@ class SierraBibMergerWorkerServiceTest
     println("@@AWLC Sent the second record to SQS")
     sendBibRecordToSQS(record)
 
-    val expectedSierraRecord = MergedSierraRecord(bibRecord = record)
+    val expectedSierraRecord = MergedSierraRecord(bibRecord = record, version = 2)
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
@@ -166,6 +166,7 @@ class SierraBibMergerWorkerServiceTest
     )
     val newRecord = MergedSierraRecord(bibRecord = newBibRecord)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
+    val expectedSierraRecord = MergedSierraRecord(bibRecord = newBibRecord)
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
@@ -179,8 +180,6 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = oldUpdatedDate
     )
     sendBibRecordToSQS(record)
-
-    val expectedSierraRecord = MergedSierraRecord(bibRecord = record)
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
@@ -207,7 +206,7 @@ class SierraBibMergerWorkerServiceTest
     )
 
     sendBibRecordToSQS(record)
-    val expectedSierraRecord = MergedSierraRecord(bibRecord = record)
+    val expectedSierraRecord = MergedSierraRecord(bibRecord = record, version = 2)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
