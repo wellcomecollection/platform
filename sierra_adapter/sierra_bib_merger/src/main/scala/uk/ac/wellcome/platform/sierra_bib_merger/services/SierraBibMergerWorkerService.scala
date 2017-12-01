@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.MergedSierraRecord
+import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -20,9 +20,9 @@ class SierraBibMergerWorkerService @Inject()(
 ) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
-    JsonUtil.fromJson[MergedSierraRecord](message.body) match {
-      case Success(mergedSierraRecord) => {
-        sierraBibMergerUpdaterService.update(mergedSierraRecord)
+    JsonUtil.fromJson[SierraBibRecord](message.body) match {
+      case Success(record) => {
+        sierraBibMergerUpdaterService.update(record)
         Future.successful(Unit)
       }
       case Failure(e) => {
