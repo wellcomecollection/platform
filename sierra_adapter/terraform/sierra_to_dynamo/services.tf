@@ -23,7 +23,6 @@ module "sierra_to_dynamo_service" {
   task_role_arn      = "${module.ecs_sierra_to_dynamo_iam.task_role_arn}"
   vpc_id             = "${var.vpc_id}"
   app_uri            = "${var.ecr_repository_url}:${var.release_id}"
-  nginx_uri          = "${var.nginx_ecr_repository_url}:${var.nginx_release_id}"
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
   path_pattern       = "/sierra_to_dynamo/${var.resource_type}/*"

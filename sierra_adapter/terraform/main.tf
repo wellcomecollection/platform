@@ -99,6 +99,4 @@ module "sierra_bib_merger" {
   vpc_id = "${local.services_vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
-
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }
