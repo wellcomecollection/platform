@@ -156,7 +156,7 @@ class SierraBibMergerWorkerServiceTest
       title = oldTitle,
       updatedDate = oldUpdatedDate
     )
-    val expectedSierraObject = MergedSierraObject(id = id, bibData = oldData)
+    val expectedSierraObject = MergedSierraObject(id = id, bibData = newData)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraObject)
   }
