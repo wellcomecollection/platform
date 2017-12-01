@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.SierraRecord
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
-import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
+import uk.ac.wellcome.models.MergedSierraObject
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil

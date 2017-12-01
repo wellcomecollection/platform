@@ -9,7 +9,7 @@ import com.twitter.inject.annotations.Flag
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
+import uk.ac.wellcome.models.MergedSierraObject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
+import uk.ac.wellcome.models.MergedSierraObject
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil
 

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_bib_merger.locals
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.platform.sierra_bib_merger.models.MergedSierraObject
+import uk.ac.wellcome.models.MergedSierraObject
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
