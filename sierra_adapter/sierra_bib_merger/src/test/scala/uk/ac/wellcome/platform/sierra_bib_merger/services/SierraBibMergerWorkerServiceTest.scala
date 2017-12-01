@@ -114,6 +114,7 @@ class SierraBibMergerWorkerServiceTest
       ),
       modifiedDate = "2002-02-02T02:02:02Z"
     )
+    sendBibRecordToSQS(record2)
     val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2)
 
     dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraRecord1)
@@ -129,22 +130,23 @@ class SierraBibMergerWorkerServiceTest
     )
     val oldRecord = MergedSierraRecord(id = id, bibData = oldData)
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+    println("@@AWLC Put the first record into DynamoDB")
 
     val newTitle = "A number of new narwhals near Newmarket"
     val newUpdatedDate = "2004-04-04T04:04:04Z"
-    val newData = bibRecordString(
+    val record = SierraBibRecord(
       id = id,
-      title = newTitle,
-      updatedDate = newUpdatedDate
+      data = bibRecordString(
+        id = id,
+        updatedDate = newUpdatedDate,
+        title = newTitle
+      ),
+      modifiedDate = newUpdatedDate
     )
+    println("@@AWLC Sent the second record to SQS")
+    sendBibRecordToSQS(record)
 
-    sendMessageForBibToSQS(
-      id = id,
-      title = newTitle,
-      updatedDate = newUpdatedDate
-    )
-    val expectedSierraRecord = MergedSierraRecord(id = id, bibData = newData)
-
+    val expectedSierraRecord = MergedSierraRecord(bibRecord = record)
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
@@ -160,18 +162,18 @@ class SierraBibMergerWorkerServiceTest
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
-    val oldData = bibRecordString(
+    val record = SierraBibRecord(
       id = id,
-      title = oldTitle,
-      updatedDate = oldUpdatedDate
+      data = bibRecordString(
+        id = id,
+        updatedDate = oldUpdatedDate,
+        title = oldTitle
+      ),
+      modifiedDate = oldUpdatedDate
     )
+    sendBibRecordToSQS(record)
 
-    sendMessageForBibToSQS(
-      id = id,
-      title = oldTitle,
-      updatedDate = oldUpdatedDate
-    )
-    val expectedSierraRecord = MergedSierraRecord(id = id, bibData = newData)
+    val expectedSierraRecord = MergedSierraRecord(bibRecord = record)
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
@@ -187,26 +189,18 @@ class SierraBibMergerWorkerServiceTest
 
     val title = "Inside an inquisitive igloo of ice imps"
     val updatedDate = "2007-07-07T07:07:07Z"
-    val data = bibRecordString(
-      id = id,
-      title = title,
-      updatedDate = updatedDate
-    )
     val record = SierraBibRecord(
       id = id,
-      data = data,
+      data = bibRecordString(
+        id = id,
+        title = title,
+        updatedDate = updatedDate
+      ),
       modifiedDate = updatedDate
     )
 
-    sendMessageForBibToSQS(
-      id = id,
-      title = title,
-      updatedDate = updatedDate
-    )
-    val expectedSierraRecord = MergedSierraRecord(
-      id = id,
-      bibData = Some(record)
-    )
+    sendBibRecordToSQS(record)
+    val expectedSierraRecord = MergedSierraRecord(bibRecord = record)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
@@ -224,23 +218,11 @@ class SierraBibMergerWorkerServiceTest
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
   }
 
-  private def sendMessageForBibToSQS(id: String, updatedDate: String, title: String) = {
-    val record = SierraBibRecord(
-      id = id,
-      data = bibRecordString(
-        id = id,
-        updatedDate = updatedDate,
-        title = title
-      ),
-      modifiedDate = updatedDate
-    )
-    sendBibRecordToSQS(record)
-  }
-
   // TODO: This message is suitably generic, and could be moved
   // to DynamoDBLocal or another parent class, but requires some fiddling
   // with implicit ExecutionContexts to get right.  Move it!
   private def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(expectedValue: T) = {
+    println(s"Searching DynamoDB for expectedValue = $expectedValue")
     eventually {
       val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get
       actualValue shouldEqual Right(expectedValue)
