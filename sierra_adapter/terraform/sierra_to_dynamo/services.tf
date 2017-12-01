@@ -29,6 +29,7 @@ module "sierra_to_dynamo_service" {
   alb_priority       = "${var.alb_priority}"
   healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
+  https_domain       = "services.wellcomecollection.ac.uk"
 
   config_key           = "config/${var.build_env}/sierra_to_dynamo_${var.resource_type}.ini"
   config_template_path = "config/sierra_to_dynamo.ini.template"

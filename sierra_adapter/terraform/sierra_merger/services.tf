@@ -29,6 +29,7 @@ module "sierra_merger_service" {
   alb_priority       = "${var.alb_priority}"
   healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
+  https_domain       = "services.wellcomecollection.ac.uk"
 
   config_key           = "config/${var.build_env}/sierra_${var.resource_type}_merger.ini"
   config_template_path = "config/sierra_merger.ini.template"
