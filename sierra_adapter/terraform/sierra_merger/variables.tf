@@ -25,6 +25,10 @@ variable "build_env" {
   default = "prod"
 }
 
+variable "infra_bucket" {
+  default = "platform-infra"
+}
+
 variable "alb_listener_https_arn" {}
 variable "alb_listener_http_arn" {}
 variable "alb_priority" {}
