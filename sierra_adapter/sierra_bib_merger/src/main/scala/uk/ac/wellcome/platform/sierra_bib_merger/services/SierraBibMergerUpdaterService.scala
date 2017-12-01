@@ -25,7 +25,8 @@ class SierraBibMergerUpdaterService @Inject()(
   def update(bibRecord: SierraBibRecord): Unit = {
 
     // First we read the existing record from the table
-    val existingRecord: MergedSierraRecord = Scanamo.get[MergedSierraRecord](dynamoDBClient)(dynamoConfig.table)('id -> bibRecord.id) match {
+    val existingRecord: MergedSierraRecord = Scanamo.get[MergedSierraRecord](
+      dynamoDBClient)(dynamoConfig.table)('id -> bibRecord.id) match {
 
       // TODO: Handle this properly!
       case Some(record) => record.right.get
@@ -34,7 +35,8 @@ class SierraBibMergerUpdaterService @Inject()(
 
     // Then we add the record we've received from the Sierra API, and
     // optionally send that to DynamoDB.
-    val newRecord: Option[MergedSierraRecord] = existingRecord.mergeBibRecord(bibRecord)
+    val newRecord: Option[MergedSierraRecord] =
+      existingRecord.mergeBibRecord(bibRecord)
 
     newRecord match {
       case Some(record) => {
