@@ -95,4 +95,11 @@ class SierraBibMergerWorkerServiceTest
     )
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
   }
+
+  private def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(expectedValue: T) = {
+    eventually {
+      val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get
+      actualValue shouldEqual Right(expectedValue)
+    }
+  }
 }

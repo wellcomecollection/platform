@@ -21,9 +21,11 @@ class SierraBibMergerUpdaterService @Inject()(
    dynamoConfig: DynamoConfig) extends Logging {
 
   def update(mergedSierraObject: MergedSierraObject): Unit = {
-
     val table = Table[MergedSierraObject](dynamoConfig.table)
     val ops = table
+      .given(
+        not(attributeExists('id))
+      )
       .put(mergedSierraObject)
     val x = Scanamo.exec(dynamoDBClient)(ops) match {
       case Right(_) =>
