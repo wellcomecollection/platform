@@ -50,6 +50,7 @@ module "sierra_to_dynamo_service" {
     sierra_oauth_key     = "${var.sierra_oauth_key}"
     sierra_oauth_secret  = "${var.sierra_oauth_secret}"
     sierra_resource_type = "${var.resource_type}"
+    sierra_fields = "${var.sierra_fields}"
   }
 
   loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"

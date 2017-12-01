@@ -10,3 +10,7 @@ variable "release_ids" {
 variable "sierra_api_url" {}
 variable "sierra_oauth_key" {}
 variable "sierra_oauth_secret" {}
+
+variable "sierra_bibs_fields" {}
+
+variable "sierra_items_fields" {}
