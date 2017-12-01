@@ -9,7 +9,8 @@ case class MergedSierraRecord(
 ) {
   def mergeBibRecord(record: SierraBibRecord): Option[MergedSierraRecord] = {
     if (record.id != this.id) {
-      throw new RuntimeException(s"Non-matching bib ids ${record.id} != ${this.id}")
+      throw new RuntimeException(
+        s"Non-matching bib ids ${record.id} != ${this.id}")
     }
 
     val isNewerData = this.bibData match {
@@ -18,10 +19,11 @@ case class MergedSierraRecord(
     }
 
     if (isNewerData) {
-      Some(this.copy(
-        bibData = Some(record),
-        version = this.version + 1
-      ))
+      Some(
+        this.copy(
+          bibData = Some(record),
+          version = this.version + 1
+        ))
     } else {
       None
     }
