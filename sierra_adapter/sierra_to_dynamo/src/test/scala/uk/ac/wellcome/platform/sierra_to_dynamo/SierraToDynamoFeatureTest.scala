@@ -7,11 +7,22 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_to_dynamo.locals.SierraDynamoDBLocal
 import uk.ac.wellcome.models.SierraRecord
 import uk.ac.wellcome.models.SierraRecord._
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
 import uk.ac.wellcome.utils.JsonUtil
 import com.gu.scanamo.Scanamo
 
-class SierraToDynamoFeatureTest extends FunSpec with FeatureTestMixin with SQSLocal with SierraDynamoDBLocal with AmazonCloudWatchFlag with Matchers with ExtendedPatience{
+class SierraToDynamoFeatureTest
+    extends FunSpec
+    with FeatureTestMixin
+    with SQSLocal
+    with SierraDynamoDBLocal
+    with AmazonCloudWatchFlag
+    with Matchers
+    with ExtendedPatience {
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
 
   override protected def server = new EmbeddedHttpServer(
@@ -21,8 +32,8 @@ class SierraToDynamoFeatureTest extends FunSpec with FeatureTestMixin with SQSLo
       "aws.sqs.waitTime" -> "1",
       "aws.dynamo.sierraToDynamo.tableName" -> tableName,
       "sierra.apiUrl" -> "http://localhost:8080",
-      "sierra.oauthKey" ->"key",
-      "sierra.oauthSecret" ->"secret",
+      "sierra.oauthKey" -> "key",
+      "sierra.oauthSecret" -> "secret",
       "sierra.resourceType" -> "items",
       "sierra.fields" -> "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
