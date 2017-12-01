@@ -20,7 +20,10 @@ variable "vpc_id" {}
 
 variable "ecr_repository_url" {}
 variable "release_id" {}
-variable "build_env" { default = "prod" }
+
+variable "build_env" {
+  default = "prod"
+}
 
 variable "alb_listener_https_arn" {}
 variable "alb_listener_http_arn" {}
