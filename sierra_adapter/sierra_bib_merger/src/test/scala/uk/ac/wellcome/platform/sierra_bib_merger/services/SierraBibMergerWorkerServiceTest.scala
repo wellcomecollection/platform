@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
-import scala.concurrent.duration._
-
 import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
@@ -14,6 +12,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.models.MergedSierraRecord
+import uk.ac.wellcome.models.SierraBibRecord._
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
@@ -162,7 +161,7 @@ class SierraBibMergerWorkerServiceTest
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
-    eventually { Thread.sleep(10 seconds) }
+    Thread.sleep(5000)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
