@@ -31,8 +31,8 @@ module "sierra_merger_service" {
   healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
 
-  config_key           = "config/${var.build_env}/sierra_to_dynamo_${var.resource_type}.ini"
-  config_template_path = "config/sierra_to_dynamo.ini.template"
+  config_key           = "config/${var.build_env}/sierra_${var.resource_type}_merger.ini"
+  config_template_path = "config/sierra_merger.ini.template"
 
   cpu    = 256
   memory = 1024
