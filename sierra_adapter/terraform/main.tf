@@ -22,7 +22,7 @@ module "sierra_to_dynamo_items" {
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
-  sierra_fields = "${var.sierra_items_fields}"
+  sierra_fields       = "${var.sierra_items_fields}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
@@ -67,7 +67,7 @@ module "sierra_to_dynamo_bibs" {
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
-  sierra_fields = "${var.sierra_bibs_fields}"
+  sierra_fields       = "${var.sierra_bibs_fields}"
 
   vpc_id = "${local.services_vpc_id}"
 
