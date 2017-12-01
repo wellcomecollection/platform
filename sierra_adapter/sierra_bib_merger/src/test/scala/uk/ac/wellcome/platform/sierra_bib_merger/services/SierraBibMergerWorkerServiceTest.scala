@@ -75,32 +75,46 @@ class SierraBibMergerWorkerServiceTest
 
   it("should put a bib from SQS into DynamoDB") {
     val id = "1000001"
-    sendMessageForBibToSQS(
+    val record = SierraBibRecord(
       id = id,
-      updatedDate = "2001-01-01T01:01:01Z",
-      title = "One ocelot on our oval"
+      data = bibRecordString(
+        id = id,
+        updatedDate = "2001-01-01T01:01:01Z",
+        title = "One ocelot on our oval"
+      ),
+      modifiedDate = "2001-01-01T01:01:01Z"
     )
-    val expectedMergedSierraRecord = MergedSierraRecord(id)
+    sendBibRecordToSQS(record)
+    val expectedMergedSierraRecord = MergedSierraRecord(bibRecord = record)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraRecord)
   }
 
   it("should put multiple bibs from SQS into DynamoDB") {
     val id1 = "1000001"
-    sendMessageForBibToSQS(
+    val record1 = SierraBibRecord(
       id = id1,
-      updatedDate = "2001-01-01T01:01:01Z",
-      title = "The first ferret of four"
+      data = bibRecordString(
+        id = id1,
+        updatedDate = "2001-01-01T01:01:01Z",
+        title = "The first ferret of four"
+      ),
+      modifiedDate = "2001-01-01T01:01:01Z"
     )
-    val expectedMergedSierraRecord1 = MergedSierraRecord(id1)
+    sendBibRecordToSQS(record1)
+    val expectedMergedSierraRecord1 = MergedSierraRecord(bibRecord = record1)
 
     val id2 = "2000002"
-    sendMessageForBibToSQS(
+    val record2 = SierraBibRecord(
       id = id2,
-      updatedDate = "2002-02-02T02:02:02Z",
-      title = "The second swan of a set"
+      data = bibRecordString(
+        id = id2,
+        updatedDate = "2002-02-02T02:02:02Z",
+        title = "The second swan of a set"
+      ),
+      modifiedDate = "2002-02-02T02:02:02Z"
     )
-    val expectedMergedSierraRecord2 = MergedSierraRecord(id2)
+    val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2)
 
     dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraRecord1)
     dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraRecord2)
@@ -197,16 +211,7 @@ class SierraBibMergerWorkerServiceTest
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
-  private def sendMessageForBibToSQS(id: String, updatedDate: String, title: String) = {
-    val record = SierraBibRecord(
-      id = id,
-      data = bibRecordString(
-        id = id,
-        updatedDate = updatedDate,
-        title = title
-      ),
-      modifiedDate = updatedDate
-    )
+  private def sendBibRecordToSQS(record: SierraBibRecord) = {
     val messageBody = JsonUtil.toJson(record).get
 
     val message = SQSMessage(
@@ -217,6 +222,19 @@ class SierraBibMergerWorkerServiceTest
       timestamp = "2001-01-01T01:01:01Z"
     )
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
+  }
+
+  private def sendMessageForBibToSQS(id: String, updatedDate: String, title: String) = {
+    val record = SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        updatedDate = updatedDate,
+        title = title
+      ),
+      modifiedDate = updatedDate
+    )
+    sendBibRecordToSQS(record)
   }
 
   // TODO: This message is suitably generic, and could be moved
