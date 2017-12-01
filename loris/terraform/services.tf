@@ -15,7 +15,7 @@ module "loris" {
 
   path_pattern     = "/image*"
   healthcheck_path = "/image/"
-  alb_priority     = "100"
+  alb_priority     = "101"
 
   cpu    = 3960
   memory = 7350
