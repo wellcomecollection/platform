@@ -55,7 +55,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       id = "777",
       bibData = Some(
         sierraBibRecord(
-          id = "888",
+          id = "777",
           title = "Shiny McNewRecordz 2.0",
           modifiedDate = "2009-09-09T09:09:09Z"
         )
@@ -67,7 +67,25 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   }
 
   it("should update bibData when merging bib records with newer data") {
+    val record = sierraBibRecord(
+      id = "888",
+      title = "New and Shiny Data",
+      modifiedDate = "2011-11-11T11:11:11Z"
+    )
 
+    val mergedSierraRecord = MergedSierraRecord(
+      id = "888",
+      bibData = Some(
+        sierraBibRecord(
+          id = "888",
+          title = "Old and Dusty Data",
+          modifiedDate = "2001-01-01T01:01:01Z"
+        )
+      )
+    )
+
+    val result = mergedSierraRecord.mergeBibRecord(record)
+    result.get.bibData.get shouldBe record
   }
 
   def sierraBibRecord(
