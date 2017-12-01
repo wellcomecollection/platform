@@ -1,3 +1,3 @@
-output "dynamo_stream_arn" {
-  value = "${aws_dynamodb_table.sierra_table.stream_arn}"
+output "sns_events_arn" {
+  value = "${module.topic_sierra_windows.arn}"
 }
