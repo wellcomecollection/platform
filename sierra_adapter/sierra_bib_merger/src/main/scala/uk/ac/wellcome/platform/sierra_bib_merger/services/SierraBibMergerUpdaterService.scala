@@ -15,10 +15,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class SierraBibMergerUpdaterService @Inject()(
-   dynamoDBClient: AmazonDynamoDB,
-   metrics: MetricsSender,
-   dynamoConfig: DynamoConfig) extends Logging {
+class SierraBibMergerUpdaterService @Inject()(dynamoDBClient: AmazonDynamoDB,
+                                              metrics: MetricsSender,
+                                              dynamoConfig: DynamoConfig)
+    extends Logging {
 
   def update(mergedSierraObject: MergedSierraObject): Unit = {
     val table = Table[MergedSierraObject](dynamoConfig.table)
