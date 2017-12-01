@@ -95,7 +95,7 @@ module "sierra_bib_merger" {
   cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
   cluster_id    = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 
-  alb_priority               = 106
+  alb_priority               = 107
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
   alb_cloudwatch_id          = "${local.services_alb_cloudwatch_id}"
