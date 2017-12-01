@@ -12,10 +12,19 @@ case class MergedSierraRecord(
       throw new RuntimeException(s"Non-matching bib ids ${record.id} != ${this.id}")
     }
 
-    Some(this.copy(
-      bibData = Some(record),
-      version = this.version + 1
-    ))
+    val isNewerData = this.bibData match {
+      case Some(bibData) => record.modifiedDate.isAfter(bibData.modifiedDate)
+      case None => true
+    }
+
+    if (isNewerData) {
+      Some(this.copy(
+        bibData = Some(record),
+        version = this.version + 1
+      ))
+    } else {
+      None
+    }
   }
 }
 
