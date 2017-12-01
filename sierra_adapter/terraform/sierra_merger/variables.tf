@@ -22,9 +22,6 @@ variable "ecr_repository_url" {}
 variable "release_id" {}
 variable "build_env" { default = "prod" }
 
-variable "nginx_ecr_repository_url" {}
-variable "nginx_release_id" {}
-
 variable "alb_listener_https_arn" {}
 variable "alb_listener_http_arn" {}
 variable "alb_priority" {}

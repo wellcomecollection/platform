@@ -30,9 +30,6 @@ variable "alb_cloudwatch_id" {}
 variable "ecr_repository_url" {}
 variable "release_id" {}
 
-variable "nginx_ecr_repository_url" {}
-variable "nginx_release_id" {}
-
 variable "infra_bucket" {
   default = "platform-infra"
 }
