@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.services
 
 import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
@@ -24,13 +24,20 @@ class SierraToDynamoWorkerServiceTest
     with SierraDynamoDBLocal
     with Matchers
     with ExtendedPatience
-    with ScalaFutures {
+    with ScalaFutures
+    with BeforeAndAfterEach{
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
+  var worker: Option[SierraToDynamoWorkerService] = None
+
+  override def afterEach(): Unit = {
+    super.afterEach()
+    stopWorker(worker)
+  }
 
   private def createSierraWorkerService(resourceType: String, fields: String) = {
-    new SierraToDynamoWorkerService(
+    Some(new SierraToDynamoWorkerService(
       reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
       system = ActorSystem(),
       metrics = mockMetrics,
@@ -41,14 +48,14 @@ class SierraToDynamoWorkerServiceTest
       resourceType = resourceType,
       dynamoConfig = DynamoConfig(tableName),
       fields = fields
-    )
+    ))
   }
 
   it("should read a window message from sqs, retrieve the items from sierra and insert into DynamoDb") {
-    val worker = createSierraWorkerService(
+    worker = createSierraWorkerService(
       resourceType = "items",
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
-    worker.runSQSWorker()
+    worker.get.runSQSWorker()
     val message =
       """
         |{
@@ -65,14 +72,13 @@ class SierraToDynamoWorkerServiceTest
       // This comes from the wiremock recordings for sierra api response
       Scanamo.scan[SierraRecord](dynamoDbClient)(tableName) should have size 157
     }
-    worker.cancelRun()
   }
 
   it("should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
-    val worker = createSierraWorkerService(
+    worker = createSierraWorkerService(
       resourceType = "bibs",
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title")
-    worker.runSQSWorker()
+    worker.get.runSQSWorker()
     val message =
       """
         |{
@@ -89,11 +95,11 @@ class SierraToDynamoWorkerServiceTest
       // This comes from the wiremock recordings for sierra api response
       Scanamo.scan[SierraRecord](dynamoDbClient)(tableName) should have size 29
     }
-    worker.cancelRun()
+
   }
 
   it("should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
-    val worker = createSierraWorkerService(resourceType = "items", fields = "")
+    worker = createSierraWorkerService(resourceType = "items", fields = "")
 
     val message =
       """
@@ -104,14 +110,14 @@ class SierraToDynamoWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    whenReady(worker.processMessage(sqsMessage).failed) { ex =>
+    whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
       ex shouldBe a[SQSReaderGracefulException]
     }
 
   }
 
   it("should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
-    val worker = new SierraToDynamoWorkerService(
+    worker = Some(new SierraToDynamoWorkerService(
       reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
       system = ActorSystem(),
       metrics = mockMetrics,
@@ -122,7 +128,7 @@ class SierraToDynamoWorkerServiceTest
       resourceType = "items",
       fields = "",
       dynamoConfig = DynamoConfig(tableName)
-    )
+    ))
 
     val message =
       """
@@ -135,8 +141,14 @@ class SierraToDynamoWorkerServiceTest
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
 
-    whenReady(worker.processMessage(sqsMessage).failed) { ex =>
+    whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
       ex shouldNot be(a[SQSReaderGracefulException])
+    }
+  }
+
+  private def stopWorker(worker: Option[SierraToDynamoWorkerService]) = {
+    eventually {
+      worker.fold(true)(_.cancelRun()) shouldBe true
     }
   }
 }
