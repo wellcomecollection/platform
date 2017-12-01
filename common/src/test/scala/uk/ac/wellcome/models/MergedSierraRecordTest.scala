@@ -4,75 +4,98 @@ import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
 
+import uk.ac.wellcome.utils.JsonUtil
+
 class MergedSierraRecordTest extends FunSpec with Matchers {
 
   it("should allow creation of MergedSierraRecord with no data") {
-    MergedSierraRecord(id = "100")
+    MergedSierraRecord(id = "111")
   }
 
   it("should merge data from a bibRecord when empty") {
-    val sierraRecord = SierraRecord(id = "100", data = "", modifiedDate = Instant.now)
-    val originalRecord = MergedSierraRecord(id = "100")
+    val record = sierraBibRecord(id = "222")
+    val originalRecord = MergedSierraRecord(id = "222")
 
     val newRecord: Option[MergedSierraRecord] =
-      originalRecord.mergeBibRecord(sierraRecord)
+      originalRecord.mergeBibRecord(record)
 
-    newRecord.get.bibData.get shouldEqual sierraRecord.data
+    newRecord.get.bibData.get shouldEqual record
   }
 
   it("should only merge bib records with matching ids") {
-    val sierraRecord = SierraRecord(id = "100", data = "", modifiedDate = Instant.now)
-    val originalRecord = MergedSierraRecord(id = "200")
+    val record = sierraBibRecord(id = "333")
+    val originalRecord = MergedSierraRecord(id = "444")
 
     val caught = intercept[RuntimeException] {
-      originalRecord.mergeBibRecord(sierraRecord)
+      originalRecord.mergeBibRecord(record)
     }
-
-    caught.getMessage shouldEqual "Non-matching bib ids 100 != 200"
+    caught.getMessage shouldEqual "Non-matching bib ids 333 != 444"
   }
 
   it("should be at version 1 when first created") {
-    val record = MergedSierraRecord(id = "300")
+    val record = MergedSierraRecord(id = "555")
     record.version shouldEqual 1
   }
 
   it("should always increment the version when mergeBibRecord is called") {
-    val sierraRecord = SierraRecord(id = "400", data = "", modifiedDate = Instant.now)
-    val originalRecord = MergedSierraRecord(id = "400", version = 10)
-    val newRecord = originalRecord.mergeBibRecord(sierraRecord)
-
+    val record = sierraBibRecord(id = "666")
+    val originalRecord = MergedSierraRecord(id = "666", version = 10)
+    val newRecord = originalRecord.mergeBibRecord(record)
     newRecord.get.version shouldEqual 11
   }
 
   it("should return None when merging bib records with stale data"){
-    val sierraRecord = SierraRecord(
-      id = "400",
-      data = bibRecordString(
-        id = "400",
-        updatedDate = "2001-01-01T01:01:01Z",
-        title = "Olde McOlde Recorde"
-      ),
+    val record = sierraBibRecord(
+      id = "777",
+      title = "Olde McOlde Recorde",
       modifiedDate = "2001-01-01T01:01:01Z"
     )
 
     val mergedSierraRecord = MergedSierraRecord(
-      id = "400",
-      bibData = Some(bibRecordString(
-        id = "400",
-        updatedDate = "2009-09-09T09:09:09Z",
-        title = "Shiny McNewRecordz 2.0"
-      ))
+      id = "777",
+      bibData = Some(
+        sierraBibRecord(
+          id = "888",
+          title = "Shiny McNewRecordz 2.0",
+          modifiedDate = "2009-09-09T09:09:09Z"
+        )
+      )
     )
 
-    val result = mergedSierraRecord.mergeBibRecord(sierraRecord)
-
+    val result = mergedSierraRecord.mergeBibRecord(record)
     result shouldBe None
   }
 
+  it("should update bibData when merging bib records with newer data") {
 
-  def bibRecordString(id: String,
-                      updatedDate: String,
-                      title: String = "Lehrbuch und Atlas der Gastroskopie") =
+  }
+
+  def sierraBibRecord(
+    id: String = "111",
+    title: String = "Two toucans touching a towel",
+    modifiedDate: String = "2001-01-01T01:01:01Z"
+  ) = SierraBibRecord(
+    id = id,
+    data = bibRecordString(id = id, updatedDate = modifiedDate, title = title),
+    modifiedDate = modifiedDate
+  )
+
+  def sierraBibRecordString(id: String, modifiedDate: String, title: String) =
+    JsonUtil.toJson(SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        updatedDate = modifiedDate,
+        title = title
+      ),
+      modifiedDate = modifiedDate
+    )).get
+
+  private def bibRecordString(
+    id: String,
+    updatedDate: String,
+    title: String
+  ) =
     s"""
        |{
        |      "id": "$id",

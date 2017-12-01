@@ -8,12 +8,12 @@ case class MergedSierraRecord(
   version: Int = 1
 ) {
   def mergeBibRecord(record: SierraBibRecord): Option[MergedSierraRecord] = {
-    if(record.id != this.id) {
+    if (record.id != this.id) {
       throw new RuntimeException(s"Non-matching bib ids ${record.id} != ${this.id}")
     }
 
     Some(this.copy(
-      bibData = Some(record.data),
+      bibData = Some(record),
       version = this.version + 1
     ))
   }
