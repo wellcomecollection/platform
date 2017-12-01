@@ -17,7 +17,7 @@ module "sqs_autoscaling_alarms" {
 }
 
 module "sierra_merger_service" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=s3-mystery"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.0"
   name               = "sierra_${var.resource_type}_merger"
   cluster_id         = "${var.cluster_id}"
   task_role_arn      = "${module.ecs_sierra_merger.task_role_arn}"
