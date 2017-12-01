@@ -23,7 +23,8 @@ class SierraToDynamoFeatureTest extends FunSpec with FeatureTestMixin with SQSLo
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" ->"key",
       "sierra.oauthSecret" ->"secret",
-      "sierra.resourceType" -> "items"
+      "sierra.resourceType" -> "items",
+      "sierra.fields" -> "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
