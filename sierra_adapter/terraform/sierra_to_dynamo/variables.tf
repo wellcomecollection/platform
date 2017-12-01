@@ -30,9 +30,6 @@ variable "alb_cloudwatch_id" {}
 variable "ecr_repository_url" {}
 variable "release_id" {}
 
-variable "nginx_ecr_repository_url" {}
-variable "nginx_release_id" {}
-
 variable "infra_bucket" {
   default = "platform-infra"
 }
@@ -42,3 +39,5 @@ variable "account_id" {}
 variable "sierra_api_url" {}
 variable "sierra_oauth_key" {}
 variable "sierra_oauth_secret" {}
+
+variable "lambda_error_alarm_arn" {}
