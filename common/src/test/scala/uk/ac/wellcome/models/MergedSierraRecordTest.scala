@@ -3,7 +3,7 @@ package uk.ac.wellcome.models
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.utils.JsonUtil
 
 class MergedSierraRecordTest extends FunSpec with Matchers {
@@ -103,6 +103,25 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
 
     val result = mergedSierraRecord.mergeBibRecord(record)
     result.get.bibData.get shouldBe record
+  }
+
+  it("should transform itself into a work") {
+    val id = "000"
+    val title = "Hi Diddle Dee Dee"
+    val data =
+      s"""
+        |{
+        | "id": "$id",
+        | "title": "$title",
+        |}
+      """.stripMargin
+
+    val mergedSierraRecord = MergedSierraRecord(id = id, bibData = Some(SierraBibRecord(id = id, data = data, modifiedDate = Instant.now())))
+
+    val transformedSierraRecord = mergedSierraRecord.transform
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get shouldBe Work(title = title, identifiers = List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
   }
 
   def sierraBibRecord(
