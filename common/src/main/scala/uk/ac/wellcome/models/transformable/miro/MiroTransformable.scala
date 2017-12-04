@@ -456,17 +456,18 @@ case class MiroTransformable(MiroID: String,
     val miroData = MiroTransformableData.create(data)
     val (title, description) = getTitleAndDescription(miroData)
 
-    Some(Work(
-      identifiers = getIdentifiers(miroData),
-      title = title,
-      description = description,
-      createdDate = getCreatedDate(miroData),
-      lettering = miroData.suppLettering,
-      creators = getCreators(miroData),
-      subjects = getSubjects(miroData),
-      genres = getGenres(miroData),
-      thumbnail = Some(getThumbnail(miroData)),
-      items = getItems(miroData)
-    ))
+    Some(
+      Work(
+        identifiers = getIdentifiers(miroData),
+        title = title,
+        description = description,
+        createdDate = getCreatedDate(miroData),
+        lettering = miroData.suppLettering,
+        creators = getCreators(miroData),
+        subjects = getSubjects(miroData),
+        genres = getGenres(miroData),
+        thumbnail = Some(getThumbnail(miroData)),
+        items = getItems(miroData)
+      ))
   }
 }

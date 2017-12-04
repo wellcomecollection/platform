@@ -43,19 +43,23 @@ case class MergedSierraRecord(
     }
   }
 
-  override def transform(): Try[Option[Work]] = maybeBibData.map { foo =>
-    JsonUtil.fromJson[SierraBibData](foo.data).map { sierraBibData =>
-      Some(Work(
-        title = sierraBibData.title,
-        identifiers = List(
-          SourceIdentifier(
-            identifierScheme = IdentifierSchemes.sierraSystemNumber,
-            sierraBibData.id
-          )
-        )
-      ))
-    }
-  }.getOrElse(Success(None))
+  override def transform(): Try[Option[Work]] =
+    maybeBibData
+      .map { foo =>
+        JsonUtil.fromJson[SierraBibData](foo.data).map { sierraBibData =>
+          Some(
+            Work(
+              title = sierraBibData.title,
+              identifiers = List(
+                SourceIdentifier(
+                  identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                  sierraBibData.id
+                )
+              )
+            ))
+        }
+      }
+      .getOrElse(Success(None))
 }
 
 case class SierraBibData(id: String, title: String)
