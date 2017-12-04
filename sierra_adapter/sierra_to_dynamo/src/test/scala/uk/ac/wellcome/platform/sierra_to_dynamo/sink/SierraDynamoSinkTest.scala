@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import com.gu.scanamo.syntax._
 import io.circe.parser._
 import org.mockito.Mockito
@@ -25,12 +25,18 @@ class SierraDynamoSinkTest
     with SierraDynamoDBLocal
     with Matchers
     with ExtendedPatience
-    with MockitoSugar {
+    with MockitoSugar with BeforeAndAfterAll {
   implicit val system = ActorSystem()
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
   val sink = SierraDynamoSink(client = dynamoDbClient, tableName = tableName)
+
+  override def afterAll(): Unit = {
+    system.terminate()
+    materialiser.shutdown()
+    super.afterAll()
+  }
 
   it("should ingest a json into DynamoDB") {
     val id = "100001"
