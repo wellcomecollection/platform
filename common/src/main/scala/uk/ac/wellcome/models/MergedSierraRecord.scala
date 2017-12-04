@@ -4,7 +4,7 @@ import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 /** Represents a row in the DynamoDB database of "merged" Sierra records;
   * that is, records that contain data for both bibs and
@@ -12,7 +12,7 @@ import scala.util.Try
   */
 case class MergedSierraRecord(
   id: String,
-  bibData: Option[SierraBibRecord] = None,
+  maybeBibData: Option[SierraBibRecord] = None,
   version: Int = 1
 ) extends Transformable {
 
@@ -27,7 +27,7 @@ case class MergedSierraRecord(
         s"Non-matching bib ids ${record.id} != ${this.id}")
     }
 
-    val isNewerData = this.bibData match {
+    val isNewerData = this.maybeBibData match {
       case Some(bibData) => record.modifiedDate.isAfter(bibData.modifiedDate)
       case None => true
     }
@@ -35,7 +35,7 @@ case class MergedSierraRecord(
     if (isNewerData) {
       Some(
         this.copy(
-          bibData = Some(record),
+          maybeBibData = Some(record),
           version = this.version + 1
         ))
     } else {
@@ -43,18 +43,19 @@ case class MergedSierraRecord(
     }
   }
 
-  override def transform: Try[Work] =
-    JsonUtil.fromJson[SierraBibData](bibData.get.data).map { sierraBibData =>
-    Work(
-      title = sierraBibData.title,
-      identifiers = List(
-        SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraSystemNumber,
-          sierraBibData.id
+  override def transform(): Try[Option[Work]] = maybeBibData.map { foo =>
+    JsonUtil.fromJson[SierraBibData](foo.data).map { sierraBibData =>
+      Some(Work(
+        title = sierraBibData.title,
+        identifiers = List(
+          SourceIdentifier(
+            identifierScheme = IdentifierSchemes.sierraSystemNumber,
+            sierraBibData.id
+          )
         )
-      )
-    )
-  }
+      ))
+    }
+  }.getOrElse(Success(None))
 }
 
 case class SierraBibData(id: String, title: String)
@@ -62,16 +63,16 @@ case class SierraBibData(id: String, title: String)
 object MergedSierraRecord {
   def apply(id: String, bibData: String): MergedSierraRecord = {
     val bibRecord = JsonUtil.fromJson[SierraBibRecord](bibData).get
-    MergedSierraRecord(id = id, bibData = Some(bibRecord))
+    MergedSierraRecord(id = id, maybeBibData = Some(bibRecord))
   }
 
   def apply(bibRecord: SierraBibRecord): MergedSierraRecord =
-    MergedSierraRecord(id = bibRecord.id, bibData = Some(bibRecord))
+    MergedSierraRecord(id = bibRecord.id, maybeBibData = Some(bibRecord))
 
   def apply(bibRecord: SierraBibRecord, version: Int): MergedSierraRecord =
     MergedSierraRecord(
       id = bibRecord.id,
-      bibData = Some(bibRecord),
+      maybeBibData = Some(bibRecord),
       version = version
     )
 }
