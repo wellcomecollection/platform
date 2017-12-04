@@ -25,14 +25,14 @@ module "sierra_merger_service" {
   app_uri            = "${var.ecr_repository_url}:${var.release_id}"
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
-  path_pattern       = "/sierra_to_dynamo/${var.resource_type}/*"
+  path_pattern       = "/sierra_${var.resource_type}_merger/*"
   alb_priority       = "${var.alb_priority}"
-  healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
+  healthcheck_path   = "/sierra_${var.resource_type}_merger/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   https_domain       = "services.wellcomecollection.ac.uk"
 
   config_key           = "config/${var.build_env}/sierra_${var.resource_type}_merger.ini"
-  config_template_path = "config/sierra_merger.ini.template"
+  config_template_path = "config/sierra_${var.resource_type}_merger.ini.template"
 
   cpu    = 256
   memory = 1024
