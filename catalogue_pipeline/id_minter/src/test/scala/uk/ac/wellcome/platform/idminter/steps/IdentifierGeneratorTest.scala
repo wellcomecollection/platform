@@ -6,9 +6,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal

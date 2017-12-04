@@ -1,11 +1,10 @@
 package uk.ac.wellcome.models.transformable.miro
 
 import java.io.InputStream
+
 import scala.io.Source
 import scala.util.Try
-
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.transformable._
 import uk.ac.wellcome.utils.JsonUtil
 

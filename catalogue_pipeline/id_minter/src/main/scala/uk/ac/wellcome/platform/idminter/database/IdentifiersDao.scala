@@ -5,8 +5,7 @@ import javax.inject.Singleton
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import scalikejdbc._
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
-import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
 
 import scala.concurrent.blocking
