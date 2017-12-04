@@ -15,24 +15,11 @@ trait SierraDynamoDBLocal
 
   val tableName = "SierraData"
 
-  deleteTables()
-  createTable()
-
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearTable()
+    deleteTables()
+    createTable()
   }
-
-  private def clearTable(): List[DeleteItemResult] =
-    Scanamo.scan[SierraRecord](dynamoDbClient)(tableName).map {
-      case Right(record) =>
-        dynamoDbClient.deleteItem(
-          tableName,
-          Map("id" -> new AttributeValue(record.id))
-        )
-      case e =>
-        throw new Exception(s"Unable to clear the table $tableName error $e")
-    }
 
   private def deleteTables() = {
     dynamoDbClient
