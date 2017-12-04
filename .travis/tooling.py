@@ -125,6 +125,7 @@ def make_decision(changed_files, task, action):
 
 
 def make(task):
+    print('*** Running make %s' % task)
     subprocess.check_call(['make', task])
 
 
