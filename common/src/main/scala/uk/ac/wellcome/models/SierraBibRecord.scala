@@ -24,11 +24,4 @@ object SierraBibRecord {
       data = data,
       modifiedDate = Instant.parse(modifiedDate)
     )
-
-  def apply(id: String, data: String, modifiedDate: Long): SierraBibRecord =
-    SierraBibRecord(
-      id = id,
-      data = data,
-      modifiedDate = Instant.ofEpochMilli(modifiedDate)
-    )
 }
