@@ -1,21 +1,20 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
 import akka.actor.ActorSystem
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
 import com.gu.scanamo.query.UniqueKey
+import com.gu.scanamo.syntax._
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
-import uk.ac.wellcome.models.MergedSierraRecord
-import uk.ac.wellcome.models.SierraBibRecord._
-import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
+
+import uk.ac.wellcome.models.SierraBibRecord._
 
 
 class SierraBibMergerWorkerServiceTest
@@ -85,7 +84,7 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record)
-    val expectedMergedSierraRecord = MergedSierraRecord(bibRecord = record, version = 2)
+    val expectedMergedSierraRecord = MergedSierraRecord(bibRecord = record, version = 1)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraRecord)
   }
@@ -102,7 +101,7 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record1)
-    val expectedMergedSierraRecord1 = MergedSierraRecord(bibRecord = record1, version = 2)
+    val expectedMergedSierraRecord1 = MergedSierraRecord(bibRecord = record1, version = 1)
 
     val id2 = "2000002"
     val record2 = SierraBibRecord(
@@ -115,7 +114,7 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2002-02-02T02:02:02Z"
     )
     sendBibRecordToSQS(record2)
-    val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2, version = 2)
+    val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2, version = 1)
 
     dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraRecord1)
     dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraRecord2)

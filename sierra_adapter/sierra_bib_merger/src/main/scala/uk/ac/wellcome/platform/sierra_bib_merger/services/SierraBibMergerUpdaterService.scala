@@ -10,8 +10,8 @@ import uk.ac.wellcome.models.SierraBibRecord._
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 class SierraBibMergerUpdaterService @Inject()(
@@ -30,6 +30,8 @@ class SierraBibMergerUpdaterService @Inject()(
     .put(record)
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = Future {
+    logger.info(s"Attempting to update $bibRecord")
+
     val existingRecord = Scanamo.exec(dynamoDBClient)(
       table.get('id -> bibRecord.id)
     )
@@ -38,17 +40,28 @@ class SierraBibMergerUpdaterService @Inject()(
       case Left(error) => Left(
         new RuntimeException(error.toString)
       )
-      case Right(record) => record.mergeBibRecord(bibRecord).toRight(
-        new RuntimeException("Unable to merge record!")
-      )
-    }.getOrElse(
-      Right(MergedSierraRecord(id = bibRecord.id))
-    )
+      case Right(record) => {
+        logger.info(s"Found $record, attempting merge.")
+
+        record.mergeBibRecord(bibRecord).toRight(
+          new RuntimeException("Unable to merge record!")
+        )
+      }
+    }.getOrElse {
+      val record = MergedSierraRecord(bibRecord)
+      logger.info(s"No match found, creating new record: $record")
+
+      Right(record)
+    }
 
     val putOperation = newRecord match {
-      case Right(record) => Scanamo.exec(dynamoDBClient)(
-        putRecord(record)
-      ).left.map(e => new RuntimeException(e.toString))
+      case Right(record) => {
+        logger.info(s"Attempting to conditionally update $record.")
+
+        Scanamo.exec(dynamoDBClient)(
+          putRecord(record)
+        ).left.map(e => new RuntimeException(e.toString))
+      }
       case Left(e) => Left(e)
     }
 
