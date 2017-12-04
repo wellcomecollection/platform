@@ -1,6 +1,9 @@
 package uk.ac.wellcome.models
 
+import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.utils.JsonUtil
+
+import scala.util.Try
 
 /** Represents a row in the DynamoDB database of "merged" Sierra records;
   * that is, records that contain data for both bibs and
@@ -10,7 +13,7 @@ case class MergedSierraRecord(
   id: String,
   bibData: Option[SierraBibRecord] = None,
   version: Int = 1
-) {
+) extends Transformable {
 
   /** Given a new bib record, construct the new merged row that we should
     * insert into the merged database.
@@ -38,6 +41,8 @@ case class MergedSierraRecord(
       None
     }
   }
+
+  override def transform: Try[Work] = ???
 }
 
 object MergedSierraRecord {
