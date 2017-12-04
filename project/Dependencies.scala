@@ -14,6 +14,7 @@ object Dependencies {
     val elastic4s = "5.4.1"
     val scanamo = "0.9.4"
     val jacksonYamlVersion = "2.8.8"
+    val jacksonJSR310Version = "2.8.9"
     val circeVersion = "0.8.0"
   }
 
@@ -48,6 +49,11 @@ object Dependencies {
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
+  val jacksonDependencies = Seq(
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % versions.jacksonJSR310Version
+  )
+
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
@@ -67,9 +73,8 @@ object Dependencies {
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies
+  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
