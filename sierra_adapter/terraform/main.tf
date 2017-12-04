@@ -40,7 +40,7 @@ module "sierra_to_dynamo_bibs" {
 module "sierra_bib_merger" {
   source                   = "sierra_merger"
   resource_type            = "bibs"
-  dynamo_events_topic_name = "${module.sierra_to_dynamo_bibs.topic_name}"
+  dynamo_events_topic_name = "${module.sierra_bib_merger_events_topic.name}"
 
   target_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
   target_dynamo_table_arn  = "${aws_dynamodb_table.sierradata_table.arn}"
