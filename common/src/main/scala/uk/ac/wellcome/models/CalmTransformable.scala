@@ -11,11 +11,12 @@ case class CalmTransformableData(
 ) extends Transformable {
   def transform(): Try[Option[Work]] = Try {
     // TODO: Fill in proper data here
-    Some(Work(
-      identifiers =
-        List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
-      title = "placeholder title for a Calm record"
-    ))
+    Some(
+      Work(
+        identifiers =
+          List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+        title = "placeholder title for a Calm record"
+      ))
   }
 }
 
