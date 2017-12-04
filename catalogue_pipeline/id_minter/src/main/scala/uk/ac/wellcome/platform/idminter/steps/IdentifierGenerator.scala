@@ -5,7 +5,10 @@ import com.twitter.inject.annotations.Flag
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, UnableToMintIdentifierException}
+import uk.ac.wellcome.platform.idminter.database.{
+  IdentifiersDao,
+  UnableToMintIdentifierException
+}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
@@ -64,7 +67,7 @@ class IdentifierGenerator @Inject()(
   }
 
   private def findIdentifierWith(identifiers: List[SourceIdentifier],
-                                 identifierScheme: String): String = {
+                                 identifierScheme: IdentifierSchemes.IdentifierScheme): String = {
     identifiers
       .find(identifier => identifier.identifierScheme == identifierScheme)
       .fold[String](null)(identifier => identifier.value)
