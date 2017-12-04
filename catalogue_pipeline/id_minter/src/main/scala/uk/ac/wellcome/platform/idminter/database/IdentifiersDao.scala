@@ -122,7 +122,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     sql: ConditionSQLBuilder[String],
     sourceIdentifiers: List[SourceIdentifier],
     column: SQLSyntax,
-    identifierScheme: String): ConditionSQLBuilder[String] = {
+    identifierScheme: IdentifierSchemes.IdentifierScheme): ConditionSQLBuilder[String] = {
     val sourceID = sourceIdentifiers.filter {
       _.identifierScheme == identifierScheme
     }
