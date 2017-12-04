@@ -48,4 +48,11 @@ object MergedSierraRecord {
 
   def apply(bibRecord: SierraBibRecord): MergedSierraRecord =
     MergedSierraRecord(id = bibRecord.id, bibData = Some(bibRecord))
+
+  def apply(bibRecord: SierraBibRecord, version: Int): MergedSierraRecord =
+    MergedSierraRecord(
+      id = bibRecord.id,
+      bibData = Some(bibRecord),
+      version = version
+    )
 }
