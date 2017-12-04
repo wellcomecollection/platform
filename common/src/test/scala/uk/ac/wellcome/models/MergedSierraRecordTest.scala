@@ -16,7 +16,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     val bibRecord = sierraBibRecord(id = "101")
     val mergedRecord = MergedSierraRecord(bibRecord = bibRecord)
     mergedRecord.id shouldEqual bibRecord.id
-    mergedRecord.bibData.get shouldEqual bibRecord
+    mergedRecord.maybeBibData.get shouldEqual bibRecord
   }
 
   it("should allow creation from a SierraBibRecord and a version") {
@@ -36,7 +36,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     val newRecord: Option[MergedSierraRecord] =
       originalRecord.mergeBibRecord(record)
 
-    newRecord.get.bibData.get shouldEqual record
+    newRecord.get.maybeBibData.get shouldEqual record
   }
 
   it("should only merge bib records with matching ids") {
@@ -70,7 +70,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
 
     val mergedSierraRecord = MergedSierraRecord(
       id = "777",
-      bibData = Some(
+      maybeBibData = Some(
         sierraBibRecord(
           id = "777",
           title = "Shiny McNewRecordz 2.0",
@@ -92,7 +92,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
 
     val mergedSierraRecord = MergedSierraRecord(
       id = "888",
-      bibData = Some(
+      maybeBibData = Some(
         sierraBibRecord(
           id = "888",
           title = "Old and Dusty Data",
@@ -102,7 +102,16 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     )
 
     val result = mergedSierraRecord.mergeBibRecord(record)
-    result.get.bibData.get shouldBe record
+    result.get.maybeBibData.get shouldBe record
+  }
+
+  it("should not perform a transformation without bibData") {
+    val mergedSierraRecord = MergedSierraRecord(id = "000", maybeBibData = None)
+
+    val transformedSierraRecord = mergedSierraRecord.transform
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get shouldBe None
   }
 
   it("should transform itself into a work") {
@@ -116,12 +125,14 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         |}
       """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(id = id, bibData = Some(SierraBibRecord(id = id, data = data, modifiedDate = Instant.now())))
+    val mergedSierraRecord = MergedSierraRecord(id = id, maybeBibData = Some(SierraBibRecord(id = id, data = data, modifiedDate = Instant.now())))
 
     val transformedSierraRecord = mergedSierraRecord.transform
     transformedSierraRecord.isSuccess shouldBe true
 
-    transformedSierraRecord.get shouldBe Work(title = title, identifiers = List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+    transformedSierraRecord.get shouldBe Some(
+      Work(title = title, identifiers = List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+    )
   }
 
   def sierraBibRecord(
