@@ -38,6 +38,8 @@ class SierraBibMergerUpdaterService @Inject()(
     val newRecord: Option[MergedSierraRecord] =
       existingRecord.mergeBibRecord(bibRecord)
 
+    logger.info(s"Saving $newRecord to DynamoDB")
+
     newRecord match {
       case Some(record) => {
         val table = Table[MergedSierraRecord](dynamoConfig.table)
