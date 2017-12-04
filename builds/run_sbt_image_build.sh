@@ -6,4 +6,4 @@ set -o nounset
 ROOT=$(git rev-parse --show-toplevel)
 
 $ROOT/builds/docker_run.py --dind --sbt -- \
-  sbt_image_builder --project="$PROJECT" --target="$TARGET"
+  sbt_image_builder --project="$PROJECT" --target="$TARGET" --env="${PLATFORM_ENV:-dev}"
