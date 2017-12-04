@@ -45,4 +45,7 @@ object MergedSierraRecord {
     val bibRecord = JsonUtil.fromJson[SierraBibRecord](bibData).get
     MergedSierraRecord(id = id, bibData = Some(bibRecord))
   }
+
+  def apply(bibRecord: SierraBibRecord): MergedSierraRecord =
+    MergedSierraRecord(id = bibRecord.id, bibData = Some(bibRecord))
 }

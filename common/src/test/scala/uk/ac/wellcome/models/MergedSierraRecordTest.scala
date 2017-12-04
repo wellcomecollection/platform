@@ -12,6 +12,13 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     MergedSierraRecord(id = "111")
   }
 
+  it("should allow creation from only a SierraBibRecord") {
+    val bibRecord = sierraBibRecord(id = "101")
+    val mergedRecord = MergedSierraRecord(bibRecord = bibRecord)
+    mergedRecord.id shouldEqual bibRecord.id
+    mergedRecord.bibData.get shouldEqual bibRecord
+  }
+
   it("should merge data from a bibRecord when empty") {
     val record = sierraBibRecord(id = "222")
     val originalRecord = MergedSierraRecord(id = "222")
