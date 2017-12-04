@@ -1,7 +1,8 @@
 package uk.ac.wellcome.transformer.utils
 
+import org.apache.logging.log4j.core.appender.rolling.action.IfLastModified
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{CalmTransformable, MergedSierraRecord}
+import uk.ac.wellcome.models.{CalmTransformable, MergedSierraRecord, SierraBibRecord}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -20,6 +21,20 @@ trait TransformableSQSMessageUtils {
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
     val mergedSierraRecord = MergedSierraRecord(id = id, maybeBibData = None)
+
+    sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
+  }
+
+  def createValidSierraBibSQSMessage(id: String, title: String, lastModifiedDate: String): SQSMessage = {
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title"
+         |}
+      """.stripMargin
+
+    val mergedSierraRecord = MergedSierraRecord(id = id, maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)))
 
     sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
   }
