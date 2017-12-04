@@ -25,9 +25,9 @@ module "sierra_to_dynamo_service" {
   app_uri            = "${var.ecr_repository_url}:${var.release_id}"
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
-  path_pattern       = "/sierra_to_dynamo/${var.resource_type}/*"
+  path_pattern       = "/sierra_to_dynamo_${var.resource_type}/*"
   alb_priority       = "${var.alb_priority}"
-  healthcheck_path   = "/sierra_to_dynamo/${var.resource_type}/management/healthcheck"
+  healthcheck_path   = "/sierra_to_dynamo_${var.resource_type}/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   https_domain       = "services.wellcomecollection.ac.uk"
 
