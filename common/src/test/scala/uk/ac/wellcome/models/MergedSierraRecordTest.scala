@@ -112,7 +112,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       s"""
         |{
         | "id": "$id",
-        | "title": "$title",
+        | "title": "$title"
         |}
       """.stripMargin
 

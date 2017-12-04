@@ -1,5 +1,6 @@
 package uk.ac.wellcome.models
 
+import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -42,8 +43,21 @@ case class MergedSierraRecord(
     }
   }
 
-  override def transform: Try[Work] = ???
+  override def transform: Try[Work] =
+    JsonUtil.fromJson[SierraBibData](bibData.get.data).map { sierraBibData =>
+    Work(
+      title = sierraBibData.title,
+      identifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          sierraBibData.id
+        )
+      )
+    )
+  }
 }
+
+case class SierraBibData(id: String, title: String)
 
 object MergedSierraRecord {
   def apply(id: String, bibData: String): MergedSierraRecord = {
