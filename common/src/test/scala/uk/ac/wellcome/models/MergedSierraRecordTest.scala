@@ -115,6 +115,12 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     modifiedDate = modifiedDate
   )
 
+  it("should support creation directly from a SierraBibRecord") {
+    val record = sierraBibRecord(id = "999")
+    val mergedRecord = MergedSierraRecord(bibRecord = record)
+    mergedRecord.id shouldEqual record.id
+  }
+
   def sierraBibRecordString(id: String, modifiedDate: String, title: String) =
     JsonUtil.toJson(SierraBibRecord(
       id = id,
