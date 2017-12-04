@@ -32,7 +32,7 @@ module "sierra_merger_service" {
   https_domain       = "services.wellcomecollection.ac.uk"
 
   config_key           = "config/${var.build_env}/sierra_${var.resource_type}_merger.ini"
-  config_template_path = "config/sierra_merger.ini.template"
+  config_template_path = "config/sierra_${var.resource_type}_merger.ini.template"
 
   cpu    = 256
   memory = 1024
