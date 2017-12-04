@@ -7,9 +7,8 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{IdentifierSchemes, Item, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.api
 
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
 
 trait WorksUtil {

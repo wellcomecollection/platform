@@ -20,7 +20,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "title": "title",
       |  "identifiers": [
       |    {
-      |      "identifierScheme": "identifierScheme",
+      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "value": "value"
       |    }
       |  ],
@@ -59,7 +59,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "canonicalId": "canonicalId",
       |      "identifiers": [
       |        {
-      |          "identifierScheme": "identifierScheme",
+      |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |          "value": "value"
       |        }
       |      ],
@@ -83,7 +83,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "title": "title",
       |  "identifiers": [
       |    {
-      |      "identifierScheme": "identifierScheme",
+      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "value": "value"
       |    }
       |  ],
@@ -121,7 +121,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "canonicalId": "canonicalId",
       |      "identifiers": [
       |        {
-      |          "identifierScheme": "identifierScheme",
+      |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |          "value": "value"
       |        }
       |      ],
@@ -146,7 +146,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val identifier = SourceIdentifier(
-    identifierScheme = "identifierScheme",
+    identifierScheme = IdentifierSchemes.miroImageNumber,
     value = "value"
   )
 
