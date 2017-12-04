@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.services
 
 import akka.actor.ActorSystem
 import com.gu.scanamo.Scanamo
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
@@ -25,21 +25,28 @@ class SierraToDynamoWorkerServiceTest
     with Matchers
     with ExtendedPatience
     with ScalaFutures
-    with BeforeAndAfterEach{
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll{
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
   var worker: Option[SierraToDynamoWorkerService] = None
+  val actorSystem = ActorSystem()
 
-  override def afterEach(): Unit = {
-    super.afterEach()
+  override def beforeEach(): Unit = {
+    super.beforeEach()
     stopWorker(worker)
+  }
+
+  override def afterAll(): Unit = {
+    super.afterAll()
+    actorSystem.terminate()
   }
 
   private def createSierraWorkerService(resourceType: String, fields: String) = {
     Some(new SierraToDynamoWorkerService(
       reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-      system = ActorSystem(),
+      system = actorSystem,
       metrics = mockMetrics,
       dynamoDbClient = dynamoDbClient,
       apiUrl = "http://localhost:8080",
