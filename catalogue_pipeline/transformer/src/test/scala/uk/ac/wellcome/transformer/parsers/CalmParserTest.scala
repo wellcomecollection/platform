@@ -4,7 +4,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.CalmTransformable
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 
-class CalmParserTest extends FunSpec with TransformableSQSMessageUtils with Matchers {
+class CalmParserTest
+    extends FunSpec
+    with TransformableSQSMessageUtils
+    with Matchers {
 
   val RecordID = "abcdef"
   val RecordType = "collection"
@@ -29,8 +32,7 @@ class CalmParserTest extends FunSpec with TransformableSQSMessageUtils with Matc
                                                                   data)
   }
 
-  it(
-    "should return a failed try if it's unable to parse the message") {
+  it("should return a failed try if it's unable to parse the message") {
     val calmParser = new CalmParser
 
     val triedCalmTransformable =

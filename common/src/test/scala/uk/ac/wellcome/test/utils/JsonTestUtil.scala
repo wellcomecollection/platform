@@ -15,6 +15,6 @@ trait JsonTestUtil { this: Matchers =>
   def assertJsonStringsAreDifferent(json1: String, json2: String) = {
     val tree1 = mapper.readTree(json1)
     val tree2 = mapper.readTree(json2)
-    tree1 shouldNot be (tree2)
+    tree1 shouldNot be(tree2)
   }
 }

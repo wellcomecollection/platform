@@ -19,7 +19,7 @@ trait TransformableSQSMessageUtils {
   }
 
   def createValidMiroSQSMessage(data: String): SQSMessage = {
-    val miroTransformable = MiroTransformable("id","collection", data)
+    val miroTransformable = MiroTransformable("id", "collection", data)
 
     sqsMessage(JsonUtil.toJson(miroTransformable).get)
   }

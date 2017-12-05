@@ -177,11 +177,13 @@ class IdEmbedderTests
     }
   }
 
-  describe("Documents with Identifiable structures should be updated correctly") {
+  describe(
+    "Documents with Identifiable structures should be updated correctly") {
     it("identify a document that is itself Identifiable") {
       val sourceIdentifiers = List(SourceIdentifier("australia", "sydney"))
       val ontologyType = "false capitals"
-      val newCanonicalId = generateMockCanonicalId(sourceIdentifiers, ontologyType)
+      val newCanonicalId =
+        generateMockCanonicalId(sourceIdentifiers, ontologyType)
 
       setUpIdentifierGeneratorMock(sourceIdentifiers,
                                    ontologyType,
@@ -203,7 +205,8 @@ class IdEmbedderTests
       val sourceIdentifiers =
         List(SourceIdentifier("westeros", "king's landing"))
       val ontologyType = "fictional cities"
-      val newCanonicalId = generateMockCanonicalId(sourceIdentifiers, ontologyType)
+      val newCanonicalId =
+        generateMockCanonicalId(sourceIdentifiers, ontologyType)
       setUpIdentifierGeneratorMock(sourceIdentifiers,
                                    ontologyType,
                                    newCanonicalId)
@@ -231,8 +234,11 @@ class IdEmbedderTests
       )
       val ontologyTypeA = "ghost towns"
 
-      val newCanonicalIdA = generateMockCanonicalId(sourceIdentifiersA, ontologyTypeA)
-      setUpIdentifierGeneratorMock(sourceIdentifiersA,ontologyTypeA, newCanonicalIdA)
+      val newCanonicalIdA =
+        generateMockCanonicalId(sourceIdentifiersA, ontologyTypeA)
+      setUpIdentifierGeneratorMock(sourceIdentifiersA,
+                                   ontologyTypeA,
+                                   newCanonicalIdA)
 
       val sourceIdentifiersB = List(
         SourceIdentifier("ocean", "atlantis"),
@@ -240,8 +246,11 @@ class IdEmbedderTests
       )
       val ontologyTypeB = "mythological places"
 
-      val newCanonicalIdB = generateMockCanonicalId(sourceIdentifiersB, ontologyTypeB)
-      setUpIdentifierGeneratorMock(sourceIdentifiersB,ontologyTypeB, newCanonicalIdB)
+      val newCanonicalIdB =
+        generateMockCanonicalId(sourceIdentifiersB, ontologyTypeB)
+      setUpIdentifierGeneratorMock(sourceIdentifiersB,
+                                   ontologyTypeB,
+                                   newCanonicalIdB)
 
       val sourceIdentifiersC = List(
         SourceIdentifier("england", "lundenwic"),
@@ -249,8 +258,11 @@ class IdEmbedderTests
       )
       val ontologyTypeC = "cities that were renamed"
 
-      val newCanonicalIdC = generateMockCanonicalId(sourceIdentifiersC, ontologyTypeC)
-      setUpIdentifierGeneratorMock(sourceIdentifiersC,ontologyTypeC, newCanonicalIdC)
+      val newCanonicalIdC =
+        generateMockCanonicalId(sourceIdentifiersC, ontologyTypeC)
+      setUpIdentifierGeneratorMock(sourceIdentifiersC,
+                                   ontologyTypeC,
+                                   newCanonicalIdC)
 
       assertIdEmbedderAddsCanonicalIdCorrectly(s"""
       {

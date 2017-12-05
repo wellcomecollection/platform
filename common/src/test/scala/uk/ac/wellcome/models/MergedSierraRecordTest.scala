@@ -61,7 +61,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     newRecord.get.version shouldEqual 11
   }
 
-  it("should return None when merging bib records with stale data"){
+  it("should return None when merging bib records with stale data") {
     val record = sierraBibRecord(
       id = "777",
       title = "Olde McOlde Recorde",
@@ -122,15 +122,18 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   }
 
   def sierraBibRecordString(id: String, modifiedDate: String, title: String) =
-    JsonUtil.toJson(SierraBibRecord(
-      id = id,
-      data = bibRecordString(
-        id = id,
-        updatedDate = modifiedDate,
-        title = title
-      ),
-      modifiedDate = modifiedDate
-    )).get
+    JsonUtil
+      .toJson(
+        SierraBibRecord(
+          id = id,
+          data = bibRecordString(
+            id = id,
+            updatedDate = modifiedDate,
+            title = title
+          ),
+          modifiedDate = modifiedDate
+        ))
+      .get
 
   private def bibRecordString(
     id: String,
@@ -168,4 +171,3 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     """.stripMargin
 
 }
-

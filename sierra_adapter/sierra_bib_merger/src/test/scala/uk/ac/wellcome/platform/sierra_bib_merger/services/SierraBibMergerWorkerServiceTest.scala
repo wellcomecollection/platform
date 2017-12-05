@@ -16,7 +16,6 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import uk.ac.wellcome.models.SierraBibRecord._
 
-
 class SierraBibMergerWorkerServiceTest
     extends FunSpec
     with FeatureTestMixin
@@ -84,9 +83,11 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record)
-    val expectedMergedSierraRecord = MergedSierraRecord(bibRecord = record, version = 1)
+    val expectedMergedSierraRecord =
+      MergedSierraRecord(bibRecord = record, version = 1)
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedMergedSierraRecord)
+    dynamoQueryEqualsValue('id -> id)(
+      expectedValue = expectedMergedSierraRecord)
   }
 
   it("should put multiple bibs from SQS into DynamoDB") {
@@ -101,7 +102,8 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record1)
-    val expectedMergedSierraRecord1 = MergedSierraRecord(bibRecord = record1, version = 1)
+    val expectedMergedSierraRecord1 =
+      MergedSierraRecord(bibRecord = record1, version = 1)
 
     val id2 = "2000002"
     val record2 = SierraBibRecord(
@@ -114,10 +116,13 @@ class SierraBibMergerWorkerServiceTest
       modifiedDate = "2002-02-02T02:02:02Z"
     )
     sendBibRecordToSQS(record2)
-    val expectedMergedSierraRecord2 = MergedSierraRecord(bibRecord = record2, version = 1)
+    val expectedMergedSierraRecord2 =
+      MergedSierraRecord(bibRecord = record2, version = 1)
 
-    dynamoQueryEqualsValue('id -> id1)(expectedValue = expectedMergedSierraRecord1)
-    dynamoQueryEqualsValue('id -> id2)(expectedValue = expectedMergedSierraRecord2)
+    dynamoQueryEqualsValue('id -> id1)(
+      expectedValue = expectedMergedSierraRecord1)
+    dynamoQueryEqualsValue('id -> id2)(
+      expectedValue = expectedMergedSierraRecord2)
   }
 
   it("should update a bib in DynamoDB if a newer version is sent to SQS") {
@@ -148,7 +153,8 @@ class SierraBibMergerWorkerServiceTest
     println("@@AWLC Sent the second record to SQS")
     sendBibRecordToSQS(record)
 
-    val expectedSierraRecord = MergedSierraRecord(bibRecord = record, version = 2)
+    val expectedSierraRecord =
+      MergedSierraRecord(bibRecord = record, version = 2)
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
@@ -205,7 +211,8 @@ class SierraBibMergerWorkerServiceTest
     )
 
     sendBibRecordToSQS(record)
-    val expectedSierraRecord = MergedSierraRecord(bibRecord = record, version = 2)
+    val expectedSierraRecord =
+      MergedSierraRecord(bibRecord = record, version = 2)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
@@ -226,7 +233,8 @@ class SierraBibMergerWorkerServiceTest
   // TODO: This message is suitably generic, and could be moved
   // to DynamoDBLocal or another parent class, but requires some fiddling
   // with implicit ExecutionContexts to get right.  Move it!
-  private def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(expectedValue: T) = {
+  private def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
+    expectedValue: T) = {
     println(s"Searching DynamoDB for expectedValue = $expectedValue")
     eventually {
       val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get

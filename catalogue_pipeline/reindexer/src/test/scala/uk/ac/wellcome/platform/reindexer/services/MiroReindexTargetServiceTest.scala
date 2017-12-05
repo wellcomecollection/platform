@@ -63,7 +63,10 @@ class MiroReindexTargetServiceTest
 
     val miroTransformableList = inShardMiroTransformables ++ diffShardMiroTransformables
 
-    val reindex = Reindex(miroDataTableName, reindexShard, requestedVersion, currentVersion)
+    val reindex = Reindex(miroDataTableName,
+                          reindexShard,
+                          requestedVersion,
+                          currentVersion)
     val reindexAttempt = ReindexAttempt(reindex)
     val expectedReindexAttempt = reindexAttempt.copy(
       reindex = reindex,
@@ -124,7 +127,10 @@ class MiroReindexTargetServiceTest
 
     val miroTransformableList = outOfdateMiroTransformableList ++ inDateMiroTransferrableList
 
-    val reindex = Reindex(miroDataTableName, reindexShard, requestedVersion, currentVersion)
+    val reindex = Reindex(miroDataTableName,
+                          reindexShard,
+                          requestedVersion,
+                          currentVersion)
 
     val reindexAttempt = ReindexAttempt(reindex)
     val expectedReindexAttempt = reindexAttempt.copy(
