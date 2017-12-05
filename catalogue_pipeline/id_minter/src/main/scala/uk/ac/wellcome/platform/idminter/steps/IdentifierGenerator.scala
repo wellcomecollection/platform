@@ -66,8 +66,9 @@ class IdentifierGenerator @Inject()(
       }
   }
 
-  private def findIdentifierWith(identifiers: List[SourceIdentifier],
-                                 identifierScheme: IdentifierSchemes.IdentifierScheme): String = {
+  private def findIdentifierWith(
+    identifiers: List[SourceIdentifier],
+    identifierScheme: IdentifierSchemes.IdentifierScheme): String = {
     identifiers
       .find(identifier => identifier.identifierScheme == identifierScheme)
       .fold[String](null)(identifier => identifier.value)

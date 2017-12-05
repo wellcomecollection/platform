@@ -179,7 +179,8 @@ class IdEmbedderTests
   describe(
     "Documents with Identifiable structures should be updated correctly") {
     it("identify a document that is itself Identifiable") {
-      val sourceIdentifiers = List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "sydney"))
+      val sourceIdentifiers =
+        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "sydney"))
       val ontologyType = "false capitals"
       val newCanonicalId =
         generateMockCanonicalId(sourceIdentifiers, ontologyType)
@@ -202,7 +203,9 @@ class IdEmbedderTests
 
     it("identify a document with a key that is identifiable") {
       val sourceIdentifiers =
-        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "king's landing"))
+        List(
+          SourceIdentifier(IdentifierSchemes.miroImageNumber,
+                           "king's landing"))
       val ontologyType = "fictional cities"
       val newCanonicalId =
         generateMockCanonicalId(sourceIdentifiers, ontologyType)

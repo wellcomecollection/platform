@@ -645,7 +645,7 @@ class MiroTransformableSubjectsTest
     item shouldBe Item(
       None,
       List(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber,"M0000001")
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
       ),
       List(
         Location(
