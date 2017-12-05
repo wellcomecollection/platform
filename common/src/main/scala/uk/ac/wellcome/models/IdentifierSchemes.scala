@@ -1,27 +1,39 @@
 package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode}
+import com.fasterxml.jackson.databind.{
+  DeserializationContext,
+  JsonDeserializer,
+  JsonNode
+}
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.twitter.inject.Logging
 
+class IdentifierSchemeDeserialiser
+    extends JsonDeserializer[IdentifierSchemes.IdentifierScheme]
+    with Logging {
 
-class IdentifierSchemeDeserialiser extends JsonDeserializer[IdentifierSchemes.IdentifierScheme] with Logging {
-
-  override def deserialize(p: JsonParser,
-                           ctxt: DeserializationContext): IdentifierSchemes.IdentifierScheme = {
+  override def deserialize(
+    p: JsonParser,
+    ctxt: DeserializationContext): IdentifierSchemes.IdentifierScheme = {
     val node: JsonNode = p.getCodec.readTree(p)
     val identifierScheme = node.get("identifierScheme").asText
     createIdentifierScheme(identifierScheme)
   }
 
-  private def createIdentifierScheme(identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
+  private def createIdentifierScheme(
+    identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
     identifierScheme match {
-      case s: String if s == IdentifierSchemes.miroImageNumber.toString => IdentifierSchemes.miroImageNumber
-      case s: String if s == IdentifierSchemes.sierraSystemNumber.toString => IdentifierSchemes.sierraSystemNumber
-      case s: String if s == IdentifierSchemes.calmAltRefNo.toString => IdentifierSchemes.calmAltRefNo
-      case s: String if s == IdentifierSchemes.calmPlaceholder.toString => IdentifierSchemes.calmPlaceholder
-      case s: String if s == IdentifierSchemes.miroLibraryReference.toString => IdentifierSchemes.miroLibraryReference
+      case s: String if s == IdentifierSchemes.miroImageNumber.toString =>
+        IdentifierSchemes.miroImageNumber
+      case s: String if s == IdentifierSchemes.sierraSystemNumber.toString =>
+        IdentifierSchemes.sierraSystemNumber
+      case s: String if s == IdentifierSchemes.calmAltRefNo.toString =>
+        IdentifierSchemes.calmAltRefNo
+      case s: String if s == IdentifierSchemes.calmPlaceholder.toString =>
+        IdentifierSchemes.calmPlaceholder
+      case s: String if s == IdentifierSchemes.miroLibraryReference.toString =>
+        IdentifierSchemes.miroLibraryReference
       case identifierScheme =>
         val errorMessage = s"$identifierScheme is not a valid identifierScheme"
         error(errorMessage)
@@ -37,7 +49,7 @@ object IdentifierSchemes {
   @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
   sealed trait IdentifierScheme
   // Corresponds to the image number in Miro, e.g. V00127563.
-  case object miroImageNumber extends IdentifierScheme{
+  case object miroImageNumber extends IdentifierScheme {
     override def toString: String = "miro-image-number"
   }
 
@@ -45,21 +57,21 @@ object IdentifierSchemes {
   // should be tackled properly: either assigned proper identifier schemes
   // and normalised, or removed entirely.  For now, this is a stopgap to
   // get these IDs into the API until we deal with them properly.
-  case object miroLibraryReference extends IdentifierScheme{
+  case object miroLibraryReference extends IdentifierScheme {
     override def toString: String = "miro-library-reference"
   }
 
   // Placeholder until we ingest real Calm records.
   // TODO: Replace this with something more appropriate
-  case object calmPlaceholder extends IdentifierScheme{
+  case object calmPlaceholder extends IdentifierScheme {
     override def toString: String = "calm-placeholder"
   }
 
-  case object calmAltRefNo extends IdentifierScheme{
+  case object calmAltRefNo extends IdentifierScheme {
     override def toString: String = "calm-altrefno"
   }
 
-  case object sierraSystemNumber extends IdentifierScheme{
+  case object sierraSystemNumber extends IdentifierScheme {
     override def toString: String = "sierra-system-number"
   }
 }
