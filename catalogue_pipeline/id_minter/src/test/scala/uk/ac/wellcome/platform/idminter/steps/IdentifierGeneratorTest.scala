@@ -66,7 +66,7 @@ class IdentifierGeneratorTest
   it(
     "should fail if the identifier does not contain a known identifierScheme in the list of Identifiers") {
     val triedGeneratingId = identifierGenerator.retrieveOrGenerateCanonicalId(
-      List(SourceIdentifier("not-a-known-identifier-scheme", "1234")),
+      List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "1234")),
       "Work")
 
     triedGeneratingId shouldBe a[Failure[Exception]]
@@ -121,7 +121,7 @@ class IdentifierGeneratorTest
       )
     )
     val sourceIdentifiers = knownSchemeIdentifiers :+ SourceIdentifier(
-      identifierScheme = "not-a-known-identifier-scheme",
+      identifierScheme = IdentifierSchemes.sierraSystemNumber,
       value = "jshfgh"
     )
 
