@@ -11,7 +11,7 @@ import uk.ac.wellcome.models._
 )
 case class DisplayIdentifier(
   @ApiModelProperty(value =
-    "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system.") identifierScheme: String,
+    "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system.") identifierScheme: IdentifierSchemes.IdentifierScheme,
   @ApiModelProperty(value = "The value of the thing. e.g. an identifier") value: String) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Identifier"

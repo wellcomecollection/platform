@@ -88,7 +88,7 @@ trait WorksUtil {
   }
 
   def defaultSourceIdentifier = {
-    SourceIdentifier("miro-image-number", "M0000001")
+    SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
   }
 
   def defaultLocation: Location = {

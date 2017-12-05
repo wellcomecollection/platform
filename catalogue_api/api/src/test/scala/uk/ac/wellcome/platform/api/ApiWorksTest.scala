@@ -615,7 +615,7 @@ class ApiWorksTest
   it(
     "should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
-      identifierScheme = "The ID field within the TestSource",
+      identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "Test1234"
     )
     val work1 = workWith(
@@ -625,7 +625,7 @@ class ApiWorksTest
     )
 
     val identifier2 = SourceIdentifier(
-      identifierScheme = "The ID field within the DifferentTestSource",
+      identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "DTest5678"
     )
     val work2 = workWith(
@@ -674,7 +674,7 @@ class ApiWorksTest
   it(
     "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val srcIdentifier = SourceIdentifier(
-      identifierScheme = "An Insectoid Identifier",
+      identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "Test1234"
     )
     val work = workWith(
