@@ -17,7 +17,7 @@ module "sqs_autoscaling_alarms" {
 }
 
 module "sierra_merger_service" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.1"
   name               = "sierra_${var.resource_type}_merger"
   cluster_id         = "${var.cluster_id}"
   task_role_arn      = "${module.ecs_sierra_merger.task_role_arn}"
@@ -27,7 +27,6 @@ module "sierra_merger_service" {
   listener_http_arn  = "${var.alb_listener_http_arn}"
   path_pattern       = "/sierra_${var.resource_type}_merger/*"
   alb_priority       = "${var.alb_priority}"
-  healthcheck_path   = "/sierra_${var.resource_type}_merger/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
   https_domain       = "services.wellcomecollection.ac.uk"
 
