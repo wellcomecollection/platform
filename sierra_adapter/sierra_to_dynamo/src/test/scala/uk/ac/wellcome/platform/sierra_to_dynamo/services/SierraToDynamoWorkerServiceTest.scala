@@ -27,6 +27,7 @@ class SierraToDynamoWorkerServiceTest
     with ScalaFutures
     with BeforeAndAfterEach
     with BeforeAndAfterAll{
+    with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]

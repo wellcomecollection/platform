@@ -3,8 +3,6 @@ package uk.ac.wellcome.platform.sierra_to_dynamo.locals
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.SierraRecord
-import uk.ac.wellcome.models.SierraRecord._
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._

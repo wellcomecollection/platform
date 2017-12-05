@@ -13,7 +13,6 @@ import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 class SierraBibMergerUpdaterService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   metrics: MetricsSender,
@@ -22,12 +21,13 @@ class SierraBibMergerUpdaterService @Inject()(
 
   private val table = Table[MergedSierraRecord](dynamoConfig.table)
 
-  private def putRecord(record: MergedSierraRecord) = table
-    .given(
-      not(attributeExists('id)) or
-        (attributeExists('id) and 'version < record.version)
-    )
-    .put(record)
+  private def putRecord(record: MergedSierraRecord) =
+    table
+      .given(
+        not(attributeExists('id)) or
+          (attributeExists('id) and 'version < record.version)
+      )
+      .put(record)
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = Future {
     logger.info(s"Attempting to update $bibRecord")
@@ -36,31 +36,39 @@ class SierraBibMergerUpdaterService @Inject()(
       table.get('id -> bibRecord.id)
     )
 
-    val newRecord = existingRecord.map {
-      case Left(error) => Left(
-        new RuntimeException(error.toString)
-      )
-      case Right(record) => {
-        logger.info(s"Found $record, attempting merge.")
+    val newRecord = existingRecord
+      .map {
+        case Left(error) =>
+          Left(
+            new RuntimeException(error.toString)
+          )
+        case Right(record) => {
+          logger.info(s"Found $record, attempting merge.")
 
-        record.mergeBibRecord(bibRecord).toRight(
-          new RuntimeException("Unable to merge record!")
-        )
+          record
+            .mergeBibRecord(bibRecord)
+            .toRight(
+              new RuntimeException("Unable to merge record!")
+            )
+        }
       }
-    }.getOrElse {
-      val record = MergedSierraRecord(bibRecord)
-      logger.info(s"No match found, creating new record: $record")
+      .getOrElse {
+        val record = MergedSierraRecord(bibRecord)
+        logger.info(s"No match found, creating new record: $record")
 
-      Right(record)
-    }
+        Right(record)
+      }
 
     val putOperation = newRecord match {
       case Right(record) => {
         logger.info(s"Attempting to conditionally update $record.")
 
-        Scanamo.exec(dynamoDBClient)(
-          putRecord(record)
-        ).left.map(e => new RuntimeException(e.toString))
+        Scanamo
+          .exec(dynamoDBClient)(
+            putRecord(record)
+          )
+          .left
+          .map(e => new RuntimeException(e.toString))
       }
       case Left(e) => Left(e)
     }
