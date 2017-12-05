@@ -1,5 +1,5 @@
 module "miro_reindexer" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.1"
   name               = "miro_reindexer"
   cluster_id         = "${aws_ecs_cluster.services.id}"
   task_role_arn      = "${module.ecs_miro_reindexer_iam.task_role_arn}"
@@ -9,7 +9,6 @@ module "miro_reindexer" {
   listener_http_arn  = "${module.services_alb.listener_http_arn}"
   path_pattern       = "/miro_reindexer/*"
   alb_priority       = "104"
-  healthcheck_path   = "/miro_reindexer/management/healthcheck"
   infra_bucket       = "${var.infra_bucket}"
 
   config_key           = "config/${var.build_env}/miro_reindexer.ini"
