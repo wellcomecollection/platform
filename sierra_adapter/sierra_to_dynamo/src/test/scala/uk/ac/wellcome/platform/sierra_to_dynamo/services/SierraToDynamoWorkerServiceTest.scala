@@ -26,7 +26,6 @@ class SierraToDynamoWorkerServiceTest
     with ExtendedPatience
     with ScalaFutures
     with BeforeAndAfterEach
-    with BeforeAndAfterAll{
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
