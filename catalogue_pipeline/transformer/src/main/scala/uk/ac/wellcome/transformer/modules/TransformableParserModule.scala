@@ -3,7 +3,12 @@ package uk.ac.wellcome.transformer.modules
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.transformable.Transformable
-import uk.ac.wellcome.transformer.parsers.{CalmParser, MiroParser, SierraParser, TransformableParser}
+import uk.ac.wellcome.transformer.parsers.{
+  CalmParser,
+  MiroParser,
+  SierraParser,
+  TransformableParser
+}
 
 object TransformableParserModule extends TwitterModule {
   val dataSource =
