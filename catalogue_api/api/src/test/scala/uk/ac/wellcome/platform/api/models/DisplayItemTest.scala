@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.api.models
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
 
-
 class DisplayItemTest extends FunSpec with Matchers {
 
   val location: Location = {
@@ -29,10 +28,10 @@ class DisplayItemTest extends FunSpec with Matchers {
 
   it("should read an Item as a DisplayItem correctly") {
     val item = Item(
-        canonicalId = Some("foo"),
-        identifiers = List(identifier),
-        locations = List(location)
-      )
+      canonicalId = Some("foo"),
+      identifiers = List(identifier),
+      locations = List(location)
+    )
 
     val displayItem = DisplayItem(
       item = item,

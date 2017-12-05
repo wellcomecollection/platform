@@ -9,11 +9,8 @@ import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
 
-
-
-trait DynamoDBLocal
-    extends BeforeAndAfterEach
-    with DynamoDBLocalClients { this: Suite =>
+trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
+  this: Suite =>
 
   val miroDataTableName = "MiroData"
   val calmDataTableName = "CalmData"

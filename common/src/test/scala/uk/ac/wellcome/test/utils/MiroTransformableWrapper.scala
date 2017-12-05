@@ -5,12 +5,12 @@ import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 
 /** MiroTransformable looks for several fields in the source JSON -- if they're
- *  missing or have the wrong values, it rejects the record.
- *
- *  This trait provides a single method `transform()` which adds the necessary
- *  fields before transformation, allowing tests to focus on only the fields
- *  that are interesting for that test.
- */
+  *  missing or have the wrong values, it rejects the record.
+  *
+  *  This trait provides a single method `transform()` which adds the necessary
+  *  fields before transformation, allowing tests to focus on only the fields
+  *  that are interesting for that test.
+  */
 trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
   def buildJSONForWork(extraData: String): String =

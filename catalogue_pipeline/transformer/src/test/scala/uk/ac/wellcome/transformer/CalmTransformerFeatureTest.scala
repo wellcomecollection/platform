@@ -25,16 +25,17 @@ class CalmTransformerFeatureTest
 
   it(
     "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
-    val calmTransformable = CalmTransformable(RecordID = "RecordID1",
-      RecordType = "Collection",
-      AltRefNo = "AltRefNo1",
-      RefNo = "RefNo1",
-      data = """{"AccessStatus": ["public"]}""")
+    val calmTransformable =
+      CalmTransformable(RecordID = "RecordID1",
+                        RecordType = "Collection",
+                        AltRefNo = "AltRefNo1",
+                        RefNo = "RefNo1",
+                        data = """{"AccessStatus": ["public"]}""")
     val sqsMessage = SQSMessage(Some("subject"),
-      JsonUtil.toJson(calmTransformable).get,
-      "topic",
-      "messageType",
-      "timestamp")
+                                JsonUtil.toJson(calmTransformable).get,
+                                "topic",
+                                "messageType",
+                                "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
@@ -43,16 +44,17 @@ class CalmTransformerFeatureTest
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
     }
 
-    val calmTransformable2 = CalmTransformable(RecordID = "RecordID2",
-      RecordType = "Collection",
-      AltRefNo = "AltRefNo2",
-      RefNo = "RefNo2",
-      data = """{"AccessStatus": ["restricted"]}""")
+    val calmTransformable2 =
+      CalmTransformable(RecordID = "RecordID2",
+                        RecordType = "Collection",
+                        AltRefNo = "AltRefNo2",
+                        RefNo = "RefNo2",
+                        data = """{"AccessStatus": ["restricted"]}""")
     val sqsMessage2 = SQSMessage(Some("subject"),
-      JsonUtil.toJson(calmTransformable2).get,
-      "topic",
-      "messageType",
-      "timestamp")
+                                 JsonUtil.toJson(calmTransformable2).get,
+                                 "topic",
+                                 "messageType",
+                                 "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage2).get)
 
     eventually {
@@ -72,7 +74,8 @@ class CalmTransformerFeatureTest
     snsMessage.message shouldBe JsonUtil
       .toJson(
         Work(
-          identifiers = List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+          identifiers =
+            List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
           title = "placeholder title for a Calm record"
         ))
       .get

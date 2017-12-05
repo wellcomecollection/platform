@@ -26,7 +26,6 @@ class SierraToDynamoWorkerServiceTest
     with ExtendedPatience
     with ScalaFutures
     with BeforeAndAfterEach
-    with BeforeAndAfterAll{
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
@@ -45,21 +44,23 @@ class SierraToDynamoWorkerServiceTest
   }
 
   private def createSierraWorkerService(resourceType: String, fields: String) = {
-    Some(new SierraToDynamoWorkerService(
-      reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-      system = actorSystem,
-      metrics = mockMetrics,
-      dynamoDbClient = dynamoDbClient,
-      apiUrl = "http://localhost:8080",
-      sierraOauthKey = "key",
-      sierraOauthSecret = "secret",
-      resourceType = resourceType,
-      dynamoConfig = DynamoConfig(tableName),
-      fields = fields
-    ))
+    Some(
+      new SierraToDynamoWorkerService(
+        reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        system = actorSystem,
+        metrics = mockMetrics,
+        dynamoDbClient = dynamoDbClient,
+        apiUrl = "http://localhost:8080",
+        sierraOauthKey = "key",
+        sierraOauthSecret = "secret",
+        resourceType = resourceType,
+        dynamoConfig = DynamoConfig(tableName),
+        fields = fields
+      ))
   }
 
-  it("should read a window message from sqs, retrieve the items from sierra and insert into DynamoDb") {
+  it(
+    "should read a window message from sqs, retrieve the items from sierra and insert into DynamoDb") {
     worker = createSierraWorkerService(
       resourceType = "items",
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
@@ -82,7 +83,8 @@ class SierraToDynamoWorkerServiceTest
     }
   }
 
-  it("should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
+  it(
+    "should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
     worker = createSierraWorkerService(
       resourceType = "bibs",
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title")
@@ -106,7 +108,8 @@ class SierraToDynamoWorkerServiceTest
 
   }
 
-  it("should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
+  it(
+    "should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
     worker = createSierraWorkerService(resourceType = "items", fields = "")
 
     val message =
@@ -124,19 +127,21 @@ class SierraToDynamoWorkerServiceTest
 
   }
 
-  it("should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
-    worker = Some(new SierraToDynamoWorkerService(
-      reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-      system = ActorSystem(),
-      metrics = mockMetrics,
-      dynamoDbClient = dynamoDbClient,
-      apiUrl = "http://localhost:8081",
-      sierraOauthKey = "key",
-      sierraOauthSecret = "secret",
-      resourceType = "items",
-      fields = "",
-      dynamoConfig = DynamoConfig(tableName)
-    ))
+  it(
+    "should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
+    worker = Some(
+      new SierraToDynamoWorkerService(
+        reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        system = ActorSystem(),
+        metrics = mockMetrics,
+        dynamoDbClient = dynamoDbClient,
+        apiUrl = "http://localhost:8081",
+        sierraOauthKey = "key",
+        sierraOauthSecret = "secret",
+        resourceType = "items",
+        fields = "",
+        dynamoConfig = DynamoConfig(tableName)
+      ))
 
     val message =
       """

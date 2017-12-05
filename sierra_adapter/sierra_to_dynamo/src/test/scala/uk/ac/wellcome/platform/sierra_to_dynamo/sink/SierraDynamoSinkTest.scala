@@ -25,7 +25,8 @@ class SierraDynamoSinkTest
     with SierraDynamoDBLocal
     with Matchers
     with ExtendedPatience
-    with MockitoSugar with BeforeAndAfterAll {
+    with MockitoSugar
+    with BeforeAndAfterAll {
   implicit val system = ActorSystem()
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
