@@ -43,9 +43,7 @@ class MiroTransformerFeatureTest
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size (1)
 
-      assertSNSMessageContains(snsMessages.head,
-                               secondMiroID,
-                               secondTitle)
+      assertSNSMessageContains(snsMessages.head, secondMiroID, secondTitle)
     }
   }
 
@@ -56,7 +54,6 @@ class MiroTransformerFeatureTest
     parsedWork.identifiers.head.value shouldBe miroID
     parsedWork.title shouldBe imageTitle
   }
-
 
   def shouldTransformMessage(imageTitle: String) =
     buildJSONForWork(s""""image_title": "$imageTitle"""")
@@ -69,17 +66,13 @@ class MiroTransformerFeatureTest
         }"""
 
   private def sendMiroImageToSQS(miroID: String, message: String) = {
-    val miroTransformable = MiroTransformable(
-      miroID,
-      "Images-A",
-      message)
+    val miroTransformable = MiroTransformable(miroID, "Images-A", message)
 
-    val sqsMessage = SQSMessage(
-      Some("subject"),
-      JsonUtil.toJson(miroTransformable).get,
-      "topic",
-      "messageType",
-      "timestamp")
+    val sqsMessage = SQSMessage(Some("subject"),
+                                JsonUtil.toJson(miroTransformable).get,
+                                "topic",
+                                "messageType",
+                                "timestamp")
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
   }

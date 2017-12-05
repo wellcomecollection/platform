@@ -71,7 +71,10 @@ class ReindexServiceTest
     calmTransformableList.foreach(
       Scanamo.put(dynamoDbClient)(calmDataTableName))
 
-    val reindex = Reindex(calmDataTableName, reindexShard, requestedVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName,
+                          reindexShard,
+                          requestedVersion,
+                          currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexService = createReindexService
@@ -87,7 +90,10 @@ class ReindexServiceTest
   it("should retry while the target reports that there are not updated items") {
     val calmReindexTargetService = mock[CalmReindexTargetService]
 
-    val reindex = Reindex(calmDataTableName, reindexShard, requestedVersion, currentVersion)
+    val reindex = Reindex(calmDataTableName,
+                          reindexShard,
+                          requestedVersion,
+                          currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val calmTransformableList = List(
@@ -133,7 +139,8 @@ class ReindexServiceTest
   }
 
   it("should report successful when there is no work to do") {
-    val reindex = Reindex(calmDataTableName, reindexShard, currentVersion, currentVersion)
+    val reindex =
+      Reindex(calmDataTableName, reindexShard, currentVersion, currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexService = createReindexService

@@ -34,7 +34,6 @@ class SQSMessageReceiverTest
     "AB/CD/12",
     """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
 
-
   val invalidCalmSqsMessage: SQSMessage = createInvalidRecord
 
   val failingTransformCalmSqsMessage: SQSMessage = createValidCalmSQSMessage(
@@ -47,9 +46,10 @@ class SQSMessageReceiverTest
   val failingTransformMiroSqsMessage: SQSMessage =
     createValidMiroSQSMessage("""{}""")
 
-  val work = Work(identifiers =
-                    List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
-                  title = "placeholder title for a Calm record")
+  val work = Work(
+    identifiers =
+      List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+    title = "placeholder title for a Calm record")
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
@@ -73,25 +73,24 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a [JsonParseException]
+      x shouldBe a[JsonParseException]
     }
   }
 
   it(
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter,
-        new CalmParser,
-                         metricsSender)
+      new SQSMessageReceiver(mockSNSWriter, new CalmParser, metricsSender)
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a [JsonParseException]
+      x shouldBe a[JsonParseException]
     }
   }
 
-  it("should return a failed future if it's unable to publish the unified item") {
+  it(
+    "should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
       new SQSMessageReceiver(mockSNS, new CalmParser, metricsSender)

@@ -213,8 +213,9 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     result.get shouldBe identifiedWork
   }
 
-  it("should throw an UnidentifiableException when trying to get the id of an unidentified Work") {
-    an [UnidentifiableException] should be thrownBy unidentifiedWork.id
+  it(
+    "should throw an UnidentifiableException when trying to get the id of an unidentified Work") {
+    an[UnidentifiableException] should be thrownBy unidentifiedWork.id
   }
 
   it("should have an ontology type 'Work' when serialised to JSON") {

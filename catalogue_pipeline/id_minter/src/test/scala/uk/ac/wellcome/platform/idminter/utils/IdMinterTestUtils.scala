@@ -38,9 +38,10 @@ trait IdMinterTestUtils
   }
 
   def generateSqsMessage(MiroID: String): SQSMessage = {
-    val work = Work(identifiers =
-                      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)),
-                    title = "A query about a queue of quails")
+    val work = Work(
+      identifiers =
+        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)),
+      title = "A query about a queue of quails")
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,
                "topic",

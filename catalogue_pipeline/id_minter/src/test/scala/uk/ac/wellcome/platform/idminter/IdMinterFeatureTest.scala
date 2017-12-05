@@ -31,9 +31,10 @@ class IdMinterFeatureTest
     val miroID = "M0001234"
     val title = "A limerick about a lion"
 
-    val work = Work(identifiers =
-                      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)),
-                    title = title)
+    val work =
+      Work(identifiers =
+             List(SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)),
+           title = title)
 
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(work).get,

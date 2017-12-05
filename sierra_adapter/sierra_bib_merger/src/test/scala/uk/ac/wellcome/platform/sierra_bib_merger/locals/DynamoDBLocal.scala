@@ -9,9 +9,7 @@ import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal
-  extends BeforeAndAfterEach
-    with DynamoDBLocalClients {
+trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
   this: Suite =>
 
   val tableName = "sierraBibTable"
@@ -36,8 +34,7 @@ trait DynamoDBLocal
           Map("id" -> new AttributeValue(item.id))
         )
       case a =>
-        throw new Exception(
-          s"Unable to clear the table $tableName error $a")
+        throw new Exception(s"Unable to clear the table $tableName error $a")
     }
 
   private def deleteTable(): Unit = {

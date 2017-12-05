@@ -5,12 +5,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.test.utils.MiroTransformableWrapper
 
-
 /** Tests that the Miro transformer extracts the "title" field correctly.
- *
- *  The rules around this heuristic are somewhat fiddly, and we need to be
- *  careful that we're extracting the right fields from the Miro metadata.
- */
+  *
+  *  The rules around this heuristic are somewhat fiddly, and we need to be
+  *  careful that we're extracting the right fields from the Miro metadata.
+  */
 class MiroTransformableTitleTest
     extends FunSpec
     with Matchers
@@ -24,7 +23,6 @@ class MiroTransformableTitleTest
       miroCollection = "Images-A"
     )
   }
-
 
   it("""
     should use the title field in the V collection if the description field
@@ -183,7 +181,6 @@ class MiroTransformableTitleTest
   }
 }
 
-
 class MiroTransformableTest
     extends FunSpec
     with Matchers
@@ -195,10 +192,12 @@ class MiroTransformableTest
       data = """"image_title": "A picture of a passing porpoise"""",
       MiroID = MiroID
     )
-    work.identifiers shouldBe List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
+    work.identifiers shouldBe List(
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
   }
 
-  describe("The INNOPAC ID should be passed through as the Sierra system number") {
+  describe(
+    "The INNOPAC ID should be passed through as the Sierra system number") {
     it("plain numeric ID") {
       transformRecordAndCheckSierraSystemNumber(
         innopacId = "12345678",
@@ -260,7 +259,8 @@ class MiroTransformableTest
 
     it("two references") {
       transformRecordAndCheckMiroLibraryReferences(
-        data = """
+        data =
+          """
           "image_library_ref_department": ["External Reference", "ICV No"],
           "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
         """,
@@ -418,8 +418,7 @@ class MiroTransformableTest
   it("should pass through the value of the description field") {
     val description = "A new novel about northern narwhals in November"
     val work = transformWork(
-      data =
-        s"""
+      data = s"""
         "image_title": "A note on narwhals",
         "image_image_desc": "$description"
       """
@@ -431,8 +430,7 @@ class MiroTransformableTest
     it("should do nothing for non-WIA metadata") {
       val description = "Spotting sea snakes on sandbanks."
       val work = transformWork(
-        data =
-          s"""
+        data = s"""
           "image_title": "Snakes!",
           "image_image_desc": "$description",
           "image_award": ["Award of Excellence"],
@@ -445,51 +443,50 @@ class MiroTransformableTest
     it("should add WIA metadata if present") {
       val description = "Purple penguins play with paint."
       val work = transformWork(
-        data =
-          s"""
+        data = s"""
           "image_title": "Penguin feeding time",
           "image_image_desc": "$description",
           "image_award": ["Biomedical Image Awards"],
           "image_award_date": ["2001"]
         """
       )
-      work.description shouldBe Some(description + " Biomedical Image Awards 2001.")
+      work.description shouldBe Some(
+        description + " Biomedical Image Awards 2001.")
     }
 
     it("should only include WIA metadata") {
       val description = "Giraffes can be grazing, galloping or graceful."
       val work = transformWork(
-        data =
-          s"""
+        data = s"""
           "image_title": "A giraffe trifecta",
           "image_image_desc": "$description",
           "image_award": ["Dirt, Wellcome Collection", "Biomedical Image Awards"],
           "image_award_date": [null, "2002"]
         """
       )
-      work.description shouldBe Some(description + " Biomedical Image Awards 2002.")
+      work.description shouldBe Some(
+        description + " Biomedical Image Awards 2002.")
     }
 
     it("should combine multiple WIA metadata fields if necessary") {
       val description = "Amazed and awe-inspired by an adversarial aardvark."
       val work = transformWork(
-        data =
-          s"""
+        data = s"""
           "image_title": "Award-winning!",
           "image_image_desc": "$description",
           "image_award": ["WIA Overall Winner", "Wellcome Image Awards"],
           "image_award_date": ["2015", "2015"]
         """
       )
-      work.description shouldBe Some(description + " Wellcome Image Awards Overall Winner 2015.")
+      work.description shouldBe Some(
+        description + " Wellcome Image Awards Overall Winner 2015.")
     }
   }
 
   it("should pass through the value of the creation date on V records") {
     val date = "1820-1848"
     val work = transformWork(
-      data =
-        s"""
+      data = s"""
         "image_title": "A description of a dalmation",
         "image_image_desc": "A description of a dalmation with dots",
         "image_artwork_date": "$date"
@@ -502,8 +499,7 @@ class MiroTransformableTest
   it("should not pass through the value of the creation date on non-V records") {
     val date = "1820-1848"
     val work = transformWork(
-      data =
-        s"""
+      data = s"""
         "image_title": "A diary about a dodo",
         "image_artwork_date": "$date"
       """,
@@ -515,8 +511,7 @@ class MiroTransformableTest
   it("should pass through the lettering field if available") {
     val lettering = "A lifelong lament for lemurs"
     val work = transformWork(
-      data =
-        s"""
+      data = s"""
         "image_title": "Lemurs and lemons",
         "image_supp_lettering": "$lettering"
       """
@@ -524,11 +519,9 @@ class MiroTransformableTest
     work.lettering shouldBe Some(lettering)
   }
 
-  it(
-    "should correct HTML-encoded entities in the input JSON") {
+  it("should correct HTML-encoded entities in the input JSON") {
     val work = transformWork(
-      data =
-        s"""
+      data = s"""
         "image_title": "A caf&#233; for cats",
         "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"]
       """
@@ -552,7 +545,8 @@ class MiroTransformableTest
     )
     work.identifiers shouldBe List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, expectedSierraNumber)
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber,
+                       expectedSierraNumber)
     )
   }
 
@@ -578,11 +572,11 @@ class MiroTransformableTest
 }
 
 /** Tests that the Miro transformer extracts the "subjects" field correctly.
- *
- *  Although this transformation is currently a bit basic, the data we get
- *  from Miro will need cleaning before it's presented in the API (casing,
- *  names, etc.) -- these tests will become more complicated.
- */
+  *
+  *  Although this transformation is currently a bit basic, the data we get
+  *  from Miro will need cleaning before it's presented in the API (casing,
+  *  names, etc.) -- these tests will become more complicated.
+  */
 class MiroTransformableSubjectsTest
     extends FunSpec
     with Matchers
@@ -602,7 +596,9 @@ class MiroTransformableSubjectsTest
         "image_keywords": ["animals", "arachnids", "fruit"]
       """,
       expectedSubjects = List(
-        Concept("animals"), Concept("arachnids"), Concept("fruit")
+        Concept("animals"),
+        Concept("arachnids"),
+        Concept("fruit")
       )
     )
   }
@@ -614,12 +610,14 @@ class MiroTransformableSubjectsTest
         "image_keywords_unauth": ["altruism", "mammals"]
       """,
       expectedSubjects = List(
-        Concept("altruism"), Concept("mammals")
+        Concept("altruism"),
+        Concept("mammals")
       )
     )
   }
 
-  it("should use the image_keywords and image_keywords_unauth fields if both present") {
+  it(
+    "should use the image_keywords and image_keywords_unauth fields if both present") {
     transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A squid, a sponge and a stingray walk into a bar",
@@ -627,7 +625,8 @@ class MiroTransformableSubjectsTest
         "image_keywords_unauth": ["marine creatures"]
       """,
       expectedSubjects = List(
-        Concept("humour"), Concept("marine creatures")
+        Concept("humour"),
+        Concept("marine creatures")
       )
     )
   }
@@ -637,8 +636,7 @@ class MiroTransformableSubjectsTest
     val longTitle = "A wonderful woodcut of a weird weevil"
     val descriptionBody = "Woodcut, by A.R. Thropod.  Welsh.  1789."
     val description = s"$longTitle\\n\\n$descriptionBody"
-    val work = transformWork(
-      data = s"""
+    val work = transformWork(data = s"""
         "image_title": "$title",
         "image_image_desc": "$description"
       """)
@@ -648,12 +646,13 @@ class MiroTransformableSubjectsTest
     item shouldBe Item(
       None,
       List(
-        SourceIdentifier("miro-image-number","M0000001")
+        SourceIdentifier("miro-image-number", "M0000001")
       ),
       List(
         Location(
           locationType = "iiif-image",
-          url = Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          url = Some(
+            "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
           license = License_CCBY
         )
       )
@@ -668,8 +667,6 @@ class MiroTransformableSubjectsTest
     transformedWork.subjects shouldBe expectedSubjects
   }
 }
-
-
 
 class MiroTransformableGenresTest
     extends FunSpec
@@ -707,7 +704,8 @@ class MiroTransformableGenresTest
     )
   }
 
-  it("should use the image_phys_format and image_lc_genre fields if both present") {
+  it(
+    "should use the image_phys_format and image_lc_genre fields if both present") {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "A gorilla and a gibbon in a garden",
@@ -715,7 +713,8 @@ class MiroTransformableGenresTest
         "image_lc_genre": "woodwork"
       """,
       expectedGenres = List(
-        Concept("etching"), Concept("woodwork")
+        Concept("etching"),
+        Concept("woodwork")
       )
     )
   }
@@ -741,8 +740,6 @@ class MiroTransformableGenresTest
     transformedWork.genres shouldBe expectedGenres
   }
 }
-
-
 
 class MiroTransformableCopyrightTest
     extends FunSpec
