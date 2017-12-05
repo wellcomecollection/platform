@@ -18,7 +18,8 @@ class SierraBibMergerWorkerService @Inject()(
   system: ActorSystem,
   metrics: MetricsSender,
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
-) extends SQSWorker(reader, system, metrics) with Logging {
+) extends SQSWorker(reader, system, metrics)
+    with Logging {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     JsonUtil.fromJson[SierraBibRecord](message.body) match {
