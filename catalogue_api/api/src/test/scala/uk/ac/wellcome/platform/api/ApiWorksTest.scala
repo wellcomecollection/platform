@@ -114,7 +114,9 @@ class ApiWorksTest
       .map { concept(_) }
       .mkString(",")
 
-  private def resultList(pageSize: Int = 10, totalPages: Int = 1, totalResults: Int = 1) =
+  private def resultList(pageSize: Int = 10,
+                         totalPages: Int = 1,
+                         totalResults: Int = 1) =
     s"""
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "ResultList",
@@ -154,7 +156,8 @@ class ApiWorksTest
                           |     "title": "${works(0).title}",
                           |     "description": "${works(0).description.get}",
                           |     "lettering": "${works(0).lettering.get}",
-                          |     "createdDate": ${period(works(0).createdDate.get)},
+                          |     "createdDate": ${period(
+                            works(0).createdDate.get)},
                           |     "creators": [ ${agent(works(0).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
@@ -165,7 +168,8 @@ class ApiWorksTest
                           |     "title": "${works(1).title}",
                           |     "description": "${works(1).description.get}",
                           |     "lettering": "${works(1).lettering.get}",
-                          |     "createdDate": ${period(works(1).createdDate.get)},
+                          |     "createdDate": ${period(
+                            works(1).createdDate.get)},
                           |     "creators": [ ${agent(works(1).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
@@ -176,7 +180,8 @@ class ApiWorksTest
                           |     "title": "${works(2).title}",
                           |     "description": "${works(2).description.get}",
                           |     "lettering": "${works(2).lettering.get}",
-                          |     "createdDate": ${period(works(2).createdDate.get)},
+                          |     "createdDate": ${period(
+                            works(2).createdDate.get)},
                           |     "creators": [ ${agent(works(2).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
@@ -256,7 +261,6 @@ class ApiWorksTest
     }
   }
 
-
   it("should include credit information in API responses") {
     val location = Location(
       locationType = "thumbnail-image",
@@ -323,7 +327,9 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  ${resultList(pageSize = 1, totalPages = 3, totalResults = 3)},
+                          |  ${resultList(pageSize = 1,
+                                          totalPages = 3,
+                                          totalResults = 3)},
                           |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
                           |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
                           |  "results": [
@@ -333,7 +339,8 @@ class ApiWorksTest
                           |     "title": "${works(1).title}",
                           |     "description": "${works(1).description.get}",
                           |     "lettering": "${works(1).lettering.get}",
-                          |     "createdDate": ${period(works(1).createdDate.get)},
+                          |     "createdDate": ${period(
+                            works(1).createdDate.get)},
                           |     "creators": [ ${agent(works(1).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
@@ -349,7 +356,9 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  ${resultList(pageSize = 1, totalPages = 3, totalResults = 3)},
+                          |  ${resultList(pageSize = 1,
+                                          totalPages = 3,
+                                          totalResults = 3)},
                           |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
@@ -358,7 +367,8 @@ class ApiWorksTest
                           |     "title": "${works(0).title}",
                           |     "description": "${works(0).description.get}",
                           |     "lettering": "${works(0).lettering.get}",
-                          |     "createdDate": ${period(works(0).createdDate.get)},
+                          |     "createdDate": ${period(
+                            works(0).createdDate.get)},
                           |     "creators": [ ${agent(works(0).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
@@ -374,7 +384,9 @@ class ApiWorksTest
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  ${resultList(pageSize = 1, totalPages = 3, totalResults = 3)},
+                          |  ${resultList(pageSize = 1,
+                                          totalPages = 3,
+                                          totalResults = 3)},
                           |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
@@ -383,7 +395,8 @@ class ApiWorksTest
                           |     "title": "${works(2).title}",
                           |     "description": "${works(2).description.get}",
                           |     "lettering": "${works(2).lettering.get}",
-                          |     "createdDate": ${period(works(2).createdDate.get)},
+                          |     "createdDate": ${period(
+                            works(2).createdDate.get)},
                           |     "creators": [ ${agent(works(2).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ]
@@ -396,7 +409,8 @@ class ApiWorksTest
     }
   }
 
-  it("should return a BadRequest when malformed query parameters are presented") {
+  it(
+    "should return a BadRequest when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -428,7 +442,8 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody = badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
+      withJsonBody =
+        badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
     )
   }
 
@@ -438,7 +453,8 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody = badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
+      withJsonBody =
+        badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
     )
   }
 
@@ -448,7 +464,8 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody = badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
+      withJsonBody =
+        badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
     )
   }
 
@@ -458,7 +475,8 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
       andExpect = Status.BadRequest,
-      withJsonBody = badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
+      withJsonBody =
+        badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
     )
   }
 
@@ -475,15 +493,18 @@ class ApiWorksTest
     server.httpGet(
       path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
-      withJsonBody = badRequest("page: [-50] is not greater than or equal to 1")
+      withJsonBody =
+        badRequest("page: [-50] is not greater than or equal to 1")
     )
   }
 
-  it("should return multiple errors if there's more than one invalid parameter") {
+  it(
+    "should return multiple errors if there's more than one invalid parameter") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=-60&page=-50",
       andExpect = Status.BadRequest,
-      withJsonBody = badRequest("page: [-50] is not greater than or equal to 1, pageSize: [-60] is not greater than or equal to 1")
+      withJsonBody = badRequest(
+        "page: [-50] is not greater than or equal to 1, pageSize: [-60] is not greater than or equal to 1")
     )
   }
 
@@ -550,7 +571,8 @@ class ApiWorksTest
                           |     "id": "${workWithSubjects.id}",
                           |     "title": "${workWithSubjects.title}",
                           |     "creators": [],
-                          |     "subjects": [ ${concepts(workWithSubjects.subjects) } ],
+                          |     "subjects": [ ${concepts(
+                            workWithSubjects.subjects)} ],
                           |     "genres": [ ]
                           |   }
                           |  ]
@@ -808,7 +830,8 @@ class ApiWorksTest
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,bar",
         andExpect = Status.BadRequest,
-        withJsonBody = badRequest("includes: 'foo', 'bar' are not valid includes")
+        withJsonBody =
+          badRequest("includes: 'foo', 'bar' are not valid includes")
       )
     }
   }
@@ -819,7 +842,8 @@ class ApiWorksTest
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
         andExpect = Status.BadRequest,
-        withJsonBody = badRequest("includes: 'foo', 'bar' are not valid includes")
+        withJsonBody =
+          badRequest("includes: 'foo', 'bar' are not valid includes")
       )
     }
   }
@@ -916,7 +940,8 @@ class ApiWorksTest
     }
   }
 
-  it("should return an Internal Server error if you try to search a malformed index") {
+  it(
+    "should return an Internal Server error if you try to search a malformed index") {
     // We need to do something that reliably triggers an internal exception
     // in the Elasticsearch handler.
     //
@@ -938,7 +963,8 @@ class ApiWorksTest
     }
   }
 
-  it("should return a Bad Request error if you try to page beyond the first 10000 items") {
+  it(
+    "should return a Bad Request error if you try to page beyond the first 10000 items") {
     val queries = List(
       "page=10000",
       "pageSize=100&page=101",
@@ -950,7 +976,8 @@ class ApiWorksTest
         server.httpGet(
           path = s"/$apiPrefix/works?$query",
           andExpect = Status.BadRequest,
-          withJsonBody = badRequest("Only the first 10000 works are available in the API.")
+          withJsonBody =
+            badRequest("Only the first 10000 works are available in the API.")
         )
       }
     }

@@ -11,7 +11,10 @@ import scalikejdbc.interpolation.SQLSyntax
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
 import uk.ac.wellcome.platform.idminter.model.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.utils.JsonUtil

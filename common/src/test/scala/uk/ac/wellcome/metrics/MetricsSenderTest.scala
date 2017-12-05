@@ -16,7 +16,8 @@ class MetricsSenderTest
     extends FunSpec
     with MockitoSugar
     with Matchers
-    with ScalaFutures with Eventually{
+    with ScalaFutures
+    with Eventually {
 
   import org.mockito.Matchers.any
   import org.mockito.Mockito._

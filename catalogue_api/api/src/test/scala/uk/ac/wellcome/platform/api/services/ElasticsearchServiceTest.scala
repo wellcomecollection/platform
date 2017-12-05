@@ -92,7 +92,8 @@ class ElasticsearchServiceTest
     )
   }
 
-  private def populateElasticsearch(worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] = {
+  private def populateElasticsearch(
+    worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] = {
     val works = createWorks(10)
     insertIntoElasticSearch(works: _*)
 

@@ -78,8 +78,7 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workDodo.id,
-                                              workDodo.title)
+      works.results.head shouldBe DisplayWork(workDodo.id, workDodo.title)
     }
   }
 
@@ -133,7 +132,8 @@ class WorksServiceTest
       worksService.listWorks(pageSize = 1, pageNumber = 2)
 
     whenReady(displayWorksFuture) { receivedWorks =>
-      receivedWorks.results.head shouldBe DisplayWork(works(1), WorksIncludes())
+      receivedWorks.results.head shouldBe DisplayWork(works(1),
+                                                      WorksIncludes())
     }
   }
 
@@ -165,8 +165,7 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workEmu.id,
-                                              workEmu.title)
+      works.results.head shouldBe DisplayWork(workEmu.id, workEmu.title)
     }
   }
 
@@ -176,11 +175,11 @@ class WorksServiceTest
     val title = "image title"
     val miroId = "abcdef"
     val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = workWith(canonicalId,
-                                  title,
-                                  identifiers = List(
-                                    SourceIdentifier(identifierScheme = identifierScheme,
-                                                     value = miroId)))
+    val work = workWith(
+      canonicalId,
+      title,
+      identifiers = List(
+        SourceIdentifier(identifierScheme = identifierScheme, value = miroId)))
     insertIntoElasticSearch(work)
 
     val getByIdResult = worksService.findWorkById(
@@ -192,8 +191,7 @@ class WorksServiceTest
       maybeDisplayWork.isDefined shouldBe true
       maybeDisplayWork.get.identifiers.isDefined shouldBe true
       maybeDisplayWork.get.identifiers.get shouldBe List(
-        DisplayIdentifier(identifierScheme = identifierScheme,
-                          value = miroId))
+        DisplayIdentifier(identifierScheme = identifierScheme, value = miroId))
 
     }
   }
@@ -204,11 +202,11 @@ class WorksServiceTest
     val title = "image title"
     val miroId = "abcdef"
     val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = workWith(canonicalId,
-                                  title,
-                                  identifiers = List(
-                                    SourceIdentifier(identifierScheme = identifierScheme,
-                                                     value = miroId)))
+    val work = workWith(
+      canonicalId,
+      title,
+      identifiers = List(
+        SourceIdentifier(identifierScheme = identifierScheme, value = miroId)))
     insertIntoElasticSearch(work)
 
     val listWorksResult =
@@ -216,8 +214,7 @@ class WorksServiceTest
 
     whenReady(listWorksResult) { (displayWork: DisplayResultList) =>
       displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(identifierScheme = identifierScheme,
-                          value = miroId))
+        DisplayIdentifier(identifierScheme = identifierScheme, value = miroId))
 
     }
   }
@@ -228,11 +225,11 @@ class WorksServiceTest
     val title = "A search for a snail"
     val miroId = "abcdef"
     val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = workWith(canonicalId,
-                                  title,
-                                  identifiers = List(
-                                    SourceIdentifier(identifierScheme = identifierScheme,
-                                                     value = miroId)))
+    val work = workWith(
+      canonicalId,
+      title,
+      identifiers = List(
+        SourceIdentifier(identifierScheme = identifierScheme, value = miroId)))
     insertIntoElasticSearch(work)
 
     val searchWorksResult = worksService.searchWorks(
@@ -242,8 +239,7 @@ class WorksServiceTest
 
     whenReady(searchWorksResult) { (displayWork: DisplayResultList) =>
       displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(identifierScheme = identifierScheme,
-                          value = miroId))
+        DisplayIdentifier(identifierScheme = identifierScheme, value = miroId))
 
     }
   }

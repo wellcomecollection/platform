@@ -28,7 +28,8 @@ class WorksIndexTest
     ensureIndexDeleted(indexName)
   }
 
-  it("should create an index where it's possible to insert and retrieve a valid Work json") {
+  it(
+    "should create an index where it's possible to insert and retrieve a valid Work json") {
     createAndWaitIndexIsCreated()
 
     val identifiers = List(
@@ -45,10 +46,10 @@ class WorksIndexTest
               canonicalId = Some("56789"),
               identifiers = identifiers,
               locations = List(
-                Location(
-                  locationType = "iiif",
-                  url = Some("https://iiif.wellcomecollection.org/image"),
-                  license = License_CCBY))
+                Location(locationType = "iiif",
+                         url =
+                           Some("https://iiif.wellcomecollection.org/image"),
+                         license = License_CCBY))
             ))
         )
       )
@@ -68,7 +69,8 @@ class WorksIndexTest
     }
   }
 
-  it("it should create an index where inserting a document that does not match the mapping of a work fails") {
+  it(
+    "it should create an index where inserting a document that does not match the mapping of a work fails") {
     createAndWaitIndexIsCreated()
 
     val eventualIndexResponse = elasticClient.execute(
@@ -105,10 +107,12 @@ class WorksIndexTest
     val futureIndexWithDocument =
       for {
         _ <- elasticClient.execute(createIndex(indexName))
-        _ <- elasticClient.execute(putMapping(indexName / itemType)
-          .dynamic(DynamicMapping.Strict).as(keywordField("canonicalId")))
-        _ <- elasticClient.execute(indexInto(indexName / itemType).doc(
-          """
+        _ <- elasticClient.execute(
+          putMapping(indexName / itemType)
+            .dynamic(DynamicMapping.Strict)
+            .as(keywordField("canonicalId")))
+        _ <- elasticClient.execute(
+          indexInto(indexName / itemType).doc("""
             |{
             | "canonicalId": "1234"
             |}
@@ -123,7 +127,8 @@ class WorksIndexTest
 
     whenReady(createIndexFuture) { _ =>
       eventually {
-        elasticClient.execute(indexExists(indexName)).await.isExists should be(true)
+        elasticClient.execute(indexExists(indexName)).await.isExists should be(
+          true)
       }
     }
   }

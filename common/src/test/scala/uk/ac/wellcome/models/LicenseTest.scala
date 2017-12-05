@@ -17,7 +17,8 @@ class LicenseTest extends FunSpec with Matchers {
     assertDeserialisationSucceededForType[License]()
   }
 
-  def assertDeserialisationSucceededForType[T <: License]()(implicit m: Manifest[T]) = {
+  def assertDeserialisationSucceededForType[T <: License]()(
+    implicit m: Manifest[T]) = {
     val licenseType = License_CC0.licenseType
     val label = License_CC0.label
     val url = License_CC0.url

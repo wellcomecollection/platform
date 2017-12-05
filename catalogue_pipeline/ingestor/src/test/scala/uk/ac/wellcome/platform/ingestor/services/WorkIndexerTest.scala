@@ -26,21 +26,15 @@ class WorkIndexerTest
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
   val workIndexer =
-    new WorkIndexer(indexName,
-                              itemType,
-                              elasticClient,
-                              metricsSender)
+    new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
 
-  def workJson(canonicalId: String,
-               sourceId: String,
-               title: String): String = {
+  def workJson(canonicalId: String, sourceId: String, title: String): String = {
     JsonUtil
       .toJson(
-        Work(
-            canonicalId = Some(canonicalId),
-                identifiers =
-                        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, sourceId)),
-                      title = title))
+        Work(canonicalId = Some(canonicalId),
+             identifiers = List(
+               SourceIdentifier(IdentifierSchemes.miroImageNumber, sourceId)),
+             title = title))
       .get
   }
 
@@ -71,8 +65,7 @@ class WorkIndexerTest
       workJson("5678", "1234", "A multiplicity of mice")
 
     val future = Future.sequence(
-      (1 to 2).map(_ =>
-        workIndexer.indexWork(workString))
+      (1 to 2).map(_ => workIndexer.indexWork(workString))
     )
 
     whenReady(future) { _ =>
@@ -88,8 +81,7 @@ class WorkIndexerTest
 
   }
 
-  it(
-    "should return a failed future if the input string is not a Work") {
+  it("should return a failed future if the input string is not a Work") {
     val future = workIndexer.indexWork("a document")
 
     whenReady(future.failed) { exception =>

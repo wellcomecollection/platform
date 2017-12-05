@@ -70,7 +70,7 @@ class TryBackoffTest
 
     tryBackoff.wasCalled = false
     tryBackoff.run(f.alwaysFails, system)
-    
+
     eventually {
       tryBackoff.wasCalled shouldBe true
     }
