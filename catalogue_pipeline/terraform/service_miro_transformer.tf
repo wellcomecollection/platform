@@ -25,3 +25,11 @@ module "miro_transformer" {
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }
+
+module "dynamo_to_sns_miro_transformer" {
+  source                 = "transformer_filter"
+  name                   = "miro"
+  src_stream_arn         = "${aws_dynamodb_table.miro_table.stream_arn}"
+  dst_topic_arn          = "${module.miro_transformer_topic.arn}"
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+}

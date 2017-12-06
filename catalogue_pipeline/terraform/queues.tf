@@ -37,4 +37,3 @@ module "sierra_transformer_queue" {
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
-
