@@ -25,7 +25,7 @@ module "trigger_reindexer_lambda" {
   function_role = "${module.lambda_schedule_reindexer.role_name}"
 }
 
-module "dynamo_to_sns" {
+module "dynamo_to_sns_miro_transformer" {
   source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
 
   name           = "MiroData"
@@ -57,3 +57,37 @@ module "trigger_miro_transformer_filter" {
   lambda_function_arn  = "${module.lambda_miro_transformer_filter.arn}"
   lambda_function_name = "${module.lambda_miro_transformer_filter.role_name}"
 }
+
+module "dynamo_to_sns_sierra_transformer" {
+  source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
+
+  name           = "SierraData"
+  src_stream_arn = "${local.sierradata_table_stream_arn}"
+  dst_topic_arn  = "${module.sierra_transformer_prefilter_topic.arn}"
+
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+}
+
+module "lambda_sierra_transformer_filter" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//lambda?ref=v1.2.0"
+
+  name        = "sierra_transformer_filter"
+  module_name = "transformer_sns_filter"
+  description = "Filters DynamoDB events for the Sierra transformer"
+
+  environment_variables = {
+    TOPIC_ARN = "${module.sierra_transformer_topic.arn}"
+  }
+
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+  s3_key          = "lambdas/catalogue_pipeline/transformer_sns_filter.zip"
+}
+
+module "trigger_miro_transformer_filter" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//lambda/trigger_sns?ref=v1.0.0"
+
+  sns_trigger_arn      = "${module.sierra_transformer_prefilter_topic.arn}"
+  lambda_function_arn  = "${module.lambda_sierra_transformer_filter.arn}"
+  lambda_function_name = "${module.lambda_sierra_transformer_filter.role_name}"
+}
+
