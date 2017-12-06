@@ -24,7 +24,7 @@ module "transformer_filter" {
     TOPIC_ARN = "${var.dst_topic_arn}"
   }
 
-  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_key          = "lambdas/catalogue_pipeline/transformer_sns_filter.zip"
 }
 
@@ -34,4 +34,21 @@ module "trigger_transformer_filter" {
   sns_trigger_arn      = "${module.prefilter_topic.arn}"
   lambda_function_arn  = "${module.transformer_filter.arn}"
   lambda_function_name = "${module.transformer_filter.role_name}"
+}
+
+data "aws_iam_policy_document" "publish_to_topic" {
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      "${var.dst_topic_arn}",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "transformer_filter_publish_permissions" {
+  role   = "${module.transformer_filter.role_name}"
+  policy = "${data.aws_iam_policy_document.publish_to_topic.json}"
 }
