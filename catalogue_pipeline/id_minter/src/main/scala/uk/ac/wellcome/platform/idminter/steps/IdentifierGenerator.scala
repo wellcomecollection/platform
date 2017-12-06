@@ -27,7 +27,7 @@ class IdentifierGenerator @Inject()(
                                     ontologyType: String): Try[String] = {
     Try {
       val idsWithKnownSchemes = identifiers.filter(identifier =>
-        knownIdentifierSchemeList.contains(identifier.identifierScheme))
+        knownIdentifierSchemeList.contains(identifier.identifierScheme.toString))
       if (idsWithKnownSchemes.isEmpty) {
         throw UnableToMintIdentifierException(
           "identifiers list did not contain a known identifierScheme")
