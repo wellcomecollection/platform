@@ -1,5 +1,5 @@
 module "miro_transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=sqs-autoscaling-service"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=ref=v2.0.0"
   name   = "miro_transformer"
 
   source_queue_name  = "${module.miro_transformer_queue.name}"
