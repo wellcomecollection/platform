@@ -1,12 +1,8 @@
 package uk.ac.wellcome.models
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.{
-  DeserializationContext,
-  JsonDeserializer,
-  JsonNode
-}
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
+import com.fasterxml.jackson.databind._
+import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
 import com.twitter.inject.Logging
 
 class IdentifierSchemeDeserialiser
@@ -17,7 +13,7 @@ class IdentifierSchemeDeserialiser
     p: JsonParser,
     ctxt: DeserializationContext): IdentifierSchemes.IdentifierScheme = {
     val node: JsonNode = p.getCodec.readTree(p)
-    val identifierScheme = node.get("identifierScheme").asText
+    val identifierScheme = node.asText()
     createIdentifierScheme(identifierScheme)
   }
 
@@ -42,11 +38,18 @@ class IdentifierSchemeDeserialiser
   }
 }
 
+class IdentifierSchemeSerialiser extends JsonSerializer[IdentifierSchemes.IdentifierScheme] {
+  override def serialize(value: IdentifierSchemes.IdentifierScheme, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
+    gen.writeString(value.toString)
+  }
+}
+
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
   */
 object IdentifierSchemes {
   @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
+  @JsonSerialize(using = classOf[IdentifierSchemeSerialiser])
   sealed trait IdentifierScheme
   // Corresponds to the image number in Miro, e.g. V00127563.
   case object miroImageNumber extends IdentifierScheme {
