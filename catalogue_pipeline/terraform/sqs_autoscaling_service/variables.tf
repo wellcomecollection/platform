@@ -22,10 +22,18 @@ variable "memory" {
 }
 
 variable "config_vars" {
-  type = map
+  type = "map"
 }
 
+variable "build_env" {
+  default = "prod"
+}
+
+variable "alb_priority" {}
+variable "alb_listener_https_arn" {}
+variable "alb_listener_http_arn" {}
 variable "alb_cloudwatch_id" {}
 variable "alb_server_error_alarm_arn" {}
 variable "alb_client_error_alarm_arn" {}
 
+variable "task_role_name" {}
