@@ -14,7 +14,7 @@ import uk.ac.wellcome.platform.idminter.database.{
   FieldDescription,
   IdentifiersDao
 }
-import uk.ac.wellcome.platform.idminter.model.Identifier
+import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.utils.JsonUtil
 

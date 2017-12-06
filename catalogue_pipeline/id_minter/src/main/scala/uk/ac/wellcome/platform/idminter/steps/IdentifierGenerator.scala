@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   UnableToMintIdentifierException
 }
-import uk.ac.wellcome.platform.idminter.model.Identifier
+import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.util.Try
