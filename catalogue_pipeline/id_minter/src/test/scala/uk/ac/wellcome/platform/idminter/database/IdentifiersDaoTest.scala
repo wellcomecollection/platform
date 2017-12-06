@@ -5,7 +5,7 @@ import java.sql.SQLIntegrityConstraintViolationException
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.model.Identifier
+import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
 import scala.util.{Failure, Success}

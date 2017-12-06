@@ -9,7 +9,7 @@ import scalikejdbc._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
-import uk.ac.wellcome.platform.idminter.model.Identifier
+import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
 
 import scala.util.{Failure, Success}

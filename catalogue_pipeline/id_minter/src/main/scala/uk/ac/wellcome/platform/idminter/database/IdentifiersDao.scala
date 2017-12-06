@@ -6,7 +6,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import scalikejdbc._
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.model.{Identifier, IdentifiersTable}
+import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 
 import scala.concurrent.blocking
 import scala.util.Try
