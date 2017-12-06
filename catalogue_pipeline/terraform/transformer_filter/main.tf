@@ -3,7 +3,7 @@ module "prefilter_topic" {
   name   = "${var.name}_transformer_prefilter"
 }
 
-module "dynamo_to_sns_sierra" {
+module "dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
 
   name           = "${var.name}"
