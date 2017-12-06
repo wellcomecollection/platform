@@ -1,9 +1,9 @@
 module "miro_transformer" {
-  source = "sqs_autoscaling_service"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=sqs-autoscaling-service"
   name   = "miro_transformer"
 
   source_queue_name  = "${module.miro_transformer_queue.name}"
-  task_role_name     = "${module.ecs_transformer_iam.task_role_name}"
+  source_queue_arn   = "${module.miro_transformer_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_transformer.repository_url}"
   release_id         = "${var.release_ids["transformer"]}"
   config_template    = "transformer"
