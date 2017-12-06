@@ -106,7 +106,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   }
 
   it("should not perform a transformation without bibData") {
-    val mergedSierraRecord = MergedSierraRecord(id = "000", maybeBibData = None)
+    val mergedSierraRecord =
+      MergedSierraRecord(id = "000", maybeBibData = None)
 
     val transformedSierraRecord = mergedSierraRecord.transform
     transformedSierraRecord.isSuccess shouldBe true
@@ -125,13 +126,18 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         |}
       """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(id = id, maybeBibData = Some(SierraBibRecord(id = id, data = data, modifiedDate = Instant.now())))
+    val mergedSierraRecord = MergedSierraRecord(
+      id = id,
+      maybeBibData = Some(
+        SierraBibRecord(id = id, data = data, modifiedDate = Instant.now())))
 
     val transformedSierraRecord = mergedSierraRecord.transform
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get shouldBe Some(
-      Work(title = title, identifiers = List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+      Work(title = title,
+           identifiers =
+             List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
     )
   }
 

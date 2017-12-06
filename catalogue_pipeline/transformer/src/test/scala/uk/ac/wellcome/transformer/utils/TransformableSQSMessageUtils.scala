@@ -4,7 +4,11 @@ import java.time.Instant
 
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.models.{CalmTransformable, MergedSierraRecord, SierraBibRecord}
+import uk.ac.wellcome.models.{
+  CalmTransformable,
+  MergedSierraRecord,
+  SierraBibRecord
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableSQSMessageUtils {
@@ -26,7 +30,9 @@ trait TransformableSQSMessageUtils {
     sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
   }
 
-  def createValidSierraBibSQSMessage(id: String, title: String, lastModifiedDate: Instant): SQSMessage = {
+  def createValidSierraBibSQSMessage(id: String,
+                                     title: String,
+                                     lastModifiedDate: Instant): SQSMessage = {
     val data =
       s"""
          |{
@@ -35,11 +41,12 @@ trait TransformableSQSMessageUtils {
          |}
       """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(id = id, maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)))
+    val mergedSierraRecord = MergedSierraRecord(
+      id = id,
+      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)))
 
     sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
   }
-
 
   def createValidMiroSQSMessage(data: String): SQSMessage = {
     val miroTransformable = MiroTransformable("id", "collection", data)

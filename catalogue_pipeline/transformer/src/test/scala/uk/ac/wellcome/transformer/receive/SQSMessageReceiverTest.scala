@@ -13,7 +13,11 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{MergedSierraRecord, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.transformer.parsers.{CalmParser, MiroParser, SierraParser}
+import uk.ac.wellcome.transformer.parsers.{
+  CalmParser,
+  MiroParser,
+  SierraParser
+}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -27,7 +31,6 @@ class SQSMessageReceiverTest
     with Matchers
     with IntegrationPatience
     with TransformableSQSMessageUtils {
-
 
   val calmSqsMessage: SQSMessage = createValidCalmSQSMessage(
     "abcdef",
@@ -90,7 +93,8 @@ class SQSMessageReceiverTest
     )
 
     whenReady(future) { x =>
-      verify(snsWriter, Mockito.never()).writeMessage(anyString, any[Option[String]])
+      verify(snsWriter, Mockito.never())
+        .writeMessage(anyString, any[Option[String]])
     }
   }
 

@@ -8,14 +8,18 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try
 
-class SierraParserTest extends FunSpec with TransformableSQSMessageUtils with Matchers{
+class SierraParserTest
+    extends FunSpec
+    with TransformableSQSMessageUtils
+    with Matchers {
   it("should parse a sierra merged record") {
     val id = "000"
     val sqsMessage = createValidEmptySierraBibSQSMessage(id)
 
     val sierraParser = new SierraParser
 
-    val triedSierraTransformable = sierraParser.extractTransformable(sqsMessage)
+    val triedSierraTransformable =
+      sierraParser.extractTransformable(sqsMessage)
 
     triedSierraTransformable.isSuccess shouldBe true
     triedSierraTransformable.get shouldBe a[MergedSierraRecord]
