@@ -14,27 +14,7 @@ class IdentifierSchemeDeserialiser
     ctxt: DeserializationContext): IdentifierSchemes.IdentifierScheme = {
     val node: JsonNode = p.getCodec.readTree(p)
     val identifierScheme = node.asText()
-    createIdentifierScheme(identifierScheme)
-  }
-
-  private def createIdentifierScheme(
-    identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
-    identifierScheme match {
-      case s: String if s == IdentifierSchemes.miroImageNumber.toString =>
-        IdentifierSchemes.miroImageNumber
-      case s: String if s == IdentifierSchemes.sierraSystemNumber.toString =>
-        IdentifierSchemes.sierraSystemNumber
-      case s: String if s == IdentifierSchemes.calmAltRefNo.toString =>
-        IdentifierSchemes.calmAltRefNo
-      case s: String if s == IdentifierSchemes.calmPlaceholder.toString =>
-        IdentifierSchemes.calmPlaceholder
-      case s: String if s == IdentifierSchemes.miroLibraryReference.toString =>
-        IdentifierSchemes.miroLibraryReference
-      case identifierScheme =>
-        val errorMessage = s"$identifierScheme is not a valid identifierScheme"
-        error(errorMessage)
-        throw new Exception(errorMessage)
-    }
+    IdentifierSchemes.createIdentifierScheme(identifierScheme)
   }
 }
 
@@ -76,5 +56,25 @@ object IdentifierSchemes {
 
   case object sierraSystemNumber extends IdentifierScheme {
     override def toString: String = "sierra-system-number"
+  }
+
+  def createIdentifierScheme(
+                                      identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
+    identifierScheme match {
+      case s: String if s == IdentifierSchemes.miroImageNumber.toString =>
+        IdentifierSchemes.miroImageNumber
+      case s: String if s == IdentifierSchemes.sierraSystemNumber.toString =>
+        IdentifierSchemes.sierraSystemNumber
+      case s: String if s == IdentifierSchemes.calmAltRefNo.toString =>
+        IdentifierSchemes.calmAltRefNo
+      case s: String if s == IdentifierSchemes.calmPlaceholder.toString =>
+        IdentifierSchemes.calmPlaceholder
+      case s: String if s == IdentifierSchemes.miroLibraryReference.toString =>
+        IdentifierSchemes.miroLibraryReference
+      case identifierScheme =>
+        val errorMessage = s"$identifierScheme is not a valid identifierScheme"
+        error(errorMessage)
+        throw new Exception(errorMessage)
+    }
   }
 }
