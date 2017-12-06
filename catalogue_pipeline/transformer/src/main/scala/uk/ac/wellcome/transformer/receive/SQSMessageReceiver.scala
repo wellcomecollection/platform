@@ -11,6 +11,7 @@ import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.util.{Failure, Success, Try}
 
 class SQSMessageReceiver(
@@ -19,7 +20,7 @@ class SQSMessageReceiver(
   metricsSender: MetricsSender)
     extends Logging {
 
-  def receiveMessage(message: SQSMessage): Future[PublishAttempt] = {
+  def receiveMessage(message: SQSMessage): Future[Unit] = {
     info(s"Starting to process message $message")
     metricsSender.timeAndCount(
       "ingest-time",
@@ -31,8 +32,8 @@ class SQSMessageReceiver(
         } yield cleanRecord
 
         triedWork match {
-          case Success(work) =>
-            publishMessage(work)
+          case Success(Some(work)) => publishMessage(work).map(_ => ())
+          case Success(None) => Future.successful()
           case Failure(SQSReaderGracefulException(e)) =>
             info("Recoverable failure extracting workfrom record", e)
             Future.successful(PublishAttempt(Left(e)))
@@ -44,7 +45,7 @@ class SQSMessageReceiver(
     )
   }
 
-  def transformTransformable(transformable: Transformable): Try[Work] = {
+  def transformTransformable(transformable: Transformable): Try[Option[Work]] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")
       transformed

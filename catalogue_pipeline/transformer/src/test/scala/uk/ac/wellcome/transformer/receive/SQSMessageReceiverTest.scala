@@ -3,6 +3,7 @@ package uk.ac.wellcome.transformer.receive
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.fasterxml.jackson.core.JsonParseException
 import org.mockito.Matchers.{any, anyString}
+import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
@@ -10,9 +11,13 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.{MergedSierraRecord, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.transformer.parsers.{CalmParser, MiroParser}
+import uk.ac.wellcome.transformer.parsers.{
+  CalmParser,
+  MiroParser,
+  SierraParser
+}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -74,6 +79,22 @@ class SQSMessageReceiverTest
 
     whenReady(future.failed) { x =>
       x shouldBe a[JsonParseException]
+    }
+  }
+
+  it("should send no message where Transformable work is None") {
+    val snsWriter = mockSNSWriter
+
+    val recordReceiver =
+      new SQSMessageReceiver(snsWriter, new SierraParser, metricsSender)
+
+    val future = recordReceiver.receiveMessage(
+      createValidEmptySierraBibSQSMessage("000")
+    )
+
+    whenReady(future) { x =>
+      verify(snsWriter, Mockito.never())
+        .writeMessage(anyString, any[Option[String]])
     }
   }
 
