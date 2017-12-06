@@ -24,36 +24,3 @@ module "trigger_reindexer_lambda" {
   function_arn  = "${module.lambda_schedule_reindexer.arn}"
   function_role = "${module.lambda_schedule_reindexer.role_name}"
 }
-
-module "dynamo_to_sns" {
-  source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
-
-  name           = "MiroData"
-  src_stream_arn = "${aws_dynamodb_table.miro_table.stream_arn}"
-  dst_topic_arn  = "${module.miro_transformer_prefilter_topic.arn}"
-
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-}
-
-module "lambda_miro_transformer_filter" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.2.0"
-
-  name        = "miro_transformer_filter"
-  module_name = "transformer_sns_filter"
-  description = "Filters DynamoDB events for the transformer"
-
-  environment_variables = {
-    TOPIC_ARN = "${module.miro_transformer_topic.arn}"
-  }
-
-  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
-  s3_key          = "lambdas/catalogue_pipeline/transformer_sns_filter.zip"
-}
-
-module "trigger_miro_transformer_filter" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-
-  sns_trigger_arn      = "${module.miro_transformer_prefilter_topic.arn}"
-  lambda_function_arn  = "${module.lambda_miro_transformer_filter.arn}"
-  lambda_function_name = "${module.lambda_miro_transformer_filter.role_name}"
-}
