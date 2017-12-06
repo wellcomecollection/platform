@@ -7,9 +7,8 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{IdentifierSchemes, Item, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -180,7 +179,8 @@ class IdEmbedderTests
   describe(
     "Documents with Identifiable structures should be updated correctly") {
     it("identify a document that is itself Identifiable") {
-      val sourceIdentifiers = List(SourceIdentifier("australia", "sydney"))
+      val sourceIdentifiers =
+        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "sydney"))
       val ontologyType = "false capitals"
       val newCanonicalId =
         generateMockCanonicalId(sourceIdentifiers, ontologyType)
@@ -203,7 +203,9 @@ class IdEmbedderTests
 
     it("identify a document with a key that is identifiable") {
       val sourceIdentifiers =
-        List(SourceIdentifier("westeros", "king's landing"))
+        List(
+          SourceIdentifier(IdentifierSchemes.miroImageNumber,
+                           "king's landing"))
       val ontologyType = "fictional cities"
       val newCanonicalId =
         generateMockCanonicalId(sourceIdentifiers, ontologyType)
@@ -228,9 +230,9 @@ class IdEmbedderTests
 
     it("should pick up all the source identifiers that are available") {
       val sourceIdentifiersA = List(
-        SourceIdentifier("antarctica", "husvik"),
-        SourceIdentifier("greece", "spinalonga"),
-        SourceIdentifier("ireland", "waterfoot")
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "husvik"),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "spinalonga"),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "waterfoot")
       )
       val ontologyTypeA = "ghost towns"
 
@@ -241,8 +243,8 @@ class IdEmbedderTests
                                    newCanonicalIdA)
 
       val sourceIdentifiersB = List(
-        SourceIdentifier("ocean", "atlantis"),
-        SourceIdentifier("regal", "camelot")
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "atlantis"),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "camelot")
       )
       val ontologyTypeB = "mythological places"
 
@@ -253,8 +255,8 @@ class IdEmbedderTests
                                    newCanonicalIdB)
 
       val sourceIdentifiersC = List(
-        SourceIdentifier("england", "lundenwic"),
-        SourceIdentifier("scotland", "dunedin")
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "lundenwic"),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "dunedin")
       )
       val ontologyTypeC = "cities that were renamed"
 

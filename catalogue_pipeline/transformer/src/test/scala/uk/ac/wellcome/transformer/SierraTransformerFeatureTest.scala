@@ -3,8 +3,7 @@ package uk.ac.wellcome.transformer
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
-import uk.ac.wellcome.models.{SourceIdentifier, Work}
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.transformer.utils.{
   TransformableSQSMessageUtils,
   TransformerFeatureTest
