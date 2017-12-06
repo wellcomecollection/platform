@@ -9,8 +9,7 @@ import com.fasterxml.jackson.databind.annotation.{
 import com.twitter.inject.Logging
 
 class IdentifierSchemeDeserialiser
-    extends JsonDeserializer[IdentifierSchemes.IdentifierScheme]
-    with Logging {
+    extends JsonDeserializer[IdentifierSchemes.IdentifierScheme] {
 
   override def deserialize(
     p: JsonParser,
@@ -33,7 +32,7 @@ class IdentifierSchemeSerialiser
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
   */
-object IdentifierSchemes {
+object IdentifierSchemes extends Logging {
   @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
   @JsonSerialize(using = classOf[IdentifierSchemeSerialiser])
   sealed trait IdentifierScheme
