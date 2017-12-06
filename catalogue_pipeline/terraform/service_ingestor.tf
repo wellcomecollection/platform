@@ -1,3 +1,12 @@
+data "template_file" "es_cluster_host_ingestor" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_config_ingestor["name"]}"
+    region = "${var.es_config_ingestor["region"]}"
+  }
+}
+
 module "ingestor" {
   source = "sqs_autoscaling_service"
   name   = "ingestor"
