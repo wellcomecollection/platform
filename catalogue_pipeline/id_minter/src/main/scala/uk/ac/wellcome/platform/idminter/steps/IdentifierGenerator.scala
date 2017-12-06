@@ -58,8 +58,8 @@ class IdentifierGenerator @Inject()(
         Identifier(
           MiroID =
             findIdentifierWith(identifiers, IdentifierSchemes.miroImageNumber),
-          CalmAltRefNo =
-            findIdentifierWith(identifiers, IdentifierSchemes.calmAltRefNo),
+          SierraSystemNumber =
+            findIdentifierWith(identifiers, IdentifierSchemes.sierraSystemNumber),
           CanonicalID = canonicalId,
           ontologyType = ontologyType
         ))

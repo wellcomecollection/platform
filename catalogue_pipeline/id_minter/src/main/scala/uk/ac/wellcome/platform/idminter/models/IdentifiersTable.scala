@@ -15,7 +15,7 @@ class IdentifiersTable @Inject()(
     "CanonicalID",
     "ontologyType",
     "MiroID",
-    "CalmAltRefNo"
+    "SierraSystemNumber"
   )
 
   val i = this.syntax("i")
