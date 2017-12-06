@@ -19,15 +19,18 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
                            identifierGenerator: IdentifierGenerator)
     extends Logging {
 
-  implicit val identifierSchemesDecoder: Decoder[IdentifierSchemes.IdentifierScheme] = new Decoder[IdentifierSchemes.IdentifierScheme] {
-    final def apply(c: HCursor): Decoder.Result[IdentifierSchemes.IdentifierScheme] = {
-      for {
-        identifierSchemeName <- c.as[String]
-      } yield {
-        IdentifierSchemes.createIdentifierScheme(identifierSchemeName)
+  implicit val identifierSchemesDecoder
+    : Decoder[IdentifierSchemes.IdentifierScheme] =
+    new Decoder[IdentifierSchemes.IdentifierScheme] {
+      final def apply(
+        c: HCursor): Decoder.Result[IdentifierSchemes.IdentifierScheme] = {
+        for {
+          identifierSchemeName <- c.as[String]
+        } yield {
+          IdentifierSchemes.createIdentifierScheme(identifierSchemeName)
+        }
       }
     }
-  }
 
   def embedId(json: Json): Future[Json] = {
     metricsSender.timeAndCount(

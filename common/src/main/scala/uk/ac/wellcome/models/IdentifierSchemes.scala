@@ -2,7 +2,10 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
+import com.fasterxml.jackson.databind.annotation.{
+  JsonDeserialize,
+  JsonSerialize
+}
 import com.twitter.inject.Logging
 
 class IdentifierSchemeDeserialiser
@@ -18,8 +21,11 @@ class IdentifierSchemeDeserialiser
   }
 }
 
-class IdentifierSchemeSerialiser extends JsonSerializer[IdentifierSchemes.IdentifierScheme] {
-  override def serialize(value: IdentifierSchemes.IdentifierScheme, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
+class IdentifierSchemeSerialiser
+    extends JsonSerializer[IdentifierSchemes.IdentifierScheme] {
+  override def serialize(value: IdentifierSchemes.IdentifierScheme,
+                         gen: JsonGenerator,
+                         serializers: SerializerProvider): Unit = {
     gen.writeString(value.toString)
   }
 }
@@ -59,7 +65,7 @@ object IdentifierSchemes {
   }
 
   def createIdentifierScheme(
-                                      identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
+    identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
     identifierScheme match {
       case s: String if s == IdentifierSchemes.miroImageNumber.toString =>
         IdentifierSchemes.miroImageNumber
