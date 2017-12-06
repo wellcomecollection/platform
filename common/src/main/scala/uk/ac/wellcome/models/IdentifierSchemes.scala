@@ -33,6 +33,8 @@ class IdentifierSchemeSerialiser
   *  the strings that will be presented to users of the API.
   */
 object IdentifierSchemes extends Logging {
+  val identifierSchemes = Seq(miroImageNumber, miroLibraryReference, calmPlaceholder, calmAltRefNo, sierraSystemNumber)
+
   @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
   @JsonSerialize(using = classOf[IdentifierSchemeSerialiser])
   sealed trait IdentifierScheme
