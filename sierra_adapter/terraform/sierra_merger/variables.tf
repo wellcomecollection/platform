@@ -14,7 +14,6 @@ variable "account_id" {}
 variable "dlq_alarm_arn" {}
 
 variable "cluster_name" {}
-variable "cluster_id" {}
 
 variable "vpc_id" {}
 

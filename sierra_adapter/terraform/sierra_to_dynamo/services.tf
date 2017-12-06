@@ -1,43 +1,11 @@
-module "appautoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/app/ecs?ref=v1.1.0"
-  name   = "sierra_to_dynamo_${var.resource_type}"
-
-  cluster_name = "${var.cluster_name}"
-  service_name = "${module.sierra_to_dynamo_service.service_name}"
-}
-
-module "sqs_autoscaling_alarms" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/sqs?ref=v1.1.0"
-  name   = "sierra_to_dynamo_${var.resource_type}"
-
-  queue_name = "${module.windows_queue.name}"
-
-  scale_up_arn   = "${module.appautoscaling.scale_up_arn}"
-  scale_down_arn = "${module.appautoscaling.scale_down_arn}"
-}
-
 module "sierra_to_dynamo_service" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.1"
-  name               = "sierra_to_dynamo_${var.resource_type}"
-  cluster_id         = "${var.cluster_id}"
-  task_role_arn      = "${module.ecs_sierra_to_dynamo_iam.task_role_arn}"
-  vpc_id             = "${var.vpc_id}"
-  app_uri            = "${var.ecr_repository_url}:${var.release_id}"
-  listener_https_arn = "${var.alb_listener_https_arn}"
-  listener_http_arn  = "${var.alb_listener_http_arn}"
-  path_pattern       = "/sierra_to_dynamo_${var.resource_type}/*"
-  alb_priority       = "${var.alb_priority}"
-  infra_bucket       = "${var.infra_bucket}"
-  https_domain       = "services.wellcomecollection.ac.uk"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v2.0.0"
+  name   = "sierra_to_dynamo_${var.resource_type}"
 
-  config_key           = "config/${var.build_env}/sierra_to_dynamo_${var.resource_type}.ini"
-  config_template_path = "config/sierra_to_dynamo.ini.template"
-
-  cpu    = 256
-  memory = 1024
-
-  deployment_minimum_healthy_percent = "0"
-  deployment_maximum_percent         = "200"
+  source_queue_name  = "${module.windows_queue.name}"
+  source_queue_arn   = "${module.windows_queue.arn}"
+  ecr_repository_url = "${var.ecr_repository_url}"
+  release_id         = "${var.release_id}"
 
   config_vars = {
     windows_queue_url = "${module.windows_queue.id}"
@@ -52,7 +20,15 @@ module "sierra_to_dynamo_service" {
     sierra_fields        = "${var.sierra_fields}"
   }
 
-  loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  config_template = "sierra_to_dynamo"
+
+  alb_priority = "${var.alb_priority}"
+
+  cluster_name               = "${var.cluster_name}"
+  vpc_id                     = "${var.vpc_id}"
+  alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
+  alb_listener_https_arn     = "${var.alb_listener_https_arn}"
+  alb_listener_http_arn      = "${var.alb_listener_http_arn}"
+  alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
 }
