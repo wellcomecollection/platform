@@ -17,7 +17,11 @@ module "sqs_autoscaling_alarms" {
 }
 
 data "aws_ecs_cluster" "cluster" {
-  name = "${var.cluster_name}"
+  cluster_name = "${var.cluster_name}"
+}
+
+data "aws_iam_role" "task_role" {
+  name = "${var.task_role_name}"
 }
 
 locals {
@@ -28,13 +32,13 @@ module "service" {
   source             = "git::https://github.com/wellcometrust/terraform-modules.git//services?ref=v1.3.1"
   name               = "${var.name}"
   cluster_id         = "${data.aws_ecs_cluster.cluster.arn}"
-  task_role_arn      = "${module.ecs_id_minter_iam.task_role_arn}"
+  task_role_arn      = "${data.aws_iam_role.task_role.arn}"
   vpc_id             = "${var.vpc_id}"
   app_uri            = "${var.ecr_repository_url}:${var.release_id}"
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
   path_pattern       = "/${var.name}/*"
-  alb_priority       = "103"
+  alb_priority       = "${var.alb_priority}"
   infra_bucket       = "${var.infra_bucket}"
 
   config_key           = "config/${var.build_env}/${var.name}.ini"
