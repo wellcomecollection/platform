@@ -7,7 +7,7 @@ case class Identifier(
   ontologyType: String = "Work",
   CanonicalID: String,
   MiroID: String = null,
-  CalmAltRefNo: String = null
+  SierraSystemNumber: String = null
 )
 
 object Identifier {
@@ -16,6 +16,6 @@ object Identifier {
       ontologyType = rs.string(p.resultName.ontologyType),
       CanonicalID = rs.string(p.resultName.CanonicalID),
       MiroID = rs.string(p.resultName.MiroID),
-      CalmAltRefNo = rs.string(p.resultName.CalmAltRefNo)
+      SierraSystemNumber = rs.string(p.resultName.SierraSystemNumber)
     )
 }
