@@ -50,23 +50,23 @@ class IdentifiersDaoTest
     value = "V0023075"
   )
 
-  val calmSourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.calmAltRefNo,
-    value = "MS.290"
+  val sierraSourceIdentifier = SourceIdentifier(
+    identifierScheme = IdentifierSchemes.sierraSystemNumber,
+    value = "b1234567"
   )
 
   describe(
     "lookupID should return a future of Some[Identifier] if it can find a matching ID") {
-    it("Matching Miro ID, Calm ID and ontology type") {
+    it("Matching Miro ID, Sierra ID and ontology type") {
       val identifier = Identifier(
         CanonicalID = "h2s6hz29",
         MiroID = miroSourceIdentifier.value,
-        CalmAltRefNo = calmSourceIdentifier.value
+        SierraSystemNumber = sierraSourceIdentifier.value
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsMatch(
-        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
         ontologyType = identifier.ontologyType,
         identifier = identifier
       )
@@ -76,7 +76,7 @@ class IdentifiersDaoTest
         identifier = identifier
       )
       assertLookupIDFindsMatch(
-        sourceIdentifiers = List(calmSourceIdentifier),
+        sourceIdentifiers = List(sierraSourceIdentifier),
         ontologyType = identifier.ontologyType,
         identifier = identifier
       )
@@ -105,16 +105,16 @@ class IdentifiersDaoTest
     }
 
     it(
-      "Only a Miro ID in the database, but searching for both Miro and Calm IDs") {
+      "Only a Miro ID in the database, but searching for both Miro and Sierra IDs") {
       val identifier = Identifier(
         CanonicalID = "hydmw9zy",
         MiroID = miroSourceIdentifier.value,
-        CalmAltRefNo = calmSourceIdentifier.value
+        SierraSystemNumber = sierraSourceIdentifier.value
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsMatch(
-        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
         ontologyType = identifier.ontologyType,
         identifier = identifier
       )
@@ -129,15 +129,15 @@ class IdentifiersDaoTest
       )
     }
 
-    it("empty database, looking for a Calm AltRefNo") {
+    it("empty database, looking for a Sierra ID") {
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(calmSourceIdentifier)
+        sourceIdentifiers = List(sierraSourceIdentifier)
       )
     }
 
-    it("empty database, looking for a Miro ID and a Calm AltRefNo") {
+    it("empty database, looking for a Miro ID and a Sierra ID") {
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier)
+        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier)
       )
     }
 
@@ -154,40 +154,40 @@ class IdentifiersDaoTest
         ontologyType = "TestWork"
       )
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
         ontologyType = "TestWork"
       )
     }
 
-    it("matching Calm AltRefNo, wrong ontology type") {
+    it("matching Sierra ID, wrong ontology type") {
       val identifier = Identifier(
         CanonicalID = "pptk9sz6",
-        CalmAltRefNo = calmSourceIdentifier.value,
+        SierraSystemNumber = sierraSourceIdentifier.value,
         ontologyType = "TestItem"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(calmSourceIdentifier),
+        sourceIdentifiers = List(sierraSourceIdentifier),
         ontologyType = "TestWork"
       )
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(calmSourceIdentifier, miroSourceIdentifier),
+        sourceIdentifiers = List(sierraSourceIdentifier, miroSourceIdentifier),
         ontologyType = "TestWork"
       )
     }
 
-    it("matching Calm AltRefNo and Miro ID, wrong ontology type") {
+    it("matching Sierra ID and Miro ID, wrong ontology type") {
       val identifier = Identifier(
         CanonicalID = "w9wr583y",
-        CalmAltRefNo = calmSourceIdentifier.value,
+        SierraSystemNumber = sierraSourceIdentifier.value,
         MiroID = miroSourceIdentifier.value,
         ontologyType = "TestItem"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(calmSourceIdentifier),
+        sourceIdentifiers = List(sierraSourceIdentifier),
         ontologyType = "TestWork"
       )
       assertLookupIDFindsNothing(
@@ -195,37 +195,37 @@ class IdentifiersDaoTest
         ontologyType = "TestWork"
       )
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(calmSourceIdentifier, miroSourceIdentifier),
+        sourceIdentifiers = List(sierraSourceIdentifier, miroSourceIdentifier),
         ontologyType = "TestWork"
       )
     }
 
-    it("matching Miro ID, wrong Calm AltRefNo") {
+    it("matching Miro ID, wrong Sierra ID") {
       val identifier = Identifier(
         CanonicalID = "qs5apdq8",
         MiroID = miroSourceIdentifier.value,
-        CalmAltRefNo = "Not a real Calm AltRefNo",
+        SierraSystemNumber = "Not a real Sierra ID",
         ontologyType = "TestWork"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
         ontologyType = identifier.ontologyType
       )
     }
 
-    it("matching Calm AltRefNo, wrong Miro ID") {
+    it("matching Sierra ID, wrong Miro ID") {
       val identifier = Identifier(
         CanonicalID = "qs5apdq8",
         MiroID = "Not a real MiroID",
-        CalmAltRefNo = calmSourceIdentifier.value,
+        SierraSystemNumber = sierraSourceIdentifier.value,
         ontologyType = "TestWork"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, calmSourceIdentifier),
+        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
         ontologyType = identifier.ontologyType
       )
     }
@@ -234,13 +234,13 @@ class IdentifiersDaoTest
       val identifier = Identifier(
         CanonicalID = "eqg6v2ws",
         MiroID = "A misleading Miro ID",
-        CalmAltRefNo = "A capricious Calm ID",
+        SierraSystemNumber = "A spurious Sierra ID",
         ontologyType = "TestWork"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
       assertLookupIDFindsNothing(
-        sourceIdentifiers = List(calmSourceIdentifier),
+        sourceIdentifiers = List(sierraSourceIdentifier),
         ontologyType = identifier.ontologyType
       )
       assertLookupIDFindsNothing(
