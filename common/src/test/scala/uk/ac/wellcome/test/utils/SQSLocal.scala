@@ -5,12 +5,12 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClientBuilder}
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
+import org.scalatest.{BeforeAndAfterEach, Suite}
 
 trait SQSLocal
     extends BeforeAndAfterEach
     with Eventually
-    with ExtendedPatience with Matchers{ this: Suite =>
+    with ExtendedPatience { this: Suite =>
 
   private val sqsEndpointUrl = "http://localhost:9324"
   private val accessKey = "access"
