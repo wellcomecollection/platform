@@ -12,7 +12,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "canonicalId": "canonicalId",
       |  "identifiers": [
       |    {
-      |      "identifierScheme": "identifierScheme",
+      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "value": "value"
       |    }
       |  ],
@@ -37,7 +37,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |{
       |  "identifiers": [
       |    {
-      |      "identifierScheme": "identifierScheme",
+      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "value": "value"
       |    }
       |  ],
@@ -64,7 +64,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val identifier = SourceIdentifier(
-    identifierScheme = "identifierScheme",
+    identifierScheme = IdentifierSchemes.miroImageNumber,
     value = "value"
   )
 

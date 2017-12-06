@@ -3,7 +3,6 @@ package uk.ac.wellcome.models
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.utils.JsonUtil
 
 class MergedSierraRecordTest extends FunSpec with Matchers {

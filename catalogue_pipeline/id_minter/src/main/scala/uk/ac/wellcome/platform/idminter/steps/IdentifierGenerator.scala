@@ -3,9 +3,8 @@ package uk.ac.wellcome.platform.idminter.steps
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import com.twitter.inject.{Logging, TwitterModuleFlags}
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   UnableToMintIdentifierException
@@ -27,8 +26,10 @@ class IdentifierGenerator @Inject()(
   def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
                                     ontologyType: String): Try[String] = {
     Try {
-      val idsWithKnownSchemes = identifiers.filter(identifier =>
-        knownIdentifierSchemeList.contains(identifier.identifierScheme))
+      val idsWithKnownSchemes = identifiers.filter(
+        identifier =>
+          knownIdentifierSchemeList.contains(
+            identifier.identifierScheme.toString))
       if (idsWithKnownSchemes.isEmpty) {
         throw UnableToMintIdentifierException(
           "identifiers list did not contain a known identifierScheme")
@@ -67,8 +68,9 @@ class IdentifierGenerator @Inject()(
       }
   }
 
-  private def findIdentifierWith(identifiers: List[SourceIdentifier],
-                                 identifierScheme: String): String = {
+  private def findIdentifierWith(
+    identifiers: List[SourceIdentifier],
+    identifierScheme: IdentifierSchemes.IdentifierScheme): String = {
     identifiers
       .find(identifier => identifier.identifierScheme == identifierScheme)
       .fold[String](null)(identifier => identifier.value)

@@ -2,7 +2,6 @@ package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
 
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.test.utils.MiroTransformableWrapper
 
 /** Tests that the Miro transformer extracts the "title" field correctly.
@@ -646,7 +645,7 @@ class MiroTransformableSubjectsTest
     item shouldBe Item(
       None,
       List(
-        SourceIdentifier("miro-image-number", "M0000001")
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
       ),
       List(
         Location(

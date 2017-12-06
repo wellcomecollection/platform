@@ -16,15 +16,10 @@ class DisplayItemTest extends FunSpec with Matchers {
     )
   }
 
-  val identifier: SourceIdentifier = {
-    val scheme = "identifier-scheme"
-    val value = "value"
-
-    SourceIdentifier(
-      identifierScheme = scheme,
-      value = value
-    )
-  }
+  val identifier: SourceIdentifier = SourceIdentifier(
+    identifierScheme = IdentifierSchemes.miroImageNumber,
+    value = "value"
+  )
 
   it("should read an Item as a DisplayItem correctly") {
     val item = Item(

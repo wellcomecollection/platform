@@ -8,16 +8,11 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{MergedSierraRecord, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.transformer.parsers.{
-  CalmParser,
-  MiroParser,
-  SierraParser
-}
+import uk.ac.wellcome.transformer.parsers.{CalmParser, SierraParser}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.api
 
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models._
 
 trait WorksUtil {
@@ -89,7 +88,7 @@ trait WorksUtil {
   }
 
   def defaultSourceIdentifier = {
-    SourceIdentifier("miro-image-number", "M0000001")
+    SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
   }
 
   def defaultLocation: Location = {
