@@ -13,7 +13,6 @@ module "sierra_to_dynamo_bibs" {
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
-  cluster_id    = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 
   alb_priority               = 106
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
@@ -50,7 +49,6 @@ module "sierra_bib_merger" {
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
-  cluster_id    = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
 
   alb_priority               = 107
   alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"

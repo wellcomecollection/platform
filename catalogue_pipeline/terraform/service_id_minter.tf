@@ -1,42 +1,11 @@
-module "id_minter_appautoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/app/ecs?ref=v1.1.0"
-  name   = "id_minter"
-
-  cluster_name = "${aws_ecs_cluster.services.name}"
-  service_name = "${module.id_minter.service_name}"
-}
-
-module "id_minter_sqs_autoscaling_alarms" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/alarms/sqs?ref=v1.1.0"
-  name   = "id_minter"
-
-  queue_name = "${module.id_minter_queue.name}"
-
-  scale_up_arn   = "${module.id_minter_appautoscaling.scale_up_arn}"
-  scale_down_arn = "${module.id_minter_appautoscaling.scale_down_arn}"
-}
-
 module "id_minter" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.1"
-  name               = "id_minter"
-  cluster_id         = "${aws_ecs_cluster.services.id}"
-  task_role_arn      = "${module.ecs_id_minter_iam.task_role_arn}"
-  vpc_id             = "${module.vpc_services.vpc_id}"
-  app_uri            = "${module.ecr_repository_id_minter.repository_url}:${var.release_ids["id_minter"]}"
-  listener_https_arn = "${module.services_alb.listener_https_arn}"
-  listener_http_arn  = "${module.services_alb.listener_http_arn}"
-  path_pattern       = "/id_minter/*"
-  alb_priority       = "103"
-  infra_bucket       = "${var.infra_bucket}"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v2.0.0"
+  name   = "id_minter"
 
-  config_key           = "config/${var.build_env}/id_minter.ini"
-  config_template_path = "config/id_minter.ini.template"
-
-  cpu    = 256
-  memory = 1024
-
-  deployment_minimum_healthy_percent = "0"
-  deployment_maximum_percent         = "200"
+  source_queue_name  = "${module.id_minter_queue.name}"
+  source_queue_arn   = "${module.id_minter_queue.arn}"
+  ecr_repository_url = "${module.ecr_repository_id_minter.repository_url}"
+  release_id         = "${var.release_ids["id_minter"]}"
 
   config_vars = {
     rds_database_name   = "${module.identifiers_rds_cluster.database_name}"
@@ -49,9 +18,13 @@ module "id_minter" {
     metrics_namespace   = "id-minter"
   }
 
-  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
-  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
+  alb_priority = "103"
 
-  https_domain = "services.wellcomecollection.org"
+  cluster_name               = "${aws_ecs_cluster.services.name}"
+  vpc_id                     = "${module.vpc_services.vpc_id}"
+  alb_cloudwatch_id          = "${module.services_alb.cloudwatch_id}"
+  alb_listener_https_arn     = "${module.services_alb.listener_https_arn}"
+  alb_listener_http_arn      = "${module.services_alb.listener_http_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }
