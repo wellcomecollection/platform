@@ -1,9 +1,9 @@
 module "id_minter" {
-  source = "sqs_autoscaling_service"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=sqs-autoscaling-service"
   name   = "id_minter"
 
   source_queue_name  = "${module.id_minter_queue.name}"
-  task_role_name     = "${module.ecs_id_minter_iam.task_role_name}"
+  source_queue_arn   = "${module.id_minter_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_id_minter.repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
 

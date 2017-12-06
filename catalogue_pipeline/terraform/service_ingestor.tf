@@ -8,11 +8,11 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source = "sqs_autoscaling_service"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=sqs-autoscaling-service"
   name   = "ingestor"
 
   source_queue_name  = "${module.es_ingest_queue.name}"
-  task_role_name     = "${module.ecs_ingestor_iam.task_role_name}"
+  source_queue_arn   = "${module.es_ingest_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_ingestor.repository_url}"
   release_id         = "${var.release_ids["ingestor"]}"
 
