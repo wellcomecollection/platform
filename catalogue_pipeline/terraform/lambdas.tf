@@ -83,7 +83,7 @@ module "lambda_sierra_transformer_filter" {
   s3_key          = "lambdas/catalogue_pipeline/transformer_sns_filter.zip"
 }
 
-module "trigger_miro_transformer_filter" {
+module "trigger_sierra_transformer_filter" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//lambda/trigger_sns?ref=v1.0.0"
 
   sns_trigger_arn      = "${module.sierra_transformer_prefilter_topic.arn}"
