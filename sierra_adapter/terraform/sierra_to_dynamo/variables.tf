@@ -5,7 +5,6 @@ variable "windows_topic_name" {}
 variable "dlq_alarm_arn" {}
 
 variable "cluster_name" {}
-variable "cluster_id" {}
 
 variable "vpc_id" {}
 
