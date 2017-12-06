@@ -8,9 +8,9 @@ module "es_ingest_topic" {
   name   = "es_ingest"
 }
 
-module "miro_transformer_prefilter_topic" {
+module "miro_transformer_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "miro_transformer_prefilter"
+  name   = "miro_transformer"
 }
 
 module "transformer_dlq_alarm" {
