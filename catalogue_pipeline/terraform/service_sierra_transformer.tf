@@ -1,21 +1,21 @@
-module "miro_transformer" {
+module "sierra_transformer" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v2.0.0"
-  name   = "miro_transformer"
+  name   = "sierra_transformer"
 
-  source_queue_name  = "${module.miro_transformer_queue.name}"
-  source_queue_arn   = "${module.miro_transformer_queue.arn}"
+  source_queue_name  = "${module.sierra_transformer_queue.name}"
+  source_queue_arn   = "${module.sierra_transformer_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_transformer.repository_url}"
   release_id         = "${var.release_ids["transformer"]}"
   config_template    = "transformer"
 
   config_vars = {
     sns_arn              = "${module.id_minter_topic.arn}"
-    transformer_queue_id = "${module.miro_transformer_queue.id}"
-    source_table_name    = "${aws_dynamodb_table.miro_table.name}"
-    metrics_namespace    = "miro-transformer"
+    transformer_queue_id = "${module.sierra_transformer_queue.id}"
+    source_table_name    = "SierraData"
+    metrics_namespace    = "sierra-transformer"
   }
 
-  alb_priority = "100"
+  alb_priority = "108"
 
   cluster_name               = "${aws_ecs_cluster.services.name}"
   vpc_id                     = "${module.vpc_services.vpc_id}"
@@ -26,10 +26,10 @@ module "miro_transformer" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }
 
-module "dynamo_to_sns_miro_transformer" {
+module "dynamo_to_sns_sierra_transformer" {
   source                 = "transformer_filter"
-  name                   = "miro"
-  src_stream_arn         = "${aws_dynamodb_table.miro_table.stream_arn}"
-  dst_topic_arn          = "${module.miro_transformer_topic.arn}"
+  name                   = "sierra"
+  src_stream_arn         = "${local.sierradata_table_stream_arn}"
+  dst_topic_arn          = "${module.sierra_transformer_topic.arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }
