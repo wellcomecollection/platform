@@ -5,11 +5,14 @@ import java.time.Instant
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.{SourceIdentifier, Work}
-import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 class SierraTransformerFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with TransformerFeatureTest
     with TransformableSQSMessageUtils {
@@ -30,7 +33,8 @@ class SierraTransformerFeatureTest
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
-    val sqsMessage = createValidSierraBibSQSMessage(id, title, lastModifiedDate)
+    val sqsMessage =
+      createValidSierraBibSQSMessage(id, title, lastModifiedDate)
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
@@ -38,7 +42,10 @@ class SierraTransformerFeatureTest
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size 1
 
-      val expectedWork = Work(title = title, identifiers = List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+      val expectedWork = Work(
+        title = title,
+        identifiers =
+          List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
       snsMessages.head.message shouldBe JsonUtil.toJson(expectedWork).get
     }
   }
