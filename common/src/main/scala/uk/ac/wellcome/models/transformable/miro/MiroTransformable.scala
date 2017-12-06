@@ -451,7 +451,7 @@ case class MiroTransformable(MiroID: String,
     }
   }
 
-  override def transform(): Try[Option[Work]] = Try {
+  override def transform: Try[Option[Work]] = Try {
 
     val miroData = MiroTransformableData.create(data)
     val (title, description) = getTitleAndDescription(miroData)

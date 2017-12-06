@@ -43,7 +43,7 @@ case class MergedSierraRecord(
     }
   }
 
-  override def transform(): Try[Option[Work]] =
+  override def transform: Try[Option[Work]] =
     maybeBibData
       .map { foo =>
         JsonUtil.fromJson[SierraBibData](foo.data).map { sierraBibData =>
