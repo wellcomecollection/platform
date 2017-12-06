@@ -1,6 +1,5 @@
 package uk.ac.wellcome.models
 
-import uk.ac.wellcome.finatra.modules.IdentifierSchemes
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.utils.JsonUtil
 
