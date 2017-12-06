@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.Work
 import scala.util.Try
 
 trait Transformable {
-  def transform(): Try[Option[Work]]
+  def transform: Try[Option[Work]]
 }
 
 case class HashKey(keyName: String, keyValue: String)

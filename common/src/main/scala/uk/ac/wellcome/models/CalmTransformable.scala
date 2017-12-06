@@ -9,7 +9,7 @@ import scala.util.Try
 case class CalmTransformableData(
   AccessStatus: Array[String]
 ) extends Transformable {
-  def transform(): Try[Option[Work]] = Try {
+  def transform: Try[Option[Work]] = Try {
     // TODO: Fill in proper data here
     Some(
       Work(
@@ -37,7 +37,7 @@ case class CalmTransformable(
     RangeKey("RecordType", RecordType)
   )
 
-  def transform(): Try[Option[Work]] =
+  def transform: Try[Option[Work]] =
     JsonUtil
       .fromJson[CalmTransformableData](data)
       .flatMap(_.transform)
