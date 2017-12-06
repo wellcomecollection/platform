@@ -26,8 +26,10 @@ class IdentifierGenerator @Inject()(
   def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
                                     ontologyType: String): Try[String] = {
     Try {
-      val idsWithKnownSchemes = identifiers.filter(identifier =>
-        knownIdentifierSchemeList.contains(identifier.identifierScheme.toString))
+      val idsWithKnownSchemes = identifiers.filter(
+        identifier =>
+          knownIdentifierSchemeList.contains(
+            identifier.identifierScheme.toString))
       if (idsWithKnownSchemes.isEmpty) {
         throw UnableToMintIdentifierException(
           "identifiers list did not contain a known identifierScheme")
