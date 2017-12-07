@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 """
 Because we have a lot of Travis jobs, we try to avoid running unnecessary
@@ -35,17 +35,17 @@ def main():
     task = os.environ['TASK']
 
     if should_run_tests(task=task, travis_event_type=travis_event_type):
-        print("*** We're going to run tests")
+        print("*** We're going to run tests", flush=True)
     else:
-        print("*** We don't need to run tests, exiting early")
+        print("*** We don't need to run tests, exiting early", flush=True)
         return 0
 
     make(task)
 
     if should_publish(task=task, travis_event_type=travis_event_type):
-        print("*** We're going to run the publish task")
+        print("*** We're going to run the publish task", flush=True)
     else:
-        print("*** We don't need the publish task, exiting early")
+        print("*** We don't need the publish task, exiting early", flush=True)
         return 0
 
     if task in [
