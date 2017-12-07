@@ -162,15 +162,15 @@ class SierraDynamoSinkTest
        """.stripMargin).right.get
 
     val futureUnit = Source.single(newJson).runWith(sink)
-    val newRecord = SierraRecord(
-      id = id,
+    val expectedRecord = SierraRecord(
+      id = s"b$id",
       modifiedDate = newUpdatedDate,
       data =
-        s"""{"id":"$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
+        s"""{"id":"b$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
     )
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
-        Right(newRecord))
+        Right(expectedRecord))
     }
   }
 
