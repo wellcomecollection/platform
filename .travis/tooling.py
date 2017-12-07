@@ -6,7 +6,6 @@ from __future__ import print_function
 import os
 import re
 import subprocess
-import sys
 
 
 # Root of the Git repository
@@ -15,10 +14,7 @@ ROOT = subprocess.check_output([
 
 
 def fprint(*args, **kwargs):
-    if kwargs.get('file') == sys.stderr:
-        kwargs['file'] = sys.stderr.flush()
-    else:
-        kwargs['file'] = sys.stdout.flush()
+    kwargs['flush'] = True
     print(*args, **kwargs)
 
 
@@ -50,7 +46,7 @@ def are_there_job_relevant_changes(changed_files, task):
     """
     reasons = []
 
-    if task == 'check-format':
+    if 'format' in task:
         reasons.append('Linting/formatting tasks always run')
 
     if 'Makefile' in changed_files:
@@ -125,8 +121,15 @@ def make_decision(changed_files, task, action):
 
 
 def make(task):
-    print('*** Running make %s' % task)
-    subprocess.check_call(['make', task])
+    command = ['make', task]
+    print('*** Running %r' % command, flush=True)
+    subprocess.check_call(command)
+
+
+def git(*args):
+    command = ['git'] + list(args)
+    print('*** Running %r' % command, flush=True)
+    subprocess.check_call(command)
 
 
 def rreplace(string, old, new, count=None):
