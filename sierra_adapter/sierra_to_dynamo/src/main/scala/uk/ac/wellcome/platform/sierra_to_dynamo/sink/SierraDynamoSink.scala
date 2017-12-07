@@ -22,7 +22,7 @@ object SierraDynamoSink extends Logging {
     Sink.foreachParallel(10)(unprefixedJson => {
       val json =
         addIDPrefix(json = unprefixedJson, resourceType = resourceType)
-      logger.debug(s"Inserting ${json.noSpaces} in dynamo Db")
+      logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
