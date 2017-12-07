@@ -56,10 +56,14 @@ class IdentifierGenerator @Inject()(
     identifiersDao
       .saveIdentifier(
         Identifier(
-          MiroID =
-            findIdentifierWith(identifiers, IdentifierSchemes.miroImageNumber),
-          SierraSystemNumber =
-            findIdentifierWith(identifiers, IdentifierSchemes.sierraSystemNumber),
+          MiroID = findIdentifierWith(
+            identifiers,
+            IdentifierSchemes.miroImageNumber
+          ),
+          SierraSystemNumber = findIdentifierWith(
+            identifiers,
+            IdentifierSchemes.sierraSystemNumber
+          ),
           CanonicalID = canonicalId,
           ontologyType = ontologyType
         ))
