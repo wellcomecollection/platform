@@ -19,8 +19,10 @@ import scala.concurrent.{ExecutionContext, Future}
 object SierraDynamoSink extends Logging {
   def apply(client: AmazonDynamoDB, tableName: String, resourceType: String)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
-    Sink.foreachParallel(10)(json => {
+    Sink.foreachParallel(10)(unprefixedJson => {
       logger.debug(s"Inserting ${json.noSpaces} in dynamo Db")
+      val json =
+        addIDPrefix(json = unprefixedJson, resourceType = resourceType)
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
@@ -71,7 +73,15 @@ object SierraDynamoSink extends Logging {
   //
   // TODO: Should this also update the bibIds on items?
   def addIDPrefix(json: Json, resourceType: String): Json = {
-    json
+    resourceType match {
+      case "bibs" => root.id.string.modify(id => s"b$id")(json)
+      case "items" => root.id.string.modify(id => s"i$id")(json)
+      case _ => {
+        warn(
+          "Unable to add disambiguating prefix for unknown resourceType=$resourceType")
+        json
+      }
+    }
   }
 
   private def getId(json: Json) = {

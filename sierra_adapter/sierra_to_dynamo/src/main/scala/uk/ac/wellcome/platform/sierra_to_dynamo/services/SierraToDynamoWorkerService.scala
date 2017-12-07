@@ -44,11 +44,11 @@ class SierraToDynamoWorkerService @Inject()(
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType,
-      params).runWith(SierraDynamoSink(
+      params).runWith(
+      SierraDynamoSink(
         client = dynamoDbClient,
         tableName = dynamoConfig.table,
         resourceType = resourceType
-      )
-    )
+      ))
   }
 }
