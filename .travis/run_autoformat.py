@@ -8,11 +8,15 @@ and push the results.  It also lints Python and JSON, but those aren't
 auto-formatted (yet).
 """
 
+import os
+
 from tooling import changed_files, git, make
 
 
 if __name__ == '__main__':
     make('format')
+
+    branch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
 
     if changed_files():
         print(
@@ -29,7 +33,7 @@ if __name__ == '__main__':
 
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
-        git('push', 'ssh-origin', 'autoformat-in-ci')
+        git('push', 'ssh-origin', 'HEAD:%s' % branch)
     else:
         print('*** There were no changes from auto-formatting', flush=True)
 
