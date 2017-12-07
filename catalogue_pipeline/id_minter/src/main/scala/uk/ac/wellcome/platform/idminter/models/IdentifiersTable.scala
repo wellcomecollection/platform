@@ -15,7 +15,6 @@ class IdentifiersTable @Inject()(
     "CanonicalID",
     "ontologyType",
     "MiroID",
-    "CalmAltRefNo",
     "SierraSystemNumber"
   )
 
