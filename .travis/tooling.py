@@ -15,11 +15,7 @@ ROOT = subprocess.check_output([
 
 
 def fprint(*args, **kwargs):
-    if kwargs.get('file') == sys.stderr:
-        kwargs['file'] = sys.stderr.flush()
-    else:
-        kwargs['file'] = sys.stdout.flush()
-    print(*args, **kwargs)
+    print(*args, **kwargs, flush=True)
 
 
 def changed_files(*args):
