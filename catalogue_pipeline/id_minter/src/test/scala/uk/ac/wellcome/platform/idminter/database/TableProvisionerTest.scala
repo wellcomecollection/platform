@@ -56,7 +56,7 @@ class TableProvisionerTest
                          dataType = "varchar(255)",
                          nullable = "YES",
                          key = ""),
-        FieldDescription(field = "CalmAltRefNo",
+        FieldDescription(field = "SierraSystemNumber",
                          dataType = "varchar(255)",
                          nullable = "YES",
                          key = "")
