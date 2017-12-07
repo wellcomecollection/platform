@@ -39,7 +39,6 @@ resource "aws_iam_role_policy" "reindexer_cloudwatch" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-
 # Policies for the schedule_reindexer task
 
 resource "aws_iam_role_policy" "lambda_schedule_reindexer_sns" {
