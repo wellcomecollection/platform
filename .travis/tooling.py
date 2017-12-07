@@ -92,7 +92,7 @@ def _are_there_sbt_relevant_changes(changed_files, task):
 
     sbt_project = task.split('-')[-1]
     for dirname in ['common', 'project', sbt_project]:
-        if any(f.startswith('%s/' % dirname) for f in changed_files):
+        if any(dirname in f for f in changed_files):
             reasons.append('Changes to %s/' % dirname)
 
     return reasons
