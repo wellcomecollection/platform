@@ -23,6 +23,4 @@ variable "dlq_alarm_arn" {}
 variable "es_config_ingestor" {
   type = "map"
 }
-variable "infra_bucket" {
-}
 variable "cloudwatch_push_metrics_policy_document" {}

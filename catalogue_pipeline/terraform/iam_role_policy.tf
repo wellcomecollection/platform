@@ -39,17 +39,6 @@ resource "aws_iam_role_policy" "reindexer_cloudwatch" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-# Policies for the Elasticdump task
-
-resource "aws_iam_role_policy" "elasticdump_read_ingestor_config_from_s3" {
-  role   = "${module.ecs_elasticdump_iam.task_role_name}"
-  policy = "${module.ingest_pipeline_mel.read_ingestor_config_policy_document}"
-}
-
-resource "aws_iam_role_policy" "elasticdump_upload_files_to_s3" {
-  role   = "${module.ecs_elasticdump_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.s3_upload_to_to_elasticdump_directory.json}"
-}
 
 # Policies for the schedule_reindexer task
 

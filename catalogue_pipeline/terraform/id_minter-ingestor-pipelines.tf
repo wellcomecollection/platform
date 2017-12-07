@@ -43,7 +43,6 @@ module "ingest_pipeline_mel" {
   }
 
   cloudwatch_push_metrics_policy_document = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
-  infra_bucket = "${var.infra_bucket}"
 }
 
 module "ingest_pipeline_sue" {
@@ -91,5 +90,4 @@ module "ingest_pipeline_sue" {
   }
 
   cloudwatch_push_metrics_policy_document = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
-  infra_bucket = "${var.infra_bucket}"
 }
