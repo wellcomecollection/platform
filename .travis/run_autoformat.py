@@ -9,6 +9,7 @@ auto-formatted (yet).
 """
 
 import os
+import subprocess
 
 from tooling import changed_files, git, make
 
@@ -29,11 +30,20 @@ if __name__ == '__main__':
 
         git('config', 'user.name', 'Travis CI on behalf of Wellcome')
         git('config', 'user.email', 'wellcomedigitalplatform@wellcome.ac.uk')
-        git('config', 'core.sshCommand', 'ssh -i deploy_key')
+        git('config', 'core.sshCommand', 'ssh -i id_rsa')
         git(
             'remote', 'add', 'ssh-origin',
             'git@github.com:wellcometrust/platform.git'
         )
+
+        # Unencrypt the SSH key.
+        subprocess.check_call([
+            'openssl', 'aes-256-cbc',
+            '-K', os.environ['encrypted_83630750896a_key'],
+            '-iv', os.environ['encrypted_83630750896a_iv'],
+            '-in', '.travis/id_rsa.enc',
+            '-out', 'id_rsa', '-d'
+        ])
 
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
