@@ -28,7 +28,7 @@ $(ROOT)/.docker/sbt_image_builder:
 		--dir=builds \
 		--file=builds/sbt_image_builder.Dockerfile
 
-format: format-terraform format-scala
+format: format-terraform
 
 check-format: format lint-python lint-ontologies
 	git diff --exit-code
