@@ -109,15 +109,15 @@ class IdentifierGeneratorTest
       IdentifierSchemes before sending them to the dao""") {
 
     val miroId = "1234"
-    val calmAltRefNo = "5678"
+    val calmAltRefNo = "b1234567"
     val knownSchemeIdentifiers = List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.miroImageNumber,
         value = miroId
       ),
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.calmAltRefNo,
-        value = calmAltRefNo
+        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        value = sierraID
       )
     )
     val sourceIdentifiers = knownSchemeIdentifiers :+ SourceIdentifier(
@@ -137,9 +137,11 @@ class IdentifierGeneratorTest
       select.from(identifiersTable as i).where.eq(i.MiroID, miroId)
     }.map(Identifier(i)).single.apply()
     maybeIdentifier shouldBe defined
-    maybeIdentifier.get shouldBe Identifier(CanonicalID = id,
-                                            MiroID = miroId,
-                                            CalmAltRefNo = calmAltRefNo)
+    maybeIdentifier.get shouldBe Identifier(
+      CanonicalID = id,
+      MiroID = miroId,
+      SierraSystemNumber = sierraSystemNumber
+    )
   }
 
   it("should preserve the ontologyType when generating a new identifier") {
