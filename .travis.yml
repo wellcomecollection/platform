@@ -52,6 +52,38 @@ env:
   matrix:
     - TASK=travis-format
 
+    # (not under active development)
+    # - TASK=nginx-build
+
+    # Catalogue pipeline stack
+    - TASK=sbt-common-test
+    - TASK=transformer-test
+    - TASK=ingestor-test
+    - TASK=id_minter-test
+    - TASK=reindexer-test
+
+    # Catalogue API stack
+    - TASK=api-test
+    # (not under active development)
+    # - TASK=api_docs-build
+
+    # Miro preprocessor stack  (not under active development)
+    # - TASK=miro_preprocessor-test
+
+    # Shared infra stack
+    - TASK=shared_infra-build
+
+    # Loris stack
+    - TASK=loris-build
+    # (not under active development)
+    # - TASK=cache_cleaner-build
+
+    # Monitoring stack
+    - TASK=monitoring-test
+
+    # Sierra adapter stack
+    - TASK=sierra_adapter-test
+
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
 # https://wellcome.slack.com/services/B7HD6DUT0#service_setup.
