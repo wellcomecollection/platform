@@ -129,6 +129,11 @@ def make(task):
     subprocess.check_call(['make', task])
 
 
+def git(*args):
+    print('*** Running git %s' % ' '.join(args))
+    subprocess.check_call(['git'] + list(args))
+
+
 def rreplace(string, old, new, count=None):
     """
     Replace ``old`` with ``new``, starting from the right.
