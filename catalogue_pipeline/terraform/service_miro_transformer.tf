@@ -9,7 +9,7 @@ module "miro_transformer" {
   config_template    = "transformer"
 
   config_vars = {
-    sns_arn              = "${module.id_minter_topic.arn}"
+    sns_arn              = "${module.ingest_pipeline_mel.id_minter_topic_arn}"
     transformer_queue_id = "${module.miro_transformer_queue.id}"
     source_table_name    = "${aws_dynamodb_table.miro_table.name}"
     metrics_namespace    = "miro-transformer"
