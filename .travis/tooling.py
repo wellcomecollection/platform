@@ -50,7 +50,7 @@ def are_there_job_relevant_changes(changed_files, task):
     """
     reasons = []
 
-    if task == 'check-format':
+    if 'format' in task:
         reasons.append('Linting/formatting tasks always run')
 
     if 'Makefile' in changed_files:
