@@ -220,7 +220,8 @@ class SierraDynamoSinkTest
       |  "updatedDate": "2006-06-06T06:06:06Z"
       |}
       """.stripMargin).right.get
-    val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "bibs")
+    val prefixedJson =
+      SierraDynamoSink.addIDPrefix(json = json, resourceType = "bibs")
 
     val expectedJson = parse(s"""
       |{
@@ -238,7 +239,8 @@ class SierraDynamoSinkTest
       |  "updatedDate": "2007-07-07T07:07:07Z"
       |}
       """.stripMargin).right.get
-    val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "items")
+    val prefixedJson =
+      SierraDynamoSink.addIDPrefix(json = json, resourceType = "items")
 
     val expectedJson = parse(s"""
       |{
@@ -256,7 +258,8 @@ class SierraDynamoSinkTest
       |  "updatedDate": "2007-07-07T07:07:07Z"
       |}
       """.stripMargin).right.get
-    val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "holdings")
+    val prefixedJson =
+      SierraDynamoSink.addIDPrefix(json = json, resourceType = "holdings")
 
     prefixedJson shouldEqual json
   }
