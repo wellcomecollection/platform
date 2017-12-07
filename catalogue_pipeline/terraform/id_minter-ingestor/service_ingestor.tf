@@ -15,7 +15,8 @@ module "ingestor" {
   source_queue_arn   = "${module.es_ingest_queue.arn}"
   ecr_repository_url = "${var.ingestor_repository_url}"
   release_id         = "${var.release_ids["ingestor"]}"
-  config_template = "ingestor"
+  config_template    = "ingestor"
+
   config_vars = {
     es_host           = "${data.template_file.es_cluster_host_ingestor.rendered}"
     es_port           = "${var.es_config_ingestor["port"]}"

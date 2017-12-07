@@ -6,7 +6,7 @@ module "id_minter" {
   source_queue_arn   = "${module.id_minter_queue.arn}"
   ecr_repository_url = "${var.id_minter_repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
-  config_template = "id_minter"
+  config_template    = "id_minter"
 
   config_vars = {
     rds_database_name   = "${var.identifiers_rds_cluster["database_name"]}"
