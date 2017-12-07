@@ -31,7 +31,17 @@ class SierraDynamoSinkTest
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val sink = SierraDynamoSink(client = dynamoDbClient, tableName = tableName)
+  val bibSink = SierraDynamoSink(
+    client = dynamoDbClient,
+    tableName = tableName,
+    resourceType = "bibs"
+  )
+
+  val itemSink = SierraDynamoSink(
+    client = dynamoDbClient,
+    tableName = tableName,
+    resourceType = "items"
+  )
 
   override def afterAll(): Unit = {
     system.terminate()
@@ -48,16 +58,21 @@ class SierraDynamoSinkTest
         | "updatedDate": "$updatedDate"
         |}
       """.stripMargin).right.get
-    val futureUnit = Source.single(json).runWith(sink)
+    val futureUnit = Source.single(json).runWith(bibSink)
 
     val expectedRecord = SierraRecord(
-      id = id,
-      data = json.noSpaces,
+      id = s"b$id",
+      data = parse(s"""
+        |{
+        | "id": "b$id",
+        | "updatedDate": "$updatedDate"
+        |}
+      """.stripMargin).noSpaces,
       modifiedDate = updatedDate
     )
 
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
         Right(expectedRecord))
     }
   }
@@ -73,16 +88,24 @@ class SierraDynamoSinkTest
                        |    ]
                        |}""".stripMargin).right.get
 
-    val futureUnit = Source.single(json).runWith(sink)
+    val futureUnit = Source.single(json).runWith(itemSink)
 
     val expectedRecord = SierraRecord(
-      id = id,
-      data = json.noSpaces,
+      id = s"b$id",
+      data = parse(s"""
+        |{
+        | "id": "i$id",
+        | "deletedDate" : "$deletedDate",
+        | "deleted" : true,
+        | "bibIds" : [
+        | ]
+        |}
+      """.stripMargin).noSpaces,,
       modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
         Right(expectedRecord))
     }
   }
@@ -93,10 +116,10 @@ class SierraDynamoSinkTest
     val newUpdatedDate = "2017-12-12T23:59:59Z"
 
     val newRecord = SierraRecord(
-      id = id,
+      id = "b$id",
       modifiedDate = newUpdatedDate,
       data =
-        s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
+        s"""{"id": "b$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
     )
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
@@ -108,9 +131,9 @@ class SierraDynamoSinkTest
          |}
        """.stripMargin).right.get
 
-    val futureUnit = Source.single(oldJson).runWith(sink)
+    val futureUnit = Source.single(oldJson).runWith(bibSink)
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> "b$id") shouldBe Some(
         Right(newRecord))
     }
   }
