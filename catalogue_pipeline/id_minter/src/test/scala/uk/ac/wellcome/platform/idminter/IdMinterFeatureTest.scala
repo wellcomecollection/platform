@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.FunSpec
+import org.scalatest.{BeforeAndAfterEach, FunSpec}
 import scalikejdbc.{select, _}
 import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -13,7 +13,8 @@ import uk.ac.wellcome.utils.JsonUtil
 class IdMinterFeatureTest
     extends FunSpec
     with FeatureTestMixin
-    with IdMinterTestUtils {
+    with IdMinterTestUtils
+    with BeforeAndAfterEach {
 
   override val server: EmbeddedHttpServer = defineServer
   private val i = identifiersTable.i
