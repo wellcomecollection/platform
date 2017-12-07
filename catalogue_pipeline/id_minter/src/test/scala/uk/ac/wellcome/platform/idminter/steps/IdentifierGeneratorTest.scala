@@ -140,7 +140,7 @@ class IdentifierGeneratorTest
     maybeIdentifier.get shouldBe Identifier(
       CanonicalID = id,
       MiroID = miroId,
-      SierraSystemNumber = sierraSystemNumber
+      SierraSystemNumber = null
     )
   }
 
