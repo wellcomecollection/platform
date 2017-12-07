@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.idminter.utils
 import org.scalatest.Suite
 import org.scalatest.concurrent.Eventually
 import scalikejdbc._
-import uk.ac.wellcome.platform.idminter.model.IdentifiersTable
+import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 trait MysqlLocal extends ExtendedPatience with Eventually { this: Suite =>
