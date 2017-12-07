@@ -44,6 +44,7 @@ if __name__ == '__main__':
             '-in', '.travis/id_rsa.enc',
             '-out', 'id_rsa', '-d'
         ])
+        subprocess.check_call(['chmod', '400', 'id_rsa'])
 
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
