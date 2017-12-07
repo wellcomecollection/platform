@@ -1,15 +1,8 @@
-# Role policies for the Elasticsearch ingestor
-
-resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {
-  role   = "${module.ingestor.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
-}
-
-# Role policies for the transformer
+# Role policies for the miro transformer
 
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   role   = "${module.miro_transformer.task_role_name}"
-  policy = "${module.id_minter_topic.publish_policy}"
+  policy = "${module.ingest_pipeline_mel.id_minter_topic_publish_policy}"
 }
 
 resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
@@ -17,15 +10,15 @@ resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-# Role policies for the ID minter
+# Role policies for the sierra transformer
 
-resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
-  role   = "${module.id_minter.task_role_name}"
-  policy = "${module.es_ingest_topic.publish_policy}"
+resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
+  role   = "${module.sierra_transformer.task_role_name}"
+  policy = "${module.ingest_pipeline_sue.id_minter_topic_publish_policy}"
 }
 
-resource "aws_iam_role_policy" "id_minter_cloudwatch" {
-  role   = "${module.id_minter.task_role_name}"
+resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
+  role   = "${module.sierra_transformer.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
@@ -50,7 +43,7 @@ resource "aws_iam_role_policy" "reindexer_cloudwatch" {
 
 resource "aws_iam_role_policy" "elasticdump_read_ingestor_config_from_s3" {
   role   = "${module.ecs_elasticdump_iam.task_role_name}"
-  policy = "${data.aws_iam_policy_document.s3_read_ingestor_config.json}"
+  policy = "${module.ingest_pipeline_mel.read_ingestor_config_policy_document}"
 }
 
 resource "aws_iam_role_policy" "elasticdump_upload_files_to_s3" {
