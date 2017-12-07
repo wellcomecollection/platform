@@ -16,7 +16,11 @@ from tooling import changed_files, git, make
 if __name__ == '__main__':
     make('format')
 
-    branch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
+    # https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
+    if os.environ['TRAVIS_PULL_REQUEST'] == 'false':
+        branch = os.environ['TRAVIS_BRANCH']
+    else:
+        branch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
 
     if changed_files():
         print(
