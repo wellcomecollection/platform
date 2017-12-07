@@ -63,8 +63,8 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
                 addConditionForLookingUpID(
                   sql = sql,
                   sourceIdentifiers = sourceIdentifiers,
-                  column = i.CalmAltRefNo,
-                  identifierScheme = IdentifierSchemes.calmAltRefNo
+                  column = i.SierraSystemNumber,
+                  identifierScheme = IdentifierSchemes.sierraSystemNumber
                 )
               }
           }.map(Identifier(i)).single
@@ -91,7 +91,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
               identifiers.column.CanonicalID -> identifier.CanonicalID,
               identifiers.column.ontologyType -> identifier.ontologyType,
               identifiers.column.MiroID -> identifier.MiroID,
-              identifiers.column.CalmAltRefNo -> identifier.CalmAltRefNo
+              identifiers.column.SierraSystemNumber -> identifier.SierraSystemNumber
             )
         }.update().apply()
       }
