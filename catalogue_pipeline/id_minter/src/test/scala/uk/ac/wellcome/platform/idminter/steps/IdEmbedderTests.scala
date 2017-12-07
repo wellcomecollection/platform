@@ -58,7 +58,7 @@ class IdEmbedderTests
     }
   }
 
-  it("should return a filed future if the call to IdentifierGenerator fails") {
+  it("should return a failed future if the call to IdentifierGenerator fails") {
     val identifiers =
       List(SourceIdentifier(IdentifierSchemes.miroImageNumber, value = "1234"))
     val originalWork =
