@@ -43,6 +43,8 @@ class SierraDynamoSinkTest
     resourceType = "items"
   )
 
+  val sink = bibSink
+
   override def afterAll(): Unit = {
     system.terminate()
     materialiser.shutdown()
@@ -67,7 +69,7 @@ class SierraDynamoSinkTest
         | "id": "b$id",
         | "updatedDate": "$updatedDate"
         |}
-      """.stripMargin).noSpaces,
+      """.stripMargin).right.get.noSpaces,
       modifiedDate = updatedDate
     )
 
@@ -100,7 +102,7 @@ class SierraDynamoSinkTest
         | "bibIds" : [
         | ]
         |}
-      """.stripMargin).noSpaces,,
+      """.stripMargin).right.get.noSpaces,
       modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
@@ -116,7 +118,7 @@ class SierraDynamoSinkTest
     val newUpdatedDate = "2017-12-12T23:59:59Z"
 
     val newRecord = SierraRecord(
-      id = "b$id",
+      id = s"b$id",
       modifiedDate = newUpdatedDate,
       data =
         s"""{"id": "b$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
@@ -133,7 +135,7 @@ class SierraDynamoSinkTest
 
     val futureUnit = Source.single(oldJson).runWith(bibSink)
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> "b$id") shouldBe Some(
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
         Right(newRecord))
     }
   }
@@ -199,11 +201,63 @@ class SierraDynamoSinkTest
     val expectedException = new RuntimeException("AAAAAARGH!")
     when(dynamoDbClient.putItem(any[PutItemRequest]))
       .thenThrow(expectedException)
-    val sink = SierraDynamoSink(dynamoDbClient, tableName)
+    val sink = SierraDynamoSink(
+      client = dynamoDbClient,
+      tableName = tableName,
+      resourceType = "bibs"
+    )
 
     val futureUnit = Source.single(json).runWith(sink)
     whenReady(futureUnit.failed) { ex =>
       ex shouldBe expectedException
     }
+  }
+
+  it("should prepend a B to bib IDs") {
+    val json = parse(s"""
+      |{
+      |  "id": "6000006",
+      |  "updatedDate": "2006-06-06T06:06:06Z"
+      |}
+      """).right.get
+    val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "bibs")
+
+    val expectedJson = parse(s"""
+      |{
+      |  "id": "b6000006",
+      |  "updatedDate": "2006-06-06T06:06:06Z"
+      |}
+      """).right.get
+    prefixedJson shouldEqual expectedJson
+  }
+
+  it("should prepend an I to items IDs") {
+    val json = parse(s"""
+      |{
+      |  "id": "7000007",
+      |  "updatedDate": "2007-07-07T07:07:07Z"
+      |}
+      """).right.get
+    val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "items")
+
+    val expectedJson = parse(s"""
+      |{
+      |  "id": "i7000007",
+      |  "updatedDate": "2007-07-07T07:07:07Z"
+      |}
+      """).right.get
+    prefixedJson shouldEqual expectedJson
+  }
+
+  it("should not prepend anything to IDs on unrecognised resource types") {
+    val json = parse(s"""
+      |{
+      |  "id": "8000008",
+      |  "updatedDate": "2007-07-07T07:07:07Z"
+      |}
+      """).right.get
+    val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "holdings")
+
+    prefixedJson shouldEqual json
   }
 }
