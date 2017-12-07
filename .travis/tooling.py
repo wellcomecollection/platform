@@ -122,12 +122,12 @@ def make_decision(changed_files, task, action):
 
 
 def make(task):
-    print('*** Running make %s' % task)
+    print('*** Running make %s' % task, flush=True)
     subprocess.check_call(['make', task])
 
 
 def git(*args):
-    print('*** Running git %s' % ' '.join(args))
+    print('*** Running git %s' % ' '.join(args), flush=True)
     subprocess.check_call(['git'] + list(args))
 
 
