@@ -6,6 +6,7 @@ module "id_minter" {
   source_queue_arn   = "${module.id_minter_queue.arn}"
   ecr_repository_url = "${var.id_minter_repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
+  config_template = "id_minter"
 
   config_vars = {
     rds_database_name   = "${var.identifiers_rds_cluster["database_name"]}"
@@ -18,7 +19,7 @@ module "id_minter" {
     metrics_namespace   = "id-minter"
   }
 
-  alb_priority = "103"
+  alb_priority = "${random_integer.priority_id_minter.result}"
 
   cluster_name               = "${var.cluster_name}"
   vpc_id                     = "${var.vpc_id}"
