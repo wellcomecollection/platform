@@ -93,7 +93,7 @@ class SierraDynamoSinkTest
     val futureUnit = Source.single(json).runWith(itemSink)
 
     val expectedRecord = SierraRecord(
-      id = s"b$id",
+      id = s"i$id",
       data = parse(s"""
         |{
         | "id": "i$id",
@@ -146,10 +146,10 @@ class SierraDynamoSinkTest
     val newUpdatedDate = "2011-11-11T11:11:11Z"
 
     val oldRecord = SierraRecord(
-      id = id,
+      id = s"b$id",
       modifiedDate = oldUpdatedDate,
       data =
-        s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
+        s"""{"id": "b$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
@@ -169,7 +169,7 @@ class SierraDynamoSinkTest
         s"""{"id":"$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
     )
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
+      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
         Right(newRecord))
     }
   }
@@ -219,7 +219,7 @@ class SierraDynamoSinkTest
       |  "id": "6000006",
       |  "updatedDate": "2006-06-06T06:06:06Z"
       |}
-      """).right.get
+      """.stripMargin).right.get
     val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "bibs")
 
     val expectedJson = parse(s"""
@@ -227,7 +227,7 @@ class SierraDynamoSinkTest
       |  "id": "b6000006",
       |  "updatedDate": "2006-06-06T06:06:06Z"
       |}
-      """).right.get
+      """.stripMargin).right.get
     prefixedJson shouldEqual expectedJson
   }
 
@@ -237,7 +237,7 @@ class SierraDynamoSinkTest
       |  "id": "7000007",
       |  "updatedDate": "2007-07-07T07:07:07Z"
       |}
-      """).right.get
+      """.stripMargin).right.get
     val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "items")
 
     val expectedJson = parse(s"""
@@ -245,7 +245,7 @@ class SierraDynamoSinkTest
       |  "id": "i7000007",
       |  "updatedDate": "2007-07-07T07:07:07Z"
       |}
-      """).right.get
+      """.stripMargin).right.get
     prefixedJson shouldEqual expectedJson
   }
 
@@ -255,7 +255,7 @@ class SierraDynamoSinkTest
       |  "id": "8000008",
       |  "updatedDate": "2007-07-07T07:07:07Z"
       |}
-      """).right.get
+      """.stripMargin).right.get
     val prefixedJson = SierraDynamoSink.addIDPrefix(json = json, resourceType = "holdings")
 
     prefixedJson shouldEqual json
