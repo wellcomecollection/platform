@@ -1,23 +1,23 @@
 # Role policies for the miro transformer
 
-resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
+resource "aws_iam_role_policy" "miro_ecs_transformer_task_sns" {
   role   = "${module.miro_transformer.task_role_name}"
   policy = "${module.ingest_pipeline_mel.id_minter_topic_publish_policy}"
 }
 
-resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
+resource "aws_iam_role_policy" "miro_ecs_transformer_task_cloudwatch_metric" {
   role   = "${module.miro_transformer.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
 # Role policies for the sierra transformer
 
-resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
+resource "aws_iam_role_policy" "sierra_ecs_transformer_task_sns" {
   role   = "${module.sierra_transformer.task_role_name}"
   policy = "${module.ingest_pipeline_sue.id_minter_topic_publish_policy}"
 }
 
-resource "aws_iam_role_policy" "ecs_transformer_task_cloudwatch_metric" {
+resource "aws_iam_role_policy" "sierra_ecs_transformer_task_cloudwatch_metric" {
   role   = "${module.sierra_transformer.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
