@@ -5,10 +5,7 @@
 USE ${database};
 
 ALTER TABLE ${tableName}
-DROP UNIQUE (ontologyType, CalmAltRefNo);
-
-ALTER TABLE ${tableName}
-DROP COLUMN CalmAltRefNo varchar(255);
+DROP COLUMN CalmAltRefNo;
 
 ALTER TABLE ${tableName}
 ADD COLUMN SierraSystemNumber varchar(255) AFTER MiroID;
