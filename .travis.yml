@@ -50,7 +50,7 @@ env:
     - secure: CgvR1hv+oZBiIhQOfqPaLqYx6tnMa9Fr7DbrziiLK8Iu6t99nB/cgDdPUczvCfyQvSDwnWJbYhXhkAWgmlAjTHfojeAt7FbZY1cgpLVBZfMHw/VGOhFWAjPZzpqW+IJvREVUJ3meubs/ZvxLvquTu0Xv0XXXzv30LaNyFgP94+EWQaZyIuKgY0mjS6fR5+x5TQHucs3e+EBVDmRkYDfa8dHWTLp1z9tP/veUnj7drDApXLMjbg6YsWfOIbJ3MDYLesBvWf5+3I+DRj18EF2AJ6Ls8S9IALHTq+jx0uXttqsJ2A7MqjdW+5FtDgkjwUC2eTjfok/gPKvgplM9emjrwSccMnL/msw09ahlH9X0S6zGFmCrrgyPdI3As9+tOiZQDVR4nOrCk1ALLnCS/0OmEsln2LNv8ZSD8vKCH1tng9AcTo4Ey3LfRXYElKCVIRlT38KWKPZGn5uHVdtD6mBLRnAiHHWd6Ebhj43k6q58oOjpAs0d4K20CMg6B8jUM0JzXfTtENh0eDNjDYdvfHFXUy8nKdt7Tpfnjj8y5E4jVclYfNmHRWys+nE/EvBAyV2w5naC6ve5IeP1s1V9LOIKUQMOKqzynSJwGtRzp5gZValN29CBsl1oDiccIyYmwcTc3iZCAacwbCrb3aB3ilD5CK8XsF2KmPLyAYCoF//HDbg=
 
   matrix:
-    - TASK=check-format
+    - TASK=travis-format
 
     # (not under active development)
     # - TASK=nginx-build
@@ -83,7 +83,6 @@ env:
 
     # Sierra adapter stack
     - TASK=sierra_adapter-test
-
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at

@@ -13,6 +13,7 @@ shared_infra/.releases
 .releases
 .docker
 .lambda_zips
+id_rsa
 
 ### Gatling ###
 /gatling/results/*
