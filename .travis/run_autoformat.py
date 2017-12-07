@@ -31,6 +31,7 @@ if __name__ == '__main__':
         git('config', 'user.name', 'Travis CI on behalf of Wellcome')
         git('config', 'user.email', 'wellcomedigitalplatform@wellcome.ac.uk')
         git('config', 'core.sshCommand', 'ssh -i id_rsa')
+
         git(
             'remote', 'add', 'ssh-origin',
             'git@github.com:wellcometrust/platform.git'
@@ -45,6 +46,11 @@ if __name__ == '__main__':
             '-out', 'id_rsa', '-d'
         ])
         subprocess.check_call(['chmod', '400', 'id_rsa'])
+
+        # We checkout the branch before we add the commit, so we don't
+        # include the merge commit that Travis makes.
+        git('fetch', 'ssh-origin')
+        git('checkout', branch)
 
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
