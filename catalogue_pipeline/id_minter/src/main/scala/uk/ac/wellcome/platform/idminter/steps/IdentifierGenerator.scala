@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   UnableToMintIdentifierException
 }
-import uk.ac.wellcome.platform.idminter.model.Identifier
+import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.util.Try
@@ -56,10 +56,14 @@ class IdentifierGenerator @Inject()(
     identifiersDao
       .saveIdentifier(
         Identifier(
-          MiroID =
-            findIdentifierWith(identifiers, IdentifierSchemes.miroImageNumber),
-          CalmAltRefNo =
-            findIdentifierWith(identifiers, IdentifierSchemes.calmAltRefNo),
+          MiroID = findIdentifierWith(
+            identifiers,
+            IdentifierSchemes.miroImageNumber
+          ),
+          SierraSystemNumber = findIdentifierWith(
+            identifiers,
+            IdentifierSchemes.sierraSystemNumber
+          ),
           CanonicalID = canonicalId,
           ontologyType = ontologyType
         ))
