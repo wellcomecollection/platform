@@ -10,9 +10,15 @@ class ServiceList extends Component {
     serviceList: Array<Service>
   }
 
+  compare(a: Service, b: Service) {
+    return a.serviceName.localeCompare(
+      b.serviceName
+    )
+  }
+
   render() {
       return <div className='ServiceList'>
-          {this.props.serviceList.map(service =>
+          {this.props.serviceList.sort(this.compare).map(service =>
             <ServiceBox key={service.serviceName}
             {...service}
             />
