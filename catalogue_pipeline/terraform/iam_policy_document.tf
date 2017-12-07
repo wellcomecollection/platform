@@ -51,15 +51,3 @@ data "aws_iam_policy_document" "allow_cloudwatch_read_metrics" {
     ]
   }
 }
-
-data "aws_iam_policy_document" "s3_upload_to_to_elasticdump_directory" {
-  statement {
-    actions = [
-      "s3:PutObject",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.infra_bucket}/elasticdump/*",
-    ]
-  }
-}

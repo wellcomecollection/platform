@@ -9,7 +9,3 @@ output "id_minter_topic_arn" {
 output "id_minter_topic_publish_policy" {
   value = "${module.id_minter_topic.publish_policy}"
 }
-
-output "read_ingestor_config_policy_document" {
-  value = "${data.aws_iam_policy_document.s3_read_ingestor_config.json}"
-}
