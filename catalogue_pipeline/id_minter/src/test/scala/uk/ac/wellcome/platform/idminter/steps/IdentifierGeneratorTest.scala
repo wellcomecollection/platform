@@ -109,7 +109,7 @@ class IdentifierGeneratorTest
       IdentifierSchemes before sending them to the dao""") {
 
     val miroId = "1234"
-    val calmAltRefNo = "b1234567"
+    val sierraSystemNumber = "b1234567"
     val knownSchemeIdentifiers = List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -117,7 +117,7 @@ class IdentifierGeneratorTest
       ),
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
-        value = sierraID
+        value = sierraSystemNumber
       )
     )
     val sourceIdentifiers = knownSchemeIdentifiers :+ SourceIdentifier(
