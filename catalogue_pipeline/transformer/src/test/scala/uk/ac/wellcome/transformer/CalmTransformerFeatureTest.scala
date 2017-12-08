@@ -2,12 +2,7 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  CalmTransformable,
-  IdentifierSchemes,
-  SourceIdentifier,
-  Work
-}
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
@@ -27,14 +22,14 @@ class CalmTransformerFeatureTest
     "aws.metrics.namespace" -> "calm-transformer"
   )
 
-  it(
-    "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
+  it("should transform calm records, and publish them to the given topic") {
     val calmTransformable =
       CalmTransformable(RecordID = "RecordID1",
                         RecordType = "Collection",
                         AltRefNo = "AltRefNo1",
                         RefNo = "RefNo1",
                         data = """{"AccessStatus": ["public"]}""")
+
     val sqsMessage = SQSMessage(Some("subject"),
                                 JsonUtil.toJson(calmTransformable).get,
                                 "topic",
@@ -77,11 +72,18 @@ class CalmTransformerFeatureTest
     //currently for calm data we only output hardcoded sample values
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        Work(
-          identifiers =
-            List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
-          title = "placeholder title for a Calm record"
-        ))
+        SourcedWork(
+          sourceIdentifier = SourceIdentifier(
+            IdentifierSchemes.calmPlaceholder,
+            "value"
+          ),
+          work = Work(
+            identifiers = List(
+              SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+            title = "placeholder title for a Calm record"
+          )
+        )
+      )
       .get
   }
 }

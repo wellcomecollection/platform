@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.receive
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.{SourcedWork, Work}
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
@@ -12,6 +12,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
 import scala.util.{Failure, Success, Try}
 
 class SQSMessageReceiver(
@@ -32,7 +33,8 @@ class SQSMessageReceiver(
         } yield cleanRecord
 
         triedWork match {
-          case Success(Some(work)) => publishMessage(work).map(_ => ())
+          case Success(Some(sourcedWork)) =>
+            publishMessage(sourcedWork).map(_ => ())
           case Success(None) => Future.successful()
           case Failure(SQSReaderGracefulException(e)) =>
             info("Recoverable failure extracting workfrom record", e)
@@ -45,7 +47,8 @@ class SQSMessageReceiver(
     )
   }
 
-  def transformTransformable(transformable: Transformable): Try[Option[Work]] = {
+  def transformTransformable(
+    transformable: Transformable): Try[Option[SourcedWork]] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")
       transformed
@@ -56,6 +59,9 @@ class SQSMessageReceiver(
     }
   }
 
-  def publishMessage(work: Work): Future[PublishAttempt] =
-    snsWriter.writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+  def publishMessage(sourcedWork: SourcedWork): Future[PublishAttempt] =
+    snsWriter.writeMessage(
+      JsonUtil.toJson(sourcedWork).get,
+      Some(sourcedWork.sourceIdentifier.value)
+    )
 }

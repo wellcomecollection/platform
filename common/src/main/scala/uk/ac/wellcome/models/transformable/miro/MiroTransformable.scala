@@ -450,23 +450,30 @@ case class MiroTransformable(MiroID: String,
     }
   }
 
-  override def transform: Try[Option[Work]] = Try {
+  override def transform: Try[Option[SourcedWork]] = Try {
 
     val miroData = MiroTransformableData.create(data)
     val (title, description) = getTitleAndDescription(miroData)
 
     Some(
-      Work(
-        identifiers = getIdentifiers(miroData),
-        title = title,
-        description = description,
-        createdDate = getCreatedDate(miroData),
-        lettering = miroData.suppLettering,
-        creators = getCreators(miroData),
-        subjects = getSubjects(miroData),
-        genres = getGenres(miroData),
-        thumbnail = Some(getThumbnail(miroData)),
-        items = getItems(miroData)
-      ))
+      SourcedWork(
+        sourceIdentifier = SourceIdentifier(
+          IdentifierSchemes.miroImageNumber,
+          MiroID
+        ),
+        work = Work(
+          identifiers = getIdentifiers(miroData),
+          title = title,
+          description = description,
+          createdDate = getCreatedDate(miroData),
+          lettering = miroData.suppLettering,
+          creators = getCreators(miroData),
+          subjects = getSubjects(miroData),
+          genres = getGenres(miroData),
+          thumbnail = Some(getThumbnail(miroData)),
+          items = getItems(miroData)
+        )
+      )
+    )
   }
 }

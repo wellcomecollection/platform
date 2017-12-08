@@ -3,7 +3,12 @@ package uk.ac.wellcome.transformer
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  SourcedWork,
+  Work
+}
 import uk.ac.wellcome.transformer.utils.{
   TransformableSQSMessageUtils,
   TransformerFeatureTest
@@ -41,10 +46,18 @@ class SierraTransformerFeatureTest
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size 1
 
-      val expectedWork = Work(
-        title = title,
-        identifiers =
-          List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+      val expectedWork = SourcedWork(
+        sourceIdentifier = SourceIdentifier(
+          IdentifierSchemes.sierraSystemNumber,
+          id
+        ),
+        work = Work(
+          title = title,
+          identifiers =
+            List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id))
+        )
+      )
+
       snsMessages.head.message shouldBe JsonUtil.toJson(expectedWork).get
     }
   }

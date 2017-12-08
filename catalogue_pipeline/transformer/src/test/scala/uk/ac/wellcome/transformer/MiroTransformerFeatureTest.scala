@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.{SourcedWork, Work}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.test.utils.{MessageInfo, MiroTransformableWrapper}
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
@@ -24,11 +24,7 @@ class MiroTransformerFeatureTest
     "aws.metrics.namespace" -> "miro-transformer"
   )
 
-  it("""
-      should poll the Dynamo stream for Miro records, transform into Work
-      instances, and push them into the id_minter SNS topic where those
-      messages are transformable
-      """) {
+  it("should transform miro records, and publish them to the given topic") {
 
     val miroID = "M0000001"
     val title = "A guide for a giraffe"
@@ -50,9 +46,9 @@ class MiroTransformerFeatureTest
   private def assertSNSMessageContains(snsMessage: MessageInfo,
                                        miroID: String,
                                        imageTitle: String) = {
-    val parsedWork = JsonUtil.fromJson[Work](snsMessage.message).get
-    parsedWork.identifiers.head.value shouldBe miroID
-    parsedWork.title shouldBe imageTitle
+    val sourcedWork = JsonUtil.fromJson[SourcedWork](snsMessage.message).get
+    sourcedWork.work.identifiers.head.value shouldBe miroID
+    sourcedWork.work.title shouldBe imageTitle
   }
 
   def shouldTransformMessage(imageTitle: String) =

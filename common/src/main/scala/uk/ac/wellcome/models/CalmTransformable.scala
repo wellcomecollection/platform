@@ -8,14 +8,19 @@ import scala.util.Try
 case class CalmTransformableData(
   AccessStatus: Array[String]
 ) extends Transformable {
-  def transform: Try[Option[Work]] = Try {
+  def transform: Try[Option[SourcedWork]] = Try {
     // TODO: Fill in proper data here
     Some(
-      Work(
-        identifiers =
-          List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
-        title = "placeholder title for a Calm record"
-      ))
+      SourcedWork(
+        sourceIdentifier =
+          SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value"),
+        work = Work(
+          identifiers =
+            List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+          title = "placeholder title for a Calm record"
+        )
+      )
+    )
   }
 }
 
@@ -36,7 +41,7 @@ case class CalmTransformable(
     RangeKey("RecordType", RecordType)
   )
 
-  def transform: Try[Option[Work]] =
+  def transform: Try[Option[SourcedWork]] =
     JsonUtil
       .fromJson[CalmTransformableData](data)
       .flatMap(_.transform)
