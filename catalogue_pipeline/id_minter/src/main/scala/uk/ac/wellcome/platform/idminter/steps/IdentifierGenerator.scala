@@ -23,49 +23,42 @@ class IdentifierGenerator @Inject()(
   private val knownIdentifierSchemeList =
     knownIdentifierSchemes.split(",").map(_.trim).toList
 
-  def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
-                                    ontologyType: String): Try[String] = {
+  def retrieveOrGenerateCanonicalId(
+    identifier: SourceIdentifier,
+    ontologyType: String
+  ): Try[String] = {
     Try {
-      val idsWithKnownSchemes = identifiers.filter(
-        identifier =>
-          knownIdentifierSchemeList.contains(
-            identifier.identifierScheme.toString))
-      if (idsWithKnownSchemes.isEmpty) {
-        throw UnableToMintIdentifierException(
-          "identifiers list did not contain a known identifierScheme")
-      } else {
-        identifiersDao.lookupID(idsWithKnownSchemes, ontologyType).flatMap {
+        identifiersDao.lookupId(
+          sourceIdentifier = identifier,
+          ontologyType = ontologyType
+        ).flatMap {
           case Some(id) =>
             metricsSender.incrementCount("found-old-id")
-            Try(id.CanonicalID)
+            Try(id.CanonicalId)
           case None =>
             val result =
-              generateAndSaveCanonicalId(idsWithKnownSchemes, ontologyType)
+              generateAndSaveCanonicalId(identifier, ontologyType)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
             result
         }
-      }
     }.flatten
   }
 
-  private def generateAndSaveCanonicalId(identifiers: List[SourceIdentifier],
-                                         ontologyType: String): Try[String] = {
+  private def generateAndSaveCanonicalId(
+    identifier: SourceIdentifier,
+    ontologyType: String
+  ): Try[String] = {
+
     val canonicalId = Identifiable.generate
     identifiersDao
       .saveIdentifier(
         Identifier(
-          MiroID = findIdentifierWith(
-            identifiers,
-            IdentifierSchemes.miroImageNumber
-          ),
-          SierraSystemNumber = findIdentifierWith(
-            identifiers,
-            IdentifierSchemes.sierraSystemNumber
-          ),
-          CanonicalID = canonicalId,
-          ontologyType = ontologyType
+          CanonicalId = canonicalId,
+          OntologyType = ontologyType,
+          SourceSystem = identifier.identifierScheme.toString,
+          SourceId = identifier.value
         ))
       .map { _ =>
         canonicalId

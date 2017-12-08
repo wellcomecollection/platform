@@ -1,14 +1,19 @@
 package uk.ac.wellcome.platform.common
 
 import org.scalatest.{FunSpec, Matchers}
-
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.utils.JsonUtil
 
 class JsonUtilTest extends FunSpec with Matchers {
   it("should not include fields where the value is empty or None") {
+    val identifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      value = "value"
+    )
+
     val work = Work(
-      identifiers = List(),
+      sourceIdentifier = identifier,
+      identifiers = List(identifier),
       title = "A haiku about a heron"
     )
     val jsonString = JsonUtil.toJson(work).get

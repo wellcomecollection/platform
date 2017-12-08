@@ -642,11 +642,12 @@ class MiroTransformableSubjectsTest
 
     val item = work.items.head
 
+    val identifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
+
     item shouldBe Item(
       None,
-      List(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
-      ),
+      identifier,
+      List(identifier),
       List(
         Location(
           locationType = "iiif-image",

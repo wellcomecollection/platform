@@ -49,6 +49,10 @@ case class MergedSierraRecord(
           Some(
             Work(
               title = sierraBibData.title,
+              sourceIdentifier = SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                sierraBibData.id
+              ),
               identifiers = List(
                 SourceIdentifier(
                   identifierScheme = IdentifierSchemes.sierraSystemNumber,

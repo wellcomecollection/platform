@@ -6,6 +6,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 /** A representation of a work in our ontology */
 case class Work(title: String,
+                sourceIdentifier: SourceIdentifier,
                 identifiers: List[SourceIdentifier] = List(),
                 canonicalId: Option[String] = None,
                 description: Option[String] = None,

@@ -69,50 +69,52 @@ class IdMinterWorkerTest
     }
   }
 
-  it(
-    "should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
-    val miroId = "1234"
 
-    val sourceIdentifiers = List(
-      SourceIdentifier(
-        identifierScheme = IdentifierSchemes.miroImageNumber,
-        value = miroId
-      )
-    )
-    val work = Work(
-      identifiers = sourceIdentifiers,
-      title = "Some fresh fruit for a flamingo"
-    )
 
-    val triedLookup = identifiersDao.lookupID(
-      sourceIdentifiers = sourceIdentifiers,
-      ontologyType = work.ontologyType
-    )
-
-    when(triedLookup)
-      .thenReturn(Success(None))
-    when(identifiersDao.saveIdentifier(any[Identifier]))
-      .thenReturn(Failure(new Exception("cannot insert")))
-
-    val message = JsonUtil
-      .toJson(
-        SQSMessage(
-          Some("subject"),
-          JsonUtil
-            .toJson(work)
-            .get,
-          "topic",
-          "messageType",
-          "timestamp"
-        ))
-      .get
-
-    sqsClient.sendMessage(idMinterQueue, message)
-
-    server.start()
-
-    assertMessageIsNotDeleted()
-
-    server.close()
-  }
+//  it("should send a function that returns a failed future to sqsReader if inserting an identifier into the database fails") {
+//    val miroId = "1234"
+//
+//    val sourceIdentifiers = List(
+//      SourceIdentifier(
+//        identifierScheme = IdentifierSchemes.miroImageNumber,
+//        value = miroId
+//      )
+//    )
+//
+//    val work = Work(
+//      identifiers = sourceIdentifiers,
+//      title = "Some fresh fruit for a flamingo"
+//    )
+//
+//    val triedLookup = identifiersDao.lookupID(
+//      sourceIdentifiers = sourceIdentifiers,
+//      ontologyType = work.ontologyType
+//    )
+//
+//    when(triedLookup)
+//      .thenReturn(Success(None))
+//    when(identifiersDao.saveIdentifier(any[Identifier]))
+//      .thenReturn(Failure(new Exception("cannot insert")))
+//
+//    val message = JsonUtil
+//      .toJson(
+//        SQSMessage(
+//          Some("subject"),
+//          JsonUtil
+//            .toJson(work)
+//            .get,
+//          "topic",
+//          "messageType",
+//          "timestamp"
+//        ))
+//      .get
+//
+//    sqsClient.sendMessage(idMinterQueue, message)
+//
+//    server.start()
+//
+//    assertMessageIsNotDeleted()
+//
+//    server.close()
+//  }
 }

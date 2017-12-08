@@ -27,23 +27,25 @@ class WorksIndexTest
     ensureIndexDeleted(indexName)
   }
 
-  it(
-    "should create an index where it's possible to insert and retrieve a valid Work json") {
+  it("should create an index when necessary") {
     createAndWaitIndexIsCreated()
 
-    val identifiers = List(
-      SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber,
-                       value = "4321"))
+    val identifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      value = "4321")
+
     val workJson = JsonUtil
       .toJson(
         Work(
           canonicalId = Some("1234"),
-          identifiers = identifiers,
+          sourceIdentifier = identifier,
+          identifiers = List(identifier),
           title = "A magical menagerie for magpies",
           items = List(
             Item(
               canonicalId = Some("56789"),
-              identifiers = identifiers,
+              sourceIdentifier = identifier,
+              identifiers = List(identifier),
               locations = List(
                 Location(locationType = "iiif",
                          url =

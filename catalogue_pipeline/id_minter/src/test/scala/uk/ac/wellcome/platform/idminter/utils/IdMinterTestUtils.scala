@@ -37,10 +37,14 @@ trait IdMinterTestUtils
   }
 
   def generateSqsMessage(MiroID: String): SQSMessage = {
+    val identifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
+
     val work = Work(
-      identifiers =
-        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)),
-      title = "A query about a queue of quails")
+      sourceIdentifier = identifier,
+      identifiers = List(identifier),
+      title = "A query about a queue of quails"
+    )
+
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,
                "topic",
@@ -58,8 +62,10 @@ trait IdMinterTestUtils
 
     eventually {
       sqsClient
-        .getQueueAttributes(idMinterQueue,
-                            List("ApproximateNumberOfMessagesNotVisible"))
+        .getQueueAttributes(
+          idMinterQueue,
+          List("ApproximateNumberOfMessagesNotVisible")
+        )
         .getAttributes
         .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
     }

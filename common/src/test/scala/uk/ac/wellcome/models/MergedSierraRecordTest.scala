@@ -133,10 +133,14 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     val transformedSierraRecord = mergedSierraRecord.transform
     transformedSierraRecord.isSuccess shouldBe true
 
+    val identifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+
     transformedSierraRecord.get shouldBe Some(
-      Work(title = title,
-           identifiers =
-             List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+      Work(
+        title = title,
+        sourceIdentifier = identifier,
+        identifiers = List(identifier)
+      )
     )
   }
 

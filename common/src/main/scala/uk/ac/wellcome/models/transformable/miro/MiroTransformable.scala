@@ -334,6 +334,7 @@ case class MiroTransformable(MiroID: String,
   def getItems(miroData: MiroTransformableData): List[Item] = {
     List(
       Item(
+        sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID),
         identifiers = List(
           SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
         ),
@@ -457,6 +458,7 @@ case class MiroTransformable(MiroID: String,
 
     Some(
       Work(
+        sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID),
         identifiers = getIdentifiers(miroData),
         title = title,
         description = description,

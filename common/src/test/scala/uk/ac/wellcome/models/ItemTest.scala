@@ -70,12 +70,14 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
 
   val unidentifiedItem = Item(
     canonicalId = None,
+    sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
   )
 
   val identifiedItem = Item(
     canonicalId = Some("canonicalId"),
+    sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
   )
