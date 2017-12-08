@@ -58,6 +58,10 @@ env:
     # (not under active development)
     # - TASK=nginx-build
 
+    # Sierra adapter stack.  This takes quite a long time to run (~15 mins
+    # if the cache is cold), so we put it upfront to get it started early.
+    - TASK=sierra_adapter-test
+
     # Catalogue pipeline stack
     - TASK=sbt-common-test
     - TASK=transformer-test
@@ -83,9 +87,6 @@ env:
 
     # Monitoring stack
     - TASK=monitoring-test
-
-    # Sierra adapter stack
-    - TASK=sierra_adapter-test
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
