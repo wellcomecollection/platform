@@ -33,7 +33,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       data = buildJSONForWork(data)
     )
     miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.get
+    miroTransformable.transform.get.get.work
   }
 
   def assertTransformWorkFails(

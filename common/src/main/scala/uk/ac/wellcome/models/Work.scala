@@ -24,3 +24,5 @@ case object Work extends Indexable[Work] {
   override def json(t: Work): String =
     JsonUtil.toJson(t).get
 }
+
+case class SourcedWork(sourceIdentifier: SourceIdentifier, work: Work)
