@@ -472,7 +472,8 @@ case class MiroTransformable(MiroID: String,
           genres = getGenres(miroData),
           thumbnail = Some(getThumbnail(miroData)),
           items = getItems(miroData)
-        ))
+        )
+      )
     )
   }
 }

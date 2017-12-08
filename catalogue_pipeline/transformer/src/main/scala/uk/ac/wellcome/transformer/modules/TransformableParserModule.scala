@@ -10,7 +10,6 @@ import uk.ac.wellcome.transformer.parsers.{
   TransformableParser
 }
 
-
 object TransformableParserModule extends TwitterModule {
   val dataSource =
     flag[String]("transformer.source", "", "Name of the source of data")

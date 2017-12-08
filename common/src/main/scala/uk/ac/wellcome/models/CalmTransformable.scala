@@ -12,12 +12,14 @@ case class CalmTransformableData(
     // TODO: Fill in proper data here
     Some(
       SourcedWork(
-        sourceIdentifier = SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value"),
+        sourceIdentifier =
+          SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value"),
         work = Work(
           identifiers =
             List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
           title = "placeholder title for a Calm record"
-        ))
+        )
+      )
     )
   }
 }

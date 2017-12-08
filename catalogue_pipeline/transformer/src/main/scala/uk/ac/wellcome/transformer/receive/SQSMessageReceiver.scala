@@ -33,7 +33,8 @@ class SQSMessageReceiver(
         } yield cleanRecord
 
         triedWork match {
-          case Success(Some(sourcedWork)) => publishMessage(sourcedWork).map(_ => ())
+          case Success(Some(sourcedWork)) =>
+            publishMessage(sourcedWork).map(_ => ())
           case Success(None) => Future.successful()
           case Failure(SQSReaderGracefulException(e)) =>
             info("Recoverable failure extracting workfrom record", e)
@@ -46,7 +47,8 @@ class SQSMessageReceiver(
     )
   }
 
-  def transformTransformable(transformable: Transformable): Try[Option[SourcedWork]] = {
+  def transformTransformable(
+    transformable: Transformable): Try[Option[SourcedWork]] = {
     transformable.transform map { transformed =>
       info(s"Transformed record $transformed")
       transformed

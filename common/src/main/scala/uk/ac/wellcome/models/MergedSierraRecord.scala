@@ -60,7 +60,8 @@ case class MergedSierraRecord(
                     sierraBibData.id
                   )
                 )
-              ))
+              )
+            )
           )
         }
       }

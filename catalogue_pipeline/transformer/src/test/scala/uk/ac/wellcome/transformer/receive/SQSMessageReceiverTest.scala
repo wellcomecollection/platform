@@ -10,7 +10,12 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, SourcedWork, Work}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  SourcedWork,
+  Work
+}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.{CalmParser, SierraParser}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
@@ -47,11 +52,12 @@ class SQSMessageReceiverTest
     createValidMiroSQSMessage("""{}""")
 
   val work = SourcedWork(
-    sourceIdentifier = SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value"),
+    sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value"),
     work = Work(
-    identifiers =
-      List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
-    title = "placeholder title for a Calm record")
+      identifiers =
+        List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+      title = "placeholder title for a Calm record")
   )
 
   val metricsSender: MetricsSender = new MetricsSender(

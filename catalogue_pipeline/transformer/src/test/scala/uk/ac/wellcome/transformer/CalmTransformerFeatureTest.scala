@@ -74,13 +74,16 @@ class CalmTransformerFeatureTest
       .toJson(
         SourcedWork(
           sourceIdentifier = SourceIdentifier(
-            IdentifierSchemes.calmPlaceholder, "value"
+            IdentifierSchemes.calmPlaceholder,
+            "value"
           ),
           work = Work(
-            identifiers =
-              List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+            identifiers = List(
+              SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
             title = "placeholder title for a Calm record"
-          ))
-        ).get
+          )
+        )
+      )
+      .get
   }
 }
