@@ -23,7 +23,8 @@ class IdentifierGeneratorTest
   private val metricsSender =
     new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
   private val knownIdentifierSchemes =
-    List(IdentifierSchemes.miroImageNumber, IdentifierSchemes.calmAltRefNo)
+    List(IdentifierSchemes.miroImageNumber,
+         IdentifierSchemes.sierraSystemNumber)
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable),
     metricsSender,
@@ -66,7 +67,7 @@ class IdentifierGeneratorTest
   it(
     "should fail if the identifier does not contain a known identifierScheme in the list of Identifiers") {
     val triedGeneratingId = identifierGenerator.retrieveOrGenerateCanonicalId(
-      List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "1234")),
+      List(SourceIdentifier(IdentifierSchemes.calmAltRefNo, "1234")),
       "Work")
 
     triedGeneratingId shouldBe a[Failure[Exception]]
@@ -109,7 +110,7 @@ class IdentifierGeneratorTest
       IdentifierSchemes before sending them to the dao""") {
 
     val miroId = "1234"
-    val sierraSystemNumber = "b1234567"
+    val sierraSystemNumber = "jshfgh"
     val knownSchemeIdentifiers = List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -121,8 +122,8 @@ class IdentifierGeneratorTest
       )
     )
     val sourceIdentifiers = knownSchemeIdentifiers :+ SourceIdentifier(
-      identifierScheme = IdentifierSchemes.sierraSystemNumber,
-      value = "jshfgh"
+      identifierScheme = IdentifierSchemes.calmAltRefNo,
+      value = "5678"
     )
 
     val triedId =
@@ -140,7 +141,7 @@ class IdentifierGeneratorTest
     maybeIdentifier.get shouldBe Identifier(
       CanonicalID = id,
       MiroID = miroId,
-      SierraSystemNumber = null
+      SierraSystemNumber = sierraSystemNumber
     )
   }
 

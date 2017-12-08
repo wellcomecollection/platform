@@ -31,7 +31,7 @@ trait IdMinterTestUtils
         "aws.sqs.queue.url" -> idMinterQueue,
         "aws.sqs.waitTime" -> "1",
         "aws.sns.topic.arn" -> ingestorTopicArn,
-        "known.identifierSchemes" -> s"${IdentifierSchemes.miroImageNumber},${IdentifierSchemes.calmAltRefNo},${IdentifierSchemes.sierraSystemNumber}"
+        "known.identifierSchemes" -> s"${IdentifierSchemes.miroImageNumber},${IdentifierSchemes.sierraSystemNumber}"
       ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags ++ cloudWatchLocalEndpointFlag
     )
   }
