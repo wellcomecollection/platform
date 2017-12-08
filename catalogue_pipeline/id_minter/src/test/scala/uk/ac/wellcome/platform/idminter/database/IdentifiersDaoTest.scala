@@ -248,6 +248,43 @@ class IdentifiersDaoTest
         ontologyType = identifier.ontologyType
       )
     }
+    
+    // This test case was added when we first turned on the ID minter
+    // for Sierra records.  We had a whole stack of records from the Miro
+    // ingest as follows:
+    //
+    //      canonical ID    | miro ID   | sierra ID
+    //      ...             | A1111     | null
+    //      ...             | A2222     | null
+    //      ...             | A3333     | null
+    //
+    // and if you tried to mint an ID for a work whose only ID was a Sierra ID,
+    // you'd get back the entire database!
+    it("multiple existing IDs with a null for the field we're searching on") {
+      val identifier1 = Identifier(
+        CanonicalID = "aaaaaaa",
+        MiroID = "A1111",
+        ontologyType = "work"
+      )
+      val identifier2 = Identifier(
+        CanonicalID = "aaaaaaa",
+        MiroID = "A2222",
+        ontologyType = "work"
+      )
+      val identifier3 = Identifier(
+        CanonicalID = "aaaaaaa",
+        MiroID = "A3333",
+        ontologyType = "work"
+      )
+      assertInsertingIdentifierSucceeds(identifier1)
+      assertInsertingIdentifierSucceeds(identifier2)
+      assertInsertingIdentifierSucceeds(identifier3)
+      
+      assertLookupIDFindsNothing(
+        sourceIdentifiers = List(sierraSourceIdentifier),
+        ontologyType = identifier1.ontologyType
+      ) 
+    }
   }
 
   private def assertLookupIDFindsMatch(
