@@ -18,6 +18,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     s"""
       |{
       |  "title": "title",
+      |  "sourceIdentifier": {
+      |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "value": "value"
+      |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -57,6 +61,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "items": [
       |    {
       |      "canonicalId": "canonicalId",
+      |      "sourceIdentifier": {
+      |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "value": "value"
+      |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -81,6 +89,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     s"""
       |{
       |  "title": "title",
+      |  "sourceIdentifier": {
+      |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "value": "value"
+      |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -119,6 +131,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "items": [
       |    {
       |      "canonicalId": "canonicalId",
+      |      "sourceIdentifier": {
+      |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "value": "value"
+      |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",

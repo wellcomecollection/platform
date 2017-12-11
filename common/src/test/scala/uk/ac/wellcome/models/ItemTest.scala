@@ -10,6 +10,10 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
     s"""
       |{
       |  "canonicalId": "canonicalId",
+      |  "sourceIdentifier": {
+      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "value": "value"
+      |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -35,6 +39,10 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
   val unidentifiedItemJson: String =
     s"""
       |{
+      |  "sourceIdentifier": {
+      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "value": "value"
+      |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
