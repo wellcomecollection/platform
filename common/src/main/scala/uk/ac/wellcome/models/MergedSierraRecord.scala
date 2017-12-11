@@ -12,6 +12,7 @@ import scala.util.{Success, Try}
 case class MergedSierraRecord(
   id: String,
   maybeBibData: Option[SierraBibRecord] = None,
+  itemData: Map[String, SierraItemRecord] = Map(),
   version: Int = 1
 ) extends Transformable {
 
@@ -40,6 +41,15 @@ case class MergedSierraRecord(
     } else {
       None
     }
+  }
+
+  /** Given a new item record, construct the new merged row that we should
+    * insert into the merged database.
+    *
+    * Returns None if there's nothing to do.
+    */
+  def mergeItemRecord(record: SierraItemRecord): Option[MergedSierraRecord] = {
+    None
   }
 
   override def transform: Try[Option[Work]] =
