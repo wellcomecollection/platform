@@ -5,6 +5,8 @@ module "sierra_adapter_cluster" {
   vpc_subnets = ["${module.vpc_sierra_adapter.subnets}"]
   vpc_id      = "${module.vpc_sierra_adapter.vpc_id}"
 
+  alb_certificate_domain = "sierra.wellcomecollection.org"
+
   key_name = "${var.key_name}"
 
   ec2_terminating_topic_arn                       = "${local.ec2_terminating_topic_arn}"
