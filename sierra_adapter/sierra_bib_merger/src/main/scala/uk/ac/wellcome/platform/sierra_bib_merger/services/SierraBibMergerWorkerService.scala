@@ -26,7 +26,7 @@ class SierraBibMergerWorkerService @Inject()(
   override def processMessage(message: SQSMessage): Future[Unit] =
     resourceType match {
       case "bibs" => JsonUtil.fromJson[SierraBibRecord](message.body) match {
-        case Success(record) => sierraBibMergerUpdaterService.update(record)
+        case Success(record) => sierraBibMergerUpdaterService.updateBib(record)
         case Failure(e) => Future(logger.warn(s"Failed processing $message", e))
       }
       case _ => {

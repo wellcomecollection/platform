@@ -29,7 +29,7 @@ class SierraBibMergerUpdaterService @Inject()(
       )
       .put(record)
 
-  def update(bibRecord: SierraBibRecord): Future[Unit] = Future {
+  def updateBib(bibRecord: SierraBibRecord): Future[Unit] = Future {
     logger.info(s"Attempting to update $bibRecord")
 
     val existingRecord = Scanamo.exec(dynamoDBClient)(
@@ -58,7 +58,12 @@ class SierraBibMergerUpdaterService @Inject()(
 
         Right(record)
       }
+    }
 
+    publishMergedRecord(newRecord)
+  }
+
+  def publishMergedRecord(newRecord: MergedSierraRecord): Unit = {
     val putOperation = newRecord match {
       case Right(record) => {
         logger.info(s"Attempting to conditionally update $record.")
@@ -75,9 +80,9 @@ class SierraBibMergerUpdaterService @Inject()(
 
     putOperation match {
       case Right(_) =>
-        logger.info(s"${bibRecord.id} saved successfully to DynamoDB")
+        logger.info(s"${record.id} saved successfully to DynamoDB")
       case Left(error) =>
-        logger.warn(s"Failed processing ${bibRecord.id}", error)
+        logger.warn(s"Failed processing ${record.id}", error)
     }
   }
 }
