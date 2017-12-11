@@ -17,7 +17,9 @@ import uk.ac.wellcome.utils.TryBackoff
 
 object SierraBibMergerModule extends TwitterModule with TryBackoff {
 
-  override lazy val continuous: Boolean = false
+  flag[String]("sierra.resourceType", "", "Sierra resource type")
+
+  override lazy val continuous: Boolean = true
 
   @Singleton
   @Provides

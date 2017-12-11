@@ -34,7 +34,8 @@ class SierraBibMergerWorkerServiceTest
     flags = Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraBibMerger.tableName" -> tableName
+      "aws.dynamo.sierraBibMerger.tableName" -> tableName,
+      "sierra.resourceType" -> "bibs"
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
