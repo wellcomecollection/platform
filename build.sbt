@@ -24,6 +24,11 @@ lazy val api = doSharedSetup(project, "catalogue_api/api")
   .settings(Swagger.settings: _*)
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
 
+lazy val blergh = doSharedSetup(project, "catalogue_api/blergh")
+  .settings(Search.settings: _*)
+  .settings(Swagger.settings: _*)
+  .settings(libraryDependencies ++= Dependencies.apiDependencies)
+
 lazy val ingestor = doSharedSetup(project, "catalogue_pipeline/ingestor")
   .settings(Search.settings: _*)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
@@ -56,5 +61,6 @@ lazy val root = (project in file("."))
     reindexer,
     sierra_to_dynamo,
     sierra_bib_merger,
-    sierra_item_merger
+    sierra_item_merger,
+    blergh
   )
