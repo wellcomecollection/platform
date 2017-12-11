@@ -1,6 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
-INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile

@@ -1,6 +1,5 @@
 export ROOT = $(shell git rev-parse --show-toplevel)
 export CATALOGUE_PIPELINE = $(ROOT)/catalogue_pipeline
-export INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile

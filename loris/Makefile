@@ -1,5 +1,6 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 LORIS = $(ROOT)/loris
+INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile

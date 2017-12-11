@@ -1,6 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 MONITORING = $(ROOT)/monitoring
-INFRA_BUCKET = platform-infra
 
 include $(MONITORING)/deployment_tracking/Makefile
 include $(MONITORING)/ecs_dashboard/Makefile

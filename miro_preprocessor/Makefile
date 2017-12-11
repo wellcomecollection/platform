@@ -1,6 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 MIRO_PREPROC = $(ROOT)/miro_preprocessor
-INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile

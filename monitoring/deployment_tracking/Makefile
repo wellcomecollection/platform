@@ -1,6 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 DEPLOYMENT_TRACKING = $(ROOT)/monitoring/deployment_tracking
-INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
