@@ -58,7 +58,10 @@ def are_there_job_relevant_changes(changed_files, task):
     if any(f.startswith('builds/') for f in changed_files):
         reasons.append('Changes to the build scripts')
 
-    if any(task.startswith(p) for p in _sbt_projects()):
+    if (
+        any(task.startswith(p) for p in _sbt_projects()) or
+        task == 'sbt-common-test'
+    ):
         reasons.extend(_are_there_sbt_relevant_changes(changed_files, task))
 
     for project in os.listdir(ROOT):

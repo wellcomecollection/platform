@@ -7,7 +7,8 @@ import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.models.{
   CalmTransformable,
   MergedSierraRecord,
-  SierraBibRecord
+  SierraBibRecord,
+  SierraItemRecord
 }
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -25,7 +26,11 @@ trait TransformableSQSMessageUtils {
   }
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
-    val mergedSierraRecord = MergedSierraRecord(id = id, maybeBibData = None)
+    val mergedSierraRecord = MergedSierraRecord(
+      id = id,
+      maybeBibData = None,
+      itemData = Map[String, SierraItemRecord]()
+    )
 
     sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
   }
@@ -43,7 +48,8 @@ trait TransformableSQSMessageUtils {
 
     val mergedSierraRecord = MergedSierraRecord(
       id = id,
-      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)))
+      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate))
+    )
 
     sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
   }
