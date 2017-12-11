@@ -1,6 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-INFRA_BUCKET = platform-infra
-
 SIERRA_ADAPTER = $(ROOT)/sierra_adapter
 
 include $(SIERRA_ADAPTER)/sierra_window_generator/Makefile
