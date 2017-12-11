@@ -104,6 +104,80 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     result.get.maybeBibData.get shouldBe record
   }
 
+  it("should add itemData when there isn't already an item") {
+    val record = sierraItemRecord(
+      id = "i888",
+      title = "Illustrious imps are ingenious",
+      modifiedDate = "2008-08-08T08:08:08Z"
+    )
+
+    val mergedSierraRecord = MergedSierraRecord(id = "b888")
+    val result = mergedSierraRecord.mergeItemRecord(record).get
+
+    result.itemData.get(record.id) shouldBe record
+  }
+
+  it("should overwrite existing itemData when there's a newer update") {
+    val record = sierraItemRecord(
+      id = "i999",
+      title = "No, new narwhals are never naughty",
+      modifiedDate = "2009-09-09T09:09:09Z"
+    )
+    val mergedSierraRecord = MergedSierraRecord(
+      id = "b999",
+      itemData = Map(record.id -> record)
+    )
+
+    val newerRecord = sierraItemRecord(
+      id = record.id,
+      title = "Nobody noticed the naughty narwhals",
+      modifiedDate = "2010-10-10T10:10:10Z"
+    )
+    val result = mergedSierraRecord.mergeItemRecord(newerRecord).get
+
+    result.itemData.get(record.id) shouldBe newerRecord
+  }
+
+  it("should not overwrite existing itemData when there's a older update") {
+    val record = sierraItemRecord(
+      id = "i111",
+      title = "Only otters occupy the orange oval",
+      modifiedDate = "2001-01-01T01:01:01Z"
+    )
+    val mergedSierraRecord = MergedSierraRecord(
+      id = "b111",
+      itemData = Map(record.id -> record)
+    )
+
+    val newerRecord = sierraItemRecord(
+      id = record.id,
+      title = "Old otters outside the oblong",
+      modifiedDate = "2000-00-00T00:00:00Z"
+    )
+    val result = mergedSierraRecord.mergeItemRecord(newerRecord)
+    result shouldBe None
+  }
+
+  it("should support adding multiple items to a merged record") {
+    val record1 = sierraItemRecord(
+      id = "i111",
+      title = "Outside the orangutan opens an orange",
+      modifiedDate = "2001-01-01T01:01:01Z"
+    )
+    val record2 = sierraItemRecord(
+      id = "i222",
+      title = "Twice the turtles took the turn",
+      modifiedDate = "2002-02-02T02:02:02Z"
+    )
+
+    val mergedSierraRecord = MergedSierraRecord(id = "b121")
+    val result1 = mergedSierraRecord.mergeItemRecord(record1).get
+    val result2 = result1.mergeItemRecord(record2).get
+
+    result1.itemData.get(record1.id) shouldBe record1
+    result2.itemData.get(record2.id) shouldBe record2
+  }
+
   it("should not perform a transformation without bibData") {
     val mergedSierraRecord =
       MergedSierraRecord(id = "000", maybeBibData = None)
@@ -111,6 +185,22 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     val transformedSierraRecord = mergedSierraRecord.transform
     transformedSierraRecord.isSuccess shouldBe true
 
+    transformedSierraRecord.get shouldBe None
+  }
+
+  it("should not perform a transformation, even if some itemData is present") {
+    val mergedSierraRecord = MergedSierraRecord(
+      id = "b111",
+      maybeBibData = None,
+      itemData = Map("i111" -> sierraItemRecord(
+        id = "i111",
+        title = "An incomplete invocation of items",
+        modifiedDate = "2000-00-00T00:00:00Z"
+      ))
+    )
+
+    val transformedSierraRecord = mergedSierraRecord.transform
+    transformedSierraRecord.isSuccess shouldBe true
     transformedSierraRecord.get shouldBe None
   }
 
@@ -140,37 +230,41 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     )
   }
 
-  def sierraBibRecord(
-    id: String = "111",
-    title: String = "Two toucans touching a towel",
-    modifiedDate: String = "2001-01-01T01:01:01Z"
-  ) = SierraBibRecord(
-    id = id,
-    data = bibRecordString(id = id, updatedDate = modifiedDate, title = title),
-    modifiedDate = modifiedDate
-  )
-
   it("should support creation directly from a SierraBibRecord") {
     val record = sierraBibRecord(id = "999")
     val mergedRecord = MergedSierraRecord(bibRecord = record)
     mergedRecord.id shouldEqual record.id
   }
 
-  def sierraBibRecordString(id: String, modifiedDate: String, title: String) =
-    JsonUtil
-      .toJson(
-        SierraBibRecord(
-          id = id,
-          data = bibRecordString(
-            id = id,
-            updatedDate = modifiedDate,
-            title = title
-          ),
-          modifiedDate = modifiedDate
-        ))
-      .get
+  def sierraBibRecord(
+    id: String = "111",
+    title: String = "Two toucans touching a towel",
+    modifiedDate: String = "2001-01-01T01:01:01Z"
+  ) = SierraBibRecord(
+    id = id,
+    data = sierraRecordString(
+      id = id,
+      updatedDate = modifiedDate,
+      title = title
+    ),
+    modifiedDate = modifiedDate
+  )
 
-  private def bibRecordString(
+  def sierraItemRecord(
+    id: String = "i111",
+    title: String = "Ingenious imps invent invasive implements",
+    modifiedDate: String = "2001-01-01T01:01:01Z"
+  ) = SierraItemRecord(
+    id = id,
+    data = sierraRecordString(
+      id = id,
+      updatedDate = modifiedDate,
+      title = title
+    ),
+    modifiedDate = modifiedDate
+  )
+
+  private def sierraRecordString(
     id: String,
     updatedDate: String,
     title: String
