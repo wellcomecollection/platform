@@ -8,7 +8,9 @@ echo "Running project $PROJECT"
 
 echo "Fetching config from AWS..."
 aws s3 ls s3://$INFRA_BUCKET/$CONFIG_KEY
-aws s3 cp s3://$INFRA_BUCKET/$CONFIG_KEY /opt/docker/conf/application.ini
+aws s3 cp s3://$INFRA_BUCKET/$CONFIG_KEY /opt/docker/conf/application.ini.template
+
+envsubst < /opt/docker/conf/application.ini.template > /opt/docker/conf/application.ini
 
 echo "=== config ==="
 cat /opt/docker/conf/application.ini
