@@ -1,14 +1,9 @@
 export ROOT = $(shell git rev-parse --show-toplevel)
-export SHARED_INFRA = $(ROOT)/shared_infra
-export INFRA_BUCKET = platform-infra
-
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
 
 include $(ROOT)/functions.Makefile
 
-# Build and tag a Docker image (specifically for ngnix).
+
+# Build and tag a Docker image (specifically for nginx).
 #
 # Args:
 #   $1 - Name of the variant.
@@ -21,6 +16,7 @@ define nginx_build_image
             --variant=$(1)
 endef
 
+
 nginx-build-api:
 	$(call nginx_build_image,api)
 
@@ -31,7 +27,6 @@ nginx-build-grafana:
 	$(call nginx_build_image,grafana)
 
 nginx-build: nginx-build-api nginx-build-loris nginx-build-grafana
-
 
 
 nginx-deploy-api: nginx-build-api
