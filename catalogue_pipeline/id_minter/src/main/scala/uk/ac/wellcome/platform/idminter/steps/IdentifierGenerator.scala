@@ -16,12 +16,8 @@ import scala.util.Try
 
 class IdentifierGenerator @Inject()(
   identifiersDao: IdentifiersDao,
-  metricsSender: MetricsSender,
-  @Flag("known.identifierSchemes") knownIdentifierSchemes: String)
-    extends Logging
-    with TwitterModuleFlags {
-  private val knownIdentifierSchemeList =
-    knownIdentifierSchemes.split(",").map(_.trim).toList
+  metricsSender: MetricsSender
+) extends Logging with TwitterModuleFlags {
 
   def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier,

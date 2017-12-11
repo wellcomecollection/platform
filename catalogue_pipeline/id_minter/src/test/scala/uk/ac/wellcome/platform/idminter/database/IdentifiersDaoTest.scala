@@ -37,15 +37,29 @@ class IdentifiersDaoTest
         ontologyType = identifier.OntologyType
       )
 
-      triedLookup shouldBe a[Success[Option[String]]]
-
-      val maybeIdentifier = triedLookup.get
-      maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe identifier
+      triedLookup shouldBe Success(Some(identifier))
     }
 
-    it("gets not identifier if there is no matching SourceSystem and SourceId") {
-      true shouldBe false
+    it("gets no identifier if there is no matching SourceSystem and SourceId") {
+      val identifier = Identifier(
+        CanonicalId = "A turtle turns to try to taste",
+        SourceId = "A tangerine",
+        SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+        OntologyType = "t-t-t-turtles"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        value = "not_an_existing_value"
+      )
+
+      val triedLookup = identifiersDao.lookupId(
+        sourceIdentifier = sourceIdentifier,
+        ontologyType = identifier.OntologyType
+      )
+
+      triedLookup shouldBe Success(None)
     }
   }
 

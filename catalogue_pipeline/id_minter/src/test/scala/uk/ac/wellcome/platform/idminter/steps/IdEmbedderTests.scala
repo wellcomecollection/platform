@@ -234,7 +234,7 @@ class IdEmbedderTests
 
   describe("identifiable objects should be updated correctly") {
 
-    it("identify a document that is itself Identifiable") {
+    it("identify a document that is Identifiable") {
 
       val sourceIdentifier = SourceIdentifier(
         IdentifierSchemes.miroImageNumber,
@@ -250,7 +250,17 @@ class IdEmbedderTests
         newCanonicalId
       )
 
-      assertIdEmbedderAddsCanonicalIdCorrectly(s"""
+      val inputJson = s"""
+      {
+        "sourceIdentifier": {
+          "identifierScheme": "${sourceIdentifier.identifierScheme}",
+          "value": "${sourceIdentifier.value}"
+        },
+        "type": "$ontologyType"
+      }
+      """
+
+      val outputJson = s"""
       {
         "canonicalId": "$newCanonicalId",
         "sourceIdentifier": {
@@ -259,7 +269,13 @@ class IdEmbedderTests
         },
         "type": "$ontologyType"
       }
-      """)
+      """
+
+      val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
+
+      whenReady(eventualJson) { json =>
+        assertJsonStringsAreEqual(json.toString, outputJson)
+      }
     }
 
     it("identify a document with a key that is identifiable") {
@@ -281,7 +297,21 @@ class IdEmbedderTests
         newCanonicalId
       )
 
-      assertIdEmbedderAddsCanonicalIdCorrectly(s"""
+      val inputJson = s"""
+      {
+        "ke": null,
+        "ki": "kiev",
+        "item": {
+          "sourceIdentifier": {
+            "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "value": "${sourceIdentifier.value}"
+          },
+          "type": "$ontologyType"
+        }
+      }
+      """
+
+      val outputJson = s"""
       {
         "ke": null,
         "ki": "kiev",
@@ -294,16 +324,20 @@ class IdEmbedderTests
           "type": "$ontologyType"
         }
       }
-      """)
+      """
+
+      val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
+
+      whenReady(eventualJson) { json =>
+        assertJsonStringsAreEqual(json.toString, outputJson)
+      }
     }
   }
 
   def generateMockCanonicalId(
     sourceIdentifier: SourceIdentifier,
     ontologyType: String
-  ): String = s"""
-        |${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}
-      """.stripMargin
+  ): String = s"${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}"
 
   private def setUpIdentifierGeneratorMock(
     sourceIdentifier: SourceIdentifier,
@@ -316,20 +350,6 @@ class IdEmbedderTests
           ontologyType
         )
     ).thenReturn(Try(newCanonicalId))
-  }
-
-  // Strip the canonical ID from a JSON string, then run it through the idEmbedder
-  // and check it's reinserted correctly.
-  private def assertIdEmbedderAddsCanonicalIdCorrectly(jsonString: String) = {
-    val unidentifiedString = jsonString.lines
-      .filterNot { _.contains("canonicalId") }
-      .mkString("\n")
-    unidentifiedString shouldNot be(jsonString)
-    val eventualJson = idEmbedder.embedId(parse(unidentifiedString).right.get)
-
-    whenReady(eventualJson) { json =>
-      assertJsonStringsAreEqual(json.toString, jsonString)
-    }
   }
 
   private def assertIdEmbedderDoesNothing(jsonString: String) = {
