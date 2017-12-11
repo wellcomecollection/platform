@@ -8,6 +8,16 @@ import scala.util.{Success, Try}
 /** Represents a row in the DynamoDB database of "merged" Sierra records;
   * that is, records that contain data for both bibs and
   * their associated items.
+  *
+  * Fields:
+  *
+  *   - `id`: the ID of the associated bib record
+  *   - `maybeBibData`: data from the associated bib.  This may be None if
+  *     we've received an item but haven't had the bib yet.
+  *   - `itemData`: a map from item IDs to item records
+  *   - `version`: used to track updates to the record in DynamoDB.  The exact
+  *     value at any time is unimportant, but it should only ever increase.
+  *
   */
 case class MergedSierraRecord(
   id: String,
