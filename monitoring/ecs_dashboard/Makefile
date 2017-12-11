@@ -49,6 +49,3 @@ ecs_dashboard-test: update_service_list-test
 
 ## Publish all for ecs_dashboard
 ecs_dashboard-deploy: update_service_list-publish
-
-.PHONY: ecs_dashboard-deploy update_service_list-build update_service_list-test update_service_list-publish \
-		ecs_dashboard-build ecs_dashboard-test ecs_dashboard_client-deploy

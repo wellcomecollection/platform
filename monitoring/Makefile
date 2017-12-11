@@ -43,8 +43,3 @@ monitoring-terraform-plan:
 ## Terraform apply on monitoring stack
 monitoring-terraform-apply:
 	$(call terraform_apply,$(MONITORING))
-
-
-.PHONY: post_to_slack-build post_to_slack-test post_to_slack-publish \
-		monitoring-terraform-plan monitoring-terraform-apply \
-		monitoring-test monitoring-deploy

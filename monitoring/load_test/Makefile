@@ -42,6 +42,3 @@ load_test-test: gatling_to_cloudwatch-test
 
 ## Publish all for load_test
 load_test-deploy: gatling-deploy gatling_to_cloudwatch-publish
-
-.PHONY:	gatling-build gatling-deploy gatling_to_cloudwatch-build gatling_to_cloudwatch-test gatling_to_cloudwatch-publish\
-		load_test-build load_test-test load_test-deploy

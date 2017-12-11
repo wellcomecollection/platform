@@ -53,8 +53,3 @@ deployment_tracking-test: notify_old_deploys-test service_deployment_status-test
 
 ## Publish all for deployment_tracking
 deployment_tracking-deploy: notify_old_deploys-publish service_deployment_status-publish
-
-.PHONY: notify_old_deploys-build notify_old_deploys-test notify_old_deploys-publish \
-		service_deployment_status-build service_deployment_status-test service_deployment_status-publish \
-		deployment_tracking-build deployment_tracking-test deployment_tracking-deploy
-

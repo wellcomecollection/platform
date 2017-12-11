@@ -11,5 +11,3 @@ sqs_freezeray-build:
 
 sqs_freezeray-publish: sqs_freezeray-build
 	$(call publish_service,sqs_freezeray)
-
-.PHONY: sqs_freezeray-build

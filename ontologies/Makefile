@@ -18,5 +18,3 @@ lint-json:
 	wellcome/jslint:latest
 
 lint-ontologies: lint-turtle lint-json
-
-.PHONY: lint-turtle lint-json lint-ontologies
