@@ -23,7 +23,8 @@ class SierraParserTest
 
     triedSierraTransformable.isSuccess shouldBe true
     triedSierraTransformable.get shouldBe a[MergedSierraRecord]
-    val actualRecord = triedSierraTransformable.get.asInstanceOf[MergedSierraRecord]
+    val actualRecord =
+      triedSierraTransformable.get.asInstanceOf[MergedSierraRecord]
     actualRecord.id shouldEqual id
   }
 }
