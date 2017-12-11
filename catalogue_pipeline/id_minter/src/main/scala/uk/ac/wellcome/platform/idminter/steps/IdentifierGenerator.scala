@@ -17,17 +17,20 @@ import scala.util.Try
 class IdentifierGenerator @Inject()(
   identifiersDao: IdentifiersDao,
   metricsSender: MetricsSender
-) extends Logging with TwitterModuleFlags {
+) extends Logging
+    with TwitterModuleFlags {
 
   def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier,
     ontologyType: String
   ): Try[String] = {
     Try {
-        identifiersDao.lookupId(
+      identifiersDao
+        .lookupId(
           sourceIdentifier = identifier,
           ontologyType = ontologyType
-        ).flatMap {
+        )
+        .flatMap {
           case Some(id) =>
             metricsSender.incrementCount("found-old-id")
             Try(id.CanonicalId)

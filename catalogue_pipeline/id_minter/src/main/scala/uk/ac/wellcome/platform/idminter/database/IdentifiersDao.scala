@@ -43,8 +43,10 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
         select
           .from(identifiers as i)
           .where
-          .eq(i.OntologyType, ontologyType).and
-          .eq(i.SourceSystem, sourceSystem).and
+          .eq(i.OntologyType, ontologyType)
+          .and
+          .eq(i.SourceSystem, sourceSystem)
+          .and
           .eq(i.SourceId, sourceId)
 
       }.map(Identifier(i)).single
