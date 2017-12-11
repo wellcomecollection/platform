@@ -11,7 +11,6 @@ import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import scala.concurrent.blocking
 import scala.util.Try
 
-
 @Singleton
 class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     extends Logging {
