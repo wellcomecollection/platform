@@ -1,9 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-DEPLOYMENT_TRACKING = $(ROOT)/monitoring/deployment_tracking
-
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
 
 include $(ROOT)/functions.Makefile
 

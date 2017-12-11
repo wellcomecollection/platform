@@ -1,10 +1,6 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 ONTOLOGIES = $(ROOT)/ontologies
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 lint-turtle:
 	docker run \
 		--rm \

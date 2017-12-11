@@ -5,10 +5,6 @@ include $(MONITORING)/deployment_tracking/Makefile
 include $(MONITORING)/ecs_dashboard/Makefile
 include $(MONITORING)/load_test/Makefile
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 include $(ROOT)/functions.Makefile
 
 

@@ -1,5 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-
 SIERRA_ADAPTER = $(ROOT)/sierra_adapter
 
 include $(SIERRA_ADAPTER)/sierra_window_generator/Makefile

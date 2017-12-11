@@ -1,9 +1,4 @@
 export ROOT = $(shell git rev-parse --show-toplevel)
-export SHARED_INFRA = $(ROOT)/shared_infra
-
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
 
 include $(ROOT)/functions.Makefile
 

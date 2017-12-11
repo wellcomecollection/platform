@@ -1,9 +1,5 @@
 export ROOT = $(shell git rev-parse --show-toplevel)
-export CATALOGUE_PIPELINE = $(ROOT)/catalogue_pipeline
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
 include $(ROOT)/functions.Makefile
 
 schedule_reindexer-build:

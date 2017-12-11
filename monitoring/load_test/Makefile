@@ -1,9 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-LOAD_TEST = $(ROOT)/monitoring/load_test
-
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
 
 include $(ROOT)/functions.Makefile
 

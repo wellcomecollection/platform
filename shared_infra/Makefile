@@ -1,10 +1,6 @@
 export ROOT = $(shell git rev-parse --show-toplevel)
 export SHARED_INFRA = $(ROOT)/shared_infra
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 include $(ROOT)/functions.Makefile
 
 include $(SHARED_INFRA)/drain_ecs_container_instance/Makefile

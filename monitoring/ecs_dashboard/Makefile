@@ -1,10 +1,6 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 include $(ROOT)/functions.Makefile
 
 

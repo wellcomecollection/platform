@@ -1,9 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 include $(ROOT)/functions.Makefile
 
 image_sorter-build:

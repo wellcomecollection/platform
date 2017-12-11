@@ -1,9 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 include $(ROOT)/functions.Makefile
 
 miro_image_to_dynamo-build:
