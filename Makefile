@@ -1,4 +1,6 @@
 include shared.Makefile
+include functions.Makefile
+
 include loris/Makefile
 include shared_infra/Makefile
 include catalogue_api/Makefile
@@ -10,14 +12,8 @@ include sierra_adapter/Makefile
 include nginx/Makefile
 
 
-$(ROOT)/.docker/sbt_test:
-	./builds/build_ci_docker_image.py \
-		--project=sbt_test \
-		--dir=builds \
-		--file=builds/sbt_test.Dockerfile
-
-sbt-common-test: $(ROOT)/.docker/sbt_test
-	PROJECT=common ./builds/test_sbt_project.sh
+sbt-common-test:
+	$(call sbt_test,common)
 
 sbt-common-deploy:
 	echo "Nothing to do!"

@@ -69,3 +69,15 @@ define publish_service
 		publish_service_to_aws --project="$(1)" --infra-bucket="$(INFRA_BUCKET)"
 endef
 
+
+# Test an sbt project.
+#
+# Args:
+#   $1 - Name of the project.
+#
+define sbt_test
+	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" ";dockerComposeUp;test;dockerComposeStop"
+endef
