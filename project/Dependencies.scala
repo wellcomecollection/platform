@@ -98,4 +98,6 @@ object Dependencies {
   )
 
   val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
+
+  val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies
 }
