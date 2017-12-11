@@ -269,11 +269,13 @@ class ApiWorksTest
     )
     val item = Item(
       canonicalId = Some("chu27a8"),
+      sourceIdentifier = sourceIdentifier,
       identifiers = List(),
       locations = List(location)
     )
     val workWithCopyright = Work(
       canonicalId = Some("yxh928a"),
+      sourceIdentifier = sourceIdentifier,
       title = "A scarf on a squirrel",
       items = List(item)
     )
@@ -552,6 +554,7 @@ class ApiWorksTest
   it("should include subject information in API responses") {
     val workWithSubjects = Work(
       canonicalId = Some("test_subject1"),
+      sourceIdentifier = sourceIdentifier,
       identifiers = List(),
       title = "A seal selling seaweed sandwiches in Scotland",
       subjects = List(Concept("fish"), Concept("gardening"))
@@ -584,6 +587,7 @@ class ApiWorksTest
   it("should include genre information in API responses") {
     val workWithSubjects = Work(
       canonicalId = Some("test_subject1"),
+      sourceIdentifier = sourceIdentifier,
       identifiers = List(),
       title = "A guppy in a greenhouse",
       genres = List(Concept("woodwork"), Concept("etching"))

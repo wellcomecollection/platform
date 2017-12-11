@@ -32,7 +32,8 @@ class SQSMessageReceiverTest
     "collection",
     "AB/CD/12",
     "AB/CD/12",
-    """{"foo": ["bar"], "AccessStatus": ["restricted"]}""")
+    """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
+  )
 
   val invalidCalmSqsMessage: SQSMessage = createInvalidRecord
 
@@ -41,19 +42,25 @@ class SQSMessageReceiverTest
     "collection",
     "AB/CD/12",
     "AB/CD/12",
-    """not a json string""")
+    """not a json string"""
+  )
 
   val failingTransformMiroSqsMessage: SQSMessage =
     createValidMiroSQSMessage("""{}""")
 
+  val sourceIdentifier =
+    SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
+
   val work = Work(
-    identifiers =
-      List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
-    title = "placeholder title for a Calm record")
+    sourceIdentifier = sourceIdentifier,
+    identifiers = List(sourceIdentifier),
+    title = "placeholder title for a Calm record"
+  )
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
-    mock[AmazonCloudWatch])
+    mock[AmazonCloudWatch]
+  )
 
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter

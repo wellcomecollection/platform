@@ -43,24 +43,24 @@ class TableProvisionerTest
           .apply()
       }
 
-      fields shouldBe Seq(
-        FieldDescription(field = "CanonicalID",
+      fields.sortBy(_.field) shouldBe Seq(
+        FieldDescription(field = "CanonicalId",
                          dataType = "varchar(255)",
                          nullable = "NO",
                          key = "PRI"),
-        FieldDescription(field = "ontologyType",
+        FieldDescription(field = "OntologyType",
                          dataType = "varchar(255)",
                          nullable = "NO",
                          key = "MUL"),
-        FieldDescription(field = "MiroID",
+        FieldDescription(field = "SourceSystem",
                          dataType = "varchar(255)",
-                         nullable = "YES",
+                         nullable = "NO",
                          key = ""),
-        FieldDescription(field = "SierraSystemNumber",
+        FieldDescription(field = "SourceId",
                          dataType = "varchar(255)",
-                         nullable = "YES",
+                         nullable = "NO",
                          key = "")
-      )
+      ).sortBy(_.field)
     }
   }
 }

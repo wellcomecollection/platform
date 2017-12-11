@@ -25,6 +25,13 @@ class WorksIndex @Inject()(client: HttpClient,
     textField("url")
   )
 
+  val sourceIdentifier = objectField("sourceIdentifier")
+    .fields(
+      keywordField("type"),
+      keywordField("identifierScheme"),
+      keywordField("value")
+    )
+
   val identifiers = objectField("identifiers")
     .fields(
       keywordField("type"),
@@ -53,6 +60,7 @@ class WorksIndex @Inject()(client: HttpClient,
 
   val items = objectField("items").fields(
     keywordField("canonicalId"),
+    sourceIdentifier,
     identifiers,
     location(),
     keywordField("type")
@@ -63,6 +71,7 @@ class WorksIndex @Inject()(client: HttpClient,
     .as(
       keywordField("canonicalId"),
       keywordField("type"),
+      sourceIdentifier,
       identifiers,
       textField("title").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),

@@ -58,12 +58,13 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
   }
 
   private def addIdentifierToJsonObject(obj: JsonObject): JsonObject = {
-    if (obj.contains("identifiers")) {
-      val sourceIdentifiers = parseSourceIdentifiers(obj)
+    if (obj.contains("sourceIdentifier")) {
+      val sourceIdentifier = parseSourceIdentifier(obj)
       val ontologyType = obj("type").get.asString.get
+
       val canonicalId = identifierGenerator
         .retrieveOrGenerateCanonicalId(
-          identifiers = sourceIdentifiers,
+          identifier = sourceIdentifier,
           ontologyType = ontologyType
         )
         .get
@@ -71,11 +72,11 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
     } else obj
   }
 
-  private def parseSourceIdentifiers(obj: JsonObject): List[SourceIdentifier] = {
-    decode[List[SourceIdentifier]](obj("identifiers").get.toString()) match {
-      case Right(identifiers) => identifiers
+  private def parseSourceIdentifier(obj: JsonObject): SourceIdentifier = {
+    decode[SourceIdentifier](obj("sourceIdentifier").get.toString()) match {
+      case Right(sourceIdentifier) => sourceIdentifier
       case Left(exception: Error) =>
-        error(s"Error parsing source identifiers: $exception")
+        error(s"Error parsing source identifier: $exception")
         throw exception
     }
 

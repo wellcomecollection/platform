@@ -74,12 +74,18 @@ class CalmTransformerFeatureTest
   private def assertSNSMessageContainsCalmDataWith(
     snsMessage: MessageInfo,
     AccessStatus: Option[String]): Any = {
+
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.calmPlaceholder,
+      "value"
+    )
+
     //currently for calm data we only output hardcoded sample values
     snsMessage.message shouldBe JsonUtil
       .toJson(
         Work(
-          identifiers =
-            List(SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
           title = "placeholder title for a Calm record"
         ))
       .get

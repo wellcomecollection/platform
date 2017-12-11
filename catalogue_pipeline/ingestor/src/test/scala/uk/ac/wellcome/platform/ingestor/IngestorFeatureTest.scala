@@ -7,6 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -17,6 +18,7 @@ class IngestorFeatureTest
     with IngestorUtils
     with FeatureTestMixin
     with Matchers
+    with JsonTestUtil
     with ScalaFutures {
 
   override val server: EmbeddedHttpServer = createServer
@@ -25,14 +27,18 @@ class IngestorFeatureTest
   sqsClient.setQueueAttributes(ingestorQueueUrl,
                                Map("VisibilityTimeout" -> "1"))
 
-  it(
-    "should read an identified unified item from the SQS queue and ingest it into Elasticsearch") {
-    val work = JsonUtil
+  it("reads an identified work from the queue and ingests it") {
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+
+    val workString = JsonUtil
       .toJson(
-        Work(canonicalId = Some("1234"),
-             identifiers = List(
-               SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
-             title = "A type of a tame turtle")
+        Work(
+          canonicalId = Some("1234"),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
+          title = "A type of a tame turtle"
+        )
       )
       .get
 
@@ -40,11 +46,14 @@ class IngestorFeatureTest
       ingestorQueueUrl,
       JsonUtil
         .toJson(
-          SQSMessage(Some("identified-item"),
-                     work,
-                     "ingester",
-                     "messageType",
-                     "timestamp"))
+          SQSMessage(
+            Some("identified-item"),
+            workString,
+            "ingester",
+            "messageType",
+            "timestamp"
+          )
+        )
         .get
     )
 
@@ -54,21 +63,28 @@ class IngestorFeatureTest
         .map { _.hits.hits }
       whenReady(hitsFuture) { hits =>
         hits should have size 1
-        hits.head.sourceAsString shouldBe work
+
+        assertJsonStringsAreEqual(
+          hits.head.sourceAsString,
+          workString
+        )
       }
     }
   }
 
-  it(
-    "should not delete a message from the sqs queue if it fails processing it") {
+  it("deletes a message from the queue if it fails processing") {
     val invalidMessage = JsonUtil
       .toJson(
-        SQSMessage(Some("identified-item"),
-                   "not a json string - this will fail parsing",
-                   "ingester",
-                   "messageType",
-                   "timestamp"))
+        SQSMessage(
+          Some("identified-item"),
+          "not a json string - this will fail parsing",
+          "ingester",
+          "messageType",
+          "timestamp"
+        )
+      )
       .get
+
     sqsClient.sendMessage(
       ingestorQueueUrl,
       invalidMessage
@@ -83,10 +99,14 @@ class IngestorFeatureTest
 
     eventually {
       sqsClient
-        .getQueueAttributes(ingestorQueueUrl,
-                            List("ApproximateNumberOfMessagesNotVisible"))
+        .getQueueAttributes(
+          ingestorQueueUrl,
+          List("ApproximateNumberOfMessagesNotVisible")
+        )
         .getAttributes
-        .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
+        .get(
+          "ApproximateNumberOfMessagesNotVisible"
+        ) shouldBe "1"
     }
   }
 }

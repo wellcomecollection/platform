@@ -8,7 +8,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -19,6 +19,7 @@ class WorkIndexerTest
     with ScalaFutures
     with Matchers
     with MockitoSugar
+    with JsonTestUtil
     with IndexedElasticSearchLocal {
 
   val metricsSender: MetricsSender =
@@ -28,19 +29,26 @@ class WorkIndexerTest
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
 
   def workJson(canonicalId: String, sourceId: String, title: String): String = {
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      sourceId
+    )
+
     JsonUtil
       .toJson(
-        Work(canonicalId = Some(canonicalId),
-             identifiers = List(
-               SourceIdentifier(IdentifierSchemes.miroImageNumber, sourceId)),
-             title = title))
+        Work(
+          canonicalId = Some(canonicalId),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
+          title = title
+        )
+      )
       .get
   }
 
-  it("should insert an identified unified item into Elasticsearch") {
+  it("should insert an identified item into Elasticsearch") {
 
-    val workString =
-      workJson("5678", "1234", "An identified igloo")
+    val workString = workJson("5678", "1234", "An identified igloo")
 
     val future =
       workIndexer.indexWork(workString)
@@ -51,8 +59,13 @@ class WorkIndexerTest
           .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
           .map { _.hits.hits }
           .await
+
         hits should have size 1
-        hits.head.sourceAsString shouldBe workString
+
+        assertJsonStringsAreEqual(
+          hits.head.sourceAsString,
+          workString
+        )
       }
     }
 
@@ -73,8 +86,13 @@ class WorkIndexerTest
           .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
           .map { _.hits.hits }
           .await
+
         hits should have size 1
-        hits.head.sourceAsString shouldBe workString
+
+        assertJsonStringsAreEqual(
+          hits.head.sourceAsString,
+          workString
+        )
       }
     }
 
