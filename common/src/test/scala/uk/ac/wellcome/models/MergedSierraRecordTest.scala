@@ -195,7 +195,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       itemData = Map("i111" -> sierraItemRecord(
         id = "i111",
         title = "An incomplete invocation of items",
-        modifiedDate = "2000-00-00T00:00:00Z"
+        modifiedDate = "2001-01-01T01:01:01Z"
       ))
     )
 
