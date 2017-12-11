@@ -10,7 +10,7 @@ include $(ROOT)/functions.Makefile
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
 # with a newer version of pip-tools.
 $(LORIS)/requirements.txt: $(LORIS)/requirements.in $(ROOT)/.docker/python3.6_ci
-	docker run \
+	docker run --rm \
 		-v $(LORIS):/data \
 		-e OP=build-lock-file \
 		python3.6_ci:latest

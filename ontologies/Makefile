@@ -2,15 +2,11 @@ ROOT = $(shell git rev-parse --show-toplevel)
 ONTOLOGIES = $(ROOT)/ontologies
 
 lint-turtle:
-	docker run \
-		--rm \
-		--volume $(ONTOLOGIES):/data \
-		--tty \
-		wellcome/turtlelint:latest
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(ONTOLOGIES):/data wellcome/turtlelint
 
 lint-json:
-	docker run \
-	--volume $(ROOT)/ontologies:/data \
-	wellcome/jslint:latest
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(ROOT)/ontologies:/data wellcome/jslint
 
 lint-ontologies: lint-turtle lint-json
