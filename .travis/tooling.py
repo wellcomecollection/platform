@@ -3,8 +3,6 @@
 
 from __future__ import print_function
 
-import os
-import re
 import subprocess
 
 
@@ -130,7 +128,7 @@ def are_there_job_relevant_changes(changed_files, task):
     # when it was important, we remove any files which we know are safe to
     # ignore, and run tests if there's anything left.
     interesting_changed_files = [
-        c for c in changed_files if not has_no_effect_on_tests(f, task=task)
+        f for f in changed_files if not has_no_effect_on_tests(f, task=task)
     ]
 
     if interesting_changed_files:
