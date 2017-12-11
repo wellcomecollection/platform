@@ -15,7 +15,8 @@ import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.modules._
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name = "uk.ac.wellcome.platform.sierra_bibs_to_dynamo SierraToDynamo"
+  override val name =
+    "uk.ac.wellcome.platform.sierra_bibs_to_dynamo SierraToDynamo"
   override val modules = Seq(
     PlatformDynamoConfigModule,
     DynamoClientModule,
