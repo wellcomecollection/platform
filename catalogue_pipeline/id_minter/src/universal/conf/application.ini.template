@@ -1,0 +1,10 @@
+-aws.rds.host=${cluster_url}
+-aws.rds.identifiers.database=identifiers
+-aws.rds.identifiers.table=identifiers
+-aws.rds.password=${db_password}
+-aws.rds.port=${db_port}
+-aws.rds.userName=${db_username}
+-aws.sqs.queue.url=${queue_url}
+-aws.sns.topic.arn=${topic_arn}
+-aws.metrics.namespace=id-minter
+-known.identifierSchemes=miro-image-number,sierra-system-number
