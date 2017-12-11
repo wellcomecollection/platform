@@ -15,8 +15,8 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraDynamoDBLocal
-import uk.ac.wellcome.models.SierraRecord
-import uk.ac.wellcome.models.SierraRecord._
+import uk.ac.wellcome.models.SierraBibRecord
+import uk.ac.wellcome.models.SierraBibRecord._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraDynamoSinkTest
@@ -62,7 +62,7 @@ class SierraDynamoSinkTest
       """.stripMargin).right.get
     val futureUnit = Source.single(json).runWith(bibSink)
 
-    val expectedRecord = SierraRecord(
+    val expectedRecord = SierraBibRecord(
       id = s"b$id",
       data = parse(s"""
         |{
@@ -74,7 +74,7 @@ class SierraDynamoSinkTest
     )
 
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
+      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
         Right(expectedRecord))
     }
   }
@@ -92,7 +92,7 @@ class SierraDynamoSinkTest
 
     val futureUnit = Source.single(json).runWith(itemSink)
 
-    val expectedRecord = SierraRecord(
+    val expectedRecord = SierraBibRecord(
       id = s"i$id",
       data = parse(s"""
         |{
@@ -107,7 +107,7 @@ class SierraDynamoSinkTest
     )
 
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
+      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
         Right(expectedRecord))
     }
   }
@@ -117,7 +117,7 @@ class SierraDynamoSinkTest
     val oldUpdatedDate = "2001-01-01T00:00:01Z"
     val newUpdatedDate = "2017-12-12T23:59:59Z"
 
-    val newRecord = SierraRecord(
+    val newRecord = SierraBibRecord(
       id = s"b$id",
       modifiedDate = newUpdatedDate,
       data =
@@ -135,7 +135,7 @@ class SierraDynamoSinkTest
 
     val futureUnit = Source.single(oldJson).runWith(bibSink)
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
+      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
         Right(newRecord))
     }
   }
@@ -145,7 +145,7 @@ class SierraDynamoSinkTest
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
     val newUpdatedDate = "2011-11-11T11:11:11Z"
 
-    val oldRecord = SierraRecord(
+    val oldRecord = SierraBibRecord(
       id = s"b$id",
       modifiedDate = oldUpdatedDate,
       data =
@@ -162,14 +162,14 @@ class SierraDynamoSinkTest
        """.stripMargin).right.get
 
     val futureUnit = Source.single(newJson).runWith(sink)
-    val expectedRecord = SierraRecord(
+    val expectedRecord = SierraBibRecord(
       id = s"b$id",
       modifiedDate = newUpdatedDate,
       data =
         s"""{"id":"b$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
     )
     whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
+      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
         Right(expectedRecord))
     }
   }
