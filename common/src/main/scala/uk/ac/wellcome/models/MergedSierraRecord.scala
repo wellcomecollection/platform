@@ -85,16 +85,19 @@ case class MergedSierraRecord(
     maybeBibData
       .map { bibData =>
         JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-          Some(
-            Work(
-              title = sierraBibData.title,
-              identifiers = List(
-                SourceIdentifier(
-                  identifierScheme = IdentifierSchemes.sierraSystemNumber,
-                  sierraBibData.id
-                )
+          Some(Work(
+            title = sierraBibData.title,
+            sourceIdentifier = SourceIdentifier(
+              identifierScheme = IdentifierSchemes.sierraSystemNumber,
+              sierraBibData.id
+            ),
+            identifiers = List(
+              SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                sierraBibData.id
               )
-            ))
+            )
+          ))
         }
       }
       .getOrElse(Success(None))

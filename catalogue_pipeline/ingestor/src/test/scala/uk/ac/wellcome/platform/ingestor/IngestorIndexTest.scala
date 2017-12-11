@@ -11,8 +11,7 @@ class IngestorIndexTest
     with Matchers
     with ScalaFutures {
 
-  it(
-    "should create the index at startup in elasticsearch if it doesn't already exist") {
+  it("creates the index at startup if it doesn't already exist") {
     elasticClient.execute(deleteIndex(indexName))
 
     eventually {

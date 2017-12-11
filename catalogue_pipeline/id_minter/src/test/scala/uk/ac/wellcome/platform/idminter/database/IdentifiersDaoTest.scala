@@ -19,342 +19,169 @@ class IdentifiersDaoTest
 
   describe("lookupID") {
     it(
-      "should return a future of Some[Identifier] if it can find a matching MiroID in the DB") {
+      "gets an Identifier if it can find a matching SourceSystem and SourceId") {
       val identifier = Identifier(
-        CanonicalID = "A turtle turns to try to taste",
-        MiroID = "A tangerine",
-        ontologyType = "t-t-t-turtles"
+        CanonicalId = "A turtle turns to try to taste",
+        SourceId = "A tangerine",
+        SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+        OntologyType = "t-t-t-turtles"
       )
       assertInsertingIdentifierSucceeds(identifier)
 
-      val sourceIdentifiers = List(
-        SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
-          value = identifier.MiroID
-        ))
-
-      val triedLookup = identifiersDao.lookupID(
-        sourceIdentifiers = sourceIdentifiers,
-        ontologyType = identifier.ontologyType
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        value = identifier.SourceId
       )
 
-      triedLookup shouldBe a[Success[Option[String]]]
-      val maybeIdentifier = triedLookup.get
-      maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe identifier
+      val triedLookup = identifiersDao.lookupId(
+        sourceIdentifier = sourceIdentifier,
+        ontologyType = identifier.OntologyType
+      )
+
+      triedLookup shouldBe Success(Some(identifier))
+    }
+
+    it("gets no identifier if there is no matching SourceSystem and SourceId") {
+      val identifier = Identifier(
+        CanonicalId = "A turtle turns to try to taste",
+        SourceId = "A tangerine",
+        SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+        OntologyType = "t-t-t-turtles"
+      )
+      assertInsertingIdentifierSucceeds(identifier)
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        value = "not_an_existing_value"
+      )
+
+      val triedLookup = identifiersDao.lookupId(
+        sourceIdentifier = sourceIdentifier,
+        ontologyType = identifier.OntologyType
+      )
+
+      triedLookup shouldBe Success(None)
     }
   }
 
-  val miroSourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.miroImageNumber,
-    value = "V0023075"
-  )
+  private def assertLookupIDFindsMatch(sourceIdentifier: SourceIdentifier,
+                                       ontologyType: String = "TestWork") = {
 
-  val sierraSourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.sierraSystemNumber,
-    value = "b1234567"
-  )
-
-  describe(
-    "lookupID should return a future of Some[Identifier] if it can find a matching ID") {
-    it("Matching Miro ID, Sierra ID and ontology type") {
-      val identifier = Identifier(
-        CanonicalID = "h2s6hz29",
-        MiroID = miroSourceIdentifier.value,
-        SierraSystemNumber = sierraSourceIdentifier.value
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsMatch(
-        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
-        ontologyType = identifier.ontologyType,
-        identifier = identifier
-      )
-      assertLookupIDFindsMatch(
-        sourceIdentifiers = List(miroSourceIdentifier),
-        ontologyType = identifier.ontologyType,
-        identifier = identifier
-      )
-      assertLookupIDFindsMatch(
-        sourceIdentifiers = List(sierraSourceIdentifier),
-        ontologyType = identifier.ontologyType,
-        identifier = identifier
-      )
-    }
-
-    it("Multiple Miro IDs with different ontology types") {
-      val identifier = Identifier(
-        CanonicalID = "t3qf9q24",
-        MiroID = miroSourceIdentifier.value,
-        ontologyType = "TestWork"
-      )
-      val identifierAlt = Identifier(
-        CanonicalID = "zehhzpsr",
-        MiroID = miroSourceIdentifier.value,
-        ontologyType = "TestWorkAlt"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-      assertInsertingIdentifierSucceeds(identifierAlt)
-
-      for (id <- List(identifier, identifierAlt))
-        assertLookupIDFindsMatch(
-          sourceIdentifiers = List(miroSourceIdentifier),
-          ontologyType = id.ontologyType,
-          identifier = id
-        )
-    }
-
-    it(
-      "Only a Miro ID in the database, but searching for both Miro and Sierra IDs") {
-      val identifier = Identifier(
-        CanonicalID = "hydmw9zy",
-        MiroID = miroSourceIdentifier.value,
-        SierraSystemNumber = sierraSourceIdentifier.value
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsMatch(
-        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
-        ontologyType = identifier.ontologyType,
-        identifier = identifier
-      )
-    }
-  }
-
-  describe(
-    "lookupID should return a future of None if it can't find a matching ID") {
-    it("empty database, looking for a Miro ID") {
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier)
-      )
-    }
-
-    it("empty database, looking for a Sierra ID") {
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(sierraSourceIdentifier)
-      )
-    }
-
-    it("empty database, looking for a Miro ID and a Sierra ID") {
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier)
-      )
-    }
-
-    it("matching Miro ID, wrong ontology type") {
-      val identifier = Identifier(
-        CanonicalID = "qk9yeajr",
-        MiroID = miroSourceIdentifier.value,
-        ontologyType = "TestItem"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-    }
-
-    it("matching Sierra ID, wrong ontology type") {
-      val identifier = Identifier(
-        CanonicalID = "pptk9sz6",
-        SierraSystemNumber = sierraSourceIdentifier.value,
-        ontologyType = "TestItem"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(sierraSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(sierraSourceIdentifier, miroSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-    }
-
-    it("matching Sierra ID and Miro ID, wrong ontology type") {
-      val identifier = Identifier(
-        CanonicalID = "w9wr583y",
-        SierraSystemNumber = sierraSourceIdentifier.value,
-        MiroID = miroSourceIdentifier.value,
-        ontologyType = "TestItem"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(sierraSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(sierraSourceIdentifier, miroSourceIdentifier),
-        ontologyType = "TestWork"
-      )
-    }
-
-    it("matching Miro ID, wrong Sierra ID") {
-      val identifier = Identifier(
-        CanonicalID = "qs5apdq8",
-        MiroID = miroSourceIdentifier.value,
-        SierraSystemNumber = "Not a real Sierra ID",
-        ontologyType = "TestWork"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
-        ontologyType = identifier.ontologyType
-      )
-    }
-
-    it("matching Sierra ID, wrong Miro ID") {
-      val identifier = Identifier(
-        CanonicalID = "qs5apdq8",
-        MiroID = "Not a real MiroID",
-        SierraSystemNumber = sierraSourceIdentifier.value,
-        ontologyType = "TestWork"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier, sierraSourceIdentifier),
-        ontologyType = identifier.ontologyType
-      )
-    }
-
-    it("right ontology type, wrong IDs") {
-      val identifier = Identifier(
-        CanonicalID = "eqg6v2ws",
-        MiroID = "A misleading Miro ID",
-        SierraSystemNumber = "A spurious Sierra ID",
-        ontologyType = "TestWork"
-      )
-      assertInsertingIdentifierSucceeds(identifier)
-
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(sierraSourceIdentifier),
-        ontologyType = identifier.ontologyType
-      )
-      assertLookupIDFindsNothing(
-        sourceIdentifiers = List(miroSourceIdentifier),
-        ontologyType = identifier.ontologyType
-      )
-    }
-  }
-
-  private def assertLookupIDFindsMatch(
-    sourceIdentifiers: List[SourceIdentifier],
-    ontologyType: String = "TestWork",
-    identifier: Identifier) = {
-    val triedLookup = identifiersDao.lookupID(
-      sourceIdentifiers = sourceIdentifiers,
+    val triedLookup = identifiersDao.lookupId(
+      sourceIdentifier = sourceIdentifier,
       ontologyType = ontologyType
     )
+
     triedLookup shouldBe a[Success[Option[String]]]
-    val maybeIdentifier = triedLookup.get
-    maybeIdentifier shouldBe defined
-    maybeIdentifier.get shouldBe identifier
+
+    val identifier = triedLookup.get.get
+    identifier shouldBe identifier
   }
 
-  private def assertLookupIDFindsNothing(
-    sourceIdentifiers: List[SourceIdentifier],
-    ontologyType: String = "TestWork") {
-    val triedLookup = identifiersDao.lookupID(
-      sourceIdentifiers = sourceIdentifiers,
+  private def assertLookupIDFindsNothing(sourceIdentifier: SourceIdentifier,
+                                         ontologyType: String = "TestWork") {
+
+    val triedLookup = identifiersDao.lookupId(
+      sourceIdentifier = sourceIdentifier,
       ontologyType = ontologyType
     )
+
     triedLookup shouldBe a[Success[Option[String]]]
-    val maybeIdentifier = triedLookup.get
-    maybeIdentifier shouldNot be(defined)
+
+    val identifier = triedLookup.get
+    identifier shouldBe None
   }
 
   describe("saveIdentifier") {
     it("should insert the provided identifier into the database") {
       val identifier = Identifier(
-        CanonicalID = "A provision of porpoises",
-        MiroID = "A picture of pangolins",
-        ontologyType = "Work"
+        CanonicalId = "A provision of porpoises",
+        OntologyType = "Work",
+        SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+        SourceId = "A picture of pangolins"
       )
       identifiersDao.saveIdentifier(identifier)
       val maybeIdentifier = withSQL {
         select
           .from(identifiersTable as identifiersTable.i)
           .where
-          .eq(identifiersTable.i.MiroID, identifier.MiroID)
+          .eq(identifiersTable.i.SourceSystem,
+              IdentifierSchemes.miroImageNumber.toString)
           .and
-          .eq(identifiersTable.i.CanonicalID, identifier.CanonicalID)
+          .eq(identifiersTable.i.CanonicalId, identifier.CanonicalId)
       }.map(Identifier(identifiersTable.i)).single.apply()
 
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe identifier
     }
 
-    it("should fail to insert a record with a duplicate CanonicalID") {
+    it("should fail to insert a record with a duplicate CanonicalId") {
       val identifier = new Identifier(
-        CanonicalID = "A failed field of flowers",
-        MiroID = "A farm full of fruit",
-        ontologyType = "Fruits"
+        CanonicalId = "A failed field of flowers",
+        SourceId = "A farm full of fruit",
+        SourceSystem = "France",
+        OntologyType = "Fruits"
       )
       val duplicateIdentifier = new Identifier(
-        CanonicalID = identifier.CanonicalID,
-        MiroID = "Fuel for a factory",
-        ontologyType = "Fuels"
+        CanonicalId = identifier.CanonicalId,
+        SourceId = "Fuel for a factory",
+        SourceSystem = "Space",
+        OntologyType = "Fuels"
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
     }
 
     it(
-      "should allow saving two records with the same MiroID but different ontologyType") {
+      "should save records with the same SourceSystem and SourceId but different OntologyType") {
       val identifier = new Identifier(
-        CanonicalID = "A mountain of muesli",
-        MiroID = "A maize made of maze",
-        ontologyType = "Cereals"
+        CanonicalId = "A mountain of muesli",
+        SourceSystem = "A maize made of maze",
+        SourceId = "A maize made of maze",
+        OntologyType = "Cereals"
       )
+
       val secondIdentifier = new Identifier(
-        CanonicalID = "A mere mango",
-        MiroID = identifier.MiroID,
-        ontologyType = "Fruits"
+        CanonicalId = "A mere mango",
+        SourceSystem = identifier.SourceSystem,
+        SourceId = "A maize made of maze",
+        OntologyType = "Fruits"
       )
       assertInsertingIdentifierSucceeds(identifier)
       assertInsertingIdentifierSucceeds(secondIdentifier)
     }
 
     it(
-      "should allow saving two records with different MiroID but the same ontologyType") {
+      "should save records with different SourceId but the same OntologyType and SourceSystem") {
       val identifier = new Identifier(
-        CanonicalID = "Overflowing with okra",
-        MiroID = "Olive oil in an orchard",
-        ontologyType = "Crops"
+        CanonicalId = "Overflowing with okra",
+        SourceId = "Olive oil in an orchard",
+        SourceSystem = "A hedge maze in Loughborough",
+        OntologyType = "Crops"
       )
       val secondIdentifier = new Identifier(
-        CanonicalID = "An order of onions",
-        MiroID = "Only orange orbs",
-        ontologyType = identifier.ontologyType
+        CanonicalId = "An order of onions",
+        SourceId = "Only orange orbs",
+        SourceSystem = "A hedge maze in Loughborough",
+        OntologyType = identifier.OntologyType
       )
       assertInsertingIdentifierSucceeds(identifier)
       assertInsertingIdentifierSucceeds(secondIdentifier)
     }
 
     it(
-      "should reject inserting two records with the same MiroID and ontologyType") {
+      "should not insert records with the same SourceId, SourceSystem and OntologyType") {
       val identifier = new Identifier(
-        CanonicalID = "A surplus of strawberries",
-        MiroID = "Sunflower seeds in a sack",
-        ontologyType = "Cropssss"
+        CanonicalId = "A surplus of strawberries",
+        SourceId = "Sunflower seeds in a sack",
+        SourceSystem = "The microscopic world of eyelash lice",
+        OntologyType = "Cropssss"
       )
       val duplicateIdentifier = new Identifier(
-        CanonicalID = "Sweeteners and sugar cane",
-        MiroID = identifier.MiroID,
-        ontologyType = identifier.ontologyType
+        CanonicalId = "Sweeteners and sugar cane",
+        SourceId = identifier.SourceId,
+        SourceSystem = identifier.SourceSystem,
+        OntologyType = identifier.OntologyType
       )
 
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)

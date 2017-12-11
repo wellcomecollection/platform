@@ -18,6 +18,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     s"""
       |{
       |  "title": "title",
+      |  "sourceIdentifier": {
+      |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "value": "value"
+      |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -57,6 +61,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "items": [
       |    {
       |      "canonicalId": "canonicalId",
+      |      "sourceIdentifier": {
+      |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "value": "value"
+      |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -81,6 +89,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     s"""
       |{
       |  "title": "title",
+      |  "sourceIdentifier": {
+      |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "value": "value"
+      |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -119,6 +131,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "items": [
       |    {
       |      "canonicalId": "canonicalId",
+      |      "sourceIdentifier": {
+      |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "value": "value"
+      |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -152,11 +168,13 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   val item = Item(
     canonicalId = Some("canonicalId"),
+    sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
   )
 
   val unidentifiedWork = Work(
+    sourceIdentifier = identifier,
     identifiers = List(identifier),
     title = "title",
     description = Some("description"),
@@ -171,6 +189,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   val identifiedWork = Work(
     canonicalId = Some("canonicalId"),
+    sourceIdentifier = identifier,
     identifiers = unidentifiedWork.identifiers,
     title = unidentifiedWork.title,
     description = unidentifiedWork.description,
@@ -220,7 +239,8 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   it("should have an ontology type 'Work' when serialised to JSON") {
     val work = Work(
-      identifiers = List(),
+      sourceIdentifier = identifier,
+      identifiers = List(identifier),
       title = "A book about a blue whale"
     )
     val jsonString = JsonUtil.toJson(work).get

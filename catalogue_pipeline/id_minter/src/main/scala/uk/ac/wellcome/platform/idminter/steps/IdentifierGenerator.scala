@@ -1,14 +1,10 @@
 package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
-import com.twitter.inject.annotations.Flag
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.database.{
-  IdentifiersDao,
-  UnableToMintIdentifierException
-}
+import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
@@ -16,67 +12,51 @@ import scala.util.Try
 
 class IdentifierGenerator @Inject()(
   identifiersDao: IdentifiersDao,
-  metricsSender: MetricsSender,
-  @Flag("known.identifierSchemes") knownIdentifierSchemes: String)
-    extends Logging
+  metricsSender: MetricsSender
+) extends Logging
     with TwitterModuleFlags {
-  private val knownIdentifierSchemeList =
-    knownIdentifierSchemes.split(",").map(_.trim).toList
 
-  def retrieveOrGenerateCanonicalId(identifiers: List[SourceIdentifier],
-                                    ontologyType: String): Try[String] = {
+  def retrieveOrGenerateCanonicalId(
+    identifier: SourceIdentifier,
+    ontologyType: String
+  ): Try[String] = {
     Try {
-      val idsWithKnownSchemes = identifiers.filter(
-        identifier =>
-          knownIdentifierSchemeList.contains(
-            identifier.identifierScheme.toString))
-      if (idsWithKnownSchemes.isEmpty) {
-        throw UnableToMintIdentifierException(
-          "identifiers list did not contain a known identifierScheme")
-      } else {
-        identifiersDao.lookupID(idsWithKnownSchemes, ontologyType).flatMap {
+      identifiersDao
+        .lookupId(
+          sourceIdentifier = identifier,
+          ontologyType = ontologyType
+        )
+        .flatMap {
           case Some(id) =>
             metricsSender.incrementCount("found-old-id")
-            Try(id.CanonicalID)
+            Try(id.CanonicalId)
           case None =>
             val result =
-              generateAndSaveCanonicalId(idsWithKnownSchemes, ontologyType)
+              generateAndSaveCanonicalId(identifier, ontologyType)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
             result
         }
-      }
     }.flatten
   }
 
-  private def generateAndSaveCanonicalId(identifiers: List[SourceIdentifier],
-                                         ontologyType: String): Try[String] = {
+  private def generateAndSaveCanonicalId(
+    identifier: SourceIdentifier,
+    ontologyType: String
+  ): Try[String] = {
+
     val canonicalId = Identifiable.generate
     identifiersDao
       .saveIdentifier(
         Identifier(
-          MiroID = findIdentifierWith(
-            identifiers,
-            IdentifierSchemes.miroImageNumber
-          ),
-          SierraSystemNumber = findIdentifierWith(
-            identifiers,
-            IdentifierSchemes.sierraSystemNumber
-          ),
-          CanonicalID = canonicalId,
-          ontologyType = ontologyType
+          CanonicalId = canonicalId,
+          OntologyType = ontologyType,
+          SourceSystem = identifier.identifierScheme.toString,
+          SourceId = identifier.value
         ))
       .map { _ =>
         canonicalId
       }
-  }
-
-  private def findIdentifierWith(
-    identifiers: List[SourceIdentifier],
-    identifierScheme: IdentifierSchemes.IdentifierScheme): String = {
-    identifiers
-      .find(identifier => identifier.identifierScheme == identifierScheme)
-      .fold[String](null)(identifier => identifier.value)
   }
 }

@@ -12,10 +12,10 @@ class IdentifiersTable @Inject()(
   override val tableName = table
   override val useSnakeCaseColumnName = false
   override val columns = Seq(
-    "CanonicalID",
-    "ontologyType",
-    "MiroID",
-    "SierraSystemNumber"
+    "CanonicalId",
+    "OntologyType",
+    "SourceSystem",
+    "SourceId"
   )
 
   val i = this.syntax("i")

@@ -11,9 +11,6 @@ import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import scala.concurrent.blocking
 import scala.util.Try
 
-case class UnableToMintIdentifierException(message: String)
-    extends Exception(message)
-
 @Singleton
 class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     extends Logging {
@@ -26,52 +23,32 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    * This method looks for existing IDs that have matching ontology type and
    * source identifiers.
    */
-  def lookupID(sourceIdentifiers: List[SourceIdentifier],
-               ontologyType: String): Try[Option[Identifier]] = {
+  def lookupId(
+    sourceIdentifier: SourceIdentifier,
+    ontologyType: String
+  ): Try[Option[Identifier]] = Try {
 
-    // TODO: This exception should be handled gracefully, not sent around the
-    // TryBackoff ad infinitum.
-    Try {
-      if (sourceIdentifiers.isEmpty) {
-        throw UnableToMintIdentifierException(
-          "No source identifiers supplied!")
-      } else {
+    val sourceSystem = sourceIdentifier.identifierScheme.toString
+    val sourceId = sourceIdentifier.value
 
-        blocking {
-          info(
-            s"About to search for existing ID matching $identifiers and $ontologyType")
-          val i = identifiers.i
-          val query = withSQL {
-            select
-              .from(identifiers as i)
-              .where
+    // TODO: handle gracefully, don't TryBackoff ad infinitum
+    blocking {
+      info(s"Matching ($sourceIdentifier, $ontologyType)")
 
-              // We always want to match the ontology type, and this field
-              // in SQL is never null.
-              .eq(i.ontologyType, ontologyType)
+      val i = identifiers.i
+      val query = withSQL {
+        select
+          .from(identifiers as i)
+          .where
+          .eq(i.OntologyType, ontologyType)
+          .and
+          .eq(i.SourceSystem, sourceSystem)
+          .and
+          .eq(i.SourceId, sourceId)
 
-              // Add conditions for matching on different source identifiers.
-              .map { sql: ConditionSQLBuilder[String] =>
-                addConditionForLookingUpID(
-                  sql = sql,
-                  sourceIdentifiers = sourceIdentifiers,
-                  column = i.MiroID,
-                  identifierScheme = IdentifierSchemes.miroImageNumber
-                )
-              }
-              .map { sql: ConditionSQLBuilder[String] =>
-                addConditionForLookingUpID(
-                  sql = sql,
-                  sourceIdentifiers = sourceIdentifiers,
-                  column = i.SierraSystemNumber,
-                  identifierScheme = IdentifierSchemes.sierraSystemNumber
-                )
-              }
-          }.map(Identifier(i)).single
-          debug(s"Executing SQL query = '${query.statement}'")
-          query.apply()
-        }
-      }
+      }.map(Identifier(i)).single
+      debug(s"Executing:'${query.statement}'")
+      query.apply()
     }
   }
 
@@ -88,10 +65,10 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
           insert
             .into(identifiers)
             .namedValues(
-              identifiers.column.CanonicalID -> identifier.CanonicalID,
-              identifiers.column.ontologyType -> identifier.ontologyType,
-              identifiers.column.MiroID -> identifier.MiroID,
-              identifiers.column.SierraSystemNumber -> identifier.SierraSystemNumber
+              identifiers.column.CanonicalId -> identifier.CanonicalId,
+              identifiers.column.OntologyType -> identifier.OntologyType,
+              identifiers.column.SourceSystem -> identifier.SourceSystem,
+              identifiers.column.SourceId -> identifier.SourceId
             )
         }.update().apply()
       }

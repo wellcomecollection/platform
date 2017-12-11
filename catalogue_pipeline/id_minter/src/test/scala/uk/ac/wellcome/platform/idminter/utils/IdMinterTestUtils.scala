@@ -30,17 +30,21 @@ trait IdMinterTestUtils
         "aws.region" -> "localhost",
         "aws.sqs.queue.url" -> idMinterQueue,
         "aws.sqs.waitTime" -> "1",
-        "aws.sns.topic.arn" -> ingestorTopicArn,
-        "known.identifierSchemes" -> s"${IdentifierSchemes.miroImageNumber},${IdentifierSchemes.sierraSystemNumber}"
+        "aws.sns.topic.arn" -> ingestorTopicArn
       ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags ++ cloudWatchLocalEndpointFlag
     )
   }
 
   def generateSqsMessage(MiroID: String): SQSMessage = {
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
+
     val work = Work(
-      identifiers =
-        List(SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)),
-      title = "A query about a queue of quails")
+      sourceIdentifier = identifier,
+      identifiers = List(identifier),
+      title = "A query about a queue of quails"
+    )
+
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,
                "topic",
@@ -58,8 +62,10 @@ trait IdMinterTestUtils
 
     eventually {
       sqsClient
-        .getQueueAttributes(idMinterQueue,
-                            List("ApproximateNumberOfMessagesNotVisible"))
+        .getQueueAttributes(
+          idMinterQueue,
+          List("ApproximateNumberOfMessagesNotVisible")
+        )
         .getAttributes
         .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
     }
