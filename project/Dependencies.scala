@@ -97,5 +97,5 @@ object Dependencies {
     "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
   )
 
-  val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
+  val sierraMergerDepedencies: Seq[ModuleID] = commonDependencies
 }
