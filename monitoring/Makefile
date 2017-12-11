@@ -11,35 +11,24 @@ endif
 
 include $(ROOT)/functions.Makefile
 
-## Build post_to_slack lambda
-post_to_slack-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(MONITORING)/post_to_slack:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
 
-## Test post_to_slack lambda
-post_to_slack-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(MONITORING)/post_to_slack/src:/data \
-		--env OP=test \
-		--env FIND_MATCH_PATHS="/data" --tty \
-		python3.6_ci:latest
+post_to_slack-build:
+	$(call build_lambda,monitoring/post_to_slack)
 
-## Publish post_to_slack lambda
+post_to_slack-test:
+	$(call test_lambda,monitoring/post_to_slack)
+
 post_to_slack-publish:
 	$(call publish_lambda,monitoring/post_to_slack)
 
-## Test monitoring
+
 monitoring-test: post_to_slack-test deployment_tracking-test ecs_dashboard-test load_test-test
 
-## Publish monitoring
 monitoring-deploy: post_to_slack-publish deployment_tracking-deploy ecs_dashboard-deploy load_test-deploy
 
-## Terraform plan on monitoring stack
+
 monitoring-terraform-plan:
 	$(call terraform_plan,$(MONITORING))
 
-## Terraform apply on monitoring stack
 monitoring-terraform-apply:
 	$(call terraform_apply,$(MONITORING))

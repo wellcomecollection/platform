@@ -7,21 +7,11 @@ endif
 
 include $(ROOT)/functions.Makefile
 
-## Build update_dynamo_capacity lambda
-update_dynamo_capacity-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(SHARED_INFRA)/update_dynamo_capacity:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
+update_dynamo_capacity-build:
+	$(call build_lambda,shared_infra/update_dynamo_capacity)
 
-## Test update_dynamo_capacity lambda
-update_dynamo_capacity-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(SHARED_INFRA)/update_dynamo_capacity/src:/data \
-		--env OP=test \
-		--env FIND_MATCH_PATHS="/data" --tty \
-		python3.6_ci:latest
+update_dynamo_capacity-test:
+	$(call test_lambda,shared_infra/update_dynamo_capacity)
 
-## Publish update_dynamo_capacity lambda
 update_dynamo_capacity-publish:
 	$(call publish_lambda,shared_infra/update_dynamo_capacity)
