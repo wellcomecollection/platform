@@ -10,7 +10,7 @@ ALTER TABLE ${tableName}
 CHANGE COLUMN MiroID SourceId varchar(255) NOT NULL;
 
 ALTER TABLE ${tableName}
-ADD COLUMN SourceSystem varchar(255) NOT NULL DEFAULT 'miroImageNumber';
+ADD COLUMN SourceSystem varchar(255) NOT NULL DEFAULT 'miro-image-number';
 
 ALTER TABLE ${tableName}
 ALTER COLUMN SourceSystem DROP DEFAULT;
