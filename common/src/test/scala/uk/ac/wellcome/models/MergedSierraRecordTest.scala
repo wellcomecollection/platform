@@ -192,11 +192,12 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     val mergedSierraRecord = MergedSierraRecord(
       id = "b111",
       maybeBibData = None,
-      itemData = Map("i111" -> sierraItemRecord(
-        id = "i111",
-        title = "An incomplete invocation of items",
-        modifiedDate = "2001-01-01T01:01:01Z"
-      ))
+      itemData = Map(
+        "i111" -> sierraItemRecord(
+          id = "i111",
+          title = "An incomplete invocation of items",
+          modifiedDate = "2001-01-01T01:01:01Z"
+        ))
     )
 
     val transformedSierraRecord = mergedSierraRecord.transform
