@@ -22,7 +22,7 @@ import scala.util.{Success, Try}
 case class MergedSierraRecord(
   id: String,
   maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map(),
+  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
   version: Int = 1
 ) extends Transformable {
 
