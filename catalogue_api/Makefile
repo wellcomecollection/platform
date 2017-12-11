@@ -10,7 +10,7 @@ api_docs-deploy: api_docs-build
 	$(call publish_service,update_api_docs)
 
 
-api-test: $(ROOT)/.docker/sbt_test
+api-test:
 	$(call sbt_test,api)
 
 api-build: $(ROOT)/.docker/sbt_image_builder
