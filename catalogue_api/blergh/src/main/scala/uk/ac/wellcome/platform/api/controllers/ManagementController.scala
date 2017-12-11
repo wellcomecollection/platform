@@ -8,7 +8,7 @@ import com.twitter.inject.annotations.Flag
 
 @Singleton
 class ManagementController @Inject()(
-                                    @Flag("api.name") apiName: String
+  @Flag("api.name") apiName: String
 ) extends Controller {
 
   get("/management/healthcheck") { request: Request =>
