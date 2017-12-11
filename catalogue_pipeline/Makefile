@@ -22,16 +22,16 @@ transformer-build: $(ROOT)/.docker/sbt_image_builder
 	PROJECT=transformer $(ROOT)/builds/run_sbt_image_build.sh
 
 
-id_minter-test: $(ROOT)/.docker/sbt_test
+id_minter-test:
 	$(call sbt_test,id_minter)
 
-ingestor-test: $(ROOT)/.docker/sbt_test
+ingestor-test:
 	$(call sbt_test,ingestor)
 
-reindexer-test: $(ROOT)/.docker/sbt_test
+reindexer-test:
 	$(call sbt_test,reindexer)
 
-transformer-test: $(ROOT)/.docker/sbt_test
+transformer-test:
 	$(call sbt_test,transformer)
 
 

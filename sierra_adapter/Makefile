@@ -6,7 +6,7 @@ SIERRA_ADAPTER = $(ROOT)/sierra_adapter
 include $(SIERRA_ADAPTER)/sierra_window_generator/Makefile
 include $(ROOT)/functions.Makefile
 
-sierra_to_dynamo-test: $(ROOT)/.docker/sbt_test
+sierra_to_dynamo-test:
 	$(call sbt_test,sierra_to_dynamo)
 
 sierra_to_dynamo-build: $(ROOT)/.docker/sbt_image_builder
@@ -17,7 +17,7 @@ sierra_to_dynamo-publish: sierra_to_dynamo-build
 	$(call publish_service,sierra_to_dynamo)
 
 
-sierra_bib_merger-test: $(ROOT)/.docker/sbt_test
+sierra_bib_merger-test:
 	$(call sbt_test,sierra_bib_merger)
 
 sierra_bib_merger-build: $(ROOT)/.docker/sbt_image_builder
