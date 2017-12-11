@@ -59,7 +59,26 @@ case class MergedSierraRecord(
     * Returns None if there's nothing to do.
     */
   def mergeItemRecord(record: SierraItemRecord): Option[MergedSierraRecord] = {
-    None
+
+    // We can decide whether to insert the new data in two steps:
+    //
+    //  - Do we already have any data for this item?  If not, we definitely
+    //    need to merge this record.
+    //  - If we have existing data, is it newer or older than the update we've
+    //    just received?  If the existing data is older, we need to merge the
+    //    new record.
+    //
+    val isNewerData = this.itemData.get(record.id) match {
+      case Some(existing) => record.modifiedDate.isAfter(existing.modifiedDate)
+      case None => true
+    }
+
+    if (isNewerData) {
+      val itemData = this.itemData + (record.id -> record)
+      Some(this.copy(itemData = itemData))
+    } else {
+      None
+    }
   }
 
   override def transform: Try[Option[Work]] =
