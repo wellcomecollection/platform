@@ -23,16 +23,16 @@ transformer-build: $(ROOT)/.docker/sbt_image_builder
 
 
 id_minter-test: $(ROOT)/.docker/sbt_test
-	PROJECT=id_minter $(ROOT)/builds/test_sbt_project.sh
+	$(call sbt_test,id_minter)
 
 ingestor-test: $(ROOT)/.docker/sbt_test
-	PROJECT=ingestor $(ROOT)/builds/test_sbt_project.sh
+	$(call sbt_test,ingestor)
 
 reindexer-test: $(ROOT)/.docker/sbt_test
-	PROJECT=reindexer $(ROOT)/builds/test_sbt_project.sh
+	$(call sbt_test,reindexer)
 
 transformer-test: $(ROOT)/.docker/sbt_test
-	PROJECT=transformer $(ROOT)/builds/test_sbt_project.sh
+	$(call sbt_test,transformer)
 
 
 id_minter-deploy: id_minter-build

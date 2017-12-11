@@ -11,7 +11,7 @@ api_docs-deploy: api_docs-build
 
 
 api-test: $(ROOT)/.docker/sbt_test
-	PROJECT=api ./builds/test_sbt_project.sh
+	$(call sbt_test,api)
 
 api-build: $(ROOT)/.docker/sbt_image_builder
 	TARGET=catalogue_api/api/target \
