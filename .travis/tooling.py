@@ -34,6 +34,64 @@ def changed_files(*args):
     return files
 
 
+def has_no_effect_on_tests(path, task):
+    """Is this a file we can safely assume has no effect on tests?"""
+    # Nothing reads our Markdown files in tests, so we can ignore their
+    # effect here.
+    if path.endswith(('.md', '.png')) or path == 'LICENSE':
+        return True
+
+    # The ``misc`` folder is never used anywhere, so we can ignore it.
+    if path.startswith('misc/'):
+        return True
+
+    # We do lint the JSON and TTL files in the ontologies directory when
+    # running in CI, but not in any of the code tests.
+    #
+    # Since linting already happens unconditionally, we can ignore changes
+    # to this directory as well.
+    if path.startswith('ontologies/'):
+        return True
+
+    # For each task, which directories only have an effect on this task?
+    #
+    # For example, changes to the ``loris`` directory only have an effect
+    # on the ``loris`` task; in any other task changes to that directory
+    # can be ignored.
+    task_specific_directories = {
+        'loris': ['loris'],
+        'sierra_adapter': ['sierra_adapter'],
+        'id_minter': ['catalogue_pipeline/id_minter'],
+        'ingestor': ['catalogue_pipeline/ingestor'],
+        'reindexer': ['catalogue_pipeline/reindexer'],
+        'transformer': ['catalogue_pipeline/transformer'],
+        'api': ['catalogue_api'],
+        'monitoring': ['monitoring'],
+        'shared_infra': ['shared_infra'],
+        'nginx': ['nginx'],
+    }
+
+    # If we have a change to a file which is specific to a particular task,
+    # but we're *not* in that task, this change is unimportant.
+    for prefix, directories in task_specific_directories.items():
+        if not task.startswith(prefix) and path.startswith(tuple(directories)):
+            return True
+
+        if task.startswith(prefix) and path.startswith(tuple(directories)):
+            return False
+
+    # The top-level common directory contains some Scala files which are
+    # shared across multiple projects.  If we're definitely in a project
+    # which doesn't use this sbt-common lib, we can ignore changes to it.
+    sbt_free_tasks = ('loris', 'monitoring', 'shared_infra')
+    if task.startswith(sbt_free_tasks) and path.startswith('common/'):
+        return True
+
+    # Otherwise, we were unable to decide if this change was important.
+    # We assume that it is, so we'll run tests just in case.
+    return False
+
+
 def are_there_job_relevant_changes(changed_files, task):
     """
     Given a list of changed files and a Make task, are there any reasons
@@ -46,67 +104,42 @@ def are_there_job_relevant_changes(changed_files, task):
     """
     reasons = []
 
-    if 'format' in task:
-        reasons.append('Linting/formatting tasks always run')
+    # These tests are usually fast; we always run them rather than trying
+    # to keep up-to-date rules of exactly which changed files mean they
+    # should run.
+    if task in [
+        'travis-format'
+    ]:
+        reasons.append('We always run the %s task' % task)
 
-    if 'Makefile' in changed_files:
-        reasons.append('Changes to the Makefile')
+    # These files are so fundamental to the build process that if they change,
+    # we should do a complete rebuild just to be safe.
+    if any(f in changed_files for f in [
+        'Makefile',
+        'functions.Makefile',
+        'shared.Makefile'
+    ]):
+        reasons.append('Changes to a core Makefile')
 
     if any(f.startswith('.travis') for f in changed_files):
         reasons.append('Changes to the Travis config')
 
     if any(f.startswith('builds/') for f in changed_files):
         reasons.append('Changes to the build scripts')
+    # Since it's better to run tests when we didn't need to, than skip tests
+    # when it was important, we remove any files which we know are safe to
+    # ignore, and run tests if there's anything left.
+    interesting_changed_files = [
+        c for c in changed_files if not has_no_effect_on_tests(f, task=task)
+    ]
 
-    if (
-        any(task.startswith(p) for p in _sbt_projects()) or
-        task == 'sbt-common-test'
-    ):
-        reasons.extend(_are_there_sbt_relevant_changes(changed_files, task))
-
-    for project in os.listdir(ROOT):
-        if task.startswith(project):
-            if any(f.startswith('%s/' % project) for f in changed_files):
-                reasons.append('Changes to %s/' % project)
-
-    return reasons
-
-
-def _sbt_projects():
-    """Returns a list of sbt project names."""
-    for line in open(os.path.join(ROOT, 'build.sbt')):
-        m = re.match(r'lazy val (?P<project>[a-z_]+)', line)
-        if (m is not None) and (m.group('project') != 'root'):
-            yield m.group('project')
-
-
-def _are_there_sbt_relevant_changes(changed_files, task):
-    """
-    Return a list of reasons we might want to re-run an sbt task.
-    """
-    reasons = []
-
-    if 'build.sbt' in changed_files:
-        reasons.append('Changes to build.sbt')
-
-    sbt_project = task.split('-')[-1]
-    for dirname in ['common', 'project', sbt_project]:
-        if any(dirname in f for f in changed_files):
-            reasons.append('Changes to %s/' % dirname)
+    if interesting_changed_files:
+        reasons.append(
+            'Changes to the following files mean we need to run tests: %s' %
+            ', '.join(interesting_changed_files)
+        )
 
     return reasons
-
-
-def _are_there_docker_relevant_changes(changed_files, task):
-    """
-    Return a list of reasons we might want to re-run a task in the
-    docker directory.
-    """
-    image = task.split('-')[0]
-    if any(f.startswith('docker/%s/' % image) for f in changed_files):
-        return ['Changes to docker/%s' % image]
-    else:
-        return []
 
 
 def make_decision(changed_files, task, action):
