@@ -4,10 +4,7 @@ import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.transformer.utils.{
-  TransformableSQSMessageUtils,
-  TransformerFeatureTest
-}
+import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
 import uk.ac.wellcome.utils.JsonUtil
 
 class SierraTransformerFeatureTest
@@ -32,8 +29,11 @@ class SierraTransformerFeatureTest
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
-    val sqsMessage =
-      createValidSierraBibSQSMessage(id, title, lastModifiedDate)
+    val sqsMessage = createValidSierraBibSQSMessage(
+      id,
+      title,
+      lastModifiedDate
+    )
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
@@ -41,10 +41,17 @@ class SierraTransformerFeatureTest
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size 1
 
+      val sourceIdentifier = SourceIdentifier(
+        IdentifierSchemes.sierraSystemNumber,
+        id
+      )
+
       val expectedWork = Work(
+        sourceIdentifier = sourceIdentifier,
         title = title,
-        identifiers =
-          List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))
+        identifiers = List(sourceIdentifier)
+      )
+
       snsMessages.head.message shouldBe JsonUtil.toJson(expectedWork).get
     }
   }
