@@ -48,7 +48,8 @@ class SQSMessageReceiverTest
   val failingTransformMiroSqsMessage: SQSMessage =
     createValidMiroSQSMessage("""{}""")
 
-  val sourceIdentifier = SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
+  val sourceIdentifier =
+    SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
 
   val work = Work(
     sourceIdentifier = sourceIdentifier,

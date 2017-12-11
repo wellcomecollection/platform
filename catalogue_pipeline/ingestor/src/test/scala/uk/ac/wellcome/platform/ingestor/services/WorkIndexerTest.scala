@@ -34,14 +34,16 @@ class WorkIndexerTest
       sourceId
     )
 
-    JsonUtil.toJson(
+    JsonUtil
+      .toJson(
         Work(
           canonicalId = Some(canonicalId),
           sourceIdentifier = sourceIdentifier,
           identifiers = List(sourceIdentifier),
           title = title
         )
-    ).get
+      )
+      .get
   }
 
   it("should insert an identified item into Elasticsearch") {

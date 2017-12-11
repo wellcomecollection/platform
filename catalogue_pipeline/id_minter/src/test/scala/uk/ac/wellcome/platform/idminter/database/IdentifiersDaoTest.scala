@@ -18,7 +18,8 @@ class IdentifiersDaoTest
   val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
   describe("lookupID") {
-    it("gets an Identifier if it can find a matching SourceSystem and SourceId") {
+    it(
+      "gets an Identifier if it can find a matching SourceSystem and SourceId") {
       val identifier = Identifier(
         CanonicalId = "A turtle turns to try to taste",
         SourceId = "A tangerine",
@@ -28,8 +29,8 @@ class IdentifiersDaoTest
       assertInsertingIdentifierSucceeds(identifier)
 
       val sourceIdentifier = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
-          value = identifier.SourceId
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        value = identifier.SourceId
       )
 
       val triedLookup = identifiersDao.lookupId(
@@ -63,9 +64,8 @@ class IdentifiersDaoTest
     }
   }
 
-  private def assertLookupIDFindsMatch(
-    sourceIdentifier: SourceIdentifier,
-    ontologyType: String = "TestWork") = {
+  private def assertLookupIDFindsMatch(sourceIdentifier: SourceIdentifier,
+                                       ontologyType: String = "TestWork") = {
 
     val triedLookup = identifiersDao.lookupId(
       sourceIdentifier = sourceIdentifier,
@@ -78,9 +78,8 @@ class IdentifiersDaoTest
     identifier shouldBe identifier
   }
 
-  private def assertLookupIDFindsNothing(
-    sourceIdentifier: SourceIdentifier,
-    ontologyType: String = "TestWork") {
+  private def assertLookupIDFindsNothing(sourceIdentifier: SourceIdentifier,
+                                         ontologyType: String = "TestWork") {
 
     val triedLookup = identifiersDao.lookupId(
       sourceIdentifier = sourceIdentifier,
@@ -106,7 +105,8 @@ class IdentifiersDaoTest
         select
           .from(identifiersTable as identifiersTable.i)
           .where
-          .eq(identifiersTable.i.SourceSystem, IdentifierSchemes.miroImageNumber.toString)
+          .eq(identifiersTable.i.SourceSystem,
+              IdentifierSchemes.miroImageNumber.toString)
           .and
           .eq(identifiersTable.i.CanonicalId, identifier.CanonicalId)
       }.map(Identifier(identifiersTable.i)).single.apply()
@@ -132,7 +132,8 @@ class IdentifiersDaoTest
       assertInsertingDuplicateFails(identifier, duplicateIdentifier)
     }
 
-    it("should save records with the same SourceSystem and SourceId but different OntologyType") {
+    it(
+      "should save records with the same SourceSystem and SourceId but different OntologyType") {
       val identifier = new Identifier(
         CanonicalId = "A mountain of muesli",
         SourceSystem = "A maize made of maze",
@@ -150,7 +151,8 @@ class IdentifiersDaoTest
       assertInsertingIdentifierSucceeds(secondIdentifier)
     }
 
-    it("should save records with different SourceId but the same OntologyType and SourceSystem") {
+    it(
+      "should save records with different SourceId but the same OntologyType and SourceSystem") {
       val identifier = new Identifier(
         CanonicalId = "Overflowing with okra",
         SourceId = "Olive oil in an orchard",
@@ -167,7 +169,8 @@ class IdentifiersDaoTest
       assertInsertingIdentifierSucceeds(secondIdentifier)
     }
 
-    it("should not insert records with the same SourceId, SourceSystem and OntologyType") {
+    it(
+      "should not insert records with the same SourceId, SourceSystem and OntologyType") {
       val identifier = new Identifier(
         CanonicalId = "A surplus of strawberries",
         SourceId = "Sunflower seeds in a sack",

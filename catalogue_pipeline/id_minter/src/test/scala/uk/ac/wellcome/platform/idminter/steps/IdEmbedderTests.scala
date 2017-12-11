@@ -116,13 +116,13 @@ class IdEmbedderTests
     )
 
     val originalItem2 = Item(
-        canonicalId = None,
-        sourceIdentifier = SourceIdentifier(
-          IdentifierSchemes.miroImageNumber,
-          value = "1235"
-        ),
-        locations = List()
-      )
+      canonicalId = None,
+      sourceIdentifier = SourceIdentifier(
+        IdentifierSchemes.miroImageNumber,
+        value = "1235"
+      ),
+      locations = List()
+    )
 
     val originalWork = Work(
       sourceIdentifier = identifier,
@@ -242,7 +242,8 @@ class IdEmbedderTests
       )
 
       val ontologyType = "false capitals"
-      val newCanonicalId = generateMockCanonicalId(sourceIdentifier, ontologyType)
+      val newCanonicalId =
+        generateMockCanonicalId(sourceIdentifier, ontologyType)
 
       setUpIdentifierGeneratorMock(
         sourceIdentifier,
@@ -337,12 +338,12 @@ class IdEmbedderTests
   def generateMockCanonicalId(
     sourceIdentifier: SourceIdentifier,
     ontologyType: String
-  ): String = s"${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}"
+  ): String =
+    s"${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}"
 
-  private def setUpIdentifierGeneratorMock(
-    sourceIdentifier: SourceIdentifier,
-    ontologyType: String,
-    newCanonicalId: String) = {
+  private def setUpIdentifierGeneratorMock(sourceIdentifier: SourceIdentifier,
+                                           ontologyType: String,
+                                           newCanonicalId: String) = {
     when(
       mockIdentifierGenerator
         .retrieveOrGenerateCanonicalId(

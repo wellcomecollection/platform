@@ -28,20 +28,24 @@ class IngestorFeatureTest
                                Map("VisibilityTimeout" -> "1"))
 
   it("reads an identified work from the queue and ingests it") {
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
 
-    val workString = JsonUtil.toJson(
-      Work(
-        canonicalId = Some("1234"),
-        sourceIdentifier = sourceIdentifier,
-        identifiers = List(sourceIdentifier),
-        title = "A type of a tame turtle"
+    val workString = JsonUtil
+      .toJson(
+        Work(
+          canonicalId = Some("1234"),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
+          title = "A type of a tame turtle"
+        )
       )
-    ).get
+      .get
 
     sqsClient.sendMessage(
       ingestorQueueUrl,
-      JsonUtil.toJson(
+      JsonUtil
+        .toJson(
           SQSMessage(
             Some("identified-item"),
             workString,
@@ -49,7 +53,8 @@ class IngestorFeatureTest
             "messageType",
             "timestamp"
           )
-      ).get
+        )
+        .get
     )
 
     eventually {
@@ -68,7 +73,8 @@ class IngestorFeatureTest
   }
 
   it("deletes a message from the queue if it fails processing") {
-    val invalidMessage = JsonUtil.toJson(
+    val invalidMessage = JsonUtil
+      .toJson(
         SQSMessage(
           Some("identified-item"),
           "not a json string - this will fail parsing",
@@ -76,7 +82,8 @@ class IngestorFeatureTest
           "messageType",
           "timestamp"
         )
-    ).get
+      )
+      .get
 
     sqsClient.sendMessage(
       ingestorQueueUrl,
@@ -95,7 +102,9 @@ class IngestorFeatureTest
         .getQueueAttributes(
           ingestorQueueUrl,
           List("ApproximateNumberOfMessagesNotVisible")
-        ).getAttributes.get(
+        )
+        .getAttributes
+        .get(
           "ApproximateNumberOfMessagesNotVisible"
         ) shouldBe "1"
     }

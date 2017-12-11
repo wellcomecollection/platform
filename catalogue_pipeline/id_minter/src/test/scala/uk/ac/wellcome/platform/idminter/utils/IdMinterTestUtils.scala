@@ -37,7 +37,8 @@ trait IdMinterTestUtils
   }
 
   def generateSqsMessage(MiroID: String): SQSMessage = {
-    val identifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
 
     val work = Work(
       sourceIdentifier = identifier,

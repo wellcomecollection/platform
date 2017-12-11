@@ -27,11 +27,13 @@ class IdMinterFeatureTest
       .apply()
   }
 
-  it("mints the same ID for SourcedWorks that have matching source identifiers") {
+  it(
+    "mints the same ID for SourcedWorks that have matching source identifiers") {
     val miroID = "M0001234"
     val title = "A limerick about a lion"
 
-    val identifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
 
     val work = Work(
       sourceIdentifier = identifier,

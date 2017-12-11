@@ -30,9 +30,9 @@ class WorksIndexTest
   it("should create an index when necessary") {
     createAndWaitIndexIsCreated()
 
-    val identifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
-      value = "4321")
+    val identifier = SourceIdentifier(identifierScheme =
+                                        IdentifierSchemes.miroImageNumber,
+                                      value = "4321")
 
     val workJson = JsonUtil
       .toJson(

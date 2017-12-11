@@ -70,7 +70,7 @@ class IdentifierGeneratorTest
       select
         .from(identifiersTable as i)
         .where
-          .eq(i.SourceId, "1234")
+        .eq(i.SourceId, "1234")
 
     }.map(Identifier(i)).single.apply()
 
@@ -137,7 +137,7 @@ class IdentifierGeneratorTest
       select
         .from(identifiersTable as i)
         .where
-          .eq(i.SourceId, miroId)
+        .eq(i.SourceId, miroId)
 
     }.map(Identifier(i)).single.apply()
 
