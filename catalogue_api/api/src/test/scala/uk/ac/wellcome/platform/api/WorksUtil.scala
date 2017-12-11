@@ -12,6 +12,11 @@ trait WorksUtil {
   val period = Period("the past")
   val agent = Agent("a person")
 
+  val sourceIdentifier = SourceIdentifier(
+    IdentifierSchemes.miroImageNumber,
+    "value"
+  )
+
   def createWorks(count: Int): Seq[Work] =
     (1 to count).map(
       (idx: Int) =>
@@ -28,9 +33,8 @@ trait WorksUtil {
   def workWith(canonicalId: String, title: String): Work =
     Work(
       canonicalId = Some(canonicalId),
-      identifiers = List(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
-      ),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
       title = title
     )
 
@@ -42,6 +46,7 @@ trait WorksUtil {
   ): Work =
     Work(
       canonicalId = Some(canonicalId),
+      sourceIdentifier = sourceIdentifier,
       identifiers = identifiers,
       title = title,
       items = items
@@ -54,6 +59,7 @@ trait WorksUtil {
   ): Work =
     Work(
       canonicalId = Some(canonicalId),
+      sourceIdentifier = sourceIdentifier,
       identifiers = List(
         SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
       ),
@@ -69,8 +75,8 @@ trait WorksUtil {
                creator: Agent,
                items: List[Item]): Work = Work(
     canonicalId = Some(canonicalId),
-    identifiers =
-      List(SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")),
+    sourceIdentifier = sourceIdentifier,
+    identifiers = List(sourceIdentifier),
     title = title,
     description = Some(description),
     lettering = Some(lettering),
@@ -97,19 +103,16 @@ trait WorksUtil {
       License_CCBY)
   }
 
-  def itemWith(canonicalId: String,
-               identifier: SourceIdentifier,
-               location: Location): Item = {
-    Item(
-      canonicalId = Some(canonicalId),
-      List(
-        identifier
-      ),
-      List(
-        location
-      )
-    )
-  }
+  def itemWith(
+    canonicalId: String,
+    identifier: SourceIdentifier,
+    location: Location
+  ): Item = Item(
+    canonicalId = Some(canonicalId),
+    sourceIdentifier = identifier,
+    identifiers = List(identifier),
+    locations = List(location)
+  )
 
   def locationWith(url: Option[String], license: License): Location = {
     Location(locationType = "iiif-image", url = url, license = license)
