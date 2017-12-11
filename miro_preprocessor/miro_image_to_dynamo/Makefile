@@ -1,27 +1,12 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-INFRA_BUCKET = platform-infra
-
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
 
 include $(ROOT)/functions.Makefile
 
-## Build miro_image_to_dynamo lambda
-miro_image_to_dynamo-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(ROOT)/miro_preprocessor/miro_image_to_dynamo:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
+miro_image_to_dynamo-build:
+	$(call build_lambda,miro_preprocessor/miro_image_to_dynamo)
 
-## Test miro_image_to_dynamo lambda
-miro_image_to_dynamo-test: $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT)/miro_preprocessor/miro_image_to_dynamo/src:/data \
-		--env OP=test \
-		--env FIND_MATCH_PATHS="/data" --tty \
-		python3.6_ci:latest
+miro_image_to_dynamo-test:
+	$(call test_lambda,miro_preprocessor/miro_image_to_dynamo)
 
-## Publish miro_image_to_dynamo lambda
 miro_image_to_dynamo-publish:
 	$(call publish_lambda,miro_preprocessor/miro_image_to_dynamo)

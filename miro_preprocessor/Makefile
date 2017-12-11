@@ -1,6 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 MIRO_PREPROC = $(ROOT)/miro_preprocessor
-INFRA_BUCKET = platform-infra
 
 ifneq ($(ROOT), $(shell pwd))
 	include $(ROOT)/shared.Makefile
@@ -45,5 +44,3 @@ miro_preprocessor-terraform-plan:
 
 miro_preprocessor-terraform-apply:
 	$(call terraform_apply,$(MIRO_PREPROC))
-
-.PHONY: miro_preprocessor-build miro_preprocessor-test miro_preprocessor-deploy

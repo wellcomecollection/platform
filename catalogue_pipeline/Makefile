@@ -22,17 +22,17 @@ transformer-build: $(ROOT)/.docker/sbt_image_builder
 	PROJECT=transformer $(ROOT)/builds/run_sbt_image_build.sh
 
 
-id_minter-test: $(ROOT)/.docker/sbt_test
-	PROJECT=id_minter $(ROOT)/builds/test_sbt_project.sh
+id_minter-test:
+	$(call sbt_test,id_minter)
 
-ingestor-test: $(ROOT)/.docker/sbt_test
-	PROJECT=ingestor $(ROOT)/builds/test_sbt_project.sh
+ingestor-test:
+	$(call sbt_test,ingestor)
 
-reindexer-test: $(ROOT)/.docker/sbt_test
-	PROJECT=reindexer $(ROOT)/builds/test_sbt_project.sh
+reindexer-test:
+	$(call sbt_test,reindexer)
 
-transformer-test: $(ROOT)/.docker/sbt_test
-	PROJECT=transformer $(ROOT)/builds/test_sbt_project.sh
+transformer-test:
+	$(call sbt_test,transformer)
 
 
 id_minter-deploy: id_minter-build
@@ -48,11 +48,8 @@ transformer-deploy: transformer-build
 	$(call publish_service,transformer)
 
 
-transformer_sns_filter-build: $(ROOT)/.docker/python3.6_ci
-	docker run \
-		--volume $(CATALOGUE_PIPELINE)/transformer_sns_filter:/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
+transformer_sns_filter-build:
+	$(call build_lambda,$(CATALOGUE_PIPELINE)/transformer_sns_filter)
 
 transformer_sns_filter-publish:
 	$(call publish_lambda,catalogue_pipeline/transformer_sns_filter)
