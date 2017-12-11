@@ -1,10 +1,11 @@
 module "miro_reindexer" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.3.1"
-  name               = "miro_reindexer"
-  cluster_id         = "${aws_ecs_cluster.services.id}"
-  task_role_arn      = "${module.ecs_miro_reindexer_iam.task_role_arn}"
-  vpc_id             = "${module.vpc_services.vpc_id}"
-  app_uri            = "${module.ecr_repository_reindexer.repository_url}:${var.release_ids["reindexer"]}"
+  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v3.0.2"
+  name   = "miro_reindexer"
+
+  cluster_id = "${aws_ecs_cluster.services.id}"
+  vpc_id     = "${module.vpc_services.vpc_id}"
+  app_uri    = "${module.ecr_repository_reindexer.repository_url}:${var.release_ids["reindexer"]}"
+
   listener_https_arn = "${module.services_alb.listener_https_arn}"
   listener_http_arn  = "${module.services_alb.listener_http_arn}"
   path_pattern       = "/miro_reindexer/*"

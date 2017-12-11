@@ -1,5 +1,5 @@
 module "id_minter" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v2.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v3.0.2"
   name   = "id_minter_${var.name}"
 
   source_queue_name  = "${module.id_minter_queue.name}"
