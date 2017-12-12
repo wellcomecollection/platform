@@ -16,7 +16,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.duration._
 
-class SierraToDynamoWorkerServiceTest
+class SierraBibsToDynamoWorkerServiceTest
     extends FunSpec
     with MockitoSugar
     with SQSLocal
@@ -30,7 +30,7 @@ class SierraToDynamoWorkerServiceTest
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
-  var worker: Option[SierraToDynamoWorkerService] = None
+  var worker: Option[SierraBibsToDynamoWorkerService] = None
   val actorSystem = ActorSystem()
 
   override def beforeEach(): Unit = {
@@ -45,7 +45,7 @@ class SierraToDynamoWorkerServiceTest
 
   private def createSierraWorkerService(resourceType: String, fields: String) = {
     Some(
-      new SierraToDynamoWorkerService(
+      new SierraBibsToDynamoWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = actorSystem,
         metrics = mockMetrics,
@@ -130,7 +130,7 @@ class SierraToDynamoWorkerServiceTest
   it(
     "should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
     worker = Some(
-      new SierraToDynamoWorkerService(
+      new SierraBibsToDynamoWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = ActorSystem(),
         metrics = mockMetrics,
@@ -159,7 +159,7 @@ class SierraToDynamoWorkerServiceTest
     }
   }
 
-  private def stopWorker(worker: Option[SierraToDynamoWorkerService]) = {
+  private def stopWorker(worker: Option[SierraBibsToDynamoWorkerService]) = {
     eventually {
       worker.fold(true)(_.cancelRun()) shouldBe true
     }

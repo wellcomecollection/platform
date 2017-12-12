@@ -16,12 +16,12 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.sierra_bibs_to_dynamo SierraToDynamo"
+    "uk.ac.wellcome.platform.sierra_bibs_to_dynamo SierraBibsToDynamo"
   override val modules = Seq(
     PlatformDynamoConfigModule,
     DynamoClientModule,
-    SierraDynamoConfigModule,
-    SierraToDynamoModule,
+    SierraBibsToDynamoConfigModule,
+    SierraBibsToDynamoModule,
     AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,

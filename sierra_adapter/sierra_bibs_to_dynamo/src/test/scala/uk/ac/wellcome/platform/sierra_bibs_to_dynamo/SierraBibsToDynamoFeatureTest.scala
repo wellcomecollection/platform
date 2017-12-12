@@ -15,7 +15,7 @@ import uk.ac.wellcome.test.utils.{
 import uk.ac.wellcome.utils.JsonUtil
 import com.gu.scanamo.Scanamo
 
-class SierraToDynamoFeatureTest
+class SierraBibsToDynamoFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with SQSLocal
@@ -30,7 +30,7 @@ class SierraToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraToDynamo.tableName" -> tableName,
+      "aws.dynamo.sierraBibsToDynamo.tableName" -> tableName,
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",

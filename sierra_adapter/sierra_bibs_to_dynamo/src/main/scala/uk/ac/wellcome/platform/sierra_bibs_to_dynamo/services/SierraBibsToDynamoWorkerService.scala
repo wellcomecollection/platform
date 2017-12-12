@@ -15,7 +15,7 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class SierraToDynamoWorkerService @Inject()(
+class SierraBibsToDynamoWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
