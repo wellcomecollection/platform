@@ -7,4 +7,3 @@
 -aws.sqs.queue.url=${id_minter_queue_id}
 -aws.sns.topic.arn=${es_ingest_topic_arn}
 -aws.metrics.namespace=${metrics_namespace}
--known.identifierSchemes=miro-image-number,sierra-system-number
