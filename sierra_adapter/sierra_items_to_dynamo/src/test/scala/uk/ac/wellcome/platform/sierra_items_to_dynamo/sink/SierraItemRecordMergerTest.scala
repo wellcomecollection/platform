@@ -46,7 +46,14 @@ class SierraItemRecordMergerTest
     mergedRecord.unlinkedBibIds shouldEqual List("3")
   }
 
-  // previously unlinked ID becomes present
+  it("should remove an unlinked bibId if it appears on a new record") {
+    val oldRecord = sierraItemRecord(bibIds = List(), unlinkedBibIds = List("1", "2", "3"))
+    val newRecord = sierraItemRecord(bibIds = List("1", "2"))
+
+    val mergedRecord = SierraItemRecordMerger.mergeItems(oldRecord = oldRecord, newRecord = newRecord)
+    mergedRecord.bibIds shouldEqual List("1", "2")
+    mergedRecord.unlinkedBibIds shouldEqual List("3")
+  }
 
   private def sierraItemRecord(bibIds: List[String], unlinkedBibIds: List[String] = List()): SierraItemRecord = {
     SierraItemRecord(
