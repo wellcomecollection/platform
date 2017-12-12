@@ -35,7 +35,6 @@ sierra_item_merger-build: $(ROOT)/.docker/sbt_image_builder
 
 sierra_item_merger-publish: sierra_item_merger-build
 	echo "This does nothing yet!"
-	# $(call publish_service,sierra_item_merger)
 
 
 sierra_adapter-test: \
