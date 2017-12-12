@@ -21,8 +21,7 @@ module "sierra_to_dynamo_bibs" {
   alb_listener_http_arn      = "${local.services_alb_listener_http_arn}"
   alb_listener_https_arn     = "${local.services_alb_listener_https_arn}"
 
-  ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
-  release_id         = "${var.release_ids["sierra_to_dynamo"]}"
+  release_id = "${var.release_ids["sierra_bibs_to_dynamo"]}"
 
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
