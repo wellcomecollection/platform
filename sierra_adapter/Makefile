@@ -15,6 +15,17 @@ sierra_to_dynamo-publish: sierra_to_dynamo-build
 	$(call publish_service,sierra_to_dynamo)
 
 
+sierra_bibs_to_dynamo-test:
+	$(call sbt_test,sierra_bibs_to_dynamo)
+
+sierra_bibs_to_dynamo-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=sierra_adapter/sierra_bibs_to_dynamo/target \
+	PROJECT=sierra_bibs_to_dynamo $(ROOT)/builds/run_sbt_image_build.sh
+
+sierra_bibs_to_dynamo-publish: sierra_bibs_to_dynamo-build
+	$(call publish_service,sierra_bibs_to_dynamo)
+
+
 sierra_bib_merger-test:
 	$(call sbt_test,sierra_bib_merger)
 
