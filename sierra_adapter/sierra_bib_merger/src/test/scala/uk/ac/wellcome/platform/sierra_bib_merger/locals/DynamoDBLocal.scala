@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.MergedSierraRecord
-import uk.ac.wellcome.models.SierraBibRecord._
+import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._

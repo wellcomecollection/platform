@@ -6,7 +6,7 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.SierraBibRecord._
+import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 

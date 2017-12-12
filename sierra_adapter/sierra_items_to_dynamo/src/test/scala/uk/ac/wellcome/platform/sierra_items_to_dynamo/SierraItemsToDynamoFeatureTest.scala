@@ -1,25 +1,25 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo
+package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
+import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsToDynamoDBLocal
-import uk.ac.wellcome.models.SierraBibRecord
-import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   ExtendedPatience,
   SQSLocal
 }
 import uk.ac.wellcome.utils.JsonUtil
-import com.gu.scanamo.Scanamo
+import uk.ac.wellcome.dynamo._
 
-class SierraBibsToDynamoFeatureTest
+class SierraItemsToDynamoFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with SQSLocal
-    with SierraBibsToDynamoDBLocal
+    with SierraItemsToDynamoDBLocal
     with AmazonCloudWatchFlag
     with Matchers
     with ExtendedPatience {
@@ -30,15 +30,15 @@ class SierraBibsToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraBibsToDynamo.tableName" -> tableName,
+      "aws.dynamo.sierraItemsToDynamo.tableName" -> tableName,
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",
-      "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
+      "sierra.fields" -> "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
-  it("should read bibs from Sierra and add them to DynamoDB") {
+  it("should read items from Sierra and add them to DynamoDB") {
     val message =
       """
         |{
@@ -53,7 +53,7 @@ class SierraBibsToDynamoFeatureTest
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response
-      Scanamo.scan[SierraBibRecord](dynamoDbClient)(tableName) should have size 29
+      Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 157
     }
   }
 }

@@ -266,7 +266,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       updatedDate = modifiedDate,
       title = title
     ),
-    modifiedDate = modifiedDate
+    modifiedDate = modifiedDate,
+    bibIds = List("b1111")
   )
 
   private def sierraRecordString(

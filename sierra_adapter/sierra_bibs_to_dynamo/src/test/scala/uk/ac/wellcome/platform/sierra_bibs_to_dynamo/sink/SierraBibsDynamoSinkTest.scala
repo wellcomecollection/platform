@@ -10,13 +10,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import com.gu.scanamo.syntax._
 import io.circe.parser._
-import org.mockito.Mockito
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsToDynamoDBLocal
 import uk.ac.wellcome.models.SierraBibRecord
-import uk.ac.wellcome.models.SierraBibRecord._
+import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraBibsDynamoSinkTest
