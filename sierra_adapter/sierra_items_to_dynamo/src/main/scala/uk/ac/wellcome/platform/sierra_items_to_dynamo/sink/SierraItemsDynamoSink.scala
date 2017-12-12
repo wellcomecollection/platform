@@ -6,6 +6,7 @@ import java.time.{LocalDate, ZoneOffset}
 import akka.Done
 import akka.stream.scaladsl.Sink
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
@@ -20,31 +21,45 @@ object SierraItemsDynamoSink extends Logging {
   def apply(client: AmazonDynamoDB, tableName: String)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(unprefixedJson => {
+      val table = Table[SierraItemRecord](tableName)
+
       val json = addIDPrefix(json = unprefixedJson)
       logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
+      // TODO: fail if bibIds filed does not exist
+      val bibIdList = root.bibIds.each.string.getAll(json)
+
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
           SierraItemRecord(
             id = getId(json),
             data = json.noSpaces,
-            modifiedDate = updatedDate
+            modifiedDate = updatedDate,
+            bibIds = bibIdList
           )
         case None =>
           SierraItemRecord(
             id = getId(json),
             data = json.noSpaces,
-            modifiedDate = getDeletedDateTimeAtStartOfDay(json)
+            modifiedDate = getDeletedDateTimeAtStartOfDay(json),
+            bibIds = bibIdList
           )
       }
 
-      val table = Table[SierraItemRecord](tableName)
+      val option = Scanamo.exec(client)(
+        table.get('id -> record.id)
+      )
+      val newRecord = option.map { either =>
+        val existingRecord = either.right.get
+        SierraItemRecordMerger.mergeItems(oldRecord = existingRecord, newRecord = record)
+      }.getOrElse(record)
+
       val ops = table
         .given(
           not(attributeExists('id)) or
-            (attributeExists('id) and 'modifiedDate < record.modifiedDate.getEpochSecond)
+            (attributeExists('id) and 'modifiedDate < newRecord.modifiedDate.getEpochSecond)
         )
-        .put(record)
+        .put(newRecord)
       Scanamo.exec(client)(ops) match {
         case Right(_) =>
           logger.info(s"${json.noSpaces} saved successfully to DynamoDB")

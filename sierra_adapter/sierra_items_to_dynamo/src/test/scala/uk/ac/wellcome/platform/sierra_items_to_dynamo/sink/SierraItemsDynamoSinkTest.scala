@@ -4,9 +4,11 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, GetItemResult, PutItemRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
+import io.circe.optics.JsonPath
+import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -47,7 +49,8 @@ class SierraItemsDynamoSinkTest
     val json = parse(s"""
         |{
         | "id": "$id",
-        | "updatedDate": "$updatedDate"
+        | "updatedDate": "$updatedDate",
+        | "bibIds": ["1556974"]
         |}
       """.stripMargin).right.get
     val futureUnit = Source.single(json).runWith(itemSink)
@@ -57,10 +60,12 @@ class SierraItemsDynamoSinkTest
       data = parse(s"""
         |{
         | "id": "i$id",
-        | "updatedDate": "$updatedDate"
+        | "updatedDate": "$updatedDate",
+        | "bibIds": ["1556974"]
         |}
       """.stripMargin).right.get.noSpaces,
-      modifiedDate = updatedDate
+      modifiedDate = updatedDate,
+      bibIds = List("1556974")
     )
 
     whenReady(futureUnit) { _ =>
@@ -69,7 +74,7 @@ class SierraItemsDynamoSinkTest
     }
   }
 
-  it("should be able to handle deleted bibs") {
+  it("should be able to handle deleted items") {
     val id = "1357947"
     val deletedDate = "2014-01-31"
     val json = parse(s"""{
@@ -82,14 +87,9 @@ class SierraItemsDynamoSinkTest
 
     val expectedRecord = SierraItemRecord(
       id = s"i$id",
-      data = parse(s"""
-        |{
-        | "id": "i$id",
-        | "deletedDate" : "$deletedDate",
-        | "deleted" : true
-        |}
-      """.stripMargin).right.get.noSpaces,
-      modifiedDate = s"${deletedDate}T00:00:00Z"
+      data = root.id.string.modify(s => s"i$s")(json).noSpaces,
+      modifiedDate = s"${deletedDate}T00:00:00Z",
+      bibIds = List()
     )
 
     whenReady(futureUnit) { _ =>
@@ -107,7 +107,8 @@ class SierraItemsDynamoSinkTest
       id = s"i$id",
       modifiedDate = newUpdatedDate,
       data =
-        s"""{"id": "i$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
+        s"""{"id": "i$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record", "bibIds": ["1556974"]}""",
+      bibIds = List("1556974")
     )
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
@@ -115,7 +116,8 @@ class SierraItemsDynamoSinkTest
          |{
          |  "id": "$id",
          |  "updatedDate": "$oldUpdatedDate",
-         |  "comment": "I am an old record"
+         |  "comment": "I am an old record",
+         |  "bibIds": ["00000"]
          |}
        """.stripMargin).right.get
 
@@ -135,7 +137,8 @@ class SierraItemsDynamoSinkTest
       id = s"i$id",
       modifiedDate = oldUpdatedDate,
       data =
-        s"""{"id": "i$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
+        s"""{"id": "i$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards", "bibIds": ["1556974"]}""",
+      bibIds = List("1556974")
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
@@ -143,7 +146,8 @@ class SierraItemsDynamoSinkTest
          |{
          |  "id": "$id",
          |  "updatedDate": "$newUpdatedDate",
-         |  "comment": "Nice! New notes about narwhals in November"
+         |  "comment": "Nice! New notes about narwhals in November",
+         |  "bibIds": ["1556974", "11111"]
          |}
        """.stripMargin).right.get
 
@@ -152,7 +156,116 @@ class SierraItemsDynamoSinkTest
       id = s"i$id",
       modifiedDate = newUpdatedDate,
       data =
-        s"""{"id":"i$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
+        root.id.string.modify(s => s"i$s")(newJson).noSpaces,
+      bibIds = List("1556974", "11111")
+    )
+    whenReady(futureUnit) { _ =>
+      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
+        Right(expectedRecord))
+    }
+  }
+
+  it("should record unlinked bibIds") {
+    val id = "300003"
+    val oldUpdatedDate = "2001-01-01T01:01:01Z"
+    val newUpdatedDate = "2011-11-11T11:11:11Z"
+
+    val oldRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = oldUpdatedDate,
+      data =
+        s"""{"id": "i$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["1", "2", "3"]}""",
+      bibIds = List("1", "2", "3")
+    )
+    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+
+    val newJson = parse(s"""
+         |{
+         |  "id": "$id",
+         |  "updatedDate": "$newUpdatedDate",
+         |  "bibIds": ["1", "2"]
+         |}
+       """.stripMargin).right.get
+
+    val futureUnit = Source.single(newJson).runWith(itemSink)
+    val expectedRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = newUpdatedDate,
+      data = root.id.string.modify(s => s"i$s")(newJson).noSpaces,
+      bibIds = List("1", "2"),
+      unlinkedBibIds = List("3")
+    )
+    whenReady(futureUnit) { _ =>
+      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
+        Right(expectedRecord))
+    }
+  }
+
+  it("should add new bibIds and record unlinked bibIds in the same update") {
+    val id = "300003"
+    val oldUpdatedDate = "2001-01-01T01:01:01Z"
+    val newUpdatedDate = "2011-11-11T11:11:11Z"
+
+    val oldRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = oldUpdatedDate,
+      data =
+        s"""{"id": "i$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["1", "2", "3"]}""",
+      bibIds = List("1", "2", "3")
+    )
+    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+
+    val newJson = parse(s"""
+                           |{
+                           |  "id": "$id",
+                           |  "updatedDate": "$newUpdatedDate",
+                           |  "bibIds": ["2", "3", "4"]
+                           |}
+       """.stripMargin).right.get
+
+    val futureUnit = Source.single(newJson).runWith(itemSink)
+    val expectedRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = newUpdatedDate,
+      data = root.id.string.modify(s => s"i$s")(newJson).noSpaces,
+      bibIds = List("2", "3", "4"),
+      unlinkedBibIds = List("1")
+    )
+    whenReady(futureUnit) { _ =>
+      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
+        Right(expectedRecord))
+    }
+  }
+
+  it("should preserve existing unlinked bibIds in DynamoDB") {
+    val id = "300003"
+    val oldUpdatedDate = "2001-01-01T01:01:01Z"
+    val newUpdatedDate = "2011-11-11T11:11:11Z"
+
+    val oldRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = oldUpdatedDate,
+      data =
+        s"""{"id": "i$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["2", "3"]}""",
+      bibIds = List("1", "2", "3")
+    )
+    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+
+    val newJson = parse(s"""
+                           |{
+                           |  "id": "$id",
+                           |  "updatedDate": "$newUpdatedDate",
+                           |  "bibIds": ["2", "3", "4"]
+                           |}
+       """.stripMargin).right.get
+
+    val futureUnit = Source.single(newJson).runWith(itemSink)
+    val expectedRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = newUpdatedDate,
+      data = root.id.string.modify(s => s"i$s")(newJson).noSpaces,
+      bibIds = List("2", "3", "4"),
+      unlinkedBibIds = List("1")
     )
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
@@ -175,7 +288,7 @@ class SierraItemsDynamoSinkTest
     }
   }
 
-  it("should fail the stream if DynamoDB returns an error") {
+  it("should fail the stream if DynamoDB Put returns an error") {
     val json = parse(s"""
          |{
          | "id": "500005",
@@ -185,7 +298,33 @@ class SierraItemsDynamoSinkTest
 
     val dynamoDbClient = mock[AmazonDynamoDB]
     val expectedException = new RuntimeException("AAAAAARGH!")
+    when(dynamoDbClient.getItem(any[GetItemRequest]))
+      .thenReturn(new GetItemResult())
+
     when(dynamoDbClient.putItem(any[PutItemRequest]))
+      .thenThrow(expectedException)
+    val brokenSink = SierraItemsDynamoSink(
+      client = dynamoDbClient,
+      tableName = tableName
+    )
+
+    val futureUnit = Source.single(json).runWith(brokenSink)
+    whenReady(futureUnit.failed) { ex =>
+      ex shouldBe expectedException
+    }
+  }
+
+  it("should fail the stream if a DynamoDB GetItem returns an error") {
+    val json = parse(s"""
+         |{
+         | "id": "50505",
+         | "updatedDate": "2005-05-05T05:55:05Z"
+         |}
+      """.stripMargin).right.get
+
+    val dynamoDbClient = mock[AmazonDynamoDB]
+    val expectedException = new RuntimeException("BLAAAAARGH!")
+    when(dynamoDbClient.getItem(any[GetItemRequest]))
       .thenThrow(expectedException)
     val brokenSink = SierraItemsDynamoSink(
       client = dynamoDbClient,
