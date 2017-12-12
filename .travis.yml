@@ -30,8 +30,10 @@ cache:
     - catalogue_pipeline/transformer/target
     - catalogue_pipeline/reindexer/target
     - common/target
+    - sierra_adapter/sierra_bibs_to_dynamo/target
+    - sierra_adapter/sierra_items_to_dynamo/target
     - sierra_adapter/sierra_bib_merger/target
-    - sierra_adapter/sierra_to_dynamo/target
+    - sierra_adapter/sierra_item_merger/target
 
 script:
   - .travis/run_task.py
