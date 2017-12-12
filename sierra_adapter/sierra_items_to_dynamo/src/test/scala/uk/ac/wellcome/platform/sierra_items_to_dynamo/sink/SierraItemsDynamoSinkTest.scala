@@ -4,7 +4,11 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, GetItemResult, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  GetItemRequest,
+  GetItemResult,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import io.circe.optics.JsonPath
@@ -155,8 +159,7 @@ class SierraItemsDynamoSinkTest
     val expectedRecord = SierraItemRecord(
       id = s"i$id",
       modifiedDate = newUpdatedDate,
-      data =
-        root.id.string.modify(s => s"i$s")(newJson).noSpaces,
+      data = root.id.string.modify(s => s"i$s")(newJson).noSpaces,
       bibIds = List("1556974", "11111")
     )
     whenReady(futureUnit) { _ =>

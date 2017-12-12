@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
 import uk.ac.wellcome.models.SierraItemRecord
 
 object SierraItemRecordMerger {
-  def mergeItems(oldRecord: SierraItemRecord, newRecord: SierraItemRecord): SierraItemRecord = {
+  def mergeItems(oldRecord: SierraItemRecord,
+                 newRecord: SierraItemRecord): SierraItemRecord = {
     newRecord.copy(
-
       // Let's suppose we have
       //
       //    oldRecord = (linked = {1, 2, 3}, unlinked = {4, 5})
@@ -23,9 +23,9 @@ object SierraItemRecordMerger {
       //      = {1, 2, 3, 4, 5} - {3, 4}
       //      = {1, 2, 5}
       //
-      unlinkedBibIds = subList(
-        addList(oldRecord.unlinkedBibIds, oldRecord.bibIds),
-        newRecord.bibIds)
+      unlinkedBibIds =
+        subList(addList(oldRecord.unlinkedBibIds, oldRecord.bibIds),
+                newRecord.bibIds)
     )
   }
 
