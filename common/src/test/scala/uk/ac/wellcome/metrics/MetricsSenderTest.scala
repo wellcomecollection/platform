@@ -23,35 +23,35 @@ class MetricsSenderTest
   import org.mockito.Mockito._
 
   describe("timeAndCount") {
-     it("should record the time and count of a successful future") {
-       val amazonCloudWatch = mock[AmazonCloudWatch]
-       val metricsSender = new MetricsSender("test", amazonCloudWatch)
-       val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
+    it("should record the time and count of a successful future") {
+      val amazonCloudWatch = mock[AmazonCloudWatch]
+      val metricsSender = new MetricsSender("test", amazonCloudWatch)
+      val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
-       val expectedResult = "foo"
-       val timedFunction = () => Future { Thread.sleep(100); expectedResult }
-       val metricName = "bar"
+      val expectedResult = "foo"
+      val timedFunction = () => Future { Thread.sleep(100); expectedResult }
+      val metricName = "bar"
 
-       val future = metricsSender.timeAndCount(metricName, timedFunction)
+      val future = metricsSender.timeAndCount(metricName, timedFunction)
 
-       whenReady(future) { result =>
-         result shouldBe expectedResult
-         eventually {
+      whenReady(future) { result =>
+        result shouldBe expectedResult
+        eventually {
 
-           verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
+          verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
-           capture.getAllValues.exists { request: PutMetricDataRequest =>
-             val item = request.getMetricData()
-             (item.head.getValue == 1.0) && item.head.getMetricName == "success"
-           } shouldBe true
+          capture.getAllValues.exists { request: PutMetricDataRequest =>
+            val item = request.getMetricData()
+            (item.head.getValue == 1.0) && item.head.getMetricName == "success"
+          } shouldBe true
 
-           capture.getAllValues.exists { request: PutMetricDataRequest =>
-             val item = request.getMetricData()
-             (item.head.getValue > 100) && (item.head.getMetricName == "bar")
-           } shouldBe true
-         }
-       }
-     }
+          capture.getAllValues.exists { request: PutMetricDataRequest =>
+            val item = request.getMetricData()
+            (item.head.getValue > 100) && (item.head.getMetricName == "bar")
+          } shouldBe true
+        }
+      }
+    }
 
     it("should record the time and count of a failed future") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
