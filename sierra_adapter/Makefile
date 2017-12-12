@@ -13,7 +13,7 @@ sierra_bibs_to_dynamo-build: $(ROOT)/.docker/sbt_image_builder
 	PROJECT=sierra_bibs_to_dynamo $(ROOT)/builds/run_sbt_image_build.sh
 
 sierra_bibs_to_dynamo-publish: sierra_bibs_to_dynamo-build
-	echo "Not until we have ECR in place!"
+	$(call publish_service,sierra_bibs_to_dynamo)
 
 
 sierra_bib_merger-test:
