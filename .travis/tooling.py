@@ -63,7 +63,6 @@ def affects_tests(path, task):
     # can be ignored.
     task_specific_directories = {
         'loris': ['loris'],
-        'sierra_adapter': ['sierra_adapter'],
         'id_minter': ['catalogue_pipeline/id_minter'],
         'ingestor': ['catalogue_pipeline/ingestor'],
         'reindexer': ['catalogue_pipeline/reindexer'],
@@ -72,6 +71,12 @@ def affects_tests(path, task):
         'monitoring': ['monitoring'],
         'shared_infra': ['shared_infra'],
         'nginx': ['nginx'],
+
+        'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
+        'sierra_bibs_to_dynamo': ['sierra_adapter/sierra_bibs_to_dynamo'],
+        'sierra_items_to_dynamo': ['sierra_adapter/sierra_items_to_dynamo'],
+        'sierra_bib_merger': ['sierra_adapter/sierra_bib_merger'],
+        'sierra_item_merger': ['sierra_adapter/sierra_item_merger'],
     }
 
     # If we have a change to a file which is specific to a particular task,
