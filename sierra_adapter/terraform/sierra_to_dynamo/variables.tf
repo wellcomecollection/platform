@@ -26,7 +26,6 @@ variable "alb_client_error_alarm_arn" {}
 
 variable "alb_cloudwatch_id" {}
 
-variable "ecr_repository_url" {}
 variable "release_id" {}
 
 variable "infra_bucket" {
