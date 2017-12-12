@@ -32,16 +32,16 @@ def changed_files(*args):
     return files
 
 
-def has_no_effect_on_tests(path, task):
-    """Is this a file we can safely assume has no effect on tests?"""
+def affects_tests(path, task):
+    """Does this file have any effect on test outcomes?"""
     # Nothing reads our Markdown files in tests, so we can ignore their
     # effect here.
     if path.endswith(('.md', '.png')) or path == 'LICENSE':
-        return True
+        return False
 
     # The ``misc`` folder is never used anywhere, so we can ignore it.
     if path.startswith('misc/'):
-        return True
+        return False
 
     # We do lint the JSON and TTL files in the ontologies directory when
     # running in CI, but not in any of the code tests.
@@ -49,7 +49,12 @@ def has_no_effect_on_tests(path, task):
     # Since linting already happens unconditionally, we can ignore changes
     # to this directory as well.
     if path.startswith('ontologies/'):
-        return True
+        return False
+
+    # Nothing in Travis except the ``travis-format`` task (which always runs)
+    # interacts with our Terraform files.
+    if path.endswith('.tf'):
+        return False
 
     # For each task, which directories only have an effect on this task?
     #
@@ -73,21 +78,21 @@ def has_no_effect_on_tests(path, task):
     # but we're *not* in that task, this change is unimportant.
     for prefix, directories in task_specific_directories.items():
         if not task.startswith(prefix) and path.startswith(tuple(directories)):
-            return True
+            return False
 
         if task.startswith(prefix) and path.startswith(tuple(directories)):
-            return False
+            return True
 
     # The top-level common directory contains some Scala files which are
     # shared across multiple projects.  If we're definitely in a project
     # which doesn't use this sbt-common lib, we can ignore changes to it.
     sbt_free_tasks = ('loris', 'monitoring', 'shared_infra')
     if task.startswith(sbt_free_tasks) and path.startswith('common/'):
-        return True
+        return False
 
     # Otherwise, we were unable to decide if this change was important.
     # We assume that it is, so we'll run tests just in case.
-    return False
+    return True
 
 
 def are_there_job_relevant_changes(changed_files, task):
@@ -128,7 +133,7 @@ def are_there_job_relevant_changes(changed_files, task):
     # when it was important, we remove any files which we know are safe to
     # ignore, and run tests if there's anything left.
     interesting_changed_files = [
-        f for f in changed_files if not has_no_effect_on_tests(f, task=task)
+        f for f in changed_files if affects_tests(f, task=task)
     ]
 
     if interesting_changed_files:
