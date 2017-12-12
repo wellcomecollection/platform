@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.sink
+package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, ZoneOffset}
@@ -11,12 +11,12 @@ import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.models.SierraBibRecord
+import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.dynamo._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object SierraBibsDynamoSink extends Logging {
+object SierraItemsDynamoSink extends Logging {
   def apply(client: AmazonDynamoDB, tableName: String)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(unprefixedJson => {
@@ -25,20 +25,20 @@ object SierraBibsDynamoSink extends Logging {
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
-          SierraBibRecord(
+          SierraItemRecord(
             id = getId(json),
             data = json.noSpaces,
             modifiedDate = updatedDate
           )
         case None =>
-          SierraBibRecord(
+          SierraItemRecord(
             id = getId(json),
             data = json.noSpaces,
             modifiedDate = getDeletedDateTimeAtStartOfDay(json)
           )
       }
 
-      val table = Table[SierraBibRecord](tableName)
+      val table = Table[SierraItemRecord](tableName)
       val ops = table
         .given(
           not(attributeExists('id)) or
@@ -70,7 +70,7 @@ object SierraBibsDynamoSink extends Logging {
   //
   // This updates the ID in a block of JSON to add this disambiguating prefix.
   def addIDPrefix(json: Json): Json =
-    root.id.string.modify(id => s"b$id")(json)
+    root.id.string.modify(id => s"i$id")(json)
 
   private def getId(json: Json) = {
     root.id.string.getOption(json).get
