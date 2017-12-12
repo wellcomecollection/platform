@@ -9,7 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.transformer.controllers._
+import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.transformer.modules.{
   TransformableParserModule,
   TransformerWorkerModule
