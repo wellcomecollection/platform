@@ -16,6 +16,17 @@ sierra_bibs_to_dynamo-publish: sierra_bibs_to_dynamo-build
 	$(call publish_service,sierra_bibs_to_dynamo)
 
 
+sierra_items_to_dynamo-test:
+	$(call sbt_test,sierra_items_to_dynamo)
+
+sierra_items_to_dynamo-build: $(ROOT)/.docker/sbt_image_builder
+	TARGET=sierra_adapter/sierra_items_to_dynamo/target \
+	PROJECT=sierra_items_to_dynamo $(ROOT)/builds/run_sbt_image_build.sh
+
+sierra_items_to_dynamo-publish: sierra_items_to_dynamo-build
+	echo "Do nothing until ECR is set up!"
+
+
 sierra_bib_merger-test:
 	$(call sbt_test,sierra_bib_merger)
 
