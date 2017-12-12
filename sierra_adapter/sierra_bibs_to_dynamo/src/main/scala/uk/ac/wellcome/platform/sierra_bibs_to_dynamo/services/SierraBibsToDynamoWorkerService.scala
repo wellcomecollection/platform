@@ -23,7 +23,6 @@ class SierraBibsToDynamoWorkerService @Inject()(
   @Flag("sierra.apiUrl") apiUrl: String,
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
-  @Flag("sierra.resourceType") resourceType: String,
   @Flag("sierra.fields") fields: String,
   dynamoConfig: DynamoConfig
 ) extends SQSWorker(reader, system, metrics) {
@@ -43,12 +42,11 @@ class SierraBibsToDynamoWorkerService @Inject()(
 
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
-      resourceType,
+      resourceType = "bibs",
       params).runWith(
       SierraDynamoSink(
         client = dynamoDbClient,
-        tableName = dynamoConfig.table,
-        resourceType = resourceType
+        tableName = dynamoConfig.table
       ))
   }
 }

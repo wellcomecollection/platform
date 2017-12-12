@@ -17,11 +17,10 @@ import uk.ac.wellcome.models.SierraBibRecord._
 import scala.concurrent.{ExecutionContext, Future}
 
 object SierraDynamoSink extends Logging {
-  def apply(client: AmazonDynamoDB, tableName: String, resourceType: String)(
+  def apply(client: AmazonDynamoDB, tableName: String)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(unprefixedJson => {
-      val json =
-        addIDPrefix(json = unprefixedJson, resourceType = resourceType)
+      val json = addIDPrefix(json = unprefixedJson)
       logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
@@ -70,19 +69,8 @@ object SierraDynamoSink extends Logging {
   // respectively.
   //
   // This updates the ID in a block of JSON to add this disambiguating prefix.
-  //
-  // TODO: Should this also update the bibIds on items?
-  def addIDPrefix(json: Json, resourceType: String): Json = {
-    resourceType match {
-      case "bibs" => root.id.string.modify(id => s"b$id")(json)
-      case "items" => root.id.string.modify(id => s"i$id")(json)
-      case _ => {
-        warn(
-          s"Unable to add disambiguating prefix for unknown resourceType=$resourceType")
-        json
-      }
-    }
-  }
+  def addIDPrefix(json: Json): Json =
+    root.id.string.modify(id => s"b$id")(json)
 
   private def getId(json: Json) = {
     root.id.string.getOption(json).get

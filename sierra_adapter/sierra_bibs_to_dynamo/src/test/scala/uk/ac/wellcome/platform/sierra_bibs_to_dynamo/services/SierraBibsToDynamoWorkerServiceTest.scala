@@ -43,7 +43,7 @@ class SierraBibsToDynamoWorkerServiceTest
     actorSystem.terminate()
   }
 
-  private def createSierraWorkerService(resourceType: String, fields: String) = {
+  private def createSierraWorkerService(fields: String) = {
     Some(
       new SierraBibsToDynamoWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
@@ -53,16 +53,14 @@ class SierraBibsToDynamoWorkerServiceTest
         apiUrl = "http://localhost:8080",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
-        resourceType = resourceType,
         dynamoConfig = DynamoConfig(tableName),
         fields = fields
       ))
   }
 
   it(
-    "should read a window message from sqs, retrieve the items from sierra and insert into DynamoDb") {
+    "should read a window message from sqs, retrieve the bibs from sierra and insert into DynamoDb") {
     worker = createSierraWorkerService(
-      resourceType = "items",
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
     worker.get.runSQSWorker()
     val message =
@@ -86,7 +84,6 @@ class SierraBibsToDynamoWorkerServiceTest
   it(
     "should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
     worker = createSierraWorkerService(
-      resourceType = "bibs",
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title")
     worker.get.runSQSWorker()
     val message =
@@ -110,7 +107,7 @@ class SierraBibsToDynamoWorkerServiceTest
 
   it(
     "should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
-    worker = createSierraWorkerService(resourceType = "items", fields = "")
+    worker = createSierraWorkerService(fields = "")
 
     val message =
       """
@@ -138,7 +135,6 @@ class SierraBibsToDynamoWorkerServiceTest
         apiUrl = "http://localhost:8081",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
-        resourceType = "items",
         fields = "",
         dynamoConfig = DynamoConfig(tableName)
       ))

@@ -34,12 +34,11 @@ class SierraBibsToDynamoFeatureTest
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",
-      "sierra.resourceType" -> "items",
       "sierra.fields" -> "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
-  it("should read items from sierra and add them to dynamo db") {
+  it("should read bibs from sierra and add them to dynamo db") {
     val message =
       """
         |{
