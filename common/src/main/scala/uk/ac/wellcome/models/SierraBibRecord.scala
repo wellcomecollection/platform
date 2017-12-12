@@ -11,13 +11,6 @@ case class SierraBibRecord(
 )
 
 object SierraBibRecord {
-  implicit val instantLongFormat =
-    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
-      Instant.ofEpochSecond
-    )(
-      _.getEpochSecond
-    )
-
   def apply(id: String, data: String, modifiedDate: String): SierraBibRecord =
     SierraBibRecord(
       id = id,

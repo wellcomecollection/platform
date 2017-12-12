@@ -11,13 +11,6 @@ case class SierraItemRecord(
 )
 
 object SierraItemRecord {
-  implicit val instantLongFormat =
-    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
-      Instant.ofEpochSecond
-    )(
-      _.getEpochSecond
-    )
-
   def apply(id: String, data: String, modifiedDate: String): SierraItemRecord =
     SierraItemRecord(
       id = id,
