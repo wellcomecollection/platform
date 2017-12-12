@@ -1,0 +1,14 @@
+dynamodb:
+  image: peopleperhour/dynamodb
+  ports:
+    - "45678:8000"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"
+sierra:
+  image: rodolpheche/wiremock
+  ports:
+    - "8080:8080"
+  volumes:
+    - "${ROOT}/sierra_adapter/sierra_bibs_to_dynamo/src/test/resources/wiremock:/home/wiremock"
