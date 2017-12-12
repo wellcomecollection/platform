@@ -1,0 +1,27 @@
+{
+  "id" : "6b3b4626-8c75-4426-a993-b905b79ef38a",
+  "name" : "bibs",
+  "request" : {
+    "url" : "/bibs?updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D&fields=updatedDate%2Cdeleted%2CdeletedDate%2CbibIds%2CfixedFields%2CvarFields&id=%5B1794166%2C%5D",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer fake-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "bibs-6b3b4626-8c75-4426-a993-b905b79ef38a.json",
+    "headers" : {
+      "Date" : "Thu, 30 Nov 2017 14:43:53 GMT",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Set-Cookie" : [ "jcontainerId=.jcontainer-public1; path=/iii/stage", "jcontainerId=.jcontainer-public1; path=/iii/patronio", "jcontainerId=.jcontainer-public1; path=/iii/rss", "jcontainerId=.jcontainer-public1; path=/iii/webrpt", "jcontainerId=.jcontainer-public1; path=/iii/upgrademgr", "jcontainerId=.jcontainer-public1; path=/iii/sierra-api", "jcontainerId=.jcontainer-public1; path=/sierra/admin", "jcontainerId=.jcontainer-public1; path=/sierra/dashboard", "jcontainerId=.jcontainer-public1; path=/sierra/shindig", "jcontainerId=.jcontainer-public1; path=/iii/ws/extlink", "jcontainerId=.jcontainer-public1; path=/sierra/ws/summit" ],
+      "Vary" : "User-Agent",
+      "Keep-Alive" : "timeout=5, max=97",
+      "Connection" : "Keep-Alive"
+    }
+  },
+  "uuid" : "6b3b4626-8c75-4426-a993-b905b79ef38a",
+  "persistent" : true
+}
