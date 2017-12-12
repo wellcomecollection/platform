@@ -9,11 +9,11 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.{
   SierraDynamoConfigModule,
   SierraBibMergerModule
 }
-import uk.ac.wellcome.platform.sierra_bib_merger.controllers.ManagementController
 
 object ServerMain extends Server
 

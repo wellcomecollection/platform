@@ -9,7 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.ingestor.controllers._
+import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.platform.ingestor.modules._
 
 object ServerMain extends Server
