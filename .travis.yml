@@ -30,8 +30,10 @@ cache:
     - catalogue_pipeline/transformer/target
     - catalogue_pipeline/reindexer/target
     - common/target
+    - sierra_adapter/sierra_bibs_to_dynamo/target
+    - sierra_adapter/sierra_items_to_dynamo/target
     - sierra_adapter/sierra_bib_merger/target
-    - sierra_adapter/sierra_to_dynamo/target
+    - sierra_adapter/sierra_item_merger/target
 
 script:
   - .travis/run_task.py
@@ -58,9 +60,14 @@ env:
     # (not under active development)
     # - TASK=nginx-build
 
-    # Sierra adapter stack.  This takes quite a long time to run (~15 mins
-    # if the cache is cold), so we put it upfront to get it started early.
-    - TASK=sierra_adapter-test
+    # Sierra adapter stack.  This covers multiple Scala apps, so we skip
+    # it into separate tasks to avoid running all of them any time there's
+    # a change to just one.
+    - TASK=sierra_window_generator-test
+    - TASK=sierra_bibs_to_dynamo-test
+    - TASK=sierra_items_to_dynamo-test
+    - TASK=sierra_bib_merger-test
+    - TASK=sierra_item_merger-test
 
     # Catalogue pipeline stack
     - TASK=sbt-common-test
