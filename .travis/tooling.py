@@ -51,6 +51,11 @@ def affects_tests(path, task):
     if path.startswith('ontologies/'):
         return False
 
+    # Nothing in Travis except the ``travis-format`` task (which always runs)
+    # interacts with our Terraform files.
+    if path.endswith('.tf'):
+        return False
+
     # For each task, which directories only have an effect on this task?
     #
     # For example, changes to the ``loris`` directory only have an effect
