@@ -59,29 +59,6 @@ class SierraBibsToDynamoWorkerServiceTest
   }
 
   it(
-    "should read a window message from sqs, retrieve the bibs from sierra and insert into DynamoDb") {
-    worker = createSierraWorkerService(
-      fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
-    worker.get.runSQSWorker()
-    val message =
-      """
-        |{
-        | "start": "2013-12-10T17:16:35Z",
-        | "end": "2013-12-13T21:34:35Z"
-        |}
-      """.stripMargin
-
-    val sqsMessage =
-      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
-
-    eventually {
-      // This comes from the wiremock recordings for sierra api response
-      Scanamo.scan[SierraBibRecord](dynamoDbClient)(tableName) should have size 157
-    }
-  }
-
-  it(
     "should read a window message from sqs, retrieve the bibs from sierra and insert them into DynamoDb") {
     worker = createSierraWorkerService(
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title")
