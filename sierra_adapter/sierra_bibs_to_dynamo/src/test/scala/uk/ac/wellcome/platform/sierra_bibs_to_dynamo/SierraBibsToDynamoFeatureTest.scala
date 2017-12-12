@@ -30,11 +30,11 @@ class SierraBibsToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraToDynamo.tableName" -> tableName,
+      "aws.dynamo.sierraBibsToDynamo.tableName" -> tableName,
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",
-      "sierra.fields" -> "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
+      "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
