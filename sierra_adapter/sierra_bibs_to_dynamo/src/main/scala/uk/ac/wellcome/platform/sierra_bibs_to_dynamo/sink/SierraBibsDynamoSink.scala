@@ -11,8 +11,8 @@ import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.models.SierraRecord
-import uk.ac.wellcome.models.SierraRecord._
+import uk.ac.wellcome.models.SierraBibRecord
+import uk.ac.wellcome.models.SierraBibRecord._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,20 +25,20 @@ object SierraBibsDynamoSink extends Logging {
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
-          SierraRecord(
+          SierraBibRecord(
             id = getId(json),
             data = json.noSpaces,
             modifiedDate = updatedDate
           )
         case None =>
-          SierraRecord(
+          SierraBibRecord(
             id = getId(json),
             data = json.noSpaces,
             modifiedDate = getDeletedDateTimeAtStartOfDay(json)
           )
       }
 
-      val table = Table[SierraRecord](tableName)
+      val table = Table[SierraBibRecord](tableName)
       val ops = table
         .given(
           not(attributeExists('id)) or

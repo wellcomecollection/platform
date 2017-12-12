@@ -5,8 +5,8 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsToDynamoDBLocal
-import uk.ac.wellcome.models.SierraRecord
-import uk.ac.wellcome.models.SierraRecord._
+import uk.ac.wellcome.models.SierraBibRecord
+import uk.ac.wellcome.models.SierraBibRecord._
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   ExtendedPatience,
@@ -53,7 +53,7 @@ class SierraBibsToDynamoFeatureTest
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response
-      Scanamo.scan[SierraRecord](dynamoDbClient)(tableName) should have size 29
+      Scanamo.scan[SierraBibRecord](dynamoDbClient)(tableName) should have size 29
     }
   }
 }
