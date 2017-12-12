@@ -30,7 +30,7 @@ class SierraBibsToDynamoWorkerServiceTest
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
   val mockMetrics = mock[MetricsSender]
-  var worker: Option[SierraToDynamoWorkerService] = None
+  var worker: Option[SierraBibsToDynamoWorkerService] = None
   val actorSystem = ActorSystem()
 
   override def beforeEach(): Unit = {
@@ -45,7 +45,7 @@ class SierraBibsToDynamoWorkerServiceTest
 
   private def createSierraWorkerService(fields: String) = {
     Some(
-      new SierraToDynamoWorkerService(
+      new SierraBibsToDynamoWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = actorSystem,
         metrics = mockMetrics,
@@ -104,7 +104,7 @@ class SierraBibsToDynamoWorkerServiceTest
   it(
     "should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
     worker = Some(
-      new SierraToDynamoWorkerService(
+      new SierraBibsToDynamoWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = ActorSystem(),
         metrics = mockMetrics,
@@ -132,7 +132,7 @@ class SierraBibsToDynamoWorkerServiceTest
     }
   }
 
-  private def stopWorker(worker: Option[SierraToDynamoWorkerService]) = {
+  private def stopWorker(worker: Option[SierraBibsToDynamoWorkerService]) = {
     eventually {
       worker.fold(true)(_.cancelRun()) shouldBe true
     }

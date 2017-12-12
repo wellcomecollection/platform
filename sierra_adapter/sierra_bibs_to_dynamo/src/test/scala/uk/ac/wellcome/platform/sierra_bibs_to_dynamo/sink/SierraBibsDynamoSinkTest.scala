@@ -14,7 +14,7 @@ import org.mockito.Mockito
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsDynamoDBLocal
+import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsToDynamoDBLocal
 import uk.ac.wellcome.models.SierraRecord
 import uk.ac.wellcome.models.SierraRecord._
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -82,7 +82,7 @@ class SierraBibsDynamoSinkTest
     val futureUnit = Source.single(json).runWith(bibSink)
 
     val expectedRecord = SierraRecord(
-      id = s"i$id",
+      id = s"b$id",
       data = parse(s"""
         |{
         | "id": "b$id",
@@ -188,12 +188,12 @@ class SierraBibsDynamoSinkTest
     val expectedException = new RuntimeException("AAAAAARGH!")
     when(dynamoDbClient.putItem(any[PutItemRequest]))
       .thenThrow(expectedException)
-    val sink = SierraBibDynamoSink(
+    val brokenSink = SierraBibsDynamoSink(
       client = dynamoDbClient,
       tableName = tableName
     )
 
-    val futureUnit = Source.single(json).runWith(bibSink)
+    val futureUnit = Source.single(json).runWith(brokenSink)
     whenReady(futureUnit.failed) { ex =>
       ex shouldBe expectedException
     }
@@ -206,7 +206,7 @@ class SierraBibsDynamoSinkTest
       |  "updatedDate": "2006-06-06T06:06:06Z"
       |}
       """.stripMargin).right.get
-    val prefixedJson = SierraBibDynamoSink.addIDPrefix(json = json)
+    val prefixedJson = SierraBibsDynamoSink.addIDPrefix(json = json)
 
     val expectedJson = parse(s"""
       |{
