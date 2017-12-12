@@ -37,10 +37,12 @@ def affects_tests(path, task):
     # Nothing reads our Markdown files in tests, so we can ignore their
     # effect here.
     if path.endswith(('.md', '.png')) or path == 'LICENSE':
+        print("~~~ %s is ignored because it's not a file type we care about")
         return False
 
     # The ``misc`` folder is never used anywhere, so we can ignore it.
     if path.startswith('misc/'):
+        print("~~~ %s is ignored because it's in the misc dir")
         return False
 
     # We do lint the JSON and TTL files in the ontologies directory when
@@ -49,11 +51,13 @@ def affects_tests(path, task):
     # Since linting already happens unconditionally, we can ignore changes
     # to this directory as well.
     if path.startswith('ontologies/'):
+        print("~~~ %s is ignored because it's in the ontologies dir" % path)
         return False
 
     # Nothing in Travis except the ``travis-format`` task (which always runs)
     # interacts with our Terraform files.
     if path.endswith('.tf'):
+        print("~~~ %s is ignored because it's a Terraform file" % path)
         return False
 
     # For each task, which directories only have an effect on this task?
@@ -83,9 +87,11 @@ def affects_tests(path, task):
     # but we're *not* in that task, this change is unimportant.
     for prefix, directories in task_specific_directories.items():
         if not task.startswith(prefix) and path.startswith(tuple(directories)):
+            print('~~~ Ignoring %s; it only affects %s tests' % (path, task))
             return False
 
         if task.startswith(prefix) and path.startswith(tuple(directories)):
+            print("+++ %s is definitely part of the %s tests" % (path, task))
             return True
 
     # The top-level common directory contains some Scala files which are
@@ -93,10 +99,14 @@ def affects_tests(path, task):
     # which doesn't use this sbt-common lib, we can ignore changes to it.
     sbt_free_tasks = ('loris', 'monitoring', 'shared_infra')
     if task.startswith(sbt_free_tasks) and path.startswith('common/'):
+        print(
+            "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
+            (path, task))
         return False
 
     # Otherwise, we were unable to decide if this change was important.
     # We assume that it is, so we'll run tests just in case.
+    print("+++ Unable to decide if %s is significant, so assume it is" % path)
     return True
 
 
