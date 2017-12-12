@@ -13,14 +13,21 @@ case class SierraItemRecord(
 )
 
 object SierraItemRecord {
-  def apply(id: String, data: String, modifiedDate: String, bibIds: List[String]): SierraItemRecord =
+  def apply(id: String,
+            data: String,
+            modifiedDate: String,
+            bibIds: List[String]): SierraItemRecord =
     SierraItemRecord(
       id = id,
       data = data,
       modifiedDate = Instant.parse(modifiedDate),
       bibIds = bibIds
     )
-  def apply(id: String, data: String, modifiedDate: String, bibIds: List[String], unlinkedBibIds : List[String]): SierraItemRecord =
+  def apply(id: String,
+            data: String,
+            modifiedDate: String,
+            bibIds: List[String],
+            unlinkedBibIds: List[String]): SierraItemRecord =
     SierraItemRecord(
       id = id,
       data = data,

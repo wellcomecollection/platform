@@ -49,10 +49,13 @@ object SierraItemsDynamoSink extends Logging {
       val option = Scanamo.exec(client)(
         table.get('id -> record.id)
       )
-      val newRecord = option.map { either =>
-        val existingRecord = either.right.get
-        SierraItemRecordMerger.mergeItems(oldRecord = existingRecord, newRecord = record)
-      }.getOrElse(record)
+      val newRecord = option
+        .map { either =>
+          val existingRecord = either.right.get
+          SierraItemRecordMerger.mergeItems(oldRecord = existingRecord,
+                                            newRecord = record)
+        }
+        .getOrElse(record)
 
       val ops = table
         .given(
