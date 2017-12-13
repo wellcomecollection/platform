@@ -20,8 +20,9 @@ class SierraItemMergerUpdaterService @Inject()(
       .flatMap {
         case Some(record) =>
           val mergedRecord = record.mergeItemRecord(itemRecord)
-          if(mergedRecord != record)
-            mergedSierraRecordDao.updateRecord(mergedRecord.copy(version = mergedRecord.version + 1))
+          if (mergedRecord != record)
+            mergedSierraRecordDao.updateRecord(
+              mergedRecord.copy(version = mergedRecord.version + 1))
           else Future.successful(())
       }
 
