@@ -56,11 +56,11 @@ trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {
       id = id,
       data = itemRecordString(
         id = id,
-        updatedDate = "2001-01-01T01:01:01Z",
+        updatedDate = updatedDate,
         bibIds = bibIds
       ),
       bibIds = bibIds,
-      modifiedDate = "2001-01-01T01:01:01Z"
+      modifiedDate = updatedDate
     )
 
   protected def dynamoQueryEqualsValue[T: DynamoFormat](id: String)(

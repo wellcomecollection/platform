@@ -78,7 +78,7 @@ class SierraItemMergerUpdaterServiceTest
   }
 
   it(
-    "should add an item to the MergedSierraRecord if the bibId exists in DuynamoDB but no itemData") {
+    "should add an item to the MergedSierraRecord if the bibId exists in DynamoDB but no itemData") {
     val bibId = "b7000007"
     val newRecord = MergedSierraRecord(id = bibId, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
