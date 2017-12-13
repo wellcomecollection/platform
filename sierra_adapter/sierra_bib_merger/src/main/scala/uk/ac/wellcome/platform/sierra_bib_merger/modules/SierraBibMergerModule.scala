@@ -19,18 +19,6 @@ object SierraBibMergerModule extends TwitterModule with TryBackoff {
 
   override lazy val continuous: Boolean = false
 
-  @Singleton
-  @Provides
-  def providesSierraBibMergerUpdaterService(
-    dynamoDBClient: AmazonDynamoDBAsync,
-    metricsSender: MetricsSender,
-    dynamoConfig: DynamoConfig): SierraBibMergerUpdaterService =
-    new SierraBibMergerUpdaterService(
-      dynamoDBClient = dynamoDBClient,
-      metrics = metricsSender,
-      dynamoConfig = dynamoConfig
-    )
-
   override def singletonStartup(injector: Injector) {
     val workerService = injector.instance[SierraBibMergerWorkerService]
 
