@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.GetItemRequest
+import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -82,13 +82,13 @@ class MergedSierraRecordDaoTest
       val mergedSierraRecord = MergedSierraRecord(id = id,
                                                   maybeBibData = None,
                                                   itemData = Map(),
-                                                  version = 1)
+                                                  version = 0)
 
       whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>
         Scanamo
           .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
           .get shouldBe Right(
-          mergedSierraRecord
+          mergedSierraRecord.copy(version = 1)
         )
       }
     }
@@ -97,13 +97,10 @@ class MergedSierraRecordDaoTest
       "should update a merged sierra record if it already exists and has a higher version") {
       val id = "b1111"
       val mergedSierraRecord = MergedSierraRecord(id = id,
-                                                  maybeBibData = None,
-                                                  itemData = Map(),
-                                                  version = 1)
-      val newerMergedSierraRecord = MergedSierraRecord(id = id,
-                                                       maybeBibData = None,
-                                                       itemData = Map(),
-                                                       version = 2)
+        maybeBibData = None,
+        itemData = Map(),
+        version = 1)
+      val newerMergedSierraRecord = mergedSierraRecord.copy(version = 2)
 
       Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
 
@@ -112,7 +109,27 @@ class MergedSierraRecordDaoTest
           Scanamo
             .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
             .get shouldBe Right(
-            newerMergedSierraRecord
+            newerMergedSierraRecord.copy(version = 3)
+          )
+      }
+    }
+
+    it(
+      "should update a merged sierra record if it already exists and has a the same version") {
+      val id = "b1111"
+      val mergedSierraRecord = MergedSierraRecord(id = id,
+                                                  maybeBibData = None,
+                                                  itemData = Map(),
+                                                  version = 1)
+
+      Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
+
+      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) {
+        _ =>
+          Scanamo
+            .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
+            .get shouldBe Right(
+            mergedSierraRecord.copy(version = 2)
           )
       }
     }
@@ -131,7 +148,9 @@ class MergedSierraRecordDaoTest
 
       Scanamo.put(dynamoDbClient)(tableName)(newerMergedSierraRecord)
 
-      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>
+      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord).failed) { ex =>
+        ex shouldBe a [ConditionalCheckFailedException]
+
         Scanamo
           .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
           .get shouldBe Right(

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.SierraItemRecord
+import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 import uk.ac.wellcome.platform.sierra_item_merger.dynamo.MergedSierraRecordDao
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,10 +20,10 @@ class SierraItemMergerUpdaterService @Inject()(
       .flatMap {
         case Some(record) =>
           val mergedRecord = record.mergeItemRecord(itemRecord)
-          if (mergedRecord != record)
-            mergedSierraRecordDao.updateRecord(
-              mergedRecord.copy(version = mergedRecord.version + 1))
+          if(mergedRecord != record)
+            mergedSierraRecordDao.updateRecord(mergedRecord)
           else Future.successful(())
+        case None => mergedSierraRecordDao.updateRecord(MergedSierraRecord(id = itemRecord.bibIds.head, itemRecord = itemRecord))
       }
 
 }

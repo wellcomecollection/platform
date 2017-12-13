@@ -27,6 +27,20 @@ class SierraItemMergerUpdaterServiceTest
     mock[MetricsSender]
   )
 
+  it("should create a record in DynamoDB if it receives a item") {
+    val bibId = "b666"
+    val newItemRecord = sierraItemRecord(
+      id = "i666",
+      updatedDate = "2014-04-04T04:04:04Z",
+      bibIds = List(bibId)
+    )
+
+    whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
+      val expectedSierraRecord = MergedSierraRecord(id = bibId, maybeBibData = None, itemData = Map(newItemRecord.id -> newItemRecord), version = 1)
+      dynamoQueryEqualsValue(id = bibId)(expectedValue = expectedSierraRecord)
+    }
+  }
+
   it(
     "should update an item in DynamoDB if it receives an update with a newer date") {
     val id = "i3000003"
