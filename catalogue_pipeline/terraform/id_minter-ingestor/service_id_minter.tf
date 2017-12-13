@@ -31,11 +31,11 @@ module "id_minter" {
     {
       name  = "topic_arn"
       value = "${module.es_ingest_topic.arn}"
-    }
+    },
   ]
 
-  cluster_name               = "${var.cluster_name}"
-  vpc_id                     = "${var.vpc_id}"
+  cluster_name = "${var.cluster_name}"
+  vpc_id       = "${var.vpc_id}"
 
   alb_priority = "${random_integer.priority_id_minter.result}"
 
