@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.services
+package uk.ac.wellcome.sierra_adapter.services
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

@@ -30,6 +30,7 @@ cache:
     - catalogue_pipeline/transformer/target
     - catalogue_pipeline/reindexer/target
     - common/target
+    - sierra_adapter/common/target
     - sierra_adapter/sierra_bibs_to_dynamo/target
     - sierra_adapter/sierra_items_to_dynamo/target
     - sierra_adapter/sierra_bib_merger/target
@@ -63,6 +64,7 @@ env:
     # Sierra adapter stack.  This covers multiple Scala apps, so we skip
     # it into separate tasks to avoid running all of them any time there's
     # a change to just one.
+    - TASK=sierra_common-test
     - TASK=sierra_window_generator-test
     - TASK=sierra_bibs_to_dynamo-test
     - TASK=sierra_items_to_dynamo-test

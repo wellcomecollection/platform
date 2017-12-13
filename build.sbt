@@ -37,16 +37,23 @@ lazy val id_minter = doSharedSetup(project, "catalogue_pipeline/id_minter")
 lazy val reindexer = doSharedSetup(project, "catalogue_pipeline/reindexer")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
-lazy val sierra_bibs_to_dynamo = doSharedSetup(project, "sierra_adapter/sierra_bibs_to_dynamo")
+def doSharedSierraSetup(project: Project, folder: String) =
+  doSharedSetup(project = project, folder = folder)
+    .dependsOn(sierra_adapter_common % "compile->compile;test->test")
+
+lazy val sierra_adapter_common = doSharedSetup(project, "sierra_adapter/common")
+  .settings(libraryDependencies ++= Dependencies.sierraAdapterCommonDependencies)
+
+lazy val sierra_bibs_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_bibs_to_dynamo")
   .settings(libraryDependencies ++= Dependencies.sierraToDynamoDependencies)
 
-lazy val sierra_items_to_dynamo = doSharedSetup(project, "sierra_adapter/sierra_items_to_dynamo")
+lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")
   .settings(libraryDependencies ++= Dependencies.sierraToDynamoDependencies)
 
-lazy val sierra_bib_merger = doSharedSetup(project, "sierra_adapter/sierra_bib_merger")
+lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_bib_merger")
   .settings(libraryDependencies ++= Dependencies.sierraBibMergerDepedencies)
 
-lazy val sierra_item_merger = doSharedSetup(project, "sierra_adapter/sierra_item_merger")
+lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .settings(libraryDependencies ++= Dependencies.sierraItemMergerDependencies)
 
 lazy val root = (project in file("."))
@@ -57,6 +64,7 @@ lazy val root = (project in file("."))
     transformer,
     id_minter,
     reindexer,
+    sierra_adapter_common,
     sierra_bibs_to_dynamo,
     sierra_items_to_dynamo,
     sierra_bib_merger,

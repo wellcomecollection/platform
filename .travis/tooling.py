@@ -94,6 +94,22 @@ def affects_tests(path, task):
             print("+++ %s is definitely part of the %s tests" % (path, task))
             return True
 
+    # A number of Sierra-related tasks share code/Makefiles in the
+    # sierra_adapter directory.  If we're definitely in a project which
+    # has nothing to do with Sierra, we can ignore changes in this dir.
+    sierra_free_tasks = (
+        'loris', 'id_minter', 'ingestor', 'reindexer', 'transformer',
+        'api', 'monitoring', 'shared_infra', 'nginx'
+    )
+    if (
+        task.startswith(sierra_free_tasks) and
+        path.startswith('sierra_adapter/')
+    ):
+        print(
+            "~~~ Ignoring %s; sierra_adapter changes don't affect %s tests" %
+            (path, task))
+        return False
+
     # The top-level common directory contains some Scala files which are
     # shared across multiple projects.  If we're definitely in a project
     # which doesn't use this sbt-common lib, we can ignore changes to it.

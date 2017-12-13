@@ -11,6 +11,7 @@ import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.sink.SierraItemsDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
