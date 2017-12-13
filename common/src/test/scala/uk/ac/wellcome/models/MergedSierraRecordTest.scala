@@ -48,16 +48,16 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     caught.getMessage shouldEqual "Non-matching bib ids 333 != 444"
   }
 
-  it("should be at version 1 when first created") {
+  it("should be at version 0 when first created") {
     val record = MergedSierraRecord(id = "555")
-    record.version shouldEqual 1
+    record.version shouldEqual 0
   }
 
   it("should always increment the version when mergeBibRecord is called") {
     val record = sierraBibRecord(id = "666")
     val originalRecord = MergedSierraRecord(id = "666", version = 10)
     val newRecord = originalRecord.mergeBibRecord(record)
-    newRecord.get.version shouldEqual 11
+    newRecord.version shouldEqual 11
   }
 
   it("should return None when merging bib records with stale data") {
@@ -79,7 +79,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     )
 
     val result = mergedSierraRecord.mergeBibRecord(record)
-    result shouldBe None
+    result shouldBe mergedSierraRecord
   }
 
   it("should update bibData when merging bib records with newer data") {
@@ -101,7 +101,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     )
 
     val result = mergedSierraRecord.mergeBibRecord(record)
-    result.get.maybeBibData.get shouldBe record
+    result.maybeBibData.get shouldBe record
   }
 
   it("should add itemData when there isn't already an item") {

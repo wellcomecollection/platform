@@ -23,7 +23,7 @@ case class MergedSierraRecord(
   id: String,
   maybeBibData: Option[SierraBibRecord] = None,
   itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
-  version: Int = 1
+  version: Int = 0
 ) extends Transformable {
 
   /** Given a new bib record, construct the new merged row that we should
@@ -31,7 +31,7 @@ case class MergedSierraRecord(
     *
     * Returns None if there's nothing to do.
     */
-  def mergeBibRecord(record: SierraBibRecord): Option[MergedSierraRecord] = {
+  def mergeBibRecord(record: SierraBibRecord): MergedSierraRecord = {
     if (record.id != this.id) {
       throw new RuntimeException(
         s"Non-matching bib ids ${record.id} != ${this.id}")
@@ -43,13 +43,9 @@ case class MergedSierraRecord(
     }
 
     if (isNewerData) {
-      Some(
-        this.copy(
-          maybeBibData = Some(record),
-          version = this.version + 1
-        ))
+      this.copy(maybeBibData = Some(record))
     } else {
-      None
+      this
     }
   }
 
