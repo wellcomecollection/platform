@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bib_merger.services
+package uk.ac.wellcome.platform.sierra_bib_merger
 
 import akka.actor.ActorSystem
 import com.gu.scanamo.query.UniqueKey
@@ -9,14 +9,11 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
-import uk.ac.wellcome.platform.sierra_bib_merger.Server
 import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
-import uk.ac.wellcome.dynamo._
-
-class SierraBibMergerWorkerServiceTest
+class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with AmazonCloudWatchFlag
