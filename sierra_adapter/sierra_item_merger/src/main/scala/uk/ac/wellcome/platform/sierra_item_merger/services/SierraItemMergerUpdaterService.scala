@@ -8,7 +8,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
+import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -29,11 +29,11 @@ class SierraItemMergerUpdaterService @Inject()(
       )
       .put(record)
 
-  def update(bibRecord: SierraBibRecord): Future[Unit] = Future {
-    logger.info(s"Attempting to update $bibRecord")
+  def update(itemRecord: SierraItemRecord): Future[Unit] = Future {
+    logger.info(s"Attempting to update $itemRecord")
 
     val existingRecord = Scanamo.exec(dynamoDBClient)(
-      table.get('id -> bibRecord.id)
+      table.get('id -> itemRecord.id)
     )
 
     val newRecord = existingRecord
@@ -46,14 +46,14 @@ class SierraItemMergerUpdaterService @Inject()(
           logger.info(s"Found $record, attempting merge.")
 
           record
-            .mergeBibRecord(bibRecord)
+            .mergeItemRecord(itemRecord)
             .toRight(
               new RuntimeException("Unable to merge record!")
             )
         }
       }
       .getOrElse {
-        val record = MergedSierraRecord(bibRecord)
+        val record = MergedSierraRecord(itemRecord)
         logger.info(s"No match found, creating new record: $record")
 
         Right(record)
@@ -75,9 +75,9 @@ class SierraItemMergerUpdaterService @Inject()(
 
     putOperation match {
       case Right(_) =>
-        logger.info(s"${bibRecord.id} saved successfully to DynamoDB")
+        logger.info(s"${itemRecord.id} saved successfully to DynamoDB")
       case Left(error) =>
-        logger.warn(s"Failed processing ${bibRecord.id}", error)
+        logger.warn(s"Failed processing ${itemRecord.id}", error)
     }
   }
 }
