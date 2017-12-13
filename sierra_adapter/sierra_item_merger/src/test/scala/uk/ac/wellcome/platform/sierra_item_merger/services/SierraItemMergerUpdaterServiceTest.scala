@@ -40,7 +40,11 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
-      val expectedSierraRecord = MergedSierraRecord(id = bibId, maybeBibData = None, itemData = Map(newItemRecord.id -> newItemRecord), version = 1)
+      val expectedSierraRecord =
+        MergedSierraRecord(id = bibId,
+                           maybeBibData = None,
+                           itemData = Map(newItemRecord.id -> newItemRecord),
+                           version = 1)
       dynamoQueryEqualsValue(id = bibId)(expectedValue = expectedSierraRecord)
     }
   }
@@ -130,9 +134,11 @@ class SierraItemMergerUpdaterServiceTest
       mock[MetricsSender]
     )
     val expectedException = new RuntimeException("BOOOM!")
-    when(failingDao.getRecord(any[String])).thenReturn(Future.failed(expectedException))
-    val itemRecord = sierraItemRecord("i000", "2007-07-07T07:07:07Z", List("b242"))
-    whenReady(failingUpdaterService.update(itemRecord).failed) {ex =>
+    when(failingDao.getRecord(any[String]))
+      .thenReturn(Future.failed(expectedException))
+    val itemRecord =
+      sierraItemRecord("i000", "2007-07-07T07:07:07Z", List("b242"))
+    whenReady(failingUpdaterService.update(itemRecord).failed) { ex =>
       ex shouldBe expectedException
     }
   }
@@ -146,12 +152,15 @@ class SierraItemMergerUpdaterServiceTest
     val expectedException = new RuntimeException("BOOOM!")
     val bibId = "b242"
     val newRecord = MergedSierraRecord(id = bibId, version = 1)
-    when(failingDao.getRecord(any[String])).thenReturn(Future.successful(Some(newRecord)))
-    when(failingDao.updateRecord(any[MergedSierraRecord])).thenReturn(Future.failed(expectedException))
+    when(failingDao.getRecord(any[String]))
+      .thenReturn(Future.successful(Some(newRecord)))
+    when(failingDao.updateRecord(any[MergedSierraRecord]))
+      .thenReturn(Future.failed(expectedException))
 
-    val itemRecord = sierraItemRecord("i000", "2007-07-07T07:07:07Z", List(bibId))
+    val itemRecord =
+      sierraItemRecord("i000", "2007-07-07T07:07:07Z", List(bibId))
 
-    whenReady(failingUpdaterService.update(itemRecord).failed) {ex =>
+    whenReady(failingUpdaterService.update(itemRecord).failed) { ex =>
       ex shouldBe expectedException
     }
   }

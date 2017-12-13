@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -97,9 +101,9 @@ class MergedSierraRecordDaoTest
       "should update a merged sierra record if it already exists and has a higher version") {
       val id = "b1111"
       val mergedSierraRecord = MergedSierraRecord(id = id,
-        maybeBibData = None,
-        itemData = Map(),
-        version = 1)
+                                                  maybeBibData = None,
+                                                  itemData = Map(),
+                                                  version = 1)
       val newerMergedSierraRecord = mergedSierraRecord.copy(version = 2)
 
       Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
@@ -124,13 +128,12 @@ class MergedSierraRecordDaoTest
 
       Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
 
-      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) {
-        _ =>
-          Scanamo
-            .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
-            .get shouldBe Right(
-            mergedSierraRecord.copy(version = 2)
-          )
+      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>
+        Scanamo
+          .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
+          .get shouldBe Right(
+          mergedSierraRecord.copy(version = 2)
+        )
       }
     }
 
@@ -148,19 +151,19 @@ class MergedSierraRecordDaoTest
 
       Scanamo.put(dynamoDbClient)(tableName)(newerMergedSierraRecord)
 
-      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord).failed) { ex =>
-        ex shouldBe a [ConditionalCheckFailedException]
+      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord).failed) {
+        ex =>
+          ex shouldBe a[ConditionalCheckFailedException]
 
-        Scanamo
-          .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
-          .get shouldBe Right(
-          newerMergedSierraRecord
-        )
+          Scanamo
+            .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
+            .get shouldBe Right(
+            newerMergedSierraRecord
+          )
       }
     }
 
-    it(
-      "return a failed future if the request to DynamoDb fails") {
+    it("return a failed future if the request to DynamoDb fails") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val expectedException = new RuntimeException("AAAAAARGH!")
       when(dynamoDbClient.putItem(any[PutItemRequest]))
@@ -170,9 +173,9 @@ class MergedSierraRecordDaoTest
         new MergedSierraRecordDao(dynamoDbClient, DynamoConfig(tableName))
 
       val mergedSierraRecord = MergedSierraRecord(id = "b1111",
-        maybeBibData = None,
-        itemData = Map(),
-        version = 1)
+                                                  maybeBibData = None,
+                                                  itemData = Map(),
+                                                  version = 1)
 
       whenReady(failingDao.updateRecord(mergedSierraRecord).failed) { ex =>
         ex shouldBe expectedException

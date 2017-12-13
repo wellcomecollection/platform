@@ -20,10 +20,13 @@ class SierraItemMergerUpdaterService @Inject()(
       .flatMap {
         case Some(record) =>
           val mergedRecord = record.mergeItemRecord(itemRecord)
-          if(mergedRecord != record)
+          if (mergedRecord != record)
             mergedSierraRecordDao.updateRecord(mergedRecord)
           else Future.successful(())
-        case None => mergedSierraRecordDao.updateRecord(MergedSierraRecord(id = itemRecord.bibIds.head, itemRecord = itemRecord))
+        case None =>
+          mergedSierraRecordDao.updateRecord(
+            MergedSierraRecord(id = itemRecord.bibIds.head,
+                               itemRecord = itemRecord))
       }
 
 }
