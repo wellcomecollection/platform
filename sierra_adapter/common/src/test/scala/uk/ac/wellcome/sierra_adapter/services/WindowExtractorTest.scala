@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.services
+package uk.ac.wellcome.sierra_adapter.services
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException

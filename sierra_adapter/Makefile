@@ -5,6 +5,13 @@ include $(SIERRA_ADAPTER)/sierra_window_generator/Makefile
 include $(ROOT)/functions.Makefile
 
 
+sierra_common-test:
+	$(call sbt_test,sierra_adapter_common)
+
+sierra_common-publish:
+	echo "Nothing to do!"
+
+
 sierra_bibs_to_dynamo-test:
 	$(call sbt_test,sierra_bibs_to_dynamo)
 
@@ -24,7 +31,7 @@ sierra_items_to_dynamo-build: $(ROOT)/.docker/sbt_image_builder
 	PROJECT=sierra_items_to_dynamo $(ROOT)/builds/run_sbt_image_build.sh
 
 sierra_items_to_dynamo-publish: sierra_items_to_dynamo-build
-	echo "Do nothing until ECR is set up!"
+	$(call publish_service,sierra_items_to_dynamo)
 
 
 sierra_bib_merger-test:
