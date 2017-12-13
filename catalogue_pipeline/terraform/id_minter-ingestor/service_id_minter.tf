@@ -7,32 +7,14 @@ module "id_minter" {
   ecr_repository_url = "${var.id_minter_repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
 
-  config_vars = [
-    {
-      name  = "cluster_url"
-      value = "${var.identifiers_rds_cluster["host"]}"
-    },
-    {
-      name  = "db_port"
-      value = "${var.identifiers_rds_cluster["port"]}"
-    },
-    {
-      name  = "db_username"
-      value = "${var.identifiers_rds_cluster["username"]}"
-    },
-    {
-      name  = "db_password"
-      value = "${var.identifiers_rds_cluster["password"]}"
-    },
-    {
-      name  = "queue_url"
-      value = "${module.id_minter_queue.id}"
-    },
-    {
-      name  = "topic_arn"
-      value = "${module.es_ingest_topic.arn}"
-    },
-  ]
+  config_vars = {
+    cluster_url = "${var.identifiers_rds_cluster["host"]}"
+    db_port     = "${var.identifiers_rds_cluster["port"]}"
+    db_username = "${var.identifiers_rds_cluster["username"]}"
+    db_password = "${var.identifiers_rds_cluster["password"]}"
+    queue_url   = "${module.id_minter_queue.id}"
+    topic_arn   = "${module.es_ingest_topic.arn}"
+  }
 
   cluster_name = "${var.cluster_name}"
   vpc_id       = "${var.vpc_id}"
