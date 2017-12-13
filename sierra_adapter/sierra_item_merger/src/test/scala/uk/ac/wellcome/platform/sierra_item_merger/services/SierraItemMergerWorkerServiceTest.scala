@@ -34,7 +34,7 @@ class SierraItemMergerWorkerServiceTest
     flags = Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraBibMerger.tableName" -> tableName
+      "aws.dynamo.sierraItemMerger.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
@@ -83,9 +83,9 @@ class SierraItemMergerWorkerServiceTest
       data = itemRecordString(
         id = id,
         updatedDate = "2001-01-01T01:01:01Z",
-        bibIds = List(bibId)
+        bibIds = bibIds
       ),
-      bibIds =  List(bibId),
+      bibIds = bibIds,
       modifiedDate = "2001-01-01T01:01:01Z"
     )
 
@@ -97,7 +97,7 @@ class SierraItemMergerWorkerServiceTest
       updatedDate = "2001-01-01T01:01:01Z",
       bibIds = List(bibId)
     )
-    sendBibRecordToSQS(record)
+    sendItemRecordToSQS(record)
     val expectedMergedSierraRecord = MergedSierraRecord(
       id = bibId,
       itemData = Map(id -> record),
@@ -120,20 +120,21 @@ class SierraItemMergerWorkerServiceTest
       updatedDate = "2001-01-01T01:01:01Z",
       bibIds = List(bibId1)
     )
-    sendBibRecordToSQS(record1)
+    sendItemRecordToSQS(record1)
     val expectedMergedSierraRecord1 = MergedSierraRecord(
       id = bibId1,
       itemData = Map(id1 -> record1),
       version = 1
     )
 
+    val bibId2 = "b2000002"
     val id2 = "2000002"
     val record2 = sierraItemRecord(
       id = id2,
       updatedDate = "2002-02-02T02:02:02Z",
       bibIds = List(bibId2)
     )
-    sendBibRecordToSQS(record2)
+    sendItemRecordToSQS(record2)
     val expectedMergedSierraRecord2 = MergedSierraRecord(
       id = bibId2,
       itemData = Map(id2 -> record2),
@@ -158,7 +159,7 @@ class SierraItemMergerWorkerServiceTest
     )
     val oldRecord = MergedSierraRecord(
       id = bibId,
-      itemData = Map(id -> oldItemRecord)
+      itemData = Map(id -> oldItemRecord),
       version = 1
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
@@ -169,11 +170,11 @@ class SierraItemMergerWorkerServiceTest
       updatedDate = newUpdatedDate,
       bibIds = List(bibId)
     )
-    sendBibRecordToSQS(record)
+    sendItemRecordToSQS(newItemRecord)
 
-    val oldRecord = MergedSierraRecord(
+    val expectedSierraRecord = MergedSierraRecord(
       id = bibId,
-      itemData = Map(id -> newItemRecord)
+      itemData = Map(id -> newItemRecord),
       version = 2
     )
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
@@ -198,10 +199,10 @@ class SierraItemMergerWorkerServiceTest
 
     val oldItemRecord = sierraItemRecord(
       id = id,
-      updatedDate = "2001-01-01T01:01:01Z"
+      updatedDate = "2001-01-01T01:01:01Z",
       bibIds = List(bibId)
     )
-    sendBibRecordToSQS(oldItemRecord)
+    sendItemRecordToSQS(oldItemRecord)
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
@@ -221,17 +222,17 @@ class SierraItemMergerWorkerServiceTest
       bibIds = List(bibId)
     )
 
-    sendBibRecordToSQS(itemRecord)
+    sendItemRecordToSQS(itemRecord)
     val expectedSierraRecord = MergedSierraRecord(
       id = bibId,
       itemData = Map(itemRecord.id -> itemRecord),
       version = 2
     )
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
+    dynamoQueryEqualsValue('id -> bibId)(expectedValue = expectedSierraRecord)
   }
 
-  private def sendBibRecordToSQS(record: SierraBibRecord) = {
+  private def sendItemRecordToSQS(record: SierraItemRecord) = {
     val messageBody = JsonUtil.toJson(record).get
 
     val message = SQSMessage(
