@@ -196,21 +196,30 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     }
 
     describe("when the merged record is unlinked from the item") {
-      it("should remove the item if it already exists") {
+      ignore("should remove the item if it already exists") {
+        val unlinkedBibId = "222"
+        val record = sierraItemRecord(
+          id = "i111",
+          title = "Only otters occupy the orange oval",
+          modifiedDate = "2001-01-01T01:01:01Z",
+          bibIds = List("i111"),
+          unlinkedBibIds = List(unlinkedBibId)
+        )
+        val mergedSierraRecord = MergedSierraRecord(id = unlinkedBibId,itemData = Map(record.id -> record))
+        mergedSierraRecord.unlinkItemRecord(record) shouldBe mergedSierraRecord.copy(itemData = Map.empty)
+      }
+
+      ignore("should return None when merging an unlinked record which is already absent") {
         true shouldBe false
       }
 
-      it("should return None when merging an unlinked record which is already absent") {
-        true shouldBe false
-      }
-
-      it("should return None when merging an unlinked record which has linked more recently") {
+      ignore("should return None when merging an unlinked record which has linked more recently") {
         true shouldBe false
       }
     }
 
     describe("when the merged record is unrelated to the item") {
-      it("should only merge item records with matching bib IDs") {
+      ignore("should only merge item records with matching bib IDs") {
         true shouldBe false
       }
     }
@@ -296,7 +305,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     id: String = "i111",
     title: String = "Ingenious imps invent invasive implements",
     modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String]
+    bibIds: List[String],
+    unlinkedBibIds: List[String] = List()
   ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(
@@ -305,7 +315,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       title = title
     ),
     modifiedDate = modifiedDate,
-    bibIds = bibIds
+    bibIds = bibIds,
+    unlinkedBibIds = unlinkedBibIds
   )
 
   private def sierraRecordString(

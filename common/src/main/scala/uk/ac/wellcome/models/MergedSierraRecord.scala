@@ -75,6 +75,8 @@ case class MergedSierraRecord(
     }
   }
 
+  def unlinkItemRecord(itemRecord: SierraItemRecord): MergedSierraRecord = ???
+
   override def transform: Try[Option[Work]] =
     maybeBibData
       .map { bibData =>
