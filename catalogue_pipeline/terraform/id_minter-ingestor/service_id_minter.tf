@@ -5,7 +5,7 @@ module "id_minter" {
   source_queue_name  = "${module.id_minter_queue.name}"
   source_queue_arn   = "${module.id_minter_queue.arn}"
   ecr_repository_url = "${var.id_minter_repository_url}"
-  release_id         = "1f74eda6f16c79b3c8c760f5bb8832a27b3436c0"
+  release_id         = "${var.release_ids["id_minter"]}"
 
   config_template    = "id_minter"
   is_config_managed = false

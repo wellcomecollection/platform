@@ -1,4 +1,4 @@
-FROM finatra_service_base:latest
+FROM wellcome/finatra_service_base
 
 ADD target/universal/stage /opt/docker
 
