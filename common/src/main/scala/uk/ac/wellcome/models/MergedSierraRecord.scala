@@ -26,10 +26,8 @@ case class MergedSierraRecord(
   version: Int = 0
 ) extends Transformable {
 
-  /** Given a new bib record, construct the new merged row that we should
-    * insert into the merged database.
-    *
-    * Returns None if there's nothing to do.
+  /** Return the most up-to-date combination of the merged record and the
+    * bib record we've just received.
     */
   def mergeBibRecord(record: SierraBibRecord): MergedSierraRecord = {
     if (record.id != this.id) {
