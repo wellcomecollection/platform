@@ -6,10 +6,10 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import javax.inject.Singleton
 
 object SierraDynamoConfigModule extends DynamoConfigModule {
-  val sierraBibMergerTable = flags("sierraItemMerger")
+  val sierraItemMergerTable = flags("sierraItemMerger")
 
   @Singleton
   @Provides
   def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(sierraBibMergerTable())
+    DynamoConfig(sierraItemMergerTable())
 }

@@ -30,54 +30,56 @@ class SierraItemMergerUpdaterService @Inject()(
       .put(record)
 
   def update(itemRecord: SierraItemRecord): Future[Unit] = Future {
-    logger.info(s"Attempting to update $itemRecord")
 
-    val existingRecord = Scanamo.exec(dynamoDBClient)(
-      table.get('id -> itemRecord.id)
-    )
 
-    val newRecord = existingRecord
-      .map {
-        case Left(error) =>
-          Left(
-            new RuntimeException(error.toString)
-          )
-        case Right(record) => {
-          logger.info(s"Found $record, attempting merge.")
-
-          record
-            .mergeItemRecord(itemRecord)
-            .toRight(
-              new RuntimeException("Unable to merge record!")
-            )
-        }
-      }
-      .getOrElse {
-        val record = MergedSierraRecord(itemRecord)
-        logger.info(s"No match found, creating new record: $record")
-
-        Right(record)
-      }
-
-    val putOperation = newRecord match {
-      case Right(record) => {
-        logger.info(s"Attempting to conditionally update $record.")
-
-        Scanamo
-          .exec(dynamoDBClient)(
-            putRecord(record)
-          )
-          .left
-          .map(e => new RuntimeException(e.toString))
-      }
-      case Left(e) => Left(e)
-    }
-
-    putOperation match {
-      case Right(_) =>
-        logger.info(s"${itemRecord.id} saved successfully to DynamoDB")
-      case Left(error) =>
-        logger.warn(s"Failed processing ${itemRecord.id}", error)
-    }
+//    logger.info(s"Attempting to update $itemRecord")
+//
+//    val existingRecord = Scanamo.exec(dynamoDBClient)(
+//      table.get('id -> itemRecord.)
+//    )
+//
+//    val newRecord = existingRecord
+//      .map {
+//        case Left(error) =>
+//          Left(
+//            new RuntimeException(error.toString)
+//          )
+//        case Right(record) => {
+//          logger.info(s"Found $record, attempting merge.")
+//
+//          record
+//            .mergeItemRecord(itemRecord)
+//            .toRight(
+//              new RuntimeException("Unable to merge record!")
+//            )
+//        }
+//      }
+//      .getOrElse {
+//        val record = MergedSierraRecord(itemRecord)
+//        logger.info(s"No match found, creating new record: $record")
+//
+//        Right(record)
+//      }
+//
+//    val putOperation = newRecord match {
+//      case Right(record) => {
+//        logger.info(s"Attempting to conditionally update $record.")
+//
+//        Scanamo
+//          .exec(dynamoDBClient)(
+//            putRecord(record)
+//          )
+//          .left
+//          .map(e => new RuntimeException(e.toString))
+//      }
+//      case Left(e) => Left(e)
+//    }
+//
+//    putOperation match {
+//      case Right(_) =>
+//        logger.info(s"${itemRecord.id} saved successfully to DynamoDB")
+//      case Left(error) =>
+//        logger.warn(s"Failed processing ${itemRecord.id}", error)
+//    }
   }
 }

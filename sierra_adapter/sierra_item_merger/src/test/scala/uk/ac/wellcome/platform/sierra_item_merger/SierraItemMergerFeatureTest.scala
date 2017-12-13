@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
-import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.Eventually
@@ -11,6 +10,7 @@ import uk.ac.wellcome.platform.sierra_item_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.dynamo._
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -63,11 +63,6 @@ class SierraItemMergerFeatureTest
       bibIds = List(bibId1)
     )
     sendItemRecordToSQS(record1)
-    val expectedMergedSierraRecord1 = MergedSierraRecord(
-      id = bibId1,
-      itemData = Map(id1 -> record1),
-      version = 1
-    )
 
     val bibId2 = "b2000002"
     val id2 = "2000002"
@@ -77,13 +72,19 @@ class SierraItemMergerFeatureTest
       bibIds = List(bibId2)
     )
     sendItemRecordToSQS(record2)
-    val expectedMergedSierraRecord2 = MergedSierraRecord(
-      id = bibId2,
-      itemData = Map(id2 -> record2),
-      version = 1
-    )
 
     eventually {
+      val expectedMergedSierraRecord1 = MergedSierraRecord(
+        id = bibId1,
+        itemData = Map(id1 -> record1),
+        version = 1
+      )
+      val expectedMergedSierraRecord2 = MergedSierraRecord(
+        id = bibId2,
+        itemData = Map(id2 -> record2),
+        version = 1
+      )
+
       dynamoQueryEqualsValue(id = bibId1)(
         expectedValue = expectedMergedSierraRecord1)
       dynamoQueryEqualsValue(id = bibId2)(
