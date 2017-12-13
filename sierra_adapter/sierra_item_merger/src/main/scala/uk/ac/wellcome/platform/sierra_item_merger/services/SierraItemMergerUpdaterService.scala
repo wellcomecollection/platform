@@ -31,11 +31,13 @@ class SierraItemMergerUpdaterService @Inject()(
 
   def update(itemRecord: SierraItemRecord): Future[Unit] = Future {
 
-    Scanamo.get[MergedSierraRecord](dynamoDBClient)(dynamoConfig.table)('id -> itemRecord.bibIds.head) match {
+    Scanamo.get[MergedSierraRecord](dynamoDBClient)(dynamoConfig.table)(
+      'id -> itemRecord.bibIds.head) match {
       case Some(Right(mergedRecord)) =>
         val newRecord = mergedRecord.mergeItemRecord(itemRecord)
-        if(newRecord != mergedRecord)
-          Scanamo.put[MergedSierraRecord](dynamoDBClient)(dynamoConfig.table)(newRecord.copy(version = mergedRecord.version + 1))
+        if (newRecord != mergedRecord)
+          Scanamo.put[MergedSierraRecord](dynamoDBClient)(dynamoConfig.table)(
+            newRecord.copy(version = mergedRecord.version + 1))
     }
 //    logger.info(s"Attempting to update $itemRecord")
 //

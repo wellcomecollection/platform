@@ -16,7 +16,8 @@ class SierraItemMergerUpdaterServiceTest
     with Matchers
     with SierraItemMergerTestUtil
     with MockitoSugar
-    with ScalaFutures with ExtendedPatience{
+    with ScalaFutures
+    with ExtendedPatience {
   val sierraUpdateRService = new SierraItemMergerUpdaterService(
     dynamoDbClient,
     mock[MetricsSender],
@@ -45,7 +46,8 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
-      val expectedSierraRecord = oldRecord.copy(itemData = Map(id -> newItemRecord), version = 2)
+      val expectedSierraRecord =
+        oldRecord.copy(itemData = Map(id -> newItemRecord), version = 2)
       dynamoQueryEqualsValue(id = bibId)(expectedValue = expectedSierraRecord)
     }
   }
