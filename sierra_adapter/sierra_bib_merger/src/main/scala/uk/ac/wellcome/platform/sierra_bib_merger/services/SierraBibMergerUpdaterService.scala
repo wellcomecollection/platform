@@ -62,7 +62,7 @@ class SierraBibMergerUpdaterService @Inject()(
 
     val putOperation = Scanamo
       .exec(dynamoDBClient)(
-        putRecord(newRecord)
+        putRecord(recordToWrite)
       )
       .left
       .map(e => new RuntimeException(e.toString))

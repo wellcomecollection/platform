@@ -32,10 +32,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     val record = sierraBibRecord(id = "222")
     val originalRecord = MergedSierraRecord(id = "222")
 
-    val newRecord: Option[MergedSierraRecord] =
-      originalRecord.mergeBibRecord(record)
-
-    newRecord.get.maybeBibData.get shouldEqual record
+    val newRecord = originalRecord.mergeBibRecord(record)
+    newRecord.maybeBibData.get shouldEqual record
   }
 
   it("should only merge bib records with matching ids") {

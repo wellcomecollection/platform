@@ -136,7 +136,7 @@ class SierraBibMergerWorkerServiceTest
       ),
       modifiedDate = "2003-03-03T03:03:03Z"
     )
-    val oldRecord = MergedSierraRecord(bibRecord = oldBibRecord)
+    val oldRecord = MergedSierraRecord(bibRecord = oldBibRecord, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
     val newTitle = "A number of new narwhals near Newmarket"
@@ -150,7 +150,6 @@ class SierraBibMergerWorkerServiceTest
       ),
       modifiedDate = newUpdatedDate
     )
-    println("@@AWLC Sent the second record to SQS")
     sendBibRecordToSQS(record)
 
     val expectedSierraRecord =
@@ -195,7 +194,7 @@ class SierraBibMergerWorkerServiceTest
 
   it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
     val id = "7000007"
-    val newRecord = MergedSierraRecord(id = id)
+    val newRecord = MergedSierraRecord(id = id, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     val title = "Inside an inquisitive igloo of ice imps"
