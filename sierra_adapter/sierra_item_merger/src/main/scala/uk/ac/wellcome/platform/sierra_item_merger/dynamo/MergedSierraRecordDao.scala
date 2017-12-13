@@ -13,7 +13,9 @@ import scala.concurrent.Future
 
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class MergedSierraRecordDao(dynamoDbClient: AmazonDynamoDB, dynamoConfig: DynamoConfig) extends Logging {
+class MergedSierraRecordDao(dynamoDbClient: AmazonDynamoDB,
+                            dynamoConfig: DynamoConfig)
+    extends Logging {
   private val table = Table[MergedSierraRecord](dynamoConfig.table)
 
   private def scanamoExec[T](op: ScanamoOps[T]) =
@@ -36,7 +38,8 @@ class MergedSierraRecordDao(dynamoDbClient: AmazonDynamoDB, dynamoConfig: Dynamo
       case Some(Right(record)) => Some(record)
       case Some(Left(scanamoError)) =>
         val exception = new RuntimeException(scanamoError.toString)
-        error(s"An error occurred while retrieving $id from DynamoDB", exception)
+        error(s"An error occurred while retrieving $id from DynamoDB",
+              exception)
         throw exception
       case None => None
     }
