@@ -6,7 +6,7 @@ include $(ROOT)/functions.Makefile
 gatling-build:
 	$(call build_image,gatling,monitoring/load_test/gatling/Dockerfile)
 
-gatling-deploy: gatling-build
+gatling-publish: gatling-build
 	$(call publish_service,gatling)
 
 
@@ -24,4 +24,4 @@ load_test-build: gatling-build gatling_to_cloudwatch-build
 
 load_test-test: gatling_to_cloudwatch-test
 
-load_test-deploy: gatling-deploy gatling_to_cloudwatch-publish
+load_test-publish: gatling-publish gatling_to_cloudwatch-publish
