@@ -231,7 +231,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       transformedSierraRecord.get shouldBe None
     }
 
-    it("should not perform a transformation without bibData, even if some itemData is present") {
+    it(
+      "should not perform a transformation without bibData, even if some itemData is present") {
       val mergedSierraRecord = MergedSierraRecord(
         id = "b111",
         maybeBibData = None,
@@ -268,7 +269,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       val transformedSierraRecord = mergedSierraRecord.transform
       transformedSierraRecord.isSuccess shouldBe true
 
-      val identifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+      val identifier =
+        SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
       transformedSierraRecord.get shouldBe Some(
         Work(
