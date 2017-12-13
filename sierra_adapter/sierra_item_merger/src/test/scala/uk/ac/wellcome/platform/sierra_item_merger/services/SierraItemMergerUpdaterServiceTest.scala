@@ -9,13 +9,14 @@ import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
     with Matchers
     with SierraItemMergerTestUtil
     with MockitoSugar
-    with ScalaFutures {
+    with ScalaFutures with ExtendedPatience{
   val sierraUpdateRService = new SierraItemMergerUpdaterService(
     dynamoDbClient,
     mock[MetricsSender],
@@ -37,20 +38,15 @@ class SierraItemMergerUpdaterServiceTest
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
-    val newUpdatedDate = "2004-04-04T04:04:04Z"
     val newItemRecord = sierraItemRecord(
       id = id,
-      updatedDate = newUpdatedDate,
+      updatedDate = "2014-04-04T04:04:04Z",
       bibIds = List(bibId)
     )
 
     whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
-      val expectedSierraRecord = MergedSierraRecord(
-        id = bibId,
-        itemData = Map(id -> newItemRecord),
-        version = 2
-      )
-      dynamoQueryEqualsValue(id = id)(expectedValue = expectedSierraRecord)
+      val expectedSierraRecord = oldRecord.copy(itemData = Map(id -> newItemRecord), version = 2)
+      dynamoQueryEqualsValue(id = bibId)(expectedValue = expectedSierraRecord)
     }
   }
 
