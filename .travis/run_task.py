@@ -42,16 +42,17 @@ def main():
 
     make(task)
 
-    if should_publish(task=task, travis_event_type=travis_event_type):
-        print("*** We're going to run the publish task", flush=True)
-    else:
-        print("*** We don't need the publish task, exiting early", flush=True)
-        return 0
-
     publish_task = rreplace(task, 'build', 'publish', count=1)
     publish_task = rreplace(task, 'test', 'publish', count=1)
 
-    make(publish_task)
+    if should_publish(task=task, travis_event_type=travis_event_type):
+        print("*** We're going to run the publish task", flush=True)
+        dry_run = False
+    else:
+        print("*** We don't need to actually run the publish task", flush=True)
+        dry_run = True
+
+    make(publish_task, dry_run=dry_run)
 
     return 0
 
