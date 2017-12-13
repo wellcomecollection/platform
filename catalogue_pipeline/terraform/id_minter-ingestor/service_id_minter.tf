@@ -1,5 +1,5 @@
 module "id_minter" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=nicer-service-vars"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
   name   = "id_minter_${var.name}"
 
   source_queue_name  = "${module.id_minter_queue.name}"
@@ -7,7 +7,7 @@ module "id_minter" {
   ecr_repository_url = "${var.id_minter_repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
 
-  config_vars = {
+  env_vars = {
     cluster_url = "${var.identifiers_rds_cluster["host"]}"
     db_port     = "${var.identifiers_rds_cluster["port"]}"
     db_username = "${var.identifiers_rds_cluster["username"]}"
