@@ -78,7 +78,7 @@ object Dependencies {
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
-  ) ++ dynamoDependencies
+  ) ++ dynamoDependencies ++ circeDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
