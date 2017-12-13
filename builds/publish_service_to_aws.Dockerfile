@@ -8,7 +8,8 @@ RUN apk add docker git python3
 
 RUN pip3 install awscli docopt boto3
 
-COPY . /builds
+COPY publish_service_to_aws.py /builds/publish_service_to_aws.py
+COPY tooling.py /builds/tooling.py
 
 VOLUME /repo
 WORKDIR /repo
