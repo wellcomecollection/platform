@@ -36,48 +36,42 @@ class SierraBibMergerUpdaterService @Inject()(
       table.get('id -> bibRecord.id)
     )
 
-    val newRecord = existingRecord
+    existingRecord
       .map {
         case Left(error) =>
-          Left(
-            new RuntimeException(error.toString)
-          )
+          throw new RuntimeException(error.toString)
         case Right(record) => {
           logger.info(s"Found $record, attempting merge.")
 
-          record
-            .mergeBibRecord(bibRecord)
-            .toRight(
-              new RuntimeException("Unable to merge record!")
-            )
+          val newRecord = record.mergeBibRecord(bibRecord)
+          if (record != newRecord) {
+            writeRecordToDynamo(newRecord)
+          }
         }
       }
       .getOrElse {
         val record = MergedSierraRecord(bibRecord)
         logger.info(s"No match found, creating new record: $record")
-
-        Right(record)
+        writeRecordToDynamo(record)
       }
+  }
 
-    val putOperation = newRecord match {
-      case Right(record) => {
-        logger.info(s"Attempting to conditionally update $record.")
+  private def writeRecordToDynamo(record: MergedSierraRecord) {
+    val recordToWrite = record.copy(version = record.version + 1)
+    logger.info(s"Attempting to conditionally update $recordToWrite.")
 
-        Scanamo
-          .exec(dynamoDBClient)(
-            putRecord(record)
-          )
-          .left
-          .map(e => new RuntimeException(e.toString))
-      }
-      case Left(e) => Left(e)
-    }
+    val putOperation = Scanamo
+      .exec(dynamoDBClient)(
+        putRecord(recordToWrite)
+      )
+      .left
+      .map(e => new RuntimeException(e.toString))
 
     putOperation match {
       case Right(_) =>
-        logger.info(s"${bibRecord.id} saved successfully to DynamoDB")
+        logger.info(s"${record.id} saved successfully to DynamoDB")
       case Left(error) =>
-        logger.warn(s"Failed processing ${bibRecord.id}", error)
+        logger.warn(s"Failed processing ${record.id}", error)
     }
   }
 }
