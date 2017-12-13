@@ -9,7 +9,6 @@ object SierraItemMergerModule extends TwitterModule with TryBackoff {
 
   override lazy val continuous: Boolean = false
 
-
   override def singletonStartup(injector: Injector) {
     val workerService = injector.instance[SierraItemMergerWorkerService]
 

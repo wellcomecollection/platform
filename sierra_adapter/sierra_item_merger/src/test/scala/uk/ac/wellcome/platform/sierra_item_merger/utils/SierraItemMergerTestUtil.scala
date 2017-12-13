@@ -9,11 +9,12 @@ import uk.ac.wellcome.platform.sierra_item_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.utils.JsonUtil
 import com.gu.scanamo.syntax._
 
-trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {this: Suite =>
+trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {
+  this: Suite =>
 
   private def itemRecordString(id: String,
-                       updatedDate: String,
-                       bibIds: List[String] = List()) =
+                               updatedDate: String,
+                               bibIds: List[String] = List()) =
     s"""
        |{
        |  "id": "$id",
@@ -47,10 +48,10 @@ trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {this: Suite 
        |}""".stripMargin
 
   protected def sierraItemRecord(
-                                id: String,
-                                updatedDate: String,
-                                bibIds: List[String]
-                              ): SierraItemRecord =
+    id: String,
+    updatedDate: String,
+    bibIds: List[String]
+  ): SierraItemRecord =
     SierraItemRecord(
       id = id,
       data = itemRecordString(
@@ -65,7 +66,7 @@ trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {this: Suite 
   protected def dynamoQueryEqualsValue[T: DynamoFormat](id: String)(
     expectedValue: T): Assertion = {
 
-      val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)('id -> id).get
-      actualValue shouldBe Right(expectedValue)
+    val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)('id -> id).get
+    actualValue shouldBe Right(expectedValue)
   }
 }

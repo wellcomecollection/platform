@@ -10,19 +10,29 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
 
-class SierraItemMergerUpdaterServiceTest extends FunSpec with Matchers with SierraItemMergerTestUtil with MockitoSugar with ScalaFutures{
-  val sierraUpdateRService = new SierraItemMergerUpdaterService(dynamoDbClient, mock[MetricsSender], DynamoConfig(tableName))
+class SierraItemMergerUpdaterServiceTest
+    extends FunSpec
+    with Matchers
+    with SierraItemMergerTestUtil
+    with MockitoSugar
+    with ScalaFutures {
+  val sierraUpdateRService = new SierraItemMergerUpdaterService(
+    dynamoDbClient,
+    mock[MetricsSender],
+    DynamoConfig(tableName))
 
-  it("should update an item in DynamoDB if it receives an update with a newer date") {
+  it(
+    "should update an item in DynamoDB if it receives an update with a newer date") {
     val id = "i3000003"
     val bibId = "b3000003"
     val oldRecord = MergedSierraRecord(
       id = bibId,
-      itemData = Map(id -> sierraItemRecord(
-        id = id,
-        updatedDate = "2003-03-03T03:03:03Z",
-        bibIds = List(bibId)
-      )),
+      itemData = Map(
+        id -> sierraItemRecord(
+          id = id,
+          updatedDate = "2003-03-03T03:03:03Z",
+          bibIds = List(bibId)
+        )),
       version = 1
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
@@ -35,7 +45,6 @@ class SierraItemMergerUpdaterServiceTest extends FunSpec with Matchers with Sier
     )
 
     whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
-
       val expectedSierraRecord = MergedSierraRecord(
         id = bibId,
         itemData = Map(id -> newItemRecord),
@@ -45,16 +54,18 @@ class SierraItemMergerUpdaterServiceTest extends FunSpec with Matchers with Sier
     }
   }
 
-  it("should not update an item in DynamoDB if it receives an update with an older date") {
+  it(
+    "should not update an item in DynamoDB if it receives an update with an older date") {
     val id = "i6000006"
     val bibId = "b6000006"
     val newRecord = MergedSierraRecord(
       id = bibId,
-      itemData = Map(id -> sierraItemRecord(
-        id = id,
-        updatedDate = "2006-06-06T06:06:06Z",
-        bibIds = List(bibId)
-      )),
+      itemData = Map(
+        id -> sierraItemRecord(
+          id = id,
+          updatedDate = "2006-06-06T06:06:06Z",
+          bibIds = List(bibId)
+        )),
       version = 1
     )
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
@@ -65,12 +76,13 @@ class SierraItemMergerUpdaterServiceTest extends FunSpec with Matchers with Sier
       bibIds = List(bibId)
     )
 
-    whenReady(sierraUpdateRService.update(oldItemRecord)) {_ =>
+    whenReady(sierraUpdateRService.update(oldItemRecord)) { _ =>
       dynamoQueryEqualsValue(id = bibId)(expectedValue = newRecord)
     }
   }
 
-  it("should add an item to the MergedSierraRecord if the bibId exists in DuynamoDB but no itemData") {
+  it(
+    "should add an item to the MergedSierraRecord if the bibId exists in DuynamoDB but no itemData") {
     val bibId = "b7000007"
     val newRecord = MergedSierraRecord(id = bibId, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
@@ -81,7 +93,7 @@ class SierraItemMergerUpdaterServiceTest extends FunSpec with Matchers with Sier
       bibIds = List(bibId)
     )
 
-    whenReady(sierraUpdateRService.update(itemRecord)) {_ =>
+    whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
       val expectedSierraRecord = MergedSierraRecord(
         id = bibId,
         itemData = Map(itemRecord.id -> itemRecord),

@@ -18,7 +18,9 @@ class SierraItemMergerFeatureTest
     with AmazonCloudWatchFlag
     with Matchers
     with SQSLocal
-    with DynamoDBLocal with SierraItemMergerTestUtil with Eventually{
+    with DynamoDBLocal
+    with SierraItemMergerTestUtil
+    with Eventually {
 
   val queueUrl = createQueueAndReturnUrl("test_item_merger")
 

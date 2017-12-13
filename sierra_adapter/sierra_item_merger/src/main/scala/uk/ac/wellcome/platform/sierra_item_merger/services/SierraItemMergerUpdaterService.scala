@@ -31,7 +31,6 @@ class SierraItemMergerUpdaterService @Inject()(
 
   def update(itemRecord: SierraItemRecord): Future[Unit] = Future {
 
-
 //    logger.info(s"Attempting to update $itemRecord")
 //
 //    val existingRecord = Scanamo.exec(dynamoDBClient)(
