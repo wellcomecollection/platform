@@ -110,3 +110,16 @@ define sbt_test
 		wellcome/sbt_wrapper \
 		"project $(1)" ";dockerComposeUp;test;dockerComposeStop"
 endef
+
+
+# Build an sbt project.
+#
+# Args:
+#   $1 - Name of the project.
+#
+define sbt_build
+	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" ";stage"
+endef
