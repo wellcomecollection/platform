@@ -8,16 +8,14 @@ module "id_minter" {
   release_id         = "${var.release_ids["id_minter"]}"
   config_template    = "id_minter"
 
-  config_vars = {
-    rds_database_name   = "${var.identifiers_rds_cluster["database_name"]}"
-    rds_host            = "${var.identifiers_rds_cluster["host"]}"
-    rds_port            = "${var.identifiers_rds_cluster["port"]}"
-    rds_username        = "${var.identifiers_rds_cluster["username"]}"
-    rds_password        = "${var.identifiers_rds_cluster["password"]}"
-    id_minter_queue_id  = "${module.id_minter_queue.id}"
-    es_ingest_topic_arn = "${module.es_ingest_topic.arn}"
-    metrics_namespace   = "id-minter"
-  }
+  extra_vars = [
+    "{ \"name\" : \"cluster_url\", \"value\" : \"${var.identifiers_rds_cluster["host"]}\" }",
+    "{ \"name\" : \"db_port\", \"value\" : \"${var.identifiers_rds_cluster["port"]}\" }",
+    "{ \"name\" : \"db_username\", \"value\" : \"${var.identifiers_rds_cluster["username"]}\" }",
+    "{ \"name\" : \"db_password\", \"value\" : \"${var.identifiers_rds_cluster["password"]}\" }",
+    "{ \"name\" : \"queue_url\", \"value\" : \"${module.id_minter_queue.id}\" }",
+    "{ \"name\" : \"topic_arn\", \"value\" : \"${module.es_ingest_topic.arn}\" }",
+  ]
 
   alb_priority = "${random_integer.priority_id_minter.result}"
 
