@@ -51,11 +51,11 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     record.version shouldEqual 0
   }
 
-  it("should always increment the version when mergeBibRecord is called") {
+  it("should never increment the version when mergeBibRecord is called") {
     val record = sierraBibRecord(id = "666")
     val originalRecord = MergedSierraRecord(id = "666", version = 10)
     val newRecord = originalRecord.mergeBibRecord(record)
-    newRecord.version shouldEqual 11
+    newRecord.version shouldEqual 10
   }
 
   it("should return None when merging bib records with stale data") {
