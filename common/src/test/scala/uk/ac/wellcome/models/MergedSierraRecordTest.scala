@@ -112,85 +112,111 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   }
 
   describe("merging with a SierraItemRecord") {
-    it("should add itemData when there isn't already an item") {
-      val record = sierraItemRecord(
-        id = "i888",
-        title = "Illustrious imps are ingenious",
-        modifiedDate = "2008-08-08T08:08:08Z",
-        bibIds = List("b888")
-      )
+    describe("when the merged record is linked to the item") {
+      it("should add the item if it doesn't exist already") {
+        val record = sierraItemRecord(
+          id = "i888",
+          title = "Illustrious imps are ingenious",
+          modifiedDate = "2008-08-08T08:08:08Z",
+          bibIds = List("b888")
+        )
 
-      val mergedSierraRecord = MergedSierraRecord(id = "b888")
-      val result = mergedSierraRecord.mergeItemRecord(record).get
+        val mergedSierraRecord = MergedSierraRecord(id = "b888")
+        val result = mergedSierraRecord.mergeItemRecord(record).get
 
-      result.itemData.get(record.id).get shouldBe record
+        result.itemData.get(record.id).get shouldBe record
+      }
+
+      it("should update itemData when merging item records with newer data") {
+        val record = sierraItemRecord(
+          id = "i999",
+          title = "No, new narwhals are never naughty",
+          modifiedDate = "2009-09-09T09:09:09Z",
+          bibIds = List("b999")
+        )
+        val mergedSierraRecord = MergedSierraRecord(
+          id = "b999",
+          itemData = Map(record.id -> record)
+        )
+
+        val newerRecord = sierraItemRecord(
+          id = record.id,
+          title = "Nobody noticed the naughty narwhals",
+          modifiedDate = "2010-10-10T10:10:10Z",
+          bibIds = List("b999")
+        )
+        val result = mergedSierraRecord.mergeItemRecord(newerRecord).get
+
+        result.itemData.get(record.id).get shouldBe newerRecord
+      }
+
+      it("should return None when merging item records with stale data") {
+        val record = sierraItemRecord(
+          id = "i111",
+          title = "Only otters occupy the orange oval",
+          modifiedDate = "2001-01-01T01:01:01Z",
+          bibIds = List("i111")
+        )
+        val mergedSierraRecord = MergedSierraRecord(
+          id = "b111",
+          itemData = Map(record.id -> record)
+        )
+
+        val newerRecord = sierraItemRecord(
+          id = record.id,
+          title = "Old otters outside the oblong",
+          modifiedDate = "2000-01-01T01:01:01Z",
+          bibIds = List("i111")
+        )
+        val result = mergedSierraRecord.mergeItemRecord(newerRecord)
+        result shouldBe None
+      }
+
+      it("should support adding multiple items to a merged record") {
+        val record1 = sierraItemRecord(
+          id = "i111",
+          title = "Outside the orangutan opens an orange",
+          modifiedDate = "2001-01-01T01:01:01Z",
+          bibIds = List("b121")
+        )
+        val record2 = sierraItemRecord(
+          id = "i222",
+          title = "Twice the turtles took the turn",
+          modifiedDate = "2002-02-02T02:02:02Z",
+          bibIds = List("b121")
+        )
+
+        val mergedSierraRecord = MergedSierraRecord(id = "b121")
+        val result1 = mergedSierraRecord.mergeItemRecord(record1).get
+        val result2 = result1.mergeItemRecord(record2).get
+
+        result1.itemData.get(record1.id).get shouldBe record1
+        result2.itemData.get(record2.id).get shouldBe record2
+      }
+
+      it("should always increment the version when mergeItemRecord is called") {
+        true shouldBe false
+      }
     }
 
-    it("should overwrite existing itemData when there's a newer update") {
-      val record = sierraItemRecord(
-        id = "i999",
-        title = "No, new narwhals are never naughty",
-        modifiedDate = "2009-09-09T09:09:09Z",
-        bibIds = List("b999")
-      )
-      val mergedSierraRecord = MergedSierraRecord(
-        id = "b999",
-        itemData = Map(record.id -> record)
-      )
+    describe("when the merged record is unlinked from the item") {
+      it("should remove the item if it already exists") {
+        true shouldBe false
+      }
 
-      val newerRecord = sierraItemRecord(
-        id = record.id,
-        title = "Nobody noticed the naughty narwhals",
-        modifiedDate = "2010-10-10T10:10:10Z",
-        bibIds = List("b999")
-      )
-      val result = mergedSierraRecord.mergeItemRecord(newerRecord).get
+      it("should return None when merging an unlinked record which is already absent") {
+        true shouldBe false
+      }
 
-      result.itemData.get(record.id).get shouldBe newerRecord
+      it("should return None when merging an unlinked record which has linked more recently") {
+        true shouldBe false
+      }
     }
 
-    it("should return None when merging item records with stale data") {
-      val record = sierraItemRecord(
-        id = "i111",
-        title = "Only otters occupy the orange oval",
-        modifiedDate = "2001-01-01T01:01:01Z",
-        bibIds = List("i111")
-      )
-      val mergedSierraRecord = MergedSierraRecord(
-        id = "b111",
-        itemData = Map(record.id -> record)
-      )
-
-      val newerRecord = sierraItemRecord(
-        id = record.id,
-        title = "Old otters outside the oblong",
-        modifiedDate = "2000-01-01T01:01:01Z",
-        bibIds = List("i111")
-      )
-      val result = mergedSierraRecord.mergeItemRecord(newerRecord)
-      result shouldBe None
-    }
-
-    it("should support adding multiple items to a merged record") {
-      val record1 = sierraItemRecord(
-        id = "i111",
-        title = "Outside the orangutan opens an orange",
-        modifiedDate = "2001-01-01T01:01:01Z",
-        bibIds = List("b121")
-      )
-      val record2 = sierraItemRecord(
-        id = "i222",
-        title = "Twice the turtles took the turn",
-        modifiedDate = "2002-02-02T02:02:02Z",
-        bibIds = List("b121")
-      )
-
-      val mergedSierraRecord = MergedSierraRecord(id = "b121")
-      val result1 = mergedSierraRecord.mergeItemRecord(record1).get
-      val result2 = result1.mergeItemRecord(record2).get
-
-      result1.itemData.get(record1.id).get shouldBe record1
-      result2.itemData.get(record2.id).get shouldBe record2
+    describe("when the merged record is unrelated to the item") {
+      it("should only merge item records with matching bib IDs") {
+        true shouldBe false
+      }
     }
   }
 
@@ -213,7 +239,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           "i111" -> sierraItemRecord(
             id = "i111",
             title = "An incomplete invocation of items",
-            modifiedDate = "2001-01-01T01:01:01Z"
+            modifiedDate = "2001-01-01T01:01:01Z",
+            bibIds = List("b111")
           ))
       )
 
@@ -270,7 +297,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   def sierraItemRecord(
     id: String = "i111",
     title: String = "Ingenious imps invent invasive implements",
-    modifiedDate: String = "2001-01-01T01:01:01Z"
+    modifiedDate: String = "2001-01-01T01:01:01Z",
+    bibIds: List[String]
   ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(
@@ -279,7 +307,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       title = title
     ),
     modifiedDate = modifiedDate,
-    bibIds = List("b1111")
+    bibIds = bibIds
   )
 
   private def sierraRecordString(
