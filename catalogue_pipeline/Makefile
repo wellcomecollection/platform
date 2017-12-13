@@ -35,16 +35,16 @@ transformer-test:
 	$(call sbt_test,transformer)
 
 
-id_minter-deploy: id_minter-build
+id_minter-publish: id_minter-build
 	$(call publish_service,id_minter)
 
-ingestor-deploy: ingestor-build
+ingestor-publish: ingestor-build
 	$(call publish_service,ingestor)
 
-reindexer-deploy: reindexer-build
+reindexer-publish: reindexer-build
 	$(call publish_service,reindexer)
 
-transformer-deploy: transformer-build
+transformer-publish: transformer-build
 	$(call publish_service,transformer)
 
 
@@ -71,13 +71,13 @@ catalogue_pipeline-test: \
 	reindexer-test \
 	transformer-test
 
-catalogue_pipeline-deploy: \
+catalogue_pipeline-publish: \
 	schedule_reindexer-publish \
 	transformer_sns_filter-publish \
-	id_minter-deploy \
-	ingestor-deploy \
-	reindexer-deploy \
-	transformer-deploy
+	id_minter-publish \
+	ingestor-publish \
+	reindexer-publish \
+	transformer-publish
 
 
 catalogue_pipeline-terraform-plan:

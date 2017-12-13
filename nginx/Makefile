@@ -29,13 +29,13 @@ nginx-build-grafana:
 nginx-build: nginx-build-api nginx-build-loris nginx-build-grafana
 
 
-nginx-deploy-api: nginx-build-api
+nginx-publish-api: nginx-build-api
 	$(call publish_service,nginx_api)
 
-nginx-deploy-loris: nginx-build-loris
+nginx-publish-loris: nginx-build-loris
 	$(call publish_service,nginx_loris)
 
-nginx-deploy-grafana: nginx-build-grafana
+nginx-publish-grafana: nginx-build-grafana
 	$(call publish_service,nginx_grafana)
 
-nginx-deploy: nginx-deploy-api nginx-deploy-loris nginx-deploy-grafana
+nginx-publish: nginx-publish-api nginx-publish-loris nginx-publish-grafana

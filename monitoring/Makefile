@@ -20,7 +20,7 @@ post_to_slack-publish:
 
 monitoring-test: post_to_slack-test deployment_tracking-test ecs_dashboard-test load_test-test
 
-monitoring-deploy: post_to_slack-publish deployment_tracking-deploy ecs_dashboard-deploy load_test-deploy
+monitoring-publish: post_to_slack-publish deployment_tracking-publish ecs_dashboard-publish load_test-publish
 
 
 monitoring-terraform-plan:

@@ -15,7 +15,7 @@ include nginx/Makefile
 sbt-common-test:
 	$(call sbt_test,common)
 
-sbt-common-deploy:
+sbt-common-publish:
 	echo "Nothing to do!"
 
 $(ROOT)/.docker/sbt_image_builder:

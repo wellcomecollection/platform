@@ -48,21 +48,8 @@ def main():
         print("*** We don't need the publish task, exiting early", flush=True)
         return 0
 
-    if task in [
-        'loris-build',
-        'cache_cleaner-build',
-        'miro_preprocessor-test',
-        'lambdas-test',
-        'monitoring_lambdas-test',
-        'lambda_utils-test',
-        'sierra_adapter-test',
-    ]:
-        verb = 'publish'
-    else:
-        verb = 'deploy'
-
-    publish_task = rreplace(task, 'build', verb, count=1)
-    publish_task = rreplace(task, 'test', verb, count=1)
+    publish_task = rreplace(task, 'build', 'publish', count=1)
+    publish_task = rreplace(task, 'test', 'publish', count=1)
 
     make(publish_task)
 

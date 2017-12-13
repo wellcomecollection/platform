@@ -27,4 +27,4 @@ deployment_tracking-build: notify_old_deploys-build service_deployment_status-bu
 
 deployment_tracking-test: notify_old_deploys-test service_deployment_status-test
 
-deployment_tracking-deploy: notify_old_deploys-publish service_deployment_status-publish
+deployment_tracking-publish: notify_old_deploys-publish service_deployment_status-publish
