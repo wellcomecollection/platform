@@ -174,8 +174,11 @@ def make_decision(changed_files, task, action):
         return False
 
 
-def make(task):
-    command = ['make', task]
+def make(task, dry_run=False):
+    if dry_run:
+        command = ['make', '--dry-run', task]
+    else:
+        command = ['make', task]
     print('*** Running %r' % command, flush=True)
     subprocess.check_call(command)
 
