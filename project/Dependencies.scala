@@ -76,6 +76,10 @@ object Dependencies {
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies
 
+  val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % "test"
+  ) ++ dynamoDependencies
+
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
   )
