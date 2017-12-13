@@ -5,6 +5,7 @@ ADD target/universal/stage /opt/docker
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
+ENV project=ingestor
 
 USER daemon
 CMD ["/run.sh"]
