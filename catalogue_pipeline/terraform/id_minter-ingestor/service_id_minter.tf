@@ -7,7 +7,7 @@ module "id_minter" {
   ecr_repository_url = "${var.id_minter_repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
 
-  config_template    = "id_minter"
+  config_template   = "id_minter"
   is_config_managed = false
 
   extra_vars = [
