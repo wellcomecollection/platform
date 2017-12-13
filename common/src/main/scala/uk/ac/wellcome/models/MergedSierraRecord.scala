@@ -52,7 +52,7 @@ case class MergedSierraRecord(
     *
     * Returns None if there's nothing to do.
     */
-  def mergeItemRecord(record: SierraItemRecord): Option[MergedSierraRecord] = {
+  def mergeItemRecord(record: SierraItemRecord): MergedSierraRecord = {
 
     // We can decide whether to insert the new data in two steps:
     //
@@ -69,9 +69,9 @@ case class MergedSierraRecord(
 
     if (isNewerData) {
       val itemData = this.itemData + (record.id -> record)
-      Some(this.copy(itemData = itemData))
+      this.copy(itemData = itemData)
     } else {
-      None
+      this
     }
   }
 

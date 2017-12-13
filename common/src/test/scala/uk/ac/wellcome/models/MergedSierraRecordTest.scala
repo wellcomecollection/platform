@@ -31,7 +31,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
 
     it("should be at version 1 when first created") {
       val record = MergedSierraRecord(id = "555")
-      record.version shouldEqual 1
+      record.version shouldEqual 0
     }
   }
 
@@ -122,9 +122,9 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         )
 
         val mergedSierraRecord = MergedSierraRecord(id = "b888")
-        val result = mergedSierraRecord.mergeItemRecord(record).get
+        val result = mergedSierraRecord.mergeItemRecord(record)
 
-        result.itemData.get(record.id).get shouldBe record
+        result.itemData(record.id) shouldBe record
       }
 
       it("should update itemData when merging item records with newer data") {
@@ -145,9 +145,9 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           modifiedDate = "2010-10-10T10:10:10Z",
           bibIds = List("b999")
         )
-        val result = mergedSierraRecord.mergeItemRecord(newerRecord).get
+        val result = mergedSierraRecord.mergeItemRecord(newerRecord)
 
-        result.itemData.get(record.id).get shouldBe newerRecord
+        result.itemData(record.id) shouldBe newerRecord
       }
 
       it("should return None when merging item records with stale data") {
@@ -187,15 +187,11 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         )
 
         val mergedSierraRecord = MergedSierraRecord(id = "b121")
-        val result1 = mergedSierraRecord.mergeItemRecord(record1).get
-        val result2 = result1.mergeItemRecord(record2).get
+        val result1 = mergedSierraRecord.mergeItemRecord(record1)
+        val result2 = result1.mergeItemRecord(record2)
 
-        result1.itemData.get(record1.id).get shouldBe record1
-        result2.itemData.get(record2.id).get shouldBe record2
-      }
-
-      it("should always increment the version when mergeItemRecord is called") {
-        true shouldBe false
+        result1.itemData(record1.id) shouldBe record1
+        result2.itemData(record2.id) shouldBe record2
       }
     }
 
