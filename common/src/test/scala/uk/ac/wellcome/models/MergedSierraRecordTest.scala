@@ -205,15 +205,20 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           bibIds = List("i111"),
           unlinkedBibIds = List(unlinkedBibId)
         )
-        val mergedSierraRecord = MergedSierraRecord(id = unlinkedBibId,itemData = Map(record.id -> record))
-        mergedSierraRecord.unlinkItemRecord(record) shouldBe mergedSierraRecord.copy(itemData = Map.empty)
+        val mergedSierraRecord = MergedSierraRecord(id = unlinkedBibId,
+                                                    itemData =
+                                                      Map(record.id -> record))
+        mergedSierraRecord.unlinkItemRecord(record) shouldBe mergedSierraRecord
+          .copy(itemData = Map.empty)
       }
 
-      ignore("should return None when merging an unlinked record which is already absent") {
+      ignore(
+        "should return None when merging an unlinked record which is already absent") {
         true shouldBe false
       }
 
-      ignore("should return None when merging an unlinked record which has linked more recently") {
+      ignore(
+        "should return None when merging an unlinked record which has linked more recently") {
         true shouldBe false
       }
     }
