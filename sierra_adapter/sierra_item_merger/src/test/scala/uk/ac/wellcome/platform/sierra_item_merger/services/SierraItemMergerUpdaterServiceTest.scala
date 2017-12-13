@@ -9,6 +9,7 @@ import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.platform.sierra_item_merger.dynamo.MergedSierraRecordDao
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerUpdaterServiceTest
@@ -19,9 +20,12 @@ class SierraItemMergerUpdaterServiceTest
     with ScalaFutures
     with ExtendedPatience {
   val sierraUpdateRService = new SierraItemMergerUpdaterService(
-    dynamoDbClient,
-    mock[MetricsSender],
-    DynamoConfig(tableName))
+    mergedSierraRecordDao = new MergedSierraRecordDao(
+      dynamoConfig = DynamoConfig(tableName),
+      dynamoDbClient = dynamoDbClient
+    ),
+    mock[MetricsSender]
+  )
 
   it(
     "should update an item in DynamoDB if it receives an update with a newer date") {

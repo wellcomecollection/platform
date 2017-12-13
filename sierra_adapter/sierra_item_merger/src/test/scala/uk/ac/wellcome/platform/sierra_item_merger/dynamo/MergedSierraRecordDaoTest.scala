@@ -1,11 +1,9 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest}
-import com.gu.scanamo.ops.ScanamoOps
-import com.gu.scanamo.{Scanamo, ScanamoAsync, Table}
+import com.amazonaws.services.dynamodbv2.model.GetItemRequest
+import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import com.twitter.inject.Logging
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
@@ -14,11 +12,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.locals.DynamoDBLocal
-import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.test.utils.ExtendedPatience
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import uk.ac.wellcome.dynamo._
 
 class MergedSierraRecordDaoTest
     extends FunSpec
