@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, PutItemResult}
 import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._

@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import com.gu.scanamo.Scanamo
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -11,6 +13,8 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.platform.sierra_item_merger.dynamo.MergedSierraRecordDao
 import uk.ac.wellcome.test.utils.ExtendedPatience
+
+import scala.concurrent.Future
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
@@ -116,6 +120,39 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
       dynamoQueryEqualsValue(id = bibId)(expectedValue = expectedSierraRecord)
+    }
+  }
+
+  it("should return a failed future if getting and item from the dao fails") {
+    val failingDao = mock[MergedSierraRecordDao]
+    val failingUpdaterService = new SierraItemMergerUpdaterService(
+      mergedSierraRecordDao = failingDao,
+      mock[MetricsSender]
+    )
+    val expectedException = new RuntimeException("BOOOM!")
+    when(failingDao.getRecord(any[String])).thenReturn(Future.failed(expectedException))
+    val itemRecord = sierraItemRecord("i000", "2007-07-07T07:07:07Z", List("b242"))
+    whenReady(failingUpdaterService.update(itemRecord).failed) {ex =>
+      ex shouldBe expectedException
+    }
+  }
+
+  it("should return a failed future if putting and item in DynamoDb fails") {
+    val failingDao = mock[MergedSierraRecordDao]
+    val failingUpdaterService = new SierraItemMergerUpdaterService(
+      failingDao,
+      mock[MetricsSender]
+    )
+    val expectedException = new RuntimeException("BOOOM!")
+    val bibId = "b242"
+    val newRecord = MergedSierraRecord(id = bibId, version = 1)
+    when(failingDao.getRecord(any[String])).thenReturn(Future.successful(Some(newRecord)))
+    when(failingDao.updateRecord(any[MergedSierraRecord])).thenReturn(Future.failed(expectedException))
+
+    val itemRecord = sierraItemRecord("i000", "2007-07-07T07:07:07Z", List(bibId))
+
+    whenReady(failingUpdaterService.update(itemRecord).failed) {ex =>
+      ex shouldBe expectedException
     }
   }
 
