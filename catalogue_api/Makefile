@@ -13,9 +13,9 @@ api_docs-publish: api_docs-build
 api-test:
 	$(call sbt_test,api)
 
-api-build: $(ROOT)/.docker/sbt_image_builder
-	TARGET=catalogue_api/api/target \
-	PROJECT=api ./builds/run_sbt_image_build.sh
+api-build:
+	$(call sbt_build,api)
+	$(call build_image,api,catalogue_api/api/Dockerfile)
 
 api-publish: api-build
 	$(call publish_service,api)

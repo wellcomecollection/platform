@@ -5,22 +5,22 @@ include $(ROOT)/functions.Makefile
 include $(CATALOGUE_PIPELINE)/schedule_reindexer/Makefile
 
 
-ingestor-build: $(ROOT)/.docker/sbt_image_builder
-	TARGET=catalogue_pipeline/ingestor/target \
-	PROJECT=ingestor $(ROOT)/builds/run_sbt_image_build.sh
-
-reindexer-build: $(ROOT)/.docker/sbt_image_builder
-	TARGET=catalogue_pipeline/reindexer/target \
-	PROJECT=reindexer $(ROOT)/builds/run_sbt_image_build.sh
-
-transformer-build: $(ROOT)/.docker/sbt_image_builder
-	TARGET=catalogue_pipeline/transformer/target \
-	PROJECT=transformer $(ROOT)/builds/run_sbt_image_build.sh
-
-
 id_minter-build:
-	$(call sbt_build, id_minter)
+	$(call sbt_build,id_minter)
 	$(call build_image,id_minter,catalogue_pipeline/id_minter/Dockerfile)
+
+ingestor-build:
+	$(call sbt_build,ingestor)
+	$(call build_image,ingestor,catalogue_pipeline/ingestor/Dockerfile)
+
+reindexer-build:
+	$(call sbt_build,reindexer)
+	$(call build_image,reindexer,catalogue_pipeline/reindexer/Dockerfile)
+
+transformer-build:
+	$(call sbt_build,transformer)
+	$(call build_image,transformer,catalogue_pipeline/transformer/Dockerfile)
+
 
 id_minter-test:
 	$(call sbt_test,id_minter)
