@@ -9,14 +9,9 @@ import com.twitter.finatra.http.Controller
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 @Singleton
-class ManagementController @Inject()(
+class ClusterHealthController @Inject()(
   elasticClient: HttpClient
 ) extends Controller {
-
-  get("/management/healthcheck") { request: Request =>
-    response.ok.json(Map("message" -> "ok"))
-  }
-
   get("/management/clusterhealth") { request: Request =>
     elasticClient
       .execute { clusterHealth() }
