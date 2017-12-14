@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 RUN apt-get update && \
-    apt-get install --yes python uwsgi uwsgi-plugin-python wget
+    apt-get install --yes envsubst python uwsgi uwsgi-plugin-python wget
 
 # Install pip.  We don't use pip from the Ubuntu package repositories
 # because it tends to be out-of-date and using it gets issues like:
@@ -11,8 +11,8 @@ RUN python ./get-pip.py
 
 RUN pip install awscli
 
-ENV LORIS_COMMIT e72d9bf00bd0a4f7052765af6e6ce5480cca5ef3
 ENV LORIS_GITHUB_USER loris-imageserver
+ENV LORIS_COMMIT e72d9bf00bd0a4f7052765af6e6ce5480cca5ef3
 
 COPY requirements.txt /
 COPY install_loris.sh /install_loris.sh
@@ -26,6 +26,7 @@ COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
 COPY run_loris.sh /
 
+COPY loris2.conf.template /opt/loris/etc/loris2.conf.template
 ENV LORIS_CONF_FILE /opt/loris/etc/loris2.conf
 
 EXPOSE 8888
