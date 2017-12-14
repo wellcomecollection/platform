@@ -29,9 +29,9 @@ class SierraItemMergerWorkerService @Inject()(
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] =
       for {
-        foo <- c.as[Int]
+        epochSeconds <- c.as[Long]
       } yield {
-        Instant.ofEpochSecond(foo)
+        Instant.ofEpochSecond(epochSeconds)
       }
   }
 
