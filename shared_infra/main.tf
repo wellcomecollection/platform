@@ -49,15 +49,6 @@ module "update_ecs_service_size" {
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
 
-module "update_task_for_config_change" {
-  source = "update_task_for_config_change"
-
-  bucket_infra_arn = "${aws_s3_bucket.infra.arn}"
-  bucket_infra_id  = "${aws_s3_bucket.infra.id}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = "${aws_s3_bucket.infra.id}"
 
