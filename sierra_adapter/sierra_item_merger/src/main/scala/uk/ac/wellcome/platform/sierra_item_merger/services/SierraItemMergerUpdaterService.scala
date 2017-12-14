@@ -18,14 +18,18 @@ class SierraItemMergerUpdaterService @Inject()(
 
     val updateFutures = itemRecord.bibIds.map { bibId =>
       mergedSierraRecordDao
-        .getRecord(bibId).flatMap {
-        case Some(record) =>
-          val mergedRecord = record.mergeItemRecord(itemRecord)
-          if (mergedRecord != record)
-            mergedSierraRecordDao.updateRecord(mergedRecord)
-          else Future.successful(())
-        case None => mergedSierraRecordDao.updateRecord(MergedSierraRecord(bibId, itemData = Map(itemRecord.id -> itemRecord)))
-      }
+        .getRecord(bibId)
+        .flatMap {
+          case Some(record) =>
+            val mergedRecord = record.mergeItemRecord(itemRecord)
+            if (mergedRecord != record)
+              mergedSierraRecordDao.updateRecord(mergedRecord)
+            else Future.successful(())
+          case None =>
+            mergedSierraRecordDao.updateRecord(
+              MergedSierraRecord(bibId,
+                                 itemData = Map(itemRecord.id -> itemRecord)))
+        }
     }
     Future.sequence(updateFutures).map(_ => ())
   }
