@@ -9,7 +9,7 @@ function install_dependencies {
   if [ -e /data/requirements.txt ]
   then
     echo "Found requirements.txt, installing."
-    pip install -r /data/requirements.txt
+    pip3 install -r /data/requirements.txt
   else
     echo "No requirements.txt present. Skipping."
   fi
