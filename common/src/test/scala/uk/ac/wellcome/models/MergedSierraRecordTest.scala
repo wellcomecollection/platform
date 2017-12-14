@@ -152,12 +152,13 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         val itemId = "i111"
         val mergedSierraRecord = MergedSierraRecord(
           id = "b111",
-          itemData = Map(itemId -> sierraItemRecord(
-            id = itemId,
-            title = "Only otters occupy the orange oval",
-            modifiedDate = "2001-01-01T01:01:01Z",
-            bibIds = List("b111")
-          ))
+          itemData = Map(
+            itemId -> sierraItemRecord(
+              id = itemId,
+              title = "Only otters occupy the orange oval",
+              modifiedDate = "2001-01-01T01:01:01Z",
+              bibIds = List("b111")
+            ))
         )
 
         val oldRecord = sierraItemRecord(

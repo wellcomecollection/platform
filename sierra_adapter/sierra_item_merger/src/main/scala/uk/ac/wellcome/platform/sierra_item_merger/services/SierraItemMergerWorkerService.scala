@@ -41,9 +41,10 @@ class SierraItemMergerWorkerService @Inject()(
   override def processMessage(message: SQSMessage): Future[Unit] =
     decode[SierraItemRecord](message.body) match {
       case Right(record) => sierraBibMergerUpdaterService.update(record)
-      case Left(e) => Future{
-        logger.warn(s"Failed processing $message", e)
-        throw e
-      }
+      case Left(e) =>
+        Future {
+          logger.warn(s"Failed processing $message", e)
+          throw e
+        }
     }
 }
