@@ -14,19 +14,20 @@ class SierraItemMergerUpdaterService @Inject()(
   metrics: MetricsSender
 ) extends Logging {
 
-  def update(itemRecord: SierraItemRecord): Future[Unit] =
-    mergedSierraRecordDao
-      .getRecord(itemRecord.bibIds.head)
-      .flatMap {
+  def update(itemRecord: SierraItemRecord): Future[Unit] = {
+
+    val updateFutures = itemRecord.bibIds.map { bibId =>
+      mergedSierraRecordDao
+        .getRecord(bibId).flatMap {
         case Some(record) =>
           val mergedRecord = record.mergeItemRecord(itemRecord)
           if (mergedRecord != record)
             mergedSierraRecordDao.updateRecord(mergedRecord)
           else Future.successful(())
-        case None =>
-          mergedSierraRecordDao.updateRecord(
-            MergedSierraRecord(id = itemRecord.bibIds.head,
-                               itemRecord = itemRecord))
+        case None => mergedSierraRecordDao.updateRecord(MergedSierraRecord(bibId, itemData = Map(itemRecord.id -> itemRecord)))
       }
+    }
+    Future.sequence(updateFutures).map(_ => ())
+  }
 
 }

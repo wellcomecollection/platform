@@ -31,7 +31,7 @@ class SierraItemMergerUpdaterServiceTest
     mock[MetricsSender]
   )
 
-  it("should create a record in DynamoDB if it receives a item") {
+  it("should create a record in DynamoDB if it receives a item with a bib that doesn't exist") {
     val bibId = "b666"
     val newItemRecord = sierraItemRecord(
       id = "i666",
@@ -46,6 +46,60 @@ class SierraItemMergerUpdaterServiceTest
                            itemData = Map(newItemRecord.id -> newItemRecord),
                            version = 1)
       dynamoQueryEqualsValue(id = bibId)(expectedValue = expectedSierraRecord)
+    }
+  }
+
+  it("should update multiple merged sierra records if the item contains multiple bibIds") {
+    val bibIdNotExisting = "b666"
+    val bibIdWithOldData = "b555"
+    val bibIdWithNewerData = "b777"
+    val itemId = "i666"
+    val bibIds = List(bibIdNotExisting, bibIdWithOldData, bibIdWithNewerData)
+    val itemRecord = sierraItemRecord(
+      id = itemId,
+      updatedDate = "2014-04-04T04:04:04Z",
+      bibIds = bibIds
+    )
+
+    val otherItem = sierraItemRecord(id = "i888",
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = bibIds)
+    val oldRecord = MergedSierraRecord(
+      id = bibIdWithOldData,
+      itemData = Map(
+        itemId -> sierraItemRecord(
+          id = itemId,
+          updatedDate = "2003-03-03T03:03:03Z",
+          bibIds = bibIds
+        ),
+        "i888" -> otherItem),
+      version = 1
+    )
+    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+
+    val anotherItem = sierraItemRecord(id = "i999",
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = bibIds)
+    val newRecord = MergedSierraRecord(
+      id = bibIdWithNewerData,
+      itemData = Map(
+        itemId -> sierraItemRecord(
+          id = itemId,
+          updatedDate = "3003-03-03T03:03:03Z",
+          bibIds = bibIds
+        ),
+        "i999"-> anotherItem),
+      version = 1
+    )
+    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
+
+    whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
+      val expectedNewSierraRecord = MergedSierraRecord(id = bibIdNotExisting, maybeBibData = None, itemData = Map(itemRecord.id -> itemRecord), version = 1)
+      dynamoQueryEqualsValue(id = bibIdNotExisting)(expectedValue = expectedNewSierraRecord)
+      val expectedUpdatedSierraRecord = oldRecord.copy(itemData = Map(itemId -> itemRecord, "i888" -> otherItem), version = 2)
+      dynamoQueryEqualsValue(id = bibIdWithOldData)(expectedValue = expectedUpdatedSierraRecord)
+      val expectedUnchangedSierraRecord = newRecord
+      dynamoQueryEqualsValue(id = bibIdWithNewerData)(expectedValue = expectedUnchangedSierraRecord)
     }
   }
 
