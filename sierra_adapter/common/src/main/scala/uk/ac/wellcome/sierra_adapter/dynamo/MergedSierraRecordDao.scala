@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_item_merger.dynamo
+package uk.ac.wellcome.platform.sierra_adapter.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
@@ -23,6 +23,7 @@ class MergedSierraRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
 
   private def putRecord(record: MergedSierraRecord) = {
     val newVersion = record.version + 1
+
     table
       .given(
         not(attributeExists('id)) or

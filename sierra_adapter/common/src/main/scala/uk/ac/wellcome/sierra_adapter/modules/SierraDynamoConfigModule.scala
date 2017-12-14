@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_item_merger.modules
+package uk.ac.wellcome.platform.sierra_adapter.modules
 
 import com.google.inject.Provides
 import uk.ac.wellcome.finatra.modules.DynamoConfigModule

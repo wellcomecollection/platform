@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.platform.sierra_item_merger.dynamo.MergedSierraRecordDao
+import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
@@ -23,6 +23,7 @@ class SierraItemMergerUpdaterServiceTest
     with MockitoSugar
     with ScalaFutures
     with ExtendedPatience {
+
   val sierraUpdateRService = new SierraItemMergerUpdaterService(
     mergedSierraRecordDao = new MergedSierraRecordDao(
       dynamoConfig = DynamoConfig(tableName),
@@ -94,12 +95,16 @@ class SierraItemMergerUpdaterServiceTest
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
+
       val expectedNewSierraRecord =
-        MergedSierraRecord(id = bibIdNotExisting,
-                           maybeBibData = None,
-                           itemData = Map(itemRecord.id -> itemRecord),
-                           version = 1)
-      dynamoQueryEqualsValue(id = bibIdNotExisting)(
+        MergedSierraRecord(
+          id = bibIdNotExisting,
+          maybeBibData = None,
+          itemData = Map(itemRecord.id -> itemRecord),
+          version = 1
+        )
+
+      dynamoQueryEqualsValue('id -> bibIdNotExisting)(
         expectedValue = expectedNewSierraRecord)
       val expectedUpdatedSierraRecord =
         oldRecord.copy(itemData =

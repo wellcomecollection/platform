@@ -13,6 +13,7 @@ import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.sierra_adapter.utils.DynamoTestUtils
 
 class SierraBibMergerFeatureTest
     extends FunSpec
@@ -20,7 +21,8 @@ class SierraBibMergerFeatureTest
     with AmazonCloudWatchFlag
     with Matchers
     with SQSLocal
-    with DynamoDBLocal {
+    with DynamoDBLocal
+    with DynamoTestUtils {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
@@ -225,17 +227,5 @@ class SierraBibMergerFeatureTest
       timestamp = "2001-01-01T01:01:01Z"
     )
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
-  }
-
-  // TODO: This message is suitably generic, and could be moved
-  // to DynamoDBLocal or another parent class, but requires some fiddling
-  // with implicit ExecutionContexts to get right.  Move it!
-  private def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
-    expectedValue: T) = {
-    println(s"Searching DynamoDB for expectedValue = $expectedValue")
-    eventually {
-      val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get
-      actualValue shouldEqual Right(expectedValue)
-    }
   }
 }

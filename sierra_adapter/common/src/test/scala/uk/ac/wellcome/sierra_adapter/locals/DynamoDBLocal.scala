@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_item_merger.locals
+package uk.ac.wellcome.sierra_adapter.locals
 
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
@@ -12,14 +12,11 @@ import scala.collection.JavaConversions._
 trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
   this: Suite =>
 
-  val tableName = "sierraItemsTable"
+  val tableName: String
 
   deleteTable()
 
   private val table: CreateTableResult = createTable()
-
-  val streamArn: String =
-    table.getTableDescription.getLatestStreamArn
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -33,8 +30,8 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
           tableName,
           Map("id" -> new AttributeValue(item.id))
         )
-      case a =>
-        throw new Exception(s"Unable to clear the table $tableName error $a")
+      case error =>
+        throw new Exception(s"Unable to clear the table $tableName error $error")
     }
 
   private def deleteTable(): Unit = {

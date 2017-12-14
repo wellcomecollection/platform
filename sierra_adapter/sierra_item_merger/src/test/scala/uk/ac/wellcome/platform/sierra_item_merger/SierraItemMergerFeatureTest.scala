@@ -6,7 +6,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
-import uk.ac.wellcome.platform.sierra_item_merger.locals.DynamoDBLocal
+import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil

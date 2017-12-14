@@ -5,12 +5,15 @@ import com.gu.scanamo.query.UniqueKey
 import org.scalatest.{Assertion, Matchers, Suite}
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.SierraItemRecord
-import uk.ac.wellcome.platform.sierra_item_merger.locals.DynamoDBLocal
+import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
 import uk.ac.wellcome.utils.JsonUtil
 import com.gu.scanamo.syntax._
+import uk.ac.wellcome.sierra_adapter.utils.DynamoTestUtils
 
-trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {
+trait SierraItemMergerTestUtil extends DynamoDBLocal with DynamoTestUtils {
   this: Suite =>
+
+  val tableName = "sierraItemsTable"
 
   private def itemRecordString(id: String,
                                updatedDate: String,
@@ -62,11 +65,4 @@ trait SierraItemMergerTestUtil extends DynamoDBLocal with Matchers {
       bibIds = bibIds,
       modifiedDate = updatedDate
     )
-
-  protected def dynamoQueryEqualsValue[T: DynamoFormat](id: String)(
-    expectedValue: T): Assertion = {
-
-    val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)('id -> id).get
-    actualValue shouldBe Right(expectedValue)
-  }
 }

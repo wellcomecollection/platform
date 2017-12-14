@@ -22,9 +22,8 @@ class SierraItemMergerWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
-  sierraBibMergerUpdaterService: SierraItemMergerUpdaterService
-) extends SQSWorker(reader, system, metrics)
-    with Logging {
+  sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
+) extends SQSWorker(reader, system, metrics) with Logging {
 
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] =
@@ -40,7 +39,7 @@ class SierraItemMergerWorkerService @Inject()(
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     decode[SierraItemRecord](message.body) match {
-      case Right(record) => sierraBibMergerUpdaterService.update(record)
+      case Right(record) => sierraItemMergerUpdaterService.update(record)
       case Left(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)

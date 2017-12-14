@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
-import uk.ac.wellcome.platform.sierra_item_merger.dynamo.MergedSierraRecordDao
+import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
