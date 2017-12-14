@@ -1,5 +1,5 @@
 module "miro_reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v3.0.2"
+  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
   name   = "miro_reindexer"
 
   cluster_id = "${aws_ecs_cluster.services.id}"
@@ -10,10 +10,6 @@ module "miro_reindexer" {
   listener_http_arn  = "${module.services_alb.listener_http_arn}"
   path_pattern       = "/miro_reindexer/*"
   alb_priority       = "104"
-  infra_bucket       = "${var.infra_bucket}"
-
-  config_key           = "config/${var.build_env}/miro_reindexer.ini"
-  config_template_path = "config/miro_reindexer.ini.template"
 
   cpu    = 512
   memory = 1024
@@ -23,7 +19,7 @@ module "miro_reindexer" {
   deployment_minimum_healthy_percent = "0"
   deployment_maximum_percent         = "200"
 
-  config_vars = {
+  env_vars = {
     miro_table_name    = "${aws_dynamodb_table.miro_table.name}"
     reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
     metrics_namespace  = "miro-reindexer"

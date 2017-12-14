@@ -8,19 +8,14 @@ data "template_file" "es_cluster_host_romulus" {
 }
 
 module "api_romulus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
   name               = "api_romulus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
-  task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
   app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_romulus_api != "" ? var.pinned_romulus_api : var.release_ids["api"]}"
   nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_romulus_api_nginx != "" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
-  infra_bucket       = "${local.bucket_infra_id}"
-
-  config_key           = "config/${var.build_env}/api_romulus_v1.ini"
-  config_template_path = "config/api_romulus_v1.ini.template"
 
   path_pattern = "/catalogue/v1/*"
   alb_priority = "114"
@@ -36,7 +31,7 @@ module "api_romulus_v1" {
   deployment_minimum_healthy_percent = "${var.production_api == "romulus" ? "50" : "0"}"
   deployment_maximum_percent         = "200"
 
-  config_vars = {
+  env_vars = {
     api_host    = "${var.api_host}"
     es_host     = "${data.template_file.es_cluster_host_romulus.rendered}"
     es_port     = "${var.es_config_romulus["port"]}"
@@ -63,19 +58,14 @@ data "template_file" "es_cluster_host_remus" {
 }
 
 module "api_remus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
   name               = "api_remus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
-  task_role_arn      = "${module.ecs_api_iam.task_role_arn}"
   vpc_id             = "${module.vpc_api.vpc_id}"
   app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_remus_api != "" ? var.pinned_remus_api : var.release_ids["api"]}"
   nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api_nginx != "" ? var.pinned_remus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
-  infra_bucket       = "${local.bucket_infra_id}"
-
-  config_key           = "config/${var.build_env}/api_remus_v1.ini"
-  config_template_path = "config/api_remus_v1.ini.template"
 
   path_pattern = "/catalogue/v1/*"
   alb_priority = "113"
@@ -91,7 +81,7 @@ module "api_remus_v1" {
   deployment_minimum_healthy_percent = "${var.production_api == "remus" ? "50" : "0"}"
   deployment_maximum_percent         = "200"
 
-  config_vars = {
+  env_vars = {
     api_host    = "${var.api_host}"
     es_host     = "${data.template_file.es_cluster_host_remus.rendered}"
     es_port     = "${var.es_config_remus["port"]}"

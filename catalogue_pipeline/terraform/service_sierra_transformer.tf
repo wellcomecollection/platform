@@ -1,14 +1,13 @@
 module "sierra_transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v3.0.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
   name   = "sierra_transformer"
 
   source_queue_name  = "${module.sierra_transformer_queue.name}"
   source_queue_arn   = "${module.sierra_transformer_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_transformer.repository_url}"
   release_id         = "${var.release_ids["transformer"]}"
-  config_template    = "transformer"
 
-  config_vars = {
+  env_vars = {
     sns_arn              = "${module.ingest_pipeline_sue.id_minter_topic_arn}"
     transformer_queue_id = "${module.sierra_transformer_queue.id}"
     source_table_name    = "SierraData"
