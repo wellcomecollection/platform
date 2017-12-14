@@ -218,8 +218,4 @@ class SierraItemMergerUpdaterServiceTest
       ex shouldBe expectedException
     }
   }
-
-  // shouldn't unlink if older version
-  // read unlinked IDs
-  // put multiple items with same bibId
 }
