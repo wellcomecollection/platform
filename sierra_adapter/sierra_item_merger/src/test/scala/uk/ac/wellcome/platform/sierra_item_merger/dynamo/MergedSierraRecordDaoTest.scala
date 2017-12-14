@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -79,10 +83,16 @@ class MergedSierraRecordDaoTest
     it(
       "should insert a new merged sierra record if it doesn't already exist in DynamoDB") {
       val id = "b1111"
-      val mergedSierraRecord = MergedSierraRecord(id = id,
-                                                  maybeBibData = None,
-                                                  itemData = Map("i111"-> SierraItemRecord(id = "i111",data = "something", modifiedDate = "2001-01-01T01:01:30Z", bibIds = List("b1111"))),
-                                                  version = 0)
+      val mergedSierraRecord = MergedSierraRecord(
+        id = id,
+        maybeBibData = None,
+        itemData = Map(
+          "i111" -> SierraItemRecord(id = "i111",
+                                     data = "something",
+                                     modifiedDate = "2001-01-01T01:01:30Z",
+                                     bibIds = List("b1111"))),
+        version = 0
+      )
 
       whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>
         Scanamo
