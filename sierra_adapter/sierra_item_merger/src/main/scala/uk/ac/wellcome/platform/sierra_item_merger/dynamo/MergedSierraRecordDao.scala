@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class MergedSierraRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
-                            dynamoConfig: DynamoConfig)
+                                      dynamoConfig: DynamoConfig)
     extends Logging {
   private val table = Table[MergedSierraRecord](dynamoConfig.table)
 
