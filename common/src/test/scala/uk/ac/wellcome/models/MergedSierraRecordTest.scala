@@ -29,7 +29,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       mergedRecord.version shouldEqual version
     }
 
-    it("should be at version 1 when first created") {
+    it("should be at version 0 when first created") {
       val record = MergedSierraRecord(id = "555")
       record.version shouldEqual 0
     }
@@ -54,11 +54,6 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       caught.getMessage shouldEqual "Non-matching bib ids 333 != 444"
     }
 
-    it("should be at version 0 when first created") {
-      val record = MergedSierraRecord(id = "555")
-      record.version shouldEqual 0
-    }
-
     it("should never increment the version when mergeBibRecord is called") {
       val record = sierraBibRecord(id = "666")
       val originalRecord = MergedSierraRecord(id = "666", version = 10)
@@ -66,7 +61,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       newRecord.version shouldEqual 10
     }
 
-    it("should return None when merging bib records with stale data") {
+    it("should return the unmerged record when merging bib records with stale data") {
       val record = sierraBibRecord(
         id = "777",
         title = "Olde McOlde Recorde",
@@ -155,8 +150,9 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           id = "i111",
           title = "Only otters occupy the orange oval",
           modifiedDate = "2001-01-01T01:01:01Z",
-          bibIds = List("i111")
+          bibIds = List("b111")
         )
+
         val mergedSierraRecord = MergedSierraRecord(
           id = "b111",
           itemData = Map(record.id -> record)
@@ -166,7 +162,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           id = record.id,
           title = "Old otters outside the oblong",
           modifiedDate = "2000-01-01T01:01:01Z",
-          bibIds = List("i111")
+          bibIds = List("b111")
         )
         val result = mergedSierraRecord.mergeItemRecord(newerRecord)
         result shouldBe mergedSierraRecord
@@ -213,19 +209,26 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       }
 
       ignore(
-        "should return None when merging an unlinked record which is already absent") {
+        "should return the original record when merging an unlinked record which is already absent") {
         true shouldBe false
       }
 
       ignore(
-        "should return None when merging an unlinked record which has linked more recently") {
+        "should return the original record when merging an unlinked record which has linked more recently") {
         true shouldBe false
       }
     }
 
     describe("when the merged record is unrelated to the item") {
-      ignore("should only merge item records with matching bib IDs") {
-        true shouldBe false
+      describe("mergeSierraItemRecord") {
+        ignore("should only merge item records with matching bib IDs") {
+          true shouldBe false
+        }
+      }
+      describe("unlinkSierraItemRecord") {
+        ignore("should only unlink item records with matching bib IDs") {
+          true shouldBe false
+        }
       }
     }
   }

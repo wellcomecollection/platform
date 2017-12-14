@@ -50,7 +50,7 @@ case class MergedSierraRecord(
   /** Given a new item record, construct the new merged row that we should
     * insert into the merged database.
     *
-    * Returns None if there's nothing to do.
+    * Returns the merged record.
     */
   def mergeItemRecord(record: SierraItemRecord): MergedSierraRecord = {
 
