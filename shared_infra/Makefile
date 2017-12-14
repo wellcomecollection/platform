@@ -10,7 +10,6 @@ include $(SHARED_INFRA)/run_ecs_task/Makefile
 include $(SHARED_INFRA)/service_scheduler/Makefile
 include $(SHARED_INFRA)/update_dynamo_capacity/Makefile
 include $(SHARED_INFRA)/update_ecs_service_size/Makefile
-include $(SHARED_INFRA)/update_task_for_config_change/Makefile
 include $(SHARED_INFRA)/sqs_freezeray/Makefile
 include $(SHARED_INFRA)/sqs_redrive/Makefile
 
@@ -21,8 +20,7 @@ shared_infra-test: drain_ecs_container_instance-test \
                    run_ecs_task-test \
                    service_scheduler-test \
                    update_dynamo_capacity-test \
-                   update_ecs_service_size-test \
-                   update_task_for_config_change-test
+                   update_ecs_service_size-test
 
 ## Build shared_infra
 shared_infra-build: drain_ecs_container_instance-build \
@@ -32,7 +30,6 @@ shared_infra-build: drain_ecs_container_instance-build \
                     service_scheduler-build \
                     update_dynamo_capacity-build \
                     update_ecs_service_size-build \
-                    update_task_for_config_change-build \
                     sqs_freezeray-build	\
                     sqs_redrive-build
 
@@ -44,7 +41,6 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
                       service_scheduler-publish \
                       update_dynamo_capacity-publish \
                       update_ecs_service_size-publish \
-                      update_task_for_config_change-publish \
                       sqs_freezeray-publish	\
                       sqs_redrive-publish
 
