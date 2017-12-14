@@ -48,14 +48,3 @@ module "update_ecs_service_size" {
 
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 }
-
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = "${aws_s3_bucket.infra.id}"
-
-  lambda_function {
-    lambda_function_arn = "${module.update_task_for_config_change.lambda_arn}"
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "config/prod/"
-    filter_suffix       = ".ini"
-  }
-}
