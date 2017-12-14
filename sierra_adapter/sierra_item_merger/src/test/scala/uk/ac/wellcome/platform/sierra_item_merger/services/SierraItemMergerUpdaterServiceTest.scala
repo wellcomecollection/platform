@@ -95,7 +95,6 @@ class SierraItemMergerUpdaterServiceTest
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
-
       val expectedNewSierraRecord =
         MergedSierraRecord(
           id = bibIdNotExisting,

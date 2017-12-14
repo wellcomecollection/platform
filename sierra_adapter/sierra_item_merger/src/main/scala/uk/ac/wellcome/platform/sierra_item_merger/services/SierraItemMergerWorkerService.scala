@@ -23,7 +23,8 @@ class SierraItemMergerWorkerService @Inject()(
   system: ActorSystem,
   metrics: MetricsSender,
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
-) extends SQSWorker(reader, system, metrics) with Logging {
+) extends SQSWorker(reader, system, metrics)
+    with Logging {
 
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] =

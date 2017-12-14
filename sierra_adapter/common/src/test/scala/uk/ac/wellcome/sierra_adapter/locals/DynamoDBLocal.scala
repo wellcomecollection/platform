@@ -31,7 +31,8 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
           Map("id" -> new AttributeValue(item.id))
         )
       case error =>
-        throw new Exception(s"Unable to clear the table $tableName error $error")
+        throw new Exception(
+          s"Unable to clear the table $tableName error $error")
     }
 
   private def deleteTable(): Unit = {
