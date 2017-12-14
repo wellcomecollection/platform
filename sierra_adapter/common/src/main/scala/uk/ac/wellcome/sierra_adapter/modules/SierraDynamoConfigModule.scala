@@ -1,15 +1,16 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.modules
+package uk.ac.wellcome.sierra_adapter.modules
 
 import com.google.inject.Provides
-import uk.ac.wellcome.finatra.modules.DynamoConfigModule
-import uk.ac.wellcome.models.aws.DynamoConfig
 import javax.inject.Singleton
 
+import uk.ac.wellcome.finatra.modules.DynamoConfigModule
+import uk.ac.wellcome.models.aws.DynamoConfig
+
 object SierraDynamoConfigModule extends DynamoConfigModule {
-  val sierraBibsToDynamoAppTable = flags("sierraBibsToDynamo")
+  val sierraTable = flags("sierra")
 
   @Singleton
   @Provides
   def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(sierraBibsToDynamoAppTable())
+    DynamoConfig(sierraTable())
 }

@@ -1,4 +1,4 @@
--aws.dynamo.sierraToDynamo.tableName=${dynamo_table_name}
+-aws.dynamo.sierra.tableName=${dynamo_table_name}
 -aws.sqs.queue.url=${windows_queue_url}
 -aws.metrics.namespace=${metrics_namespace}
 -sierra.apiUrl=${sierra_api_url}
