@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.google.inject.Inject
 import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._
@@ -12,7 +13,7 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class MergedSierraRecordDao(dynamoDbClient: AmazonDynamoDB,
+class MergedSierraRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
                             dynamoConfig: DynamoConfig)
     extends Logging {
   private val table = Table[MergedSierraRecord](dynamoConfig.table)
