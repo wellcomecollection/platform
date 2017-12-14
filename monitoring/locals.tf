@@ -9,9 +9,6 @@ locals {
   terminal_failure_alarm_arn = "${data.terraform_remote_state.shared_infra.terminal_failure_alarm_arn}"
   dlq_alarm_arn              = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
-  bucket_infra_arn = "${data.terraform_remote_state.shared_infra.bucket_infra_arn}"
-  bucket_infra_id  = "${data.terraform_remote_state.shared_infra.bucket_infra_id}"
-
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 
   ecs_services_cluster_id = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
