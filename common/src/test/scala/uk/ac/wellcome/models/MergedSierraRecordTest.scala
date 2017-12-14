@@ -150,7 +150,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         result.itemData(record.id) shouldBe newerRecord
       }
 
-      it("should return None when merging item records with stale data") {
+      it("should return itself when merging item records with stale data") {
         val record = sierraItemRecord(
           id = "i111",
           title = "Only otters occupy the orange oval",
@@ -169,7 +169,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           bibIds = List("i111")
         )
         val result = mergedSierraRecord.mergeItemRecord(newerRecord)
-        result shouldBe None
+        result shouldBe mergedSierraRecord
       }
 
       it("should support adding multiple items to a merged record") {
