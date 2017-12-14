@@ -120,6 +120,29 @@ def affects_tests(path, task):
             (path, task))
         return False
 
+    # The Makefile at the top of the sierra_adapter directory is often
+    # changed, but isn't exclusively owned by any one task.  If this a task
+    # which _definitely isn't_ affected by this file, we can skip tests.
+    not_sierra_adapter = (
+        'loris',
+        'id_minter',
+        'ingestor',
+        'reindexer',
+        'transformer',
+        'api',
+        'monitoring',
+        'shared_infra',
+        'nginx',
+    )
+    if (
+        task.startswith(not_sierra_adapter) and
+        path == 'sierra_adapter/Makefile'
+    ):
+        print(
+            "~~~ Ignoring %s; sierra_adapter changes don't affect %s" %
+            (path, task))
+        return False
+
     # Otherwise, we were unable to decide if this change was important.
     # We assume that it is, so we'll run tests just in case.
     print("+++ Unable to decide if %s is significant, so assume it is" % path)
