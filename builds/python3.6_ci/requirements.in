@@ -2,3 +2,12 @@ boto3
 pytest
 moto==1.1.21
 pip-tools
+
+# These packages are dependencies of cryptography, which is in turn a
+# dependency of boto3.  We pin the versions here so we can install binary
+# packages (called "wheels") from the APK package repository, rather than
+# downloading from PyPI and compiling from source --- we don't care about
+# the exact versions, and this makes the build much faster!
+cffi==1.10.0
+cryptography==2.0.3
+PyYAML==3.12

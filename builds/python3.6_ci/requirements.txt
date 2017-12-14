@@ -9,11 +9,11 @@ boto3==1.4.7
 boto==2.48.0              # via moto
 botocore==1.7.27          # via boto3, s3transfer
 certifi==2017.7.27.1      # via requests
-cffi==1.11.2              # via cryptography
+cffi==1.10.0
 chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
 cookies==2.2.1            # via moto
-cryptography==2.1.1       # via moto
+cryptography==2.0.3
 docker-pycreds==0.2.1     # via docker
 docker==2.5.1             # via moto
 docutils==0.14            # via botocore
@@ -32,7 +32,7 @@ pycparser==2.18           # via cffi
 pytest==3.2.3
 python-dateutil==2.6.1    # via botocore, moto
 pytz==2017.2              # via moto
-pyyaml==3.12              # via pyaml
+pyyaml==3.12
 requests==2.18.4          # via docker, moto
 s3transfer==0.1.11        # via boto3
 six==1.11.0               # via cryptography, docker, docker-pycreds, mock, moto, pip-tools, python-dateutil, websocket-client
