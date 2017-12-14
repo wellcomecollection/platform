@@ -1,11 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  ConditionalCheckFailedException,
-  GetItemRequest,
-  PutItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -13,7 +9,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.MergedSierraRecord
+import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -85,7 +81,7 @@ class MergedSierraRecordDaoTest
       val id = "b1111"
       val mergedSierraRecord = MergedSierraRecord(id = id,
                                                   maybeBibData = None,
-                                                  itemData = Map(),
+                                                  itemData = Map("i111"-> SierraItemRecord(id = "i111",data = "something", modifiedDate = "2001-01-01T01:01:30Z", bibIds = List("b1111"))),
                                                   version = 0)
 
       whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>

@@ -32,6 +32,7 @@ class MergedSierraRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
   }
 
   def updateRecord(record: MergedSierraRecord): Future[Unit] = Future {
+    debug(s"About to update record $record")
     scanamoExec(putRecord(record)) match {
       case Left(err) =>
         warn(s"Failed updating record ${record.id}", err)
