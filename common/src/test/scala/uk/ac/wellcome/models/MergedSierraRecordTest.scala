@@ -61,7 +61,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       newRecord.version shouldEqual 10
     }
 
-    it("should return the unmerged record when merging bib records with stale data") {
+    it(
+      "should return the unmerged record when merging bib records with stale data") {
       val record = sierraBibRecord(
         id = "777",
         title = "Olde McOlde Recorde",
