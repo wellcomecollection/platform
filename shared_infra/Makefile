@@ -46,7 +46,7 @@ shared_infra-deploy: drain_ecs_container_instance-publish \
 
 ## Run a plan on shared_infra stack
 shared_infra-terraform-plan:
-	$(call terraform_plan,$(SHARED_INFRA))
+	$(call terraform_plan,$(SHARED_INFRA),false)
 
 ## Run an apply on shared_infra stack
 shared_infra-terraform-apply:

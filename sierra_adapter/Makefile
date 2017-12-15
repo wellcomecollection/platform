@@ -70,7 +70,7 @@ sierra_adapter-publish: \
 
 
 sierra_adapter-terraform-plan:
-	$(call terraform_plan,$(SIERRA_ADAPTER)/terraform)
+	$(call terraform_plan,$(SIERRA_ADAPTER)/terraform,false)
 
 sierra_adapter-terraform-apply:
 	$(call terraform_apply,$(SIERRA_ADAPTER)/terraform)
