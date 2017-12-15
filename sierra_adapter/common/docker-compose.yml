@@ -1,2 +1,4 @@
-empty:
-  image: alpine
+dynamodb:
+  image: peopleperhour/dynamodb
+  ports:
+    - "45678:8000"
