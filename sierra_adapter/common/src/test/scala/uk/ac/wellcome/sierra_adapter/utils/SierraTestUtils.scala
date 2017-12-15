@@ -9,14 +9,12 @@ import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 trait SierraTestUtils
-  extends DynamoDBLocal
+    extends DynamoDBLocal
     with Matchers
     with Eventually
     with ScalaFutures
     with MockitoSugar
-    with ExtendedPatience {
-
-  this: Suite =>
+    with ExtendedPatience { this: Suite =>
 
   def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
     expectedValue: T) = {

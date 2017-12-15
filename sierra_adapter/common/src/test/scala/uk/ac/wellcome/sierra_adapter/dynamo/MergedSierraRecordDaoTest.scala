@@ -1,7 +1,11 @@
 package uk.ac.wellcome.sierra_adapter.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -17,10 +21,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
 
-
-class MergedSierraRecordDaoTest
-    extends FunSpec
-    with SierraTestUtils {
+class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
 
   val mergedSierraRecordDao =
     new MergedSierraRecordDao(dynamoDbClient, DynamoConfig(tableName))

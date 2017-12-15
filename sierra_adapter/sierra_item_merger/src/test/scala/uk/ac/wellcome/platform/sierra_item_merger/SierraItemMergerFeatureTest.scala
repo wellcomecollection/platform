@@ -9,7 +9,6 @@ import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.dynamo._
 import com.gu.scanamo.syntax._
 
-
 class SierraItemMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin

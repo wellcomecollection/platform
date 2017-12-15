@@ -14,7 +14,6 @@ import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 
 import uk.ac.wellcome.dynamo._
 
-
 class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin

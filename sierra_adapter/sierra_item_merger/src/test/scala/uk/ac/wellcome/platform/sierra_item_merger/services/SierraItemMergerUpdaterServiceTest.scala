@@ -14,7 +14,6 @@ import scala.concurrent.Future
 
 import com.gu.scanamo.syntax._
 
-
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
     with SierraItemMergerTestUtil {
@@ -36,13 +35,13 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
-      val expectedMergedSierraRecord = MergedSierraRecord(
-        id = bibId,
-        maybeBibData = None,
-        itemData = Map(
-          newItemRecord.id -> newItemRecord
-        ),
-        version = 1)
+      val expectedMergedSierraRecord =
+        MergedSierraRecord(id = bibId,
+                           maybeBibData = None,
+                           itemData = Map(
+                             newItemRecord.id -> newItemRecord
+                           ),
+                           version = 1)
 
       dynamoQueryEqualsValue('id -> bibId)(
         expectedValue = expectedMergedSierraRecord)
@@ -111,7 +110,6 @@ class SierraItemMergerUpdaterServiceTest
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
-
       val expectedNewSierraRecord =
         MergedSierraRecord(
           id = bibIdNotExisting,
@@ -201,9 +199,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(sierraUpdateRService.update(oldItemRecord)) { _ =>
-
-      dynamoQueryEqualsValue('id -> bibId)(
-        expectedValue = newRecord)
+      dynamoQueryEqualsValue('id -> bibId)(expectedValue = newRecord)
     }
   }
 

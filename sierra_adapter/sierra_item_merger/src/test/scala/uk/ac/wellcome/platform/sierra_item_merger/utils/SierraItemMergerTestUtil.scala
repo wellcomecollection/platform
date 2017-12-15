@@ -7,10 +7,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.test.utils.SQSLocal
 
-
-trait SierraItemMergerTestUtil
-  extends SierraTestUtils
-    with SQSLocal {
+trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
 
   this: Suite =>
 

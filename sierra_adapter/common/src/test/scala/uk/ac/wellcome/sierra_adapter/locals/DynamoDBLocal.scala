@@ -35,12 +35,14 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
           s"Unable to clear the table $tableName error $error")
     }
 
-  private def deleteTable = dynamoDbClient
+  private def deleteTable =
+    dynamoDbClient
       .listTables()
       .getTableNames
       .foreach(dynamoDbClient.deleteTable)
 
-  private def createTable = dynamoDbClient.createTable(
+  private def createTable =
+    dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
