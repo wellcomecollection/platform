@@ -1,15 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -o errexit
 set -o nounset
-
-function build_lambda {
-  echo "Attempting to build lambda ..."
-
-  /app/build_lambda.sh
-
-  echo "Done."
-}
 
 function install_dependencies {
   echo "Installing dependencies ..."
@@ -17,7 +9,7 @@ function install_dependencies {
   if [ -e /data/requirements.txt ]
   then
     echo "Found requirements.txt, installing."
-    pip install -r /data/requirements.txt
+    pip3 install -r /data/requirements.txt
   else
     echo "No requirements.txt present. Skipping."
   fi
@@ -44,9 +36,6 @@ function build_lock_file {
 if [[ "$OP" == "test" ]]
 then
   run_tests
-elif [[ "$OP" == "build-lambda" ]]
-then
-  build_lambda
 elif [[ "$OP" == "build-lock-file" ]]
 then
   build_lock_file
