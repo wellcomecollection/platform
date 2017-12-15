@@ -10,6 +10,8 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.platform.sierra_adapter.modules.SierraDynamoConfigModule
+import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 
 object ServerMain extends Server
 
@@ -21,7 +23,9 @@ class Server extends HttpServer {
     AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,
-    AkkaModule
+    AkkaModule,
+    SierraDynamoConfigModule,
+    SierraItemMergerModule
   )
 
   override def configureHttp(router: HttpRouter) {

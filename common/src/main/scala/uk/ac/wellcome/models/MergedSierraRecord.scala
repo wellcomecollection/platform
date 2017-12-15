@@ -110,6 +110,9 @@ object MergedSierraRecord {
   def apply(bibRecord: SierraBibRecord): MergedSierraRecord =
     MergedSierraRecord(id = bibRecord.id, maybeBibData = Some(bibRecord))
 
+  def apply(id: String, itemRecord: SierraItemRecord): MergedSierraRecord =
+    MergedSierraRecord(id = id, itemData = Map(itemRecord.id -> itemRecord))
+
   def apply(bibRecord: SierraBibRecord, version: Int): MergedSierraRecord =
     MergedSierraRecord(
       id = bibRecord.id,
