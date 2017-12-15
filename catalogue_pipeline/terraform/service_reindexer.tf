@@ -1,5 +1,5 @@
 module "miro_reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v5.0.2"
   name   = "miro_reindexer"
 
   cluster_id = "${aws_ecs_cluster.services.id}"
@@ -24,6 +24,8 @@ module "miro_reindexer" {
     reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
     metrics_namespace  = "miro-reindexer"
   }
+
+  env_vars_length = 3
 
   loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"

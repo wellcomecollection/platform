@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
   name   = "ingestor_${var.name}"
 
   source_queue_name  = "${module.es_ingest_queue.name}"
@@ -28,6 +28,8 @@ module "ingestor" {
     ingest_queue_id   = "${module.es_ingest_queue.id}"
     metrics_namespace = "ingestor"
   }
+
+  env_vars_length = 9
 
   alb_priority = "${random_integer.priority_ingestor.result}"
 

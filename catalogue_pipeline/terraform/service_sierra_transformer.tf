@@ -1,5 +1,5 @@
 module "sierra_transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
   name   = "sierra_transformer"
 
   source_queue_name  = "${module.sierra_transformer_queue.name}"
@@ -13,6 +13,8 @@ module "sierra_transformer" {
     source_table_name    = "SierraData"
     metrics_namespace    = "sierra-transformer"
   }
+
+  env_vars_length = 4
 
   alb_priority = "108"
 
