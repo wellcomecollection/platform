@@ -1,5 +1,5 @@
 module "miro_transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
   name   = "miro_transformer"
 
   source_queue_name  = "${module.miro_transformer_queue.name}"
@@ -13,6 +13,8 @@ module "miro_transformer" {
     source_table_name    = "${aws_dynamodb_table.miro_table.name}"
     metrics_namespace    = "miro-transformer"
   }
+
+  env_vars_length = 4
 
   alb_priority = "100"
 

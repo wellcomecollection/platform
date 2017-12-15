@@ -1,5 +1,5 @@
 module "id_minter" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
   name   = "id_minter_${var.name}"
 
   source_queue_name  = "${module.id_minter_queue.name}"
@@ -15,6 +15,8 @@ module "id_minter" {
     queue_url   = "${module.id_minter_queue.id}"
     topic_arn   = "${module.es_ingest_topic.arn}"
   }
+
+  env_vars_length = 6
 
   cluster_name = "${var.cluster_name}"
   vpc_id       = "${var.vpc_id}"
