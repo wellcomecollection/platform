@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_romulus" {
 }
 
 module "api_romulus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v5.0.2"
   name               = "api_romulus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   vpc_id             = "${module.vpc_api.vpc_id}"
@@ -45,6 +45,8 @@ module "api_romulus_v1" {
     es_protocol = "${var.es_config_romulus["protocol"]}"
   }
 
+  env_vars_length = 9
+
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
   client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
@@ -60,7 +62,7 @@ data "template_file" "es_cluster_host_remus" {
 }
 
 module "api_remus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v5.0.2"
   name               = "api_remus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   vpc_id             = "${module.vpc_api.vpc_id}"
@@ -96,6 +98,8 @@ module "api_remus_v1" {
     es_password = "${var.es_config_remus["password"]}"
     es_protocol = "${var.es_config_remus["protocol"]}"
   }
+
+  env_vars_length = 9
 
   loadbalancer_cloudwatch_id   = "${module.api_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
