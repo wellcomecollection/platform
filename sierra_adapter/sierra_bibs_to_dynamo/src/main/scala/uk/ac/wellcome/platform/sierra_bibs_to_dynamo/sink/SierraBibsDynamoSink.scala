@@ -1,8 +1,5 @@
 package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.sink
 
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, ZoneOffset}
-
 import akka.Done
 import akka.stream.scaladsl.Sink
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
@@ -13,10 +10,11 @@ import io.circe.Json
 import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.sierra_adapter.sink.SierraDynamoSink
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object SierraBibsDynamoSink extends Logging {
+object SierraBibsDynamoSink extends SierraDynamoSink with Logging {
   def apply(client: AmazonDynamoDB, tableName: String)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(unprefixedJson => {
@@ -53,14 +51,6 @@ object SierraBibsDynamoSink extends Logging {
       }
     })
 
-  private def getDeletedDateTimeAtStartOfDay(json: Json) = {
-    val formatter = DateTimeFormatter.ISO_DATE
-    LocalDate
-      .parse(root.deletedDate.string.getOption(json).get, formatter)
-      .atStartOfDay()
-      .toInstant(ZoneOffset.UTC)
-  }
-
   // Sierra assigns IDs for bibs and items in the same namespace.  A record
   // with ID "1234567" could be a bib or an item (or something else!).
   //
@@ -71,8 +61,4 @@ object SierraBibsDynamoSink extends Logging {
   // This updates the ID in a block of JSON to add this disambiguating prefix.
   def addIDPrefix(json: Json): Json =
     root.id.string.modify(id => s"b$id")(json)
-
-  private def getId(json: Json) = {
-    root.id.string.getOption(json).get
-  }
 }
