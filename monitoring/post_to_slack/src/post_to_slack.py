@@ -312,23 +312,34 @@ def main(event, _):
     print(f'event = {event!r}')
 
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
+    slack_critical_hook = os.environ['CRITICAL_SLACK_WEBHOOK']
+    slack_noncritical_hook = os.environ['NONCRITICAL_SLACK_WEBHOOK']
 
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
 
-    slack_data = {
-        'username': 'cloudwatch-alert',
-        'icon_emoji': ':rotating_light:',
-        'attachments': [
-            {
-                'color': 'danger',
-                'fallback': alarm.name,
-                'title': alarm.name,
-                'fields': [{
-                    'value': alarm.human_reason() or alarm.state_reason
-                }]
-            }
-        ]
-    }
+    if alarm.is_critical:
+        slack_data = {
+            'username': 'cloudwatch-alarm',
+            'icon_emoji': ':rotating_light:',
+        }
+        alarm_color = 'danger'
+    else:
+        slack_data = {
+            'username': 'cloudwatch-warning',
+            'icon_emoji': ':warning:',
+        }
+        alarm_color = 'warning'
+
+    slack_data['attachments'] = [
+        {
+            'color': alarm_color,
+            'fallback': alarm.name,
+            'title': alarm.name,
+            'fields': [{
+                'value': alarm.human_reason() or alarm.state_reason
+            }]
+        }
+    ]
 
     messages = alarm.cloudwatch_messages()
     if messages:
@@ -352,8 +363,13 @@ def main(event, _):
 
     print('Sending message %s' % json.dumps(slack_data))
 
+    if alarm.is_critical:
+        webhook_url = slack_critical_hook
+    else:
+        webhook_url = slack_noncritical_hook
+
     response = requests.post(
-        os.environ["SLACK_INCOMING_WEBHOOK"],
+        webhook_url,
         data=json.dumps(slack_data),
         headers={'Content-Type': 'application/json'}
     )
