@@ -7,16 +7,32 @@ import pytest
 import post_to_slack
 
 
-@mock.patch('post_to_slack.requests.post')
-def test_post_to_slack(mock_post):
-    url = "http://blah.com"
+@pytest.fixture
+def critical_hook():
+    return 'https://api.slack.com/hooks/example_critical'
 
-    os.environ['SLACK_INCOMING_WEBHOOK'] = url
-    os.environ['BITLY_ACCESS_TOKEN'] = "foo"
 
-    mock_post.return_value.ok = True
+@pytest.fixture
+def alarm_name():
+    return 'api-alb-target-500-errors'
 
-    alarm_name = "api-alb-target-500-errors"
+
+@pytest.fixture
+def alarm_reason():
+    return (
+        "Threshold Crossed: 1 datapoint (4.0) was "
+        "greater than or equal to the threshold (1.0)."
+    )
+
+
+@pytest.fixture
+def event(critical_hook, alarm_name, alarm_reason):
+    noncritical_hook = 'https://api.slack.com/hooks/example_non-critical'
+
+    os.environ['CRITICAL_SLACK_WEBHOOK'] = critical_hook
+    os.environ['NONCRITICAL_SLACK_WEBHOOK'] = noncritical_hook
+    os.environ['BITLY_ACCESS_TOKEN'] = 'bitly-example-12345'
+
     metric_name = "HTTPCode_Target_5XX_Count"
     namespace = "AWS/ApplicationELB"
     dimensions = [
@@ -29,8 +45,6 @@ def test_post_to_slack(mock_post):
             "value": "app/api/e87a4a5f32874d8b"
         }
     ]
-    reason = "Threshold Crossed: 1 datapoint (4.0) was \
-        greater than or equal to the threshold (1.0)."
     timestamp = "2017-07-10T15:42:24.243+0000"
 
     alarm_info = {
@@ -38,7 +52,7 @@ def test_post_to_slack(mock_post):
         "AlarmDescription": "This metric monitors api-alb-target-500-errors",
         "AWSAccountId": "account_id",
         "NewStateValue": "ALARM",
-        "NewStateReason": reason,
+        "NewStateReason": alarm_reason,
         "StateChangeTime": timestamp,
         "Region": "EU - Ireland",
         "OldStateValue": "INSUFFICIENT_DATA",
@@ -58,7 +72,7 @@ def test_post_to_slack(mock_post):
         }
     }
 
-    event = {
+    return {
         'Records': [{
             'EventSource': 'aws:sns',
             'EventVersion': '1.0',
@@ -81,13 +95,19 @@ def test_post_to_slack(mock_post):
         }]
     }
 
-    post_to_slack.main(event, None)
+
+@mock.patch('post_to_slack.requests.post')
+def test_post_to_slack(
+    mock_post, event, critical_hook, alarm_name, alarm_reason
+):
+    mock_post.return_value.ok = True
+
+    post_to_slack.main(event, context=None)
 
     calls = mock_post.call_args_list
 
     assert len(calls) == 1
-
-    assert calls[0][0][0] == url
+    assert calls[0][0][0] == critical_hook
 
     sent_data = json.loads(calls[0][1]['data'])
 
@@ -96,7 +116,7 @@ def test_post_to_slack(mock_post):
     assert attachment['fallback'] == alarm_name
     assert attachment['title'] == alarm_name
     assert len(attachment['fields']) == 1
-    assert attachment['fields'][0]['value'] == reason
+    assert attachment['fields'][0]['value'] == alarm_reason
 
 
 class TestAlarm:
@@ -176,3 +196,16 @@ class TestAlarm:
 ])
 def test_simplify_message(message, expected):
     assert post_to_slack.simplify_message(message) == expected
+
+
+@pytest.mark.parametrize('name, is_critical', [
+    ('lambda-notify_old_deploys-errors', False),
+    ('api_remus_v1-alb-target-500-errors', True),
+    ('api_remus_v2-alb-target-500-errors', True),
+    ('es_ingest_queue_mel_dlq_not_empty', False),
+    ('unknown_alarm', True),
+])
+def test_alarm_is_critical(name, is_critical):
+    metadata = {'AlarmName': name}
+    alarm = post_to_slack.Alarm(json.dumps(metadata))
+    assert alarm.is_critical == is_critical
