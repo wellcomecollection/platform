@@ -81,7 +81,7 @@ catalogue_pipeline-publish: \
 
 
 catalogue_pipeline-terraform-plan:
-	$(call terraform_plan,$(CATALOGUE_PIPELINE)/terraform)
+	$(call terraform_plan,$(CATALOGUE_PIPELINE)/terraform,false)
 
 catalogue_pipeline-terraform-apply:
 	$(call terraform_apply,$(CATALOGUE_PIPELINE)/terraform)

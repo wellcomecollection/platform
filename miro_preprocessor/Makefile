@@ -40,7 +40,7 @@ miro_preprocessor-publish: xml_to_json_converter-publish \
 						   miro_image_to_tandem_vault-publish
 
 miro_preprocessor-terraform-plan:
-	$(call terraform_plan,$(MIRO_PREPROC))
+	$(call terraform_plan,$(MIRO_PREPROC),false)
 
 miro_preprocessor-terraform-apply:
 	$(call terraform_apply,$(MIRO_PREPROC))
