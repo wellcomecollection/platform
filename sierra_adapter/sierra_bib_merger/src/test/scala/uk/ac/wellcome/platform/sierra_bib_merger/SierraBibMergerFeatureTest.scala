@@ -1,28 +1,26 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
 import akka.actor.ActorSystem
-import com.gu.scanamo.query.UniqueKey
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
-import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
+
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.sierra_adapter.utils.DynamoTestUtils
+
 
 class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with AmazonCloudWatchFlag
-    with Matchers
     with SQSLocal
-    with DynamoDBLocal
-    with DynamoTestUtils {
+    with SierraTestUtils {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher

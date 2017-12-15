@@ -12,18 +12,18 @@ import scala.collection.JavaConversions._
 trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
   this: Suite =>
 
-  val tableName: String
+  val tableName = "sierraObjectTable"
 
-  deleteTable()
+  deleteTable
 
-  private val table: CreateTableResult = createTable()
+  private val table: CreateTableResult = createTable
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearTable()
+    clearTable
   }
 
-  private def clearTable(): List[DeleteItemResult] =
+  private def clearTable =
     Scanamo.scan[MergedSierraRecord](dynamoDbClient)(tableName).map {
       case Right(item) =>
         dynamoDbClient.deleteItem(
@@ -35,15 +35,12 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
           s"Unable to clear the table $tableName error $error")
     }
 
-  private def deleteTable(): Unit = {
-    dynamoDbClient
+  private def deleteTable = dynamoDbClient
       .listTables()
       .getTableNames
       .foreach(dynamoDbClient.deleteTable)
-  }
 
-  private def createTable() = {
-    dynamoDbClient.createTable(
+  private def createTable = dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
@@ -57,5 +54,5 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
-  }
+
 }

@@ -1,19 +1,20 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
-import com.gu.scanamo.query.UniqueKey
-import org.scalatest.{Assertion, Matchers, Suite}
-import org.scalatest.concurrent.Eventually
+import org.scalatest.Suite
 import uk.ac.wellcome.models.SierraItemRecord
-import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.JsonUtil
-import com.gu.scanamo.syntax._
-import uk.ac.wellcome.sierra_adapter.utils.DynamoTestUtils
+import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
+import uk.ac.wellcome.test.utils.SQSLocal
 
-trait SierraItemMergerTestUtil extends DynamoDBLocal with DynamoTestUtils {
+
+trait SierraItemMergerTestUtil
+  extends SierraTestUtils
+    with SQSLocal {
+
   this: Suite =>
 
-  val tableName = "sierraItemsTable"
+  val queueUrl = createQueueAndReturnUrl("test_item_merger")
 
   private def itemRecordString(id: String,
                                updatedDate: String,
@@ -65,4 +66,17 @@ trait SierraItemMergerTestUtil extends DynamoDBLocal with DynamoTestUtils {
       bibIds = bibIds,
       modifiedDate = updatedDate
     )
+
+  protected def sendItemRecordToSQS(record: SierraItemRecord) = {
+    val messageBody = JsonUtil.toJson(record).get
+
+    val message = SQSMessage(
+      subject = None,
+      body = messageBody,
+      topic = "topic",
+      messageType = "messageType",
+      timestamp = "2001-01-01T01:01:01Z"
+    )
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
+  }
 }

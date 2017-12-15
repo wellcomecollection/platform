@@ -1,16 +1,22 @@
 package uk.ac.wellcome.sierra_adapter.utils
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.query.UniqueKey
-import org.scalatest.Matchers
-import org.scalatest.concurrent.Eventually
+import org.scalatest.{Matchers, Suite}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
-trait DynamoTestUtils extends Matchers with Eventually {
+trait SierraTestUtils
+  extends DynamoDBLocal
+    with Matchers
+    with Eventually
+    with ScalaFutures
+    with MockitoSugar
+    with ExtendedPatience {
 
-  val tableName: String
-  val dynamoDbClient: AmazonDynamoDB
+  this: Suite =>
 
   def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
     expectedValue: T) = {
