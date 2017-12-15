@@ -31,6 +31,7 @@ class SierraItemMergerUpdaterService @Inject()(
                                  itemData = Map(itemRecord.id -> itemRecord)))
         }
     }
+
     Future.sequence(updateFutures).map(_ => ())
   }
 

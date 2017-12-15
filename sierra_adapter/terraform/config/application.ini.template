@@ -1,3 +1,0 @@
--aws.dynamo.sierraBibMerger.tableName=${dynamo_table_name}
--aws.sqs.queue.url=${windows_queue_url}
--aws.metrics.namespace=${metrics_namespace}
