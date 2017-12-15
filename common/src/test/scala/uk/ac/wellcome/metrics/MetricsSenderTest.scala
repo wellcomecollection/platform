@@ -47,7 +47,7 @@ class MetricsSenderTest
 
           capture.getAllValues.exists { request: PutMetricDataRequest =>
             val item = request.getMetricData()
-            (item.head.getValue > 100) && (item.head.getMetricName == "bar")
+            (item.head.getValue >= 100) && (item.head.getMetricName == "bar")
           } shouldBe true
         }
       }
