@@ -3,8 +3,12 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "slack_webhook" {
-  description = "Incoming Webhook URL to send slack notifications"
+variable "critical_slack_webhook" {
+  description = "Incoming Webhook URL to send critical Slack notifications"
+}
+
+variable "non_critical_slack_webhook" {
+  description = "Incoming Webhook URL to send non-critical Slack notifications"
 }
 
 variable "bitly_access_token" {
@@ -32,16 +36,6 @@ variable "key_name" {
 
 variable "admin_cidr_ingress" {
   description = "CIDR to allow tcp/22 ingress to EC2 instance"
-}
-
-variable "infra_bucket" {
-  description = "S3 bucket storing our configuration"
-  default     = "platform-infra"
-}
-
-variable "build_env" {
-  description = "Build environment (prod, dev, stage, ...)"
-  default     = "prod"
 }
 
 variable "grafana_anonymous_enabled" {
