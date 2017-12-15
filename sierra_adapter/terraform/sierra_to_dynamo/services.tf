@@ -1,5 +1,5 @@
 module "sierra_to_dynamo_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.0"
   name   = "sierra_to_dynamo_${var.resource_type}"
 
   source_queue_name  = "${module.windows_queue.name}"
@@ -19,6 +19,8 @@ module "sierra_to_dynamo_service" {
     sierra_resource_type = "${var.resource_type}"
     sierra_fields        = "${var.sierra_fields}"
   }
+
+  env_vars_length = 8
 
   alb_priority = "${var.alb_priority}"
 
