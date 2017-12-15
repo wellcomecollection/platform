@@ -5,6 +5,7 @@ INFRA_BUCKET = platform-infra
 #
 # Args:
 #   $1 - Path to the Terraform directory.
+#	$2 - true/false: is this a public-facing stack?
 #
 define terraform_plan
 	make uptodate-git
@@ -12,6 +13,7 @@ define terraform_plan
 		--volume $(1):/data \
 		--env OP=plan \
 		--env GET_PLATFORM_TFVARS=true \
+		--env IS_PUBLIC_FACING=$(2) \
 		wellcome/terraform_wrapper:latest
 endef
 

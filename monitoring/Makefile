@@ -24,7 +24,7 @@ monitoring-publish: post_to_slack-publish deployment_tracking-publish ecs_dashbo
 
 
 monitoring-terraform-plan:
-	$(call terraform_plan,$(MONITORING))
+	$(call terraform_plan,$(MONITORING),false)
 
 monitoring-terraform-apply:
 	$(call terraform_apply,$(MONITORING))
