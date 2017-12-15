@@ -308,15 +308,7 @@ def simplify_message(message):
     return message.strip()
 
 
-def main(event, _):
-    print(f'event = {event!r}')
-
-    bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
-    slack_critical_hook = os.environ['CRITICAL_SLACK_WEBHOOK']
-    slack_noncritical_hook = os.environ['NONCRITICAL_SLACK_WEBHOOK']
-
-    alarm = Alarm(event['Records'][0]['Sns']['Message'])
-
+def prepare_slack_payload(alarm):
     if alarm.is_critical:
         slack_data = {
             'username': 'cloudwatch-alarm',
@@ -360,6 +352,19 @@ def main(event, _):
         slack_data['attachments'][0]['fields'].append({
             'value': cloudwatch_url_str
         })
+
+    return slack_data
+
+
+def main(event, context):
+    print(f'event = {event!r}')
+
+    bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
+    slack_critical_hook = os.environ['CRITICAL_SLACK_WEBHOOK']
+    slack_noncritical_hook = os.environ['NONCRITICAL_SLACK_WEBHOOK']
+
+    alarm = Alarm(event['Records'][0]['Sns']['Message'])
+    slack_data = prepare_slack_payload(alarm)
 
     print('Sending message %s' % json.dumps(slack_data))
 
