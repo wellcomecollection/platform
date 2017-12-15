@@ -17,6 +17,8 @@ module "api_romulus_v1" {
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
 
+  healthcheck_path = "/management/healthcheck"
+
   path_pattern = "/catalogue/v1/*"
   alb_priority = "114"
   host_name    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
@@ -66,6 +68,8 @@ module "api_remus_v1" {
   nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api_nginx != "" ? var.pinned_remus_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
+
+  healthcheck_path = "/management/healthcheck"
 
   path_pattern = "/catalogue/v1/*"
   alb_priority = "113"

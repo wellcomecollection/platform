@@ -1,28 +1,25 @@
-package uk.ac.wellcome.platform.sierra_bib_merger.services
+package uk.ac.wellcome.platform.sierra_bib_merger
 
 import akka.actor.ActorSystem
-import com.gu.scanamo.query.UniqueKey
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
-import uk.ac.wellcome.platform.sierra_bib_merger.Server
-import uk.ac.wellcome.platform.sierra_bib_merger.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 
 import uk.ac.wellcome.dynamo._
 
-class SierraBibMergerWorkerServiceTest
+class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with AmazonCloudWatchFlag
-    with Matchers
     with SQSLocal
-    with DynamoDBLocal {
+    with SierraTestUtils {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
@@ -227,17 +224,5 @@ class SierraBibMergerWorkerServiceTest
       timestamp = "2001-01-01T01:01:01Z"
     )
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
-  }
-
-  // TODO: This message is suitably generic, and could be moved
-  // to DynamoDBLocal or another parent class, but requires some fiddling
-  // with implicit ExecutionContexts to get right.  Move it!
-  private def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
-    expectedValue: T) = {
-    println(s"Searching DynamoDB for expectedValue = $expectedValue")
-    eventually {
-      val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get
-      actualValue shouldEqual Right(expectedValue)
-    }
   }
 }
