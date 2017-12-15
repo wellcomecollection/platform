@@ -22,7 +22,7 @@ api-publish: api-build
 
 
 catalogue_api-terraform-plan:
-	$(call terraform_plan,$(CATALOGUE_API)/terraform)
+	$(call terraform_plan,$(CATALOGUE_API)/terraform,true)
 
 catalogue_api-terraform-apply:
 	$(call terraform_apply,$(CATALOGUE_API)/terraform)

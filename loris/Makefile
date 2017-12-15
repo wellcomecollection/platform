@@ -30,7 +30,7 @@ loris-publish: loris-build
 	$(call publish_service,loris)
 
 loris-terraform-plan:
-	$(call terraform_plan,$(LORIS)/terraform)
+	$(call terraform_plan,$(LORIS)/terraform,true)
 
 loris-terraform-apply:
 	$(call terraform_apply,$(LORIS)/terraform)
