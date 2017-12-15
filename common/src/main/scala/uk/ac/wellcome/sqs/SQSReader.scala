@@ -14,7 +14,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
 
-case class SQSReaderGracefulException(e: Exception)
+case class SQSReaderGracefulException(e: Throwable)
     extends Exception(e.getMessage)
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
