@@ -7,8 +7,9 @@ module "lambda_post_to_slack" {
   timeout     = 10
 
   environment_variables = {
-    SLACK_INCOMING_WEBHOOK = "${var.slack_webhook}"
-    BITLY_ACCESS_TOKEN     = "${var.bitly_access_token}"
+    CRITICAL_SLACK_WEBHOOK    = "${var.critical_slack_webhook}"
+    NONCRITICAL_SLACK_WEBHOOK = "${var.non_critical_slack_webhook}"
+    BITLY_ACCESS_TOKEN        = "${var.bitly_access_token}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
