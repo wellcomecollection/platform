@@ -211,6 +211,23 @@ class Alarm:
             f'end={timeframe.end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
         )
 
+    @property
+    def is_critical(self):
+        """Returns True if this is a critical alarm."""
+        # Alarms for the API or Loris are *always* critical.
+        if any(p in self.name for p in ['api_remus', 'api_romulus', 'loris']):
+            return True
+
+        # Lambdas and DLQ alarms are *never* critical.
+        if (
+            self.name.endswith('dlq_not_empty') or
+            self.name.startswith('lambda-')
+        ):
+            return False
+
+        # Otherwise default to True, because we don't know what this alarm is.
+        return True
+
 
 def to_bitly(url, access_token):
     """
