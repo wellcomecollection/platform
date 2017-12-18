@@ -52,7 +52,11 @@ case class MergedSierraRecord(
     *
     * Returns the merged record.
     */
-  def mergeItemRecord(record: SierraItemRecord): MergedSierraRecord = {
+  def mergeItemRecord(itemRecord: SierraItemRecord): MergedSierraRecord = {
+    if (!itemRecord.bibIds.contains(this.id)) {
+      throw new RuntimeException(
+        s"Non-matching bib id ${this.id} in item bib ${itemRecord.bibIds}")
+    }
 
     // We can decide whether to insert the new data in two steps:
     //
@@ -62,20 +66,41 @@ case class MergedSierraRecord(
     //    just received?  If the existing data is older, we need to merge the
     //    new record.
     //
-    val isNewerData = this.itemData.get(record.id) match {
-      case Some(existing) => record.modifiedDate.isAfter(existing.modifiedDate)
+    val isNewerData = this.itemData.get(itemRecord.id) match {
+      case Some(existing) =>
+        itemRecord.modifiedDate.isAfter(existing.modifiedDate)
       case None => true
     }
 
     if (isNewerData) {
-      val itemData = this.itemData + (record.id -> record)
+      val itemData = this.itemData + (itemRecord.id -> itemRecord)
       this.copy(itemData = itemData)
     } else {
       this
     }
   }
 
-  def unlinkItemRecord(itemRecord: SierraItemRecord): MergedSierraRecord = ???
+  def unlinkItemRecord(itemRecord: SierraItemRecord): MergedSierraRecord = {
+    if (!itemRecord.unlinkedBibIds.contains(this.id)) {
+      throw new RuntimeException(
+        s"Non-matching bib id ${this.id} in item unlink bibs ${itemRecord.unlinkedBibIds}")
+    }
+
+    val itemData: Map[String, SierraItemRecord] = this.itemData
+      .filterNot {
+        case (id, currentItemRecord) => {
+          val matchesCurrentItemRecord = id == itemRecord.id
+
+          val modifiedAfter = itemRecord.modifiedDate.isAfter(
+            currentItemRecord.modifiedDate
+          )
+
+          matchesCurrentItemRecord && modifiedAfter
+        }
+      }
+
+    this.copy(itemData = itemData)
+  }
 
   override def transform: Try[Option[Work]] =
     maybeBibData
