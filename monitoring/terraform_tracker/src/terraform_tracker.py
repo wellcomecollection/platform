@@ -10,10 +10,30 @@ import sys
 from botocore.vendored import requests
 
 
+def to_bitly(url, access_token):
+    """
+    Try to shorten a URL with bit.ly.  If it fails, just return the
+    original URL.
+    """
+    def _to_bity_single_url(url):
+        resp = requests.get(
+            'https://api-ssl.bitly.com/v3/user/link_save',
+            params={'access_token': access_token, 'longUrl': url}
+        )
+        try:
+            return resp.json()['data']['link_save']['link']
+        except KeyError:
+            return url
+
+    return ' / '.join([_to_bity_single_url(u) for u in url.split(' / ')])
+
+
 def main(event, context):
     print(f'event = {event!r}')
 
     slack_webhook = os.environ['SLACK_WEBHOOK']
+    bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
+
     message = event['Records'][0]['Sns']
 
     if message['Subject'] != 'terraform-apply-notification':
@@ -23,6 +43,11 @@ def main(event, context):
     data = json.loads(message['Message'])
 
     username = data['username']
+    key = data['key']
+
+    key_url = f'https://console.aws.amazon.com/s3/object/platform-infra/{key}?region=eu-west-1&tab=overview'
+    display_url = to_bitly(key_url, access_token=bitly_access_token)
+
     stack = {
         'platform.tfstate': 'catalogue_api',
         'platform-pipeline.tfstate': 'catalogue_pipeline',
@@ -34,9 +59,16 @@ def main(event, context):
         stack = stack[:-len('.tfstate')]
 
     slack_data = {
-        'username': 'terraform-apply',
+        'username': 'terraform-tracker',
         'icon_emoji': ':terraform:',
-        'text': f'{username} has run "terraform apply" in the {stack} stack.'
+        'attachments': [{
+            'color': '#5C4EE5',
+            'fields': [{
+                'value': f'{username} has run "terraform apply" in the {stack} stack.'
+            }, {
+                'value': display_url
+            }]
+        }]
     }
 
     print('Sending message %s' % json.dumps(slack_data))
