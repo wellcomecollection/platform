@@ -76,4 +76,5 @@ module "terraform_tracker" {
   lambda_error_alarm_arn     = "${local.lambda_error_alarm_arn}"
   terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
   slack_webhook              = "${var.non_critical_slack_webhook}"
+  bitly_access_token         = "${var.bitly_access_token}"
 }
