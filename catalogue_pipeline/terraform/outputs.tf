@@ -25,7 +25,3 @@ output "table_miro_data_arn" {
 output "table_miro_data_name" {
   value = "${aws_dynamodb_table.miro_table.name}"
 }
-
-output "ecr_nginx_services_repository_url" {
-  value = "${module.ecr_repository_nginx_services.repository_url}"
-}
