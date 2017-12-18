@@ -5,7 +5,6 @@ Sends Slack notifications for 'terraform apply' invocations.
 
 import json
 import os
-import sys
 
 from botocore.vendored import requests
 
