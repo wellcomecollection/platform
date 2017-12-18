@@ -14,6 +14,13 @@ switch_api_pins: $(ROOT)/.docker/switch_api_pins
 		 --volume $(CATALOGUE_API)/terraform:/terraform switch_api_pins
 
 
+update_api_size-build:
+	$(call build_lambda,catalogue_api/update_api_size)
+
+update_api_size-publish:
+	$(call publish_lambda,catalogue_api/update_api_size)
+
+
 api_docs-build:
 	$(call build_image,update_api_docs,catalogue_api/update_api_docs/Dockerfile)
 

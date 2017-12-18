@@ -15,7 +15,11 @@ def read_config():
 
 
 def write_config(config):
-    config_str = hcl.dumps(config, indent=2)
+    config_str = f'''
+production_api   = "{config["production_api"]}"
+pinned_api       = "{config["pinned_api"]}"
+pinned_api_nginx = "{config["pinned_api_nginx"]}"
+'''.lstrip()
     with open(TFVARS, 'w') as f:
         f.write(config_str)
 

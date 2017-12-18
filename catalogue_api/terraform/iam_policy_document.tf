@@ -66,3 +66,27 @@ data "aws_iam_policy_document" "miro_images_sync" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "publish_to_service_scheduler_topic" {
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      "${data.aws_sns_topic.service_scheduler_topic.arn}",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "allow_s3_read_prod_api" {
+  statement {
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${data.aws_s3_bucket.infra.arn}/prod_api",
+    ]
+  }
+}

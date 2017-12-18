@@ -81,3 +81,7 @@ output "bucket_wellcomecollection_images_arn" {
 output "terraform_apply_topic_name" {
   value = "${module.terraform_apply_topic.name}"
 }
+
+output "service_scheduler_topic_name" {
+  value = "${module.service_scheduler_topic.name}"
+}
