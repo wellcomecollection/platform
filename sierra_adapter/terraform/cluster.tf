@@ -1,5 +1,5 @@
 module "sierra_adapter_cluster" {
-  source = "cluster"
+  source = "git::https://github.com/wellcometrust/terraform.git//cluster?ref=v5.2.0"
   name   = "sierra_adapter"
 
   vpc_subnets = ["${module.vpc_sierra_adapter.subnets}"]
