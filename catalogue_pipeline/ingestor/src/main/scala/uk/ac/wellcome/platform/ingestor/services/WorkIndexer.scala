@@ -32,11 +32,12 @@ class WorkIndexer @Inject()(
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
-        Future.fromTry(Try{
-          decode[Work](document) match {
-            case Right(work) => work
-            case Left(error) => throw SQSReaderGracefulException(error)
-          }
+        Future
+          .fromTry(Try {
+            decode[Work](document) match {
+              case Right(work) => work
+              case Left(error) => throw SQSReaderGracefulException(error)
+            }
           })
           .flatMap(item => {
             info(s"Indexing item $item")
