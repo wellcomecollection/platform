@@ -61,16 +61,28 @@ if __name__ == '__main__':
             "Unrecognised value in production_api: %r" % d['production_api']
         )
 
-    print('*** Updating the production API variables to %s' % new_api)
+    print('Switching the production API variables to %s' % new_api)
     d['production_api'] = new_api
 
-    print('*** Reading current ECS versions...')
+    print('Reading current ECS versions...')
     existing_state = read_current_api_version(new_api)
 
     d['pinned_api'] = existing_state['app']
-    print('*** Current API version   = %s' % d['pinned_api'])
+    print('Current API version   = %s' % d['pinned_api'])
 
     d['pinned_api_nginx'] = existing_state['nginx']
-    print('*** Current nginx version = %s' % d['pinned_api_nginx'])
+    print('Current nginx version = %s' % d['pinned_api_nginx'])
 
     write_config(d)
+
+    print("")
+    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    print("@                                                                      @")
+    print("@ Please review these changes before you plan/apply.                   @")
+    print("@                                                                      @")
+    print("@ In particular, make sure the Elasticsearch config variables for      @")
+    print("@ the new versions of the API are up-to-date.                          @")
+    print("@                                                                      @")
+    print("@ If you're happy with the changes, don't forget to commit them!       @")
+    print("@                                                                      @")
+    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
