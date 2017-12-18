@@ -46,20 +46,12 @@ variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
 }
 
-variable "pinned_romulus_api" {
-  description = "Which version of the API image to pin romulus to, if any"
+variable "pinned_api" {
+  description = "Which version of the API image to pin to"
 }
 
-variable "pinned_romulus_api_nginx" {
-  description = "Which version of the nginx API image to pin romulus to, if any"
-}
-
-variable "pinned_remus_api" {
-  description = "Which version of the API image to pin remus to, if any"
-}
-
-variable "pinned_remus_api_nginx" {
-  description = "Which version of the nginx API image to pin remus to, if any"
+variable "pinned_api_nginx" {
+  description = "Which version of nginx image to pin to"
 }
 
 variable "api_task_count_stage" {
