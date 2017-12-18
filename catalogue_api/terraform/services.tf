@@ -1,3 +1,10 @@
+resource "aws_s3_bucket_object" "s3_prod_api_marker" {
+  bucket  = "${var.infra_bucket}"
+  acl     = "private"
+  key     = "/prod_api"
+  content = "${var.production_api}"
+}
+
 data "template_file" "es_cluster_host_romulus" {
   template = "$${name}.$${region}.aws.found.io"
 

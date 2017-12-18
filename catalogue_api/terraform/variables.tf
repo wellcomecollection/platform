@@ -1,3 +1,7 @@
+variable "infra_bucket" {
+  default = "platform-infra"
+}
+
 # We can run two versions of the API: a "production" and a "staging" API.
 # The idea is that we can run the new version of the API behind a different
 # hostname, then promote it to production when it's ready to go.
