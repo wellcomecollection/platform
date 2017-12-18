@@ -67,7 +67,8 @@ case class MergedSierraRecord(
     //    new record.
     //
     val isNewerData = this.itemData.get(itemRecord.id) match {
-      case Some(existing) => itemRecord.modifiedDate.isAfter(existing.modifiedDate)
+      case Some(existing) =>
+        itemRecord.modifiedDate.isAfter(existing.modifiedDate)
       case None => true
     }
 
@@ -86,7 +87,8 @@ case class MergedSierraRecord(
     }
 
     val itemData: Map[String, SierraItemRecord] = this.itemData
-      .filterNot { case (id, currentItemRecord) => {
+      .filterNot {
+        case (id, currentItemRecord) => {
           val matchesCurrentItemRecord = id == itemRecord.id
 
           val modifiedAfter = itemRecord.modifiedDate.isAfter(

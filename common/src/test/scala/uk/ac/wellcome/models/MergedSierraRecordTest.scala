@@ -218,7 +218,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           itemData = Map(record.id -> record)
         )
 
-        val expectedMergedSierraRecord =  mergedSierraRecord.copy(
+        val expectedMergedSierraRecord = mergedSierraRecord.copy(
           itemData = Map.empty
         )
 
@@ -249,7 +249,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           itemData = Map(record.id -> record)
         )
 
-        val expectedMergedSierraRecord =  mergedSierraRecord
+        val expectedMergedSierraRecord = mergedSierraRecord
 
         mergedSierraRecord.unlinkItemRecord(previouslyUnlinkedRecord) shouldBe expectedMergedSierraRecord
       }
@@ -279,7 +279,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
           itemData = Map(record.id -> record)
         )
 
-        val expectedMergedSierraRecord =  mergedSierraRecord
+        val expectedMergedSierraRecord = mergedSierraRecord
 
         mergedSierraRecord.unlinkItemRecord(outOfDateUnlinkedRecord) shouldBe expectedMergedSierraRecord
       }
@@ -387,8 +387,8 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
 
       val mergedSierraRecord = MergedSierraRecord(
         id = id,
-        maybeBibData = Some(
-          SierraBibRecord(id = id, data = data, modifiedDate = now())))
+        maybeBibData =
+          Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
       val transformedSierraRecord = mergedSierraRecord.transform
       transformedSierraRecord.isSuccess shouldBe true
