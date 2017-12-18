@@ -38,7 +38,7 @@ def main(event, context):
 
     if message['Subject'] != 'terraform-apply-notification':
         print("Ignoring this event")
-        sys.exit(0)
+        return
 
     data = json.loads(message['Message'])
 
