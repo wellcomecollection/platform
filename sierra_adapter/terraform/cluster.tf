@@ -1,11 +1,11 @@
 module "sierra_adapter_cluster" {
-  source = "git::https://github.com/wellcometrust/terraform.git//cluster?ref=v5.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=bugix2"
   name   = "sierra_adapter"
 
   vpc_subnets = ["${module.vpc_sierra_adapter.subnets}"]
   vpc_id      = "${module.vpc_sierra_adapter.vpc_id}"
 
-  alb_certificate_domain = "sierra.wellcomecollection.org"
+  alb_certificate_domain = "sierra-adapter.wellcomecollection.org"
 
   key_name = "${var.key_name}"
 
