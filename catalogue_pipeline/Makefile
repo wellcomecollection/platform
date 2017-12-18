@@ -48,6 +48,9 @@ transformer-publish: transformer-build
 	$(call publish_service,transformer)
 
 
+transformer_sns_filter-test:
+	$(call test_lambda,catalogue_pipeline/transformer_sns_filter)
+
 transformer_sns_filter-build:
 	$(call build_lambda,$(CATALOGUE_PIPELINE)/transformer_sns_filter)
 
@@ -66,6 +69,7 @@ catalogue_pipeline-build: \
 
 catalogue_pipeline-test: \
 	schedule_reindexer-test \
+	transformer_sns_filter-test \
 	id_minter-test \
 	ingestor-test \
 	reindexer-test \

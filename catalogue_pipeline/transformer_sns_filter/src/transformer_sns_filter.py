@@ -29,8 +29,9 @@ def main(event, _):
     topic_arn = os.environ['TOPIC_ARN']
 
     for sns_event in extract_sns_messages_from_lambda_event(event):
-        publish_sns_message(
-            topic_arn=topic_arn,
-            message=sns_event.message['new_image'],
-            sns_client=sns_client
-        )
+        if sns_event.message['new_image']:
+            publish_sns_message(
+                topic_arn=topic_arn,
+                message=sns_event.message['new_image'],
+                sns_client=sns_client
+            )
