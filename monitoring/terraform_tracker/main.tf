@@ -7,7 +7,8 @@ module "lambda_terraform_tracker" {
   timeout     = 10
 
   environment_variables = {
-    SLACK_WEBHOOK = "${var.slack_webhook}"
+    SLACK_WEBHOOK      = "${var.slack_webhook}"
+    BITLY_ACCESS_TOKEN = "${var.bitly_access_token}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
