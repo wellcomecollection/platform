@@ -18,7 +18,7 @@ class SierraItemMergerUpdaterServiceTest
     extends FunSpec
     with SierraItemMergerTestUtil {
 
-  val sierraUpdateRService = new SierraItemMergerUpdaterService(
+  val sierraUpdaterService = new SierraItemMergerUpdaterService(
     mergedSierraRecordDao = new MergedSierraRecordDao(
       dynamoConfig = DynamoConfig(tableName),
       dynamoDbClient = dynamoDbClient
@@ -34,7 +34,7 @@ class SierraItemMergerUpdaterServiceTest
       bibIds = List(bibId)
     )
 
-    whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
+    whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
       val expectedMergedSierraRecord =
         MergedSierraRecord(id = bibId,
                            maybeBibData = None,
@@ -109,7 +109,7 @@ class SierraItemMergerUpdaterServiceTest
 
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
-    whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
+    whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
       val expectedNewSierraRecord =
         MergedSierraRecord(
           id = bibIdNotExisting,
@@ -162,7 +162,7 @@ class SierraItemMergerUpdaterServiceTest
       bibIds = List(bibId)
     )
 
-    whenReady(sierraUpdateRService.update(newItemRecord)) { _ =>
+    whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
       val expectedSierraRecord = oldRecord.copy(
         itemData = Map(
           id -> newItemRecord
@@ -172,6 +172,185 @@ class SierraItemMergerUpdaterServiceTest
 
       dynamoQueryEqualsValue('id -> bibId)(
         expectedValue = expectedSierraRecord)
+    }
+  }
+
+  it("unlinks an item if it receives an update with an item specifying unlinking") {
+    val itemId = "i3000003"
+
+    val bibId1 = "b9000001"
+    val bibId2 = "b9000002"
+
+    val itemRecord = sierraItemRecord(
+      id = itemId,
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = List(bibId1)
+    )
+
+    val itemData = Map(
+      itemRecord.id -> itemRecord
+    )
+
+    val mergedSierraRecord1 = MergedSierraRecord(
+      id = bibId1,
+      itemData = itemData,
+      version = 1
+    )
+
+    val mergedSierraRecord2 = MergedSierraRecord(
+      id = bibId2,
+      itemData = Map.empty,
+      version = 1
+    )
+
+    Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord1)
+    Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord2)
+
+    val unlinkItemRecord = itemRecord.copy(
+      bibIds = List(bibId2),
+      unlinkedBibIds = List(bibId1),
+      modifiedDate = itemRecord.modifiedDate.plusSeconds(1)
+    )
+
+    val expectedItemData = Map(
+      itemRecord.id -> itemRecord.copy(
+        bibIds = List(bibId2),
+        unlinkedBibIds = List(bibId1),
+        modifiedDate = unlinkItemRecord.modifiedDate
+      )
+    )
+
+    whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+      val expectedSierraRecord1 = mergedSierraRecord1.copy(
+        itemData = Map.empty,
+        version = 2
+      )
+
+      val expectedSierraRecord2 = mergedSierraRecord2.copy(
+        itemData = expectedItemData,
+        version = 2
+      )
+
+      dynamoQueryEqualsValue('id -> bibId1)(expectedValue = expectedSierraRecord1)
+      dynamoQueryEqualsValue('id -> bibId2)(expectedValue = expectedSierraRecord2)
+    }
+  }
+
+  it("unlinks and updates a bib from a single call") {
+    val itemId = "i3000003"
+
+    val bibId1 = "b9000001"
+    val bibId2 = "b9000002"
+
+    val itemRecord = sierraItemRecord(
+      id = itemId,
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = List(bibId1)
+    )
+
+    val itemData = Map(
+      itemRecord.id -> itemRecord
+    )
+
+    val mergedSierraRecord1 = MergedSierraRecord(
+      id = bibId1,
+      itemData = itemData,
+      version = 1
+    )
+
+    val mergedSierraRecord2 = MergedSierraRecord(
+      id = bibId2,
+      itemData = itemData,
+      version = 1
+    )
+
+    Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord1)
+    Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord2)
+
+    val unlinkItemRecord = itemRecord.copy(
+      bibIds = List(bibId2),
+      unlinkedBibIds = List(bibId1),
+      modifiedDate = itemRecord.modifiedDate.plusSeconds(1)
+    )
+
+    val expectedItemData = Map(
+      itemRecord.id -> unlinkItemRecord
+    )
+
+    whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+      val expectedSierraRecord1 = mergedSierraRecord1.copy(
+        itemData = Map.empty,
+        version = 2
+      )
+
+      // In this situation the item was already linked to mergedSierraRecord2
+      // but the modified date is updated in line with the item update
+      val expectedSierraRecord2 = mergedSierraRecord2.copy(
+        itemData = expectedItemData,
+        version = 2
+      )
+
+      dynamoQueryEqualsValue('id -> bibId1)(expectedValue = expectedSierraRecord1)
+    }
+  }
+
+  it("does not unlink an item from a bib if it receives an update with an item specifying unlinking which is out of date") {
+    val itemId = "i3000003"
+
+    val bibId1 = "b9000001"
+    val bibId2 = "b9000002"
+
+    val itemRecord = sierraItemRecord(
+      id = itemId,
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = List(bibId1)
+    )
+
+    val itemData = Map(
+      itemRecord.id -> itemRecord
+    )
+
+    val mergedSierraRecord1 = MergedSierraRecord(
+      id = bibId1,
+      itemData = itemData,
+      version = 1
+    )
+
+    val mergedSierraRecord2 = MergedSierraRecord(
+      id = bibId2,
+      itemData = Map.empty,
+      version = 1
+    )
+
+    Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord1)
+    Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord2)
+
+    val unlinkItemRecord = itemRecord.copy(
+      bibIds = List(bibId2),
+      unlinkedBibIds = List(bibId1),
+      modifiedDate = itemRecord.modifiedDate.minusSeconds(1)
+    )
+
+    val expectedItemData = Map(
+      itemRecord.id -> itemRecord.copy(
+        bibIds = List(bibId2),
+        unlinkedBibIds = List(bibId1),
+        modifiedDate = unlinkItemRecord.modifiedDate
+      )
+    )
+
+    whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+      // In this situation the item will _not_ be unlinked from the original record
+      // but will be linked to the new record (as this is the first time we've seen
+      // the link so it is valid for that bib.
+      val expectedSierraRecord1 = mergedSierraRecord1
+      val expectedSierraRecord2 = mergedSierraRecord2.copy(
+        version = 2,
+        itemData = expectedItemData
+      )
+
+      dynamoQueryEqualsValue('id -> bibId1)(expectedValue = expectedSierraRecord1)
+      dynamoQueryEqualsValue('id -> bibId2)(expectedValue = expectedSierraRecord2)
     }
   }
 
@@ -198,7 +377,7 @@ class SierraItemMergerUpdaterServiceTest
       bibIds = List(bibId)
     )
 
-    whenReady(sierraUpdateRService.update(oldItemRecord)) { _ =>
+    whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
       dynamoQueryEqualsValue('id -> bibId)(expectedValue = newRecord)
     }
   }
@@ -219,7 +398,7 @@ class SierraItemMergerUpdaterServiceTest
       bibIds = List(bibId)
     )
 
-    whenReady(sierraUpdateRService.update(itemRecord)) { _ =>
+    whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
       val expectedSierraRecord = MergedSierraRecord(
         id = bibId,
         itemData = Map(
