@@ -20,7 +20,7 @@ class SierraItemMergerFeatureTest
     flags = Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraItemMerger.tableName" -> tableName
+      "aws.dynamo.merger.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
