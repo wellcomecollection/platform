@@ -20,7 +20,7 @@ def write_config(config):
         f.write(config_str)
 
 
-def read_current_api_pins(name):
+def read_current_api_version(name):
     """
     For an API (remus/romulus), return the _current_ versions of the API
     and nginx that are running in ECS.
@@ -51,5 +51,26 @@ def read_current_api_pins(name):
 
 if __name__ == '__main__':
     d = read_config()
+
+    if d['production_api'] == 'remus':
+        new_api = 'romulus'
+    elif d['production_api'] == 'romulus':
+        new_api = 'remus'
+    else:
+        raise RuntimeError(
+            "Unrecognised value in production_api: %r" % d['production_api']
+        )
+
+    print('*** Updating the production API variables to %s' % new_api)
+    d['production_api'] = new_api
+
+    print('*** Reading current ECS versions...')
+    existing_state = read_current_api_version(new_api)
+
+    d['pinned_api'] = existing_state['app']
+    print('*** Current API version   = %s' % d['pinned_api'])
+
+    d['pinned_api_nginx'] = existing_state['nginx']
+    print('*** Current nginx version = %s' % d['pinned_api_nginx'])
+
     write_config(d)
-    print(read_current_api_pins('remus'))
