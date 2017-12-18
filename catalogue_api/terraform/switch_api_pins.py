@@ -1,7 +1,23 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
+import os
+
 import boto3
+import hcl
+
+
+TFVARS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'terraform_api.tfvars')
+
+
+def read_config():
+    return hcl.load(open(TFVARS))
+
+
+def write_config(config):
+    config_str = hcl.dumps(config, indent=2)
+    with open(TFVARS, 'w') as f:
+        f.write(config_str)
 
 
 def read_current_api_pins(name):
@@ -34,4 +50,6 @@ def read_current_api_pins(name):
 
 
 if __name__ == '__main__':
+    d = read_config()
+    write_config(d)
     print(read_current_api_pins('remus'))
