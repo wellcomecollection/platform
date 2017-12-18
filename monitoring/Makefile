@@ -18,6 +18,13 @@ post_to_slack-publish:
 	$(call publish_lambda,monitoring/post_to_slack)
 
 
+terraform_tracker-build:
+	$(call build_lambda,monitoring/terraform_tracker)
+
+terraform_tracker-publish:
+	$(call publish_lambda,monitoring/terraform_tracker)
+
+
 monitoring-test: post_to_slack-test deployment_tracking-test ecs_dashboard-test load_test-test
 
 monitoring-publish: post_to_slack-publish deployment_tracking-publish ecs_dashboard-publish load_test-publish
