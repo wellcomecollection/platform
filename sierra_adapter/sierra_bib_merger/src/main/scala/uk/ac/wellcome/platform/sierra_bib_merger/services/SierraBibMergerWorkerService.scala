@@ -6,7 +6,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
@@ -24,6 +24,10 @@ class SierraBibMergerWorkerService @Inject()(
   override def processMessage(message: SQSMessage): Future[Unit] =
     JsonUtil.fromJson[SierraBibRecord](message.body) match {
       case Success(record) => sierraBibMergerUpdaterService.update(record)
-      case Failure(e) => Future(logger.warn(s"Failed processing $message", e))
+      case Failure(e) =>
+        Future {
+          logger.warn(s"Failed processing $message", e)
+          throw SQSReaderGracefulException(e)
+        }
     }
 }

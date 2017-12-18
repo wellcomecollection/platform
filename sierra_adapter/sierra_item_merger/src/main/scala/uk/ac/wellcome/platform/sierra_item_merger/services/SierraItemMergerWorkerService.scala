@@ -13,7 +13,7 @@ import io.circe.{Decoder, HCursor}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -26,6 +26,7 @@ class SierraItemMergerWorkerService @Inject()(
 ) extends SQSWorker(reader, system, metrics)
     with Logging {
 
+  // Using Circe here because Jackson creates nulls for empty lists
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] =
       for {
@@ -44,7 +45,7 @@ class SierraItemMergerWorkerService @Inject()(
       case Left(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)
-          throw e
+          throw SQSReaderGracefulException(e)
         }
     }
 }
