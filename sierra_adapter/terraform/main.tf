@@ -25,9 +25,9 @@ module "sierra_to_dynamo_bibs" {
   alb_priority               = 106
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-  alb_cloudwatch_id          = "${local.alb_cloudwatch_id}"
-  alb_listener_http_arn      = "${local.alb_listener_http_arn}"
-  alb_listener_https_arn     = "${local.alb_listener_https_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
   release_id = "${var.release_ids["sierra_bibs_to_dynamo"]}"
 
@@ -89,9 +89,9 @@ module "sierra_bib_merger" {
   alb_priority               = 107
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-  alb_cloudwatch_id          = "${local.alb_cloudwatch_id}"
-  alb_listener_http_arn      = "${local.alb_listener_http_arn}"
-  alb_listener_https_arn     = "${local.alb_listener_https_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
   vpc_id = "${module.vpc_sierra_adapter.vpc_id}"
 
