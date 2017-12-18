@@ -8,6 +8,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -103,6 +104,14 @@ class WorkIndexerTest
 
     whenReady(future.failed) { exception =>
       exception shouldBe a[JsonParseException]
+    }
+  }
+
+  it("should not return a NullPointerException if the document is the string null") {
+    val future = workIndexer.indexWork("null")
+
+    whenReady(future.failed) { exception =>
+      exception shouldBe a[SQSReaderGracefulException]
     }
   }
 }

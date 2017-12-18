@@ -9,7 +9,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
-import uk.ac.wellcome.sierra_adapter.circe._
+import uk.ac.wellcome.circe._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

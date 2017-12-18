@@ -10,9 +10,13 @@ import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
+import io.circe.generic.extras.auto._
+import uk.ac.wellcome.circe._
+import io.circe.parser._
+
+import scala.util.Try
 
 @Singleton
 class WorkIndexer @Inject()(
@@ -27,8 +31,8 @@ class WorkIndexer @Inject()(
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
-        Future
-          .fromTry(JsonUtil.fromJson[Work](document))
+        Future.fromTry(Try(
+        decode[Work](document).right.get))
           .flatMap(item => {
             info(s"Indexing item $item")
             elasticClient.execute {
