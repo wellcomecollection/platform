@@ -77,3 +77,7 @@ output "bucket_wellcomecollection_images_name" {
 output "bucket_wellcomecollection_images_arn" {
   value = "${aws_s3_bucket.wellcomecollection-images.arn}"
 }
+
+output "terraform_apply_topic_name" {
+  value = "${module.terraform_apply_topic.name}"
+}
