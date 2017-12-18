@@ -175,7 +175,8 @@ class SierraItemMergerUpdaterServiceTest
     }
   }
 
-  it("unlinks an item if it receives an update with an item specifying unlinking") {
+  it(
+    "unlinks an item if it receives an update with an item specifying unlinking") {
     val itemId = "i3000003"
 
     val bibId1 = "b9000001"
@@ -231,8 +232,10 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(expectedValue = expectedSierraRecord1)
-      dynamoQueryEqualsValue('id -> bibId2)(expectedValue = expectedSierraRecord2)
+      dynamoQueryEqualsValue('id -> bibId1)(
+        expectedValue = expectedSierraRecord1)
+      dynamoQueryEqualsValue('id -> bibId2)(
+        expectedValue = expectedSierraRecord2)
     }
   }
 
@@ -290,11 +293,13 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(expectedValue = expectedSierraRecord1)
+      dynamoQueryEqualsValue('id -> bibId1)(
+        expectedValue = expectedSierraRecord1)
     }
   }
 
-  it("does not unlink an item from a bib if it receives an update with an item specifying unlinking which is out of date") {
+  it(
+    "does not unlink an item from a bib if it receives an update with an item specifying unlinking which is out of date") {
     val itemId = "i3000003"
 
     val bibId1 = "b9000001"
@@ -349,8 +354,10 @@ class SierraItemMergerUpdaterServiceTest
         itemData = expectedItemData
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(expectedValue = expectedSierraRecord1)
-      dynamoQueryEqualsValue('id -> bibId2)(expectedValue = expectedSierraRecord2)
+      dynamoQueryEqualsValue('id -> bibId1)(
+        expectedValue = expectedSierraRecord1)
+      dynamoQueryEqualsValue('id -> bibId2)(
+        expectedValue = expectedSierraRecord2)
     }
   }
 

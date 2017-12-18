@@ -44,13 +44,14 @@ class SierraItemMergerUpdaterService @Inject()(
             else Future.successful(())
           // In the case we cannot find the bib record
           // assume we're too early and put the message back
-          case None => Future.failed(SQSReaderGracefulException(
-            new RuntimeException("Missing Bib record to unlink: $unlinkedBibId.")
-          ))
+          case None =>
+            Future.failed(
+              SQSReaderGracefulException(
+                new RuntimeException(
+                  "Missing Bib record to unlink: $unlinkedBibId.")
+              ))
         }
     }
-
-
 
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures).map(_ => ())
   }
