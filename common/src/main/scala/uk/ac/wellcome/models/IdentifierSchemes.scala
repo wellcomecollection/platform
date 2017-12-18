@@ -2,11 +2,10 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.{
-  JsonDeserialize,
-  JsonSerialize
-}
+import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
 import com.twitter.inject.Logging
+import io.circe.{Decoder, HCursor}
+import cats.syntax.either._
 
 class IdentifierSchemeDeserialiser
     extends JsonDeserializer[IdentifierSchemes.IdentifierScheme] {
@@ -88,4 +87,16 @@ object IdentifierSchemes extends Logging {
         throw new Exception(errorMessage)
     }
   }
+
+  implicit val identifierSchemesDecoder
+  : Decoder[IdentifierSchemes.IdentifierScheme] =
+    new Decoder[IdentifierSchemes.IdentifierScheme] {
+      final def apply(c: HCursor): Decoder.Result[IdentifierSchemes.IdentifierScheme] = {
+        for {
+          identifierSchemeName <- c.as[String]
+        } yield {
+          IdentifierSchemes.createIdentifierScheme(identifierSchemeName)
+        }
+      }
+    }
 }

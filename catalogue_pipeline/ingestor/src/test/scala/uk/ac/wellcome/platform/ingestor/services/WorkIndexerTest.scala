@@ -103,7 +103,7 @@ class WorkIndexerTest
     val future = workIndexer.indexWork("a document")
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[JsonParseException]
+      exception shouldBe a[SQSReaderGracefulException]
     }
   }
 
