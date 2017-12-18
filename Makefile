@@ -18,12 +18,6 @@ sbt-common-test:
 sbt-common-publish:
 	echo "Nothing to do!"
 
-$(ROOT)/.docker/sbt_image_builder:
-	./builds/build_ci_docker_image.py \
-		--project=sbt_image_builder \
-		--dir=builds \
-		--file=builds/sbt_image_builder.Dockerfile
-
 format: format-terraform format-scala
 
 check-format: format lint-python lint-ontologies
