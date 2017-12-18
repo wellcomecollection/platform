@@ -26,22 +26,6 @@ output "table_miro_data_name" {
   value = "${aws_dynamodb_table.miro_table.name}"
 }
 
-output "vpc_services_id" {
-  value = "${module.vpc_services.vpc_id}"
-}
-
-output "services_alb_listener_http_arn" {
-  value = "${module.services_alb.listener_http_arn}"
-}
-
-output "services_alb_listener_https_arn" {
-  value = "${module.services_alb.listener_https_arn}"
-}
-
-output "services_alb_cloudwatch_id" {
-  value = "${module.services_alb.cloudwatch_id}"
-}
-
 output "ecr_nginx_services_repository_url" {
   value = "${module.ecr_repository_nginx_services.repository_url}"
 }
