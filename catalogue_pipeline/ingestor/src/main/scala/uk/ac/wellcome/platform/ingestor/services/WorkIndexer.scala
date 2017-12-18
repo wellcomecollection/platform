@@ -31,8 +31,8 @@ class WorkIndexer @Inject()(
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
-        Future.fromTry(Try(
-        decode[Work](document).right.get))
+        Future
+          .fromTry(Try(decode[Work](document).right.get))
           .flatMap(item => {
             info(s"Indexing item $item")
             elasticClient.execute {

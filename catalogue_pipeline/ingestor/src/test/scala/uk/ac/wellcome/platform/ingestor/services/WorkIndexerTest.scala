@@ -107,7 +107,8 @@ class WorkIndexerTest
     }
   }
 
-  it("should not return a NullPointerException if the document is the string null") {
+  it(
+    "should not return a NullPointerException if the document is the string null") {
     val future = workIndexer.indexWork("null")
 
     whenReady(future.failed) { exception =>
