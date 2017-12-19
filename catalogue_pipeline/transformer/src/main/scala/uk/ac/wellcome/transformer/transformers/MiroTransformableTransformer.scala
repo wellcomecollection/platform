@@ -9,6 +9,8 @@ import scala.io.Source
 import scala.util.Try
 
 class MiroTransformableTransformer extends TransformableTransformer[MiroTransformable] {
+  // TODO this class is too big as the different test classes would suggest. Split it.
+
   // This JSON resource gives us credit lines for contributor codes.
   //
   // It is constructed as a map with fields drawn from the `contributors.xml`
@@ -153,7 +155,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     (title, description)
   }
 
-  def getIdentifiers(miroData: MiroTransformableData, miroId: String): List[SourceIdentifier] = {
+  private def getIdentifiers(miroData: MiroTransformableData, miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)
     )
@@ -215,7 +217,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
   /*
    * <image_creator>: the Creator, which maps to our property "hasCreator"
    */
-  def getCreators(miroData: MiroTransformableData): List[Agent] = {
+  private def getCreators(miroData: MiroTransformableData): List[Agent] = {
     val primaryCreators = miroData.creator match {
       case Some(c) => c.map { Agent(_) }
       case None => List()
@@ -252,7 +254,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
    *  e.g. where keywords were pulled directly from Sierra -- but we don't
    *  have enough information in Miro to determine which ones those are.
    */
-  def getSubjects(miroData: MiroTransformableData): List[Concept] = {
+  private def getSubjects(miroData: MiroTransformableData): List[Concept] = {
     val keywords: List[Concept] = miroData.keywords match {
       case Some(k) =>
         k.map { Concept(_) }
@@ -267,7 +269,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     keywords ++ keywordsUnauth
   }
 
-  def getGenres(miroData: MiroTransformableData): List[Concept] = {
+  private def getGenres(miroData: MiroTransformableData): List[Concept] = {
     // Populate the subjects field.  This is based on two fields in the XML,
     // <image_phys_format> and <image_lc_genre>.
     val physFormat: List[Concept] = miroData.physFormat match {
@@ -283,7 +285,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     (physFormat ++ lcGenre).distinct
   }
 
-  def getThumbnail(miroData: MiroTransformableData, miroId: String): Location = {
+  private def getThumbnail(miroData: MiroTransformableData, miroId: String): Location = {
     Location(
       locationType = "thumbnail-image",
       url = Some(buildImageApiURL(miroId, "thumbnail")),
@@ -291,7 +293,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     )
   }
 
-  def getItems(miroData: MiroTransformableData, miroId: String): List[Item] = {
+  private def getItems(miroData: MiroTransformableData, miroId: String): List[Item] = {
     List(
       Item(
         sourceIdentifier =
@@ -310,14 +312,14 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
       ))
   }
 
-  def getCreatedDate(miroData: MiroTransformableData, collection: String): Option[Period] =
+  private def getCreatedDate(miroData: MiroTransformableData, collection: String): Option[Period] =
     if (collectionIsV(collection)) {
       miroData.artworkDate.map { Period(_) }
     } else {
       None
     }
 
-  def collectionIsV(c: String) = c.toLowerCase.contains("images-v")
+  private def collectionIsV(c: String) = c.toLowerCase.contains("images-v")
 
   /** Image credits in MIRO could be set in two ways:
     *
