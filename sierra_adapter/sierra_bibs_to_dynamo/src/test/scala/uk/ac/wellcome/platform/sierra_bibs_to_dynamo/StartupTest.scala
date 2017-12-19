@@ -7,8 +7,13 @@ import uk.ac.wellcome.test.utils.StartupLogbackOverride
 
 class StartupTest extends FeatureTest with StartupLogbackOverride {
 
-  val server = new EmbeddedHttpServer(stage = Stage.PRODUCTION,
-                                      twitterServer = new Server)
+  val server = new EmbeddedHttpServer(
+    twitterServer = new Server,
+    flags = Map(
+      "aws.dynamo.sierraToDynamo.tableName" -> "foo"
+    ),
+    stage = Stage.PRODUCTION
+  )
 
   test("server starts up correctly") {
     server.assertHealthy()
