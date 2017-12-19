@@ -38,7 +38,7 @@ class SierraBibsToDynamoFeatureTest
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
-  it("should read bibs from Sierra and add them to DynamoDB") {
+  it("reads bibs from Sierra and adds them to DynamoDB") {
     val message =
       """
         |{

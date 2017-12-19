@@ -41,7 +41,7 @@ class SierraBibsDynamoSinkTest
     super.afterAll()
   }
 
-  it("should ingest a json into DynamoDB") {
+  it("ingests a json into DynamoDB") {
     val id = "100001"
     val updatedDate = "2013-12-13T12:43:16Z"
     val json = parse(s"""
@@ -69,7 +69,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("should be able to handle deleted bibs") {
+  it("is able to handle deleted bibs") {
     val id = "1357947"
     val deletedDate = "2014-01-31"
     val json = parse(s"""{
@@ -98,7 +98,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("should not overwrite new data with old data") {
+  it("does not overwrite new data with old data") {
     val id = "200002"
     val oldUpdatedDate = "2001-01-01T00:00:01Z"
     val newUpdatedDate = "2017-12-12T23:59:59Z"
@@ -126,7 +126,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("should overwrite old data with new data") {
+  it("overwrites old data with new data") {
     val id = "300003"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
     val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -160,7 +160,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("should fail the stream if the record contains invalid JSON") {
+  it("fails the stream if the record contains invalid JSON") {
     val invalidSierraJson = parse(s"""
          |{
          |  "missing": ["id", "updatedDate"],
@@ -175,7 +175,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("should fail the stream if DynamoDB returns an error") {
+  it("fails the stream if DynamoDB returns an error") {
     val json = parse(s"""
          |{
          | "id": "500005",
@@ -198,7 +198,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("should prepend a B to bib IDs") {
+  it("prepends a B to bib IDs") {
     val json = parse(s"""
       |{
       |  "id": "6000006",
