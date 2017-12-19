@@ -5,5 +5,5 @@ import uk.ac.wellcome.models.{MergedSierraRecord, Work}
 import scala.util.Try
 
 class SierraTransformableTransformer extends TransformableTransformer[MergedSierraRecord] {
-  override def transform(transformable: MergedSierraRecord): Try[Work] = ???
+  override def transform(transformable: MergedSierraRecord): Try[Option[Work]] = ???
 }

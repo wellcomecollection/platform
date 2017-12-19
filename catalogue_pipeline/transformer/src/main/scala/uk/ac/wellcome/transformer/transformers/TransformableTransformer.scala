@@ -6,5 +6,5 @@ import uk.ac.wellcome.models.transformable.Transformable
 import scala.util.Try
 
 trait TransformableTransformer[+T <: Transformable] {
-  protected[this] def transform(transformable: T): Try[Work]
+  protected[this] def transform(transformable: T): Try[Option[Work]]
 }
