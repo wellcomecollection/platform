@@ -20,7 +20,7 @@ class SierraItemMergerUpdaterServiceTest
 
   val sierraUpdaterService = new SierraItemMergerUpdaterService(
     mergedSierraRecordDao = new MergedSierraRecordDao(
-      dynamoConfig = DynamoConfig(tableName),
+      dynamoConfigs = Map("merger" -> DynamoConfig(tableName)),
       dynamoDbClient = dynamoDbClient
     ),
     mock[MetricsSender]
