@@ -20,14 +20,14 @@ module "sierra_to_dynamo_bibs" {
   windows_topic_name = "${module.sierra_window_generator_bibs.topic_name}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
   alb_priority               = 106
-  alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
-  alb_cloudwatch_id          = "${local.services_alb_cloudwatch_id}"
-  alb_listener_http_arn      = "${local.services_alb_listener_http_arn}"
-  alb_listener_https_arn     = "${local.services_alb_listener_https_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
   release_id = "${var.release_ids["sierra_bibs_to_dynamo"]}"
 
@@ -36,7 +36,7 @@ module "sierra_to_dynamo_bibs" {
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
   sierra_fields       = "${var.sierra_bibs_fields}"
 
-  vpc_id = "${local.services_vpc_id}"
+  vpc_id = "${module.vpc_sierra_adapter.vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
@@ -49,14 +49,14 @@ module "sierra_to_dynamo_items" {
   windows_topic_name = "${module.sierra_window_generator_items.topic_name}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
   alb_priority               = 109
-  alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
-  alb_cloudwatch_id          = "${local.services_alb_cloudwatch_id}"
-  alb_listener_http_arn      = "${local.services_alb_listener_http_arn}"
-  alb_listener_https_arn     = "${local.services_alb_listener_https_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
   release_id = "${var.release_ids["sierra_items_to_dynamo"]}"
 
@@ -65,7 +65,7 @@ module "sierra_to_dynamo_items" {
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
   sierra_fields       = "${var.sierra_items_fields}"
 
-  vpc_id = "${local.services_vpc_id}"
+  vpc_id = "${module.vpc_sierra_adapter.vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
@@ -84,16 +84,16 @@ module "sierra_bib_merger" {
   release_id         = "${var.release_ids["sierra_bib_merger"]}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name  = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
   alb_priority               = 107
-  alb_server_error_alarm_arn = "${local.services_alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${local.services_alb_client_error_alarm_arn}"
-  alb_cloudwatch_id          = "${local.services_alb_cloudwatch_id}"
-  alb_listener_http_arn      = "${local.services_alb_listener_http_arn}"
-  alb_listener_https_arn     = "${local.services_alb_listener_https_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
-  vpc_id = "${local.services_vpc_id}"
+  vpc_id = "${module.vpc_sierra_adapter.vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 }
