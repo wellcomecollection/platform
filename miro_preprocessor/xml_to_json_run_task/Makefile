@@ -2,10 +2,7 @@ ROOT = $(shell git rev-parse --show-toplevel)
 
 include $(ROOT)/functions.Makefile
 
-xml_to_json_run_task-build: $(ROOT)/.docker/python3.6_ci
-	$(call build_lambda,miro_preprocessor/xml_to_json_run_task)
-
-xml_to_json_run_task-test: $(ROOT)/.docker/python3.6_ci
+xml_to_json_run_task-test:
 	$(call test_lambda,miro_preprocessor/xml_to_json_run_task)
 
 xml_to_json_run_task-publish:

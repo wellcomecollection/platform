@@ -45,32 +45,16 @@ define publish_lambda
 endef
 
 
-# Build a Lambda project.
-#
-# Args:
-#   $1 - Path to the Lambda src directory, relative to the root of the repo.
-#
-define build_lambda
-	make  $(ROOT)/.docker/python3.6_ci
-	$(ROOT)/builds/docker_run.py -- \
-		--volume $(ROOT)/$(1):/data \
-		--env OP=build-lambda \
-		python3.6_ci:latest
-endef
-
-
 # Test a Lambda project.
 #
 # Args:
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
-	make $(ROOT)/.docker/python3.6_ci
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT)/$(1)/src:/data \
-		--env OP=test \
 		--env FIND_MATCH_PATHS="/data" --tty \
-		python3.6_ci:latest
+		wellcome/test_lambda:latest
 endef
 
 
