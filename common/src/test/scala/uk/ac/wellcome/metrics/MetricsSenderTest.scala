@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
@@ -17,7 +18,8 @@ class MetricsSenderTest
     with MockitoSugar
     with Matchers
     with ScalaFutures
-    with Eventually {
+    with Eventually
+    with ExtendedPatience {
 
   import org.mockito.Matchers.any
   import org.mockito.Mockito._

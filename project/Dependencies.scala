@@ -75,11 +75,11 @@ object Dependencies {
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies
+  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
-  ) ++ dynamoDependencies ++ circeDependencies
+  ) ++ dynamoDependencies
 
   val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
@@ -94,7 +94,7 @@ object Dependencies {
   val ingestorDependencies: Seq[ModuleID] = commonDependencies
 
   val idminterDependencies
-    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies ++ circeDependencies
+    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
