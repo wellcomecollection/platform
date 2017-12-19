@@ -24,7 +24,7 @@ import uk.ac.wellcome.dynamo._
 class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
 
   val mergedSierraRecordDao =
-    new MergedSierraRecordDao(dynamoDbClient, DynamoConfig(tableName))
+    new MergedSierraRecordDao(dynamoDbClient, Map("merger" -> DynamoConfig(tableName)))
 
   describe("get a merged sierra record") {
     it(
@@ -64,7 +64,7 @@ class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
         .thenThrow(expectedException)
 
       val mergedSierraRecordDaoMockedDynamoClient =
-        new MergedSierraRecordDao(dynamoDbClient, DynamoConfig(tableName))
+        new MergedSierraRecordDao(dynamoDbClient, Map("merger" -> DynamoConfig(tableName)))
 
       val future =
         mergedSierraRecordDaoMockedDynamoClient.getRecord("b88888")
@@ -166,7 +166,7 @@ class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
         .thenThrow(expectedException)
 
       val failingDao =
-        new MergedSierraRecordDao(dynamoDbClient, DynamoConfig(tableName))
+        new MergedSierraRecordDao(dynamoDbClient, Map("merger" -> DynamoConfig(tableName)))
 
       val mergedSierraRecord = MergedSierraRecord(id = "b1111",
                                                   maybeBibData = None,
