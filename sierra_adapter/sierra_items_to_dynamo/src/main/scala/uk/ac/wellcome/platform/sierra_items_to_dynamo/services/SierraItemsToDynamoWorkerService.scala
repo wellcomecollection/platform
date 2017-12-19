@@ -36,7 +36,7 @@ class SierraItemsToDynamoWorkerService @Inject()(
       s"SierraItemsToDynamoWorkerService ($tableConfigId) dynamo config not available!"
     )
   )
-  
+
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
