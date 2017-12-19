@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sierra_adapter
+package uk.ac.wellcome
 
 import java.time.Instant
 

@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.idminter.steps
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.generic.auto._
-import cats.syntax.either._
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe.parser._
@@ -18,19 +17,6 @@ import scala.concurrent.Future
 class IdEmbedder @Inject()(metricsSender: MetricsSender,
                            identifierGenerator: IdentifierGenerator)
     extends Logging {
-
-  implicit val identifierSchemesDecoder
-    : Decoder[IdentifierSchemes.IdentifierScheme] =
-    new Decoder[IdentifierSchemes.IdentifierScheme] {
-      final def apply(
-        c: HCursor): Decoder.Result[IdentifierSchemes.IdentifierScheme] = {
-        for {
-          identifierSchemeName <- c.as[String]
-        } yield {
-          IdentifierSchemes.createIdentifierScheme(identifierSchemeName)
-        }
-      }
-    }
 
   def embedId(json: Json): Future[Json] = {
     metricsSender.timeAndCount(
