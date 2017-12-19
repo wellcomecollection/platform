@@ -96,7 +96,7 @@ endef
 #
 define publish_service
 	$(ROOT)/builds/docker_run.py \
-	    --dind -- \
+	    --aws --dind -- \
 	    wellcome/publish_service:latest \
 	        --project="$(1)" \
 	        --namespace=uk.ac.wellcome \
