@@ -4,5 +4,4 @@
 -sierra.apiUrl=${sierra_api_url}
 -sierra.oauthKey=${sierra_oauth_key}
 -sierra.oauthSecret=${sierra_oauth_secret}
--sierra.resourceType=${sierra_resource_type}
 -sierra.fields=${sierra_fields}
