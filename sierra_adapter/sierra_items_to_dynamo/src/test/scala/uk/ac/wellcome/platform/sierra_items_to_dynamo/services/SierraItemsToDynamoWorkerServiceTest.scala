@@ -59,7 +59,7 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   it(
-    "should read a window message from sqs, retrieve the items from sierra and insert them into DynamoDb") {
+    "reads a window message from sqs, retrieves the items from sierra and inserts them into DynamoDb") {
     worker = createSierraWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
     worker.get.runSQSWorker()
@@ -83,7 +83,7 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   it(
-    "should return a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
+    "returns a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
     worker = createSierraWorkerService(fields = "")
 
     val message =
@@ -102,7 +102,7 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   it(
-    "should not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
+    "does not return a SQSReaderGracefulException when the Sierra Api is unreachable") {
     worker = Some(
       new SierraItemsToDynamoWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
