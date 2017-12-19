@@ -4,6 +4,7 @@ module "sierra_merger_service" {
 
   source_queue_name  = "${module.update_events_queue.name}"
   source_queue_arn   = "${module.update_events_queue.arn}"
+
   ecr_repository_url = "${var.ecr_repository_url}"
   release_id         = "${var.release_id}"
 

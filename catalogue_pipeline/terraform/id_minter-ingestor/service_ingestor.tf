@@ -29,7 +29,7 @@ module "ingestor" {
     metrics_namespace = "ingestor"
   }
 
-  env_vars_length = 9
+  env_vars_length = 10
 
   alb_priority = "${random_integer.priority_ingestor.result}"
 
