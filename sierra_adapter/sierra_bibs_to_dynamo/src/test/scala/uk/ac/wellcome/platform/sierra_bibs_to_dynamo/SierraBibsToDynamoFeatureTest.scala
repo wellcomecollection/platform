@@ -30,7 +30,7 @@ class SierraBibsToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraBibsToDynamo.tableName" -> tableName,
+      "aws.dynamo.sierraToDynamo.tableName" -> tableName,
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",
