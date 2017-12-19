@@ -53,7 +53,7 @@ class SierraItemsToDynamoWorkerServiceTest
         apiUrl = "http://localhost:8080",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
-        dynamoConfig = DynamoConfig(tableName),
+        dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName)),
         fields = fields
       ))
   }
@@ -113,7 +113,7 @@ class SierraItemsToDynamoWorkerServiceTest
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
         fields = "",
-        dynamoConfig = DynamoConfig(tableName)
+        dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName))
       ))
 
     val message =
