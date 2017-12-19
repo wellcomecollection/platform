@@ -8,7 +8,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 class SierraItemRecordMergerTest extends FunSpec with Matchers {
 
-  it("should combine the bibIds in the final result") {
+  it("combines the bibIds in the final result") {
     val oldRecord = sierraItemRecord(bibIds = List("1", "2", "3"))
     val newRecord = sierraItemRecord(bibIds = List("1", "2", "3", "4", "5"))
 
@@ -18,7 +18,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
     mergedRecord.unlinkedBibIds shouldEqual List()
   }
 
-  it("should record unlinked bibIds") {
+  it("records unlinked bibIds") {
     val oldRecord = sierraItemRecord(bibIds = List("1", "2", "3"))
     val newRecord = sierraItemRecord(bibIds = List("3", "4", "5"))
 
@@ -28,7 +28,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
     mergedRecord.unlinkedBibIds shouldEqual List("1", "2")
   }
 
-  it("should preserve existing unlinked bibIds") {
+  it("preserves existing unlinked bibIds") {
     val oldRecord = sierraItemRecord(bibIds = List("1", "2", "3"),
                                      unlinkedBibIds = List("4", "5"))
     val newRecord = sierraItemRecord(bibIds = List("1", "2", "3"))
@@ -38,7 +38,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
     mergedRecord.unlinkedBibIds shouldEqual List("4", "5")
   }
 
-  it("should not duplicate unlinked bibIds") {
+  it("does not duplicate unlinked bibIds") {
     // This would be an unusual scenario to arise, but check we handle it anyway!
     val oldRecord = sierraItemRecord(bibIds = List("1", "2", "3"),
                                      unlinkedBibIds = List("3"))
@@ -50,7 +50,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
     mergedRecord.unlinkedBibIds shouldEqual List("3")
   }
 
-  it("should remove an unlinked bibId if it appears on a new record") {
+  it("removes an unlinked bibId if it appears on a new record") {
     val oldRecord =
       sierraItemRecord(bibIds = List(), unlinkedBibIds = List("1", "2", "3"))
     val newRecord = sierraItemRecord(bibIds = List("1", "2"))

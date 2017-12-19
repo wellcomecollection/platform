@@ -8,7 +8,7 @@ class ServerTest extends FeatureTest {
 
   val server = new EmbeddedHttpServer(new Server)
 
-  test("it should show the healthcheck message") {
+  test("it shows the healthcheck message") {
     server.httpGet(path = "/management/healthcheck",
                    andExpect = Ok,
                    withJsonBody = """{"message": "ok"}""")
