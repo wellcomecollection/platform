@@ -9,7 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.sierra_adapter.modules.SierraDynamoConfigModule
+import uk.ac.wellcome.sierra_adapter.modules.SierraDynamoConfigModule
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.controllers.ManagementController
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.modules.SierraItemsToDynamoModule
 
