@@ -25,8 +25,17 @@ class SierraBibsToDynamoWorkerService @Inject()(
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
   @Flag("sierra.fields") fields: String,
-  dynamoConfig: DynamoConfig
+  dynamoConfigs: Map[String, DynamoConfig]
 ) extends SQSWorker(reader, system, metrics) {
+
+  private val tableConfigId = "sierraToDynamo"
+
+  private val dynamoConfig = dynamoConfigs.getOrElse(
+    tableConfigId,
+    throw new RuntimeException(
+      s"SierraBibsToDynamoWorkerService ($tableConfigId) dynamo config not available!"
+    )
+  )
 
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()

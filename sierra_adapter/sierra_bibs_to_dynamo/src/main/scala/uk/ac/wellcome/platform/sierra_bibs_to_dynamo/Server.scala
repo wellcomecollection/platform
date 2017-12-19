@@ -10,10 +10,8 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.modules.{
-  SierraBibsToDynamoModule,
-  SierraDynamoConfigModule
-}
+import uk.ac.wellcome.platform.sierra_adapter.modules.SierraDynamoConfigModule
+import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.modules.SierraBibsToDynamoModule
 
 object ServerMain extends Server
 

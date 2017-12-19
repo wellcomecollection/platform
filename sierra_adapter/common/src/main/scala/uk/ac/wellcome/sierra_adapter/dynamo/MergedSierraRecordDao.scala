@@ -13,9 +13,20 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-class MergedSierraRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
-                                      dynamoConfig: DynamoConfig)
-    extends Logging {
+class MergedSierraRecordDao @Inject()(
+  dynamoDbClient: AmazonDynamoDB,
+  dynamoConfigs: Map[String, DynamoConfig]
+) extends Logging {
+
+  private val tableConfigId = "merger"
+
+  private val dynamoConfig = dynamoConfigs.getOrElse(
+    tableConfigId,
+    throw new RuntimeException(
+      s"MergedSierraRecordDao ($tableConfigId) dynamo config not available!"
+    )
+  )
+
   private val table = Table[MergedSierraRecord](dynamoConfig.table)
 
   private def scanamoExec[T](op: ScanamoOps[T]) =
