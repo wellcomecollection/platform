@@ -99,6 +99,7 @@ define publish_service
 	    --dind -- \
 	    wellcome/publish_service:latest \
 	        --project="$(1)" \
+	        --namespace=uk.ac.wellcome \
 	        --infra-bucket="$(INFRA_BUCKET)"
 endef
 
