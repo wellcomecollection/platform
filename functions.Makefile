@@ -95,9 +95,11 @@ endef
 #   $1 - Name of the Docker image.
 #
 define publish_service
-	make $(ROOT)/.docker/publish_service_to_aws
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
-		publish_service_to_aws --project="$(1)" --infra-bucket="$(INFRA_BUCKET)"
+	$(ROOT)/builds/docker_run.py \
+	    --dind -- \
+	    wellcome/publish_service:latest \
+	        --project="$(1)" \
+	        --infra-bucket="$(INFRA_BUCKET)"
 endef
 
 
