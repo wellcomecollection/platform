@@ -1,5 +1,5 @@
 module "sierra_merger_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v4.0.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
   name   = "sierra_${var.resource_type}_merger"
 
   source_queue_name  = "${module.update_events_queue.name}"
@@ -12,6 +12,8 @@ module "sierra_merger_service" {
     metrics_namespace = "sierra_${var.resource_type}_merger"
     dynamo_table_name = "${var.target_dynamo_table_name}"
   }
+
+  env_vars_length = 3
 
   alb_priority = "${var.alb_priority}"
 
