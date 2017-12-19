@@ -97,3 +97,29 @@ module "sierra_bib_merger" {
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 }
+
+module "sierra_item_merger" {
+  source                   = "sierra_merger"
+  resource_type            = "items"
+  dynamo_events_topic_name = "${module.sierra_items_merger_events_topic.name}"
+
+  target_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
+  target_dynamo_table_arn  = "${aws_dynamodb_table.sierradata_table.arn}"
+
+  ecr_repository_url = "${module.ecr_repository_sierra_item_merger.repository_url}"
+  release_id         = "${var.release_ids["sierra_bib_merger"]}"
+
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
+
+  alb_priority               = 110
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
+
+  vpc_id = "${module.vpc_sierra_adapter.vpc_id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
+}
