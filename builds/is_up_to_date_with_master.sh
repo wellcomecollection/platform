@@ -36,7 +36,7 @@ then
   echo "new commits on master."
   echo
 
-  if [[ $(git rev-parse --abbrev-ref) == "HEAD" ]]
+  if [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]]
   then
     echo 'Run `git pull origin master` to catch up.'
   else

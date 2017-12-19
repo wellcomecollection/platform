@@ -7,30 +7,11 @@
 # image isn't rebuilt unless you run 'make clean' first.  This makes CI tasks
 # slightly less chatty when run locally.
 
-export INFRA_BUCKET = platform-infra
-
 ROOT = $(shell git rev-parse --show-toplevel)
 
 CURRENT_DIR = $(shell pwd)
 
 include $(ROOT)/builds/Makefile
-
-$(ROOT)/.docker/publish_service_to_aws:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=publish_service_to_aws \
-		--dir=builds \
-		--file=builds/publish_service_to_aws.Dockerfile
-
-$(ROOT)/.docker/_build_deps:
-	pip3 install --upgrade boto3 docopt
-	mkdir -p $(ROOT)/.docker && touch $(ROOT)/.docker/_build_deps
-
-$(ROOT)/.docker/miro_adapter_tests:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=miro_adapter_tests \
-		--dir=miro_adapter \
-		--file=miro_adapter/miro_adapter_tests.Dockerfile
-
 
 # Project utility tasks
 
@@ -48,7 +29,7 @@ lint-js:
 	wellcome/jslint:latest
 
 ## Check a git repo is up to date with remote master
-uptodate-git: $(ROOT)/.docker/python3.6_ci
+uptodate-git:
 	$(ROOT)/builds/is_up_to_date_with_master.sh
 
 format-terraform:

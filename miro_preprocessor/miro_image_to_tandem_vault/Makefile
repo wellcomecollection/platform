@@ -19,5 +19,5 @@ miro_tandem_vault_uploader-publish: miro_tandem_vault_uploader-build
 miro_tandem_vault_enrichment-build:
 	$(call build_image,tandem_vault_enrichment,miro_preprocessor/miro_image_to_tandem_vault/tandem_vault_enrichment.Dockerfile)
 
-miro_tandem_vault_enrichment-publish: miro_tandem_vault_enrichment-build $(ROOT)/.docker/publish_service_to_aws
+miro_tandem_vault_enrichment-publish: miro_tandem_vault_enrichment-build
 	$(call publish_service,tandem_vault_enrichment)
