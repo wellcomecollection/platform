@@ -5,11 +5,19 @@ import uk.ac.wellcome.finatra.modules.DynamoConfigModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 import javax.inject.Singleton
 
+
 object SierraDynamoConfigModule extends DynamoConfigModule {
-  val tableName = flags("merger")
+
+  val sierraToDynamo = flags("sierraToDynamo")
+  val merger = flags("merger")
 
   @Singleton
   @Provides
-  def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(tableName())
+  def providesDynamoConfig(): Map[String, DynamoConfig] =
+    Map(
+      "sierraToDynamo" -> DynamoConfig(sierraToDynamo()),
+      "merger" -> DynamoConfig(merger())
+    ).filterNot {
+      case (_, v) => v.table.isEmpty
+    }
 }
