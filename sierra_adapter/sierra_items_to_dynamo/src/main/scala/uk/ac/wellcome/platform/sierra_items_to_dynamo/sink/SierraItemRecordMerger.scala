@@ -6,7 +6,7 @@ object SierraItemRecordMerger {
   def mergeItems(oldRecord: SierraItemRecord,
                  newRecord: SierraItemRecord): SierraItemRecord = {
 
-    if(oldRecord.modifiedDate.isBefore(newRecord.modifiedDate)) {
+    if (oldRecord.modifiedDate.isBefore(newRecord.modifiedDate)) {
 
       newRecord.copy(
         // Let's suppose we have
@@ -28,10 +28,9 @@ object SierraItemRecordMerger {
         //
         unlinkedBibIds =
           subList(addList(oldRecord.unlinkedBibIds, oldRecord.bibIds),
-            newRecord.bibIds)
+                  newRecord.bibIds)
       )
-    }
-    else {
+    } else {
       oldRecord
     }
   }
