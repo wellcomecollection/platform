@@ -23,8 +23,10 @@ class SierraItemRecordDaoTest
     with MockitoSugar
     with ExtendedPatience {
 
-  private val dynamoConfigMap = Map("sierraToDynamo" -> DynamoConfig(tableName))
-  val sierraItemRecordDao = new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
+  private val dynamoConfigMap = Map(
+    "sierraToDynamo" -> DynamoConfig(tableName))
+  val sierraItemRecordDao =
+    new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
 
   describe("get item") {
 

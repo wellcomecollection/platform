@@ -34,7 +34,9 @@ class SierraItemsDynamoSinkTest
   implicit val executionContext = system.dispatcher
 
   val itemSink = SierraItemsDynamoSink(
-    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient, dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName)))
+    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient,
+                            dynamoConfigs =
+                              Map("sierraToDynamo" -> DynamoConfig(tableName)))
   )
 
   override def afterAll(): Unit = {
@@ -299,9 +301,16 @@ class SierraItemsDynamoSinkTest
     val expectedException = new RuntimeException("AAAAAARGH!")
 
     when(mockedDao.getItem(any[String]))
-      .thenReturn(Future.successful(Some(SierraItemRecord(id = "500005",  "{}", "2001-01-01T00:00:00Z", List()))))
+      .thenReturn(
+        Future.successful(
+          Some(
+            SierraItemRecord(id = "500005",
+                             "{}",
+                             "2001-01-01T00:00:00Z",
+                             List()))))
 
-    when(mockedDao.updateItem(any[SierraItemRecord])).thenThrow(expectedException)
+    when(mockedDao.updateItem(any[SierraItemRecord]))
+      .thenThrow(expectedException)
 
     val brokenSink = SierraItemsDynamoSink(
       mockedDao
