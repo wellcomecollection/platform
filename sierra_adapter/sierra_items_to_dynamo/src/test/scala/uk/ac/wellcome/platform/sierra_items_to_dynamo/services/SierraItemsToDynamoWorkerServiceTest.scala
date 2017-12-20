@@ -50,8 +50,7 @@ class SierraItemsToDynamoWorkerServiceTest
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = actorSystem,
         metrics = mockMetrics,
-        sierraItemRecordDao =
-          new SierraItemRecordDao(dynamoDbClient, tableName),
+        sierraItemRecordDao = new SierraItemRecordDao(dynamoDbClient, Map("sierraToDynamo" -> DynamoConfig(tableName))),
         apiUrl = "http://localhost:8080",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
@@ -109,8 +108,7 @@ class SierraItemsToDynamoWorkerServiceTest
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = ActorSystem(),
         metrics = mockMetrics,
-        sierraItemRecordDao =
-          new SierraItemRecordDao(dynamoDbClient, tableName),
+        sierraItemRecordDao = new SierraItemRecordDao(dynamoDbClient, Map("sierraToDynamo" -> DynamoConfig(tableName))),
         apiUrl = "http://localhost:8081",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
