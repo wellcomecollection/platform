@@ -4,7 +4,11 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, GetItemResult, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  GetItemRequest,
+  GetItemResult,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import io.circe.optics.JsonPath.root
@@ -35,7 +39,8 @@ class SierraItemsDynamoSinkTest
   implicit val executionContext = system.dispatcher
 
   val itemSink = SierraItemsDynamoSink(
-    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient, tableName = tableName)
+    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient,
+                            tableName = tableName)
   )
 
   override def afterAll(): Unit = {
@@ -300,9 +305,16 @@ class SierraItemsDynamoSinkTest
     val expectedException = new RuntimeException("AAAAAARGH!")
 
     when(mockedDao.getItem(any[String]))
-      .thenReturn(Future.successful(Some(SierraItemRecord(id = "500005",  "{}", "2001-01-01T00:00:00Z", List()))))
+      .thenReturn(
+        Future.successful(
+          Some(
+            SierraItemRecord(id = "500005",
+                             "{}",
+                             "2001-01-01T00:00:00Z",
+                             List()))))
 
-    when(mockedDao.updateItem(any[SierraItemRecord])).thenThrow(expectedException)
+    when(mockedDao.updateItem(any[SierraItemRecord]))
+      .thenThrow(expectedException)
 
     val brokenSink = SierraItemsDynamoSink(
       mockedDao
