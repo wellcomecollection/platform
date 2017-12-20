@@ -5,7 +5,7 @@ import uk.ac.wellcome.models._
 
 class DisplayWorkTest extends FunSpec with Matchers {
 
-  it("should parse a JSON body without any items") {
+  it("correctly parses a JSON body without any items") {
     val title = "An irritating imp is immune from items"
     val document = s"""{
       "title": "$title",
@@ -28,5 +28,14 @@ class DisplayWorkTest extends FunSpec with Matchers {
       includes = WorksIncludes(items = true)
     )
     displayWork.items shouldBe List()
+  }
+
+  it("throws a RuntimeException if you try to parse invalid JSON") {
+    intercept[RuntimeException] {
+      DisplayWork.jsonToDisplayWork(
+        document = "<xml><is pretty=nifty></xml>",
+        includes = WorksIncludes()
+      )
+    }
   }
 }
