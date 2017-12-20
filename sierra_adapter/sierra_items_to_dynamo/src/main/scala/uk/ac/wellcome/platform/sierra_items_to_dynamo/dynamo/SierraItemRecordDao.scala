@@ -12,7 +12,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB, dynamoConfigs: Map[String, DynamoConfig])
+class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
+                                    dynamoConfigs: Map[String, DynamoConfig])
     extends Logging {
 
   private val tableConfigId = "sierraToDynamo"
@@ -37,7 +38,8 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB, dynamoConfig
   }
 
   def getItem(id: String): Future[Option[SierraItemRecord]] = Future {
-    Scanamo.get[SierraItemRecord](dynamoDbClient)(dynamoConfig.table)('id -> id) match {
+    Scanamo.get[SierraItemRecord](dynamoDbClient)(dynamoConfig.table)(
+      'id -> id) match {
       case Some(Right(item)) => Some(item)
       case None => None
       case Some(Left(readError)) =>
