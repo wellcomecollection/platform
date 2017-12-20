@@ -1,6 +1,7 @@
 package uk.ac.wellcome.sierra_adapter.services
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 
 class WindowExtractorTest extends FunSpec with Matchers {
