@@ -99,10 +99,8 @@ case object DisplayWork {
     jsonToDisplayWork(got.sourceAsString, includes)
   }
 
-  private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    val work =
-      JsonUtil.fromJson[Work](document).get
-
+  def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
+    val work = JsonUtil.fromJson[Work](document).get
     DisplayWork(work, includes)
   }
 }
