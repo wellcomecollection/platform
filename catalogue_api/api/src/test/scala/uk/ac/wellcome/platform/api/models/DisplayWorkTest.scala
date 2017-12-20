@@ -27,7 +27,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       document = document,
       includes = WorksIncludes(items = true)
     )
-    displayWork.items shouldBe List()
+    displayWork.items shouldBe Some(List())
   }
 
   it("throws a RuntimeException if you try to parse invalid JSON") {
