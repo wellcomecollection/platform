@@ -21,9 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 object SierraItemsDynamoSink extends Logging {
   def apply(sierraItemRecordDao: SierraItemRecordDao)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Unit]] =
-    Sink.foldAsync(()){
+    Sink.foldAsync(()) {
       case (_, unprefixedJson) =>
-
         val json = addIDPrefix(json = unprefixedJson)
         logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
         val maybeUpdatedDate = root.updatedDate.string.getOption(json)
@@ -49,13 +48,12 @@ object SierraItemsDynamoSink extends Logging {
 
         sierraItemRecordDao.getItem(record.id).flatMap {
           case Some(existingRecord) =>
-            val mergedRecord = SierraItemRecordMerger.mergeItems(oldRecord = existingRecord,
-              newRecord = record)
-            if(mergedRecord != existingRecord) {
+            val mergedRecord = SierraItemRecordMerger
+              .mergeItems(oldRecord = existingRecord, newRecord = record)
+            if (mergedRecord != existingRecord) {
               sierraItemRecordDao.updateItem(mergedRecord)
-            }
-            else {
-              Future. successful(())
+            } else {
+              Future.successful(())
             }
           case None => sierraItemRecordDao.updateItem(record)
         }
