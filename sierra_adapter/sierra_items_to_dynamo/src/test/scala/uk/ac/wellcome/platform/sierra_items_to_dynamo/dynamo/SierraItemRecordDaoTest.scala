@@ -13,6 +13,7 @@ import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.aws.DynamoConfig
 
 class SierraItemRecordDaoTest
     extends FunSpec
@@ -22,7 +23,8 @@ class SierraItemRecordDaoTest
     with MockitoSugar
     with ExtendedPatience {
 
-  val sierraItemRecordDao = new SierraItemRecordDao(dynamoDbClient, tableName)
+  private val dynamoConfigMap = Map("sierraToDynamo" -> DynamoConfig(tableName))
+  val sierraItemRecordDao = new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
 
   describe("get item") {
 
@@ -49,7 +51,7 @@ class SierraItemRecordDaoTest
     it("should fail if an exception is thrown by dynamoDbClient") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val sierraItemRecordDao =
-        new SierraItemRecordDao(dynamoDbClient, tableName)
+        new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
 
       val expectedException = new RuntimeException("BLERGH")
       when(dynamoDbClient.getItem(any[GetItemRequest]))
@@ -136,7 +138,7 @@ class SierraItemRecordDaoTest
 
       val dynamoDbClient = mock[AmazonDynamoDB]
       val sierraItemRecordDao =
-        new SierraItemRecordDao(dynamoDbClient, tableName)
+        new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
 
       val expectedException = new RuntimeException("BLERGH")
       when(dynamoDbClient.putItem(any[PutItemRequest]))

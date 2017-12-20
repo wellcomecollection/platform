@@ -3,12 +3,6 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  GetItemRequest,
-  GetItemResult,
-  PutItemRequest
-}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import io.circe.optics.JsonPath.root
@@ -19,10 +13,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import uk.ac.wellcome.models.SierraItemRecord
+import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 
 import scala.concurrent.Future
 
@@ -39,8 +34,7 @@ class SierraItemsDynamoSinkTest
   implicit val executionContext = system.dispatcher
 
   val itemSink = SierraItemsDynamoSink(
-    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient,
-                            tableName = tableName)
+    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient, dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName)))
   )
 
   override def afterAll(): Unit = {
@@ -305,16 +299,9 @@ class SierraItemsDynamoSinkTest
     val expectedException = new RuntimeException("AAAAAARGH!")
 
     when(mockedDao.getItem(any[String]))
-      .thenReturn(
-        Future.successful(
-          Some(
-            SierraItemRecord(id = "500005",
-                             "{}",
-                             "2001-01-01T00:00:00Z",
-                             List()))))
+      .thenReturn(Future.successful(Some(SierraItemRecord(id = "500005",  "{}", "2001-01-01T00:00:00Z", List()))))
 
-    when(mockedDao.updateItem(any[SierraItemRecord]))
-      .thenThrow(expectedException)
+    when(mockedDao.updateItem(any[SierraItemRecord])).thenThrow(expectedException)
 
     val brokenSink = SierraItemsDynamoSink(
       mockedDao
