@@ -118,18 +118,21 @@ case class MergedSierraRecord(
                 sierraBibData.id
               )
             ),
-            items = itemData.values.map(record =>
-              Item(
-                sourceIdentifier = SourceIdentifier(
-                  IdentifierSchemes.sierraSystemNumber, record.id
-                ),
-                identifiers = List(
-                  SourceIdentifier(
-                    IdentifierSchemes.sierraSystemNumber, record.id
+            items = itemData.values
+              .map(record =>
+                Item(
+                  sourceIdentifier = SourceIdentifier(
+                    IdentifierSchemes.sierraSystemNumber,
+                    record.id
+                  ),
+                  identifiers = List(
+                    SourceIdentifier(
+                      IdentifierSchemes.sierraSystemNumber,
+                      record.id
+                    )
                   )
-                )
-              )
-            ).toList
+              ))
+              .toList
           ))
         }
       }
