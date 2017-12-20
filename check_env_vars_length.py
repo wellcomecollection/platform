@@ -1,5 +1,24 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
+"""
+Because of limitations in Terraform's interpolation abilities, our service
+modules have to be defined with an arbitrary-length map of environment
+variables, and declare their length statically.  For example:
+
+    module "my_service" {
+      source = "service"
+      ...
+      env_vars = {
+        HOST = "localhost"
+        IP   = "1.2.3.4"
+      }
+      env_vars_length = 2
+    }
+
+This script iterates through all the Terraform files in the repo, and checks
+that the length is correct.  Not doing so can lead to hard-to-debug, subtle
+errors.
+"""
 
 import logging
 import os
