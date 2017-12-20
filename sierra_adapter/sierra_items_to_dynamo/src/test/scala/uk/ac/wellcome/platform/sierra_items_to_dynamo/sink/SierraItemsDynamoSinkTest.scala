@@ -364,7 +364,7 @@ class SierraItemsDynamoSinkTest
     prefixedJson shouldEqual expectedJson
   }
 
-  it("should not insert anitem into DynamoDb if it's not changed"){
+  it("should not insert anitem into DynamoDb if it's not changed") {
     val id = "100001"
     val updatedDate = "2013-12-13T12:43:16Z"
     val json = parse(s"""

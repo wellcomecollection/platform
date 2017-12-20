@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, PutItemResult}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  PutItemResult
+}
 import com.google.inject.Inject
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
@@ -37,8 +40,10 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
             (attributeExists('id) and 'modifiedDate < sierraItemRecord.modifiedDate.getEpochSecond)
         )
         .put(sierraItemRecord)) match {
-      case Right(_) => debug(s"Successfully inserted item ${sierraItemRecord.id}")
-      case Left(error) => warn(s"Failed saving ${sierraItemRecord.id} into DynamoDB", error)
+      case Right(_) =>
+        debug(s"Successfully inserted item ${sierraItemRecord.id}")
+      case Left(error) =>
+        warn(s"Failed saving ${sierraItemRecord.id} into DynamoDB", error)
     }
   }
 
