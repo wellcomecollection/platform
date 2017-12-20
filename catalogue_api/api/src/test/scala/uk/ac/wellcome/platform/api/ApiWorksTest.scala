@@ -261,6 +261,33 @@ class ApiWorksTest
     }
   }
 
+  it("always includes the 'items' list if the items include is present") {
+    val work = workWith(
+      canonicalId = "dgdb712",
+      title = "Without windows or wind or washing-up liquid"
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.canonicalId.get}",
+                          | "title": "${work.title}",
+                          | "creators": [ ],
+                          | "items": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
   it("should include credit information in API responses") {
     val location = Location(
       locationType = "thumbnail-image",
@@ -968,7 +995,7 @@ class ApiWorksTest
   }
 
   it(
-    "should return a Bad Request error if you try to page beyond the first 10000 items") {
+    "should return a Bad Request error if you try to page beyond the first 10000 works") {
     val queries = List(
       "page=10000",
       "pageSize=100&page=101",
