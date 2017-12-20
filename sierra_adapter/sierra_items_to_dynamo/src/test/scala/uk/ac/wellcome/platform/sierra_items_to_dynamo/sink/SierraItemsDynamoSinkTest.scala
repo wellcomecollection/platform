@@ -4,14 +4,9 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  GetItemRequest,
-  GetItemResult,
-  PutItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, GetItemResult, PutItemRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import io.circe.optics.JsonPath
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import org.mockito.Matchers.any
@@ -23,6 +18,9 @@ import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
+
+import scala.concurrent.Future
 
 class SierraItemsDynamoSinkTest
     extends FunSpec
@@ -37,8 +35,7 @@ class SierraItemsDynamoSinkTest
   implicit val executionContext = system.dispatcher
 
   val itemSink = SierraItemsDynamoSink(
-    client = dynamoDbClient,
-    tableName = tableName
+    new SierraItemRecordDao(dynamoDbClient = dynamoDbClient, tableName = tableName)
   )
 
   override def afterAll(): Unit = {
@@ -291,7 +288,7 @@ class SierraItemsDynamoSinkTest
     }
   }
 
-  it("fails the stream if DynamoDB Put returns an error") {
+  it("fails the stream if a dao returns an error when updating an item") {
     val json = parse(s"""
          |{
          | "id": "500005",
@@ -299,16 +296,16 @@ class SierraItemsDynamoSinkTest
          |}
       """.stripMargin).right.get
 
-    val dynamoDbClient = mock[AmazonDynamoDB]
+    val mockedDao = mock[SierraItemRecordDao]
     val expectedException = new RuntimeException("AAAAAARGH!")
-    when(dynamoDbClient.getItem(any[GetItemRequest]))
-      .thenReturn(new GetItemResult())
 
-    when(dynamoDbClient.putItem(any[PutItemRequest]))
-      .thenThrow(expectedException)
+    when(mockedDao.getItem(any[String]))
+      .thenReturn(Future.successful(Some(SierraItemRecord(id = "500005",  "{}", "2001-01-01T00:00:00Z", List()))))
+
+    when(mockedDao.updateItem(any[SierraItemRecord])).thenThrow(expectedException)
+
     val brokenSink = SierraItemsDynamoSink(
-      client = dynamoDbClient,
-      tableName = tableName
+      mockedDao
     )
 
     val futureUnit = Source.single(json).runWith(brokenSink)
@@ -317,7 +314,7 @@ class SierraItemsDynamoSinkTest
     }
   }
 
-  it("fails the stream if a DynamoDB GetItem returns an error") {
+  it("fails the stream if a dao returns an error when getting an item") {
     val json = parse(s"""
          |{
          | "id": "50505",
@@ -325,13 +322,13 @@ class SierraItemsDynamoSinkTest
          |}
       """.stripMargin).right.get
 
-    val dynamoDbClient = mock[AmazonDynamoDB]
+    val mockedDao = mock[SierraItemRecordDao]
     val expectedException = new RuntimeException("BLAAAAARGH!")
-    when(dynamoDbClient.getItem(any[GetItemRequest]))
+    when(mockedDao.getItem(any[String]))
       .thenThrow(expectedException)
+
     val brokenSink = SierraItemsDynamoSink(
-      client = dynamoDbClient,
-      tableName = tableName
+      mockedDao
     )
 
     val futureUnit = Source.single(json).runWith(brokenSink)

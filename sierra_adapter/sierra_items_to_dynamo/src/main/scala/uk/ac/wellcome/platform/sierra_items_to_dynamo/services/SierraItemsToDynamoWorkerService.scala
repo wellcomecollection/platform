@@ -8,6 +8,7 @@ import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.sink.SierraItemsDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
@@ -20,22 +21,12 @@ class SierraItemsToDynamoWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
-  dynamoDbClient: AmazonDynamoDB,
+  sierraItemRecordDao: SierraItemRecordDao,
   @Flag("sierra.apiUrl") apiUrl: String,
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
-  @Flag("sierra.fields") fields: String,
-  dynamoConfigs: Map[String, DynamoConfig]
+  @Flag("sierra.fields") fields: String
 ) extends SQSWorker(reader, system, metrics) {
-
-  private val tableConfigId = "sierraToDynamo"
-
-  private val dynamoConfig = dynamoConfigs.getOrElse(
-    tableConfigId,
-    throw new RuntimeException(
-      s"SierraItemsToDynamoWorkerService ($tableConfigId) dynamo config not available!"
-    )
-  )
 
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()
@@ -50,13 +41,12 @@ class SierraItemsToDynamoWorkerService @Inject()(
       _ <- runSierraStream(params)
     } yield ()
 
-  private def runSierraStream(params: Map[String, String]): Future[Done] = {
+  private def runSierraStream(params: Map[String, String]): Future[Unit] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType = "items",
       params).runWith(
       SierraItemsDynamoSink(
-        client = dynamoDbClient,
-        tableName = dynamoConfig.table
+        sierraItemRecordDao
       ))
   }
 }
