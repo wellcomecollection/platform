@@ -3,12 +3,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, ZoneOffset}
 
-import akka.Done
 import akka.stream.scaladsl.Sink
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.syntax._
-import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
