@@ -106,9 +106,10 @@ case object DisplayWork {
     implicit val jsonMapper = Work
     decode[Work](document) match {
       case Right(work) => DisplayWork(work = work, includes = includes)
-      case Left(error) => throw new RuntimeException(
-        s"Unable to parse JSON as DisplayWork ($error): $document"
-      )
+      case Left(error) =>
+        throw new RuntimeException(
+          s"Unable to parse JSON as DisplayWork ($error): $document"
+        )
     }
   }
 }

@@ -60,15 +60,17 @@ class DisplayWorkTest extends FunSpec with Matchers {
       document = document,
       includes = WorksIncludes(items = true)
     )
-    displayWork.items shouldBe Some(DisplayItem(
-      id = "c3a599u5",
-      identifiers = Some(List(
-        DisplayIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
-          value = "M0000001"
-        )
+    displayWork.items shouldBe Some(
+      DisplayItem(
+        id = "c3a599u5",
+        identifiers = Some(
+          List(
+            DisplayIdentifier(
+              identifierScheme = IdentifierSchemes.miroImageNumber,
+              value = "M0000001"
+            )
+          ))
       ))
-    ))
   }
 
   it("throws a RuntimeException if you try to parse invalid JSON") {
