@@ -404,6 +404,40 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
         )
       )
     }
+
+    it("should transform itself into a work with items") {
+      val id = "b5757575"
+      val title = "A morning mixture of molasses and muesli"
+
+      val mergedSierraRecord = MergedSierraRecord(
+        id = id,
+        maybeBibData = Some(sierraBibRecord(title = title)),
+        itemData = Map(
+          "i111" -> sierraItemRecord(id = "i111", title = title),
+          "i222" -> sierraItemRecord(id = "i222", title = title)
+        )
+      )
+
+      val transformedSierraRecord = mergedSierraRecord.transform
+      transformedSierraRecord.isSuccess shouldBe true
+      val work = transformedSierraRecord.get.get
+
+      val sourceIdentifier1 =
+        SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i111")
+      val sourceIdentifier2 =
+        SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
+
+      work.items shouldBe List(
+        Item(
+          sourceIdentifier = sourceIdentifier1,
+          identifiers = List(sourceIdentifier1)
+        ),
+        Item(
+          sourceIdentifier = sourceIdentifier2,
+          identifiers = List(sourceIdentifier2)
+        )
+      )
+    }
   }
 
   def sierraBibRecord(
@@ -424,7 +458,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     id: String = "i111",
     title: String = "Ingenious imps invent invasive implements",
     modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String],
+    bibIds: List[String] = List(),
     unlinkedBibIds: List[String] = List()
   ) = SierraItemRecord(
     id = id,
