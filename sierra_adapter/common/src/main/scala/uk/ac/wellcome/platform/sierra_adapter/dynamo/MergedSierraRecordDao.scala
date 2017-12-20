@@ -2,16 +2,16 @@ package uk.ac.wellcome.platform.sierra_adapter.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
-import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._
+import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class MergedSierraRecordDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
