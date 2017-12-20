@@ -14,62 +14,52 @@ import io.circe.Json
 import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object SierraItemsDynamoSink extends Logging {
-  def apply(client: AmazonDynamoDB, tableName: String)(
-    implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
-    Sink.foreachParallel(10)(unprefixedJson => {
-      val table = Table[SierraItemRecord](tableName)
+  def apply(sierraItemRecordDao: SierraItemRecordDao)(
+    implicit executionContext: ExecutionContext): Sink[Json, Future[Unit]] =
+    Sink.foldAsync(()){
+      case (_, unprefixedJson) =>
 
-      val json = addIDPrefix(json = unprefixedJson)
-      logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
-      val maybeUpdatedDate = root.updatedDate.string.getOption(json)
-      // TODO: fail if bibIds filed does not exist
-      val bibIdList = root.bibIds.each.string.getAll(json)
+        val json = addIDPrefix(json = unprefixedJson)
+        logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
+        val maybeUpdatedDate = root.updatedDate.string.getOption(json)
+        // TODO: fail if bibIds filed does not exist
+        val bibIdList = root.bibIds.each.string.getAll(json)
 
-      val record = maybeUpdatedDate match {
-        case Some(updatedDate) =>
-          SierraItemRecord(
-            id = getId(json),
-            data = json.noSpaces,
-            modifiedDate = updatedDate,
-            bibIds = bibIdList
-          )
-        case None =>
-          SierraItemRecord(
-            id = getId(json),
-            data = json.noSpaces,
-            modifiedDate = getDeletedDateTimeAtStartOfDay(json),
-            bibIds = bibIdList
-          )
-      }
-
-      val option = Scanamo.exec(client)(
-        table.get('id -> record.id)
-      )
-      val newRecord = option
-        .map { either =>
-          val existingRecord = either.right.get
-          SierraItemRecordMerger.mergeItems(oldRecord = existingRecord,
-                                            newRecord = record)
+        val record = maybeUpdatedDate match {
+          case Some(updatedDate) =>
+            SierraItemRecord(
+              id = getId(json),
+              data = json.noSpaces,
+              modifiedDate = updatedDate,
+              bibIds = bibIdList
+            )
+          case None =>
+            SierraItemRecord(
+              id = getId(json),
+              data = json.noSpaces,
+              modifiedDate = getDeletedDateTimeAtStartOfDay(json),
+              bibIds = bibIdList
+            )
         }
-        .getOrElse(record)
 
-      val ops = table
-        .given(
-          not(attributeExists('id)) or
-            (attributeExists('id) and 'modifiedDate < newRecord.modifiedDate.getEpochSecond)
-        )
-        .put(newRecord)
-      Scanamo.exec(client)(ops) match {
-        case Right(_) =>
-          logger.info(s"${json.noSpaces} saved successfully to DynamoDB")
-        case Left(error) =>
-          logger.warn(s"Failed saving ${json.noSpaces} into DynamoDB", error)
-      }
-    })
+        sierraItemRecordDao.getItem(record.id).flatMap {
+          case Some(existingRecord) =>
+            val mergedRecord = SierraItemRecordMerger.mergeItems(oldRecord = existingRecord,
+              newRecord = record)
+            if(mergedRecord != existingRecord) {
+              sierraItemRecordDao.updateItem(mergedRecord)
+            }
+            else {
+              Future. successful(())
+            }
+          case None => sierraItemRecordDao.updateItem(record)
+        }
+    }
 
   private def getDeletedDateTimeAtStartOfDay(json: Json) = {
     val formatter = DateTimeFormatter.ISO_DATE
