@@ -8,7 +8,8 @@ import com.gu.scanamo.syntax._
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
@@ -361,5 +362,41 @@ class SierraItemsDynamoSinkTest
       |}
       """.stripMargin).right.get
     prefixedJson shouldEqual expectedJson
+  }
+
+  it("should not insert anitem into DynamoDb if it's not changed"){
+    val id = "100001"
+    val updatedDate = "2013-12-13T12:43:16Z"
+    val json = parse(s"""
+                        |{
+                        | "id": "$id",
+                        | "updatedDate": "$updatedDate",
+                        | "bibIds": ["1556974"]
+                        |}
+      """.stripMargin).right.get
+
+    val newUpdatedDate = "2014-12-13T12:43:16Z"
+    val newRecord = SierraItemRecord(
+      id = s"i$id",
+      modifiedDate = newUpdatedDate,
+      data =
+        s"""{"id": "i$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record", "bibIds": ["1556974", "1556975"]}""",
+      bibIds = List("1556974")
+    )
+
+    val mockedDao = mock[SierraItemRecordDao]
+
+    when(mockedDao.getItem(any[String]))
+      .thenReturn(Future.successful(Some(newRecord)))
+
+    val brokenSink = SierraItemsDynamoSink(
+      mockedDao
+    )
+
+    val futureUnit = Source.single(json).runWith(brokenSink)
+
+    whenReady(futureUnit) { _ =>
+      verify(mockedDao, Mockito.never()).updateItem(any[SierraItemRecord])
+    }
   }
 }
