@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 class MiroTransformableTransformerCopyrightTest
   extends FunSpec
     with Matchers
-    with MiroTransformableTransformerWrapper {
+    with MiroTransformableWrapper {
 
   it("should have no credit line if there's not enough information") {
     transformRecordAndCheckCredit(

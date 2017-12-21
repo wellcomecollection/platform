@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.transformable.miro.MiroTransformable
   *  fields before transformation, allowing tests to focus on only the fields
   *  that are interesting for that test.
   */
-trait MiroTransformableTransformerWrapper extends Matchers { this: Suite =>
+trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String =

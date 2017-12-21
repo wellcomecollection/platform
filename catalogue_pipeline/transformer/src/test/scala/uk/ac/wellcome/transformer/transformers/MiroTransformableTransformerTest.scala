@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.{Agent, IdentifierSchemes, Period, SourceIdentifier
 class MiroTransformableTransformerTest
   extends FunSpec
     with Matchers
-    with MiroTransformableTransformerWrapper {
+    with MiroTransformableWrapper {
 
   it("should pass through the Miro identifier") {
     val MiroID = "M0000005_test"

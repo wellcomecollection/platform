@@ -11,7 +11,7 @@ import org.scalatest.{FunSpec, Matchers}
 class MiroTransformableTransformerTitleTest
   extends FunSpec
     with Matchers
-    with MiroTransformableTransformerWrapper {
+    with MiroTransformableWrapper {
 
   it("should use the image_title field on non-V records") {
     val title = "A picture of a parrot"

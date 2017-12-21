@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.Concept
 class MiroTransformableTransformerGenresTest
   extends FunSpec
     with Matchers
-    with MiroTransformableTransformerWrapper {
+    with MiroTransformableWrapper {
 
   it("should have an empty genre list on records without keywords") {
     transformRecordAndCheckGenres(

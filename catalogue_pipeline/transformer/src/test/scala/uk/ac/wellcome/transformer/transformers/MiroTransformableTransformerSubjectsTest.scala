@@ -13,7 +13,7 @@ import uk.ac.wellcome.models._
 class MiroTransformableTransformerSubjectsTest
   extends FunSpec
     with Matchers
-    with MiroTransformableTransformerWrapper {
+    with MiroTransformableWrapper {
 
   it("should have an empty subject list on records without keywords") {
     transformRecordAndCheckSubjects(
