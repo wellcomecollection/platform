@@ -8,18 +8,12 @@ include $(MONITORING)/load_test/Makefile
 include $(ROOT)/functions.Makefile
 
 
-post_to_slack-build:
-	$(call build_lambda,monitoring/post_to_slack)
-
 post_to_slack-test:
 	$(call test_lambda,monitoring/post_to_slack)
 
 post_to_slack-publish:
 	$(call publish_lambda,monitoring/post_to_slack)
 
-
-terraform_tracker-build:
-	$(call build_lambda,monitoring/terraform_tracker)
 
 terraform_tracker-publish:
 	$(call publish_lambda,monitoring/terraform_tracker)

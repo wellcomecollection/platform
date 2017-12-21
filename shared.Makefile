@@ -11,8 +11,6 @@ ROOT = $(shell git rev-parse --show-toplevel)
 
 CURRENT_DIR = $(shell pwd)
 
-include $(ROOT)/builds/Makefile
-
 # Project utility tasks
 
 ## Run Python linting over the current directory

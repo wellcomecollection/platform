@@ -13,6 +13,10 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.{CalmParser, SierraParser}
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -65,7 +69,10 @@ class SQSMessageReceiverTest
   it("should receive a message and send it to SNS client") {
     val snsWriter = mockSNSWriter
     val recordReceiver =
-      new SQSMessageReceiver(snsWriter, new CalmParser, metricsSender)
+      new SQSMessageReceiver(snsWriter,
+                             new CalmParser,
+                             new CalmTransformableTransformer,
+                             metricsSender)
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future) { _ =>
@@ -75,7 +82,10 @@ class SQSMessageReceiverTest
 
   it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter, new CalmParser, metricsSender)
+      new SQSMessageReceiver(mockSNSWriter,
+                             new CalmParser,
+                             new CalmTransformableTransformer,
+                             metricsSender)
 
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
@@ -88,7 +98,10 @@ class SQSMessageReceiverTest
     val snsWriter = mockSNSWriter
 
     val recordReceiver =
-      new SQSMessageReceiver(snsWriter, new SierraParser, metricsSender)
+      new SQSMessageReceiver(snsWriter,
+                             new SierraParser,
+                             new SierraTransformableTransformer,
+                             metricsSender)
 
     val future = recordReceiver.receiveMessage(
       createValidEmptySierraBibSQSMessage("000")
@@ -103,7 +116,10 @@ class SQSMessageReceiverTest
   it(
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter, new CalmParser, metricsSender)
+      new SQSMessageReceiver(mockSNSWriter,
+                             new CalmParser,
+                             new CalmTransformableTransformer,
+                             metricsSender)
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
@@ -116,7 +132,10 @@ class SQSMessageReceiverTest
     "should return a failed future if it's unable to publish the unified item") {
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new SQSMessageReceiver(mockSNS, new CalmParser, metricsSender)
+      new SQSMessageReceiver(mockSNS,
+                             new CalmParser,
+                             new CalmTransformableTransformer,
+                             metricsSender)
 
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 

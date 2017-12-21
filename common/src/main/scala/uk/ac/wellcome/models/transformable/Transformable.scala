@@ -4,9 +4,7 @@ import uk.ac.wellcome.models.Work
 
 import scala.util.Try
 
-trait Transformable {
-  def transform: Try[Option[Work]]
-}
+trait Transformable
 
 case class HashKey(keyName: String, keyValue: String)
 case class RangeKey[T](keyName: String, keyValue: T)

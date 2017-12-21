@@ -107,7 +107,7 @@ module "sierra_item_merger" {
   target_dynamo_table_arn  = "${aws_dynamodb_table.sierradata_table.arn}"
 
   ecr_repository_url = "${module.ecr_repository_sierra_item_merger.repository_url}"
-  release_id         = "${var.release_ids["sierra_bib_merger"]}"
+  release_id         = "${var.release_ids["sierra_item_merger"]}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
