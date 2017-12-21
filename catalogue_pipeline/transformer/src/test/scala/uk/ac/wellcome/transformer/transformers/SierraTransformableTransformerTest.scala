@@ -8,6 +8,53 @@ import uk.ac.wellcome.models._
 class SierraTransformableTransformerTest extends FunSpec with Matchers {
   val transformer = new SierraTransformableTransformer
 
+  it("performs a transformation on a work with items") {
+    val id = "b5757575"
+    val title = "A morning mixture of molasses and muesli"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title"
+         |}
+        """.stripMargin
+
+    val mergedSierraRecord = MergedSierraRecord(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+      itemData = Map(
+        "i111" -> sierraItemRecord(id = "i111",
+                                   title = title,
+                                   bibIds = List(id)),
+        "i222" -> sierraItemRecord(id = "i222",
+                                   title = title,
+                                   bibIds = List(id))
+      )
+    )
+
+    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    val sourceIdentifier1 =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i111")
+    val sourceIdentifier2 =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
+
+    work.items shouldBe List(
+      Item(
+        sourceIdentifier = sourceIdentifier1,
+        identifiers = List(sourceIdentifier1)
+      ),
+      Item(
+        sourceIdentifier = sourceIdentifier2,
+        identifiers = List(sourceIdentifier2)
+      )
+    )
+  }
+
   it("should not perform a transformation without bibData") {
     val mergedSierraRecord =
       MergedSierraRecord(id = "000", maybeBibData = None)

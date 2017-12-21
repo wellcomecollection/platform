@@ -290,7 +290,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     id: String = "i111",
     title: String = "Ingenious imps invent invasive implements",
     modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String],
+    bibIds: List[String] = List(),
     unlinkedBibIds: List[String] = List()
   ) = SierraItemRecord(
     id = id,
