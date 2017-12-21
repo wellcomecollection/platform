@@ -13,6 +13,7 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 
 import scala.concurrent.duration._
 
@@ -49,11 +50,12 @@ class SierraItemsToDynamoWorkerServiceTest
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = actorSystem,
         metrics = mockMetrics,
-        dynamoDbClient = dynamoDbClient,
+        sierraItemRecordDao = new SierraItemRecordDao(
+          dynamoDbClient,
+          Map("sierraToDynamo" -> DynamoConfig(tableName))),
         apiUrl = "http://localhost:8080",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
-        dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName)),
         fields = fields
       ))
   }
@@ -108,12 +110,13 @@ class SierraItemsToDynamoWorkerServiceTest
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system = ActorSystem(),
         metrics = mockMetrics,
-        dynamoDbClient = dynamoDbClient,
+        sierraItemRecordDao = new SierraItemRecordDao(
+          dynamoDbClient,
+          Map("sierraToDynamo" -> DynamoConfig(tableName))),
         apiUrl = "http://localhost:8081",
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
-        fields = "",
-        dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName))
+        fields = ""
       ))
 
     val message =
