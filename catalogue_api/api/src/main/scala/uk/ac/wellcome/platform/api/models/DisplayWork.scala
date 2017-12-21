@@ -81,10 +81,10 @@ case object DisplayWork {
           // as appropriate, and avoids throwing a NullPointerError when
           // we map over the value.
           Option[List[SourceIdentifier]](work.identifiers) match {
-            case Some(identifiers) => Some(identifiers.map(DisplayIdentifier(_)))
+            case Some(identifiers) =>
+              Some(identifiers.map(DisplayIdentifier(_)))
             case None => Some(List())
-          }
-        else None,
+          } else None,
       thumbnail =
         if (includes.thumbnail)
           work.thumbnail.map(DisplayLocation(_))
@@ -92,10 +92,10 @@ case object DisplayWork {
       items =
         if (includes.items)
           Option[List[Item]](work.items) match {
-            case Some(items) => Some(items.map(DisplayItem(_, includes.identifiers)))
+            case Some(items) =>
+              Some(items.map(DisplayItem(_, includes.identifiers)))
             case None => Some(List())
-          }
-        else None
+          } else None
     )
   }
 

@@ -38,12 +38,11 @@ object DisplayItem {
           // as appropriate, and avoids throwing a NullPointerError when
           // we map over the value.
           Option[List[SourceIdentifier]](item.identifiers) match {
-            case Some(identifiers) => Some(identifiers.map(DisplayIdentifier(_)))
+            case Some(identifiers) =>
+              Some(identifiers.map(DisplayIdentifier(_)))
             case None => Some(List())
-          }
-        else None,
-      locations =
-        // Same as with identifiers
+          } else None,
+      locations = // Same as with identifiers
         Option[List[Location]](item.locations) match {
           case Some(locations) => locations.map(DisplayLocation(_))
           case None => List()

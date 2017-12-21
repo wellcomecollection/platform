@@ -261,7 +261,8 @@ class ApiWorksTest
     }
   }
 
-  it("always includes 'items' if the items include is present, even with no items") {
+  it(
+    "always includes 'items' if the items include is present, even with no items") {
     val work = workWith(
       canonicalId = "dgdb712",
       title = "Without windows or wind or washing-up liquid",
@@ -736,7 +737,8 @@ class ApiWorksTest
     }
   }
 
-  it("always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+  it(
+    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
     val work = workWith(
       canonicalId = "a87na87",
       title = "Idling inkwells of indigo images",
