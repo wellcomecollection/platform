@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.api.models
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.utils.JsonUtil
 
 class DisplayItemTest extends FunSpec with Matchers {
 
@@ -41,11 +42,17 @@ class DisplayItemTest extends FunSpec with Matchers {
   }
 
   it("correctly parses an Item without any identifiers") {
-    val item = Item(
-      canonicalId = Some("b71876a"),
-      sourceIdentifier = identifier,
-      locations = List()
-    )
+    val item = JsonUtil.fromJson[Item]("""
+        {
+          "canonicalId": "b71876a",
+          "sourceIdentifier": {
+            "identifierScheme": "miro-image-number",
+            "value": "B718760"
+          },
+          "locations": [],
+          "type": "item"
+        }
+      """).get
 
     val displayItem = DisplayItem(
       item = item,
@@ -53,5 +60,26 @@ class DisplayItemTest extends FunSpec with Matchers {
     )
 
     displayItem.identifiers shouldBe Some(List())
+  }
+
+  it("correctly parses an Item without any locations") {
+    val item = JsonUtil.fromJson[Item]("""
+        {
+          "canonicalId": "mr953zsh",
+          "sourceIdentifier": {
+            "identifierScheme": "miro-image-number",
+            "value": "M9530000"
+          },
+          "identifiers": [],
+          "type": "item"
+        }
+      """).get
+
+    val displayItem = DisplayItem(
+      item = item,
+      includesIdentifiers = true
+    )
+
+    displayItem.locations shouldBe Some(List())
   }
 }
