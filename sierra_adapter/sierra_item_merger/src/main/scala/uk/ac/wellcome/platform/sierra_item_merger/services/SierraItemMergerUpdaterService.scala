@@ -48,7 +48,7 @@ class SierraItemMergerUpdaterService @Inject()(
             Future.failed(
               SQSReaderGracefulException(
                 new RuntimeException(
-                  "Missing Bib record to unlink: $unlinkedBibId.")
+                  s"Missing Bib record to unlink: $unlinkedBibId.")
               ))
         }
     }
