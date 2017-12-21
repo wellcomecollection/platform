@@ -47,4 +47,19 @@ class DisplayWorkTest extends FunSpec with Matchers {
     identifierScheme = IdentifierSchemes.sierraSystemNumber,
     value = "b1234567"
   )
+
+  it("correctly parses a work without any identifiers") {
+    val work = Work(
+      title = "An irascible iguana invites impudence",
+      sourceIdentifier = sourceIdentifier,
+      identifiers = Nil,
+      canonicalId = Some("xtsx8hwk")
+    )
+
+    val displayWork = DisplayWork(
+      work = work,
+      includes = WorksIncludes(identifiers = true)
+    )
+    displayWork.identifiers shouldBe Some(List())
+  }
 }

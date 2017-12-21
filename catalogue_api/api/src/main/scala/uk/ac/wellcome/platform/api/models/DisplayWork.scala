@@ -75,8 +75,18 @@ case object DisplayWork {
       subjects = Option(work.subjects).getOrElse(Nil),
       genres = Option(work.genres).getOrElse(Nil),
       identifiers =
-        if (includes.identifiers)
-          Some(work.identifiers.map(DisplayIdentifier(_)))
+        if (includes.identifiers) {
+          // If there aren't any identifiers on the work JSON, Jackson puts a
+          // nil here.  Wrapping it in an Option casts it into a None or Some
+          // as appropriate, and avoids throwing a NullPointerError when
+          // we map over the value.
+          val workIdentifiers = Option[List[SourceIdentifier]](work.identifiers)
+
+          workIdentifiers match {
+            case Some(identifiers) => Some(identifiers.map(DisplayIdentifier(_)))
+            case None => Some(List())
+          }
+        }
         else None,
       thumbnail =
         if (includes.thumbnail)
@@ -84,9 +94,7 @@ case object DisplayWork {
         else None,
       items =
         if (includes.items) {
-          // If there aren't any items on the work JSON, Jackson puts a nil
-          // here.  Wrapping it in an Option casts it into a None or Some
-          // as appropriate.
+          // Similar to above with identifiers.
           val workItems = Option[List[Item]](work.items)
 
           workItems match {
