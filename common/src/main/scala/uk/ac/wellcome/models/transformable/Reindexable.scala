@@ -20,7 +20,7 @@ case class ItemIdentifier[T](hashKey: HashKey, rangeKey: RangeKey[T])
 case class ReindexItem[T](id: ItemIdentifier[T],
                           ReindexShard: String,
                           ReindexVersion: Int)
-  extends Reindexable[T] {
+    extends Reindexable[T] {
 
   def hashKey = Symbol(id.hashKey.keyName) -> id.hashKey.keyValue
   def rangeKey = Symbol(id.rangeKey.keyName) -> id.rangeKey.keyValue

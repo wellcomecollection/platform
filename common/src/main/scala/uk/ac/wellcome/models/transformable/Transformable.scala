@@ -31,15 +31,15 @@ object Transformable {
 
 //TODO add some tests around transformation
 case class CalmTransformable(
-                              RecordID: String,
-                              RecordType: String,
-                              AltRefNo: String,
-                              RefNo: String,
-                              data: String,
-                              ReindexShard: String = "default",
-                              ReindexVersion: Int = 0
-                            ) extends Transformable
-  with Reindexable[String] {
+  RecordID: String,
+  RecordType: String,
+  AltRefNo: String,
+  RefNo: String,
+  data: String,
+  ReindexShard: String = "default",
+  ReindexVersion: Int = 0
+) extends Transformable
+    with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
     HashKey("RecordID", RecordID),
@@ -58,7 +58,7 @@ case class MiroTransformable(MiroID: String,
                              data: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
-  extends Transformable
+    extends Transformable
     with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
@@ -97,7 +97,7 @@ case class MiroTransformable(MiroID: String,
    *  here if there's nothing more useful in the other fields.
    */
   private def getTitleAndDescription(
-                                      miroData: MiroTransformableData): (String, Option[String]) = {
+    miroData: MiroTransformableData): (String, Option[String]) = {
 
     val candidateDescription: String = miroData.description match {
       case Some(s) => {
@@ -140,13 +140,13 @@ case class MiroTransformable(MiroID: String,
     //
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
-    zipMiroFields(keys = miroData.award, values = miroData.awardDate)
-      .filter {
-        case (label, _) =>
-          (label == "WIA Overall Winner" ||
-            label == "Wellcome Image Awards" ||
-            label == "Biomedical Image Awards")
-      }
+      zipMiroFields(keys = miroData.award, values = miroData.awardDate)
+        .filter {
+          case (label, _) =>
+            (label == "WIA Overall Winner" ||
+              label == "Wellcome Image Awards" ||
+              label == "Biomedical Image Awards")
+        }
 
     val wiaAwardsString = wiaAwardsData match {
       // Most images have no award, or only a single award string.
@@ -166,9 +166,9 @@ case class MiroTransformable(MiroID: String,
     // Finally, remove any leading/trailing from the description, and drop
     // the description if it's *only* whitespace.
     val description =
-    if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
-      Some((rawDescription + wiaAwardsString).trim)
-    } else None
+      if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
+        Some((rawDescription + wiaAwardsString).trim)
+      } else None
 
     (title, description)
   }
@@ -329,17 +329,17 @@ case class MiroTransformable(MiroID: String,
       case Some(line) =>
         Some(line
           .replaceAll("Adrian Wressell, Heart of England NHSFT",
-            "Adrian Wressell, Heart of England NHS FT")
+                      "Adrian Wressell, Heart of England NHS FT")
           .replaceAll("Andrew Dilley,Jane Greening & Bruce Lynn",
-            "Andrew Dilley, Jane Greening & Bruce Lynn")
+                      "Andrew Dilley, Jane Greening & Bruce Lynn")
           .replaceAll("Andrew Dilley,Nicola DeLeon & Bruce Lynn",
-            "Andrew Dilley, Nicola De Leon & Bruce Lynn")
+                      "Andrew Dilley, Nicola De Leon & Bruce Lynn")
           .replaceAll("Ashley Prytherch, Royal Surrey County Hospital NHS Foundation Trust",
-            "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
+                      "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
           .replaceAll("David Gregory & Debbie Marshall",
-            "David Gregory and Debbie Marshall")
+                      "David Gregory and Debbie Marshall")
           .replaceAll("David Gregory&Debbie Marshall",
-            "David Gregory and Debbie Marshall")
+                      "David Gregory and Debbie Marshall")
           .replaceAll("Geraldine Thompson.", "Geraldine Thompson")
           .replaceAll("John & Penny Hubley.", "John & Penny Hubley")
           .replaceAll(
@@ -441,15 +441,15 @@ case class MiroTransformable(MiroID: String,
     // put them all in the same identifier scheme, because we're not doing
     // any transformation or cleaning.
     val libraryRefsList: List[SourceIdentifier] =
-    zipMiroFields(keys = miroData.libraryRefDepartment,
-      values = miroData.libraryRefId)
-      .map {
-        case (label, value) =>
-          SourceIdentifier(
-            IdentifierSchemes.miroLibraryReference,
-            s"$label $value"
-          )
-      }
+      zipMiroFields(keys = miroData.libraryRefDepartment,
+                    values = miroData.libraryRefId)
+        .map {
+          case (label, value) =>
+            SourceIdentifier(
+              IdentifierSchemes.miroLibraryReference,
+              s"$label $value"
+            )
+        }
 
     miroIDList ++ sierraList ++ libraryRefsList
   }
@@ -535,11 +535,11 @@ case class MiroTransformable(MiroID: String,
   *
   */
 case class MergedSierraRecord(
-                               id: String,
-                               maybeBibData: Option[SierraBibRecord] = None,
-                               itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
-                               version: Int = 0
-                             ) extends Transformable {
+  id: String,
+  maybeBibData: Option[SierraBibRecord] = None,
+  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
+  version: Int = 0
+) extends Transformable {
 
   /** Return the most up-to-date combination of the merged record and the
     * bib record we've just received.

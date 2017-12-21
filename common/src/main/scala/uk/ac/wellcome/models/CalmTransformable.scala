@@ -25,4 +25,3 @@ case class CalmTransformableData(
       ))
   }
 }
-

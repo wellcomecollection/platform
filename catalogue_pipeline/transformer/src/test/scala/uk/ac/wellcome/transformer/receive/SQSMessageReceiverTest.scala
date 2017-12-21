@@ -75,7 +75,9 @@ class SQSMessageReceiverTest
 
   it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter, new TransformableParser, metricsSender)
+      new SQSMessageReceiver(mockSNSWriter,
+                             new TransformableParser,
+                             metricsSender)
 
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
@@ -103,7 +105,9 @@ class SQSMessageReceiverTest
   it(
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter, new TransformableParser, metricsSender)
+      new SQSMessageReceiver(mockSNSWriter,
+                             new TransformableParser,
+                             metricsSender)
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 

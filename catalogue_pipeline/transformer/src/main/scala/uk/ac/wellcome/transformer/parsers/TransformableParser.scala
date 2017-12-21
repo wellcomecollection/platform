@@ -25,11 +25,10 @@ class TransformableParser extends Logging {
           throw e
       }
 
-  def readFromRecord(message: String): Try[Transformable] =
-    {
-      decode[Transformable](message) match {
-        case Right(transformable) => Success(transformable)
-        case Left(parseError) => Failure(parseError)
-      }
+  def readFromRecord(message: String): Try[Transformable] = {
+    decode[Transformable](message) match {
+      case Right(transformable) => Success(transformable)
+      case Left(parseError) => Failure(parseError)
     }
+  }
 }
