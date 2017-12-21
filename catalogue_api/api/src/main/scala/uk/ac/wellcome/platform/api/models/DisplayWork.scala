@@ -1,12 +1,11 @@
 package uk.ac.wellcome.platform.api.models
 
+import scala.util.{Failure, Success}
+
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
-import io.circe.generic.extras.auto._
-import io.circe.parser._
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.circe._
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -103,12 +102,11 @@ case object DisplayWork {
   }
 
   def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    implicit val jsonMapper = Work
-    decode[Work](document) match {
-      case Right(work) => DisplayWork(work = work, includes = includes)
-      case Left(error) =>
+    JsonUtil.fromJson[Work](document) match {
+      case Success(work) => DisplayWork(work = work, includes = includes)
+      case Failure(e) =>
         throw new RuntimeException(
-          s"Unable to parse JSON as DisplayWork ($error): $document"
+          s"Unable to parse JSON as Work ($e): $document"
         )
     }
   }
