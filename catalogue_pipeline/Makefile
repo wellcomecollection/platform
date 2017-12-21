@@ -51,9 +51,6 @@ transformer-publish: transformer-build
 transformer_sns_filter-test:
 	$(call test_lambda,catalogue_pipeline/transformer_sns_filter)
 
-transformer_sns_filter-build:
-	$(call build_lambda,$(CATALOGUE_PIPELINE)/transformer_sns_filter)
-
 transformer_sns_filter-publish:
 	$(call publish_lambda,catalogue_pipeline/transformer_sns_filter)
 
