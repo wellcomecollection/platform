@@ -28,7 +28,7 @@ class SierraTransformerFeatureTest
 
   it("should transform sierra records, and publish them to the given topic") {
 
-    val id = "001"
+    val id = "b001"
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 

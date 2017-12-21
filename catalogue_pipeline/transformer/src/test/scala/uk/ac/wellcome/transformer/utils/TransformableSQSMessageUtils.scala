@@ -48,7 +48,8 @@ trait TransformableSQSMessageUtils {
 
     val mergedSierraRecord = MergedSierraRecord(
       id = id,
-      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate))
+      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
+      itemData = Map[String, SierraItemRecord]()
     )
 
     sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
@@ -71,6 +72,10 @@ trait TransformableSQSMessageUtils {
   def createInvalidRecord: SQSMessage = sqsMessage("not a json string")
 
   def sqsMessage(message: String) = {
-    SQSMessage(None, message, "test_transformer_topic", "notification", "")
+    SQSMessage(None,
+               message,
+               "test_transformer_topic",
+               "notification",
+               "the_time")
   }
 }
