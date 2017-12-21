@@ -80,6 +80,6 @@ class DisplayItemTest extends FunSpec with Matchers {
       includesIdentifiers = true
     )
 
-    displayItem.locations shouldBe Some(List())
+    displayItem.locations shouldBe List()
   }
 }
