@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.models.Work
@@ -13,6 +13,7 @@ import uk.ac.wellcome.models.transformable.miro.MiroTransformable
   */
 trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
+  val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String =
     s"""{
         "image_cleared": "Y",
@@ -32,8 +33,9 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )
-    miroTransformable.transform.isSuccess shouldBe true
-    miroTransformable.transform.get.get
+
+    transformer.transform(miroTransformable).isSuccess shouldBe true
+    transformer.transform(miroTransformable).get.get
   }
 
   def assertTransformWorkFails(
@@ -46,6 +48,6 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )
-    miroTransformable.transform.isSuccess shouldBe false
+    transformer.transform(miroTransformable).isSuccess shouldBe false
   }
 }

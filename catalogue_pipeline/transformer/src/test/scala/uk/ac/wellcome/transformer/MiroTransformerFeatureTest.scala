@@ -4,7 +4,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.test.utils.{MessageInfo, MiroTransformableWrapper}
+import uk.ac.wellcome.test.utils.MessageInfo
+import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
 import uk.ac.wellcome.utils.JsonUtil
 

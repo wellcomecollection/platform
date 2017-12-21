@@ -9,10 +9,30 @@ import uk.ac.wellcome.transformer.parsers.{
   SierraParser,
   TransformableParser
 }
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  MiroTransformableTransformer,
+  SierraTransformableTransformer,
+  TransformableTransformer
+}
 
-object TransformableParserModule extends TwitterModule {
+object TransformerModule extends TwitterModule {
   val dataSource =
     flag[String]("transformer.source", "", "Name of the source of data")
+
+  @Singleton
+  @Provides
+  def providesTransformableTransformer()
+    : TransformableTransformer[Transformable] = {
+
+    dataSource() match {
+      case "MiroData" => new MiroTransformableTransformer
+      case "CalmData" => new CalmTransformableTransformer
+      case "SierraData" => new SierraTransformableTransformer
+      case tableName =>
+        throw new RuntimeException(s"$tableName is not a recognised source")
+    }
+  }
 
   @Singleton
   @Provides
