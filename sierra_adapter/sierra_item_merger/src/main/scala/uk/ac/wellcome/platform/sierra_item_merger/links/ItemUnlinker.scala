@@ -4,7 +4,8 @@ import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 
 object ItemUnlinker {
 
-  def unlinkItemRecord(mergedSierraRecord: MergedSierraRecord,itemRecord: SierraItemRecord): MergedSierraRecord = {
+  def unlinkItemRecord(mergedSierraRecord: MergedSierraRecord,
+                       itemRecord: SierraItemRecord): MergedSierraRecord = {
     if (!itemRecord.unlinkedBibIds.contains(mergedSierraRecord.id)) {
       throw new RuntimeException(
         s"Non-matching bib id ${mergedSierraRecord.id} in item unlink bibs ${itemRecord.unlinkedBibIds}")
