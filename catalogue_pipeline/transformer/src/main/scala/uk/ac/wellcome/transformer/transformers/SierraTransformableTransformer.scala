@@ -7,9 +7,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.util.{Success, Try}
 
 class SierraTransformableTransformer extends TransformableTransformer[MergedSierraRecord] {
-  override def transform(transformable: Transformable): Try[Option[Work]] =
-    transformable match {
-      case sierraTransformable: MergedSierraRecord =>
+  override def transformForType(sierraTransformable: MergedSierraRecord): Try[Option[Work]] =
       sierraTransformable.maybeBibData
         .map { bibData =>
           JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
@@ -27,9 +25,6 @@ class SierraTransformableTransformer extends TransformableTransformer[MergedSier
               )
             ))
           }
-        }
-        .getOrElse(Success(None))
-      case _ => throw new RuntimeException
-    }
+        }.getOrElse(Success(None))
 
 }

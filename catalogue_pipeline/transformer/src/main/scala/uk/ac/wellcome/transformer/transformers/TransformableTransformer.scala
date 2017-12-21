@@ -6,5 +6,12 @@ import uk.ac.wellcome.models.transformable.Transformable
 import scala.util.Try
 
 trait TransformableTransformer[+T <: Transformable] {
-  def transform(transformable: Transformable): Try[Option[Work]]
+  protected[this] def transformForType(t: T): Try[Option[Work]]
+
+  def transform(transformable: Transformable): Try[Option[Work]] = Try {
+    transformable match {
+      case t: T => transformForType(t)
+      case _ => throw new RuntimeException(s"$transformable is not of the right type")
+    }
+  }.flatten
 }

@@ -29,9 +29,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
   val contributorMap =
     JsonUtil.toMap[String](Source.fromInputStream(stream).mkString).get
 
-  override def transform(transformable: Transformable): Try[Option[Work]] = transformable match {
-    case miroTransformable: MiroTransformable =>
-    Try {
+  override def transformForType(miroTransformable: MiroTransformable): Try[Option[Work]] = Try {
 
       val miroData = MiroTransformableData.create(miroTransformable.data)
       val (title, description) = getTitleAndDescription(miroData)
@@ -52,8 +50,6 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
           items = getItems(miroData, miroTransformable.MiroID)
         ))
     }
-    case _ => throw new RuntimeException
-  }
 
   /*
    * Populate the title and description.  The rules are as follows:
