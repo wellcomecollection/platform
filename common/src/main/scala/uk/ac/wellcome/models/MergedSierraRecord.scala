@@ -24,30 +24,7 @@ case class MergedSierraRecord(
   maybeBibData: Option[SierraBibRecord] = None,
   itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
   version: Int = 0
-) extends Transformable {
-
-  def unlinkItemRecord(itemRecord: SierraItemRecord): MergedSierraRecord = {
-    if (!itemRecord.unlinkedBibIds.contains(this.id)) {
-      throw new RuntimeException(
-        s"Non-matching bib id ${this.id} in item unlink bibs ${itemRecord.unlinkedBibIds}")
-    }
-
-    val itemData: Map[String, SierraItemRecord] = this.itemData
-      .filterNot {
-        case (id, currentItemRecord) => {
-          val matchesCurrentItemRecord = id == itemRecord.id
-
-          val modifiedAfter = itemRecord.modifiedDate.isAfter(
-            currentItemRecord.modifiedDate
-          )
-
-          matchesCurrentItemRecord && modifiedAfter
-        }
-      }
-
-    this.copy(itemData = itemData)
-  }
-}
+) extends Transformable
 
 case class SierraBibData(id: String, title: String)
 
