@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer.transformers
 import java.io.InputStream
 
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.models.transformable.miro.{MiroTransformable, MiroTransformableData}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -28,26 +29,30 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
   val contributorMap =
     JsonUtil.toMap[String](Source.fromInputStream(stream).mkString).get
 
-  override def transform(miroTransformable: MiroTransformable): Try[Option[Work]] = Try {
+  override def transform(transformable: Transformable): Try[Option[Work]] = transformable match {
+    case miroTransformable: MiroTransformable =>
+    Try {
 
-    val miroData = MiroTransformableData.create(miroTransformable.data)
-    val (title, description) = getTitleAndDescription(miroData)
+      val miroData = MiroTransformableData.create(miroTransformable.data)
+      val (title, description) = getTitleAndDescription(miroData)
 
-    Some(
-      Work(
-        sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, miroTransformable.MiroID),
-        identifiers = getIdentifiers(miroData,miroTransformable.MiroID),
-        title = title,
-        description = description,
-        createdDate = getCreatedDate(miroData,miroTransformable.MiroCollection),
-        lettering = miroData.suppLettering,
-        creators = getCreators(miroData),
-        subjects = getSubjects(miroData),
-        genres = getGenres(miroData),
-        thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)),
-        items = getItems(miroData, miroTransformable.MiroID)
-      ))
+      Some(
+        Work(
+          sourceIdentifier =
+            SourceIdentifier(IdentifierSchemes.miroImageNumber, miroTransformable.MiroID),
+          identifiers = getIdentifiers(miroData, miroTransformable.MiroID),
+          title = title,
+          description = description,
+          createdDate = getCreatedDate(miroData, miroTransformable.MiroCollection),
+          lettering = miroData.suppLettering,
+          creators = getCreators(miroData),
+          subjects = getSubjects(miroData),
+          genres = getGenres(miroData),
+          thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)),
+          items = getItems(miroData, miroTransformable.MiroID)
+        ))
+    }
+    case _ => throw new RuntimeException
   }
 
   /*
