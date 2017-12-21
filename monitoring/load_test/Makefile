@@ -10,9 +10,6 @@ gatling-publish: gatling-build
 	$(call publish_service,gatling)
 
 
-gatling_to_cloudwatch-build:
-	$(call build_lambda,monitoring/load_test/gatling_to_cloudwatch)
-
 gatling_to_cloudwatch-test:
 	$(call test_lambda,monitoring/load_test/gatling_to_cloudwatch)
 
