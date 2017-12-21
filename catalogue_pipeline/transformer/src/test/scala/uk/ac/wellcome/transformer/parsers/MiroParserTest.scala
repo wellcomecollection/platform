@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.parsers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.test.utils.MiroTransformableWrapper
+import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 
 class MiroParserTest
