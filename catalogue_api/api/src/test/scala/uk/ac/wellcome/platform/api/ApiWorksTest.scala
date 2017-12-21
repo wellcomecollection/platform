@@ -261,6 +261,35 @@ class ApiWorksTest
     }
   }
 
+  it(
+    "always includes 'items' if the items include is present, even with no items") {
+    val work = workWith(
+      canonicalId = "dgdb712",
+      title = "Without windows or wind or washing-up liquid",
+      items = List()
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.canonicalId.get}",
+                          | "title": "${work.title}",
+                          | "creators": [ ],
+                          | "items": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
   it("should include credit information in API responses") {
     val location = Location(
       locationType = "thumbnail-image",
@@ -709,6 +738,35 @@ class ApiWorksTest
   }
 
   it(
+    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+    val work = workWith(
+      canonicalId = "a87na87",
+      title = "Idling inkwells of indigo images",
+      identifiers = List()
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.id}?includes=identifiers",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.id}",
+                          | "title": "${work.title}",
+                          | "creators": [ ],
+                          | "identifiers": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it(
     "should be able to look at different Elasticsearch indices based on the ?index query parameter") {
     val work = workWith(
       canonicalId = "1234",
@@ -968,7 +1026,7 @@ class ApiWorksTest
   }
 
   it(
-    "should return a Bad Request error if you try to page beyond the first 10000 items") {
+    "should return a Bad Request error if you try to page beyond the first 10000 works") {
     val queries = List(
       "page=10000",
       "pageSize=100&page=101",

@@ -14,7 +14,7 @@ trait WorksUtil {
 
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,
-    "value"
+    "sourceIdentifierFromWorksUtil"
   )
 
   def createWorks(count: Int): Seq[Work] =
