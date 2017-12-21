@@ -83,11 +83,19 @@ case object DisplayWork {
           work.thumbnail.map(DisplayLocation(_))
         else None,
       items =
-        if (includes.items)
-          Some(work.items.map(DisplayItem(_, includes.identifiers)))
+        if (includes.items) {
+          // If there aren't any items on the work JSON, Jackson puts a nil
+          // here.  Wrapping it in an Option casts it into a None or Some
+          // as appropriate.
+          val workItems = Option[List[Item]](work.items)
+
+          workItems match {
+            case Some(items) => Some(items.map(DisplayItem(_, includes.identifiers)))
+            case None => Some(List())
+          }
+        }
         else None
     )
-
   }
 
   def apply(hit: SearchHit): DisplayWork =
@@ -101,7 +109,7 @@ case object DisplayWork {
     jsonToDisplayWork(got.sourceAsString, includes)
   }
 
-  def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
+  private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
     JsonUtil.fromJson[Work](document) match {
       case Success(work) => DisplayWork(work = work, includes = includes)
       case Failure(e) =>

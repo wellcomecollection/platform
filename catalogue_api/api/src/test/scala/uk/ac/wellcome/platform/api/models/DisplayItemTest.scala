@@ -38,6 +38,20 @@ class DisplayItemTest extends FunSpec with Matchers {
     displayItem.locations shouldBe List(DisplayLocation(location))
     displayItem.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
     displayItem.ontologyType shouldBe "Item"
+  }
 
+  it("correctly parses an Item without any identifiers") {
+    val item = Item(
+      canonicalId = Some("b71876a"),
+      sourceIdentifier = identifier,
+      locations = List()
+    )
+
+    val displayItem = DisplayItem(
+      item = item,
+      includesIdentifiers = true
+    )
+
+    displayItem.identifiers shouldBe Some(List())
   }
 }
