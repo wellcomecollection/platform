@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.sierra_bib_merger.services
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
+import uk.ac.wellcome.models.SierraBibRecord
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
 import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
 
 import scala.concurrent.ExecutionContext.Implicits.global

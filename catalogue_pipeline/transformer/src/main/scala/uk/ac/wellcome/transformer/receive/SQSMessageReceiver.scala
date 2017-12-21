@@ -14,10 +14,9 @@ import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.util.{Failure, Success, Try}
 
-class SQSMessageReceiver(
-  snsWriter: SNSWriter,
-  transformableParser: TransformableParser[Transformable],
-  metricsSender: MetricsSender)
+class SQSMessageReceiver(snsWriter: SNSWriter,
+                         transformableParser: TransformableParser,
+                         metricsSender: MetricsSender)
     extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {

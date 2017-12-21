@@ -18,7 +18,7 @@ class TransformerWorkerService @Inject()(
   writer: SNSWriter,
   system: ActorSystem,
   metrics: MetricsSender,
-  transformableParser: TransformableParser[Transformable]
+  transformableParser: TransformableParser
 ) extends SQSWorker(reader, system, metrics) {
 
   private val messageReceiver =

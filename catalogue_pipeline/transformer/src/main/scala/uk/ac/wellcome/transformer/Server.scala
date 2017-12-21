@@ -10,10 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.transformer.modules.{
-  TransformableParserModule,
-  TransformerWorkerModule
-}
+import uk.ac.wellcome.transformer.modules.{TransformerWorkerModule}
 
 object ServerMain extends Server
 
@@ -28,7 +25,6 @@ class Server extends HttpServer {
     SQSConfigModule,
     SNSConfigModule,
     SNSClientModule,
-    TransformableParserModule,
     TransformerWorkerModule
   )
   override def configureHttp(router: HttpRouter) {

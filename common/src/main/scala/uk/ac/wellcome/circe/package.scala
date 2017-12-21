@@ -17,5 +17,5 @@ package object circe {
   }
 
   implicit val customConfig: Configuration =
-    Configuration.default.withDefaults.withDiscriminator("type")
+    Configuration.default.withDefaults //.withDiscriminator("type")
 }
