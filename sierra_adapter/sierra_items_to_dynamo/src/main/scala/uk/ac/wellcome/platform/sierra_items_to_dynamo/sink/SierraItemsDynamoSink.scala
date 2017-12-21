@@ -18,8 +18,12 @@ object SierraItemsDynamoSink extends Logging {
     implicit executionContext: ExecutionContext): Sink[Json, Future[Unit]] =
     Sink.foldAsync(()) {
       case (_, unprefixedJson) =>
-        val json = addIDPrefix(json = unprefixedJson)
+        val json = addIDPrefixToItems(
+          addIDPrefixToBibs(unprefixedJson)
+        )
+
         logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
+
         val maybeUpdatedDate = root.updatedDate.string.getOption(json)
         // TODO: fail if bibIds filed does not exist
         val bibIdList = root.bibIds.each.string.getAll(json)
@@ -70,8 +74,11 @@ object SierraItemsDynamoSink extends Logging {
   // respectively.
   //
   // This updates the ID in a block of JSON to add this disambiguating prefix.
-  def addIDPrefix(json: Json): Json =
+  def addIDPrefixToItems(json: Json): Json =
     root.id.string.modify(id => s"i$id")(json)
+
+  def addIDPrefixToBibs(json: Json): Json =
+    root.bibIds.each.string.modify(id => s"b$id")(json)
 
   private def getId(json: Json) = {
     root.id.string.getOption(json).get
