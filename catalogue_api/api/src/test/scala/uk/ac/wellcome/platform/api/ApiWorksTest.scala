@@ -261,7 +261,7 @@ class ApiWorksTest
     }
   }
 
-  it("always includes the 'items' list if the items include is present") {
+  it("always includes 'items' if the items include is present, even with no items") {
     val work = workWith(
       canonicalId = "dgdb712",
       title = "Without windows or wind or washing-up liquid"
@@ -727,6 +727,33 @@ class ApiWorksTest
                           | "title": "${work.title}",
                           | "creators": [ ],
                           | "identifiers": [ ${identifier(srcIdentifier)} ],
+                          | "subjects": [ ],
+                          | "genres": [ ]
+                          |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it("always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+    val work = workWith(
+      canonicalId = "a87na87",
+      title = "Idling inkwells of indigo images"
+    )
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/${work.id}?includes=identifiers",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                          | "type": "Work",
+                          | "id": "${work.id}",
+                          | "title": "${work.title}",
+                          | "creators": [ ],
+                          | "identifiers": [ ],
                           | "subjects": [ ],
                           | "genres": [ ]
                           |}
