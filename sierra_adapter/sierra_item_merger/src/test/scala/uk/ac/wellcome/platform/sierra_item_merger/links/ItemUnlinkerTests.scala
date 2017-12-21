@@ -3,96 +3,97 @@ package uk.ac.wellcome.platform.sierra_item_merger.links
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 
-class ItemUnlinkerTests extends FunSpec with Matchers{
+class ItemUnlinkerTests extends FunSpec with Matchers {
 
-    it("removes the item if it already exists") {
-      val bibId = "222"
+  it("removes the item if it already exists") {
+    val bibId = "222"
 
-      val record = sierraItemRecord(
-        id = "i111",
-        title = "Only otters occupy the orange oval",
-        modifiedDate = "2001-01-01T01:01:01Z",
-        bibIds = List(bibId),
-        unlinkedBibIds = List()
-      )
+    val record = sierraItemRecord(
+      id = "i111",
+      title = "Only otters occupy the orange oval",
+      modifiedDate = "2001-01-01T01:01:01Z",
+      bibIds = List(bibId),
+      unlinkedBibIds = List()
+    )
 
-      val unlinkedItemRecord = record.copy(
-        bibIds = Nil,
-        modifiedDate = record.modifiedDate.plusSeconds(1),
-        unlinkedBibIds = List(bibId)
-      )
+    val unlinkedItemRecord = record.copy(
+      bibIds = Nil,
+      modifiedDate = record.modifiedDate.plusSeconds(1),
+      unlinkedBibIds = List(bibId)
+    )
 
-      val mergedSierraRecord = MergedSierraRecord(
-        id = bibId,
-        itemData = Map(record.id -> record)
-      )
+    val mergedSierraRecord = MergedSierraRecord(
+      id = bibId,
+      itemData = Map(record.id -> record)
+    )
 
-      val expectedMergedSierraRecord = mergedSierraRecord.copy(
-        itemData = Map.empty
-      )
+    val expectedMergedSierraRecord = mergedSierraRecord.copy(
+      itemData = Map.empty
+    )
 
-      ItemUnlinker.unlinkItemRecord(mergedSierraRecord,unlinkedItemRecord) shouldBe expectedMergedSierraRecord
-    }
+    ItemUnlinker.unlinkItemRecord(mergedSierraRecord, unlinkedItemRecord) shouldBe expectedMergedSierraRecord
+  }
 
-    it("returns the original record when merging an unlinked record which is already absent") {
-      val bibId = "333"
+  it(
+    "returns the original record when merging an unlinked record which is already absent") {
+    val bibId = "333"
 
-      val record = sierraItemRecord(
-        id = "i111",
-        title = "Only otters occupy the orange oval",
-        modifiedDate = "2001-01-01T01:01:01Z",
-        bibIds = List(bibId),
-        unlinkedBibIds = List()
-      )
+    val record = sierraItemRecord(
+      id = "i111",
+      title = "Only otters occupy the orange oval",
+      modifiedDate = "2001-01-01T01:01:01Z",
+      bibIds = List(bibId),
+      unlinkedBibIds = List()
+    )
 
-      val previouslyUnlinkedRecord = sierraItemRecord(
-        id = "i222",
-        title = "Only otters occupy the orange oval",
-        modifiedDate = "2001-01-01T01:01:01Z",
-        bibIds = List(),
-        unlinkedBibIds = List(bibId)
-      )
+    val previouslyUnlinkedRecord = sierraItemRecord(
+      id = "i222",
+      title = "Only otters occupy the orange oval",
+      modifiedDate = "2001-01-01T01:01:01Z",
+      bibIds = List(),
+      unlinkedBibIds = List(bibId)
+    )
 
-      val mergedSierraRecord = MergedSierraRecord(
-        id = bibId,
-        itemData = Map(record.id -> record)
-      )
+    val mergedSierraRecord = MergedSierraRecord(
+      id = bibId,
+      itemData = Map(record.id -> record)
+    )
 
-      val expectedMergedSierraRecord = mergedSierraRecord
+    val expectedMergedSierraRecord = mergedSierraRecord
 
-      ItemUnlinker.unlinkItemRecord(mergedSierraRecord,previouslyUnlinkedRecord) shouldBe expectedMergedSierraRecord
-    }
+    ItemUnlinker.unlinkItemRecord(mergedSierraRecord, previouslyUnlinkedRecord) shouldBe expectedMergedSierraRecord
+  }
 
-    it("returns the original record when merging an unlinked record which has linked more recently") {
-      val bibId = "444"
-      val itemId = "i111"
+  it(
+    "returns the original record when merging an unlinked record which has linked more recently") {
+    val bibId = "444"
+    val itemId = "i111"
 
-      val record = sierraItemRecord(
-        id = itemId,
-        title = "Only otters occupy the orange oval",
-        modifiedDate = "2001-01-01T01:01:01Z",
-        bibIds = List(bibId),
-        unlinkedBibIds = List()
-      )
+    val record = sierraItemRecord(
+      id = itemId,
+      title = "Only otters occupy the orange oval",
+      modifiedDate = "2001-01-01T01:01:01Z",
+      bibIds = List(bibId),
+      unlinkedBibIds = List()
+    )
 
-      val outOfDateUnlinkedRecord = sierraItemRecord(
-        id = record.id,
-        title = "Curious clams caught in caul",
-        modifiedDate = "2000-01-01T01:01:01Z",
-        bibIds = List(),
-        unlinkedBibIds = List(bibId)
-      )
+    val outOfDateUnlinkedRecord = sierraItemRecord(
+      id = record.id,
+      title = "Curious clams caught in caul",
+      modifiedDate = "2000-01-01T01:01:01Z",
+      bibIds = List(),
+      unlinkedBibIds = List(bibId)
+    )
 
-      val mergedSierraRecord = MergedSierraRecord(
-        id = bibId,
-        itemData = Map(record.id -> record)
-      )
+    val mergedSierraRecord = MergedSierraRecord(
+      id = bibId,
+      itemData = Map(record.id -> record)
+    )
 
-      val expectedMergedSierraRecord = mergedSierraRecord
+    val expectedMergedSierraRecord = mergedSierraRecord
 
-      ItemUnlinker.unlinkItemRecord(mergedSierraRecord,outOfDateUnlinkedRecord) shouldBe expectedMergedSierraRecord
-    }
-
+    ItemUnlinker.unlinkItemRecord(mergedSierraRecord, outOfDateUnlinkedRecord) shouldBe expectedMergedSierraRecord
+  }
 
   it("should only unlink item records with matching bib IDs") {
     val bibId = "222"
@@ -120,19 +121,19 @@ class ItemUnlinkerTests extends FunSpec with Matchers{
     )
 
     val caught = intercept[RuntimeException] {
-      ItemUnlinker.unlinkItemRecord(mergedSierraRecord,unrelatedItemRecord)
+      ItemUnlinker.unlinkItemRecord(mergedSierraRecord, unrelatedItemRecord)
     }
 
     caught.getMessage shouldEqual "Non-matching bib id 222 in item unlink bibs List(846)"
   }
 
   def sierraItemRecord(
-                        id: String = "i111",
-                        title: String = "Ingenious imps invent invasive implements",
-                        modifiedDate: String = "2001-01-01T01:01:01Z",
-                        bibIds: List[String],
-                        unlinkedBibIds: List[String] = List()
-                      ) = SierraItemRecord(
+    id: String = "i111",
+    title: String = "Ingenious imps invent invasive implements",
+    modifiedDate: String = "2001-01-01T01:01:01Z",
+    bibIds: List[String],
+    unlinkedBibIds: List[String] = List()
+  ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(
       id = id,
@@ -145,10 +146,10 @@ class ItemUnlinkerTests extends FunSpec with Matchers{
   )
 
   private def sierraRecordString(
-                                  id: String,
-                                  updatedDate: String,
-                                  title: String
-                                ) =
+    id: String,
+    updatedDate: String,
+    title: String
+  ) =
     s"""
        |{
        |      "id": "$id",

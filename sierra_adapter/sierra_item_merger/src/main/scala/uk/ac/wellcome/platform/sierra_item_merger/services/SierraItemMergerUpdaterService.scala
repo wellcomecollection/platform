@@ -41,7 +41,8 @@ class SierraItemMergerUpdaterService @Inject()(
         .getRecord(unlinkedBibId)
         .flatMap {
           case Some(record) =>
-            val mergedRecord = ItemUnlinker.unlinkItemRecord(record,itemRecord)
+            val mergedRecord =
+              ItemUnlinker.unlinkItemRecord(record, itemRecord)
             if (mergedRecord != record)
               mergedSierraRecordDao.updateRecord(mergedRecord)
             else Future.successful(())
