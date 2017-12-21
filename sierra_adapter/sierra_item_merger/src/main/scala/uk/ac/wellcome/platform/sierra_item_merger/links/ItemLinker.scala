@@ -3,12 +3,14 @@ package uk.ac.wellcome.platform.sierra_item_merger.links
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 
 object ItemLinker {
+
   /** Given a new item record, construct the new merged row that we should
     * insert into the merged database.
     *
     * Returns the merged record.
     */
-  def linkItemRecord(mergedSierraRecord: MergedSierraRecord, itemRecord: SierraItemRecord): MergedSierraRecord = {
+  def linkItemRecord(mergedSierraRecord: MergedSierraRecord,
+                     itemRecord: SierraItemRecord): MergedSierraRecord = {
     if (!itemRecord.bibIds.contains(mergedSierraRecord.id)) {
       throw new RuntimeException(
         s"Non-matching bib id ${mergedSierraRecord.id} in item bib ${itemRecord.bibIds}")

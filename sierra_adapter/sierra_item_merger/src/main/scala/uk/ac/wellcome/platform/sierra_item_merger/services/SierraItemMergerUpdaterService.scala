@@ -23,7 +23,8 @@ class SierraItemMergerUpdaterService @Inject()(
         .getRecord(bibId)
         .flatMap {
           case Some(existingMergedSierraRecord) =>
-            val mergedRecord = ItemLinker.linkItemRecord(existingMergedSierraRecord,itemRecord)
+            val mergedRecord =
+              ItemLinker.linkItemRecord(existingMergedSierraRecord, itemRecord)
             if (mergedRecord != existingMergedSierraRecord)
               mergedSierraRecordDao.updateRecord(mergedRecord)
             else Future.successful(())
