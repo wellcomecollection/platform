@@ -25,7 +25,7 @@ class SierraTransformableTransformer
                 sierraBibData.id
               )
             ),
-            items = sierraTransformable.itemData.values.map(record =>
+            items = Option(sierraTransformable.itemData).getOrElse(Map.empty).values.map(record =>
               Item(
                 sourceIdentifier = SourceIdentifier(
                   IdentifierSchemes.sierraSystemNumber, record.id

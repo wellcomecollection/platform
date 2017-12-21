@@ -9,8 +9,8 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
-    val id = "000"
-    val title = "Hi Diddle Dee Dee"
+    val id = "b5757575"
+    val title = "A morning mixture of molasses and muesli"
     val data =
       s"""
          |{
@@ -21,8 +21,11 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
 
     val mergedSierraRecord = MergedSierraRecord(
       id = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now()))
+      maybeBibData = Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+      itemData = Map(
+        "i111" -> sierraItemRecord(id = "i111", title = title, bibIds = List(id)),
+        "i222" -> sierraItemRecord(id = "i222", title = title, bibIds = List(id))
+      )
     )
 
     val transformedSierraRecord = transformer.transform(mergedSierraRecord)
