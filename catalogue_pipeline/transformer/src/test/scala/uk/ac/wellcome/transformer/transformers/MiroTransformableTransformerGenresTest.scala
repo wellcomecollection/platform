@@ -3,9 +3,8 @@ package uk.ac.wellcome.transformer.transformers
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Concept
 
-
 class MiroTransformableTransformerGenresTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
@@ -69,9 +68,9 @@ class MiroTransformableTransformerGenresTest
   }
 
   private def transformRecordAndCheckGenres(
-                                             data: String,
-                                             expectedGenres: List[Concept] = List()
-                                           ) = {
+    data: String,
+    expectedGenres: List[Concept] = List()
+  ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
   }

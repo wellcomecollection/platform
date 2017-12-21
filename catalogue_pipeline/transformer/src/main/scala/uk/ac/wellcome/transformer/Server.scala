@@ -2,11 +2,18 @@ package uk.ac.wellcome.platform.transformer
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.transformer.modules.{TransformerModule, TransformerWorkerModule}
+import uk.ac.wellcome.transformer.modules.{
+  TransformerModule,
+  TransformerWorkerModule
+}
 
 object ServerMain extends Server
 

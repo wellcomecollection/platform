@@ -69,12 +69,12 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   }
 
   def sierraItemRecord(
-                        id: String = "i111",
-                        title: String = "Ingenious imps invent invasive implements",
-                        modifiedDate: String = "2001-01-01T01:01:01Z",
-                        bibIds: List[String],
-                        unlinkedBibIds: List[String] = List()
-                      ) = SierraItemRecord(
+    id: String = "i111",
+    title: String = "Ingenious imps invent invasive implements",
+    modifiedDate: String = "2001-01-01T01:01:01Z",
+    bibIds: List[String],
+    unlinkedBibIds: List[String] = List()
+  ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(
       id = id,
@@ -87,10 +87,10 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   )
 
   private def sierraRecordString(
-                                  id: String,
-                                  updatedDate: String,
-                                  title: String
-                                ) =
+    id: String,
+    updatedDate: String,
+    title: String
+  ) =
     s"""
        |{
        |      "id": "$id",

@@ -3,7 +3,6 @@ package uk.ac.wellcome.transformer.transformers
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
 
-
 /** Tests that the Miro transformer extracts the "subjects" field correctly.
   *
   *  Although this transformation is currently a bit basic, the data we get
@@ -11,7 +10,7 @@ import uk.ac.wellcome.models._
   *  names, etc.) -- these tests will become more complicated.
   */
 class MiroTransformableTransformerSubjectsTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
@@ -95,9 +94,9 @@ class MiroTransformableTransformerSubjectsTest
   }
 
   private def transformRecordAndCheckSubjects(
-                                               data: String,
-                                               expectedSubjects: List[Concept] = List()
-                                             ) = {
+    data: String,
+    expectedSubjects: List[Concept] = List()
+  ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.subjects shouldBe expectedSubjects
   }

@@ -6,14 +6,19 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try
 
-class CalmTransformableTransformer extends TransformableTransformer[CalmTransformable] {
-  override def transformForType(calmTransformable: CalmTransformable): Try[Option[Work]] = JsonUtil
+class CalmTransformableTransformer
+    extends TransformableTransformer[CalmTransformable] {
+  override def transformForType(
+    calmTransformable: CalmTransformable): Try[Option[Work]] =
+    JsonUtil
       .fromJson[CalmTransformableData](calmTransformable.data)
       .flatMap(data => (new CalmDataTransformer).transform(data))
 }
 
-class CalmDataTransformer extends TransformableTransformer[CalmTransformableData] {
-  override def transformForType(transformable: CalmTransformableData): Try[Option[Work]] = Try {
+class CalmDataTransformer
+    extends TransformableTransformer[CalmTransformableData] {
+  override def transformForType(
+    transformable: CalmTransformableData): Try[Option[Work]] = Try {
     // TODO: Fill in proper data here
     Some(
       Work(

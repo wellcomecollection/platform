@@ -34,7 +34,6 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       data = buildJSONForWork(data)
     )
 
-
     transformer.transform(miroTransformable).isSuccess shouldBe true
     transformer.transform(miroTransformable).get.get
   }

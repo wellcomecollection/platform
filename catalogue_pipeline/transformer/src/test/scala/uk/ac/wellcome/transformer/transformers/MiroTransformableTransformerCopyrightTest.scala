@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.transformers
 import org.scalatest.{FunSpec, Matchers}
 
 class MiroTransformableTransformerCopyrightTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
@@ -77,9 +77,9 @@ class MiroTransformableTransformerCopyrightTest
   }
 
   private def transformRecordAndCheckCredit(
-                                             data: String,
-                                             expectedCredit: Option[String] = None
-                                           ) = {
+    data: String,
+    expectedCredit: Option[String] = None
+  ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.items.head.locations.head.credit shouldBe expectedCredit
   }

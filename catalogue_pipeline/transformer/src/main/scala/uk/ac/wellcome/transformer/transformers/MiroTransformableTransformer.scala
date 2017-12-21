@@ -3,13 +3,17 @@ import java.io.InputStream
 
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.Transformable
-import uk.ac.wellcome.models.transformable.miro.{MiroTransformable, MiroTransformableData}
+import uk.ac.wellcome.models.transformable.miro.{
+  MiroTransformable,
+  MiroTransformableData
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.io.Source
 import scala.util.Try
 
-class MiroTransformableTransformer extends TransformableTransformer[MiroTransformable] {
+class MiroTransformableTransformer
+    extends TransformableTransformer[MiroTransformable] {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   // This JSON resource gives us credit lines for contributor codes.
@@ -29,27 +33,29 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
   val contributorMap =
     JsonUtil.toMap[String](Source.fromInputStream(stream).mkString).get
 
-  override def transformForType(miroTransformable: MiroTransformable): Try[Option[Work]] = Try {
+  override def transformForType(
+    miroTransformable: MiroTransformable): Try[Option[Work]] = Try {
 
-      val miroData = MiroTransformableData.create(miroTransformable.data)
-      val (title, description) = getTitleAndDescription(miroData)
+    val miroData = MiroTransformableData.create(miroTransformable.data)
+    val (title, description) = getTitleAndDescription(miroData)
 
-      Some(
-        Work(
-          sourceIdentifier =
-            SourceIdentifier(IdentifierSchemes.miroImageNumber, miroTransformable.MiroID),
-          identifiers = getIdentifiers(miroData, miroTransformable.MiroID),
-          title = title,
-          description = description,
-          createdDate = getCreatedDate(miroData, miroTransformable.MiroCollection),
-          lettering = miroData.suppLettering,
-          creators = getCreators(miroData),
-          subjects = getSubjects(miroData),
-          genres = getGenres(miroData),
-          thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)),
-          items = getItems(miroData, miroTransformable.MiroID)
-        ))
-    }
+    Some(
+      Work(
+        sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
+                                            miroTransformable.MiroID),
+        identifiers = getIdentifiers(miroData, miroTransformable.MiroID),
+        title = title,
+        description = description,
+        createdDate =
+          getCreatedDate(miroData, miroTransformable.MiroCollection),
+        lettering = miroData.suppLettering,
+        creators = getCreators(miroData),
+        subjects = getSubjects(miroData),
+        genres = getGenres(miroData),
+        thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)),
+        items = getItems(miroData, miroTransformable.MiroID)
+      ))
+  }
 
   /*
    * Populate the title and description.  The rules are as follows:
@@ -80,7 +86,7 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
    *  here if there's nothing more useful in the other fields.
    */
   private def getTitleAndDescription(
-                                      miroData: MiroTransformableData): (String, Option[String]) = {
+    miroData: MiroTransformableData): (String, Option[String]) = {
 
     val candidateDescription: String = miroData.description match {
       case Some(s) => {
@@ -123,13 +129,13 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     //
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
-    zipMiroFields(keys = miroData.award, values = miroData.awardDate)
-      .filter {
-        case (label, _) =>
-          (label == "WIA Overall Winner" ||
-            label == "Wellcome Image Awards" ||
-            label == "Biomedical Image Awards")
-      }
+      zipMiroFields(keys = miroData.award, values = miroData.awardDate)
+        .filter {
+          case (label, _) =>
+            (label == "WIA Overall Winner" ||
+              label == "Wellcome Image Awards" ||
+              label == "Biomedical Image Awards")
+        }
 
     val wiaAwardsString = wiaAwardsData match {
       // Most images have no award, or only a single award string.
@@ -149,14 +155,15 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     // Finally, remove any leading/trailing from the description, and drop
     // the description if it's *only* whitespace.
     val description =
-    if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
-      Some((rawDescription + wiaAwardsString).trim)
-    } else None
+      if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
+        Some((rawDescription + wiaAwardsString).trim)
+      } else None
 
     (title, description)
   }
 
-  private def getIdentifiers(miroData: MiroTransformableData, miroId: String): List[SourceIdentifier] = {
+  private def getIdentifiers(miroData: MiroTransformableData,
+                             miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)
     )
@@ -202,15 +209,15 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     // put them all in the same identifier scheme, because we're not doing
     // any transformation or cleaning.
     val libraryRefsList: List[SourceIdentifier] =
-    zipMiroFields(keys = miroData.libraryRefDepartment,
-      values = miroData.libraryRefId)
-      .map {
-        case (label, value) =>
-          SourceIdentifier(
-            IdentifierSchemes.miroLibraryReference,
-            s"$label $value"
-          )
-      }
+      zipMiroFields(keys = miroData.libraryRefDepartment,
+                    values = miroData.libraryRefId)
+        .map {
+          case (label, value) =>
+            SourceIdentifier(
+              IdentifierSchemes.miroLibraryReference,
+              s"$label $value"
+            )
+        }
 
     miroIDList ++ sierraList ++ libraryRefsList
   }
@@ -286,7 +293,8 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     (physFormat ++ lcGenre).distinct
   }
 
-  private def getThumbnail(miroData: MiroTransformableData, miroId: String): Location = {
+  private def getThumbnail(miroData: MiroTransformableData,
+                           miroId: String): Location = {
     Location(
       locationType = "thumbnail-image",
       url = Some(buildImageApiURL(miroId, "thumbnail")),
@@ -294,7 +302,8 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     )
   }
 
-  private def getItems(miroData: MiroTransformableData, miroId: String): List[Item] = {
+  private def getItems(miroData: MiroTransformableData,
+                       miroId: String): List[Item] = {
     List(
       Item(
         sourceIdentifier =
@@ -313,7 +322,8 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
       ))
   }
 
-  private def getCreatedDate(miroData: MiroTransformableData, collection: String): Option[Period] =
+  private def getCreatedDate(miroData: MiroTransformableData,
+                             collection: String): Option[Period] =
     if (collectionIsV(collection)) {
       miroData.artworkDate.map { Period(_) }
     } else {
@@ -340,17 +350,17 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
       case Some(line) =>
         Some(line
           .replaceAll("Adrian Wressell, Heart of England NHSFT",
-            "Adrian Wressell, Heart of England NHS FT")
+                      "Adrian Wressell, Heart of England NHS FT")
           .replaceAll("Andrew Dilley,Jane Greening & Bruce Lynn",
-            "Andrew Dilley, Jane Greening & Bruce Lynn")
+                      "Andrew Dilley, Jane Greening & Bruce Lynn")
           .replaceAll("Andrew Dilley,Nicola DeLeon & Bruce Lynn",
-            "Andrew Dilley, Nicola De Leon & Bruce Lynn")
+                      "Andrew Dilley, Nicola De Leon & Bruce Lynn")
           .replaceAll("Ashley Prytherch, Royal Surrey County Hospital NHS Foundation Trust",
-            "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
+                      "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
           .replaceAll("David Gregory & Debbie Marshall",
-            "David Gregory and Debbie Marshall")
+                      "David Gregory and Debbie Marshall")
           .replaceAll("David Gregory&Debbie Marshall",
-            "David Gregory and Debbie Marshall")
+                      "David Gregory and Debbie Marshall")
           .replaceAll("Geraldine Thompson.", "Geraldine Thompson")
           .replaceAll("John & Penny Hubley.", "John & Penny Hubley")
           .replaceAll(
@@ -422,7 +432,6 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
     }
   }
 
-
   private def buildImageApiURL(miroID: String, templateName: String): String = {
     val iiifImageApiBaseUri = "https://iiif.wellcomecollection.org"
 
@@ -438,7 +447,6 @@ class MiroTransformableTransformer extends TransformableTransformer[MiroTransfor
 
     imageUriTemplate.format(iiifImageApiBaseUri, miroID)
   }
-
 
   /** If the image has a non-empty image_use_restrictions field, choose which
     *  license (if any) we're going to assign to the thumbnail for this work.

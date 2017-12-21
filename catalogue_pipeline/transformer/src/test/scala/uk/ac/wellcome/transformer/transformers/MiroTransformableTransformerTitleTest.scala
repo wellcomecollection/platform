@@ -2,14 +2,13 @@ package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 
-
 /** Tests that the Miro transformer extracts the "title" field correctly.
   *
   *  The rules around this heuristic are somewhat fiddly, and we need to be
   *  careful that we're extracting the right fields from the Miro metadata.
   */
 class MiroTransformableTransformerTitleTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
@@ -164,11 +163,11 @@ class MiroTransformableTransformerTitleTest
   }
 
   private def transformRecordAndCheckTitle(
-                                            data: String,
-                                            expectedTitle: String,
-                                            expectedDescription: Option[String] = None,
-                                            miroCollection: String = "TestCollection"
-                                          ) = {
+    data: String,
+    expectedTitle: String,
+    expectedDescription: Option[String] = None,
+    miroCollection: String = "TestCollection"
+  ) = {
     val transformedWork = transformWork(
       MiroCollection = miroCollection,
       data = data

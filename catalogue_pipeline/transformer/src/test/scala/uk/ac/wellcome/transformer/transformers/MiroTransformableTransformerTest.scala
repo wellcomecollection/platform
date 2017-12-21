@@ -1,10 +1,15 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{Agent, IdentifierSchemes, Period, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  Agent,
+  IdentifierSchemes,
+  Period,
+  SourceIdentifier
+}
 
 class MiroTransformableTransformerTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
@@ -225,9 +230,9 @@ class MiroTransformableTransformerTest
   }
 
   private def transformRecordAndCheckCreators(
-                                               data: String,
-                                               expectedCreators: List[String]
-                                             ) = {
+    data: String,
+    expectedCreators: List[String]
+  ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.creators shouldBe expectedCreators.map { Agent(_) }
   }
@@ -354,10 +359,10 @@ class MiroTransformableTransformerTest
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
-                                                         innopacId: String,
-                                                         expectedSierraNumber: String,
-                                                         miroID: String = "V0000832"
-                                                       ) = {
+    innopacId: String,
+    expectedSierraNumber: String,
+    miroID: String = "V0000832"
+  ) = {
     val work = transformWork(
       data = s"""
         "image_title": "A bouncing bundle of bison",
@@ -368,14 +373,14 @@ class MiroTransformableTransformerTest
     work.identifiers shouldBe List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber,
-        expectedSierraNumber)
+                       expectedSierraNumber)
     )
   }
 
   private def transformRecordAndCheckMiroLibraryReferences(
-                                                            data: String,
-                                                            expectedValues: List[String]
-                                                          ) = {
+    data: String,
+    expectedValues: List[String]
+  ) = {
     val work = transformWork(
       data = s"""
         "image_title": "A fanciful frolicking of fish",
