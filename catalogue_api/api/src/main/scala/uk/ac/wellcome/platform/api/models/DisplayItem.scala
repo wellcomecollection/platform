@@ -29,8 +29,6 @@ case class DisplayItem(
 
 object DisplayItem {
   def apply(item: Item, includesIdentifiers: Boolean): DisplayItem = {
-    println(s"@@AWLC item = ${item}")
-    println(s"@@AWLC item.identifiers = ${item.identifiers}")
     DisplayItem(
       id = item.id,
       identifiers =
