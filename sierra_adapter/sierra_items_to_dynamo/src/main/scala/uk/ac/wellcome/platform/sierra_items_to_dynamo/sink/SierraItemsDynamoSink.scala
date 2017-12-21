@@ -18,7 +18,6 @@ object SierraItemsDynamoSink extends Logging {
     implicit executionContext: ExecutionContext): Sink[Json, Future[Unit]] =
     Sink.foldAsync(()) {
       case (_, unprefixedJson) =>
-
         val json = addIDPrefixToItems(
           addIDPrefixToBibs(unprefixedJson)
         )

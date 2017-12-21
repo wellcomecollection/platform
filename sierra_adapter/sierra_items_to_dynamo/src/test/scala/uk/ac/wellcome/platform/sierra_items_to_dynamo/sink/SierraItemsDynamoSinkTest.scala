@@ -200,7 +200,8 @@ class SierraItemsDynamoSinkTest
       data = {
         val json1 = root.id.string.modify(s => s"i$s")(newJson)
         root.bibIds.each.string.modify(id => s"b$id")(json1).noSpaces
-      },      bibIds = List("b1", "b2"),
+      },
+      bibIds = List("b1", "b2"),
       unlinkedBibIds = List("b3")
     )
     whenReady(futureUnit) { _ =>
