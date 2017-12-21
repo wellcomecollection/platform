@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.api.models
 
+import scala.util.{Failure, Success}
+
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
@@ -74,18 +76,27 @@ case object DisplayWork {
       genres = Option(work.genres).getOrElse(Nil),
       identifiers =
         if (includes.identifiers)
-          Some(work.identifiers.map(DisplayIdentifier(_)))
-        else None,
+          // If there aren't any identifiers on the work JSON, Jackson puts a
+          // nil here.  Wrapping it in an Option casts it into a None or Some
+          // as appropriate, and avoids throwing a NullPointerError when
+          // we map over the value.
+          Option[List[SourceIdentifier]](work.identifiers) match {
+            case Some(identifiers) =>
+              Some(identifiers.map(DisplayIdentifier(_)))
+            case None => Some(List())
+          } else None,
       thumbnail =
         if (includes.thumbnail)
           work.thumbnail.map(DisplayLocation(_))
         else None,
       items =
         if (includes.items)
-          Some(work.items.map(DisplayItem(_, includes.identifiers)))
-        else None
+          Option[List[Item]](work.items) match {
+            case Some(items) =>
+              Some(items.map(DisplayItem(_, includes.identifiers)))
+            case None => Some(List())
+          } else None
     )
-
   }
 
   def apply(hit: SearchHit): DisplayWork =
@@ -100,9 +111,12 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    val work =
-      JsonUtil.fromJson[Work](document).get
-
-    DisplayWork(work, includes)
+    JsonUtil.fromJson[Work](document) match {
+      case Success(work) => DisplayWork(work = work, includes = includes)
+      case Failure(e) =>
+        throw new RuntimeException(
+          s"Unable to parse JSON as Work ($e): $document"
+        )
+    }
   }
 }
