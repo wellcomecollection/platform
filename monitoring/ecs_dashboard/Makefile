@@ -18,17 +18,12 @@ ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
 		ecs_dashboard
 
 
-update_service_list-build:
-	$(call build_lambda,monitoring/ecs_dashboard/update_service_list)
-
 update_service_list-test:
 	$(call test_lambda,monitoring/ecs_dashboard/update_service_list)
 
 update_service_list-publish:
 	$(call publish_lambda,monitoring/ecs_dashboard/update_service_list)
 
-
-ecs_dashboard-build: update_service_list-build
 
 ecs_dashboard-test: update_service_list-test
 

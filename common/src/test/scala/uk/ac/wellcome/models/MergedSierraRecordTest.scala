@@ -344,68 +344,6 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     }
   }
 
-  describe("transformations") {
-    it("should not perform a transformation without bibData") {
-      val mergedSierraRecord =
-        MergedSierraRecord(id = "000", maybeBibData = None)
-
-      val transformedSierraRecord = mergedSierraRecord.transform
-      transformedSierraRecord.isSuccess shouldBe true
-
-      transformedSierraRecord.get shouldBe None
-    }
-
-    it(
-      "should not perform a transformation without bibData, even if some itemData is present") {
-      val mergedSierraRecord = MergedSierraRecord(
-        id = "b111",
-        maybeBibData = None,
-        itemData = Map(
-          "i111" -> sierraItemRecord(
-            id = "i111",
-            title = "An incomplete invocation of items",
-            modifiedDate = "2001-01-01T01:01:01Z",
-            bibIds = List("b111")
-          ))
-      )
-
-      val transformedSierraRecord = mergedSierraRecord.transform
-      transformedSierraRecord.isSuccess shouldBe true
-      transformedSierraRecord.get shouldBe None
-    }
-
-    it("should transform itself into a work") {
-      val id = "000"
-      val title = "Hi Diddle Dee Dee"
-      val data =
-        s"""
-          |{
-          | "id": "$id",
-          | "title": "$title"
-          |}
-        """.stripMargin
-
-      val mergedSierraRecord = MergedSierraRecord(
-        id = id,
-        maybeBibData =
-          Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-      val transformedSierraRecord = mergedSierraRecord.transform
-      transformedSierraRecord.isSuccess shouldBe true
-
-      val identifier =
-        SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
-
-      transformedSierraRecord.get shouldBe Some(
-        Work(
-          title = title,
-          sourceIdentifier = identifier,
-          identifiers = List(identifier)
-        )
-      )
-    }
-  }
-
   def sierraBibRecord(
     id: String = "111",
     title: String = "Two toucans touching a towel",

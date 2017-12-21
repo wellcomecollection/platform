@@ -53,7 +53,7 @@ sierra_item_merger-build:
 	$(call build_image,sierra_item_merger,sierra_adapter/sierra_item_merger/Dockerfile)
 
 sierra_item_merger-publish: sierra_item_merger-build
-	echo "This does nothing yet!"
+	$(call publish_service,sierra_item_merger)
 
 
 sierra_adapter-test: \

@@ -13,19 +13,19 @@ module "lambda_sierra_window_generator" {
   }
 }
 
-# module "trigger_sierra_window_generator_lambda" {
-#   source                  = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
-#   lambda_function_name    = "${module.lambda_sierra_window_generator.function_name}"
-#   lambda_function_arn     = "${module.lambda_sierra_window_generator.arn}"
-#   cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.sierra_window_generator_rule.arn}"
-#   cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.sierra_window_generator_rule.id}"
-# }
-#
-# resource "aws_cloudwatch_event_rule" "sierra_window_generator_rule" {
-#   name                = "sierra_window_generator_rule_${var.resource_type}"
-#   description         = "Starts the sierra_window_generator lambda"
-#   schedule_expression = "rate(${var.lambda_trigger_minutes} minutes)"
-# }
+module "trigger_sierra_window_generator_lambda" {
+  source                  = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
+  lambda_function_name    = "${module.lambda_sierra_window_generator.function_name}"
+  lambda_function_arn     = "${module.lambda_sierra_window_generator.arn}"
+  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.sierra_window_generator_rule.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.sierra_window_generator_rule.id}"
+}
+
+resource "aws_cloudwatch_event_rule" "sierra_window_generator_rule" {
+  name                = "sierra_window_generator_rule_${var.resource_type}"
+  description         = "Starts the sierra_window_generator lambda"
+  schedule_expression = "rate(${var.lambda_trigger_minutes} minutes)"
+}
 
 resource "aws_iam_role_policy" "sierra_window_generator_sns_publish" {
   name   = "${module.lambda_sierra_window_generator.function_name}_policy"

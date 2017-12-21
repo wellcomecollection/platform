@@ -8,15 +8,18 @@ import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
+import uk.ac.wellcome.transformer.transformers.TransformableTransformer
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
 import scala.util.{Failure, Success, Try}
 
 class SQSMessageReceiver(
   snsWriter: SNSWriter,
   transformableParser: TransformableParser[Transformable],
+  transformableTransformer: TransformableTransformer[Transformable],
   metricsSender: MetricsSender)
     extends Logging {
 
@@ -46,7 +49,7 @@ class SQSMessageReceiver(
   }
 
   def transformTransformable(transformable: Transformable): Try[Option[Work]] = {
-    transformable.transform map { transformed =>
+    transformableTransformer.transform(transformable) map { transformed =>
       info(s"Transformed record $transformed")
       transformed
     } recover {

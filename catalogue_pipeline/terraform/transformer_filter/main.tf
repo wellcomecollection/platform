@@ -19,6 +19,7 @@ module "transformer_filter" {
   name        = "${var.name}_transformer_filter"
   module_name = "transformer_sns_filter"
   description = "Filters DynamoDB events for the ${var.name} transformer"
+  timeout     = 6
 
   environment_variables = {
     TOPIC_ARN = "${var.dst_topic_arn}"
