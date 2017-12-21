@@ -21,10 +21,15 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
 
     val mergedSierraRecord = MergedSierraRecord(
       id = id,
-      maybeBibData = Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
-        "i111" -> sierraItemRecord(id = "i111", title = title, bibIds = List(id)),
-        "i222" -> sierraItemRecord(id = "i222", title = title, bibIds = List(id))
+        "i111" -> sierraItemRecord(id = "i111",
+                                   title = title,
+                                   bibIds = List(id)),
+        "i222" -> sierraItemRecord(id = "i222",
+                                   title = title,
+                                   bibIds = List(id))
       )
     )
 

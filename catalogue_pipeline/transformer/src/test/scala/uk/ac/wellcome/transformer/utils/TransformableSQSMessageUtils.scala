@@ -72,6 +72,10 @@ trait TransformableSQSMessageUtils {
   def createInvalidRecord: SQSMessage = sqsMessage("not a json string")
 
   def sqsMessage(message: String) = {
-    SQSMessage(None, message, "test_transformer_topic", "notification", "the_time")
+    SQSMessage(None,
+               message,
+               "test_transformer_topic",
+               "notification",
+               "the_time")
   }
 }
