@@ -1,5 +1,5 @@
 module "sierra_to_dynamo_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=terrible-hack"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.2.2"
   name   = "sierra_to_dynamo_${var.resource_type}"
 
   source_queue_name  = "${module.windows_queue.name}"
