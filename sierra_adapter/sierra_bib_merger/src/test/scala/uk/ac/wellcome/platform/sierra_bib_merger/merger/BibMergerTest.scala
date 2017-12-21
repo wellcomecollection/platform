@@ -78,10 +78,10 @@ class BibMergerTest extends FunSpec with Matchers {
   }
 
   def sierraBibRecord(
-                       id: String = "111",
-                       title: String = "Two toucans touching a towel",
-                       modifiedDate: String = "2001-01-01T01:01:01Z"
-                     ) = SierraBibRecord(
+    id: String = "111",
+    title: String = "Two toucans touching a towel",
+    modifiedDate: String = "2001-01-01T01:01:01Z"
+  ) = SierraBibRecord(
     id = id,
     data = sierraRecordString(
       id = id,
@@ -92,10 +92,10 @@ class BibMergerTest extends FunSpec with Matchers {
   )
 
   private def sierraRecordString(
-                                  id: String,
-                                  updatedDate: String,
-                                  title: String
-                                ) =
+    id: String,
+    updatedDate: String,
+    title: String
+  ) =
     s"""
        |{
        |      "id": "$id",
