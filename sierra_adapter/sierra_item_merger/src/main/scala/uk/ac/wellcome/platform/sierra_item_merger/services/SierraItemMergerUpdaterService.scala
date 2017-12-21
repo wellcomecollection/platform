@@ -5,6 +5,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
+import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -21,9 +22,9 @@ class SierraItemMergerUpdaterService @Inject()(
       mergedSierraRecordDao
         .getRecord(bibId)
         .flatMap {
-          case Some(record) =>
-            val mergedRecord = record.mergeItemRecord(itemRecord)
-            if (mergedRecord != record)
+          case Some(existingMergedSierraRecord) =>
+            val mergedRecord = ItemLinker.linkItemRecord(existingMergedSierraRecord,itemRecord)
+            if (mergedRecord != existingMergedSierraRecord)
               mergedSierraRecordDao.updateRecord(mergedRecord)
             else Future.successful(())
           case None =>
