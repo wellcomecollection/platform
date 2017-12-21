@@ -24,7 +24,19 @@ class SierraTransformableTransformer
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
                 sierraBibData.id
               )
-            )
+            ),
+            items = sierraTransformable.itemData.values.map(record =>
+              Item(
+                sourceIdentifier = SourceIdentifier(
+                  IdentifierSchemes.sierraSystemNumber, record.id
+                ),
+                identifiers = List(
+                  SourceIdentifier(
+                    IdentifierSchemes.sierraSystemNumber, record.id
+                  )
+                )
+              )
+            ).toList
           ))
         }
       }

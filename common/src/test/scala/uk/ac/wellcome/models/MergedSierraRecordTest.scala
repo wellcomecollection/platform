@@ -343,7 +343,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       }
     }
   }
-  
+
   def sierraBibRecord(
     id: String = "111",
     title: String = "Two toucans touching a towel",
