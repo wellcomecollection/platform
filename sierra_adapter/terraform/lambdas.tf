@@ -4,6 +4,7 @@ module "lambda_sierra_bibs_merger_filter" {
   name        = "sierra_bibs_merger_filter_filter"
   module_name = "transformer_sns_filter"
   description = "Filters DynamoDB events for the Sierra bibs merger"
+  timeout     = 6
 
   environment_variables = {
     TOPIC_ARN = "${module.sierra_bib_merger_events_topic.arn}"
