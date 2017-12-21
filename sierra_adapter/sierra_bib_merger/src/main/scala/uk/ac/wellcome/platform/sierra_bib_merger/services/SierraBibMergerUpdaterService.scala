@@ -5,6 +5,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
+import uk.ac.wellcome.platform.sierra_bib_merger.merger.BibMerger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -19,9 +20,9 @@ class SierraBibMergerUpdaterService @Inject()(
     mergedSierraRecordDao
       .getRecord(bibRecord.id)
       .flatMap {
-        case Some(record) =>
-          val mergedRecord = record.mergeBibRecord(bibRecord)
-          if (mergedRecord != record)
+        case Some(existingMergedSierraRecord) =>
+          val mergedRecord = BibMerger.mergeBibRecord(existingMergedSierraRecord, bibRecord)
+          if (mergedRecord != existingMergedSierraRecord)
             mergedSierraRecordDao.updateRecord(mergedRecord)
           else Future.successful(())
         case None =>

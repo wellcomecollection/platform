@@ -26,27 +26,6 @@ case class MergedSierraRecord(
   version: Int = 0
 ) extends Transformable {
 
-  /** Return the most up-to-date combination of the merged record and the
-    * bib record we've just received.
-    */
-  def mergeBibRecord(record: SierraBibRecord): MergedSierraRecord = {
-    if (record.id != this.id) {
-      throw new RuntimeException(
-        s"Non-matching bib ids ${record.id} != ${this.id}")
-    }
-
-    val isNewerData = this.maybeBibData match {
-      case Some(bibData) => record.modifiedDate.isAfter(bibData.modifiedDate)
-      case None => true
-    }
-
-    if (isNewerData) {
-      this.copy(maybeBibData = Some(record))
-    } else {
-      this
-    }
-  }
-
   /** Given a new item record, construct the new merged row that we should
     * insert into the merged database.
     *
