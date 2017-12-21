@@ -79,6 +79,28 @@ case class MergedSierraRecord(
       this
     }
   }
+
+  def unlinkItemRecord(itemRecord: SierraItemRecord): MergedSierraRecord = {
+    if (!itemRecord.unlinkedBibIds.contains(this.id)) {
+      throw new RuntimeException(
+        s"Non-matching bib id ${this.id} in item unlink bibs ${itemRecord.unlinkedBibIds}")
+    }
+
+    val itemData: Map[String, SierraItemRecord] = this.itemData
+      .filterNot {
+        case (id, currentItemRecord) => {
+          val matchesCurrentItemRecord = id == itemRecord.id
+
+          val modifiedAfter = itemRecord.modifiedDate.isAfter(
+            currentItemRecord.modifiedDate
+          )
+
+          matchesCurrentItemRecord && modifiedAfter
+        }
+      }
+
+    this.copy(itemData = itemData)
+  }
 }
 
 case class SierraBibData(id: String, title: String)
