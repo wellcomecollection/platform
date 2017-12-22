@@ -12,7 +12,7 @@ RUN python ./get-pip.py
 
 RUN pip install awscli
 
-ENV LORIS_COMMIT e72d9bf00bd0a4f7052765af6e6ce5480cca5ef3
+ENV LORIS_COMMIT a349d24b63bf1ae1af97e376304c4b1acc983639
 ENV LORIS_GITHUB_USER loris-imageserver
 
 COPY requirements.txt /
