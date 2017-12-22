@@ -8,31 +8,31 @@ import uk.ac.wellcome.utils.JsonUtil
 
 class MergedSierraRecordTest extends FunSpec with Matchers {
 
-    it("should allow creation of MergedSierraRecord with no data") {
-      MergedSierraRecord(id = "111")
-    }
+  it("should allow creation of MergedSierraRecord with no data") {
+    MergedSierraRecord(id = "111")
+  }
 
-    it("should allow creation from only a SierraBibRecord") {
-      val bibRecord = sierraBibRecord(id = "101")
-      val mergedRecord = MergedSierraRecord(bibRecord = bibRecord)
-      mergedRecord.id shouldEqual bibRecord.id
-      mergedRecord.maybeBibData.get shouldEqual bibRecord
-    }
+  it("should allow creation from only a SierraBibRecord") {
+    val bibRecord = sierraBibRecord(id = "101")
+    val mergedRecord = MergedSierraRecord(bibRecord = bibRecord)
+    mergedRecord.id shouldEqual bibRecord.id
+    mergedRecord.maybeBibData.get shouldEqual bibRecord
+  }
 
-    it("should allow creation from a SierraBibRecord and a version") {
-      val bibRecord = sierraBibRecord(id = "202")
-      val version = 10
-      val mergedRecord = MergedSierraRecord(
-        bibRecord = bibRecord,
-        version = version
-      )
-      mergedRecord.version shouldEqual version
-    }
+  it("should allow creation from a SierraBibRecord and a version") {
+    val bibRecord = sierraBibRecord(id = "202")
+    val version = 10
+    val mergedRecord = MergedSierraRecord(
+      bibRecord = bibRecord,
+      version = version
+    )
+    mergedRecord.version shouldEqual version
+  }
 
-    it("should be at version 0 when first created") {
-      val record = MergedSierraRecord(id = "555")
-      record.version shouldEqual 0
-    }
+  it("should be at version 0 when first created") {
+    val record = MergedSierraRecord(id = "555")
+    record.version shouldEqual 0
+  }
 
   def sierraBibRecord(
     id: String = "111",
