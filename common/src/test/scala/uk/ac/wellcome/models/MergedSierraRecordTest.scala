@@ -8,7 +8,6 @@ import uk.ac.wellcome.utils.JsonUtil
 
 class MergedSierraRecordTest extends FunSpec with Matchers {
 
-  describe("creation") {
     it("should allow creation of MergedSierraRecord with no data") {
       MergedSierraRecord(id = "111")
     }
@@ -34,7 +33,6 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
       val record = MergedSierraRecord(id = "555")
       record.version shouldEqual 0
     }
-  }
 
   def sierraBibRecord(
     id: String = "111",
