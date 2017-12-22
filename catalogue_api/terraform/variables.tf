@@ -59,12 +59,12 @@ variable "pinned_romulus_api_nginx" {
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "258770078cf085f97138193337bdfedb869a98d3"
 }
 
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 variable "api_task_count_stage" {
