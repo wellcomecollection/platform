@@ -37,91 +37,6 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   }
 
   describe("merging with a SierraItemRecord") {
-    describe("when the merged record is linked to the item") {
-      it("should add the item if it doesn't exist already") {
-        val record = sierraItemRecord(
-          id = "i888",
-          title = "Illustrious imps are ingenious",
-          modifiedDate = "2008-08-08T08:08:08Z",
-          bibIds = List("b888")
-        )
-
-        val mergedSierraRecord = MergedSierraRecord(id = "b888")
-        val result = mergedSierraRecord.mergeItemRecord(record)
-
-        result.itemData(record.id) shouldBe record
-      }
-
-      it("should update itemData when merging item records with newer data") {
-        val itemId = "i999"
-        val mergedSierraRecord = MergedSierraRecord(
-          id = "b999",
-          itemData = Map(
-            itemId -> sierraItemRecord(
-              id = itemId,
-              title = "No, new narwhals are never naughty",
-              modifiedDate = "2009-09-09T09:09:09Z",
-              bibIds = List("b999")
-            ))
-        )
-
-        val newerRecord = sierraItemRecord(
-          id = itemId,
-          title = "Nobody noticed the naughty narwhals",
-          modifiedDate = "2010-10-10T10:10:10Z",
-          bibIds = List("b999")
-        )
-        val result = mergedSierraRecord.mergeItemRecord(newerRecord)
-
-        result shouldBe mergedSierraRecord.copy(
-          itemData = Map(itemId -> newerRecord))
-      }
-
-      it("should return itself when merging item records with stale data") {
-        val itemId = "i111"
-        val mergedSierraRecord = MergedSierraRecord(
-          id = "b111",
-          itemData = Map(
-            itemId -> sierraItemRecord(
-              id = itemId,
-              title = "Only otters occupy the orange oval",
-              modifiedDate = "2001-01-01T01:01:01Z",
-              bibIds = List("b111")
-            ))
-        )
-
-        val oldRecord = sierraItemRecord(
-          id = itemId,
-          title = "Old otters outside the oblong",
-          modifiedDate = "2000-01-01T01:01:01Z",
-          bibIds = List("b111")
-        )
-        val result = mergedSierraRecord.mergeItemRecord(oldRecord)
-        result shouldBe mergedSierraRecord
-      }
-
-      it("should support adding multiple items to a merged record") {
-        val record1 = sierraItemRecord(
-          id = "i111",
-          title = "Outside the orangutan opens an orange",
-          modifiedDate = "2001-01-01T01:01:01Z",
-          bibIds = List("b121")
-        )
-        val record2 = sierraItemRecord(
-          id = "i222",
-          title = "Twice the turtles took the turn",
-          modifiedDate = "2002-02-02T02:02:02Z",
-          bibIds = List("b121")
-        )
-
-        val mergedSierraRecord = MergedSierraRecord(id = "b121")
-        val result1 = mergedSierraRecord.mergeItemRecord(record1)
-        val result2 = result1.mergeItemRecord(record2)
-
-        result1.itemData(record1.id) shouldBe record1
-        result2.itemData(record2.id) shouldBe record2
-      }
-    }
 
     describe("when the merged record is unlinked from the item") {
       it("removes the item if it already exists") {
@@ -214,28 +129,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
     }
 
     describe("when the merged record is unrelated to the item") {
-      describe("mergeSierraItemRecord") {
-        it("should only merge item records with matching bib IDs") {
-          val bibId = "444"
-          val unrelatedBibId = "666"
 
-          val record = sierraItemRecord(
-            id = "i999",
-            title = "Only otters occupy the orange oval",
-            modifiedDate = "2001-01-01T01:01:01Z",
-            bibIds = List(unrelatedBibId),
-            unlinkedBibIds = List()
-          )
-
-          val mergedSierraRecord = MergedSierraRecord(id = bibId)
-
-          val caught = intercept[RuntimeException] {
-            mergedSierraRecord.mergeItemRecord(record)
-          }
-
-          caught.getMessage shouldEqual "Non-matching bib id 444 in item bib List(666)"
-        }
-      }
       describe("unlinkSierraItemRecord") {
         it("should only unlink item records with matching bib IDs") {
           val bibId = "222"
