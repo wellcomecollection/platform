@@ -23,6 +23,12 @@ apt-get remove --yes unzip wget
 echo "*** Creating Loris user"
 useradd -d /var/www/loris -s /sbin/false loris
 
+# Install pip.  We don't use pip from the Ubuntu package repositories
+# because it tends to be out-of-date and using it gets issues like:
+# https://github.com/pyca/cryptography/issues/3959
+wget https://bootstrap.pypa.io/get-pip.py
+python ./get-pip.py
+
 echo "*** Installing Loris dependencies"
 pip install -r /requirements.txt
 
