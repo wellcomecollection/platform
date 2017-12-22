@@ -26,8 +26,13 @@ useradd -d /var/www/loris -s /sbin/false loris
 # Install pip.  We don't use pip from the Ubuntu package repositories
 # because it tends to be out-of-date and using it gets issues like:
 # https://github.com/pyca/cryptography/issues/3959
+apt-get install --yes wget
 wget https://bootstrap.pypa.io/get-pip.py
 python ./get-pip.py
+
+rm -rf get-pip.py
+apt-get remove --yes wget
+apt-get autoremove --yes
 
 echo "*** Installing Loris dependencies"
 pip install -r /requirements.txt

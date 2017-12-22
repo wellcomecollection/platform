@@ -18,8 +18,7 @@ COPY sRGB2014.icc /usr/share/color/icc/colord/sRGB2014.icc
 COPY loris2.conf /opt/loris/etc/loris2.conf
 COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
-COPY run_loris.sh /
 
 EXPOSE 8888
 
-CMD ["/usr/bin/uwsgi --ini /etc/uwsgi/uwsgi.ini"]
+CMD ["/usr/bin/uwsgi", "--ini", "/etc/uwsgi/uwsgi.ini"]
