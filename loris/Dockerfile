@@ -1,7 +1,8 @@
 FROM ubuntu:16.04
 
 RUN apt-get update && \
-    apt-get install --yes python uwsgi uwsgi-plugin-python wget
+    apt-get install --yes python uwsgi uwsgi-plugin-python wget && \
+    apt-get clean
 
 # Install pip.  We don't use pip from the Ubuntu package repositories
 # because it tends to be out-of-date and using it gets issues like:
