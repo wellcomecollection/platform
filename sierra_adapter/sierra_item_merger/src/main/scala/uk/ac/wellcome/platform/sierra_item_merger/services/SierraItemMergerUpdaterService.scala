@@ -6,6 +6,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
+import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,7 +41,8 @@ class SierraItemMergerUpdaterService @Inject()(
         .getRecord(unlinkedBibId)
         .flatMap {
           case Some(record) =>
-            val mergedRecord = record.unlinkItemRecord(itemRecord)
+            val mergedRecord =
+              ItemUnlinker.unlinkItemRecord(record, itemRecord)
             if (mergedRecord != record)
               mergedSierraRecordDao.updateRecord(mergedRecord)
             else Future.successful(())
