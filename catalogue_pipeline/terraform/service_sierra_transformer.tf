@@ -27,10 +27,12 @@ module "sierra_transformer" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }
 
-module "dynamo_to_sns_sierra_transformer" {
-  source                 = "transformer_filter"
-  name                   = "sierra"
-  src_stream_arn         = "${local.sierradata_table_stream_arn}"
-  dst_topic_arn          = "${module.sierra_transformer_topic.arn}"
+module "dynamo_to_sns_sierra" {
+  source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns?ref=nofilter-dynamo_to_sns"
+
+  name           = "sierra"
+  src_stream_arn = "${local.sierradata_table_stream_arn}"
+  dst_topic_arn  = "${module.sierra_transformer_topic.arn}"
+
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }
