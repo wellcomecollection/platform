@@ -5,7 +5,7 @@ module "sierra_merger_service" {
   source_queue_name = "${var.dynamo_updates_queue_name}"
   source_queue_arn  = "${var.dynamo_updates_queue_arn}"
 
-  ecr_repository_url = "${var.ecr_repository_url}"
+  ecr_repository_url = "${module.ecr_repository.repository_url}"
   release_id         = "${var.release_id}"
 
   env_vars = {
