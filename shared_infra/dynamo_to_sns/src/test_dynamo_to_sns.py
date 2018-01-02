@@ -11,14 +11,7 @@ import dynamo_to_sns
 TEST_STREAM_ARN = 'arn:aws:dynamodb:eu-west-1:123456789012:table/table-stream'
 
 
-def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
-    sqs_client = boto3.client('sqs')
-    topic_arn, queue_url = sns_sqs
-
-    os.environ = {
-        'TOPIC_ARN': topic_arn
-    }
-
+def test_dynamo_to_sns_fails_gracefully_on_remove_event(topic_arn, queue_url):
     old_image = {
         'MiroID': {'S': 'V0000001'},
         'MiroCollection': {'S': 'Images-V'},
@@ -47,11 +40,7 @@ def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
     )
 
 
-def test_dynamo_to_sns(sns_sqs):
-    sqs_client = boto3.client('sqs')
-    topic_arn, queue_url = sns_sqs
-    stream_arn = 'arn:aws:dynamodb:eu-west-1:123456789012:table/table-stream'
-
+def test_dynamo_to_sns(topic_arn, queue_url):
     new_image = {
         'ReindexVersion': {'N': '0'},
         'ReindexShard': {'S': 'default'},
@@ -76,10 +65,6 @@ def test_dynamo_to_sns(sns_sqs):
         'Records': [
             _dynamo_event(event_name='MODIFY', new_image=new_image)
         ]
-    }
-
-    os.environ = {
-        'TOPIC_ARN': topic_arn
     }
 
     dynamo_to_sns.main(event, None)
