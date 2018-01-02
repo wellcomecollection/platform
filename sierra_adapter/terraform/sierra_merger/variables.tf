@@ -1,6 +1,8 @@
 variable "resource_type" {}
 
-variable "dynamo_events_topic_name" {}
+variable "dynamo_updates_queue_name" {}
+variable "dynamo_updates_queue_arn" {}
+variable "dynamo_updates_queue_url" {}
 
 variable "target_dynamo_table_name" {}
 variable "target_dynamo_table_arn" {}
