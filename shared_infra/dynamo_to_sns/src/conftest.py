@@ -42,9 +42,7 @@ def topic_arn(moto_start):
 
     # DynamoToSNS reads its topic ARN from the environment, so we'll just
     # set it here.
-    os.environ = {
-        'TOPIC_ARN': topic_arn
-    }
+    os.environ.update({'TOPIC_ARN': topic_arn})
 
     yield topic_arn
 
