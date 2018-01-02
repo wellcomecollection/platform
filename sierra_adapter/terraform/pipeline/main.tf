@@ -15,7 +15,7 @@ module "sierra_to_dynamo" {
 
   release_id = "${var.release_ids["sierra_${var.resource_type}_to_dynamo"]}"
 
-  resource_type      = "${var.resource_type}"
+  resource_type = "${var.resource_type}"
 
   windows_queue_name = "${module.sierra_window_generator.queue_name}"
   windows_queue_arn  = "${module.sierra_window_generator.queue_arn}"

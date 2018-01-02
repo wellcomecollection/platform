@@ -27,7 +27,7 @@ module "sierra_bibs_pipeline" {
   cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
   vpc_id       = "${module.vpc_sierra_adapter.vpc_id}"
 
-  account_id   = "${data.aws_caller_identity.current.account_id}"
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "sierra_items_pipeline" {
@@ -59,5 +59,5 @@ module "sierra_items_pipeline" {
   cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
   vpc_id       = "${module.vpc_sierra_adapter.vpc_id}"
 
-  account_id   = "${data.aws_caller_identity.current.account_id}"
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
