@@ -1,10 +1,12 @@
 module "lambda_sierra_window_generator" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
+
+  description = "Generate update windows for ${var.resource_type} and push them to SNS"
+  name        = "sierra_${var.resource_type}_window_generator"
+
   s3_key      = "lambdas/sierra_adapter/sierra_window_generator.zip"
   module_name = "sierra_window_generator"
 
-  description     = "Generate windows of a specified length and push them to sns"
-  name            = "sierra_window_generator_${var.resource_type}"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
   environment_variables = {
@@ -22,7 +24,7 @@ module "trigger_sierra_window_generator_lambda" {
 }
 
 resource "aws_cloudwatch_event_rule" "sierra_window_generator_rule" {
-  name                = "sierra_window_generator_rule_${var.resource_type}"
+  name                = "sierra_${var.resource_type}_window_generator_rule"
   description         = "Starts the sierra_window_generator lambda"
   schedule_expression = "rate(${var.lambda_trigger_minutes} minutes)"
 }
