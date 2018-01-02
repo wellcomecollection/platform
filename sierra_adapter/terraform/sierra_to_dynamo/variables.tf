@@ -9,6 +9,9 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "account_id" {}
+variable "dlq_alarm_arn" {}
+
 variable "alb_priority" {}
 variable "alb_listener_http_arn" {}
 variable "alb_listener_https_arn" {}

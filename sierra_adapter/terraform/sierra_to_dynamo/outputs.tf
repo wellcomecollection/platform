@@ -1,7 +1,3 @@
-output "topic_name" {
-  value = "${module.topic_sierra_updates.name}"
-}
-
-output "topic_arn" {
-  value = "${module.topic_sierra_updates.arn}"
+output "update_events_queue_name" {
+  value = "${module.queue_sierra_updates.name}"
 }
