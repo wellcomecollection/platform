@@ -3,7 +3,7 @@ variable "resource_type" {}
 variable "window_length_minutes" {}
 variable "window_interval_minutes" {}
 
-variable "release_id" {
+variable "release_ids" {
   type = "map"
 }
 

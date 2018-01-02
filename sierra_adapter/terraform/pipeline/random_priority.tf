@@ -7,7 +7,7 @@ resource "random_integer" "priority_sierra_to_dynamo" {
     listener_http_arn  = "${var.alb_listener_http_arn}"
   }
 
-  seed = "${var.name}_sierra_${var.resource_type}_to_dynamo"
+  seed = "sierra_${var.resource_type}_to_dynamo"
 }
 
 resource "random_integer" "priority_sierra_merger" {
@@ -19,5 +19,5 @@ resource "random_integer" "priority_sierra_merger" {
     listener_http_arn  = "${var.alb_listener_http_arn}"
   }
 
-  seed = "${var.name}_sierra_${var.resource_type}_merger"
+  seed = "sierra_${var.resource_type}_merger"
 }

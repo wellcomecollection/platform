@@ -1,6 +1,8 @@
 variable "resource_type" {}
 
 variable "windows_queue_name" {}
+variable "windows_queue_arn" {}
+variable "windows_queue_url" {}
 
 variable "cluster_name" {}
 variable "vpc_id" {}
@@ -9,8 +11,8 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
-variable "account_id" {}
 variable "dlq_alarm_arn" {}
+variable "lambda_error_alarm_arn" {}
 
 variable "alb_priority" {}
 variable "alb_listener_http_arn" {}
@@ -30,4 +32,4 @@ variable "sierra_oauth_key" {}
 variable "sierra_oauth_secret" {}
 variable "sierra_fields" {}
 
-variable "lambda_error_alarm_arn" {}
+variable "account_id" {}

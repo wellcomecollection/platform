@@ -13,6 +13,8 @@ module "sierra_bibs_pipeline" {
 
   sierradata_table_name = "${aws_dynamodb_table.sierradata_table.name}"
 
+  release_ids = "${var.release_ids}"
+
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
@@ -28,7 +30,7 @@ module "sierra_bibs_pipeline" {
   account_id   = "${data.aws_caller_identity.current.account_id}"
 }
 
-module "sierra_bibs_pipeline" {
+module "sierra_items_pipeline" {
   source = "pipeline"
 
   resource_type = "items"
@@ -39,9 +41,11 @@ module "sierra_bibs_pipeline" {
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
-  sierra_fields       = "${var.sierra_bibs_fields}"
+  sierra_fields       = "${var.sierra_items_fields}"
 
   sierradata_table_name = "${aws_dynamodb_table.sierradata_table.name}"
+
+  release_ids = "${var.release_ids}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"

@@ -18,7 +18,6 @@ variable "cluster_name" {}
 
 variable "vpc_id" {}
 
-variable "ecr_repository_url" {}
 variable "release_id" {}
 
 variable "infra_bucket" {
