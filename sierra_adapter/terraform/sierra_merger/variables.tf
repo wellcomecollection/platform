@@ -20,10 +20,6 @@ variable "vpc_id" {}
 variable "ecr_repository_url" {}
 variable "release_id" {}
 
-variable "build_env" {
-  default = "prod"
-}
-
 variable "infra_bucket" {
   default = "platform-infra"
 }

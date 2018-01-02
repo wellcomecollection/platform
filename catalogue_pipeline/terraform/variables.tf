@@ -16,11 +16,6 @@ variable "infra_bucket" {
   default     = "platform-infra"
 }
 
-variable "build_env" {
-  description = "Build environment (prod, dev, stage, ...)"
-  default     = "prod"
-}
-
 variable "aws_region" {
   description = "The AWS region to create things in."
   default     = "eu-west-1"
