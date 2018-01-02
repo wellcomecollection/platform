@@ -74,15 +74,10 @@ def test_dynamo_to_sns_fails_gracefully_on_remove_event(sns_sqs):
 
     dynamo_to_sns.main(remove_event, None)
 
-    messages = sqs_client.receive_message(
-        QueueUrl=queue_url,
-        MaxNumberOfMessages=1
+    _assert_sqs_has_messages(
+        expected_messages=[expected_image],
+        queue_url=queue_url
     )
-
-    assert len(messages['Messages']) == 1
-    message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
-    assert json.loads(json.loads(inner_message)['default']) == expected_image
 
 
 def test_dynamo_to_sns(sns_sqs):
@@ -122,11 +117,22 @@ def test_dynamo_to_sns(sns_sqs):
 
     dynamo_to_sns.main(event, None)
 
+    _assert_sqs_has_messages(
+        expected_messages=[expected_image],
+        queue_url=queue_url
+    )
+
+
+def _assert_sqs_has_messages(expected_messages, queue_url):
+    sqs_client = boto3.client('sqs')
     messages = sqs_client.receive_message(
         QueueUrl=queue_url,
-        MaxNumberOfMessages=1
+        MaxNumberOfMessages=len(expected_messages)
     )
-    assert len(messages['Messages']) == 1
-    message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
-    assert json.loads(inner_message)['default'] == json.dumps(expected_image)
+
+    assert len(messages['Messages']) == len(expected_messages)
+
+    for msg, expected_msg in zip(messages['Messages'], expected_messages):
+        body = msg['Body']
+        inner_msg = json.loads(body)['Message']
+        assert json.loads(json.loads(inner_msg)['default']) == expected_msg
