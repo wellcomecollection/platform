@@ -28,7 +28,6 @@ variable "infra_bucket" {
 variable "sierra_api_url" {}
 variable "sierra_oauth_key" {}
 variable "sierra_oauth_secret" {}
-
 variable "sierra_fields" {}
 
 variable "lambda_error_alarm_arn" {}

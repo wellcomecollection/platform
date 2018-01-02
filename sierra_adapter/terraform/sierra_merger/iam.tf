@@ -1,3 +1,7 @@
+data "aws_dynamodb_table" "target" {
+  name = "${var.target_dynamo_table_name}"
+}
+
 data "aws_iam_policy_document" "sierra_table_permissions" {
   statement {
     actions = [
@@ -5,7 +9,7 @@ data "aws_iam_policy_document" "sierra_table_permissions" {
     ]
 
     resources = [
-      "${var.target_dynamo_table_arn}",
+      "${data.aws_dynamodb_table.target.arn}",
     ]
   }
 }

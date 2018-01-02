@@ -5,7 +5,6 @@ variable "dynamo_updates_queue_arn" {}
 variable "dynamo_updates_queue_url" {}
 
 variable "target_dynamo_table_name" {}
-variable "target_dynamo_table_arn" {}
 
 variable "aws_region" {
   default = "eu-west-1"
