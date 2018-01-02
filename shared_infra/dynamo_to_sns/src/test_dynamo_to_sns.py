@@ -4,75 +4,38 @@ import json
 import os
 
 import boto3
+import pytest
 
 import dynamo_to_sns
 
 
 TEST_STREAM_ARN = 'arn:aws:dynamodb:eu-west-1:123456789012:table/table-stream'
 
+OLD_IMAGE = {
+    'MiroID': {'S': 'V0000001'},
+    'MiroCollection': {'S': 'Images-V'},
+}
 
-def test_dynamo_to_sns_fails_gracefully_on_remove_event(topic_arn, queue_url):
-    old_image = {
-        'MiroID': {'S': 'V0000001'},
-        'MiroCollection': {'S': 'Images-V'},
-    }
+OLD_IMAGE_DATA = {
+    'MiroID': 'V0000001',
+    'MiroCollection': 'Images-V'
+}
 
-    expected_image = {
-        "event_type": "REMOVE",
-        "new_image": None,
-        "old_image": {
-            "MiroID": "V0000001",
-            "MiroCollection": "Images-V"
-        }
-    }
+NEW_IMAGE = {
+    'ReindexVersion': {'N': '0'},
+    'ReindexShard': {'S': 'default'},
+    'data': {'S': 'test-json-data'},
+    'MiroID': {'S': 'V0010033'},
+    'MiroCollection': {'S': 'Images-V'}
+}
 
-    remove_event = {
-        'Records': [
-            _dynamo_event(event_name='REMOVE', old_image=old_image)
-        ]
-    }
-
-    dynamo_to_sns.main(remove_event, None)
-
-    _assert_sqs_has_messages(
-        expected_messages=[expected_image],
-        queue_url=queue_url
-    )
-
-
-def test_dynamo_to_sns(topic_arn, queue_url):
-    new_image = {
-        'ReindexVersion': {'N': '0'},
-        'ReindexShard': {'S': 'default'},
-        'data': {'S': 'test-json-data'},
-        'MiroID': {'S': 'V0010033'},
-        'MiroCollection': {'S': 'Images-V'}
-    }
-
-    expected_image = {
-        "event_type": "MODIFY",
-        "old_image": None,
-        "new_image": {
-            "ReindexVersion": 0,
-            "ReindexShard": "default",
-            "data": "test-json-data",
-            "MiroID": "V0010033",
-            "MiroCollection": "Images-V"
-        }
-    }
-
-    event = {
-        'Records': [
-            _dynamo_event(event_name='MODIFY', new_image=new_image)
-        ]
-    }
-
-    dynamo_to_sns.main(event, None)
-
-    _assert_sqs_has_messages(
-        expected_messages=[expected_image],
-        queue_url=queue_url
-    )
+NEW_IMAGE_DATA = {
+    'ReindexVersion': 0,
+    'ReindexShard': 'default',
+    'data': 'test-json-data',
+    'MiroID': 'V0010033',
+    'MiroCollection': 'Images-V'
+}
 
 
 def _dynamo_event(event_name, old_image=None, new_image=None):
@@ -108,16 +71,42 @@ def _dynamo_event(event_name, old_image=None, new_image=None):
     return event_data
 
 
-def _assert_sqs_has_messages(expected_messages, queue_url):
+@pytest.mark.parametrize('input_event, expected_message', [
+    (
+        _dynamo_event(event_name='MODIFY', new_image=NEW_IMAGE),
+        {
+            'event_type': 'MODIFY',
+            'old_image': None,
+            'new_image': NEW_IMAGE_DATA
+        }
+    ),
+    (
+        _dynamo_event(event_name='REMOVE', old_image=OLD_IMAGE),
+        {
+            'event_type': 'REMOVE',
+            'old_image': OLD_IMAGE_DATA,
+            'new_image': None
+        },
+    ),
+])
+def test_end_to_end_feature_test(queue_url, input_event, expected_message):
+    event = {'Records': [input_event]}
+    dynamo_to_sns.main(event=event, context=None)
+
+    _assert_sqs_has_message(
+        expected_message=expected_message,
+        queue_url=queue_url
+    )
+
+
+def _assert_sqs_has_message(expected_message, queue_url):
     sqs_client = boto3.client('sqs')
     messages = sqs_client.receive_message(
         QueueUrl=queue_url,
-        MaxNumberOfMessages=len(expected_messages)
+        MaxNumberOfMessages=1
     )
 
-    assert len(messages['Messages']) == len(expected_messages)
-
-    for msg, expected_msg in zip(messages['Messages'], expected_messages):
-        body = msg['Body']
-        inner_msg = json.loads(body)['Message']
-        assert json.loads(json.loads(inner_msg)['default']) == expected_msg
+    assert len(messages['Messages']) == 1
+    message_body = messages['Messages'][0]['Body']
+    inner_message = json.loads(message_body)['Message']
+    assert json.loads(json.loads(inner_message)['default']) == expected_message

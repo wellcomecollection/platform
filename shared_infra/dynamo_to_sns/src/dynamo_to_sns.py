@@ -38,7 +38,7 @@ def get_sns_messages(trigger_event, stream_view_type):
             )
 
 
-def main(event, _):
+def main(event, context):
     print(f'Received event: {event!r}')
 
     topic_arn = os.environ['TOPIC_ARN']
