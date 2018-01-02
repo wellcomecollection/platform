@@ -12,7 +12,7 @@ module "sierra_bibs_window_generator" {
 module "sierra_bibs_to_dynamo" {
   source             = "sierra_to_dynamo"
   resource_type      = "bibs"
-  windows_topic_name = "${module.sierra_bibs_window_generator.topic_name}"
+  windows_queue_name = "${module.sierra_bibs_window_generator.windows_queue_name}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
