@@ -21,22 +21,9 @@ variable "key_name" {
   description = "Name of AWS key pair"
 }
 
-variable "admin_cidr_ingress" {
-  description = "CIDR to allow tcp/22 ingress to EC2 instance"
-}
-
 variable "release_ids" {
   description = "Release tags for platform apps"
   type        = "map"
-}
-
-variable "build_env" {
-  description = "Build environment (prod, dev, stage, ...)"
-  default     = "prod"
-}
-
-variable "iiif_acm_cert_arn" {
-  description = "ARN of ACM cert for iiif API (in us-east-1) for CloudFront"
 }
 
 # These variables will change fairly regularly, whenever we want to swap the
