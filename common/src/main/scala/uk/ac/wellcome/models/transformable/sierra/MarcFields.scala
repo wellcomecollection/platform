@@ -36,7 +36,7 @@ case class VarField(
   content: Option[String],
   marcTag: Option[String],
   @JsonProperty("ind1") indicator1: Option[String],
-  @JsonProperty("ind2") indicator1: Option[String],
+  @JsonProperty("ind2") indicator2: Option[String],
   subfields: Option[List[MarcSubfield]]
 )
 
