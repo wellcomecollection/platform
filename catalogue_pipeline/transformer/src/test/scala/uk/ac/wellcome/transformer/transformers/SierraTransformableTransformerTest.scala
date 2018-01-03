@@ -115,6 +115,28 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
     )
   }
 
+  it("passes through the title from the bib record") {
+    val id = "t1234"
+    val title = "Tickling a tiny turtle in Tenerife"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title"
+         |}
+        """.stripMargin
+
+    val mergedSierraRecord = MergedSierraRecord(
+      bibRecord = SierraBibRecord(id = id, data = data, modifiedDate = now())
+    )
+
+    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    work.title shouldBe title
+  }
+
   def sierraItemRecord(
     id: String = "i111",
     title: String = "Ingenious imps invent invasive implements",
