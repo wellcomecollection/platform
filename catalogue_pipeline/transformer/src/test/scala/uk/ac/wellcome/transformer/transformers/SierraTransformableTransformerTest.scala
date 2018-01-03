@@ -15,7 +15,8 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -91,7 +92,8 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -122,7 +124,8 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -140,11 +143,11 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   describe("publishers") {
     it("picks up zero publishers") {
       assertPublisherJsonGivesExpectedPublishers(
-        json = "", expectedPublishers = List()
+        json = """"varFields": [],""", expectedPublishers = List()
       )
     }
 
-    it("ignores information unrelated to the name of the publisher") {
+    it("ignores subfields unrelated to the name of the publisher") {
       assertPublisherJsonGivesExpectedPublishers(
         json = """
           "varFields": [
@@ -229,7 +232,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
         """.stripMargin,
         expectedPublishers = List(
           Agent(
-            label = "H. Humphrey",
+            label = "Gauthier-Villars",
             ontologyType = "Organisation"
           ),
           Agent(
