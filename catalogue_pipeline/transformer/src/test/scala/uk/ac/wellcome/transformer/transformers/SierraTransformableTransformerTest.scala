@@ -139,13 +139,13 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
 
   describe("publishers") {
     it("picks up zero publishers") {
-      val mergedSierraRecord = assertPublisherJsonGivesExpectedPublishers(
+      assertPublisherJsonGivesExpectedPublishers(
         json = "", expectedPublishers = List()
       )
     }
 
     it("ignores information unrelated to the name of the publisher") {
-      val mergedSierraRecord = assertPublisherJsonGivesExpectedPublishers(
+      assertPublisherJsonGivesExpectedPublishers(
         json = """
           "varFields": [
             {
@@ -167,7 +167,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
     }
 
     it("picks up information about the name of the publisher") {
-      val mergedSierraRecord = assertPublisherJsonGivesExpectedPublishers(
+      assertPublisherJsonGivesExpectedPublishers(
         json = """
           "varFields": [
             {
@@ -191,13 +191,62 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       )
     }
 
+    it("picks up information about multiple publishers") {
+      // Based on an example in
+      // http://www.loc.gov/marc/bibliographic/bd260.html
+      assertPublisherJsonGivesExpectedPublishers(
+        json = """
+          "varFields": [
+            {
+              "fieldTag": "p",
+              "marcTag": "260",
+              "ind1": " ",
+              "ind2": " ",
+              "subfields": [
+                {
+                  "tag": "a",
+                  "content": "Paris"
+                },
+                {
+                  "tag": "b",
+                  "content": "Gauthier-Villars"
+                },
+                {
+                  "tag": "a",
+                  "content": "Chicago"
+                },
+                {
+                  "tag": "b",
+                  "content": "University of Chicago Press"
+                },
+                {
+                  "tag": "c",
+                  "content": "1955"
+                }
+              ]
+            }
+          ],
+        """.stripMargin,
+        expectedPublishers = List(
+          Agent(
+            label = "H. Humphrey",
+            ontologyType = "Organisation"
+          ),
+          Agent(
+            label = "University of Chicago Press",
+            ontologyType = "Organisation"
+          )
+        )
+      )
+    }
+
   }
 
   private def assertPublisherJsonGivesExpectedPublishers(
     json: String, expectedPublishers: List[Agent]
   ) = {
     val data = s"""{
-      $json,
+      $json
       "id": "p1234",
       "title": "A pack of puffins"
     }"""
