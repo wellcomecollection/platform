@@ -1,4 +1,7 @@
+// @@AWLC: Double-check the meaning of "citation/list order"
 
+
+// @@AWLC: wwork:title is implemented!
 
    /* Populate wwork:title. The rules are as follows:
    * 
@@ -50,6 +53,11 @@
    */
 
 
+
+// @@AWLC: See https://techdocs.iii.com/sierraapi/Content/zReference/objects/bibObjectDescription.htm
+//
+// Is the ISO 639-2 a Wellcome distinction?
+
    /* Populate wwork:language. Rules
    * 
    * 1. For all bibliographic records use "language"
@@ -67,6 +75,10 @@
    */
 
 
+
+// @@AWLC Each MARC varField gets its own creator entry?
+//
+// I don't recognise the qualifiers stuff
 
    /* Populate wwork:creators. Rules:
    * 
@@ -86,37 +98,40 @@
    *
    *
    * Example:
-   *  "creators": [
-   *     {
-   *        "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
-   *        "type": "QualifiedConcept" , 
-   *        "concept": {
-   *           "label": "Jacobs, Philip P",
-   *           "type": "Person",
-   *           "identifiers": [
-   *        {
+   * "creators": [
+   *   {
+   *     "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
+   *     "type": "QualifiedConcept" ,
+   *     "concept": {
+   *       "label": "Jacobs, Philip P",
+   *       "type": "Person",
+   *       "identifiers": [
+   *         {
    *           "value": "2005016805",
    *           "type": "Identifier",
    *           "identifierScheme": "lcsh"
-   *        }
-   *        ]
+   *         }
+   *       ]
    *     },
    *     "qualifiers": [
-   *        {
-   *           "qualifiedType": "fuller-form-of-name" ,        
-   *           "label": "Philip Peter",
-   *           "type": "Name"  
-   *        } ,
-   *        {
-   *           "qualifierType": "associated-time" ,
-   *           "label": "1879-1940",
-   *           "type": "Period"
-   *        } 
+   *       {
+   *         "qualifiedType": "fuller-form-of-name" ,
+   *         "label": "Philip Peter",
+   *         "type": "Name"
+   *       },
+   *       {
+   *         "qualifierType": "associated-time" ,
+   *         "label": "1879-1940",
+   *         "type": "Period"
+   *       }
    *     ]
-   *  }
-   * ],
+   *   }
+   * ]
    *
    */
+
+
+// @@AWLC: multiple genres?
 
    /* Populate wwork:genres. Rules:
    * 
@@ -133,28 +148,30 @@
    *
    *
    *"genres": [
-   * {
-   *   "label": "Caricatures 1952",
-   *   "type": "QualifiedConcept",
-   *   "concept" : {
+   *  {
+   *    "label": "Caricatures 1952",
+   *    "type": "QualifiedConcept",
+   *    "concept": {
    *      "id": "a24s7qf3" ,
    *      "label": "Caricatures" ,
-          "type": "Concept" , 
+   *      "type": "Concept" ,
    *      "identifiers": [
    *        {
-   *         "type": "Identifier",
-   *         "identifierScheme": "lctgm",
-   *         "value": "tgm001698"
+   *          "type": "Identifier",
+   *          "identifierScheme": "lctgm",
+   *          "value": "tgm001698"
    *        }
-   *      ] ,
-   *   "qualifiers": [
-   *     {
-   *      "qualifierType": "chronological-subdivision" ,        
-   *      "label": "1952",
-   *      "type": "Period"  
-   *     } 
-   *   ]
-   *],
+   *      ],
+   *      "qualifiers": [
+   *        {
+   *          "qualifierType": "chronological-subdivision" ,
+   *          "label": "1952",
+   *          "type": "Period"
+   *        }
+   *      ]
+   *    }
+   *  }
+   *]
    *
    */
 
