@@ -1,5 +1,9 @@
+# -*- encoding: utf-8 -*-
+
+import os
+
 import boto3
-from moto import mock_ec2, mock_autoscaling, mock_ecs, mock_sns, mock_sqs
+from moto import mock_sns, mock_sqs
 import pytest
 
 
@@ -18,30 +22,36 @@ def set_region():
 
 @pytest.fixture()
 def moto_start(set_region):
-    mock_autoscaling().start()
-    mock_ec2().start()
-    mock_ecs().start()
     mock_sns().start()
     mock_sqs().start()
     yield
-    mock_autoscaling().stop()
-    mock_ec2().stop()
-    mock_ecs().stop()
     mock_sns().stop()
     mock_sqs().stop()
 
 
 @pytest.fixture()
-def sns_sqs(set_region, moto_start):
+def topic_arn(moto_start):
+    fake_sns_client = boto3.client('sns')
+    topic_name = "test-topic"
+
+    print(f'Creating topic {topic_name}')
+    fake_sns_client.create_topic(Name=topic_name)
+    response = fake_sns_client.list_topics()
+
+    topic_arn = response['Topics'][0]['TopicArn']
+
+    # DynamoToSNS reads its topic ARN from the environment, so we'll just
+    # set it here.
+    os.environ.update({'TOPIC_ARN': topic_arn})
+
+    yield topic_arn
+
+
+@pytest.fixture()
+def queue_url(set_region, moto_start, topic_arn):
     fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
     queue_name = "test-queue"
-    topic_name = "test-topic"
-    print(f"Creating topic {topic_name} and queue {queue_name}")
-
-    fake_sns_client.create_topic(Name=topic_name)
-    response = fake_sns_client.list_topics()
-    topic_arn = response["Topics"][0]['TopicArn']
 
     queue = fake_sqs_client.create_queue(QueueName=queue_name)
 
@@ -50,4 +60,4 @@ def sns_sqs(set_region, moto_start):
         Protocol="sqs",
         Endpoint=f"arn:aws:sqs:eu-west-1:123456789012:{queue_name}"
     )
-    yield topic_arn, queue['QueueUrl']
+    yield queue['QueueUrl']

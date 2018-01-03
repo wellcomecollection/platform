@@ -1,9 +1,10 @@
 variable "resource_type" {}
 
-variable "dynamo_events_topic_name" {}
+variable "dynamo_updates_queue_name" {}
+variable "dynamo_updates_queue_arn" {}
+variable "dynamo_updates_queue_url" {}
 
 variable "target_dynamo_table_name" {}
-variable "target_dynamo_table_arn" {}
 
 variable "aws_region" {
   default = "eu-west-1"
@@ -17,7 +18,6 @@ variable "cluster_name" {}
 
 variable "vpc_id" {}
 
-variable "ecr_repository_url" {}
 variable "release_id" {}
 
 variable "infra_bucket" {
