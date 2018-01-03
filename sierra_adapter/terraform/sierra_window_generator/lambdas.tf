@@ -6,6 +6,7 @@ module "lambda_sierra_window_generator" {
   description     = "Generate windows of a specified length and push them to sns"
   name            = "sierra_window_generator_${var.resource_type}"
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  timeout         = 10
 
   environment_variables = {
     "TOPIC_ARN"             = "${module.topic_sierra_windows.arn}"
