@@ -3,7 +3,7 @@
 import os
 
 import boto3
-from moto import mock_ec2, mock_autoscaling, mock_ecs, mock_sns, mock_sqs
+from moto import mock_sns, mock_sqs
 import pytest
 
 
