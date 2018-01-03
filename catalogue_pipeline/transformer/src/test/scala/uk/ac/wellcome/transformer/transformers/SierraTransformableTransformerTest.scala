@@ -137,6 +137,86 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
     work.title shouldBe title
   }
 
+  describe("publishers") {
+    it("picks up zero publishers") {
+      val mergedSierraRecord = assertPublisherJsonGivesExpectedPublishers(
+        json = "", expectedPublishers = List()
+      )
+    }
+
+    it("ignores information unrelated to the name of the publisher") {
+      val mergedSierraRecord = assertPublisherJsonGivesExpectedPublishers(
+        json = """
+          "varFields": [
+            {
+              "fieldTag": "p",
+              "marcTag": "260",
+              "ind1": " ",
+              "ind2": " ",
+              "subfields": [
+                {
+                  "tag": "c",
+                  "content": "1984"
+                }
+              ]
+            }
+          ],
+        """.stripMargin,
+        expectedPublishers = List()
+      )
+    }
+
+    it("picks up information about the name of the publisher") {
+      val mergedSierraRecord = assertPublisherJsonGivesExpectedPublishers(
+        json = """
+          "varFields": [
+            {
+              "fieldTag": "p",
+              "marcTag": "260",
+              "ind1": " ",
+              "ind2": " ",
+              "subfields": [
+                {
+                  "tag": "b",
+                  "content": "H. Humphrey"
+                }
+              ]
+            }
+          ],
+        """.stripMargin,
+        expectedPublishers = List(Agent(
+          label = "H. Humphrey",
+          ontologyType = "Organisation"
+        ))
+      )
+    }
+
+  }
+
+  private def assertPublisherJsonGivesExpectedPublishers(
+    json: String, expectedPublishers: List[Agent]
+  ) = {
+    val data = s"""{
+      $json,
+      "id": "p1234",
+      "title": "A pack of puffins"
+    }"""
+
+    val mergedSierraRecord = MergedSierraRecord(
+      bibRecord = SierraBibRecord(
+        id = "p1234",
+        data = data,
+        modifiedDate = now()
+      )
+    )
+
+    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    work.publishers shouldBe expectedPublishers
+  }
+
   def sierraItemRecord(
     id: String = "i111",
     title: String = "Ingenious imps invent invasive implements",

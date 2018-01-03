@@ -59,10 +59,19 @@ class SierraTransformableTransformer
 
   // Populate wwork:title.  The rules are as follows:
   //
-  //   1. For all bibliographic records use Sierra "title".
+  //    For all bibliographic records use Sierra "title".
   //
   // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
   // http://www.loc.gov/marc/bibliographic/bd245.html
   private def getTitle(bibData: SierraBibTransformableData): String =
     bibData.title.get
+
+  // Populate wwork:publishers.
+  //
+  //    For bibliographic records where "260" is populated:
+  //    - "label" comes from MARC field 260 subfield $b.
+  //    - "type" is "Organisation"
+  //
+  // http://www.loc.gov/marc/bibliographic/bd260.html
+  private def getPublishers(bibData: SierraBibTransformableData): List[Agent] = List()
 }
