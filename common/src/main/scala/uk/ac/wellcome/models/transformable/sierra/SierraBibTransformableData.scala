@@ -5,7 +5,9 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.util.{Failure, Success, Try}
 
 case class SierraBibTransformableData(
-  title: Option[String]
+  title: Option[String],
+  fixedFields: Map[String, FixedField] = Map(),
+  varFields: List[VarField] = List()
 )
 
 case object SierraBibTransformableData {

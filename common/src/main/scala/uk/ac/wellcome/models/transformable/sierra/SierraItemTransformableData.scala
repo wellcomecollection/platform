@@ -5,7 +5,9 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.util.{Failure, Success, Try}
 
 case class SierraItemTransformableData(
-  deleted: Option[Boolean]
+  deleted: Option[Boolean],
+  fixedFields: Map[String, FixedField] = Map(),
+  varFields: List[VarField] = List()
 )
 
 case object SierraItemTransformableData {
