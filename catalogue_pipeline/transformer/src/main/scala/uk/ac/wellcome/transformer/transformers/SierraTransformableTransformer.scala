@@ -21,7 +21,6 @@ class SierraTransformableTransformer
           Some(Work(
             title = getTitle(bibData),
             publishers = getPublishers(bibData),
-
             // TODO: Rewrite this to use the transformableData
             sourceIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.sierraSystemNumber,
@@ -84,9 +83,11 @@ class SierraTransformableTransformer
 
     matchingSubfields
       .filter { _.tag == "b" }
-      .map { subfield => Agent(
-        label = subfield.content,
-        ontologyType = "Organisation"
-      )}
-    }
+      .map { subfield =>
+        Agent(
+          label = subfield.content,
+          ontologyType = "Organisation"
+        )
+      }
+  }
 }

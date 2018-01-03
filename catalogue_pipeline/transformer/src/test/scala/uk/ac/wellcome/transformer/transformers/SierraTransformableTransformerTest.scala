@@ -143,7 +143,8 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   describe("publishers") {
     it("picks up zero publishers") {
       assertPublisherJsonGivesExpectedPublishers(
-        json = """"varFields": [],""", expectedPublishers = List()
+        json = """"varFields": [],""",
+        expectedPublishers = List()
       )
     }
 
@@ -187,10 +188,11 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
             }
           ],
         """.stripMargin,
-        expectedPublishers = List(Agent(
-          label = "H. Humphrey",
-          ontologyType = "Organisation"
-        ))
+        expectedPublishers = List(
+          Agent(
+            label = "H. Humphrey",
+            ontologyType = "Organisation"
+          ))
       )
     }
 
@@ -246,7 +248,8 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   }
 
   private def assertPublisherJsonGivesExpectedPublishers(
-    json: String, expectedPublishers: List[Agent]
+    json: String,
+    expectedPublishers: List[Agent]
   ) = {
     val data = s"""{
       $json
