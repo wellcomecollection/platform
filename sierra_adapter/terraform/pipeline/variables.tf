@@ -4,6 +4,9 @@ variable "window_length_minutes" {}
 variable "trigger_interval_minutes" {}
 
 variable "sierra_to_dynamo_release_id" {}
+variable "sierra_merger_release_id" {}
+
+variable "merged_dynamo_table_name" {}
 
 variable "sierra_api_url" {}
 variable "sierra_oauth_key" {}
