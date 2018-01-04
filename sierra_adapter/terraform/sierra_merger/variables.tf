@@ -26,7 +26,6 @@ variable "infra_bucket" {
 
 variable "alb_listener_https_arn" {}
 variable "alb_listener_http_arn" {}
-variable "alb_priority" {}
 variable "alb_cloudwatch_id" {}
 
 variable "alb_server_error_alarm_arn" {}

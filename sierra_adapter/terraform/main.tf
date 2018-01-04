@@ -22,7 +22,6 @@ module "sierra_to_dynamo_bibs" {
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
-  alb_priority               = 106
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
@@ -51,7 +50,6 @@ module "sierra_to_dynamo_items" {
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
-  alb_priority               = 109
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
@@ -86,7 +84,6 @@ module "sierra_bib_merger" {
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
-  alb_priority               = 107
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
@@ -112,7 +109,6 @@ module "sierra_item_merger" {
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
 
-  alb_priority               = 110
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
