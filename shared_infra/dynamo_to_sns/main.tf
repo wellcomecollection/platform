@@ -8,7 +8,8 @@ module "lambda_dynamo_to_sns" {
   memory_size = 1024
 
   environment_variables = {
-    TOPIC_ARN = "${var.dst_topic_arn}"
+    TOPIC_ARN        = "${var.dst_topic_arn}"
+    STREAM_VIEW_TYPE = "${var.stream_view_type}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
