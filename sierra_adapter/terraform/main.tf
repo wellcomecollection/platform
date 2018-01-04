@@ -1,3 +1,15 @@
+module "bibs_pipeline" {
+  source = "pipeline"
+
+  resource_type = "bibs"
+}
+
+module "items_pipeline" {
+  source = "pipeline"
+
+  resource_type = "items"
+}
+
 module "sierra_window_generator_bibs" {
   source                 = "sierra_window_generator"
   window_length_minutes  = "30"
@@ -21,6 +33,8 @@ module "sierra_to_dynamo_bibs" {
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
+
+  ecr_repository_url = "${module.bibs_pipeline.to_dynamo_repository_url}"
 
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
@@ -56,6 +70,8 @@ module "sierra_to_dynamo_items" {
   alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
   alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
+  ecr_repository_url = "${module.items_pipeline.to_dynamo_repository_url}"
+
   release_id = "${var.release_ids["sierra_items_to_dynamo"]}"
 
   sierra_api_url      = "${var.sierra_api_url}"
@@ -78,7 +94,7 @@ module "sierra_bib_merger" {
   target_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
   target_dynamo_table_arn  = "${aws_dynamodb_table.sierradata_table.arn}"
 
-  ecr_repository_url = "${module.ecr_repository_sierra_bib_merger.repository_url}"
+  ecr_repository_url = "${module.bibs_pipeline.merger_repository_url}"
   release_id         = "${var.release_ids["sierra_bib_merger"]}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
@@ -103,7 +119,7 @@ module "sierra_item_merger" {
   target_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
   target_dynamo_table_arn  = "${aws_dynamodb_table.sierradata_table.arn}"
 
-  ecr_repository_url = "${module.ecr_repository_sierra_item_merger.repository_url}"
+  ecr_repository_url = "${module.items_pipeline.merger_repository_url}"
   release_id         = "${var.release_ids["sierra_item_merger"]}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"

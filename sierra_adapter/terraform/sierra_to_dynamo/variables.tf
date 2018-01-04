@@ -12,6 +12,8 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "ecr_repository_url" {}
+
 variable "alb_listener_http_arn" {}
 variable "alb_listener_https_arn" {}
 
