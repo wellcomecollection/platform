@@ -15,6 +15,8 @@ RUN /install_loris.sh
 # http://www.color.org/srgbprofiles.xalter
 COPY sRGB2014.icc /usr/share/color/icc/colord/sRGB2014.icc
 
+ENV LORIS_CONF_FILE /opt/loris/etc/loris2.conf
+
 COPY loris2.conf /opt/loris/etc/loris2.conf
 COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
