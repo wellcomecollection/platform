@@ -11,10 +11,11 @@ module "bibs_pipeline" {
   window_length_minutes    = 30
   trigger_interval_minutes = 15
 
+  sierra_fields = "${var.sierra_bibs_fields}"
+
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
-  sierra_fields       = "${var.sierra_items_fields}"
 
   cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
   vpc_id       = "${module.vpc_sierra_adapter.vpc_id}"
@@ -44,10 +45,11 @@ module "items_pipeline" {
   window_length_minutes    = 30
   trigger_interval_minutes = 15
 
+  sierra_fields = "${var.sierra_items_fields}"
+
   sierra_api_url      = "${var.sierra_api_url}"
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
-  sierra_fields       = "${var.sierra_items_fields}"
 
   cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
   vpc_id       = "${module.vpc_sierra_adapter.vpc_id}"
