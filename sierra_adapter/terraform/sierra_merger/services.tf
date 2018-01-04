@@ -1,5 +1,5 @@
 module "sierra_merger_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.3.0"
   name   = "sierra_${var.resource_type}_merger"
 
   source_queue_name = "${module.update_events_queue.name}"
@@ -15,8 +15,6 @@ module "sierra_merger_service" {
   }
 
   env_vars_length = 3
-
-  alb_priority = "${var.alb_priority}"
 
   cluster_name               = "${var.cluster_name}"
   vpc_id                     = "${var.vpc_id}"
