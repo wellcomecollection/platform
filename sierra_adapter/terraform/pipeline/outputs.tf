@@ -5,3 +5,7 @@ output "merger_repository_url" {
 output "to_dynamo_repository_url" {
   value = "${module.ecr_repository_to_dynamo.repository_url}"
 }
+
+output "topic_name" {
+  value = "${module.windows_topic.name}"
+}

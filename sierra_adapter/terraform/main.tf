@@ -2,34 +2,28 @@ module "bibs_pipeline" {
   source = "pipeline"
 
   resource_type = "bibs"
+
+  window_length_minutes    = 30
+  trigger_interval_minutes = 15
+
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }
 
 module "items_pipeline" {
   source = "pipeline"
 
   resource_type = "items"
-}
 
-module "sierra_window_generator_bibs" {
-  source                 = "sierra_window_generator"
-  window_length_minutes  = "30"
-  lambda_trigger_minutes = "15"
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-  resource_type          = "bibs"
-}
+  window_length_minutes    = 30
+  trigger_interval_minutes = 15
 
-module "sierra_window_generator_items" {
-  source                 = "sierra_window_generator"
-  window_length_minutes  = "30"
-  lambda_trigger_minutes = "15"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-  resource_type          = "items"
 }
 
 module "sierra_to_dynamo_bibs" {
   source             = "sierra_to_dynamo"
   resource_type      = "bibs"
-  windows_topic_name = "${module.sierra_window_generator_bibs.topic_name}"
+  windows_topic_name = "${module.bibs_pipeline.topic_name}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
@@ -59,7 +53,7 @@ module "sierra_to_dynamo_bibs" {
 module "sierra_to_dynamo_items" {
   source             = "sierra_to_dynamo"
   resource_type      = "items"
-  windows_topic_name = "${module.sierra_window_generator_items.topic_name}"
+  windows_topic_name = "${module.items_pipeline.topic_name}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
