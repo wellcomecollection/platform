@@ -6,7 +6,10 @@ module "bibs_pipeline" {
   window_length_minutes    = 30
   trigger_interval_minutes = 15
 
+  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "items_pipeline" {
@@ -17,16 +20,20 @@ module "items_pipeline" {
   window_length_minutes    = 30
   trigger_interval_minutes = 15
 
+  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "sierra_to_dynamo_bibs" {
   source             = "sierra_to_dynamo"
   resource_type      = "bibs"
-  windows_topic_name = "${module.bibs_pipeline.topic_name}"
+  windows_queue_name = "${module.bibs_pipeline.windows_queue_name}"
+  windows_queue_arn  = "${module.bibs_pipeline.windows_queue_arn}"
+  windows_queue_id   = "${module.bibs_pipeline.windows_queue_id}"
 
-  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
+  cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
 
   ecr_repository_url = "${module.bibs_pipeline.to_dynamo_repository_url}"
 
@@ -53,10 +60,11 @@ module "sierra_to_dynamo_bibs" {
 module "sierra_to_dynamo_items" {
   source             = "sierra_to_dynamo"
   resource_type      = "items"
-  windows_topic_name = "${module.items_pipeline.topic_name}"
+  windows_queue_name = "${module.items_pipeline.windows_queue_name}"
+  windows_queue_arn  = "${module.items_pipeline.windows_queue_arn}"
+  windows_queue_id   = "${module.items_pipeline.windows_queue_id}"
 
-  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  cluster_name  = "${module.sierra_adapter_cluster.cluster_name}"
+  cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
 
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"

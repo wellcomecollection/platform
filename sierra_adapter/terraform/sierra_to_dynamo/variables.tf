@@ -1,8 +1,8 @@
 variable "resource_type" {}
 
-variable "windows_topic_name" {}
-
-variable "dlq_alarm_arn" {}
+variable "windows_queue_name" {}
+variable "windows_queue_arn" {}
+variable "windows_queue_id" {}
 
 variable "cluster_name" {}
 
