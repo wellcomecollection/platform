@@ -57,4 +57,3 @@ module "sierra_merger_service" {
   alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
 }
-
