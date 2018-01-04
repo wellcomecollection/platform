@@ -3,7 +3,7 @@ terraform {
 
   backend "s3" {
     bucket         = "platform-infra"
-    key            = "platform-loris.tfstate"
+    key            = "terraform/loris.tfstate"
     dynamodb_table = "terraform-locktable"
     region         = "eu-west-1"
   }
