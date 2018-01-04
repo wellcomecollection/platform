@@ -16,11 +16,10 @@ module "sierra_to_dynamo_service" {
     sierra_api_url       = "${var.sierra_api_url}"
     sierra_oauth_key     = "${var.sierra_oauth_key}"
     sierra_oauth_secret  = "${var.sierra_oauth_secret}"
-    sierra_resource_type = "${var.resource_type}"
     sierra_fields        = "${var.sierra_fields}"
   }
 
-  env_vars_length = 8
+  env_vars_length = 7
 
   cluster_name               = "${var.cluster_name}"
   vpc_id                     = "${var.vpc_id}"
