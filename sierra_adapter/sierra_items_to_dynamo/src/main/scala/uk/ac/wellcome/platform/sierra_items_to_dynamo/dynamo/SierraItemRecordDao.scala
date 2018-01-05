@@ -41,9 +41,11 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
         )
         .put(sierraItemRecord)) match {
       case Right(_) =>
-        debug(s"Successfully inserted item ${sierraItemRecord.id}")
+        debug(s"Successfully saved item ${sierraItemRecord.id} to DynamoDB")
+      case Left(error: ConditionalCheckFailedException) =>
+        info(s"Conditional check failed saving ${sierraItemRecord.id} to DynamoDB")
       case Left(error) =>
-        warn(s"Failed saving ${sierraItemRecord.id} into DynamoDB", error)
+        warn(s"Failed saving ${sierraItemRecord.id} to DynamoDB", error)
     }
   }
 
