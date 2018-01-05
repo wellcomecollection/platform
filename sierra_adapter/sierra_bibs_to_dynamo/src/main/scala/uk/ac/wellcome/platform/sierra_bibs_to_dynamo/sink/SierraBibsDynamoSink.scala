@@ -50,7 +50,8 @@ object SierraBibsDynamoSink extends Logging {
         case Right(_) =>
           logger.info(s"Successfully saved ${record.id} to DynamoDB")
         case Left(error: ConditionalCheckFailedException) =>
-          logger.info(s"Conditional check failed saving ${record.id} to DynamoDB")
+          logger.info(
+            s"Conditional check failed saving ${record.id} to DynamoDB")
         case Left(error) =>
           logger.warn(s"Failed saving ${record.id} to DynamoDB", error)
       }
