@@ -74,4 +74,3 @@ resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
     target_value = 70
   }
 }
-
