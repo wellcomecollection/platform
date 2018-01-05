@@ -49,13 +49,11 @@ class SierraTransformerFeatureTest
         id
       )
 
-      val expectedWork = Work(
-        sourceIdentifier = sourceIdentifier,
-        title = title,
-        identifiers = List(sourceIdentifier)
-      )
+      val actualWork = JsonUtil.fromJson[Work](snsMessages.head.message).get
 
-      snsMessages.head.message shouldBe JsonUtil.toJson(expectedWork).get
+      actualWork.sourceIdentifier shouldBe sourceIdentifier
+      actualWork.title shouldBe title
+      actualWork.identifiers shouldBe List(sourceIdentifier)
     }
   }
 
