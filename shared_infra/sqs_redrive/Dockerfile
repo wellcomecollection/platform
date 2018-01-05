@@ -3,5 +3,5 @@ FROM python:3-alpine
 COPY requirements.txt /
 RUN pip install -r requirements.txt
 
-COPY run.py /
-CMD ["/run.py"]
+COPY redrive.py /
+CMD "python3 redrive.py --src=$SQS_SOURCE_URL --dst=$SQS_TARGET_URL"
