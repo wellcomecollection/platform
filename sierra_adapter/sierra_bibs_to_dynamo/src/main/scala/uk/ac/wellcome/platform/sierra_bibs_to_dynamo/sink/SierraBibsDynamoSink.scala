@@ -6,6 +6,7 @@ import java.time.{LocalDate, ZoneOffset}
 import akka.Done
 import akka.stream.scaladsl.Sink
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
@@ -47,9 +48,12 @@ object SierraBibsDynamoSink extends Logging {
         .put(record)
       Scanamo.exec(client)(ops) match {
         case Right(_) =>
-          logger.info(s"${json.noSpaces} saved successfully to DynamoDB")
+          logger.info(s"Successfully saved ${record.id} to DynamoDB")
+        case Left(error: ConditionalCheckFailedException) =>
+          logger.info(
+            s"Conditional check failed saving ${record.id} to DynamoDB")
         case Left(error) =>
-          logger.warn(s"Failed saving ${json.noSpaces} into DynamoDB", error)
+          logger.warn(s"Failed saving ${record.id} to DynamoDB", error)
       }
     })
 
