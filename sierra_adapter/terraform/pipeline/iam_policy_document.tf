@@ -25,3 +25,16 @@ data "aws_iam_policy_document" "sierra_merged_table_permissions" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "read_from_windows_q" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      "${module.windows_queue.arn}",
+    ]
+  }
+}
