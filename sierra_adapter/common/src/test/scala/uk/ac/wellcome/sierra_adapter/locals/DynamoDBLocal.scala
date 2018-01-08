@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
@@ -24,7 +24,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
   }
 
   private def clearTable =
-    Scanamo.scan[MergedSierraRecord](dynamoDbClient)(tableName).map {
+    Scanamo.scan[SierraTransformable](dynamoDbClient)(tableName).map {
       case Right(item) =>
         dynamoDbClient.deleteItem(
           tableName,

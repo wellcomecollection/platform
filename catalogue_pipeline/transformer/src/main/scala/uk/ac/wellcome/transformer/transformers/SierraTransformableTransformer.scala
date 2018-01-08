@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.{Success, Try}
@@ -9,9 +9,9 @@ import scala.util.{Success, Try}
 case class SierraBibData(id: String, title: String)
 
 class SierraTransformableTransformer
-    extends TransformableTransformer[MergedSierraRecord] {
+    extends TransformableTransformer[SierraTransformable] {
   override def transformForType(
-    sierraTransformable: MergedSierraRecord): Try[Option[Work]] =
+    sierraTransformable: SierraTransformable): Try[Option[Work]] =
     sierraTransformable.maybeBibData
       .map { bibData =>
         JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>

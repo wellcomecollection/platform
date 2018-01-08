@@ -23,7 +23,7 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
   private val dynamoConfig = dynamoConfigs.getOrElse(
     tableConfigId,
     throw new RuntimeException(
-      s"MergedSierraRecordDao ($tableConfigId) dynamo config not available!"
+      s"SierraTransformableDao ($tableConfigId) dynamo config not available!"
     )
   )
 

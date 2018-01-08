@@ -4,18 +4,19 @@ import java.time.Instant
 import java.time.Instant._
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil
 
-class MergedSierraRecordTest extends FunSpec with Matchers {
+class SierraTransformableTest extends FunSpec with Matchers {
 
-  it("should allow creation of MergedSierraRecord with no data") {
-    MergedSierraRecord(id = "111")
+  it("should allow creation of SierraTransformable with no data") {
+    SierraTransformable(id = "111")
   }
 
   it("should allow creation from only a SierraBibRecord") {
     val bibRecord = sierraBibRecord(id = "101")
-    val mergedRecord = MergedSierraRecord(bibRecord = bibRecord)
+    val mergedRecord = SierraTransformable(bibRecord = bibRecord)
     mergedRecord.id shouldEqual bibRecord.id
     mergedRecord.maybeBibData.get shouldEqual bibRecord
   }
@@ -23,7 +24,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   it("should allow creation from a SierraBibRecord and a version") {
     val bibRecord = sierraBibRecord(id = "202")
     val version = 10
-    val mergedRecord = MergedSierraRecord(
+    val mergedRecord = SierraTransformable(
       bibRecord = bibRecord,
       version = version
     )
@@ -31,7 +32,7 @@ class MergedSierraRecordTest extends FunSpec with Matchers {
   }
 
   it("should be at version 0 when first created") {
-    val record = MergedSierraRecord(id = "555")
+    val record = SierraTransformable(id = "555")
     record.version shouldEqual 0
   }
 

@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.utils
 import java.time.Instant
 
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MergedSierraRecord}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, SierraTransformable}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
@@ -23,13 +23,13 @@ trait TransformableSQSMessageUtils {
   }
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData = None,
       itemData = Map[String, SierraItemRecord]()
     )
 
-    sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
+    sqsMessage(JsonUtil.toJson(sierraTransformable).get)
   }
 
   def createValidSierraBibSQSMessage(id: String,
@@ -43,13 +43,13 @@ trait TransformableSQSMessageUtils {
          |}
       """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
       itemData = Map[String, SierraItemRecord]()
     )
 
-    sqsMessage(JsonUtil.toJson(mergedSierraRecord).get)
+    sqsMessage(JsonUtil.toJson(sierraTransformable).get)
   }
 
   def createValidMiroSQSMessage(data: String): SQSMessage = {

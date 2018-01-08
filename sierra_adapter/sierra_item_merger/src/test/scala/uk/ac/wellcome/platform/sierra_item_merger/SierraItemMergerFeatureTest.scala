@@ -7,7 +7,7 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.dynamo._
 import com.gu.scanamo.syntax._
-import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.SierraTransformable
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -36,7 +36,7 @@ class SierraItemMergerFeatureTest
 
     sendItemRecordToSQS(record)
 
-    val expectedMergedSierraRecord = MergedSierraRecord(
+    val expectedSierraTransformable = SierraTransformable(
       id = bibId,
       itemData = Map(id -> record),
       version = 1
@@ -44,7 +44,7 @@ class SierraItemMergerFeatureTest
 
     eventually {
       dynamoQueryEqualsValue('id -> bibId)(
-        expectedValue = expectedMergedSierraRecord)
+        expectedValue = expectedSierraTransformable)
     }
   }
 
@@ -74,23 +74,23 @@ class SierraItemMergerFeatureTest
 
     eventually {
 
-      val expectedMergedSierraRecord1 = MergedSierraRecord(
+      val expectedSierraTransformable1 = SierraTransformable(
         id = bibId1,
         itemData = Map(id1 -> record1),
         version = 1
       )
 
-      val expectedMergedSierraRecord2 = MergedSierraRecord(
+      val expectedSierraTransformable2 = SierraTransformable(
         id = bibId2,
         itemData = Map(id2 -> record2),
         version = 1
       )
 
       dynamoQueryEqualsValue('id -> bibId1)(
-        expectedValue = expectedMergedSierraRecord1)
+        expectedValue = expectedSierraTransformable1)
 
       dynamoQueryEqualsValue('id -> bibId2)(
-        expectedValue = expectedMergedSierraRecord2)
+        expectedValue = expectedSierraTransformable2)
 
     }
   }

@@ -59,7 +59,7 @@ case class MiroTransformable(MiroID: String,
   *     value at any time is unimportant, but it should only ever increase.
   *
   */
-case class MergedSierraRecord(
+case class SierraTransformable(
                                id: String,
                                maybeBibData: Option[SierraBibRecord] = None,
                                itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
@@ -67,20 +67,20 @@ case class MergedSierraRecord(
                              ) extends Transformable
 
 
-object MergedSierraRecord {
-  def apply(id: String, bibData: String): MergedSierraRecord = {
+object SierraTransformable {
+  def apply(id: String, bibData: String): SierraTransformable = {
     val bibRecord = JsonUtil.fromJson[SierraBibRecord](bibData).get
-    MergedSierraRecord(id = id, maybeBibData = Some(bibRecord))
+    SierraTransformable(id = id, maybeBibData = Some(bibRecord))
   }
 
-  def apply(bibRecord: SierraBibRecord): MergedSierraRecord =
-    MergedSierraRecord(id = bibRecord.id, maybeBibData = Some(bibRecord))
+  def apply(bibRecord: SierraBibRecord): SierraTransformable =
+    SierraTransformable(id = bibRecord.id, maybeBibData = Some(bibRecord))
 
-  def apply(id: String, itemRecord: SierraItemRecord): MergedSierraRecord =
-    MergedSierraRecord(id = id, itemData = Map(itemRecord.id -> itemRecord))
+  def apply(id: String, itemRecord: SierraItemRecord): SierraTransformable =
+    SierraTransformable(id = id, itemData = Map(itemRecord.id -> itemRecord))
 
-  def apply(bibRecord: SierraBibRecord, version: Int): MergedSierraRecord =
-    MergedSierraRecord(
+  def apply(bibRecord: SierraBibRecord, version: Int): SierraTransformable =
+    SierraTransformable(
       id = bibRecord.id,
       maybeBibData = Some(bibRecord),
       version = version
