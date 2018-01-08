@@ -4,6 +4,8 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 class SierraTransformableTransformerTest extends FunSpec with Matchers {
   val transformer = new SierraTransformableTransformer

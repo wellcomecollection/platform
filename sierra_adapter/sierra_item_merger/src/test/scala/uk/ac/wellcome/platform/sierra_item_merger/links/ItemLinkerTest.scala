@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 class ItemLinkerTest extends FunSpec with Matchers {
 

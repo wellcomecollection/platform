@@ -6,9 +6,9 @@ import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

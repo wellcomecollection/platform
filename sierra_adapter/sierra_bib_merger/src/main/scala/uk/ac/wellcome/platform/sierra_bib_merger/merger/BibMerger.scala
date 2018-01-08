@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.merger
 
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 object BibMerger {
 

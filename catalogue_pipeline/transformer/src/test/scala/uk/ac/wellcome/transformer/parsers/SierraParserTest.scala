@@ -1,8 +1,7 @@
 package uk.ac.wellcome.transformer.parsers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.MergedSierraRecord
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.{MergedSierraRecord, Transformable}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 

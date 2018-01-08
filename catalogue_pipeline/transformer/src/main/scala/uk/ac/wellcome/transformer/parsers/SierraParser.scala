@@ -1,7 +1,6 @@
 package uk.ac.wellcome.transformer.parsers
 
-import uk.ac.wellcome.models.MergedSierraRecord
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.{MergedSierraRecord, Transformable}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try

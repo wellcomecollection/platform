@@ -1,10 +1,12 @@
 package uk.ac.wellcome.transformer.transformers
 
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.{Success, Try}
+
+case class SierraBibData(id: String, title: String)
 
 class SierraTransformableTransformer
     extends TransformableTransformer[MergedSierraRecord] {

@@ -3,11 +3,11 @@ package uk.ac.wellcome.platform.sierra_item_merger
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
-import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.dynamo._
 import com.gu.scanamo.syntax._
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
 
 class SierraItemMergerFeatureTest
     extends FunSpec

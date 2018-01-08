@@ -4,6 +4,7 @@ import java.time.Instant
 import java.time.Instant._
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
 import uk.ac.wellcome.utils.JsonUtil
 
 class MergedSierraRecordTest extends FunSpec with Matchers {

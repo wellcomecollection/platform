@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers
 
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.{CalmTransformable, CalmTransformableData, Transformable}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil
 

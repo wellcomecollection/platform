@@ -3,13 +3,10 @@ package uk.ac.wellcome.transformer.utils
 import java.time.Instant
 
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MergedSierraRecord}
 import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.models.{
-  CalmTransformable,
-  MergedSierraRecord,
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableSQSMessageUtils {

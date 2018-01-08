@@ -7,12 +7,12 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
-
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 class SierraBibMergerFeatureTest
     extends FunSpec

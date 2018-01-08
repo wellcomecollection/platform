@@ -1,17 +1,14 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  ConditionalCheckFailedException,
-  PutItemResult
-}
+import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, PutItemResult}
 import com.google.inject.Inject
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.sink.SierraItemsDynamoSink.logger
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
