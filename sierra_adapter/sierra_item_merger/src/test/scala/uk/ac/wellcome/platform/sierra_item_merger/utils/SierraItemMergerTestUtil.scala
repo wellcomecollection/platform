@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
 import org.scalatest.Suite
-import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.test.utils.SQSLocal

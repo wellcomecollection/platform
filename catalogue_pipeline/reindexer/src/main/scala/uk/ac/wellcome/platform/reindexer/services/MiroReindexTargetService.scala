@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.Scanamo
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
 
 class MiroReindexTargetService @Inject()(

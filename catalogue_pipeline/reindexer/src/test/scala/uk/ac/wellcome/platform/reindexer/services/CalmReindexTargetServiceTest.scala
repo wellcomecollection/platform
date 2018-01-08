@@ -6,7 +6,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{CalmTransformable, Reindex}
+import uk.ac.wellcome.models.Reindex
+import uk.ac.wellcome.models.transformable.CalmTransformable
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.test.utils.ExtendedPatience

@@ -6,7 +6,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 

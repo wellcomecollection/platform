@@ -1,8 +1,6 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.transformable.sierra
 
 import java.time.Instant
-
-import com.gu.scanamo.DynamoFormat
 
 case class SierraItemRecord(
   id: String,
