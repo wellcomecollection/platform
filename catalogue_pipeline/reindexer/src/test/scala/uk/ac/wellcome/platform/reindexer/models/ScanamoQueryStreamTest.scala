@@ -6,7 +6,7 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.DynamoConstants._
 

@@ -3,9 +3,8 @@ package uk.ac.wellcome.platform.reindexer.locals
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.CalmTransformable
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable}
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
