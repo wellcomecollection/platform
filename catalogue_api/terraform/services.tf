@@ -20,7 +20,6 @@ module "api_romulus_v1" {
 
   alb_listener_https_arn     = "${module.api_alb.listener_https_arn}"
   alb_listener_http_arn      = "${module.api_alb.listener_http_arn}"
-  alb_priority               = "114"
   alb_cloudwatch_id          = "${module.api_alb.cloudwatch_id}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"

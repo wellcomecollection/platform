@@ -47,7 +47,6 @@ module "service" {
   listener_http_arn  = "${var.alb_listener_http_arn}"
   healthcheck_path   = "/management/healthcheck"
   path_pattern       = "/catalogue/v1/*"
-  alb_priority       = "${var.alb_priority}"
 
   loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
   server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
