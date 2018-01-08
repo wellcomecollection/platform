@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v6.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.0.0"
 
   name = "api_${var.name}_v1"
 
