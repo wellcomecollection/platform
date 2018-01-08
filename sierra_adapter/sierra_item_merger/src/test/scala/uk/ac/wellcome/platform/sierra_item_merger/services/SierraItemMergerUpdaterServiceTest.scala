@@ -37,11 +37,11 @@ class SierraItemMergerUpdaterServiceTest
     whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
       val expectedSierraTransformable =
         SierraTransformable(id = bibId,
-                           maybeBibData = None,
-                           itemData = Map(
-                             newItemRecord.id -> newItemRecord
-                           ),
-                           version = 1)
+                            maybeBibData = None,
+                            itemData = Map(
+                              newItemRecord.id -> newItemRecord
+                            ),
+                            version = 1)
 
       dynamoQueryEqualsValue('id -> bibId)(
         expectedValue = expectedSierraTransformable)

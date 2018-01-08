@@ -14,8 +14,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-                                                sierraTransformableDao: SierraTransformableDao,
-                                                metrics: MetricsSender
+  sierraTransformableDao: SierraTransformableDao,
+  metrics: MetricsSender
 ) extends Logging {
 
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
@@ -26,14 +26,15 @@ class SierraItemMergerUpdaterService @Inject()(
         .flatMap {
           case Some(existingSierraTransformable) =>
             val mergedRecord =
-              ItemLinker.linkItemRecord(existingSierraTransformable, itemRecord)
+              ItemLinker.linkItemRecord(existingSierraTransformable,
+                                        itemRecord)
             if (mergedRecord != existingSierraTransformable)
               sierraTransformableDao.updateRecord(mergedRecord)
             else Future.successful(())
           case None =>
             sierraTransformableDao.updateRecord(
               SierraTransformable(bibId,
-                                 itemData = Map(itemRecord.id -> itemRecord)))
+                                  itemData = Map(itemRecord.id -> itemRecord)))
         }
     }
 

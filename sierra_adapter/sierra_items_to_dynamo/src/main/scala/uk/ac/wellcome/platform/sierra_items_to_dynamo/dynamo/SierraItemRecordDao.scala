@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, PutItemResult}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  PutItemResult
+}
 import com.google.inject.Inject
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
