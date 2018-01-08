@@ -14,12 +14,13 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
 import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
 import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
 

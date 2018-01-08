@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models.transformable.miro
+package uk.ac.wellcome.transformer.source
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.apache.commons.lang.StringEscapeUtils

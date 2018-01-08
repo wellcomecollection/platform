@@ -5,14 +5,14 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.MergedSierraRecord
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
-import scala.concurrent.Future
 
+import scala.concurrent.Future
 import com.gu.scanamo.syntax._
+import uk.ac.wellcome.models.transformable.MergedSierraRecord
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec

@@ -5,7 +5,6 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsToDynamoDBLocal
-import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
@@ -14,6 +13,7 @@ import uk.ac.wellcome.test.utils.{
 }
 import uk.ac.wellcome.utils.JsonUtil
 import com.gu.scanamo.Scanamo
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 class SierraBibsToDynamoFeatureTest
     extends FunSpec
