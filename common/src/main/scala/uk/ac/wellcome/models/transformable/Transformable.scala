@@ -1,7 +1,7 @@
 package uk.ac.wellcome.models.transformable
 
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
-import uk.ac.wellcome.models.{SierraItemRecord, Work}
+import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try
