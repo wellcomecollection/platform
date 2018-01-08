@@ -3,7 +3,7 @@ package uk.ac.wellcome.models
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.utils.JsonUtil
 
 class SierraBibRecordTest extends FunSpec with Matchers {

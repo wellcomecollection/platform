@@ -1,8 +1,7 @@
 package uk.ac.wellcome.transformer.parsers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.MergedSierraRecord
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -22,9 +21,9 @@ class SierraParserTest
       sierraParser.extractTransformable(sqsMessage)
 
     triedSierraTransformable.isSuccess shouldBe true
-    triedSierraTransformable.get shouldBe a[MergedSierraRecord]
+    triedSierraTransformable.get shouldBe a[SierraTransformable]
     val actualRecord =
-      triedSierraTransformable.get.asInstanceOf[MergedSierraRecord]
+      triedSierraTransformable.get.asInstanceOf[SierraTransformable]
     actualRecord.id shouldEqual id
   }
 }

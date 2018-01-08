@@ -1,17 +1,18 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 object ItemUnlinker {
 
-  def unlinkItemRecord(mergedSierraRecord: MergedSierraRecord,
-                       itemRecord: SierraItemRecord): MergedSierraRecord = {
-    if (!itemRecord.unlinkedBibIds.contains(mergedSierraRecord.id)) {
+  def unlinkItemRecord(sierraTransformable: SierraTransformable,
+                       itemRecord: SierraItemRecord): SierraTransformable = {
+    if (!itemRecord.unlinkedBibIds.contains(sierraTransformable.id)) {
       throw new RuntimeException(
-        s"Non-matching bib id ${mergedSierraRecord.id} in item unlink bibs ${itemRecord.unlinkedBibIds}")
+        s"Non-matching bib id ${sierraTransformable.id} in item unlink bibs ${itemRecord.unlinkedBibIds}")
     }
 
-    val itemData: Map[String, SierraItemRecord] = mergedSierraRecord.itemData
+    val itemData: Map[String, SierraItemRecord] = sierraTransformable.itemData
       .filterNot {
         case (id, currentItemRecord) => {
           val matchesCurrentItemRecord = id == itemRecord.id
@@ -24,6 +25,6 @@ object ItemUnlinker {
         }
       }
 
-    mergedSierraRecord.copy(itemData = itemData)
+    sierraTransformable.copy(itemData = itemData)
   }
 }

@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 object ItemLinker {
 
@@ -9,11 +10,11 @@ object ItemLinker {
     *
     * Returns the merged record.
     */
-  def linkItemRecord(mergedSierraRecord: MergedSierraRecord,
-                     itemRecord: SierraItemRecord): MergedSierraRecord = {
-    if (!itemRecord.bibIds.contains(mergedSierraRecord.id)) {
+  def linkItemRecord(sierraTransformable: SierraTransformable,
+                     itemRecord: SierraItemRecord): SierraTransformable = {
+    if (!itemRecord.bibIds.contains(sierraTransformable.id)) {
       throw new RuntimeException(
-        s"Non-matching bib id ${mergedSierraRecord.id} in item bib ${itemRecord.bibIds}")
+        s"Non-matching bib id ${sierraTransformable.id} in item bib ${itemRecord.bibIds}")
     }
 
     // We can decide whether to insert the new data in two steps:
@@ -24,17 +25,17 @@ object ItemLinker {
     //    just received?  If the existing data is older, we need to merge the
     //    new record.
     //
-    val isNewerData = mergedSierraRecord.itemData.get(itemRecord.id) match {
+    val isNewerData = sierraTransformable.itemData.get(itemRecord.id) match {
       case Some(existing) =>
         itemRecord.modifiedDate.isAfter(existing.modifiedDate)
       case None => true
     }
 
     if (isNewerData) {
-      val itemData = mergedSierraRecord.itemData + (itemRecord.id -> itemRecord)
-      mergedSierraRecord.copy(itemData = itemData)
+      val itemData = sierraTransformable.itemData + (itemRecord.id -> itemRecord)
+      sierraTransformable.copy(itemData = itemData)
     } else {
-      mergedSierraRecord
+      sierraTransformable
     }
   }
 }

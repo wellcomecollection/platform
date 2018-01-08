@@ -6,10 +6,10 @@ import grizzled.slf4j.Logging
 import io.circe.generic.extras.auto._
 import io.circe.parser.decode
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.SierraBibRecord
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -7,12 +7,12 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
-
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 class SierraBibMergerFeatureTest
     extends FunSpec
@@ -80,11 +80,11 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record)
-    val expectedMergedSierraRecord =
-      MergedSierraRecord(bibRecord = record, version = 1)
+    val expectedSierraTransformable =
+      SierraTransformable(bibRecord = record, version = 1)
 
     dynamoQueryEqualsValue('id -> id)(
-      expectedValue = expectedMergedSierraRecord)
+      expectedValue = expectedSierraTransformable)
   }
 
   it("should put multiple bibs from SQS into DynamoDB") {
@@ -99,8 +99,8 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record1)
-    val expectedMergedSierraRecord1 =
-      MergedSierraRecord(bibRecord = record1, version = 1)
+    val expectedSierraTransformable1 =
+      SierraTransformable(bibRecord = record1, version = 1)
 
     val id2 = "2000002"
     val record2 = SierraBibRecord(
@@ -113,13 +113,13 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2002-02-02T02:02:02Z"
     )
     sendBibRecordToSQS(record2)
-    val expectedMergedSierraRecord2 =
-      MergedSierraRecord(bibRecord = record2, version = 1)
+    val expectedSierraTransformable2 =
+      SierraTransformable(bibRecord = record2, version = 1)
 
     dynamoQueryEqualsValue('id -> id1)(
-      expectedValue = expectedMergedSierraRecord1)
+      expectedValue = expectedSierraTransformable1)
     dynamoQueryEqualsValue('id -> id2)(
-      expectedValue = expectedMergedSierraRecord2)
+      expectedValue = expectedSierraTransformable2)
   }
 
   it("should update a bib in DynamoDB if a newer version is sent to SQS") {
@@ -133,7 +133,7 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2003-03-03T03:03:03Z"
     )
-    val oldRecord = MergedSierraRecord(bibRecord = oldBibRecord, version = 1)
+    val oldRecord = SierraTransformable(bibRecord = oldBibRecord, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
     val newTitle = "A number of new narwhals near Newmarket"
@@ -150,7 +150,7 @@ class SierraBibMergerFeatureTest
     sendBibRecordToSQS(record)
 
     val expectedSierraRecord =
-      MergedSierraRecord(bibRecord = record, version = 2)
+      SierraTransformable(bibRecord = record, version = 2)
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
@@ -165,9 +165,9 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2006-06-06T06:06:06Z"
     )
-    val newRecord = MergedSierraRecord(bibRecord = newBibRecord)
+    val newRecord = SierraTransformable(bibRecord = newBibRecord)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
-    val expectedSierraRecord = MergedSierraRecord(bibRecord = newBibRecord)
+    val expectedSierraRecord = SierraTransformable(bibRecord = newBibRecord)
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
@@ -191,7 +191,7 @@ class SierraBibMergerFeatureTest
 
   it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
     val id = "7000007"
-    val newRecord = MergedSierraRecord(id = id, version = 1)
+    val newRecord = SierraTransformable(id = id, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     val title = "Inside an inquisitive igloo of ice imps"
@@ -208,7 +208,7 @@ class SierraBibMergerFeatureTest
 
     sendBibRecordToSQS(record)
     val expectedSierraRecord =
-      MergedSierraRecord(bibRecord = record, version = 2)
+      SierraTransformable(bibRecord = record, version = 2)
 
     dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }

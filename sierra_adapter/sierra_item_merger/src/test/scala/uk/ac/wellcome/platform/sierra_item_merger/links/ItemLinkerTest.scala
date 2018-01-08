@@ -1,9 +1,11 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.test.utils.SierraData
 
-class ItemLinkerTest extends FunSpec with Matchers {
+class ItemLinkerTest extends FunSpec with Matchers with SierraData {
 
   it("should add the item if it doesn't exist already") {
     val record = sierraItemRecord(
@@ -13,15 +15,15 @@ class ItemLinkerTest extends FunSpec with Matchers {
       bibIds = List("b888")
     )
 
-    val mergedSierraRecord = MergedSierraRecord(id = "b888")
-    val result = ItemLinker.linkItemRecord(mergedSierraRecord, record)
+    val sierraTransformable = SierraTransformable(id = "b888")
+    val result = ItemLinker.linkItemRecord(sierraTransformable, record)
 
     result.itemData(record.id) shouldBe record
   }
 
   it("should update itemData when merging item records with newer data") {
     val itemId = "i999"
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = "b999",
       itemData = Map(
         itemId -> sierraItemRecord(
@@ -38,15 +40,15 @@ class ItemLinkerTest extends FunSpec with Matchers {
       modifiedDate = "2010-10-10T10:10:10Z",
       bibIds = List("b999")
     )
-    val result = ItemLinker.linkItemRecord(mergedSierraRecord, newerRecord)
+    val result = ItemLinker.linkItemRecord(sierraTransformable, newerRecord)
 
-    result shouldBe mergedSierraRecord.copy(
+    result shouldBe sierraTransformable.copy(
       itemData = Map(itemId -> newerRecord))
   }
 
   it("should return itself when merging item records with stale data") {
     val itemId = "i111"
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = "b111",
       itemData = Map(
         itemId -> sierraItemRecord(
@@ -63,8 +65,8 @@ class ItemLinkerTest extends FunSpec with Matchers {
       modifiedDate = "2000-01-01T01:01:01Z",
       bibIds = List("b111")
     )
-    val result = ItemLinker.linkItemRecord(mergedSierraRecord, oldRecord)
-    result shouldBe mergedSierraRecord
+    val result = ItemLinker.linkItemRecord(sierraTransformable, oldRecord)
+    result shouldBe sierraTransformable
   }
 
   it("should support adding multiple items to a merged record") {
@@ -81,8 +83,8 @@ class ItemLinkerTest extends FunSpec with Matchers {
       bibIds = List("b121")
     )
 
-    val mergedSierraRecord = MergedSierraRecord(id = "b121")
-    val result1 = ItemLinker.linkItemRecord(mergedSierraRecord, record1)
+    val sierraTransformable = SierraTransformable(id = "b121")
+    val result1 = ItemLinker.linkItemRecord(sierraTransformable, record1)
     val result2 = ItemLinker.linkItemRecord(result1, record2)
 
     result1.itemData(record1.id) shouldBe record1
@@ -101,65 +103,12 @@ class ItemLinkerTest extends FunSpec with Matchers {
       unlinkedBibIds = List()
     )
 
-    val mergedSierraRecord = MergedSierraRecord(id = bibId)
+    val sierraTransformable = SierraTransformable(id = bibId)
 
     val caught = intercept[RuntimeException] {
-      ItemLinker.linkItemRecord(mergedSierraRecord, record)
+      ItemLinker.linkItemRecord(sierraTransformable, record)
     }
 
     caught.getMessage shouldEqual "Non-matching bib id 444 in item bib List(666)"
   }
-
-  def sierraItemRecord(
-    id: String = "i111",
-    title: String = "Ingenious imps invent invasive implements",
-    modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String],
-    unlinkedBibIds: List[String] = List()
-  ) = SierraItemRecord(
-    id = id,
-    data = sierraRecordString(
-      id = id,
-      updatedDate = modifiedDate,
-      title = title
-    ),
-    modifiedDate = modifiedDate,
-    bibIds = bibIds,
-    unlinkedBibIds = unlinkedBibIds
-  )
-
-  private def sierraRecordString(
-    id: String,
-    updatedDate: String,
-    title: String
-  ) =
-    s"""
-       |{
-       |      "id": "$id",
-       |      "updatedDate": "$updatedDate",
-       |      "createdDate": "1999-11-01T16:36:51Z",
-       |      "deleted": false,
-       |      "suppressed": false,
-       |      "lang": {
-       |        "code": "ger",
-       |        "name": "German"
-       |      },
-       |      "title": "$title",
-       |      "author": "Schindler, Rudolf, 1888-",
-       |      "materialType": {
-       |        "code": "a",
-       |        "value": "Books"
-       |      },
-       |      "bibLevel": {
-       |        "code": "m",
-       |        "value": "MONOGRAPH"
-       |      },
-       |      "publishYear": 1923,
-       |      "catalogDate": "1999-01-01",
-       |      "country": {
-       |        "code": "gw ",
-       |        "name": "Germany"
-       |      }
-       |    }
-    """.stripMargin
 }

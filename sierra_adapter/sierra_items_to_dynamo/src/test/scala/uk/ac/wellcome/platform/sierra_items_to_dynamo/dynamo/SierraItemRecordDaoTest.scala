@@ -9,11 +9,11 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 class SierraItemRecordDaoTest
     extends FunSpec

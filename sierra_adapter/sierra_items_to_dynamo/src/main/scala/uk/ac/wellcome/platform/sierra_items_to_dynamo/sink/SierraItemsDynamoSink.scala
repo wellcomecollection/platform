@@ -7,8 +7,8 @@ import akka.stream.scaladsl.Sink
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -4,8 +4,17 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
+import uk.ac.wellcome.test.utils.SierraData
 
-class SierraTransformableTransformerTest extends FunSpec with Matchers {
+class SierraTransformableTransformerTest
+    extends FunSpec
+    with Matchers
+    with SierraData {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
@@ -19,7 +28,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
@@ -33,7 +42,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       )
     )
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
 
     transformedSierraRecord.isSuccess shouldBe true
     val work = transformedSierraRecord.get.get
@@ -56,10 +65,10 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   }
 
   it("should not perform a transformation without bibData") {
-    val mergedSierraRecord =
-      MergedSierraRecord(id = "000", maybeBibData = None)
+    val sierraTransformable =
+      SierraTransformable(id = "000", maybeBibData = None)
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get shouldBe None
@@ -67,7 +76,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
 
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = "b111",
       maybeBibData = None,
       itemData = Map(
@@ -79,7 +88,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
         ))
     )
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
     transformedSierraRecord.get shouldBe None
   }
@@ -95,12 +104,12 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
 
     val identifier =
@@ -114,57 +123,4 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       )
     )
   }
-
-  def sierraItemRecord(
-    id: String = "i111",
-    title: String = "Ingenious imps invent invasive implements",
-    modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String],
-    unlinkedBibIds: List[String] = List()
-  ) = SierraItemRecord(
-    id = id,
-    data = sierraRecordString(
-      id = id,
-      updatedDate = modifiedDate,
-      title = title
-    ),
-    modifiedDate = modifiedDate,
-    bibIds = bibIds,
-    unlinkedBibIds = unlinkedBibIds
-  )
-
-  private def sierraRecordString(
-    id: String,
-    updatedDate: String,
-    title: String
-  ) =
-    s"""
-       |{
-       |      "id": "$id",
-       |      "updatedDate": "$updatedDate",
-       |      "createdDate": "1999-11-01T16:36:51Z",
-       |      "deleted": false,
-       |      "suppressed": false,
-       |      "lang": {
-       |        "code": "ger",
-       |        "name": "German"
-       |      },
-       |      "title": "$title",
-       |      "author": "Schindler, Rudolf, 1888-",
-       |      "materialType": {
-       |        "code": "a",
-       |        "value": "Books"
-       |      },
-       |      "bibLevel": {
-       |        "code": "m",
-       |        "value": "MONOGRAPH"
-       |      },
-       |      "publishYear": 1923,
-       |      "catalogDate": "1999-01-01",
-       |      "country": {
-       |        "code": "gw ",
-       |        "name": "Germany"
-       |      }
-       |    }
-    """.stripMargin
 }

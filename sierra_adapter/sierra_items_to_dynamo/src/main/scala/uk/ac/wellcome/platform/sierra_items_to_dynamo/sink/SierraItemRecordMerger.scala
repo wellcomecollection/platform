@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
 
-import uk.ac.wellcome.models.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 object SierraItemRecordMerger {
   def mergeItems(oldRecord: SierraItemRecord,
