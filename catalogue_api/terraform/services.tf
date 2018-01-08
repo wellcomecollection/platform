@@ -4,6 +4,8 @@ module "api_romulus_v1" {
   name     = "romulus"
   prod_api = "remus"
 
+  es_config = "${var.es_config_romulus}"
+
   prod_api_release_id       = "${var.production_api == "romulus" ? var.pinned_romulus_api : var.pinned_remus_api}"
   prod_api_nginx_release_id = "${var.production_api == "romulus" ? var.pinned_romulus_api_nginx : var.pinned_remus_api_nginx}"
   release_ids               = "${var.release_ids}"
@@ -16,14 +18,11 @@ module "api_romulus_v1" {
 
   api_host = "${var.api_host}"
 
-  es_config = "${var.es_config_romulus}"
-
   alb_listener_https_arn     = "${module.api_alb.listener_https_arn}"
   alb_listener_http_arn      = "${module.api_alb.listener_http_arn}"
   alb_cloudwatch_id          = "${module.api_alb.cloudwatch_id}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-
 }
 
 data "template_file" "es_cluster_host_remus" {
