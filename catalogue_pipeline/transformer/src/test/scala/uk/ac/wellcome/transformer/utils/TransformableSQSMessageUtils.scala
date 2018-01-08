@@ -3,9 +3,7 @@ package uk.ac.wellcome.transformer.utils
 import java.time.Instant
 
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, SierraTransformable}
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
-import uk.ac.wellcome.models.SierraItemRecord
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil
 
