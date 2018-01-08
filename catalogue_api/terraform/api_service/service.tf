@@ -1,3 +1,12 @@
+locals {
+  is_prod_api = "${var.name == var.prod_api ? true : false}"
+
+  api_release_id   = "${local.is_prod_api ? var.prod_api_release_id : var.release_ids["api"]}"
+  nginx_release_id = "${local.is_prod_api ? var.prod_api_nginx_release_id : var.release_ids["nginx_api"]}"
+
+  host_name = "${local.is_prod_api ? "api.wellcomecollection.org" : "api-stage.wellcomecollection.org"}"
+}
+
 data "template_file" "es_cluster_host" {
   template = "$${name}.$${region}.aws.found.io"
 
@@ -20,10 +29,10 @@ module "service" {
 
   host_name = "${local.host_name}"
 
-  enable_alb_alarm = "${local.enable_alb_alarm}"
+  enable_alb_alarm = "${local.is_prod_api ? 1 : 0}"
 
-  desired_count                      = "${local.desired_count}"
-  deployment_minimum_healthy_percent = "${local.minimum_healthy_percent}"
+  desired_count                      = "${local.is_prod_api ? 3 : 1}"
+  deployment_minimum_healthy_percent = "${local.is_prod_api ? 50 : 0}"
   deployment_maximum_percent         = "200"
 
   cpu    = 1024
