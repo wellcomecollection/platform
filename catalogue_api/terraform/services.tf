@@ -2,7 +2,7 @@ module "api_romulus_v1" {
   source = "./api_service"
 
   name     = "romulus"
-  prod_api = "remus"
+  prod_api = "${var.production_api}"
 
   es_config = "${var.es_config_romulus}"
 
