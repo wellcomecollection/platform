@@ -2,6 +2,16 @@ variable "name" {
   description = "remus/romulus"
 }
 
+variable "prod_api" {
+  description = "remus/romulus"
+}
+
+variable "prod_api_release_id" {}
+variable "prod_api_nginx_release_id" {}
+variable "release_ids" {
+  type = "map"
+}
+
 variable "cluster_id" {}
 variable "vpc_id" {}
 
