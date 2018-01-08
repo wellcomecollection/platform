@@ -1,3 +1,10 @@
+resource "aws_s3_bucket_object" "s3_prod_api_marker" {
+  bucket  = "${var.infra_bucket}"
+  acl     = "private"
+  key     = "/prod_api"
+  content = "${var.production_api}"
+}
+
 data "template_file" "es_cluster_host_romulus" {
   template = "$${name}.$${region}.aws.found.io"
 
@@ -12,8 +19,8 @@ module "api_romulus_v1" {
   name               = "api_romulus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_romulus_api != "" ? var.pinned_romulus_api : var.release_ids["api"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_romulus_api_nginx != "" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.production_api == "romulus" ? var.pinned_api : var.release_ids["api"]}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.production_api == "romulus" ? var.pinned_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
 
@@ -66,8 +73,8 @@ module "api_remus_v1" {
   name               = "api_remus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   vpc_id             = "${module.vpc_api.vpc_id}"
-  app_uri            = "${module.ecr_repository_api.repository_url}:${var.pinned_remus_api != "" ? var.pinned_remus_api : var.release_ids["api"]}"
-  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.pinned_remus_api_nginx != "" ? var.pinned_remus_api_nginx : var.release_ids["nginx_api"]}"
+  app_uri            = "${module.ecr_repository_api.repository_url}:${var.production_api == "remus" ? var.pinned_api : var.release_ids["api"]}"
+  nginx_uri          = "${module.ecr_repository_nginx_api.repository_url}:${var.production_api == "remus" ? var.pinned_api_nginx : var.release_ids["nginx_api"]}"
   listener_https_arn = "${module.api_alb.listener_https_arn}"
   listener_http_arn  = "${module.api_alb.listener_http_arn}"
 

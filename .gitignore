@@ -6,7 +6,6 @@
 terraform.plan
 .terraform
 shared_infra/.releases
-*.tfvars
 *.tfstate
 *.tfstate.backup
 *.tfstate.*.backup
@@ -14,6 +13,9 @@ shared_infra/.releases
 .docker
 .lambda_zips
 id_rsa
+
+*.tfvars
+!terraform_api.tfvars
 
 ### Gatling ###
 /gatling/results/*
