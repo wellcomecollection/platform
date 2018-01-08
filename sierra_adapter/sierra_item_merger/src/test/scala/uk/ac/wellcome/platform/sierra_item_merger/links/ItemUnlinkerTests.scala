@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 class ItemUnlinkerTests extends FunSpec with Matchers {
 
@@ -22,16 +23,16 @@ class ItemUnlinkerTests extends FunSpec with Matchers {
       unlinkedBibIds = List(bibId)
     )
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = bibId,
       itemData = Map(record.id -> record)
     )
 
-    val expectedMergedSierraRecord = mergedSierraRecord.copy(
+    val expectedSierraTransformable = sierraTransformable.copy(
       itemData = Map.empty
     )
 
-    ItemUnlinker.unlinkItemRecord(mergedSierraRecord, unlinkedItemRecord) shouldBe expectedMergedSierraRecord
+    ItemUnlinker.unlinkItemRecord(sierraTransformable, unlinkedItemRecord) shouldBe expectedSierraTransformable
   }
 
   it(
@@ -54,14 +55,14 @@ class ItemUnlinkerTests extends FunSpec with Matchers {
       unlinkedBibIds = List(bibId)
     )
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = bibId,
       itemData = Map(record.id -> record)
     )
 
-    val expectedMergedSierraRecord = mergedSierraRecord
+    val expectedSierraTransformable = sierraTransformable
 
-    ItemUnlinker.unlinkItemRecord(mergedSierraRecord, previouslyUnlinkedRecord) shouldBe expectedMergedSierraRecord
+    ItemUnlinker.unlinkItemRecord(sierraTransformable, previouslyUnlinkedRecord) shouldBe expectedSierraTransformable
   }
 
   it(
@@ -85,14 +86,14 @@ class ItemUnlinkerTests extends FunSpec with Matchers {
       unlinkedBibIds = List(bibId)
     )
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = bibId,
       itemData = Map(record.id -> record)
     )
 
-    val expectedMergedSierraRecord = mergedSierraRecord
+    val expectedSierraTransformable = sierraTransformable
 
-    ItemUnlinker.unlinkItemRecord(mergedSierraRecord, outOfDateUnlinkedRecord) shouldBe expectedMergedSierraRecord
+    ItemUnlinker.unlinkItemRecord(sierraTransformable, outOfDateUnlinkedRecord) shouldBe expectedSierraTransformable
   }
 
   it("should only unlink item records with matching bib IDs") {
@@ -115,13 +116,13 @@ class ItemUnlinkerTests extends FunSpec with Matchers {
       unlinkedBibIds = List(unrelatedBibId)
     )
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = bibId,
       itemData = Map(record.id -> record)
     )
 
     val caught = intercept[RuntimeException] {
-      ItemUnlinker.unlinkItemRecord(mergedSierraRecord, unrelatedItemRecord)
+      ItemUnlinker.unlinkItemRecord(sierraTransformable, unrelatedItemRecord)
     }
 
     caught.getMessage shouldEqual "Non-matching bib id 222 in item unlink bibs List(846)"

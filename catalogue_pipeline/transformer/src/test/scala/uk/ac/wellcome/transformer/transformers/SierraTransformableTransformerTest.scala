@@ -4,6 +4,8 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 
 class SierraTransformableTransformerTest extends FunSpec with Matchers {
   val transformer = new SierraTransformableTransformer
@@ -19,7 +21,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
@@ -33,7 +35,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       )
     )
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
 
     transformedSierraRecord.isSuccess shouldBe true
     val work = transformedSierraRecord.get.get
@@ -56,10 +58,10 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   }
 
   it("should not perform a transformation without bibData") {
-    val mergedSierraRecord =
-      MergedSierraRecord(id = "000", maybeBibData = None)
+    val sierraTransformable =
+      SierraTransformable(id = "000", maybeBibData = None)
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get shouldBe None
@@ -67,7 +69,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
 
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = "b111",
       maybeBibData = None,
       itemData = Map(
@@ -79,7 +81,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
         ))
     )
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
     transformedSierraRecord.get shouldBe None
   }
@@ -95,12 +97,12 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
 
     val identifier =

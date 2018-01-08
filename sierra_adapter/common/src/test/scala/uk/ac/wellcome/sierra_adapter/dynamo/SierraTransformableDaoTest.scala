@@ -1,11 +1,7 @@
 package uk.ac.wellcome.sierra_adapter.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  ConditionalCheckFailedException,
-  GetItemRequest,
-  PutItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -14,45 +10,45 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraItemRecord}
-import uk.ac.wellcome.platform.sierra_adapter.dynamo.MergedSierraRecordDao
 import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
-class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
+class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
 
-  val mergedSierraRecordDao =
-    new MergedSierraRecordDao(dynamoDbClient,
+  val sierraTransformableDao =
+    new SierraTransformableDao(dynamoDbClient,
                               Map("merger" -> DynamoConfig(tableName)))
 
   describe("get a merged sierra record") {
     it(
       "should return a future of merged sierra record if it exists in  DynamoDB") {
-      val mergedSierraRecord = MergedSierraRecord(id = "b1111",
+      val sierraTransformable = SierraTransformable(id = "b1111",
                                                   maybeBibData = None,
                                                   itemData = Map(),
                                                   version = 1)
 
-      Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
+      Scanamo.put(dynamoDbClient)(tableName)(sierraTransformable)
 
-      whenReady(mergedSierraRecordDao.getRecord(mergedSierraRecord.id)) {
+      whenReady(sierraTransformableDao.getRecord(sierraTransformable.id)) {
         record =>
-          record shouldBe Some(mergedSierraRecord)
+          record shouldBe Some(sierraTransformable)
       }
     }
 
     it(
       "should return a future of None if the record does not exist in DynamoDB") {
-      val mergedSierraRecord = MergedSierraRecord(id = "b1111",
+      val sierraTransformable = SierraTransformable(id = "b1111",
                                                   maybeBibData = None,
                                                   itemData = Map(),
                                                   version = 1)
 
-      Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
+      Scanamo.put(dynamoDbClient)(tableName)(sierraTransformable)
 
-      whenReady(mergedSierraRecordDao.getRecord("b88888")) { record =>
+      whenReady(sierraTransformableDao.getRecord("b88888")) { record =>
         record shouldBe None
       }
     }
@@ -64,12 +60,12 @@ class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
       when(dynamoDbClient.getItem(any[GetItemRequest]))
         .thenThrow(expectedException)
 
-      val mergedSierraRecordDaoMockedDynamoClient =
-        new MergedSierraRecordDao(dynamoDbClient,
+      val sierraTransformableDaoMockedDynamoClient =
+        new SierraTransformableDao(dynamoDbClient,
                                   Map("merger" -> DynamoConfig(tableName)))
 
       val future =
-        mergedSierraRecordDaoMockedDynamoClient.getRecord("b88888")
+        sierraTransformableDaoMockedDynamoClient.getRecord("b88888")
 
       whenReady(future.failed) { ex =>
         ex shouldBe expectedException
@@ -80,7 +76,7 @@ class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
   describe("update a merged sierra record") {
     it("inserts a new record if it doesn't already exist") {
       val id = "b1111"
-      val mergedSierraRecord = MergedSierraRecord(
+      val sierraTransformable = SierraTransformable(
         id = id,
         maybeBibData = None,
         itemData = Map(
@@ -91,72 +87,72 @@ class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
         version = 0
       )
 
-      val expectedSierraRecord = mergedSierraRecord.copy(version = 1)
+      val expectedSierraRecord = sierraTransformable.copy(version = 1)
 
-      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>
+      whenReady(sierraTransformableDao.updateRecord(sierraTransformable)) { _ =>
         dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
       }
     }
 
     it("updates an existing record if the update has a higher version") {
       val id = "b1111"
-      val mergedSierraRecord = MergedSierraRecord(id = id,
+      val sierraTransformable = SierraTransformable(id = id,
                                                   maybeBibData = None,
                                                   itemData = Map(),
                                                   version = 1)
-      val newerMergedSierraRecord = mergedSierraRecord.copy(version = 2)
+      val newerSierraTransformable = sierraTransformable.copy(version = 2)
 
-      Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
+      Scanamo.put(dynamoDbClient)(tableName)(sierraTransformable)
 
-      whenReady(mergedSierraRecordDao.updateRecord(newerMergedSierraRecord)) {
+      whenReady(sierraTransformableDao.updateRecord(newerSierraTransformable)) {
         _ =>
           Scanamo
-            .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
+            .get[SierraTransformable](dynamoDbClient)(tableName)('id -> id)
             .get shouldBe Right(
-            newerMergedSierraRecord.copy(version = 3)
+            newerSierraTransformable.copy(version = 3)
           )
       }
     }
 
     it("updates a record if it already exists and has the same version") {
       val id = "b1111"
-      val mergedSierraRecord = MergedSierraRecord(id = id,
+      val sierraTransformable = SierraTransformable(id = id,
                                                   maybeBibData = None,
                                                   itemData = Map(),
                                                   version = 1)
 
-      Scanamo.put(dynamoDbClient)(tableName)(mergedSierraRecord)
+      Scanamo.put(dynamoDbClient)(tableName)(sierraTransformable)
 
-      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord)) { _ =>
+      whenReady(sierraTransformableDao.updateRecord(sierraTransformable)) { _ =>
         Scanamo
-          .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
+          .get[SierraTransformable](dynamoDbClient)(tableName)('id -> id)
           .get shouldBe Right(
-          mergedSierraRecord.copy(version = 2)
+          sierraTransformable.copy(version = 2)
         )
       }
     }
 
     it("does not update an existing record if the update has a lower version") {
       val id = "b1111"
-      val mergedSierraRecord = MergedSierraRecord(id = id,
+      val sierraTransformable = SierraTransformable(id = id,
                                                   maybeBibData = None,
                                                   itemData = Map(),
                                                   version = 1)
-      val newerMergedSierraRecord = MergedSierraRecord(id = id,
+      val newerSierraTransformable = SierraTransformable(id = id,
                                                        maybeBibData = None,
                                                        itemData = Map(),
                                                        version = 2)
 
-      Scanamo.put(dynamoDbClient)(tableName)(newerMergedSierraRecord)
+      Scanamo.put(dynamoDbClient)(tableName)(newerSierraTransformable)
 
-      whenReady(mergedSierraRecordDao.updateRecord(mergedSierraRecord).failed) {
+      whenReady(sierraTransformableDao.updateRecord(sierraTransformable).failed) {
         ex =>
           ex shouldBe a[ConditionalCheckFailedException]
 
           Scanamo
-            .get[MergedSierraRecord](dynamoDbClient)(tableName)('id -> id)
+            .get[SierraTransformable](dynamoDbClient)(tableName)('id -> id)
             .get shouldBe Right(
-            newerMergedSierraRecord
+            newerSierraTransformable
           )
       }
     }
@@ -168,15 +164,15 @@ class MergedSierraRecordDaoTest extends FunSpec with SierraTestUtils {
         .thenThrow(expectedException)
 
       val failingDao =
-        new MergedSierraRecordDao(dynamoDbClient,
+        new SierraTransformableDao(dynamoDbClient,
                                   Map("merger" -> DynamoConfig(tableName)))
 
-      val mergedSierraRecord = MergedSierraRecord(id = "b1111",
+      val sierraTransformable = SierraTransformable(id = "b1111",
                                                   maybeBibData = None,
                                                   itemData = Map(),
                                                   version = 1)
 
-      whenReady(failingDao.updateRecord(mergedSierraRecord).failed) { ex =>
+      whenReady(failingDao.updateRecord(sierraTransformable).failed) { ex =>
         ex shouldBe expectedException
       }
     }

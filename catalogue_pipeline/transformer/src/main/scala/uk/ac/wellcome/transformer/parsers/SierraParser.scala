@@ -1,13 +1,12 @@
 package uk.ac.wellcome.transformer.parsers
 
-import uk.ac.wellcome.models.MergedSierraRecord
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try
 
-class SierraParser extends TransformableParser[MergedSierraRecord] {
+class SierraParser extends TransformableParser[SierraTransformable] {
   override def readFromRecord(
     transformableAsJson: String): Try[Transformable] =
-    JsonUtil.fromJson[MergedSierraRecord](transformableAsJson)
+    JsonUtil.fromJson[SierraTransformable](transformableAsJson)
 }
