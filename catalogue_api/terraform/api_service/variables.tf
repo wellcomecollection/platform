@@ -8,6 +8,7 @@ variable "prod_api" {
 
 variable "prod_api_release_id" {}
 variable "prod_api_nginx_release_id" {}
+
 variable "release_ids" {
   type = "map"
 }
