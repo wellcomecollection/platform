@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_romulus" {
 }
 
 module "api_romulus_v1" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v5.0.2"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=new-alarms4"
   name               = "api_romulus_v1"
   cluster_id         = "${aws_ecs_cluster.api.id}"
   vpc_id             = "${module.vpc_api.vpc_id}"
@@ -23,7 +23,7 @@ module "api_romulus_v1" {
   alb_priority = "114"
   host_name    = "${var.production_api == "romulus" ? var.api_host : var.api_host_stage}"
 
-  enable_alb_alarm = "${var.production_api == "romulus" ? 1 : 0}"
+  enable_alb_alarm = "1" #"${var.production_api == "romulus" ? 1 : 0}"
 
   cpu    = 1024
   memory = 2048
