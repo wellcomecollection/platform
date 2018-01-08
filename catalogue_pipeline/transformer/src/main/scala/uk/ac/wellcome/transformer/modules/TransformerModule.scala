@@ -3,12 +3,6 @@ package uk.ac.wellcome.transformer.modules
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.transformable.Transformable
-import uk.ac.wellcome.transformer.parsers.{
-  CalmParser,
-  MiroParser,
-  SierraParser,
-  TransformableParser
-}
 import uk.ac.wellcome.transformer.transformers.{
   CalmTransformableTransformer,
   MiroTransformableTransformer,
@@ -29,19 +23,6 @@ object TransformerModule extends TwitterModule {
       case "MiroData" => new MiroTransformableTransformer
       case "CalmData" => new CalmTransformableTransformer
       case "SierraData" => new SierraTransformableTransformer
-      case tableName =>
-        throw new RuntimeException(s"$tableName is not a recognised source")
-    }
-  }
-
-  @Singleton
-  @Provides
-  def providesTransformableParser(): TransformableParser[Transformable] = {
-
-    dataSource() match {
-      case "MiroData" => new MiroParser
-      case "CalmData" => new CalmParser
-      case "SierraData" => new SierraParser
       case tableName =>
         throw new RuntimeException(s"$tableName is not a recognised source")
     }

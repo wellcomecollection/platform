@@ -1,12 +1,21 @@
 package uk.ac.wellcome.transformer.parsers
 
 import com.twitter.inject.Logging
+import io.circe.parser.decode
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.sqs.SQSReaderGracefulException
+import uk.ac.wellcome.utils.JsonUtil
+import cats.syntax.either._
+import com.twitter.finagle.NameTree.Fail
+import uk.ac.wellcome.circe._
+import io.circe.generic.auto._
+import io.circe.parser._
 
-import scala.util.Try
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
-trait TransformableParser[+T <: Transformable] extends Logging {
+class TransformableParser extends Logging {
   final def extractTransformable(message: SQSMessage): Try[Transformable] =
     readFromRecord(message.body)
       .recover {
@@ -15,5 +24,10 @@ trait TransformableParser[+T <: Transformable] extends Logging {
           throw e
       }
 
-  def readFromRecord(message: String): Try[Transformable]
+  def readFromRecord(message: String): Try[Transformable] = {
+    decode[Transformable](message) match {
+      case Right(transformable) => Success(transformable)
+      case Left(parseError) => Failure(parseError)
+    }
+  }
 }

@@ -18,7 +18,7 @@ class CalmParserTest
     createValidCalmSQSMessage(RecordID, RecordType, AltRefNo, RefNo, data)
 
   it("should parse a record into a calm case class") {
-    val calmParser = new CalmParser
+    val calmParser = new TransformableParser
     val triedCalmTransformable =
       calmParser.extractTransformable(calmRecord)
 
@@ -33,7 +33,7 @@ class CalmParserTest
   }
 
   it("should return a failed try if it's unable to parse the message") {
-    val calmParser = new CalmParser
+    val calmParser = new TransformableParser
 
     val triedCalmTransformable =
       calmParser.extractTransformable(createInvalidRecord)

@@ -1,21 +1,37 @@
 package uk.ac.wellcome.models.transformable
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import java.time.Instant
+
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.JsonUtil
+import io.circe.{Decoder, Encoder, HCursor}
+import cats.syntax.functor._
+import io.circe.generic.extras.auto._
+
+import cats.syntax.either._
+
 
 import scala.util.Try
 
 sealed trait Transformable
 
+
+object Transformable {
+  import uk.ac.wellcome.circe._
+
+  implicit val decodeEvent: Decoder[Transformable] =
+    List[Decoder[Transformable]](
+      Decoder[CalmTransformable].widen,
+      Decoder[SierraTransformable].widen,
+      Decoder[MiroTransformable].widen
+    ).reduceLeft(_ or _)
+}
+
 case class CalmTransformableData(
   AccessStatus: Array[String]
 ) extends Transformable
 
-//TODO add some tests around transformation
 case class CalmTransformable(
   RecordID: String,
   RecordType: String,

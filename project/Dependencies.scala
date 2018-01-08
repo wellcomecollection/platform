@@ -15,7 +15,7 @@ object Dependencies {
     val scanamo = "0.9.4"
     val jacksonYamlVersion = "2.8.8"
     val jacksonJSR310Version = "2.8.9"
-    val circeVersion = "0.8.0"
+    val circeVersion = "0.9.0"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
