@@ -5,12 +5,12 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 trait SierraData {
 
   def sierraItemRecord(
-                        id: String = "i111",
-                        title: String = "Ingenious imps invent invasive implements",
-                        modifiedDate: String = "2001-01-01T01:01:01Z",
-                        bibIds: List[String] = List(),
-                        unlinkedBibIds: List[String] = List()
-                      ) = SierraItemRecord(
+    id: String = "i111",
+    title: String = "Ingenious imps invent invasive implements",
+    modifiedDate: String = "2001-01-01T01:01:01Z",
+    bibIds: List[String] = List(),
+    unlinkedBibIds: List[String] = List()
+  ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(
       id = id,
@@ -23,10 +23,10 @@ trait SierraData {
   )
 
   def sierraRecordString(
-                                  id: String,
-                                  updatedDate: String,
-                                  title: String
-                                ) =
+    id: String,
+    updatedDate: String,
+    title: String
+  ) =
     s"""
        |{
        |      "id": "$id",

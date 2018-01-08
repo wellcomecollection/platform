@@ -3,8 +3,15 @@ package uk.ac.wellcome.transformer.utils
 import java.time.Instant
 
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable
+}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableSQSMessageUtils {

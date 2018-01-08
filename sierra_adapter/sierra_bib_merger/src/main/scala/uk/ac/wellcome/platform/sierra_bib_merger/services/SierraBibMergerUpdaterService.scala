@@ -12,8 +12,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
-                                               sierraTransformableDao: SierraTransformableDao,
-                                               metrics: MetricsSender
+  sierraTransformableDao: SierraTransformableDao,
+  metrics: MetricsSender
 ) extends Logging {
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = {

@@ -1,6 +1,9 @@
 package uk.ac.wellcome.models.transformable
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -9,20 +12,20 @@ import scala.util.Try
 sealed trait Transformable
 
 case class CalmTransformableData(
-                                  AccessStatus: Array[String]
-                                ) extends Transformable
+  AccessStatus: Array[String]
+) extends Transformable
 
 //TODO add some tests around transformation
 case class CalmTransformable(
-                              RecordID: String,
-                              RecordType: String,
-                              AltRefNo: String,
-                              RefNo: String,
-                              data: String,
-                              ReindexShard: String = "default",
-                              ReindexVersion: Int = 0
-                            ) extends Transformable
-  with Reindexable[String] {
+  RecordID: String,
+  RecordType: String,
+  AltRefNo: String,
+  RefNo: String,
+  data: String,
+  ReindexShard: String = "default",
+  ReindexVersion: Int = 0
+) extends Transformable
+    with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
     HashKey("RecordID", RecordID),
@@ -36,7 +39,7 @@ case class MiroTransformable(MiroID: String,
                              data: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
-  extends Transformable
+    extends Transformable
     with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
@@ -60,12 +63,11 @@ case class MiroTransformable(MiroID: String,
   *
   */
 case class SierraTransformable(
-                               id: String,
-                               maybeBibData: Option[SierraBibRecord] = None,
-                               itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
-                               version: Int = 0
-                             ) extends Transformable
-
+  id: String,
+  maybeBibData: Option[SierraBibRecord] = None,
+  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
+  version: Int = 0
+) extends Transformable
 
 object SierraTransformable {
   def apply(id: String, bibData: String): SierraTransformable = {

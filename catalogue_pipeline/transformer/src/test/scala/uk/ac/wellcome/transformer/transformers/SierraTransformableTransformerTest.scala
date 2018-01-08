@@ -5,10 +5,16 @@ import java.time.Instant.now
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.test.utils.SierraData
 
-class SierraTransformableTransformerTest extends FunSpec with Matchers with SierraData {
+class SierraTransformableTransformerTest
+    extends FunSpec
+    with Matchers
+    with SierraData {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {

@@ -12,7 +12,11 @@ import uk.ac.wellcome.models.Reindex
 import uk.ac.wellcome.models.transformable.CalmTransformable
 import uk.ac.wellcome.platform.reindexer.Server
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-import uk.ac.wellcome.platform.reindexer.services.{CalmReindexTargetService, ReindexService, ReindexTargetService}
+import uk.ac.wellcome.platform.reindexer.services.{
+  CalmReindexTargetService,
+  ReindexService,
+  ReindexTargetService
+}
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 
