@@ -3,14 +3,18 @@ package uk.ac.wellcome.platform.sierra_bibs_to_sns.sink
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
-import org.scalatest.concurrent.ScalaFutures
+import com.amazonaws.services.sns.AmazonSNS
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import io.circe.parser._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SNSLocal}
+import uk.ac.wellcome.utils.JsonUtil
 
 class SierraBibsToSnsSinkTest
     extends FunSpec
@@ -18,6 +22,7 @@ class SierraBibsToSnsSinkTest
     with SNSLocal
     with Matchers
     with ExtendedPatience
+    with Eventually
     with MockitoSugar
     with BeforeAndAfterAll {
   implicit val system = ActorSystem()
@@ -61,7 +66,7 @@ class SierraBibsToSnsSinkTest
     eventually {
       val messages = listMessagesReceivedFromSNS()
       messages should have size 1
-      JsonUtil.fromJson[SierraBibRecord](messages.head) shouldBe expectedRecord
+      JsonUtil.fromJson[SierraBibRecord](messages.head.message) shouldBe expectedRecord
     }
   }
 
@@ -91,7 +96,7 @@ class SierraBibsToSnsSinkTest
     eventually {
       val messages = listMessagesReceivedFromSNS()
       messages should have size 1
-      JsonUtil.fromJson[SierraBibRecord](messages.head) shouldBe expectedRecord
+      JsonUtil.fromJson[SierraBibRecord](messages.head.message) shouldBe expectedRecord
     }
   }
 
@@ -118,13 +123,11 @@ class SierraBibsToSnsSinkTest
          |}
       """.stripMargin).right.get
 
-    val brokenSnsClient = mock[AmazonSNS]
     val expectedException = new RuntimeException("AAAAAARGH!")
-    when(brokenSnsClient.writeMessage(any[String], any[String]))
+    val brokenWriter = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn))
+    when(brokenWriter.writeMessage(any[String], any[Option[String]]))
       .thenThrow(expectedException)
-    val brokenSink = SierraBibsToSnsSink(
-      writer = new SNSWriter(brokenSnsClient, SNSConfig(topicArn = topicArn))
-    )
+    val brokenSink = SierraBibsToSnsSink(writer = brokenWriter)
 
     val futureUnit = Source.single(json).runWith(brokenSink)
     whenReady(futureUnit.failed) { ex =>

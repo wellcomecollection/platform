@@ -6,6 +6,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSConfig, SQSMessage}
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
@@ -28,7 +29,7 @@ class SierraBibsToSnsWorkerServiceTest
   val topicArn = createTopicAndReturnArn("sierra-test-topic")
 
   val mockMetrics = mock[MetricsSender]
-  var worker: Option[SierraBibsToSnsService] = None
+  var worker: Option[SierraBibsToSnsWorkerService] = None
   val actorSystem = ActorSystem()
 
   override def beforeEach(): Unit = {
@@ -41,14 +42,14 @@ class SierraBibsToSnsWorkerServiceTest
     actorSystem.terminate()
   }
 
-  private def createSierraBibsToSnsService(
+  private def createSierraBibsToSnsWorkerService(
     fields: String,
-    apiUrl = "http://localhost:8080"
+    apiUrl: String = "http://localhost:8080"
   ) = {
     Some(
-      new SierraBibsToSnsService(
+      new SierraBibsToSnsWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-        writer = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn))
+        writer = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn)),
         system = actorSystem,
         metrics = mockMetrics,
         apiUrl = apiUrl,
@@ -60,7 +61,7 @@ class SierraBibsToSnsWorkerServiceTest
 
   it(
     "reads a window message from SQS, retrieves the bibs from Sierra and sends them to SNS") {
-    worker = createSierraWorkerService(
+    worker = createSierraBibsToSnsWorkerService(
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
     )
     worker.get.runSQSWorker()
@@ -85,7 +86,7 @@ class SierraBibsToSnsWorkerServiceTest
 
   it(
     "returns a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
-    worker = createSierraWorkerService(fields = "")
+    worker = createSierraBibsToSnsWorkerService(fields = "")
 
     val message =
       """
@@ -104,7 +105,10 @@ class SierraBibsToSnsWorkerServiceTest
 
   it(
     "does not return a SQSReaderGracefulException if it cannot reach the Sierra API") {
-    worker = createSierraWorkerService(fields = "", apiUrl = "http://localhost:5050")
+    worker = createSierraBibsToSnsWorkerService(
+      fields = "",
+      apiUrl = "http://localhost:5050"
+    )
 
     val message =
       """
@@ -122,7 +126,7 @@ class SierraBibsToSnsWorkerServiceTest
     }
   }
 
-  private def stopWorker(worker: Option[SierraBibsToDynamoWorkerService]) = {
+  private def stopWorker(worker: Option[SierraBibsToSnsWorkerService]) = {
     eventually {
       worker.fold(true)(_.cancelRun()) shouldBe true
     }
