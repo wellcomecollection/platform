@@ -7,11 +7,7 @@ import uk.ac.wellcome.test.utils.StartupLogbackOverride
 
 class StartupTest extends FeatureTest with StartupLogbackOverride {
 
-  val server = new EmbeddedHttpServer(
-    twitterServer = new Server,
-    flags = Map(),
-    stage = Stage.PRODUCTION
-  )
+  val server = new EmbeddedHttpServer(new Server())
 
   test("server starts up correctly") {
     server.assertHealthy()
