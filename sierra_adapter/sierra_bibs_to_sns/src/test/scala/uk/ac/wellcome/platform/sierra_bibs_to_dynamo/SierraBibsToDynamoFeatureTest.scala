@@ -1,10 +1,10 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo
+package uk.ac.wellcome.platform.sierra_bibs_to_sns
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals.SierraBibsToDynamoDBLocal
+import uk.ac.wellcome.platform.sierra_bibs_to_sns.locals.SierraBibsToDynamoDBLocal
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,

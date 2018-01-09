@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.sink
+package uk.ac.wellcome.platform.sierra_bibs_to_sns.sink
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, ZoneOffset}

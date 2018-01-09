@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.services
+package uk.ac.wellcome.platform.sierra_bibs_to_sns.services
 
 import akka.Done
 import akka.actor.ActorSystem
@@ -8,7 +8,7 @@ import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
-import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.sink.SierraBibsDynamoSink
+import uk.ac.wellcome.platform.sierra_bibs_to_sns.sink.SierraBibsDynamoSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
