@@ -157,6 +157,13 @@ class TestAlarm:
             },
             None
         ),
+        (
+            {
+                'AlarmName': 'api_remus_v1-alb-not-enough-healthy-hosts',
+                'NewStateReason': 'Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [Breaching].',
+            },
+            "There are no healthy hosts in the ALB target group."
+        ),
     ])
     def test_human_reason(self, alarm_data, expected_reason):
         a = post_to_slack.Alarm(json.dumps(alarm_data))
