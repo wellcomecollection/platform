@@ -67,6 +67,13 @@ class Alarm:
         """
         Try to return a more human-readable explanation for the alarm.
         """
+        if self.name.endswith('-alb-not-enough-healthy-hosts'):
+            if self.state_reason == (
+                'Threshold Crossed: no datapoints were received for 1 period '
+                'and 1 missing datapoint was treated as [Breaching].'
+            ):
+                return 'There are no healthy hosts in the ALB target group.'
+
         match = DATAPOINT_RE.search(self.state_reason)
         if match is None:
             return
