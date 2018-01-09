@@ -24,7 +24,7 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
         "aws.secretKey" -> secretKey,
         "aws.region" -> "localhost")
 
-  val amazonSNS: AmazonSNS = AmazonSNSClientBuilder
+  val snsClient: AmazonSNS = AmazonSNSClientBuilder
     .standard()
     .withCredentials(new AWSStaticCredentialsProvider(
       new BasicAWSCredentials(accessKey, secretKey)))
@@ -33,7 +33,7 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
     .build()
 
   def createTopicAndReturnArn(topicName: String): String = {
-    amazonSNS.createTopic(topicName).getTopicArn
+    snsClient.createTopic(topicName).getTopicArn
   }
 
   override def beforeEach(): Unit = {
