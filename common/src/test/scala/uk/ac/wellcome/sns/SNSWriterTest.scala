@@ -17,7 +17,7 @@ class SNSWriterTest
 
   it(
     "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
-    val snsWriter = new SNSWriter(amazonSNS, snsConfig)
+    val snsWriter = new SNSWriter(snsClient, snsConfig)
     val message = "someMessage"
     val subject = "subject"
     val futurePublishAttempt = snsWriter.writeMessage(message, Some(subject))
@@ -33,7 +33,7 @@ class SNSWriterTest
 
   it(
     "should send a message with no subject to the SNS client with the default subject") {
-    val snsWriter = new SNSWriter(amazonSNS, snsConfig)
+    val snsWriter = new SNSWriter(snsClient, snsConfig)
     val message = "someMessage"
 
     val futurePublishAttempt = snsWriter.writeMessage(message, None)
@@ -47,7 +47,7 @@ class SNSWriterTest
 
   it("should return a failed future if it fails to publish the message") {
     val snsWriter =
-      new SNSWriter(amazonSNS, SNSConfig("not a valid topic"))
+      new SNSWriter(snsClient, SNSConfig("not a valid topic"))
 
     val futurePublishAttempt =
       snsWriter.writeMessage("someMessage", Some("subject"))
