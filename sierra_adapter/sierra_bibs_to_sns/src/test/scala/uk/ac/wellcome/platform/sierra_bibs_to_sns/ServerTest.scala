@@ -8,9 +8,7 @@ class ServerTest extends FeatureTest {
 
   val server = new EmbeddedHttpServer(
     new Server(),
-    flags = Map(
-      "aws.dynamo.sierraToDynamo.tableName" -> "foo"
-    )
+    flags = Map()
   )
 
   test("it shows the healthcheck message") {
