@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_sns.modules
+package uk.ac.wellcome.platform.sierra_reader.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.sierra_bibs_to_sns.services.SierraBibsToSnsWorkerService
+import uk.ac.wellcome.platform.sierra_reader.services.SierraBibsToSnsWorkerService
 
 object SierraBibsToSnsModule extends TwitterModule {
   flag[String]("sierra.apiUrl", "", "Sierra API url")

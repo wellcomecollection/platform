@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_sns
+package uk.ac.wellcome.platform.sierra_reader
 
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
