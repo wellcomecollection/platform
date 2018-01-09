@@ -6,9 +6,6 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.Transformable
 import scala.util.{Failure, Success, Try}
 
-import uk.ac.wellcome.circe._
-import io.circe.generic.auto._
-
 
 class TransformableParser extends Logging {
   final def extractTransformable(message: SQSMessage): Try[Transformable] =
