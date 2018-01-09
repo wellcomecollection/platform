@@ -164,6 +164,20 @@ class TestAlarm:
             },
             "There are no healthy hosts in the ALB target group."
         ),
+        (
+            {
+                'AlarmName': 'api_remus_v1-alb-unhealthy-hosts',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (09/01/18 10:23:00)] was greater than or equal to the threshold (1.0).',
+            },
+            "There is an unhealthy host in the API at 10:23:00 on 9 Jan 2018."
+        ),
+        (
+            {
+                'AlarmName': 'api_remus_v1-alb-unhealthy-hosts',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (10/02/19 10:26:00)] was greater than or equal to the threshold (1.0).',
+            },
+            "There are multiple unhealthy hosts (3) in the API at 10:26:00 on 10 Feb 2019."
+        ),
     ])
     def test_human_reason(self, alarm_data, expected_reason):
         a = post_to_slack.Alarm(json.dumps(alarm_data))
