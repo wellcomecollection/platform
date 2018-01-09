@@ -4,16 +4,11 @@ import com.twitter.inject.Logging
 import io.circe.parser.decode
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.Transformable
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
-import uk.ac.wellcome.utils.JsonUtil
-import cats.syntax.either._
-import com.twitter.finagle.NameTree.Fail
+import scala.util.{Failure, Success, Try}
+
 import uk.ac.wellcome.circe._
 import io.circe.generic.auto._
-import io.circe.parser._
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 class TransformableParser extends Logging {
   final def extractTransformable(message: SQSMessage): Try[Transformable] =
