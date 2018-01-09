@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.modules
+package uk.ac.wellcome.platform.sierra_bibs_to_sns.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.sierra_bibs_to_dynamo.services.SierraBibsToDynamoWorkerService
+import uk.ac.wellcome.platform.sierra_bibs_to_sns.services.SierraBibsToDynamoWorkerService
 
 object SierraBibsToDynamoModule extends TwitterModule {
   flag[String]("sierra.apiUrl", "", "Sierra API url")

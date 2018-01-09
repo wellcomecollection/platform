@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo.locals
+package uk.ac.wellcome.platform.sierra_bibs_to_sns.locals
 
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo

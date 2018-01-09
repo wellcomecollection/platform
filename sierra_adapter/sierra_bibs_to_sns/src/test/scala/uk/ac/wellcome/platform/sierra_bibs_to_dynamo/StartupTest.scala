@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_dynamo
+package uk.ac.wellcome.platform.sierra_bibs_to_sns
 
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
