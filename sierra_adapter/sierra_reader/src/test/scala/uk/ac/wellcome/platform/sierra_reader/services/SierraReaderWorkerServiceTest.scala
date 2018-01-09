@@ -13,7 +13,7 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.duration._
 
-class SierraBibsToSnsWorkerServiceTest
+class SierraReaderWorkerServiceTest
     extends FunSpec
     with MockitoSugar
     with SNSLocal
@@ -29,7 +29,7 @@ class SierraBibsToSnsWorkerServiceTest
   val topicArn = createTopicAndReturnArn("sierra-test-topic")
 
   val mockMetrics = mock[MetricsSender]
-  var worker: Option[SierraBibsToSnsWorkerService] = None
+  var worker: Option[SierraReaderWorkerService] = None
   val actorSystem = ActorSystem()
 
   override def beforeEach(): Unit = {
@@ -47,7 +47,7 @@ class SierraBibsToSnsWorkerServiceTest
     apiUrl: String = "http://localhost:8080"
   ) = {
     Some(
-      new SierraBibsToSnsWorkerService(
+      new SierraReaderWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         writer = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn)),
         system = actorSystem,
@@ -126,7 +126,7 @@ class SierraBibsToSnsWorkerServiceTest
     }
   }
 
-  private def stopWorker(worker: Option[SierraBibsToSnsWorkerService]) = {
+  private def stopWorker(worker: Option[SierraReaderWorkerService]) = {
     eventually {
       worker.fold(true)(_.cancelRun()) shouldBe true
     }

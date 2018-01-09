@@ -14,7 +14,7 @@ import uk.ac.wellcome.test.utils.{
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
-class SierraBibsToSnsFeatureTest
+class SierraReaderFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with SNSLocal
@@ -38,7 +38,7 @@ class SierraBibsToSnsFeatureTest
     ) ++ sqsLocalFlags ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag
   )
 
-  it("reads bibs from Sierra and writes them to SNS") {
+  it("reads bibs from Sierra and writes files to s3") {
     val message =
       """
         |{
