@@ -3,11 +3,12 @@ package uk.ac.wellcome.platform.sierra_reader.services
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Sink
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.sierra_reader.sink.SierraBibsToSnsSink
+import uk.ac.wellcome.platform.sierra_reader.sink.{SierraRecordWrapperFlow, SierraResourceTypes}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
@@ -16,7 +17,7 @@ import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class SierraBibsToSnsWorkerService @Inject()(
+class SierraReaderWorkerService @Inject()(
   reader: SQSReader,
   writer: SNSWriter,
   system: ActorSystem,
@@ -43,8 +44,6 @@ class SierraBibsToSnsWorkerService @Inject()(
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType = "bibs",
-      params).runWith(
-      SierraBibsToSnsSink(writer = writer)
-    )
+      params).via(SierraRecordWrapperFlow(resourceType = SierraResourceTypes.bibs)).runWith(Sink.ignore)
   }
 }

@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.sierra_reader.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.sierra_reader.services.SierraBibsToSnsWorkerService
+import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 
-object SierraBibsToSnsModule extends TwitterModule {
+object SierraReaderModule extends TwitterModule {
   flag[String]("sierra.apiUrl", "", "Sierra API url")
   flag[String]("sierra.oauthKey", "", "Sierra API oauth key")
   flag[String]("sierra.oauthSecret", "", "Sierra API oauth secret")
@@ -13,7 +13,7 @@ object SierraBibsToSnsModule extends TwitterModule {
                "List of fields to include in the Sierra API response")
 
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[SierraBibsToSnsWorkerService]
+    val workerService = injector.instance[SierraReaderWorkerService]
 
     workerService.runSQSWorker()
 
@@ -24,7 +24,7 @@ object SierraBibsToSnsModule extends TwitterModule {
     info("Terminating Sierra Bibs to SNS worker")
 
     val system = injector.instance[ActorSystem]
-    val workerService = injector.instance[SierraBibsToSnsWorkerService]
+    val workerService = injector.instance[SierraReaderWorkerService]
 
     workerService.cancelRun()
     system.terminate()
