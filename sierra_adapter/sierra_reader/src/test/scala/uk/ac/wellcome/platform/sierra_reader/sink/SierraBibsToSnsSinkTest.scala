@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_sns.sink
+package uk.ac.wellcome.platform.sierra_reader.sink
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer

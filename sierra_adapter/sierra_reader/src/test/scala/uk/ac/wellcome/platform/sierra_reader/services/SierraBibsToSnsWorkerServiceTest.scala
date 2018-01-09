@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_sns.services
+package uk.ac.wellcome.platform.sierra_reader.services
 
 import akka.actor.ActorSystem
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
