@@ -1,14 +1,13 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
 import akka.actor.ActorSystem
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{SNSConfig, SQSConfig, SQSMessage}
-import uk.ac.wellcome.sns.SNSWriter
+import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
-import uk.ac.wellcome.test.utils.{ExtendedPatience, SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.duration._
@@ -16,7 +15,7 @@ import scala.concurrent.duration._
 class SierraReaderWorkerServiceTest
     extends FunSpec
     with MockitoSugar
-    with SNSLocal
+    with S3Local
     with SQSLocal
     with Eventually
     with Matchers
@@ -26,7 +25,7 @@ class SierraReaderWorkerServiceTest
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
-  val topicArn = createTopicAndReturnArn("sierra-test-topic")
+  val bucketName: String = createBucketAndReturnName("sierra-reader-test-bucket")
 
   val mockMetrics = mock[MetricsSender]
   var worker: Option[SierraReaderWorkerService] = None
@@ -42,14 +41,15 @@ class SierraReaderWorkerServiceTest
     actorSystem.terminate()
   }
 
-  private def createSierraBibsToSnsWorkerService(
+  private def createSierraReaderWorkerService(
     fields: String,
     apiUrl: String = "http://localhost:8080"
   ) = {
     Some(
       new SierraReaderWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-        writer = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn)),
+        s3client = s3Client,
+        bucketName = bucketName,
         system = actorSystem,
         metrics = mockMetrics,
         apiUrl = apiUrl,
@@ -60,8 +60,8 @@ class SierraReaderWorkerServiceTest
   }
 
   it(
-    "reads a window message from SQS, retrieves the bibs from Sierra and sends them to SNS") {
-    worker = createSierraBibsToSnsWorkerService(
+    "reads a window message from SQS, retrieves the bibs from Sierra and writes them to S3") {
+    worker = createSierraReaderWorkerService(
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
     )
     worker.get.runSQSWorker()
@@ -78,15 +78,16 @@ class SierraReaderWorkerServiceTest
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
-      // This comes from the wiremock recordings for Sierra API responses
-      listMessagesReceivedFromSNS() should have size 29
-    }
+      val objects = s3Client.listObjects(bucketName).getObjectSummaries
 
+      // One file containing the page, another "done" marker for the window
+      objects should have size 2
+    }
   }
 
   it(
     "returns a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
-    worker = createSierraBibsToSnsWorkerService(fields = "")
+    worker = createSierraReaderWorkerService(fields = "")
 
     val message =
       """
@@ -105,7 +106,7 @@ class SierraReaderWorkerServiceTest
 
   it(
     "does not return a SQSReaderGracefulException if it cannot reach the Sierra API") {
-    worker = createSierraBibsToSnsWorkerService(
+    worker = createSierraReaderWorkerService(
       fields = "",
       apiUrl = "http://localhost:5050"
     )
