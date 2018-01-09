@@ -1,6 +1,5 @@
-package uk.ac.wellcome.platform.sierra_bibs_to_sns
+package uk.ac.wellcome.platform.sierra_reader
 
-import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
 import uk.ac.wellcome.test.utils.StartupLogbackOverride

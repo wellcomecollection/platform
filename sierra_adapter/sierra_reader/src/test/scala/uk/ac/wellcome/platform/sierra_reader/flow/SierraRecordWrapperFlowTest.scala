@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_reader.sink
+package uk.ac.wellcome.platform.sierra_reader.flow
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
