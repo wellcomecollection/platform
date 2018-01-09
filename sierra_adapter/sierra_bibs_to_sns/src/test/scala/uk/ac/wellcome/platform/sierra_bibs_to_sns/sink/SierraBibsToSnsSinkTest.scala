@@ -3,25 +3,19 @@ package uk.ac.wellcome.platform.sierra_bibs_to_sns.sink
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest
-import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import com.gu.scanamo.syntax._
 import io.circe.parser._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.sierra_bibs_to_sns.locals.SierraBibsToDynamoDBLocal
-import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, SNSLocal}
 
-class SierraBibsDynamoSinkTest
+class SierraBibsToSnsSinkTest
     extends FunSpec
     with ScalaFutures
-    with SierraBibsToDynamoDBLocal
+    with SNSLocal
     with Matchers
     with ExtendedPatience
     with MockitoSugar
@@ -30,9 +24,10 @@ class SierraBibsDynamoSinkTest
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val bibSink = SierraBibsDynamoSink(
-    client = dynamoDbClient,
-    tableName = tableName
+  val topicArn = createTopicAndReturnArn("sierra-bibs-sink-test-topic")
+
+  val bibSink = SierraBibsToSnsSink(
+    writer = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn))
   )
 
   override def afterAll(): Unit = {
@@ -63,9 +58,10 @@ class SierraBibsDynamoSinkTest
       modifiedDate = updatedDate
     )
 
-    whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
-        Right(expectedRecord))
+    eventually {
+      val messages = listMessagesReceivedFromSNS()
+      messages should have size 1
+      JsonUtil.fromJson[SierraBibRecord](messages.head) shouldBe expectedRecord
     }
   }
 
@@ -92,71 +88,10 @@ class SierraBibsDynamoSinkTest
       modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
-    whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
-        Right(expectedRecord))
-    }
-  }
-
-  it("does not overwrite new data with old data") {
-    val id = "200002"
-    val oldUpdatedDate = "2001-01-01T00:00:01Z"
-    val newUpdatedDate = "2017-12-12T23:59:59Z"
-
-    val newRecord = SierraBibRecord(
-      id = s"b$id",
-      modifiedDate = newUpdatedDate,
-      data =
-        s"""{"id": "b$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record"}"""
-    )
-    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
-
-    val oldJson = parse(s"""
-         |{
-         |  "id": "$id",
-         |  "updatedDate": "$oldUpdatedDate",
-         |  "comment": "I am an old record"
-         |}
-       """.stripMargin).right.get
-
-    val futureUnit = Source.single(oldJson).runWith(bibSink)
-    whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
-        Right(newRecord))
-    }
-  }
-
-  it("overwrites old data with new data") {
-    val id = "300003"
-    val oldUpdatedDate = "2001-01-01T01:01:01Z"
-    val newUpdatedDate = "2011-11-11T11:11:11Z"
-
-    val oldRecord = SierraBibRecord(
-      id = s"b$id",
-      modifiedDate = oldUpdatedDate,
-      data =
-        s"""{"id": "b$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards"}"""
-    )
-    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
-
-    val newJson = parse(s"""
-         |{
-         |  "id": "$id",
-         |  "updatedDate": "$newUpdatedDate",
-         |  "comment": "Nice! New notes about narwhals in November"
-         |}
-       """.stripMargin).right.get
-
-    val futureUnit = Source.single(newJson).runWith(bibSink)
-    val expectedRecord = SierraBibRecord(
-      id = s"b$id",
-      modifiedDate = newUpdatedDate,
-      data =
-        s"""{"id":"b$id","updatedDate":"$newUpdatedDate","comment":"Nice! New notes about narwhals in November"}"""
-    )
-    whenReady(futureUnit) { _ =>
-      Scanamo.get[SierraBibRecord](dynamoDbClient)(tableName)('id -> s"b$id") shouldBe Some(
-        Right(expectedRecord))
+    eventually {
+      val messages = listMessagesReceivedFromSNS()
+      messages should have size 1
+      JsonUtil.fromJson[SierraBibRecord](messages.head) shouldBe expectedRecord
     }
   }
 
@@ -175,7 +110,7 @@ class SierraBibsDynamoSinkTest
     }
   }
 
-  it("fails the stream if DynamoDB returns an error") {
+  it("fails the stream if SNS returns an error") {
     val json = parse(s"""
          |{
          | "id": "500005",
@@ -183,13 +118,12 @@ class SierraBibsDynamoSinkTest
          |}
       """.stripMargin).right.get
 
-    val dynamoDbClient = mock[AmazonDynamoDB]
+    val brokenSnsClient = mock[AmazonSNS]
     val expectedException = new RuntimeException("AAAAAARGH!")
-    when(dynamoDbClient.putItem(any[PutItemRequest]))
+    when(brokenSnsClient.writeMessage(any[String], any[String]))
       .thenThrow(expectedException)
-    val brokenSink = SierraBibsDynamoSink(
-      client = dynamoDbClient,
-      tableName = tableName
+    val brokenSink = SierraBibsToSnsSink(
+      writer = new SNSWriter(brokenSnsClient, SNSConfig(topicArn = topicArn))
     )
 
     val futureUnit = Source.single(json).runWith(brokenSink)
@@ -205,7 +139,7 @@ class SierraBibsDynamoSinkTest
       |  "updatedDate": "2006-06-06T06:06:06Z"
       |}
       """.stripMargin).right.get
-    val prefixedJson = SierraBibsDynamoSink.addIDPrefix(json = json)
+    val prefixedJson = SierraBibsToSnsSink.addIDPrefix(json = json)
 
     val expectedJson = parse(s"""
       |{
