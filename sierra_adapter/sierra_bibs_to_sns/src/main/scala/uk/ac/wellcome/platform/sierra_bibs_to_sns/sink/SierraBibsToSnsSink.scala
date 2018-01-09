@@ -10,6 +10,7 @@ import io.circe.Json
 import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.sns.SNSWriter
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,7 +19,7 @@ object SierraBibsToSnsSink extends Logging {
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(unprefixedJson => {
       val json = addIDPrefix(json = unprefixedJson)
-      logger.info(s"Inserting ${json.noSpaces} into DynamoDB")
+      logger.info(s"Sending ${json.noSpaces} to SNS")
       val maybeUpdatedDate = root.updatedDate.string.getOption(json)
       val record = maybeUpdatedDate match {
         case Some(updatedDate) =>
@@ -36,7 +37,7 @@ object SierraBibsToSnsSink extends Logging {
       }
 
       writer.writeMessage(
-        message = record.toString(),
+        message = JsonUtil.toJson(record).get,
         subject = Some("New bib record from Sierra")
       )
     })
