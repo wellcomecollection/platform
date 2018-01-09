@@ -1,27 +1,23 @@
 package uk.ac.wellcome.platform.sierra_bibs_to_sns.services
 
 import akka.actor.ActorSystem
-import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
-import uk.ac.wellcome.platform.sierra_bibs_to_sns.locals.SierraBibsToDynamoDBLocal
-import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.aws.{SNSConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
-import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{ExtendedPatience, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.duration._
 
-class SierraBibsToDynamoWorkerServiceTest
+class SierraBibsToSnsWorkerServiceTest
     extends FunSpec
     with MockitoSugar
+    with SNSLocal
     with SQSLocal
     with Eventually
-    with SierraBibsToDynamoDBLocal
     with Matchers
     with ExtendedPatience
     with ScalaFutures
@@ -29,8 +25,10 @@ class SierraBibsToDynamoWorkerServiceTest
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
+  val topicArn = createTopicAndReturnArn("sierra-test-topic")
+
   val mockMetrics = mock[MetricsSender]
-  var worker: Option[SierraBibsToDynamoWorkerService] = None
+  var worker: Option[SierraBibsToSnsService] = None
   val actorSystem = ActorSystem()
 
   override def beforeEach(): Unit = {
@@ -43,25 +41,28 @@ class SierraBibsToDynamoWorkerServiceTest
     actorSystem.terminate()
   }
 
-  private def createSierraWorkerService(fields: String) = {
+  private def createSierraBibsToSnsService(
+    fields: String,
+    apiUrl = "http://localhost:8080"
+  ) = {
     Some(
-      new SierraBibsToDynamoWorkerService(
+      new SierraBibsToSnsService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        writer = new SNSWriter(snsClient, SNSConfig(topicArn = topicArn))
         system = actorSystem,
         metrics = mockMetrics,
-        dynamoDbClient = dynamoDbClient,
-        apiUrl = "http://localhost:8080",
+        apiUrl = apiUrl,
         sierraOauthKey = "key",
         sierraOauthSecret = "secret",
-        dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName)),
         fields = fields
       ))
   }
 
   it(
-    "reads a window message from sqs, retrieves the bibs from sierra and inserts them into DynamoDb") {
+    "reads a window message from SQS, retrieves the bibs from Sierra and sends them to SNS") {
     worker = createSierraWorkerService(
-      fields = "updatedDate,deletedDate,deleted,suppressed,author,title")
+      fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
+    )
     worker.get.runSQSWorker()
     val message =
       """
@@ -76,8 +77,8 @@ class SierraBibsToDynamoWorkerServiceTest
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
-      // This comes from the wiremock recordings for sierra api response
-      Scanamo.scan[SierraBibRecord](dynamoDbClient)(tableName) should have size 29
+      // This comes from the wiremock recordings for Sierra API responses
+      listMessagesReceivedFromSNS() should have size 29
     }
 
   }
@@ -102,19 +103,8 @@ class SierraBibsToDynamoWorkerServiceTest
   }
 
   it(
-    "does not return a SQSReaderGracefulException if it cannot reach the Sierra Api") {
-    worker = Some(
-      new SierraBibsToDynamoWorkerService(
-        reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-        system = ActorSystem(),
-        metrics = mockMetrics,
-        dynamoDbClient = dynamoDbClient,
-        apiUrl = "http://localhost:8081",
-        sierraOauthKey = "key",
-        sierraOauthSecret = "secret",
-        fields = "",
-        dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName))
-      ))
+    "does not return a SQSReaderGracefulException if it cannot reach the Sierra API") {
+    worker = createSierraWorkerService(fields = "", apiUrl = "http://localhost:5050")
 
     val message =
       """
