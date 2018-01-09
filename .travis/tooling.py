@@ -77,7 +77,7 @@ def affects_tests(path, task):
         'nginx': ['nginx'],
 
         'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
-        'sierra_bibs_to_dynamo': ['sierra_adapter/sierra_bibs_to_dynamo'],
+        'sierra_bibs_to_sns': ['sierra_adapter/sierra_bibs_to_sns'],
         'sierra_items_to_dynamo': ['sierra_adapter/sierra_items_to_dynamo'],
         'sierra_bib_merger': ['sierra_adapter/sierra_bib_merger'],
         'sierra_item_merger': ['sierra_adapter/sierra_item_merger'],

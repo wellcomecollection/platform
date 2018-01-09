@@ -12,15 +12,15 @@ sierra_common-publish:
 	echo "Nothing to do!"
 
 
-sierra_bibs_to_dynamo-test:
-	$(call sbt_test,sierra_bibs_to_dynamo)
+sierra_bibs_to_sns-test:
+	$(call sbt_test,sierra_bibs_to_sns)
 
-sierra_bibs_to_dynamo-build:
-	$(call sbt_build,sierra_bibs_to_dynamo)
-	$(call build_image,sierra_bibs_to_dynamo,sierra_adapter/sierra_bibs_to_dynamo/Dockerfile)
+sierra_bibs_to_sns-build:
+	$(call sbt_build,sierra_bibs_to_sns)
+	$(call build_image,sierra_bibs_to_sns,sierra_adapter/sierra_bibs_to_sns/Dockerfile)
 
-sierra_bibs_to_dynamo-publish: sierra_bibs_to_dynamo-build
-	$(call publish_service,sierra_bibs_to_dynamo)
+sierra_bibs_to_sns-publish: sierra_bibs_to_sns-build
+	$(call publish_service,sierra_bibs_to_sns)
 
 
 sierra_items_to_dynamo-test:
@@ -54,19 +54,6 @@ sierra_item_merger-build:
 
 sierra_item_merger-publish: sierra_item_merger-build
 	$(call publish_service,sierra_item_merger)
-
-
-sierra_adapter-test: \
-	sierra_window_generator-test \
-	sierra_bibs_to_dynamo-test \
-	sierra_bib_merger-test \
-	sierra_item_merger-test
-
-sierra_adapter-publish: \
-	sierra_window_generator-publish \
-	sierra_bibs_to_dynamo-publish \
-	sierra_bib_merger-publish \
-	sierra_item_merger-publish
 
 
 sierra_adapter-terraform-plan:
