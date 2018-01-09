@@ -1,5 +1,5 @@
-dynamodb:
-  image: peopleperhour/dynamodb
+s3:
+  image: scality/s3server
   ports:
     - "45678:8000"
 sqs:
@@ -11,4 +11,4 @@ sierra:
   ports:
     - "8080:8080"
   volumes:
-    - "${ROOT}/sierra_adapter/sierra_bibs_to_dynamo/src/test/resources/wiremock:/home/wiremock"
+    - "${ROOT}/sierra_adapter/sierra_reader/src/test/resources/wiremock:/home/wiremock"
