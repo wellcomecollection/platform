@@ -102,6 +102,10 @@ object Dependencies {
     "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
   )
 
+  val sierraBibsToSnsDependencies: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
+  )
+
   val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
 
   val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies
