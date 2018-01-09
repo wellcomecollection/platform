@@ -84,7 +84,8 @@ class Alarm:
 
         timestamp = match.group('timestamp')
         time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-        display_time = time.strftime('at %H:%M:%S on %-d %b %Y')
+        display_time = (
+            time.strftime('at %H:%M:%S on %d %b %Y').replace('on 0', 'on '))
 
         if self.name.startswith('loris'):
             service = 'Loris'
