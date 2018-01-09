@@ -13,9 +13,6 @@ class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable] with Logging {
   override def transformForType(
     sierraTransformable: SierraTransformable): Try[Option[Work]] = {
-    
-    info(s"foo: $sierraTransformable")
-
     sierraTransformable.maybeBibData
       .map { bibData =>
 
