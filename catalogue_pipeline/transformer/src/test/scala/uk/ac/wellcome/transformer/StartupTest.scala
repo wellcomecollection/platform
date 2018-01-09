@@ -17,8 +17,8 @@ class StartupTest
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
     flags = Map(
-      "transformer.source" -> "SierraData"
-    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalEndpointFlags
+      "transformer.source" -> "MiroData"
+    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalFlags
   )
 
   test("server starts up correctly") {
