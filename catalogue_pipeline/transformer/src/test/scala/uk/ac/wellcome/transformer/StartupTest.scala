@@ -16,7 +16,9 @@ class StartupTest
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
-    flags = cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalEndpointFlags
+    flags = Map(
+      "transformer.source" -> "SierraData"
+    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalEndpointFlags
   )
 
   test("server starts up correctly") {
