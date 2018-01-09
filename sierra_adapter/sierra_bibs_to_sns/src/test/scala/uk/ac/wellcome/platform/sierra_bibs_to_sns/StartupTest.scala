@@ -9,9 +9,7 @@ class StartupTest extends FeatureTest with StartupLogbackOverride {
 
   val server = new EmbeddedHttpServer(
     twitterServer = new Server,
-    flags = Map(
-      "aws.dynamo.sierraToDynamo.tableName" -> "foo"
-    ),
+    flags = Map(),
     stage = Stage.PRODUCTION
   )
 
