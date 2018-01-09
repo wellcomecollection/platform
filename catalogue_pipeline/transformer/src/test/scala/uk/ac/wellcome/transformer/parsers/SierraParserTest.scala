@@ -3,7 +3,10 @@ package uk.ac.wellcome.transformer.parsers
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
@@ -17,8 +20,8 @@ class SierraParserTest
   it("should parse a sierra merged record") {
     val id = "000"
     val title = "A flock of flanged flamingos in France"
-    val lastModifiedDate = Instant.ofEpochSecond(
-      Instant.now().getEpochSecond())
+    val lastModifiedDate =
+      Instant.ofEpochSecond(Instant.now().getEpochSecond())
 
     val data =
       s"""
@@ -28,7 +31,8 @@ class SierraParserTest
          |}
       """.stripMargin
 
-    val sqsMessage = createValidSierraBibSQSMessage(id, title, lastModifiedDate)
+    val sqsMessage =
+      createValidSierraBibSQSMessage(id, title, lastModifiedDate)
 
     val sierraParser = new TransformableParser
 
@@ -43,7 +47,8 @@ class SierraParserTest
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate))
     )
 
-    val actualRecord = triedSierraTransformable.get.asInstanceOf[SierraTransformable]
+    val actualRecord =
+      triedSierraTransformable.get.asInstanceOf[SierraTransformable]
 
     actualRecord shouldEqual expectedRecord
   }

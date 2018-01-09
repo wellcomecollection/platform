@@ -6,7 +6,6 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.Transformable
 import scala.util.{Failure, Success, Try}
 
-
 class TransformableParser extends Logging {
   final def extractTransformable(message: SQSMessage): Try[Transformable] =
     readFromRecord(message.body)

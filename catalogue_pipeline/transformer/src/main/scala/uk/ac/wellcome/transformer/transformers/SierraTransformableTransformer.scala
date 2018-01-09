@@ -10,12 +10,12 @@ import scala.util.{Success, Try}
 case class SierraBibData(id: String, title: String)
 
 class SierraTransformableTransformer
-    extends TransformableTransformer[SierraTransformable] with Logging {
+    extends TransformableTransformer[SierraTransformable]
+    with Logging {
   override def transformForType(
     sierraTransformable: SierraTransformable): Try[Option[Work]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
-
         info(s"Attempting to transform $bibData")
 
         JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
@@ -46,7 +46,7 @@ class SierraTransformableTransformer
                       record.id
                     )
                   )
-                ))
+              ))
               .toList
           ))
         }
