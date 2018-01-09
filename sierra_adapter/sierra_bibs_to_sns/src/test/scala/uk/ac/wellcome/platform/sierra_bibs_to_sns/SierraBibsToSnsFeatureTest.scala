@@ -19,7 +19,6 @@ class SierraBibsToSnsFeatureTest
     with FeatureTestMixin
     with SNSLocal
     with SQSLocal
-    with SierraBibsToDynamoDBLocal
     with AmazonCloudWatchFlag
     with Matchers
     with ExtendedPatience {
@@ -31,7 +30,7 @@ class SierraBibsToSnsFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.sns.topic.arn",
+      "aws.sns.topic.arn" -> topicArn,
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",

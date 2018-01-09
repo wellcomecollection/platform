@@ -5,20 +5,16 @@ import java.time.{LocalDate, ZoneOffset}
 
 import akka.Done
 import akka.stream.scaladsl.Sink
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
-import com.gu.scanamo.syntax._
-import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.sns.SNSWriter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object SierraBibsDynamoSink extends Logging {
-  def apply(client: AmazonDynamoDB, tableName: String)(
+object SierraBibsToSnsSink extends Logging {
+  def apply(writer: SNSWriter)(
     implicit executionContext: ExecutionContext): Sink[Json, Future[Done]] =
     Sink.foreachParallel(10)(unprefixedJson => {
       val json = addIDPrefix(json = unprefixedJson)
@@ -39,22 +35,10 @@ object SierraBibsDynamoSink extends Logging {
           )
       }
 
-      val table = Table[SierraBibRecord](tableName)
-      val ops = table
-        .given(
-          not(attributeExists('id)) or
-            (attributeExists('id) and 'modifiedDate < record.modifiedDate.getEpochSecond)
-        )
-        .put(record)
-      Scanamo.exec(client)(ops) match {
-        case Right(_) =>
-          logger.info(s"Successfully saved ${record.id} to DynamoDB")
-        case Left(error: ConditionalCheckFailedException) =>
-          logger.info(
-            s"Conditional check failed saving ${record.id} to DynamoDB")
-        case Left(error) =>
-          logger.warn(s"Failed saving ${record.id} to DynamoDB", error)
-      }
+      writer.writeMessage(
+        message = record.toString(),
+        subject = Some("New bib record from Sierra")
+      )
     })
 
   private def getDeletedDateTimeAtStartOfDay(json: Json) = {

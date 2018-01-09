@@ -3,39 +3,29 @@ package uk.ac.wellcome.platform.sierra_bibs_to_sns.services
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
-import uk.ac.wellcome.platform.sierra_bibs_to_sns.sink.SierraBibsDynamoSink
+import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.platform.sierra_bibs_to_sns.sink.SierraBibsToSnsSink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class SierraBibsToDynamoWorkerService @Inject()(
+class SierraBibsToSnsWorkerService @Inject()(
   reader: SQSReader,
+  writer: SNSWriter,
   system: ActorSystem,
   metrics: MetricsSender,
-  dynamoDbClient: AmazonDynamoDB,
   @Flag("sierra.apiUrl") apiUrl: String,
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
-  @Flag("sierra.fields") fields: String,
-  dynamoConfigs: Map[String, DynamoConfig]
+  @Flag("sierra.fields") fields: String
 ) extends SQSWorker(reader, system, metrics) {
-
-  private val tableConfigId = "sierraToDynamo"
-
-  private val dynamoConfig = dynamoConfigs.getOrElse(
-    tableConfigId,
-    throw new RuntimeException(
-      s"SierraBibsToDynamoWorkerService ($tableConfigId) dynamo config not available!"
-    )
-  )
 
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()
@@ -54,9 +44,7 @@ class SierraBibsToDynamoWorkerService @Inject()(
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
       resourceType = "bibs",
       params).runWith(
-      SierraBibsDynamoSink(
-        client = dynamoDbClient,
-        tableName = dynamoConfig.table
-      ))
+      SierraBibsToSnsSink(writer = writer)
+    )
   }
 }
