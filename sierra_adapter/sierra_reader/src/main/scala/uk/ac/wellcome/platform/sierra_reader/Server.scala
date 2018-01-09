@@ -10,7 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.platform.sierra_reader.modules.SierraBibsToSnsModule
+import uk.ac.wellcome.platform.sierra_reader.modules.SierraReaderModule
 
 object ServerMain extends Server
 
@@ -18,7 +18,7 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.sierra_reader SierraReader"
   override val modules = Seq(
-    SierraBibsToSnsModule,
+    SierraReaderModule,
     AmazonCloudWatchModule,
     SNSConfigModule,
     SNSClientModule,
