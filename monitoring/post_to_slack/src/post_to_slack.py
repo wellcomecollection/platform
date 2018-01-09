@@ -105,6 +105,15 @@ class Alarm:
             else:
                 return f'There are multiple unhealthy hosts ({value}) in {service} {display_time}.'
 
+        elif self.name.endswith('-alb-not-enough-healthy-hosts'):
+            threshold = re.search(
+                r'less than or equal to the threshold \((?P<value>\d+)\.0\)',
+                self.state_reason).group('value')
+            return (
+                f"There aren't enough healthy hosts in {service} "
+                f'(saw {value}; expected more than {threshold}) {display_time}.'
+            )
+
     # Sometimes there's enough data in the alarm to make an educated guess
     # about useful CloudWatch logs to check, so we include that in the alarm.
     # The methods and properties below pull out the relevant info.
