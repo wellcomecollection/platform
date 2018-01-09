@@ -4,41 +4,42 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.sierra_bibs_to_sns.locals.SierraBibsToDynamoDBLocal
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   ExtendedPatience,
+  SNSLocal,
   SQSLocal
 }
 import uk.ac.wellcome.utils.JsonUtil
-import com.gu.scanamo.Scanamo
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
-class SierraBibsToDynamoFeatureTest
+class SierraBibsToSnsFeatureTest
     extends FunSpec
     with FeatureTestMixin
+    with SNSLocal
     with SQSLocal
     with SierraBibsToDynamoDBLocal
     with AmazonCloudWatchFlag
     with Matchers
     with ExtendedPatience {
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
+  val topicArn = createTopicAndReturnArn("sierra-bibs-feature-test-topic")
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraToDynamo.tableName" -> tableName,
+      "aws.sns.topic.arn",
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",
       "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+    ) ++ sqsLocalFlags ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag
   )
 
-  it("reads bibs from Sierra and adds them to DynamoDB") {
+  it("reads bibs from Sierra and writes them to SNS") {
     val message =
       """
         |{
@@ -53,7 +54,7 @@ class SierraBibsToDynamoFeatureTest
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response
-      Scanamo.scan[SierraBibRecord](dynamoDbClient)(tableName) should have size 29
+      listMessagesReceivedFromSNS() should have size 29
     }
   }
 }
