@@ -6,10 +6,7 @@ import com.twitter.inject.server.FeatureTest
 
 class ServerTest extends FeatureTest {
 
-  val server = new EmbeddedHttpServer(
-    new Server(),
-    flags = Map()
-  )
+  val server = new EmbeddedHttpServer(new Server())
 
   test("it shows the healthcheck message") {
     server.httpGet(path = "/management/healthcheck",
