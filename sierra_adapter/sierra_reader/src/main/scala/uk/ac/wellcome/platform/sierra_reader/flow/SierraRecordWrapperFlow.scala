@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_reader.sink
+package uk.ac.wellcome.platform.sierra_reader.flow
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, ZoneOffset}
