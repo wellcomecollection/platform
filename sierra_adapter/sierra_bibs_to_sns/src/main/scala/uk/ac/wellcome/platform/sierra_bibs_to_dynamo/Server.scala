@@ -17,7 +17,7 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.sierra_bibs_to_sns SierraBibsToDynamo"
+    "uk.ac.wellcome.platform.sierra_bibs_to_sns SierraBibsToSNS"
   override val modules = Seq(
     SierraBibsToDynamoModule,
     SierraDynamoConfigModule,
