@@ -60,9 +60,7 @@ class WindowManager @Inject()(
         val records = decode[List[SierraRecord]](lastBody)
         val lastId = records match {
           case Right(r) =>
-            r.map { _.id }
-              .sorted
-              .lastOption
+            r.map { _.id }.sorted.lastOption
           case Left(err) => throw SQSReaderGracefulException(err)
         }
 
