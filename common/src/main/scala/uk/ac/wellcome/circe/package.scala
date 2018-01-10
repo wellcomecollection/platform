@@ -2,7 +2,7 @@ package uk.ac.wellcome
 
 import java.time.Instant
 
-import io.circe.{Decoder, HCursor}
+import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._
 import io.circe.generic.extras.Configuration
 
@@ -16,6 +16,11 @@ package object circe {
         .head
         .map(i => Instant.ofEpochSecond(i))
     }
+  }
+
+  implicit val encodeInstant: Encoder[Instant] = new Encoder[Instant] {
+    override def apply(value: Instant): Json =
+      Json.fromInt(value.getEpochSecond.toInt)
   }
 
   implicit val customConfig: Configuration =
