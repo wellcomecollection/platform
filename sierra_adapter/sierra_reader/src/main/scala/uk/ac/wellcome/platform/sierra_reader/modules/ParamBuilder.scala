@@ -11,6 +11,7 @@ import io.circe.syntax._
 import io.circe.parser.decode
 import uk.ac.wellcome.platform.sierra_reader.flow.{SierraRecord, SierraResourceTypes}
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
@@ -41,16 +42,19 @@ class ParamBuilder @Inject()(
     lastExistingKey match {
       case Some(key) => {
         val lastBody = IOUtils.toString(s3client.getObject(bucketName, key).getObjectContent)
-        val records = decode[List[SierraRecord]](lastBody).right.get
-
-        val lastId = records
-          .map { _.id }
-          .sorted
-          .lastOption
-
+        val records = decode[List[SierraRecord]](lastBody)
+        val lastId = records match {
+          case Right(r) => r
+              .map {_.id}
+              .sorted
+              .lastOption
+          case Left(err) => throw SQSReaderGracefulException(err)
+        }
         info(s"Found latest ID in S3: $lastId")
-
-        baseParams ++ Map("id" -> (lastId.get.toInt + 1).toString)
+        lastId.map(id => baseParams ++ Map("id" -> (id.toInt + 1).toString))
+          .getOrElse(
+            throw SQSReaderGracefulException(new RuntimeException("Json did not contain an id"))
+          )
       }
       case None => baseParams
     }
