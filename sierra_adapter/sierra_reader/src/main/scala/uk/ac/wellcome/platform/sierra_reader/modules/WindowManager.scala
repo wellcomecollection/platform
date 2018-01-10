@@ -23,7 +23,7 @@ class WindowManager @Inject()(
   s3client: AmazonS3,
   @Flag("aws.s3.bucketName") bucketName: String,
   @Flag("sierra.fields") fields: String,
-  @Flag("reader.resourceType") resourceType: SierraResourceTypes.Value
+  resourceType: SierraResourceTypes.Value
 ) extends Logging {
 
   def getCurrentStatus(window: String): Future[WindowStatus] = Future {

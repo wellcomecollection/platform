@@ -20,8 +20,9 @@ class Server extends HttpServer {
   override val modules = Seq(
     SierraReaderModule,
     AmazonCloudWatchModule,
-    SNSConfigModule,
-    SNSClientModule,
+    AWSConfigModule,
+    S3ClientModule,
+    S3ConfigModule,
     SQSConfigModule,
     SQSClientModule,
     AkkaModule

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
@@ -29,7 +28,7 @@ class SierraReaderWorkerService @Inject()(
                                            metrics: MetricsSender,
                                            windowManager: WindowManager,
                                            @Flag("reader.batchSize") batchSize: Int,
-                                           @Flag("reader.resourceType") resourceType: SierraResourceTypes.Value,
+                                           resourceType: SierraResourceTypes.Value,
                                            @Flag("aws.s3.bucketName") bucketName: String,
                                            @Flag("sierra.apiUrl") apiUrl: String,
                                            @Flag("sierra.oauthKey") sierraOauthKey: String,
