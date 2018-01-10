@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.sierra_reader.modules
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
+import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local}
 
 class ParamBuilderTest extends FunSpec with Matchers with S3Local with ScalaFutures with ExtendedPatience {
@@ -52,4 +53,41 @@ class ParamBuilderTest extends FunSpec with Matchers with S3Local with ScalaFutu
       "id" -> "1794166"
     )}
   }
+
+  it("throws an error if it finds invalid JSON in the bucket") {
+    val paramBuilder = new ParamBuilder(
+      s3client = s3Client,
+      bucketName = bucketName,
+      fields = "title",
+      resourceType = SierraResourceTypes.bibs
+    )
+
+    val prefix = paramBuilder.buildWindowShard("[2013,2014]")
+
+    s3Client.putObject(bucketName, s"$prefix/0000.json", "not valid")
+
+    val result = paramBuilder.buildParams("[2013,2014]")
+
+    whenReady(result.failed) {
+      _ shouldBe a[SQSReaderGracefulException]
+    }
+  }
+
+  it("throws an error if it finds empty JSON in the bucket") {
+    val paramBuilder = new ParamBuilder(
+      s3client = s3Client,
+      bucketName = bucketName,
+      fields = "title",
+      resourceType = SierraResourceTypes.bibs
+    )
+
+    val prefix = paramBuilder.buildWindowShard("[2013,2014]")
+
+    s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
+
+    val result = paramBuilder.buildParams("[2013,2014]")
+
+    whenReady(result.failed) {
+      _ shouldBe a[SQSReaderGracefulException]
+    } }
 }
