@@ -79,7 +79,7 @@ The window queue is read by the **_sierra_reader_** service.
 It pops a window from the queue, and requests bib/item records from Sierra that were updated in that window.
 
 Requests to the Sierra API are sequential -- you can't ask for page *N* before you have page *N-1* -- so we can't parallelise reading within a single window.
-We want to get out of the reader as quickly as possible, so we do minimal processing here, and just save the records as JSON files in S3.
+We want to get out of the reader as quickly as possible, so we do minimal processing here, and save the records as JSON files straight into S3.
 Each file contains multiple records, to reduce the number of S3 requests we need.
 
 We use the event stream of PUT requests in S3 to trigger a splitter Lambda.
