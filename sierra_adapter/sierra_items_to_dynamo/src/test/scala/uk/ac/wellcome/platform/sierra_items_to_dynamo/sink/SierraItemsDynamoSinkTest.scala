@@ -74,7 +74,7 @@ class SierraItemsDynamoSinkTest
 
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(expectedRecord))
+        Right(expectedRecord.copy(version = 1)))
     }
   }
 
@@ -98,7 +98,7 @@ class SierraItemsDynamoSinkTest
 
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(expectedRecord))
+        Right(expectedRecord.copy(version = 1)))
     }
   }
 
@@ -167,7 +167,7 @@ class SierraItemsDynamoSinkTest
     )
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(expectedRecord))
+        Right(expectedRecord.copy(version = 1)))
     }
   }
 
@@ -206,7 +206,7 @@ class SierraItemsDynamoSinkTest
     )
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(expectedRecord))
+        Right(expectedRecord.copy(version = 1)))
     }
   }
 
@@ -245,7 +245,7 @@ class SierraItemsDynamoSinkTest
     )
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(expectedRecord))
+        Right(expectedRecord.copy(version = 1)))
     }
   }
 
@@ -284,7 +284,7 @@ class SierraItemsDynamoSinkTest
     )
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(expectedRecord))
+        Right(expectedRecord.copy(version = 1)))
     }
   }
 

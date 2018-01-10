@@ -78,7 +78,7 @@ class SierraItemRecordDaoTest
       whenReady(sierraItemRecordDao.updateItem(sierraItemRecord)) { _ =>
         Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
           Right(
-            sierraItemRecord
+            sierraItemRecord.copy(version = 1)
           ))
       }
     }
@@ -101,7 +101,7 @@ class SierraItemRecordDaoTest
       whenReady(sierraItemRecordDao.updateItem(newSierraItemRecord)) { _ =>
         Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
           Right(
-            newSierraItemRecord
+            newSierraItemRecord.copy(version = 1)
           ))
       }
 
