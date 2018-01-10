@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 
 class SQSMessageReceiver(
   snsWriter: SNSWriter,
-  transformableParser: TransformableParser[Transformable],
+  transformableParser: TransformableParser,
   transformableTransformer: TransformableTransformer[Transformable],
   metricsSender: MetricsSender)
     extends Logging {
