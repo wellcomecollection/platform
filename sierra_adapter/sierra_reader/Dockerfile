@@ -5,7 +5,7 @@ ADD target/universal/stage /opt/docker
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
-ENV project=sierra_bibs_to_dynamo
+ENV project=sierra_reader
 
 USER daemon
 CMD ["/run.sh"]
