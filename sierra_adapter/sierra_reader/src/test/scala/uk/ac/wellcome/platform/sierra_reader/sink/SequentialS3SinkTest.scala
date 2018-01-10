@@ -70,4 +70,25 @@ class SequentialS3SinkTest
       getJsonFromS3(bucketName, "testB_0002.json") shouldBe json2
     }
   }
+
+  it("uses the offset if provided") {
+    val sink = SequentialS3Sink(s3Client, bucketName = bucketName, keyPrefix = "testC_", offset = 3)
+
+    val json0 = parse(s"""{"red": "orange"}""").right.get
+    val json1 = parse(s"""{"orange": "yellow"}""").right.get
+    val json2 = parse(s"""{"yellow": "green"}""").right.get
+
+    val futureDone = Source(List(json0, json1, json2))
+      .zipWithIndex
+      .runWith(sink)
+
+    whenReady(futureDone) { _ =>
+      val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
+      s3objects.map { _.getKey() } shouldBe List("testC_0003.json", "testC_0004.json", "testC_0005.json")
+
+      getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
+      getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
+      getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
+    }
+  }
 }
