@@ -18,6 +18,7 @@ class SierraTransformableDao @Inject()(
   dynamoConfigs: Map[String, DynamoConfig]
 ) extends Logging {
 
+
   private val tableConfigId = "merger"
 
   private val dynamoConfig = dynamoConfigs.getOrElse(
