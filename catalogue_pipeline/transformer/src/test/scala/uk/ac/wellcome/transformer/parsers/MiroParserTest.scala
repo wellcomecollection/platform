@@ -12,7 +12,7 @@ class MiroParserTest
     with MiroTransformableWrapper {
   it(
     "should parse a record representing Miro Data into a Miro Data transformable") {
-    val miroParser = new MiroParser
+    val miroParser = new TransformableParser
 
     val MiroID = "1234"
     val MiroCollection = "Images-A"

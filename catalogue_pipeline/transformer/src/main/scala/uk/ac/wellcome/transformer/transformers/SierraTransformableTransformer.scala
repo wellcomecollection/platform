@@ -1,5 +1,6 @@
 package uk.ac.wellcome.transformer.transformers
 
+import com.twitter.inject.Logging
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil
@@ -9,11 +10,14 @@ import scala.util.{Success, Try}
 case class SierraBibData(id: String, title: String)
 
 class SierraTransformableTransformer
-    extends TransformableTransformer[SierraTransformable] {
+    extends TransformableTransformer[SierraTransformable]
+    with Logging {
   override def transformForType(
-    sierraTransformable: SierraTransformable): Try[Option[Work]] =
+    sierraTransformable: SierraTransformable): Try[Option[Work]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
+        info(s"Attempting to transform $bibData")
+
         JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(Work(
             title = sierraBibData.title,
@@ -48,5 +52,6 @@ class SierraTransformableTransformer
         }
       }
       .getOrElse(Success(None))
+  }
 
 }

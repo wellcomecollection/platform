@@ -12,6 +12,8 @@ import uk.ac.wellcome.test.utils.DynamoConstants._
 
 import scala.collection.mutable.ListBuffer
 
+import com.gu.scanamo.syntax._
+
 class ScanamoQueryStreamTest
     extends FunSpec
     with BeforeAndAfterEach

@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer.receive
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.fasterxml.jackson.core.JsonParseException
+import io.circe.ParsingFailure
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
@@ -12,7 +13,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.transformer.parsers.{CalmParser, SierraParser}
+import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.transformers.{
   CalmTransformableTransformer,
   SierraTransformableTransformer
@@ -70,7 +71,7 @@ class SQSMessageReceiverTest
     val snsWriter = mockSNSWriter
     val recordReceiver =
       new SQSMessageReceiver(snsWriter,
-                             new CalmParser,
+                             new TransformableParser,
                              new CalmTransformableTransformer,
                              metricsSender)
     val future = recordReceiver.receiveMessage(calmSqsMessage)
@@ -83,14 +84,14 @@ class SQSMessageReceiverTest
   it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
       new SQSMessageReceiver(mockSNSWriter,
-                             new CalmParser,
+                             new TransformableParser,
                              new CalmTransformableTransformer,
                              metricsSender)
 
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a[JsonParseException]
+      x shouldBe a[ParsingFailure]
     }
   }
 
@@ -99,7 +100,7 @@ class SQSMessageReceiverTest
 
     val recordReceiver =
       new SQSMessageReceiver(snsWriter,
-                             new SierraParser,
+                             new TransformableParser,
                              new SierraTransformableTransformer,
                              metricsSender)
 
@@ -117,7 +118,7 @@ class SQSMessageReceiverTest
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
       new SQSMessageReceiver(mockSNSWriter,
-                             new CalmParser,
+                             new TransformableParser,
                              new CalmTransformableTransformer,
                              metricsSender)
 
@@ -133,7 +134,7 @@ class SQSMessageReceiverTest
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
       new SQSMessageReceiver(mockSNS,
-                             new CalmParser,
+                             new TransformableParser,
                              new CalmTransformableTransformer,
                              metricsSender)
 

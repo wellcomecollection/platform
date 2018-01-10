@@ -19,14 +19,14 @@ class TransformerWorkerService @Inject()(
   writer: SNSWriter,
   system: ActorSystem,
   metrics: MetricsSender,
-  transformableParser: TransformableParser[Transformable],
-  transformabletransformer: TransformableTransformer[Transformable]
+  transformableParser: TransformableParser,
+  transformableTransformer: TransformableTransformer[Transformable]
 ) extends SQSWorker(reader, system, metrics) {
 
   private val messageReceiver =
     new SQSMessageReceiver(writer,
                            transformableParser,
-                           transformabletransformer,
+                           transformableTransformer,
                            metrics)
 
   override def processMessage(message: SQSMessage): Future[Unit] =
