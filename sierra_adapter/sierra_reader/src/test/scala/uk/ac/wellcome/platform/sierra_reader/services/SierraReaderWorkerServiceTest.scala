@@ -92,13 +92,12 @@ class SierraReaderWorkerServiceTest
 
     val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
       s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
-    }
+    } ++ List("windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
 
       // there are 29 bib updates in the sierra wiremock so we expect 3 files
-      objects should have size 3
       objects.map { _.getKey() } shouldBe pageNames
 
       getRecordsFromS3(pageNames(0)) should have size 10
@@ -131,13 +130,12 @@ class SierraReaderWorkerServiceTest
 
     val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json").map { label =>
       s"records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
-    }
+    } ++ List("windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
 
-      // there are 29 bib updates in the sierra wiremock so we expect 3 files
-      objects should have size 4
+      // There are 157 item records in the Sierra wiremock so we expect 4 files
       objects.map { _.getKey() } shouldBe pageNames
 
       getRecordsFromS3(pageNames(0)) should have size 50
