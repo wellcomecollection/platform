@@ -16,7 +16,7 @@ import io.circe.syntax._
 import io.circe.parser.decode
 import uk.ac.wellcome.platform.sierra_reader.flow.{SierraRecord, SierraResourceTypes}
 import uk.ac.wellcome.circe._
-import uk.ac.wellcome.platform.sierra_reader.modules.ParamBuilder
+import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
 import scala.concurrent.duration._
 
@@ -59,7 +59,7 @@ class SierraReaderWorkerServiceTest
       new SierraReaderWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         s3client = s3Client,
-        paramBuilder = new ParamBuilder(s3Client, bucketName, fields, resourceType),
+        windowManager = new WindowManager(s3Client, bucketName, fields, resourceType),
         batchSize = batchSize,
         resourceType = resourceType,
         bucketName = bucketName,

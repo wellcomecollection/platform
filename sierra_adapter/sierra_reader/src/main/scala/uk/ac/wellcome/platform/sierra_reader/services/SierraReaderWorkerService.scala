@@ -16,25 +16,25 @@ import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import io.circe.syntax._
 import io.circe.generic.auto._
 import uk.ac.wellcome.circe._
-import uk.ac.wellcome.platform.sierra_reader.modules.ParamBuilder
+import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
 class SierraReaderWorkerService @Inject()(
-  reader: SQSReader,
-  s3client: AmazonS3,
-  system: ActorSystem,
-  metrics: MetricsSender,
-  paramBuilder: ParamBuilder,
-  @Flag("reader.batchSize") batchSize: Int,
-  @Flag("reader.resourceType") resourceType: SierraResourceTypes.Value,
-  @Flag("aws.s3.bucketName") bucketName: String,
-  @Flag("sierra.apiUrl") apiUrl: String,
-  @Flag("sierra.oauthKey") sierraOauthKey: String,
-  @Flag("sierra.oauthSecret") sierraOauthSecret: String,
-  @Flag("sierra.fields") fields: String
+                                           reader: SQSReader,
+                                           s3client: AmazonS3,
+                                           system: ActorSystem,
+                                           metrics: MetricsSender,
+                                           windowManager: WindowManager,
+                                           @Flag("reader.batchSize") batchSize: Int,
+                                           @Flag("reader.resourceType") resourceType: SierraResourceTypes.Value,
+                                           @Flag("aws.s3.bucketName") bucketName: String,
+                                           @Flag("sierra.apiUrl") apiUrl: String,
+                                           @Flag("sierra.oauthKey") sierraOauthKey: String,
+                                           @Flag("sierra.oauthSecret") sierraOauthSecret: String,
+                                           @Flag("sierra.fields") fields: String
 ) extends SQSWorker(reader, system, metrics) {
 
   implicit val actorSystem = system
@@ -46,15 +46,22 @@ class SierraReaderWorkerService @Inject()(
   def processMessage(message: SQSMessage): Future[Unit] =
     for {
       window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
-      params <- paramBuilder.buildParams(window = window)
-      _ <- runSierraStream(params, window = window)
+      windowStatus <- windowManager.getCurrentStatus(window = window)
+      _ <- runSierraStream(window = window, windowStatus = windowStatus)
     } yield ()
 
-  private def runSierraStream(params: Map[String, String], window: String): Future[PutObjectResult] = {
+  private def runSierraStream(window: String, windowStatus: WindowStatus): Future[PutObjectResult] = {
+
+    val baseParams = Map("updatedDate" -> window, "fields" -> fields)
+    val params = windowStatus.id match {
+      case Some(id) => baseParams ++ Map("id" -> id)
+      case None => baseParams
+    }
+
     val s3sink = SequentialS3Sink(
       client = s3client,
       bucketName = bucketName,
-      keyPrefix = paramBuilder.buildWindowShard(window)
+      keyPrefix = windowManager.buildWindowShard(window)
     )
     val outcome = SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
       .via(SierraRecordWrapperFlow(resourceType = resourceType))
@@ -66,7 +73,7 @@ class SierraReaderWorkerService @Inject()(
     // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
     // were never successfully completed.
     outcome.map { _ =>
-      s3client.putObject(bucketName, s"windows_${resourceType.toString}_complete/${paramBuilder.buildWindowLabel(window)}", "")
+      s3client.putObject(bucketName, s"windows_${resourceType.toString}_complete/${windowManager.buildWindowLabel(window)}", "")
     }
   }
 }
