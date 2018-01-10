@@ -12,15 +12,15 @@ sierra_common-publish:
 	echo "Nothing to do!"
 
 
-sierra_bibs_to_sns-test:
-	$(call sbt_test,sierra_bibs_to_sns)
+sierra_reader-test:
+	$(call sbt_test,sierra_reader)
 
-sierra_bibs_to_sns-build:
-	$(call sbt_build,sierra_bibs_to_sns)
-	$(call build_image,sierra_bibs_to_sns,sierra_adapter/sierra_bibs_to_sns/Dockerfile)
+sierra_reader-build:
+	$(call sbt_build,sierra_reader)
+	$(call build_image,sierra_reader,sierra_adapter/sierra_reader/Dockerfile)
 
-sierra_bibs_to_sns-publish: sierra_bibs_to_sns-build
-	$(call publish_service,sierra_bibs_to_sns)
+sierra_reader-publish: sierra_reader-build
+	$(call publish_service,sierra_reader)
 
 
 sierra_items_to_dynamo-test:
