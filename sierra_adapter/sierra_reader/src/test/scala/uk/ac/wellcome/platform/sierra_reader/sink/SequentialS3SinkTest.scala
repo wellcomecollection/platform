@@ -6,7 +6,7 @@ import akka.stream.scaladsl.Source
 import io.circe.parser._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import uk.ac.wellcome.test.utils.S3Local
+import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local}
 
 import scala.collection.JavaConversions._
 
@@ -15,7 +15,7 @@ class SequentialS3SinkTest
   with Matchers
   with S3Local
   with BeforeAndAfterAll
-  with ScalaFutures {
+  with ScalaFutures with ExtendedPatience{
 
   implicit val system = ActorSystem()
   implicit val materialiser = ActorMaterializer()
