@@ -2,9 +2,11 @@ package uk.ac.wellcome.platform.sierra_reader.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 
 object SierraReaderModule extends TwitterModule {
+  flag[SierraResourceTypes.Value]("reader.resourceType", "Sierra resource type")
   flag[Int]("reader.batchSize", 50, "Number of records in a single json batch")
   flag[String]("sierra.apiUrl", "", "Sierra API url")
   flag[String]("sierra.oauthKey", "", "Sierra API oauth key")

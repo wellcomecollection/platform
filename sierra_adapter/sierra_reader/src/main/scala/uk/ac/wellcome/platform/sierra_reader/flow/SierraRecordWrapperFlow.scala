@@ -5,6 +5,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
+import com.twitter.app.Flaggable
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
@@ -13,6 +14,12 @@ import scala.concurrent.ExecutionContext
 
 object SierraResourceTypes extends Enumeration {
   val bibs, items = Value
+
+  implicit val flaggable: Flaggable[SierraResourceTypes.Value] = Flaggable.mandatory[SierraResourceTypes.Value]{
+    case s: String if s == bibs.toString => bibs
+    case s: String if s == items.toString => items
+    case s: String => throw new IllegalArgumentException(s"$s is not a valid Sierra resource type")
+  }
 }
 
 object SierraRecordWrapperFlow extends Logging {
