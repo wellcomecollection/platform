@@ -1,10 +1,9 @@
-package uk.ac.wellcome.platform.transformer
+package uk.ac.wellcome.transformer
 
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
 import uk.ac.wellcome.test.utils._
-import uk.ac.wellcome.transformer.Server
 
 class StartupTest
     extends FeatureTest
