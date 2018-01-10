@@ -90,18 +90,22 @@ class SierraReaderWorkerServiceTest
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
+    val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
+      s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+    }
+
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
 
       // there are 29 bib updates in the sierra wiremock so we expect 3 files
       objects should have size 3
-      objects.map { _.getKey() } shouldBe List("0000.json", "0001.json", "0002.json")
+      objects.map { _.getKey() } shouldBe pageNames
 
-      getRecordsFromS3("0000.json") should have size 10
-      getRecordsFromS3("0001.json") should have size 10
-      getRecordsFromS3("0002.json") should have size 9
+      getRecordsFromS3(pageNames(0)) should have size 10
+      getRecordsFromS3(pageNames(1)) should have size 10
+      getRecordsFromS3(pageNames(2)) should have size 9
 
-      getRecordsFromS3("0001.json").head.id should startWith("b")
+      getRecordsFromS3(pageNames(0)).head.id should startWith("b")
     }
   }
 
@@ -125,19 +129,23 @@ class SierraReaderWorkerServiceTest
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
+    val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json").map { label =>
+      s"records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+    }
+
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
 
       // there are 29 bib updates in the sierra wiremock so we expect 3 files
       objects should have size 4
-      objects.map { _.getKey() } shouldBe List("0000.json", "0001.json", "0002.json", "0003.json")
+      objects.map { _.getKey() } shouldBe pageNames
 
-      getRecordsFromS3("0000.json") should have size 50
-      getRecordsFromS3("0001.json") should have size 50
-      getRecordsFromS3("0002.json") should have size 50
-      getRecordsFromS3("0003.json") should have size 7
+      getRecordsFromS3(pageNames(0)) should have size 50
+      getRecordsFromS3(pageNames(1)) should have size 50
+      getRecordsFromS3(pageNames(2)) should have size 50
+      getRecordsFromS3(pageNames(3)) should have size 7
 
-      getRecordsFromS3("0001.json").head.id should startWith("i")
+      getRecordsFromS3(pageNames(0)).head.id should startWith("i")
     }
   }
 
