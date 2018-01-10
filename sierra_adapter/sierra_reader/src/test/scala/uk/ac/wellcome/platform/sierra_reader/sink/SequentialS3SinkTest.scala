@@ -45,7 +45,7 @@ class SequentialS3SinkTest
       s3objects should have size 1
       s3objects.head.getKey() shouldBe "testA_0000.json"
 
-      getJsonFromS3("testA_0000.json") shouldBe json
+      getJsonFromS3(bucketName, "testA_0000.json") shouldBe json
     }
   }
 
@@ -65,14 +65,9 @@ class SequentialS3SinkTest
       s3objects should have size 3
       s3objects.map { _.getKey() } shouldBe List("testB_0000.json", "testB_0001.json", "testB_0002.json")
 
-      getJsonFromS3("testB_0000.json") shouldBe json0
-      getJsonFromS3("testB_0001.json") shouldBe json1
-      getJsonFromS3("testB_0002.json") shouldBe json2
+      getJsonFromS3(bucketName, "testB_0000.json") shouldBe json0
+      getJsonFromS3(bucketName, "testB_0001.json") shouldBe json1
+      getJsonFromS3(bucketName, "testB_0002.json") shouldBe json2
     }
-  }
-
-  private def getJsonFromS3(key: String): Json = {
-    val content = IOUtils.toString(s3Client.getObject(bucketName, key).getObjectContent)
-    parse(content).right.get
   }
 }

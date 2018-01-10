@@ -10,6 +10,13 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
+import scala.collection.JavaConversions._
+import io.circe.generic.auto._
+import io.circe.syntax._
+import io.circe.parser.decode
+import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecord
+import uk.ac.wellcome.circe._
+
 import scala.concurrent.duration._
 
 class SierraReaderWorkerServiceTest
@@ -43,12 +50,14 @@ class SierraReaderWorkerServiceTest
 
   private def createSierraReaderWorkerService(
     fields: String,
-    apiUrl: String = "http://localhost:8080"
+    apiUrl: String = "http://localhost:8080",
+    batchSize: Int = 50
   ) = {
     Some(
       new SierraReaderWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         s3client = s3Client,
+        batchSize = batchSize,
         bucketName = bucketName,
         system = actorSystem,
         metrics = mockMetrics,
@@ -62,7 +71,8 @@ class SierraReaderWorkerServiceTest
   it(
     "reads a window message from SQS, retrieves the bibs from Sierra and writes them to S3") {
     worker = createSierraReaderWorkerService(
-      fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
+      fields = "updatedDate,deletedDate,deleted,suppressed,author,title",
+      batchSize = 10
     )
     worker.get.runSQSWorker()
     val message =
@@ -80,9 +90,18 @@ class SierraReaderWorkerServiceTest
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
 
-      // One file containing the page, another "done" marker for the window
-      objects should have size 2
+      // there are 29 bib updates in the sierra wiremock so we expect 3 files
+      objects should have size 3
+      objects.map { _.getKey() } shouldBe List("0000.json", "0001.json", "0002.json")
+
+      assertS3KeyHasSize("0000.json", 10)
+      assertS3KeyHasSize("0001.json", 10)
+      assertS3KeyHasSize("0002.json", 9)
     }
+  }
+
+  private def assertS3KeyHasSize(key: String, expectedSize: Int): Unit = {
+    decode[List[SierraRecord]](getContentFromS3(bucketName, key)).right.get should have size expectedSize
   }
 
   it(
