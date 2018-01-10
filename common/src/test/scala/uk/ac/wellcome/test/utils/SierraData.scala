@@ -9,13 +9,15 @@ trait SierraData {
     title: String = "Ingenious imps invent invasive implements",
     modifiedDate: String = "2001-01-01T01:01:01Z",
     bibIds: List[String] = List(),
-    unlinkedBibIds: List[String] = List()
+    unlinkedBibIds: List[String] = List(),
+    deleted:Boolean = false
   ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(
       id = id,
       updatedDate = modifiedDate,
-      title = title
+      title = title,
+      deleted = deleted
     ),
     modifiedDate = modifiedDate,
     bibIds = bibIds,
@@ -25,14 +27,15 @@ trait SierraData {
   def sierraRecordString(
     id: String,
     updatedDate: String,
-    title: String
+    title: String,
+    deleted: Boolean = false
   ) =
     s"""
        |{
        |      "id": "$id",
        |      "updatedDate": "$updatedDate",
        |      "createdDate": "1999-11-01T16:36:51Z",
-       |      "deleted": false,
+       |      "deleted": $deleted,
        |      "suppressed": false,
        |      "lang": {
        |        "code": "ger",
