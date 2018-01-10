@@ -14,7 +14,10 @@ import scala.collection.JavaConversions._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.parser.decode
-import uk.ac.wellcome.platform.sierra_reader.flow.{SierraRecord, SierraResourceTypes}
+import uk.ac.wellcome.platform.sierra_reader.flow.{
+  SierraRecord,
+  SierraResourceTypes
+}
 import uk.ac.wellcome.circe._
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
@@ -33,7 +36,8 @@ class SierraReaderWorkerServiceTest
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
-  val bucketName: String = createBucketAndReturnName("sierra-reader-test-bucket")
+  val bucketName: String = createBucketAndReturnName(
+    "sierra-reader-test-bucket")
 
   val mockMetrics = mock[MetricsSender]
   var worker: Option[SierraReaderWorkerService] = None
@@ -59,7 +63,8 @@ class SierraReaderWorkerServiceTest
       new SierraReaderWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         s3client = s3Client,
-        windowManager = new WindowManager(s3Client, bucketName, fields, resourceType),
+        windowManager =
+          new WindowManager(s3Client, bucketName, fields, resourceType),
         batchSize = batchSize,
         resourceType = resourceType,
         bucketName = bucketName,
@@ -94,7 +99,8 @@ class SierraReaderWorkerServiceTest
 
     val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
       s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
-    } ++ List("windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
+    } ++ List(
+      "windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
@@ -130,9 +136,11 @@ class SierraReaderWorkerServiceTest
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
-    val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json").map { label =>
-      s"records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
-    } ++ List("windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
+    val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
+      .map { label =>
+        s"records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+      } ++ List(
+      "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries
@@ -160,7 +168,9 @@ class SierraReaderWorkerServiceTest
 
     // First we pre-populate S3 with files as if they'd come from a prior run of the reader.
     s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
-    s3Client.putObject(bucketName, s"$prefix/0001.json",
+    s3Client.putObject(
+      bucketName,
+      s"$prefix/0001.json",
       """
         |[
         |  {
@@ -169,7 +179,8 @@ class SierraReaderWorkerServiceTest
         |    "data": "{}"
         |  }
         |]
-      """.stripMargin)
+      """.stripMargin
+    )
 
     // Then we trigger the reader, and we expect it to fill in the rest.
     worker.get.runSQSWorker()
@@ -185,9 +196,11 @@ class SierraReaderWorkerServiceTest
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
-    val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json").map { label =>
-      s"$prefix/$label"
-    } ++ List("windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
+    val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
+      .map { label =>
+        s"$prefix/$label"
+      } ++ List(
+      "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
     eventually {
       val objects = s3Client.listObjects(bucketName).getObjectSummaries

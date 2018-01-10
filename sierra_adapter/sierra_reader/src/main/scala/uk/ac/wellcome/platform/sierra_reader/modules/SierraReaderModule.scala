@@ -7,7 +7,10 @@ import com.google.inject.Provides
 import com.twitter.inject.annotations.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
-import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes.{bibs, items}
+import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes.{
+  bibs,
+  items
+}
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 
 object SierraReaderModule extends TwitterModule {
@@ -40,11 +43,15 @@ object SierraReaderModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesSierraResourceType(@Flag("reader.resourceType") resourceTypeString: String): SierraResourceTypes.Value = {
+  def providesSierraResourceType(
+    @Flag("reader.resourceType") resourceTypeString: String)
+    : SierraResourceTypes.Value = {
     resourceTypeString match {
-          case s: String if s == bibs.toString => bibs
-          case s: String if s == items.toString => items
-          case s: String => throw new IllegalArgumentException(s"$s is not a valid Sierra resource type")
-        }
+      case s: String if s == bibs.toString => bibs
+      case s: String if s == items.toString => items
+      case s: String =>
+        throw new IllegalArgumentException(
+          s"$s is not a valid Sierra resource type")
+    }
   }
 }

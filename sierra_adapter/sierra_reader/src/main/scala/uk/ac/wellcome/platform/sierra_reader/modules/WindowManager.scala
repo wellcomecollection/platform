@@ -9,7 +9,10 @@ import org.apache.commons.io.IOUtils
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.parser.decode
-import uk.ac.wellcome.platform.sierra_reader.flow.{SierraRecord, SierraResourceTypes}
+import uk.ac.wellcome.platform.sierra_reader.flow.{
+  SierraRecord,
+  SierraResourceTypes
+}
 import uk.ac.wellcome.circe._
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -27,7 +30,8 @@ class WindowManager @Inject()(
 ) extends Logging {
 
   def getCurrentStatus(window: String): Future[WindowStatus] = Future {
-    info(s"Searching for existing records in prefix ${buildWindowShard(window)}")
+    info(
+      s"Searching for existing records in prefix ${buildWindowShard(window)}")
 
     val lastExistingKey = s3client
       .listObjects(bucketName, buildWindowShard(window))
@@ -46,14 +50,17 @@ class WindowManager @Inject()(
         val embeddedIndexMatch = "(\\d{4})\\.json$".r.unanchored
         val offset = key match {
           case embeddedIndexMatch(index) => index.toInt
-          case _ => throw SQSReaderGracefulException(new RuntimeException(s"Unable to determine offset in $key"))
+          case _ =>
+            throw SQSReaderGracefulException(
+              new RuntimeException(s"Unable to determine offset in $key"))
         }
 
-        val lastBody = IOUtils.toString(s3client.getObject(bucketName, key).getObjectContent)
+        val lastBody = IOUtils.toString(
+          s3client.getObject(bucketName, key).getObjectContent)
         val records = decode[List[SierraRecord]](lastBody)
         val lastId = records match {
-          case Right(r) => r
-              .map {_.id}
+          case Right(r) =>
+            r.map { _.id }
               .sorted
               .lastOption
           case Left(err) => throw SQSReaderGracefulException(err)
@@ -66,7 +73,8 @@ class WindowManager @Inject()(
             WindowStatus(id = Some(newId), offset = offset + 1)
           })
           .getOrElse(
-            throw SQSReaderGracefulException(new RuntimeException("Json did not contain an id"))
+            throw SQSReaderGracefulException(
+              new RuntimeException("Json did not contain an id"))
           )
       }
       case None => WindowStatus(id = None, offset = 0)

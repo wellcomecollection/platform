@@ -44,11 +44,11 @@ trait S3Local extends BeforeAndAfterEach with Logging { this: Suite =>
     super.beforeEach()
     val bucketList = s3Client.listBuckets()
     bucketList.foreach { bucket =>
-
       // This assumes we'll never put more objects in a bucket that can be retrieved
       // with a single ListObjects API call.
-      s3Client.listObjects(bucket.getName).getObjectSummaries.foreach { obj: S3ObjectSummary =>
-        s3Client.deleteObject(bucket.getName, obj.getKey)
+      s3Client.listObjects(bucket.getName).getObjectSummaries.foreach {
+        obj: S3ObjectSummary =>
+          s3Client.deleteObject(bucket.getName, obj.getKey)
       }
 
       s3Client.deleteBucket(bucket.getName)

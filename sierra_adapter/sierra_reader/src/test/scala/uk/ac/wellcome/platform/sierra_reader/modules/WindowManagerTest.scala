@@ -6,8 +6,14 @@ import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local}
 
-class WindowManagerTest extends FunSpec with Matchers with S3Local with ScalaFutures with ExtendedPatience {
-  val bucketName: String = createBucketAndReturnName("window-manager-test-bucket")
+class WindowManagerTest
+    extends FunSpec
+    with Matchers
+    with S3Local
+    with ScalaFutures
+    with ExtendedPatience {
+  val bucketName: String = createBucketAndReturnName(
+    "window-manager-test-bucket")
 
   val windowManager = new WindowManager(
     s3client = s3Client,
@@ -27,7 +33,9 @@ class WindowManagerTest extends FunSpec with Matchers with S3Local with ScalaFut
 
     // We pre-populate S3 with files as if they'd come from a prior run of the reader.
     s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
-    s3Client.putObject(bucketName, s"$prefix/0001.json",
+    s3Client.putObject(
+      bucketName,
+      s"$prefix/0001.json",
       """
         |[
         |  {
@@ -36,11 +44,14 @@ class WindowManagerTest extends FunSpec with Matchers with S3Local with ScalaFut
         |    "data": "{}"
         |  }
         |]
-      """.stripMargin)
+      """.stripMargin
+    )
 
     val result = windowManager.getCurrentStatus("[2013,2014]")
 
-    whenReady(result) { _ shouldBe WindowStatus(id = Some("1794166"), offset = 2) }
+    whenReady(result) {
+      _ shouldBe WindowStatus(id = Some("1794166"), offset = 2)
+    }
   }
 
   it("throws an error if it finds invalid JSON in the bucket") {
