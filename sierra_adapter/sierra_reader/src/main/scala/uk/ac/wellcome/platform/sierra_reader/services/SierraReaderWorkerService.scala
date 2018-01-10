@@ -26,6 +26,7 @@ class SierraReaderWorkerService @Inject()(
   system: ActorSystem,
   metrics: MetricsSender,
   @Flag("reader.batchSize") batchSize: Int,
+  @Flag("reader.resourceType") resourceType: SierraResourceTypes.Value,
   @Flag("aws.s3.bucketName") bucketName: String,
   @Flag("sierra.apiUrl") apiUrl: String,
   @Flag("sierra.oauthKey") sierraOauthKey: String,
@@ -49,7 +50,7 @@ class SierraReaderWorkerService @Inject()(
     } yield ()
 
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
-    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = "bibs", params)
+    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
       .via(SierraRecordWrapperFlow(resourceType = SierraResourceTypes.bibs))
       .grouped(batchSize)
       .map(recordBatch => recordBatch.asJson)

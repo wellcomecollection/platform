@@ -6,7 +6,7 @@ sqs:
   image: s12v/elasticmq
   ports:
     - "9324:9324"
-sierra:
+wiremock:
   image: rodolpheche/wiremock
   ports:
     - "8080:8080"
