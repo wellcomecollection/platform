@@ -207,12 +207,12 @@ class SierraTransformableTransformerTest
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
         "i111" -> sierraItemRecord(id = "i111",
-          title = title,
-          bibIds = List(id)),
+                                   title = title,
+                                   bibIds = List(id)),
         "i222" -> sierraItemRecord(id = "i222",
-          title = title,
-          deleted = true,
-          bibIds = List(id))
+                                   title = title,
+                                   deleted = true,
+                                   bibIds = List(id))
       )
     )
 

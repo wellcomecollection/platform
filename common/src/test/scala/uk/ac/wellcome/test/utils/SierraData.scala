@@ -10,7 +10,7 @@ trait SierraData {
     modifiedDate: String = "2001-01-01T01:01:01Z",
     bibIds: List[String] = List(),
     unlinkedBibIds: List[String] = List(),
-    deleted:Boolean = false
+    deleted: Boolean = false
   ) = SierraItemRecord(
     id = id,
     data = sierraRecordString(

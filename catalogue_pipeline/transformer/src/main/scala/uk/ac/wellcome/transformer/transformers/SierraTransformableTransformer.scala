@@ -9,7 +9,6 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.{Failure, Success, Try}
 
-
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with Logging {
@@ -19,19 +18,21 @@ class SierraTransformableTransformer
 
     JsonUtil
       .fromJson[SierraItemData](itemRecord.data) match {
-      case Success(sierraItemData) => Some(Item(
-        sourceIdentifier = SourceIdentifier(
-          IdentifierSchemes.sierraSystemNumber,
-          sierraItemData.id
-        ),
-        identifiers = List(
-          SourceIdentifier(
-            identifierScheme = IdentifierSchemes.sierraSystemNumber,
-            sierraItemData.id
-          )
-        ),
-        visible = !sierraItemData.deleted
-      ))
+      case Success(sierraItemData) =>
+        Some(
+          Item(
+            sourceIdentifier = SourceIdentifier(
+              IdentifierSchemes.sierraSystemNumber,
+              sierraItemData.id
+            ),
+            identifiers = List(
+              SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                sierraItemData.id
+              )
+            ),
+            visible = !sierraItemData.deleted
+          ))
       case Failure(e) => {
         error(s"Failed to parse item!", e)
 
@@ -46,8 +47,8 @@ class SierraTransformableTransformer
       .map { bibData =>
         info(s"Attempting to transform $bibData")
 
-        JsonUtil.fromJson[SierraBibData](bibData.data).map {
-          sierraBibData => Some(Work(
+        JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
+          Some(Work(
             title = sierraBibData.title,
             sourceIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.sierraSystemNumber,
