@@ -16,6 +16,7 @@ import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import io.circe.syntax._
 import io.circe.generic.auto._
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.platform.sierra_reader.modules.ParamBuilder
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -26,6 +27,7 @@ class SierraReaderWorkerService @Inject()(
   s3client: AmazonS3,
   system: ActorSystem,
   metrics: MetricsSender,
+  paramBuilder: ParamBuilder,
   @Flag("reader.batchSize") batchSize: Int,
   @Flag("reader.resourceType") resourceType: SierraResourceTypes.Value,
   @Flag("aws.s3.bucketName") bucketName: String,
@@ -44,25 +46,15 @@ class SierraReaderWorkerService @Inject()(
   def processMessage(message: SQSMessage): Future[Unit] =
     for {
       window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
-      params = Map("updatedDate" -> window, "fields" -> fields)
+      params <- paramBuilder.buildParams(window = window)
       _ <- runSierraStream(params, window = window)
     } yield ()
 
   private def runSierraStream(params: Map[String, String], window: String): Future[PutObjectResult] = {
-    // Window is a string like [2013-12-01T01:01:01Z,2013-12-01T01:01:01Z].
-    // We discard the square braces, colons and comma so we get slightly nicer filenames.
-    val windowString = window
-      .replaceAll("\\[", "")
-      .replaceAll("\\]", "")
-      .replaceAll(":", "-")
-      .replaceAll(",", "__")
-
-    val keyPrefix = s"records_${resourceType.toString}/$windowString/"
-
     val s3sink = SequentialS3Sink(
       client = s3client,
       bucketName = bucketName,
-      keyPrefix = keyPrefix
+      keyPrefix = paramBuilder.buildWindowShard(window)
     )
     val outcome = SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
       .via(SierraRecordWrapperFlow(resourceType = resourceType))
@@ -74,7 +66,7 @@ class SierraReaderWorkerService @Inject()(
     // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
     // were never successfully completed.
     outcome.map { _ =>
-      s3client.putObject(bucketName, s"windows_${resourceType.toString}_complete/$windowString", "")
+      s3client.putObject(bucketName, s"windows_${resourceType.toString}_complete/${paramBuilder.buildWindowLabel(window)}", "")
     }
   }
 }
