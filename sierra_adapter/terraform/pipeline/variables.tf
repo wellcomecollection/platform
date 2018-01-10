@@ -1,7 +1,6 @@
 variable "resource_type" {}
 
-variable "window_length_minutes" {}
-variable "trigger_interval_minutes" {}
+variable "windows_topic_name" {}
 
 variable "sierra_to_dynamo_release_id" {}
 variable "sierra_merger_release_id" {}
