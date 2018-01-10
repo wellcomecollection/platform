@@ -15,6 +15,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
+
 class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
                                     dynamoConfigs: Map[String, DynamoConfig])
     extends Logging {
