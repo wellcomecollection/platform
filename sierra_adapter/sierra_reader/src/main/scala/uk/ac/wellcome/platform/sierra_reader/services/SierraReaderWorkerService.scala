@@ -38,18 +38,31 @@ class SierraReaderWorkerService @Inject()(
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val s3sink = SequentialS3Sink(client = s3client, bucketName = bucketName)
-
   val throttleRate = ThrottleRate(3, 1.second)
 
   def processMessage(message: SQSMessage): Future[Unit] =
     for {
       window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
       params = Map("updatedDate" -> window, "fields" -> fields)
-      _ <- runSierraStream(params)
+      _ <- runSierraStream(params, window = window)
     } yield ()
 
-  private def runSierraStream(params: Map[String, String]): Future[Done] = {
+  private def runSierraStream(params: Map[String, String], window: String): Future[Done] = {
+    // Window is a string like [2013-12-01T01:01:01Z,2013-12-01T01:01:01Z].
+    // We discard the square braces, colons and comma so we get slightly nicer filenames.
+    val windowString = window
+      .replaceAll("\\[", "")
+      .replaceAll("\\]", "")
+      .replaceAll(":", "-")
+      .replaceAll(",", "__")
+
+    val keyPrefix = s"records_${resourceType.toString}/$windowString/"
+
+    val s3sink = SequentialS3Sink(
+      client = s3client,
+      bucketName = bucketName,
+      keyPrefix = keyPrefix
+    )
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
       .via(SierraRecordWrapperFlow(resourceType = resourceType))
       .grouped(batchSize)
