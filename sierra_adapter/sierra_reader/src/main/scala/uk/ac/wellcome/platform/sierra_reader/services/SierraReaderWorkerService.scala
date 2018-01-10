@@ -4,6 +4,7 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
@@ -47,7 +48,7 @@ class SierraReaderWorkerService @Inject()(
       _ <- runSierraStream(params, window = window)
     } yield ()
 
-  private def runSierraStream(params: Map[String, String], window: String): Future[Done] = {
+  private def runSierraStream(params: Map[String, String], window: String): Future[PutObjectResult] = {
     // Window is a string like [2013-12-01T01:01:01Z,2013-12-01T01:01:01Z].
     // We discard the square braces, colons and comma so we get slightly nicer filenames.
     val windowString = window
@@ -63,11 +64,17 @@ class SierraReaderWorkerService @Inject()(
       bucketName = bucketName,
       keyPrefix = keyPrefix
     )
-    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
+    val outcome = SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
       .via(SierraRecordWrapperFlow(resourceType = resourceType))
       .grouped(batchSize)
       .map(recordBatch => recordBatch.asJson)
       .zipWithIndex
       .runWith(s3sink)
+
+    // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
+    // were never successfully completed.
+    outcome.map { _ =>
+      s3client.putObject(bucketName, s"windows_${resourceType.toString}_complete/$windowString", "")
+    }
   }
 }
