@@ -100,6 +100,8 @@ class SierraReaderWorkerServiceTest
       getRecordsFromS3("0000.json") should have size 10
       getRecordsFromS3("0001.json") should have size 10
       getRecordsFromS3("0002.json") should have size 9
+
+      getRecordsFromS3("0001.json").head.id should startWith("b")
     }
   }
 
@@ -134,6 +136,8 @@ class SierraReaderWorkerServiceTest
       getRecordsFromS3("0001.json") should have size 50
       getRecordsFromS3("0002.json") should have size 50
       getRecordsFromS3("0003.json") should have size 7
+
+      getRecordsFromS3("0001.json").head.id should startWith("i")
     }
   }
 

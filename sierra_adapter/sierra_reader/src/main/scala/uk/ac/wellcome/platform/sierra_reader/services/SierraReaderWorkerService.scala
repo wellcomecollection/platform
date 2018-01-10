@@ -51,7 +51,7 @@ class SierraReaderWorkerService @Inject()(
 
   private def runSierraStream(params: Map[String, String]): Future[Done] = {
     SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
-      .via(SierraRecordWrapperFlow(resourceType = SierraResourceTypes.bibs))
+      .via(SierraRecordWrapperFlow(resourceType = resourceType))
       .grouped(batchSize)
       .map(recordBatch => recordBatch.asJson)
       .zipWithIndex
