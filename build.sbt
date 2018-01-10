@@ -44,8 +44,8 @@ def doSharedSierraSetup(project: Project, folder: String) =
 lazy val sierra_adapter_common = doSharedSetup(project, "sierra_adapter/common")
   .settings(libraryDependencies ++= Dependencies.sierraAdapterCommonDependencies)
 
-lazy val sierra_bibs_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_bibs_to_dynamo")
-  .settings(libraryDependencies ++= Dependencies.sierraToDynamoDependencies)
+lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
+  .settings(libraryDependencies ++= Dependencies.sierraReaderDependencies)
 
 lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")
   .settings(libraryDependencies ++= Dependencies.sierraToDynamoDependencies)
@@ -65,7 +65,7 @@ lazy val root = (project in file("."))
     id_minter,
     reindexer,
     sierra_adapter_common,
-    sierra_bibs_to_dynamo,
+    sierra_reader,
     sierra_items_to_dynamo,
     sierra_bib_merger,
     sierra_item_merger

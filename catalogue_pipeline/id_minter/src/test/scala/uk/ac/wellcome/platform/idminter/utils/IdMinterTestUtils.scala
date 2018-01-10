@@ -31,7 +31,7 @@ trait IdMinterTestUtils
         "aws.sqs.queue.url" -> idMinterQueue,
         "aws.sqs.waitTime" -> "1",
         "aws.sns.topic.arn" -> ingestorTopicArn
-      ) ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags ++ cloudWatchLocalEndpointFlag
+      ) ++ snsLocalFlags ++ sqsLocalFlags ++ identifiersMySqlLocalFlags ++ cloudWatchLocalEndpointFlag
     )
   }
 

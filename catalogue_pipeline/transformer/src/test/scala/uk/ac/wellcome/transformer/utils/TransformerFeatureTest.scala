@@ -19,7 +19,7 @@ trait TransformerFeatureTest
   lazy val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
-      flags ++ snsLocalEndpointFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
+      flags ++ snsLocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
     )
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")

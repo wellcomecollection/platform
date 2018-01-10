@@ -1,0 +1,14 @@
+s3:
+  image: scality/s3server:mem-latest
+  ports:
+    - "33333:8000"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"
+wiremock:
+  image: rodolpheche/wiremock
+  ports:
+    - "8080:8080"
+  volumes:
+    - "${ROOT}/sierra_adapter/sierra_reader/src/test/resources/wiremock:/home/wiremock"
