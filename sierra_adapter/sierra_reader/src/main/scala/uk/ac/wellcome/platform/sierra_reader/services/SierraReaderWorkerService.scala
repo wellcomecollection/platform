@@ -51,17 +51,18 @@ class SierraReaderWorkerService @Inject()(
     } yield ()
 
   private def runSierraStream(window: String, windowStatus: WindowStatus): Future[PutObjectResult] = {
-
+    info(s"Running the stream with window=$window and status=$windowStatus")
     val baseParams = Map("updatedDate" -> window, "fields" -> fields)
     val params = windowStatus.id match {
-      case Some(id) => baseParams ++ Map("id" -> id)
+      case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
       case None => baseParams
     }
 
     val s3sink = SequentialS3Sink(
       client = s3client,
       bucketName = bucketName,
-      keyPrefix = windowManager.buildWindowShard(window)
+      keyPrefix = windowManager.buildWindowShard(window),
+      offset = windowStatus.offset
     )
     val outcome = SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(resourceType = resourceType.toString, params)
       .via(SierraRecordWrapperFlow(resourceType = resourceType))
