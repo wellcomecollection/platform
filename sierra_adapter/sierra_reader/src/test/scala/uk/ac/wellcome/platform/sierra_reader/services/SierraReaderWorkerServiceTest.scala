@@ -16,6 +16,7 @@ import io.circe.syntax._
 import io.circe.parser.decode
 import uk.ac.wellcome.platform.sierra_reader.flow.{SierraRecord, SierraResourceTypes}
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.platform.sierra_reader.modules.ParamBuilder
 
 import scala.concurrent.duration._
 
@@ -58,6 +59,7 @@ class SierraReaderWorkerServiceTest
       new SierraReaderWorkerService(
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         s3client = s3Client,
+        paramBuilder = new ParamBuilder(s3Client, bucketName, fields, resourceType),
         batchSize = batchSize,
         resourceType = resourceType,
         bucketName = bucketName,
@@ -144,6 +146,62 @@ class SierraReaderWorkerServiceTest
       getRecordsFromS3(pageNames(3)) should have size 7
 
       getRecordsFromS3(pageNames(0)).head.id should startWith("i")
+    }
+  }
+
+  it("resumes a window if it finds an in-progress set of records") {
+    worker = createSierraReaderWorkerService(
+      fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
+      batchSize = 50,
+      resourceType = SierraResourceTypes.items
+    )
+
+    val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
+
+    // First we pre-populate S3 with files as if they'd come from a prior run of the reader.
+    s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
+    s3Client.putObject(bucketName, s"$prefix/0001.json",
+      """
+        |[
+        |  {
+        |    "id": "1794165",
+        |    "modifiedDate": 12345678,
+        |    "data": "{}"
+        |  }
+        |]
+      """.stripMargin)
+
+    // Then we trigger the reader, and we expect it to fill in the rest.
+    worker.get.runSQSWorker()
+    val message =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
+    val sqsMessage =
+      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+
+    val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json").map { label =>
+      s"$prefix/$label"
+    } ++ List("windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
+
+    eventually {
+      val objects = s3Client.listObjects(bucketName).getObjectSummaries
+
+      // There are 157 item records in the Sierra wiremock so we expect 4 files
+      objects.map { _.getKey() } shouldBe pageNames
+
+      // These two files were pre-populated -- we check the reader hasn't overwritten these
+      getRecordsFromS3(pageNames(0)) should have size 0
+      getRecordsFromS3(pageNames(1)) should have size 1
+
+      // We check the reader has filled these in correctly
+      getRecordsFromS3(pageNames(2)) should have size 50
+      getRecordsFromS3(pageNames(3)) should have size 7
     }
   }
 
