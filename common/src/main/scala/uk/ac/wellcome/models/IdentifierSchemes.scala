@@ -2,12 +2,9 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.{
-  JsonDeserialize,
-  JsonSerialize
-}
+import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
 import com.twitter.inject.Logging
-import io.circe.{Decoder, HCursor}
+import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._
 
 class IdentifierSchemeDeserialiser
@@ -101,6 +98,14 @@ object IdentifierSchemes extends Logging {
         } yield {
           IdentifierSchemes.createIdentifierScheme(identifierSchemeName)
         }
+      }
+    }
+
+  implicit val identifierSchemesEncoder
+    : Encoder[IdentifierSchemes.IdentifierScheme] =
+    new Encoder[IdentifierSchemes.IdentifierScheme] {
+      override def apply(a: IdentifierScheme): Json = {
+        Json.fromString(a.toString)
       }
     }
 }

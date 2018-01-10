@@ -6,16 +6,17 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import io.circe.{Decoder, Encoder}
-import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.parser._
-import uk.ac.wellcome.circe._
 import cats.syntax.either._
+import io.circe.Printer
 
 import scala.util.Try
 
 object JsonUtil {
   val mapper = new ObjectMapper() with ScalaObjectMapper
+
+  val printer = Printer.noSpaces.copy(dropNullValues = true)
 
   mapper.registerModule(DefaultScalaModule)
   mapper.registerModule(new JavaTimeModule())
@@ -26,7 +27,10 @@ object JsonUtil {
   // feature in the API outputs.
   mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
   def toJsonCirce[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
-    Try(value.asJson.noSpaces)
+    import io.circe.generic.auto._
+    import uk.ac.wellcome.circe._
+    import uk.ac.wellcome.models.IdentifierSchemes._
+    Try(printer.pretty(value.asJson))
   }
 
   def toJson(value: Any): Try[String] =

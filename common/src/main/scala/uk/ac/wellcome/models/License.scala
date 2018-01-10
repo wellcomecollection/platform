@@ -3,12 +3,9 @@ package uk.ac.wellcome.models
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.{
-  DeserializationContext,
-  JsonDeserializer,
-  JsonNode
-}
+import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode}
 import com.twitter.inject.Logging
+import io.circe.{Encoder, Json}
 
 @JsonDeserialize(using = classOf[LicenseDeserialiser])
 sealed trait License {
@@ -16,6 +13,18 @@ sealed trait License {
   val label: String
   val url: String
   @JsonProperty("type") val ontologyType: String = "License"
+}
+
+object License {
+  implicit val encodeLicense: Encoder[License] = new Encoder[License] {
+    override def apply(a: License): Json = {
+      Json.obj(
+        ("label",Json.fromString(a.label)),
+        ("licenseType", Json.fromString(a.licenseType)),
+        ("url", Json.fromString(a.url))
+      )
+    }
+  }
 }
 
 class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
