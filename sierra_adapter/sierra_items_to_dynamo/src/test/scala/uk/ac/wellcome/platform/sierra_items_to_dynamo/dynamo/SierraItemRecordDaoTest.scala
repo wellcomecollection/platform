@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -86,10 +90,10 @@ class SierraItemRecordDaoTest
     it("does not update an existing item if the update has a lower version") {
       val id = "i111"
       val sierraItemRecord = SierraItemRecord(id = id,
-        data = "old data!",
-        modifiedDate =
-          "2005-01-01T00:00:00Z",
-        bibIds = List())
+                                              data = "old data!",
+                                              modifiedDate =
+                                                "2005-01-01T00:00:00Z",
+                                              bibIds = List())
 
       val newerSierraItemRecord = sierraItemRecord.copy(
         version = 1,
@@ -98,8 +102,7 @@ class SierraItemRecordDaoTest
 
       Scanamo.put(dynamoDbClient)(tableName)(newerSierraItemRecord)
 
-      whenReady(
-        sierraItemRecordDao.updateItem(sierraItemRecord).failed) {
+      whenReady(sierraItemRecordDao.updateItem(sierraItemRecord).failed) {
         ex =>
           ex shouldBe a[ConditionalCheckFailedException]
 

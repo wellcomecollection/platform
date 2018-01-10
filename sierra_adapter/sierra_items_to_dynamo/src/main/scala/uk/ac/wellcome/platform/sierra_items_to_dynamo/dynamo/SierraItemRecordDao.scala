@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, PutItemResult}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  PutItemResult
+}
 import com.google.inject.Inject
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._
@@ -14,7 +17,6 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.sink.SierraItemsDynamoSink
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-
 
 class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
                                     dynamoConfigs: Map[String, DynamoConfig])
@@ -70,4 +72,3 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
   }
 
 }
-
