@@ -19,7 +19,8 @@ package object circe {
   }
 
   implicit val encodeInstant: Encoder[Instant] = new Encoder[Instant] {
-    override def apply(value: Instant): Json = Json.fromInt(value.getEpochSecond.toInt)
+    override def apply(value: Instant): Json =
+      Json.fromInt(value.getEpochSecond.toInt)
   }
 
   implicit val customConfig: Configuration =

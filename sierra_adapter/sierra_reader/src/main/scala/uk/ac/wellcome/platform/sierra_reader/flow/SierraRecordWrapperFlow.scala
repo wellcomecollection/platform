@@ -17,12 +17,17 @@ object SierraResourceTypes extends Enumeration {
 
 object SierraRecordWrapperFlow extends Logging {
   def apply(resourceType: SierraResourceTypes.Value)(
-    implicit executionContext: ExecutionContext): Flow[Json, SierraRecord, NotUsed] = Flow.fromFunction({ json =>
+    implicit executionContext: ExecutionContext)
+    : Flow[Json, SierraRecord, NotUsed] =
+    Flow.fromFunction({ json =>
       createSierraRecord(json, resourceType)
     })
 
-  private def createSierraRecord(unprefixedJson: Json, resourceType: SierraResourceTypes.Value): SierraRecord = {
-    val json = addIDPrefix(json = unprefixedJson, resourceType: SierraResourceTypes.Value)
+  private def createSierraRecord(
+    unprefixedJson: Json,
+    resourceType: SierraResourceTypes.Value): SierraRecord = {
+    val json = addIDPrefix(json = unprefixedJson,
+                           resourceType: SierraResourceTypes.Value)
     logger.info(s"Creating record from ${json.noSpaces}")
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
     maybeUpdatedDate match {
@@ -57,9 +62,11 @@ object SierraRecordWrapperFlow extends Logging {
   // respectively.
   //
   // This updates the ID in a block of JSON to add this disambiguating prefix.
-  private def addIDPrefix(json: Json, resourceType: SierraResourceTypes.Value): Json = {
+  private def addIDPrefix(json: Json,
+                          resourceType: SierraResourceTypes.Value): Json = {
     resourceType match {
-      case SierraResourceTypes.bibs => root.id.string.modify(id => s"b$id")(json)
+      case SierraResourceTypes.bibs =>
+        root.id.string.modify(id => s"b$id")(json)
       case SierraResourceTypes.items => {
         val identifiedJson = root.id.string.modify(id => s"i$id")(json)
         root.bibIds.each.string.modify(id => s"b$id")(identifiedJson)
@@ -67,19 +74,15 @@ object SierraRecordWrapperFlow extends Logging {
     }
   }
 
-
   def addIDPrefixToBibs(json: Json): Json =
     root.bibIds.each.string.modify(id => s"b$id")(json)
-
 
   private def getId(json: Json) = {
     root.id.string.getOption(json).get
   }
 }
 
-case class SierraRecord(  id: String,
-                          data: String,
-                          modifiedDate: Instant)
+case class SierraRecord(id: String, data: String, modifiedDate: Instant)
 object SierraRecord {
   def apply(id: String, data: String, modifiedDate: String): SierraRecord =
     SierraRecord(

@@ -18,8 +18,10 @@ class SierraRecordWrapperFlowTest
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val bibWrapperFlow = SierraRecordWrapperFlow(resourceType = SierraResourceTypes.bibs)
-  val itemWrapperFlow = SierraRecordWrapperFlow(resourceType = SierraResourceTypes.items)
+  val bibWrapperFlow = SierraRecordWrapperFlow(
+    resourceType = SierraResourceTypes.bibs)
+  val itemWrapperFlow = SierraRecordWrapperFlow(
+    resourceType = SierraResourceTypes.items)
 
   override def afterAll(): Unit = {
     system.terminate()
@@ -48,14 +50,16 @@ class SierraRecordWrapperFlowTest
       modifiedDate = updatedDate
     )
 
-    val futureRecord = Source.single(json).via(bibWrapperFlow).runWith(Sink.head)
+    val futureRecord =
+      Source.single(json).via(bibWrapperFlow).runWith(Sink.head)
 
-    whenReady(futureRecord){sierraRecord =>
+    whenReady(futureRecord) { sierraRecord =>
       sierraRecord shouldBe expectedRecord
     }
   }
 
-  it("creates a SierraRecord from an item with i-prefixed item ID and b-prefixed bibIds") {
+  it(
+    "creates a SierraRecord from an item with i-prefixed item ID and b-prefixed bibIds") {
     val id = "400004"
     val updatedDate = "2014-04-14T14:14:14Z"
     val json = parse(s"""
@@ -78,9 +82,10 @@ class SierraRecordWrapperFlowTest
       modifiedDate = updatedDate
     )
 
-    val futureRecord = Source.single(json).via(itemWrapperFlow).runWith(Sink.head)
+    val futureRecord =
+      Source.single(json).via(itemWrapperFlow).runWith(Sink.head)
 
-    whenReady(futureRecord){sierraRecord =>
+    whenReady(futureRecord) { sierraRecord =>
       sierraRecord shouldBe expectedRecord
     }
   }
@@ -106,9 +111,10 @@ class SierraRecordWrapperFlowTest
       modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
-    val futureRecord = Source.single(json).via(bibWrapperFlow).runWith(Sink.head)
+    val futureRecord =
+      Source.single(json).via(bibWrapperFlow).runWith(Sink.head)
 
-    whenReady(futureRecord){sierraRecord =>
+    whenReady(futureRecord) { sierraRecord =>
       sierraRecord shouldBe expectedRecord
     }
   }
@@ -122,7 +128,8 @@ class SierraRecordWrapperFlowTest
          |}
        """.stripMargin).right.get
 
-    val futureUnit = Source.single(invalidSierraJson).via(bibWrapperFlow).runWith(Sink.head)
+    val futureUnit =
+      Source.single(invalidSierraJson).via(bibWrapperFlow).runWith(Sink.head)
     whenReady(futureUnit.failed) { _ =>
       ()
     }

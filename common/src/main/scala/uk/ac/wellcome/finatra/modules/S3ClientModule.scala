@@ -29,10 +29,10 @@ object S3ClientModule extends TwitterModule {
         .withCredentials(
           new AWSStaticCredentialsProvider(
             new BasicAWSCredentials(awsConfig.accessKey.get,
-              awsConfig.secretKey.get)))
+                                    awsConfig.secretKey.get)))
         .withPathStyleAccessEnabled(true)
-        .withEndpointConfiguration(
-          new EndpointConfiguration(s3Endpoint(), awsConfig.region))
+        .withEndpointConfiguration(new EndpointConfiguration(s3Endpoint(),
+                                                             awsConfig.region))
         .build()
   }
 
