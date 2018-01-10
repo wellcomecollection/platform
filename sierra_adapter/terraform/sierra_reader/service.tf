@@ -16,7 +16,7 @@ module "sierra_reader_service" {
     resource_type = "${var.resource_type}"
 
     windows_queue_url = "${module.windows_queue.id}"
-    bucket_name = "${var.bucket_name}"
+    bucket_name       = "${var.bucket_name}"
 
     metrics_namespace = "${local.service_name}"
 
