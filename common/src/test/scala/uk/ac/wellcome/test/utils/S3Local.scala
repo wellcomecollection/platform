@@ -5,6 +5,9 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.twitter.inject.Logging
+import io.circe.Json
+import io.circe.parser.parse
+import org.apache.commons.io.IOUtils
 import org.scalatest.{BeforeAndAfterEach, Suite}
 
 import scala.collection.JavaConversions._
@@ -51,5 +54,13 @@ trait S3Local extends BeforeAndAfterEach with Logging { this: Suite =>
       s3Client.deleteBucket(bucket.getName)
       s3Client.createBucket(bucket.getName)
     }
+  }
+
+  def getContentFromS3(bucketName: String, key: String): String = {
+    IOUtils.toString(s3Client.getObject(bucketName, key).getObjectContent)
+  }
+
+  def getJsonFromS3(bucketName: String, key: String): Json = {
+    parse(getContentFromS3(bucketName, key)).right.get
   }
 }
