@@ -3,9 +3,7 @@ package uk.ac.wellcome.platform.sierra_reader.sink
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
-import io.circe.Json
 import io.circe.parser._
-import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import uk.ac.wellcome.test.utils.S3Local

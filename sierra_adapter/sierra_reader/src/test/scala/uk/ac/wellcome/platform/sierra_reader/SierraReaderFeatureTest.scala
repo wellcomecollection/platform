@@ -4,41 +4,35 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SNSLocal,
-  SQSLocal
-}
+import uk.ac.wellcome.test.utils._
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 class SierraReaderFeatureTest
     extends FunSpec
     with FeatureTestMixin
-    with SNSLocal
+    with S3Local
     with SQSLocal
     with AmazonCloudWatchFlag
     with Matchers
     with ExtendedPatience {
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
-  val topicArn = createTopicAndReturnArn("sierra-bibs-feature-test-topic")
+  val bucketName = createBucketAndReturnName("sierra-reader-feature-test-bucket")
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.sns.topic.arn" -> topicArn,
+      "aws.s3.bucketName" -> bucketName,
       "sierra.apiUrl" -> "http://localhost:8080",
       "sierra.oauthKey" -> "key",
       "sierra.oauthSecret" -> "secret",
-      "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
-    ) ++ sqsLocalFlags ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag
+      "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title",
+      "reader.resourceType" -> "bibs"
+    ) ++ sqsLocalFlags ++ s3LocalFlags ++ cloudWatchLocalEndpointFlag
   )
 
-  it("reads bibs from Sierra and writes files to s3") {
+  it("reads bibs from Sierra and writes files to S3") {
     val message =
       """
         |{
@@ -53,7 +47,7 @@ class SierraReaderFeatureTest
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response
-      listMessagesReceivedFromSNS() should have size 29
+      s3Client.listObjects(bucketName).getObjectSummaries should have size 2
     }
   }
 }
