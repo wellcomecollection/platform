@@ -17,7 +17,7 @@ import scala.concurrent.Future
 
 class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
                                     dynamoConfigs: Map[String, DynamoConfig])
-  extends Logging {
+    extends Logging {
 
   private val tableConfigId = "sierraToDynamo"
 
@@ -35,13 +35,11 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
 
   private def putRecord(record: SierraItemRecord) = {
     val newVersion = record.version + 1
-    val modifiedDate = record.modifiedDate.getEpochSecond
 
     table
       .given(
         not(attributeExists('id)) or
-          (attributeExists('id) and 'version < newVersion) and
-          (attributeExists('id) and 'modifiedDate < modifiedDate)
+          (attributeExists('id) and 'version < newVersion)
       )
       .put(record.copy(version = newVersion))
   }
@@ -49,12 +47,10 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
   def updateItem(record: SierraItemRecord): Future[Unit] = Future {
     debug(s"About to update record $record")
     scanamoExec(putRecord(record)) match {
-      case Left(error: ConditionalCheckFailedException) =>
-        info(
-          s"Conditional check failed saving ${record.id} to DynamoDB")
-      case Left(error) =>
-        warn(s"Failed saving ${record.id} to DynamoDB", error)
-      case Right(_) => debug(s"Successfully saved item ${record.id} to DynamoDB")
+      case Left(err) =>
+        warn(s"Failed updating record ${record.id}", err)
+        throw err
+      case Right(_) => ()
     }
   }
 
@@ -67,9 +63,10 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
         val exception = new RuntimeException(
           s"An error occurred while retrieving item $id: $readError")
         error(s"An error occurred while retrieving item $id: $readError",
-          exception)
+              exception)
         throw exception
     }
   }
 
 }
+
