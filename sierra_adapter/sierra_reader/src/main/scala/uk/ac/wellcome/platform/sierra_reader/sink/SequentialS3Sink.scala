@@ -14,7 +14,7 @@ object SequentialS3Sink extends Logging {
             keyPrefix: String = "",
             offset: Int = 0)(implicit executionContext: ExecutionContext)
     : Sink[(Json, Long), Future[Done]] = {
-    Sink.foreachParallel(10) {
+    Sink.foreach {
       case (json: Json, index: Long) => {
         // Zero-pad the index to four digits for easy sorting,
         // e.g. "1" ~> "0001", "25" ~> "0025"
