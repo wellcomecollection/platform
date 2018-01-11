@@ -123,4 +123,120 @@ class SierraTransformableTransformerTest
       )
     )
   }
+
+  it("makes deleted works invisible") {
+    val id = "000"
+    val title = "Hi Diddle Dee Dee"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title",
+         | "deleted": true
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+
+    transformedSierraRecord.get shouldBe Some(
+      Work(
+        title = title,
+        sourceIdentifier = identifier,
+        identifiers = List(identifier),
+        visible = false
+      )
+    )
+  }
+
+  it("makes supressed works invisible") {
+    val id = "000"
+    val title = "Hi Diddle Dee Dee"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title",
+         | "suppressed": true
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+
+    transformedSierraRecord.get shouldBe Some(
+      Work(
+        title = title,
+        sourceIdentifier = identifier,
+        identifiers = List(identifier),
+        visible = false
+      )
+    )
+  }
+
+  it("makes deleted items on a work invisible") {
+    val id = "b5757575"
+    val title = "A morning mixture of molasses and muesli"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title"
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+      itemData = Map(
+        "i111" -> sierraItemRecord(id = "i111",
+                                   title = title,
+                                   bibIds = List(id)),
+        "i222" -> sierraItemRecord(id = "i222",
+                                   title = title,
+                                   deleted = true,
+                                   bibIds = List(id))
+      )
+    )
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    val sourceIdentifier1 =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i111")
+    val sourceIdentifier2 =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
+
+    work.items shouldBe List(
+      Item(
+        sourceIdentifier = sourceIdentifier1,
+        identifiers = List(sourceIdentifier1)
+      ),
+      Item(
+        sourceIdentifier = sourceIdentifier2,
+        identifiers = List(sourceIdentifier2),
+        visible = false
+      )
+    )
+  }
+
 }

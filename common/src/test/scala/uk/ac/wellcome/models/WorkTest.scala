@@ -78,9 +78,11 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |          "type": "Location"
       |        }
       |      ],
+      |      "visible":true,
       |      "type": "Item"
       |    }
       |  ],
+      |  "visible":true,
       |  "type": "Work"
       |}
     """.stripMargin
@@ -148,9 +150,11 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |          "type": "Location"
       |        }
       |      ],
+      |      "visible":true,
       |      "type": "Item"
       |    }
       |  ],
+      |  "visible":true,
       |  "type": "Work"
       |}
     """.stripMargin
