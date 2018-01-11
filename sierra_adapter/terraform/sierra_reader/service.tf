@@ -32,8 +32,8 @@ module "sierra_reader_service" {
 
   path_pattern = "/${local.service_name}/*"
 
-  cpu    = 256
-  memory = 1024
+  cpu    = 512
+  memory = 2048
 
   deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 200
