@@ -25,7 +25,7 @@ class SierraTransformableTransformer
   // http://www.loc.gov/marc/bibliographic/bd260.html
   private def getPublishers(bibData: SierraBibData): List[Agent] = {
     val matchingSubfields = bibData.varFields
-      .filter _.marcTag.contains("260")
+      .filter(_.marcTag.contains("260"))
       .flatMap {
         _.subfields
       }

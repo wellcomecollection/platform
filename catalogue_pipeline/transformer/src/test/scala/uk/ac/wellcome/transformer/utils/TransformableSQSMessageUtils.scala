@@ -44,7 +44,8 @@ trait TransformableSQSMessageUtils {
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
       """.stripMargin
 

@@ -24,7 +24,8 @@ class SierraTransformableTransformerTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -100,7 +101,8 @@ class SierraTransformableTransformerTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -132,6 +134,7 @@ class SierraTransformableTransformerTest
          |{
          | "id": "$id",
          | "title": "$title",
+         | "varFields": [],
          | "deleted": true
          |}
         """.stripMargin
@@ -165,6 +168,7 @@ class SierraTransformableTransformerTest
          |{
          | "id": "$id",
          | "title": "$title",
+         | "varFields": [],
          | "suppressed": true
          |}
         """.stripMargin
@@ -197,7 +201,8 @@ class SierraTransformableTransformerTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
