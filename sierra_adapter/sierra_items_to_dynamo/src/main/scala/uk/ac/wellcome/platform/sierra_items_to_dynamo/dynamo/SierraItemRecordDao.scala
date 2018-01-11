@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.model.{
   PutItemResult
 }
 import com.google.inject.Inject
+import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
 import com.twitter.inject.Logging
@@ -32,21 +33,27 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
 
   val table = Table[SierraItemRecord](dynamoConfig.table)
 
-  def updateItem(sierraItemRecord: SierraItemRecord): Future[Unit] = Future {
-    Scanamo.exec(dynamoDbClient)(
-      table
-        .given(
-          not(attributeExists('id)) or
-            (attributeExists('id) and 'modifiedDate < sierraItemRecord.modifiedDate.getEpochSecond)
-        )
-        .put(sierraItemRecord)) match {
-      case Right(_) =>
-        debug(s"Successfully saved item ${sierraItemRecord.id} to DynamoDB")
-      case Left(error: ConditionalCheckFailedException) =>
-        info(
-          s"Conditional check failed saving ${sierraItemRecord.id} to DynamoDB")
-      case Left(error) =>
-        warn(s"Failed saving ${sierraItemRecord.id} to DynamoDB", error)
+  private def scanamoExec[T](op: ScanamoOps[T]) =
+    Scanamo.exec(dynamoDbClient)(op)
+
+  private def putRecord(record: SierraItemRecord) = {
+    val newVersion = record.version + 1
+
+    table
+      .given(
+        not(attributeExists('id)) or
+          (attributeExists('id) and 'version < newVersion)
+      )
+      .put(record.copy(version = newVersion))
+  }
+
+  def updateItem(record: SierraItemRecord): Future[Unit] = Future {
+    debug(s"About to update record $record")
+    scanamoExec(putRecord(record)) match {
+      case Left(err) =>
+        warn(s"Failed updating record ${record.id}", err)
+        throw err
+      case Right(_) => ()
     }
   }
 
