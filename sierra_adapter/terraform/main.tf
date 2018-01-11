@@ -3,13 +3,12 @@ module "bibs_pipeline" {
 
   resource_type = "bibs"
 
+  windows_topic_name = "${module.bibs_window_generator.topic_name}"
+
   sierra_to_dynamo_release_id = "${var.release_ids["sierra_bibs_to_dynamo"]}"
   sierra_merger_release_id    = "${var.release_ids["sierra_bib_merger"]}"
 
   merged_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
-
-  window_length_minutes    = 30
-  trigger_interval_minutes = 15
 
   sierra_fields = "${var.sierra_bibs_fields}"
 
@@ -37,13 +36,12 @@ module "items_pipeline" {
 
   resource_type = "items"
 
+  windows_topic_name = "${module.items_window_generator.topic_name}"
+
   sierra_to_dynamo_release_id = "${var.release_ids["sierra_items_to_dynamo"]}"
   sierra_merger_release_id    = "${var.release_ids["sierra_item_merger"]}"
 
   merged_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
-
-  window_length_minutes    = 30
-  trigger_interval_minutes = 15
 
   sierra_fields = "${var.sierra_items_fields}"
 
