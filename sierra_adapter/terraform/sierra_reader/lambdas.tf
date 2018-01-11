@@ -30,10 +30,12 @@ resource "aws_iam_role_policy" "allow_s3_read" {
 data "aws_iam_policy_document" "allow_s3_read" {
   statement {
     actions = [
-      "s3:GetObject",
+      "s3:Get*",
+      "s3:List*",
     ]
 
     resources = [
+      "${data.aws_s3_bucket.sierra_data.arn}",
       "${data.aws_s3_bucket.sierra_data.arn}/*",
     ]
   }
