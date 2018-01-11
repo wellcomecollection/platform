@@ -32,6 +32,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type": "Location"
       |    }
       |  ],
+      |  "visible":true,
       |  "type": "Item"
       |}
     """.stripMargin
@@ -61,6 +62,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type": "Location"
       |    }
       |  ],
+      |  "visible":true,
       |  "type": "Item"
       |}
     """.stripMargin
