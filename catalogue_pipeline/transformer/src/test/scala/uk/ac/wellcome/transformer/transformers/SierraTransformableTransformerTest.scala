@@ -244,7 +244,7 @@ class SierraTransformableTransformerTest
     )
   }
 
-   it("passes through the title from the bib record") {
+  it("passes through the title from the bib record") {
     val id = "t1234"
     val title = "Tickling a tiny turtle in Tenerife"
     val data =
@@ -398,6 +398,5 @@ class SierraTransformableTransformerTest
 
     work.publishers shouldBe expectedPublishers
   }
-
 
 }
