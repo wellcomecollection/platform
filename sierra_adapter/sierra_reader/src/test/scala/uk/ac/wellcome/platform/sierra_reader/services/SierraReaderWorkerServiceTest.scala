@@ -174,7 +174,7 @@ class SierraReaderWorkerServiceTest
       """
         |[
         |  {
-        |    "id": "1794165",
+        |    "id": "i1794165",
         |    "modifiedDate": 12345678,
         |    "data": "{}"
         |  }

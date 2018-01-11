@@ -16,7 +16,8 @@ object SequentialS3Sink extends Logging {
     : Sink[(Json, Long), Future[Done]] = {
     Sink.foreachParallel(10) {
       case (json: Json, index: Long) => {
-        // Zero-pad the index to four digits for easy sorting, e.g. "1" ~> "0001", "25" ~> "0025"
+        // Zero-pad the index to four digits for easy sorting,
+        // e.g. "1" ~> "0001", "25" ~> "0025"
         val key = f"${keyPrefix}${index + offset}%04d.json"
         client.putObject(bucketName, key, json.noSpaces)
       }
