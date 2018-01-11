@@ -1,17 +1,12 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//services?ref=v1.2.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
-  task_role_arn      = "${module.ecs_loris_iam.task_role_arn}"
   vpc_id             = "${local.vpc_api_id}"
   app_uri            = "${module.ecr_loris.repository_url}:${var.release_ids["loris"]}"
   nginx_uri          = "${module.ecr_nginx_loris.repository_url}:${var.release_ids["nginx_loris"]}"
   listener_https_arn = "${module.loris_alb.listener_https_arn}"
   listener_http_arn  = "${module.loris_alb.listener_http_arn}"
-  infra_bucket       = "${var.infra_bucket}"
-
-  config_key           = "config/${var.build_env}/loris.ini"
-  config_template_path = "config/loris.ini.template"
 
   path_pattern     = "/image*"
   healthcheck_path = "/image/"

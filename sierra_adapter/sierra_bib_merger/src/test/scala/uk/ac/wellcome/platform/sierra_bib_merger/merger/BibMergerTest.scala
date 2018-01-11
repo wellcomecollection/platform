@@ -1,14 +1,15 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.merger
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{MergedSierraRecord, SierraBibRecord}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
 class BibMergerTest extends FunSpec with Matchers {
 
   describe("merging with a SierraBibRecord") {
     it("should merge data from a bibRecord when empty") {
       val record = sierraBibRecord(id = "222")
-      val originalRecord = MergedSierraRecord(id = "222")
+      val originalRecord = SierraTransformable(id = "222")
 
       val newRecord = BibMerger.mergeBibRecord(originalRecord, record)
       newRecord.maybeBibData.get shouldEqual record
@@ -16,7 +17,7 @@ class BibMergerTest extends FunSpec with Matchers {
 
     it("should only merge bib records with matching ids") {
       val record = sierraBibRecord(id = "333")
-      val originalRecord = MergedSierraRecord(id = "444")
+      val originalRecord = SierraTransformable(id = "444")
 
       val caught = intercept[RuntimeException] {
         BibMerger.mergeBibRecord(originalRecord, record)
@@ -26,7 +27,7 @@ class BibMergerTest extends FunSpec with Matchers {
 
     it("should never increment the version when mergeBibRecord is called") {
       val record = sierraBibRecord(id = "666")
-      val originalRecord = MergedSierraRecord(id = "666", version = 10)
+      val originalRecord = SierraTransformable(id = "666", version = 10)
       val newRecord = BibMerger.mergeBibRecord(originalRecord, record)
       newRecord.version shouldEqual 10
     }
@@ -39,7 +40,7 @@ class BibMergerTest extends FunSpec with Matchers {
         modifiedDate = "2001-01-01T01:01:01Z"
       )
 
-      val mergedSierraRecord = MergedSierraRecord(
+      val sierraTransformable = SierraTransformable(
         id = "777",
         maybeBibData = Some(
           sierraBibRecord(
@@ -50,8 +51,8 @@ class BibMergerTest extends FunSpec with Matchers {
         )
       )
 
-      val result = BibMerger.mergeBibRecord(mergedSierraRecord, record)
-      result shouldBe mergedSierraRecord
+      val result = BibMerger.mergeBibRecord(sierraTransformable, record)
+      result shouldBe sierraTransformable
     }
 
     it("should update bibData when merging bib records with newer data") {
@@ -61,7 +62,7 @@ class BibMergerTest extends FunSpec with Matchers {
         modifiedDate = "2011-11-11T11:11:11Z"
       )
 
-      val mergedSierraRecord = MergedSierraRecord(
+      val sierraTransformable = SierraTransformable(
         id = "888",
         maybeBibData = Some(
           sierraBibRecord(
@@ -72,7 +73,7 @@ class BibMergerTest extends FunSpec with Matchers {
         )
       )
 
-      val result = BibMerger.mergeBibRecord(mergedSierraRecord, record)
+      val result = BibMerger.mergeBibRecord(sierraTransformable, record)
       result.maybeBibData.get shouldBe record
     }
   }

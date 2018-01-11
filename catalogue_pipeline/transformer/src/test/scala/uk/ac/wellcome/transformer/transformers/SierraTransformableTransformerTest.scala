@@ -4,8 +4,17 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
+import uk.ac.wellcome.test.utils.SierraData
 
-class SierraTransformableTransformerTest extends FunSpec with Matchers {
+class SierraTransformableTransformerTest
+    extends FunSpec
+    with Matchers
+    with SierraData {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
@@ -15,12 +24,11 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       s"""
          |{
          | "id": "$id",
-         | "title": "$title",
-         | "varFields": []
+         | "title": "$title"
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
@@ -34,7 +42,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       )
     )
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
 
     transformedSierraRecord.isSuccess shouldBe true
     val work = transformedSierraRecord.get.get
@@ -57,10 +65,10 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
   }
 
   it("should not perform a transformation without bibData") {
-    val mergedSierraRecord =
-      MergedSierraRecord(id = "000", maybeBibData = None)
+    val sierraTransformable =
+      SierraTransformable(id = "000", maybeBibData = None)
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get shouldBe None
@@ -68,7 +76,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
 
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = "b111",
       maybeBibData = None,
       itemData = Map(
@@ -80,7 +88,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
         ))
     )
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
     transformedSierraRecord.get shouldBe None
   }
@@ -92,17 +100,16 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       s"""
          |{
          | "id": "$id",
-         | "title": "$title",
-         | "varFields": []
+         | "title": "$title"
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val sierraTransformable = SierraTransformable(
       id = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
 
     val identifier =
@@ -117,7 +124,122 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
     )
   }
 
-  it("passes through the title from the bib record") {
+  it("makes deleted works invisible") {
+    val id = "000"
+    val title = "Hi Diddle Dee Dee"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title",
+         | "deleted": true
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+
+    transformedSierraRecord.get shouldBe Some(
+      Work(
+        title = title,
+        sourceIdentifier = identifier,
+        identifiers = List(identifier),
+        visible = false
+      )
+    )
+  }
+
+  it("makes supressed works invisible") {
+    val id = "000"
+    val title = "Hi Diddle Dee Dee"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title",
+         | "suppressed": true
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    val identifier =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+
+    transformedSierraRecord.get shouldBe Some(
+      Work(
+        title = title,
+        sourceIdentifier = identifier,
+        identifiers = List(identifier),
+        visible = false
+      )
+    )
+  }
+
+  it("makes deleted items on a work invisible") {
+    val id = "b5757575"
+    val title = "A morning mixture of molasses and muesli"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title"
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+      itemData = Map(
+        "i111" -> sierraItemRecord(id = "i111",
+                                   title = title,
+                                   bibIds = List(id)),
+        "i222" -> sierraItemRecord(id = "i222",
+                                   title = title,
+                                   deleted = true,
+                                   bibIds = List(id))
+      )
+    )
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    val sourceIdentifier1 =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i111")
+    val sourceIdentifier2 =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
+
+    work.items shouldBe List(
+      Item(
+        sourceIdentifier = sourceIdentifier1,
+        identifiers = List(sourceIdentifier1)
+      ),
+      Item(
+        sourceIdentifier = sourceIdentifier2,
+        identifiers = List(sourceIdentifier2),
+        visible = false
+      )
+    )
+  }
+
+   it("passes through the title from the bib record") {
     val id = "t1234"
     val title = "Tickling a tiny turtle in Tenerife"
     val data =
@@ -129,7 +251,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
          |}
         """.stripMargin
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val mergedSierraRecord = SierraTransformable(
       bibRecord = SierraBibRecord(id = id, data = data, modifiedDate = now())
     )
 
@@ -257,7 +379,7 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
       "title": "A pack of puffins"
     }"""
 
-    val mergedSierraRecord = MergedSierraRecord(
+    val mergedSierraRecord = SierraTransformable(
       bibRecord = SierraBibRecord(
         id = "p1234",
         data = data,
@@ -272,56 +394,5 @@ class SierraTransformableTransformerTest extends FunSpec with Matchers {
     work.publishers shouldBe expectedPublishers
   }
 
-  def sierraItemRecord(
-    id: String = "i111",
-    title: String = "Ingenious imps invent invasive implements",
-    modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String],
-    unlinkedBibIds: List[String] = List()
-  ) = SierraItemRecord(
-    id = id,
-    data = sierraRecordString(
-      id = id,
-      updatedDate = modifiedDate,
-      title = title
-    ),
-    modifiedDate = modifiedDate,
-    bibIds = bibIds,
-    unlinkedBibIds = unlinkedBibIds
-  )
 
-  private def sierraRecordString(
-    id: String,
-    updatedDate: String,
-    title: String
-  ) =
-    s"""
-       |{
-       |      "id": "$id",
-       |      "updatedDate": "$updatedDate",
-       |      "createdDate": "1999-11-01T16:36:51Z",
-       |      "deleted": false,
-       |      "suppressed": false,
-       |      "lang": {
-       |        "code": "ger",
-       |        "name": "German"
-       |      },
-       |      "title": "$title",
-       |      "author": "Schindler, Rudolf, 1888-",
-       |      "materialType": {
-       |        "code": "a",
-       |        "value": "Books"
-       |      },
-       |      "bibLevel": {
-       |        "code": "m",
-       |        "value": "MONOGRAPH"
-       |      },
-       |      "publishYear": 1923,
-       |      "catalogDate": "1999-01-01",
-       |      "country": {
-       |        "code": "gw ",
-       |        "name": "Germany"
-       |      }
-       |    }
-    """.stripMargin
 }

@@ -63,6 +63,7 @@ class WorksIndex @Inject()(client: HttpClient,
     sourceIdentifier,
     identifiers,
     location(),
+    booleanField("visible"),
     keywordField("type")
   )
 
@@ -70,6 +71,7 @@ class WorksIndex @Inject()(client: HttpClient,
     .dynamic(DynamicMapping.Strict)
     .as(
       keywordField("canonicalId"),
+      booleanField("visible"),
       keywordField("type"),
       sourceIdentifier,
       identifiers,

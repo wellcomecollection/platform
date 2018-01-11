@@ -36,7 +36,7 @@ def affects_tests(path, task):
     """Does this file have any effect on test outcomes?"""
     # Nothing reads our Markdown files in tests, so we can ignore their
     # effect here.
-    if path.endswith(('.md', '.png')) or path == 'LICENSE':
+    if path.endswith(('.md', '.png', '.graffle')) or path == 'LICENSE':
         print("~~~ %s is ignored because it's not a file type we care about")
         return False
 
@@ -77,7 +77,7 @@ def affects_tests(path, task):
         'nginx': ['nginx'],
 
         'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
-        'sierra_bibs_to_dynamo': ['sierra_adapter/sierra_bibs_to_dynamo'],
+        'sierra_reader': ['sierra_adapter/sierra_reader'],
         'sierra_items_to_dynamo': ['sierra_adapter/sierra_items_to_dynamo'],
         'sierra_bib_merger': ['sierra_adapter/sierra_bib_merger'],
         'sierra_item_merger': ['sierra_adapter/sierra_item_merger'],

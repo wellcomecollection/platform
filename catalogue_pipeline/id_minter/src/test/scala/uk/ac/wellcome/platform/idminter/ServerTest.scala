@@ -18,7 +18,7 @@ class ServerTest
 
   val server = new EmbeddedHttpServer(
     new Server(),
-    flags = snsLocalEndpointFlags ++
+    flags = snsLocalFlags ++
       sqsLocalFlags ++
       identifiersMySqlLocalFlags ++
       cloudWatchLocalEndpointFlag

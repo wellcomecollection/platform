@@ -1,7 +1,6 @@
 variable "resource_type" {}
 
-variable "lambda_error_alarm_arn" {}
-
 variable "window_length_minutes" {}
+variable "trigger_interval_minutes" {}
 
-variable "lambda_trigger_minutes" {}
+variable "lambda_error_alarm_arn" {}

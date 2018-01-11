@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.parsers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 
@@ -12,7 +12,7 @@ class MiroParserTest
     with MiroTransformableWrapper {
   it(
     "should parse a record representing Miro Data into a Miro Data transformable") {
-    val miroParser = new MiroParser
+    val miroParser = new TransformableParser
 
     val MiroID = "1234"
     val MiroCollection = "Images-A"

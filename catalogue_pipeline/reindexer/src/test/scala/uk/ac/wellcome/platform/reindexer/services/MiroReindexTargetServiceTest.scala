@@ -7,7 +7,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.miro.MiroTransformable
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.test.utils.ExtendedPatience

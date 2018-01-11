@@ -1,27 +1,96 @@
 package uk.ac.wellcome.transformer.transformers
 
+import com.twitter.inject.Logging
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.models.transformable.Transformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibTransformableData,
-  SierraItemTransformableData
-}
+
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.transformer.source.{SierraBibData, SierraItemData}
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 class SierraTransformableTransformer
-    extends TransformableTransformer[MergedSierraRecord] {
+  extends TransformableTransformer[SierraTransformable]
+    with Logging {
+
+  // Populate wwork:publishers.
+  //
+  //    For bibliographic records where "260" is populated:
+  //    - "label" comes from MARC field 260 subfield $b.
+  //    - "type" is "Organisation"
+  //
+  // Note that subfield $b can occur more than once on a record.
+  //
+  // http://www.loc.gov/marc/bibliographic/bd260.html
+  private def getPublishers(bibData: SierraBibData): List[Agent] = {
+    val matchingSubfields = bibData.varFields
+      .filter _.marcTag.contains("260")
+      .flatMap {
+        _.subfields
+      }
+      .flatten
+
+    matchingSubfields
+      .filter {
+        _.tag == "b"
+      }
+      .map { subfield =>
+        Agent(
+          label = subfield.content,
+          ontologyType = "Organisation"
+        )
+      }
+  }
+
+  // Populate wwork:title.  The rules are as follows:
+  //
+  //    For all bibliographic records use Sierra "title".
+  //
+  // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
+  // http://www.loc.gov/marc/bibliographic/bd245.html
+  private def getTitle(bibData: SierraBibData): String =
+    bibData.title
+
+  private def extractItemData(itemRecord: SierraItemRecord) = {
+    info(s"Attempting to transform $itemRecord")
+
+    JsonUtil
+      .fromJson[SierraItemData](itemRecord.data) match {
+      case Success(sierraItemData) =>
+        Some(
+          Item(
+            sourceIdentifier = SourceIdentifier(
+              IdentifierSchemes.sierraSystemNumber,
+              sierraItemData.id
+            ),
+            identifiers = List(
+              SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                sierraItemData.id
+              )
+            ),
+            visible = !sierraItemData.deleted
+          ))
+      case Failure(e) => {
+        error(s"Failed to parse item!", e)
+
+        None
+      }
+    }
+  }
+
   override def transformForType(
-    sierraTransformable: MergedSierraRecord): Try[Option[Work]] =
+                                 sierraTransformable: SierraTransformable
+                               ): Try[Option[Work]] = {
     sierraTransformable.maybeBibData
-      .map { bibRecord =>
-        val bibData = SierraBibTransformableData.create(bibRecord.data)
-        JsonUtil.fromJson[SierraBibData](bibRecord.data).map { sierraBibData =>
+      .map { bibData =>
+        info(s"Attempting to transform $bibData")
+
+        JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(Work(
-            title = getTitle(bibData),
-            publishers = getPublishers(bibData),
-            // TODO: Rewrite this to use the transformableData
+            title = getTitle(sierraBibData),
+            publishers = getPublishers(sierraBibData),
             sourceIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.sierraSystemNumber,
               sierraBibData.id
@@ -35,59 +104,16 @@ class SierraTransformableTransformer
             items = Option(sierraTransformable.itemData)
               .getOrElse(Map.empty)
               .values
-              .map(record =>
-                Item(
-                  sourceIdentifier = SourceIdentifier(
-                    IdentifierSchemes.sierraSystemNumber,
-                    record.id
-                  ),
-                  identifiers = List(
-                    SourceIdentifier(
-                      IdentifierSchemes.sierraSystemNumber,
-                      record.id
-                    )
-                  )
-              ))
-              .toList
+              .flatMap(extractItemData)
+              .toList,
+            visible = !(sierraBibData.deleted || sierraBibData.suppressed)
           ))
         }
+
       }
       // A merged record can have both bibs and items.  If we only have
       // the item data so far, we don't have enough to build a Work, so we
       // return None.
       .getOrElse(Success(None))
-
-  // Populate wwork:title.  The rules are as follows:
-  //
-  //    For all bibliographic records use Sierra "title".
-  //
-  // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
-  // http://www.loc.gov/marc/bibliographic/bd245.html
-  private def getTitle(bibData: SierraBibTransformableData): String =
-    bibData.title.get
-
-  // Populate wwork:publishers.
-  //
-  //    For bibliographic records where "260" is populated:
-  //    - "label" comes from MARC field 260 subfield $b.
-  //    - "type" is "Organisation"
-  //
-  // Note that subfield $b can occur more than once on a record.
-  //
-  // http://www.loc.gov/marc/bibliographic/bd260.html
-  private def getPublishers(bibData: SierraBibTransformableData): List[Agent] = {
-    val matchingSubfields = bibData.varFields
-      .filter { _.marcTag == Some("260") }
-      .flatMap { _.subfields }
-      .flatten
-
-    matchingSubfields
-      .filter { _.tag == "b" }
-      .map { subfield =>
-        Agent(
-          label = subfield.content,
-          ontologyType = "Organisation"
-        )
-      }
   }
 }

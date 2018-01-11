@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer
+package uk.ac.wellcome.transformer
 
 import com.google.inject.Stage
 import com.twitter.finatra.http.EmbeddedHttpServer
@@ -17,7 +17,7 @@ class StartupTest
     twitterServer = new Server,
     flags = Map(
       "transformer.source" -> "MiroData"
-    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalEndpointFlags
+    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalFlags
   )
 
   test("server starts up correctly") {

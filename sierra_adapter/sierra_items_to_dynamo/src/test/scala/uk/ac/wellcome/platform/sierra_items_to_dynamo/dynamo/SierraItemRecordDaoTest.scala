@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -9,11 +13,11 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 class SierraItemRecordDaoTest
     extends FunSpec
@@ -78,57 +82,36 @@ class SierraItemRecordDaoTest
       whenReady(sierraItemRecordDao.updateItem(sierraItemRecord)) { _ =>
         Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
           Right(
-            sierraItemRecord
+            sierraItemRecord.copy(version = 1)
           ))
       }
     }
 
-    it("should update an item if the existing one has an older modifiedDate") {
+    it("does not update an existing item if the update has a lower version") {
       val id = "i111"
-      val oldSierraItemRecord = SierraItemRecord(id = id,
-                                                 data = "{}",
-                                                 modifiedDate =
-                                                   "2005-01-01T00:00:00Z",
-                                                 bibIds = List())
-      Scanamo.put(dynamoDbClient)(tableName)(oldSierraItemRecord)
+      val sierraItemRecord = SierraItemRecord(id = id,
+                                              data = "old data!",
+                                              modifiedDate =
+                                                "2005-01-01T00:00:00Z",
+                                              bibIds = List())
 
-      val newSierraItemRecord = SierraItemRecord(id = id,
-                                                 data = "{}",
-                                                 modifiedDate =
-                                                   "2006-01-01T00:00:00Z",
-                                                 bibIds = List("b111"))
+      val newerSierraItemRecord = sierraItemRecord.copy(
+        version = 1,
+        data = "new data!"
+      )
 
-      whenReady(sierraItemRecordDao.updateItem(newSierraItemRecord)) { _ =>
-        Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
-          Right(
-            newSierraItemRecord
-          ))
+      Scanamo.put(dynamoDbClient)(tableName)(newerSierraItemRecord)
+
+      whenReady(sierraItemRecordDao.updateItem(sierraItemRecord).failed) {
+        ex =>
+          ex shouldBe a[ConditionalCheckFailedException]
+
+          Scanamo
+            .get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id)
+            .get shouldBe Right(
+            newerSierraItemRecord
+          )
       }
-
-    }
-
-    it(
-      "should not update an item if the existing one has an newer modifiedDate") {
-      val id = "i111"
-      val oldSierraItemRecord = SierraItemRecord(id = id,
-                                                 data = "{}",
-                                                 modifiedDate =
-                                                   "2005-01-01T00:00:00Z",
-                                                 bibIds = List())
-      val newSierraItemRecord = SierraItemRecord(id = id,
-                                                 data = "{}",
-                                                 modifiedDate =
-                                                   "2006-01-01T00:00:00Z",
-                                                 bibIds = List("b111"))
-      Scanamo.put(dynamoDbClient)(tableName)(newSierraItemRecord)
-
-      whenReady(sierraItemRecordDao.updateItem(oldSierraItemRecord)) { _ =>
-        Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
-          Right(
-            newSierraItemRecord
-          ))
-      }
-
     }
 
     it("should fail if an exception is thrown by dynamoDbClient") {

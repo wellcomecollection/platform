@@ -12,10 +12,10 @@ object Dependencies {
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
     val elastic4s = "5.4.1"
-    val scanamo = "0.9.4"
+    val scanamo = "1.0.0-M3"
     val jacksonYamlVersion = "2.8.8"
     val jacksonJSR310Version = "2.8.9"
-    val circeVersion = "0.8.0"
+    val circeVersion = "0.9.0"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -99,6 +99,10 @@ object Dependencies {
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
   val sierraToDynamoDependencies: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
+  )
+
+  val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % "0.1"
   )
 
