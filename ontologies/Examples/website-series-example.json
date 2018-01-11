@@ -3,29 +3,29 @@
   "id": "watu9tbc",
   "type": "Series",
   "seriesType": {
-    "id": "?",
-    "type": "seriesType",
-    "label": "?"
-  },
+    "id": "article-series",
+    "type": "SeriesType",
+    "label": "Series of articles"
+  } ,,
   "identifiers": [
     {
       "value": "9781999809003",
       "type": "Identifier",
       "identifierScheme": "prism-id"
-    }
+    } ,
   ],
   "title": "The Outsiders",
   "language": {
     "id": "eng",
     "label": "English",
     "type": "Language"
-  },
+  } ,,
   "numberInSeries": "6",
   "season": {
     "id": "d921j0ddj",
     "label": "Epidemics",
     "type": "Season"
-  },
+  } ,,
   "works": [
     {
       "id": "dh8191d8",
@@ -34,7 +34,7 @@
         "id": "article",
         "type": "WorkType",
         "label": "Article"
-      },
+      } ,,
       "title": "The stranger who started an epidemic",
       "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
       "positionInSeries": "1",
@@ -48,16 +48,16 @@
           "licenseType": "CC-BY",
           "label": "Attribution 4.0 International (CC BY 4.0)",
           "url": "http://creativecommons.org/licenses/by/4.0/"
-        }
-      }
-    },
+        } ,
+      } ,
+    } ,,
     {
       "id": "j90xj9qjq",
       "workType": {
         "id": "article",
         "type": "WorkType",
         "label": "Article"
-      },
+      } ,,
       "title": "The tradesman who confronted the pestilence",
       "url": "https://wellcomecollection.org/articles/outsiders-the-tradesman",
       "positionInSeries": "2",
@@ -71,8 +71,8 @@
           "licenseType": "CC-BY",
           "label": "Attribution 4.0 International (CC BY 4.0)",
           "url": "http://creativecommons.org/licenses/by/4.0/"
-        }
-      }
-    }
+        } ,
+      } ,
+    } ,
   ]
-}
+} ,

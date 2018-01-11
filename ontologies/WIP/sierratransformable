@@ -14,7 +14,7 @@
    *     "id": "e-book",
    *     "type": "WorkType",
    *     "label": "E-books"
-   *     },
+   *     } ,,
    *
    * Note: will map to a controlled vocabulary terms in future
    */
@@ -32,7 +32,7 @@
    *   "value": "b11579328",
    *   "type": "Identifier",
    *   "identifierScheme": "sierra-system-number"
-   * }
+   * } ,
    * ]
    *
    * 
@@ -61,7 +61,7 @@
    *     "id": "eng",
    *     "label": "English",
    *     "type": "Language"
-   *     },
+   *     } ,,
    *
    * Note: This is populated currently by ISO 639-2 language codes
    */
@@ -76,11 +76,11 @@
    * 4. For "100" type as "Person"
    * 5. For "110" type as "Organisation"
    * 6. For "111" type as "Event"
-   * 7. If subfield c contains a value use to populate "identifiers" after stripping first two letters (ls, sh). Check we want to do this. Platform "authority" is defined by first two letters of code. sh=lc-names, indicators can also help disabiguate the authority. 
-   * 8. For all other subfields populate "qualifiers" apart from 6,9,4 populate "qualifierType" with the subfield type (kebab-case) 
-   * 9. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * 10. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
-   * 11. Inaddition to excluding 6,9,4 also exclude 4 and 5 
+   * 7. If subfield 0 contains a value use to populate "identifiers". Platform "authority" is defined by first letter(s) in front of number. n=lc-names, indicators can also help disabiguate the authority. Remove spaces between "n" and the authority code. 
+   * 8. For all other subfields populate "qualifiers" from subfields apart from 6,9,4. Populate "qualifierType" with the subfield type label in kebab-case format. 
+   * 9. For subfield "d" and "f" type as "Period", for all other subfields provide no type/ or Name? Need to agree this.
+   * 10. If 700, 710 or 711 are populated repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
+   * 11. For 700's inaddition to excluding 6,9,4 also exclude 4 and 5 
    *
    * Note: need to removing trailing punctuation on subfields
    *
@@ -95,25 +95,25 @@
    *           "type": "Person",
    *           "identifiers": [
    *        {
-   *           "value": "2005016805",
+   *           "value": "n2005016805",
    *           "type": "Identifier",
    *           "identifierScheme": "lcsh"
-   *        }
+   *        } ,
    *        ]
-   *     },
+   *     } ,,
    *     "qualifiers": [
    *        {
    *           "qualifierType": "fuller-form-of-name" ,        
    *           "label": "Philip Peter",
    *           "type": "Name"  
-   *        } ,
+   *        } , ,
    *        {
    *           "qualifierType": "associated-time" ,
    *           "label": "1879-1940",
    *           "type": "Period"
-   *        } 
+   *        } , 
    *     ]
-   *  }
+   *  } ,
    * ],
    *
    */
@@ -124,13 +124,13 @@
    * 1. For all bibliographic records use "marcTag": "655"
    * 2. If more than one subfield is populated then populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
    * 3. if only "a" subfield is populated type as "Concept".   
-   * 4. If 655 is populated with a indentified concept from an authority (as indicated by use of second indicator) then populate id with Wellcome id for concept
-   * 5. populate platform "concept" with subfield "a".
+   * 4. If 655 is populated with a indentified concept from an authority (as indicated by use of second indicator) then populate id with platform id for concept.
+   * 5. populate platform "Concept" from subfield "a".
    * 6. When this concept has assocaited identifiers populate "identifiers" with value (subfield 0) and identity scheme (second indicator or if indicator 7 look to subfield 2) 
-   * 8. For each subfield, for subfields a-z ingnore 0-7, populate "qualifers" with a "label", type "Concept" (subfield "y" type as "Period" and type z as "Place") and populate "qualiferType" with the subfield name kebab-case.
+   * 8. For each subfield, from subfields a-z but ingnoring 0-7, populate "qualifers" with a "label", type "Concept" (subfield "y" type as "Period" and type z as "Place") and populate "qualiferType" with the subfield name kebab-case.
    * 
    *
-   * Note: need to removing trailing punctuation on subfields
+   * Note: need to remove trailing punctuation on subfields
    *
    *
    *"genres": [
@@ -146,14 +146,14 @@
    *         "type": "Identifier",
    *         "identifierScheme": "lctgm",
    *         "value": "tgm001698"
-   *        }
+   *        } ,
    *      ] ,
    *   "qualifiers": [
    *     {
    *      "qualifierType": "chronological-subdivision" ,        
    *      "label": "1952",
    *      "type": "Period"  
-   *     } 
+   *     } , 
    *   ]
    *],
    *
@@ -167,8 +167,8 @@
    * 2. If more than one subfield is populated. populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
    * 3. if only "a" subfield is populated type as "Concept". 
    * 4. populate platform "concept" with subfield "a".
-   * 5. When this concept has assocaited identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator or if indicator 7 look at subfield 2. 
-   * 6. For each subfield, for subfields a-z ingnore 0-7, populate "qualifers" with a "label", type "Concept" (except subfield "y" and "d" type as "Period" and type "c" and "z" as "Place") and populate "qualifierType" with the subfield name kebab-case.
+   * 5. When this concept has associated identifiers populate "identifiers" with value from subfield 0 and identity scheme from second indicator or if indicator 7 look at subfield 2. 
+   * 6. For each subfield, including subfields a-z but ingnoring 0-7, populate "qualifers" with a "label", type "Concept" (except subfield "y" and "d" type as "Period" and type "c" and "z" as "Place") and populate "qualifierType" with the subfield name kebab-case.
    * 
    *
    * Note: need to removing trailing punctuation on subfields
@@ -187,17 +187,17 @@
    *         "type": "Identifier",
    *         "identifierScheme": "mesh",
    *         "value": "D014376Q000517"
-   *       }
+   *       } ,
    *     ],
    *     "qualifiers": [
    *       {
    *         "qualifierType": "general-subdivision" ,
    *         "label": "prevention & control",
    *         "type": "Concept"
-   *       }
+   *       } ,
    *     ]
-   *   }
-   * },
+   *   } ,
+   * } ,,
    * ],
    *
    */
@@ -226,7 +226,7 @@
    *   "publicationDate": {
    *     "label": "May 23 1932",
    *     "type": "Period" 
-   *  },
+   *  } ,,
    * 
    *
    * Example of how we might pull out year or date when we know it in the future:
@@ -236,7 +236,7 @@
    *     "type": "Period" ,
    *     "year": "1932" ,
    *     "date" : "05-23-1932"
-   *  },
+   *  } ,,
    */
 
    /* Populate wwork:placeOfPublication
@@ -250,7 +250,7 @@
    * 7. Type as "Place"
    *
    * Note: American states seem to be valid entries for Marc countries: http://www.loc.gov/marc/countries/countries_code.html
-   *
+   * Note: do we want to pull out country as something distinct in the example below? As opposed to a list of locations which it seems like we could do better with.
    *
    * Example:
    *
@@ -258,7 +258,7 @@
    *        {
    *        "label": "[Maryland] (James Street)",
    *        "type": "Place" 
-   *        } ,
+   *        } , ,
    *        {
    *        "id": "j9210jdd" ,
    *        "label": "Maryland" ,
@@ -267,8 +267,8 @@
    *           "type" : "Identifier" ,
    *           "identifierScheme": "marc-countries",
    *           "value" : "mdu"
-   *         }
-   *        }
+   *         } ,
+   *        } ,
    *       ],
    *
    */
@@ -286,7 +286,7 @@
    *     {
    *        "label": "H. Humphrey" ,
    *        "type": "Organisation" 
-   *     }
+   *     } ,
    *     ],
    */
 
@@ -352,7 +352,7 @@
    *      "label": "24cm" ,
    *      "value": "24" ,
    *      "unit": "cm" 
-   *     } 
+   *     } , 
    */ 
 
    /* Populate wwork:items. Rules:
@@ -376,7 +376,7 @@
    *       "value": "i11579328",
    *       "type": "Identifier",
    *       "identifierScheme": "sierra-system-number"
-   *     }
+   *     } ,
    *     ],
    *   "type": "Item",
    *   "locations": [
@@ -388,13 +388,13 @@
    *       "accessStatus": {
    *         "id": "open",
    *         "type": "AccessStatus"
-   *       },
+   *       } ,,
    *       "accessProcess": {
    *         "id": "online-access",
    *         "label": "Online access",
    *         "type": "AccessProcess"
-   *       }
-   *     },
+   *       } ,
+   *     } ,,
    *     {
    *       "type": "Location",
    *       "locationType": "iiif-image",
@@ -404,10 +404,10 @@
    *         "licenseType": "CC-BY",
    *         "label": "Attribution 4.0 International (CC BY 4.0)",
    *         "url": "http://creativecommons.org/licenses/by/4.0/"
-   *       }
-   *     }
+   *       } ,
+   *     } ,
    *   ]
-   * }
+   * } ,
    *]
    *
    */

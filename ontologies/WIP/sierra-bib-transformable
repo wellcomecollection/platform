@@ -22,7 +22,7 @@
    *     "id": "e-book",
    *     "type": "WorkType",
    *     "label": "E-books"
-   *     },
+   *     } ,,
    *
    * Note: will map to a controlled vocabulry term in future
    */
@@ -38,12 +38,12 @@
    *   "value": "ICV No 6939",
    *   "type": "Identifier",
    *   "identifierScheme": "wellcome-library-videodisk-number"
-   * },
+   * } ,,
    * {
    *   "value": "b11579328",
    *   "type": "Identifier",
    *   "identifierScheme": "sierra-system-number"
-   * }
+   * } ,
    * ],
    *
    * 
@@ -61,7 +61,7 @@
    *     "id": "eng",
    *     "label": "English",
    *     "type": "Language"
-   *     },
+   *     } ,,
    *
    * Note: This is populated currently by ISO 639-2 language codes
    */
@@ -98,22 +98,22 @@
    *           "value": "2005016805",
    *           "type": "Identifier",
    *           "identifierScheme": "lcsh"
-   *        }
+   *        } ,
    *        ]
-   *     },
+   *     } ,,
    *     "qualifiers": [
    *        {
    *           "qualifiedType": "fuller-form-of-name" ,        
    *           "label": "Philip Peter",
    *           "type": "Name"  
-   *        } ,
+   *        } , ,
    *        {
    *           "qualifierType": "associated-time" ,
    *           "label": "1879-1940",
    *           "type": "Period"
-   *        } 
+   *        } , 
    *     ]
-   *  }
+   *  } ,
    * ],
    *
    */
@@ -145,14 +145,14 @@
    *         "type": "Identifier",
    *         "identifierScheme": "lctgm",
    *         "value": "tgm001698"
-   *        }
+   *        } ,
    *      ] ,
    *   "qualifiers": [
    *     {
    *      "qualifierType": "chronological-subdivision" ,        
    *      "label": "1952",
    *      "type": "Period"  
-   *     } 
+   *     } , 
    *   ]
    *],
    *
@@ -186,17 +186,17 @@
    *         "type": "Identifier",
    *         "identifierScheme": "mesh",
    *         "value": "D014376Q000517"
-   *       }
+   *       } ,
    *     ],
    *     "qualifiers": [
    *       {
    *         "qualifierType": "general-subdivision" ,
    *         "label": "prevention & control",
    *         "type": "Concept"
-   *       }
+   *       } ,
    *     ]
-   *   }
-   * },
+   *   } ,
+   * } ,,
    * ],
    *
    */
@@ -224,7 +224,7 @@
    *     "label": "May 23 1932",
    *     "type": "Period" ,
    *     "year": "1932"
-   *  },
+   *  } ,,
    */
 
    /* Populate wwork:placeOfPublication
@@ -248,8 +248,8 @@
    *        "id": "mdu" ,
    *        "label": "Maryland" ,
    *        "type": "Country"
-   *        }
-   *     }
+   *        } ,
+   *     } ,
    *  ],
    *
    */
@@ -267,7 +267,7 @@
    *     {
    *        "label": "H. Humphrey" ,
    *        "type": "Organisation" 
-   *     }
+   *     } ,
    *     ],
    */
 
@@ -302,7 +302,7 @@
    * Example:
    *   "extent": {
    *      "label": "314 pages"
-   *     }  
+   *     } ,  
    */   
 
    /* wwwork:physicalDescription
@@ -329,7 +329,7 @@
    *      "label": "24cm" ,
    *      "value": "24" ,
    *      "unit": "cm" 
-   *     } 
+   *     } , 
    */ 
 
 

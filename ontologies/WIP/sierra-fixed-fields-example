@@ -56,16 +56,16 @@
         ]
       },
       "qualifiers": [
-                {
-          "qualiferType": "fuller-form-of-name" ,        
+        {
+          "qualiferType": "fuller-form-of-name",
           "label": "Philip Peter",
           "type": "Name"
-        } ,
+        },
         {
-          "qualiferType": "associated-time" ,
+          "qualiferType": "associated-time",
           "label": "1879-1940",
           "type": "Period"
-        } 
+        }
       ]
     }
   ],
@@ -145,21 +145,20 @@
       "type": "Concept"
     }
   ],
-  "physicalDescription": 
-    {
-      "label": "314 pages 24cm" ,
-      "type": "PhysicalDescription" ,
-      "concept": {
-        "label": "314 pages" ,
-        "type": "extent"
-      } ,
-      "qualifiers": [
-        {
-          "label": "24cm" ,
-          "type": "dimensions" 
-        }
-      ] 
-    } ,
+  "physicalDescription": {
+    "label": "314 pages 24cm",
+    "type": "PhysicalDescription",
+    "concept": {
+      "label": "314 pages",
+      "type": "extent"
+    },
+    "qualifiers": [
+      {
+        "label": "24cm",
+        "type": "dimensions"
+      }
+    ]
+  },
   "subjects": [
     {
       "id": "hd2891f",

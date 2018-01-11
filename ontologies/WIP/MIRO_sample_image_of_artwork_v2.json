@@ -1,3 +1,4 @@
+
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
@@ -187,7 +188,7 @@
           "type": "Location",
           "locationType": "iiif-image",
           "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
-          "copyright": "Wellcome "
+          "copyright": "Wellcome ",
           "license": {
             "type": "License",
             "licenseType": "CC-BY",
