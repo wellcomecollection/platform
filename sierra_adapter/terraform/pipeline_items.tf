@@ -35,7 +35,8 @@ module "items_reader" {
   alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
   alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
-  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 }
