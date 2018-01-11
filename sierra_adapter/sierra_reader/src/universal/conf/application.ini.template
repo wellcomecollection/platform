@@ -5,5 +5,5 @@
 -sierra.oauthSecret=${sierra_oauth_secret}
 -sierra.fields=${sierra_fields}
 -aws.s3.bucketName=${bucket_name}
--reader.resourceType={resource_type}
--reader.batchSize={batch_size}
+-reader.resourceType=${resource_type}
+-reader.batchSize=${batch_size}
