@@ -9,7 +9,7 @@
     "@base": "http://id.wellcomecollection.org/",
     "id": "@id",
     "type": "@type",
-	"Work": {
+    "Work": {
       "@id": "wwork:Work"
     },
     "Identifier": {
@@ -40,24 +40,24 @@
       "@id": "wcore:identifiers"
     },
     "value": {
-      "@id": "wcore:value" ,
-	  "@type": "rdfs:Literal"
+      "@id": "wcore:value",
+      "@type": "rdfs:Literal"
     },
     "identifierScheme": {
-      "@id": "wcore:identifierScheme" ,
-	  "@type": "rdfs:Literal"
+      "@id": "wcore:identifierScheme",
+      "@type": "rdfs:Literal"
     },
     "title": {
-      "@id": "wwork:title" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:title",
+      "@type": "rdf:langString"
     },
     "description": {
-      "@id": "wwork:description" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:description",
+      "@type": "rdf:langString"
     },
     "lettering": {
-      "@id": "wwork:lettering" ,
-	  "@type": "rdf:langString"
+      "@id": "wwork:lettering",
+      "@type": "rdf:langString"
     },
     "creators": {
       "@id": "wwork:creators"
@@ -99,150 +99,134 @@
       "@id": "wser:accessStatus"
     },
     "profile": {
-      "@id": "wser:profile" ,
-	  "@type": "rdfs:Literal" 
-    } 
-   } ,
+      "@id": "wser:profile",
+      "@type": "rdfs:Literal"
+    }
+  },
   "id": "watu9tbc",
   "type": "Work",
-  "thumbnail":{
-	"url": "https://wellcomelibrary.org/iiif/b28480351/imageanno/b28gh7z4n.jpg" , 
-	"type": "Image"  
-   } ,
-  "identifiers": 
-    [
-      {
-        "value": "V0006724",
-		"type": "Identifier" ,
-        "identifierScheme": "miro-image-number"
-      },
-      {
-        "value": "ICV No 6939",
-		"type": "Identifier" ,
-        "identifierScheme": "wellcome-library-videodisk-number"
-      },
-      {
-        "value": "b11579328",
-		"type": "Identifier" ,		
-        "identifierScheme": "sierra-system-number"
-      }
-    ],
+  "thumbnail": {
+    "url": "https://wellcomelibrary.org/iiif/b28480351/imageanno/b28gh7z4n.jpg",
+    "type": "Image"
+  },
+  "identifiers": [
+    {
+      "value": "V0006724",
+      "type": "Identifier",
+      "identifierScheme": "miro-image-number"
+    },
+    {
+      "value": "ICV No 6939",
+      "type": "Identifier",
+      "identifierScheme": "wellcome-library-videodisk-number"
+    },
+    {
+      "value": "b11579328",
+      "type": "Identifier",
+      "identifierScheme": "sierra-system-number"
+    }
+  ],
   "title": "A lecture on pneumatics at the Royal Institution, London. Co",
   "description": "A lecture on pneumatics at the Royal Institution, London. Coloured etching by J. Gillray, 1802.",
   "lettering": "Scientific researches! -New discoveries in pneumaticks! -or- an experimental lecture on the powers of air.- Js. Gillray inv. & fect.",
-  "creators": 
-    [
-		
-      {
-		"label": "James Gillray"
-      }
-    ],
-  "publishers": 
-    [
-      {
-        "label": "H. Humphrey,"
-      }
-    ],
-  "placeOfPublication": 
-     [
-       {
-        "label": "[London] (St. James's Street)",
-        "type": "Place"
-      }
-    ],
-  "createdDate": 
+  "creators": [
     {
-      "label": "1802",
-      "type": "Period"
-    },
-  "publicationDate": 
+      "label": "James Gillray"
+    }
+  ],
+  "publishers": [
     {
-      "label": "May 23 1802",
-      "type": "Period"
+      "label": "H. Humphrey,"
+    }
+  ],
+  "placeOfPublication": [
+    {
+      "label": "[London] (St. James's Street)",
+      "type": "Place"
+    }
+  ],
+  "createdDate": {
+    "label": "1802",
+    "type": "Period"
+  },
+  "publicationDate": {
+    "label": "May 23 1802",
+    "type": "Period"
+  },
+  "genres": [
+    {
+      "label": "Caricatures",
+      "conceptScheme": "lctgm",
+      "type": "Genre"
     },
-  "genres":
-  [	   
-	  {
-           "label": "Caricatures",
-           "conceptScheme": "lctgm" ,
-		   "type": "Genre" 	   	
-	   } , 
-	   {
-	       "label": "Etching and water colour" ,
-		   "conceptScheme": "miro-technique" ,
-		   "type": "Genre" 	   	
-	   } 
-   ],
-  "physicalDescription": "etching, with watercolour"  , 
-  "subjects": 
-    [
+    {
+      "label": "Etching and water colour",
+      "conceptScheme": "miro-technique",
+      "type": "Genre"
+    }
+  ],
+  "physicalDescription": "etching, with watercolour",
+  "subjects": [
+    {
+      "label": "Thomas Young [1773  - 1829 ]",
+      "conceptScheme": "miro-keywords",
+      "type": "Keyword"
+    },
+    {
+      "label": "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
+      "conceptScheme": "miro-keywords",
+      "type": "Keyword"
+    },
+    {
+      "label": "Sir Humphry Davy [1778  - 1829 ]",
+      "conceptScheme": "miro-keywords",
+      "type": "Keyword"
+    },
+    {
+      "label": "Sir John Coxe Hippisley [1748  - 1825 ]",
+      "conceptScheme": "miro-keywords",
+      "type": "Keyword"
+    },
+    {
+      "label": "Royal Institution of Great Britain [ - ]",
+      "conceptScheme": "miro-keywords",
+      "type": "Keyword"
+    }
+  ],
+  "items": {
+    "id": "b28gh7z4n",
+    "type": "Item",
+    "licence": "CC-BY-4.0",
+    "identifiers": {
+      "value": "V0006724",
+      "type": "Identifier",
+      "identifierScheme": "miro-image-number"
+    },
+    "itemAccess": [
       {
-        "label": "Thomas Young [1773  - 1829 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+        "type": "Access",
+        "format": "Picture",
+        "location": "1l19",
+        "accessStatus": "Open",
+        "service": {
+          "type": "Service",
+          "label": "Closed Store Iconographic",
+          "profile": "http://catalogue.wellcomelibrary.org/screens/loc_closed_online_icon.html"
+        }
       },
       {
-        "label": "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
-      },
-      {
-        "label": "Sir Humphry Davy [1778  - 1829 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
-      },
-      {
-        "label": "Sir John Coxe Hippisley [1748  - 1825 ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
-      },
-      {
-        "label": "Royal Institution of Great Britain [ - ]",
-        "conceptScheme": "miro-keywords" ,
-		"type": "Keyword"
+        "type": "Access",
+        "format": "Manifest",
+        "accessStatus": "Open",
+        "license": "CC-BY-4.0",
+        "location": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n",
+        "service": {
+          "type": "Service",
+          "id": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n",
+          "label": "IIIF Image API",
+          "profile": "http://iiif.io/api/image/2/level2.json"
+        }
       }
-    ],
-  "items":
-      {
-       "id": "b28gh7z4n",
-       "type": "Item",
-       "licence": "CC-BY-4.0",
-       "identifiers": 
-          {
-            "value": "V0006724",
-			"type": "Identifier" ,
-            "identifierScheme": "miro-image-number"
-          } ,
-		"itemAccess" :
-         [
-			 {
-		     "type": "Access" ,
-			 "format": "Picture" ,
-			 "location": "1l19",
-			 "accessStatus": "Open" ,
-			 "service":
-			  {
-	 		      "type": "Service" ,
-				  "label": "Closed Store Iconographic" ,
-				  "profile": "http://catalogue.wellcomelibrary.org/screens/loc_closed_online_icon.html" 
-			  } 
-				 
-			 } ,
-			 {
-			 "type": "Access" ,
-			 "format": "Manifest" ,
-			 "accessStatus": "Open" ,
-			 "license": "CC-BY-4.0" ,
-			 "location": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
-			 "service":
-			  {
-	 		      "type": "Service" ,
-				  "id": "https://dlcs.io/iiif-img/wellcome/1/b28gh7z4n" ,
-				  "label": "IIIF Image API" ,
-				  "profile": "http://iiif.io/api/image/2/level2.json" 
-			  } 
-			 }
-		 ] 	
-       }
+    ]
+  }
 }
-
