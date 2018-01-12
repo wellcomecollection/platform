@@ -14,7 +14,11 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecord
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -57,15 +61,14 @@ class SierraItemsToDynamoWorkerServiceTest
         system = actorSystem,
         metrics = mockMetrics,
         dynamoInserter = new DynamoInserter(
-        sierraItemRecordDao = new SierraItemRecordDao(
-          dynamoDbClient,
-          Map("sierraToDynamo" -> DynamoConfig(tableName)))
+          sierraItemRecordDao = new SierraItemRecordDao(
+            dynamoDbClient,
+            Map("sierraToDynamo" -> DynamoConfig(tableName)))
         )
       ))
   }
 
-  it(
-    "reads a sierra record from sqs an inserts it into DynamoDb") {
+  it("reads a sierra record from sqs an inserts it into DynamoDb") {
     worker = createSierraWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
     worker.get.runSQSWorker()
@@ -76,12 +79,20 @@ class SierraItemsToDynamoWorkerServiceTest
     val message = SierraRecord(id, data, modifiedDate)
 
     val sqsMessage =
-      SQSMessage(Some("subject"), message.asJson.noSpaces, "topic", "messageType", "timestamp")
+      SQSMessage(Some("subject"),
+                 message.asJson.noSpaces,
+                 "topic",
+                 "messageType",
+                 "timestamp")
     sqsClient.sendMessage(queueUrl, sqsMessage.asJson.noSpaces)
 
     eventually {
       Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
-      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe SierraItemRecord(id, data, modifiedDate, List(bibId))
+      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe SierraItemRecord(
+        id,
+        data,
+        modifiedDate,
+        List(bibId))
     }
   }
 

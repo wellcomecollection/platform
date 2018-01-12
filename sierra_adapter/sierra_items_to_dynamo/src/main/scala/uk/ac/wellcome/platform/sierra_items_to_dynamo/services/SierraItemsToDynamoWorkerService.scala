@@ -14,15 +14,16 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import scala.concurrent.Future
 
 class SierraItemsToDynamoWorkerService @Inject()(
-                                                  reader: SQSReader,
-                                                  system: ActorSystem,
-                                                  metrics: MetricsSender,
-                                                  dynamoInserter: DynamoInserter
+  reader: SQSReader,
+  system: ActorSystem,
+  metrics: MetricsSender,
+  dynamoInserter: DynamoInserter
 ) extends SQSWorker(reader, system, metrics) {
 
   def processMessage(message: SQSMessage): Future[Unit] =
     decode[SierraRecord](message.body) match {
-      case Right(record) => dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
+      case Right(record) =>
+        dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
       case Left(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)

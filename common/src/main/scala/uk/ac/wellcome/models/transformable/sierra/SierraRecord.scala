@@ -10,15 +10,28 @@ import com.amazonaws.services.kinesis.model.InvalidArgumentException
 import scala.util.Try
 
 case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
-  def toBibRecord: SierraBibRecord = SierraBibRecord(id = this.id, data = this.data, modifiedDate = this.modifiedDate)
+  def toBibRecord: SierraBibRecord =
+    SierraBibRecord(id = this.id,
+                    data = this.data,
+                    modifiedDate = this.modifiedDate)
 
-  def toItemRecord: Try[SierraItemRecord] = for {
-    json <- parse(this.data).toTry
-    bibIdsJsonSeq = root.bibIds.arr.getOption(json).getOrElse(throw new InvalidArgumentException("Json data did not contain bibIds"))
-    bibIds = bibIdsJsonSeq.map{ json => json.asString.getOrElse(throw new InvalidArgumentException("Found non string in bibIds"))}.toList
-  } yield {
-    SierraItemRecord(id = this.id, data = this.data, modifiedDate = this.modifiedDate, bibIds = bibIds)
-  }
+  def toItemRecord: Try[SierraItemRecord] =
+    for {
+      json <- parse(this.data).toTry
+      bibIdsJsonSeq = root.bibIds.arr
+        .getOption(json)
+        .getOrElse(throw new InvalidArgumentException(
+          "Json data did not contain bibIds"))
+      bibIds = bibIdsJsonSeq.map { json =>
+        json.asString.getOrElse(
+          throw new InvalidArgumentException("Found non string in bibIds"))
+      }.toList
+    } yield {
+      SierraItemRecord(id = this.id,
+                       data = this.data,
+                       modifiedDate = this.modifiedDate,
+                       bibIds = bibIds)
+    }
 }
 
 object SierraRecord {

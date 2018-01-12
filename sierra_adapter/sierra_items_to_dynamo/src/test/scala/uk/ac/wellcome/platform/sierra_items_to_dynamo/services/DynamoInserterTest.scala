@@ -17,10 +17,17 @@ import uk.ac.wellcome.dynamo._
 
 import scala.concurrent.Future
 
-class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoDBLocal with ScalaFutures with MockitoSugar{
+class DynamoInserterTest
+    extends FunSpec
+    with Matchers
+    with SierraItemsToDynamoDBLocal
+    with ScalaFutures
+    with MockitoSugar {
 
-  val dynamoInserter = new DynamoInserter(new SierraItemRecordDao(dynamoDbClient, dynamoConfigs =
-    Map("sierraToDynamo" -> DynamoConfig(tableName))))
+  val dynamoInserter = new DynamoInserter(
+    new SierraItemRecordDao(
+      dynamoDbClient,
+      dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName))))
 
   it("ingests a json item into DynamoDB") {
     val id = "100001"
@@ -40,7 +47,6 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
     )
 
     val futureUnit = dynamoInserter.insertIntoDynamo(record)
-
 
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
@@ -62,15 +68,19 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
     )
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
-    val oldRecord = SierraItemRecord(id = id, data = s"""
+    val oldRecord = SierraItemRecord(
+      id = id,
+      data = s"""
                                                         |{
                                                         |  "id": "i$id",
                                                         |  "updatedDate": "$oldUpdatedDate",
                                                         |  "comment": "I am an old record",
                                                         |  "bibIds": ["b00000"]
                                                         |}
-       """.stripMargin, modifiedDate = oldUpdatedDate, bibIds = List("b00000"))
-
+       """.stripMargin,
+      modifiedDate = oldUpdatedDate,
+      bibIds = List("b00000")
+    )
 
     val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
     whenReady(futureUnit) { _ =>
@@ -92,7 +102,6 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
       bibIds = List("b1556974")
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
-
 
     val newRecord = SierraItemRecord(
       id = s"i$id",
@@ -144,7 +153,6 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
     )
 
     val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
-
 
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
@@ -226,7 +234,8 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
 
   it("fails if a dao returns an error when updating an item") {
 
-    val record = SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
+    val record =
+      SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
 
     val mockedDao = mock[SierraItemRecordDao]
     val expectedException = new RuntimeException("AAAAAARGH!")
@@ -236,9 +245,9 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
         Future.successful(
           Some(
             SierraItemRecord(id = "500005",
-              "{}",
-              "2001-01-01T00:00:00Z",
-              List()))))
+                             "{}",
+                             "2001-01-01T00:00:00Z",
+                             List()))))
 
     when(mockedDao.updateItem(any[SierraItemRecord]))
       .thenThrow(expectedException)
@@ -252,13 +261,13 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
   }
 
   it("fails the stream if a dao returns an error when getting an item") {
-    val record = SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
+    val record =
+      SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
 
     val mockedDao = mock[SierraItemRecordDao]
     val expectedException = new RuntimeException("BLAAAAARGH!")
     when(mockedDao.getItem(any[String]))
       .thenThrow(expectedException)
-
 
     val dynamoInserter = new DynamoInserter(mockedDao)
     val futureUnit = dynamoInserter.insertIntoDynamo(record)
@@ -272,13 +281,18 @@ class DynamoInserterTest extends FunSpec with Matchers with SierraItemsToDynamoD
     val id = "100001"
     val updatedDate = "2013-12-13T12:43:16Z"
 
-    val record = SierraItemRecord(id = id, data = s"""
+    val record = SierraItemRecord(
+      id = id,
+      data = s"""
                                                      |{
                                                      | "id": "i$id",
                                                      | "updatedDate": "$updatedDate",
                                                      | "bibIds": ["b1556974"]
                                                      |}
-      """.stripMargin, modifiedDate = updatedDate, bibIds = List("b1556974"))
+      """.stripMargin,
+      modifiedDate = updatedDate,
+      bibIds = List("b1556974")
+    )
 
     val newUpdatedDate = "2014-12-13T12:43:16Z"
     val newRecord = SierraItemRecord(

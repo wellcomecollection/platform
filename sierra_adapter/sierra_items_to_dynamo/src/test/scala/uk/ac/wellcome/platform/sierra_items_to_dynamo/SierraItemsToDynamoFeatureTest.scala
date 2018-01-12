@@ -9,10 +9,17 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecord
+}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import uk.ac.wellcome.circe._
@@ -43,15 +50,22 @@ class SierraItemsToDynamoFeatureTest
     val modifiedDate = Instant.now
     val message = SierraRecord(id, data, modifiedDate)
 
-
     val sqsMessage =
-      SQSMessage(Some("subject"), message.asJson.noSpaces, "topic", "messageType", "timestamp")
+      SQSMessage(Some("subject"),
+                 message.asJson.noSpaces,
+                 "topic",
+                 "messageType",
+                 "timestamp")
     sqsClient.sendMessage(queueUrl, message.asJson.noSpaces)
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response
       Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
-      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe SierraItemRecord(id, data, modifiedDate, List(bibId))
+      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe SierraItemRecord(
+        id,
+        data,
+        modifiedDate,
+        List(bibId))
     }
   }
 }
