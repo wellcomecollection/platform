@@ -2,53 +2,49 @@
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "ghdke34",
   "type": "Work",
-  "identifiers": 
-    [
-      {
-        "label": "A0000584",
-        "authority": "MIRO"
-      },
-      {
-         "label": "Contributor Reference VET 43 (17)",
-        "authority": "MIRO contributor"
-      }
-    ],
+  "identifiers": [
+    {
+      "label": "A0000584",
+      "authority": "MIRO"
+    },
+    {
+      "label": "Contributor Reference VET 43 (17)",
+      "authority": "MIRO contributor"
+    }
+  ],
   "label": "A very frightened horse.",
   "description": "A very frightened horse.",
   "ipRightsStatement": "Royal Veterinary College",
-  "subjects": 
-    [
-      {
-        "label": "ROYAL VETERINARY COLLEGE",
-        "authority": "MIRO keywords" 
-      },
-      {
-        "label": "PHYSICAL RESTRAINT ON HORSES",
-        "authority": "MIRO keywords"
-      },
-      {
-        "label": "NERVOUS",
-        "authority": "MIRO keywords"
-      },
-      {
-        "label": "EQUINE",
-        "authority": "MIRO keywords"
-      }
-    ],  
-  "items": 
-    [
-      {
-        "id": "no819h6",
-        "type": "item",
-        "licence": "CC-BY-NC",
-        "access": "Open",
-        "identifiers": 
-          [
-            {
-              "label": "A0000584",
-              "authority": "MIRO"
-            }
-          ]
-      }
-    ]
+  "subjects": [
+    {
+      "label": "ROYAL VETERINARY COLLEGE",
+      "authority": "MIRO keywords"
+    },
+    {
+      "label": "PHYSICAL RESTRAINT ON HORSES",
+      "authority": "MIRO keywords"
+    },
+    {
+      "label": "NERVOUS",
+      "authority": "MIRO keywords"
+    },
+    {
+      "label": "EQUINE",
+      "authority": "MIRO keywords"
+    }
+  ],
+  "items": [
+    {
+      "id": "no819h6",
+      "type": "item",
+      "licence": "CC-BY-NC",
+      "access": "Open",
+      "identifiers": [
+        {
+          "label": "A0000584",
+          "authority": "MIRO"
+        }
+      ]
+    }
+  ]
 }

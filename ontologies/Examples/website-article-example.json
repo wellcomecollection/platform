@@ -40,14 +40,14 @@
   "series": {
     "id": "1j09ddj90",
     "label": "The Outsiders",
-    "type" : "Series"
-    },
-  "positionInSeries": "1",  
-  "season" : {
-    "id" : "d921j0ddj" ,
-    "label" : "Epidemics" ,
+    "type": "Series"
+  },
+  "positionInSeries": "1",
+  "season": {
+    "id": "d921j0ddj",
+    "label": "Epidemics",
     "type": "Season"
-    } ,
+  },
   "genres": [
     {
       "id": "a24s7qf3",
