@@ -94,6 +94,25 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
+  it(
+    "returns a SQSReaderGracefulException if it receives an invalid message") {
+    worker = createSierraWorkerService(fields = "")
+
+    val message =
+      """
+        |{
+        | "something": "something"
+        |}
+      """.stripMargin
+
+    val sqsMessage =
+      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+    whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
+      ex shouldBe a[SQSReaderGracefulException]
+    }
+
+  }
+
   private def stopWorker(worker: Option[SierraItemsToDynamoWorkerService]) = {
     eventually {
       worker.fold(true)(_.cancelRun()) shouldBe true
