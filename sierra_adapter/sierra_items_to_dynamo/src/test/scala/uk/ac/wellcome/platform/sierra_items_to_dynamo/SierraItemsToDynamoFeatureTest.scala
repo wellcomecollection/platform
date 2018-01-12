@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 import java.time.Instant
 
 import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
@@ -14,6 +15,7 @@ import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
 import io.circe.generic.auto._
 import io.circe.syntax._
+import uk.ac.wellcome.circe._
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
