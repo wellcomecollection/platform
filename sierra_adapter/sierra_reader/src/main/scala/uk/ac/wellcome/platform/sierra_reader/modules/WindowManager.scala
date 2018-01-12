@@ -67,7 +67,11 @@ class WindowManager @Inject()(
         info(s"Found latest ID in S3: $lastId")
         lastId
           .map(id => {
-            val newId = (id.toInt + 1).toString
+            // The Sierra IDs we store in S3 are prefixed with "b" or "i".
+            // Remove the first character
+            val unprefixedId = id.substring(1)
+
+            val newId = (unprefixedId.toInt + 1).toString
             WindowStatus(id = Some(newId), offset = offset + 1)
           })
           .getOrElse(
