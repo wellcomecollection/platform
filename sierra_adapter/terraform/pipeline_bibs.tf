@@ -40,3 +40,28 @@ module "bibs_reader" {
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 }
+
+module "bibs_merger" {
+  source = "merger"
+
+  resource_type = "bibs"
+
+  release_id    = "${var.release_ids["sierra_bib_merger"]}"
+
+  merged_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
+
+  updates_topic_name = "${module.bibs_reader.topic_name}"
+
+  cluster_name = "${module.sierra_adapter_cluster.cluster_name}"
+  vpc_id       = "${module.vpc_sierra_adapter.vpc_id}"
+
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${module.sierra_adapter_cluster.alb_cloudwatch_id}"
+  alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
+  alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
+
+  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
+}
