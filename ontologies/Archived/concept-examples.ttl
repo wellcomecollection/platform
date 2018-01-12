@@ -1,10 +1,11 @@
-@prefix wcon: <http://wellcomecollection.org/ontologies/concept/> ; 
-@prefix wcore: <http://wellcomecollection.org/ontologies/core/> ; 
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ; 
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ;
-@prefix dcterms: <http://purl.org/dc/terms/> ;
-@prefix owl:     <http://www.w3.org/2002/07/owl#> ;
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> ;
+@prefix wcon: <http://wellcomecollection.org/ontologies/concept/> .
+@prefix wcore: <http://wellcomecollection.org/ontologies/core/> .
+@prefix wellcome: <http://wellcomecollection.org/ontologies/wellcome/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 
 
 <http://id.wellcomecollection.org/d22e2opp> rdf:type wcon:Concept ;
@@ -16,8 +17,8 @@
     wcon:narrower <http://id.wellcomecollection.org/d22e2oph> ; 
     wcon:narrower <http://id.wellcomecollection.org/d22e2opi> ; 
     wcon:closeMatch <http://id.wellcomecollection.org/d22e2opu> ; 
-    wcon:usageNote "Use as a form subdivision under names of individual persons, families, and corporate bodies, and under classes of persons, ethnic groups, individual wars, and topical headings for collections of caricatures or pictorial humor about those subjects." . 
-    wcon:example "Reference under the headings [Caricatures and cartoons; Wit and humor, Pictorial]" . 
+    wcon:usageNote "Use as a form subdivision under names of individual persons, families, and corporate bodies, and under classes of persons, ethnic groups, individual wars, and topical headings for collections of caricatures or pictorial humor about those subjects." ;
+    wcon:example "Reference under the headings [Caricatures and cartoons; Wit and humor, Pictorial]" ;
     wcon:altLabel "Pictorial humor"@en .
 
 
@@ -65,7 +66,7 @@
     wellcome:gender "Male" ;
     wcon:altLabel "Bolívar Palacios, Simón" ;
     wellcome:nationality <http://id.wellcomecollection.org/t78g8yfp> ;
-    wellcome:description "Simon Bolivar (1783-1830) was born in Caracas but, after becoming an orphan at 9, grew up in Europe, where he was influenced by the Enlightenment and the French Revolution.In the early 19th century Spanish rule in its South American colonies began to break down, areas professing conflicting loyalties to the Bourbon king Charles IV, his son Ferdinand VII in whose favour he was forced to abdicate, or Joseph Bonaparte who was granted the Spanish throne by his brother Napoleon in 1810. Venezuela became independent in 1811, led by Francisco de Miranda (1750-1816), but the First Republic collapsed under regional and racial tensions, Miranda surrendering to Spain in 1812. Bolivar, at this time a subordinate of Miranda, escaped to New Granada (modern Colombia) and assumed the leadership of the struggle. A rapid campaign captured Caracas and led to the proclamation of the Second Republic, with Bolivar gaining the title of "the Liberator"; again, racial tensions and the belief of black, Indian or mestizo Venezuelans that the revolutionary army spoke only for the white elite led to its defeat and the reassertion of Spanish control. Bolivar retreated to Jamaica but returned in 1816, this time with the support of a mestizo leader José Antonio Páez who persuaded the llaneros or plainsmen that the revolution served populist aspirations. With the support of the llaneros Bolivar was victorious in a largely cavalry war, established the Third Republic in 1819 and in 1821 won a victory at Carabobo that recaptured Caracas. In the same year the independent Venezuela was united with New Granada in the Republic of Gran Colombia. Rule from Bogota bred resentment and during the 1820s there was tension between Bolivar - still campaigning in pursuit of his vision of a united independent South America - and Venezuelan nationalism, led by the now General Páez. This culminated in Bolivar's deposition and exile in 1829. He died in Santa Maria in 1830, having expressed the view that the attempt to unify the continent had been "ploughing the sea". Further details can be found at http://countrystudies.us/venezuela/4.htm."@en .
+    wellcome:description "Simon Bolivar (1783-1830) was born in Caracas but, after becoming an orphan at 9, grew up in Europe, where he was influenced by the Enlightenment and the French Revolution.In the early 19th century Spanish rule in its South American colonies began to break down, areas professing conflicting loyalties to the Bourbon king Charles IV, his son Ferdinand VII in whose favour he was forced to abdicate, or Joseph Bonaparte who was granted the Spanish throne by his brother Napoleon in 1810. Venezuela became independent in 1811, led by Francisco de Miranda (1750-1816), but the First Republic collapsed under regional and racial tensions, Miranda surrendering to Spain in 1812. Bolivar, at this time a subordinate of Miranda, escaped to New Granada (modern Colombia) and assumed the leadership of the struggle. A rapid campaign captured Caracas and led to the proclamation of the Second Republic, with Bolivar gaining the title of \"the Liberator\"; again, racial tensions and the belief of black, Indian or mestizo Venezuelans that the revolutionary army spoke only for the white elite led to its defeat and the reassertion of Spanish control. Bolivar retreated to Jamaica but returned in 1816, this time with the support of a mestizo leader José Antonio Páez who persuaded the llaneros or plainsmen that the revolution served populist aspirations. With the support of the llaneros Bolivar was victorious in a largely cavalry war, established the Third Republic in 1819 and in 1821 won a victory at Carabobo that recaptured Caracas. In the same year the independent Venezuela was united with New Granada in the Republic of Gran Colombia. Rule from Bogota bred resentment and during the 1820s there was tension between Bolivar - still campaigning in pursuit of his vision of a united independent South America - and Venezuelan nationalism, led by the now General Páez. This culminated in Bolivar's deposition and exile in 1829. He died in Santa Maria in 1830, having expressed the view that the attempt to unify the continent had been \"ploughing the sea\". Further details can be found at http://countrystudies.us/venezuela/4.htm."@en .
 
 <http://id.wellcomecollection.org//y8uty5fp> rdf:type wcore:Identifier ;
     wcore:identifierScheme "wel-auth" ;
