@@ -15,4 +15,10 @@ object SierraBibRecord {
       data = data,
       modifiedDate = Instant.parse(modifiedDate)
     )
+
+  def apply(sierraRecord: SierraRecord): SierraBibRecord = {
+    SierraBibRecord(id = sierraRecord.id,
+                    data = sierraRecord.data,
+                    modifiedDate = sierraRecord.modifiedDate)
+  }
 }
