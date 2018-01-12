@@ -70,6 +70,7 @@ env:
     - TASK=sierra_items_to_dynamo-test
     - TASK=sierra_bib_merger-test
     - TASK=sierra_item_merger-test
+    - TASK=s3_demultiplexer-test
 
     # Catalogue pipeline stack
     - TASK=sbt-common-test
