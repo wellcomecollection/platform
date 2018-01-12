@@ -46,7 +46,7 @@ module "bibs_merger" {
 
   resource_type = "bibs"
 
-  release_id    = "${var.release_ids["sierra_bib_merger"]}"
+  release_id = "${var.release_ids["sierra_bib_merger"]}"
 
   merged_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
 
@@ -61,7 +61,7 @@ module "bibs_merger" {
   alb_listener_http_arn      = "${module.sierra_adapter_cluster.alb_listener_http_arn}"
   alb_listener_https_arn     = "${module.sierra_adapter_cluster.alb_listener_https_arn}"
 
-  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 }

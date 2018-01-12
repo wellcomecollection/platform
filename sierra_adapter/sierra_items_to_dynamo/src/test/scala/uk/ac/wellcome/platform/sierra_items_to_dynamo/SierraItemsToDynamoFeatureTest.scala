@@ -60,9 +60,11 @@ class SierraItemsToDynamoFeatureTest
 
     eventually {
       Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
-      val scanamoResult = Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id)
+      val scanamoResult =
+        Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id)
       scanamoResult shouldBe defined
-      scanamoResult.get shouldBe Right(SierraItemRecord(id, data, modifiedDate, List(bibId), version = 1))
+      scanamoResult.get shouldBe Right(
+        SierraItemRecord(id, data, modifiedDate, List(bibId), version = 1))
     }
   }
 }

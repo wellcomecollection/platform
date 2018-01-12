@@ -10,10 +10,11 @@ module "sierra_to_dynamo_service" {
 
   env_vars = {
     demultiplexer_queue_url = "${module.demultiplexer_queue.id}"
-    metrics_namespace = "sierra_items_to_dynamo"
+    metrics_namespace       = "sierra_items_to_dynamo"
 
     dynamo_table_name = "${aws_dynamodb_table.sierra_table.id}"
   }
+
   env_vars_length = 3
 
   path_pattern = "/sierra_items_to_dynamo/*"
