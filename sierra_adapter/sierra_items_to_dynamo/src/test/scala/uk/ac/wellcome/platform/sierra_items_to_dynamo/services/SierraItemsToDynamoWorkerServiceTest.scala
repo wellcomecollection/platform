@@ -75,7 +75,7 @@ class SierraItemsToDynamoWorkerServiceTest
     val id = "i12345"
     val bibId = "b54321"
     val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
-    val modifiedDate = Instant.now
+    val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
     val message = SierraRecord(id, data, modifiedDate)
 
     val sqsMessage =
@@ -84,15 +84,13 @@ class SierraItemsToDynamoWorkerServiceTest
                  "topic",
                  "messageType",
                  "timestamp")
-    sqsClient.sendMessage(queueUrl, sqsMessage.asJson.noSpaces)
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
 
     eventually {
       Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
-      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe SierraItemRecord(
-        id,
-        data,
-        modifiedDate,
-        List(bibId))
+      val scanamoResult = Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id)
+      scanamoResult shouldBe defined
+      scanamoResult.get shouldBe Right(SierraItemRecord(id, data, modifiedDate, List(bibId), version = 1))
     }
   }
 

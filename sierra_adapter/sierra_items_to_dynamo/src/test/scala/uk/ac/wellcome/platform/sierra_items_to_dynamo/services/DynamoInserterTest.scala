@@ -14,15 +14,17 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class DynamoInserterTest
     extends FunSpec
     with Matchers
     with SierraItemsToDynamoDBLocal
     with ScalaFutures
-    with MockitoSugar {
+    with MockitoSugar with ExtendedPatience{
 
   val dynamoInserter = new DynamoInserter(
     new SierraItemRecordDao(
@@ -260,14 +262,14 @@ class DynamoInserterTest
     }
   }
 
-  it("fails the stream if a dao returns an error when getting an item") {
+  it("fails if the dao returns an error when getting an item") {
     val record =
       SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
 
     val mockedDao = mock[SierraItemRecordDao]
     val expectedException = new RuntimeException("BLAAAAARGH!")
     when(mockedDao.getItem(any[String]))
-      .thenThrow(expectedException)
+      .thenReturn(Future.failed(expectedException))
 
     val dynamoInserter = new DynamoInserter(mockedDao)
     val futureUnit = dynamoInserter.insertIntoDynamo(record)
