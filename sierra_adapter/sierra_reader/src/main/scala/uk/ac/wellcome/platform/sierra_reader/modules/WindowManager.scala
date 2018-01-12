@@ -4,16 +4,12 @@ import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import io.circe
 import org.apache.commons.io.IOUtils
 import io.circe.generic.auto._
-import io.circe.syntax._
 import io.circe.parser.decode
-import uk.ac.wellcome.platform.sierra_reader.flow.{
-  SierraRecord,
-  SierraResourceTypes
-}
+import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

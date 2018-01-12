@@ -1,13 +1,14 @@
 package uk.ac.wellcome.platform.sierra_reader.flow
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDate, ZoneOffset}
+import java.time.{LocalDate, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
+import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 
 import scala.concurrent.ExecutionContext
 
@@ -80,14 +81,4 @@ object SierraRecordWrapperFlow extends Logging {
   private def getId(json: Json) = {
     root.id.string.getOption(json).get
   }
-}
-
-case class SierraRecord(id: String, data: String, modifiedDate: Instant)
-object SierraRecord {
-  def apply(id: String, data: String, modifiedDate: String): SierraRecord =
-    SierraRecord(
-      id = id,
-      data = data,
-      modifiedDate = Instant.parse(modifiedDate)
-    )
 }
