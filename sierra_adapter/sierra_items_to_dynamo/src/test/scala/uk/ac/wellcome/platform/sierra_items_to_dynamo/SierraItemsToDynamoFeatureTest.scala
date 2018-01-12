@@ -1,19 +1,19 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
+import java.time.Instant
+
 import com.gu.scanamo.Scanamo
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SQSLocal
-}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
+import io.circe.generic.auto._
+import io.circe.syntax._
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
@@ -30,30 +30,26 @@ class SierraItemsToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraToDynamo.tableName" -> tableName,
-      "sierra.apiUrl" -> "http://localhost:8080",
-      "sierra.oauthKey" -> "key",
-      "sierra.oauthSecret" -> "secret",
-      "sierra.fields" -> "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
+      "aws.dynamo.sierraToDynamo.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
   it("reads items from Sierra and adds them to DynamoDB") {
-    val message =
-      """
-        |{
-        | "start": "2013-12-10T17:16:35Z",
-        | "end": "2013-12-13T21:34:35Z"
-        |}
-      """.stripMargin
+    val id = "i12345"
+    val bibId = "b54321"
+    val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
+    val modifiedDate = Instant.now
+    val message = SierraRecord(id, data, modifiedDate)
+
 
     val sqsMessage =
-      SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+      SQSMessage(Some("subject"), message.asJson.noSpaces, "topic", "messageType", "timestamp")
+    sqsClient.sendMessage(queueUrl, message.asJson.noSpaces)
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response
-      Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 157
+      Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
+      Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe SierraItemRecord(id, data, modifiedDate, List(bibId))
     }
   }
 }

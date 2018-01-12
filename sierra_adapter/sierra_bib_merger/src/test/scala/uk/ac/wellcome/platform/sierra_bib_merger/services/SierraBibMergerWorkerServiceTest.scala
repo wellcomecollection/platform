@@ -18,7 +18,7 @@ class SierraBibMergerWorkerServiceTest
     with ExtendedPatience {
 
   it(
-    "does not throw a NullPointerException when receiving a message with null body") {
+    "throws a SQSReaderGracefulException if the message on the queue does not represent a SierraRecord") {
 
     val sqsReader = mock[SQSReader]
     val metricsSender = mock[MetricsSender]
