@@ -6,6 +6,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import io.circe.parser._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraRecordWrapperFlowTest
