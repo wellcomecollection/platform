@@ -42,13 +42,13 @@
       "concept": {
          "label": "English Language" ,
          "type": "Concept" ,
-         "indentifers": {
+         "identifiers": {
            "id": "D81290",
            "type": "Identifier",
            "authority": "mesh"
-      }       
-      } 
-      "qualifiers"
+         }
+      },
+      "qualifiers":
          {
             "label": "Provincialisms" ,
             "type": "Concept" 
