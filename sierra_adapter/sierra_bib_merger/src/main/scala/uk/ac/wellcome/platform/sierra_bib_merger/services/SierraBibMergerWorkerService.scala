@@ -9,7 +9,10 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
 import uk.ac.wellcome.circe._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraRecord
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -24,7 +27,8 @@ class SierraBibMergerWorkerService @Inject()(
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     decode[SierraRecord](message.body) match {
-      case Right(record) => sierraBibMergerUpdaterService.update(SierraBibRecord(record))
+      case Right(record) =>
+        sierraBibMergerUpdaterService.update(SierraBibRecord(record))
       case Left(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)
