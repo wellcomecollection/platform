@@ -43,7 +43,7 @@
    * 
    * 1. For all bibliographic records use bib record "title".
    *
-   * Note: Sierra populates this field from field 245 subfield a and b. Does title in sierra also daw from n and p?
+   * Note: Sierra populates this field from field 245 subfield a and b.
    *
    * Example:
    *  "title": "The tuberculosis worker : a handbook on methods and programs of tuberculosis work",
@@ -76,7 +76,7 @@
    * 4. For "100" type as "Person"
    * 5. For "110" type as "Organisation"
    * 6. For "111" type as "Event"
-   * 7. If subfield 0 contains a value use to populate "identifiers" after stripping first two letters (ls, sh). Check we want to do this. Platform "authority" is defined by first two letters of code; n or nr. Indicators can also help disabiguate the authority. 
+   * 7. If subfield c contains a value use to populate "identifiers" after stripping first two letters (ls, sh). Check we want to do this. Platform "authority" is defined by first two letters of code. sh=lc-names, indicators can also help disabiguate the authority. 
    * 8. For all other subfields populate "qualifiers" apart from 6,9,4 populate "qualifierType" with the subfield type (kebab-case) 
    * 9. For subfield "d" and "f" type as "Period", for all other subfields provide no type
    * 10. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
@@ -123,10 +123,10 @@
    * 
    * 1. For all bibliographic records use "marcTag": "655"
    * 2. If more than one subfield is populated then populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
-   * 3. If only "a" subfield is populated type as "Concept".   
+   * 3. if only "a" subfield is populated type as "Concept".   
    * 4. If 655 is populated with a indentified concept from an authority (as indicated by use of second indicator) then populate id with Wellcome id for concept
    * 5. populate platform "concept" with subfield "a".
-   * 6. When this concept has assocaited identifiers populate "identifiers" with value (subfield 0) and identity scheme (second indicator or if indicator 7 look to subfield 2) Secound indicator 0=lcsh 2=mesh
+   * 6. When this concept has assocaited identifiers populate "identifiers" with value (subfield 0) and identity scheme (second indicator or if indicator 7 look to subfield 2) 
    * 8. For each subfield, for subfields a-z ingnore 0-7, populate "qualifers" with a "label", type "Concept" (subfield "y" type as "Period" and type z as "Place") and populate "qualiferType" with the subfield name kebab-case.
    * 
    *
@@ -164,7 +164,7 @@
    /* Populate wwork:subjects. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "650".
-   * 2. If more than one subfield is populated. populate platform "label" with concatenated (with hyphens) subfields in citation/list order and type as "QualifiedConcept".
+   * 2. If more than one subfield is populated. populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
    * 3. if only "a" subfield is populated type as "Concept". 
    * 4. populate platform "concept" with subfield "a".
    * 5. When this concept has assocaited identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator or if indicator 7 look at subfield 2. 
@@ -176,7 +176,7 @@
    *
    *"subjects": [
    * {
-   *   "label": "Tuberculosis - prevention & control.",
+   *   "label": "Tuberculosis prevention & control.",
    *   "type": "QualifiedConcept",
    *   "concept": {
    *     "id": "hd2891f",
@@ -224,7 +224,7 @@
    *
    * Example: 
    *   "publicationDate": {
-   *     "label": "23 May 1932",
+   *     "label": "May 23 1932",
    *     "type": "Period" 
    *  },
    * 
@@ -277,7 +277,7 @@
 
    /* Populate wwork:publishers
    * 
-   * 1. For bibliographic records where "260" is populated. If "260" is not populated look at "264".
+   * 1. For bibliographic records where "260" is populated
    * 2. Platform "publishers" "label" populate with 260 subfield "b"
    * 3. Type as "Organisation"
    *
@@ -292,8 +292,8 @@
 
    /* Populate wwork:lettering: Rules:
    *
-   *  1. For bibliographic records where "246" is popuated with "1" as the first indicator and a second indicator of "6" 
-   *  2. Populate "lettering" 
+   *  1. For bibliographic records where "246" is popuated with any first indicator and a secound indicator of 6 
+   *  2. Populate "letting" 
    *  3. If record is archive, image or journals look at 749 but not subfield "6". Need to check how we identify these records. Archive will come through CALM anyway
    * 
    * Example:
