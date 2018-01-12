@@ -1,4 +1,25 @@
 # -*- encoding: utf-8 -*-
+"""
+We have a sierra_reader that reads records from Sierra, and uploads them
+to files in S3.  Each file in S3 contains multiple records.
+
+Our downstream applications want to process records one at a time, so this
+demultiplexer receives the event stream of PUTs from S3, and splits each
+file into individual messages on SNS.
+
+                                S3                                  SNS
+
+    +--------+          +-------------------+
+    | reader |------>   |  r1, r2, r3, r4   |   --- demultiplexer ---+
+    +--------+          +-------------------+                        |
+                        |  r5, r6, r7, r8   |                        |
+                        +-------------------+                        v
+                        | r9, r10, r11, r12 |                      [ r1 ]
+                        +-------------------+                      [ r2 ]
+                                                                   [ r3 ]
+                                                                    ....
+
+"""
 
 import json
 import os
