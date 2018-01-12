@@ -3,7 +3,6 @@
 
 import json
 import os
-import subprocess
 import sys
 
 
@@ -16,9 +15,6 @@ def find_json_files():
             continue
 
         for f in filenames:
-
-
-
             if f.lower().endswith('.json'):
                 yield os.path.join(root, f)
 
