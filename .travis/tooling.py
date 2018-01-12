@@ -76,6 +76,7 @@ def affects_tests(path, task):
         'shared_infra': ['shared_infra'],
         'nginx': ['nginx'],
 
+        's3_demultiplexer': ['sierra_adapter/s3_demultiplexer'],
         'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
         'sierra_reader': ['sierra_adapter/sierra_reader'],
         'sierra_items_to_dynamo': ['sierra_adapter/sierra_items_to_dynamo'],
@@ -113,7 +114,13 @@ def affects_tests(path, task):
     # The top-level common directory contains some Scala files which are
     # shared across multiple projects.  If we're definitely in a project
     # which doesn't use this sbt-common lib, we can ignore changes to it.
-    sbt_free_tasks = ('loris', 'monitoring', 'shared_infra')
+    sbt_free_tasks = (
+        'loris',
+        'monitoring',
+        'shared_infra',
+        's3_demultiplexer',
+        'sierra_window_generator',
+    )
     if task.startswith(sbt_free_tasks) and path.startswith('common/'):
         print(
             "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
