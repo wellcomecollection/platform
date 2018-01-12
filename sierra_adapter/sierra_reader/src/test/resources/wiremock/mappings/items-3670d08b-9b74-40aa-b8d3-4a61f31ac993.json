@@ -1,27 +1,39 @@
 {
-  "id" : "3670d08b-9b74-40aa-b8d3-4a61f31ac993",
-  "name" : "items",
-  "request" : {
-    "url" : "/items?updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D&fields=updatedDate%2Cdeleted%2CdeletedDate%2CbibIds%2CfixedFields%2CvarFields&id=%5B1851558%2C%5D",
-    "method" : "GET",
-    "headers" : {
-      "Authorization" : {
-        "equalTo" : "Bearer fake-token"
+  "id": "3670d08b-9b74-40aa-b8d3-4a61f31ac993",
+  "name": "items",
+  "request": {
+    "url": "/items?updatedDate=%5B2013-12-10T17%3A16%3A35Z%2C2013-12-13T21%3A34%3A35Z%5D&fields=updatedDate%2Cdeleted%2CdeletedDate%2CbibIds%2CfixedFields%2CvarFields&id=%5B1851558%2C%5D",
+    "method": "GET",
+    "headers": {
+      "Authorization": {
+        "equalTo": "Bearer fake-token"
       }
     }
   },
-  "response" : {
-    "status" : 200,
-    "bodyFileName" : "items-3670d08b-9b74-40aa-b8d3-4a61f31ac993.json",
-    "headers" : {
-      "Date" : "Thu, 30 Nov 2017 14:43:54 GMT",
-      "Content-Type" : "application/json;charset=UTF-8",
-      "Set-Cookie" : [ "jcontainerId=.jcontainer-public2; path=/iii/stage", "jcontainerId=.jcontainer-public2; path=/iii/patronio", "jcontainerId=.jcontainer-public2; path=/iii/rss", "jcontainerId=.jcontainer-public2; path=/iii/webrpt", "jcontainerId=.jcontainer-public2; path=/iii/upgrademgr", "jcontainerId=.jcontainer-public2; path=/iii/sierra-api", "jcontainerId=.jcontainer-public2; path=/sierra/admin", "jcontainerId=.jcontainer-public2; path=/sierra/dashboard", "jcontainerId=.jcontainer-public2; path=/sierra/shindig", "jcontainerId=.jcontainer-public2; path=/iii/ws/extlink", "jcontainerId=.jcontainer-public2; path=/sierra/ws/summit" ],
-      "Vary" : "User-Agent",
-      "Keep-Alive" : "timeout=5, max=96",
-      "Connection" : "Keep-Alive"
+  "response": {
+    "status": 200,
+    "bodyFileName": "items-3670d08b-9b74-40aa-b8d3-4a61f31ac993.json",
+    "headers": {
+      "Date": "Thu, 30 Nov 2017 14:43:54 GMT",
+      "Content-Type": "application/json;charset=UTF-8",
+      "Set-Cookie": [
+        "jcontainerId=.jcontainer-public2; path=/iii/stage",
+        "jcontainerId=.jcontainer-public2; path=/iii/patronio",
+        "jcontainerId=.jcontainer-public2; path=/iii/rss",
+        "jcontainerId=.jcontainer-public2; path=/iii/webrpt",
+        "jcontainerId=.jcontainer-public2; path=/iii/upgrademgr",
+        "jcontainerId=.jcontainer-public2; path=/iii/sierra-api",
+        "jcontainerId=.jcontainer-public2; path=/sierra/admin",
+        "jcontainerId=.jcontainer-public2; path=/sierra/dashboard",
+        "jcontainerId=.jcontainer-public2; path=/sierra/shindig",
+        "jcontainerId=.jcontainer-public2; path=/iii/ws/extlink",
+        "jcontainerId=.jcontainer-public2; path=/sierra/ws/summit"
+      ],
+      "Vary": "User-Agent",
+      "Keep-Alive": "timeout=5, max=96",
+      "Connection": "Keep-Alive"
     }
   },
-  "uuid" : "3670d08b-9b74-40aa-b8d3-4a61f31ac993",
-  "persistent" : true
+  "uuid": "3670d08b-9b74-40aa-b8d3-4a61f31ac993",
+  "persistent": true
 }

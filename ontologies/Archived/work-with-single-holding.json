@@ -20,7 +20,7 @@
       "type": "Organisation"
     }
   ],
-    "placeOfPublication": [
+  "placeOfPublication": [
     {
       "label": "London",
       "type": "Place"
@@ -29,7 +29,7 @@
   "publicationDate": {
     "label": "1889",
     "type": "Period"
-  },  
+  },
   "designation": "11th ed",
   "genre": {
     "label": "Dictionary",
@@ -40,19 +40,18 @@
       "label": "English Language--Provincialisms",
       "type": "QualifiedConcept",
       "concept": {
-         "label": "English Language" ,
-         "type": "Concept" ,
-         "identifiers": {
-           "id": "D81290",
-           "type": "Identifier",
-           "authority": "mesh"
-         }
+        "label": "English Language",
+        "type": "Concept",
+        "identifiers": {
+          "id": "D81290",
+          "type": "Identifier",
+          "authority": "mesh"
+        }
       },
-      "qualifiers":
-         {
-            "label": "Provincialisms" ,
-            "type": "Concept" 
-         }
+      "qualifiers": {
+        "label": "Provincialisms",
+        "type": "Concept"
+      }
     }
   ],
   "creators": [
@@ -64,7 +63,7 @@
     {
       "id": "dhu458qh",
       "type": "Holding",
-      "label" : "Complete set" ,
+      "label": "Complete set",
       "identifiers": [
         {
           "label": "c13328396",

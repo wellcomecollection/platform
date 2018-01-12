@@ -27,30 +27,30 @@
   ],
   "title": "Saturday Studio: Emoji design",
   "description": "Learn about the principles of graphic design by creating your own series of medical emojis.",
-  "series" : {
-    "id" : "1j09ddj90" ,
-    "label" : "Saturday Studio" ,
-    "url" : "https://wellcomecollection.org/saturdaystudio" 
-    } ,
-  "positionInSeries": "2" ,  
+  "series": {
+    "id": "1j09ddj90",
+    "label": "Saturday Studio",
+    "url": "https://wellcomecollection.org/saturdaystudio"
+  },
+  "positionInSeries": "2",
   "audience": "Youth event",
   "endDate": {
-    "label" : "21 October 2017" ,
-    "type" : "Period" ,
-    "date" : "21-10-2017" 
-  } ,
+    "label": "21 October 2017",
+    "type": "Period",
+    "date": "21-10-2017"
+  },
   "startDate": {
-    "label" : "21 October 2017" ,
-    "type" : "Period" ,
-    "date" : "21-10-2017"  
-  } ,
+    "label": "21 October 2017",
+    "type": "Period",
+    "date": "21-10-2017"
+  },
   "location": "Wellcome Studio",
   "offer": {
-    "priceSpecification" : {
+    "priceSpecification": {
       "price": "5",
-      "priceCurrency": "GBP" ,
+      "priceCurrency": "GBP",
       "type": "PriceSpecification"
-    } ,
+    },
     "url": "http://bookshop.blackwell.co.uk/bookshop/product/9781999809003"
   }
 }

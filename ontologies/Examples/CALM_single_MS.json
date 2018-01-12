@@ -2,66 +2,60 @@
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "e39dg92",
   "type": "Work",
-  "identifiers": 
-    [
-      {
-        "value": "MS5754",
-        "type": "Identifier" ,
-        "identifierScheme": "CALM-RefNo"
-      },
-      {
-        "value": "MS.5754",
-        "type": "Identifier" ,
-        "identifierScheme": "CALM-AltRefNo"
-      }
-    ],
+  "identifiers": [
+    {
+      "value": "MS5754",
+      "type": "Identifier",
+      "identifierScheme": "CALM-RefNo"
+    },
+    {
+      "value": "MS.5754",
+      "type": "Identifier",
+      "identifierScheme": "CALM-AltRefNo"
+    }
+  ],
   "title": "Oxyrhynchus Papyrus 2547",
   "level": "Item",
-  "creationDate": 
-    {
-      "label": "3rd century AD",
-      "type": "Period"
-    },
+  "creationDate": {
+    "label": "3rd century AD",
+    "type": "Period"
+  },
   "description": "<p>Fragment of a document from Oxyrhynchus, Egypt, including a text of the Hippocratic Oath. <p>Recto: A business or official document in a fluent cursive hand, almost entirely illegible. <p>Verso: The Hippocratic Oath. Right hand section of a column of sixteen lines, written in an uncial hand.",
   "language": "Greek",
   "workType": "Archives",
-  "subjects": 
-    [
-     {
-        "label": "Hippocratic Oath",
-        "conceptScheme": "MeSH",
-        "type": "Subject"
-      },
-     {
-        "label": "Manuscripts, Greek (Papyri)",
-        "conceptScheme": "LCSH",
-        "type": "Subject"
-      }
-    ],
+  "subjects": [
+    {
+      "label": "Hippocratic Oath",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Manuscripts, Greek (Papyri)",
+      "conceptScheme": "LCSH",
+      "type": "Subject"
+    }
+  ],
   "isOriginalOf": "Colour photograph of a fragment of Hippocratic Oath, held at L5847EA",
-  "publicationNote": "Transcription and commentary in J W B Barns, <i>The Oxyrhynchus papyri, part 31</i> (London, 1966), pp. 62-65, with black and white photograph (plate II). Cf. Marie-Hélène Marganne, <i>Inventaire analytique des papyrus grecs de médecine</i> (Geneva, 1981), p. 251, with additional bibliography. Coloured photograph in Vivian Nutton, \"Wellcome papiro Oxyrhynchus 2547 e papiro Johnson\", <i>Kos</i> 1984, Vol. 1, no. 6, pp. 7-9.",
-    
-  "items":
-    [
-      {
-       "id": "v938kwb",
-       "type": "item",
-       "identifiers": 
-        [
-          {
-            "value": "MS5754",
-           "type": "Identifier" ,
-            "identifierScheme": "CALM-RefNo"
-          },
-          {
-            "value": "MS.5754",
-            "type": "Identifier" ,
-            "identifierScheme": "CALM-AltRefNo"
-          }
-        ],
-       "physicalDescription": "1 file.  Papyrus fragment: 105 × 52 mm.",
-       "acquisitionDetails": "Purchased in 1968.",
-       "accessionNumber": "acc. 315992"
-      }
-    ]
+  "publicationNote": "Transcription and commentary in J W B Barns, <i>The Oxyrhynchus papyri, part 31</i> (London, 1966), pp. 62-65, with black and white photograph (plate II). Cf. Marie-H\u00e9l\u00e8ne Marganne, <i>Inventaire analytique des papyrus grecs de m\u00e9decine</i> (Geneva, 1981), p. 251, with additional bibliography. Coloured photograph in Vivian Nutton, \"Wellcome papiro Oxyrhynchus 2547 e papiro Johnson\", <i>Kos</i> 1984, Vol. 1, no. 6, pp. 7-9.",
+  "items": [
+    {
+      "id": "v938kwb",
+      "type": "item",
+      "identifiers": [
+        {
+          "value": "MS5754",
+          "type": "Identifier",
+          "identifierScheme": "CALM-RefNo"
+        },
+        {
+          "value": "MS.5754",
+          "type": "Identifier",
+          "identifierScheme": "CALM-AltRefNo"
+        }
+      ],
+      "physicalDescription": "1 file.  Papyrus fragment: 105 \u00d7 52 mm.",
+      "acquisitionDetails": "Purchased in 1968.",
+      "accessionNumber": "acc. 315992"
+    }
+  ]
 }
