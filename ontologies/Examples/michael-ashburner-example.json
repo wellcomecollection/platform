@@ -3,19 +3,17 @@
   "type": "Person",
   "label": "Professor Michael Ashburner",
   "gender": "Male",
-  "dateOfBirth": "1942-05-23" ,
-  "nationality":
-    {
-      "id": "x2n20d1io",
-      "label": "United Kingdom" ,
-      "type": "Place"	
-    } ,
-  "placeOfBirth":
-      {
-      "id": "dj901290",
-      "label": "Sussex" ,
-      "type": "Place"	
-      } ,
+  "dateOfBirth": "1942-05-23",
+  "nationality": {
+    "id": "x2n20d1io",
+    "label": "United Kingdom",
+    "type": "Place"
+  },
+  "placeOfBirth": {
+    "id": "dj901290",
+    "label": "Sussex",
+    "type": "Place"
+  },
   "occupation": [
     {
       "id": "dj9120d1io",

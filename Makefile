@@ -18,7 +18,7 @@ sbt-common-test:
 sbt-common-publish:
 	echo "Nothing to do!"
 
-format: format-terraform format-scala
+format: format-terraform format-scala format-json
 
 check-format: format lint-python lint-ontologies
 	git diff --exit-code

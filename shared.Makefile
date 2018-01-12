@@ -41,6 +41,12 @@ format-scala:
 		--volume $(ROOT):/repo \
 		wellcome/scalafmt
 
+format-json:
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(ROOT):/src \
+		--workdir /src \
+		python:3-alpine python builds/format_json.py
+
 
 clean:
 	rm -rf $(ROOT)/.docker

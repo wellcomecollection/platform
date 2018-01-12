@@ -1,190 +1,183 @@
 {
-	"@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
-	"id": "25kw8v9",
-	"type": "Work",
-	"identifiers": 
-	[
-		{
-			"value": "PPCRI",
-			"type": "Identifier",
-			"identifierScheme": "CALM-RefNo"
-		},
-		{
-			"value": "PP/CRI",
-			"type": "Identifier",
-			"identifierScheme": "CALM-AltRefNo"
-		}
-	],
-	"title": "Francis Crick (1916-2004): archives",
-	"level": "Collection",
-	"creationDate": 
-		{
-		"label": "c.1911-2004",
-		"type": "Period"
-		},
-	"description": "<p>PP/CRI documents the course of Francis Crick's career through extensive files of correspondence, scientific notes, writings in draft, laboratory notebooks, and papers relating to scientific meetings attended, over a period of more than fifty years.  Researchers can trace both the emergence of molecular biology as a scientific discipline, and Crick's formative and central role as a scientific theorist.</p><p>Unpublished \"Notes\" of the RNA Tie Club and Crick's PhD thesis, <i>Polypeptides and Proteins: X-Ray Studies</i> (1953), supplement more familiar published papers.  Whilst the archive is a collection of scientific papers, it also contains miscellaneous personal material, such as greetings cards, travel ephemera, photographs, and the telegram that brought news of a Nobel Prize.  Correspondence files trace the currents of thought and experiment that determined the development of molecular biology in the second half of the twentieth century.  With their candidness, insight, humour and occasional abrasiveness, Crick's letters bear the stamp of his personality.  Scientific notes and papers in variant drafts reveal something of the process of composition and the habit of thought that produced the directness and clarity characteristic of his published work.</p><p><a href=\"http: //profiles.nlm.nih.gov/SC/\" target=\"_blank\">Material from the collection has been digitised for the National Library of Medicine's 'Profiles in Science' website and can be viewed online.</a></p>",
-	"workType": "Archives",
-	"historicalBackground": "<p><b>Career</b></p><p>Francis Harry Compton Crick was born 8 June, 1916, in Northampton, England, the elder child of Harry Crick and Annie Elizabeth Wilkins.  He was educated at Northampton Grammar School and Mill Hill School, London.  Subsequently, Crick studied physics at University College London (UCL), obtaining his BSc in 1937.  He remained at UCL, and commenced doctoral research under Professor E N da C Andrade, investigating the viscosity of water at temperatures above 100ºC, but his study was interrupted by the outbreak of war in 1939.</p><p>During World War II, Crick was a scientist at the British Admiralty Research Laboratory, working on non-contact magnetic and acoustic mines.  He continued to work at the Admiralty immediately after the war.  In 1947, he obtained a Medical Council Research Studentship and re-commenced graduate study, this time at Strangeways Laboratory in Cambridge.  There, he worked under Arthur Hughes, studying the physical properties of cytoplasm in cultured fibroblast cells, but did not submit a dissertation.  During this period, Crick began to read widely and purposefully in biology and chemistry, developing a particular interest in the nature of genetic material and in protein structure.  In June, 1949, Crick joined the staff of the Medical Research Council Unit at the Cavendish Laboratory, Cambridge.  With the encouragement of Sir Edward Mellenby, Secretary to the MRC, he also re-registered his research degree at Gonville and Caius College, Cambridge.</p><p>At the Cavendish, headed by Sir Lawrence Bragg, Crick joined a small team that included Max Perutz and John Kendrew, investigating the structure of proteins through X-ray crystallography, an investigative technique which was then entirely new to Crick.  He proved a rapid learner.  Together with W Cochran and V Vand, Crick determined the general theory of X-ray diffraction patterns produced by continuous and discontinuous helices.  The theory of helices formed a major component of his PhD thesis, by now entirely concerned with X-ray crystallography.  Drafted during 1952-53, <i>X-ray diffraction: polypeptides and proteins</i> was submitted to Gonville and Caius College, Cambridge, in July, 1953, shortly after the publication of his first papers with James D Watson on the structure of DNA.</p><p>James Watson came to the Cavendish Laboratory in the autumn of 1951 as a young man of twenty-three, with a PhD in genetics and an equally passionate interest in identifying the structure of genetic material.  Drawing upon experimental data produced at King's College by Rosalind Franklin and Maurice Wilkins, Crick and Watson published four papers during 1953-54, in which they elaborated a double-helical structure for DNA, and postulated a relationship between that structure and the transmission of genetic information.</p><p>Crick continued to explore the structure of other molecules, in his work on collagen with Alexander Rich (from 1955), and further work with Watson on the structure of viruses (1956).  He also continued to explore practical and theoretical aspects of crystallography, collaborating with Beatrice Magdoff on isomorphous replacement (1956).  The majority of his attention, however, was given to understanding the way in which genetic information is encoded in DNA, and the manner of its determination of protein formation.  During the 1950s and 1960s, Crick published a number of influential theoretical papers which addressed the transfer of genetic information, including:  \"On degenerate templates and the adaptor hypothesis: a note for the RNA Tie Club\" (privately circulated, 1955), \"On protein synthesis\" (1958), \"General nature of the genetic code for proteins\" (1961), \"On the genetic code\" (1962), \"Codon-anticodon pairing: the wobble hypothesis\" (1966), and \"The central dogma of molecular biology\" (1970).</p><p>In February 1962, Crick and Sydney Brenner took joint charge of the Molecular Genetics Division, at the newly-opened Laboratory of Molecular Biology, in Cambridge.  Brenner and Crick had worked together since Brenner's arrival from South Africa, in 1956, when he joined the MRC Unit at the Cavendish.  Together, they established, in 1961, through genetic work with acridine mutants, that the genetic code had a triple ratio.  Under Crick and Brenner, the Molecular Genetics Division concentrated its research on the genetics and biochemistry of control mechanisms in cellular development.  Brenner began comprehensive research on <i>Caenorhabditis elegans</i>, a small (1 mm long) soil nematode, establishing it as a powerful experimental system for the analysis of complex biological processes.  Crick became interested in embryogenesis and in chromosome structure.  By now, he was in great demand as a speaker, a role in which he excelled, and he regularly undertook, in addition to his work at Cambridge, a considerable number of lecture engagements across the world.</p><p>From 1976-1977, Crick was Ferkhauf Foundation Visiting Professor at the Salk Institute for Biological Studies, a privately-funded research institute based at La Jolla, California.  From 1977, his position there became permanent with his appointment as J W Kieckhefer Distinguished Research Professor.  His decision to leave Cambridge grew from a longstanding involvement with the work of the American Institute and a desire to tackle a fresh field of study: the neurobiological basis of consciousness.  In 1962, Crick had become a Non-Resident Fellow of the newly-formed Salk Institute (the first laboratory was opened in 1963).  In addition to Crick, the first faculty of resident and non-resident Fellows gathered by Jonas Salk included Jacob Bronowski, Melvin Cohn, Renato Dulbecco, Edwin Lennox, Leslie Orgel, Leo Szilard,  Salvador Luria, Jaques Monod, and Warren Weaver.  From 1962 until 1976, Crick made regular trips to the Salk Institute, often incorporating his time there with other American academic commitments.  Crick also served as President of the Salk Institute (1994-1995).</p><p>After moving to America, Crick published a number of papers in neurobiology.  Proceeding from the position that consciousness derives from bio-chemical reactions in the brain, Crick rejected a 'black-box' approach, electing to begin - as he and Watson had done many years before with DNA - from an understanding of physical structure.  Crick worked closely with Christoph Koch and others on the neural basis of attention to discover the neural correlates of consciousness.</p><p>In 1940 Crick married Ruth Doreen Dodd, with whom he had a son, Michael.  The marriage was dissolved in 1947, and in 1949 he married Odile Speed, with whom he had two daughters, Gabrielle and Jacqueline.</p><p>Crick died on 28 July 2004 at Thornton Hospital, San Diego.</p><p><b>Publications</b><br>In addition to his many scientific papers, Crick published:  <i>Of Molecules and Men</i> (1966), <i>Life Itself: Its Origin and Nature</i> (1981), <i>What Mad Pursuit: A Personal View of Scientific Discovery</i> (1988), and <i>The Astonishing Hypothesis: The Scientific Search for the Soul</i> (1994).</p><p><b>Awards and Honours</b><br>In 1962, Crick shared the Nobel Prize in Physiology or Medicine with James Watson and Maurice Wilkins, in recognition of their respective contributions to the discovery of the structure of DNA.  Although Crick consistently declined honorary degrees, he was the recipient of a number of awards and honours.  They include:  Fellow of the Royal Society (1959), Warren Triennial Prize (1959), Albert Lasker Award (1960), Le Prix Charles-Léopold Mayer (1961), Royal Society Royal Medal (1972), Royal Society Copley Medal (1975), Order of Merit (1991), and University of California (San Diego Division of Biological Sciences) inaugural Life Sciences Achievement Award (2003). Francis Crick was a Fellow of University College, London, Honorary Fellow of Churchill College Cambridge, and Honorary Fellow of Caius College, Cambridge.</p>",
-	"structure": "<p>PP/CRI has been arranged as follows:<br><b>A</b> Personal Material<br><b>B</b> Medical Research Council<br><b>C</b> Salk Institute for Biological Studies<br><b>D</b> Correspondence<br><b>E</b> Travels and Meetings<br><b>F</b> Doctorate<br><b>G</b> Notebooks<br><b>H</b> Notes and Drafts<br><b>I</b> Publications<br><b>J</b> Correspondence 1976-2002<br><b>K</b> Travel and Lectures 1982-1999<br><b>L</b> Notes, Drafts and Models [1976]-2001<br><b>M</b> Publications 1950-2001<br><b>N</b> Societies</p><p>Through force of circumstance the archive was catalogued in three separate batches.  The first batch (sections A-I) focuses mainly on Crick's DNA and genetic code research, and the second (sections J-M) on his shift in the late 1970s to theoretical research into neurobiology, particularly consciousness.  The third batch largely continues the series of records in sections J-M up to Crick's death in 2004, but also contained some earlier material which has been slotted into the appropriate series in sections A-I.</p><p>The arrangement reflects an order revealed rather than an order imposed.  Specifically, the titles of the two largest Sections - Travels and Meetings (PP/CRI/E) and Notes and Drafts (PP/CRI/H) - are Crick's.  Whilst not all files now placed in these two Sections were so kept, a sufficiently large proportion of them were for the application of Crick's headings - backwards and forwards in time as required - to be unforced and practical.  Together with the Correspondence file sequences (arranged as found), Travels and Meetings, and Notes and Drafts provide a chronological spine to the archive, documenting closely the matters and the occasions, that occupied Crick's attention over time. </p><p>Not surprisingly, for some time after his move to the Salk Institute in 1977 Crick found it hard to persuade the scientific community that he had moved to a new intellectual challenge.  In addition, he was inevitably asked to lecture on his DNA work throughout his life, with the result that material on this theme appears in the phase of papers documenting his neurobiological work.    Wherever possible, the catalogue points readers to related documents in other sections of the archive, but readers should also be aware of this potential overlap when searching the catalogue.  For example, while section J contains the main series of alphabetical correspondence for 1984 onwards, there is also a little correspondence for 1984-1985 in section D.",
-	"hasCopy": "A digitised copy is held by the Wellcome Library as part of Codebreakers: Makers of Modern Genetics.",
-	"subjects": 
-	[
-		{
-			"label": "Biochemistry",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Neurobiology",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Genetics",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Crystallography",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Correspondence",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Laboratories",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Consciousness",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Molecular Biology",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "DNA",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Aging",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Science",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Evolution",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Religion",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Societies, Scientific",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		},
-		{
-			"label": "Protein",
-			"conceptScheme": "MeSH", 
-			"type": "Subject"
-		}
-	],
-	"languages":
-	[
-	{
-		"label": "English"
-	},
-	{
-		"label": "French"
-	},
-	{
-		"label": "German"
-	},
-	{
-		"label": "Italian"
-	},
-	{
-		"label": "Spanish"
-	},
-	{
-		"label": "Finnish"
-	},
-	{
-		"label": "Hungarian"
-	},
-	{
-		"label": "Swedish"
-	},
-	{
-		"label": "Serbo - Croat"
-	},
-	{
-		"label": "Portuguese"
-	},
-	{
-		"label": "Japanese"
-	}
-	],
-	"items": 
-	[
-		{
-		"id": "fhw9829",
-		"type": "Item",
-		"identifiers": 
-		[
-			{
-				"value": "PPCRI",
-				"type": "Identifier",
-				"identifierScheme": "CALM-RefNo"
-			},
-			{
-				"value": "PP/CRI",
-				"type": "Identifier",
-				"identifierScheme": "CALM-AltRefNo"
-			}
-		],
-		"acquisitionDetails": "The materials that comprise PP/CRI were purchased from Dr Francis Crick by the Wellcome Trust, with the assistance of the Heritage Lottery Fund, in December 2001.",
-		"accessionNumber": 
-		[
-			{
-				"value": "1060"
-			},
-			{
-				"value": "1107"
-			},
-			{
-				"value": "1345"
-			},
-			{
-				"value": "1419"
-			},
-			{
-				"value": "1494"
-			},
-			{
-				"value": "1778"
-			}
-		],
-		"physicalDescription": "331 boxes, 12 oversize items (2,247 items in total)",
-		"access": "Certain restrictions apply",
-		"accessRightsStatement": "<p>The majority of the papers are open and available subject to the usual conditions of access to Archives and Manuscripts material.  The exceptions are:<br>PP/CRI/A/2/5 Restricted access until 1 January 2024.<br>PP/CRI/C/1/17 Closed until 1 January 2059<br>PP/CRI/D/2/12 Closed until 1 January 2083.<br>PP/CRI/D/4/5A Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/E/1/24/10 Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/H/1/37/A Cannot be consulted in the original for conservation reasons, but will be accessible digitally in due course via the Wellcome Digital Library.<br>PP/CRI/H/1/41/2A Cannot be consulted in the original for conservation reasons, but will be accessible digitally in due course via the Wellcome Digital Library.<br>PP/CRI/J/1/1/20 Restricted access until 1 January 2088.<br>PP/CRI/J/1/2/11A Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/J/1/2/20 Restricted access until 1 January 2090.<br>PP/CRI/J/1/2/21 Closed until 1 January 2090.<br>PP/CRI/J/1/3/21 Restricted access until 1 January 2094.<br>PP/CRI/J/1/3/22 Closed until 1 January 2094.<br>PP/CRI/J/1/4/22 Restricted access until 1 January 2096.<br>PP/CRI/J/1/4/23 Closed until 1 January 2096.<br>PP/CRI/J/1/5/24 Restricted access until 1 January 2098.<br>PP/CRI/J/1/5/25 Closed until 1 January 2098.<br>PP/CRI/J/1/6/24 Restricted access until 1 January 2100.<br>PP/CRI/J/1/6/25 Closed until 1 January 2100.<br>PP/CRI/J/1/7/27 Restricted access until 1 January 2086<br>PP/CRI/J/1/7/28/1-2 Closed until 1 January 2085<br>PP/CRI/J/1/8/5/2 Restricted access until 1 January 2088<br>PP/CRI/J/1/8/24/1 Restricted access until 1 January 2088<br>PP/CRI/J/1/8/24/2 Restricted access until 1 January 2034<br>PP/CRI/J/1/8/25/1 Closed until 1 January 2088<br>PP/CRI/J/1/8/25/2 Closed until 1 January 2034<br>PP/CRI/J/1/9/22 Restricted access until 1 January 2089<br>PP/CRI/J/1/9/23 Closed until 1 January 2089<br>PP/CRI/J/2/20/3 Closed until 1 January 2061<br>PP/CRI/J/4/1/15/4 Closed until 1 January 2064<br>PP/CRI/J/4/1/18 Closed until 1 January 2089<br>PP/CRI/J/4/3 Restricted access until 1 January 2030<br>PP/CRI/J/6  All files in this section are either restricted access for 30 years or closed for 60 years (see individual catalogue entries for specific dates).<br>PP/CRI/J/10/1 Closed until 1 January 2061<br>PP/CRI/J/10/2 Closed until 1 January 2058<br>PP/CRI/J/15/5A Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/J/15/6 Closed until 1 January 2089<br>PP/CRI/L/1/6/4/4 Restricted access until 1 January 2034.<br>PP/CRI/L/1/8/21 Closed until 1 January 2035<br>PP/CRI/L/2/2/6 Closed until 1 January 2052<br>PP/CRI/L/4/1 This item is in a fragile condition and can only be consulted by appointment and under supervision of the Wellcome Library Conservation Department. Please contact the Archives and Manuscripts Department for further information. It is advisable to provide a minimum of five working days advance notice if you wish to make an appointment to view this manuscript. <br>PP/CRI/N/11/2/1-5 Restricted access for varying dates until 1 January 2063<br>PP/CRI/N/11/3 Closed until 1 January 2059<br>PP/CRI/N/12/5/1 Closed until 1 January 2064<br>PP/CRI/N/12/5/2 Closed until 1 January 2062</p><p>The archivist may allow consultation of material designated \"restricted access\" (as opposed to closed) on completion of a restricted access application form.</p><p>For full details of the criteria used by the Wellcome Library to determine whether a file requires closure or restriction, see the Library's <a href=http://wellcomelibrary.org/content/documents/access-to-archives.pdf target=\"_blank \">Access to Archives policy</a>.</p> ",
-		"ipRightsStatement": "Images are supplied for private research only at the Archivist's discretion. Please note that material may be unsuitable for copying on conservation grounds. Researchers who wish to publish material must seek copyright permission from the copyright owner."
-		}
-	]
+  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id": "25kw8v9",
+  "type": "Work",
+  "identifiers": [
+    {
+      "value": "PPCRI",
+      "type": "Identifier",
+      "identifierScheme": "CALM-RefNo"
+    },
+    {
+      "value": "PP/CRI",
+      "type": "Identifier",
+      "identifierScheme": "CALM-AltRefNo"
+    }
+  ],
+  "title": "Francis Crick (1916-2004): archives",
+  "level": "Collection",
+  "creationDate": {
+    "label": "c.1911-2004",
+    "type": "Period"
+  },
+  "description": "<p>PP/CRI documents the course of Francis Crick's career through extensive files of correspondence, scientific notes, writings in draft, laboratory notebooks, and papers relating to scientific meetings attended, over a period of more than fifty years.  Researchers can trace both the emergence of molecular biology as a scientific discipline, and Crick's formative and central role as a scientific theorist.</p><p>Unpublished \"Notes\" of the RNA Tie Club and Crick's PhD thesis, <i>Polypeptides and Proteins: X-Ray Studies</i> (1953), supplement more familiar published papers.  Whilst the archive is a collection of scientific papers, it also contains miscellaneous personal material, such as greetings cards, travel ephemera, photographs, and the telegram that brought news of a Nobel Prize.  Correspondence files trace the currents of thought and experiment that determined the development of molecular biology in the second half of the twentieth century.  With their candidness, insight, humour and occasional abrasiveness, Crick's letters bear the stamp of his personality.  Scientific notes and papers in variant drafts reveal something of the process of composition and the habit of thought that produced the directness and clarity characteristic of his published work.</p><p><a href=\"http: //profiles.nlm.nih.gov/SC/\" target=\"_blank\">Material from the collection has been digitised for the National Library of Medicine's 'Profiles in Science' website and can be viewed online.</a></p>",
+  "workType": "Archives",
+  "historicalBackground": "<p><b>Career</b></p><p>Francis Harry Compton Crick was born 8 June, 1916, in Northampton, England, the elder child of Harry Crick and Annie Elizabeth Wilkins.  He was educated at Northampton Grammar School and Mill Hill School, London.  Subsequently, Crick studied physics at University College London (UCL), obtaining his BSc in 1937.  He remained at UCL, and commenced doctoral research under Professor E N da C Andrade, investigating the viscosity of water at temperatures above 100\u00baC, but his study was interrupted by the outbreak of war in 1939.</p><p>During World War II, Crick was a scientist at the British Admiralty Research Laboratory, working on non-contact magnetic and acoustic mines.  He continued to work at the Admiralty immediately after the war.  In 1947, he obtained a Medical Council Research Studentship and re-commenced graduate study, this time at Strangeways Laboratory in Cambridge.  There, he worked under Arthur Hughes, studying the physical properties of cytoplasm in cultured fibroblast cells, but did not submit a dissertation.  During this period, Crick began to read widely and purposefully in biology and chemistry, developing a particular interest in the nature of genetic material and in protein structure.  In June, 1949, Crick joined the staff of the Medical Research Council Unit at the Cavendish Laboratory, Cambridge.  With the encouragement of Sir Edward Mellenby, Secretary to the MRC, he also re-registered his research degree at Gonville and Caius College, Cambridge.</p><p>At the Cavendish, headed by Sir Lawrence Bragg, Crick joined a small team that included Max Perutz and John Kendrew, investigating the structure of proteins through X-ray crystallography, an investigative technique which was then entirely new to Crick.  He proved a rapid learner.  Together with W Cochran and V Vand, Crick determined the general theory of X-ray diffraction patterns produced by continuous and discontinuous helices.  The theory of helices formed a major component of his PhD thesis, by now entirely concerned with X-ray crystallography.  Drafted during 1952-53, <i>X-ray diffraction: polypeptides and proteins</i> was submitted to Gonville and Caius College, Cambridge, in July, 1953, shortly after the publication of his first papers with James D Watson on the structure of DNA.</p><p>James Watson came to the Cavendish Laboratory in the autumn of 1951 as a young man of twenty-three, with a PhD in genetics and an equally passionate interest in identifying the structure of genetic material.  Drawing upon experimental data produced at King's College by Rosalind Franklin and Maurice Wilkins, Crick and Watson published four papers during 1953-54, in which they elaborated a double-helical structure for DNA, and postulated a relationship between that structure and the transmission of genetic information.</p><p>Crick continued to explore the structure of other molecules, in his work on collagen with Alexander Rich (from 1955), and further work with Watson on the structure of viruses (1956).  He also continued to explore practical and theoretical aspects of crystallography, collaborating with Beatrice Magdoff on isomorphous replacement (1956).  The majority of his attention, however, was given to understanding the way in which genetic information is encoded in DNA, and the manner of its determination of protein formation.  During the 1950s and 1960s, Crick published a number of influential theoretical papers which addressed the transfer of genetic information, including:  \"On degenerate templates and the adaptor hypothesis: a note for the RNA Tie Club\" (privately circulated, 1955), \"On protein synthesis\" (1958), \"General nature of the genetic code for proteins\" (1961), \"On the genetic code\" (1962), \"Codon-anticodon pairing: the wobble hypothesis\" (1966), and \"The central dogma of molecular biology\" (1970).</p><p>In February 1962, Crick and Sydney Brenner took joint charge of the Molecular Genetics Division, at the newly-opened Laboratory of Molecular Biology, in Cambridge.  Brenner and Crick had worked together since Brenner's arrival from South Africa, in 1956, when he joined the MRC Unit at the Cavendish.  Together, they established, in 1961, through genetic work with acridine mutants, that the genetic code had a triple ratio.  Under Crick and Brenner, the Molecular Genetics Division concentrated its research on the genetics and biochemistry of control mechanisms in cellular development.  Brenner began comprehensive research on <i>Caenorhabditis elegans</i>, a small (1 mm long) soil nematode, establishing it as a powerful experimental system for the analysis of complex biological processes.  Crick became interested in embryogenesis and in chromosome structure.  By now, he was in great demand as a speaker, a role in which he excelled, and he regularly undertook, in addition to his work at Cambridge, a considerable number of lecture engagements across the world.</p><p>From 1976-1977, Crick was Ferkhauf Foundation Visiting Professor at the Salk Institute for Biological Studies, a privately-funded research institute based at La Jolla, California.  From 1977, his position there became permanent with his appointment as J W Kieckhefer Distinguished Research Professor.  His decision to leave Cambridge grew from a longstanding involvement with the work of the American Institute and a desire to tackle a fresh field of study: the neurobiological basis of consciousness.  In 1962, Crick had become a Non-Resident Fellow of the newly-formed Salk Institute (the first laboratory was opened in 1963).  In addition to Crick, the first faculty of resident and non-resident Fellows gathered by Jonas Salk included Jacob Bronowski, Melvin Cohn, Renato Dulbecco, Edwin Lennox, Leslie Orgel, Leo Szilard,  Salvador Luria, Jaques Monod, and Warren Weaver.  From 1962 until 1976, Crick made regular trips to the Salk Institute, often incorporating his time there with other American academic commitments.  Crick also served as President of the Salk Institute (1994-1995).</p><p>After moving to America, Crick published a number of papers in neurobiology.  Proceeding from the position that consciousness derives from bio-chemical reactions in the brain, Crick rejected a 'black-box' approach, electing to begin - as he and Watson had done many years before with DNA - from an understanding of physical structure.  Crick worked closely with Christoph Koch and others on the neural basis of attention to discover the neural correlates of consciousness.</p><p>In 1940 Crick married Ruth Doreen Dodd, with whom he had a son, Michael.  The marriage was dissolved in 1947, and in 1949 he married Odile Speed, with whom he had two daughters, Gabrielle and Jacqueline.</p><p>Crick died on 28 July 2004 at Thornton Hospital, San Diego.</p><p><b>Publications</b><br>In addition to his many scientific papers, Crick published:  <i>Of Molecules and Men</i> (1966), <i>Life Itself: Its Origin and Nature</i> (1981), <i>What Mad Pursuit: A Personal View of Scientific Discovery</i> (1988), and <i>The Astonishing Hypothesis: The Scientific Search for the Soul</i> (1994).</p><p><b>Awards and Honours</b><br>In 1962, Crick shared the Nobel Prize in Physiology or Medicine with James Watson and Maurice Wilkins, in recognition of their respective contributions to the discovery of the structure of DNA.  Although Crick consistently declined honorary degrees, he was the recipient of a number of awards and honours.  They include:  Fellow of the Royal Society (1959), Warren Triennial Prize (1959), Albert Lasker Award (1960), Le Prix Charles-L\u00e9opold Mayer (1961), Royal Society Royal Medal (1972), Royal Society Copley Medal (1975), Order of Merit (1991), and University of California (San Diego Division of Biological Sciences) inaugural Life Sciences Achievement Award (2003). Francis Crick was a Fellow of University College, London, Honorary Fellow of Churchill College Cambridge, and Honorary Fellow of Caius College, Cambridge.</p>",
+  "structure": "<p>PP/CRI has been arranged as follows:<br><b>A</b> Personal Material<br><b>B</b> Medical Research Council<br><b>C</b> Salk Institute for Biological Studies<br><b>D</b> Correspondence<br><b>E</b> Travels and Meetings<br><b>F</b> Doctorate<br><b>G</b> Notebooks<br><b>H</b> Notes and Drafts<br><b>I</b> Publications<br><b>J</b> Correspondence 1976-2002<br><b>K</b> Travel and Lectures 1982-1999<br><b>L</b> Notes, Drafts and Models [1976]-2001<br><b>M</b> Publications 1950-2001<br><b>N</b> Societies</p><p>Through force of circumstance the archive was catalogued in three separate batches.  The first batch (sections A-I) focuses mainly on Crick's DNA and genetic code research, and the second (sections J-M) on his shift in the late 1970s to theoretical research into neurobiology, particularly consciousness.  The third batch largely continues the series of records in sections J-M up to Crick's death in 2004, but also contained some earlier material which has been slotted into the appropriate series in sections A-I.</p><p>The arrangement reflects an order revealed rather than an order imposed.  Specifically, the titles of the two largest Sections - Travels and Meetings (PP/CRI/E) and Notes and Drafts (PP/CRI/H) - are Crick's.  Whilst not all files now placed in these two Sections were so kept, a sufficiently large proportion of them were for the application of Crick's headings - backwards and forwards in time as required - to be unforced and practical.  Together with the Correspondence file sequences (arranged as found), Travels and Meetings, and Notes and Drafts provide a chronological spine to the archive, documenting closely the matters and the occasions, that occupied Crick's attention over time. </p><p>Not surprisingly, for some time after his move to the Salk Institute in 1977 Crick found it hard to persuade the scientific community that he had moved to a new intellectual challenge.  In addition, he was inevitably asked to lecture on his DNA work throughout his life, with the result that material on this theme appears in the phase of papers documenting his neurobiological work.    Wherever possible, the catalogue points readers to related documents in other sections of the archive, but readers should also be aware of this potential overlap when searching the catalogue.  For example, while section J contains the main series of alphabetical correspondence for 1984 onwards, there is also a little correspondence for 1984-1985 in section D.",
+  "hasCopy": "A digitised copy is held by the Wellcome Library as part of Codebreakers: Makers of Modern Genetics.",
+  "subjects": [
+    {
+      "label": "Biochemistry",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Neurobiology",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Genetics",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Crystallography",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Correspondence",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Laboratories",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Consciousness",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Molecular Biology",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "DNA",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Aging",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Science",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Evolution",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Religion",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Societies, Scientific",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    },
+    {
+      "label": "Protein",
+      "conceptScheme": "MeSH",
+      "type": "Subject"
+    }
+  ],
+  "languages": [
+    {
+      "label": "English"
+    },
+    {
+      "label": "French"
+    },
+    {
+      "label": "German"
+    },
+    {
+      "label": "Italian"
+    },
+    {
+      "label": "Spanish"
+    },
+    {
+      "label": "Finnish"
+    },
+    {
+      "label": "Hungarian"
+    },
+    {
+      "label": "Swedish"
+    },
+    {
+      "label": "Serbo - Croat"
+    },
+    {
+      "label": "Portuguese"
+    },
+    {
+      "label": "Japanese"
+    }
+  ],
+  "items": [
+    {
+      "id": "fhw9829",
+      "type": "Item",
+      "identifiers": [
+        {
+          "value": "PPCRI",
+          "type": "Identifier",
+          "identifierScheme": "CALM-RefNo"
+        },
+        {
+          "value": "PP/CRI",
+          "type": "Identifier",
+          "identifierScheme": "CALM-AltRefNo"
+        }
+      ],
+      "acquisitionDetails": "The materials that comprise PP/CRI were purchased from Dr Francis Crick by the Wellcome Trust, with the assistance of the Heritage Lottery Fund, in December 2001.",
+      "accessionNumber": [
+        {
+          "value": "1060"
+        },
+        {
+          "value": "1107"
+        },
+        {
+          "value": "1345"
+        },
+        {
+          "value": "1419"
+        },
+        {
+          "value": "1494"
+        },
+        {
+          "value": "1778"
+        }
+      ],
+      "physicalDescription": "331 boxes, 12 oversize items (2,247 items in total)",
+      "access": "Certain restrictions apply",
+      "accessRightsStatement": "<p>The majority of the papers are open and available subject to the usual conditions of access to Archives and Manuscripts material.  The exceptions are:<br>PP/CRI/A/2/5 Restricted access until 1 January 2024.<br>PP/CRI/C/1/17 Closed until 1 January 2059<br>PP/CRI/D/2/12 Closed until 1 January 2083.<br>PP/CRI/D/4/5A Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/E/1/24/10 Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/H/1/37/A Cannot be consulted in the original for conservation reasons, but will be accessible digitally in due course via the Wellcome Digital Library.<br>PP/CRI/H/1/41/2A Cannot be consulted in the original for conservation reasons, but will be accessible digitally in due course via the Wellcome Digital Library.<br>PP/CRI/J/1/1/20 Restricted access until 1 January 2088.<br>PP/CRI/J/1/2/11A Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/J/1/2/20 Restricted access until 1 January 2090.<br>PP/CRI/J/1/2/21 Closed until 1 January 2090.<br>PP/CRI/J/1/3/21 Restricted access until 1 January 2094.<br>PP/CRI/J/1/3/22 Closed until 1 January 2094.<br>PP/CRI/J/1/4/22 Restricted access until 1 January 2096.<br>PP/CRI/J/1/4/23 Closed until 1 January 2096.<br>PP/CRI/J/1/5/24 Restricted access until 1 January 2098.<br>PP/CRI/J/1/5/25 Closed until 1 January 2098.<br>PP/CRI/J/1/6/24 Restricted access until 1 January 2100.<br>PP/CRI/J/1/6/25 Closed until 1 January 2100.<br>PP/CRI/J/1/7/27 Restricted access until 1 January 2086<br>PP/CRI/J/1/7/28/1-2 Closed until 1 January 2085<br>PP/CRI/J/1/8/5/2 Restricted access until 1 January 2088<br>PP/CRI/J/1/8/24/1 Restricted access until 1 January 2088<br>PP/CRI/J/1/8/24/2 Restricted access until 1 January 2034<br>PP/CRI/J/1/8/25/1 Closed until 1 January 2088<br>PP/CRI/J/1/8/25/2 Closed until 1 January 2034<br>PP/CRI/J/1/9/22 Restricted access until 1 January 2089<br>PP/CRI/J/1/9/23 Closed until 1 January 2089<br>PP/CRI/J/2/20/3 Closed until 1 January 2061<br>PP/CRI/J/4/1/15/4 Closed until 1 January 2064<br>PP/CRI/J/4/1/18 Closed until 1 January 2089<br>PP/CRI/J/4/3 Restricted access until 1 January 2030<br>PP/CRI/J/6  All files in this section are either restricted access for 30 years or closed for 60 years (see individual catalogue entries for specific dates).<br>PP/CRI/J/10/1 Closed until 1 January 2061<br>PP/CRI/J/10/2 Closed until 1 January 2058<br>PP/CRI/J/15/5A Currently closed as digital material is not yet available at the Wellcome Library.<br>PP/CRI/J/15/6 Closed until 1 January 2089<br>PP/CRI/L/1/6/4/4 Restricted access until 1 January 2034.<br>PP/CRI/L/1/8/21 Closed until 1 January 2035<br>PP/CRI/L/2/2/6 Closed until 1 January 2052<br>PP/CRI/L/4/1 This item is in a fragile condition and can only be consulted by appointment and under supervision of the Wellcome Library Conservation Department. Please contact the Archives and Manuscripts Department for further information. It is advisable to provide a minimum of five working days advance notice if you wish to make an appointment to view this manuscript. <br>PP/CRI/N/11/2/1-5 Restricted access for varying dates until 1 January 2063<br>PP/CRI/N/11/3 Closed until 1 January 2059<br>PP/CRI/N/12/5/1 Closed until 1 January 2064<br>PP/CRI/N/12/5/2 Closed until 1 January 2062</p><p>The archivist may allow consultation of material designated \"restricted access\" (as opposed to closed) on completion of a restricted access application form.</p><p>For full details of the criteria used by the Wellcome Library to determine whether a file requires closure or restriction, see the Library's <a href=http://wellcomelibrary.org/content/documents/access-to-archives.pdf target=\"_blank \">Access to Archives policy</a>.</p> ",
+      "ipRightsStatement": "Images are supplied for private research only at the Archivist's discretion. Please note that material may be unsuitable for copying on conservation grounds. Researchers who wish to publish material must seek copyright permission from the copyright owner."
+    }
+  ]
 }
