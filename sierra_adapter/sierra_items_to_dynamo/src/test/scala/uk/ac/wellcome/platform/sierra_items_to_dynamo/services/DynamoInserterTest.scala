@@ -24,7 +24,8 @@ class DynamoInserterTest
     with Matchers
     with SierraItemsToDynamoDBLocal
     with ScalaFutures
-    with MockitoSugar with ExtendedPatience{
+    with MockitoSugar
+    with ExtendedPatience {
 
   val dynamoInserter = new DynamoInserter(
     new SierraItemRecordDao(
