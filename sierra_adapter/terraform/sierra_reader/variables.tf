@@ -22,6 +22,7 @@ variable "alb_client_error_alarm_arn" {}
 variable "alb_cloudwatch_id" {}
 
 variable "dlq_alarm_arn" {}
+variable "lambda_error_alarm_arn" {}
 
 variable "aws_region" {
   default = "eu-west-1"
