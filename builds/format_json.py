@@ -9,13 +9,15 @@ import sys
 
 def find_json_files():
     for root, _, filenames in os.walk('.'):
+        if any(
+            d in root
+            for d in ['/WIP', '/.terraform', '/target']
+        ):
+            continue
+
         for f in filenames:
 
-            if any(
-                d in root
-                for d in ['/WIP', '/.terraform', '/target']
-            ):
-                continue
+
 
             if f.lower().endswith('.json'):
                 yield os.path.join(root, f)
@@ -30,16 +32,16 @@ if __name__ == '__main__':
         try:
             data = json.loads(f_contents)
         except ValueError as err:
-            print(f'{f} - Invalid JSON?  {err}')
+            print(f'[ERROR] {f} - Invalid JSON? {err}')
             bad_files.append(f)
             continue
 
         json_str = json.dumps(f_contents, indent=2, sort_keys=True)
         if json_str == f_contents:
-            print(f'{f} - already formatted correctly')
+            print(f'[OK]    {f}')
         else:
             open(f, 'w').write(json_str)
-            print(f'{f} - reformatted successfully')
+            print(f'[FIXED] {f}')
 
     if bad_files:
         print('')
