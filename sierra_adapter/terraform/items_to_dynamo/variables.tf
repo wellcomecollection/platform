@@ -1,16 +1,5 @@
-variable "resource_type" {}
-
-variable "windows_topic_name" {}
-
-variable "sierra_to_dynamo_release_id" {}
-variable "sierra_merger_release_id" {}
-
-variable "merged_dynamo_table_name" {}
-
-variable "sierra_api_url" {}
-variable "sierra_oauth_key" {}
-variable "sierra_oauth_secret" {}
-variable "sierra_fields" {}
+variable "release_id" {}
+variable "demultiplexer_topic_name" {}
 
 variable "cluster_name" {}
 variable "vpc_id" {}
