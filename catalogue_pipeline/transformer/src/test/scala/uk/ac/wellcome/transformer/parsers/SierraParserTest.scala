@@ -27,7 +27,8 @@ class SierraParserTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
       """.stripMargin
 

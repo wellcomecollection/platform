@@ -24,7 +24,8 @@ class SierraTransformableTransformerTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -100,7 +101,8 @@ class SierraTransformableTransformerTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -132,6 +134,7 @@ class SierraTransformableTransformerTest
          |{
          | "id": "$id",
          | "title": "$title",
+         | "varFields": [],
          | "deleted": true
          |}
         """.stripMargin
@@ -165,6 +168,7 @@ class SierraTransformableTransformerTest
          |{
          | "id": "$id",
          | "title": "$title",
+         | "varFields": [],
          | "suppressed": true
          |}
         """.stripMargin
@@ -197,7 +201,8 @@ class SierraTransformableTransformerTest
       s"""
          |{
          | "id": "$id",
-         | "title": "$title"
+         | "title": "$title",
+         | "varFields": []
          |}
         """.stripMargin
 
@@ -237,6 +242,161 @@ class SierraTransformableTransformerTest
         visible = false
       )
     )
+  }
+
+  it("passes through the title from the bib record") {
+    val id = "t1234"
+    val title = "Tickling a tiny turtle in Tenerife"
+    val data =
+      s"""
+         |{
+         | "id": "$id",
+         | "title": "$title",
+         | "varFields": []
+         |}
+        """.stripMargin
+
+    val mergedSierraRecord = SierraTransformable(
+      bibRecord = SierraBibRecord(id = id, data = data, modifiedDate = now())
+    )
+
+    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    work.title shouldBe title
+  }
+
+  describe("publishers") {
+    it("picks up zero publishers") {
+      assertPublisherJsonGivesExpectedPublishers(
+        json = """"varFields": [],""",
+        expectedPublishers = List()
+      )
+    }
+
+    it("ignores subfields unrelated to the name of the publisher") {
+      assertPublisherJsonGivesExpectedPublishers(
+        json = """
+          "varFields": [
+            {
+              "fieldTag": "p",
+              "marcTag": "260",
+              "ind1": " ",
+              "ind2": " ",
+              "subfields": [
+                {
+                  "tag": "c",
+                  "content": "1984"
+                }
+              ]
+            }
+          ],
+        """.stripMargin,
+        expectedPublishers = List()
+      )
+    }
+
+    it("picks up information about the name of the publisher") {
+      assertPublisherJsonGivesExpectedPublishers(
+        json = """
+          "varFields": [
+            {
+              "fieldTag": "p",
+              "marcTag": "260",
+              "ind1": " ",
+              "ind2": " ",
+              "subfields": [
+                {
+                  "tag": "b",
+                  "content": "H. Humphrey"
+                }
+              ]
+            }
+          ],
+        """.stripMargin,
+        expectedPublishers = List(
+          Agent(
+            label = "H. Humphrey",
+            ontologyType = "Organisation"
+          ))
+      )
+    }
+
+    it("picks up information about multiple publishers") {
+      // Based on an example in
+      // http://www.loc.gov/marc/bibliographic/bd260.html
+      assertPublisherJsonGivesExpectedPublishers(
+        json = """
+          "varFields": [
+            {
+              "fieldTag": "p",
+              "marcTag": "260",
+              "ind1": " ",
+              "ind2": " ",
+              "subfields": [
+                {
+                  "tag": "a",
+                  "content": "Paris"
+                },
+                {
+                  "tag": "b",
+                  "content": "Gauthier-Villars"
+                },
+                {
+                  "tag": "a",
+                  "content": "Chicago"
+                },
+                {
+                  "tag": "b",
+                  "content": "University of Chicago Press"
+                },
+                {
+                  "tag": "c",
+                  "content": "1955"
+                }
+              ]
+            }
+          ],
+        """.stripMargin,
+        expectedPublishers = List(
+          Agent(
+            label = "Gauthier-Villars",
+            ontologyType = "Organisation"
+          ),
+          Agent(
+            label = "University of Chicago Press",
+            ontologyType = "Organisation"
+          )
+        )
+      )
+    }
+
+  }
+
+  private def assertPublisherJsonGivesExpectedPublishers(
+    json: String,
+    expectedPublishers: List[Agent]
+  ) = {
+    val data = s"""{
+      $json
+      "id": "p1234",
+      "title": "A pack of puffins"
+    }"""
+
+    val mergedSierraRecord = SierraTransformable(
+      bibRecord = SierraBibRecord(
+        id = "p1234",
+        data = data,
+        modifiedDate = now()
+      )
+    )
+
+    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
+    transformedSierraRecord.isSuccess shouldBe true
+    val work = transformedSierraRecord.get.get
+
+    work.publishers shouldBe expectedPublishers
   }
 
 }

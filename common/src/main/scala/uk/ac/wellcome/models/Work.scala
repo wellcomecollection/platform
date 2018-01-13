@@ -17,6 +17,7 @@ case class Work(title: String,
                 genres: List[Concept] = Nil,
                 thumbnail: Option[Location] = None,
                 items: List[Item] = Nil,
+                publishers: List[Agent] = Nil,
                 visible: Boolean = true)
     extends Identifiable {
   @JsonProperty("type") val ontologyType: String = "Work"
