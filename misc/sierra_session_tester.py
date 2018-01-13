@@ -102,10 +102,7 @@ class SierraAPI(object):
 
             from contextlib import closing
 
-            with closing(self.sess.get(
-                f'{self.api_url}{path}',
-                params=params,
-            )) as resp:
+            with closing(self.sess.get(get_url, params=params)) as resp:
                 return resp
 
         try:
