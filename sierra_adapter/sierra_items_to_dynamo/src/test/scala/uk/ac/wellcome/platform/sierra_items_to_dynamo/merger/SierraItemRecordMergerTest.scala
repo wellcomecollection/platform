@@ -1,7 +1,5 @@
-package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
+package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
-import io.circe.optics.JsonPath.root
-import io.circe.parser._
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.utils.JsonUtil
