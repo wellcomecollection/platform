@@ -1,52 +1,33 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
-import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
-import com.twitter.inject.annotations.Flag
+import io.circe.parser.decode
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{DynamoConfig, SQSMessage}
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.sink.SierraItemsDynamoSink
-import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
-import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
-import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
+import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.sierra.SierraRecord
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.circe._
+import io.circe.generic.auto._
+import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
 
 class SierraItemsToDynamoWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
-  sierraItemRecordDao: SierraItemRecordDao,
-  @Flag("sierra.apiUrl") apiUrl: String,
-  @Flag("sierra.oauthKey") sierraOauthKey: String,
-  @Flag("sierra.oauthSecret") sierraOauthSecret: String,
-  @Flag("sierra.fields") fields: String
+  dynamoInserter: DynamoInserter
 ) extends SQSWorker(reader, system, metrics) {
 
-  implicit val actorSystem = system
-  implicit val materialiser = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
-
-  val throttleRate = ThrottleRate(3, 1.second)
-
   def processMessage(message: SQSMessage): Future[Unit] =
-    for {
-      window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
-      params = Map("updatedDate" -> window, "fields" -> fields)
-      _ <- runSierraStream(params)
-    } yield ()
-
-  private def runSierraStream(params: Map[String, String]): Future[Unit] = {
-    SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
-      resourceType = "items",
-      params).runWith(
-      SierraItemsDynamoSink(
-        sierraItemRecordDao
-      ))
-  }
+    decode[SierraRecord](message.body) match {
+      case Right(record) =>
+        dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
+      case Left(e) =>
+        Future {
+          logger.warn(s"Failed processing $message", e)
+          throw SQSReaderGracefulException(e)
+        }
+    }
 }

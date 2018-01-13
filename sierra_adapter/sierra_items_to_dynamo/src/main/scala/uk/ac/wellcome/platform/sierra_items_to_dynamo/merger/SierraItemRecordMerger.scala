@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_items_to_dynamo.sink
+package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 

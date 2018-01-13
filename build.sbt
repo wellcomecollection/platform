@@ -48,7 +48,6 @@ lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_rea
   .settings(libraryDependencies ++= Dependencies.sierraReaderDependencies)
 
 lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")
-  .settings(libraryDependencies ++= Dependencies.sierraToDynamoDependencies)
 
 lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_bib_merger")
   .settings(libraryDependencies ++= Dependencies.sierraBibMergerDepedencies)
