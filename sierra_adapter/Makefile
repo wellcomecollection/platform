@@ -56,6 +56,13 @@ sierra_item_merger-publish: sierra_item_merger-build
 	$(call publish_service,sierra_item_merger)
 
 
+s3_demultiplexer-test:
+	$(call test_lambda,sierra_adapter/s3_demultiplexer)
+
+s3_demultiplexer-publish:
+	$(call publish_lambda,sierra_adapter/s3_demultiplexer)
+
+
 sierra_adapter-terraform-plan:
 	$(call terraform_plan,$(SIERRA_ADAPTER)/terraform,false)
 
