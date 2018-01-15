@@ -20,7 +20,7 @@ class SierraTitleTest
   val transformer = new Object with SierraTitle
 
   private def assertTitleIsCorrect(
-    bibDataTitle: SierraBibData,
+    bibDataTitle: String,
     expectedTitle: String
   ) = {
 
