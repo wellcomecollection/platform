@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.1.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.1.1"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   vpc_id             = "${local.vpc_api_id}"
