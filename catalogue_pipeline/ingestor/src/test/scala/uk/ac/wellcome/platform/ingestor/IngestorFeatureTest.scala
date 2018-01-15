@@ -7,6 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -15,7 +16,7 @@ import scala.collection.JavaConversions._
 
 class IngestorFeatureTest
     extends FunSpec
-    with IngestorUtils
+    with Ingestor
     with FeatureTestMixin
     with Matchers
     with JsonTestUtil

@@ -1,18 +1,24 @@
-package uk.ac.wellcome.platform.ingestor
+package uk.ac.wellcome.platform.ingestor.test.utils
 
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.Suite
+import org.scalatest.{BeforeAndAfterEach, Suite}
+import uk.ac.wellcome.platform.ingestor.Server
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   IndexedElasticSearchLocal,
   SQSLocal
 }
 
-trait IngestorUtils
+trait Ingestor
     extends IndexedElasticSearchLocal
     with SQSLocal
+    with BeforeAndAfterEach
     with AmazonCloudWatchFlag { this: Suite =>
+
   val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
+
+  val indexName = "works"
+  val itemType = "work"
 
   def createServer: EmbeddedHttpServer = {
     new EmbeddedHttpServer(

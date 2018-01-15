@@ -13,6 +13,9 @@ class ApiWorksTest
     with IndexedElasticSearchLocal
     with WorksUtil {
 
+  val indexName = "works"
+  val itemType = "work"
+
   implicit val jsonMapper = Work
   override val server =
     new EmbeddedHttpServer(

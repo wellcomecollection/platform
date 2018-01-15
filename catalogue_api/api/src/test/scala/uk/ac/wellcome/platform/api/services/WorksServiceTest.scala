@@ -21,6 +21,9 @@ class WorksServiceTest
     with ScalaFutures
     with WorksUtil {
 
+  val indexName = "works"
+  val itemType = "work"
+
   val searchService =
     new ElasticSearchService(indexName, itemType, elasticClient)
 

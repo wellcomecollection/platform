@@ -16,6 +16,8 @@ object Dependencies {
     val jacksonYamlVersion = "2.8.8"
     val jacksonJSR310Version = "2.8.9"
     val circeVersion = "0.9.0"
+    val scalaCheckVersion = "1.13.4"
+    val scalaCheckShapelessVersion = "1.1.6"
     val sierraStreamsSourceVersion = "0.2"
   }
 
@@ -75,7 +77,9 @@ object Dependencies {
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
-    "com.novocode" % "junit-interface" % versions.junitInterface % "test"
+    "com.novocode" % "junit-interface" % versions.junitInterface % "test",
+    "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
