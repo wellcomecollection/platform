@@ -51,10 +51,12 @@ endef
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
+	$(ROOT)/builds/build_lambda_test_image.sh $(1)
 	$(ROOT)/builds/docker_run.py --aws -- \
 		--volume $(ROOT)/$(1)/src:/data \
+		--env INSTALL_DEPENDENCIES=false \
 		--env FIND_MATCH_PATHS="/data" --tty \
-		wellcome/test_lambda:latest
+		wellcome/test_lambda_$(shell basename $(1)):latest
 endef
 
 
