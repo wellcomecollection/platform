@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 
 import json
-import os
 
 import boto3
 from moto import mock_s3

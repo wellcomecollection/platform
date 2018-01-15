@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import boto3
 from moto import mock_ec2, mock_autoscaling, mock_ecs, mock_sns, mock_sqs
 import pytest
 
