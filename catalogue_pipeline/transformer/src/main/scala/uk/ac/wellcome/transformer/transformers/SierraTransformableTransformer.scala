@@ -13,16 +13,8 @@ import scala.util.{Failure, Success, Try}
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraPublishers
+    with SierraTitle
     with Logging {
-
-  // Populate wwork:title.  The rules are as follows:
-  //
-  //    For all bibliographic records use Sierra "title".
-  //
-  // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
-  // http://www.loc.gov/marc/bibliographic/bd245.html
-  private def getTitle(bibData: SierraBibData): String =
-    bibData.title
 
   private def extractItemData(itemRecord: SierraItemRecord) = {
     info(s"Attempting to transform $itemRecord")
