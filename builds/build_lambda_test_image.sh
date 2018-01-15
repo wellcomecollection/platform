@@ -32,7 +32,7 @@ MARKER=$ROOT/.docker/lambda_test_$LABEL
 
 
 # If we don't already have the image, pull it now.
-if [[ ! $(docker inspect --type=image wellcome/test_lambda) ]]
+if ! docker inspect --type=image wellcome/test_lambda >/dev/null 2>&1
 then
   docker pull wellcome/test_lambda:latest
 fi
