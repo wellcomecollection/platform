@@ -72,11 +72,9 @@ def sns_image_json_event():
 def test_should_copy_an_asset_into_a_different_bucket(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -89,12 +87,11 @@ def test_should_copy_an_asset_into_a_different_bucket(
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -105,11 +102,9 @@ def test_should_copy_an_asset_into_a_different_bucket(
 def test_should_copy_dt_and_tifs_into_a_different_bucket(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -128,12 +123,11 @@ def test_should_copy_dt_and_tifs_into_a_different_bucket(
     destination_tif_key = f"{destination_prefix}A0000000/{miro_id}.tif"
     destination_dt_key = f"{destination_prefix}A0000000/{miro_id}.dt"
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -147,22 +141,19 @@ def test_should_copy_dt_and_tifs_into_a_different_bucket(
 def test_should_not_crash_if_the_asset_does_not_exist(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
 
     destination_prefix = "library/"
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -172,11 +163,9 @@ def test_should_not_crash_if_the_asset_does_not_exist(
 def test_should_replace_asset_if_already_exists_with_different_content(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -195,12 +184,11 @@ def test_should_replace_asset_if_already_exists_with_different_content(
         ACL='private',
         Body=b"adjhgkjae", Key=destination_key)
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -211,11 +199,9 @@ def test_should_replace_asset_if_already_exists_with_different_content(
 def test_should_copy_the_exact_matching_key(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -234,12 +220,11 @@ def test_should_copy_the_exact_matching_key(
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -250,11 +235,9 @@ def test_should_copy_the_exact_matching_key(
 def test_should_copy_the_exact_matching_key_capital_file_extension(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -273,12 +256,11 @@ def test_should_copy_the_exact_matching_key_capital_file_extension(
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -289,11 +271,9 @@ def test_should_copy_the_exact_matching_key_capital_file_extension(
 def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -310,12 +290,11 @@ def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches
         ACL='private',
         Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2")
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
@@ -327,11 +306,9 @@ def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches
 def test_should_raise_an_exception_if_multiple_non_exact_matches(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
-
-    topic_arn, queue_url = sns_sqs
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
@@ -348,12 +325,11 @@ def test_should_raise_an_exception_if_multiple_non_exact_matches(
         ACL='private',
         Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2")
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     with pytest.raises(MiroKeyIdMismatchException):
         miro_copy_s3_master_asset.main(event, None)
@@ -362,14 +338,12 @@ def test_should_raise_an_exception_if_multiple_non_exact_matches(
 def test_should_raise_an_exception_if_only_match_is_not_exact_or_exact_before_hyphen(
         create_source_and_destination_buckets,
         sns_image_json_event,
-        sns_sqs):
+        queue_url):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-
-    topic_arn, queue_url = sns_sqs
 
     image_body = b'baba'
     destination_prefix = "library/"
@@ -379,12 +353,11 @@ def test_should_raise_an_exception_if_only_match_is_not_exact_or_exact_before_hy
         ACL='private',
         Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL-RA-RA.jp2")
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     with pytest.raises(MiroKeyIdMismatchException):
         miro_copy_s3_master_asset.main(event, None)

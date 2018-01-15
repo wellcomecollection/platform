@@ -91,12 +91,11 @@ def sns_image_json_event():
 
 def test_should_copy_an_asset_into_a_different_bucket_and_forward_the_message(
         create_source_and_destination_buckets,
-        sns_sqs,
+        queue_url,
         sns_image_json_event):
     sqs_client = boto3.client("sqs")
     s3_client = boto3.client("s3")
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
-    topic_arn, queue_url = sns_sqs
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
     s3_client.put_object(
@@ -106,12 +105,11 @@ def test_should_copy_an_asset_into_a_different_bucket_and_forward_the_message(
 
     destination_key = f"A0000000/{miro_id}.jpg"
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_derivative_asset.main(event, None)
 
@@ -123,20 +121,18 @@ def test_should_copy_an_asset_into_a_different_bucket_and_forward_the_message(
 
 def test_should_not_forward_the_message_if_the_asset_does_not_exist(
         create_source_and_destination_buckets,
-        sns_sqs,
+        queue_url,
         sns_image_json_event):
     sqs_client = boto3.client("sqs")
     s3_client = boto3.client("s3")
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
-    topic_arn, queue_url = sns_sqs
     miro_id, image_json, event = sns_image_json_event
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_derivative_asset.main(event, None)
 
@@ -147,12 +143,11 @@ def test_should_not_forward_the_message_if_the_asset_does_not_exist(
 
 def test_should_replace_asset_if_already_exists_with_different_content(
         create_source_and_destination_buckets,
-        sns_sqs,
+        queue_url,
         sns_image_json_event):
     sqs_client = boto3.client("sqs")
     s3_client = boto3.client("s3")
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
-    topic_arn, queue_url = sns_sqs
     miro_id, image_json, event = sns_image_json_event
     image_body = b'baba'
     s3_client.put_bucket_versioning(Bucket=destination_bucket_name,
@@ -168,12 +163,11 @@ def test_should_replace_asset_if_already_exists_with_different_content(
         ACL='public-read',
         Body=image_body, Key=destination_key)
 
-    os.environ = {
+    os.environ.update({
         "S3_SOURCE_BUCKET": source_bucket_name,
         "S3_DESTINATION_BUCKET": destination_bucket_name,
         "S3_DESTINATION_PREFIX": destination_prefix,
-        "TOPIC_ARN": topic_arn
-    }
+    })
 
     miro_copy_s3_derivative_asset.main(event, None)
 

@@ -20,14 +20,16 @@ shared_infra-test: drain_ecs_container_instance-test \
                    run_ecs_task-test \
                    service_scheduler-test \
                    update_dynamo_capacity-test \
-                   update_ecs_service_size-test
+                   update_ecs_service_size-test \
+				   sqs_freezeray-build\
+				   sqs_redrive-build
 
 ## Build shared_infra
 shared_infra-build: sqs_freezeray-build	\
                     sqs_redrive-build
 
 ## Publish shared_infra
-shared_infra-deploy: drain_ecs_container_instance-publish \
+shared_infra-publish: drain_ecs_container_instance-publish \
                       dynamo_to_sns-publish \
                       ecs_ec2_instance_tagger-publish \
                       run_ecs_task-publish \

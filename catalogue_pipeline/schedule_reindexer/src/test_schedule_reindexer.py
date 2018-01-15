@@ -31,7 +31,7 @@ def _create_topic_and_queue(sns_client, sqs_client, name):
     return topic_arn, queue['QueueUrl']
 
 
-def schedule_reindexer_sns_sqs(set_region, moto_start):
+def schedule_reindexer_sns_sqs(moto_start):
     fake_sns_client = boto3.client('sns')
     fake_sqs_client = boto3.client('sqs')
 
@@ -100,7 +100,7 @@ def _config_os_env(sns_sqs):
     }
 
 
-def test_schedule_reindexer_scale_up(set_region, moto_start):
+def test_schedule_reindexer_scale_up(moto_start):
     sqs_client = boto3.client('sqs')
 
     event = _wrap({
@@ -110,7 +110,7 @@ def test_schedule_reindexer_scale_up(set_region, moto_start):
         'RequestedVersion': {'N': '1'}
     })
 
-    sns_sqs = schedule_reindexer_sns_sqs(set_region, moto_start)
+    sns_sqs = schedule_reindexer_sns_sqs(moto_start)
     _config_os_env(sns_sqs)
 
     schedule_reindexer.main(event, None)
@@ -135,7 +135,7 @@ def test_schedule_reindexer_scale_up(set_region, moto_start):
     assert dynamo_provision_msg == expected_dynamo_provision_msg
 
 
-def test_schedule_reindexer_scale_down(set_region, moto_start):
+def test_schedule_reindexer_scale_down(moto_start):
     table_name = "table_name"
     reindex_shard = "default"
 
@@ -148,7 +148,7 @@ def test_schedule_reindexer_scale_down(set_region, moto_start):
         'RequestedVersion': {'N': '1'}
     })
 
-    sns_sqs = schedule_reindexer_sns_sqs(set_region, moto_start)
+    sns_sqs = schedule_reindexer_sns_sqs(moto_start)
     _config_os_env(sns_sqs)
 
     schedule_reindexer.main(event, None)
