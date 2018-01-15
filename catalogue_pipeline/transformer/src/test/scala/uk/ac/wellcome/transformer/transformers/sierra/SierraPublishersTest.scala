@@ -9,10 +9,7 @@ import uk.ac.wellcome.transformer.source.{
 }
 import uk.ac.wellcome.test.utils.SierraData
 
-class SierraPublishersTest
-    extends FunSpec
-    with Matchers
-    with SierraData {
+class SierraPublishersTest extends FunSpec with Matchers with SierraData {
 
   it("picks up zero publishers") {
     assertFindsCorrectPublishers(
