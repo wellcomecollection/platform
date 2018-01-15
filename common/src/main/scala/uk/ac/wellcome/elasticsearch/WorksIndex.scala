@@ -67,6 +67,10 @@ class WorksIndex @Inject()(client: HttpClient,
     booleanField("visible"),
     keywordField("type")
   )
+  val publishers = objectField("publishers").fields(
+    textField("label"),
+    keywordField("type")
+  )
 
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] = Seq(
     keywordField("canonicalId"),
@@ -85,6 +89,7 @@ class WorksIndex @Inject()(client: HttpClient,
     labelledTextField("subjects"),
     labelledTextField("genres"),
     items,
+    publishers,
     location("thumbnail")
   )
 

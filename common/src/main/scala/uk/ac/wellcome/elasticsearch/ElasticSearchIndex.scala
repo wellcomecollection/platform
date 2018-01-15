@@ -3,6 +3,8 @@ package uk.ac.wellcome.elasticsearch
 import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.MappingDefinition
+import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
+import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping.Dynamic
 import com.twitter.inject.Logging
 import org.elasticsearch.ResourceAlreadyExistsException
 import org.elasticsearch.client.ResponseException
@@ -34,6 +36,9 @@ trait ElasticSearchIndex extends Logging {
         httpClient
           .execute {
             putMapping(indexName / mappingDefinition.`type`)
+              .dynamic(
+                mappingDefinition.dynamic.getOrElse(
+                  DynamicMapping.Strict))
               .as(mappingDefinition.fields)
           }
           .recover {

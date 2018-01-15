@@ -1,9 +1,17 @@
 package uk.ac.wellcome.elasticsearch
 
+import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search}
+import org.scalacheck.Arbitrary
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import org.scalacheck.ScalacheckShapeless._
+import uk.ac.wellcome.utils.JsonUtil
+import com.sksamuel.elastic4s.http.ElasticDsl._
+import org.elasticsearch.client.ResponseException
+
 
 class WorksIndexTest
     extends FunSpec
@@ -13,8 +21,8 @@ class WorksIndexTest
     with Matchers
     with BeforeAndAfterEach {
 
-  val indexName = "records"
-  val itemType = "item"
+  val indexName = "works"
+  val itemType = "work"
 
   val worksIndex = new WorksIndex(elasticClient, indexName, itemType)
 
@@ -22,7 +30,51 @@ class WorksIndexTest
     ensureIndexDeleted(indexName)
   }
 
-  ignore("puts a work") {
+  implicitly[Arbitrary[Work]]
+
+  it("puts a valid work") {
+    createAndWaitIndexIsCreated(worksIndex, indexName)
+
+    val sampleWork = Arbitrary.arbitrary[Work].sample.get
+    val sampleWorkJson = JsonUtil.toJson(sampleWork).get
+
+    elasticClient
+      .execute(indexInto(indexName / itemType)
+        .doc(sampleWorkJson))
+
+    eventually {
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery())
+        .map { _.hits.hits }
+        .await
+
+      hits should have size 1
+
+      JsonUtil.fromJson[Work](
+        hits.head.sourceAsString
+      ) shouldBe JsonUtil.fromJson[Work](
+        sampleWorkJson
+      )
+    }
 
   }
+
+  it("does not put an invalid work") {
+    createAndWaitIndexIsCreated(worksIndex, indexName)
+
+    val badTestObject = BadTestObject("id", 5)
+    val badTestObjectJson = JsonUtil.toJson(badTestObject).get
+
+    val eventualIndexResponse = elasticClient
+      .execute(indexInto(indexName / itemType)
+        .doc(badTestObjectJson))
+
+    whenReady(eventualIndexResponse.failed) { exception =>
+      exception shouldBe a[ResponseException]
+    }
+  }
+
 }
+
+
+

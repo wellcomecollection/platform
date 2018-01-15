@@ -5,8 +5,9 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.admin.IndexExistsResponse
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import org.scalatest.concurrent.Eventually
-import org.scalatest.{Matchers, Suite}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.{Assertion, Matchers, Suite}
+import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 import uk.ac.wellcome.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -15,6 +16,7 @@ import scala.concurrent.Future
 trait ElasticSearchLocal
     extends Eventually
     with ExtendedPatience
+    with ScalaFutures
     with Matchers { this: Suite =>
 
   val restClient: RestClient = RestClient
@@ -35,6 +37,19 @@ trait ElasticSearchLocal
       _ <- deleteIndexIfExists(indexName, indexExistQuery)
     } yield waitForIndexDeleted(indexName)
     future.await
+  }
+
+  def createAndWaitIndexIsCreated(index: ElasticSearchIndex, indexName: String): Assertion = {
+    val createIndexFuture = index.create
+
+    whenReady(createIndexFuture) { _ =>
+      eventually {
+        elasticClient
+          .execute(indexExists(indexName))
+          .await
+          .isExists should be(true)
+      }
+    }
   }
 
   private def waitForIndexDeleted(indexName: String) = {

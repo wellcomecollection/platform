@@ -78,7 +78,7 @@ class ElasticSearchIndexTest
   val compatibleTestIndex = new CompatibleTestIndex()
 
   it("creates an index into which doc of the expected type can be put") {
-    createAndWaitIndexIsCreated(testIndex)
+    createAndWaitIndexIsCreated(testIndex, testIndexName)
 
     val testObject = TestObject("id", "description", true)
     val testObjectJson = JsonUtil.toJson(testObject).get
@@ -105,7 +105,7 @@ class ElasticSearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    createAndWaitIndexIsCreated(testIndex)
+    createAndWaitIndexIsCreated(testIndex, testIndexName)
 
     val badTestObject = BadTestObject("id", 5)
     val badTestObjectJson = JsonUtil.toJson(badTestObject).get
@@ -120,9 +120,9 @@ class ElasticSearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    createAndWaitIndexIsCreated(testIndex)
+    createAndWaitIndexIsCreated(testIndex, testIndexName)
 
-    createAndWaitIndexIsCreated(compatibleTestIndex)
+    createAndWaitIndexIsCreated(compatibleTestIndex, testIndexName)
 
     val compatibleTestObject = CompatibleTestObject("id", "description", 5, true)
     val compatibleTestObjectJson = JsonUtil.toJson(compatibleTestObject).get
@@ -145,19 +145,6 @@ class ElasticSearchIndexTest
       ) shouldBe JsonUtil.fromJson[CompatibleTestObject](
         compatibleTestObjectJson
       )
-    }
-  }
-
-  def createAndWaitIndexIsCreated(index: ElasticSearchIndex): Assertion = {
-    val createIndexFuture = index.create
-
-    whenReady(createIndexFuture) { _ =>
-      eventually {
-        elasticClient
-          .execute(indexExists(testIndexName))
-          .await
-          .isExists should be(true)
-      }
     }
   }
 }
