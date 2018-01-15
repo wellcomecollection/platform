@@ -14,10 +14,10 @@ class WorksIndex @Inject()(client: HttpClient,
                            @Flag("es.type") itemType: String)
     extends ElasticSearchIndex with Logging {
 
-  val rootIndexType = "work"
+  val rootIndexType = itemType
 
   val httpClient: HttpClient = client
-  val indexName = "works"
+  val indexName = name
 
   val license = objectField("license").fields(
     keywordField("type"),
