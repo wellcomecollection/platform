@@ -51,12 +51,11 @@ case object VarField {
       subfields = None
     )
 
-  def apply(
-    fieldTag: String,
-    marcTag: String,
-    indicator1: String,
-    indicator2: String,
-    subfields: List[MarcSubfield]): VarField =
+  def apply(fieldTag: String,
+            marcTag: String,
+            indicator1: String,
+            indicator2: String,
+            subfields: List[MarcSubfield]): VarField =
     VarField(
       fieldTag = fieldTag,
       content = None,

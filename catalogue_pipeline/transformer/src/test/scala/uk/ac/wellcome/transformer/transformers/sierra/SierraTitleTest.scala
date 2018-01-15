@@ -4,10 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.transformer.source.SierraBibData
 import uk.ac.wellcome.test.utils.SierraData
 
-class SierraTitleTest
-    extends FunSpec
-    with Matchers
-    with SierraData {
+class SierraTitleTest extends FunSpec with Matchers with SierraData {
 
   it("passes through the title from the bib record") {
     val title = "Tickling a tiny turtle in Tenerife"
