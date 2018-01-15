@@ -2,9 +2,9 @@ package uk.ac.wellcome.transformer.transformers
 
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models._
-
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.transformer.transformers.sierra._
 import uk.ac.wellcome.transformer.source.{SierraBibData, SierraItemData}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -12,45 +12,9 @@ import scala.util.{Failure, Success, Try}
 
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
+    with SierraPublishers
+    with SierraTitle
     with Logging {
-
-  // Populate wwork:publishers.
-  //
-  //    For bibliographic records where "260" is populated:
-  //    - "label" comes from MARC field 260 subfield $b.
-  //    - "type" is "Organisation"
-  //
-  // Note that subfield $b can occur more than once on a record.
-  //
-  // http://www.loc.gov/marc/bibliographic/bd260.html
-  private def getPublishers(bibData: SierraBibData): List[Agent] = {
-    val matchingSubfields = bibData.varFields
-      .filter(_.marcTag.contains("260"))
-      .flatMap {
-        _.subfields
-      }
-      .flatten
-
-    matchingSubfields
-      .filter {
-        _.tag == "b"
-      }
-      .map { subfield =>
-        Agent(
-          label = subfield.content,
-          ontologyType = "Organisation"
-        )
-      }
-  }
-
-  // Populate wwork:title.  The rules are as follows:
-  //
-  //    For all bibliographic records use Sierra "title".
-  //
-  // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
-  // http://www.loc.gov/marc/bibliographic/bd245.html
-  private def getTitle(bibData: SierraBibData): String =
-    bibData.title
 
   private def extractItemData(itemRecord: SierraItemRecord) = {
     info(s"Attempting to transform $itemRecord")
