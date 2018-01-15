@@ -1,12 +1,20 @@
-package uk.ac.wellcome
+package uk.ac.wellcome.circe
 
 import java.time.Instant
 
 import io.circe.{Decoder, Encoder, HCursor, Json}
+import io.circe.generic.extras.{AutoDerivation, Configuration}
+import io.circe.parser.decode
+import io.circe.syntax._
 import cats.syntax.either._
-import io.circe.generic.extras.Configuration
 
-package object circe {
+import scala.util.Try
+
+object json extends AutoDerivation {
+
+  import uk.ac.wellcome.models.transformable.Transformable._
+  import uk.ac.wellcome.models.License._
+
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] = {
       List(
@@ -25,4 +33,12 @@ package object circe {
 
   implicit val customConfig: Configuration =
     Configuration.default.withDefaults.withDiscriminator("type")
+
+  def toJsonCirce[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
+    Try(value.asJson.noSpaces)
+  }
+
+  def fromJsonCirce[T](json:String)(implicit decoder: Decoder[T]): Try[T] = {
+    decode[T](json).toTry
+  }
 }

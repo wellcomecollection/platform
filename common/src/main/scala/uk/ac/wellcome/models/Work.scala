@@ -2,8 +2,8 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.Indexable
-import uk.ac.wellcome.utils.JsonUtil
-import io.circe.generic.auto._
+import uk.ac.wellcome.circe.json._
+import uk.ac.wellcome.circe.json.toJsonCirce
 
 /** A representation of a work in our ontology */
 case class Work(title: String,
@@ -26,5 +26,5 @@ case class Work(title: String,
 
 case object Work extends Indexable[Work] {
   override def json(t: Work): String =
-    JsonUtil.toJsonCirce(t).get
+    toJsonCirce(t).get
 }
