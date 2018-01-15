@@ -2,7 +2,7 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.mappings.PutMappingDefinition
+import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.twitter.inject.Logging
 import org.elasticsearch.ResourceAlreadyExistsException
 import org.elasticsearch.client.ResponseException
@@ -14,11 +14,13 @@ import scala.concurrent.Future
 trait ElasticSearchIndex extends Logging {
   val indexName: String
   val httpClient: HttpClient
-  val mappingDefinition: PutMappingDefinition
+  val mappingDefinition: MappingDefinition
 
   def create: Future[Unit] =
     httpClient
-      .execute(createIndex(indexName))
+      .execute(createIndex(indexName).mappings {
+        mappingDefinition
+      })
       .recover {
         case e: ResponseException =>
           if(e.getCause.isInstanceOf[ResourceAlreadyExistsException]) {
@@ -31,7 +33,8 @@ trait ElasticSearchIndex extends Logging {
       .flatMap { _ =>
         httpClient
           .execute {
-            mappingDefinition
+            putMapping(indexName / mappingDefinition.`type`)
+              .as(mappingDefinition.fields)
           }
           .recover {
             case e: Throwable =>

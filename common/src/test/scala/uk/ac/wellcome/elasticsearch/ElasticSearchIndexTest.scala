@@ -50,8 +50,7 @@ class ElasticSearchIndexTest
     val httpClient: HttpClient = elasticClient
     val indexName: String = testIndexName
 
-    val mappingDefinition: PutMappingDefinition =
-      putMapping(indexName / testType)
+    val mappingDefinition = mapping(testType)
         .dynamic(DynamicMapping.Strict)
         .as(
           keywordField("id"),
@@ -65,15 +64,14 @@ class ElasticSearchIndexTest
     val httpClient: HttpClient = elasticClient
     val indexName: String = testIndexName
 
-    val mappingDefinition: PutMappingDefinition =
-      putMapping(indexName / testType)
-        .dynamic(DynamicMapping.Strict)
-        .as(
-          keywordField("id"),
-          textField("description"),
-          intField("count"),
-          booleanField("visible")
-        )
+    val mappingDefinition = mapping(testType)
+      .dynamic(DynamicMapping.Strict)
+      .as(
+        keywordField("id"),
+        textField("description"),
+        intField("count"),
+        booleanField("visible")
+      )
   }
 
   val testIndex = new TestIndex()
