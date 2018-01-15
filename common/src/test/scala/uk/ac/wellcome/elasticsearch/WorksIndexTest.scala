@@ -12,7 +12,6 @@ import uk.ac.wellcome.utils.JsonUtil
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.elasticsearch.client.ResponseException
 
-
 class WorksIndexTest
     extends FunSpec
     with ElasticSearchLocal
@@ -40,8 +39,9 @@ class WorksIndexTest
     val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
     elasticClient
-      .execute(indexInto(indexName / itemType)
-        .doc(sampleWorkJson))
+      .execute(
+        indexInto(indexName / itemType)
+          .doc(sampleWorkJson))
 
     eventually {
       val hits = elasticClient
@@ -63,8 +63,9 @@ class WorksIndexTest
     val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
     val eventualIndexResponse = elasticClient
-      .execute(indexInto(indexName / itemType)
-        .doc(badTestObjectJson))
+      .execute(
+        indexInto(indexName / itemType)
+          .doc(badTestObjectJson))
 
     whenReady(eventualIndexResponse.failed) { exception =>
       exception shouldBe a[ResponseException]
@@ -72,6 +73,3 @@ class WorksIndexTest
   }
 
 }
-
-
-

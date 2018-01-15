@@ -11,7 +11,6 @@ import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-
 case class TestObject(
   id: String,
   description: String,
@@ -32,12 +31,12 @@ case class BadTestObject(
 
 class ElasticSearchIndexTest
     extends FunSpec
-      with ElasticSearchLocal
-      with ScalaFutures
-      with Eventually
-      with Matchers
-      with JsonTestUtil
-      with BeforeAndAfterEach {
+    with ElasticSearchLocal
+    with ScalaFutures
+    with Eventually
+    with Matchers
+    with JsonTestUtil
+    with BeforeAndAfterEach {
 
   val testIndexName = "test_index"
   val testType = "thing"
@@ -52,12 +51,12 @@ class ElasticSearchIndexTest
     val indexName: String = testIndexName
 
     val mappingDefinition = mapping(testType)
-        .dynamic(DynamicMapping.Strict)
-        .as(
-          keywordField("id"),
-          textField("description"),
-          booleanField("visible")
-        )
+      .dynamic(DynamicMapping.Strict)
+      .as(
+        keywordField("id"),
+        textField("description"),
+        booleanField("visible")
+      )
   }
 
   class CompatibleTestIndex extends ElasticSearchIndex {
@@ -85,8 +84,9 @@ class ElasticSearchIndexTest
     val testObjectJson = JsonUtil.toJson(testObject).get
 
     elasticClient
-      .execute(indexInto(testIndexName / testType)
-        .doc(testObjectJson))
+      .execute(
+        indexInto(testIndexName / testType)
+          .doc(testObjectJson))
 
     eventually {
       val hits = elasticClient
@@ -108,8 +108,9 @@ class ElasticSearchIndexTest
     val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
     val eventualIndexResponse = elasticClient
-      .execute(indexInto(testIndexName / testType)
-        .doc(badTestObjectJson))
+      .execute(
+        indexInto(testIndexName / testType)
+          .doc(badTestObjectJson))
 
     whenReady(eventualIndexResponse.failed) { exception =>
       exception shouldBe a[ResponseException]
@@ -121,12 +122,14 @@ class ElasticSearchIndexTest
 
     createAndWaitIndexIsCreated(compatibleTestIndex, testIndexName)
 
-    val compatibleTestObject = CompatibleTestObject("id", "description", 5, true)
+    val compatibleTestObject =
+      CompatibleTestObject("id", "description", 5, true)
     val compatibleTestObjectJson = JsonUtil.toJson(compatibleTestObject).get
 
     elasticClient
-      .execute(indexInto(testIndexName / testType)
-        .doc(compatibleTestObjectJson))
+      .execute(
+        indexInto(testIndexName / testType)
+          .doc(compatibleTestObjectJson))
 
     eventually {
       val hits = elasticClient
@@ -136,7 +139,6 @@ class ElasticSearchIndexTest
         }
         .await
       hits should have size 1
-
 
       assertJsonStringsAreEqual(
         hits.head.sourceAsString,

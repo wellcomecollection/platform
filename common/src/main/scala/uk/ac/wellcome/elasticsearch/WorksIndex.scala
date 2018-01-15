@@ -12,7 +12,8 @@ import com.twitter.inject.annotations.Flag
 class WorksIndex @Inject()(client: HttpClient,
                            @Flag("es.index") name: String,
                            @Flag("es.type") itemType: String)
-    extends ElasticSearchIndex with Logging {
+    extends ElasticSearchIndex
+    with Logging {
 
   val rootIndexType = itemType
 
@@ -72,26 +73,27 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("type")
   )
 
-  val rootIndexFields: Seq[FieldDefinition with Product with Serializable] = Seq(
-    keywordField("canonicalId"),
-    booleanField("visible"),
-    keywordField("type"),
-    sourceIdentifier,
-    identifiers,
-    textField("title").fields(
-      textField("english").analyzer(EnglishLanguageAnalyzer)),
-    textField("description").fields(
-      textField("english").analyzer(EnglishLanguageAnalyzer)),
-    textField("lettering").fields(
-      textField("english").analyzer(EnglishLanguageAnalyzer)),
-    date("createdDate"),
-    labelledTextField("creators"),
-    labelledTextField("subjects"),
-    labelledTextField("genres"),
-    items,
-    publishers,
-    location("thumbnail")
-  )
+  val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
+    Seq(
+      keywordField("canonicalId"),
+      booleanField("visible"),
+      keywordField("type"),
+      sourceIdentifier,
+      identifiers,
+      textField("title").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      textField("description").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      textField("lettering").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      date("createdDate"),
+      labelledTextField("creators"),
+      labelledTextField("subjects"),
+      labelledTextField("genres"),
+      items,
+      publishers,
+      location("thumbnail")
+    )
 
   val mappingDefinition: MappingDefinition = mapping(rootIndexType)
     .dynamic(DynamicMapping.Strict)

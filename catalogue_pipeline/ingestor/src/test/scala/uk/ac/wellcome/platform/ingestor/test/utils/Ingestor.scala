@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.ingestor.test.utils
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.platform.ingestor.Server
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, IndexedElasticSearchLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  IndexedElasticSearchLocal,
+  SQSLocal
+}
 
 trait Ingestor
     extends IndexedElasticSearchLocal

@@ -1,6 +1,11 @@
 package uk.ac.wellcome.test.utils
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{indexExists, indexInto, search, _}
+import com.sksamuel.elastic4s.http.ElasticDsl.{
+  indexExists,
+  indexInto,
+  search,
+  _
+}
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.WorksIndex
@@ -11,7 +16,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import scala.concurrent.Future
 
 trait IndexedElasticSearchLocal
-  extends ElasticSearchLocal
+    extends ElasticSearchLocal
     with BeforeAndAfterEach { this: Suite =>
 
   val indexName: String

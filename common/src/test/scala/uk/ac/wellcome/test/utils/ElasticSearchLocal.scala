@@ -39,7 +39,8 @@ trait ElasticSearchLocal
     future.await
   }
 
-  def createAndWaitIndexIsCreated(index: ElasticSearchIndex, indexName: String): Assertion = {
+  def createAndWaitIndexIsCreated(index: ElasticSearchIndex,
+                                  indexName: String): Assertion = {
     val createIndexFuture = index.create
 
     whenReady(createIndexFuture) { _ =>
