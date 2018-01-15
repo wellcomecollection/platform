@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//service?ref=v4.0.0"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.1.1"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   vpc_id             = "${local.vpc_api_id}"
@@ -10,12 +10,13 @@ module "loris" {
 
   path_pattern     = "/image*"
   healthcheck_path = "/image/"
-  alb_priority     = "101"
 
   cpu    = 3960
   memory = 7350
 
   desired_count = 4
+
+  env_vars_length = 0
 
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
