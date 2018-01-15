@@ -25,10 +25,7 @@ def test_build_window():
 
 
 @mock.patch('datetime.datetime', patched_datetime)
-def test_end_to_end(sns_sqs):
-    topic_arn, queue_url = sns_sqs
-
-    os.environ['TOPIC_ARN'] = topic_arn
+def test_end_to_end(queue_url):
     os.environ['WINDOW_LENGTH_MINUTES'] = '25'
 
     # This Lambda doesn't read anything from its event or context

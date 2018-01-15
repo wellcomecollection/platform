@@ -117,9 +117,8 @@ def ecs_task(ecs_cluster):
 
 
 @pytest.fixture()
-def ec2_terminating_message(sns_sqs, autoscaling_group):
+def ec2_terminating_message(topic_arn, autoscaling_group):
     autoscaling_group_name, instance_id = autoscaling_group
-    topic_arn, _ = sns_sqs
     lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
 
     lifecycle_action_token = "78c16884-6bd4-4296-ac0c-2da9eb6a0d29"
@@ -221,16 +220,15 @@ def test_complete_ec2_shutdown_ecs_cluster_no_tasks(
 
 
 def test_drain_ecs_instance_if_running_tasks(
-        sns_sqs,
         autoscaling_group,
         ecs_task,
-        ec2_terminating_message):
+        ec2_terminating_message,
+        queue_url):
     fake_ec2_client = boto3.client('ec2')
     fake_ecs_client = boto3.client('ecs')
     fake_sqs_client = boto3.client('sqs')
     fake_sns_client = boto3.client('sns')
 
-    _, queue_url = sns_sqs
     autoscaling_group_name, instance_id = autoscaling_group
     lifecycle_hook_name, \
         lifecycle_action_token, \
