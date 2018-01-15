@@ -7,16 +7,14 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import org.elasticsearch.ResourceAlreadyExistsException
-import org.elasticsearch.transport.RemoteTransportException
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
-import scala.concurrent.Future
 
 class WorksIndex @Inject()(client: HttpClient,
-                           @Flag("es.index") indexName: String,
+                           @Flag("es.index") name: String,
                            @Flag("es.type") itemType: String)
-    extends Logging {
+    extends ElasticSearchIndex with Logging {
+
+  val httpClient = client
+  val indexName = name
 
   val license = objectField("license").fields(
     keywordField("type"),
@@ -88,32 +86,4 @@ class WorksIndex @Inject()(client: HttpClient,
       items,
       location("thumbnail")
     )
-
-  def create: Future[Unit] =
-    client
-      .execute(createIndex(indexName))
-      .recover {
-        case e: RemoteTransportException
-            if e.getCause.isInstanceOf[ResourceAlreadyExistsException] =>
-          info(s"Index $indexName already exists")
-        case _: ResourceAlreadyExistsException =>
-          info(s"Index $indexName already exists")
-        case e: Throwable =>
-          error(s"Failed creating index $indexName", e)
-          throw e
-      }
-      .flatMap { _ =>
-        client
-          .execute {
-            mappingDefinition
-          }
-          .recover {
-            case e: Throwable =>
-              error(s"Failed updating index $indexName", e)
-              throw e
-          }
-      }
-      .map { _ =>
-        info("Index updated successfully")
-      }
 }
