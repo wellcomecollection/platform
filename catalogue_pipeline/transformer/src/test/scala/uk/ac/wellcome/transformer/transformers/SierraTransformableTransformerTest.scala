@@ -5,10 +5,7 @@ import java.time.Instant.now
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.test.utils.SierraData
 
 class SierraTransformableTransformerTest
@@ -242,28 +239,5 @@ class SierraTransformableTransformerTest
         visible = false
       )
     )
-  }
-
-  it("passes through the title from the bib record") {
-    val id = "t1234"
-    val title = "Tickling a tiny turtle in Tenerife"
-    val data =
-      s"""
-         |{
-         | "id": "$id",
-         | "title": "$title",
-         | "varFields": []
-         |}
-        """.stripMargin
-
-    val mergedSierraRecord = SierraTransformable(
-      bibRecord = SierraBibRecord(id = id, data = data, modifiedDate = now())
-    )
-
-    val transformedSierraRecord = transformer.transform(mergedSierraRecord)
-    transformedSierraRecord.isSuccess shouldBe true
-    val work = transformedSierraRecord.get.get
-
-    work.title shouldBe title
   }
 }
