@@ -88,7 +88,7 @@ env:
     # - TASK=miro_preprocessor-test
 
     # Shared infra stack
-    - TASK=shared_infra-build
+    - TASK=shared_infra-test
 
     # Loris stack
     - TASK=loris-build
