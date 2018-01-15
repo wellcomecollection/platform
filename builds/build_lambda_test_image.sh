@@ -50,7 +50,6 @@ then
     docker build --tag $DOCKER_IMAGE --file $DOCKERFILE $SRC
   fi
 else
-
   docker tag wellcome/test_lambda $DOCKER_IMAGE
 fi
 
