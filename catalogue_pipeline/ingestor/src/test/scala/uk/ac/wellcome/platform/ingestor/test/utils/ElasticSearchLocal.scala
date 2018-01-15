@@ -1,18 +1,14 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.platform.ingestor.test.utils
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.admin.IndexExistsResponse
-import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.HttpHost
-import org.apache.http.impl.client.BasicCredentialsProvider
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
 import org.elasticsearch.client.RestClient
-import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -22,12 +18,12 @@ trait ElasticSearchLocal
     with ExtendedPatience
     with Matchers { this: Suite =>
 
-  val restClient = RestClient
+  val restClient: RestClient = RestClient
     .builder(new HttpHost("localhost", 9200, "http"))
     .setHttpClientConfigCallback(new ElasticCredentials("elastic", "changeme"))
     .build()
 
-  val elasticClient = HttpClient.fromRestClient(restClient)
+  val elasticClient: HttpClient = HttpClient.fromRestClient(restClient)
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {

@@ -1,21 +1,23 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.platform.ingestor.test.utils
 
-import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.http.ElasticDsl.{indexExists, indexInto, search}
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.elasticsearch.mappings.WorksIndex
 import uk.ac.wellcome.models.Work
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.ingestor.models.WorksIndex
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
+import com.sksamuel.elastic4s.http.ElasticDsl._
 
 import scala.concurrent.Future
 
 trait IndexedElasticSearchLocal
-    extends ElasticSearchLocal
+  extends ElasticSearchLocal
     with BeforeAndAfterEach { this: Suite =>
 
-  val indexName = "works"
-  val itemType = "work"
+  val indexName: String
+  val itemType: String
 
   private def createIndex(index: String) = {
     ensureIndexDeleted(index)

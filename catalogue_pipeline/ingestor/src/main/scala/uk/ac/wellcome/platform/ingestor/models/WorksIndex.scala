@@ -1,4 +1,4 @@
-package uk.ac.wellcome.elasticsearch.mappings
+package uk.ac.wellcome.platform.ingestor.models
 
 import com.google.inject.Inject
 import com.sksamuel.elastic4s.analyzers._
