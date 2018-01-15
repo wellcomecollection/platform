@@ -1,22 +1,24 @@
-package uk.ac.wellcome.elasticsearch.mappings
+package uk.ac.wellcome.elasticsearch
 
 import com.google.inject.Inject
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import org.elasticsearch.ResourceAlreadyExistsException
-import org.elasticsearch.transport.RemoteTransportException
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
-import scala.concurrent.Future
 
 class WorksIndex @Inject()(client: HttpClient,
-                           @Flag("es.index") indexName: String,
+                           @Flag("es.index") name: String,
                            @Flag("es.type") itemType: String)
-    extends Logging {
+    extends ElasticSearchIndex
+    with Logging {
+
+  val rootIndexType = itemType
+
+  val httpClient: HttpClient = client
+  val indexName = name
 
   val license = objectField("license").fields(
     keywordField("type"),
@@ -66,10 +68,13 @@ class WorksIndex @Inject()(client: HttpClient,
     booleanField("visible"),
     keywordField("type")
   )
+  val publishers = objectField("publishers").fields(
+    textField("label"),
+    keywordField("type")
+  )
 
-  val mappingDefinition = putMapping(indexName / itemType)
-    .dynamic(DynamicMapping.Strict)
-    .as(
+  val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
+    Seq(
       keywordField("canonicalId"),
       booleanField("visible"),
       keywordField("type"),
@@ -86,34 +91,11 @@ class WorksIndex @Inject()(client: HttpClient,
       labelledTextField("subjects"),
       labelledTextField("genres"),
       items,
+      publishers,
       location("thumbnail")
     )
 
-  def create: Future[Unit] =
-    client
-      .execute(createIndex(indexName))
-      .recover {
-        case e: RemoteTransportException
-            if e.getCause.isInstanceOf[ResourceAlreadyExistsException] =>
-          info(s"Index $indexName already exists")
-        case _: ResourceAlreadyExistsException =>
-          info(s"Index $indexName already exists")
-        case e: Throwable =>
-          error(s"Failed creating index $indexName", e)
-          throw e
-      }
-      .flatMap { _ =>
-        client
-          .execute {
-            mappingDefinition
-          }
-          .recover {
-            case e: Throwable =>
-              error(s"Failed updating index $indexName", e)
-              throw e
-          }
-      }
-      .map { _ =>
-        info("Index updated successfully")
-      }
+  val mappingDefinition: MappingDefinition = mapping(rootIndexType)
+    .dynamic(DynamicMapping.Strict)
+    .as(rootIndexFields)
 }

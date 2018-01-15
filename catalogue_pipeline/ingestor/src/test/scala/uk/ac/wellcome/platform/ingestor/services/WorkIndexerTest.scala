@@ -23,6 +23,9 @@ class WorkIndexerTest
     with JsonTestUtil
     with IndexedElasticSearchLocal {
 
+  val indexName = "works"
+  val itemType = "work"
+
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
