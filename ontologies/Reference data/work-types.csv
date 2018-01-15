@@ -1,31 +1,31 @@
-Books,books,Books
-DigitalImages,digital-images,Digital Images
-EManuscriptsAsian,e-manuscripts-asian,"E-manuscripts, Asian"
-Ephemera,ephemera,Ephemera
-Maps,maps,Maps
-Pictures,pictures,Pictures
-StudentDissertations,student-dissertations,Student dissertations
-3DObjects,3-d-objects,3-D Objects
-CDRoms,cd-roms,CD-Roms
-Ebooks,e-books,E-books
-ESound,e-sound,E-sound
-Journals,journals,Journals
-MixedMaterials,mixed-materials,Mixed materials
-Sound,sound,Sound
-VideoRecordings,videorecordings,Videorecordings
-ArchivesAndManuscripts,archives-and-manuscripts,Archives and manuscripts
-Cinefilm,cinefilm,Cinefilm
-EJournals,e-journals,E-journals
-EVideos,e-videos,E-videos
-ManuscriptsAsian,manuscripts-asian,"Manuscripts, Asian"
-Music,music,Music
-StandingOrder,standing-order,Standing order
-WebSites,web-site,Web sites
-ArchivesNonDigital,archives-non-digital,Archives - Non-digital
-AudioVisualMaterialVisual,audio-visual-material-visual,Audio-Visual Material - Visual
-ArchivesDigital,archives-digital,Archives - Digital
-ArchivesHybrid,archives-hybrid,Archives - Hybrid
-AudioVisualMaterialESoundOnly,audio-visual-material-e-sound-only,Audio-Visual Material - e-sound only
-AudioVisualMaterialEVisualOnly,audio-visual-material-e-visual-only,Audio-Visual Material - e-visual only
-AudioVisualMaterialSoundOnly,audio-visual-material-sound-only,Audio-Visual Material - sound only
-PublishedMaterial,published-material,Published material
+Books,a, books,Books
+DigitalImages,q,digital-images,Digital Images
+EManuscriptsAsian,x,e-manuscripts-asian,"E-manuscripts, Asian"
+Ephemera,l,ephemera,Ephemera
+Maps,e,maps,Maps
+Pictures,k,pictures,Pictures
+StudentDissertations,w,student-dissertations,Student dissertations
+3DObjects,r,3-d-objects,3-D Objects
+CDRoms,m,cd-roms,CD-Roms
+Ebooks,v,e-books,E-books
+ESound,s,e-sound,E-sound
+Journals,j,journals,Journals
+MixedMaterials,p,mixed-materials,Mixed materials
+Sound,i,sound,Sound
+VideoRecordings,g,videorecordings,Videorecordings
+ArchivesAndManuscripts,h,archives-and-manuscripts,Archives and manuscripts
+Cinefilm,n,cinefilm,Cinefilm
+EJournals,j,e-journals,E-journals
+EVideos,f,e-videos,E-videos
+ManuscriptsAsian,b,manuscripts-asian,"Manuscripts, Asian"
+Music,c,music,Music
+StandingOrder,u,standing-order,Standing order
+WebSites,z,web-site,Web sites
+ArchivesNonDigital,,archives-non-digital,Archives - Non-digital
+AudioVisualMaterialVisual,,audio-visual-material-visual,Audio-Visual Material - Visual
+ArchivesDigital,,archives-digital,Archives - Digital
+ArchivesHybrid,,archives-hybrid,Archives - Hybrid
+AudioVisualMaterialESoundOnly,,audio-visual-material-e-sound-only,Audio-Visual Material - e-sound only
+AudioVisualMaterialEVisualOnly,,audio-visual-material-e-visual-only,Audio-Visual Material - e-visual only
+AudioVisualMaterialSoundOnly,,audio-visual-material-sound-only,Audio-Visual Material - sound only
+PublishedMaterial,,published-material,Published material
