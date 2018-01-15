@@ -13,7 +13,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import scala.concurrent.Future
 
 trait IndexedElasticSearchLocal
-  extends ElasticSearchLocal
+    extends ElasticSearchLocal
     with BeforeAndAfterEach { this: Suite =>
 
   val indexName: String
