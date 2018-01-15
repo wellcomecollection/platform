@@ -67,6 +67,15 @@ class Alarm:
         """
         Try to return a more human-readable explanation for the alarm.
         """
+        if (
+            self.name.endswith('-alb-not-enough-healthy-hosts') and
+            self.state_reason == (
+                'Threshold Crossed: no datapoints were received for 1 period '
+                'and 1 missing datapoint was treated as [Breaching].'
+            )
+        ):
+            return 'There are no healthy hosts in the ALB target group.'
+
         match = DATAPOINT_RE.search(self.state_reason)
         if match is None:
             return
@@ -75,20 +84,36 @@ class Alarm:
 
         timestamp = match.group('timestamp')
         time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-        display_time = time.strftime('at %H:%M:%S on %d %b %Y')
+        display_time = (
+            time.strftime('at %H:%M:%S on %d %b %Y').replace('on 0', 'on '))
+
+        if self.name.startswith('loris'):
+            service = 'Loris'
+        elif self.name.startswith('api_'):
+            service = 'the API'
+        else:
+            return
 
         if self.name.endswith('-alb-target-500-errors'):
-            if self.name.startswith('loris'):
-                service = 'Loris'
-            elif self.name.startswith('api_'):
-                service = 'the API'
-            else:
-                return
-
             if value == 1:
                 return f'The ALB spotted a 500 error in {service} {display_time}.'
             else:
                 return f'The ALB spotted multiple 500 errors ({value}) in {service} {display_time}.'
+
+        elif self.name.endswith('-alb-unhealthy-hosts'):
+            if value == 1:
+                return f'There is an unhealthy host in {service} {display_time}.'
+            else:
+                return f'There are multiple unhealthy hosts ({value}) in {service} {display_time}.'
+
+        elif self.name.endswith('-alb-not-enough-healthy-hosts'):
+            threshold = re.search(
+                r'less than or equal to the threshold \((?P<value>\d+)\.0\)',
+                self.state_reason).group('value')
+            return (
+                f"There aren't enough healthy hosts in {service} "
+                f'(saw {value}; expected more than {threshold}) {display_time}.'
+            )
 
     # Sometimes there's enough data in the alarm to make an educated guess
     # about useful CloudWatch logs to check, so we include that in the alarm.
