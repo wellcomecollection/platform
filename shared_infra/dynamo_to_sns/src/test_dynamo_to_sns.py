@@ -143,7 +143,7 @@ def test_end_to_end_feature_test(
     )
 
 
-def test_invalid_stream_view_type_is_error():
+def test_invalid_stream_view_type_is_error(topic_arn):
     input_event = _dynamo_event(event_name='REMOVE', old_image=OLD_IMAGE)
     os.environ.update({'STREAM_VIEW_TYPE': 'NOTAREALSTREAMVIEWTYPE'})
 
@@ -153,7 +153,7 @@ def test_invalid_stream_view_type_is_error():
         dynamo_to_sns.main(event=event, context=None)
 
 
-def _assert_sqs_has_message(expected_message, queue_url):
+def _assert_sqs_has_message(queue_url, expected_message):
     sqs_client = boto3.client('sqs')
     messages = sqs_client.receive_message(
         QueueUrl=queue_url,
