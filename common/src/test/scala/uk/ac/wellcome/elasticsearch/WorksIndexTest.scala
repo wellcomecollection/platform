@@ -5,7 +5,7 @@ import org.scalacheck.Arbitrary
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
+import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.utils.JsonUtil
@@ -19,6 +19,7 @@ class WorksIndexTest
     with ScalaFutures
     with Eventually
     with Matchers
+    with JsonTestUtil
     with BeforeAndAfterEach {
 
   val indexName = "works"
@@ -50,11 +51,7 @@ class WorksIndexTest
 
       hits should have size 1
 
-      JsonUtil.fromJson[Work](
-        hits.head.sourceAsString
-      ) shouldBe JsonUtil.fromJson[Work](
-        sampleWorkJson
-      )
+      assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
     }
 
   }

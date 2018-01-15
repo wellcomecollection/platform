@@ -7,7 +7,7 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
+import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -36,6 +36,7 @@ class ElasticSearchIndexTest
       with ScalaFutures
       with Eventually
       with Matchers
+      with JsonTestUtil
       with BeforeAndAfterEach {
 
   val testIndexName = "test_index"
@@ -96,11 +97,7 @@ class ElasticSearchIndexTest
         .await
       hits should have size 1
 
-      JsonUtil.fromJson[TestObject](
-        hits.head.sourceAsString
-      ) shouldBe JsonUtil.fromJson[TestObject](
-        testObjectJson
-      )
+      assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)
     }
   }
 
@@ -140,9 +137,9 @@ class ElasticSearchIndexTest
         .await
       hits should have size 1
 
-      JsonUtil.fromJson[CompatibleTestObject](
-        hits.head.sourceAsString
-      ) shouldBe JsonUtil.fromJson[CompatibleTestObject](
+
+      assertJsonStringsAreEqual(
+        hits.head.sourceAsString,
         compatibleTestObjectJson
       )
     }
