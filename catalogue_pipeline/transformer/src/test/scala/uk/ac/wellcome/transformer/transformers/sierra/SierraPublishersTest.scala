@@ -9,17 +9,6 @@ import uk.ac.wellcome.transformer.source.{
 }
 import uk.ac.wellcome.test.utils.SierraData
 
-// import java.time.Instant.now
-//
-//
-// import uk.ac.wellcome.models._
-// import uk.ac.wellcome.models.transformable.SierraTransformable
-// import uk.ac.wellcome.models.transformable.sierra.{
-//   SierraBibRecord,
-//   SierraItemRecord
-// }
-//
-
 class SierraPublishersTest
     extends FunSpec
     with Matchers
