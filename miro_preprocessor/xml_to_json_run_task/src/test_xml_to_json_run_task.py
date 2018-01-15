@@ -29,20 +29,20 @@ def s3_event():
     }
 
 
-def test_xml_to_json_run_task(sns_sqs):
+def test_xml_to_json_run_task(queue_url):
     e = s3_event()
 
     sqs_client = boto3.client('sqs')
-    topic_arn, queue_url = sns_sqs
 
     cluster_name = "cluster_name"
     container_name = "container_name"
     task_definition_arn = "task_definition_arn"
 
-    os.environ["TOPIC_ARN"] = topic_arn
-    os.environ["CLUSTER_NAME"] = cluster_name
-    os.environ["CONTAINER_NAME"] = container_name
-    os.environ["TASK_DEFINITION_ARN"] = task_definition_arn
+    os.environ.update({
+        'CLUSTER_NAME': cluster_name,
+        'CONTAINER_NAME': container_name,
+        'TASK_DEFINITION_ARN': task_definition_arn,
+    })
 
     xml_to_json_run_task.main(e, {})
 

@@ -10,7 +10,7 @@ from s3_demultiplexer import main
 
 
 @mock_s3
-def test_end_to_end_demultiplexer(sns_sqs):
+def test_end_to_end_demultiplexer(queue_url):
     client = boto3.client("s3")
 
     records = [
@@ -46,8 +46,6 @@ def test_end_to_end_demultiplexer(sns_sqs):
     }
 
     sqs_client = boto3.client('sqs')
-    topic_arn, queue_url = sns_sqs
-    os.environ["TOPIC_ARN"] = topic_arn
 
     main(s3_event, None)
 
