@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.ingestor.modules
 
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.ingestor.models.WorksIndex
+import uk.ac.wellcome.elasticsearch.WorksIndex
 
 object WorksIndexModule extends TwitterModule {
 

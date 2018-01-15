@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.ingestor.test.utils
+package uk.ac.wellcome.test.utils
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
@@ -8,7 +8,6 @@ import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.finatra.modules.ElasticCredentials
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future

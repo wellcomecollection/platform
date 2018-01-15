@@ -1,13 +1,13 @@
-package uk.ac.wellcome.platform.ingestor.models
+package uk.ac.wellcome.elasticsearch
 
-import com.sksamuel.elastic4s.http.ElasticDsl.createIndex
+import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.PutMappingDefinition
+import com.twitter.inject.Logging
 import org.elasticsearch.ResourceAlreadyExistsException
-import com.sksamuel.elastic4s.http.ElasticDsl._
+import org.elasticsearch.client.ResponseException
 import org.elasticsearch.transport.RemoteTransportException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import com.twitter.inject.Logging
 
 import scala.concurrent.Future
 
@@ -20,11 +20,10 @@ trait ElasticSearchIndex extends Logging {
     httpClient
       .execute(createIndex(indexName))
       .recover {
-        case e: RemoteTransportException
-          if e.getCause.isInstanceOf[ResourceAlreadyExistsException] =>
-          info(s"Index $indexName already exists")
-        case _: ResourceAlreadyExistsException =>
-          info(s"Index $indexName already exists")
+        case e: ResponseException =>
+          if(e.getCause.isInstanceOf[ResourceAlreadyExistsException]) {
+            info(s"Index $indexName already exists")
+          }
         case e: Throwable =>
           error(s"Failed creating index $indexName", e)
           throw e

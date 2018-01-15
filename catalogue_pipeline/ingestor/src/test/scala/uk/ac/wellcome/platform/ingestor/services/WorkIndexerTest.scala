@@ -8,9 +8,8 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.platform.ingestor.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
-import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 

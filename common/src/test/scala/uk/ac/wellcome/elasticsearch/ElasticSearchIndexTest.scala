@@ -1,16 +1,34 @@
-package uk.ac.wellcome.platform.ingestor.models
+package uk.ac.wellcome.elasticsearch
 
-import org.scalatest.{Assertion, BeforeAndAfterEach, FunSpec, Matchers}
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import uk.ac.wellcome.platform.ingestor.test.utils.ElasticSearchLocal
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.PutMappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.elasticsearch.client.ResponseException
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.{Assertion, BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
+
+case class TestObject(
+  id: String,
+  description: String,
+  visible: Boolean
+)
+
+case class CompatibleTestObject(
+  id: String,
+  description: String,
+  count: Int,
+  visible: Boolean
+)
+
+case class BadTestObject(
+  id: String,
+  weight: Int
+)
 
 class ElasticSearchIndexTest
     extends FunSpec
@@ -61,24 +79,6 @@ class ElasticSearchIndexTest
   val testIndex = new TestIndex()
   val compatibleTestIndex = new CompatibleTestIndex()
 
-  case class TestObject(
-    id: String,
-    description: String,
-    visible: Boolean
-  )
-
-  case class CompatibleTestObject(
-    id: String,
-    description: String,
-    count: Int,
-    visible: Boolean
-  )
-
-  case class BadTestObject(
-    id: String,
-    weight: Int
-  )
-
   it("creates an index into which doc of the expected type can be put") {
     createAndWaitIndexIsCreated(testIndex)
 
@@ -98,9 +98,9 @@ class ElasticSearchIndexTest
         .await
       hits should have size 1
 
-      JsonUtil.fromJson(
+      JsonUtil.fromJson[TestObject](
         hits.head.sourceAsString
-      ) shouldBe JsonUtil.fromJson(
+      ) shouldBe JsonUtil.fromJson[TestObject](
         testObjectJson
       )
     }
@@ -142,9 +142,9 @@ class ElasticSearchIndexTest
         .await
       hits should have size 1
 
-      JsonUtil.fromJson(
+      JsonUtil.fromJson[CompatibleTestObject](
         hits.head.sourceAsString
-      ) shouldBe JsonUtil.fromJson(
+      ) shouldBe JsonUtil.fromJson[CompatibleTestObject](
         compatibleTestObjectJson
       )
     }
