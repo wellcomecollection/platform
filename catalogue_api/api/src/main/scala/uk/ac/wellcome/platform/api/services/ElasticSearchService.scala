@@ -38,7 +38,7 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
     elasticClient
       .execute {
         search(s"${getIndex(index)}/$documentType")
-          .matchAllQuery()
+          .query(termQuery("visible", true))
           .sortBy(fieldSort(sortByField))
           .limit(limit)
           .from(from)
@@ -52,7 +52,10 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
     elasticClient
       .execute {
         search(s"${getIndex(index)}/$documentType")
-          .query(simpleStringQuery(queryString))
+          .query(must(
+            simpleStringQuery(queryString),
+            termQuery("visible", true)
+          ))
           .limit(limit)
           .from(from)
       }
