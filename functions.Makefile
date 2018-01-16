@@ -123,7 +123,7 @@ endef
 #	$1 - Name of the project in sbt.
 #	$2 - Root of the project's source code.
 #
-define scala_target_template
+define __scala_target_template
 $(1)-build:
 	$(call sbt_build,$(1))
 	$(call build_image,$(1),$(2)/Dockerfile)
@@ -143,7 +143,7 @@ endef
 #	$2 - Root to the Terraform directory.
 #	$3 - Is this a public-facing stack?  (true/false)
 #
-define terraform_target_template
+define __terraform_target_template
 $(1)-terraform-plan:
 	$(call terraform_plan,$(2),$(3))
 
@@ -158,7 +158,7 @@ endef
 #	$1 - Name of the target.
 #	$2 - Path to the Lambda source directory.
 #
-define lambda_target_template
+define __lambda_target_template
 $(1)-test:
 	$(call test_lambda,$(2))
 
@@ -173,7 +173,7 @@ endef
 #	$1 - Name of the ECS service.
 #	$2 - Path to the associated Dockerfile.
 #
-define ecs_target_template
+define __ecs_target_template
 $(1)-build:
 	$(call build_image,$(1),$(2))
 
@@ -197,8 +197,8 @@ endef
 #	$TF_IS_PUBLIC_FACING	Is this a public-facing stack?  (true/false)
 #
 define stack_setup
-$(foreach proj,$(SBT_APPS),$(eval $(call scala_target_template,$(proj),$(STACK_ROOT)/$(proj))))
-$(foreach task,$(ECS_TASKS),$(eval $(call ecs_target_template,$(task),$(STACK_ROOT)/task)))
-$(foreach lamb,$(LAMBDAS),$(eval $(call lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
-$(eval $(call terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING)))
+$(foreach proj,$(SBT_APPS),$(eval $(call __scala_target_template,$(proj),$(STACK_ROOT)/$(proj))))
+$(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/task)))
+$(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
+$(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING)))
 endef
