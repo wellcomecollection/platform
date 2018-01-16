@@ -1,6 +1,15 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 INFRA_BUCKET = platform-infra
 
+
+ifndef UPTODATE_GIT_DEFINED
+uptodate-git:
+	$(ROOT)/builds/is_up_to_date_with_master.sh
+
+UPTODATE_GIT_DEFINED = true
+endif
+
+
 # Run a 'terraform plan' step.
 #
 # Args:
@@ -123,7 +132,7 @@ endef
 #	$1 - Name of the project in sbt.
 #	$2 - Root of the project's source code.
 #
-define __scala_target_template
+define __sbt_target_template
 $(1)-build:
 	$(call sbt_build,$(1))
 	$(call build_image,$(1),$(2)/Dockerfile)
@@ -197,7 +206,7 @@ endef
 #	$TF_IS_PUBLIC_FACING	Is this a public-facing stack?  (true/false)
 #
 define stack_setup
-$(foreach proj,$(SBT_APPS),$(eval $(call __scala_target_template,$(proj),$(STACK_ROOT)/$(proj))))
+$(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
 $(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/task)))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING)))

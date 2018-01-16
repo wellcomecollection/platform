@@ -1,5 +1,6 @@
-include shared.Makefile
 include functions.Makefile
+
+include formatting.Makefile
 
 include loris/Makefile
 include shared_infra/Makefile
@@ -17,11 +18,3 @@ sbt-common-test:
 
 sbt-common-publish:
 	echo "Nothing to do!"
-
-format: format-terraform format-scala format-json
-
-check-format: format lint-python lint-ontologies
-	git diff --exit-code
-
-travis-format:
-	python3 .travis/run_autoformat.py

@@ -181,7 +181,6 @@ def are_there_job_relevant_changes(changed_files, task):
     if any(f in changed_files for f in [
         'Makefile',
         'functions.Makefile',
-        'shared.Makefile'
     ]):
         reasons.append('Changes to a core Makefile')
 
