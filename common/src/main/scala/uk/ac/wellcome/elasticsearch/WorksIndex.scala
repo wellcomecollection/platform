@@ -90,7 +90,6 @@ class WorksIndex @Inject()(client: HttpClient,
       labelledTextField("creators"),
       labelledTextField("subjects"),
       labelledTextField("genres"),
-      labelledTextField("publishers"),
       items,
       publishers,
       location("thumbnail")
