@@ -1,13 +1,15 @@
 package uk.ac.wellcome.platform.api.models
 
 import scala.util.{Failure, Success}
-import com.fasterxml.jackson.annotation.{JsonIgnore, JsonProperty}
+
+import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.utils.ApiJsonUtil
 
+@JsonIgnoreProperties(Array("visible"))
 @ApiModel(
   value = "Work",
   description =
@@ -55,7 +57,7 @@ case class DisplayWork(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
-  @JsonIgnore visible: Boolean = true
+  visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Work"
