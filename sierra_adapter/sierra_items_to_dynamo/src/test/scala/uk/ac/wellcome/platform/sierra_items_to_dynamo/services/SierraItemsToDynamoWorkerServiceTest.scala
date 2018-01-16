@@ -16,7 +16,11 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecord
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import io.circe.generic.auto._
 import io.circe.syntax._

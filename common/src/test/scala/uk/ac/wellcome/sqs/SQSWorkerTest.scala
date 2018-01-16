@@ -19,7 +19,7 @@ import scala.collection.JavaConversions._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class SQSWorkerTest
-  extends FunSpec
+    extends FunSpec
     with SQSLocal
     with MockitoSugar
     with Eventually {
@@ -39,10 +39,11 @@ class SQSWorkerTest
 
   sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
 
-  class TestWorker extends SQSWorker(
-    new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-    ActorSystem(),
-    metricsSender) {
+  class TestWorker
+      extends SQSWorker(
+        new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        ActorSystem(),
+        metricsSender) {
     override lazy val totalWait = 1.second
 
     override def processMessage(message: SQSMessage): Future[Unit] =
@@ -67,13 +68,13 @@ class SQSWorkerTest
     sqsClient.sendMessage(queueUrl, testMessageJson)
 
     eventually {
-        verify(
-          metricsSender,
-          times(1)
-        ).timeAndCount(
-          contains("TestWorker_ProcessMessage"),
-          any[() => Future[Unit]]()
-        )
+      verify(
+        metricsSender,
+        times(1)
+      ).timeAndCount(
+        contains("TestWorker_ProcessMessage"),
+        any[() => Future[Unit]]()
+      )
     }
   }
 
