@@ -8,13 +8,21 @@ trait SierraPublishers {
 
   // Populate wwork:publishers.
   //
-  //    For bibliographic records where "260" is populated:
-  //    - "label" comes from MARC field 260 subfield $b.
-  //    - "type" is "Organisation"
+  // We use MARC field "260", if populated, otherwise we use field "264".
   //
-  // Note that subfield $b can occur more than once on a record.
+  // In either case:
+  //  - "label" comes from subfield $b
+  //  - "type" is "Organisation".
   //
-  // http://www.loc.gov/marc/bibliographic/bd260.html
+  // Notes:
+  //  - A bib may have 260, or 264, or neither -- but we would never expect
+  //    it to have both.
+  //  - A bib may have a single 260 field, or multiple 264 fields.
+  //  - Subfield $b may occur more than once on a field.
+  //
+  // https://www.loc.gov/marc/bibliographic/bd260.html
+  // https://www.loc.gov/marc/bibliographic/bd264.html
+  //
   def getPublishers(bibData: SierraBibData): List[Agent] = {
     val matchingSubfields = bibData.varFields
       .filter(_.marcTag.contains("260"))
