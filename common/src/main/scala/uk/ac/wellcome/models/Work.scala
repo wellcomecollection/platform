@@ -19,10 +19,9 @@ case class Work(title: String,
                 thumbnail: Option[Location] = None,
                 items: List[Item] = Nil,
                 publishers: List[Agent] = Nil,
-                visible: Boolean = true)
-    extends Identifiable {
-  @JsonProperty("type") val ontologyType: String = "Work"
-}
+                visible: Boolean = true,
+                @JsonProperty("type") ontologyType: String = "Work")
+    extends Identifiable
 
 case object Work extends Indexable[Work] {
   override def json(t: Work): String =
