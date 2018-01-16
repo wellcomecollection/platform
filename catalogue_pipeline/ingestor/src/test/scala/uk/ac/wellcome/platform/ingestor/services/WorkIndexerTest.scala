@@ -47,8 +47,8 @@ class WorkIndexerTest
     }
   }
 
-  it("should return a failed future if the input string is not a Work") {
-    val future = workIndexer.indexWork("a document")
+  private def assertElasticsearchEventuallyHasWork(work: Work) = {
+    val workJson = JsonUtil.toJson(work).get
 
     whenReady(future.failed) { exception =>
       exception shouldBe a[GracefulFailureException]
@@ -77,21 +77,17 @@ class WorkIndexerTest
     }
   }
 
-  private def workJson(canonicalId: String, sourceId: String, title: String): String = {
+  private def createWork(canonicalId: String, sourceId: String, title: String): Work = {
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,
       sourceId
     )
 
-    JsonUtil
-      .toJson(
-        Work(
-          canonicalId = Some(canonicalId),
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier),
-          title = title
-        )
-      )
-      .get
+    Work(
+      canonicalId = Some(canonicalId),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      title = title
+    )
   }
 }
