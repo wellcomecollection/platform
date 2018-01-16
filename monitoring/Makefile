@@ -4,9 +4,8 @@ include $(ROOT)/functions.Makefile
 STACK_ROOT  = monitoring
 
 SBT_APPS    =
-ECS_TASKS   = gatling
-LAMBDAS     = gatling_to_cloudwatch \
-              notify_old_deploys \
+ECS_TASKS   =
+LAMBDAS     = notify_old_deploys \
               post_to_slack \
               service_deployment_status \
               terraform_tracker \
@@ -17,6 +16,8 @@ TF_PATH     = $(ROOT)/$(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
+
+include $(ROOT)/monitoring/load_test/Makefile
 
 
 ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
