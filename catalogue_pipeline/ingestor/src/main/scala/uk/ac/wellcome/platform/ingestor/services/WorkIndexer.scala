@@ -30,15 +30,36 @@ class WorkIndexer @Inject()(
       "ingestor-index-work",
       () => {
         info(s"Indexing work $work")
-        elasticClient
-          .execute {
-            indexInto(esIndex / esType).id(work.id).doc(work)
+
+        // If the work has visible = false, we save a stub into Elasticsearch.
+        // This record isn't searchable, but allows us to return proper
+        // HTTP 410 Gone codes from the API.
+        //
+        // Longer term, this will allow us to track if/when a work was deleted,
+        // and ensure that if we get an UPDATE and a DELETE out-of-order, we
+        // don't restore a record that should really be deleted.
+        val workToIndex = work.visible match {
+          case true => work
+          case false => {
+            val stubWork = Work(
+              canonicalId = work.canonicalId,
+              sourceIdentifier = work.sourceIdentifier,
+              identifiers = work.identifiers,
+              title = "This work has been deleted",
+              visible = false
+            )
+            info(s"Replacing work with stub record $stubWork")
+            stubWork
           }
-          .recover {
-            case e: Throwable =>
-              error(s"Error indexing work $work into Elasticsearch", e)
-              throw e
-          }
+        }
+
+        elasticClient.execute {
+          indexInto(esIndex / esType).id(workToIndex.id).doc(workToIndex)
+        }.recover {
+          case e: Throwable =>
+            error(s"Error indexing work $work into Elasticsearch", e)
+            throw e
+        }
       }
     )
   }
