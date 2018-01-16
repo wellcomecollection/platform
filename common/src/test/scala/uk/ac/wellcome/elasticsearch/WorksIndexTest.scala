@@ -39,8 +39,6 @@ class WorksIndexTest
     val sampleWork = Arbitrary.arbitrary[Work].sample.get
     val sampleWorkJson = jsonUtil.toJson(sampleWork).get
 
-    println("*********\n"+sampleWorkJson)
-
     elasticClient
       .execute(
         indexInto(indexName / itemType)
