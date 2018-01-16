@@ -2,19 +2,19 @@ ROOT = $(shell git rev-parse --show-toplevel)
 
 include $(ROOT)/functions.Makefile
 
-STACK_ROOT 	= monitoring
+STACK_ROOT  = monitoring
 
-SBT_APPS 	= api
-ECS_TASKS 	= gatling
-LAMBDAS 	= gatling_to_cloudwatch \
-				notify_old_deploys \
-				post_to_slack \
-				service_deployment_status \
-				terraform_tracker \
-				update_service_list
+SBT_APPS    =
+ECS_TASKS   = gatling
+LAMBDAS     = gatling_to_cloudwatch \
+              notify_old_deploys \
+              post_to_slack \
+              service_deployment_status \
+              terraform_tracker \
+              update_service_list
 
-TF_NAME 	= monitoring
-TF_PATH 	= $(ROOT)/$(STACK_ROOT)/terraform
+TF_NAME     = monitoring
+TF_PATH     = $(ROOT)/$(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
