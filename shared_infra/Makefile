@@ -6,12 +6,12 @@ STACK_ROOT  = shared_infra
 SBT_APPS    =
 ECS_TASKS   = sqs_freezeray sqs_redrive
 LAMBDAS     = drain_ecs_container_instance \
-				dynamo_to_sns \
-				ecs_ec2_instance_tagger \
-				run_ecs_task \
-				service_scheduler \
-				update_dynamo_capacity \
-				update_ecs_service_size
+              dynamo_to_sns \
+              ecs_ec2_instance_tagger \
+              run_ecs_task \
+              service_scheduler \
+              update_dynamo_capacity \
+              update_ecs_service_size
 
 TF_NAME     = shared_infra
 TF_PATH     = $(ROOT)/$(STACK_ROOT)
