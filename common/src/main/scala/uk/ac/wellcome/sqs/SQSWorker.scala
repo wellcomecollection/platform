@@ -16,17 +16,26 @@ abstract class SQSWorker(sqsReader: SQSReader,
                          metricsSender: MetricsSender)
     extends TryBackoff {
 
-  val workerName: String = this.getClass.getSimpleName
+  lazy val workerName: String = this.getClass.getSimpleName
 
   def processMessage(message: SQSMessage): Future[Unit]
 
   def runSQSWorker(): Unit = run(() => processMessages, actorSystem)
 
   private def processMessages(): Future[Unit] = {
+    info(s"Starting $workerName.")
+
     sqsReader.retrieveAndDeleteMessages { message =>
       Future
         .fromTry(extractMessage(message))
-        .flatMap(m => processMessage(m))
+        .flatMap(m => {
+          debug(s"Processing message: $m")
+
+          metricsSender.timeAndCount(
+            s"${workerName}_ProcessMessage",
+            () => processMessage(m)
+          )
+        })
     }
   }
 

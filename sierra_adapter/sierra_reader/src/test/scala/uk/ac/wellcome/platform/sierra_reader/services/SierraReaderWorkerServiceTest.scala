@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
@@ -14,11 +16,14 @@ import scala.collection.JavaConversions._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.parser.decode
+import org.mockito.Matchers.{any, anyString}
+import org.mockito.Mockito.when
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.circe._
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class SierraReaderWorkerServiceTest
@@ -37,7 +42,13 @@ class SierraReaderWorkerServiceTest
   val bucketName: String = createBucketAndReturnName(
     "sierra-reader-test-bucket")
 
-  val mockMetrics = mock[MetricsSender]
+  val mockPutMetricDataResult = mock[PutMetricDataResult]
+  val mockCloudWatch = mock[AmazonCloudWatch]
+
+  when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
+
+  val mockMetrics = new MetricsSender("namespace", mockCloudWatch)
+
   var worker: Option[SierraReaderWorkerService] = None
   val actorSystem = ActorSystem()
 
