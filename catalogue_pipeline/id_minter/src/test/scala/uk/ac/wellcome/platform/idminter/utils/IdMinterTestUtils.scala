@@ -47,7 +47,7 @@ trait IdMinterTestUtils
     )
 
     SQSMessage(Some("subject"),
-               jsonUtil.toJsonCirce(work).get,
+               jsonUtil.toJson(work).get,
                "topic",
                "messageType",
                "timestamp")

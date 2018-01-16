@@ -5,16 +5,16 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import org.apache.commons.io.IOUtils
-import io.circe.generic.auto._
-import io.circe.parser.decode
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
-import uk.ac.wellcome.circe._
+import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.circe.jsonUtil
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 case class WindowStatus(id: Option[String], offset: Int)
 
@@ -53,11 +53,11 @@ class WindowManager @Inject()(
 
         val lastBody = IOUtils.toString(
           s3client.getObject(bucketName, key).getObjectContent)
-        val records = decode[List[SierraRecord]](lastBody)
+        val records = jsonUtil.fromJson[List[SierraRecord]](lastBody)
         val lastId = records match {
-          case Right(r) =>
+          case Success(r) =>
             r.map { _.id }.sorted.lastOption
-          case Left(err) => throw SQSReaderGracefulException(err)
+          case Failure(err) => throw SQSReaderGracefulException(err)
         }
 
         info(s"Found latest ID in S3: $lastId")

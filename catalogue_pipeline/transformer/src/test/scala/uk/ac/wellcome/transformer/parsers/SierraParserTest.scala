@@ -17,6 +17,7 @@ class SierraParserTest
     extends FunSpec
     with TransformableSQSMessageUtils
     with Matchers {
+
   it("should parse a sierra merged record") {
     val id = "000"
     val title = "A flock of flanged flamingos in France"

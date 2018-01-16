@@ -1,20 +1,19 @@
 package uk.ac.wellcome.test.utils
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.scalatest.Matchers
+import io.circe.parser._
 
 trait JsonTestUtil { this: Matchers =>
-  val mapper = new ObjectMapper()
 
   def assertJsonStringsAreEqual(json1: String, json2: String) = {
-    val tree1 = mapper.readTree(json1)
-    val tree2 = mapper.readTree(json2)
+    val tree1 = parse(json1).right.get
+    val tree2 = parse(json2).right.get
     tree1 shouldBe tree2
   }
 
   def assertJsonStringsAreDifferent(json1: String, json2: String) = {
-    val tree1 = mapper.readTree(json1)
-    val tree2 = mapper.readTree(json2)
+    val tree1 = parse(json1).right.get
+    val tree2 = parse(json2).right.get
     tree1 shouldNot be(tree2)
   }
 }

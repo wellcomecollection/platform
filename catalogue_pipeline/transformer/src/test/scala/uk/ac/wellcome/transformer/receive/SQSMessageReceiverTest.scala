@@ -9,18 +9,16 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.transformer.parsers.TransformableParser
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 
@@ -77,7 +75,7 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future) { _ =>
-      verify(snsWriter).writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+      verify(snsWriter).writeMessage(jsonUtil.toJson(work).get, Some("Foo"))
     }
   }
 

@@ -61,7 +61,7 @@ class IdEmbedderTests
 
     val newWorkFuture = idEmbedder.embedId(
       json = parse(
-        jsonUtil.toJsonCirce(originalWork).get
+        jsonUtil.toJson(originalWork).get
       ).right.get
     )
 
@@ -70,7 +70,7 @@ class IdEmbedderTests
     whenReady(newWorkFuture) { newWorkJson =>
       assertJsonStringsAreEqual(
         newWorkJson.toString(),
-        jsonUtil.toJsonCirce(expectedWork).get
+        jsonUtil.toJson(expectedWork).get
       )
     }
   }
@@ -98,7 +98,7 @@ class IdEmbedderTests
     ).thenReturn(Try(throw expectedException))
 
     val newWorkFuture = idEmbedder.embedId(
-      json = parse(jsonUtil.toJsonCirce(originalWork).get).right.get)
+      json = parse(jsonUtil.toJson(originalWork).get).right.get)
 
     whenReady(newWorkFuture.failed) { exception =>
       exception shouldBe expectedException
@@ -156,7 +156,7 @@ class IdEmbedderTests
 
     val eventualWork = idEmbedder.embedId(
       parse(
-        jsonUtil.toJsonCirce(originalWork).get
+        jsonUtil.toJson(originalWork).get
       ).right.get
     )
 
@@ -175,13 +175,13 @@ class IdEmbedderTests
       val actualItem2 = work.items.tail.head
 
       assertJsonStringsAreEqual(
-        jsonUtil.toJsonCirce(actualItem1).get,
-        jsonUtil.toJsonCirce(expectedItem1).get
+        jsonUtil.toJson(actualItem1).get,
+        jsonUtil.toJson(expectedItem1).get
       )
 
       assertJsonStringsAreEqual(
-        jsonUtil.toJsonCirce(actualItem2).get,
-        jsonUtil.toJsonCirce(expectedItem2).get
+        jsonUtil.toJson(actualItem2).get,
+        jsonUtil.toJson(expectedItem2).get
       )
     }
 

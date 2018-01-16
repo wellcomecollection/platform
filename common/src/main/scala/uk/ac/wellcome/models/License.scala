@@ -5,23 +5,31 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode}
 import com.twitter.inject.Logging
-import io.circe.{Encoder, Json}
+import io.circe.{Decoder, Encoder, Json}
+import cats.syntax.either._
 
 @JsonDeserialize(using = classOf[LicenseDeserialiser])
-sealed case class License (licenseType: String,label: String,url: String){
+sealed trait License {
+  val licenseType: String
+  val label: String
+  val url: String
   @JsonProperty("type") val ontologyType: String = "License"
 }
 
-class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
+object License extends Logging {
+  implicit val licenseEncoder = Encoder.instance[License](license => Json.obj(
+    ("licenseType", Json.fromString(license.licenseType)),
+    ("label", Json.fromString(license.label)),
+    ("url", Json.fromString(license.url))
+  ))
 
-  override def deserialize(p: JsonParser,
-                           ctxt: DeserializationContext): License = {
-    val node: JsonNode = p.getCodec.readTree(p)
-    val licenseType = node.get("licenseType").asText
+  implicit val licenseDecoder = Decoder.instance[License](cursor => for {
+    licenseType <- cursor.downField("licenseType").as[String]
+  } yield {
     createLicense(licenseType)
-  }
+  })
 
-  private def createLicense(licenseType: String): License = {
+  def createLicense(licenseType: String): License = {
     licenseType match {
       case s: String if s == License_CCBY.licenseType => License_CCBY
       case s: String if s == License_CCBYNC.licenseType => License_CCBYNC
@@ -36,32 +44,42 @@ class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
   }
 }
 
-object License_CCBY extends License(
-  licenseType = "CC-BY",
-  label = "Attribution 4.0 International (CC BY 4.0)",
-  url = "http://creativecommons.org/licenses/by/4.0/"
-)
+class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
 
-object License_CCBYNC extends License (
-  licenseType = "CC-BY-NC",
-  label = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)",
-  url = "https://creativecommons.org/licenses/by-nc/4.0/"
-)
+  override def deserialize(p: JsonParser,
+                           ctxt: DeserializationContext): License = {
+    val node: JsonNode = p.getCodec.readTree(p)
+    val licenseType = node.get("licenseType").asText
+    License.createLicense(licenseType)
+  }
+}
 
-object License_CCBYNCND extends License (
-  licenseType = "CC-BY-NC-ND",
-  label = "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)",
-   url = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
-)
+case object License_CCBY extends License {
+  val licenseType = "CC-BY"
+  val label = "Attribution 4.0 International (CC BY 4.0)"
+  val url = "http://creativecommons.org/licenses/by/4.0/"
+}
 
-object License_CC0 extends License (
-   licenseType = "CC-0",
-   label = "CC0 1.0 Universal",
-   url = "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
-)
+object License_CCBYNC extends License{
+  val licenseType = "CC-BY-NC"
+  val label = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
+  val url = "https://creativecommons.org/licenses/by-nc/4.0/"
+}
 
-object License_PDM extends License (
-   licenseType = "PDM",
-   label = "Public Domain Mark",
-   url = "https://creativecommons.org/share-your-work/public-domain/pdm/"
-)
+object License_CCBYNCND extends License {
+  val licenseType = "CC-BY-NC-ND"
+  val label = "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
+  val url = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+}
+
+object License_CC0 extends License {
+  val licenseType = "CC-0"
+  val label = "CC0 1.0 Universal"
+  val url = "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+}
+
+object License_PDM extends License {
+  val licenseType = "PDM"
+  val label = "Public Domain Mark"
+  val url = "https://creativecommons.org/share-your-work/public-domain/pdm/"
+}

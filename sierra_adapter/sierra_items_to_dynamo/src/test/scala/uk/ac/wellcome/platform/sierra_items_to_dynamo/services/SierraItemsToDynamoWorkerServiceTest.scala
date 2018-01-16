@@ -16,18 +16,13 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord,
-  SierraRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
-import io.circe.generic.auto._
-import io.circe.syntax._
 import com.gu.scanamo.syntax._
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import uk.ac.wellcome.circe._
 
 import scala.concurrent.duration._
 
@@ -89,7 +84,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"),
-                 message.asJson.noSpaces,
+                 jsonUtil.toJson(message).get,
                  "topic",
                  "messageType",
                  "timestamp")

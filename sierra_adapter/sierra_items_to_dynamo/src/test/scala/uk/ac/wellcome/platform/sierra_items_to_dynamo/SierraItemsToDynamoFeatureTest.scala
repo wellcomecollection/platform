@@ -7,22 +7,14 @@ import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SQSLocal
-}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraItemRecord,
-  SierraRecord
-}
-import io.circe.generic.auto._
-import io.circe.syntax._
-import uk.ac.wellcome.circe._
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
@@ -52,7 +44,7 @@ class SierraItemsToDynamoFeatureTest
 
     val sqsMessage =
       SQSMessage(Some("subject"),
-                 message.asJson.noSpaces,
+                 jsonUtil.toJson(message).get,
                  "topic",
                  "messageType",
                  "timestamp")

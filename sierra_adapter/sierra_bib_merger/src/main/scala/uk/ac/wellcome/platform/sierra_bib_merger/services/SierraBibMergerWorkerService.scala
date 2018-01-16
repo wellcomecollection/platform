@@ -3,19 +3,15 @@ package uk.ac.wellcome.platform.sierra_bib_merger.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import io.circe.generic.extras.auto._
-import io.circe.parser.decode
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
-import uk.ac.wellcome.circe._
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraRecord
-}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class SierraBibMergerWorkerService @Inject()(
   reader: SQSReader,
@@ -26,10 +22,10 @@ class SierraBibMergerWorkerService @Inject()(
     with Logging {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
-    decode[SierraRecord](message.body) match {
-      case Right(record) =>
+    fromJson[SierraRecord](message.body) match {
+      case Success(record) =>
         sierraBibMergerUpdaterService.update(record.toBibRecord)
-      case Left(e) =>
+      case Failure(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)
           throw SQSReaderGracefulException(e)

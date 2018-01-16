@@ -3,12 +3,10 @@ package uk.ac.wellcome.transformer
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.transformer.utils.{
-  TransformableSQSMessageUtils,
-  TransformerFeatureTest
-}
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
 
 class SierraTransformerFeatureTest
     extends FunSpec
@@ -38,7 +36,7 @@ class SierraTransformerFeatureTest
       lastModifiedDate
     )
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, jsonUtil.toJson(sqsMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -49,7 +47,7 @@ class SierraTransformerFeatureTest
         id
       )
 
-      val actualWork = JsonUtil.fromJson[Work](snsMessages.head.message).get
+      val actualWork = jsonUtil.fromJson[Work](snsMessages.head.message).get
 
       actualWork.sourceIdentifier shouldBe sourceIdentifier
       actualWork.title shouldBe title

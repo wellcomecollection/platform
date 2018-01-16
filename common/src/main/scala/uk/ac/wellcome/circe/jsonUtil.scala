@@ -13,6 +13,7 @@ import scala.util.Try
 object jsonUtil extends AutoDerivation {
 
   import uk.ac.wellcome.models.transformable.Transformable._
+  import uk.ac.wellcome.models.License._
 
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] = {
@@ -36,11 +37,11 @@ object jsonUtil extends AutoDerivation {
       case other => other
     })
 
-  def toJsonCirce[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
+  def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
     Try(value.asJson.noSpaces)
   }
 
-  def fromJsonCirce[T](json:String)(implicit decoder: Decoder[T]): Try[T] = {
+  def fromJson[T](json:String)(implicit decoder: Decoder[T]): Try[T] = {
     decode[T](json).toTry
   }
 }

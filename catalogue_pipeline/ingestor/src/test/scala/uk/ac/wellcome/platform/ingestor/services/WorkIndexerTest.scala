@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.fasterxml.jackson.core.JsonParseException
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -13,7 +12,6 @@ import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 
@@ -41,7 +39,7 @@ class WorkIndexerTest
     )
 
     jsonUtil
-      .toJsonCirce(
+      .toJson(
         Work(
           canonicalId = Some(canonicalId),
           sourceIdentifier = sourceIdentifier,

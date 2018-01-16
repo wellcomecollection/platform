@@ -1,6 +1,8 @@
 package uk.ac.wellcome.transformer.receive
 
 import com.twitter.inject.Logging
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.Work
@@ -9,7 +11,6 @@ import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.transformers.TransformableTransformer
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -60,5 +61,5 @@ class SQSMessageReceiver(
   }
 
   def publishMessage(work: Work): Future[PublishAttempt] =
-    snsWriter.writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+    snsWriter.writeMessage(jsonUtil.toJson(work).get, Some("Foo"))
 }

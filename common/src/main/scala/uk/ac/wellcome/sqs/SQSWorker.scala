@@ -41,7 +41,7 @@ abstract class SQSWorker(sqsReader: SQSReader,
   }
 
   private def extractMessage(sqsMessage: Message): Try[SQSMessage] =
-    jsonUtil.fromJsonCirce[SQSMessage](sqsMessage.getBody).recover {
+    jsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover {
       case e: Exception =>
         warn("Invalid message structure (not via SNS?)", e)
         throw SQSReaderGracefulException(e)

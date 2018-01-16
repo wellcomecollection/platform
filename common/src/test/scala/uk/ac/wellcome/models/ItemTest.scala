@@ -1,8 +1,9 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil
 
 class ItemTest extends FunSpec with Matchers with JsonTestUtil {
 
@@ -23,13 +24,13 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "locations": [
       |    {
       |      "locationType": "location",
+      |      "url" : null,
+      |      "credit" : null,
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",
-      |        "url": "${License_CCBY.url}",
-      |        "type": "License"
-      |      },
-      |      "type": "Location"
+      |        "url": "${License_CCBY.url}"
+      |      }
       |    }
       |  ],
       |  "visible":true,
@@ -40,6 +41,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
   val unidentifiedItemJson: String =
     s"""
       |{
+      |  "canonicalId" : null,
       |  "sourceIdentifier": {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "value": "value"
@@ -53,13 +55,13 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "locations": [
       |    {
       |      "locationType": "location",
+      |      "url" : null,
+      |      "credit" : null,
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",
-      |        "url": "${License_CCBY.url}",
-      |        "type": "License"
-      |      },
-      |      "type": "Location"
+      |        "url": "${License_CCBY.url}"
+      |      }
       |    }
       |  ],
       |  "visible":true,
@@ -93,28 +95,28 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   it("should serialise an unidentified Item as JSON") {
-    val result = JsonUtil.toJson(unidentifiedItem)
+    val result = jsonUtil.toJson(unidentifiedItem)
 
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, unidentifiedItemJson)
   }
 
   it("should deserialize a JSON string as a unidentified Item") {
-    val result = JsonUtil.fromJson[Item](unidentifiedItemJson)
+    val result = jsonUtil.fromJson[Item](unidentifiedItemJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe unidentifiedItem
   }
 
   it("should serialise an identified Item as JSON") {
-    val result = JsonUtil.toJson(identifiedItem)
+    val result = jsonUtil.toJson(identifiedItem)
 
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, identifiedItemJson)
   }
 
   it("should deserialize a JSON string as a identified Item") {
-    val result = JsonUtil.fromJson[Item](identifiedItemJson)
+    val result = jsonUtil.fromJson[Item](identifiedItemJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe identifiedItem
