@@ -2,17 +2,16 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil, SQSLocal}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.duration._
 
@@ -22,16 +21,10 @@ class IngestorWorkerServiceTest
     with Matchers
     with MockitoSugar
     with JsonTestUtil
-    with SQSLocal
-    with IndexedElasticSearchLocal {
-
-  val indexName = "works"
-  val itemType = "work"
+    with Ingestor {
 
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
-
-  val queueUrl = createQueueAndReturnUrl("ingestor-worker-service-test-q")
 
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
@@ -86,33 +79,4 @@ class IngestorWorkerServiceTest
       messageType = "json",
       timestamp = "2018-01-16T15:24:00Z"
     )
-
-  private def assertElasticsearchEventuallyHasWork(work: Work) = {
-    val workJson = JsonUtil.toJson(work).get
-
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-        .map { _.hits.hits }
-        .await
-
-      hits should have size 1
-
-      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
-    }
-  }
-
-  private def createWork(canonicalId: String, sourceId: String, title: String): Work = {
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
-      sourceId
-    )
-
-    Work(
-      canonicalId = Some(canonicalId),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      title = title
-    )
-  }
 }

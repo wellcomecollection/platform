@@ -1,17 +1,14 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
+import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 
@@ -20,11 +17,7 @@ class WorkIndexerTest
     with ScalaFutures
     with Matchers
     with MockitoSugar
-    with JsonTestUtil
-    with IndexedElasticSearchLocal {
-
-  val indexName = "works"
-  val itemType = "work"
+    with Ingestor {
 
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
@@ -52,49 +45,5 @@ class WorkIndexerTest
     whenReady(future) { _ =>
       assertElasticsearchEventuallyHasWork(work)
     }
-  }
-
-  private def assertElasticsearchEventuallyHasWork(work: Work) = {
-    val workJson = JsonUtil.toJson(work).get
-
-    whenReady(future.failed) { exception =>
-      exception shouldBe a[GracefulFailureException]
-    }
-  }
-
-  it(
-    "should not return a NullPointerException if the document is the string null") {
-    val future = workIndexer.indexWork("null")
-
-    whenReady(future.failed) { exception =>
-      exception shouldBe a[GracefulFailureException]
-    }
-  }
-
-  private def assertElasticsearchEventuallyHasWork(workJson: String) = {
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-        .map { _.hits.hits }
-        .await
-
-      hits should have size 1
-
-      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
-    }
-  }
-
-  private def createWork(canonicalId: String, sourceId: String, title: String): Work = {
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
-      sourceId
-    )
-
-    Work(
-      canonicalId = Some(canonicalId),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      title = title
-    )
   }
 }
