@@ -14,7 +14,7 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
   it("picks up zero publishers") {
     assertFindsCorrectPublishers(
       varFields = List(),
-      expectedPublishers = List()
+      expectedPublisherNames = List()
     )
   }
 
@@ -31,7 +31,7 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
           )
         )
       ),
-      expectedPublishers = List()
+      expectedPublisherNames = List()
     )
   }
 
@@ -44,15 +44,11 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
           indicator1 = " ",
           indicator2 = " ",
           subfields = List(
-            MarcSubfield(tag = "b", content = "H. Humphrey")
+            MarcSubfield(tag = "b", content = "Peaceful Poetry")
           )
         )
       ),
-      expectedPublishers = List(
-        Agent(
-          label = "H. Humphrey",
-          ontologyType = "Organisation"
-        ))
+      expectedPublisherNames = List("Peaceful Poetry")
     )
   }
 
@@ -75,15 +71,83 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
           )
         )
       ),
-      expectedPublishers = List(
-        Agent(
-          label = "Gauthier-Villars",
-          ontologyType = "Organisation"
-        ),
-        Agent(
-          label = "University of Chicago Press",
-          ontologyType = "Organisation"
+      expectedPublisherNames = List(
+        "Gauthier-Villars",
+        "University of Chicago Press"
+      )
+    )
+  }
+
+  it("uses MARC field 264 if field 260 is not present") {
+    assertFindsCorrectPublishers(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "264",
+          indicator1 = " ",
+          indicator2 = " ",
+          subfields = List(
+            MarcSubfield(tag = "b", content = "Daring Diaries")
+          )
         )
+      ),
+      expectedPublisherNames = List("Daring Diaries")
+    )
+  }
+
+  it("ignores MARC field 264 if field 260 is present") {
+    assertFindsCorrectPublishers(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "260",
+          indicator1 = " ",
+          indicator2 = " ",
+          subfields = List(
+            MarcSubfield(tag = "b", content = "Harrowing Hardbacks")
+          )
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "264",
+          indicator1 = " ",
+          indicator2 = " ",
+          subfields = List(
+            MarcSubfield(tag = "b", content = "Nail-Biting Novels")
+          )
+        )
+      ),
+      expectedPublisherNames = List("Harrowing Hardbacks")
+    )
+  }
+
+  it("picks up multiple instances of MARC field 264 if necessary") {
+    assertFindsCorrectPublishers(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "264",
+          indicator1 = " ",
+          indicator2 = " ",
+          subfields = List(
+            MarcSubfield(tag = "b", content = "Brilliant Books")
+          )
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "264",
+          indicator1 = " ",
+          indicator2 = " ",
+          subfields = List(
+            MarcSubfield(tag = "b", content = "Thrilling Tomes"),
+            MarcSubfield(tag = "b", content = "Page-Turning Paperbacks")
+          )
+        ),
+      ),
+      expectedPublisherNames = List(
+        "Brilliant Books",
+        "Thrilling Tomes",
+        "Page-Turning Paperbacks"
       )
     )
   }
@@ -92,7 +156,7 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
 
   private def assertFindsCorrectPublishers(
     varFields: List[VarField],
-    expectedPublishers: List[Agent]
+    expectedPublisherNames: List[String]
   ) = {
 
     val bibData = SierraBibData(
@@ -102,6 +166,10 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
       suppressed = false,
       varFields = varFields
     )
+
+    val expectedPublishers = expectedPublisherNames.map { name =>
+      Agent(label = name, ontologyType = "Organisation")
+    }
 
     transformer.getPublishers(bibData = bibData) shouldBe expectedPublishers
   }
