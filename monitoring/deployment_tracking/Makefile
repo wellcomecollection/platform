@@ -7,4 +7,8 @@ SBT_APPS    =
 ECS_TASKS   =
 LAMBDAS     = notify_old_deploys service_deployment_status
 
+TF_NAME     =
+TF_PATH     =
+TF_IS_PUBLIC_FACING =
+
 $(val $(call stack_setup))
