@@ -79,7 +79,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
   it("excludes works with visible=false from search results") {
     val work1 = workWith(
       canonicalId = "r8dx6std",
-      title = "A work of wonders"
+      title = "A deleted dodo"
     )
     val work2 = workWith(
       canonicalId = "a22tjhsy",
@@ -94,7 +94,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works?query=work",
+        path = s"/$apiPrefix/works?query=deleted",
         andExpect = Status.Ok,
         withJsonBody = s"""
           |{
