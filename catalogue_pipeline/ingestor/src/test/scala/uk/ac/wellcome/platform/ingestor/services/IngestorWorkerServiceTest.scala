@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -27,8 +26,6 @@ class IngestorWorkerServiceTest
 
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
-
-  val queueUrl = createQueueAndReturnUrl("ingestor-worker-service-test-q")
 
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
