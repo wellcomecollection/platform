@@ -2,7 +2,12 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
+import io.circe.generic.extras.auto._
+import io.circe.parser._
+import uk.ac.wellcome.circe._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -17,6 +22,8 @@ class IngestorWorkerService @Inject()(
 ) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
-    identifiedWorkIndexer.indexWork(message.body).map(_ => ())
-
+    decode[Work](message.body) match {
+      case Right(work) => identifiedWorkIndexer.indexWork(work = work).map(_ => ())
+      case Left(error) => throw GracefulFailureException(error)
+    }
 }
