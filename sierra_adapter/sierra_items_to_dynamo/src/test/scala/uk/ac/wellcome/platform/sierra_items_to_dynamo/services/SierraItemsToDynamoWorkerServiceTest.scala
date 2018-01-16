@@ -3,6 +3,8 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 import java.time.Instant
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
@@ -14,15 +16,13 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord,
-  SierraRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import io.circe.generic.auto._
 import io.circe.syntax._
 import com.gu.scanamo.syntax._
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import uk.ac.wellcome.circe._
 
 import scala.concurrent.duration._
@@ -40,7 +40,12 @@ class SierraItemsToDynamoWorkerServiceTest
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
-  val mockMetrics = mock[MetricsSender]
+  val mockPutMetricDataResult = mock[PutMetricDataResult]
+  val mockCloudWatch = mock[AmazonCloudWatch]
+
+  when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
+  val mockMetrics = new MetricsSender("namespace", mockCloudWatch)
+
   var worker: Option[SierraItemsToDynamoWorkerService] = None
   val actorSystem = ActorSystem()
 
