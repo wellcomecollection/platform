@@ -115,3 +115,38 @@ define sbt_build
 		wellcome/sbt_wrapper \
 		"project $(1)" ";stage"
 endef
+
+
+# Define a series of Make tasks (build, test, publish) for a Scala application.
+#
+# Args:
+#	$1 - Name of the project in sbt.
+#	$2 - Root of the project's source code.
+#
+define scala_target_template
+$(1)-build:
+	$(call sbt_build,$(1))
+	$(call build_image,$(1),$(2)/Dockerfile)
+
+$(1)-test:
+	$(call sbt_test,$(1))
+
+$(1)-publish: $(1)-build
+	$(call publish_service,$(1))
+endef
+
+
+# Define a series of Make tasks (plan, apply) for a Terraform stack.
+#
+# Args:
+#	$1 - Name of the stack.
+#	$2 - Root to the Terraform directory.
+#	$3 - Is this a public-facing stack?  (true/false)
+#
+define terraform_target_template
+$(1)-terraform-plan:
+	$(call terraform_plan,$(2),$(3))
+
+$(1)-terraform-apply:
+	$(call terraform_apply,$(2))
+endef
