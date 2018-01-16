@@ -13,8 +13,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-import scala.util.{Failure, Success, Try}
-
 @Singleton
 class WorkIndexer @Inject()(
   @Flag("es.index") esIndex: String,

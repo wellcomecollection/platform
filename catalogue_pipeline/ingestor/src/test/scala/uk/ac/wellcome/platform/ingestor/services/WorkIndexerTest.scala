@@ -60,7 +60,9 @@ class WorkIndexerTest
     }
   }
 
-  private def workJson(canonicalId: String, sourceId: String, title: String): String = {
+  private def workJson(canonicalId: String,
+                       sourceId: String,
+                       title: String): String = {
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,
       sourceId
