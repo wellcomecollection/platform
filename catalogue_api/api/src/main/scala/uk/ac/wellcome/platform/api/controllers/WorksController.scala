@@ -57,6 +57,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .responseWith[DisplayResultList](200, "ResultList[Work]")
         .responseWith[DisplayError](400, "Bad Request Error")
         .responseWith[DisplayError](404, "Not Found Error")
+        .responseWith[DisplayError](410, "Gone Error")
         .responseWith[DisplayError](500, "Internal Server Error")
         .queryParam[Int]("page",
                          "The page to return from the result list",
