@@ -4,9 +4,9 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.utils.JsonUtil
 import io.circe.Decoder
 import cats.syntax.functor._
+import uk.ac.wellcome.circe.jsonUtil._
 
 sealed trait Transformable
 object Transformable {
@@ -79,7 +79,7 @@ case class SierraTransformable(
 
 object SierraTransformable {
   def apply(id: String, bibData: String): SierraTransformable = {
-    val bibRecord = JsonUtil.fromJson[SierraBibRecord](bibData).get
+    val bibRecord = fromJson[SierraBibRecord](bibData).get
     SierraTransformable(id = id, maybeBibData = Some(bibRecord))
   }
 
