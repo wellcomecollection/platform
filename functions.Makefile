@@ -165,3 +165,40 @@ $(1)-test:
 $(1)-publish:
 	$(call publish_lambda,$(2))
 endef
+
+
+# Define a series of Make tasks (build, test, publish) for an ECS service.
+#
+# Args:
+#	$1 - Name of the ECS service.
+#	$2 - Path to the associated Dockerfile.
+#
+define ecs_target_template
+$(1)-build:
+	$(call build_image,$(1),$(2))
+
+$(1)-publish: $(1)-build
+	$(call publish_lambda,$(1))
+endef
+
+
+# Define all the Make tasks for a stack.
+#
+# Args:
+#
+#	$STACK_ROOT				Path to this stack, relative to the repo root
+#
+#	$SBT_APPS			A space delimited list of sbt apps in this stack
+#	$ECS_TASKS				A space delimited list of ECS services
+#	$LAMBDAS				A space delimited list of Lambdas in this stack
+#
+#	$TF_NAME				Name of the associated Terraform stack
+#	$TF_PATH				Path to the associated Terraform stack
+#	$TF_IS_PUBLIC_FACING	Is this a public-facing stack?  (true/false)
+#
+define stack_setup
+$(foreach proj,$(SBT_APPS),$(eval $(call scala_target_template,$(proj),$(STACK_ROOT)/$(proj))))
+$(foreach task,$(ECS_TASKS),$(eval $(call ecs_target_template,$(task),$(STACK_ROOT)/task)))
+$(foreach lamb,$(LAMBDAS),$(eval $(call lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
+$(eval $(call terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING)))
+endef
