@@ -46,4 +46,52 @@ class WorkIndexerTest
       assertElasticsearchEventuallyHasWork(work)
     }
   }
+
+  it("should return a failed future if the input string is not a Work") {
+    val future = workIndexer.indexWork("a document")
+
+    whenReady(future.failed) { exception =>
+      exception shouldBe a[GracefulFailureException]
+    }
+  }
+
+  it(
+    "should not return a NullPointerException if the document is the string null") {
+    val future = workIndexer.indexWork("null")
+
+    whenReady(future.failed) { exception =>
+      exception shouldBe a[GracefulFailureException]
+    }
+  }
+
+  private def assertElasticsearchEventuallyHasWork(workJson: String) = {
+    eventually {
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
+        .map { _.hits.hits }
+        .await
+
+      hits should have size 1
+
+      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
+    }
+  }
+
+  private def workJson(canonicalId: String, sourceId: String, title: String): String = {
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      sourceId
+    )
+
+    JsonUtil
+      .toJson(
+        Work(
+          canonicalId = Some(canonicalId),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
+          title = title
+        )
+      )
+      .get
+  }
 }
