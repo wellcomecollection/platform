@@ -54,7 +54,7 @@ class IdMinterFeatureTest
 
     def sendMessage = sqsClient.sendMessage(
       idMinterQueue,
-      JsonUtil.toJson(sqsMessage).get
+      jsonUtil.toJsonCirce(sqsMessage).get
     )
 
     def getWorksFromMessages(messages: Seq[MessageInfo]) =
@@ -91,7 +91,7 @@ class IdMinterFeatureTest
     val miroId = "1234"
     val sqsMessage = generateSqsMessage(miroId)
 
-    sqsClient.sendMessage(idMinterQueue, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, jsonUtil.toJsonCirce(sqsMessage).get)
 
     eventually {
       val messages = listMessagesReceivedFromSNS()
