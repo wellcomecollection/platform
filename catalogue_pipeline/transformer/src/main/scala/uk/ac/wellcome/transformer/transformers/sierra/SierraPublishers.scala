@@ -24,17 +24,22 @@ trait SierraPublishers {
   // https://www.loc.gov/marc/bibliographic/bd264.html
   //
   def getPublishers(bibData: SierraBibData): List[Agent] = {
-    val matchingSubfields = bibData.varFields
-      .filter(_.marcTag.contains("260"))
-      .flatMap {
-        _.subfields
-      }
+    val matchingFields = bibData.varFields
+      .filter { _.marcTag.contains("260") }
+
+    val publisherFields = if (!matchingFields.isEmpty) {
+      matchingFields
+    } else {
+      bibData.varFields
+        .filter { _.marcTag.contains("264") }
+    }
+
+    val matchingSubfields = publisherFields
+      .flatMap { _.subfields }
       .flatten
 
     matchingSubfields
-      .filter {
-        _.tag == "b"
-      }
+      .filter { _.tag == "b" }
       .map { subfield =>
         Agent(
           label = subfield.content,
