@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.common
+package uk.ac.wellcome.utils
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}

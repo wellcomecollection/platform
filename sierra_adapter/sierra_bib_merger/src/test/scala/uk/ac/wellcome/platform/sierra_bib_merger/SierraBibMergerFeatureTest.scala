@@ -8,11 +8,11 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.circe.jsonUtil._
 
 class SierraBibMergerFeatureTest
     extends FunSpec
@@ -214,7 +214,7 @@ class SierraBibMergerFeatureTest
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {
-    val messageBody = JsonUtil.toJson(record).get
+    val messageBody = toJson(record).get
 
     val message = SQSMessage(
       subject = Some("Test message sent by SierraBibMergerWorkerServiceTest"),
@@ -223,6 +223,6 @@ class SierraBibMergerFeatureTest
       messageType = "messageType",
       timestamp = "2001-01-01T01:01:01Z"
     )
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
+    sqsClient.sendMessage(queueUrl, toJson(message).get)
   }
 }

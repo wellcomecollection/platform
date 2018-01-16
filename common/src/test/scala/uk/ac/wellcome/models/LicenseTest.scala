@@ -7,7 +7,7 @@ import uk.ac.wellcome.circe.jsonUtil._
 class LicenseTest extends FunSpec with Matchers {
 
   it("should serialise a License as JSON") {
-    val result = jsonUtil.toJson(License_CCBY)
+    val result = jsonUtil.toJson[License](License_CCBY)
     result.isSuccess shouldBe true
     result.get shouldBe """{"licenseType":"CC-BY","label":"Attribution 4.0 International (CC BY 4.0)","url":"http://creativecommons.org/licenses/by/4.0/"}"""
   }

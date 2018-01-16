@@ -5,7 +5,7 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.utils._
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 
 class SierraReaderFeatureTest
     extends FunSpec
@@ -44,7 +44,7 @@ class SierraReaderFeatureTest
 
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     eventually {
       // This comes from the wiremock recordings for Sierra API response

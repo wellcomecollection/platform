@@ -1,8 +1,8 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil
 
 class WorkTest extends FunSpec with Matchers with JsonTestUtil {
 
@@ -10,8 +10,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     s"""{
             "licenseType": "${License_CCBY.licenseType}",
             "label": "${License_CCBY.label}",
-            "url": "${License_CCBY.url}",
-            "type": "License"
+            "url": "${License_CCBY.url}"
           }"""
 
   val identifiedWorkJson: String =
@@ -32,13 +31,11 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "description": "description",
       |  "lettering": "lettering",
       |  "createdDate": {
-      |    "label": "period",
-      |    "type": "Period"
+      |    "label": "period"
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject",
-      |      "type": "Concept"
+      |      "label": "subject"
       |    }
       |  ],
       |  "creators": [
@@ -49,14 +46,14 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "genres": [
       |    {
-      |      "label": "genre",
-      |      "type": "Concept"
+      |      "label": "genre"
       |    }
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
-      |    "license": $license_CCBYJson,
-      |    "type": "Location"
+      |    "url" : null,
+      |    "credit" : null,
+      |    "license": $license_CCBYJson
       |  },
       |  "items": [
       |    {
@@ -74,8 +71,9 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "locations": [
       |        {
       |          "locationType": "location",
-      |          "license": $license_CCBYJson,
-      |          "type": "Location"
+      |          "url" : null,
+      |          "credit" : null,
+      |          "license": $license_CCBYJson
       |        }
       |      ],
       |      "visible":true,
@@ -101,6 +99,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |    "value": "value"
       |  },
+      |  "canonicalId" : null,
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -110,13 +109,11 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "description": "description",
       |  "lettering": "lettering",
       |  "createdDate": {
-      |    "label": "period",
-      |    "type": "Period"
+      |    "label": "period"
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject",
-      |      "type": "Concept"
+      |      "label": "subject"
       |    }
       |  ],
       |  "creators": [
@@ -127,14 +124,14 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "genres": [
       |    {
-      |      "label": "genre",
-      |      "type": "Concept"
+      |      "label": "genre"
       |    }
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
-      |    "license": $license_CCBYJson,
-      |    "type": "Location"
+      |    "url" : null,
+      |    "credit" : null,
+      |    "license": $license_CCBYJson
       |  },
       |  "items": [
       |    {
@@ -152,8 +149,9 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "locations": [
       |        {
       |          "locationType": "location",
-      |          "license": $license_CCBYJson,
-      |          "type": "Location"
+      |          "url" : null,
+      |          "credit" : null,
+      |          "license": $license_CCBYJson
       |        }
       |      ],
       |      "visible":true,
@@ -226,21 +224,21 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   it("should serialise an unidentified Work as JSON") {
-    val result = JsonUtil.toJson(unidentifiedWork)
+    val result = toJson(unidentifiedWork)
 
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, unidentifiedWorkJson)
   }
 
   it("should deserialize a JSON string as a unidentified Work") {
-    val result = JsonUtil.fromJson[Work](unidentifiedWorkJson)
+    val result = fromJson[Work](unidentifiedWorkJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe unidentifiedWork
   }
 
   it("should serialise an identified Item as Work") {
-    val result = JsonUtil.toJson(identifiedWork)
+    val result = toJson(identifiedWork)
 
     print(result)
 
@@ -249,7 +247,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   it("should deserialize a JSON string as a identified Item") {
-    val result = JsonUtil.fromJson[Work](identifiedWorkJson)
+    val result = fromJson[Work](identifiedWorkJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe identifiedWork
@@ -266,7 +264,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       identifiers = List(identifier),
       title = "A book about a blue whale"
     )
-    val jsonString = JsonUtil.toJson(work).get
+    val jsonString = toJson(work).get
 
     jsonString.contains("""type":"Work"""") should be(true)
   }

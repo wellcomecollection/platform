@@ -11,7 +11,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 
 import scala.concurrent.Future
 
@@ -39,7 +39,7 @@ trait IndexedElasticSearchLocal
     }
 
     works.foreach { work =>
-      val jsonDoc = JsonUtil.toJson(work).get
+      val jsonDoc = toJson(work).get
 
       val result: Future[IndexResponse] = elasticClient.execute(
         indexInto(index / itemType)

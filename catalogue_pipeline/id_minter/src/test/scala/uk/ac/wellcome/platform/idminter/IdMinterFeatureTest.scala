@@ -4,13 +4,11 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{BeforeAndAfterEach, FunSpec}
 import scalikejdbc._
-import uk.ac.wellcome.circe.jsonUtil
 import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.utils.JsonUtil
 
 class IdMinterFeatureTest
     extends FunSpec
@@ -42,11 +40,9 @@ class IdMinterFeatureTest
       title = title
     )
 
-    val value = jsonUtil.toJson(work).get
-
     val sqsMessage = SQSMessage(
       Some("subject"),
-      value,
+      toJson(work).get,
       "topic",
       "messageType",
       "timestamp"
@@ -54,11 +50,11 @@ class IdMinterFeatureTest
 
     def sendMessage = sqsClient.sendMessage(
       idMinterQueue,
-      jsonUtil.toJson(sqsMessage).get
+      toJson(sqsMessage).get
     )
 
     def getWorksFromMessages(messages: Seq[MessageInfo]) =
-      messages.map(m => JsonUtil.fromJson[Work](m.message).get)
+      messages.map(m => fromJson[Work](m.message).get)
 
     sendMessage
 
@@ -91,7 +87,7 @@ class IdMinterFeatureTest
     val miroId = "1234"
     val sqsMessage = generateSqsMessage(miroId)
 
-    sqsClient.sendMessage(idMinterQueue, jsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(idMinterQueue, toJson(sqsMessage).get)
 
     eventually {
       val messages = listMessagesReceivedFromSNS()

@@ -14,12 +14,10 @@ import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import com.gu.scanamo.syntax._
-import uk.ac.wellcome.circe.jsonUtil
 import uk.ac.wellcome.circe.jsonUtil._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -84,11 +82,11 @@ class SierraItemsToDynamoWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"),
-                 jsonUtil.toJson(message).get,
+                 toJson(message).get,
                  "topic",
                  "messageType",
                  "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     eventually {
       Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
