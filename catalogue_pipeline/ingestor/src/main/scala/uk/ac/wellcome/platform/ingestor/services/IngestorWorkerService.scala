@@ -21,9 +21,10 @@ class IngestorWorkerService @Inject()(
   metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
-  override def processMessage(message: SQSMessage): Future[Unit] =
+  override def processMessage(message: SQSMessage): Future[Unit] = Future {
     decode[Work](message.body) match {
       case Right(work) => identifiedWorkIndexer.indexWork(work = work).map(_ => ())
       case Left(error) => throw GracefulFailureException(error)
     }
+  }
 }
