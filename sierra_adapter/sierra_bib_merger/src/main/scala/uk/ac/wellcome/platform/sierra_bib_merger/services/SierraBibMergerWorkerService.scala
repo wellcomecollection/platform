@@ -8,7 +8,7 @@ import io.circe.generic.extras.auto._
 import io.circe.parser.decode
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker, WriteSQSToDynamo}
 import uk.ac.wellcome.circe._
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecord}
 
@@ -21,15 +21,12 @@ class SierraBibMergerWorkerService @Inject()(
   metrics: MetricsSender,
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
 ) extends SQSWorker(reader, system, metrics)
+    with WriteSQSToDynamo
     with Logging {
 
+  private def processSierraRecord(record: SierraRecord) =
+    sierraBibMergerUpdaterService.update(record.toBibRecord)
+
   override def processMessage(message: SQSMessage): Future[Unit] =
-    decode[SierraRecord](message.body) match {
-      case Right(record) =>
-        sierraBibMergerUpdaterService.update(record.toBibRecord).recover {
-          case e: ConditionalCheckFailedException =>
-            failGracefully(message, e)
-        }
-      case Left(e) => failGracefully(message, e)
-    }
+    convertAndProcess(message, decode[SierraRecord], processSierraRecord)
 }

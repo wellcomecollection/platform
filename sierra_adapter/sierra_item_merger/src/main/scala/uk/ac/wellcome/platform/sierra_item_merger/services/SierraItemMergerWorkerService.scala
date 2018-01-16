@@ -8,7 +8,7 @@ import io.circe.generic.extras.auto._
 import io.circe.parser._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker, WriteSQSToDynamo}
 import uk.ac.wellcome.circe._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
@@ -21,15 +21,12 @@ class SierraItemMergerWorkerService @Inject()(
   metrics: MetricsSender,
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
 ) extends SQSWorker(reader, system, metrics)
+  with WriteSQSToDynamo
     with Logging {
 
+  private def processSierraItemRecord(record: SierraItemRecord) =
+    sierraItemMergerUpdaterService.update(record)
+
   override def processMessage(message: SQSMessage): Future[Unit] =
-    // Using Circe here because Jackson creates nulls for empty lists
-    decode[SierraItemRecord](message.body) match {
-      case Right(record) => sierraItemMergerUpdaterService.update(record).recover {
-        case e: ConditionalCheckFailedException =>
-          failGracefully(message, e)
-      }
-      case Left(e) => failGracefully(message, e)
-    }
+    convertAndProcess(message, decode[SierraItemRecord], processSierraItemRecord)
 }

@@ -1,8 +1,10 @@
 package uk.ac.wellcome.sqs
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.amazonaws.services.sqs.model.Message
 import com.fasterxml.jackson.core.JsonParseException
+import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -21,11 +23,6 @@ abstract class SQSWorker(sqsReader: SQSReader,
   def processMessage(message: SQSMessage): Future[Unit]
 
   def runSQSWorker(): Unit = run(() => processMessages, actorSystem)
-
-  def failGracefully(message: SQSMessage, e: Throwable): Future[Unit] = {
-    logger.warn(s"Failed processing $message", e)
-    Future.failed(SQSReaderGracefulException(e))
-  }
 
   private def processMessages(): Future[Unit] = {
     info(s"Starting $workerName.")
@@ -54,3 +51,4 @@ abstract class SQSWorker(sqsReader: SQSReader,
   override def terminalFailureHook(): Unit =
     metricsSender.incrementCount(s"${workerName}_TerminalFailure")
 }
+

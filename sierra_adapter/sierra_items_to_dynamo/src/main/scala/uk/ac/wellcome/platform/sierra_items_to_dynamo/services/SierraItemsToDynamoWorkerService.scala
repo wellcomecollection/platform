@@ -7,7 +7,7 @@ import io.circe.parser.decode
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker, WriteSQSToDynamo}
 import uk.ac.wellcome.circe._
 import io.circe.generic.auto._
 import uk.ac.wellcome.utils.GlobalExecutionContext._
@@ -19,15 +19,12 @@ class SierraItemsToDynamoWorkerService @Inject()(
   system: ActorSystem,
   metrics: MetricsSender,
   dynamoInserter: DynamoInserter
-) extends SQSWorker(reader, system, metrics) {
+) extends SQSWorker(reader, system, metrics)
+    with WriteSQSToDynamo {
 
-  def processMessage(message: SQSMessage): Future[Unit] =
-    decode[SierraRecord](message.body) match {
-      case Right(record) =>
-        dynamoInserter.insertIntoDynamo(record.toItemRecord.get).recover {
-          case e: ConditionalCheckFailedException =>
-            failGracefully(message, e)
-        }
-      case Left(e) => failGracefully(message, e)
-    }
+  private def insertItemRecord(record: SierraRecord) =
+    dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
+
+  override def processMessage(message: SQSMessage): Future[Unit] =
+    convertAndProcess(message, decode[SierraRecord], insertItemRecord)
 }
