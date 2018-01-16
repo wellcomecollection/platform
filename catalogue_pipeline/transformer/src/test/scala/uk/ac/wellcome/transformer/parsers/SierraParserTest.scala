@@ -3,15 +3,9 @@ package uk.ac.wellcome.transformer.parsers
 import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
-import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
-import uk.ac.wellcome.utils.JsonUtil
-
-import scala.util.Try
 
 class SierraParserTest
     extends FunSpec
