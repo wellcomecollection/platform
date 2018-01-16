@@ -46,4 +46,35 @@ class WorkIndexerTest
       assertElasticsearchEventuallyHasWork(work)
     }
   }
+
+  private def assertElasticsearchEventuallyHasWork(workJson: String) = {
+    eventually {
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
+        .map { _.hits.hits }
+        .await
+
+      hits should have size 1
+
+      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
+    }
+  }
+
+  private def workJson(canonicalId: String, sourceId: String, title: String): String = {
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      sourceId
+    )
+
+    JsonUtil
+      .toJson(
+        Work(
+          canonicalId = Some(canonicalId),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
+          title = title
+        )
+      )
+      .get
+  }
 }
