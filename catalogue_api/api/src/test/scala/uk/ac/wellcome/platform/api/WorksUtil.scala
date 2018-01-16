@@ -38,6 +38,15 @@ trait WorksUtil {
       title = title
     )
 
+  def workWith(canonicalId: String, title: String, visible: Boolean): Work =
+    Work(
+      canonicalId = Some(canonicalId),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      title = title,
+      visible = visible
+    )
+
   def workWith(
     canonicalId: String,
     title: String,
