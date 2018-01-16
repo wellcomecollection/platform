@@ -45,7 +45,6 @@ class IdMinterFeatureTest
 
     val value = json.toJsonCirce(work).get
 
-    println("*********"+value+"**************")
     val sqsMessage = SQSMessage(
       Some("subject"),
       value,
