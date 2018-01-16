@@ -127,11 +127,11 @@ class MiroTransformableTransformer
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
       zipMiroFields(keys = miroData.award, values = miroData.awardDate)
-        .filter {
-          case (label, _) =>
-            (label == "WIA Overall Winner" ||
+        .collect {
+          case (Some(label), Some(year)) if
+            label == "WIA Overall Winner" ||
               label == "Wellcome Image Awards" ||
-              label == "Biomedical Image Awards")
+              label == "Biomedical Image Awards" => (label,year)
         }
 
     val wiaAwardsString = wiaAwardsData match {
@@ -208,8 +208,8 @@ class MiroTransformableTransformer
     val libraryRefsList: List[SourceIdentifier] =
       zipMiroFields(keys = miroData.libraryRefDepartment,
                     values = miroData.libraryRefId)
-        .map {
-          case (label, value) =>
+        .collect {
+          case (Some(label), Some(value)) =>
             SourceIdentifier(
               IdentifierSchemes.miroLibraryReference,
               s"$label $value"
@@ -400,34 +400,18 @@ class MiroTransformableTransformer
     * of (key, value) tuples.  Note: we don't use a map because keys aren't
     * guaranteed to be unique.
     */
-  def zipMiroFields(keys: Option[List[String]],
-                    values: Option[List[String]]): List[(String, String)] = {
-    (keys, values) match {
-      case (Some(k), Some(v)) => {
-        if (k.length != v.length) {
+  def zipMiroFields(keys: List[Option[String]],
+                    values: List[Option[String]]): List[(Option[String], Option[String])] = {
+
+
+        if (keys.lengthCompare(values.length) != 0) {
           throw new RuntimeException(
-            s"Different lengths! keys=$k, values=$v"
+            s"Different lengths! keys=$keys, values=$values"
           )
         }
 
-        (k, v).zipped.toList
+        (keys, values).zipped.toList
       }
-
-      // If both fields are empty, we fall straight through.
-      case (None, None) => List()
-
-      // If only one of the fields is non-empty, for now we just raise
-      // an exception -- this probably indicates an issue in the source data.
-      case (Some(k), None) =>
-        throw new RuntimeException(
-          s"Inconsistent k/v pairs: keys=$k, values=null"
-        )
-      case (None, Some(v)) =>
-        throw new RuntimeException(
-          s"Inconsistent k/v pairs: keys=null, values=$v"
-        )
-    }
-  }
 
   private def buildImageApiURL(miroID: String, templateName: String): String = {
     val iiifImageApiBaseUri = "https://iiif.wellcomecollection.org"
