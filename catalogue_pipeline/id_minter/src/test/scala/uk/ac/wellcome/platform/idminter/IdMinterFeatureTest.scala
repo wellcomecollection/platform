@@ -3,7 +3,9 @@ package uk.ac.wellcome.platform.idminter
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{BeforeAndAfterEach, FunSpec}
-import scalikejdbc.{select, _}
+import scalikejdbc._
+import uk.ac.wellcome.circe.json
+import uk.ac.wellcome.circe.json._
 import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.models.Identifier
@@ -41,9 +43,12 @@ class IdMinterFeatureTest
       title = title
     )
 
+    val value = json.toJsonCirce(work).get
+
+    println("*********"+value+"**************")
     val sqsMessage = SQSMessage(
       Some("subject"),
-      JsonUtil.toJson(work).get,
+      value,
       "topic",
       "messageType",
       "timestamp"

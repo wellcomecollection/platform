@@ -31,7 +31,10 @@ object json extends AutoDerivation {
   }
 
   implicit val customConfig: Configuration =
-    Configuration.default.withDefaults.withDiscriminator("type")
+    Configuration.default.withDefaults.withDiscriminator("type").copy(transformMemberNames = {
+      case "ontologyType" => "type"
+      case other => other
+    })
 
   def toJsonCirce[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
     Try(value.asJson.noSpaces)
