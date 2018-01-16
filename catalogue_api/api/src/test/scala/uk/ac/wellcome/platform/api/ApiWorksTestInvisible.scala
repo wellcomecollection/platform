@@ -40,7 +40,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
         andExpect = Status.Ok,
         withJsonBody = s"""
           |{
-          |  ${resultList(totalResults = 3)},
+          |  ${resultList(totalResults = 2)},
           |  "results": [
           |   {
           |     "type": "Work",
