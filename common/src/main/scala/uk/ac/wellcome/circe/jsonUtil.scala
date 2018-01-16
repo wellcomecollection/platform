@@ -10,7 +10,7 @@ import cats.syntax.either._
 
 import scala.util.Try
 
-object json extends AutoDerivation {
+object jsonUtil extends AutoDerivation {
 
   import uk.ac.wellcome.models.transformable.Transformable._
 

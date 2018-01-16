@@ -10,7 +10,7 @@ import cats.syntax.functor._
 
 sealed trait Transformable
 object Transformable {
-  import uk.ac.wellcome.circe.json._
+  import uk.ac.wellcome.circe.jsonUtil._
 
   implicit val decodeEvent: Decoder[Transformable] =
     List[Decoder[Transformable]](

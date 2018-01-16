@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-import uk.ac.wellcome.circe.json._
+import uk.ac.wellcome.circe.jsonUtil._
 import io.circe.parser._
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 

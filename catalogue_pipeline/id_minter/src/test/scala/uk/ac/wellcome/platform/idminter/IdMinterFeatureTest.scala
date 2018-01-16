@@ -4,11 +4,10 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.{BeforeAndAfterEach, FunSpec}
 import scalikejdbc._
-import uk.ac.wellcome.circe.json
-import uk.ac.wellcome.circe.json._
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.utils.JsonUtil
@@ -43,7 +42,7 @@ class IdMinterFeatureTest
       title = title
     )
 
-    val value = json.toJsonCirce(work).get
+    val value = jsonUtil.toJsonCirce(work).get
 
     val sqsMessage = SQSMessage(
       Some("subject"),

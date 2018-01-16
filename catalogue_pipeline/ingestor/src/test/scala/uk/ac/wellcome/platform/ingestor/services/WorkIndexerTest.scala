@@ -6,8 +6,8 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.circe.json
-import uk.ac.wellcome.circe.json._
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
@@ -40,7 +40,7 @@ class WorkIndexerTest
       sourceId
     )
 
-    json
+    jsonUtil
       .toJsonCirce(
         Work(
           canonicalId = Some(canonicalId),

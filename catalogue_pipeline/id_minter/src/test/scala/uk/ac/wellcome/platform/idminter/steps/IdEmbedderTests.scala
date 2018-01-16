@@ -7,6 +7,8 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, Item, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -59,7 +61,7 @@ class IdEmbedderTests
 
     val newWorkFuture = idEmbedder.embedId(
       json = parse(
-        JsonUtil.toJson(originalWork).get
+        jsonUtil.toJsonCirce(originalWork).get
       ).right.get
     )
 
@@ -68,7 +70,7 @@ class IdEmbedderTests
     whenReady(newWorkFuture) { newWorkJson =>
       assertJsonStringsAreEqual(
         newWorkJson.toString(),
-        JsonUtil.toJson(expectedWork).get
+        jsonUtil.toJsonCirce(expectedWork).get
       )
     }
   }
@@ -96,7 +98,7 @@ class IdEmbedderTests
     ).thenReturn(Try(throw expectedException))
 
     val newWorkFuture = idEmbedder.embedId(
-      json = parse(JsonUtil.toJson(originalWork).get).right.get)
+      json = parse(jsonUtil.toJsonCirce(originalWork).get).right.get)
 
     whenReady(newWorkFuture.failed) { exception =>
       exception shouldBe expectedException
@@ -154,7 +156,7 @@ class IdEmbedderTests
 
     val eventualWork = idEmbedder.embedId(
       parse(
-        JsonUtil.toJson(originalWork).get
+        jsonUtil.toJsonCirce(originalWork).get
       ).right.get
     )
 
@@ -173,13 +175,13 @@ class IdEmbedderTests
       val actualItem2 = work.items.tail.head
 
       assertJsonStringsAreEqual(
-        JsonUtil.toJson(actualItem1).get,
-        JsonUtil.toJson(expectedItem1).get
+        jsonUtil.toJsonCirce(actualItem1).get,
+        jsonUtil.toJsonCirce(expectedItem1).get
       )
 
       assertJsonStringsAreEqual(
-        JsonUtil.toJson(actualItem2).get,
-        JsonUtil.toJson(expectedItem2).get
+        jsonUtil.toJsonCirce(actualItem2).get,
+        jsonUtil.toJsonCirce(expectedItem2).get
       )
     }
 
