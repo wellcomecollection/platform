@@ -150,3 +150,18 @@ $(1)-terraform-plan:
 $(1)-terraform-apply:
 	$(call terraform_apply,$(2))
 endef
+
+
+# Define a series of Make tasks (test, publish) for a Python Lambda.
+#
+# Args:
+#	$1 - Name of the target.
+#	$2 - Path to the Lambda source directory.
+#
+define lambda_target_template
+$(1)-test:
+	$(call test_lambda,$(2))
+
+$(1)-publish:
+	$(call publish_lambda,$(2))
+endef
