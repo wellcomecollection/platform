@@ -206,6 +206,18 @@ endef
 #	$TF_IS_PUBLIC_FACING	Is this a public-facing stack?  (true/false)
 #
 define stack_setup
+
+# The structure of each of these lines is as follows:
+#
+#	$(foreach name,$(NAMES),
+#		$(eval
+#			$(call __target_template,$(arg1),...,$(argN))
+#		)
+#	)
+#
+# It can't actually be written that way because Make is very sensitive to
+# whitespace, but that's the general idea.
+
 $(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
 $(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
