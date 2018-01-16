@@ -15,6 +15,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
@@ -89,7 +90,7 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a[ParsingFailure]
+      x shouldBe a[SQSReaderGracefulException]
     }
   }
 
@@ -123,7 +124,7 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a[JsonParseException]
+      x shouldBe a[SQSReaderGracefulException]
     }
   }
 

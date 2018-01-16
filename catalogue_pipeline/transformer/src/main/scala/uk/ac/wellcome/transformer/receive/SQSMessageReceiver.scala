@@ -1,6 +1,7 @@
 package uk.ac.wellcome.transformer.receive
 
 import com.twitter.inject.Logging
+import io.circe.ParsingFailure
 import uk.ac.wellcome.circe.jsonUtil
 import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
@@ -38,9 +39,9 @@ class SQSMessageReceiver(
         triedWork match {
           case Success(Some(work)) => publishMessage(work).map(_ => ())
           case Success(None) => Future.successful()
-          case Failure(SQSReaderGracefulException(e)) =>
+          case Failure(e: ParsingFailure) =>
             info("Recoverable failure extracting workfrom record", e)
-            Future.successful(PublishAttempt(Left(e)))
+            Future.failed(SQSReaderGracefulException(e))
           case Failure(e) =>
             info("Unrecoverable failure extracting work from record", e)
             Future.failed(e)

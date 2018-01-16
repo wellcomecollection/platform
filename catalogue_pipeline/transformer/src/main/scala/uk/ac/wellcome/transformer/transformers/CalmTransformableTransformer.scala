@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.{
   Transformable
 }
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 
 import scala.util.Try
 
@@ -14,8 +14,7 @@ class CalmTransformableTransformer
     extends TransformableTransformer[CalmTransformable] {
   override def transformForType(
     calmTransformable: CalmTransformable): Try[Option[Work]] =
-    JsonUtil
-      .fromJson[CalmTransformableData](calmTransformable.data)
+    fromJson[CalmTransformableData](calmTransformable.data)
       .flatMap(data => (new CalmDataTransformer).transform(data))
 }
 
