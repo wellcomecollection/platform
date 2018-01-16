@@ -1,31 +1,36 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-MONITORING = $(ROOT)/monitoring
-
-include $(MONITORING)/deployment_tracking/Makefile
-include $(MONITORING)/ecs_dashboard/Makefile
-include $(MONITORING)/load_test/Makefile
 
 include $(ROOT)/functions.Makefile
 
+STACK_ROOT 	= monitoring
 
-post_to_slack-test:
-	$(call test_lambda,monitoring/post_to_slack)
+SBT_APPS 	= api
+ECS_TASKS 	= gatling
+LAMBDAS 	= gatling_to_cloudwatch \
+				notify_old_deploys \
+				post_to_slack \
+				service_deployment_status \
+				terraform_tracker \
+				update_service_list
 
-post_to_slack-publish:
-	$(call publish_lambda,monitoring/post_to_slack)
+TF_NAME 	= monitoring
+TF_PATH 	= $(ROOT)/$(STACK_ROOT)/terraform
+TF_IS_PUBLIC_FACING = false
+
+$(val $(call stack_setup))
 
 
-terraform_tracker-publish:
-	$(call publish_lambda,monitoring/terraform_tracker)
+ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
 
+$(ROOT)/.docker/ecs_dashboard:
+	$(ROOT)/builds/build_ci_docker_image.py \
+		--project=ecs_dashboard \
+		--dir=$(ECS_DASHBOARD)/client \
+		--file=$(ECS_DASHBOARD)/client/Dockerfile
 
-monitoring-test: post_to_slack-test deployment_tracking-test ecs_dashboard-test load_test-test
-
-monitoring-publish: post_to_slack-publish deployment_tracking-publish ecs_dashboard-publish load_test-publish
-
-
-monitoring-terraform-plan:
-	$(call terraform_plan,$(MONITORING),false)
-
-monitoring-terraform-apply:
-	$(call terraform_apply,$(MONITORING))
+ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(ECS_DASHBOARD)/client:/dashboard \
+		--env BUCKET_NAME=wellcome-platform-dash \
+		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash/ \
+		ecs_dashboard
