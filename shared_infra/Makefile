@@ -20,6 +20,14 @@ TF_IS_PUBLIC_FACING = false
 $(val $(call stack_setup))
 
 
+shared_infra-test:	drain_ecs_container_instance-test \
+					dynamo_to_sns-test \
+					ecs_ec2_instance_tagger-test \
+					run_ecs_task-test \
+					service_scheduler-test \
+					update_dynamo_capacity-test \
+					update_ecs_service_size-test
+
 
 FREEZERAY = $(ROOT)/shared_infra/sqs_freezeray
 
