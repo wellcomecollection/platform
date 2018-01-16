@@ -142,7 +142,7 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
             MarcSubfield(tag = "b", content = "Thrilling Tomes"),
             MarcSubfield(tag = "b", content = "Page-Turning Paperbacks")
           )
-        ),
+        )
       ),
       expectedPublisherNames = List(
         "Brilliant Books",
