@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.google.inject.Inject
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.syntax._
@@ -45,6 +46,8 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
   def updateItem(record: SierraItemRecord): Future[Unit] = Future {
     debug(s"About to update record $record")
     scanamoExec(putRecord(record)) match {
+      case Left(e: ConditionalCheckFailedException) =>
+        info(s"Update for ${record.id} superseded by more recent version")
       case Left(err) =>
         warn(s"Failed updating record ${record.id}", err)
         throw err

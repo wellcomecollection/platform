@@ -1,14 +1,10 @@
 package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.{
-  DeleteMessageRequest,
-  Message,
-  ReceiveMessageRequest
-}
+import com.amazonaws.services.sqs.model.{DeleteMessageRequest, Message, ReceiveMessageRequest}
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.aws.SQSConfig
+import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._

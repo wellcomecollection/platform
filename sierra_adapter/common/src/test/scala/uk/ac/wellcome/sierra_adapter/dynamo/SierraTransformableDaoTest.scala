@@ -20,6 +20,8 @@ import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
+
 
 class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
 
@@ -28,8 +30,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
                                Map("merger" -> DynamoConfig(tableName)))
 
   describe("get a merged sierra record") {
-    it(
-      "should return a future of merged sierra record if it exists in  DynamoDB") {
+    it("returns a future of merged sierra record if its in dynamo") {
       val sierraTransformable = SierraTransformable(id = "b1111",
                                                     maybeBibData = None,
                                                     itemData = Map(),
@@ -43,8 +44,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
       }
     }
 
-    it(
-      "should return a future of None if the record does not exist in DynamoDB") {
+    it("returns a future of None if the record isn't in dynamo") {
       val sierraTransformable = SierraTransformable(id = "b1111",
                                                     maybeBibData = None,
                                                     itemData = Map(),
@@ -57,8 +57,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
       }
     }
 
-    it(
-      "returns a failed future with the underlying exception if the DynamoDB read fails") {
+    it("returns a failed future with exception if dynamo read fails") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val expectedException = new RuntimeException("AAAAAARGH!")
       when(dynamoDbClient.getItem(any[GetItemRequest]))
@@ -165,7 +164,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
       }
     }
 
-    it("returns a failed future if the request to DynamoDb fails") {
+    it("returns a failed future if the request to dynamo fails") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val expectedException = new RuntimeException("AAAAAARGH!")
       when(dynamoDbClient.putItem(any[PutItemRequest]))

@@ -22,6 +22,11 @@ abstract class SQSWorker(sqsReader: SQSReader,
 
   def runSQSWorker(): Unit = run(() => processMessages, actorSystem)
 
+  def failGracefully(message: SQSMessage, e: Throwable): Future[Unit] = {
+    logger.warn(s"Failed processing $message", e)
+    Future.failed(SQSReaderGracefulException(e))
+  }
+
   private def processMessages(): Future[Unit] = {
     info(s"Starting $workerName.")
 

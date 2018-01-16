@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.google.inject.Inject
 import io.circe.parser.decode
 import uk.ac.wellcome.metrics.MetricsSender
@@ -23,11 +24,10 @@ class SierraItemsToDynamoWorkerService @Inject()(
   def processMessage(message: SQSMessage): Future[Unit] =
     decode[SierraRecord](message.body) match {
       case Right(record) =>
-        dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
-      case Left(e) =>
-        Future {
-          logger.warn(s"Failed processing $message", e)
-          throw SQSReaderGracefulException(e)
+        dynamoInserter.insertIntoDynamo(record.toItemRecord.get).recover {
+          case e: ConditionalCheckFailedException =>
+            failGracefully(message, e)
         }
+      case Left(e) => failGracefully(message, e)
     }
 }
