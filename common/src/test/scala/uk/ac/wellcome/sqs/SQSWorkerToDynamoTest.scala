@@ -29,8 +29,6 @@ import scala.util.Try
 
 case class TestObject(foo: String)
 
-
-
 class SQSWorkerToDynamoTest
   extends FunSpec
     with SQSLocal
@@ -83,49 +81,27 @@ class SQSWorkerToDynamoTest
   }
 
   class ConditionalCheckFailingTestWorker
-    extends SQSWorkerToDynamo[TestObject](
-      new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-      ActorSystem(),
-      metricsSender) {
-    override lazy val totalWait = 1.second
-
-    override def conversion(s: String): Either[circe.Error, TestObject] =
-      decode[TestObject](s)
+    extends TestWorker {
 
     override def process(record: TestObject): Future[Unit] = Future {
       throw new ConditionalCheckFailedException("Wrong!")
     }
-
-    override def terminalFailureHook(): Unit = {
-      terminalFailure = true
-    }
   }
 
   class TerminalFailingTestWorker
-    extends SQSWorkerToDynamo[TestObject](
-      new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-      ActorSystem(),
-      metricsSender) {
-    override lazy val totalWait = 1.second
-
-    override def conversion(s: String): Either[circe.Error, TestObject] =
-      decode[TestObject](s)
+    extends TestWorker {
 
     override def process(record: TestObject): Future[Unit] = Future {
       throw new RuntimeException("Wrong!")
-    }
-
-    override def terminalFailureHook(): Unit = {
-      terminalFailure = true
     }
   }
 
   val worker = new TestWorker()
   val failingWorker = new ConditionalCheckFailingTestWorker()
-  val terminalFailingWorker = new TerminalFailingTestWorker()
 
   it("processes messages") {
     processCalled = false
+    terminalFailure = false
 
     worker.runSQSWorker()
 
@@ -133,10 +109,13 @@ class SQSWorkerToDynamoTest
 
     eventually {
       processCalled shouldBe true
+      terminalFailure shouldBe false
     }
   }
 
   it("fails terminally when receiving an exception other than ConditionalCheckFailedException") {
+    val terminalFailingWorker = new TerminalFailingTestWorker()
+
     terminalFailure = false
 
     terminalFailingWorker.runSQSWorker()
