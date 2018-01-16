@@ -21,15 +21,10 @@ resource "aws_dynamodb_table" "sierradata_table" {
   }
 }
 
-data "aws_iam_role" "DynamoDBAutoscaleRole" {
-  name = "DynamoDBAutoscaleRole"
-}
-
 resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
   max_capacity       = 100
   min_capacity       = 1
   resource_id        = "table/${aws_dynamodb_table.sierradata_table.name}"
-  role_arn           = "${data.aws_iam_role.DynamoDBAutoscaleRole.arn}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
 }
@@ -54,7 +49,6 @@ resource "aws_appautoscaling_target" "dynamodb_table_write_target" {
   max_capacity       = 100
   min_capacity       = 1
   resource_id        = "table/${aws_dynamodb_table.sierradata_table.name}"
-  role_arn           = "${data.aws_iam_role.DynamoDBAutoscaleRole.arn}"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
   service_namespace  = "dynamodb"
 }
