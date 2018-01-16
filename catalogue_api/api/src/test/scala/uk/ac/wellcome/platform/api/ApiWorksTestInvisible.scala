@@ -77,20 +77,16 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
   }
 
   it("excludes works with visible=false from search results") {
-    val work1 = workWith(
+    val work = workWith(
       canonicalId = "r8dx6std",
       title = "A deleted dodo"
-    )
-    val work2 = workWith(
-      canonicalId = "a22tjhsy",
-      title = "An age of amber"
     )
     val deletedWork = workWith(
       canonicalId = "e7rxkty8",
       title = "This work has been deleted",
       visible = false
     )
-    insertIntoElasticSearch(work1, work2, deletedWork)
+    insertIntoElasticSearch(work, deletedWork)
 
     eventually {
       server.httpGet(
@@ -102,8 +98,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |  "results": [
           |   {
           |     "type": "Work",
-          |     "id": "${work1.id}",
-          |     "title": "${work1.title}",
+          |     "id": "${work.id}",
+          |     "title": "${work.title}",
           |     "creators": [],
           |     "subjects": [ ],
           |     "genres": [ ]
