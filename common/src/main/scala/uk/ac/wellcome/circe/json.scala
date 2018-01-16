@@ -13,7 +13,6 @@ import scala.util.Try
 object json extends AutoDerivation {
 
   import uk.ac.wellcome.models.transformable.Transformable._
-  import uk.ac.wellcome.models.License._
 
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] = {
