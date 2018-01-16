@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.models
 
 import scala.util.{Failure, Success}
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.{JsonIgnore, JsonProperty}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
@@ -54,7 +54,8 @@ case class DisplayWork(
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
     value = "List of items related to this work."
-  ) items: Option[List[DisplayItem]] = None
+  ) items: Option[List[DisplayItem]] = None,
+  @JsonIgnore visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Work"
@@ -94,7 +95,8 @@ case object DisplayWork {
             case Some(items) =>
               Some(items.map(DisplayItem(_, includes.identifiers)))
             case None => Some(List())
-          } else None
+          } else None,
+      visible = work.visible
     )
   }
 

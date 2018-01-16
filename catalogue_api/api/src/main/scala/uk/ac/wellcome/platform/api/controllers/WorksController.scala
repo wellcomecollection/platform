@@ -57,7 +57,6 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .responseWith[DisplayResultList](200, "ResultList[Work]")
         .responseWith[DisplayError](400, "Bad Request Error")
         .responseWith[DisplayError](404, "Not Found Error")
-        .responseWith[DisplayError](410, "Gone Error")
         .responseWith[DisplayError](500, "Internal Server Error")
         .queryParam[Int]("page",
                          "The page to return from the result list",
@@ -134,6 +133,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .responseWith[DisplayWork](200, "Work")
         .responseWith[DisplayError](400, "Bad Request Error")
         .responseWith[DisplayError](404, "Not Found Error")
+        .responseWith[DisplayError](410, "Gone Error")
         .responseWith[DisplayError](500, "Internal Server Error")
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
@@ -143,9 +143,26 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                       request.includes.getOrElse(WorksIncludes()),
                       index = request._index)
         .map {
-          case Some(result) =>
-            response.ok.json(
-              ResultResponse(context = contextUri, result = result))
+
+          // If the work is visible, we return the complete work.  If it's
+          // present but hidden, we need to return an HTTP 410 Gone.
+          case Some(work) =>
+            if (work.visible) {
+              response.ok.json(
+                ResultResponse(context = contextUri, result = work))
+            } else {
+              val result = Error(
+                variant = "http-410",
+                description = Some("This work has been deleted")
+              )
+              response.gone.json(
+                ResultResponse(
+                  context = contextUri,
+                  result = DisplayError(result)
+                )
+              )
+            }
+
           case None => {
             val result = Error(
               variant = "http-404",
