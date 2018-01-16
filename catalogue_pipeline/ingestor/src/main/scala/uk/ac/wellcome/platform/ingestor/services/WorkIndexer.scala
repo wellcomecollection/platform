@@ -29,13 +29,15 @@ class WorkIndexer @Inject()(
       "ingestor-index-work",
       () => {
         info("Indexing work $work")
-        elasticClient.execute {
-          indexInto(esIndex / esType).id(work.id).doc(work)
-        }.recover {
-          case e: Throwable =>
-            error(s"Error indexing work $work into Elasticsearch", e)
-            throw e
-        }
+        elasticClient
+          .execute {
+            indexInto(esIndex / esType).id(work.id).doc(work)
+          }
+          .recover {
+            case e: Throwable =>
+              error(s"Error indexing work $work into Elasticsearch", e)
+              throw e
+          }
       }
     )
   }

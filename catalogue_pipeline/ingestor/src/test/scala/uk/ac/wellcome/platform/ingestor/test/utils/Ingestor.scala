@@ -5,7 +5,12 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.ingestor.Server
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, IndexedElasticSearchLocal, JsonTestUtil, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  IndexedElasticSearchLocal,
+  JsonTestUtil,
+  SQSLocal
+}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -14,7 +19,7 @@ trait Ingestor
     with SQSLocal
     with BeforeAndAfterEach
     with AmazonCloudWatchFlag
-      with JsonTestUtil { this: Suite =>
+    with JsonTestUtil { this: Suite =>
 
   val queueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
 
