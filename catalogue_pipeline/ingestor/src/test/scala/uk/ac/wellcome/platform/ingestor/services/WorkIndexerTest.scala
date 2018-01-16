@@ -30,7 +30,7 @@ class WorkIndexerTest
     val future = workIndexer.indexWork(work)
 
     whenReady(future) { _ =>
-      assertElasticsearchEventuallyHasWork(work)
+      assertElasticsearchEventuallyHasWork(expectedWork)
     }
   }
 
