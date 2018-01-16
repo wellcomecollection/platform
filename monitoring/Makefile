@@ -1,5 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-
 include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = monitoring

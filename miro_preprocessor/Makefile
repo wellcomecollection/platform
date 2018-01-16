@@ -1,7 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-MIRO_PREPROC = $(ROOT)/miro_preprocessor
-
-
+include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= miro_preprocessor
 
