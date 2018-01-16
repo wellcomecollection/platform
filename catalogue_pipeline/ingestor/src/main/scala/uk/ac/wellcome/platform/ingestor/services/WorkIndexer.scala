@@ -24,11 +24,10 @@ class WorkIndexer @Inject()(
 ) extends Logging {
 
   def indexWork(work: Work): Future[IndexResponse] = {
-    implicit val jsonMapper = Work
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
-        info("Indexing work $work")
+        info(s"Indexing work $work")
         elasticClient
           .execute {
             indexInto(esIndex / esType).id(work.id).doc(work)
