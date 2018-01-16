@@ -70,7 +70,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                         lettering = lettering,
                         createdDate = period,
                         creator = agent,
-                        List(defaultItem))
+                        items = List(defaultItem),
+                        visible = true)
 
     insertIntoElasticSearch(work)
 

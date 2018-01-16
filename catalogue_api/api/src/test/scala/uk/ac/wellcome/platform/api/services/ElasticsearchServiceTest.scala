@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
@@ -95,13 +96,32 @@ class ElasticsearchServiceTest
     )
   }
 
+  it("should not list works that have visible=true") {
+    val visibleWorks = createWorks(8, visible = true)
+    val invisibleWorks = createWorks(2, visible = false)
+
+    val works = visibleWorks ++ invisibleWorks
+    insertIntoElasticSearch(works: _*)
+
+    val displayWorks = toDisplayWorks(visibleWorks)
+
+    assertSliceIsCorrect(
+      limit = 10,
+      from = 0,
+      expectedWorks = displayWorks
+    )
+  }
+
   private def populateElasticsearch(
     worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] = {
     val works = createWorks(10)
     insertIntoElasticSearch(works: _*)
 
-    works.map(DisplayWork(_, worksIncludes)).sortBy(_.id).toList
+    toDisplayWorks(works, worksIncludes = worksIncludes)
   }
+
+  private def toDisplayWorks(works: Seq[Work], worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] =
+    works.map(DisplayWork(_, worksIncludes)).sortBy(_.id).toList
 
   private def assertSliceIsCorrect(
     limit: Int,

@@ -17,7 +17,7 @@ trait WorksUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWorks(count: Int): Seq[Work] =
+  def createWorks(count: Int, visible: Boolean = true): Seq[Work] =
     (1 to count).map(
       (idx: Int) =>
         workWith(
@@ -27,7 +27,8 @@ trait WorksUtil {
           lettering = s"${idx}-${lettering}",
           createdDate = Period(s"${idx}-${period.label}"),
           creator = Agent(s"${idx}-${agent.label}"),
-          List(defaultItem)
+          items = List(defaultItem),
+          visible = visible
       ))
 
   def workWith(canonicalId: String, title: String): Work =
@@ -82,7 +83,8 @@ trait WorksUtil {
                lettering: String,
                createdDate: Period,
                creator: Agent,
-               items: List[Item]): Work = Work(
+               items: List[Item],
+               visible: Boolean): Work = Work(
     canonicalId = Some(canonicalId),
     sourceIdentifier = sourceIdentifier,
     identifiers = List(sourceIdentifier),
@@ -91,7 +93,8 @@ trait WorksUtil {
     lettering = Some(lettering),
     createdDate = Some(createdDate),
     creators = List(creator),
-    items = items
+    items = items,
+    visible = visible
   )
 
   def defaultItem: Item = {
