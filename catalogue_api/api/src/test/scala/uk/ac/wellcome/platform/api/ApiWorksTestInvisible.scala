@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api
 
 import com.twitter.finagle.http.Status
+import uk.ac.wellcome.models.Work
 
 class ApiWorksTestInvisible extends ApiWorksTestBase {
 
@@ -24,7 +25,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
 
   it("excludes works with visible=false from list results") {
     // Start by indexing a work with visible=false.
-    val work = workWith(
+    val deletedWork = workWith(
       canonicalId = "gze7bc24",
       title = "This work has been deleted",
       visible = false
@@ -32,7 +33,9 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
 
     // Then we index two ordinary works into Elasticsearch.
     val works = createWorks(2)
-    insertIntoElasticSearch(works: _*)
+
+    val worksToIndex: Seq[Work] = Seq[Work](deletedWork) ++ works
+    insertIntoElasticSearch(worksToIndex: _*)
 
     eventually {
       server.httpGet(
