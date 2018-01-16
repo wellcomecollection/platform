@@ -195,15 +195,15 @@ endef
 #
 # Args:
 #
-#	$STACK_ROOT				Path to this stack, relative to the repo root
+#	$STACK_ROOT             Path to this stack, relative to the repo root
 #
-#	$SBT_APPS			A space delimited list of sbt apps in this stack
-#	$ECS_TASKS				A space delimited list of ECS services
-#	$LAMBDAS				A space delimited list of Lambdas in this stack
+#	$SBT_APPS               A space delimited list of sbt apps in this stack
+#	$ECS_TASKS              A space delimited list of ECS services
+#	$LAMBDAS                A space delimited list of Lambdas in this stack
 #
-#	$TF_NAME				Name of the associated Terraform stack
-#	$TF_PATH				Path to the associated Terraform stack
-#	$TF_IS_PUBLIC_FACING	Is this a public-facing stack?  (true/false)
+#	$TF_NAME                Name of the associated Terraform stack
+#	$TF_PATH                Path to the associated Terraform stack
+#	$TF_IS_PUBLIC_FACING    Is this a public-facing stack?  (true/false)
 #
 define stack_setup
 

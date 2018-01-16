@@ -24,4 +24,7 @@ monitoring-test: gatling_to_cloudwatch-test \
 				 service_deployment_status-test \
 				 update_service_list-test
 
-
+monitoring-publish:	deployment_tracking-publish \
+					ecs_dashboard-publish \
+					load_test-publish \
+					post_to_slack-publish
