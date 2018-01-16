@@ -2,17 +2,17 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import io.circe.generic.auto._
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
-import io.circe.parser._
 import io.circe.{Json, _}
+import uk.ac.wellcome.circe.jsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class IdEmbedder @Inject()(metricsSender: MetricsSender,
                            identifierGenerator: IdentifierGenerator)
@@ -59,9 +59,9 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
   }
 
   private def parseSourceIdentifier(obj: JsonObject): SourceIdentifier = {
-    decode[SourceIdentifier](obj("sourceIdentifier").get.toString()) match {
-      case Right(sourceIdentifier) => sourceIdentifier
-      case Left(exception: Error) =>
+    fromJson[SourceIdentifier](obj("sourceIdentifier").get.toString()) match {
+      case Success(sourceIdentifier) => sourceIdentifier
+      case Failure(exception: Error) =>
         error(s"Error parsing source identifier: $exception")
         throw exception
     }

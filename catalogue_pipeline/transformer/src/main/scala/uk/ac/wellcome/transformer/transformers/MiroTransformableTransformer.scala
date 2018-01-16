@@ -4,7 +4,7 @@ import java.io.InputStream
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.circe.jsonUtil._
 
 import scala.io.Source
 import scala.util.Try
@@ -28,7 +28,7 @@ class MiroTransformableTransformer
   val stream: InputStream = getClass
     .getResourceAsStream("/miro_contributor_map.json")
   val contributorMap =
-    JsonUtil.toMap[String](Source.fromInputStream(stream).mkString).get
+    toMap[String](Source.fromInputStream(stream).mkString).get
 
   override def transformForType(
     miroTransformable: MiroTransformable): Try[Option[Work]] = Try {

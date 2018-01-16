@@ -41,6 +41,9 @@ object jsonUtil extends AutoDerivation {
     Try(value.asJson.noSpaces)
   }
 
+  def toMap[T](json: String)(implicit decoder: Decoder[T]): Try[Map[String, T]] =
+    fromJson[Map[String, T]](json)
+
   def fromJson[T](json:String)(implicit decoder: Decoder[T]): Try[T] = {
     decode[T](json).toTry
   }
