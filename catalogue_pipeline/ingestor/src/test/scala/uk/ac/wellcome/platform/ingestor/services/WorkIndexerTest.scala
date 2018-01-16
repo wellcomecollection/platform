@@ -32,74 +32,26 @@ class WorkIndexerTest
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
 
-  def workJson(canonicalId: String, sourceId: String, title: String): String = {
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
-      sourceId
-    )
-
-    JsonUtil
-      .toJson(
-        Work(
-          canonicalId = Some(canonicalId),
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier),
-          title = title
-        )
-      )
-      .get
-  }
-
-  it("should insert an identified item into Elasticsearch") {
-
+  it("should insert an identified Work into Elasticsearch") {
     val workString = workJson("5678", "1234", "An identified igloo")
-
-    val future =
-      workIndexer.indexWork(workString)
+    val future = workIndexer.indexWork(workString)
 
     whenReady(future) { _ =>
-      eventually {
-        val hits = elasticClient
-          .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-          .map { _.hits.hits }
-          .await
-
-        hits should have size 1
-
-        assertJsonStringsAreEqual(
-          hits.head.sourceAsString,
-          workString
-        )
-      }
+      assertElasticsearchEventuallyHasWork(workString)
     }
-
   }
 
   it(
     "should add only one record when multiple records with same id are ingested") {
-    val workString =
-      workJson("5678", "1234", "A multiplicity of mice")
+    val workString = workJson("5678", "1234", "A multiplicity of mice")
 
     val future = Future.sequence(
       (1 to 2).map(_ => workIndexer.indexWork(workString))
     )
 
     whenReady(future) { _ =>
-      eventually {
-        val hits = elasticClient
-          .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-          .map { _.hits.hits }
-          .await
-
-        hits should have size 1
-
-        assertJsonStringsAreEqual(
-          hits.head.sourceAsString,
-          workString
-        )
-      }
+      assertElasticsearchEventuallyHasWork(workString)
     }
-
   }
 
   it("should return a failed future if the input string is not a Work") {
@@ -117,5 +69,36 @@ class WorkIndexerTest
     whenReady(future.failed) { exception =>
       exception shouldBe a[GracefulFailureException]
     }
+  }
+
+  private def assertElasticsearchEventuallyHasWork(workJson: String) = {
+    eventually {
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
+        .map { _.hits.hits }
+        .await
+
+      hits should have size 1
+
+      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
+    }
+  }
+
+  private def workJson(canonicalId: String, sourceId: String, title: String): String = {
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      sourceId
+    )
+
+    JsonUtil
+      .toJson(
+        Work(
+          canonicalId = Some(canonicalId),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier),
+          title = title
+        )
+      )
+      .get
   }
 }
