@@ -1,26 +1,28 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
+import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
+import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil, SQSLocal}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.concurrent.Future
+import scala.concurrent.duration._
 
-class WorkIndexerTest
+class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
     with MockitoSugar
     with JsonTestUtil
+    with SQSLocal
     with IndexedElasticSearchLocal {
 
   val indexName = "works"
@@ -29,49 +31,65 @@ class WorkIndexerTest
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
+  val queueUrl = createQueueAndReturnUrl("ingestor-worker-service-test-q")
+
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
+  val actorSystem = ActorSystem()
+
+  val service = new IngestorWorkerService(
+    identifiedWorkIndexer = workIndexer,
+    reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+    system = actorSystem,
+    metrics = metricsSender
+  )
 
   it("should insert an identified Work into Elasticsearch") {
-    val work = createWork("5678", "1234", "An identified igloo")
-    val future = workIndexer.indexWork(work)
-
-    whenReady(future) { _ =>
-      assertElasticsearchEventuallyHasWork(work)
-    }
-  }
-
-  it(
-    "should add only one record when multiple records with same id are ingested") {
-    val work = createWork("5678", "1234", "A multiplicity of mice")
-
-    val future = Future.sequence(
-      (1 to 2).map(_ => workIndexer.indexWork(work))
+    val work = createWork(
+      canonicalId = "m7b2aqtw",
+      sourceId = "M000765",
+      title = "A monstrous monolith of moss"
     )
 
-    whenReady(future) { _ =>
+    val sqsMessage = messageFromString(JsonUtil.toJson(work).get)
+    service.processMessage(sqsMessage)
+
+    eventually {
       assertElasticsearchEventuallyHasWork(work)
     }
   }
 
-  private def assertElasticsearchEventuallyHasWork(work: Work) = {
-    val workJson = JsonUtil.toJson(work).get
+  it("should return a failed future if the input string is not a Work") {
+    val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
+    val future = service.processMessage(sqsMessage)
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[GracefulFailureException]
+      exception shouldBe a[SQSReaderGracefulException]
     }
   }
 
   it(
     "should not return a NullPointerException if the document is the string null") {
-    val future = workIndexer.indexWork("null")
+    val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
+    val future = service.processMessage(sqsMessage)
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[GracefulFailureException]
+      exception shouldBe a[SQSReaderGracefulException]
     }
   }
 
-  private def assertElasticsearchEventuallyHasWork(workJson: String) = {
+  private def messageFromString(body: String): SQSMessage =
+    SQSMessage(
+      subject = Some("inserting-identified-work-test"),
+      body = body,
+      topic = "arn:aws:topic:123",
+      messageType = "json",
+      timestamp = "2018-01-16T15:24:00Z"
+    )
+
+  private def assertElasticsearchEventuallyHasWork(work: Work) = {
+    val workJson = JsonUtil.toJson(work).get
+
     eventually {
       val hits = elasticClient
         .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
