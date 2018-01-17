@@ -22,5 +22,4 @@ class SierraItemMergerWorkerService @Inject()(
 
   override def store(record: SierraItemRecord): Future[Unit] =
     sierraItemMergerUpdaterService.update(record)
-
 }

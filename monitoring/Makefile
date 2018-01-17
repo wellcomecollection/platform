@@ -1,31 +1,32 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-MONITORING = $(ROOT)/monitoring
-
-include $(MONITORING)/deployment_tracking/Makefile
-include $(MONITORING)/ecs_dashboard/Makefile
-include $(MONITORING)/load_test/Makefile
-
 include $(ROOT)/functions.Makefile
 
+STACK_ROOT  = monitoring
 
-post_to_slack-test:
-	$(call test_lambda,monitoring/post_to_slack)
+SBT_APPS    =
+ECS_TASKS   =
+LAMBDAS     = post_to_slack terraform_tracker
 
-post_to_slack-publish:
-	$(call publish_lambda,monitoring/post_to_slack)
+TF_NAME     = monitoring
+TF_PATH     = $(ROOT)/$(STACK_ROOT)/terraform
+TF_IS_PUBLIC_FACING = false
+
+$(val $(call stack_setup))
+
+include $(ROOT)/monitoring/deployment_tracking/Makefile
+include $(ROOT)/monitoring/ecs_dashboard/Makefile
+include $(ROOT)/monitoring/load_test/Makefile
 
 
-terraform_tracker-publish:
-	$(call publish_lambda,monitoring/terraform_tracker)
+monitoring-test: gatling_to_cloudwatch-test \
+				 notify_old_deploys-test \
+				 post_to_slack-test \
+				 service_deployment_status-test \
+				 update_service_list-test
 
-
-monitoring-test: post_to_slack-test deployment_tracking-test ecs_dashboard-test load_test-test
-
-monitoring-publish: post_to_slack-publish deployment_tracking-publish ecs_dashboard-publish load_test-publish
-
-
-monitoring-terraform-plan:
-	$(call terraform_plan,$(MONITORING),false)
-
-monitoring-terraform-apply:
-	$(call terraform_apply,$(MONITORING))
+monitoring-publish:	gatling_to_cloudwatch-publish \
+					gatling-publish \
+					notify_old_deploys-publish \
+					post_to_slack-publish \
+					service_deployment_status-publish \
+					update_service_list-publish

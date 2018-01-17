@@ -1,5 +1,4 @@
-export ROOT = $(shell git rev-parse --show-toplevel)
-
+ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/functions.Makefile
 
 

@@ -3,14 +3,16 @@ package uk.ac.wellcome.utils
 import java.time.Instant
 
 import cats.syntax.either._
+import com.twitter.inject.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.parser.decode
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder, HCursor, Json}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.Try
 
-object JsonUtil extends AutoDerivation {
+object JsonUtil extends AutoDerivation with Logging {
 
   implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
     final def apply(c: HCursor): Decoder.Result[Instant] = {
@@ -36,15 +38,17 @@ object JsonUtil extends AutoDerivation {
         case other => other
       })
 
-  def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
+  def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] =
     Try(value.asJson.noSpaces)
-  }
 
   def toMap[T](json: String)(
     implicit decoder: Decoder[T]): Try[Map[String, T]] =
     fromJson[Map[String, T]](json)
 
-  def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] = {
-    decode[T](json).toTry
-  }
+  def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] =
+    decode[T](json).toTry.recover {
+      case e: Exception =>
+        warn(s"Error when trying to decode $json", e)
+        throw GracefulFailureException(e)
+    }
 }

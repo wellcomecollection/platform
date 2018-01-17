@@ -53,27 +53,28 @@ class WindowManager @Inject()(
 
         val lastBody = IOUtils.toString(
           s3client.getObject(bucketName, key).getObjectContent)
-        val records = JsonUtil.fromJson[List[SierraRecord]](lastBody)
-        val lastId = records match {
-          case Success(r) =>
+        val triedMaybeLastId =
+          JsonUtil.fromJson[List[SierraRecord]](lastBody).map { r =>
             r.map { _.id }.sorted.lastOption
-          case Failure(err) => throw GracefulFailureException(err)
-        }
+          }
 
-        info(s"Found latest ID in S3: $lastId")
-        lastId
-          .map(id => {
-            // The Sierra IDs we store in S3 are prefixed with "b" or "i".
-            // Remove the first character
-            val unprefixedId = id.substring(1)
+        info(s"Found latest ID in S3: $triedMaybeLastId")
+        val triedStatus = triedMaybeLastId
+          .map {
+            case Some(id) =>
+              // The Sierra IDs we store in S3 are prefixed with "b" or "i".
+              // Remove the first character
+              val unprefixedId = id.substring(1)
 
-            val newId = (unprefixedId.toInt + 1).toString
-            WindowStatus(id = Some(newId), offset = offset + 1)
-          })
-          .getOrElse(
-            throw GracefulFailureException(
-              new RuntimeException("Json did not contain an id"))
-          )
+              val newId = (unprefixedId.toInt + 1).toString
+              WindowStatus(id = Some(newId), offset = offset + 1)
+            case None =>
+              throw GracefulFailureException(
+                new RuntimeException("Json did not contain an id"))
+          }
+
+        // Let it throw the exception if it's a failure
+        triedStatus.get
       }
       case None => WindowStatus(id = None, offset = 0)
     }
