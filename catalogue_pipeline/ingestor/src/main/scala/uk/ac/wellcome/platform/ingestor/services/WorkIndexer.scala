@@ -24,6 +24,10 @@ class WorkIndexer @Inject()(
 ) extends Logging {
 
   def indexWork(work: Work): Future[IndexResponse] = {
+
+    // This is required for elastic4s, not Circe
+    implicit val jsonMapper = Work
+
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
