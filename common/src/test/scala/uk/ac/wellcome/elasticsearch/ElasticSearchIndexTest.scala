@@ -6,10 +6,10 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil
 
 case class TestObject(
   id: String,
@@ -81,7 +81,7 @@ class ElasticSearchIndexTest
     createAndWaitIndexIsCreated(testIndex, testIndexName)
 
     val testObject = TestObject("id", "description", true)
-    val testObjectJson = jsonUtil.toJson(testObject).get
+    val testObjectJson = JsonUtil.toJson(testObject).get
 
     elasticClient
       .execute(
@@ -105,7 +105,7 @@ class ElasticSearchIndexTest
     createAndWaitIndexIsCreated(testIndex, testIndexName)
 
     val badTestObject = BadTestObject("id", 5)
-    val badTestObjectJson = jsonUtil.toJson(badTestObject).get
+    val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
     val eventualIndexResponse = elasticClient
       .execute(
@@ -124,7 +124,7 @@ class ElasticSearchIndexTest
 
     val compatibleTestObject =
       CompatibleTestObject("id", "description", 5, true)
-    val compatibleTestObjectJson = jsonUtil.toJson(compatibleTestObject).get
+    val compatibleTestObjectJson = JsonUtil.toJson(compatibleTestObject).get
 
     elasticClient
       .execute(

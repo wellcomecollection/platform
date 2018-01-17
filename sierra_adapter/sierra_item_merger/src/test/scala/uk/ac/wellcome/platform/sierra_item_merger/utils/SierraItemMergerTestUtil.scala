@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.test.utils.SQSLocal
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
 

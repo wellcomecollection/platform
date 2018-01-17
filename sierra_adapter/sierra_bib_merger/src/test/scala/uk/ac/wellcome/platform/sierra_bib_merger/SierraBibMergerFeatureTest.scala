@@ -12,7 +12,7 @@ import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraBibMergerFeatureTest
     extends FunSpec

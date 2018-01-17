@@ -5,7 +5,7 @@ import com.twitter.inject.Logging
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe.{Json, _}
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

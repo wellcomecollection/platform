@@ -18,7 +18,7 @@ import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import com.gu.scanamo.syntax._
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 

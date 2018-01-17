@@ -5,13 +5,13 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.Future
 
@@ -38,7 +38,7 @@ class WorkIndexerTest
       sourceId
     )
 
-    jsonUtil
+    JsonUtil
       .toJson(
         Work(
           canonicalId = Some(canonicalId),

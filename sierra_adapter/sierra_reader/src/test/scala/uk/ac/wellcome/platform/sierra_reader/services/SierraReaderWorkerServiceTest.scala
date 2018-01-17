@@ -15,7 +15,7 @@ import scala.collection.JavaConversions._
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 

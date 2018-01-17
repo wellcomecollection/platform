@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.transformer.transformers.sierra._
 import uk.ac.wellcome.transformer.source.{SierraBibData, SierraItemData}
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success, Try}
 

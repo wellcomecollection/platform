@@ -16,7 +16,7 @@ import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import io.circe.syntax._
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.platform.sierra_reader.modules.{
   WindowManager,
   WindowStatus

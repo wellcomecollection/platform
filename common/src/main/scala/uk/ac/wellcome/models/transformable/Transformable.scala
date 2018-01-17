@@ -6,11 +6,11 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import io.circe.Decoder
 import cats.syntax.functor._
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable
 object Transformable {
-  import uk.ac.wellcome.circe.jsonUtil._
+  import uk.ac.wellcome.utils.JsonUtil._
 
   implicit val decodeEvent: Decoder[Transformable] =
     List[Decoder[Transformable]](

@@ -2,12 +2,12 @@ package uk.ac.wellcome.platform.idminter.utils
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.Server
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
 
@@ -47,7 +47,7 @@ trait IdMinterTestUtils
     )
 
     SQSMessage(Some("subject"),
-               jsonUtil.toJson(work).get,
+               JsonUtil.toJson(work).get,
                "topic",
                "messageType",
                "timestamp")

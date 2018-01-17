@@ -1,9 +1,9 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.utils.JsonUtil
 
 class ItemTest extends FunSpec with Matchers with JsonTestUtil {
 
@@ -95,28 +95,28 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   it("should serialise an unidentified Item as JSON") {
-    val result = jsonUtil.toJson(unidentifiedItem)
+    val result = JsonUtil.toJson(unidentifiedItem)
 
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, unidentifiedItemJson)
   }
 
   it("should deserialize a JSON string as a unidentified Item") {
-    val result = jsonUtil.fromJson[Item](unidentifiedItemJson)
+    val result = JsonUtil.fromJson[Item](unidentifiedItemJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe unidentifiedItem
   }
 
   it("should serialise an identified Item as JSON") {
-    val result = jsonUtil.toJson(identifiedItem)
+    val result = JsonUtil.toJson(identifiedItem)
 
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, identifiedItemJson)
   }
 
   it("should deserialize a JSON string as a identified Item") {
-    val result = jsonUtil.fromJson[Item](identifiedItemJson)
+    val result = JsonUtil.fromJson[Item](identifiedItemJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe identifiedItem

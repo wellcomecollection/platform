@@ -1,9 +1,9 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.utils.JsonUtil
 
 class SierraBibRecordTest extends FunSpec with Matchers {
 
@@ -14,8 +14,8 @@ class SierraBibRecordTest extends FunSpec with Matchers {
       modifiedDate = "2007-07-07T07:07:07Z"
     )
 
-    val jsonString = jsonUtil.toJson(originalRecord).get
-    val parsedRecord = jsonUtil.fromJson[SierraBibRecord](jsonString).get
+    val jsonString = JsonUtil.toJson(originalRecord).get
+    val parsedRecord = JsonUtil.fromJson[SierraBibRecord](jsonString).get
     parsedRecord shouldEqual originalRecord
   }
 }

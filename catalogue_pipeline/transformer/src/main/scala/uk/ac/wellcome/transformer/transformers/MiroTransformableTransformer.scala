@@ -4,7 +4,7 @@ import java.io.InputStream
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.io.Source
 import scala.util.Try
@@ -402,7 +402,6 @@ class MiroTransformableTransformer
     */
   def zipMiroFields(keys: List[Option[String]],
                     values: List[Option[String]]): List[(Option[String], Option[String])] = {
-
 
         if (keys.lengthCompare(values.length) != 0) {
           throw new RuntimeException(

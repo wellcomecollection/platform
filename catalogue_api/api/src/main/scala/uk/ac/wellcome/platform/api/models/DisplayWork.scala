@@ -1,13 +1,12 @@
 package uk.ac.wellcome.platform.api.models
 
 import scala.util.{Failure, Success}
-
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.platform.api.utils.ApiJsonUtil
 
 @ApiModel(
   value = "Work",
@@ -111,7 +110,7 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    JsonUtil.fromJson[Work](document) match {
+    ApiJsonUtil.fromJson[Work](document) match {
       case Success(work) => DisplayWork(work = work, includes = includes)
       case Failure(e) =>
         throw new RuntimeException(

@@ -2,12 +2,11 @@ package uk.ac.wellcome.sqs
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs.model.Message
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.TryBackoff
+import uk.ac.wellcome.utils.{TryBackoff, JsonUtil}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -41,7 +40,7 @@ abstract class SQSWorker(sqsReader: SQSReader,
   }
 
   private def extractMessage(sqsMessage: Message): Try[SQSMessage] =
-    jsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover {
+    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover {
       case e: Exception =>
         warn("Invalid message structure (not via SNS?)", e)
         throw SQSReaderGracefulException(e)

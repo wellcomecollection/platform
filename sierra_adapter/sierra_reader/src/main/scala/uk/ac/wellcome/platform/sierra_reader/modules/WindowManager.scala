@@ -6,11 +6,11 @@ import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
-import uk.ac.wellcome.circe.jsonUtil._
-import uk.ac.wellcome.circe.jsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -53,7 +53,7 @@ class WindowManager @Inject()(
 
         val lastBody = IOUtils.toString(
           s3client.getObject(bucketName, key).getObjectContent)
-        val records = jsonUtil.fromJson[List[SierraRecord]](lastBody)
+        val records = JsonUtil.fromJson[List[SierraRecord]](lastBody)
         val lastId = records match {
           case Success(r) =>
             r.map { _.id }.sorted.lastOption

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_bib_merger.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord

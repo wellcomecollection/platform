@@ -1,10 +1,9 @@
-package uk.ac.wellcome.utils
+package uk.ac.wellcome.platform.api.utils
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.utils.JsonUtil
 
-class JsonUtilTest extends FunSpec with Matchers {
+class ApiJsonUtilTest extends FunSpec with Matchers {
   it("should not include fields where the value is empty or None") {
     val identifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -16,7 +15,7 @@ class JsonUtilTest extends FunSpec with Matchers {
       identifiers = List(identifier),
       title = "A haiku about a heron"
     )
-    val jsonString = JsonUtil.toJson(work).get
+    val jsonString = ApiJsonUtil.toJson(work).get
 
     jsonString.contains(""""accessStatus":null""") should be(false)
     jsonString.contains(""""identifiers":[]""") should be(false)
@@ -24,8 +23,8 @@ class JsonUtilTest extends FunSpec with Matchers {
 
   it("should round-trip an empty list back to an empty list") {
     val jsonString = """{"accessStatus": [], "title": "A doodle of a dog"}"""
-    val parsedWork = JsonUtil.fromJson[Work](jsonString).get
-    val extrapolatedString = JsonUtil.toJson(parsedWork).get
+    val parsedWork = ApiJsonUtil.fromJson[Work](jsonString).get
+    val extrapolatedString = ApiJsonUtil.toJson(parsedWork).get
 
     jsonString.contains(""""accessStatus": []""") shouldBe true
   }

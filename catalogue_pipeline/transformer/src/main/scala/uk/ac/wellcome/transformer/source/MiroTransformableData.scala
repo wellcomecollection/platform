@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.source
 
 import io.circe.generic.extras.JsonKey
 import org.apache.commons.lang.StringEscapeUtils
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success, Try}
 

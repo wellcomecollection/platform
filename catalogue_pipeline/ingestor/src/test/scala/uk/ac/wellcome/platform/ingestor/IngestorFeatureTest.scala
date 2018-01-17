@@ -5,13 +5,13 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
 
@@ -33,7 +33,7 @@ class IngestorFeatureTest
     val sourceIdentifier =
       SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
 
-    val workString = jsonUtil
+    val workString = JsonUtil
       .toJson(
         Work(
           canonicalId = Some("1234"),
@@ -46,7 +46,7 @@ class IngestorFeatureTest
 
     sqsClient.sendMessage(
       ingestorQueueUrl,
-      jsonUtil
+      JsonUtil
         .toJson(
           SQSMessage(
             Some("identified-item"),
@@ -75,7 +75,7 @@ class IngestorFeatureTest
   }
 
   it("deletes a message from the queue if it fails processing") {
-    val invalidMessage = jsonUtil
+    val invalidMessage = JsonUtil
       .toJson(
         SQSMessage(
           Some("identified-item"),

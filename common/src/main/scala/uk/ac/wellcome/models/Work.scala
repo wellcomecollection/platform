@@ -2,8 +2,8 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.sksamuel.elastic4s.Indexable
-import uk.ac.wellcome.circe.jsonUtil._
-import uk.ac.wellcome.circe.jsonUtil.toJson
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.utils.JsonUtil.toJson
 
 /** A representation of a work in our ontology */
 case class Work(title: String,

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.models
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.platform.api.utils.ApiJsonUtil
 
 class DisplayItemTest extends FunSpec with Matchers {
 
@@ -42,7 +42,7 @@ class DisplayItemTest extends FunSpec with Matchers {
   }
 
   it("correctly parses an Item without any identifiers") {
-    val item = JsonUtil.fromJson[Item]("""
+    val item = ApiJsonUtil.fromJson[Item]("""
         {
           "canonicalId": "b71876a",
           "sourceIdentifier": {
@@ -63,7 +63,7 @@ class DisplayItemTest extends FunSpec with Matchers {
   }
 
   it("correctly parses an Item without any locations") {
-    val item = JsonUtil.fromJson[Item]("""
+    val item = ApiJsonUtil.fromJson[Item]("""
         {
           "canonicalId": "mr953zsh",
           "sourceIdentifier": {

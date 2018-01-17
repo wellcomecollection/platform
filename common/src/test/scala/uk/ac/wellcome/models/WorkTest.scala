@@ -1,7 +1,7 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class WorkTest extends FunSpec with Matchers with JsonTestUtil {

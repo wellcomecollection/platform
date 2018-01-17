@@ -10,8 +10,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.elasticsearch.client.ResponseException
-import uk.ac.wellcome.circe.jsonUtil
-import uk.ac.wellcome.circe.jsonUtil._
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.utils.JsonUtil
 
 class WorksIndexTest
     extends FunSpec
@@ -37,7 +37,7 @@ class WorksIndexTest
     createAndWaitIndexIsCreated(worksIndex, indexName)
 
     val sampleWork = Arbitrary.arbitrary[Work].sample.get
-    val sampleWorkJson = jsonUtil.toJson(sampleWork).get
+    val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
     elasticClient
       .execute(
@@ -61,7 +61,7 @@ class WorksIndexTest
     createAndWaitIndexIsCreated(worksIndex, indexName)
 
     val badTestObject = BadTestObject("id", 5)
-    val badTestObjectJson = jsonUtil.toJson(badTestObject).get
+    val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
     val eventualIndexResponse = elasticClient
       .execute(
