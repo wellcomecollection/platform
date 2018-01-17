@@ -15,6 +15,8 @@ import tooling
 
     ('sierra_adapter/common/main.scala', 'sierra_adapter-test', True),
     ('sierra_adapter/common/main.scala', 'loris-test', False),
+    ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', False),
+    ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', False),
     ('sierra_adapter/common/main.scala', 'unknown-task', True),
 ])
 def test_affects_test(path, task, expected_result):
