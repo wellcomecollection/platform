@@ -50,7 +50,8 @@ object Dependencies {
     "io.circe" %% "circe-generic"% versions.circeVersion,
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion
+    "io.circe" %% "circe-optics" % versions.circeVersion,
+    "io.circe" %% "circe-java8" % versions.circeVersion
   )
 
   val jacksonDependencies = Seq(
