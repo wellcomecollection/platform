@@ -9,7 +9,6 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -24,8 +23,7 @@ class SierraItemMergerWorkerService @Inject()(
     with Logging {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
-    // Using Circe here because Jackson creates nulls for empty lists
-    JsonUtil.fromJson[SierraItemRecord](message.body) match {
+    fromJson[SierraItemRecord](message.body) match {
       case Success(record) => sierraItemMergerUpdaterService.update(record)
       case Failure(e) =>
         Future {

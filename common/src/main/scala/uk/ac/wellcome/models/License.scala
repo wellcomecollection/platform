@@ -20,7 +20,8 @@ object License extends Logging {
   implicit val licenseEncoder = Encoder.instance[License](license => Json.obj(
     ("licenseType", Json.fromString(license.licenseType)),
     ("label", Json.fromString(license.label)),
-    ("url", Json.fromString(license.url))
+    ("url", Json.fromString(license.url)),
+    ("type", Json.fromString(license.ontologyType))
   ))
 
   implicit val licenseDecoder = Decoder.instance[License](cursor => for {

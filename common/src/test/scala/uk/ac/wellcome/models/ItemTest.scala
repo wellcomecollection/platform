@@ -29,8 +29,10 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",
-      |        "url": "${License_CCBY.url}"
-      |      }
+      |        "url": "${License_CCBY.url}",
+      |        "type": "License"
+      |      },
+      |      "type": "Location"
       |    }
       |  ],
       |  "visible":true,
@@ -60,8 +62,10 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",
-      |        "url": "${License_CCBY.url}"
-      |      }
+      |        "url": "${License_CCBY.url}",
+      |        "type": "License"
+      |      },
+      |      "type": "Location"
       |    }
       |  ],
       |  "visible":true,

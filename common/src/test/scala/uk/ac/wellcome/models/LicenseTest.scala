@@ -9,7 +9,7 @@ class LicenseTest extends FunSpec with Matchers {
   it("should serialise a License as JSON") {
     val result = JsonUtil.toJson[License](License_CCBY)
     result.isSuccess shouldBe true
-    result.get shouldBe """{"licenseType":"CC-BY","label":"Attribution 4.0 International (CC BY 4.0)","url":"http://creativecommons.org/licenses/by/4.0/"}"""
+    result.get shouldBe """{"licenseType":"CC-BY","label":"Attribution 4.0 International (CC BY 4.0)","url":"http://creativecommons.org/licenses/by/4.0/","type":"License"}"""
   }
 
   it("should deserialise a JSON string as a License") {

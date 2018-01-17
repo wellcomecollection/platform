@@ -6,7 +6,6 @@ case class Location(
   locationType: String,
   url: Option[String] = None,
   credit: Option[String] = None,
-  license: License
-) {
-  @JsonProperty("type") val ontologyType: String = "Location"
-}
+  license: License,
+    @JsonProperty("type") ontologyType: String = "Location"
+)

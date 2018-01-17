@@ -10,7 +10,8 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     s"""{
             "licenseType": "${License_CCBY.licenseType}",
             "label": "${License_CCBY.label}",
-            "url": "${License_CCBY.url}"
+            "url": "${License_CCBY.url}",
+            "type": "License"
           }"""
 
   val identifiedWorkJson: String =
@@ -31,11 +32,13 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "description": "description",
       |  "lettering": "lettering",
       |  "createdDate": {
-      |    "label": "period"
+      |    "label": "period",
+      |    "type": "Period"
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject"
+      |      "label": "subject",
+      |      "type": "Concept"
       |    }
       |  ],
       |  "creators": [
@@ -46,14 +49,16 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "genres": [
       |    {
-      |      "label": "genre"
+      |      "label": "genre",
+      |      "type": "Concept"
       |    }
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
       |    "url" : null,
       |    "credit" : null,
-      |    "license": $license_CCBYJson
+      |    "license": $license_CCBYJson,
+      |    "type": "Location"
       |  },
       |  "items": [
       |    {
@@ -73,7 +78,8 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |          "locationType": "location",
       |          "url" : null,
       |          "credit" : null,
-      |          "license": $license_CCBYJson
+      |          "license": $license_CCBYJson,
+      |          "type": "Location"
       |        }
       |      ],
       |      "visible":true,
@@ -109,11 +115,13 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "description": "description",
       |  "lettering": "lettering",
       |  "createdDate": {
-      |    "label": "period"
+      |    "label": "period",
+      |    "type": "Period"
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject"
+      |      "label": "subject",
+      |      "type": "Concept"
       |    }
       |  ],
       |  "creators": [
@@ -124,14 +132,16 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "genres": [
       |    {
-      |      "label": "genre"
+      |      "label": "genre",
+      |      "type": "Concept"
       |    }
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
       |    "url" : null,
       |    "credit" : null,
-      |    "license": $license_CCBYJson
+      |    "license": $license_CCBYJson,
+      |    "type": "Location"
       |  },
       |  "items": [
       |    {
@@ -151,7 +161,8 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |          "locationType": "location",
       |          "url" : null,
       |          "credit" : null,
-      |          "license": $license_CCBYJson
+      |          "license": $license_CCBYJson,
+      |          "type": "Location"
       |        }
       |      ],
       |      "visible":true,
