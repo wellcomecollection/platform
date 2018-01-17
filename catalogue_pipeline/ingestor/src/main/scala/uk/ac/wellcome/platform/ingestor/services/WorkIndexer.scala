@@ -38,9 +38,9 @@ class WorkIndexer @Inject()(
         // Longer term, this will allow us to track if/when a work was deleted,
         // and ensure that if we get an UPDATE and a DELETE out-of-order, we
         // don't restore a record that should really be deleted.
-        val workToIndex = work.visible match {
-          case true => work
-          case false => {
+        val workToIndex = if (work.visible) {
+          work
+        } else {
             val stubWork = Work(
               canonicalId = work.canonicalId,
               sourceIdentifier = work.sourceIdentifier,
