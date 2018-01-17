@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import subprocess
+import sys
 
 
 # Root of the Git repository
@@ -99,8 +100,15 @@ def affects_tests(path, task):
     # sierra_adapter directory.  If we're definitely in a project which
     # has nothing to do with Sierra, we can ignore changes in this dir.
     sierra_free_tasks = (
-        'loris', 'id_minter', 'ingestor', 'reindexer', 'transformer',
-        'api', 'monitoring', 'shared_infra', 'nginx'
+        'loris',
+        'id_minter',
+        'ingestor',
+        'reindexer',
+        'transformer',
+        'api',
+        'monitoring',
+        'shared_infra',
+        'nginx',
     )
     if (
         task.startswith(sierra_free_tasks) and
@@ -108,6 +116,21 @@ def affects_tests(path, task):
     ):
         print(
             "~~~ Ignoring %s; sierra_adapter changes don't affect %s tests" %
+            (path, task))
+        return False
+
+    # Within the sierra_adapter stack, there's an sbt common lib.  If we're
+    # in a Sierra project that doesn't use sbt, we can ignore that too.
+    sbt_common_free_tasks = (
+        's3_demultiplexer',
+        'sierra_window_generator',
+    )
+    if (
+        task.startswith(sbt_common_free_tasks) and
+        path.startswith('sierra_adapter/common/')
+    ):
+        print(
+            "~~~ Ignoring %s; sierra-common changes don't affect %s tests" %
             (path, task))
         return False
 
@@ -124,29 +147,6 @@ def affects_tests(path, task):
     if task.startswith(sbt_free_tasks) and path.startswith('common/'):
         print(
             "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
-            (path, task))
-        return False
-
-    # The Makefile at the top of the sierra_adapter directory is often
-    # changed, but isn't exclusively owned by any one task.  If this a task
-    # which _definitely isn't_ affected by this file, we can skip tests.
-    not_sierra_adapter = (
-        'loris',
-        'id_minter',
-        'ingestor',
-        'reindexer',
-        'transformer',
-        'api',
-        'monitoring',
-        'shared_infra',
-        'nginx',
-    )
-    if (
-        task.startswith(not_sierra_adapter) and
-        path == 'sierra_adapter/Makefile'
-    ):
-        print(
-            "~~~ Ignoring %s; sierra_adapter changes don't affect %s" %
             (path, task))
         return False
 
@@ -226,7 +226,9 @@ def make(task, dry_run=False):
     else:
         command = ['make', task]
     print('*** Running %r' % command, flush=True)
-    subprocess.check_call(command)
+    rc = subprocess.call(command)
+    if rc != 0:
+        sys.exit(rc)
 
 
 def git(*args):

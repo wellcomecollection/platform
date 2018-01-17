@@ -10,6 +10,7 @@ auto-formatted (yet).
 
 import os
 import subprocess
+import sys
 
 from tooling import changed_files, git, make
 
@@ -55,6 +56,8 @@ if __name__ == '__main__':
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
         git('push', 'ssh-origin', 'HEAD:%s' % branch)
+
+        sys.exit(1)
     else:
         print('*** There were no changes from auto-formatting', flush=True)
 
