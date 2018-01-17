@@ -1,3 +1,4 @@
 boto3
 daiquiri
+docopt
 wellcome_lambda_utils==2017.10.24
