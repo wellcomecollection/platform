@@ -26,7 +26,6 @@ monitoring-test: gatling_to_cloudwatch-test \
 
 monitoring-publish:	gatling_to_cloudwatch-publish \
 					gatling-publish \
-					ecs_dashboard_client-publish \
 					notify_old_deploys-publish \
 					post_to_slack-publish \
 					service_deployment_status-publish \
