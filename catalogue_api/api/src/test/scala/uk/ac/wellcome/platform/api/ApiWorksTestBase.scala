@@ -118,8 +118,8 @@ class ApiWorksTestBase
       .mkString(",")
 
   def resultList(pageSize: Int = 10,
-                         totalPages: Int = 1,
-                         totalResults: Int = 1) =
+                 totalPages: Int = 1,
+                 totalResults: Int = 1) =
     s"""
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "ResultList",

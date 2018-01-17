@@ -51,8 +51,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "title": "${works(0).title}",
           |     "description": "${works(0).description.get}",
           |     "lettering": "${works(0).lettering.get}",
-          |     "createdDate": ${period(
-            works(0).createdDate.get)},
+          |     "createdDate": ${period(works(0).createdDate.get)},
           |     "creators": [ ${agent(works(0).creators(0))} ],
           |     "subjects": [ ],
           |     "genres": [ ]
@@ -63,8 +62,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "title": "${works(1).title}",
           |     "description": "${works(1).description.get}",
           |     "lettering": "${works(1).lettering.get}",
-          |     "createdDate": ${period(
-            works(1).createdDate.get)},
+          |     "createdDate": ${period(works(1).createdDate.get)},
           |     "creators": [ ${agent(works(1).creators(0))} ],
           |     "subjects": [ ],
           |     "genres": [ ]

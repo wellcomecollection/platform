@@ -120,7 +120,9 @@ class ElasticsearchServiceTest
     toDisplayWorks(works, worksIncludes = worksIncludes)
   }
 
-  private def toDisplayWorks(works: Seq[Work], worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] =
+  private def toDisplayWorks(
+    works: Seq[Work],
+    worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] =
     works.map(DisplayWork(_, worksIncludes)).sortBy(_.id).toList
 
   private def assertSliceIsCorrect(

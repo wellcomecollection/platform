@@ -52,10 +52,11 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
     elasticClient
       .execute {
         search(s"${getIndex(index)}/$documentType")
-          .query(must(
-            simpleStringQuery(queryString),
-            termQuery("visible", true)
-          ))
+          .query(
+            must(
+              simpleStringQuery(queryString),
+              termQuery("visible", true)
+            ))
           .limit(limit)
           .from(from)
       }
