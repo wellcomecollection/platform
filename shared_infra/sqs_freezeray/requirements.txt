@@ -4,18 +4,13 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-attrs==17.2.0             # via wellcome-lambda-utils
-boto3==1.4.7
-botocore==1.7.34          # via boto3, s3transfer
-certifi==2017.7.27.1      # via requests
-chardet==3.0.4            # via requests
+boto3==1.5.16             # via wellcome-aws-utils
+botocore==1.8.30          # via boto3, s3transfer
 daiquiri==1.3.0
+docopt==0.6.2
 docutils==0.14            # via botocore
-idna==2.6                 # via requests
 jmespath==0.9.3           # via boto3, botocore
-python-dateutil==2.6.1    # via botocore, wellcome-lambda-utils
-requests==2.18.4          # via wellcome-lambda-utils
-s3transfer==0.1.11        # via boto3
+python-dateutil==2.6.1    # via botocore, wellcome-aws-utils
+s3transfer==0.1.12        # via boto3
 six==1.11.0               # via python-dateutil
-urllib3==1.22             # via requests
-wellcome_lambda_utils==2017.10.24
+wellcome_aws_utils==2.0.1
