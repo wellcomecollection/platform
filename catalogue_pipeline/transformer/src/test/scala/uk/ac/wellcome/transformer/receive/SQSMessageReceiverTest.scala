@@ -9,12 +9,12 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
@@ -90,7 +90,7 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a[SQSReaderGracefulException]
+      x shouldBe a[GracefulFailureException]
     }
   }
 
@@ -124,7 +124,7 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
     whenReady(future.failed) { x =>
-      x shouldBe a[SQSReaderGracefulException]
+      x shouldBe a[GracefulFailureException]
     }
   }
 
