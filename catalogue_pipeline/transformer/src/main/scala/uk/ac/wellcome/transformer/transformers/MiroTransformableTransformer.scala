@@ -128,10 +128,11 @@ class MiroTransformableTransformer
     val wiaAwardsData: List[(String, String)] =
       zipMiroFields(keys = miroData.award, values = miroData.awardDate)
         .collect {
-          case (Some(label), Some(year)) if
-            label == "WIA Overall Winner" ||
-              label == "Wellcome Image Awards" ||
-              label == "Biomedical Image Awards" => (label,year)
+          case (Some(label), Some(year))
+              if label == "WIA Overall Winner" ||
+                label == "Wellcome Image Awards" ||
+                label == "Biomedical Image Awards" =>
+            (label, year)
         }
 
     val wiaAwardsString = wiaAwardsData match {
@@ -400,17 +401,18 @@ class MiroTransformableTransformer
     * of (key, value) tuples.  Note: we don't use a map because keys aren't
     * guaranteed to be unique.
     */
-  def zipMiroFields(keys: List[Option[String]],
-                    values: List[Option[String]]): List[(Option[String], Option[String])] = {
+  def zipMiroFields(
+    keys: List[Option[String]],
+    values: List[Option[String]]): List[(Option[String], Option[String])] = {
 
-        if (keys.lengthCompare(values.length) != 0) {
-          throw new RuntimeException(
-            s"Different lengths! keys=$keys, values=$values"
-          )
-        }
+    if (keys.lengthCompare(values.length) != 0) {
+      throw new RuntimeException(
+        s"Different lengths! keys=$keys, values=$values"
+      )
+    }
 
-        (keys, values).zipped.toList
-      }
+    (keys, values).zipped.toList
+  }
 
   private def buildImageApiURL(miroID: String, templateName: String): String = {
     val iiifImageApiBaseUri = "https://iiif.wellcomecollection.org"

@@ -2,7 +2,10 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
+import com.fasterxml.jackson.databind.annotation.{
+  JsonDeserialize,
+  JsonSerialize
+}
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._

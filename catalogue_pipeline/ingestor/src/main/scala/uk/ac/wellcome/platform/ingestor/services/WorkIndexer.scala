@@ -32,7 +32,7 @@ class WorkIndexer @Inject()(
       () => {
         Future
           .fromTry(
-            fromJson[Work](document).recover{
+            fromJson[Work](document).recover {
               case error: Throwable => throw GracefulFailureException(error)
             }
           )

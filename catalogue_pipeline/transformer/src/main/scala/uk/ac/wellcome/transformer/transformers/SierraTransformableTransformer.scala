@@ -52,21 +52,22 @@ class SierraTransformableTransformer
         info(s"Attempting to transform $bibData")
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-          Some(Work(
-            title = getTitle(sierraBibData),
-            publishers = getPublishers(sierraBibData),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.sierraSystemNumber,
-              sierraBibData.id
-            ),
-            identifiers = getIdentifiers(sierraBibData),
-            items = Option(sierraTransformable.itemData)
-              .getOrElse(Map.empty)
-              .values
-              .flatMap(extractItemData)
-              .toList,
-            visible = !(sierraBibData.deleted || sierraBibData.suppressed)
-          ))
+          Some(
+            Work(
+              title = getTitle(sierraBibData),
+              publishers = getPublishers(sierraBibData),
+              sourceIdentifier = SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                sierraBibData.id
+              ),
+              identifiers = getIdentifiers(sierraBibData),
+              items = Option(sierraTransformable.itemData)
+                .getOrElse(Map.empty)
+                .values
+                .flatMap(extractItemData)
+                .toList,
+              visible = !(sierraBibData.deleted || sierraBibData.suppressed)
+            ))
         }
 
       }

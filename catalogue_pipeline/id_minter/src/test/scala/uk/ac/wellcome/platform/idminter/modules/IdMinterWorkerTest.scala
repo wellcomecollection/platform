@@ -6,7 +6,10 @@ import org.scalatest.FunSpec
 import org.scalatest.mockito.MockitoSugar
 import scalikejdbc._
 import scalikejdbc.interpolation.SQLSyntax
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
 import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
 
 class IdMinterWorkerTest

@@ -3,7 +3,11 @@ package uk.ac.wellcome.models
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode}
+import com.fasterxml.jackson.databind.{
+  DeserializationContext,
+  JsonDeserializer,
+  JsonNode
+}
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder, Json}
 import cats.syntax.either._
@@ -17,17 +21,20 @@ sealed trait License {
 }
 
 object License extends Logging {
-  implicit val licenseEncoder = Encoder.instance[License](license => Json.obj(
-    ("licenseType", Json.fromString(license.licenseType)),
-    ("label", Json.fromString(license.label)),
-    ("url", Json.fromString(license.url)),
-    ("type", Json.fromString(license.ontologyType))
-  ))
+  implicit val licenseEncoder = Encoder.instance[License](
+    license =>
+      Json.obj(
+        ("licenseType", Json.fromString(license.licenseType)),
+        ("label", Json.fromString(license.label)),
+        ("url", Json.fromString(license.url)),
+        ("type", Json.fromString(license.ontologyType))
+    ))
 
-  implicit val licenseDecoder = Decoder.instance[License](cursor => for {
-    licenseType <- cursor.downField("licenseType").as[String]
-  } yield {
-    createLicense(licenseType)
+  implicit val licenseDecoder = Decoder.instance[License](cursor =>
+    for {
+      licenseType <- cursor.downField("licenseType").as[String]
+    } yield {
+      createLicense(licenseType)
   })
 
   def createLicense(licenseType: String): License = {
@@ -61,7 +68,7 @@ case object License_CCBY extends License {
   val url = "http://creativecommons.org/licenses/by/4.0/"
 }
 
-case object License_CCBYNC extends License{
+case object License_CCBYNC extends License {
   val licenseType = "CC-BY-NC"
   val label = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
   val url = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -69,7 +76,8 @@ case object License_CCBYNC extends License{
 
 case object License_CCBYNCND extends License {
   val licenseType = "CC-BY-NC-ND"
-  val label = "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
+  val label =
+    "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
   val url = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
 }
 

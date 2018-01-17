@@ -95,8 +95,8 @@ class IdEmbedderTests
         )
     ).thenReturn(Try(throw expectedException))
 
-    val newWorkFuture = idEmbedder.embedId(
-      json = parse(toJson(originalWork).get).right.get)
+    val newWorkFuture =
+      idEmbedder.embedId(json = parse(toJson(originalWork).get).right.get)
 
     whenReady(newWorkFuture.failed) { exception =>
       exception shouldBe expectedException

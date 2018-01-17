@@ -7,5 +7,5 @@ case class Location(
   url: Option[String] = None,
   credit: Option[String] = None,
   license: License,
-    @JsonProperty("type") ontologyType: String = "Location"
+  @JsonProperty("type") ontologyType: String = "Location"
 )
