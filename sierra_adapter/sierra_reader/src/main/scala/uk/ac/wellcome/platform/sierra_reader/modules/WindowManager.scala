@@ -7,8 +7,8 @@ import com.twitter.inject.annotations.Flag
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -47,7 +47,7 @@ class WindowManager @Inject()(
         val offset = key match {
           case embeddedIndexMatch(index) => index.toInt
           case _ =>
-            throw SQSReaderGracefulException(
+            throw GracefulFailureException(
               new RuntimeException(s"Unable to determine offset in $key"))
         }
 
@@ -57,7 +57,7 @@ class WindowManager @Inject()(
         val lastId = records match {
           case Success(r) =>
             r.map { _.id }.sorted.lastOption
-          case Failure(err) => throw SQSReaderGracefulException(err)
+          case Failure(err) => throw GracefulFailureException(err)
         }
 
         info(s"Found latest ID in S3: $lastId")
@@ -71,7 +71,7 @@ class WindowManager @Inject()(
             WindowStatus(id = Some(newId), offset = offset + 1)
           })
           .getOrElse(
-            throw SQSReaderGracefulException(
+            throw GracefulFailureException(
               new RuntimeException("Json did not contain an id"))
           )
       }

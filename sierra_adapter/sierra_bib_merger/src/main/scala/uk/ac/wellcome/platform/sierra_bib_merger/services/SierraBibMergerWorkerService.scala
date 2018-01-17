@@ -7,7 +7,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -28,7 +29,7 @@ class SierraBibMergerWorkerService @Inject()(
       case Failure(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)
-          throw SQSReaderGracefulException(e)
+          throw GracefulFailureException(e)
         }
     }
 }

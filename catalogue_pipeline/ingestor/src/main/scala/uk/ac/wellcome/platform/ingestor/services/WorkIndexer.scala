@@ -13,7 +13,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.{Failure, Success, Try}
 
@@ -33,7 +33,7 @@ class WorkIndexer @Inject()(
         Future
           .fromTry(
             fromJson[Work](document).recover{
-              case error: Throwable => throw SQSReaderGracefulException(error)
+              case error: Throwable => throw GracefulFailureException(error)
             }
           )
           .flatMap(item => {

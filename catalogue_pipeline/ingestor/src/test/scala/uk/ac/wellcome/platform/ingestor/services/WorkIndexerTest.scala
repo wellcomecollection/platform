@@ -6,9 +6,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -106,7 +106,7 @@ class WorkIndexerTest
     val future = workIndexer.indexWork("a document")
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[SQSReaderGracefulException]
+      exception shouldBe a[GracefulFailureException]
     }
   }
 
@@ -115,7 +115,7 @@ class WorkIndexerTest
     val future = workIndexer.indexWork("null")
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[SQSReaderGracefulException]
+      exception shouldBe a[GracefulFailureException]
     }
   }
 }
