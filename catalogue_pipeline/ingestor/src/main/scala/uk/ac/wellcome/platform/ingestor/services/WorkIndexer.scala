@@ -32,9 +32,7 @@ class WorkIndexer @Inject()(
       () => {
         Future
           .fromTry(
-            fromJson[Work](document).recover {
-              case error: Throwable => throw GracefulFailureException(error)
-            }
+            fromJson[Work](document)
           )
           .flatMap(item => {
             info(s"Indexing item $item")

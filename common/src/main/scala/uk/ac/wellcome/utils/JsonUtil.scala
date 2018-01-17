@@ -46,7 +46,7 @@ object JsonUtil extends AutoDerivation with Logging {
 
   def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] = decode[T](json).toTry.recover {
     case e: Exception =>
-      warn("Invalid message structure (not via SNS?)", e)
+      warn(s"Error when trying to decode $json", e)
       throw GracefulFailureException(e)
   }
 }
