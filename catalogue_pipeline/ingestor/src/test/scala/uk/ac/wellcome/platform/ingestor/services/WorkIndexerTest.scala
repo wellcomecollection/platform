@@ -7,7 +7,12 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifierSchemes, Period, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  Period,
+  SourceIdentifier,
+  Work
+}
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -81,7 +86,8 @@ class WorkIndexerTest
     }
   }
 
-  it("should overwrite an existing record with a stub if it receives an update with visible = false") {
+  it(
+    "should overwrite an existing record with a stub if it receives an update with visible = false") {
     val work = createWork(
       canonicalId = "kxdg3wmj",
       sourceId = "K0000567",
