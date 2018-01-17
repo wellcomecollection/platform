@@ -28,6 +28,13 @@ case object Error {
           label = "Not Found",
           description = description
         )
+      case "http-410" =>
+        Error(
+          errorType = "http",
+          httpStatus = Some(410),
+          label = "Gone",
+          description = description
+        )
       case "http-500" =>
         Error(
           errorType = "http",
