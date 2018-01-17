@@ -1,7 +1,11 @@
 package uk.ac.wellcome.sqs
 
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.{DeleteMessageRequest, Message, ReceiveMessageRequest}
+import com.amazonaws.services.sqs.model.{
+  DeleteMessageRequest,
+  Message,
+  ReceiveMessageRequest
+}
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -10,8 +14,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
-
-
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {

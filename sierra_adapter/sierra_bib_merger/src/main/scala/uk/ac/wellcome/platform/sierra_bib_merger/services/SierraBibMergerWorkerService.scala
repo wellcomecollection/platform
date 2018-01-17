@@ -10,7 +10,10 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.circe._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraRecord
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
