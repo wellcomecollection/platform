@@ -7,10 +7,10 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, Item, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.util.Try
 
@@ -59,7 +59,7 @@ class IdEmbedderTests
 
     val newWorkFuture = idEmbedder.embedId(
       json = parse(
-        JsonUtil.toJson(originalWork).get
+        toJson(originalWork).get
       ).right.get
     )
 
@@ -68,7 +68,7 @@ class IdEmbedderTests
     whenReady(newWorkFuture) { newWorkJson =>
       assertJsonStringsAreEqual(
         newWorkJson.toString(),
-        JsonUtil.toJson(expectedWork).get
+        toJson(expectedWork).get
       )
     }
   }
@@ -95,8 +95,8 @@ class IdEmbedderTests
         )
     ).thenReturn(Try(throw expectedException))
 
-    val newWorkFuture = idEmbedder.embedId(
-      json = parse(JsonUtil.toJson(originalWork).get).right.get)
+    val newWorkFuture =
+      idEmbedder.embedId(json = parse(toJson(originalWork).get).right.get)
 
     whenReady(newWorkFuture.failed) { exception =>
       exception shouldBe expectedException
@@ -154,7 +154,7 @@ class IdEmbedderTests
 
     val eventualWork = idEmbedder.embedId(
       parse(
-        JsonUtil.toJson(originalWork).get
+        toJson(originalWork).get
       ).right.get
     )
 
@@ -167,19 +167,19 @@ class IdEmbedderTests
     )
 
     whenReady(eventualWork) { json =>
-      val work = JsonUtil.fromJson[Work](json.toString()).get
+      val work = fromJson[Work](json.toString()).get
 
       val actualItem1 = work.items.head
       val actualItem2 = work.items.tail.head
 
       assertJsonStringsAreEqual(
-        JsonUtil.toJson(actualItem1).get,
-        JsonUtil.toJson(expectedItem1).get
+        toJson(actualItem1).get,
+        toJson(expectedItem1).get
       )
 
       assertJsonStringsAreEqual(
-        JsonUtil.toJson(actualItem2).get,
-        JsonUtil.toJson(expectedItem2).get
+        toJson(actualItem2).get,
+        toJson(expectedItem2).get
       )
     }
 

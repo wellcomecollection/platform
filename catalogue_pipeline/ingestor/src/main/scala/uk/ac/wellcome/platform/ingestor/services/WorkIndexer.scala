@@ -12,12 +12,10 @@ import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-import io.circe.generic.extras.auto._
-import uk.ac.wellcome.circe._
-import io.circe.parser._
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class WorkIndexer @Inject()(
@@ -33,12 +31,11 @@ class WorkIndexer @Inject()(
       "ingestor-index-work",
       () => {
         Future
-          .fromTry(Try {
-            decode[Work](document) match {
-              case Right(work) => work
-              case Left(error) => throw SQSReaderGracefulException(error)
+          .fromTry(
+            fromJson[Work](document).recover {
+              case error: Throwable => throw GracefulFailureException(error)
             }
-          })
+          )
           .flatMap(item => {
             info(s"Indexing item $item")
             elasticClient.execute {

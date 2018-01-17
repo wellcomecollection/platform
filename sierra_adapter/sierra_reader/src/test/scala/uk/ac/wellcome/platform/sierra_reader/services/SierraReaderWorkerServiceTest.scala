@@ -8,18 +8,15 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
+import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local, SQSLocal}
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import io.circe.parser.decode
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
-import uk.ac.wellcome.circe._
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
@@ -104,7 +101,7 @@ class SierraReaderWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
       s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
@@ -143,7 +140,7 @@ class SierraReaderWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
       .map { label =>
@@ -203,7 +200,7 @@ class SierraReaderWorkerServiceTest
 
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
       .map { label =>
@@ -228,7 +225,7 @@ class SierraReaderWorkerServiceTest
   }
 
   private def getRecordsFromS3(key: String): List[SierraRecord] =
-    decode[List[SierraRecord]](getContentFromS3(bucketName, key)).right.get
+    fromJson[List[SierraRecord]](getContentFromS3(bucketName, key)).get
 
   it(
     "returns a SQSReaderGracefulException if it receives a message that doesn't contain start or end values") {
@@ -244,7 +241,7 @@ class SierraReaderWorkerServiceTest
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
-      ex shouldBe a[SQSReaderGracefulException]
+      ex shouldBe a[GracefulFailureException]
     }
 
   }
@@ -268,7 +265,7 @@ class SierraReaderWorkerServiceTest
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
 
     whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
-      ex shouldNot be(a[SQSReaderGracefulException])
+      ex shouldNot be(a[GracefulFailureException])
     }
   }
 

@@ -7,7 +7,6 @@ case class Item(
   sourceIdentifier: SourceIdentifier,
   identifiers: List[SourceIdentifier] = Nil,
   locations: List[Location] = List(),
-  visible: Boolean = true
-) extends Identifiable {
-  @JsonProperty("type") val ontologyType: String = "Item"
-}
+  visible: Boolean = true,
+  @JsonProperty("type") ontologyType: String = "Item"
+) extends Identifiable

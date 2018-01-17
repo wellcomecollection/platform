@@ -4,7 +4,7 @@ import java.io.InputStream
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.io.Source
 import scala.util.Try
@@ -28,7 +28,7 @@ class MiroTransformableTransformer
   val stream: InputStream = getClass
     .getResourceAsStream("/miro_contributor_map.json")
   val contributorMap =
-    JsonUtil.toMap[String](Source.fromInputStream(stream).mkString).get
+    toMap[String](Source.fromInputStream(stream).mkString).get
 
   override def transformForType(
     miroTransformable: MiroTransformable): Try[Option[Work]] = Try {
@@ -127,11 +127,12 @@ class MiroTransformableTransformer
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
       zipMiroFields(keys = miroData.award, values = miroData.awardDate)
-        .filter {
-          case (label, _) =>
-            (label == "WIA Overall Winner" ||
-              label == "Wellcome Image Awards" ||
-              label == "Biomedical Image Awards")
+        .collect {
+          case (Some(label), Some(year))
+              if label == "WIA Overall Winner" ||
+                label == "Wellcome Image Awards" ||
+                label == "Biomedical Image Awards" =>
+            (label, year)
         }
 
     val wiaAwardsString = wiaAwardsData match {
@@ -208,8 +209,8 @@ class MiroTransformableTransformer
     val libraryRefsList: List[SourceIdentifier] =
       zipMiroFields(keys = miroData.libraryRefDepartment,
                     values = miroData.libraryRefId)
-        .map {
-          case (label, value) =>
+        .collect {
+          case (Some(label), Some(value)) =>
             SourceIdentifier(
               IdentifierSchemes.miroLibraryReference,
               s"$label $value"
@@ -400,33 +401,17 @@ class MiroTransformableTransformer
     * of (key, value) tuples.  Note: we don't use a map because keys aren't
     * guaranteed to be unique.
     */
-  def zipMiroFields(keys: Option[List[String]],
-                    values: Option[List[String]]): List[(String, String)] = {
-    (keys, values) match {
-      case (Some(k), Some(v)) => {
-        if (k.length != v.length) {
-          throw new RuntimeException(
-            s"Different lengths! keys=$k, values=$v"
-          )
-        }
+  def zipMiroFields(
+    keys: List[Option[String]],
+    values: List[Option[String]]): List[(Option[String], Option[String])] = {
 
-        (k, v).zipped.toList
-      }
-
-      // If both fields are empty, we fall straight through.
-      case (None, None) => List()
-
-      // If only one of the fields is non-empty, for now we just raise
-      // an exception -- this probably indicates an issue in the source data.
-      case (Some(k), None) =>
-        throw new RuntimeException(
-          s"Inconsistent k/v pairs: keys=$k, values=null"
-        )
-      case (None, Some(v)) =>
-        throw new RuntimeException(
-          s"Inconsistent k/v pairs: keys=null, values=$v"
-        )
+    if (keys.lengthCompare(values.length) != 0) {
+      throw new RuntimeException(
+        s"Different lengths! keys=$keys, values=$values"
+      )
     }
+
+    (keys, values).zipped.toList
   }
 
   private def buildImageApiURL(miroID: String, templateName: String): String = {

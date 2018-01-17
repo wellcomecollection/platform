@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.{
   JsonNode
 }
 import com.twitter.inject.Logging
+import io.circe.{Decoder, Encoder, Json}
+import cats.syntax.either._
 
 @JsonDeserialize(using = classOf[LicenseDeserialiser])
 sealed trait License {
@@ -18,16 +20,24 @@ sealed trait License {
   @JsonProperty("type") val ontologyType: String = "License"
 }
 
-class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
+object License extends Logging {
+  implicit val licenseEncoder = Encoder.instance[License](
+    license =>
+      Json.obj(
+        ("licenseType", Json.fromString(license.licenseType)),
+        ("label", Json.fromString(license.label)),
+        ("url", Json.fromString(license.url)),
+        ("type", Json.fromString(license.ontologyType))
+    ))
 
-  override def deserialize(p: JsonParser,
-                           ctxt: DeserializationContext): License = {
-    val node: JsonNode = p.getCodec.readTree(p)
-    val licenseType = node.get("licenseType").asText
-    createLicense(licenseType)
-  }
+  implicit val licenseDecoder = Decoder.instance[License](cursor =>
+    for {
+      licenseType <- cursor.downField("licenseType").as[String]
+    } yield {
+      createLicense(licenseType)
+  })
 
-  private def createLicense(licenseType: String): License = {
+  def createLicense(licenseType: String): License = {
     licenseType match {
       case s: String if s == License_CCBY.licenseType => License_CCBY
       case s: String if s == License_CCBYNC.licenseType => License_CCBYNC
@@ -39,6 +49,16 @@ class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
         error(errorMessage)
         throw new Exception(errorMessage)
     }
+  }
+}
+
+class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
+
+  override def deserialize(p: JsonParser,
+                           ctxt: DeserializationContext): License = {
+    val node: JsonNode = p.getCodec.readTree(p)
+    val licenseType = node.get("licenseType").asText
+    License.createLicense(licenseType)
   }
 }
 

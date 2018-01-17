@@ -8,9 +8,10 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
-import uk.ac.wellcome.utils.JsonUtil
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.elasticsearch.client.ResponseException
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.utils.JsonUtil
 
 class WorksIndexTest
     extends FunSpec
