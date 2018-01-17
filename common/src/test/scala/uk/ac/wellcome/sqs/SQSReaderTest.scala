@@ -117,7 +117,7 @@ class SQSReaderTest
   }
 
   it(
-    "should return a successful future but not delete the message if processing a message fails with SQSReaderGracefulException") {
+    "should return a successful future but not delete the message if processing a message fails with GracefulFailureException") {
     val sqsConfig =
       SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
 

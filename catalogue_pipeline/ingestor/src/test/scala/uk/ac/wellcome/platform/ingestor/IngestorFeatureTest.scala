@@ -26,8 +26,7 @@ class IngestorFeatureTest
   override val server: EmbeddedHttpServer = createServer
 
   // Setting 1 second timeout for tests, so that test don't have to wait too long to test message deletion
-  sqsClient.setQueueAttributes(ingestorQueueUrl,
-                               Map("VisibilityTimeout" -> "1"))
+  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
   it("reads an identified work from the queue and ingests it") {
     val sourceIdentifier =
@@ -45,7 +44,7 @@ class IngestorFeatureTest
       .get
 
     sqsClient.sendMessage(
-      ingestorQueueUrl,
+      queueUrl,
       JsonUtil
         .toJson(
           SQSMessage(
@@ -88,7 +87,7 @@ class IngestorFeatureTest
       .get
 
     sqsClient.sendMessage(
-      ingestorQueueUrl,
+      queueUrl,
       invalidMessage
     )
 
@@ -102,7 +101,7 @@ class IngestorFeatureTest
     eventually {
       sqsClient
         .getQueueAttributes(
-          ingestorQueueUrl,
+          queueUrl,
           List("ApproximateNumberOfMessagesNotVisible")
         )
         .getAttributes

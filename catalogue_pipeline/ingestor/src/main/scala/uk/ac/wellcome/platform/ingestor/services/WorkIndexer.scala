@@ -12,8 +12,6 @@ import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.{Failure, Success, Try}
 
@@ -25,26 +23,22 @@ class WorkIndexer @Inject()(
   metricsSender: MetricsSender
 ) extends Logging {
 
-  def indexWork(document: String): Future[IndexResponse] = {
+  def indexWork(work: Work): Future[IndexResponse] = {
+
+    // This is required for elastic4s, not Circe
     implicit val jsonMapper = Work
+
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
-        Future
-          .fromTry(
-            fromJson[Work](document).recover {
-              case error: Throwable => throw GracefulFailureException(error)
-            }
-          )
-          .flatMap(item => {
-            info(s"Indexing item $item")
-            elasticClient.execute {
-              indexInto(esIndex / esType).id(item.id).doc(item)
-            }
-          })
+        info(s"Indexing work $work")
+        elasticClient
+          .execute {
+            indexInto(esIndex / esType).id(work.id).doc(work)
+          }
           .recover {
             case e: Throwable =>
-              error(s"Error indexing document $document into Elasticsearch", e)
+              error(s"Error indexing work $work into Elasticsearch", e)
               throw e
           }
       }
