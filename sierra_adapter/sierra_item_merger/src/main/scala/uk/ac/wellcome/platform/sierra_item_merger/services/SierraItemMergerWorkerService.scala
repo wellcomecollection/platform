@@ -11,7 +11,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-
 class SierraItemMergerWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
@@ -25,4 +24,3 @@ class SierraItemMergerWorkerService @Inject()(
     sierraItemMergerUpdaterService.update(record)
 
 }
-

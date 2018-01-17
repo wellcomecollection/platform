@@ -49,4 +49,3 @@ abstract class SQSWorker(sqsReader: SQSReader,
   override def terminalFailureHook(): Unit =
     metricsSender.incrementCount(s"${workerName}_TerminalFailure")
 }
-

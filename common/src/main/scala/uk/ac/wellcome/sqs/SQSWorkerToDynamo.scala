@@ -15,10 +15,10 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 abstract class SQSWorkerToDynamo[T](
-    sqsReader: SQSReader,
-    actorSystem: ActorSystem,
-    metricsSender: MetricsSender
-  ) extends SQSWorker(sqsReader, actorSystem, metricsSender) {
+  sqsReader: SQSReader,
+  actorSystem: ActorSystem,
+  metricsSender: MetricsSender
+) extends SQSWorker(sqsReader, actorSystem, metricsSender) {
 
   private def failGracefully(message: SQSMessage, e: Throwable): Future[Unit] = {
     logger.warn(s"Failed processing $message", e)
@@ -31,10 +31,11 @@ abstract class SQSWorkerToDynamo[T](
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     fromJson[T](message.body) match {
-      case Success(t: T) => store(t).recover {
-        case e: ConditionalCheckFailedException =>
-          failGracefully(message, e)
-      }
+      case Success(t: T) =>
+        store(t).recover {
+          case e: ConditionalCheckFailedException =>
+            failGracefully(message, e)
+        }
       case Failure(e: Throwable) => failGracefully(message, e)
     }
 }

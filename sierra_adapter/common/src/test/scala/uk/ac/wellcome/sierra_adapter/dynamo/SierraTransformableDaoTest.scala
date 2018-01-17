@@ -22,7 +22,6 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 
-
 class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
 
   val sierraTransformableDao =

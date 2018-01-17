@@ -26,7 +26,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 case class TestObject(foo: String)
 
 class SQSWorkerToDynamoTest
-  extends FunSpec
+    extends FunSpec
     with SQSLocal
     with MockitoSugar
     with ScalaFutures
@@ -39,7 +39,8 @@ class SQSWorkerToDynamoTest
 
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
-  private val metricsSender: MetricsSender = new MetricsSender("namespace", mockCloudWatch)
+  private val metricsSender: MetricsSender =
+    new MetricsSender("namespace", mockCloudWatch)
 
   val testMessage = SQSMessage(
     subject = Some("subject"),
@@ -59,10 +60,10 @@ class SQSWorkerToDynamoTest
   }
 
   class TestWorker(queueUrl: String)
-    extends SQSWorkerToDynamo[TestObject](
-      new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-      ActorSystem(),
-      metricsSender) {
+      extends SQSWorkerToDynamo[TestObject](
+        new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        ActorSystem(),
+        metricsSender) {
     override lazy val totalWait = 1.second
 
     override implicit val decoder = Decoder[TestObject]
@@ -80,7 +81,7 @@ class SQSWorkerToDynamoTest
   }
 
   class ConditionalCheckFailingTestWorker(queueUrl: String)
-    extends TestWorker(queueUrl: String) {
+      extends TestWorker(queueUrl: String) {
 
     override def store(record: TestObject): Future[Unit] = Future {
       throw new ConditionalCheckFailedException("Wrong!")
@@ -88,7 +89,7 @@ class SQSWorkerToDynamoTest
   }
 
   class TerminalFailingTestWorker(queueUrl: String)
-    extends TestWorker(queueUrl: String) {
+      extends TestWorker(queueUrl: String) {
 
     override def store(record: TestObject): Future[Unit] = Future {
       throw new RuntimeException("Wrong!")
@@ -148,7 +149,8 @@ class SQSWorkerToDynamoTest
     worker.terminalFailure shouldBe false
   }
 
-  it("fails terminally when receiving an exception other than ConditionalCheckFailedException") {
+  it(
+    "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
     val queueUrl = newQueue("purple")
 
     val terminalFailingWorker = new TerminalFailingTestWorker(queueUrl)

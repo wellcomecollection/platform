@@ -87,7 +87,6 @@ trait TryBackoff extends Logging {
       }
     }
 
-
   }
 
   def cancelRun(): Boolean = {
