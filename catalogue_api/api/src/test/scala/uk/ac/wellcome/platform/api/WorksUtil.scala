@@ -17,7 +17,9 @@ trait WorksUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWorks(count: Int, start: Int = 1, visible: Boolean = true): Seq[Work] =
+  def createWorks(count: Int,
+                  start: Int = 1,
+                  visible: Boolean = true): Seq[Work] =
     (start to count).map(
       (idx: Int) =>
         workWith(
