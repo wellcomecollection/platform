@@ -1,4 +1,3 @@
-boto3
 daiquiri
 docopt
-wellcome_lambda_utils==2017.10.24
+wellcome_aws_utils==2.0.1
