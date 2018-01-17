@@ -6,11 +6,11 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class JsonUtilTest extends FunSpec with Matchers with JsonTestUtil {
   case class A(id: String, b: B)
-  case class B(id :String, c: C)
+  case class B(id: String, c: C)
   case class C(ints: List[Int])
 
-  describe("fromJson"){
-    it("successfully parses a json string into an instance of a case class"){
+  describe("fromJson") {
+    it("successfully parses a json string into an instance of a case class") {
       val aId = "a"
       val bId = "b"
 
@@ -29,17 +29,18 @@ class JsonUtilTest extends FunSpec with Matchers with JsonTestUtil {
 
       val triedA = fromJson[A](inputString)
       triedA.isSuccess shouldBe true
-      triedA.get shouldBe A(aId, B(bId, C(List(1,2,3))))
+      triedA.get shouldBe A(aId, B(bId, C(List(1, 2, 3))))
     }
 
-    it("fails with GracefulFailureException if the json is invalid"){
+    it("fails with GracefulFailureException if the json is invalid") {
       val triedA = fromJson[A]("not a valid json string")
 
       triedA.isFailure shouldBe true
       triedA.failed.get shouldBe a[GracefulFailureException]
     }
 
-    it("fails with GracefulFailureException if the json does not match the structure of the case class"){
+    it(
+      "fails with GracefulFailureException if the json does not match the structure of the case class") {
       val triedA = fromJson[A]("""{"something": "else"}""")
 
       triedA.isFailure shouldBe true
@@ -49,8 +50,8 @@ class JsonUtilTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   describe("toJson") {
-    it("returns the json string representation of a case class"){
-      val a = A(id ="A", b= B(id = "B", c = C(ints = List(1, 2, 3))))
+    it("returns the json string representation of a case class") {
+      val a = A(id = "A", b = B(id = "B", c = C(ints = List(1, 2, 3))))
 
       val triedString = toJson(a)
       triedString.isSuccess shouldBe true
@@ -67,9 +68,8 @@ class JsonUtilTest extends FunSpec with Matchers with JsonTestUtil {
           |}
         """.stripMargin
 
-      assertJsonStringsAreEqual(triedString.get , expectedString)
+      assertJsonStringsAreEqual(triedString.get, expectedString)
     }
   }
-
 
 }

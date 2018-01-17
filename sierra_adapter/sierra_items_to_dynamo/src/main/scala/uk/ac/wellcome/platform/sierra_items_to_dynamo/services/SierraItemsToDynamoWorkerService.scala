@@ -22,7 +22,8 @@ class SierraItemsToDynamoWorkerService @Inject()(
 ) extends SQSWorker(reader, system, metrics) {
 
   def processMessage(message: SQSMessage): Future[Unit] =
-    Future.fromTry(JsonUtil.fromJson[SierraRecord](message.body)).map { record =>
+    Future.fromTry(JsonUtil.fromJson[SierraRecord](message.body)).map {
+      record =>
         dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
     }
 }

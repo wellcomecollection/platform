@@ -53,9 +53,10 @@ class WindowManager @Inject()(
 
         val lastBody = IOUtils.toString(
           s3client.getObject(bucketName, key).getObjectContent)
-        val triedMaybeLastId = JsonUtil.fromJson[List[SierraRecord]](lastBody).map {r =>
+        val triedMaybeLastId =
+          JsonUtil.fromJson[List[SierraRecord]](lastBody).map { r =>
             r.map { _.id }.sorted.lastOption
-        }
+          }
 
         info(s"Found latest ID in S3: $triedMaybeLastId")
         val triedStatus = triedMaybeLastId

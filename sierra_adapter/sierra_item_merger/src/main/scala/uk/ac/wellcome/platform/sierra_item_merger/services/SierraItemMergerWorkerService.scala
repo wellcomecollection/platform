@@ -23,6 +23,7 @@ class SierraItemMergerWorkerService @Inject()(
     with Logging {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
-    Future.fromTry(fromJson[SierraItemRecord](message.body)).map {
-      record => sierraItemMergerUpdaterService.update(record)    }
+    Future.fromTry(fromJson[SierraItemRecord](message.body)).map { record =>
+      sierraItemMergerUpdaterService.update(record)
+    }
 }

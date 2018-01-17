@@ -38,15 +38,17 @@ object JsonUtil extends AutoDerivation with Logging {
         case other => other
       })
 
-  def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] = Try(value.asJson.noSpaces)
+  def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] =
+    Try(value.asJson.noSpaces)
 
   def toMap[T](json: String)(
     implicit decoder: Decoder[T]): Try[Map[String, T]] =
     fromJson[Map[String, T]](json)
 
-  def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] = decode[T](json).toTry.recover {
-    case e: Exception =>
-      warn(s"Error when trying to decode $json", e)
-      throw GracefulFailureException(e)
-  }
+  def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] =
+    decode[T](json).toTry.recover {
+      case e: Exception =>
+        warn(s"Error when trying to decode $json", e)
+        throw GracefulFailureException(e)
+    }
 }
