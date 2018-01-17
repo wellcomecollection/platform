@@ -22,13 +22,8 @@ class SierraItemsToDynamoWorkerService @Inject()(
 ) extends SQSWorker(reader, system, metrics) {
 
   def processMessage(message: SQSMessage): Future[Unit] =
-    JsonUtil.fromJson[SierraRecord](message.body) match {
-      case Success(record) =>
+    Future.fromTry(JsonUtil.fromJson[SierraRecord](message.body)).map {
+      record =>
         dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
-      case Failure(e) =>
-        Future {
-          logger.warn(s"Failed processing $message", e)
-          throw GracefulFailureException(e)
-        }
     }
 }
