@@ -22,7 +22,7 @@ daiquiri.setup(level=logging.INFO)
 logger = daiquiri.getLogger(__name__)
 
 
-def write_all_messages_to_s3(bucket, key, queue_url):
+def write_all_messages_to_s3(bucket, key, src_queue_url):
     """
     Write all the messages from a queue to an S3 bucket.
     """
@@ -34,7 +34,9 @@ def write_all_messages_to_s3(bucket, key, queue_url):
             len(messages), bucket, key)
         s3_utils.write_dicts_to_s3(bucket=bucket, key=key, dicts=messages)
 
-    generator = sqs_utils.get_messages(queue_url=queue_url, delete=True)
+    generator = sqs_utils.get_messages(
+        src_queue_url=src_queue_url, delete=True
+    )
     for i, message in enumerate(generator):
         messages.append(message)
 
@@ -48,11 +50,16 @@ def write_all_messages_to_s3(bucket, key, queue_url):
 
 
 if __name__ == '__main__':
-    queue_url = os.environ['QUEUE_URL']
+    args = docopt.docopt(__doc__)
+
+    src_queue_url = args['--src']
+    bucket = args['--bucket']
+
     queue_name = os.path.basename(queue_url)
 
     date_string = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     key = f'sqs/{queue_name}_{date_string}.txt'
-    bucket = os.environ['BUCKET']
 
-    write_all_messages_to_s3(bucket=bucket, key=key, queue_url=queue_url)
+    write_all_messages_to_s3(
+        bucket=bucket, key=key, src_queue_url=src_queue_url
+    )
