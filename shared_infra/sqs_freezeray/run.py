@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
+"""
+Save all the messages from an SQS queue to a file in S3.
+
+Usage: freezeray.py --src=<SRC_QUEUE_URL> --bucket=<S3_BUCKET>
+       freezeray.py -h | --help
+
+"""
 
 import datetime as dt
 import os
@@ -7,6 +14,7 @@ import logging
 
 import boto3
 import daiquiri
+import docopt
 from wellcome_lambda_utils import s3_utils
 
 
