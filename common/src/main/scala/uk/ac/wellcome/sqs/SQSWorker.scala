@@ -41,11 +41,7 @@ abstract class SQSWorker(sqsReader: SQSReader,
   }
 
   private def extractMessage(sqsMessage: Message): Try[SQSMessage] =
-    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody).recover {
-      case e: Exception =>
-        warn("Invalid message structure (not via SNS?)", e)
-        throw GracefulFailureException(e)
-    }
+    JsonUtil.fromJson[SQSMessage](sqsMessage.getBody)
 
   override def terminalFailureHook(): Unit =
     metricsSender.incrementCount(s"${workerName}_TerminalFailure")
