@@ -40,7 +40,6 @@ class WindowManagerTest
 
     val record = SierraRecord(id = "b1794165", data = "{}", modifiedDate = Instant.now())
 
-    println(toJson(List(record)).get)
     s3Client.putObject(
       bucketName,
       s"$prefix/0001.json",
