@@ -96,9 +96,9 @@ class ElasticsearchServiceTest
     )
   }
 
-  it("should not list works that have visible=true") {
-    val visibleWorks = createWorks(8, visible = true)
-    val invisibleWorks = createWorks(2, visible = false)
+  it("should not list works that have visible=false") {
+    val visibleWorks = createWorks(count = 8, visible = true)
+    val invisibleWorks = createWorks(count = 2, start = 9, visible = false)
 
     val works = visibleWorks ++ invisibleWorks
     insertIntoElasticSearch(works: _*)

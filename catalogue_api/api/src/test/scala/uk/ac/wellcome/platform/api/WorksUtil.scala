@@ -17,8 +17,8 @@ trait WorksUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWorks(count: Int, visible: Boolean = true): Seq[Work] =
-    (1 to count).map(
+  def createWorks(count: Int, start: Int = 1, visible: Boolean = true): Seq[Work] =
+    (start to count).map(
       (idx: Int) =>
         workWith(
           canonicalId = s"${idx}-${canonicalId}",
