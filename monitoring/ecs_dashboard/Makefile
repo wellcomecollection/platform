@@ -1,8 +1,20 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
-
 include $(ROOT)/functions.Makefile
 
+STACK_ROOT  = monitoring/ecs_dashboard
+
+SBT_APPS    =
+ECS_TASKS   =
+LAMBDAS     = update_service_list
+
+TF_NAME     =
+TF_PATH     =
+TF_IS_PUBLIC_FACING =
+
+$(val $(call stack_setup))
+
+
+ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
 
 $(ROOT)/.docker/ecs_dashboard:
 	$(ROOT)/builds/build_ci_docker_image.py \
@@ -16,15 +28,3 @@ ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
 		--env BUCKET_NAME=wellcome-platform-dash \
 		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash/ \
 		ecs_dashboard
-
-
-update_service_list-test:
-	$(call test_lambda,monitoring/ecs_dashboard/update_service_list)
-
-update_service_list-publish:
-	$(call publish_lambda,monitoring/ecs_dashboard/update_service_list)
-
-
-ecs_dashboard-test: update_service_list-test
-
-ecs_dashboard-publish: update_service_list-publish
