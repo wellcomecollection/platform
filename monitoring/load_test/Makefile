@@ -1,24 +1,17 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-
 include $(ROOT)/functions.Makefile
 
+STACK_ROOT  = monitoring/load_test
 
-gatling-build:
-	$(call build_image,gatling,monitoring/load_test/gatling/Dockerfile)
+SBT_APPS    =
+ECS_TASKS   = gatling
+LAMBDAS     = gatling_to_cloudwatch
 
-gatling-publish: gatling-build
-	$(call publish_service,gatling)
+TF_NAME     =
+TF_PATH     =
+TF_IS_PUBLIC_FACING =
 
-
-gatling_to_cloudwatch-test:
-	$(call test_lambda,monitoring/load_test/gatling_to_cloudwatch)
-
-gatling_to_cloudwatch-publish:
-	$(call publish_lambda,monitoring/load_test/gatling_to_cloudwatch)
+$(val $(call stack_setup))
 
 
-load_test-build: gatling-build gatling_to_cloudwatch-build
-
-load_test-test: gatling_to_cloudwatch-test
-
-load_test-publish: gatling-publish gatling_to_cloudwatch-publish
+ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard

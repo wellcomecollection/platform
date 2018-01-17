@@ -1,46 +1,41 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-MIRO_PREPROC = $(ROOT)/miro_preprocessor
-
-ifneq ($(ROOT), $(shell pwd))
-	include $(ROOT)/shared.Makefile
-endif
-
 include $(ROOT)/functions.Makefile
 
-include $(MIRO_PREPROC)/xml_to_json_converter/Makefile
-include $(MIRO_PREPROC)/image_sorter/Makefile
-include $(MIRO_PREPROC)/xml_to_json_run_task/Makefile
-include $(MIRO_PREPROC)/miro_image_to_dynamo/Makefile
-include $(MIRO_PREPROC)/miro_image_to_tandem_vault/Makefile
-include $(MIRO_PREPROC)/miro_copy_s3_asset/Makefile
-include $(MIRO_PREPROC)/miro_inventory/Makefile
+STACK_ROOT 	= miro_preprocessor
 
-miro_preprocessor-build: xml_to_json_converter-build \
-						 xml_to_json_run_task-build \
-						 image_sorter-build \
-						 miro_image_to_dynamo-build \
-						 miro_copy_s3_asset-build \
-						 miro_inventory-build \
-						 miro_image_to_tandem_vault-build
+SBT_APPS 	=
+ECS_TASKS 	= xml_to_json_converter
+LAMBDAS 	= image_sorter \
+				miro_copy_s3_master_asset \
+				miro_copy_s3_derivative_asset \
+				miro_image_to_dynamo \
+				miro_inventory \
+				xml_to_json_run_task
 
-miro_preprocessor-test: xml_to_json_converter-test \
-						xml_to_json_run_task-test \
-						image_sorter-test \
-						miro_image_to_dynamo-test \
-						miro_copy_s3_asset-test \
-						miro_inventory-test \
-						miro_image_to_tandem_vault-test
+TF_NAME 	= miro_preprocessor
+TF_PATH 	= $(ROOT)/$(STACK_ROOT)/terraform
+TF_IS_PUBLIC_FACING = false
 
-miro_preprocessor-publish: xml_to_json_converter-publish \
-						   xml_to_json_run_task-publish \
-						   image_sorter-publish \
-						   miro_image_to_dynamo-publish \
-						   miro_copy_s3_asset-publish \
-						   miro_inventory-publish \
-						   miro_image_to_tandem_vault-publish
+$(val $(call stack_setup))
 
-miro_preprocessor-terraform-plan:
-	$(call terraform_plan,$(MIRO_PREPROC),false)
 
-miro_preprocessor-terraform-apply:
-	$(call terraform_apply,$(MIRO_PREPROC))
+xml_to_json_converter-test: $(ROOT)/.docker/python3.6_ci
+	docker run --rm --tty \
+		--volume $(ROOT)/miro_preprocessor/xml_to_json_converter/src:/data \
+		--env OP=test \
+		python3.6_ci:latest
+
+miro_tandem_vault_uploader-build:
+	$(call build_image,tandem_vault_uploader,miro_preprocessor/miro_image_to_tandem_vault/tandem_vault_uploader.Dockerfile)
+
+miro_image_to_tandem_vault-test:
+	$(call test_lambda,miro_preprocessor/miro_image_to_tandem_vault)
+
+miro_tandem_vault_uploader-publish: miro_tandem_vault_uploader-build
+	$(call publish_service,tandem_vault_uploader)
+
+miro_tandem_vault_enrichment-build:
+	$(call build_image,tandem_vault_enrichment,miro_preprocessor/miro_image_to_tandem_vault/tandem_vault_enrichment.Dockerfile)
+
+miro_tandem_vault_enrichment-publish: miro_tandem_vault_enrichment-build
+	$(call publish_service,tandem_vault_enrichment)

@@ -1,6 +1,15 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 INFRA_BUCKET = platform-infra
 
+
+ifndef UPTODATE_GIT_DEFINED
+uptodate-git:
+	$(ROOT)/builds/is_up_to_date_with_master.sh
+
+UPTODATE_GIT_DEFINED = true
+endif
+
+
 # Run a 'terraform plan' step.
 #
 # Args:
@@ -114,4 +123,103 @@ define sbt_build
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";stage"
+endef
+
+
+# Define a series of Make tasks (build, test, publish) for a Scala application.
+#
+# Args:
+#	$1 - Name of the project in sbt.
+#	$2 - Root of the project's source code.
+#
+define __sbt_target_template
+$(1)-build:
+	$(call sbt_build,$(1))
+	$(call build_image,$(1),$(2)/Dockerfile)
+
+$(1)-test:
+	$(call sbt_test,$(1))
+
+$(1)-publish: $(1)-build
+	$(call publish_service,$(1))
+endef
+
+
+# Define a series of Make tasks (plan, apply) for a Terraform stack.
+#
+# Args:
+#	$1 - Name of the stack.
+#	$2 - Root to the Terraform directory.
+#	$3 - Is this a public-facing stack?  (true/false)
+#
+define __terraform_target_template
+$(1)-terraform-plan:
+	$(call terraform_plan,$(2),$(3))
+
+$(1)-terraform-apply:
+	$(call terraform_apply,$(2))
+endef
+
+
+# Define a series of Make tasks (test, publish) for a Python Lambda.
+#
+# Args:
+#	$1 - Name of the target.
+#	$2 - Path to the Lambda source directory.
+#
+define __lambda_target_template
+$(1)-test:
+	$(call test_lambda,$(2))
+
+$(1)-publish:
+	$(call publish_lambda,$(2))
+endef
+
+
+# Define a series of Make tasks (build, test, publish) for an ECS service.
+#
+# Args:
+#	$1 - Name of the ECS service.
+#	$2 - Path to the associated Dockerfile.
+#
+define __ecs_target_template
+$(1)-build:
+	$(call build_image,$(1),$(2))
+
+$(1)-publish: $(1)-build
+	$(call publish_service,$(1))
+endef
+
+
+# Define all the Make tasks for a stack.
+#
+# Args:
+#
+#	$STACK_ROOT             Path to this stack, relative to the repo root
+#
+#	$SBT_APPS               A space delimited list of sbt apps in this stack
+#	$ECS_TASKS              A space delimited list of ECS services
+#	$LAMBDAS                A space delimited list of Lambdas in this stack
+#
+#	$TF_NAME                Name of the associated Terraform stack
+#	$TF_PATH                Path to the associated Terraform stack
+#	$TF_IS_PUBLIC_FACING    Is this a public-facing stack?  (true/false)
+#
+define stack_setup
+
+# The structure of each of these lines is as follows:
+#
+#	$(foreach name,$(NAMES),
+#		$(eval
+#			$(call __target_template,$(arg1),...,$(argN))
+#		)
+#	)
+#
+# It can't actually be written that way because Make is very sensitive to
+# whitespace, but that's the general idea.
+
+$(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
+$(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
+$(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
+$(foreach name,$(TF_NAME),$(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))
 endef

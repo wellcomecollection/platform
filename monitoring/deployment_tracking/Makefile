@@ -1,22 +1,14 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-
 include $(ROOT)/functions.Makefile
 
+STACK_ROOT  = monitoring/deployment_tracking
 
-notify_old_deploys-test:
-	$(call test_lambda,monitoring/deployment_tracking/notify_old_deploys)
+SBT_APPS    =
+ECS_TASKS   =
+LAMBDAS     = notify_old_deploys service_deployment_status
 
-notify_old_deploys-publish:
-	$(call publish_lambda,monitoring/deployment_tracking/notify_old_deploys)
+TF_NAME     =
+TF_PATH     =
+TF_IS_PUBLIC_FACING =
 
-
-service_deployment_status-test:
-	$(call test_lambda,monitoring/deployment_tracking/service_deployment_status)
-
-service_deployment_status-publish:
-	$(call publish_lambda,monitoring/deployment_tracking/service_deployment_status)
-
-
-deployment_tracking-test: notify_old_deploys-test service_deployment_status-test
-
-deployment_tracking-publish: notify_old_deploys-publish service_deployment_status-publish
+$(val $(call stack_setup))
