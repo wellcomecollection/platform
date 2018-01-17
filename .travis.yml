@@ -55,48 +55,54 @@ env:
     #  * PYPI_PASSWORD
     - secure: CgvR1hv+oZBiIhQOfqPaLqYx6tnMa9Fr7DbrziiLK8Iu6t99nB/cgDdPUczvCfyQvSDwnWJbYhXhkAWgmlAjTHfojeAt7FbZY1cgpLVBZfMHw/VGOhFWAjPZzpqW+IJvREVUJ3meubs/ZvxLvquTu0Xv0XXXzv30LaNyFgP94+EWQaZyIuKgY0mjS6fR5+x5TQHucs3e+EBVDmRkYDfa8dHWTLp1z9tP/veUnj7drDApXLMjbg6YsWfOIbJ3MDYLesBvWf5+3I+DRj18EF2AJ6Ls8S9IALHTq+jx0uXttqsJ2A7MqjdW+5FtDgkjwUC2eTjfok/gPKvgplM9emjrwSccMnL/msw09ahlH9X0S6zGFmCrrgyPdI3As9+tOiZQDVR4nOrCk1ALLnCS/0OmEsln2LNv8ZSD8vKCH1tng9AcTo4Ey3LfRXYElKCVIRlT38KWKPZGn5uHVdtD6mBLRnAiHHWd6Ebhj43k6q58oOjpAs0d4K20CMg6B8jUM0JzXfTtENh0eDNjDYdvfHFXUy8nKdt7Tpfnjj8y5E4jVclYfNmHRWys+nE/EvBAyV2w5naC6ve5IeP1s1V9LOIKUQMOKqzynSJwGtRzp5gZValN29CBsl1oDiccIyYmwcTc3iZCAacwbCrb3aB3ilD5CK8XsF2KmPLyAYCoF//HDbg=
 
-  matrix:
-    - TASK=travis-format
+jobs:
+  include:
+    - env: TASK=travis-format
+      stage: format
 
     # (not under active development)
-    # - TASK=nginx-build
+    # - env: TASK=nginx-build
 
     # Sierra adapter stack.  This covers multiple Scala apps, so we skip
     # it into separate tasks to avoid running all of them any time there's
     # a change to just one.
-    - TASK=sierra_common-test
-    - TASK=sierra_window_generator-test
-    - TASK=sierra_reader-test
-    - TASK=sierra_items_to_dynamo-test
-    - TASK=sierra_bib_merger-test
-    - TASK=sierra_item_merger-test
-    - TASK=s3_demultiplexer-test
+    - env: TASK=sierra_common-test
+    - env: TASK=sierra_window_generator-test
+    - env: TASK=sierra_reader-test
+    - env: TASK=sierra_items_to_dynamo-test
+    - env: TASK=sierra_bib_merger-test
+    - env: TASK=sierra_item_merger-test
+    - env: TASK=s3_demultiplexer-test
 
     # Catalogue pipeline stack
-    - TASK=sbt-common-test
-    - TASK=transformer-test
-    - TASK=ingestor-test
-    - TASK=id_minter-test
-    - TASK=reindexer-test
+    - env: TASK=sbt-common-test
+    - env: TASK=transformer-test
+    - env: TASK=ingestor-test
+    - env: TASK=id_minter-test
+    - env: TASK=reindexer-test
 
     # Catalogue API stack
-    - TASK=api-test
+    - env: TASK=api-test
     # (not under active development)
-    # - TASK=api_docs-build
+    # - env: TASK=api_docs-build
 
     # Miro preprocessor stack  (not under active development)
-    # - TASK=miro_preprocessor-test
+    # - env: TASK=miro_preprocessor-test
 
     # Shared infra stack
-    - TASK=shared_infra-test
+    - env: TASK=shared_infra-test
 
     # Loris stack
-    - TASK=loris-build
+    - env: TASK=loris-build
     # (not under active development)
-    # - TASK=cache_cleaner-build
+    # - env: TASK=cache_cleaner-build
 
     # Monitoring stack
-    - TASK=monitoring-test
+    - env: TASK=monitoring-test
+
+stages:
+  - format
+  - test
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at

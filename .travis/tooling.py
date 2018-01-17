@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import subprocess
+import sys
 
 
 # Root of the Git repository
@@ -226,7 +227,9 @@ def make(task, dry_run=False):
     else:
         command = ['make', task]
     print('*** Running %r' % command, flush=True)
-    subprocess.check_call(command)
+    rc = subprocess.call(command)
+    if rc != 0:
+        sys.exit(rc)
 
 
 def git(*args):
