@@ -15,7 +15,7 @@ import scala.concurrent.Future
 import io.circe.generic.extras.auto._
 import uk.ac.wellcome.circe._
 import io.circe.parser._
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.Try
 
@@ -36,7 +36,7 @@ class WorkIndexer @Inject()(
           .fromTry(Try {
             decode[Work](document) match {
               case Right(work) => work
-              case Left(error) => throw SQSReaderGracefulException(error)
+              case Left(error) => throw GracefulFailureException(error)
             }
           })
           .flatMap(item => {
