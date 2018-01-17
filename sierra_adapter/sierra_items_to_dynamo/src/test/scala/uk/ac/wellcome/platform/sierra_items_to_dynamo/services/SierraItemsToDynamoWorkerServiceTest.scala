@@ -103,7 +103,7 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  it("returns a SQSReaderGracefulException if it receives an invalid message") {
+  it("returns a GracefulFailureException if it receives an invalid message") {
     worker = createSierraWorkerService(fields = "")
 
     val message =

@@ -8,7 +8,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
+import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -57,7 +58,7 @@ class IngestorWorkerServiceTest
     val future = service.processMessage(sqsMessage)
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[SQSReaderGracefulException]
+      exception shouldBe a[GracefulFailureException]
     }
   }
 
@@ -67,7 +68,7 @@ class IngestorWorkerServiceTest
     val future = service.processMessage(sqsMessage)
 
     whenReady(future.failed) { exception =>
-      exception shouldBe a[SQSReaderGracefulException]
+      exception shouldBe a[GracefulFailureException]
     }
   }
 
