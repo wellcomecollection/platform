@@ -32,11 +32,9 @@ def write_all_messages_to_s3(bucket, key, src_queue_url):
         logger.info(
             'Writing %d messages to s3://%s/%s',
             len(messages), bucket, key)
-        s3_utils.write_dicts_to_s3(bucket=bucket, key=key, dicts=messages)
+        s3_utils.write_objects_to_s3(bucket=bucket, key=key, objects=messages)
 
-    generator = sqs_utils.get_messages(
-        src_queue_url=src_queue_url, delete=True
-    )
+    generator = sqs_utils.get_messages(queue_url=src_queue_url, delete=True)
     for i, message in enumerate(generator):
         messages.append(message)
 
@@ -55,7 +53,7 @@ if __name__ == '__main__':
     src_queue_url = args['--src']
     bucket = args['--bucket']
 
-    queue_name = os.path.basename(queue_url)
+    queue_name = os.path.basename(src_queue_url)
 
     date_string = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     key = f'sqs/{queue_name}_{date_string}.txt'
