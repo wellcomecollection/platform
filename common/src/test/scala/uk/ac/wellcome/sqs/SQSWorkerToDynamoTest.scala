@@ -4,28 +4,24 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
+import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import io.circe
-import org.mockito.Matchers.{any, anyDouble, anyString, contains}
+import org.mockito.Matchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.{never, times, verify, when}
-import org.scalatest.{FunSpec, Matchers}
+import org.mockito.Mockito.when
+import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.test.utils.SQSLocal
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
-import io.circe
-import io.circe.generic.extras.auto._
-import io.circe.parser.decode
-import uk.ac.wellcome.circe._
+import io.circe.Decoder
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
-import scala.util.Try
 
 case class TestObject(foo: String)
 
@@ -34,10 +30,9 @@ class SQSWorkerToDynamoTest
     with SQSLocal
     with MockitoSugar
     with ScalaFutures
+    with BeforeAndAfterEach
     with Matchers
     with Eventually {
-
-  val queueUrl = createQueueAndReturnUrl("worker-test-queue")
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]
@@ -45,11 +40,6 @@ class SQSWorkerToDynamoTest
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
   private val metricsSender: MetricsSender = new MetricsSender("namespace", mockCloudWatch)
-
-  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
-
-  var processCalled: Boolean = false
-  var terminalFailure: Boolean = false
 
   val testMessage = SQSMessage(
     subject = Some("subject"),
@@ -59,19 +49,28 @@ class SQSWorkerToDynamoTest
     timestamp = "timestamp"
   )
 
-  val testMessageJson = JsonUtil.toJson(testMessage).get
+  val testMessageJson = toJson(testMessage).get
 
-  class TestWorker
+  def newQueue(name: String) = {
+    val queueUrl = createQueueAndReturnUrl(name)
+    sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
+
+    queueUrl
+  }
+
+  class TestWorker(queueUrl: String)
     extends SQSWorkerToDynamo[TestObject](
       new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
       ActorSystem(),
       metricsSender) {
     override lazy val totalWait = 1.second
 
-    override def conversion(s: String): Either[circe.Error, TestObject] =
-      decode[TestObject](s)
+    override implicit val decoder = Decoder[TestObject]
 
-    override def process(record: TestObject): Future[Unit] = Future {
+    var processCalled: Boolean = false
+    var terminalFailure: Boolean = false
+
+    override def store(record: TestObject): Future[Unit] = Future {
       processCalled = true
     }
 
@@ -80,56 +79,41 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  class ConditionalCheckFailingTestWorker
-    extends TestWorker {
+  class ConditionalCheckFailingTestWorker(queueUrl: String)
+    extends TestWorker(queueUrl: String) {
 
-    override def process(record: TestObject): Future[Unit] = Future {
+    override def store(record: TestObject): Future[Unit] = Future {
       throw new ConditionalCheckFailedException("Wrong!")
     }
   }
 
-  class TerminalFailingTestWorker
-    extends TestWorker {
+  class TerminalFailingTestWorker(queueUrl: String)
+    extends TestWorker(queueUrl: String) {
 
-    override def process(record: TestObject): Future[Unit] = Future {
+    override def store(record: TestObject): Future[Unit] = Future {
       throw new RuntimeException("Wrong!")
     }
   }
 
-  val worker = new TestWorker()
-  val failingWorker = new ConditionalCheckFailingTestWorker()
-
   it("processes messages") {
-    processCalled = false
-    terminalFailure = false
+    val queueUrl = newQueue("red")
+
+    val worker = new TestWorker(queueUrl)
 
     worker.runSQSWorker()
 
     sqsClient.sendMessage(queueUrl, testMessageJson)
 
     eventually {
-      processCalled shouldBe true
-      terminalFailure shouldBe false
+      worker.processCalled shouldBe true
+      worker.terminalFailure shouldBe false
     }
   }
 
-  it("fails terminally when receiving an exception other than ConditionalCheckFailedException") {
-    val terminalFailingWorker = new TerminalFailingTestWorker()
-
-    terminalFailure = false
-
-    terminalFailingWorker.runSQSWorker()
-
-    sqsClient.sendMessage(queueUrl, testMessageJson)
-
-    Thread.sleep(terminalFailingWorker.totalWait.toMillis + 2000)
-
-    terminalFailure shouldBe true
-  }
-
-
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
-    terminalFailure = false
+    val queueUrl = newQueue("blue")
+
+    val failingWorker = new ConditionalCheckFailingTestWorker(queueUrl)
 
     failingWorker.runSQSWorker()
 
@@ -137,11 +121,13 @@ class SQSWorkerToDynamoTest
 
     Thread.sleep(failingWorker.totalWait.toMillis + 2000)
 
-    terminalFailure shouldBe false
+    failingWorker.terminalFailure shouldBe false
   }
 
   it("fails gracefully when a conversion fails") {
-    terminalFailure = false
+    val queueUrl = newQueue("green")
+
+    val worker = new TestWorker(queueUrl)
 
     worker.runSQSWorker()
 
@@ -153,12 +139,26 @@ class SQSWorkerToDynamoTest
       timestamp = "timestamp"
     )
 
-    val invalidBodyTestMessageJson = JsonUtil.toJson(invalidBodyTestMessage).get
+    val invalidBodyTestMessageJson = toJson(invalidBodyTestMessage).get
 
     sqsClient.sendMessage(queueUrl, invalidBodyTestMessageJson)
 
     Thread.sleep(worker.totalWait.toMillis + 2000)
 
-    terminalFailure shouldBe false
+    worker.terminalFailure shouldBe false
+  }
+
+  it("fails terminally when receiving an exception other than ConditionalCheckFailedException") {
+    val queueUrl = newQueue("purple")
+
+    val terminalFailingWorker = new TerminalFailingTestWorker(queueUrl)
+
+    terminalFailingWorker.runSQSWorker()
+
+    sqsClient.sendMessage(queueUrl, testMessageJson)
+
+    eventually {
+      terminalFailingWorker.terminalFailure shouldBe true
+    }
   }
 }
