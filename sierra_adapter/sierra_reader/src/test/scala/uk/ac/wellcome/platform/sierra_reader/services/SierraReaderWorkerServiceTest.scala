@@ -8,7 +8,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
+import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -20,6 +20,7 @@ import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
@@ -244,7 +245,7 @@ class SierraReaderWorkerServiceTest
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
-      ex shouldBe a[SQSReaderGracefulException]
+      ex shouldBe a[GracefulFailureException]
     }
 
   }
@@ -268,7 +269,7 @@ class SierraReaderWorkerServiceTest
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
 
     whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
-      ex shouldNot be(a[SQSReaderGracefulException])
+      ex shouldNot be(a[GracefulFailureException])
     }
   }
 

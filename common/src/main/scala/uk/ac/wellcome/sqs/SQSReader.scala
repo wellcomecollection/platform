@@ -8,14 +8,12 @@ import com.amazonaws.services.sqs.model.{
 }
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
-
-case class SQSReaderGracefulException(e: Throwable)
-    extends Exception(e.getMessage)
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
@@ -69,7 +67,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
         })
         .flatMap(_ => deleteMessage(message))
         .recover {
-          case e: SQSReaderGracefulException =>
+          case e: GracefulFailureException =>
             warn(s"An error occurred while processing the message $message", e)
             ()
           case e: Throwable =>

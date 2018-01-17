@@ -1,12 +1,12 @@
 package uk.ac.wellcome.transformer.receive
 
 import com.twitter.inject.Logging
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
 import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.transformers.TransformableTransformer
 import uk.ac.wellcome.utils.JsonUtil
@@ -37,7 +37,7 @@ class SQSMessageReceiver(
         triedWork match {
           case Success(Some(work)) => publishMessage(work).map(_ => ())
           case Success(None) => Future.successful()
-          case Failure(SQSReaderGracefulException(e)) =>
+          case Failure(GracefulFailureException(e)) =>
             info("Recoverable failure extracting workfrom record", e)
             Future.successful(PublishAttempt(Left(e)))
           case Failure(e) =>

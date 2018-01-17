@@ -6,9 +6,10 @@ import io.circe.parser.decode
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException, SQSWorker}
+import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.circe._
 import io.circe.generic.auto._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
@@ -27,7 +28,7 @@ class SierraItemsToDynamoWorkerService @Inject()(
       case Left(e) =>
         Future {
           logger.warn(s"Failed processing $message", e)
-          throw SQSReaderGracefulException(e)
+          throw GracefulFailureException(e)
         }
     }
 }

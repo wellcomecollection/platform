@@ -1,7 +1,7 @@
 package uk.ac.wellcome.sierra_adapter.services
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 class WindowExtractorTest extends FunSpec with Matchers {
 
@@ -30,7 +30,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -45,7 +45,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -60,7 +60,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -75,7 +75,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -89,7 +89,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -103,7 +103,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -118,7 +118,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 
   it(
@@ -133,6 +133,6 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[SQSReaderGracefulException]
+      .get shouldBe a[GracefulFailureException]
   }
 }

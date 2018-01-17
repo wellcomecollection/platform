@@ -7,7 +7,7 @@ import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
 import io.circe.parser.parse
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.Try
 
@@ -31,7 +31,7 @@ object WindowExtractor extends Logging {
       .recover {
         case e: Exception =>
           warn(s"Error parsing $jsonString", e)
-          throw SQSReaderGracefulException(e)
+          throw GracefulFailureException(e)
       }
 
   private def extractField(field: String, json: Json) = {

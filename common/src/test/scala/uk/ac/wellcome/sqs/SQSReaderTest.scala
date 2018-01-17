@@ -3,13 +3,13 @@ package uk.ac.wellcome.sqs
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.utils.SQSLocal
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
-
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class SQSReaderTest
@@ -132,7 +132,7 @@ class SQSReaderTest
     val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
       if (message.getBody == failingMessage)
         Future {
-          throw SQSReaderGracefulException(
+          throw GracefulFailureException(
             new RuntimeException(s"$failingMessage is not valid"))
         } else
         Future.successful(message)

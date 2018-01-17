@@ -12,7 +12,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
-import uk.ac.wellcome.sqs.{SQSReader, SQSReaderGracefulException}
+import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.dynamo._
@@ -28,6 +28,7 @@ import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.circe._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.concurrent.duration._
 
@@ -118,7 +119,7 @@ class SierraItemsToDynamoWorkerServiceTest
     val sqsMessage =
       SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
     whenReady(worker.get.processMessage(sqsMessage).failed) { ex =>
-      ex shouldBe a[SQSReaderGracefulException]
+      ex shouldBe a[GracefulFailureException]
     }
 
   }
