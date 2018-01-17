@@ -38,7 +38,8 @@ class WindowManagerTest
     // We pre-populate S3 with files as if they'd come from a prior run of the reader.
     s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
 
-    val record = SierraRecord(id = "b1794165", data = "{}", modifiedDate = Instant.now())
+    val record =
+      SierraRecord(id = "b1794165", data = "{}", modifiedDate = Instant.now())
 
     s3Client.putObject(
       bucketName,
