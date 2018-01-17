@@ -11,7 +11,7 @@ import uk.ac.wellcome.test.utils.{
   JsonTestUtil,
   SQSLocal
 }
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 trait Ingestor
@@ -43,7 +43,7 @@ trait Ingestor
   }
 
   def assertElasticsearchEventuallyHasWork(work: Work) = {
-    val workJson = JsonUtil.toJson(work).get
+    val workJson = toJson(work).get
 
     eventually {
       val hits = elasticClient

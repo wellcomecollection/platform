@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.duration._
@@ -45,7 +45,7 @@ class IngestorWorkerServiceTest
       title = "A monstrous monolith of moss"
     )
 
-    val sqsMessage = messageFromString(JsonUtil.toJson(work).get)
+    val sqsMessage = messageFromString(toJson(work).get)
     service.processMessage(sqsMessage)
 
     eventually {
