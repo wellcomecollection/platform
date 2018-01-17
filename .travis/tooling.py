@@ -137,6 +137,8 @@ def affects_tests(path, task):
     # The top-level common directory contains some Scala files which are
     # shared across multiple projects.  If we're definitely in a project
     # which doesn't use this sbt-common lib, we can ignore changes to it.
+    #
+    # The project directory and build.sbt are also Scala-specific.
     sbt_free_tasks = (
         'loris',
         'monitoring',
@@ -144,7 +146,10 @@ def affects_tests(path, task):
         's3_demultiplexer',
         'sierra_window_generator',
     )
-    if task.startswith(sbt_free_tasks) and path.startswith('common/'):
+    if (
+        task.startswith(sbt_free_tasks) and
+        path.startswith(('common/', 'project/', 'build.sbt'))
+    ):
         print(
             "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
             (path, task))
