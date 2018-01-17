@@ -2,13 +2,13 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
 import uk.ac.wellcome.sierra_adapter.dynamo.SierraTransformableDao
-import uk.ac.wellcome.sqs.SQSReaderGracefulException
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -52,7 +52,7 @@ class SierraItemMergerUpdaterService @Inject()(
           // assume we're too early and put the message back
           case None =>
             Future.failed(
-              SQSReaderGracefulException(
+              GracefulFailureException(
                 new RuntimeException(
                   s"Missing Bib record to unlink: $unlinkedBibId.")
               ))

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraItemRecordMergerTest extends FunSpec with Matchers {
 
@@ -94,7 +94,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
            |  "id": "i111",
            |  "updatedDate": "$modifiedDate",
            |  "comment": "Legacy line of lamentable leopards",
-           |  "bibIds": ${JsonUtil.toJson(bibIds).get}
+           |  "bibIds": ${toJson(bibIds).get}
            |}""".stripMargin,
       bibIds = bibIds,
       unlinkedBibIds = unlinkedBibIds

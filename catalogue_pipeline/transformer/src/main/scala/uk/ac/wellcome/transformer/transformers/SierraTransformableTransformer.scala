@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.transformer.transformers.sierra._
 import uk.ac.wellcome.transformer.source.{SierraBibData, SierraItemData}
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success, Try}
 
@@ -20,8 +20,7 @@ class SierraTransformableTransformer
   private def extractItemData(itemRecord: SierraItemRecord) = {
     info(s"Attempting to transform $itemRecord")
 
-    JsonUtil
-      .fromJson[SierraItemData](itemRecord.data) match {
+    fromJson[SierraItemData](itemRecord.data) match {
       case Success(sierraItemData) =>
         Some(
           Item(
@@ -52,22 +51,23 @@ class SierraTransformableTransformer
       .map { bibData =>
         info(s"Attempting to transform $bibData")
 
-        JsonUtil.fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-          Some(Work(
-            title = getTitle(sierraBibData),
-            publishers = getPublishers(sierraBibData),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.sierraSystemNumber,
-              sierraBibData.id
-            ),
-            identifiers = getIdentifiers(sierraBibData),
-            items = Option(sierraTransformable.itemData)
-              .getOrElse(Map.empty)
-              .values
-              .flatMap(extractItemData)
-              .toList,
-            visible = !(sierraBibData.deleted || sierraBibData.suppressed)
-          ))
+        fromJson[SierraBibData](bibData.data).map { sierraBibData =>
+          Some(
+            Work(
+              title = getTitle(sierraBibData),
+              publishers = getPublishers(sierraBibData),
+              sourceIdentifier = SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                sierraBibData.id
+              ),
+              identifiers = getIdentifiers(sierraBibData),
+              items = Option(sierraTransformable.itemData)
+                .getOrElse(Map.empty)
+                .values
+                .flatMap(extractItemData)
+                .toList,
+              visible = !(sierraBibData.deleted || sierraBibData.suppressed)
+            ))
         }
 
       }

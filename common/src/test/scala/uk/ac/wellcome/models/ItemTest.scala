@@ -1,6 +1,7 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -23,6 +24,8 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "locations": [
       |    {
       |      "locationType": "location",
+      |      "url" : null,
+      |      "credit" : null,
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",
@@ -40,6 +43,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
   val unidentifiedItemJson: String =
     s"""
       |{
+      |  "canonicalId" : null,
       |  "sourceIdentifier": {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "value": "value"
@@ -53,6 +57,8 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "locations": [
       |    {
       |      "locationType": "location",
+      |      "url" : null,
+      |      "credit" : null,
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",

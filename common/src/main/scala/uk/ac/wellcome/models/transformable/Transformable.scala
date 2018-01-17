@@ -4,14 +4,13 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.utils.JsonUtil
 import io.circe.Decoder
 import cats.syntax.functor._
-import io.circe.generic.extras.auto._
+import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable
 object Transformable {
-  import uk.ac.wellcome.circe._
+  import uk.ac.wellcome.utils.JsonUtil._
 
   implicit val decodeEvent: Decoder[Transformable] =
     List[Decoder[Transformable]](
@@ -80,7 +79,7 @@ case class SierraTransformable(
 
 object SierraTransformable {
   def apply(id: String, bibData: String): SierraTransformable = {
-    val bibRecord = JsonUtil.fromJson[SierraBibRecord](bibData).get
+    val bibRecord = fromJson[SierraBibRecord](bibData).get
     SierraTransformable(id = id, maybeBibData = Some(bibRecord))
   }
 
