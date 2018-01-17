@@ -19,7 +19,7 @@ class SierraBibMergerWorkerServiceTest
     with ExtendedPatience {
 
   it(
-    "throws a SQSReaderGracefulException if the message on the queue does not represent a SierraRecord") {
+    "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {
 
     val sqsReader = mock[SQSReader]
     val metricsSender = mock[MetricsSender]

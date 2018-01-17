@@ -1,21 +1,27 @@
 package uk.ac.wellcome.platform.ingestor.test.utils
 
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.ingestor.Server
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   IndexedElasticSearchLocal,
+  JsonTestUtil,
   SQSLocal
 }
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 trait Ingestor
     extends IndexedElasticSearchLocal
     with SQSLocal
     with BeforeAndAfterEach
-    with AmazonCloudWatchFlag { this: Suite =>
+    with AmazonCloudWatchFlag
+    with JsonTestUtil { this: Suite =>
 
-  val ingestorQueueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
+  val queueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
 
   val indexName = "works"
   val itemType = "work"
@@ -25,7 +31,7 @@ trait Ingestor
       new Server(),
       flags = Map(
         "aws.region" -> "eu-west-1",
-        "aws.sqs.queue.url" -> ingestorQueueUrl,
+        "aws.sqs.queue.url" -> queueUrl,
         "aws.sqs.waitTime" -> "1",
         "es.host" -> "localhost",
         "es.port" -> "9200",
@@ -33,6 +39,35 @@ trait Ingestor
         "es.index" -> indexName,
         "es.type" -> itemType
       ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
+    )
+  }
+
+  def assertElasticsearchEventuallyHasWork(work: Work) = {
+    val workJson = toJson(work).get
+
+    eventually {
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
+        .map { _.hits.hits }
+        .await
+
+      hits should have size 1
+
+      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
+    }
+  }
+
+  def createWork(canonicalId: String, sourceId: String, title: String): Work = {
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      sourceId
+    )
+
+    Work(
+      canonicalId = Some(canonicalId),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      title = title
     )
   }
 }
