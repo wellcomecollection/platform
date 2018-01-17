@@ -1,31 +1,50 @@
 package uk.ac.wellcome.utils
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import java.time.Instant
+
+import cats.syntax.either._
+import io.circe.generic.extras.{AutoDerivation, Configuration}
+import io.circe.parser.decode
+import io.circe.syntax._
+import io.circe.{Decoder, Encoder, HCursor, Json}
 
 import scala.util.Try
 
-object JsonUtil {
-  val mapper = new ObjectMapper() with ScalaObjectMapper
+object JsonUtil extends AutoDerivation {
 
-  mapper.registerModule(DefaultScalaModule)
-  mapper.registerModule(new JavaTimeModule())
-  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
+    final def apply(c: HCursor): Decoder.Result[Instant] = {
+      List(
+        c.as[Long],
+        c.as[Double].map(_.toLong)
+      ).filter(_.isRight)
+        .head
+        .map(i => Instant.ofEpochSecond(i))
+    }
+  }
 
-  // This serialisation option means that if the value would be an empty list
-  // or null, we don't include it in the JSON body.  This is a desirable
-  // feature in the API outputs.
-  mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+  implicit val encodeInstant: Encoder[Instant] = new Encoder[Instant] {
+    override def apply(value: Instant): Json =
+      Json.fromInt(value.getEpochSecond.toInt)
+  }
 
-  def toJson(value: Any): Try[String] =
-    Try(mapper.writeValueAsString(value))
+  implicit val customConfig: Configuration =
+    Configuration.default.withDefaults
+      .withDiscriminator("type")
+      .copy(transformMemberNames = {
+        case "ontologyType" => "type"
+        case other => other
+      })
 
-  def toMap[V](json: String)(implicit m: Manifest[V]) =
-    fromJson[Map[String, V]](json)
+  def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
+    Try(value.asJson.noSpaces)
+  }
 
-  def fromJson[T](json: String)(implicit m: Manifest[T]): Try[T] =
-    Try(mapper.readValue[T](json))
+  def toMap[T](json: String)(
+    implicit decoder: Decoder[T]): Try[Map[String, T]] =
+    fromJson[Map[String, T]](json)
+
+  def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] = {
+    decode[T](json).toTry
+  }
 }

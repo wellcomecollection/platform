@@ -8,4 +8,6 @@ trait Identifiable {
   def id: String = canonicalId.getOrElse(
     throw UnidentifiableException()
   )
+  val sourceIdentifier: SourceIdentifier
+  val ontologyType: String
 }

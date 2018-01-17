@@ -54,8 +54,7 @@ object Dependencies {
   )
 
   val jacksonDependencies = Seq(
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test",
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % versions.jacksonJSR310Version
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test"
   )
 
   val commonDependencies: Seq[ModuleID] = Seq(

@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.sierra_item_merger.utils
 import org.scalatest.Suite
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
 
@@ -21,7 +21,7 @@ trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
        |  "id": "$id",
        |  "updatedDate": "$updatedDate",
        |  "deleted": false,
-       |  "bibIds": ${JsonUtil.toJson(bibIds).get},
+       |  "bibIds": ${toJson(bibIds).get},
        |  "fixedFields": {
        |    "85": {
        |      "label": "REVISIONS",
@@ -65,7 +65,7 @@ trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
     )
 
   protected def sendItemRecordToSQS(record: SierraItemRecord) = {
-    val messageBody = JsonUtil.toJson(record).get
+    val messageBody = toJson(record).get
 
     val message = SQSMessage(
       subject = None,
@@ -74,6 +74,6 @@ trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
       messageType = "messageType",
       timestamp = "2001-01-01T01:01:01Z"
     )
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(message).get)
+    sqsClient.sendMessage(queueUrl, toJson(message).get)
   }
 }

@@ -1,11 +1,11 @@
 package uk.ac.wellcome.models.aws
 
-import com.fasterxml.jackson.annotation._
+import io.circe.generic.extras.JsonKey
 
 case class SQSMessage(
-  @JsonProperty("Subject") subject: Option[String],
-  @JsonProperty("Message") body: String,
-  @JsonProperty("TopicArn") topic: String,
-  @JsonProperty("Type") messageType: String,
-  @JsonProperty("Timestamp") timestamp: String
+  @JsonKey("Subject") subject: Option[String],
+  @JsonKey("Message") body: String,
+  @JsonKey("TopicArn") topic: String,
+  @JsonKey("Type") messageType: String,
+  @JsonKey("Timestamp") timestamp: String
 )

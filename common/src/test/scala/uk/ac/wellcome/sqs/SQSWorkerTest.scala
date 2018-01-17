@@ -10,7 +10,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.test.utils.SQSLocal
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -63,7 +63,7 @@ class SQSWorkerTest
       timestamp = "timestamp"
     )
 
-    val testMessageJson = JsonUtil.toJson(testMessage).get
+    val testMessageJson = toJson(testMessage).get
 
     sqsClient.sendMessage(queueUrl, testMessageJson)
 

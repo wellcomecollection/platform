@@ -1,6 +1,7 @@
 package uk.ac.wellcome.transformer
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.transformable.MiroTransformable

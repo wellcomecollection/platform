@@ -27,3 +27,15 @@ data "aws_iam_policy_document" "read_from_windows_q" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}

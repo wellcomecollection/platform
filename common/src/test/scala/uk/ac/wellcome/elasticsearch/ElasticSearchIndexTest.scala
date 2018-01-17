@@ -2,14 +2,14 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.mappings.PutMappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.{Assertion, BeforeAndAfterEach, FunSpec, Matchers}
+import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil
 
 case class TestObject(
   id: String,
