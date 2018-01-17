@@ -22,7 +22,8 @@ class IngestorWorkerService @Inject()(
 
   override def processMessage(message: SQSMessage): Future[Unit] = Future {
     fromJson[Work](message.body) match {
-      case Success(work) => identifiedWorkIndexer.indexWork(work = work).map(_ => ())
+      case Success(work) =>
+        identifiedWorkIndexer.indexWork(work = work).map(_ => ())
       case Failure(err) => throw GracefulFailureException(err)
     }
   }
