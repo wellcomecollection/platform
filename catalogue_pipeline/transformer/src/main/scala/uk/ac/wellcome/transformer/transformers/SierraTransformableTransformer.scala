@@ -13,6 +13,7 @@ import scala.util.{Failure, Success, Try}
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
+    with SierraDescription
     with SierraPublishers
     with SierraTitle
     with Logging {
@@ -60,6 +61,7 @@ class SierraTransformableTransformer
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
                 sierraBibData.id
               ),
+              description = getDescription(sierraBibData),
               identifiers = getIdentifiers(sierraBibData),
               items = Option(sierraTransformable.itemData)
                 .getOrElse(Map.empty)
