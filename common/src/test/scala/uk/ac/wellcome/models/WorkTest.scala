@@ -198,11 +198,11 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     locations = List(location)
   )
 
-  val publisher = Agent(
-    label = "MIT Press",
-    ontologyType = "Organisation"
+  val publisher = Organisation(
+    label = "MIT Press"
   )
 
+  val publishers = List(publisher)
   val unidentifiedWork = Work(
     sourceIdentifier = identifier,
     identifiers = List(identifier),
@@ -215,7 +215,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
-    publishers = List(publisher)
+    publishers = publishers
   )
 
   val identifiedWork = Work(
@@ -231,13 +231,14 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     genres = unidentifiedWork.genres,
     thumbnail = unidentifiedWork.thumbnail,
     items = unidentifiedWork.items,
-    publishers = List(publisher)
+    publishers = publishers
   )
 
   it("should serialise an unidentified Work as JSON") {
     val result = toJson(unidentifiedWork)
 
     result.isSuccess shouldBe true
+
     assertJsonStringsAreEqual(result.get, unidentifiedWorkJson)
   }
 
@@ -250,8 +251,6 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   it("should serialise an identified Item as Work") {
     val result = toJson(identifiedWork)
-
-    print(result)
 
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, identifiedWorkJson)

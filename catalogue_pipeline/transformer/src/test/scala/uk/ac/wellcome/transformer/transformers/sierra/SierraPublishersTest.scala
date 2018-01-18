@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.Agent
+import uk.ac.wellcome.models.{Agent, Organisation}
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
   SierraBibData,
@@ -168,7 +168,7 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
     )
 
     val expectedPublishers = expectedPublisherNames.map { name =>
-      Agent(label = name, ontologyType = "Organisation")
+      Organisation(label = name)
     }
 
     transformer.getPublishers(bibData = bibData) shouldBe expectedPublishers
