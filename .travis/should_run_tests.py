@@ -16,10 +16,17 @@ def should_run_tests(task, travis_event_type):
         print('*** We always run tests in cron!')
         return True
 
+    subprocess.check_call(['git', 'fetch', 'origin'])
+
     assert travis_event_type in ('pull_request', 'push')
 
+    if travis_event_type == 'pull_request':
+        changed_files = changed_files('HEAD', 'master')
+    else:
+        changed_files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
+
     return make_decision(
-        changed_files=changed_files('HEAD', 'master'),
+        changed_files=changed_files,
         task=task,
         action='run tests'
     )
