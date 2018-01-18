@@ -198,9 +198,8 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     locations = List(location)
   )
 
-  val publisher = Agent(
-    label = "MIT Press",
-    ontologyType = "Organisation"
+  val publisher = Organisation(
+    label = "MIT Press"
   )
 
   val unidentifiedWork = Work(
