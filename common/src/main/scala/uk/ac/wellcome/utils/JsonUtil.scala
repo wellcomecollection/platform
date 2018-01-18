@@ -1,34 +1,17 @@
 package uk.ac.wellcome.utils
 
-import java.time.Instant
-
 import cats.syntax.either._
 import com.twitter.inject.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
+import io.circe.java8.time.TimeInstances
 import io.circe.parser.decode
 import io.circe.syntax._
-import io.circe.{Decoder, Encoder, HCursor, Json}
+import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.Try
 
-object JsonUtil extends AutoDerivation with Logging {
-
-  implicit val decodeInstant: Decoder[Instant] = new Decoder[Instant] {
-    final def apply(c: HCursor): Decoder.Result[Instant] = {
-      List(
-        c.as[Long],
-        c.as[Double].map(_.toLong)
-      ).filter(_.isRight)
-        .head
-        .map(i => Instant.ofEpochSecond(i))
-    }
-  }
-
-  implicit val encodeInstant: Encoder[Instant] = new Encoder[Instant] {
-    override def apply(value: Instant): Json =
-      Json.fromInt(value.getEpochSecond.toInt)
-  }
+object JsonUtil extends AutoDerivation with TimeInstances with Logging {
 
   implicit val customConfig: Configuration =
     Configuration.default.withDefaults

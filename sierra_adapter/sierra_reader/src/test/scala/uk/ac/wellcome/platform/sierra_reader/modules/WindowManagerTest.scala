@@ -1,10 +1,14 @@
 package uk.ac.wellcome.platform.sierra_reader.modules
 
+import java.time.Instant
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local}
+import uk.ac.wellcome.utils.JsonUtil._
 
 class WindowManagerTest
     extends FunSpec
@@ -33,18 +37,14 @@ class WindowManagerTest
 
     // We pre-populate S3 with files as if they'd come from a prior run of the reader.
     s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
+
+    val record =
+      SierraRecord(id = "b1794165", data = "{}", modifiedDate = Instant.now())
+
     s3Client.putObject(
       bucketName,
       s"$prefix/0001.json",
-      """
-        |[
-        |  {
-        |    "id": "b1794165",
-        |    "modifiedDate": 12345678,
-        |    "data": "{}"
-        |  }
-        |]
-      """.stripMargin
+      toJson(List(record)).get
     )
 
     val result = windowManager.getCurrentStatus("[2013,2014]")
