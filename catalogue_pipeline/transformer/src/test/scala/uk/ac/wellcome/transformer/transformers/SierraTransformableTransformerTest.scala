@@ -146,13 +146,14 @@ class SierraTransformableTransformerTest
 
     val identifier =
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
-    
+
     transformedSierraRecord.get shouldBe Some(
       Work(
         title = title,
         sourceIdentifier = identifier,
         identifiers = List(identifier),
-        publishers = List(Agent(label = "Peaceful Poetry", ontologyType = "Organisation")),
+        publishers = List(
+          Agent(label = "Peaceful Poetry", ontologyType = "Organisation")),
         description = Some("A delightful description of a dead daisy.")
       )
     )

@@ -3,11 +3,16 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{Agent, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.test.utils.SierraData
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraDescriptionTest extends FunSpec with Matchers with SierraData {
 
-  it("extracts a work description where MARC field 520 with subfield a is populated") {
+  it(
+    "extracts a work description where MARC field 520 with subfield a is populated") {
     val description = "A panolopy of penguins perching on a python."
 
     assertFindsCorrectDescription(
@@ -71,7 +76,8 @@ class SierraDescriptionTest extends FunSpec with Matchers with SierraData {
     )
   }
 
-  it("extracts a work description where MARC field 520 with subfield a and b are populated") {
+  it(
+    "extracts a work description where MARC field 520 with subfield a and b are populated") {
     val description = "A panolopy of penguins perching on a python."
     val summaryDescription = "A fracas of frolicking frogs on futons."
 

@@ -4,7 +4,6 @@ import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
 
 trait SierraDescription {
 
-
   def getSubfields(
     bibData: SierraBibData,
     marcTag: String,
@@ -23,7 +22,6 @@ trait SierraDescription {
     })
   }
 
-
   // Populate wwork:description.
   //
   // We use MARC field "520"
@@ -40,15 +38,14 @@ trait SierraDescription {
     getSubfields(bibData, "520", List("a", "b"))
       .foldLeft[List[String]](Nil)((acc, subfields) => {
 
-      (subfields.get("a"), subfields.get("b")) match {
-        case (Some(a), Some(b)) => acc :+ s"${a.content} ${b.content}"
-        case (Some(a), None) => acc :+ a.content
-        case (None, None) => acc
-      }
-    }) match {
+        (subfields.get("a"), subfields.get("b")) match {
+          case (Some(a), Some(b)) => acc :+ s"${a.content} ${b.content}"
+          case (Some(a), None) => acc :+ a.content
+          case (None, None) => acc
+        }
+      }) match {
       case Nil => None
       case list => Some(list.mkString(" "))
     }
   }
 }
-
