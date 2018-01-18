@@ -18,7 +18,7 @@ case class Work(title: String,
                 genres: List[Concept] = Nil,
                 thumbnail: Option[Location] = None,
                 items: List[Item] = Nil,
-                publishers: List[Agent] = Nil,
+                publishers: List[AbstractAgent] = Nil,
                 visible: Boolean = true,
                 @JsonProperty("type") ontologyType: String = "Work")
     extends Identifiable
