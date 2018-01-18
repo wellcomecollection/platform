@@ -15,28 +15,27 @@ from wellcome_lambda_utils.sns_utils import publish_sns_message
 
 
 def get_service_name(reindexers, table_name):
-    table_service_dict = dict([line.split("=")
-                               for line in reindexers.splitlines()])
+    table_service_dict = dict(
+        [line.split("=") for line in reindexers.splitlines()])
     return table_service_dict[table_name]
 
 
-def _determine_count_and_capacity(record, desired_capacity):
+def _determine_desired_count(record):
     current_version = record.new_image["CurrentVersion"]["N"]
     requested_version = record.new_image["RequestedVersion"]["N"]
 
     if current_version == requested_version:
-        desired_count = 0
-        desired_capacity = 1
+        return 0
     else:
-        desired_count = 1
-
-    return {
-        "count": desired_count,
-        "capacity": desired_capacity
-    }
+        return 1
 
 
-def _request_task_run(sns_client, scheduler_topic_arn, cluster_name, service, desired_count):
+def _request_task_run(
+        sns_client,
+        scheduler_topic_arn,
+        cluster_name,
+        service,
+        desired_count):
     message = {
         'cluster': cluster_name,
         'service': service,
@@ -46,48 +45,37 @@ def _request_task_run(sns_client, scheduler_topic_arn, cluster_name, service, de
     print(f'message = {message!r}')
     print(f'scheduler_topic_arn = {scheduler_topic_arn!r}')
 
-    publish_sns_message(sns_client=sns_client, topic_arn=scheduler_topic_arn, message=message)
-
-
-def _request_dynamo_provision(sns_client, dynamo_topic_arn, dynamo_table_name, desired_capacity):
-    message = {
-        'dynamo_table_name': dynamo_table_name,
-        'desired_capacity': desired_capacity
-    }
-
-    print(f'message = {message!r}')
-    print(f'dynamo_topic_arn = {dynamo_topic_arn!r}')
-
-    publish_sns_message(sns_client=sns_client, topic_arn=dynamo_topic_arn, message=message)
+    publish_sns_message(
+        sns_client=sns_client,
+        topic_arn=scheduler_topic_arn,
+        message=message
+    )
 
 
 def main(event, _):
     print(f'event = {event!r}')
 
-    sns_client = boto3.client('sns')
+    scheduler_topic_arn = os.environ['SCHEDULER_TOPIC_ARN']
+    cluster_name = os.environ['CLUSTER_NAME']
+    reindexers = os.environ['REINDEXERS']
 
-    desired_capacity = int(os.environ["DYNAMO_DESIRED_CAPACITY"])
+    sns_client = boto3.client('sns')
 
     for record in DynamoImageFactory.create(event):
         table_name = record.new_image["TableName"]["S"]
-
-        desired = _determine_count_and_capacity(record, desired_capacity)
-
-        print(f"Count and capacity required: {desired}")
-
-        _request_task_run(
-            sns_client,
-            os.environ["SCHEDULER_TOPIC_ARN"],
-            os.environ["CLUSTER_NAME"],
-            get_service_name(os.environ["REINDEXERS"], table_name),
-            desired["count"]
+        service = get_service_name(
+            reindexers=reindexers,
+            table_name=table_name
         )
 
-        _request_dynamo_provision(
-            sns_client,
-            os.environ["DYNAMO_TOPIC_ARN"],
-            os.environ["DYNAMO_TABLE_NAME"],
-            desired["capacity"]
+        desired_count = _determine_desired_count(record=record)
+
+        _request_task_run(
+            sns_client=sns_client,
+            scheduler_topic_arn=scheduler_topic_arn,
+            cluster_name=cluster_name,
+            service=service,
+            desired_count=desired_count
         )
 
         print("Done.")

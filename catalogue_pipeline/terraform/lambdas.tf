@@ -5,12 +5,10 @@ module "lambda_schedule_reindexer" {
   description = "Schedules the reindexer based on the ReindexerTracker table"
 
   environment_variables = {
-    SCHEDULER_TOPIC_ARN     = "${local.service_scheduler_topic_arn}"
-    DYNAMO_TABLE_NAME       = "${aws_dynamodb_table.miro_table.name}"
-    DYNAMO_TOPIC_ARN        = "${local.dynamo_capacity_topic_arn}"
-    DYNAMO_DESIRED_CAPACITY = "125"
-    CLUSTER_NAME            = "${aws_ecs_cluster.services.name}"
-    REINDEXERS              = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
+    SCHEDULER_TOPIC_ARN = "${local.service_scheduler_topic_arn}"
+    DYNAMO_TABLE_NAME   = "${aws_dynamodb_table.miro_table.name}"
+    CLUSTER_NAME        = "${aws_ecs_cluster.services.name}"
+    REINDEXERS          = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"

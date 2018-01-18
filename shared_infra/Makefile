@@ -10,7 +10,6 @@ LAMBDAS     = drain_ecs_container_instance \
               ecs_ec2_instance_tagger \
               run_ecs_task \
               service_scheduler \
-              update_dynamo_capacity \
               update_ecs_service_size
 
 TF_NAME     = shared_infra
@@ -25,7 +24,6 @@ shared_infra-test:	drain_ecs_container_instance-test \
 					ecs_ec2_instance_tagger-test \
 					run_ecs_task-test \
 					service_scheduler-test \
-					update_dynamo_capacity-test \
 					update_ecs_service_size-test
 
 shared_infra-publish:	drain_ecs_container_instance-publish \
@@ -33,7 +31,6 @@ shared_infra-publish:	drain_ecs_container_instance-publish \
 						ecs_ec2_instance_tagger-publish \
 						run_ecs_task-publish \
 						service_scheduler-publish \
-						update_dynamo_capacity-publish \
 						update_ecs_service_size-publish \
 						sqs_freezeray-publish	\
 						sqs_redrive-publish
