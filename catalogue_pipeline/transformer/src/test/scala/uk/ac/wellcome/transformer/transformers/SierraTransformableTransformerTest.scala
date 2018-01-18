@@ -152,8 +152,7 @@ class SierraTransformableTransformerTest
         title = title,
         sourceIdentifier = identifier,
         identifiers = List(identifier),
-        publishers = List(
-          Agent(label = "Peaceful Poetry", ontologyType = "Organisation")),
+        publishers = List(Organisation(label = "Peaceful Poetry")),
         description = Some("A delightful description of a dead daisy.")
       )
     )
