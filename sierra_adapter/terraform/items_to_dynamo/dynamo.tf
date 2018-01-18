@@ -21,50 +21,18 @@ resource "aws_dynamodb_table" "sierra_table" {
   }
 }
 
-resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
-  max_capacity       = 100
-  min_capacity       = 1
-  resource_id        = "table/${aws_dynamodb_table.sierra_table.name}"
-  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
-  service_namespace  = "dynamodb"
-}
+module "sierradata_dynamo_autoscaling" {
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=dynamodb-autoscaling"
 
-resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
-  name               = "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.dynamodb_table_read_target.resource_id}"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = "${aws_appautoscaling_target.dynamodb_table_read_target.resource_id}"
-  scalable_dimension = "${aws_appautoscaling_target.dynamodb_table_read_target.scalable_dimension}"
-  service_namespace  = "${aws_appautoscaling_target.dynamodb_table_read_target.service_namespace}"
+  table_name = "${aws_dynamodb_table.sierra_table.name}"
 
-  target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBReadCapacityUtilization"
-    }
+  enable_read_scaling     = true
+  read_target_utilization = 70
+  read_min_capacity       = 1
+  read_max_capacity       = 100
 
-    target_value = 70
-  }
-}
-
-resource "aws_appautoscaling_target" "dynamodb_table_write_target" {
-  max_capacity       = 100
-  min_capacity       = 1
-  resource_id        = "table/${aws_dynamodb_table.sierra_table.name}"
-  scalable_dimension = "dynamodb:table:WriteCapacityUnits"
-  service_namespace  = "dynamodb"
-}
-
-resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
-  name               = "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.dynamodb_table_write_target.resource_id}"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = "${aws_appautoscaling_target.dynamodb_table_write_target.resource_id}"
-  scalable_dimension = "${aws_appautoscaling_target.dynamodb_table_write_target.scalable_dimension}"
-  service_namespace  = "${aws_appautoscaling_target.dynamodb_table_write_target.service_namespace}"
-
-  target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBWriteCapacityUtilization"
-    }
-
-    target_value = 70
-  }
+  enable_write_scaling     = true
+  write_target_utilization = 70
+  write_min_capacity       = 1
+  write_max_capacity       = 100
 }
