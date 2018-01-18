@@ -32,15 +32,6 @@ module "service_scheduler" {
   lambda_error_alarm_arn                 = "${module.lambda_error_alarm.arn}"
 }
 
-module "update_dynamo_capacity" {
-  source = "update_dynamo_capacity"
-
-  dynamo_capacity_topic_arn = "${module.dynamo_capacity_topic.arn}"
-  ec2_terminating_topic_arn = "${module.ec2_terminating_topic.arn}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-}
-
 module "update_ecs_service_size" {
   source = "update_ecs_service_size"
 
