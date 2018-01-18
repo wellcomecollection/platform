@@ -25,7 +25,12 @@ def _aws_credentials_args():
     with the running container.
     """
     # THE AWS_PROFILE environment allows you to run operations in a
-    # non-default profile.  For details:
+    # non-default profile.  If you have multiple profiles in your ~/.aws
+    # config, use this variable to choose a non-default profile.  For example:
+    #
+    #   AWS_PROFILE=platform ./docker_run.py --aws -- ...
+    #
+    # For details:
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html
     try:
         cmd = ['--env', 'AWS_PROFILE=%s' % os.environ['AWS_PROFILE']]
