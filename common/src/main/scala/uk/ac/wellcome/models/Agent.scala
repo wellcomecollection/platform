@@ -7,11 +7,11 @@ sealed trait AbstractAgent {
   @JsonProperty("type") val ontologyType: String
 }
 
-case class Agent(
-                  label:String,
-                  @JsonProperty("type") ontologyType: String = "Agent") extends AbstractAgent
+case class Agent(label: String,
+                 @JsonProperty("type") ontologyType: String = "Agent")
+    extends AbstractAgent
 
-case class Organisation (
-                          label: String,
-                          @JsonProperty("type") ontologyType: String = "Organisation"
-                        ) extends AbstractAgent
+case class Organisation(
+  label: String,
+  @JsonProperty("type") ontologyType: String = "Organisation"
+) extends AbstractAgent

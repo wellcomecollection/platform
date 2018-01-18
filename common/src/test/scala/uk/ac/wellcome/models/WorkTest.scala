@@ -252,7 +252,6 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   it("should serialise an identified Item as Work") {
     val result = toJson(identifiedWork)
 
-
     result.isSuccess shouldBe true
     assertJsonStringsAreEqual(result.get, identifiedWorkJson)
   }

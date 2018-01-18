@@ -152,8 +152,7 @@ class SierraTransformableTransformerTest
         title = title,
         sourceIdentifier = identifier,
         identifiers = List(identifier),
-        publishers = List(
-          Organisation(label = "Peaceful Poetry")),
+        publishers = List(Organisation(label = "Peaceful Poetry")),
         description = Some("A delightful description of a dead daisy.")
       )
     )
