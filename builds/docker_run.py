@@ -15,6 +15,7 @@ Arguments after the two flags are passed directly to ``docker run``.
 import argparse
 import os
 import subprocess
+import sys
 
 from tooling import ROOT
 
@@ -99,4 +100,7 @@ if __name__ == '__main__':
         additional_args = additional_args[1:]
     cmd += additional_args
 
-    subprocess.check_call(cmd)
+    print('*** Running %r' % ' '.join(cmd))
+    rc = subprocess.call(cmd)
+    if rc != 0:
+        sys.exit(rc)
