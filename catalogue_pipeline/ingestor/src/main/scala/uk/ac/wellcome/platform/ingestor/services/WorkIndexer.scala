@@ -41,16 +41,15 @@ class WorkIndexer @Inject()(
         val workToIndex = if (work.visible) {
           work
         } else {
-            val stubWork = Work(
-              canonicalId = work.canonicalId,
-              sourceIdentifier = work.sourceIdentifier,
-              identifiers = work.identifiers,
-              title = "This work has been deleted",
-              visible = false
-            )
-            info(s"Replacing work with stub record $stubWork")
-            stubWork
-          }
+          val stubWork = Work(
+            canonicalId = work.canonicalId,
+            sourceIdentifier = work.sourceIdentifier,
+            identifiers = work.identifiers,
+            title = "This work has been deleted",
+            visible = false
+          )
+          info(s"Replacing work with stub record $stubWork")
+          stubWork
         }
 
         elasticClient.execute {
