@@ -24,18 +24,33 @@ def _aws_credentials_args():
     Returns the arguments to add to ``docker run`` for sharing AWS credentials
     with the running container.
     """
+    # THE AWS_PROFILE environment allows you to run operations in a
+    # non-default profile.  If you have multiple profiles in your ~/.aws
+    # config, use this variable to choose a non-default profile.  For example:
+    #
+    #   AWS_PROFILE=platform ./docker_run.py --aws -- ...
+    #
+    # For details:
+    # https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html
+    try:
+        cmd = ['--env', 'AWS_PROFILE=%s' % os.environ['AWS_PROFILE']]
+    except KeyError:
+        cmd = []
+
     if 'AWS_ACCESS_KEY_ID' in os.environ:
         print('*** Trying environment variables for AWS config...')
-        return [
+        cmd.extend([
             '--env', 'AWS_ACCESS_KEY_ID=%s' % os.environ.get('AWS_ACCESS_KEY_ID', ''),
             '--env', 'AWS_SECRET_ACCESS_KEY=%s' % os.environ.get('AWS_SECRET_ACCESS_KEY', ''),
             '--env', 'AWS_REGION=%s' % os.environ.get('AWS_REGION', ''),
             '--env', 'AWS_DEFAULT_REGION=%s' % os.environ.get('AWS_DEFAULT_REGION', ''),
-        ]
+        ])
     else:
         print('*** Missing environment variable, using ~/.aws')
         aws_path = os.path.join(os.environ['HOME'], '.aws')
-        return ['--volume', '%s:/root/.aws' % aws_path]
+        cmd.extend(['--volume', '%s:/root/.aws' % aws_path])
+
+    return cmd
 
 
 def parse_args():
