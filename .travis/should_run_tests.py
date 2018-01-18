@@ -12,11 +12,11 @@ def should_run_tests(task, travis_event_type):
     We skip doing the publish/deploy step when running a build on master that
     doesn't have any relevant changes since the last deploy.
     """
-    if travis_event_type == 'push':
-        print('*** We always run tests on master!')
+    if travis_event_type == 'cron':
+        print('*** We always run tests in cron!')
         return True
 
-    assert travis_event_type == 'pull_request'
+    assert travis_event_type in ('pull_request', 'push')
 
     return make_decision(
         changed_files=changed_files('HEAD', 'master'),
