@@ -19,14 +19,15 @@ def should_run_tests(task, travis_event_type):
     assert travis_event_type in ('pull_request', 'push')
 
     if travis_event_type == 'pull_request':
-        changed_files = changed_files('HEAD', 'master')
+        files = changed_files('HEAD', 'master')
     else:
+        import os
         import subprocess
         subprocess.check_call(['git', 'fetch', 'origin'])
-        changed_files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
+        files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
 
     return make_decision(
-        changed_files=changed_files,
+        changed_files=files,
         task=task,
         action='run tests'
     )
