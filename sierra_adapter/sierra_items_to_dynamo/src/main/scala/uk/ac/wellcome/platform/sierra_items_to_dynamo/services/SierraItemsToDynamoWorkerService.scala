@@ -2,28 +2,27 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
+import io.circe.Decoder
+import uk.ac.wellcome.sqs.SQSWorkerToDynamo
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
-import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.GlobalExecutionContext._
-import uk.ac.wellcome.utils.JsonUtil
+
+import io.circe.generic.extras.semiauto._
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class SierraItemsToDynamoWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
   dynamoInserter: DynamoInserter
-) extends SQSWorker(reader, system, metrics) {
+) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics) {
 
-  def processMessage(message: SQSMessage): Future[Unit] =
-    Future.fromTry(JsonUtil.fromJson[SierraRecord](message.body)).map {
-      record =>
-        dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
-    }
+  override implicit val decoder = deriveDecoder[SierraRecord]
+
+  override def store(record: SierraRecord): Future[Unit] =
+    dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
 }

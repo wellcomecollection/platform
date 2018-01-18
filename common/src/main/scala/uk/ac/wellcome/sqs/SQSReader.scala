@@ -11,7 +11,6 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
 import scala.collection.JavaConversions._
 import scala.concurrent.{Future, blocking}
 
