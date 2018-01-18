@@ -7,6 +7,9 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.test.utils.SierraData
+import uk.ac.wellcome.transformer.source.{MarcSubfield, VarField}
+
+import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraTransformableTransformerTest
     extends FunSpec
@@ -91,15 +94,45 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.get shouldBe None
   }
 
-  it("should transform itself into a work") {
+  it("performs a transformation on a work using all varfields") {
     val id = "000"
     val title = "Hi Diddle Dee Dee"
+
+    val publisherFields = List(
+      VarField(
+        fieldTag = "p",
+        marcTag = "260",
+        indicator1 = " ",
+        indicator2 = " ",
+        subfields = List(
+          MarcSubfield(tag = "b", content = "Peaceful Poetry")
+        )
+      )
+    )
+
+    val descriptionFields = List(
+      VarField(
+        fieldTag = "?",
+        marcTag = "520",
+        indicator1 = " ",
+        indicator2 = " ",
+        subfields = List(
+          MarcSubfield(
+            tag = "a",
+            content = "A delightful description of a dead daisy."
+          )
+        )
+      )
+    )
+
+    val marcFields = publisherFields ++ descriptionFields
+
     val data =
       s"""
          |{
          | "id": "$id",
          | "title": "$title",
-         | "varFields": []
+         | "varFields": ${toJson(marcFields).get}
          |}
         """.stripMargin
 
@@ -118,7 +151,10 @@ class SierraTransformableTransformerTest
       Work(
         title = title,
         sourceIdentifier = identifier,
-        identifiers = List(identifier)
+        identifiers = List(identifier),
+        publishers = List(
+          Agent(label = "Peaceful Poetry", ontologyType = "Organisation")),
+        description = Some("A delightful description of a dead daisy.")
       )
     )
   }

@@ -27,14 +27,14 @@ trait SierraPublishers {
     val matchingFields = bibData.varFields
       .filter { _.marcTag.contains("260") }
 
-    val publisherFields = if (!matchingFields.isEmpty) {
+    val publisherFields = if (matchingFields.nonEmpty) {
       matchingFields
     } else {
       bibData.varFields
         .filter { _.marcTag.contains("264") }
     }
 
-    val matchingSubfields = publisherFields.flatMap { _.subfields }.flatten
+    val matchingSubfields = publisherFields.flatMap(_.subfields)
 
     matchingSubfields
       .filter { _.tag == "b" }
