@@ -8,6 +8,9 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
+
+import io.circe.generic.extras.semiauto._
 
 import scala.concurrent.Future
 
@@ -18,7 +21,7 @@ class SierraItemMergerWorkerService @Inject()(
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
 ) extends SQSWorkerToDynamo[SierraItemRecord](reader, system, metrics) {
 
-  override implicit val decoder = Decoder[SierraItemRecord]
+  override implicit val decoder = deriveDecoder[SierraItemRecord]
 
   override def store(record: SierraItemRecord): Future[Unit] =
     sierraItemMergerUpdaterService.update(record)

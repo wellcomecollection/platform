@@ -10,6 +10,8 @@ import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
+import io.circe.generic.extras.semiauto._
+
 import scala.concurrent.Future
 
 class SierraItemsToDynamoWorkerService @Inject()(
@@ -19,7 +21,7 @@ class SierraItemsToDynamoWorkerService @Inject()(
   dynamoInserter: DynamoInserter
 ) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics) {
 
-  override implicit val decoder = Decoder[SierraRecord]
+  override implicit val decoder = deriveDecoder[SierraRecord]
 
   override def store(record: SierraRecord): Future[Unit] =
     dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
