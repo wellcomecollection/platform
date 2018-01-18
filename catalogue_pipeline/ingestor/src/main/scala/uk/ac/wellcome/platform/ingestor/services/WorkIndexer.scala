@@ -52,13 +52,15 @@ class WorkIndexer @Inject()(
           stubWork
         }
 
-        elasticClient.execute {
-          indexInto(esIndex / esType).id(workToIndex.id).doc(workToIndex)
-        }.recover {
-          case e: Throwable =>
-            error(s"Error indexing work $work into Elasticsearch", e)
-            throw e
-        }
+        elasticClient
+          .execute {
+            indexInto(esIndex / esType).id(workToIndex.id).doc(workToIndex)
+          }
+          .recover {
+            case e: Throwable =>
+              error(s"Error indexing work $work into Elasticsearch", e)
+              throw e
+          }
       }
     )
   }
