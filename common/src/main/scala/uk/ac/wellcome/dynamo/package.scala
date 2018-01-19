@@ -6,9 +6,9 @@ import com.gu.scanamo.DynamoFormat
 
 package object dynamo {
   implicit val instantLongFormat =
-    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
-      Instant.ofEpochSecond
+    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](
+      Instant.parse
     )(
-      _.getEpochSecond
+      _.toString
     )
 }
