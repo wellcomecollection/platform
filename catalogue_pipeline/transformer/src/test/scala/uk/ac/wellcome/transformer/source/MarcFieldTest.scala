@@ -4,10 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class MarcFieldTest
-    extends FunSpec
-    with Matchers
-    with JsonTestUtil {
+class MarcFieldTest extends FunSpec with Matchers with JsonTestUtil {
 
   it("converts a long-form VarField to JSON") {
     val varField = VarField(
