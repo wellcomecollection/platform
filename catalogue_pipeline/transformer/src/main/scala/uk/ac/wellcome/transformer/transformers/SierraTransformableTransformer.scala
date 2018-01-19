@@ -38,7 +38,6 @@ class SierraTransformableTransformer
           ))
       case Failure(e) => {
         error(s"Failed to parse item!", e)
-
         None
       }
     }
@@ -74,6 +73,9 @@ class SierraTransformableTransformer
       // A merged record can have both bibs and items.  If we only have
       // the item data so far, we don't have enough to build a Work, so we
       // return None.
-      .getOrElse(Success(None))
+      .getOrElse {
+        info("No bib data on the record, so skipping")
+        Success(None)
+      }
   }
 }
