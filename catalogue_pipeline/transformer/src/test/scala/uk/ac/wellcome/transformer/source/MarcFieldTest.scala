@@ -20,6 +20,7 @@ class MarcFieldTest extends FunSpec with Matchers with JsonTestUtil {
       s"""{
         "fieldTag": "${varField.fieldTag}",
         "marcTag": "${varField.marcTag.get}",
+        "content": null,
         "ind1": "${varField.indicator1.get}",
         "ind2": "${varField.indicator2.get}",
         "subfields": []
@@ -75,7 +76,11 @@ class MarcFieldTest extends FunSpec with Matchers with JsonTestUtil {
       toJson(varField).get,
       s"""{
         "fieldTag": "${varField.fieldTag}",
-        "content": "${varField.content.get}"
+        "content": "${varField.content.get}",
+        "marcTag": null,
+        "ind1": null,
+        "ind2": null,
+        "subfields": []
       }"""
     )
   }
