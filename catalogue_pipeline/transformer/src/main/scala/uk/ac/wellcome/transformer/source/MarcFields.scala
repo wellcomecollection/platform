@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.source
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 
 // Examples of varFields from the Sierra JSON:
 //
@@ -33,11 +33,11 @@ case class MarcSubfield(
 
 case class VarField(
   fieldTag: String,
-  content: Option[String],
-  marcTag: Option[String],
-  @JsonProperty("ind1") indicator1: Option[String],
-  @JsonProperty("ind2") indicator2: Option[String],
-  subfields: List[MarcSubfield]
+  content: Option[String] = None,
+  marcTag: Option[String] = None,
+  @JsonKey("ind1") indicator1: Option[String] = None,
+  @JsonKey("ind2") indicator2: Option[String] = None,
+  subfields: List[MarcSubfield] = Nil
 )
 
 case object VarField {
