@@ -31,7 +31,7 @@ class MarcFieldTest extends FunSpec with Matchers with JsonTestUtil {
   it("reads a JSON string as a long-form VarField") {
     val jsonString = s"""{
       "fieldTag": "n",
-      "marcTag": "008,
+      "marcTag": "008",
       "ind1": " ",
       "ind2": " ",
       "subfields": [
@@ -89,7 +89,6 @@ class MarcFieldTest extends FunSpec with Matchers with JsonTestUtil {
     val jsonString = s"""{
       "fieldTag": "c",
       "content": "Enjoying an event with enormous eagles"
-      ]
     }"""
 
     val expectedVarField = VarField(
