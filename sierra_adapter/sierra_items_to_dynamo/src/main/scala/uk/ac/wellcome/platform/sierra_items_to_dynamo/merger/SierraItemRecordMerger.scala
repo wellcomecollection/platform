@@ -9,10 +9,8 @@ object SierraItemRecordMerger {
     if (existingRecord.modifiedDate.isBefore(updatedRecord.modifiedDate)) {
 
       updatedRecord.copy(
-
         // We always carry across the version from the existing record.
         version = existingRecord.version,
-
         // Let's suppose we have
         //
         //    oldRecord = (linked = {1, 2, 3}, unlinked = {4, 5})
@@ -30,9 +28,9 @@ object SierraItemRecordMerger {
         //      = {1, 2, 3, 4, 5} - {3, 4}
         //      = {1, 2, 5}
         //
-        unlinkedBibIds =
-          subList(addList(existingRecord.unlinkedBibIds, existingRecord.bibIds),
-                  updatedRecord.bibIds)
+        unlinkedBibIds = subList(
+          addList(existingRecord.unlinkedBibIds, existingRecord.bibIds),
+          updatedRecord.bibIds)
       )
     } else {
       existingRecord
