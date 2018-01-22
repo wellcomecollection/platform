@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
+import java.time.Instant
+
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import io.circe.parser.parse
@@ -99,10 +101,11 @@ class DynamoInserterTest
 
     val oldRecord = SierraItemRecord(
       id = s"i$id",
-      modifiedDate = oldUpdatedDate,
+      modifiedDate = Instant.parse(oldUpdatedDate),
       data =
         s"""{"id": "i$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards", "bibIds": ["b1556974"]}""",
-      bibIds = List("b1556974")
+      bibIds = List("b1556974"),
+      version = 1
     )
     Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
 
@@ -124,7 +127,7 @@ class DynamoInserterTest
 
     whenReady(futureUnit) { _ =>
       Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> s"i$id") shouldBe Some(
-        Right(newRecord.copy(version = 1)))
+        Right(newRecord.copy(version = 2)))
     }
   }
 
