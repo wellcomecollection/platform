@@ -3,12 +3,13 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 object SierraItemRecordMerger {
-  def mergeItems(oldRecord: SierraItemRecord,
-                 newRecord: SierraItemRecord): SierraItemRecord = {
+  def mergeItems(existingRecord: SierraItemRecord,
+                 updatedRecord: SierraItemRecord): SierraItemRecord = {
 
-    if (oldRecord.modifiedDate.isBefore(newRecord.modifiedDate)) {
+    if (existingRecord.modifiedDate.isBefore(updatedRecord.modifiedDate)) {
 
-      newRecord.copy(
+      updatedRecord.copy(
+
         // Let's suppose we have
         //
         //    oldRecord = (linked = {1, 2, 3}, unlinked = {4, 5})
@@ -27,11 +28,11 @@ object SierraItemRecordMerger {
         //      = {1, 2, 5}
         //
         unlinkedBibIds =
-          subList(addList(oldRecord.unlinkedBibIds, oldRecord.bibIds),
-                  newRecord.bibIds)
+          subList(addList(existingRecord.unlinkedBibIds, existingRecord.bibIds),
+                  updatedRecord.bibIds)
       )
     } else {
-      oldRecord
+      existingRecord
     }
   }
 

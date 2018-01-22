@@ -14,7 +14,7 @@ class DynamoInserter @Inject()(sierraItemRecordDao: SierraItemRecordDao) {
     sierraItemRecordDao.getItem(record.id).flatMap {
       case Some(existingRecord) =>
         val mergedRecord = SierraItemRecordMerger
-          .mergeItems(oldRecord = existingRecord, newRecord = record)
+          .mergeItems(existingRecord = existingRecord, updatedRecord = record)
         if (mergedRecord != existingRecord) {
           sierraItemRecordDao.updateItem(mergedRecord)
         } else {
