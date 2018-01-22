@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
+import java.time.Instant
+
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.utils.JsonUtil._
@@ -74,6 +76,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
     val existingRecord = sierraItemRecord(
       bibIds = List("1", "2", "3"),
       modifiedDate = "2017-01-01T00:00:00Z",
+      version = 3
     )
     val updatedRecord = sierraItemRecord(
       bibIds = List("1", "2", "3", "4", "5"),
@@ -84,18 +87,29 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
 
     mergedRecord shouldBe existingRecord
   }
+  
+  it("carries across the version from the existing record") {
+    val existingRecord = sierraItemRecord(
+      modifiedDate = "2001-01-01T00:00:00Z",
+      version = 10
+    )
+    val updatedRecord = sierraItemRecord(
+      modifiedDate = "2009-09-09T00:00:00Z",
+      version = 2
+    )
 
     val mergedRecord = SierraItemRecordMerger.mergeItems(existingRecord, updatedRecord)
     mergedRecord.version shouldBe existingRecord.version
   }
 
   private def sierraItemRecord(
-    bibIds: List[String],
+    bibIds: List[String] = List(),
     unlinkedBibIds: List[String] = List(),
-    modifiedDate: String = "2001-01-01T01:01:01Z"): SierraItemRecord = {
+    modifiedDate: String = "2001-01-01T01:01:01Z",
+    version: Int = 1): SierraItemRecord = {
     SierraItemRecord(
       id = s"i111",
-      modifiedDate = modifiedDate,
+      modifiedDate = Instant.parse(modifiedDate),
       data = s"""
            |{
            |  "id": "i111",
@@ -104,7 +118,8 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
            |  "bibIds": ${toJson(bibIds).get}
            |}""".stripMargin,
       bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
+      unlinkedBibIds = unlinkedBibIds,
+      version = version
     )
   }
 }
