@@ -38,16 +38,16 @@ class MiroTransformableTransformer
 
     Some(
       Work(
+        title = Some(title),
         sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
                                             miroTransformable.MiroID),
         identifiers = getIdentifiers(miroData, miroTransformable.MiroID),
-        title = title,
         description = description,
+        lettering = miroData.suppLettering,
         createdDate =
           getCreatedDate(miroData, miroTransformable.MiroCollection),
-        lettering = miroData.suppLettering,
-        creators = getCreators(miroData),
         subjects = getSubjects(miroData),
+        creators = getCreators(miroData),
         genres = getGenres(miroData),
         thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)),
         items = getItems(miroData, miroTransformable.MiroID)

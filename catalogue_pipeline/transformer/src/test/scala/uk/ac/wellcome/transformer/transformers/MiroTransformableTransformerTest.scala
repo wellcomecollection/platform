@@ -354,7 +354,7 @@ class MiroTransformableTransformerTest
       """
     )
 
-    work.title shouldBe "A café for cats"
+    work.title shouldBe Some("A café for cats")
     work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
   }
 

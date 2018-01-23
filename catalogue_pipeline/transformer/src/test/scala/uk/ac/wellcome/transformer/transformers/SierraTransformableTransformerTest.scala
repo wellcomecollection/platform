@@ -149,11 +149,11 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get shouldBe Some(
       Work(
-        title = title,
+        title = Some(title),
         sourceIdentifier = identifier,
         identifiers = List(identifier),
-        publishers = List(Organisation(label = "Peaceful Poetry")),
-        description = Some("A delightful description of a dead daisy.")
+        description = Some("A delightful description of a dead daisy."),
+        publishers = List(Organisation(label = "Peaceful Poetry"))
       )
     )
   }
@@ -183,12 +183,10 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      Work(
-        title = title,
-        sourceIdentifier = identifier,
-        identifiers = List(identifier),
-        visible = false
-      )
+      Work(title = Some(title),
+           sourceIdentifier = identifier,
+           identifiers = List(identifier),
+           visible = false)
     )
   }
 
@@ -217,12 +215,10 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      Work(
-        title = title,
-        sourceIdentifier = identifier,
-        identifiers = List(identifier),
-        visible = false
-      )
+      Work(title = Some(title),
+           sourceIdentifier = identifier,
+           identifiers = List(identifier),
+           visible = false)
     )
   }
 

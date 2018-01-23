@@ -40,9 +40,9 @@ class WorksServiceTest
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
       displayWork.results.head shouldBe DisplayWork(works(0).id,
-                                                    works(0).title)
+                                                    works(0).title.get)
       displayWork.results.tail.head shouldBe DisplayWork(works(1).id,
-                                                         works(1).title)
+                                                         works(1).title.get)
     }
   }
 
@@ -80,7 +80,7 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workDodo.id, workDodo.title)
+      works.results.head shouldBe DisplayWork(workDodo.id, workDodo.title.get)
     }
   }
 
@@ -167,7 +167,7 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workEmu.id, workEmu.title)
+      works.results.head shouldBe DisplayWork(workEmu.id, workEmu.title.get)
     }
   }
 

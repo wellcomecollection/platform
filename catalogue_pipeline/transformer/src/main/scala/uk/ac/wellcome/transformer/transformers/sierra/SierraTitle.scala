@@ -10,6 +10,6 @@ trait SierraTitle {
   //
   // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
   // http://www.loc.gov/marc/bibliographic/bd245.html
-  def getTitle(bibData: SierraBibData): String =
-    bibData.title
+  def getTitle(bibData: SierraBibData): Option[String] =
+    Some(bibData.title)
 }
