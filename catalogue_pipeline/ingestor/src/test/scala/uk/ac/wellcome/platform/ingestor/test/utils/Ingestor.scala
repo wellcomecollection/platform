@@ -66,12 +66,6 @@ trait Ingestor
       sourceId
     )
 
-    Work(
-      canonicalId = Some(canonicalId),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      title = title,
-      visible = visible
-    )
+    Work(title = Some(title), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some(canonicalId), visible = visible)
   }
 }

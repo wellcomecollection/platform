@@ -40,11 +40,7 @@ trait IdMinterTestUtils
     val identifier =
       SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
 
-    val work = Work(
-      sourceIdentifier = identifier,
-      identifiers = List(identifier),
-      title = "A query about a queue of quails"
-    )
+    val work = Work(title = Some("A query about a queue of quails"), sourceIdentifier = identifier, identifiers = List(identifier))
 
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,

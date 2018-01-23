@@ -68,7 +68,7 @@ case object DisplayWork {
   def apply(work: Work, includes: WorksIncludes): DisplayWork = {
     DisplayWork(
       id = work.id,
-      title = work.title,
+      title = work.title.get,
       description = work.description,
       lettering = work.lettering,
       createdDate = work.createdDate,

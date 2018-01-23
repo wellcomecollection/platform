@@ -203,36 +203,9 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val publishers = List(publisher)
-  val unidentifiedWork = Work(
-    sourceIdentifier = identifier,
-    identifiers = List(identifier),
-    title = "title",
-    description = Some("description"),
-    lettering = Some("lettering"),
-    createdDate = Some(Period("period")),
-    subjects = List(Concept("subject")),
-    creators = List(Agent("47")),
-    genres = List(Concept("genre")),
-    thumbnail = Some(location),
-    items = List(item),
-    publishers = publishers
-  )
+  val unidentifiedWork = Work(title = Some("title"), sourceIdentifier = identifier, identifiers = List(identifier), description = Some("description"), lettering = Some("lettering"), createdDate = Some(Period("period")), subjects = List(Concept("subject")), creators = List(Agent("47")), genres = List(Concept("genre")), thumbnail = Some(location), items = List(item), publishers = publishers)
 
-  val identifiedWork = Work(
-    canonicalId = Some("canonicalId"),
-    sourceIdentifier = identifier,
-    identifiers = unidentifiedWork.identifiers,
-    title = unidentifiedWork.title,
-    description = unidentifiedWork.description,
-    lettering = unidentifiedWork.lettering,
-    createdDate = unidentifiedWork.createdDate,
-    subjects = unidentifiedWork.subjects,
-    creators = unidentifiedWork.creators,
-    genres = unidentifiedWork.genres,
-    thumbnail = unidentifiedWork.thumbnail,
-    items = unidentifiedWork.items,
-    publishers = publishers
-  )
+  val identifiedWork = Work(title = unidentifiedWork.title, sourceIdentifier = identifier, identifiers = unidentifiedWork.identifiers, canonicalId = Some("canonicalId"), description = unidentifiedWork.description, lettering = unidentifiedWork.lettering, createdDate = unidentifiedWork.createdDate, subjects = unidentifiedWork.subjects, creators = unidentifiedWork.creators, genres = unidentifiedWork.genres, thumbnail = unidentifiedWork.thumbnail, items = unidentifiedWork.items, publishers = publishers)
 
   it("should serialise an unidentified Work as JSON") {
     val result = toJson(unidentifiedWork)
@@ -269,11 +242,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   it("should have an ontology type 'Work' when serialised to JSON") {
-    val work = Work(
-      sourceIdentifier = identifier,
-      identifiers = List(identifier),
-      title = "A book about a blue whale"
-    )
+    val work = Work(title = Some("A book about a blue whale"), sourceIdentifier = identifier, identifiers = List(identifier))
     val jsonString = toJson(work).get
 
     jsonString.contains("""type":"Work"""") should be(true)
