@@ -128,7 +128,7 @@ class SierraDescriptionTest extends FunSpec with Matchers with SierraData {
 
     val bibData = SierraBibData(
       id = "b1234567",
-      title = "A xylophone full of xenon.",
+      title = Some("A xylophone full of xenon."),
       varFields = varFields
     )
 

@@ -28,7 +28,7 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
 
     val bibData = SierraBibData(
       id = bibDataId,
-      title = "An imprint of insects on the inside of an igloo",
+      title = Some("An imprint of insects on the inside of an igloo"),
       deleted = false,
       suppressed = false
     )
