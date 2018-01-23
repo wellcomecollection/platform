@@ -63,7 +63,7 @@ class IdMinterFeatureTest
       val work = getWorksFromMessages(messages).head
 
       work.identifiers.head.value shouldBe miroID
-      work.title shouldBe title
+      work.title shouldBe Some(title)
     }
 
     sendMessage
