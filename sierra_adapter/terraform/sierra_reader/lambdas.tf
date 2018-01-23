@@ -11,7 +11,7 @@ module "s3_demultiplexer_lambda" {
     "TOPIC_ARN" = "${module.demultiplexer_topic.arn}"
   }
 
-  timeout = 30
+  timeout = 90
 }
 
 resource "aws_lambda_permission" "allow_lambda" {
