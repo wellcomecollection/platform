@@ -161,7 +161,7 @@ class SierraPublishersTest extends FunSpec with Matchers with SierraData {
 
     val bibData = SierraBibData(
       id = "b1234567",
-      title = "A pack of published puffins in Paris",
+      title = Some("A pack of published puffins in Paris"),
       deleted = false,
       suppressed = false,
       varFields = varFields

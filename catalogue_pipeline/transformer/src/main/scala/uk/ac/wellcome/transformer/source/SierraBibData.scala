@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.source
 
 case class SierraBibData(
   id: String,
-  title: String,
+  title: Option[String],
   deleted: Boolean = false,
   suppressed: Boolean = false,
   fixedFields: Map[String, FixedField] = Map(),
