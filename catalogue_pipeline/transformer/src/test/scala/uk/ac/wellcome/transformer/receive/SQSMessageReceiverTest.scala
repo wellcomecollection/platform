@@ -58,7 +58,9 @@ class SQSMessageReceiverTest
   val sourceIdentifier =
     SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
 
-  val work = Work(title = Some("placeholder title for a Calm record"), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier))
+  val work = Work(title = Some("placeholder title for a Calm record"),
+                  sourceIdentifier = sourceIdentifier,
+                  identifiers = List(sourceIdentifier))
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",

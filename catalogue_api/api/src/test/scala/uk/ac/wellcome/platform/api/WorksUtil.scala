@@ -34,10 +34,17 @@ trait WorksUtil {
       ))
 
   def workWith(canonicalId: String, title: String): Work =
-    Work(title = Some(title), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some(canonicalId))
+    Work(title = Some(title),
+         sourceIdentifier = sourceIdentifier,
+         identifiers = List(sourceIdentifier),
+         canonicalId = Some(canonicalId))
 
   def workWith(canonicalId: String, title: String, visible: Boolean): Work =
-    Work(title = Some(title), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some(canonicalId), visible = visible)
+    Work(title = Some(title),
+         sourceIdentifier = sourceIdentifier,
+         identifiers = List(sourceIdentifier),
+         canonicalId = Some(canonicalId),
+         visible = visible)
 
   def workWith(
     canonicalId: String,
@@ -45,16 +52,26 @@ trait WorksUtil {
     identifiers: List[SourceIdentifier] = List(),
     items: List[Item] = List()
   ): Work =
-    Work(title = Some(title), sourceIdentifier = sourceIdentifier, identifiers = identifiers, canonicalId = Some(canonicalId), items = items)
+    Work(title = Some(title),
+         sourceIdentifier = sourceIdentifier,
+         identifiers = identifiers,
+         canonicalId = Some(canonicalId),
+         items = items)
 
   def identifiedWorkWith(
     canonicalId: String,
     title: String,
     thumbnail: Location
   ): Work =
-    Work(title = Some(title), sourceIdentifier = sourceIdentifier, identifiers = List(
-            SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
-          ), canonicalId = Some(canonicalId), thumbnail = Some(thumbnail))
+    Work(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+      ),
+      canonicalId = Some(canonicalId),
+      thumbnail = Some(thumbnail)
+    )
 
   def workWith(canonicalId: String,
                title: String,
@@ -63,7 +80,19 @@ trait WorksUtil {
                createdDate: Period,
                creator: Agent,
                items: List[Item],
-               visible: Boolean): Work = Work(title = Some(title), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some(canonicalId), description = Some(description), lettering = Some(lettering), createdDate = Some(createdDate), creators = List(creator), items = items, visible = visible)
+               visible: Boolean): Work =
+    Work(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      canonicalId = Some(canonicalId),
+      description = Some(description),
+      lettering = Some(lettering),
+      createdDate = Some(createdDate),
+      creators = List(creator),
+      items = items,
+      visible = visible
+    )
 
   def defaultItem: Item = {
     itemWith(

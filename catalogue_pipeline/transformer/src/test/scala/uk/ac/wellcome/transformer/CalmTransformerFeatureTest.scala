@@ -80,7 +80,9 @@ class CalmTransformerFeatureTest
     //currently for calm data we only output hardcoded sample values
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        Work(title = Some("placeholder title for a Calm record"), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier)))
+        Work(title = Some("placeholder title for a Calm record"),
+             sourceIdentifier = sourceIdentifier,
+             identifiers = List(sourceIdentifier)))
       .get
   }
 }

@@ -37,9 +37,21 @@ class MiroTransformableTransformer
     val (title, description) = getTitleAndDescription(miroData)
 
     Some(
-      Work(title = Some(title), sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
-                                                  miroTransformable.MiroID), identifiers = getIdentifiers(miroData, miroTransformable.MiroID), description = description, lettering = miroData.suppLettering, createdDate =
-                getCreatedDate(miroData, miroTransformable.MiroCollection), subjects = getSubjects(miroData), creators = getCreators(miroData), genres = getGenres(miroData), thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)), items = getItems(miroData, miroTransformable.MiroID)))
+      Work(
+        title = Some(title),
+        sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
+                                            miroTransformable.MiroID),
+        identifiers = getIdentifiers(miroData, miroTransformable.MiroID),
+        description = description,
+        lettering = miroData.suppLettering,
+        createdDate =
+          getCreatedDate(miroData, miroTransformable.MiroCollection),
+        subjects = getSubjects(miroData),
+        creators = getCreators(miroData),
+        genres = getGenres(miroData),
+        thumbnail = Some(getThumbnail(miroData, miroTransformable.MiroID)),
+        items = getItems(miroData, miroTransformable.MiroID)
+      ))
   }
 
   /*
