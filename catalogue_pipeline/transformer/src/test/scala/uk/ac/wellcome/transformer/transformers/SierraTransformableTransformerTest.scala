@@ -271,4 +271,32 @@ class SierraTransformableTransformerTest
       )
     )
   }
+
+  it("transforms bib records that don't have a title") {
+    // This example is taken from a failure observed in the transformer, based on
+    // real records from Sierra.
+    val id = "b2524736"
+    val data =
+      s"""
+         |{
+         |  "id": "$id",
+         |  "deletedDate": "2017-02-20",
+         |  "deleted": true,
+         |  "orders": [],
+         |  "locations": [],
+         |  "fixedFields": {},
+         |  "varFields": []
+         |}
+        """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      id = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.title shouldBe None
+  }
 }

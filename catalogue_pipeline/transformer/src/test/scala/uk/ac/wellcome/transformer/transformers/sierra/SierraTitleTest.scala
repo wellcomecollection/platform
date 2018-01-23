@@ -23,7 +23,7 @@ class SierraTitleTest extends FunSpec with Matchers with SierraData {
 
     val bibData = SierraBibData(
       id = "b1234567",
-      title = bibDataTitle,
+      title = Some(bibDataTitle),
       deleted = false,
       suppressed = false
     )
