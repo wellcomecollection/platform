@@ -53,22 +53,14 @@ class SierraTransformableTransformer
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(
-            Work(
-              title = getTitle(sierraBibData),
-              publishers = getPublishers(sierraBibData),
-              sourceIdentifier = SourceIdentifier(
-                identifierScheme = IdentifierSchemes.sierraSystemNumber,
-                sierraBibData.id
-              ),
-              description = getDescription(sierraBibData),
-              identifiers = getIdentifiers(sierraBibData),
-              items = Option(sierraTransformable.itemData)
-                .getOrElse(Map.empty)
-                .values
-                .flatMap(extractItemData)
-                .toList,
-              visible = !(sierraBibData.deleted || sierraBibData.suppressed)
-            ))
+            Work(title = getTitle(sierraBibData), sourceIdentifier = SourceIdentifier(
+                            identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                            sierraBibData.id
+                          ), identifiers = getIdentifiers(sierraBibData), description = getDescription(sierraBibData), items = Option(sierraTransformable.itemData)
+                            .getOrElse(Map.empty)
+                            .values
+                            .flatMap(extractItemData)
+                            .toList, publishers = getPublishers(sierraBibData), visible = !(sierraBibData.deleted || sierraBibData.suppressed)))
         }
 
       }

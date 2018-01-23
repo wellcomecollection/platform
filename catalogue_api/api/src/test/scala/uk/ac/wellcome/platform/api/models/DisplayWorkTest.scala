@@ -6,12 +6,7 @@ import uk.ac.wellcome.models._
 class DisplayWorkTest extends FunSpec with Matchers {
 
   it("correctly parses a Work without any items") {
-    val work = Work(
-      title = "An irritating imp is immune from items",
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      canonicalId = Some("abcdef12")
-    )
+    val work = Work(title = Some("An irritating imp is immune from items"), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some("abcdef12"))
 
     val displayWork = DisplayWork(
       work = work,
@@ -27,13 +22,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       identifiers = List(sourceIdentifier),
       locations = List()
     )
-    val work = Work(
-      title = "Inside an irate igloo",
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      canonicalId = Some("b4heraz7"),
-      items = List(item)
-    )
+    val work = Work(title = Some("Inside an irate igloo"), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some("b4heraz7"), items = List(item))
 
     val displayWork = DisplayWork(
       work = work,
@@ -49,12 +38,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
   )
 
   it("correctly parses a work without any identifiers") {
-    val work = Work(
-      title = "An irascible iguana invites impudence",
-      sourceIdentifier = sourceIdentifier,
-      identifiers = Nil,
-      canonicalId = Some("xtsx8hwk")
-    )
+    val work = Work(title = Some("An irascible iguana invites impudence"), sourceIdentifier = sourceIdentifier, identifiers = Nil, canonicalId = Some("xtsx8hwk"))
 
     val displayWork = DisplayWork(
       work = work,

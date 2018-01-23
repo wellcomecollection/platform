@@ -18,7 +18,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
       server.httpGet(
         path = s"/$apiPrefix/works/${work.canonicalId.get}",
         andExpect = Status.Gone,
-        withJsonBody = gone(work.title)
+        withJsonBody = gone
       )
     }
   }
