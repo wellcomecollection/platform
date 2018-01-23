@@ -53,7 +53,7 @@ class SierraTransformerFeatureTest
       val actualWork = JsonUtil.fromJson[Work](snsMessages.head.message).get
 
       actualWork.sourceIdentifier shouldBe sourceIdentifier
-      actualWork.title shouldBe title
+      actualWork.title shouldBe Some(title)
       actualWork.identifiers shouldBe List(sourceIdentifier)
     }
   }

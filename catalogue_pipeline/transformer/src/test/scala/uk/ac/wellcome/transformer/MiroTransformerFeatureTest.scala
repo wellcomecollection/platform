@@ -54,7 +54,7 @@ class MiroTransformerFeatureTest
                                        imageTitle: String) = {
     val parsedWork = JsonUtil.fromJson[Work](snsMessage.message).get
     parsedWork.identifiers.head.value shouldBe miroID
-    parsedWork.title shouldBe imageTitle
+    parsedWork.title shouldBe Some(imageTitle)
   }
 
   def shouldTransformMessage(imageTitle: String) =
