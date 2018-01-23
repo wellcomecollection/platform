@@ -173,7 +173,7 @@ class MiroTransformableTransformerTitleTest
       data = data
     )
 
-    transformedWork.title shouldBe expectedTitle
+    transformedWork.title shouldBe Some(expectedTitle)
     transformedWork.description shouldBe expectedDescription
   }
 }
