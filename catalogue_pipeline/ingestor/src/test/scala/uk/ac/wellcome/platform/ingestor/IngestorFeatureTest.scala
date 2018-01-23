@@ -34,7 +34,10 @@ class IngestorFeatureTest
 
     val workString = JsonUtil
       .toJson(
-        Work(title = Some("A type of a tame turtle"), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier), canonicalId = Some("1234"))
+        Work(title = Some("A type of a tame turtle"),
+             sourceIdentifier = sourceIdentifier,
+             identifiers = List(sourceIdentifier),
+             canonicalId = Some("1234"))
       )
       .get
 

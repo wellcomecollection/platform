@@ -173,7 +173,10 @@ class ApiWorksTest extends ApiWorksTestBase {
       identifiers = List(),
       locations = List(location)
     )
-    val workWithCopyright = Work(title = Some("A scarf on a squirrel"), sourceIdentifier = sourceIdentifier, canonicalId = Some("yxh928a"), items = List(item))
+    val workWithCopyright = Work(title = Some("A scarf on a squirrel"),
+                                 sourceIdentifier = sourceIdentifier,
+                                 canonicalId = Some("yxh928a"),
+                                 items = List(item))
     insertIntoElasticSearch(workWithCopyright)
 
     eventually {
@@ -447,7 +450,13 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should include subject information in API responses") {
-    val workWithSubjects = Work(title = Some("A seal selling seaweed sandwiches in Scotland"), sourceIdentifier = sourceIdentifier, identifiers = List(), canonicalId = Some("test_subject1"), subjects = List(Concept("fish"), Concept("gardening")))
+    val workWithSubjects = Work(
+      title = Some("A seal selling seaweed sandwiches in Scotland"),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(),
+      canonicalId = Some("test_subject1"),
+      subjects = List(Concept("fish"), Concept("gardening"))
+    )
     insertIntoElasticSearch(workWithSubjects)
 
     eventually {
@@ -474,7 +483,13 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should include genre information in API responses") {
-    val workWithSubjects = Work(title = Some("A guppy in a greenhouse"), sourceIdentifier = sourceIdentifier, identifiers = List(), canonicalId = Some("test_subject1"), genres = List(Concept("woodwork"), Concept("etching")))
+    val workWithSubjects = Work(
+      title = Some("A guppy in a greenhouse"),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(),
+      canonicalId = Some("test_subject1"),
+      genres = List(Concept("woodwork"), Concept("etching"))
+    )
     insertIntoElasticSearch(workWithSubjects)
 
     eventually {

@@ -24,13 +24,17 @@ class CalmDataTransformer
     transformable: CalmTransformableData): Try[Option[Work]] = Try {
     // TODO: Fill in proper data here
     Some(
-      Work(title = Some("placeholder title for a Calm record"), sourceIdentifier = SourceIdentifier(
-                IdentifierSchemes.calmPlaceholder,
-                "value"
-              ), identifiers = List(
-                SourceIdentifier(
-                  IdentifierSchemes.calmPlaceholder,
-                  "value"
-                ))))
+      Work(
+        title = Some("placeholder title for a Calm record"),
+        sourceIdentifier = SourceIdentifier(
+          IdentifierSchemes.calmPlaceholder,
+          "value"
+        ),
+        identifiers = List(
+          SourceIdentifier(
+            IdentifierSchemes.calmPlaceholder,
+            "value"
+          ))
+      ))
   }
 }
