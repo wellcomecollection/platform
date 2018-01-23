@@ -7,10 +7,12 @@ Usage: build_windows.py --start=<START> --end=<END> [--interval=<INTERVAL>] --re
 
 import datetime as dt
 import json
+import math
 
 import boto3
 import docopt
 import maya
+import tqdm
 
 args = docopt.docopt(__doc__)
 
@@ -34,10 +36,12 @@ def generate_windows(start, end, minutes):
 
 client = boto3.client('sns')
 
-for window in generate_windows(start, end, minutes):
-    resp = client.publish(
+for window in tqdm.tqdm(
+    generate_windows(start, end, minutes),
+    total=math.ceil((end - start).total_seconds() / 60 / (minutes - 1))
+):
+    client.publish(
         TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource}_windows',
         Message=json.dumps(window),
         Subject=f'Window sent by {__file__}'
     )
-    print(resp)
