@@ -43,11 +43,9 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = Work(
-      sourceIdentifier = identifier,
-      title = "crap",
-      canonicalId = None
-    )
+    val originalWork = Work(title = Some("crap"),
+                            sourceIdentifier = identifier,
+                            canonicalId = None)
 
     val newCanonicalId = "5467"
 
@@ -79,11 +77,9 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = Work(
-      sourceIdentifier = identifier,
-      title = "crap",
-      canonicalId = None
-    )
+    val originalWork = Work(title = Some("crap"),
+                            sourceIdentifier = identifier,
+                            canonicalId = None)
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -124,12 +120,10 @@ class IdEmbedderTests
       locations = List()
     )
 
-    val originalWork = Work(
-      sourceIdentifier = identifier,
-      title = "crap",
-      canonicalId = None,
-      items = List(originalItem1, originalItem2)
-    )
+    val originalWork = Work(title = Some("crap"),
+                            sourceIdentifier = identifier,
+                            canonicalId = None,
+                            items = List(originalItem1, originalItem2))
 
     val newItemCanonicalId1 = "item1-canonical-id"
     val newItemCanonicalId2 = "item2-canonical-id"

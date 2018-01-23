@@ -138,13 +138,13 @@ class ApiWorksTestBase
       "description": "$description"
     }"""
 
-  def gone(description: String) =
+  def gone =
     s"""{
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
       "errorType": "http",
       "httpStatus": 410,
       "label": "Gone",
-      "description": "$description"
+      "description": "This work has been deleted"
     }"""
 }

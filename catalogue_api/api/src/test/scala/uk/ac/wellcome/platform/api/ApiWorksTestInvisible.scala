@@ -18,7 +18,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
       server.httpGet(
         path = s"/$apiPrefix/works/${work.canonicalId.get}",
         andExpect = Status.Gone,
-        withJsonBody = gone(work.title)
+        withJsonBody = gone
       )
     }
   }
@@ -48,7 +48,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |   {
           |     "type": "Work",
           |     "id": "${works(0).id}",
-          |     "title": "${works(0).title}",
+          |     "title": "${works(0).title.get}",
           |     "description": "${works(0).description.get}",
           |     "lettering": "${works(0).lettering.get}",
           |     "createdDate": ${period(works(0).createdDate.get)},
@@ -59,7 +59,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |   {
           |     "type": "Work",
           |     "id": "${works(1).id}",
-          |     "title": "${works(1).title}",
+          |     "title": "${works(1).title.get}",
           |     "description": "${works(1).description.get}",
           |     "lettering": "${works(1).lettering.get}",
           |     "createdDate": ${period(works(1).createdDate.get)},
@@ -97,7 +97,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |   {
           |     "type": "Work",
           |     "id": "${work.id}",
-          |     "title": "${work.title}",
+          |     "title": "${work.title.get}",
           |     "creators": [],
           |     "subjects": [ ],
           |     "genres": [ ]
