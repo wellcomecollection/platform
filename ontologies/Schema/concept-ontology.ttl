@@ -24,6 +24,7 @@ wcon:ConceptScheme rdf:type owl:Class ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .
         
 wcon:QualifiedConcept rdf:type owl:Class ;
+    rdfs:subClassOf wcon:Concept ;
     rdfs:label "QualifiedConcept"@en ;
     rdfs:comment "A qualified concept"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .        
