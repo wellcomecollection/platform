@@ -100,7 +100,10 @@ if __name__ == '__main__':
         additional_args = additional_args[1:]
     cmd += additional_args
 
-    print('*** Running %r' % ' '.join(cmd))
-    rc = subprocess.call(cmd)
-    if rc != 0:
-        sys.exit(rc)
+    try:
+        print('*** Running %r' % ' '.join(cmd))
+        rc = subprocess.call(cmd)
+        if rc != 0:
+            sys.exit(rc)
+    except KeyboardInterrupt:
+        sys.exit(1)
