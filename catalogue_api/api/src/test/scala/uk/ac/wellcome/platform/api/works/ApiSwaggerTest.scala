@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api
+package uk.ac.wellcome.platform.api.works
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api
+package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
 import uk.ac.wellcome.models._
