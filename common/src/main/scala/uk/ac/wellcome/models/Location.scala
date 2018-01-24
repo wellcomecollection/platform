@@ -18,4 +18,4 @@ case class PhysicalLocation(
                            locationType: String,
                            label: String,
                            @JsonProperty("type") ontologyType: String = "PhysicalLocation"
-                           )
+                           ) extends Location

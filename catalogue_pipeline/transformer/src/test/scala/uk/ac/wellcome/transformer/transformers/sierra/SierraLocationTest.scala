@@ -5,8 +5,10 @@ import uk.ac.wellcome.models.PhysicalLocation
 import uk.ac.wellcome.transformer.source.{SierraItemData, SierraLocation}
 
 class SierraLocationTest extends FunSpec with Matchers {
+
   val transformer = new SierraLocation {}
-  it("should add locations to items") {
+
+  it("should extract location from item data") {
     val locationType = "sgmed"
     val label = "A museum of mermaids"
     val itemData = SierraItemData(
@@ -16,11 +18,14 @@ class SierraLocationTest extends FunSpec with Matchers {
 
     val expectedLocation = PhysicalLocation(locationType, label)
 
-
-    transformer.getLocation(itemData = itemData) shouldBe expectedLocation
+    transformer.getLocation(itemData = itemData) shouldBe Some(expectedLocation)
   }
-}
 
-trait SierraLocation{
-  def getLocation(itemData: SierraItemData): PhysicalLocation = ???
+  it("should return none if there is no location in the item data") {
+    val itemData = SierraItemData(
+      id = "i1234567"
+    )
+
+    transformer.getLocation(itemData = itemData) shouldBe None
+  }
 }
