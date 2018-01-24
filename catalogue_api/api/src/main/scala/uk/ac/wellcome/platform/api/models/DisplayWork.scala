@@ -57,6 +57,10 @@ case class DisplayWork(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.models.Agent]",
+    value = "Relates a published work to its publisher."
+  ) publishers: List[Agent] = List(),
   visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
@@ -101,6 +105,9 @@ case object DisplayWork {
       visible = work.visible
     )
   }
+
+  def apply(work: Work): DisplayWork =
+    DisplayWork(work = work, includes = WorksIncludes())
 
   def apply(hit: SearchHit): DisplayWork =
     apply(hit, includes = WorksIncludes())

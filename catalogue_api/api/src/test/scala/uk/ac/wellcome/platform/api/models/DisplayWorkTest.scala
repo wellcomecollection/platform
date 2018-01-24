@@ -60,4 +60,57 @@ class DisplayWorkTest extends FunSpec with Matchers {
     )
     displayWork.identifiers shouldBe Some(List())
   }
+
+  describe("publishers") {
+    it("parses a work without any publishers") {
+      val work = Work(
+        title = Some("A goading giraffe is galling"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = Nil,
+        canonicalId = Some("gsfmhw7v"),
+        publishers = List()
+      )
+
+      val displayWork = DisplayWork(work)
+      displayWork.publishers shouldBe List()
+    }
+
+    it("parses a work with agent publishers") {
+      val work = Work(
+        title = Some("A hammerhead hamster is harrowing"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = Nil,
+        canonicalId = Some("hz2hrba9"),
+        publishers = List(
+          Agent("Henry Hare"),
+          Agent("Harriet Heron")
+        )
+      )
+
+      val displayWork = DisplayWork(work)
+      displayWork.publishers shouldBe List(
+        Agent("Henry Hare"),
+        Agent("Harriet Heron")
+      )
+    }
+
+    it("parses a work with agents and organisations as publishers") {
+      val work = Work(
+        title = Some("Jumping over jackals in Japan"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = Nil,
+        canonicalId = Some("j7tw9jv3"),
+        publishers = List(
+          Agent("Janet Jackson"),
+          Organisation("Juniper Journals")
+        )
+      )
+
+      val displayWork = DisplayWork(work)
+      displayWork.publishers shouldBe List(
+        Agent("Janet Jackson"),
+        Organisation("Juniper Journals")
+      )
+    }
+  }
 }
