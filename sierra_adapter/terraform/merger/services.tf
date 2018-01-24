@@ -16,6 +16,9 @@ module "sierra_merger_service" {
   ecr_repository_url = "${module.ecr_repository_sierra_merger.repository_url}"
   release_id         = "${var.release_id}"
 
+  cpu    = 512
+  memory = 2048
+
   env_vars = {
     windows_queue_url = "${module.updates_queue.id}"
     metrics_namespace = "sierra_${local.resource_type_singular}_merger"
