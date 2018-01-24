@@ -27,6 +27,12 @@ wag:Agent rdf:type owl:Class ;
     rdfs:label "Agent"@en ;
     rdfs:comment "A agent"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .  
+
+wag:QualifiedAgent rdf:type owl:Class ;
+    rdfs:subclassOf wag:Agent ;
+    rdfs:label "QualifiedAgent"@en ;
+    rdfs:comment "A qualified agent"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> . 
     
 wag:Position rdf:type owl:Class ;
     rdfs:label "Position"@en ;
@@ -132,6 +138,3 @@ wag:dateOfDeath rdf:type owl:DatatypeProperty ;
     rdfs:domain wag:Person ;
     rdfs:range xsd:date ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/agency> .     
-    
-                     
-    

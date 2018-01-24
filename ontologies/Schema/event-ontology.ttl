@@ -1,0 +1,100 @@
+@prefix wev: <http://wellcomecollection.org/ontologies/event/> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://wellcomecollection.org/ontologies/event>
+    rdf:type owl:Ontology ;
+    dcterms:title "Event"@en ;
+    dcterms:created "2018-01-15"^^xsd:date ;
+    dcterms:description "An event ontology describing the type of events Wellcome put on."@en .
+
+###### classes ###  
+    
+wev:Event rdf:type owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "An event."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+    
+wev:Exhibition rdf:type owl:Class ;
+    rdfs:label "Exhibition"@en ;
+    rdfs:comment "An organised presention and display of items."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .  
+            
+wev:EventFormat rdf:type owl:Class ;
+    rdfs:label "EventFormat"@en ;
+    rdfs:comment "What an attendee might expect from the strcuture of an event and the level of participation. For example tour, discussion, workshop or study day."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+    
+wev:EventSeries rdf:type owl:Class ;
+    rdfs:label "EventSeries"@en ;
+    rdfs:comment "A brand of events that are related due to some special Wellcome Collection meaning."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .     
+
+wev:Interpretation rdf:type owl:Class ;
+    rdfs:label "Interpretation"@en ;
+    rdfs:comment "The ways in which you will be able to access the content of an event. For example BSL, STT or AD"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .        
+
+wev:Place rdf:type owl:Class ;
+    rdfs:label "Place"@en ;
+    rdfs:comment "A place that an event can be located. For example Reading room, Auditorium, Williams Lounge."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+    
+wev:Audience rdf:type owl:Class ;
+    rdfs:label "Audience"@en ;
+    rdfs:comment "Who the event was designed for. For example schools, youth, researchers, experts."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
+    
+      
+#### object properties ####
+
+wev:eventFormat rdf:type owl:ObjectProperty ;
+    rdfs:label "eventFormat"@en ;
+    rdfs:comment "Relates an event to its format."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:EventFormat ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+    
+wev:interpretations rdf:type owl:ObjectProperty ;
+    rdfs:label "interpretations"@en ;
+    rdfs:comment "Relates an event to its interpretations."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:Interpretations ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
+    
+wev:venue rdf:type owl:ObjectProperty ;
+    rdfs:label "venue"@en ;
+    rdfs:comment "Relates an event to its venue."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:Place ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+    
+wev:audience rdf:type owl:ObjectProperty ;
+    rdfs:label "audience"@en ;
+    rdfs:comment "Relates an event to its inteded audience."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:Audience ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .            
+
+wev:eventSeries rdf:type owl:ObjectProperty ;
+    rdfs:label "eventSeries"@en ;
+    rdfs:comment "Relates an event to a branded series."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:EventSeries ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+
+
+####### data properties #####
+
+    
+wev:positionInEventSeries rdf:type owl:DatatypeProperty ;
+    rdfs:label "positionInEventSeries"@en ;
+    rdfs:comment "Indicates the position of the event in an event series."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range xsd:integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .    
+                     
+    
