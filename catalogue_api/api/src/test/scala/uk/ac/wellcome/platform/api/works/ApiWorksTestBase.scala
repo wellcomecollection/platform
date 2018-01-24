@@ -5,7 +5,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.platform.api.WorksUtil
+import uk.ac.wellcome.platform.api.{Server, WorksUtil}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 class ApiWorksTestBase
