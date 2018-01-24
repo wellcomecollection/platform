@@ -6,6 +6,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.platform.api.Server
 
 class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
 
