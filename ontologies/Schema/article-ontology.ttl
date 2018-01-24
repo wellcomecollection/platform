@@ -1,0 +1,56 @@
+@prefix war: <http://wellcomecollection.org/ontologies/article/> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://wellcomecollection.org/ontologies/article>
+    rdf:type owl:Ontology ;
+    dcterms:title "Article"@en ;
+    dcterms:created "2018-01-15"^^xsd:date ;
+    dcterms:description "An article ontology describing the type of articles created by Wellcome."@en .
+
+###### classes ###  
+    
+war:Article rdf:type owl:Class ;
+    rdfs:label "Article"@en ;
+    rdfs:comment "An article"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
+    
+war:ArticleType rdf:type owl:Class ;
+    rdfs:label "ArticleType"@en ;
+    rdfs:comment "A type of article"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
+    
+war:ArticleSeries rdf:type owl:Class ;
+    rdfs:label "ArticleSeries"@en ;
+    rdfs:comment "An article series"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .  
+
+    
+#### object properties ####
+
+war:articleType rdf:type owl:ObjectProperty ;
+    rdfs:label "articleType"@en ;
+    rdfs:comment "Relates an article to its type."@en ;
+    rdfs:domain war:Article ;
+    rdfs:range war:ArticleType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
+
+war:articleSeries rdf:type owl:ObjectProperty ;
+    rdfs:label "articleSeries"@en ;
+    rdfs:comment "Relates an article to an article series."@en ;
+    rdfs:domain war:Article ;
+    rdfs:range war:ArticleSeries ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .        
+    
+####### data properties #####
+
+war:positionInArticleSeries rdf:type owl:DatatypeProperty ;
+    rdfs:label "positionInArticleSeries"@en ;
+    rdfs:comment "The position of an article in an article series."@en ;
+    rdfs:domain war:Article ;
+    rdfs:range xsd:integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
+    
