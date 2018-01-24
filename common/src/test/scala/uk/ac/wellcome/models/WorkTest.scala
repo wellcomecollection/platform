@@ -180,9 +180,9 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |}
     """.stripMargin
 
-  val location = Location(
+  val location = DigitalLocation(
     locationType = "location",
-    url = None,
+    url = "",
     license = License_CCBY
   )
 

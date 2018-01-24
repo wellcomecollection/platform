@@ -83,10 +83,9 @@ class MiroTransformableTransformerSubjectsTest
       identifier,
       List(identifier),
       List(
-        Location(
+        DigitalLocation(
           locationType = "iiif-image",
-          url = Some(
-            "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+          url = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
           license = License_CCBY
         )
       )
