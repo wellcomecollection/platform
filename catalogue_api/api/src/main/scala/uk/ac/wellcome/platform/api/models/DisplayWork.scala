@@ -58,9 +58,9 @@ case class DisplayWork(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.models.Agent]",
+    dataType = "List[uk.ac.wellcome.models.DisplayAgent]",
     value = "Relates a published work to its publisher."
-  ) publishers: List[Agent] = List(),
+  ) publishers: List[DisplayAgent] = List(),
   visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
@@ -102,6 +102,7 @@ case object DisplayWork {
               Some(items.map(DisplayItem(_, includes.identifiers)))
             case None => Some(List())
           } else None,
+      publishers = work.publishers.map(DisplayAgent(_)),
       visible = work.visible
     )
   }

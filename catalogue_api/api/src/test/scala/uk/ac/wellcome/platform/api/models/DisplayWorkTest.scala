@@ -89,8 +89,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        Agent("Henry Hare"),
-        Agent("Harriet Heron")
+        new DisplayAgent(label = "Henry Hare", ontologyType = "Agent"),
+        new DisplayAgent(label = "Harriet Heron", ontologyType = "Agent")
       )
     }
 
@@ -108,8 +108,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        Agent("Janet Jackson"),
-        Organisation("Juniper Journals")
+        new DisplayAgent(label = "Janet Jackson", ontologyType = "Agent"),
+        new DisplayAgent(label = "Juniper Journals", ontologyType = "Organisation")
       )
     }
   }
