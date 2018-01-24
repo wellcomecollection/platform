@@ -7,7 +7,7 @@ import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.platform.api.utils.ApiJsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 @JsonIgnoreProperties(Array("visible"))
 @ApiModel(
@@ -121,7 +121,7 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    ApiJsonUtil.fromJson[Work](document) match {
+    fromJson[Work](document) match {
       case Success(work) => DisplayWork(work = work, includes = includes)
       case Failure(e) =>
         throw new RuntimeException(
