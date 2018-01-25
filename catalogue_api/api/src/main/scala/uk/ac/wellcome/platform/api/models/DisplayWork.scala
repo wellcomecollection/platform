@@ -94,7 +94,7 @@ case object DisplayWork {
         else None,
       items =
         if (includes.items)
-          Some(work.items.map { DisplayItem(_, includes.identifiers) })
+          Some(work.items.map { DisplayItem(_, includesIdentifiers = includes.identifiers) })
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
       visible = work.visible    )
