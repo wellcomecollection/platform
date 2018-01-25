@@ -86,25 +86,18 @@ case object DisplayWork {
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
         if (includes.identifiers)
-          work.identifiers match {
-            case Some(identifiers) =>
-              Some(identifiers.map(DisplayIdentifier(_)))
-            case None => Some(List())
-          } else None,
+          Some(work.identifiers.map { DisplayIdentifier(_) })
+        else None,
       thumbnail =
         if (includes.thumbnail)
-          work.thumbnail.map(DisplayLocation(_))
+          work.thumbnail.map { DisplayLocation(_) }
         else None,
       items =
         if (includes.items)
-          work.items match {
-            case Some(items) =>
-              Some(items.map(DisplayItem(_, includes.identifiers)))
-            case None => Some(List())
-          } else None,
+          Some(work.items.map { DisplayItem(_, includes.identifiers) })
+        else None,
       publishers = work.publishers.map(DisplayAgent(_)),
-      visible = work.visible
-    )
+      visible = work.visible    )
   }
 
   def apply(work: Work): DisplayWork =
