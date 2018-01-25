@@ -81,18 +81,12 @@ case object DisplayWork {
       description = work.description,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      // Wrapping this in Option to catch null value from Jackson
-      // TODO: Since Jackson no longer does Work decoding, can we drop this?
-      creators = Option(work.creators.map { DisplayAgent(_) } ).getOrElse(Nil),
-      subjects = Option(work.subjects.map { DisplayConcept(_) }).getOrElse(Nil),
-      genres = Option(work.genres.map { DisplayConcept(_) } ).getOrElse(Nil),
+      creators = work.creators.map { DisplayAgent(_) },
+      subjects = work.subjects.map { DisplayConcept(_) },
+      genres = work.genres.map { DisplayConcept(_) } ),
       identifiers =
         if (includes.identifiers)
-          // If there aren't any identifiers on the work JSON, Jackson puts a
-          // nil here.  Wrapping it in an Option casts it into a None or Some
-          // as appropriate, and avoids throwing a NullPointerError when
-          // we map over the value.
-          Option[List[SourceIdentifier]](work.identifiers) match {
+          work.identifiers match {
             case Some(identifiers) =>
               Some(identifiers.map(DisplayIdentifier(_)))
             case None => Some(List())
@@ -103,7 +97,7 @@ case object DisplayWork {
         else None,
       items =
         if (includes.items)
-          Option[List[Item]](work.items) match {
+          work.items match {
             case Some(items) =>
               Some(items.map(DisplayItem(_, includes.identifiers)))
             case None => Some(List())
