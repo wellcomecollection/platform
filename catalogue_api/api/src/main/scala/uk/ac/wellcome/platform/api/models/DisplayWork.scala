@@ -31,13 +31,13 @@ case class DisplayWork(
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
     value =
-      "Relates the creation of a work to a date, when the date of creation does not cover a range.") createdDate: Option[
-    DisplayPeriod] = None,
+      "Relates the creation of a work to a date, when the date of creation does not cover a range."
+  ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
     value =
-      "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has.") creators: List[
-    DisplayAgent] = List(),
+      "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
+  ) creators: List[DisplayAgent] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayIdentifier]",
     value =
@@ -46,12 +46,11 @@ case class DisplayWork(
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayConcept",
     value =
-      "Relates a work to the general thesaurus-based concept that describes the work's content.") subjects: List[
-    DisplayConcept] = List(),
+      "Relates a work to the general thesaurus-based concept that describes the work's content."
+  ) subjects: List[DisplayConcept] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayConcept",
-    value =
-      "Relates a work to the genre that describes the work's content.") genres: List[
+    value = "Relates a work to the genre that describes the work's content.") genres: List[
     DisplayConcept] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
@@ -90,14 +89,16 @@ case object DisplayWork {
         else None,
       thumbnail =
         if (includes.thumbnail)
-          work.thumbnail.map { DisplayLocation(_) }
-        else None,
+          work.thumbnail.map { DisplayLocation(_) } else None,
       items =
         if (includes.items)
-          Some(work.items.map { DisplayItem(_, includesIdentifiers = includes.identifiers) })
+          Some(work.items.map {
+            DisplayItem(_, includesIdentifiers = includes.identifiers)
+          })
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
-      visible = work.visible    )
+      visible = work.visible
+    )
   }
 
   def apply(work: Work): DisplayWork =
