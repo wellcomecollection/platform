@@ -21,7 +21,8 @@ class WorksIndexTest
     with Eventually
     with Matchers
     with JsonTestUtil
-    with BeforeAndAfterEach with PropertyChecks{
+    with BeforeAndAfterEach
+    with PropertyChecks {
 
   val indexName = "works"
   val itemType = "work"
@@ -36,7 +37,7 @@ class WorksIndexTest
 
   it("puts a valid work") {
 
-    forAll{ sampleWork: Work =>
+    forAll { sampleWork: Work =>
       ensureIndexDeleted(indexName)
       createAndWaitIndexIsCreated(worksIndex, indexName)
 
@@ -47,19 +48,19 @@ class WorksIndexTest
           indexInto(indexName / itemType)
             .doc(sampleWorkJson))
 
-        eventually {
-          val hits = elasticClient
-            .execute(search(s"$indexName/$itemType").matchAllQuery())
-            .map {
-              _.hits.hits
-            }
-            .await
+      eventually {
+        val hits = elasticClient
+          .execute(search(s"$indexName/$itemType").matchAllQuery())
+          .map {
+            _.hits.hits
+          }
+          .await
 
-          hits should have size 1
+        hits should have size 1
 
-          assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
-        }
+        assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
       }
+    }
   }
 
   it("does not put an invalid work") {

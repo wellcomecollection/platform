@@ -7,7 +7,8 @@ import uk.ac.wellcome.models.{DigitalLocation, Location, PhysicalLocation}
 @ApiModel(
   value = "Location",
   description = "A location that provides access to an item",
-  subTypes = Array(classOf[DisplayDigitalLocation], classOf[DisplayPhysicalLocation])
+  subTypes =
+    Array(classOf[DisplayDigitalLocation], classOf[DisplayPhysicalLocation])
 )
 sealed trait DisplayLocation
 
