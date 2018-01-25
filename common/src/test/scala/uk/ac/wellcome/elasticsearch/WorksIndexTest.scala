@@ -10,6 +10,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.elasticsearch.client.ResponseException
+import org.scalatest.prop.PropertyChecks
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -20,7 +21,7 @@ class WorksIndexTest
     with Eventually
     with Matchers
     with JsonTestUtil
-    with BeforeAndAfterEach {
+    with BeforeAndAfterEach with PropertyChecks{
 
   val indexName = "works"
   val itemType = "work"
@@ -34,27 +35,31 @@ class WorksIndexTest
   implicitly[Arbitrary[Work]]
 
   it("puts a valid work") {
-    createAndWaitIndexIsCreated(worksIndex, indexName)
 
-    val sampleWork = Arbitrary.arbitrary[Work].sample.get
-    val sampleWorkJson = JsonUtil.toJson(sampleWork).get
+    forAll{ sampleWork: Work =>
+      ensureIndexDeleted(indexName)
+      createAndWaitIndexIsCreated(worksIndex, indexName)
 
-    elasticClient
-      .execute(
-        indexInto(indexName / itemType)
-          .doc(sampleWorkJson))
+      val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$indexName/$itemType").matchAllQuery())
-        .map { _.hits.hits }
-        .await
+      val eventualResponse = elasticClient
+        .execute(
+          indexInto(indexName / itemType)
+            .doc(sampleWorkJson))
 
-      hits should have size 1
+        eventually {
+          val hits = elasticClient
+            .execute(search(s"$indexName/$itemType").matchAllQuery())
+            .map {
+              _.hits.hits
+            }
+            .await
 
-      assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
-    }
+          hits should have size 1
 
+          assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
+        }
+      }
   }
 
   it("does not put an invalid work") {
