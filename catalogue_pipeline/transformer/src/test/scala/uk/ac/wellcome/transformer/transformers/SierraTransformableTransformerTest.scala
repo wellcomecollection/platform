@@ -152,6 +152,7 @@ class SierraTransformableTransformerTest
   it("performs a transformation on a work using all varfields") {
     val id = "000"
     val title = "Hi Diddle Dee Dee"
+    val lettering = "An actor's life for me"
 
     val publisherFields = List(
       VarField(
@@ -180,13 +181,24 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val marcFields = publisherFields ++ descriptionFields
+    val letteringFields = List(
+      VarField(
+        fieldTag = "?",
+        marcTag = "246",
+        indicator1 = "1",
+        indicator2 = "6",
+        subfields = List()
+      )
+    )
+
+    val marcFields = publisherFields ++ descriptionFields ++ letteringFields
 
     val data =
       s"""
          |{
          | "id": "$id",
          | "title": "$title",
+         | "lettering": "$lettering",
          | "varFields": ${toJson(marcFields).get}
          |}
         """.stripMargin
@@ -208,7 +220,8 @@ class SierraTransformableTransformerTest
         sourceIdentifier = identifier,
         identifiers = List(identifier),
         description = Some("A delightful description of a dead daisy."),
-        publishers = List(Organisation(label = "Peaceful Poetry"))
+        publishers = List(Organisation(label = "Peaceful Poetry")),
+        lettering = Some(lettering)
       )
     )
   }
