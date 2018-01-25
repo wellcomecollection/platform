@@ -38,12 +38,14 @@ def affects_tests(path, task):
     # Nothing reads our Markdown files in tests, so we can ignore their
     # effect here.
     if path.endswith(('.md', '.png', '.graffle')) or path == 'LICENSE':
-        print("~~~ %s is ignored because it's not a file type we care about")
+        print(
+            "~~~ %s is ignored because it's not a file type we care about" %
+            path)
         return False
 
     # The ``misc`` folder is never used anywhere, so we can ignore it.
     if path.startswith('misc/'):
-        print("~~~ %s is ignored because it's in the misc dir")
+        print("~~~ %s is ignored because it's in the misc dir" % path)
         return False
 
     # We do lint the JSON and TTL files in the ontologies directory when
