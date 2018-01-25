@@ -78,7 +78,7 @@ class ApiWorksTestBase
        {
         "type": "${loc.ontologyType}",
         "locationType": "${loc.locationType}",
-        "label": ${loc.label}
+        "label": "${loc.label}"
        }
      """
 

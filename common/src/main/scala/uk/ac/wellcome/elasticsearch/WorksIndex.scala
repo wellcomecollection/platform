@@ -45,6 +45,7 @@ class WorksIndex @Inject()(client: HttpClient,
     objectField(fieldName).fields(
       keywordField("type"),
       keywordField("locationType"),
+      keywordField("label"),
       textField("url"),
       textField("credit"),
       license
