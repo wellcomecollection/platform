@@ -1,6 +1,5 @@
 package uk.ac.wellcome.models
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.{
@@ -17,7 +16,7 @@ sealed trait License {
   val licenseType: String
   val label: String
   val url: String
-  @JsonProperty("type") val ontologyType: String = "License"
+  val ontologyType: String = "License"
 }
 
 object License extends Logging {
@@ -52,8 +51,8 @@ object License extends Logging {
   }
 }
 
+// TODO: Do we need this?
 class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
-
   override def deserialize(p: JsonParser,
                            ctxt: DeserializationContext): License = {
     val node: JsonNode = p.getCodec.readTree(p)
