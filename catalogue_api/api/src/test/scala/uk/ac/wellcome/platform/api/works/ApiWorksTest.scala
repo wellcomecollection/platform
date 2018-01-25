@@ -209,6 +209,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           |         "locations": [
           |           {
           |             "type": "${location.ontologyType}",
+          |             "url": "",
           |             "locationType": "${location.locationType}",
           |             "license": ${license(location.license)},
           |             "credit": "${location.credit.get}"
