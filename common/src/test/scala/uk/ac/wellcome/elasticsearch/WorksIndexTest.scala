@@ -42,7 +42,7 @@ class WorksIndexTest
 
       val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
-      val eventualResponse = elasticClient
+      elasticClient
         .execute(
           indexInto(indexName / itemType)
             .doc(sampleWorkJson))
