@@ -83,7 +83,7 @@ case object DisplayWork {
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       creators = work.creators.map { DisplayAgent(_) },
       subjects = work.subjects.map { DisplayConcept(_) },
-      genres = work.genres.map { DisplayConcept(_) } ),
+      genres = work.genres.map { DisplayConcept(_) },
       identifiers =
         if (includes.identifiers)
           work.identifiers match {
