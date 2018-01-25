@@ -58,7 +58,7 @@ case class DisplayWork(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAgent] = List(),
   visible: Boolean = true
