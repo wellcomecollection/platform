@@ -107,8 +107,8 @@ trait WorksUtil {
   }
 
   def defaultLocation: Location = {
-    locationWith(
-      Some("https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"),
+    digitalLocationWith(
+      "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
       License_CCBY)
   }
 
@@ -123,7 +123,7 @@ trait WorksUtil {
     locations = List(location)
   )
 
-  def locationWith(url: Option[String], license: License): Location = {
-    Location(locationType = "iiif-image", url = url, license = license)
+  def digitalLocationWith(url: String, license: License): DigitalLocation = {
+    DigitalLocation(locationType = "iiif-image", url = url, license = license)
   }
 }

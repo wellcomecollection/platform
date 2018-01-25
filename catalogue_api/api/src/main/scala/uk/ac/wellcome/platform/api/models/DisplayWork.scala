@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.api.models
 
 import scala.util.{Failure, Success}
-
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse

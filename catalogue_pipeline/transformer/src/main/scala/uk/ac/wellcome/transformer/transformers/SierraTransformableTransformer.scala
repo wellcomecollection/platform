@@ -16,6 +16,7 @@ class SierraTransformableTransformer
     with SierraDescription
     with SierraPublishers
     with SierraTitle
+    with SierraLocation
     with Logging {
 
   private def extractItemData(itemRecord: SierraItemRecord) = {
@@ -35,6 +36,7 @@ class SierraTransformableTransformer
                 sierraItemData.id
               )
             ),
+            locations = getLocation(sierraItemData).toList,
             visible = !sierraItemData.deleted
           ))
       case Failure(e) => {
