@@ -37,7 +37,7 @@ case class DisplayDigitalLocation(
   ) locationType: String,
   @ApiModelProperty(
     dataType = "String",
-    value = "The title or other short name of a license"
+    value = "The URL of the digital asset."
   ) url: String,
   @ApiModelProperty(
     dataType = "String",
@@ -63,7 +63,7 @@ case class DisplayPhysicalLocation(
   ) locationType: String,
   @ApiModelProperty(
     dataType = "String",
-    value = "The title or other short name of a license"
+    value = "The title or other short name of the location."
   ) label: String
 ) extends DisplayLocation {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
