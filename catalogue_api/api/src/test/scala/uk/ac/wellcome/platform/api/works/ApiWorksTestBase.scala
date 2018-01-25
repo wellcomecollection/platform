@@ -60,13 +60,27 @@ class ApiWorksTestBase
       .map { location(_) }
       .mkString(",")
 
-  def location(loc: Location) =
+  def location(loc: Location) = loc match {
+    case l: DigitalLocation => digitalLocation(l)
+    case l: PhysicalLocation => physicalLocation(l)
+  }
+
+  def digitalLocation(loc: DigitalLocation) =
     s"""{
       "type": "${loc.ontologyType}",
       "locationType": "${loc.locationType}",
-      "url": "${loc.url.get}",
+      "url": "${loc.url}",
       "license": ${license(loc.license)}
     }"""
+
+  def physicalLocation(loc: PhysicalLocation) =
+    s"""
+       {
+        "type": "${loc.ontologyType}",
+        "locationType": "${loc.locationType}",
+        "label": ${loc.label}
+       }
+     """
 
   def license(license: License) =
     s"""{

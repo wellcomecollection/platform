@@ -168,8 +168,9 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should include credit information in API responses") {
-    val location = Location(
+    val location = DigitalLocation(
       locationType = "thumbnail-image",
+      url = "",
       credit = Some("Wellcome Collection"),
       license = License_CCBY
     )
@@ -816,9 +817,9 @@ class ApiWorksTest extends ApiWorksTestBase {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",
-      thumbnail = Location(
+      thumbnail = DigitalLocation(
         locationType = "thumbnail-image",
-        url = Some("https://iiif.example.org/1234/default.jpg"),
+        url = "https://iiif.example.org/1234/default.jpg",
         license = License_CCBY
       )
     )
@@ -853,8 +854,9 @@ class ApiWorksTest extends ApiWorksTestBase {
     val work = identifiedWorkWith(
       canonicalId = "5678",
       title = "An otter omitted from an occasion in Oslo",
-      thumbnail = Location(
+      thumbnail = DigitalLocation(
         locationType = "thumbnail-image",
+        url = "",
         license = License_CCBY
       )
     )
