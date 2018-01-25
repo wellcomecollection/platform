@@ -85,7 +85,8 @@ class MiroTransformableTransformerSubjectsTest
       List(
         DigitalLocation(
           locationType = "iiif-image",
-          url = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
+          url =
+            "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
           license = License_CCBY
         )
       )

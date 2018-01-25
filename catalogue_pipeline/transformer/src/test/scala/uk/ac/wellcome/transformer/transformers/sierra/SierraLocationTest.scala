@@ -18,7 +18,8 @@ class SierraLocationTest extends FunSpec with Matchers {
 
     val expectedLocation = PhysicalLocation(locationType, label)
 
-    transformer.getLocation(itemData = itemData) shouldBe Some(expectedLocation)
+    transformer.getLocation(itemData = itemData) shouldBe Some(
+      expectedLocation)
   }
 
   it("should return none if there is no location in the item data") {

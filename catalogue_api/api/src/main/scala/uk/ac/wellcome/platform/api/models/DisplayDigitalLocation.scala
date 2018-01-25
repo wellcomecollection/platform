@@ -8,13 +8,15 @@ sealed trait DisplayLocation
 
 object DisplayLocation {
   def apply(location: Location): DisplayLocation = location match {
-    case l:DigitalLocation=> DisplayDigitalLocation(
-    locationType = l.locationType,
-    url = l.url,
-    credit = l.credit,
-    license = DisplayLicense(l.license)
-  )
-  case l: PhysicalLocation => DisplayPhysicalLocation(locationType = l.locationType, label = l.label)
+    case l: DigitalLocation =>
+      DisplayDigitalLocation(
+        locationType = l.locationType,
+        url = l.url,
+        credit = l.credit,
+        license = DisplayLicense(l.license)
+      )
+    case l: PhysicalLocation =>
+      DisplayPhysicalLocation(locationType = l.locationType, label = l.label)
   }
 }
 
@@ -44,21 +46,20 @@ case class DisplayDigitalLocation(
   @JsonProperty("type") val ontologyType: String = "DigitalLocation"
 }
 
-
 @ApiModel(
   value = "PhysicalLocation",
   description = "A physical location that provides access to an item"
 )
 case class DisplayPhysicalLocation(
-                                   @ApiModelProperty(
-                                     value = "The type of location that an item is accessible from.",
-                                     allowableValues = ""
-                                   ) locationType: String,
-                                   @ApiModelProperty(
-                                     dataType = "String",
-                                     value = "The title or other short name of a license"
-                                   ) label: String
-                                 ) extends DisplayLocation {
+  @ApiModelProperty(
+    value = "The type of location that an item is accessible from.",
+    allowableValues = ""
+  ) locationType: String,
+  @ApiModelProperty(
+    dataType = "String",
+    value = "The title or other short name of a license"
+  ) label: String
+) extends DisplayLocation {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "PhysicalLocation"
 }

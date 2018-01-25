@@ -2,7 +2,7 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-sealed trait Location{
+sealed trait Location {
   val locationType: String
 }
 
@@ -15,7 +15,7 @@ case class DigitalLocation(
 ) extends Location
 
 case class PhysicalLocation(
-                           locationType: String,
-                           label: String,
-                           @JsonProperty("type") ontologyType: String = "PhysicalLocation"
-                           ) extends Location
+  locationType: String,
+  label: String,
+  @JsonProperty("type") ontologyType: String = "PhysicalLocation"
+) extends Location

@@ -16,11 +16,13 @@ class DisplayDigitalLocationTest extends FunSpec with Matchers {
     )
     val displayLocation = DisplayLocation(internalLocation)
 
-    displayLocation shouldBe a [DisplayDigitalLocation]
-    val displayDigitalLocation = displayLocation.asInstanceOf[DisplayDigitalLocation]
+    displayLocation shouldBe a[DisplayDigitalLocation]
+    val displayDigitalLocation =
+      displayLocation.asInstanceOf[DisplayDigitalLocation]
     displayDigitalLocation.locationType shouldBe locationType
     displayDigitalLocation.url shouldBe thumbnailUrl
-    displayDigitalLocation.license shouldBe DisplayLicense(internalLocation.license)
+    displayDigitalLocation.license shouldBe DisplayLicense(
+      internalLocation.license)
     displayDigitalLocation.ontologyType shouldBe "DigitalLocation"
   }
 
@@ -33,9 +35,9 @@ class DisplayDigitalLocationTest extends FunSpec with Matchers {
     )
     val displayLocation = DisplayLocation(location)
 
-
-    displayLocation shouldBe a [DisplayDigitalLocation]
-    val displayDigitalLocation = displayLocation.asInstanceOf[DisplayDigitalLocation]
+    displayLocation shouldBe a[DisplayDigitalLocation]
+    val displayDigitalLocation =
+      displayLocation.asInstanceOf[DisplayDigitalLocation]
     displayDigitalLocation.credit shouldBe location.credit
   }
 }

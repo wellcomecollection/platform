@@ -83,7 +83,7 @@ class MiroTransformableTransformerCopyrightTest
   ) = {
     val transformedWork = transformWork(data = data)
     val location = transformedWork.items.head.locations.head
-    location shouldBe a [DigitalLocation]
+    location shouldBe a[DigitalLocation]
     location.asInstanceOf[DigitalLocation].credit shouldBe expectedCredit
   }
 }
