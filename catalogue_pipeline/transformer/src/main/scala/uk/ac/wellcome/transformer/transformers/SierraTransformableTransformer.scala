@@ -14,6 +14,7 @@ class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
     with SierraDescription
+    with SierraLettering
     with SierraPublishers
     with SierraTitle
     with SierraLocation
@@ -63,6 +64,7 @@ class SierraTransformableTransformer
               ),
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
+              lettering = getLettering(sierraBibData),
               items = Option(sierraTransformable.itemData)
                 .getOrElse(Map.empty)
                 .values
