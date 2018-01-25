@@ -30,7 +30,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                             works(0).createdDate.get)},
                           |     "creators": [ ${agent(works(0).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -42,7 +43,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                             works(1).createdDate.get)},
                           |     "creators": [ ${agent(works(1).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -54,7 +56,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                             works(2).createdDate.get)},
                           |     "creators": [ ${agent(works(2).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}
@@ -90,7 +93,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "createdDate": ${period(work.createdDate.get)},
                           | "creators": [ ${agent(work.creators(0))} ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -125,7 +129,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "creators": [ ],
                           | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -154,7 +159,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "creators": [ ],
                           | "items": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -194,6 +200,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           |     "creators": [ ],
           |     "subjects": [ ],
           |     "genres": [ ],
+          |     "publishers": [ ],
           |     "items": [
           |       {
           |         "id": "${item.canonicalId.get}",
@@ -243,7 +250,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                             works(1).createdDate.get)},
                           |     "creators": [ ${agent(works(1).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -271,7 +279,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                             works(0).createdDate.get)},
                           |     "creators": [ ${agent(works(0).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -299,7 +308,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                             works(2).createdDate.get)},
                           |     "creators": [ ${agent(works(2).creators(0))} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }]
                           |   }
                           |  ]
@@ -441,7 +451,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${work1.title.get}",
                           |     "creators": [],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -474,7 +485,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "creators": [],
                           |     "subjects": [ ${concepts(
                             workWithSubjects.subjects)} ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -506,7 +518,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [ ],
-                          |     "genres": [ ${concepts(workWithSubjects.genres)} ]
+                          |     "genres": [ ${concepts(workWithSubjects.genres)} ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}""".stripMargin
@@ -555,7 +568,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "creators": [ ],
                           |     "identifiers": [ ${identifier(identifier1)} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   },
                           |   {
                           |     "type": "Work",
@@ -564,7 +578,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "creators": [ ],
                           |     "identifiers": [ ${identifier(identifier2)} ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}
@@ -599,7 +614,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "creators": [ ],
                           | "identifiers": [ ${identifier(srcIdentifier)} ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -628,7 +644,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "creators": [ ],
                           | "identifiers": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -661,7 +678,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -679,7 +697,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "title": "${work_alt.title.get}",
                           | "creators": [ ],
                           | "subjects": [ ],
-                          | "genres": [ ]
+                          | "genres": [ ],
+                          | "publishers": [ ]
                           |}
           """.stripMargin
       )
@@ -714,7 +733,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${work.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}
@@ -736,7 +756,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${work_alt.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}
@@ -818,6 +839,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
+                          |     "publishers": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }
                           |  ]
@@ -852,7 +874,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${work.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ]
+                          |     "genres": [ ],
+                          |     "publishers": [ ]
                           |   }
                           |  ]
                           |}
