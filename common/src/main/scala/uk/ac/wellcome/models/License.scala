@@ -1,17 +1,9 @@
 package uk.ac.wellcome.models
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.{
-  DeserializationContext,
-  JsonDeserializer,
-  JsonNode
-}
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder, Json}
 import cats.syntax.either._
 
-@JsonDeserialize(using = classOf[LicenseDeserialiser])
 sealed trait License {
   val licenseType: String
   val label: String
@@ -48,16 +40,6 @@ object License extends Logging {
         error(errorMessage)
         throw new Exception(errorMessage)
     }
-  }
-}
-
-// TODO: Do we need this?
-class LicenseDeserialiser extends JsonDeserializer[License] with Logging {
-  override def deserialize(p: JsonParser,
-                           ctxt: DeserializationContext): License = {
-    val node: JsonNode = p.getCodec.readTree(p)
-    val licenseType = node.get("licenseType").asText
-    License.createLicense(licenseType)
   }
 }
 
