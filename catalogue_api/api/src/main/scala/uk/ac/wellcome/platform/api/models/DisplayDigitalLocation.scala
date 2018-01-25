@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.{DigitalLocation, Location, PhysicalLocation}
 
+@ApiModel(
+  value = "Location",
+  description = "A location that provides access to an item",
+  subTypes = Array(classOf[DisplayDigitalLocation], classOf[DisplayPhysicalLocation])
+)
 sealed trait DisplayLocation
 
 object DisplayLocation {
