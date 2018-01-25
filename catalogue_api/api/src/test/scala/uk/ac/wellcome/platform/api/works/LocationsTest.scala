@@ -5,8 +5,9 @@ import uk.ac.wellcome.models._
 
 class LocationsTest extends ApiWorksTestBase {
   it("should render a physical location correctly") {
-    val physicalLocation:Location = PhysicalLocation(locationType = "smeg",
-                                           label = "a stack of slick slimes")
+    val physicalLocation: Location =
+      PhysicalLocation(locationType = "smeg",
+                       label = "a stack of slick slimes")
     val work = Work(
       canonicalId = Some("zm9q6c6h"),
       sourceIdentifier = sourceIdentifier,
