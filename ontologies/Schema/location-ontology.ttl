@@ -29,6 +29,18 @@ wloc:Location rdf:type owl:Class ;
     rdfs:comment "A location that provides access to an item"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .       
 
+wloc:PhysicalLocation rdf:type owl:Class ;
+    rdfs:subClassOf wloc:Location ;
+    rdfs:label "PhysicalLocation"@en ;
+    rdfs:comment "A physical location that provides access to an item"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> . 
+        
+wloc:DigitalLocation rdf:type owl:Class ;
+    rdfs:subClassOf wloc:Location ;
+    rdfs:label "DigitalLocation"@en ;
+    rdfs:comment "A digital location that provides access to an item"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> . 
+
 wloc:AccessStatus rdf:type owl:Class ;
     rdfs:label "AccessStatus"@en ;
     rdfs:comment "A simple open or closed access status type."@en ;
@@ -68,7 +80,7 @@ wloc:locations  rdf:type owl:ObjectProperty ;
 wloc:accessStatus rdf:type owl:ObjectProperty ;
     rdfs:label "accessStatus"@en ;
     rdfs:comment "A service that makes the thing accesible"@en ;
-    rdfs:domain wloc:Location ;
+    rdfs:domain wloc:PhysicalLocation ;
     rdfs:range wloc:AccessStatus ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
     
@@ -82,7 +94,7 @@ wloc:locationType rdf:type owl:ObjectProperty ;
 wloc:accessProcess rdf:type owl:ObjectProperty ;
     rdfs:label "accessProcess"@en ;
     rdfs:comment "This relates an accesible item to a process of access."@en ;
-    rdfs:domain wloc:Location ;
+    rdfs:domain wloc:PhysicalLocation ;
     rdfs:range wloc:AccessProcess ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .
     
