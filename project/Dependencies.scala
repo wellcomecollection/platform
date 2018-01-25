@@ -14,7 +14,6 @@ object Dependencies {
     val elastic4s = "5.4.1"
     val scanamo = "1.0.0-M3"
     val jacksonYamlVersion = "2.8.8"
-    val jacksonJSR310Version = "2.8.9"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
