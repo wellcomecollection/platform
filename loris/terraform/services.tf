@@ -8,7 +8,7 @@ module "loris" {
   listener_https_arn = "${module.loris_alb.listener_https_arn}"
   listener_http_arn  = "${module.loris_alb.listener_http_arn}"
 
-  path_pattern     = "/image*"
+  path_pattern     = "/*"
   healthcheck_path = "/image/"
 
   cpu    = 3960
