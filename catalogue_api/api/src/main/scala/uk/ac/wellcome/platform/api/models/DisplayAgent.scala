@@ -11,7 +11,7 @@ case class DisplayAgent(
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
-  @JsonProperty("type") val ontologyType: String = "Agent"
+  @JsonProperty("type") ontologyType: String = "Agent"
 )
 
 case object DisplayAgent {
