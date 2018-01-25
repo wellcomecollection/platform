@@ -7,7 +7,7 @@ import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.platform.api.utils.ApiJsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 @JsonIgnoreProperties(Array("visible"))
 @ApiModel(
@@ -57,6 +57,10 @@ case class DisplayWork(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
+    value = "Relates a published work to its publisher."
+  ) publishers: List[DisplayAgent] = List(),
   visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
@@ -98,9 +102,13 @@ case object DisplayWork {
               Some(items.map(DisplayItem(_, includes.identifiers)))
             case None => Some(List())
           } else None,
+      publishers = work.publishers.map(DisplayAgent(_)),
       visible = work.visible
     )
   }
+
+  def apply(work: Work): DisplayWork =
+    DisplayWork(work = work, includes = WorksIncludes())
 
   def apply(hit: SearchHit): DisplayWork =
     apply(hit, includes = WorksIncludes())
@@ -114,7 +122,7 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    ApiJsonUtil.fromJson[Work](document) match {
+    fromJson[Work](document) match {
       case Success(work) => DisplayWork(work = work, includes = includes)
       case Failure(e) =>
         throw new RuntimeException(
