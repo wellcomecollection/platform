@@ -20,29 +20,6 @@ class DisplayWorkTest extends FunSpec with Matchers {
     displayWork.items shouldBe Some(List())
   }
 
-  it("correctly parses items on a work") {
-    val item = Item(
-      canonicalId = Some("c3a599u5"),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      locations = List()
-    )
-    val work = Work(
-      title = Some("Inside an irate igloo"),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      canonicalId = Some("b4heraz7"),
-      items = List(item)
-    )
-
-    val displayWork = DisplayWork(
-      work = work,
-      includes = WorksIncludes(items = true)
-    )
-    val displayItem = displayWork.items.get.head
-    displayItem.id shouldBe item.canonicalId.get
-  }
-
   val sourceIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.sierraSystemNumber,
     value = "b1234567"
@@ -59,6 +36,59 @@ class DisplayWorkTest extends FunSpec with Matchers {
       includes = WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(List())
+  }
+
+  describe("items") {
+    it("includes items on a work") {
+      val item = Item(
+        canonicalId = Some("c3a599u5"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        locations = List()
+      )
+      val work = Work(
+        title = Some("Inside an irate igloo"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        canonicalId = Some("b4heraz7"),
+        items = List(item)
+      )
+
+      val displayWork = DisplayWork(
+        work = work,
+        includes = WorksIncludes(items = true)
+      )
+      val displayItem = displayWork.items.get.head
+      displayItem.id shouldBe item.canonicalId.get
+    }
+
+    it("does not include items with visible=false") {
+      val visibleItem = Item(
+        canonicalId = Some("dxkjtx8p"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        locations = List(),
+        visible = true
+      )
+      val invisibleItem = Item(
+        canonicalId = Some("dxkjtx8p"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        locations = List(),
+        visible = false
+      )
+
+      val work = Work(
+        title = Some("Daring to dance with dolpins in the Danube"),
+        sourceIdentifier = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        canonicalId = Some("d8nhz8bm"),
+        items = List(visibleItem, invisibleItem)
+      )
+      val displayWork = DisplayWork(work)
+
+      displayWork.items shouldBe List(DisplayItem(visibleItem, includesIdentifiers = true))
+    }
   }
 
   describe("publishers") {
