@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api
+package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
 import uk.ac.wellcome.models.Work
@@ -54,7 +54,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "createdDate": ${period(works(0).createdDate.get)},
           |     "creators": [ ${agent(works(0).creators(0))} ],
           |     "subjects": [ ],
-          |     "genres": [ ]
+          |     "genres": [ ],
+          |     "publishers": [ ]
           |   },
           |   {
           |     "type": "Work",
@@ -65,7 +66,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "createdDate": ${period(works(1).createdDate.get)},
           |     "creators": [ ${agent(works(1).creators(0))} ],
           |     "subjects": [ ],
-          |     "genres": [ ]
+          |     "genres": [ ],
+          |     "publishers": [ ]
           |   }
           |  ]
           |}
@@ -100,7 +102,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "title": "${work.title.get}",
           |     "creators": [],
           |     "subjects": [ ],
-          |     "genres": [ ]
+          |     "genres": [ ],
+          |     "publishers": [ ]
           |   }
           |  ]
           |}""".stripMargin
