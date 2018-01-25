@@ -1,11 +1,6 @@
 package uk.ac.wellcome.test.utils
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{
-  indexExists,
-  indexInto,
-  search,
-  _
-}
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.WorksIndex
