@@ -55,10 +55,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
-      |    "url" : null,
+      |    "url" : "",
       |    "credit" : null,
       |    "license": $license_CCBYJson,
-      |    "type": "Location"
+      |    "type": "DigitalLocation"
       |  },
       |  "items": [
       |    {
@@ -76,10 +76,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "locations": [
       |        {
       |          "locationType": "location",
-      |          "url" : null,
+      |          "url" : "",
       |          "credit" : null,
       |          "license": $license_CCBYJson,
-      |          "type": "Location"
+      |          "type": "DigitalLocation"
       |        }
       |      ],
       |      "visible":true,
@@ -138,10 +138,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "thumbnail": {
       |    "locationType": "location",
-      |    "url" : null,
+      |    "url" : "",
       |    "credit" : null,
       |    "license": $license_CCBYJson,
-      |    "type": "Location"
+      |    "type": "DigitalLocation"
       |  },
       |  "items": [
       |    {
@@ -159,10 +159,10 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "locations": [
       |        {
       |          "locationType": "location",
-      |          "url" : null,
+      |          "url" : "",
       |          "credit" : null,
       |          "license": $license_CCBYJson,
-      |          "type": "Location"
+      |          "type": "DigitalLocation"
       |        }
       |      ],
       |      "visible":true,
