@@ -24,7 +24,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "locations": [
       |    {
       |      "locationType": "location",
-      |      "url" : null,
+      |      "url" : "",
       |      "credit" : null,
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
@@ -32,7 +32,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |        "url": "${License_CCBY.url}",
       |        "type": "License"
       |      },
-      |      "type": "Location"
+      |      "type": "DigitalLocation"
       |    }
       |  ],
       |  "visible":true,
@@ -57,7 +57,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "locations": [
       |    {
       |      "locationType": "location",
-      |      "url" : null,
+      |      "url" : "",
       |      "credit" : null,
       |      "license": {
       |        "licenseType": "${License_CCBY.licenseType}",
@@ -65,7 +65,7 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |        "url": "${License_CCBY.url}",
       |        "type": "License"
       |      },
-      |      "type": "Location"
+      |      "type": "DigitalLocation"
       |    }
       |  ],
       |  "visible":true,
@@ -73,9 +73,9 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
       |}
     """.stripMargin
 
-  val location = Location(
+  val location = DigitalLocation(
     locationType = "location",
-    url = None,
+    url = "",
     license = License_CCBY
   )
 

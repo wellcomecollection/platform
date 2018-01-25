@@ -1,14 +1,22 @@
 package uk.ac.wellcome.transformer.transformers
 
+import java.time.Instant
 import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.test.utils.SierraData
-import uk.ac.wellcome.transformer.source.{MarcSubfield, VarField}
-
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  SierraItemData,
+  VarField
+}
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraTransformableTransformerTest
@@ -63,6 +71,53 @@ class SierraTransformableTransformerTest
         identifiers = List(sourceIdentifier2)
       )
     )
+  }
+
+  it("should extract information from items") {
+    val modifiedDate = Instant.now
+    val bibId = "b1234567"
+    val itemId = "i1234567"
+    val locationType = "sgmed"
+    val locationLabel = "A museum of mermaids"
+    val bibData =
+      s"""{
+            "id": "$bibId"
+          }"""
+    val itemData =
+      s"""{
+          |"id": "$itemId",
+          |"location": {
+          |   "code": "$locationType",
+          |   "name": "$locationLabel"
+          | }
+          |}""".stripMargin
+
+    val transformable = SierraTransformable(
+      id = bibId,
+      maybeBibData = Some(
+        SierraBibRecord(id = bibId,
+                        data = bibData,
+                        modifiedDate = modifiedDate)),
+      itemData = Map(
+        itemId -> SierraItemRecord(id = itemId,
+                                   data = itemData,
+                                   modifiedDate = modifiedDate,
+                                   bibIds = List(bibId),
+                                   unlinkedBibIds = Nil,
+                                   version = 1))
+    )
+
+    val triedMaybeWork = transformer.transform(transformable)
+    triedMaybeWork.isSuccess shouldBe true
+    triedMaybeWork.get.isDefined shouldBe true
+    val work = triedMaybeWork.get.get
+    work.items should have size 1
+    val expectedSourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, itemId)
+    work.items.head shouldBe Item(
+      sourceIdentifier = expectedSourceIdentifier,
+      identifiers = List(expectedSourceIdentifier),
+      locations = List(PhysicalLocation(locationType, locationLabel)))
   }
 
   it("should not perform a transformation without bibData") {

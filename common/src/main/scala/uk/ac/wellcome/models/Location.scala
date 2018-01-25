@@ -2,10 +2,20 @@ package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-case class Location(
-  locationType: String,
-  url: Option[String] = None,
-  credit: Option[String] = None,
+sealed trait Location {
+  val locationType: String
+}
+
+case class DigitalLocation(
+  url: String,
   license: License,
-  @JsonProperty("type") ontologyType: String = "Location"
-)
+  locationType: String,
+  credit: Option[String] = None,
+  @JsonProperty("type") ontologyType: String = "DigitalLocation"
+) extends Location
+
+case class PhysicalLocation(
+  locationType: String,
+  label: String,
+  @JsonProperty("type") ontologyType: String = "PhysicalLocation"
+) extends Location

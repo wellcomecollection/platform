@@ -7,10 +7,10 @@ import uk.ac.wellcome.utils.JsonUtil._
 class DisplayItemTest extends FunSpec with Matchers {
 
   val location: Location = {
-    val thumbnailUrl = Some("https://iiif.example.org/V0000001/default.jpg")
+    val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
     val locationType = "thumbnail-image"
 
-    Location(
+    DigitalLocation(
       locationType = locationType,
       url = thumbnailUrl,
       license = License_CCBY

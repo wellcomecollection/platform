@@ -1,6 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.DigitalLocation
 
 class MiroTransformableTransformerCopyrightTest
     extends FunSpec
@@ -81,6 +82,8 @@ class MiroTransformableTransformerCopyrightTest
     expectedCredit: Option[String] = None
   ) = {
     val transformedWork = transformWork(data = data)
-    transformedWork.items.head.locations.head.credit shouldBe expectedCredit
+    val location = transformedWork.items.head.locations.head
+    location shouldBe a[DigitalLocation]
+    location.asInstanceOf[DigitalLocation].credit shouldBe expectedCredit
   }
 }
