@@ -92,9 +92,9 @@ case object DisplayWork {
           work.thumbnail.map { DisplayLocation(_) } else None,
       items =
         if (includes.items)
-          Some(work.items.map {
-            DisplayItem(_, includesIdentifiers = includes.identifiers)
-          })
+          Some(work.items
+            .filter { _.visible }
+            .map { DisplayItem(_, includesIdentifiers = includes.identifiers)})
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
       visible = work.visible
