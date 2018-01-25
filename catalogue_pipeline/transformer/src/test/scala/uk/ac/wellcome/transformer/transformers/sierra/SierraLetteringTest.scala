@@ -75,7 +75,8 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
     )
   }
 
-  it("passes through nothing if the lettering is missing, even if the MARC is correct") {
+  it(
+    "passes through nothing if the lettering is missing, even if the MARC is correct") {
     assertFindsCorrectLettering(
       lettering = None,
       varFields = List(
