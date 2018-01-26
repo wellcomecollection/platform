@@ -181,14 +181,14 @@ class TestAlarm:
         (
             {
                 'AlarmName': 'api_romulus_v1-alb-not-enough-healthy-hosts',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [0.0 (09/01/18 10:36:00)] was less than or equal to the threshold (0.0).',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [0.0 (09/01/18 10:36:00)] was less than the threshold (0.0).',
             },
             "There aren't enough healthy hosts in the API (saw 0; expected more than 0) at 10:36:00 on 9 Jan 2018."
         ),
         (
             {
                 'AlarmName': 'api_romulus_v1-alb-not-enough-healthy-hosts',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (09/01/18 10:36:00)] was less than or equal to the threshold (5.0).',
+                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (09/01/18 10:36:00)] was less than the threshold (5.0).',
             },
             "There aren't enough healthy hosts in the API (saw 3; expected more than 5) at 10:36:00 on 9 Jan 2018."
         ),
