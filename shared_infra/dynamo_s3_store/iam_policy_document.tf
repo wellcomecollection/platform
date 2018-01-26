@@ -3,7 +3,6 @@ data "aws_s3_bucket" "assets" {
 }
 
 data "aws_iam_policy_document" "read_policy" {
-
   # This is based on the AmazonDynamoDBReadOnlyAccess
   statement {
     actions = [
@@ -34,7 +33,6 @@ data "aws_iam_policy_document" "read_policy" {
 }
 
 data "aws_iam_policy_document" "full_access_policy" {
-
   statement {
     actions = [
       "dynamodb:*",
@@ -56,4 +54,3 @@ data "aws_iam_policy_document" "full_access_policy" {
     ]
   }
 }
-
