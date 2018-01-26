@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.reindexer.services
 
 import javax.inject.Inject
 
+import com.gu.scanamo.DynamoFormat
 import com.twitter.inject.Logging
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
@@ -11,10 +12,10 @@ import uk.ac.wellcome.utils.TryBackoff
 
 import scala.concurrent.Future
 
-class ReindexService[T <: Reindexable[String]] @Inject()(
+class ReindexService[+T <: Reindexable[String]] @Inject()(
   reindexTrackerService: ReindexTrackerService,
   reindexTargetService: ReindexTargetService[T],
-  metricsSender: MetricsSender)
+  metricsSender: MetricsSender)(implicit dynamoFormat: DynamoFormat[T])
     extends Logging
     with TryBackoff {
 

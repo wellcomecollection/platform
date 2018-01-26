@@ -3,15 +3,12 @@ package uk.ac.wellcome.platform.reindexer.modules
 import javax.inject.Singleton
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Provides
+import com.gu.scanamo.DynamoFormat
 import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable
-}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, Reindexable}
 import uk.ac.wellcome.platform.reindexer.models._
 import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -34,27 +31,19 @@ object ReindexModule extends TwitterModule with TryBackoff {
 
   @Singleton
   @Provides
-  def providesMiroReindexTargetService(
-    dynamoDBClient: AmazonDynamoDB,
-    metricsSender: MetricsSender): ReindexTargetService[MiroTransformable] =
-    new MiroReindexTargetService(
-      dynamoDBClient = dynamoDBClient,
-      metricsSender = metricsSender,
-      targetTableName = targetTableName(),
-      targetReindexShard = targetReindexShard()
-    )
+  def providesReindexService(
+    injector: Injector): ReindexService[Reindexable[String]] =
+  {
+    val tableName = targetTableName()
 
-  @Singleton
-  @Provides
-  def providesCalmReindexTargetService(
-    dynamoDBClient: AmazonDynamoDB,
-    metricsSender: MetricsSender): ReindexTargetService[CalmTransformable] =
-    new CalmReindexTargetService(
-      dynamoDBClient = dynamoDBClient,
-      metricsSender = metricsSender,
-      targetTableName = targetTableName(),
-      targetReindexShard = targetReindexShard()
-    )
+    tableName match {
+      case "MiroData" => createReindexService[MiroTransformable](injector)
+      case "CalmData" => createReindexService[CalmTransformable](injector)
+      case _ =>
+        throw new RuntimeException(
+          s"$tableName is not a recognised reindexable table.")
+    }
+  }
 
   override def singletonStartup(injector: Injector) {
     val tableName = targetTableName()
@@ -64,13 +53,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
     ReindexStatus.init()
 
     val actorSystem = injector.instance[ActorSystem]
-    val reindexService = tableName match {
-      case "MiroData" => injector.instance[ReindexService[MiroTransformable]]
-      case "CalmData" => injector.instance[ReindexService[CalmTransformable]]
-      case _ =>
-        throw new RuntimeException(
-          s"$tableName is not a recognised reindexable table.")
-    }
+    val reindexService = injector.instance[ReindexService[Reindexable[String]]]
 
     val reindexJob = () => {
       val future = reindexService.run
@@ -86,6 +69,10 @@ object ReindexModule extends TwitterModule with TryBackoff {
     }
 
     run(() => reindexJob(), actorSystem)
+  }
+
+  private def createReindexService[T <: Reindexable[String]](injector: Injector)(implicit dynamoFormat: DynamoFormat[T], evidence: Manifest[ReindexTargetService[T]])= {
+    new ReindexService[T](injector.instance[ReindexTrackerService], injector.instance[ReindexTargetService[T]], injector.instance[MetricsSender])
   }
 
   override def singletonShutdown(injector: Injector) {
