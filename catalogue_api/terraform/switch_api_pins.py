@@ -5,7 +5,6 @@ import os
 import re
 
 import boto3
-import hcl
 
 
 TFVARS = 'terraform_api.tfvars'
