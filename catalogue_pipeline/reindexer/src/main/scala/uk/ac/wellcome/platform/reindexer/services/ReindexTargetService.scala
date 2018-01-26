@@ -35,12 +35,12 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
   private val gsiName = "ReindexTracker"
 
   private def scanamoUpdate(k: UniqueKey[_],
-                              updateExpression: UpdateExpression)(
+                            updateExpression: UpdateExpression)(
     implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] =
     Scanamo.update[T](dynamoDBClient)(targetTableName)(k, updateExpression)
 
   private def scanamoQueryStreamFunction(queryRequest: ScanamoQueryRequest,
-                                           f: ScanamoQueryResultFunction)(
+                                         f: ScanamoQueryResultFunction)(
     implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
     ScanamoQueryStream.run[T, Boolean](queryRequest, f)
 
