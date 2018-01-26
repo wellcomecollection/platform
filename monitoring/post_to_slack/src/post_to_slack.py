@@ -108,7 +108,7 @@ class Alarm:
 
         elif self.name.endswith('-alb-not-enough-healthy-hosts'):
             threshold = re.search(
-                r'less than or equal to the threshold \((?P<value>\d+)\.0\)',
+                r'less than the threshold \((?P<value>\d+)\.0\)',
                 self.state_reason).group('value')
             return (
                 f"There aren't enough healthy hosts in {service} "
