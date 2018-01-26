@@ -27,7 +27,3 @@ output "vpc_api_id" {
 output "vpc_api_subnets" {
   value = "${module.vpc_api.subnets}"
 }
-
-output "ecs_ami_id" {
-  value = "${data.aws_ami.stable_coreos.id}"
-}
