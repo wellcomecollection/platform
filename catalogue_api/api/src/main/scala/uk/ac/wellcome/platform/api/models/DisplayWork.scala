@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
 import uk.ac.wellcome.utils.JsonUtil._
 
 @JsonIgnoreProperties(Array("visible"))
@@ -29,24 +29,29 @@ case class DisplayWork(
     value = "Recording written text on a (usually visual) work.") lettering: Option[
     String] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.models.Period",
+    dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
     value =
-      "Relates the creation of a work to a date, when the date of creation does not cover a range.") createdDate: Option[
-    Period] = None,
-  @ApiModelProperty(value =
-    "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has.") creators: List[
-    Agent] = List(),
+      "Relates the creation of a work to a date, when the date of creation does not cover a range."
+  ) createdDate: Option[DisplayPeriod] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
+    value =
+      "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
+  ) creators: List[DisplayAgent] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
-  @ApiModelProperty(value =
-    "Relates a work to the general thesaurus-based concept that describes the work's content.") subjects: List[
-    Concept] = List(),
-  @ApiModelProperty(value =
-    "Relates a work to the genre that describes the work's content.") genres: List[
-    Concept] = List(),
+  @ApiModelProperty(
+    dataType = "uk.ac.wellcome.platform.api.models.DisplayConcept",
+    value =
+      "Relates a work to the general thesaurus-based concept that describes the work's content."
+  ) subjects: List[DisplayConcept] = List(),
+  @ApiModelProperty(
+    dataType = "uk.ac.wellcome.platform.api.models.DisplayConcept",
+    value = "Relates a work to the genre that describes the work's content.") genres: List[
+    DisplayConcept] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
     value =
@@ -74,33 +79,23 @@ case object DisplayWork {
       title = work.title.get,
       description = work.description,
       lettering = work.lettering,
-      createdDate = work.createdDate,
-      // Wrapping this in Option to catch null value from Jackson
-      creators = Option(work.creators).getOrElse(Nil),
-      subjects = Option(work.subjects).getOrElse(Nil),
-      genres = Option(work.genres).getOrElse(Nil),
+      createdDate = work.createdDate.map { DisplayPeriod(_) },
+      creators = work.creators.map { DisplayAgent(_) },
+      subjects = work.subjects.map { DisplayConcept(_) },
+      genres = work.genres.map { DisplayConcept(_) },
       identifiers =
         if (includes.identifiers)
-          // If there aren't any identifiers on the work JSON, Jackson puts a
-          // nil here.  Wrapping it in an Option casts it into a None or Some
-          // as appropriate, and avoids throwing a NullPointerError when
-          // we map over the value.
-          Option[List[SourceIdentifier]](work.identifiers) match {
-            case Some(identifiers) =>
-              Some(identifiers.map(DisplayIdentifier(_)))
-            case None => Some(List())
-          } else None,
+          Some(work.identifiers.map { DisplayIdentifier(_) })
+        else None,
       thumbnail =
         if (includes.thumbnail)
-          work.thumbnail.map(DisplayLocation(_))
-        else None,
+          work.thumbnail.map { DisplayLocation(_) } else None,
       items =
         if (includes.items)
-          Option[List[Item]](work.items) match {
-            case Some(items) =>
-              Some(items.map(DisplayItem(_, includes.identifiers)))
-            case None => Some(List())
-          } else None,
+          Some(work.items.map {
+            DisplayItem(_, includesIdentifiers = includes.identifiers)
+          })
+        else None,
       publishers = work.publishers.map(DisplayAgent(_)),
       visible = work.visible
     )
