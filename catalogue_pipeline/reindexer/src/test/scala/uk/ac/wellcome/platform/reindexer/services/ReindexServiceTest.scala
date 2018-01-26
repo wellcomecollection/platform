@@ -11,7 +11,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable
+}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -90,7 +93,8 @@ class ReindexServiceTest
   }
 
   it("should retry while the target reports that there are not updated items") {
-    val calmReindexTargetService = mock[ReindexTargetService[CalmTransformable]]
+    val calmReindexTargetService =
+      mock[ReindexTargetService[CalmTransformable]]
 
     val reindex = Reindex(calmDataTableName,
                           reindexShard,
@@ -109,7 +113,9 @@ class ReindexServiceTest
       ))
 
     // We need to use mockito matchers to assert on the implicit dynamo format
-    when(calmReindexTargetService.runReindex(mockitoEquals(ReindexAttempt(reindex)))(any[DynamoFormat[CalmTransformable]]))
+    when(
+      calmReindexTargetService.runReindex(mockitoEquals(
+        ReindexAttempt(reindex)))(any[DynamoFormat[CalmTransformable]]))
       .thenReturn(Future.successful(ReindexAttempt(reindex, true, 1)))
 
     (1 to 4).foreach { x =>

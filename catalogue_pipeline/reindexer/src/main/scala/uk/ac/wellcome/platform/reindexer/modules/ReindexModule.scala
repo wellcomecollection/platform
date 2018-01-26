@@ -8,7 +8,11 @@ import com.gu.scanamo.DynamoFormat
 import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, Reindexable}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  Reindexable
+}
 import uk.ac.wellcome.platform.reindexer.models._
 import uk.ac.wellcome.platform.reindexer.services._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -32,8 +36,7 @@ object ReindexModule extends TwitterModule with TryBackoff {
   @Singleton
   @Provides
   def providesReindexService(
-    injector: Injector): ReindexService[Reindexable[String]] =
-  {
+    injector: Injector): ReindexService[Reindexable[String]] = {
     val tableName = targetTableName()
 
     tableName match {
@@ -71,8 +74,12 @@ object ReindexModule extends TwitterModule with TryBackoff {
     run(() => reindexJob(), actorSystem)
   }
 
-  private def createReindexService[T <: Reindexable[String]](injector: Injector)(implicit dynamoFormat: DynamoFormat[T], evidence: Manifest[ReindexTargetService[T]])= {
-    new ReindexService[T](injector.instance[ReindexTrackerService], injector.instance[ReindexTargetService[T]], injector.instance[MetricsSender])
+  private def createReindexService[T <: Reindexable[String]](
+    injector: Injector)(implicit dynamoFormat: DynamoFormat[T],
+                        evidence: Manifest[ReindexTargetService[T]]) = {
+    new ReindexService[T](injector.instance[ReindexTrackerService],
+                          injector.instance[ReindexTargetService[T]],
+                          injector.instance[MetricsSender])
   }
 
   override def singletonShutdown(injector: Injector) {

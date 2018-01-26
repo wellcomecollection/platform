@@ -41,14 +41,19 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
 
   private val gsiName = "ReindexTracker"
 
-  protected def scanamoUpdate(k:UniqueKey[_], updateExpression: UpdateExpression)(implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] =
-    Scanamo.update[T](dynamoDBClient)(targetTableName)(k,updateExpression)
+  protected def scanamoUpdate(k: UniqueKey[_],
+                              updateExpression: UpdateExpression)(
+    implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] =
+    Scanamo.update[T](dynamoDBClient)(targetTableName)(k, updateExpression)
 
-  protected def scanamoQueryStreamFunction(queryRequest: ScanamoQueryRequest, f:ScanamoQueryResultFunction)(implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
+  protected def scanamoQueryStreamFunction(queryRequest: ScanamoQueryRequest,
+                                           f: ScanamoQueryResultFunction)(
+    implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
     ScanamoQueryStream.run[T, Boolean](queryRequest, f)
 
   private def updateVersion(requestedVersion: Int)(
-    resultGroup: List[ScanamoQueryResult])(implicit evidence: DynamoFormat[T]): Boolean = {
+    resultGroup: List[ScanamoQueryResult])(
+    implicit evidence: DynamoFormat[T]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(miroTransformable) => {
@@ -84,7 +89,8 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
       ScanamoQueryOptions.default
     )
 
-  def runReindex(reindexAttempt: ReindexAttempt)(implicit evidence: DynamoFormat[T]): Future[ReindexAttempt] = {
+  def runReindex(reindexAttempt: ReindexAttempt)(
+    implicit evidence: DynamoFormat[T]): Future[ReindexAttempt] = {
     val requestedVersion = reindexAttempt.reindex.RequestedVersion
 
     info(s"ReindexTargetService running $reindexAttempt")
