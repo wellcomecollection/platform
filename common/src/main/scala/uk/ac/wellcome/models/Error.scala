@@ -1,14 +1,12 @@
 package uk.ac.wellcome.models
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 case class Error(
   errorType: String,
   httpStatus: Option[Int] = None,
   label: String,
   description: Option[String] = None
 ) {
-  @JsonProperty("type") val ontologyType: String = "Error"
+  val ontologyType: String = "Error"
 }
 
 case object Error {
