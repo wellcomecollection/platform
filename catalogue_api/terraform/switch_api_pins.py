@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 import os
+import re
 
 import boto3
 import hcl
@@ -19,9 +20,15 @@ def get_current_prod_api():
     Raises a RuntimeError if it discovers an unexpected prod API.
     """
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), TFVARS)
-    data = hcl.load(open(path))
 
-    production_api = data['production_api']
+    # We look for a line of the form:
+    #
+    #       production_api       = "(remus|romulus)"
+    #
+    production_api = re.search(
+        r'production_api \s*= "(?P<name>[a-z]+)',
+        open(path).read()).group('name')
+
     if production_api not in API_NAMES:
         raise RuntimeError(
             'Found unexpected production_api=%r, expected one of %r' %
