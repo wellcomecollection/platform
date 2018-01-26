@@ -1,26 +1,30 @@
 package uk.ac.wellcome.platform.reindexer.services
 
+import javax.inject.Inject
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.ops.ScanamoOps
-import com.gu.scanamo.query._
+import com.gu.scanamo.query.{UniqueKey, _}
 import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.update.UpdateExpression
 import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
 import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexStatus}
+import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-abstract class ReindexTargetService[T <: Reindexable[String]](
+class ReindexTargetService[T <: Reindexable[String]] @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   metricsSender: MetricsSender,
-  targetTableName: String,
-  targetReindexShard: String)
+  @Flag("reindex.target.tableName") targetTableName: String,
+  @Flag("reindex.target.reindexShard") targetReindexShard: String = "default")
     extends Logging {
 
   type ScanamoQueryResult = Either[DynamoReadError, T]
@@ -37,13 +41,14 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
 
   private val gsiName = "ReindexTracker"
 
-  protected val scanamoUpdate: (UniqueKey[_],
-                                UpdateExpression) => Either[DynamoReadError, T]
+  protected def scanamoUpdate(k:UniqueKey[_], updateExpression: UpdateExpression)(implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] =
+    Scanamo.update[T](dynamoDBClient)(targetTableName)(k,updateExpression)
 
-  protected val scanamoQueryStreamFunction: ScanamoQueryStreamFunction
+  protected def scanamoQueryStreamFunction(queryRequest: ScanamoQueryRequest, f:ScanamoQueryResultFunction)(implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
+    ScanamoQueryStream.run[T, Boolean](queryRequest, f)
 
   private def updateVersion(requestedVersion: Int)(
-    resultGroup: List[ScanamoQueryResult]): Boolean = {
+    resultGroup: List[ScanamoQueryResult])(implicit evidence: DynamoFormat[T]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(miroTransformable) => {
@@ -79,7 +84,7 @@ abstract class ReindexTargetService[T <: Reindexable[String]](
       ScanamoQueryOptions.default
     )
 
-  def runReindex(reindexAttempt: ReindexAttempt): Future[ReindexAttempt] = {
+  def runReindex(reindexAttempt: ReindexAttempt)(implicit evidence: DynamoFormat[T]): Future[ReindexAttempt] = {
     val requestedVersion = reindexAttempt.reindex.RequestedVersion
 
     info(s"ReindexTargetService running $reindexAttempt")

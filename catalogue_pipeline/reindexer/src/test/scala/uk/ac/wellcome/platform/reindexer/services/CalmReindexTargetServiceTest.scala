@@ -63,7 +63,7 @@ class CalmReindexTargetServiceTest
     val metricsSender: MetricsSender =
       new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
-    val reindexTargetService = new CalmReindexTargetService(
+    val reindexTargetService = new ReindexTargetService[CalmTransformable](
       dynamoDBClient = dynamoDbClient,
       targetTableName = "CalmData",
       metricsSender = metricsSender
