@@ -13,7 +13,10 @@ import uk.ac.wellcome.models.Reindex
 import uk.ac.wellcome.models.transformable.{CalmTransformable, Reindexable}
 import uk.ac.wellcome.platform.reindexer.Server
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
-import uk.ac.wellcome.platform.reindexer.services.{ReindexService, ReindexTargetService}
+import uk.ac.wellcome.platform.reindexer.services.{
+  ReindexService,
+  ReindexTargetService
+}
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 
@@ -54,7 +57,10 @@ class ReindexModuleTest
                           currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
-    when(reindexTargetService.runReindex(mockitoEquals(ReindexAttempt(reindex, false, 0)))(any[DynamoFormat[CalmTransformable]]))
+    when(
+      reindexTargetService.runReindex(
+        mockitoEquals(ReindexAttempt(reindex, false, 0)))(
+        any[DynamoFormat[CalmTransformable]]))
       .thenReturn(Future.failed(new Exception("boom!")))
       .thenReturn(Future.failed(new Exception("boom!")))
       .thenReturn(Future.failed(new Exception("boom!")))
