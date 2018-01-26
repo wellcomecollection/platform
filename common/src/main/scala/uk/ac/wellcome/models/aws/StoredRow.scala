@@ -5,6 +5,7 @@ case class S3Object(
   key: String
 )
 
+// TODO: This is an awful name, pick a better one
 case class StoredRow(
   id: String,
   version: Int,
