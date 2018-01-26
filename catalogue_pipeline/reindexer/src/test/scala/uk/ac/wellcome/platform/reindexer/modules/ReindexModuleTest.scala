@@ -1,19 +1,19 @@
 package uk.ac.wellcome.platform.reindexer.modules
 
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
+import org.mockito.Matchers.{any, eq => mockitoEquals}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.CalmTransformable
+import uk.ac.wellcome.models.transformable.{CalmTransformable, Reindexable}
 import uk.ac.wellcome.platform.reindexer.Server
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.platform.reindexer.services.{
-  CalmReindexTargetService,
   ReindexService,
   ReindexTargetService
 }
@@ -45,7 +45,7 @@ class ReindexModuleTest
   override def afterEach(): Unit = maybeServer.foreach(_.close())
 
   it("should retry if the target service returns a failed future") {
-    val reindexTargetService = mock[CalmReindexTargetService]
+    val reindexTargetService = mock[ReindexTargetService[CalmTransformable]]
     val server: EmbeddedHttpServer =
       defineServer.bind[ReindexTargetService[CalmTransformable]](
         reindexTargetService)
@@ -57,7 +57,10 @@ class ReindexModuleTest
                           currentVersion)
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
-    when(reindexTargetService.runReindex(ReindexAttempt(reindex, false, 0)))
+    when(
+      reindexTargetService.runReindex(
+        mockitoEquals(ReindexAttempt(reindex, false, 0)))(
+        any[DynamoFormat[CalmTransformable]]))
       .thenReturn(Future.failed(new Exception("boom!")))
       .thenReturn(Future.failed(new Exception("boom!")))
       .thenReturn(Future.failed(new Exception("boom!")))
@@ -73,9 +76,9 @@ class ReindexModuleTest
   }
 
   it("should call reindexService.run only once if successful") {
-    val reindexService = mock[ReindexService[CalmTransformable]]
+    val reindexService = mock[ReindexService[Reindexable[String]]]
     val server: EmbeddedHttpServer =
-      defineServer.bind[ReindexService[CalmTransformable]](reindexService)
+      defineServer.bind[ReindexService[Reindexable[String]]](reindexService)
     maybeServer = Some(server)
 
     when(reindexService.run).thenReturn(Future.successful(()))

@@ -1,8 +1,9 @@
 package uk.ac.wellcome.platform.reindexer.services
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
+import org.mockito.Matchers.{any, eq => mockitoEquals}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -10,7 +11,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.CalmTransformable
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable
+}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -34,14 +38,14 @@ class ReindexServiceTest
     new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
 
   def createReindexService =
-    new ReindexService(
+    new ReindexService[CalmTransformable](
       new ReindexTrackerService(
         dynamoDbClient,
         dynamoConfigs,
         "CalmData",
         reindexShard
       ),
-      new CalmReindexTargetService(
+      new ReindexTargetService[CalmTransformable](
         dynamoDBClient = dynamoDbClient,
         targetTableName = "CalmData",
         metricsSender = metricsSender
@@ -89,7 +93,8 @@ class ReindexServiceTest
   }
 
   it("should retry while the target reports that there are not updated items") {
-    val calmReindexTargetService = mock[CalmReindexTargetService]
+    val calmReindexTargetService =
+      mock[ReindexTargetService[CalmTransformable]]
 
     val reindex = Reindex(calmDataTableName,
                           reindexShard,
@@ -107,7 +112,10 @@ class ReindexServiceTest
         ReindexVersion = currentVersion
       ))
 
-    when(calmReindexTargetService.runReindex(ReindexAttempt(reindex)))
+    // We need to use mockito matchers to assert on the implicit dynamo format
+    when(
+      calmReindexTargetService.runReindex(mockitoEquals(
+        ReindexAttempt(reindex)))(any[DynamoFormat[CalmTransformable]]))
       .thenReturn(Future.successful(ReindexAttempt(reindex, true, 1)))
 
     (1 to 4).foreach { x =>
@@ -120,7 +128,7 @@ class ReindexServiceTest
       calmReindexTargetService.runReindex(ReindexAttempt(reindex, false, 5)))
       .thenReturn(Future.successful(ReindexAttempt(reindex, true, 6)))
 
-    val reindexService = new ReindexService(
+    val reindexService = new ReindexService[CalmTransformable](
       new ReindexTrackerService(
         dynamoDbClient,
         dynamoConfigs,

@@ -80,7 +80,7 @@ class MiroReindexTargetServiceTest
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexTargetService =
-      new MiroReindexTargetService(
+      new ReindexTargetService[MiroTransformable](
         dynamoDBClient = dynamoDbClient,
         targetTableName = "MiroData",
         targetReindexShard = inShardMiroTransformables.head.ReindexShard,
@@ -145,7 +145,7 @@ class MiroReindexTargetServiceTest
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val reindexTargetService =
-      new MiroReindexTargetService(
+      new ReindexTargetService[MiroTransformable](
         dynamoDBClient = dynamoDbClient,
         targetTableName = "MiroData",
         metricsSender = metricsSender
