@@ -12,11 +12,12 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class SourceObjectStore[T <: Versioned](s3Client: AmazonS3, bucketName: String)  {
+class SourceObjectStore[T <: Versioned](s3Client: AmazonS3, bucketName: String) {
   def put(versionedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
     Future.fromTry(JsonUtil.toJson(versionedObject)).map { content =>
       val contentHash = md5(content)
-      val key = s"${versionedObject.sourceName}/${versionedObject.sourceId}/${versionedObject.version}/$contentHash.json"
+      val key =
+        s"${versionedObject.sourceName}/${versionedObject.sourceId}/${versionedObject.version}/$contentHash.json"
 
       s3Client.putObject(bucketName, key, content)
 
@@ -39,6 +40,6 @@ class SourceObjectStore[T <: Versioned](s3Client: AmazonS3, bucketName: String) 
       .getInstance("MD5")
       .digest(s.getBytes)
       .map { "%02x".format(_) }
-      .foldLeft(""){_ + _}
+      .foldLeft("") { _ + _ }
   }
 }
