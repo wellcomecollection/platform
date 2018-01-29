@@ -15,3 +15,7 @@ elasticsearch:
     - "http.host=0.0.0.0"
     - "transport.host=0.0.0.0"
     - "cluster.name=wellcome"
+dynamodb:
+  image: peopleperhour/dynamodb
+  ports:
+    - "45678:8000"
