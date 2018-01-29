@@ -35,7 +35,7 @@ class SourceObjectStoreTest
     val version = 1
     val sourceName = "testSource"
 
-    val objectStore = new SourceObjectStore[TestObject](s3Client, bucketName)
+    val objectStore = new SourceObjectStore(s3Client, bucketName)
     val testObject = TestObject(id, sourceName, version)
 
     val writtenToS3 = objectStore.put(testObject)
@@ -62,20 +62,20 @@ class SourceObjectStoreTest
     val version = 2
     val sourceName = "anotherTestSource"
 
-    val objectStore = new SourceObjectStore[TestObject](s3Client, bucketName)
+    val objectStore = new SourceObjectStore(s3Client, bucketName)
     val testObject = TestObject(id, sourceName, version)
 
     val writtenToS3 = objectStore.put(testObject)
 
-    whenReady(writtenToS3.flatMap(objectStore.get)) { actualTestObject =>
+    whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) { actualTestObject =>
       actualTestObject shouldBe testObject
     }
   }
 
   it("throws an exception when retrieving a missing object") {
-    val objectStore = new SourceObjectStore[TestObject](s3Client, bucketName)
+    val objectStore = new SourceObjectStore(s3Client, bucketName)
 
-    whenReady(objectStore.get("not/a/real/object").failed) { exception =>
+    whenReady(objectStore.get[TestObject]("not/a/real/object").failed) { exception =>
       exception shouldBe a[AmazonS3Exception]
       exception
         .asInstanceOf[AmazonS3Exception]
