@@ -14,17 +14,17 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 case class SourceData(
-                       id: String,
-                       version: Int,
-                       reindexShard: String,
-                       reindexVersion: Int,
-                       ref: String
-                     )
+  id: String,
+  version: Int,
+  reindexShard: String,
+  reindexVersion: Int,
+  ref: String
+)
 
 class SourceDataDao @Inject()(
-                               dynamoDbClient: AmazonDynamoDB,
-                               dynamoConfig: DynamoConfig
-                             ) extends Logging {
+  dynamoDbClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig
+) extends Logging {
 
   private val table = Table[SourceData](dynamoConfig.table)
 
@@ -58,7 +58,7 @@ class SourceDataDao @Inject()(
       case Some(Left(scanamoError)) =>
         val exception = new RuntimeException(scanamoError.toString)
         error(s"An error occurred while retrieving $id from DynamoDB",
-          exception)
+              exception)
         throw exception
       case None => None
     }

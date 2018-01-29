@@ -1,7 +1,5 @@
 package uk.ac.wellcome.dynamo
 
-
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest}
 import com.gu.scanamo.{DynamoFormat, Scanamo}
@@ -17,7 +15,12 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.locals.DynamoDBLocal
 
-class SourceDataDaoTest extends FunSpec with DynamoDBLocal with ScalaFutures with MockitoSugar with Matchers {
+class SourceDataDaoTest
+    extends FunSpec
+    with DynamoDBLocal
+    with ScalaFutures
+    with MockitoSugar
+    with Matchers {
 
   override lazy val tableName: String = "source"
 
@@ -37,9 +40,8 @@ class SourceDataDaoTest extends FunSpec with DynamoDBLocal with ScalaFutures wit
 
       Scanamo.put(dynamoDbClient)(tableName)(sourceData)
 
-      whenReady(sourceDataDao.getRecord(sourceData.id)) {
-        record =>
-          record shouldBe Some(sourceData)
+      whenReady(sourceDataDao.getRecord(sourceData.id)) { record =>
+        record shouldBe Some(sourceData)
       }
     }
 
@@ -91,10 +93,8 @@ class SourceDataDaoTest extends FunSpec with DynamoDBLocal with ScalaFutures wit
 
       val expectedSourceData = sourceData.copy(version = 1)
 
-      whenReady(sourceDataDao.updateRecord(sourceData)) {
-        _ =>
-          dynamoQueryEqualsValue('id -> id)(
-            expectedValue = expectedSourceData)
+      whenReady(sourceDataDao.updateRecord(sourceData)) { _ =>
+        dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSourceData)
       }
     }
 
@@ -113,13 +113,12 @@ class SourceDataDaoTest extends FunSpec with DynamoDBLocal with ScalaFutures wit
 
       Scanamo.put(dynamoDbClient)(tableName)(sourceData)
 
-      whenReady(sourceDataDao.updateRecord(newerSourceData)) {
-        _ =>
-          Scanamo
-            .get[SourceData](dynamoDbClient)(tableName)('id -> id)
-            .get shouldBe Right(
-            newerSourceData.copy(version = 3)
-          )
+      whenReady(sourceDataDao.updateRecord(newerSourceData)) { _ =>
+        Scanamo
+          .get[SourceData](dynamoDbClient)(tableName)('id -> id)
+          .get shouldBe Right(
+          newerSourceData.copy(version = 3)
+        )
       }
     }
 
@@ -136,13 +135,12 @@ class SourceDataDaoTest extends FunSpec with DynamoDBLocal with ScalaFutures wit
 
       Scanamo.put(dynamoDbClient)(tableName)(sourceData)
 
-      whenReady(sourceDataDao.updateRecord(sourceData)) {
-        _ =>
-          Scanamo
-            .get[SourceData](dynamoDbClient)(tableName)('id -> id)
-            .get shouldBe Right(
-            sourceData.copy(version = 2)
-          )
+      whenReady(sourceDataDao.updateRecord(sourceData)) { _ =>
+        Scanamo
+          .get[SourceData](dynamoDbClient)(tableName)('id -> id)
+          .get shouldBe Right(
+          sourceData.copy(version = 2)
+        )
       }
     }
 
@@ -167,16 +165,14 @@ class SourceDataDaoTest extends FunSpec with DynamoDBLocal with ScalaFutures wit
 
       Scanamo.put(dynamoDbClient)(tableName)(newerSourceData)
 
-      whenReady(
-        sourceDataDao.updateRecord(sourceData).failed) {
-        ex =>
-          ex shouldBe a[ConditionalCheckFailedException]
+      whenReady(sourceDataDao.updateRecord(sourceData).failed) { ex =>
+        ex shouldBe a[ConditionalCheckFailedException]
 
-          Scanamo
-            .get[SourceData](dynamoDbClient)(tableName)('id -> id)
-            .get shouldBe Right(
-            newerSourceData
-          )
+        Scanamo
+          .get[SourceData](dynamoDbClient)(tableName)('id -> id)
+          .get shouldBe Right(
+          newerSourceData
+        )
       }
     }
 

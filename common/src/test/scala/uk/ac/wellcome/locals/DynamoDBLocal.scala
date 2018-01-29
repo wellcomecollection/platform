@@ -11,9 +11,11 @@ import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
 
-
-trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients with Eventually with Matchers {
-  this: Suite =>
+trait DynamoDBLocal
+    extends BeforeAndAfterEach
+    with DynamoDBLocalClients
+    with Eventually
+    with Matchers { this: Suite =>
 
   val tableName: String
 
