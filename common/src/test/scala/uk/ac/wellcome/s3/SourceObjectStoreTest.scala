@@ -67,19 +67,21 @@ class SourceObjectStoreTest
 
     val writtenToS3 = objectStore.put(testObject)
 
-    whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) { actualTestObject =>
-      actualTestObject shouldBe testObject
+    whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) {
+      actualTestObject =>
+        actualTestObject shouldBe testObject
     }
   }
 
   it("throws an exception when retrieving a missing object") {
     val objectStore = new SourceObjectStore(s3Client, bucketName)
 
-    whenReady(objectStore.get[TestObject]("not/a/real/object").failed) { exception =>
-      exception shouldBe a[AmazonS3Exception]
-      exception
-        .asInstanceOf[AmazonS3Exception]
-        .getErrorCode shouldBe "NoSuchKey"
+    whenReady(objectStore.get[TestObject]("not/a/real/object").failed) {
+      exception =>
+        exception shouldBe a[AmazonS3Exception]
+        exception
+          .asInstanceOf[AmazonS3Exception]
+          .getErrorCode shouldBe "NoSuchKey"
 
     }
   }
