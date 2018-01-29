@@ -20,7 +20,8 @@ class SourceDataDaoTest
     with DynamoDBLocal
     with ScalaFutures
     with MockitoSugar
-    with Matchers with ExtendedPatience {
+    with Matchers
+    with ExtendedPatience {
 
   override lazy val tableName: String = "source"
 
