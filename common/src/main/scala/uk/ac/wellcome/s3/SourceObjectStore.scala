@@ -12,8 +12,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class SourceObjectStore[T <: Versioned](s3Client: AmazonS3, bucketName: String)  {
-  def put(versionedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
+class SourceObjectStore(s3Client: AmazonS3, bucketName: String)  {
+  def put[T <: Versioned](versionedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
     Future.fromTry(JsonUtil.toJson(versionedObject)).map { content =>
       val contentHash = md5(content)
       val key = s"${versionedObject.sourceName}/${versionedObject.sourceId}/${versionedObject.version}/$contentHash.json"
@@ -24,7 +24,7 @@ class SourceObjectStore[T <: Versioned](s3Client: AmazonS3, bucketName: String) 
     }
   }
 
-  def get(key: String)(implicit decoder: Decoder[T]): Future[T] = {
+  def get[T <: Versioned](key: String)(implicit decoder: Decoder[T]): Future[T] = {
     val getObject = Future {
       val s3Object = s3Client.getObject(bucketName, key)
       Source.fromInputStream(s3Object.getObjectContent).mkString
