@@ -8,6 +8,12 @@ import io.circe.Decoder
 import cats.syntax.functor._
 import uk.ac.wellcome.utils.JsonUtil._
 
+trait Versioned {
+  val version: Int
+  val sourceId: String
+  val sourceName: String
+}
+
 sealed trait Transformable
 object Transformable {
   import uk.ac.wellcome.utils.JsonUtil._
@@ -19,10 +25,6 @@ object Transformable {
       Decoder[MiroTransformable].widen
     ).reduceLeft(_ or _)
 }
-
-case class CalmTransformableData(
-  AccessStatus: Array[String]
-) extends Transformable
 
 case class CalmTransformable(
   RecordID: String,
@@ -48,7 +50,7 @@ case class MiroTransformable(MiroID: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
     extends Transformable
-    with Reindexable[String] {
+      with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
     HashKey("MiroID", MiroID),
