@@ -50,7 +50,7 @@ case class MiroTransformable(MiroID: String,
                              ReindexShard: String = "default",
                              ReindexVersion: Int = 0)
     extends Transformable
-      with Reindexable[String] {
+    with Reindexable[String] {
 
   val id: ItemIdentifier[String] = ItemIdentifier(
     HashKey("MiroID", MiroID),
