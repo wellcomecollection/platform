@@ -1,6 +1,9 @@
 package uk.ac.wellcome.storage
 
-import uk.ac.wellcome.models.Versioned
+import io.circe.Encoder
+import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormat}
+import uk.ac.wellcome.s3.VersionedObjectStore
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext._
@@ -12,10 +15,27 @@ case class HybridRecord(
   s3key: String
 ) extends Versioned
 
-class VersionedHybridStore {
+class VersionedHybridStore(versionedObjectStore: VersionedObjectStore, versionedDao: VersionedDao) {
 
-  def updateRecord[T <: Versioned](record: T): Future[Unit] = ???
-    // store the record in S3
-    // store the pointer in DynamoDB
+  implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord]{
+    override def updateVersion(testVersioned: HybridRecord, newVersion: Int): HybridRecord = {
+      testVersioned.copy(version = newVersion)
+    }
+  }
+
+  def updateRecord[T <: Versioned](record: T)(implicit evidence: VersionedDynamoFormat[T], versionUpdater: VersionUpdater[T], encoder: Encoder[T]): Future[Unit] = {
+    val futureKey = versionedObjectStore.put(record)
+
+    futureKey.flatMap { key =>
+      val hybridRecord = HybridRecord(
+        version = record.version,
+        sourceId = record.sourceId,
+        sourceName = record.sourceName,
+        s3key = key
+      )
+
+      versionedDao.updateRecord(hybridRecord)
+    }
+  }
 
 }
