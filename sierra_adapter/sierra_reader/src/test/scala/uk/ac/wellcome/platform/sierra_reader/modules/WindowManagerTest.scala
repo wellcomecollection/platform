@@ -16,8 +16,7 @@ class WindowManagerTest
     with S3Local
     with ScalaFutures
     with ExtendedPatience {
-  val bucketName: String = createBucketAndReturnName(
-    "window-manager-test-bucket")
+  val bucketName = "window-manager-test-bucket"
 
   val windowManager = new WindowManager(
     s3client = s3Client,

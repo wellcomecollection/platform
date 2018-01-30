@@ -20,7 +20,7 @@ class VersionedObjectStoreTest
     with JsonTestUtil
     with ScalaFutures {
 
-  val bucketName = createBucketAndReturnName("source-object-store")
+  val bucketName = "source-object-store"
 
   implicit val testVersionUpdater = new VersionUpdater[TestObject]{
     override def updateVersion(testVersioned: TestObject, newVersion: Int): TestObject = {

@@ -34,7 +34,7 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with S
   override lazy val evidence: DynamoFormat[ExampleRecord] = DynamoFormat[ExampleRecord]
 
   override lazy val tableName: String = "versioned-hybrid-store-test"
-  val bucketName = createBucketAndReturnName("versioned-hybrid-store-test")
+  val bucketName = "versioned-hybrid-store-test"
 
   val hybridStore = new VersionedHybridStore(
     versionedObjectStore = new VersionedObjectStore(s3Client = s3Client, bucketName = bucketName),
