@@ -4,7 +4,7 @@ import java.security.MessageDigest
 
 import com.amazonaws.services.s3.AmazonS3
 import io.circe.{Decoder, Encoder}
-import uk.ac.wellcome.models.transformable.Versioned
+import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
