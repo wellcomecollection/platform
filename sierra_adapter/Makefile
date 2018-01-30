@@ -24,6 +24,18 @@ $(SIERRA_WINDOW_GENERATOR)/src/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/src/
 		--volume $(SIERRA_WINDOW_GENERATOR)/src:/src micktwomey/pip-tools
 
 
+$(ROOT)/.docker/sierra_adapter_progress:
+	echo "FROM python:3-alpine\nRUN pip3 install attr boto3" | docker build --tag sierra_adapter_progress -
+	mkdir -p $(ROOT)/.docker
+	touch $(ROOT)/.docker/sierra_adapter_progress
+
+sierra_adapter_progress: $(ROOT)/.docker/sierra_adapter_progress
+	$(ROOT)/builds/docker_run.py --aws -- \
+		--volume $(ROOT)/$(STACK_ROOT):/src \
+		sierra_adapter_progress \
+		python /src/report_adapter_progress.py
+
+
 sierra_common-test:
 	$(call sbt_test,sierra_adapter_common)
 
