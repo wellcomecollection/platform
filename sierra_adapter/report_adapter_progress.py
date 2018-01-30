@@ -148,6 +148,7 @@ def chunks(iterable, chunk_size):
 
 if __name__ == '__main__':
     for resource_type in ('bibs', 'items'):
+        print('')
         print('=' * 79)
         print(f'{resource_type} windows')
         print('=' * 79)
