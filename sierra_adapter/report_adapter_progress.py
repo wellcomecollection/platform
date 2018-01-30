@@ -4,10 +4,10 @@
 Report the progress of the Sierra adapter.
 """
 
-import collections
 import datetime as dt
 import os
 
+import attr
 import boto3
 
 
@@ -48,7 +48,11 @@ def get_matching_s3_keys(bucket, prefix=''):
             break
 
 
-Interval = collections.namedtuple('Interval', ['start', 'end'])
+@attr.s
+class Interval:
+    start = attr.ib()
+    end = attr.ib()
+    key = attr.ib()
 
 
 def get_intervals(keys):
@@ -61,30 +65,38 @@ def get_intervals(keys):
     for k in keys:
         name = os.path.basename(k)
         start, end = name.split('__')
+        start = start.strip('Z')
+        end = end.strip('Z')
         try:
             yield Interval(
                 start=dt.datetime.strptime(start, '%Y-%m-%dT%H-%M-%S.%f+00-00'),
-                end=dt.datetime.strptime(end, '%Y-%m-%dT%H-%M-%S.%f+00-00')
+                end=dt.datetime.strptime(end, '%Y-%m-%dT%H-%M-%S.%f+00-00'),
+                key=k
             )
         except ValueError:
             yield Interval(
                 start=dt.datetime.strptime(start, '%Y-%m-%dT%H-%M-%S+00-00'),
-                end=dt.datetime.strptime(end, '%Y-%m-%dT%H-%M-%S+00-00')
+                end=dt.datetime.strptime(end, '%Y-%m-%dT%H-%M-%S+00-00'),
+                key=k
             )
 
 
 def combine_overlapping_intervals(sorted_intervals):
     """
     Given a generator of sorted open intervals, generate the covering set.
+    It produces a series of 2-tuples: (interval, running), where ``running``
+    is the set of sub-intervals used to build the overall interval.
 
     :param sorted_intervals: A generator of ``Interval`` instances.
 
     """
     lower = None
+    running = []
 
     for higher in sorted_intervals:
         if not lower:
             lower = higher
+            running.append(higher)
         else:
             # We treat these as open intervals.  This first case is for the
             # two intervals being wholly overlapping, for example:
@@ -94,7 +106,8 @@ def combine_overlapping_intervals(sorted_intervals):
             #
             if higher.start < lower.end:
                 upper_bound = max(lower.end, higher.end)
-                lower = Interval(start=lower.start, end=upper_bound)
+                lower = Interval(start=lower.start, end=upper_bound, key=None)
+                running.append(higher)
 
             # Otherwise the two intervals are disjoint.  Note that this
             # includes the case where lower.end == higher.start, because
@@ -109,12 +122,13 @@ def combine_overlapping_intervals(sorted_intervals):
             #                           ( -- higher -- )
             #
             else:
-                yield lower
+                yield (lower, running)
                 lower = higher
+                running = [higher]
 
     # And spit out the final interval
     if lower is not None:
-        yield lower
+        yield (lower, running)
 
 
 def build_report(bucket, resource_type):
@@ -129,13 +143,53 @@ def build_report(bucket, resource_type):
     yield from combine_overlapping_intervals(intervals)
 
 
+def chunks(iterable, chunk_size):
+    return (
+        iterable[i:i + chunk_size]
+        for i in range(0, len(iterable), chunk_size)
+    )
+
+
 if __name__ == '__main__':
     for resource_type in ('bibs', 'items'):
+        print('')
         print('=' * 79)
         print(f'{resource_type} windows')
         print('=' * 79)
 
-        for iv in build_report(bucket=BUCKET, resource_type=resource_type):
+        report = build_report(bucket=BUCKET, resource_type=resource_type)
+
+        for iv, running in report:
+            if len(running) > 1:
+                client = boto3.client('s3')
+
+                # Create a consolidated marker that represents the entire
+                # interval.  The back-history of Sierra includes >100k windows,
+                # so combining them makes reporting faster on subsequent runs.
+                start_str = iv.start.strftime("%Y-%m-%dT%H-%M-%S.%f+00-00")
+                end_str = iv.end.strftime("%Y-%m-%dT%H-%M-%S.%f+00-00")
+
+                consolidated_key = f'windows_{resource_type}_complete/{start_str}__{end_str}'
+
+                client.put_object(
+                    Bucket=BUCKET,
+                    Key=consolidated_key,
+                    Body=b''
+                )
+
+                # Then clean up the individual intervals that made up the set.
+                # We sacrifice granularity for performance.
+                for sub_ivs in chunks(running, chunk_size=1000):
+                    keys = [
+                        s.key for s in sub_ivs if s.key != consolidated_key
+                    ]
+                    client.delete_objects(
+                        Bucket=BUCKET,
+                        Delete={
+                            'Objects': [{'Key': k} for k in keys]
+                        }
+                    )
+
             print(f'{iv.start.isoformat()} -- {iv.end.isoformat()}')
 
         print('')
