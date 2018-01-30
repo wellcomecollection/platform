@@ -48,7 +48,7 @@ trait DynamoDBLocal[T <: Versioned]
           s"Unable to clear the table $tableName error $error")
     }
 
-  private def deleteTable =
+  private def deleteTable() =
     dynamoDbClient
       .listTables()
       .getTableNames
