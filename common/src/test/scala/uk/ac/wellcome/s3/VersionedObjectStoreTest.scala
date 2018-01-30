@@ -1,16 +1,9 @@
 package uk.ac.wellcome.s3
 
-import java.security.MessageDigest
-
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.{
-  ItemIdentifier,
-  Reindexable,
-  Transformable,
-  Versioned
-}
+import uk.ac.wellcome.models.transformable.Versioned
 import uk.ac.wellcome.test.utils.{JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -20,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class TestObject(sourceId: String, sourceName: String, version: Int)
     extends Versioned
 
-class SourceObjectStoreTest
+class VersionedObjectStoreTest
     extends FunSpec
     with S3Local
     with Matchers
@@ -35,7 +28,7 @@ class SourceObjectStoreTest
     val version = 1
     val sourceName = "testSource"
 
-    val objectStore = new SourceObjectStore(s3Client, bucketName)
+    val objectStore = new VersionedObjectStore(s3Client, bucketName)
     val testObject = TestObject(id, sourceName, version)
 
     val writtenToS3 = objectStore.put(testObject)
@@ -62,7 +55,7 @@ class SourceObjectStoreTest
     val version = 2
     val sourceName = "anotherTestSource"
 
-    val objectStore = new SourceObjectStore(s3Client, bucketName)
+    val objectStore = new VersionedObjectStore(s3Client, bucketName)
     val testObject = TestObject(id, sourceName, version)
 
     val writtenToS3 = objectStore.put(testObject)
@@ -74,7 +67,7 @@ class SourceObjectStoreTest
   }
 
   it("throws an exception when retrieving a missing object") {
-    val objectStore = new SourceObjectStore(s3Client, bucketName)
+    val objectStore = new VersionedObjectStore(s3Client, bucketName)
 
     whenReady(objectStore.get[TestObject]("not/a/real/object").failed) {
       exception =>

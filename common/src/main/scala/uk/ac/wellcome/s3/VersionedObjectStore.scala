@@ -12,7 +12,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class SourceObjectStore(s3Client: AmazonS3, bucketName: String) {
+class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T]): Future[String] = {
     Future.fromTry(JsonUtil.toJson(versionedObject)).map { content =>
