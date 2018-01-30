@@ -39,7 +39,7 @@ class SierraParserTest
     triedSierraTransformable.get shouldBe a[SierraTransformable]
 
     val expectedRecord = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate))
     )
 

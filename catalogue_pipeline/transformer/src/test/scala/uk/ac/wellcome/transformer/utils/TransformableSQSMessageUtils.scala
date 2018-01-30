@@ -30,7 +30,7 @@ trait TransformableSQSMessageUtils {
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData = None,
       itemData = Map[String, SierraItemRecord]()
     )
@@ -51,7 +51,7 @@ trait TransformableSQSMessageUtils {
       """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
       itemData = Map[String, SierraItemRecord]()
     )

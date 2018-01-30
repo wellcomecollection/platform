@@ -36,7 +36,7 @@ class SierraItemMergerUpdaterServiceTest
 
     whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
       val expectedSierraTransformable =
-        SierraTransformable(id = bibId,
+        SierraTransformable(sourceId = bibId,
                             maybeBibData = None,
                             itemData = Map(
                               newItemRecord.id -> newItemRecord
@@ -74,7 +74,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val oldRecord = SierraTransformable(
-      id = bibIdWithOldData,
+      sourceId = bibIdWithOldData,
       itemData = Map(
         itemId -> sierraItemRecord(
           id = itemId,
@@ -95,7 +95,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val newRecord = SierraTransformable(
-      id = bibIdWithNewerData,
+      sourceId = bibIdWithNewerData,
       itemData = Map(
         itemId -> sierraItemRecord(
           id = itemId,
@@ -112,7 +112,7 @@ class SierraItemMergerUpdaterServiceTest
     whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
       val expectedNewSierraRecord =
         SierraTransformable(
-          id = bibIdNotExisting,
+          sourceId = bibIdNotExisting,
           maybeBibData = None,
           itemData = Map(itemRecord.id -> itemRecord),
           version = 1
@@ -144,7 +144,7 @@ class SierraItemMergerUpdaterServiceTest
     val bibId = "b3000003"
 
     val oldRecord = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(
         id -> sierraItemRecord(
           id = id,
@@ -193,13 +193,13 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val sierraTransformable1 = SierraTransformable(
-      id = bibId1,
+      sourceId = bibId1,
       itemData = itemData,
       version = 1
     )
 
     val sierraTransformable2 = SierraTransformable(
-      id = bibId2,
+      sourceId = bibId2,
       itemData = Map.empty,
       version = 1
     )
@@ -256,13 +256,13 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val sierraTransformable1 = SierraTransformable(
-      id = bibId1,
+      sourceId = bibId1,
       itemData = itemData,
       version = 1
     )
 
     val sierraTransformable2 = SierraTransformable(
-      id = bibId2,
+      sourceId = bibId2,
       itemData = itemData,
       version = 1
     )
@@ -316,13 +316,13 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val sierraTransformable1 = SierraTransformable(
-      id = bibId1,
+      sourceId = bibId1,
       itemData = itemData,
       version = 1
     )
 
     val sierraTransformable2 = SierraTransformable(
-      id = bibId2,
+      sourceId = bibId2,
       itemData = Map.empty,
       version = 1
     )
@@ -366,7 +366,7 @@ class SierraItemMergerUpdaterServiceTest
     val bibId = "b6000006"
 
     val newRecord = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(
         id -> sierraItemRecord(
           id = id,
@@ -393,7 +393,7 @@ class SierraItemMergerUpdaterServiceTest
     val bibId = "b7000007"
 
     val newRecord = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       version = 1
     )
 
@@ -407,7 +407,7 @@ class SierraItemMergerUpdaterServiceTest
 
     whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
       val expectedSierraRecord = SierraTransformable(
-        id = bibId,
+        sourceId = bibId,
         itemData = Map(
           itemRecord.id -> itemRecord
         ),
@@ -453,7 +453,7 @@ class SierraItemMergerUpdaterServiceTest
     val expectedException = new RuntimeException("BOOOM!")
 
     val bibId = "b242"
-    val newRecord = SierraTransformable(id = bibId, version = 1)
+    val newRecord = SierraTransformable(sourceId = bibId, version = 1)
 
     when(failingDao.getRecord(any[String]))
       .thenReturn(Future.successful(Some(newRecord)))

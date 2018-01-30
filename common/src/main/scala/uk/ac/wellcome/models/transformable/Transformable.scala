@@ -1,11 +1,9 @@
 package uk.ac.wellcome.models.transformable
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import io.circe.Decoder
 import cats.syntax.functor._
+import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable
@@ -71,27 +69,29 @@ case class MiroTransformable(MiroID: String,
   *
   */
 case class SierraTransformable(
-  id: String,
+  sourceId: String,
   maybeBibData: Option[SierraBibRecord] = None,
   itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
   version: Int = 0
-) extends Transformable
+) extends Transformable with Versioned {
+  val sourceName = "sierra"
+}
 
 object SierraTransformable {
-  def apply(id: String, bibData: String): SierraTransformable = {
+  def apply(sourceId: String, bibData: String): SierraTransformable = {
     val bibRecord = fromJson[SierraBibRecord](bibData).get
-    SierraTransformable(id = id, maybeBibData = Some(bibRecord))
+    SierraTransformable(sourceId = sourceId, maybeBibData = Some(bibRecord))
   }
 
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(id = bibRecord.id, maybeBibData = Some(bibRecord))
+    SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
 
-  def apply(id: String, itemRecord: SierraItemRecord): SierraTransformable =
-    SierraTransformable(id = id, itemData = Map(itemRecord.id -> itemRecord))
+  def apply(sourceId: String, itemRecord: SierraItemRecord): SierraTransformable =
+    SierraTransformable(sourceId = sourceId, itemData = Map(itemRecord.id -> itemRecord))
 
   def apply(bibRecord: SierraBibRecord, version: Int): SierraTransformable =
     SierraTransformable(
-      id = bibRecord.id,
+      sourceId = bibRecord.id,
       maybeBibData = Some(bibRecord),
       version = version
     )

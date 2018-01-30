@@ -47,7 +47,7 @@ class SierraTransformableDao @Inject()(
     debug(s"About to update record $record")
     scanamoExec(putRecord(record)) match {
       case Left(err) =>
-        warn(s"Failed updating record ${record.id}", err)
+        warn(s"Failed updating record ${record.sourceId}", err)
         throw err
       case Right(_) => ()
     }
