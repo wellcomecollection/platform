@@ -19,9 +19,9 @@ class CalmTransformableTransformer
 }
 
 class CalmDataTransformer
-  extends TransformableTransformer[CalmTransformableData] {
+    extends TransformableTransformer[CalmTransformableData] {
   override def transformForType(
-                                 transformable: CalmTransformableData): Try[Option[Work]] = Try {
+    transformable: CalmTransformableData): Try[Option[Work]] = Try {
     // TODO: Fill in proper data here
     Some(
       Work(

@@ -45,8 +45,8 @@ case class CalmTransformable(
 }
 
 case class CalmTransformableData(
-                                  AccessStatus: Array[String]
-                                ) extends Transformable
+  AccessStatus: Array[String]
+) extends Transformable
 
 case class MiroTransformable(MiroID: String,
                              MiroCollection: String,
