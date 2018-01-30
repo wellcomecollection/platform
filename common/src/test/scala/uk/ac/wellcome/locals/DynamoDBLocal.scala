@@ -41,7 +41,7 @@ trait DynamoDBLocal[T <: Versioned]
       case Right(item) =>
         dynamoDbClient.deleteItem(
           tableName,
-          Map("sourceId" -> new AttributeValue(item.sourceId))
+          Map("id" -> new AttributeValue(item.id))
         )
       case error =>
         throw new Exception(
@@ -59,11 +59,11 @@ trait DynamoDBLocal[T <: Versioned]
       new CreateTableRequest()
         .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("sourceId")
+          .withAttributeName("id")
           .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("sourceId")
+            .withAttributeName("id")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()

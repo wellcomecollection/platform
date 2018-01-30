@@ -6,7 +6,7 @@ import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{VersionUpdater, Versioned}
+import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormat}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -16,18 +16,19 @@ class VersionedDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  private def putRecord[T<: Versioned](record: T)(implicit evidence: DynamoFormat[T], versionUpdater: VersionUpdater[T]) = {
+  private def putRecord[T<: Versioned](record: T)(implicit evidence: VersionedDynamoFormat[T], versionUpdater: VersionUpdater[T]) = {
+    implicit val dynamoFormat = evidence.enrichedDynamoFormat
     val newVersion = record.version + 1
 
     Table[T](dynamoConfig.table)
       .given(
-        not(attributeExists('sourceId)) or
-          (attributeExists('sourceId) and 'version < newVersion)
+        not(attributeExists('id)) or
+          (attributeExists('id) and 'version < newVersion)
       )
       .put(versionUpdater.updateVersion(record, newVersion))
   }
 
-  def updateRecord[T<: Versioned](record: T)(implicit evidence: DynamoFormat[T], versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
+  def updateRecord[T<: Versioned](record: T)(implicit evidence: VersionedDynamoFormat[T], versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
     debug(s"About to update record $record")
     Scanamo.exec(dynamoDbClient)(putRecord(record)) match {
       case Left(err) =>
@@ -39,7 +40,7 @@ class VersionedDao @Inject()(
 
   def getRecord[T<: Versioned](id: String)(implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
-    Scanamo.exec(dynamoDbClient)(table.get('sourceId -> id)) match {
+    Scanamo.exec(dynamoDbClient)(table.get('id -> id)) match {
       case Some(Right(record)) => Some(record)
       case Some(Left(scanamoError)) =>
         val exception = new RuntimeException(scanamoError.toString)
