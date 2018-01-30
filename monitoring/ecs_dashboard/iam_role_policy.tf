@@ -19,6 +19,11 @@ resource "aws_iam_role_policy" "update_service_list_read_from_webplatform" {
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
       "Resource": "arn:aws:iam::130871440101:role/platform-team-assume-role"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": "arn:aws:iam::299497370133:role/platform-team-assume-role"
     }
   ]
 }
