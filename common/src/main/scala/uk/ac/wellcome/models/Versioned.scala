@@ -12,15 +12,20 @@ trait Versioned {
   val id: String = s"$sourceName/$sourceId"
 }
 
-object Versioned{
-  implicit def toVersionedDynamoFormatWrapper[T <: Versioned](implicit dynamoFormat: DynamoFormat[T]): VersionedDynamoFormatWrapper[T] = new VersionedDynamoFormatWrapper[T](dynamoFormat)
+object Versioned {
+  implicit def toVersionedDynamoFormatWrapper[T <: Versioned](
+    implicit dynamoFormat: DynamoFormat[T]): VersionedDynamoFormatWrapper[T] =
+    new VersionedDynamoFormatWrapper[T](dynamoFormat)
 }
 
-class VersionedDynamoFormatWrapper[T <: Versioned](dynamoFormat: DynamoFormat[T]){
+class VersionedDynamoFormatWrapper[T <: Versioned](
+  dynamoFormat: DynamoFormat[T]) {
   val enrichedDynamoFormat = new DynamoFormat[T] {
-    override def read(av: AttributeValue): Either[DynamoReadError, T] = dynamoFormat.read(av)
+    override def read(av: AttributeValue): Either[DynamoReadError, T] =
+      dynamoFormat.read(av)
 
-    override def write(t: T): AttributeValue = dynamoFormat.write(t).addMEntry("id", new AttributeValue(t.id))
+    override def write(t: T): AttributeValue =
+      dynamoFormat.write(t).addMEntry("id", new AttributeValue(t.id))
   }
 }
 

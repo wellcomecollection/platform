@@ -70,8 +70,8 @@ trait DynamoDBLocal[T <: Versioned]
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
 
-  def dynamoQueryEqualsValue(key: UniqueKey[_])(
-    expectedValue: T)(implicit evidence: DynamoFormat[T]) = {
+  def dynamoQueryEqualsValue(key: UniqueKey[_])(expectedValue: T)(
+    implicit evidence: DynamoFormat[T]) = {
 
     println(s"Searching DynamoDB for expectedValue = $expectedValue")
 
