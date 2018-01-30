@@ -10,17 +10,26 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
-trait VersionedHybridStoreLocal[T <: Versioned] extends DynamoDBLocal[T] with S3Local with JsonTestUtil with ExtendedPatience { this: Suite =>
+trait VersionedHybridStoreLocal[T <: Versioned]
+    extends DynamoDBLocal[T]
+    with S3Local
+    with JsonTestUtil
+    with ExtendedPatience { this: Suite =>
 
   val hybridStore = new VersionedHybridStore(
-    versionedObjectStore = new VersionedObjectStore(s3Client = s3Client, bucketName = bucketName),
-    versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient, dynamoConfig = DynamoConfig(
-      table = tableName
-    ))
+    versionedObjectStore =
+      new VersionedObjectStore(s3Client = s3Client, bucketName = bucketName),
+    versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
+                                    dynamoConfig = DynamoConfig(
+                                      table = tableName
+                                    ))
   )
 
-  def assertHybridRecordIsStoredCorrectly(record: Versioned, expectedJson: String) = {
-    val dynamoRecord = Scanamo.get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id).get
+  def assertHybridRecordIsStoredCorrectly(record: Versioned,
+                                          expectedJson: String) = {
+    val dynamoRecord = Scanamo
+      .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
+      .get
     dynamoRecord.isRight shouldBe true
     val hybridRecord = dynamoRecord.right.get
 
@@ -30,7 +39,8 @@ trait VersionedHybridStoreLocal[T <: Versioned] extends DynamoDBLocal[T] with S3
 
     val s3key = hybridRecord.s3key
 
-    val retrievedJson = getJsonFromS3(bucketName = bucketName, key = s3key).noSpaces
+    val retrievedJson =
+      getJsonFromS3(bucketName = bucketName, key = s3key).noSpaces
     assertJsonStringsAreEqual(retrievedJson, expectedJson) // toJson(record.copy(version = record.version + 1)).get)
   }
 }

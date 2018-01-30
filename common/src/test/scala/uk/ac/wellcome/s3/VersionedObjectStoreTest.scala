@@ -22,8 +22,9 @@ class VersionedObjectStoreTest
 
   val bucketName = "source-object-store"
 
-  implicit val testVersionUpdater = new VersionUpdater[TestObject]{
-    override def updateVersion(testVersioned: TestObject, newVersion: Int): TestObject = {
+  implicit val testVersionUpdater = new VersionUpdater[TestObject] {
+    override def updateVersion(testVersioned: TestObject,
+                               newVersion: Int): TestObject = {
       testVersioned.copy(version = newVersion)
     }
   }
@@ -40,7 +41,8 @@ class VersionedObjectStoreTest
     val writtenToS3 = objectStore.put(testObject)
 
     whenReady(writtenToS3) { actualKey =>
-      val expectedJson = JsonUtil.toJson(testObject.copy(version = version + 1)).get
+      val expectedJson =
+        JsonUtil.toJson(testObject.copy(version = version + 1)).get
       val expectedHash = "81f1e6d19651d5cad8d00582b8d0482a"
 
       val expectedKey = s"${sourceName}/$id/${version + 1}/$expectedHash.json"

@@ -8,7 +8,6 @@ import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
-
 case class ExampleRecord(
   version: Int,
   sourceId: String,
@@ -16,16 +15,21 @@ case class ExampleRecord(
   content: String
 ) extends Versioned
 
+class VersionedHybridStoreTest
+    extends FunSpec
+    with Matchers
+    with ScalaFutures
+    with VersionedHybridStoreLocal[ExampleRecord] {
 
-class VersionedHybridStoreTest extends FunSpec with Matchers with ScalaFutures with VersionedHybridStoreLocal[ExampleRecord] {
-
-  implicit val testVersionUpdater = new VersionUpdater[ExampleRecord]{
-    override def updateVersion(testVersioned: ExampleRecord, newVersion: Int): ExampleRecord = {
+  implicit val testVersionUpdater = new VersionUpdater[ExampleRecord] {
+    override def updateVersion(testVersioned: ExampleRecord,
+                               newVersion: Int): ExampleRecord = {
       testVersioned.copy(version = newVersion)
     }
   }
 
-  override lazy val evidence: DynamoFormat[ExampleRecord] = DynamoFormat[ExampleRecord]
+  override lazy val evidence: DynamoFormat[ExampleRecord] =
+    DynamoFormat[ExampleRecord]
 
   override lazy val tableName: String = "versioned-hybrid-store-test"
   val bucketName = "versioned-hybrid-store-test"
@@ -70,12 +74,14 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with ScalaFutures w
     whenReady(updatedFuture) { _ =>
       assertHybridRecordIsStoredCorrectly(
         record = updatedRecord,
-        expectedJson = toJson(updatedRecord.copy(version = updatedRecord.version + 1)).get
+        expectedJson =
+          toJson(updatedRecord.copy(version = updatedRecord.version + 1)).get
       )
     }
   }
 
-  it("throws a ConditionalCheckFailedException if it gets an older version of an existing record") {
+  it(
+    "throws a ConditionalCheckFailedException if it gets an older version of an existing record") {
     val record = ExampleRecord(
       version = 4,
       sourceId = "4444",

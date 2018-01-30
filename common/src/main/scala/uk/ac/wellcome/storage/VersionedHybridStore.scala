@@ -2,7 +2,11 @@ package uk.ac.wellcome.storage
 
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
-import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormatWrapper}
+import uk.ac.wellcome.models.{
+  VersionUpdater,
+  Versioned,
+  VersionedDynamoFormatWrapper
+}
 import uk.ac.wellcome.s3.VersionedObjectStore
 
 import scala.concurrent.Future
@@ -15,15 +19,20 @@ case class HybridRecord(
   s3key: String
 ) extends Versioned
 
-class VersionedHybridStore(versionedObjectStore: VersionedObjectStore, versionedDao: VersionedDao) {
+class VersionedHybridStore(versionedObjectStore: VersionedObjectStore,
+                           versionedDao: VersionedDao) {
 
-  implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord]{
-    override def updateVersion(testVersioned: HybridRecord, newVersion: Int): HybridRecord = {
+  implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
+    override def updateVersion(testVersioned: HybridRecord,
+                               newVersion: Int): HybridRecord = {
       testVersioned.copy(version = newVersion)
     }
   }
 
-  def updateRecord[T <: Versioned](record: T)(implicit evidence: VersionedDynamoFormatWrapper[T], versionUpdater: VersionUpdater[T], encoder: Encoder[T]): Future[Unit] = {
+  def updateRecord[T <: Versioned](record: T)(
+    implicit evidence: VersionedDynamoFormatWrapper[T],
+    versionUpdater: VersionUpdater[T],
+    encoder: Encoder[T]): Future[Unit] = {
     val futureKey = versionedObjectStore.put(record)
 
     futureKey.flatMap { key =>
@@ -38,8 +47,10 @@ class VersionedHybridStore(versionedObjectStore: VersionedObjectStore, versioned
     }
   }
 
-  def getRecord[T <: Versioned](id: String)(implicit decoder: Decoder[T]): Future[Option[T]] = {
-    val dynamoRecord: Future[Option[HybridRecord]] = versionedDao.getRecord[HybridRecord](id = id)
+  def getRecord[T <: Versioned](id: String)(
+    implicit decoder: Decoder[T]): Future[Option[T]] = {
+    val dynamoRecord: Future[Option[HybridRecord]] =
+      versionedDao.getRecord[HybridRecord](id = id)
 
     dynamoRecord.flatMap {
       case Some(r) => {

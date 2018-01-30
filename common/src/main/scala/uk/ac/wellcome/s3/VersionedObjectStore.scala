@@ -13,10 +13,12 @@ import scala.io.Source
 
 class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
-    implicit encoder: Encoder[T], versionUpdater: VersionUpdater[T]): Future[String] = {
+    implicit encoder: Encoder[T],
+    versionUpdater: VersionUpdater[T]): Future[String] = {
 
     val newVersion = versionedObject.version + 1
-    val newObject = versionUpdater.updateVersion(versionedObject, newVersion = newVersion)
+    val newObject =
+      versionUpdater.updateVersion(versionedObject, newVersion = newVersion)
 
     Future.fromTry(JsonUtil.toJson(newObject)).map { content =>
       val contentHash = md5(content)
