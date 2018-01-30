@@ -4,10 +4,10 @@
 Report the progress of the Sierra adapter.
 """
 
-import collections
 import datetime as dt
 import os
 
+import attr
 import boto3
 
 
@@ -48,7 +48,11 @@ def get_matching_s3_keys(bucket, prefix=''):
             break
 
 
-Interval = collections.namedtuple('Interval', ['start', 'end', 'key'])
+@attr.s
+class Interval:
+    start = attr.ib()
+    end = attr.ib()
+    key = attr.ib()
 
 
 def get_intervals(keys):
