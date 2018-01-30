@@ -8,12 +8,6 @@ import io.circe.Decoder
 import cats.syntax.functor._
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait Versioned {
-  val version: Int
-  val sourceId: String
-  val sourceName: String
-}
-
 sealed trait Transformable
 object Transformable {
   import uk.ac.wellcome.utils.JsonUtil._
