@@ -25,7 +25,7 @@ $(SIERRA_WINDOW_GENERATOR)/src/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/src/
 
 
 $(ROOT)/.docker/sierra_adapter_progress:
-	echo "FROM python:3-alpine\nRUN pip3 install attr boto3" | docker build --tag sierra_adapter_progress -
+	echo "FROM python:3-alpine\nRUN pip3 install attrs boto3" | docker build --tag sierra_adapter_progress -
 	mkdir -p $(ROOT)/.docker
 	touch $(ROOT)/.docker/sierra_adapter_progress
 
