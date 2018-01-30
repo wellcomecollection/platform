@@ -5,12 +5,8 @@ import java.security.MessageDigest
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.{
-  ItemIdentifier,
-  Reindexable,
-  Transformable,
-  Versioned
-}
+import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.transformable.{ItemIdentifier, Reindexable, Transformable}
 import uk.ac.wellcome.test.utils.{JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._

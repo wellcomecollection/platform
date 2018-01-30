@@ -1,39 +1,47 @@
 package uk.ac.wellcome.locals
 
 import com.amazonaws.services.dynamodbv2.model._
-import com.gu.scanamo.query.UniqueKey
 import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.query.UniqueKey
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
-import uk.ac.wellcome.dynamo.SourceData
-import uk.ac.wellcome.models.transformable.SierraTransformable
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
+import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal
+trait DynamoDBLocal[T <: Versioned]
     extends BeforeAndAfterEach
+    with BeforeAndAfterAll
     with DynamoDBLocalClients
     with Eventually
     with Matchers { this: Suite =>
 
+  implicit val evidence: DynamoFormat[T]
   val tableName: String
 
-  deleteTable
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    deleteTable
+    createTable
+  }
 
-  private val table: CreateTableResult = createTable
+  override def afterAll(): Unit = {
+    deleteTable
+    super.afterAll()
+  }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
     clearTable
   }
 
-  private def clearTable =
-    Scanamo.scan[SourceData](dynamoDbClient)(tableName).map {
+  private def clearTable: List[DeleteItemResult] =
+    Scanamo.scan[T](dynamoDbClient)(tableName).map {
       case Right(item) =>
         dynamoDbClient.deleteItem(
           tableName,
-          Map("id" -> new AttributeValue(item.id))
+          Map("sourceId" -> new AttributeValue(item.sourceId))
         )
       case error =>
         throw new Exception(
@@ -51,19 +59,19 @@ trait DynamoDBLocal
       new CreateTableRequest()
         .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
+          .withAttributeName("sourceId")
           .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("id")
+            .withAttributeName("sourceId")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
 
-  def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
-    expectedValue: T) = {
+  def dynamoQueryEqualsValue(key: UniqueKey[_])(
+    expectedValue: T)(implicit evidence: DynamoFormat[T]) = {
 
     println(s"Searching DynamoDB for expectedValue = $expectedValue")
 
