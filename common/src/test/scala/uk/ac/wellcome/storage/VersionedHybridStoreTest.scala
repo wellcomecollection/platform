@@ -127,4 +127,31 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with S
       ex shouldBe a[ConditionalCheckFailedException]
     }
   }
+
+  it("returns a future of None for a non-existent record") {
+    val future = hybridStore.getRecord[ExampleRecord](id = "does/notexist")
+
+    whenReady(future) { result =>
+      result shouldBe None
+    }
+  }
+
+  it("returns a future of Some[ExampleRecord] if the record exists") {
+    val record = ExampleRecord(
+      version = 5,
+      sourceId = "5555",
+      sourceName = "Test5555",
+      content = "Five fishing flinging flint"
+    )
+
+    val putFuture = hybridStore.updateRecord(record)
+
+    val getFuture = putFuture.flatMap { _ =>
+      hybridStore.getRecord[ExampleRecord](record.id)
+    }
+
+    whenReady(getFuture) { result =>
+      result shouldBe Some(record.copy(version = record.version + 1))
+    }
+  }
 }

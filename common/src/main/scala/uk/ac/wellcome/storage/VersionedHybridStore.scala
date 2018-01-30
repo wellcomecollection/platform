@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage
 
-import io.circe.Encoder
+import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormat}
 import uk.ac.wellcome.s3.VersionedObjectStore
@@ -38,4 +38,16 @@ class VersionedHybridStore(versionedObjectStore: VersionedObjectStore, versioned
     }
   }
 
+  def getRecord[T <: Versioned](id: String)(implicit decoder: Decoder[T]): Future[Option[T]] = {
+    val dynamoRecord: Future[Option[HybridRecord]] = versionedDao.getRecord[HybridRecord](id = id)
+
+    dynamoRecord.flatMap {
+      case Some(r) => {
+        versionedObjectStore.get[T](r.s3key).map {
+          Some(_)
+        }
+      }
+      case None => Future.successful(None)
+    }
+  }
 }
