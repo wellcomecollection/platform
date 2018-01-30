@@ -1,5 +1,6 @@
 package uk.ac.wellcome.storage
 
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
@@ -11,6 +12,7 @@ import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 
 case class ExampleRecord(
@@ -63,8 +65,66 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with S
       val s3key = hybridRecord.s3key
 
       val retrievedJson = getJsonFromS3(bucketName = bucketName, key = s3key).noSpaces
-      assertJsonStringsAreEqual(retrievedJson, toJson(record.copy(version = 2)).get)
+      assertJsonStringsAreEqual(retrievedJson, toJson(record.copy(version = record.version + 1)).get)
     }
   }
 
+  it("updates DynamoDB and S3 if it sees a new version of a record") {
+    val record = ExampleRecord(
+      version = 2,
+      sourceId = "2222",
+      sourceName = "Test2222",
+      content = "Two teal turtles in Tenerife"
+    )
+
+    val updatedRecord = record.copy(
+      version = 3,
+      content = "Throwing turquoise tangerines in Tanzania"
+    )
+
+    val future = hybridStore.updateRecord(record)
+
+    val updatedFuture = future.flatMap { _ =>
+      hybridStore.updateRecord(updatedRecord)
+    }
+
+    whenReady(updatedFuture) { _ =>
+      val dynamoRecord = Scanamo.get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id).get
+      dynamoRecord.isRight shouldBe true
+      val hybridRecord = dynamoRecord.right.get
+
+      hybridRecord.version shouldBe (updatedRecord.version + 1)
+      hybridRecord.sourceId shouldBe updatedRecord.sourceId
+      hybridRecord.sourceName shouldBe updatedRecord.sourceName
+
+      val s3key = hybridRecord.s3key
+
+      val retrievedJson = getJsonFromS3(bucketName = bucketName, key = s3key).noSpaces
+      assertJsonStringsAreEqual(retrievedJson, toJson(updatedRecord.copy(version = updatedRecord.version + 1)).get)
+    }
+  }
+
+  it("throws a ConditionalCheckFailedException if it gets an older version of an existing record") {
+    val record = ExampleRecord(
+      version = 4,
+      sourceId = "4444",
+      sourceName = "Test4444",
+      content = "Four fiery foxes freezing in Finland"
+    )
+
+    val olderRecord = record.copy(
+      version = 1,
+      content = "Old otters eating oats"
+    )
+
+    val future = hybridStore.updateRecord(record)
+
+    val updatedFuture = future.flatMap { _ =>
+      hybridStore.updateRecord(olderRecord)
+    }
+
+    whenReady(updatedFuture.failed) { ex =>
+      ex shouldBe a[ConditionalCheckFailedException]
+    }
+  }
 }
