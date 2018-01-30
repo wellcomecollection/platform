@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage
 
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
-import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormat}
+import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormatWrapper}
 import uk.ac.wellcome.s3.VersionedObjectStore
 
 import scala.concurrent.Future
@@ -23,7 +23,7 @@ class VersionedHybridStore(versionedObjectStore: VersionedObjectStore, versioned
     }
   }
 
-  def updateRecord[T <: Versioned](record: T)(implicit evidence: VersionedDynamoFormat[T], versionUpdater: VersionUpdater[T], encoder: Encoder[T]): Future[Unit] = {
+  def updateRecord[T <: Versioned](record: T)(implicit evidence: VersionedDynamoFormatWrapper[T], versionUpdater: VersionUpdater[T], encoder: Encoder[T]): Future[Unit] = {
     val futureKey = versionedObjectStore.put(record)
 
     futureKey.flatMap { key =>
