@@ -12,6 +12,7 @@ import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.storage.VersionedHybridStoreLocal
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraBibMergerFeatureTest
@@ -19,7 +20,8 @@ class SierraBibMergerFeatureTest
     with FeatureTestMixin
     with AmazonCloudWatchFlag
     with SQSLocal
-    with SierraTestUtils {
+    with SierraTestUtils
+    with VersionedHybridStoreLocal[SierraTransformable] {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
@@ -186,13 +188,12 @@ class SierraBibMergerFeatureTest
     // enough time for this update to have gone through (if it was going to).
     Thread.sleep(5000)
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
+//    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
   }
 
-  it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
+  it("stores a bib from SQS if the ID already exists but no bibData") {
     val id = "7000007"
-    val newRecord = SierraTransformable(id = id, version = 1)
-    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
+    val newRecord = SierraTransformable(sourceId = id, version = 1)
 
     val title = "Inside an inquisitive igloo of ice imps"
     val updatedDate = "2007-07-07T07:07:07Z"
@@ -206,11 +207,17 @@ class SierraBibMergerFeatureTest
       modifiedDate = updatedDate
     )
 
-    sendBibRecordToSQS(record)
-    val expectedSierraRecord =
-      SierraTransformable(bibRecord = record, version = 2)
+    val future = hybridStore.updateRecord[SierraTransformable](newRecord)
 
-    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
+    val expectedRecord = SierraTransformable(bibRecord = record, version = 2)
+
+    future.map { _ =>
+      sendBibRecordToSQS(record)
+    }
+
+    eventually {
+      hybridStore.getRecord[SierraTransformable](expectedRecord.sourceId) shouldBe expectedRecord.copy(version = 3)
+    }
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {

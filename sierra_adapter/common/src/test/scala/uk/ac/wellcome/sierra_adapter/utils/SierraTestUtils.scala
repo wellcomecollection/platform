@@ -15,15 +15,4 @@ trait SierraTestUtils
     with ScalaFutures
     with MockitoSugar
     with ExtendedPatience { this: Suite =>
-
-  def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
-    expectedValue: T) = {
-
-    println(s"Searching DynamoDB for expectedValue = $expectedValue")
-
-    eventually {
-      val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get
-      actualValue shouldEqual Right(expectedValue)
-    }
-  }
 }
