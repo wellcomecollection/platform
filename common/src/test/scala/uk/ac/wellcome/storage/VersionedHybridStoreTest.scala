@@ -1,16 +1,10 @@
 package uk.ac.wellcome.storage
 
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
-import com.gu.scanamo.{DynamoFormat, Scanamo}
-import com.gu.scanamo.syntax._
+import com.gu.scanamo.DynamoFormat
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.dynamo.VersionedDao
-import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{VersionUpdater, Versioned}
-import uk.ac.wellcome.s3.VersionedObjectStore
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
@@ -23,7 +17,7 @@ case class ExampleRecord(
 ) extends Versioned
 
 
-class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with ScalaFutures with DynamoDBLocal[ExampleRecord] with JsonTestUtil with ExtendedPatience {
+class VersionedHybridStoreTest extends FunSpec with Matchers with ScalaFutures with VersionedHybridStoreLocal[ExampleRecord] {
 
   implicit val testVersionUpdater = new VersionUpdater[ExampleRecord]{
     override def updateVersion(testVersioned: ExampleRecord, newVersion: Int): ExampleRecord = {
@@ -36,13 +30,6 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with S
   override lazy val tableName: String = "versioned-hybrid-store-test"
   val bucketName = "versioned-hybrid-store-test"
 
-  val hybridStore = new VersionedHybridStore(
-    versionedObjectStore = new VersionedObjectStore(s3Client = s3Client, bucketName = bucketName),
-    versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient, dynamoConfig = DynamoConfig(
-      table = tableName
-    ))
-  )
-
   it("stores a versioned record if it has never been seen before") {
     val record = ExampleRecord(
       version = 1,
@@ -54,18 +41,10 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with S
     val future = hybridStore.updateRecord(record)
 
     whenReady(future) { _ =>
-      val dynamoRecord = Scanamo.get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id).get
-      dynamoRecord.isRight shouldBe true
-      val hybridRecord = dynamoRecord.right.get
-
-      hybridRecord.version shouldBe (record.version + 1)
-      hybridRecord.sourceId shouldBe record.sourceId
-      hybridRecord.sourceName shouldBe record.sourceName
-
-      val s3key = hybridRecord.s3key
-
-      val retrievedJson = getJsonFromS3(bucketName = bucketName, key = s3key).noSpaces
-      assertJsonStringsAreEqual(retrievedJson, toJson(record.copy(version = record.version + 1)).get)
+      assertHybridRecordIsStoredCorrectly(
+        record = record,
+        expectedJson = toJson(record.copy(version = record.version + 1)).get
+      )
     }
   }
 
@@ -89,18 +68,10 @@ class VersionedHybridStoreTest extends FunSpec with Matchers with S3Local with S
     }
 
     whenReady(updatedFuture) { _ =>
-      val dynamoRecord = Scanamo.get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id).get
-      dynamoRecord.isRight shouldBe true
-      val hybridRecord = dynamoRecord.right.get
-
-      hybridRecord.version shouldBe (updatedRecord.version + 1)
-      hybridRecord.sourceId shouldBe updatedRecord.sourceId
-      hybridRecord.sourceName shouldBe updatedRecord.sourceName
-
-      val s3key = hybridRecord.s3key
-
-      val retrievedJson = getJsonFromS3(bucketName = bucketName, key = s3key).noSpaces
-      assertJsonStringsAreEqual(retrievedJson, toJson(updatedRecord.copy(version = updatedRecord.version + 1)).get)
+      assertHybridRecordIsStoredCorrectly(
+        record = updatedRecord,
+        expectedJson = toJson(updatedRecord.copy(version = updatedRecord.version + 1)).get
+      )
     }
   }
 
