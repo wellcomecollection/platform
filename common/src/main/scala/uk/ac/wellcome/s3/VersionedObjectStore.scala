@@ -4,6 +4,7 @@ import java.security.MessageDigest
 
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
+import com.twitter.inject.annotations.Flag
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.utils.JsonUtil
@@ -12,7 +13,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class VersionedObjectStore @Inject()(s3Client: AmazonS3, bucketName: String) {
+class VersionedObjectStore @Inject()(s3Client: AmazonS3, @Flag("aws.s3.bucketName") bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T],
     versionUpdater: VersionUpdater[T]): Future[String] = {

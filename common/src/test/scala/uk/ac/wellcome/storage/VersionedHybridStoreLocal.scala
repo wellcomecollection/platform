@@ -10,8 +10,8 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
-trait VersionedHybridStoreLocal[T <: Versioned]
-    extends DynamoDBLocal[HybridRecord]
+trait VersionedHybridStoreLocal
+  extends DynamoDBLocal[HybridRecord]
     with S3Local
     with JsonTestUtil
     with ExtendedPatience { this: Suite =>

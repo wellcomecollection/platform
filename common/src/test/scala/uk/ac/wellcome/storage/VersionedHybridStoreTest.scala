@@ -19,7 +19,7 @@ class VersionedHybridStoreTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with VersionedHybridStoreLocal[ExampleRecord] {
+    with VersionedHybridStoreLocal {
 
   implicit val testVersionUpdater = new VersionUpdater[ExampleRecord] {
     override def updateVersion(testVersioned: ExampleRecord,

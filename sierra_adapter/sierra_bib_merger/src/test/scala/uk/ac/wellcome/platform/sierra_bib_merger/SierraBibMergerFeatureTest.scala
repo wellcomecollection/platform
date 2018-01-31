@@ -6,6 +6,7 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
+import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
@@ -27,7 +28,8 @@ class SierraBibMergerFeatureTest
     with SQSLocal
     with SierraTestUtils
     with ExtendedPatience
-    with VersionedHybridStoreLocal[SierraTransformable] {
+    with ScalaFutures
+    with VersionedHybridStoreLocal {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
@@ -40,8 +42,8 @@ class SierraBibMergerFeatureTest
       }
     }
 
-  val tableName = "testtable"
-  val bucketName = "testbucket"
+  override lazy val tableName = "sierra-bib-merger-feature-test-table"
+  override lazy val bucketName = "sierra-bib-merger-feature-test-bucket"
   val queueUrl = createQueueAndReturnUrl("test_bib_merger")
 
   override protected def server = new EmbeddedHttpServer(
@@ -104,8 +106,10 @@ class SierraBibMergerFeatureTest
       SierraTransformable(bibRecord = record, version = 1)
 
     eventually {
-      hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable.id) shouldBe expectedSierraTransformable
+      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        record.get shouldBe expectedSierraTransformable
+      }
     }
   }
 

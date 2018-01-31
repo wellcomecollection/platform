@@ -72,14 +72,12 @@ case class MiroTransformable(MiroID: String,
   *
   */
 case class SierraTransformable(
+  version: Int = 0,
   sourceId: String,
+  sourceName: String = "sierra",
   maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
-  version: Int = 0
-) extends Transformable
-    with Versioned {
-  val sourceName = "sierra"
-}
+  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord]()
+) extends Transformable with Versioned
 
 object SierraTransformable {
   def apply(sourceId: String, bibData: String): SierraTransformable = {
