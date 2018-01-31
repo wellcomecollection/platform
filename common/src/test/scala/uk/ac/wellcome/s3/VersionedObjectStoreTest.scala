@@ -69,7 +69,8 @@ class VersionedObjectStoreTest
 
     whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) {
       actualTestObject =>
-        actualTestObject shouldBe testObject
+        val expectedObject = testObject.copy(version = testObject.version + 1)
+        actualTestObject shouldBe expectedObject
     }
   }
 
