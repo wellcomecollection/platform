@@ -30,7 +30,7 @@ class SQSMessageReceiver @Inject()(
     info(s"Starting to process message $message")
     metricsSender.timeAndCount(
       "ingest-time",
-      {
+      () => {
         val futurePublishAttempt = for {
           hybridRecord <- Future.fromTry(JsonUtil.fromJson[HybridRecord](message.body))
           transformableRecord <- versionedObjectStore.get[Transformable](hybridRecord.s3key)
