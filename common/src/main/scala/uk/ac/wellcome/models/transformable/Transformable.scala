@@ -1,6 +1,9 @@
 package uk.ac.wellcome.models.transformable
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import io.circe.Decoder
 import cats.syntax.functor._
 import uk.ac.wellcome.models.Versioned
@@ -73,7 +76,8 @@ case class SierraTransformable(
   maybeBibData: Option[SierraBibRecord] = None,
   itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
   version: Int = 0
-) extends Transformable with Versioned {
+) extends Transformable
+    with Versioned {
   val sourceName = "sierra"
 }
 
@@ -84,10 +88,13 @@ object SierraTransformable {
   }
 
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
+    SierraTransformable(sourceId = bibRecord.id,
+                        maybeBibData = Some(bibRecord))
 
-  def apply(sourceId: String, itemRecord: SierraItemRecord): SierraTransformable =
-    SierraTransformable(sourceId = sourceId, itemData = Map(itemRecord.id -> itemRecord))
+  def apply(sourceId: String,
+            itemRecord: SierraItemRecord): SierraTransformable =
+    SierraTransformable(sourceId = sourceId,
+                        itemData = Map(itemRecord.id -> itemRecord))
 
   def apply(bibRecord: SierraBibRecord, version: Int): SierraTransformable =
     SierraTransformable(

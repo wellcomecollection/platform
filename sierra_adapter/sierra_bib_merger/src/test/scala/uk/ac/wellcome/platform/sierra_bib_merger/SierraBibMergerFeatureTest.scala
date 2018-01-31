@@ -7,7 +7,11 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
 import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.VersionUpdater
@@ -28,12 +32,13 @@ class SierraBibMergerFeatureTest
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
 
-  implicit val sierraTransformableUpdater = new VersionUpdater[SierraTransformable] {
-    override def updateVersion(sierraTransformable: SierraTransformable,
-                               newVersion: Int): SierraTransformable = {
-      sierraTransformable.copy(version = newVersion)
+  implicit val sierraTransformableUpdater =
+    new VersionUpdater[SierraTransformable] {
+      override def updateVersion(sierraTransformable: SierraTransformable,
+                                 newVersion: Int): SierraTransformable = {
+        sierraTransformable.copy(version = newVersion)
+      }
     }
-  }
 
   val tableName = "testtable"
   val bucketName = "testbucket"

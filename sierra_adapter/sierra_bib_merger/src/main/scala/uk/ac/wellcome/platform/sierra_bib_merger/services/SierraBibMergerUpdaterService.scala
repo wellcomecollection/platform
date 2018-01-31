@@ -24,28 +24,32 @@ class SierraBibMergerUpdaterService @Inject()(
 
   lazy implicit val decoder = deriveDecoder[SierraTransformable]
 
-  implicit val sierraTransformableUpdater = new VersionUpdater[SierraTransformable] {
-    override def updateVersion(sierraTransformable: SierraTransformable,
-                               newVersion: Int): SierraTransformable = {
-      sierraTransformable.copy(version = newVersion)
+  implicit val sierraTransformableUpdater =
+    new VersionUpdater[SierraTransformable] {
+      override def updateVersion(sierraTransformable: SierraTransformable,
+                                 newVersion: Int): SierraTransformable = {
+        sierraTransformable.copy(version = newVersion)
+      }
     }
-  }
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = {
 
-    versionedHybridStore.getRecord[SierraTransformable](
-      id = s"sierra/${bibRecord.id}"
-    ).flatMap {
-      case Some(existingSierraTransformable) =>
-        val mergedRecord =
-          BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
-        if (mergedRecord != existingSierraTransformable)
-          versionedHybridStore.updateRecord[SierraTransformable](mergedRecord)
-        else Future.successful(())
-      case None =>
-        versionedHybridStore.updateRecord[SierraTransformable](
-          SierraTransformable(bibRecord)
-        )
-    }
+    versionedHybridStore
+      .getRecord[SierraTransformable](
+        id = s"sierra/${bibRecord.id}"
+      )
+      .flatMap {
+        case Some(existingSierraTransformable) =>
+          val mergedRecord =
+            BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
+          if (mergedRecord != existingSierraTransformable)
+            versionedHybridStore.updateRecord[SierraTransformable](
+              mergedRecord)
+          else Future.successful(())
+        case None =>
+          versionedHybridStore.updateRecord[SierraTransformable](
+            SierraTransformable(bibRecord)
+          )
+      }
   }
 }

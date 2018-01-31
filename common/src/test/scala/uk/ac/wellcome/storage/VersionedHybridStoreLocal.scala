@@ -11,7 +11,7 @@ import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
 trait VersionedHybridStoreLocal[T <: Versioned]
-  extends DynamoDBLocal[HybridRecord]
+    extends DynamoDBLocal[HybridRecord]
     with S3Local
     with JsonTestUtil
     with ExtendedPatience { this: Suite =>
