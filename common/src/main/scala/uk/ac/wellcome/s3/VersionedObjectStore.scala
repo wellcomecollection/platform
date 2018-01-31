@@ -17,7 +17,7 @@ class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T]): Future[String] = {
     Future.fromTry(JsonUtil.toJson(versionedObject)).map { content =>
-      val contentHash = MurmurHash3.stringHash(content)
+      val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
       val key =
         s"${versionedObject.sourceName}/${versionedObject.sourceId}/${versionedObject.version}/$contentHash.json"
 
