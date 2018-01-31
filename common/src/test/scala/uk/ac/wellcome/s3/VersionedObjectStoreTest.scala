@@ -35,7 +35,7 @@ class VersionedObjectStoreTest
 
     whenReady(writtenToS3) { actualKey =>
       val expectedJson = JsonUtil.toJson(testObject).get
-      val expectedHash = "75c6238d32ce27012cc919afa69512f0"
+      val expectedHash = "424873893"
 
       val expectedKey = s"${sourceName}/$id/$version/$expectedHash.json"
 
