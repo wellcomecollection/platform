@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
+import io.circe.generic.extras.semiauto.deriveDecoder
 import org.scalatest.Suite
 import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -26,6 +27,8 @@ trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal with Versio
 
   override lazy val tableName = "sierra-item-merger-feature-test-table"
   override lazy val bucketName = "sierra-item-merger-feature-test-bucket"
+
+  lazy implicit val decoder = deriveDecoder[SierraTransformable]
 
   private def itemRecordString(id: String,
                                updatedDate: String,

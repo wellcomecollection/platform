@@ -1,143 +1,156 @@
-//package uk.ac.wellcome.platform.sierra_item_merger.services
+package uk.ac.wellcome.platform.sierra_item_merger.services
+
+import org.scalatest.FunSpec
+import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
+import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.utils.JsonUtil._
+
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.s3.VersionedObjectStore
+import uk.ac.wellcome.storage.VersionedHybridStore
+
+class SierraItemMergerUpdaterServiceTest
+    extends FunSpec
+    with SierraItemMergerTestUtil {
+
+  val sierraUpdaterService = new SierraItemMergerUpdaterService(
+    versionedHybridStore = new VersionedHybridStore(
+      new VersionedObjectStore(
+        s3Client = s3Client,
+        bucketName = bucketName
+      ),
+      new VersionedDao(
+        dynamoConfig = DynamoConfig(tableName),
+        dynamoDbClient = dynamoDbClient
+      )
+    ),
+    mock[MetricsSender]
+  )
+
+  it("creates a record if it receives an item with a bibId that doesn't exist") {
+    val bibId = "b666"
+    val newItemRecord = sierraItemRecord(
+      id = "i666",
+      updatedDate = "2014-04-04T04:04:04Z",
+      bibIds = List(bibId)
+    )
+
+    whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
+      val expectedSierraTransformable =
+        SierraTransformable(sourceId = bibId,
+                            maybeBibData = None,
+                            itemData = Map(
+                              newItemRecord.id -> newItemRecord
+                            ),
+                            version = 1)
+
+      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
+      whenReady(futureRecord1) { record =>
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
+  }
+
+  it("updates multiple merged records if the item contains multiple bibIds") {
+    val bibIdNotExisting = "b666"
+    val bibIdWithOldData = "b555"
+    val bibIdWithNewerData = "b777"
+
+    val itemId = "i666"
+
+    val bibIds = List(
+      bibIdNotExisting,
+      bibIdWithOldData,
+      bibIdWithNewerData
+    )
+
+    val itemRecord = sierraItemRecord(
+      id = itemId,
+      updatedDate = "2014-04-04T04:04:04Z",
+      bibIds = bibIds
+    )
+
+    val otherItem = sierraItemRecord(
+      id = "i888",
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = bibIds
+    )
+
+    val oldRecord = SierraTransformable(
+      sourceId = bibIdWithOldData,
+      itemData = Map(
+        itemId -> sierraItemRecord(
+          id = itemId,
+          updatedDate = "2003-03-03T03:03:03Z",
+          bibIds = bibIds
+        ),
+        "i888" -> otherItem
+      )
+    )
+
+    hybridStore.updateRecord[SierraTransformable](oldRecord)
+
+    val anotherItem = sierraItemRecord(
+      id = "i999",
+      updatedDate = "2003-03-03T03:03:03Z",
+      bibIds = bibIds
+    )
+
+    val newRecord = SierraTransformable(
+      sourceId = bibIdWithNewerData,
+      itemData = Map(
+        itemId -> sierraItemRecord(
+          id = itemId,
+          updatedDate = "3003-03-03T03:03:03Z",
+          bibIds = bibIds
+        ),
+        "i999" -> anotherItem
+      )
+    )
+
+    hybridStore.updateRecord[SierraTransformable](newRecord)
+
+    whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
+      val expectedNewSierraTransformable =
+        SierraTransformable(
+          sourceId = bibIdNotExisting,
+          maybeBibData = None,
+          itemData = Map(itemRecord.id -> itemRecord),
+          version = 2
+        )
 //
-//import com.gu.scanamo.Scanamo
-//import org.mockito.Matchers.any
-//import org.mockito.Mockito.when
-//import org.scalatest.FunSpec
-//import uk.ac.wellcome.metrics.MetricsSender
-//import uk.ac.wellcome.models.aws.DynamoConfig
-//import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-//import uk.ac.wellcome.dynamo._
+//      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
+//        expectedNewSierraTransformable.id)
+//      whenReady(futureRecord1) { record =>
+//        record.get shouldBe expectedNewSierraTransformable
+//      }
 //
-//import scala.concurrent.Future
-//import com.gu.scanamo.syntax._
-//import uk.ac.wellcome.models.transformable.SierraTransformable
-//import uk.ac.wellcome.sierra_adapter.dynamo.SierraTransformableDao
-//
-//class SierraItemMergerUpdaterServiceTest
-//    extends FunSpec
-//    with SierraItemMergerTestUtil {
-//
-//  val sierraUpdaterService = new SierraItemMergerUpdaterService(
-//    sierraTransformableDao = new SierraTransformableDao(
-//      dynamoConfigs = Map("merger" -> DynamoConfig(tableName)),
-//      dynamoDbClient = dynamoDbClient
-//    ),
-//    mock[MetricsSender]
-//  )
-//
-//  it("creates a record if it receives an item with a bibId that doesn't exist") {
-//    val bibId = "b666"
-//    val newItemRecord = sierraItemRecord(
-//      id = "i666",
-//      updatedDate = "2014-04-04T04:04:04Z",
-//      bibIds = List(bibId)
-//    )
-//
-//    whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
-//      val expectedSierraTransformable =
-//        SierraTransformable(sourceId = bibId,
-//                            maybeBibData = None,
-//                            itemData = Map(
-//                              newItemRecord.id -> newItemRecord
-//                            ),
-//                            version = 1)
-//
-//      dynamoQueryEqualsValue('id -> bibId)(
-//        expectedValue = expectedSierraTransformable)
-//    }
-//  }
-//
-//  it("updates multiple merged records if the item contains multiple bibIds") {
-//    val bibIdNotExisting = "b666"
-//    val bibIdWithOldData = "b555"
-//    val bibIdWithNewerData = "b777"
-//
-//    val itemId = "i666"
-//
-//    val bibIds = List(
-//      bibIdNotExisting,
-//      bibIdWithOldData,
-//      bibIdWithNewerData
-//    )
-//
-//    val itemRecord = sierraItemRecord(
-//      id = itemId,
-//      updatedDate = "2014-04-04T04:04:04Z",
-//      bibIds = bibIds
-//    )
-//
-//    val otherItem = sierraItemRecord(
-//      id = "i888",
-//      updatedDate = "2003-03-03T03:03:03Z",
-//      bibIds = bibIds
-//    )
-//
-//    val oldRecord = SierraTransformable(
-//      sourceId = bibIdWithOldData,
-//      itemData = Map(
-//        itemId -> sierraItemRecord(
-//          id = itemId,
-//          updatedDate = "2003-03-03T03:03:03Z",
-//          bibIds = bibIds
-//        ),
-//        "i888" -> otherItem
-//      ),
-//      version = 1
-//    )
-//
-//    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
-//
-//    val anotherItem = sierraItemRecord(
-//      id = "i999",
-//      updatedDate = "2003-03-03T03:03:03Z",
-//      bibIds = bibIds
-//    )
-//
-//    val newRecord = SierraTransformable(
-//      sourceId = bibIdWithNewerData,
-//      itemData = Map(
-//        itemId -> sierraItemRecord(
-//          id = itemId,
-//          updatedDate = "3003-03-03T03:03:03Z",
-//          bibIds = bibIds
-//        ),
-//        "i999" -> anotherItem
-//      ),
-//      version = 1
-//    )
-//
-//    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
-//
-//    whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
-//      val expectedNewSierraRecord =
-//        SierraTransformable(
-//          sourceId = bibIdNotExisting,
-//          maybeBibData = None,
-//          itemData = Map(itemRecord.id -> itemRecord),
-//          version = 1
-//        )
-//
-//      dynamoQueryEqualsValue('id -> bibIdNotExisting)(
-//        expectedValue = expectedNewSierraRecord)
-//
-//      val expectedUpdatedSierraRecord = oldRecord.copy(
+//      val expectedUpdatedSierraTransformable = oldRecord.copy(
 //        itemData = Map(
 //          itemId -> itemRecord,
 //          "i888" -> otherItem
 //        ),
-//        version = 2
+//        version = 3
 //      )
 //
-//      dynamoQueryEqualsValue('id -> bibIdWithOldData)(
-//        expectedValue = expectedUpdatedSierraRecord)
+//      val futureRecord2 = hybridStore.getRecord[SierraTransformable](
+//        expectedUpdatedSierraTransformable.id)
+//      whenReady(futureRecord2) { record =>
+//        record.get shouldBe expectedUpdatedSierraTransformable
+//      }
 //
-//      val expectedUnchangedSierraRecord = newRecord
+//      val expectedUnchangedSierraTranformable = newRecord
 //
-//      dynamoQueryEqualsValue('id -> bibIdWithNewerData)(
-//        expectedValue = expectedUnchangedSierraRecord)
-//    }
-//  }
+//      val futureRecord3 = hybridStore.getRecord[SierraTransformable](
+//        expectedUnchangedSierraTranformable.id)
+//      whenReady(futureRecord3) { record =>
+//        record.get shouldBe expectedUnchangedSierraTranformable
+//      }
+    }
+  }
 //
 //  it("updates an item if it receives an update with a newer date") {
 //    val id = "i3000003"
@@ -471,4 +484,4 @@
 //      ex shouldBe expectedException
 //    }
 //  }
-//}
+}
