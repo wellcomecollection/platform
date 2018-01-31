@@ -1,5 +1,6 @@
 package uk.ac.wellcome.transformer.receive
 
+import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -18,7 +19,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.Try
 
-class SQSMessageReceiver(
+class SQSMessageReceiver @Inject()(
                           snsWriter: SNSWriter,
                           versionedObjectStore: VersionedObjectStore,
                           transformableTransformer: TransformableTransformer[Transformable],

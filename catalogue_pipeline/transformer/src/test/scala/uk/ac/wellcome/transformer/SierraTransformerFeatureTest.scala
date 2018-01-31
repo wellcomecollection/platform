@@ -25,8 +25,9 @@ class SierraTransformerFeatureTest
     "aws.sqs.queue.url" -> queueUrl,
     "aws.sqs.waitTime" -> "1",
     "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "sierra-transformer"
-  )
+    "aws.metrics.namespace" -> "sierra-transformer",
+    "aws.s3.bucketName" -> bucketName
+  ) ++ s3LocalFlags
 
   it("should transform sierra records, and publish them to the given topic") {
 
@@ -34,14 +35,14 @@ class SierraTransformerFeatureTest
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
-    val calmSqsMessage = hybridRecordSqsMessage(
+    val sierraHybridRecordMessage = hybridRecordSqsMessage(
       createValidSierraTransformableJson(
         id,
         title,
         lastModifiedDate
       ))
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(calmSqsMessage).get)
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sierraHybridRecordMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()

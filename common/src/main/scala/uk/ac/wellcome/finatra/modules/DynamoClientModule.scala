@@ -16,6 +16,14 @@ object DynamoClientModule extends TwitterModule {
     "aws.dynamoDb.endpoint",
     "",
     "Endpoint of AWS DynamoDB. if not present it will use the region")
+  private val accessKey = flag[String](
+    "aws.dynamoDb.accessKey",
+    "",
+    "AccessKey to access DynamoDB")
+  private val secretKey = flag[String](
+    "aws.dynamoDb.secretKey",
+    "",
+    "SecretKey to access DynamoDB")
 
   @Singleton
   @Provides
@@ -54,8 +62,8 @@ object DynamoClientModule extends TwitterModule {
           new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
       awsClientBuilder.withCredentials(
         new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(awsConfig.accessKey.get,
-                                  awsConfig.secretKey.get)))
+          new BasicAWSCredentials(accessKey(),
+                                  secretKey())))
       awsClientBuilder.build()
     }
   }

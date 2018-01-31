@@ -7,7 +7,6 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.modules.SNSClientModule.flag
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object S3ClientModule extends TwitterModule {
@@ -15,6 +14,14 @@ object S3ClientModule extends TwitterModule {
     "aws.s3.endpoint",
     "",
     "Endpoint of AWS S3. The region will be used if the endpoint is not provided")
+  private val accessKey = flag[String](
+    "aws.s3.accessKey",
+    "",
+    "AccessKey to access S3")
+  private val secretKey = flag[String](
+    "aws.s3.secretKey",
+    "",
+    "SecretKey to access S3")
 
   @Singleton
   @Provides
@@ -28,8 +35,8 @@ object S3ClientModule extends TwitterModule {
       standardClient
         .withCredentials(
           new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(awsConfig.accessKey.get,
-                                    awsConfig.secretKey.get)))
+            new BasicAWSCredentials(accessKey(),
+                                    secretKey())))
         .withPathStyleAccessEnabled(true)
         .withEndpointConfiguration(new EndpointConfiguration(s3Endpoint(),
                                                              awsConfig.region))

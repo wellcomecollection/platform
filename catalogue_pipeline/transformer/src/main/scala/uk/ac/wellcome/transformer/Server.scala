@@ -29,7 +29,9 @@ class Server extends HttpServer {
     SNSConfigModule,
     SNSClientModule,
     TransformerWorkerModule,
-    TransformerModule
+    TransformerModule,
+    S3ClientModule,
+    S3ConfigModule
   )
   override def configureHttp(router: HttpRouter) {
     router

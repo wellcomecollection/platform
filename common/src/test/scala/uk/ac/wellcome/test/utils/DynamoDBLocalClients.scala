@@ -22,8 +22,8 @@ trait DynamoDBLocalClients { this: Suite =>
     Map(
       "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
       "aws.region" -> "localhost",
-      "aws.accessKey" -> accessKey,
-      "aws.secretKey" -> secretKey
+      "aws.dynamo.accessKey" -> accessKey,
+      "aws.dynamo.secretKey" -> secretKey
     )
 
   private val dynamoDBLocalCredentialsProvider =

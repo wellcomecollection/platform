@@ -19,7 +19,5 @@ object AWSConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesAWSConfig(): AWSConfig =
-    AWSConfig(region(),
-              if (awsAccessKey().isEmpty) None else Some(awsAccessKey()),
-              if (awsSecretKey().isEmpty) None else Some(awsSecretKey()))
+    AWSConfig(region())
 }

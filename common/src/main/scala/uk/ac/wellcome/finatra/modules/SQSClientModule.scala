@@ -7,6 +7,7 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.finatra.modules.DynamoClientModule.flag
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object SQSClientModule extends TwitterModule {
@@ -16,6 +17,15 @@ object SQSClientModule extends TwitterModule {
     "aws.sqs.endpoint",
     "",
     "Endpoint for AWS SQS Service. If not provided, the region will be used instead")
+
+  private val accessKey = flag[String](
+    "aws.sqs.accessKey",
+    "",
+    "AccessKey to access SQS")
+  private val secretKey = flag[String](
+    "aws.sqs.secretKey",
+    "",
+    "SecretKey to access SQS")
 
   @Singleton
   @Provides
@@ -31,8 +41,8 @@ object SQSClientModule extends TwitterModule {
           new EndpointConfiguration(sqsEndpoint(), awsConfig.region))
         .withCredentials(
           new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(awsConfig.accessKey.get,
-                                    awsConfig.secretKey.get)))
+            new BasicAWSCredentials(accessKey(),
+              secretKey())))
         .build()
   }
 
