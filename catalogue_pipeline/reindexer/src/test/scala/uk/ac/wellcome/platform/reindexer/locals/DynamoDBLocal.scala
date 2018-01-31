@@ -78,7 +78,8 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
           miroDataTableName,
           Map("sourceId" -> new AttributeValue(miroTransformable.sourceId),
               "MiroCollection" -> new AttributeValue(
-                miroTransformable.MiroCollection)))
+                miroTransformable.MiroCollection))
+        )
       case a =>
         throw new Exception(
           s"Unable to clear the table $miroDataTableName error $a")
