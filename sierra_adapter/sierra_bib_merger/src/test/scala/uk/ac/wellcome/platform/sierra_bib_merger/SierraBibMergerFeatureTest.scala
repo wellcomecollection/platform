@@ -151,7 +151,8 @@ class SierraBibMergerFeatureTest
 
     val expectedSierraRecord =
       SierraTransformable(bibRecord = record, version = 2)
-    dynamoQueryEqualsValue('sourceId -> id)(expectedValue = expectedSierraRecord)
+    dynamoQueryEqualsValue('sourceId -> id)(
+      expectedValue = expectedSierraRecord)
   }
 
   it("should not update a bib in DynamoDB if an older version is sent to SQS") {
@@ -186,7 +187,8 @@ class SierraBibMergerFeatureTest
     // enough time for this update to have gone through (if it was going to).
     Thread.sleep(5000)
 
-    dynamoQueryEqualsValue('sourceId -> id)(expectedValue = expectedSierraRecord)
+    dynamoQueryEqualsValue('sourceId -> id)(
+      expectedValue = expectedSierraRecord)
   }
 
   it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
@@ -210,7 +212,8 @@ class SierraBibMergerFeatureTest
     val expectedSierraRecord =
       SierraTransformable(bibRecord = record, version = 2)
 
-    dynamoQueryEqualsValue('sourceId -> id)(expectedValue = expectedSierraRecord)
+    dynamoQueryEqualsValue('sourceId -> id)(
+      expectedValue = expectedSierraRecord)
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {
