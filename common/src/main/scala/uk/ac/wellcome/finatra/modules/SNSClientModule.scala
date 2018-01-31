@@ -16,14 +16,10 @@ object SNSClientModule extends TwitterModule {
     "",
     "Endpoint of AWS SNS. The region will be used if the enpoint is not provided")
 
-  private val accessKey = flag[String](
-    "aws.sns.accessKey",
-    "",
-    "AccessKey to access SNS")
-  private val secretKey = flag[String](
-    "aws.sns.secretKey",
-    "",
-    "SecretKey to access SNS")
+  private val accessKey =
+    flag[String]("aws.sns.accessKey", "", "AccessKey to access SNS")
+  private val secretKey =
+    flag[String]("aws.sns.secretKey", "", "SecretKey to access SNS")
   @Singleton
   @Provides
   def providesSNSClient(awsConfig: AWSConfig): AmazonSNS = {
@@ -36,8 +32,7 @@ object SNSClientModule extends TwitterModule {
       standardSnsClient
         .withCredentials(
           new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey(),
-                                    secretKey())))
+            new BasicAWSCredentials(accessKey(), secretKey())))
         .withEndpointConfiguration(
           new EndpointConfiguration(snsEndpoint(), awsConfig.region))
         .build()

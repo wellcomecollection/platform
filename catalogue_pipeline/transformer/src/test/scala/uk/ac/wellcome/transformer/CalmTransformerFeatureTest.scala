@@ -6,15 +6,20 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.{CalmTransformable, Transformable}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.test.utils.{MessageInfo, S3Local}
-import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 class CalmTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
-    with Matchers with TransformableSQSMessageUtils {
+    with Matchers
+    with TransformableSQSMessageUtils {
 
-  override lazy val bucketName: String = "test-calm-transformer-feature-test-bucket"
+  override lazy val bucketName: String =
+    "test-calm-transformer-feature-test-bucket"
   val queueUrl: String = createQueueAndReturnUrl("test_calm_transformer")
   override val flags: Map[String, String] = Map(
     "transformer.source" -> "CalmData",
@@ -34,8 +39,10 @@ class CalmTransformerFeatureTest
                         AltRefNo = "AltRefNo1",
                         RefNo = "RefNo1",
                         data = """{"AccessStatus": ["public"]}""")
-    val calmHybridRecordMessage = hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable).get)
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(calmHybridRecordMessage).get)
+    val calmHybridRecordMessage =
+      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable).get)
+    sqsClient.sendMessage(queueUrl,
+                          JsonUtil.toJson(calmHybridRecordMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -49,8 +56,10 @@ class CalmTransformerFeatureTest
                         AltRefNo = "AltRefNo2",
                         RefNo = "RefNo2",
                         data = """{"AccessStatus": ["restricted"]}""")
-    val calmHybridRecordMessage2 = hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable2).get)
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(calmHybridRecordMessage2).get)
+    val calmHybridRecordMessage2 =
+      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable2).get)
+    sqsClient.sendMessage(queueUrl,
+                          JsonUtil.toJson(calmHybridRecordMessage2).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()

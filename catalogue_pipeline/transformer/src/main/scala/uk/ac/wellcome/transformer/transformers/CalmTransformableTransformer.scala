@@ -15,17 +15,19 @@ class CalmTransformableTransformer
   override def transformForType(
     calmTransformable: CalmTransformable): Try[Option[Work]] =
     fromJson[CalmTransformableData](calmTransformable.data)
-      .map(_ => Some(
-        Work(
-          title = Some("placeholder title for a Calm record"),
-          sourceIdentifier = SourceIdentifier(
-            IdentifierSchemes.calmPlaceholder,
-            "value"
-          ),
-          identifiers = List(
-            SourceIdentifier(
-              IdentifierSchemes.calmPlaceholder,
-              "value"
-            ))
-        )))
+      .map(
+        _ =>
+          Some(
+            Work(
+              title = Some("placeholder title for a Calm record"),
+              sourceIdentifier = SourceIdentifier(
+                IdentifierSchemes.calmPlaceholder,
+                "value"
+              ),
+              identifiers = List(
+                SourceIdentifier(
+                  IdentifierSchemes.calmPlaceholder,
+                  "value"
+                ))
+            )))
 }

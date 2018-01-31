@@ -13,7 +13,8 @@ trait TransformerFeatureTest
     with Eventually
     with SNSLocal
     with SQSLocal
-    with AmazonCloudWatchFlag with S3Local { this: Suite =>
+    with AmazonCloudWatchFlag
+    with S3Local { this: Suite =>
   val flags: Map[String, String]
 
   lazy val server: EmbeddedHttpServer =

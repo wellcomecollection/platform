@@ -14,14 +14,10 @@ object S3ClientModule extends TwitterModule {
     "aws.s3.endpoint",
     "",
     "Endpoint of AWS S3. The region will be used if the endpoint is not provided")
-  private val accessKey = flag[String](
-    "aws.s3.accessKey",
-    "",
-    "AccessKey to access S3")
-  private val secretKey = flag[String](
-    "aws.s3.secretKey",
-    "",
-    "SecretKey to access S3")
+  private val accessKey =
+    flag[String]("aws.s3.accessKey", "", "AccessKey to access S3")
+  private val secretKey =
+    flag[String]("aws.s3.secretKey", "", "SecretKey to access S3")
 
   @Singleton
   @Provides
@@ -33,10 +29,8 @@ object S3ClientModule extends TwitterModule {
         .build()
     else
       standardClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey(),
-                                    secretKey())))
+        .withCredentials(new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(accessKey(), secretKey())))
         .withPathStyleAccessEnabled(true)
         .withEndpointConfiguration(new EndpointConfiguration(s3Endpoint(),
                                                              awsConfig.region))

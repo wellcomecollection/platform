@@ -18,14 +18,10 @@ object SQSClientModule extends TwitterModule {
     "",
     "Endpoint for AWS SQS Service. If not provided, the region will be used instead")
 
-  private val accessKey = flag[String](
-    "aws.sqs.accessKey",
-    "",
-    "AccessKey to access SQS")
-  private val secretKey = flag[String](
-    "aws.sqs.secretKey",
-    "",
-    "SecretKey to access SQS")
+  private val accessKey =
+    flag[String]("aws.sqs.accessKey", "", "AccessKey to access SQS")
+  private val secretKey =
+    flag[String]("aws.sqs.secretKey", "", "SecretKey to access SQS")
 
   @Singleton
   @Provides
@@ -39,10 +35,8 @@ object SQSClientModule extends TwitterModule {
       sqsClientBuilder
         .withEndpointConfiguration(
           new EndpointConfiguration(sqsEndpoint(), awsConfig.region))
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey(),
-              secretKey())))
+        .withCredentials(new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(accessKey(), secretKey())))
         .build()
   }
 

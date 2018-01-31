@@ -20,10 +20,10 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class SQSMessageReceiver @Inject()(
-                          snsWriter: SNSWriter,
-                          versionedObjectStore: VersionedObjectStore,
-                          transformableTransformer: TransformableTransformer[Transformable],
-                          metricsSender: MetricsSender)
+  snsWriter: SNSWriter,
+  versionedObjectStore: VersionedObjectStore,
+  transformableTransformer: TransformableTransformer[Transformable],
+  metricsSender: MetricsSender)
     extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
@@ -32,23 +32,28 @@ class SQSMessageReceiver @Inject()(
       "ingest-time",
       () => {
         val futurePublishAttempt = for {
-          hybridRecord <- Future.fromTry(JsonUtil.fromJson[HybridRecord](message.body))
-          transformableRecord <- versionedObjectStore.get[Transformable](hybridRecord.s3key)
-          cleanRecord <- Future.fromTry(transformTransformable(transformableRecord))
+          hybridRecord <- Future.fromTry(
+            JsonUtil.fromJson[HybridRecord](message.body))
+          transformableRecord <- versionedObjectStore.get[Transformable](
+            hybridRecord.s3key)
+          cleanRecord <- Future.fromTry(
+            transformTransformable(transformableRecord))
           publishResult <- publishMessage(cleanRecord)
         } yield publishResult
 
-        futurePublishAttempt.recover {
-          case e: ParsingFailure =>
-            info("Recoverable failure extracting workfrom record", e)
-            throw GracefulFailureException(e)
-        }.map(_ => ())
+        futurePublishAttempt
+          .recover {
+            case e: ParsingFailure =>
+              info("Recoverable failure extracting workfrom record", e)
+              throw GracefulFailureException(e)
+          }
+          .map(_ => ())
       }
     )
   }
 
-
-  private def transformTransformable(transformable: Transformable): Try[Option[Work]] = {
+  private def transformTransformable(
+    transformable: Transformable): Try[Option[Work]] = {
     transformableTransformer.transform(transformable) map { transformed =>
       info(s"Transformed record $transformed")
       transformed
@@ -59,8 +64,11 @@ class SQSMessageReceiver @Inject()(
     }
   }
 
-  private def publishMessage(maybeWork: Option[Work]): Future[Option[PublishAttempt]] =
-    maybeWork.fold(Future.successful(None: Option[PublishAttempt])){work =>
-      snsWriter.writeMessage(JsonUtil.toJson(work).get, Some("Foo")).map(publishAttempt => Some(publishAttempt))
+  private def publishMessage(
+    maybeWork: Option[Work]): Future[Option[PublishAttempt]] =
+    maybeWork.fold(Future.successful(None: Option[PublishAttempt])) { work =>
+      snsWriter
+        .writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+        .map(publishAttempt => Some(publishAttempt))
     }
 }

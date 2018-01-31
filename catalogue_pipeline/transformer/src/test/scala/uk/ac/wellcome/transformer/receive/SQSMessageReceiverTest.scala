@@ -18,7 +18,10 @@ import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
-import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -50,12 +53,13 @@ class SQSMessageReceiverTest
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
-  private val versionedObjectStore = new VersionedObjectStore(s3Client, bucketName)
+  private val versionedObjectStore =
+    new VersionedObjectStore(s3Client, bucketName)
   val recordReceiver =
     new SQSMessageReceiver(snsWriter,
-      versionedObjectStore,
-      new CalmTransformableTransformer,
-      metricsSender)
+                           versionedObjectStore,
+                           new CalmTransformableTransformer,
+                           metricsSender)
 
   it("should receive a message and send it to SNS client") {
     val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
@@ -66,7 +70,6 @@ class SQSMessageReceiverTest
         RefNo = "AB/CD/12",
         data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
       ))
-
 
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
@@ -79,7 +82,8 @@ class SQSMessageReceiverTest
   }
 
   it("should return a failed future if it's unable to parse the SQS message") {
-    val invalidCalmSqsMessage: SQSMessage = hybridRecordSqsMessage("not a json string")
+    val invalidCalmSqsMessage: SQSMessage =
+      hybridRecordSqsMessage("not a json string")
 
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
@@ -93,7 +97,7 @@ class SQSMessageReceiverTest
 
     val recordReceiver =
       new SQSMessageReceiver(snsWriter,
-        versionedObjectStore,
+                             versionedObjectStore,
                              new SierraTransformableTransformer,
                              metricsSender)
 
@@ -125,16 +129,23 @@ class SQSMessageReceiverTest
     }
   }
 
-  it(
-    "should return a failed future if it's unable to publish the work") {
+  it("should return a failed future if it's unable to publish the work") {
     val id = "b123"
-    val sierraTransformable: Transformable = SierraTransformable(sourceId = id, bibData = JsonUtil.toJson(SierraBibRecord(id = id, data = s"""{"id": "$id"}""", modifiedDate = Instant.now)).get)
-    val message = hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get)
+    val sierraTransformable: Transformable =
+      SierraTransformable(sourceId = id,
+                          bibData = JsonUtil
+                            .toJson(
+                              SierraBibRecord(id = id,
+                                              data = s"""{"id": "$id"}""",
+                                              modifiedDate = Instant.now))
+                            .get)
+    val message =
+      hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get)
 
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
       new SQSMessageReceiver(mockSNS,
-        versionedObjectStore,
+                             versionedObjectStore,
                              new SierraTransformableTransformer,
                              metricsSender)
 

@@ -14,7 +14,10 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class VersionedObjectStore @Inject()(s3Client: AmazonS3, @Flag("aws.s3.bucketName")bucketName: String) extends Logging {
+class VersionedObjectStore @Inject()(
+  s3Client: AmazonS3,
+  @Flag("aws.s3.bucketName") bucketName: String)
+    extends Logging {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T],
     versionUpdater: VersionUpdater[T]): Future[String] = {
@@ -42,10 +45,10 @@ class VersionedObjectStore @Inject()(s3Client: AmazonS3, @Flag("aws.s3.bucketNam
       Source.fromInputStream(s3Object.getObjectContent).mkString
     }
 
-    getObject.flatMap(s3ObjectContent =>{
+    getObject.flatMap(s3ObjectContent => {
       info(s"Retrieved content $s3ObjectContent")
-      Future.fromTry(JsonUtil.fromJson[T](s3ObjectContent))}
-    )
+      Future.fromTry(JsonUtil.fromJson[T](s3ObjectContent))
+    })
   }
 
   private def md5(s: String): String = {

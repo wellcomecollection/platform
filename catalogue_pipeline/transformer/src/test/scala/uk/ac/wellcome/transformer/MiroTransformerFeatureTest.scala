@@ -7,15 +7,20 @@ import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 class MiroTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
     with Matchers
-    with MiroTransformableWrapper  with TransformableSQSMessageUtils{
-  override lazy val bucketName: String = "test-miro-transformer-feature-test-bucket"
+    with MiroTransformableWrapper
+    with TransformableSQSMessageUtils {
+  override lazy val bucketName: String =
+    "test-miro-transformer-feature-test-bucket"
   val queueUrl: String = createQueueAndReturnUrl("test_miro_transformer")
   override val flags: Map[String, String] = Map(
     "transformer.source" -> "MiroData",
@@ -69,9 +74,11 @@ class MiroTransformerFeatureTest
         }"""
 
   private def sendMiroImageToSQS(miroID: String, message: String) = {
-    val miroTransformable: Transformable = MiroTransformable(miroID, "Images-A", message)
+    val miroTransformable: Transformable =
+      MiroTransformable(miroID, "Images-A", message)
 
-    val sqsMessage = hybridRecordSqsMessage(JsonUtil.toJson(miroTransformable).get)
+    val sqsMessage = hybridRecordSqsMessage(
+      JsonUtil.toJson(miroTransformable).get)
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
   }
