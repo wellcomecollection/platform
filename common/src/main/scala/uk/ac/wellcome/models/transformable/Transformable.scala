@@ -77,7 +77,8 @@ case class SierraTransformable(
   sourceName: String = "sierra",
   maybeBibData: Option[SierraBibRecord] = None,
   itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord]()
-) extends Transformable with Versioned
+) extends Transformable
+    with Versioned
 
 object SierraTransformable {
   def apply(sourceId: String, bibData: String): SierraTransformable = {

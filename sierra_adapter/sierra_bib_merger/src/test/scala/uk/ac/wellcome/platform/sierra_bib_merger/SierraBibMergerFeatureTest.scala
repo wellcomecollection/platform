@@ -106,7 +106,8 @@ class SierraBibMergerFeatureTest
       SierraTransformable(bibRecord = record, version = 1)
 
     eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
         record.get shouldBe expectedSierraTransformable
       }
@@ -143,12 +144,14 @@ class SierraBibMergerFeatureTest
       SierraTransformable(bibRecord = record2, version = 1)
 
     eventually {
-      val futureRecord1 = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable1.id)
+      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable1.id)
       whenReady(futureRecord1) { record =>
         record.get shouldBe expectedSierraTransformable1
       }
 
-      val futureRecord2 = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable2.id)
+      val futureRecord2 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable2.id)
       whenReady(futureRecord2) { record =>
         record.get shouldBe expectedSierraTransformable2
       }
@@ -186,7 +189,8 @@ class SierraBibMergerFeatureTest
       SierraTransformable(bibRecord = record, version = 2)
 
     eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
         println(s"@@AWLC The future is here!")
         record.get shouldBe expectedSierraTransformable
@@ -207,7 +211,8 @@ class SierraBibMergerFeatureTest
     )
     sendBibRecordToSQS(newBibRecord)
 
-    val expectedSierraTransformable = SierraTransformable(bibRecord = newBibRecord, version = 1)
+    val expectedSierraTransformable =
+      SierraTransformable(bibRecord = newBibRecord, version = 1)
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
@@ -227,7 +232,8 @@ class SierraBibMergerFeatureTest
     Thread.sleep(5000)
 
     eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
         println(s"@@AWLC The future is here!")
         record.get shouldBe expectedSierraTransformable
@@ -257,10 +263,12 @@ class SierraBibMergerFeatureTest
       sendBibRecordToSQS(record)
     }
 
-    val expectedSierraTransformable = SierraTransformable(bibRecord = record, version = 2)
+    val expectedSierraTransformable =
+      SierraTransformable(bibRecord = record, version = 2)
 
     eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
         println(s"@@AWLC The future is here!")
         record.get shouldBe expectedSierraTransformable

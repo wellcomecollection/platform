@@ -13,7 +13,9 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class VersionedObjectStore @Inject()(s3Client: AmazonS3, @Flag("aws.s3.bucketName") bucketName: String) {
+class VersionedObjectStore @Inject()(
+  s3Client: AmazonS3,
+  @Flag("aws.s3.bucketName") bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T],
     versionUpdater: VersionUpdater[T]): Future[String] = {
