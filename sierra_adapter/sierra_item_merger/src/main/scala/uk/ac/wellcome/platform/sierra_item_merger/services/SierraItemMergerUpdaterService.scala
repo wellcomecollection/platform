@@ -2,37 +2,55 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import io.circe.generic.extras.semiauto.deriveDecoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
-import uk.ac.wellcome.sierra_adapter.dynamo.SierraTransformableDao
+import uk.ac.wellcome.storage.VersionedHybridStore
+
+import uk.ac.wellcome.dynamo._
+
+import uk.ac.wellcome.utils.JsonUtil._
+
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-  sierraTransformableDao: SierraTransformableDao,
+  versionedHybridStore: VersionedHybridStore,
   metrics: MetricsSender
 ) extends Logging {
 
+  lazy implicit val decoder = deriveDecoder[SierraTransformable]
+
+  implicit val sierraTransformableUpdater =
+    new VersionUpdater[SierraTransformable] {
+      override def updateVersion(sierraTransformable: SierraTransformable,
+                                 newVersion: Int): SierraTransformable = {
+        sierraTransformable.copy(version = newVersion)
+      }
+    }
+
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
 
+
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
-      sierraTransformableDao
-        .getRecord(bibId)
+      versionedHybridStore
+        .getRecord[SierraTransformable](bibId)
         .flatMap {
           case Some(existingSierraTransformable) =>
             val mergedRecord =
               ItemLinker.linkItemRecord(existingSierraTransformable,
                                         itemRecord)
             if (mergedRecord != existingSierraTransformable)
-              sierraTransformableDao.updateRecord(mergedRecord)
+              versionedHybridStore.updateRecord[SierraTransformable](mergedRecord)
             else Future.successful(())
           case None =>
-            sierraTransformableDao.updateRecord(
+            versionedHybridStore.updateRecord[SierraTransformable](
               SierraTransformable(
                 sourceId = bibId,
                 itemData = Map(itemRecord.id -> itemRecord)
@@ -42,14 +60,14 @@ class SierraItemMergerUpdaterService @Inject()(
     }
 
     val unlinkUpdateFutures = itemRecord.unlinkedBibIds.map { unlinkedBibId =>
-      sierraTransformableDao
-        .getRecord(unlinkedBibId)
+      versionedHybridStore
+        .getRecord[SierraTransformable](unlinkedBibId)
         .flatMap {
           case Some(record) =>
             val mergedRecord =
               ItemUnlinker.unlinkItemRecord(record, itemRecord)
             if (mergedRecord != record)
-              sierraTransformableDao.updateRecord(mergedRecord)
+              versionedHybridStore.updateRecord[SierraTransformable](mergedRecord)
             else Future.successful(())
           // In the case we cannot find the bib record
           // assume we're too early and put the message back

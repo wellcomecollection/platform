@@ -20,11 +20,13 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.sierra_item_merger SierraItemMerger"
   override val modules = Seq(
     DynamoClientModule,
+    SierraDynamoConfigModule,
     AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,
+    S3ClientModule,
+    S3ConfigModule,
     AkkaModule,
-    SierraDynamoConfigModule,
     SierraItemMergerModule
   )
 
