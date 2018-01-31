@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage
 
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import org.scalatest.Suite
 import uk.ac.wellcome.dynamo.VersionedDao
@@ -10,11 +10,14 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
-trait VersionedHybridStoreLocal
-    extends DynamoDBLocal[HybridRecord]
+trait VersionedHybridStoreLocal[T <: Versioned]
+  extends DynamoDBLocal[HybridRecord]
     with S3Local
     with JsonTestUtil
     with ExtendedPatience { this: Suite =>
+
+  override lazy val evidence: DynamoFormat[HybridRecord] =
+    DynamoFormat[HybridRecord]
 
   val hybridStore = new VersionedHybridStore(
     versionedObjectStore =

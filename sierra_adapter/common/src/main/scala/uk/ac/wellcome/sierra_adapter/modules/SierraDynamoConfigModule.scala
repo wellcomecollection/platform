@@ -9,6 +9,7 @@ object SierraDynamoConfigModule extends DynamoConfigModule {
 
   val sierraToDynamo = flags("sierraToDynamo")
   val merger = flags("merger")
+  val dynamoTable = flags("dynamoTable")
 
   @Singleton
   @Provides
@@ -19,4 +20,9 @@ object SierraDynamoConfigModule extends DynamoConfigModule {
     ).filterNot {
       case (_, v) => v.table.isEmpty
     }
+
+  @Singleton
+  @Provides
+  def providesSingleDynamoConfig(): DynamoConfig =
+    DynamoConfig(dynamoTable())
 }

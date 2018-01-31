@@ -54,7 +54,9 @@ trait DynamoDBLocal[T <: Versioned]
       .getTableNames
       .foreach(dynamoDbClient.deleteTable)
 
-  private def createTable =
+  private def createTable = {
+    println(s"Trying to create dynamo table: $tableName")
+
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(tableName)
@@ -69,6 +71,7 @@ trait DynamoDBLocal[T <: Versioned]
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
+  }
 
   def dynamoQueryEqualsValue(key: UniqueKey[_])(expectedValue: T)(
     implicit evidence: DynamoFormat[T]) = {

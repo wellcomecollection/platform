@@ -7,8 +7,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.sierra_adapter.dynamo.SierraTransformableDao
 import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.storage.VersionedHybridStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraBibMergerWorkerServiceTest
@@ -24,7 +24,7 @@ class SierraBibMergerWorkerServiceTest
     val sqsReader = mock[SQSReader]
     val metricsSender = mock[MetricsSender]
     val mergerUpdaterService =
-      new SierraBibMergerUpdaterService(mock[SierraTransformableDao],
+      new SierraBibMergerUpdaterService(mock[VersionedHybridStore],
                                         metricsSender)
     val worker = new SierraBibMergerWorkerService(sqsReader,
                                                   ActorSystem(),
