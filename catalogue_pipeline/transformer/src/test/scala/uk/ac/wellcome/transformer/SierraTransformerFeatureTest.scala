@@ -27,7 +27,7 @@ class SierraTransformerFeatureTest
     "aws.sns.topic.arn" -> idMinterTopicArn,
     "aws.metrics.namespace" -> "sierra-transformer",
     "aws.s3.bucketName" -> bucketName
-  ) ++ s3LocalFlags
+  )
 
   it("should transform sierra records, and publish them to the given topic") {
 

@@ -13,13 +13,13 @@ trait TransformerFeatureTest
     with Eventually
     with SNSLocal
     with SQSLocal
-    with AmazonCloudWatchFlag { this: Suite =>
+    with AmazonCloudWatchFlag with S3Local { this: Suite =>
   val flags: Map[String, String]
 
   lazy val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
-      flags ++ snsLocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
+      flags ++ snsLocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ s3LocalFlags
     )
 
   val idMinterTopicArn: String = createTopicAndReturnArn("test_id_minter")

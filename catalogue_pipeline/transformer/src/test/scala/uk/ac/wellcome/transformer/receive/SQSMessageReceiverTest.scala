@@ -12,7 +12,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
-import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.s3.VersionedObjectStore
@@ -128,7 +128,8 @@ class SQSMessageReceiverTest
   it(
     "should return a failed future if it's unable to publish the work") {
     val id = "b123"
-    val message = hybridRecordSqsMessage(JsonUtil.toJson(SierraTransformable(sourceId = id, bibData = JsonUtil.toJson(SierraBibRecord(id = id, data = s"""{"id": "$id"}""", modifiedDate = Instant.now)).get)).get)
+    val sierraTransformable: Transformable = SierraTransformable(sourceId = id, bibData = JsonUtil.toJson(SierraBibRecord(id = id, data = s"""{"id": "$id"}""", modifiedDate = Instant.now)).get)
+    val message = hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get)
 
     val mockSNS = mockFailPublishMessage
     val recordReceiver =

@@ -5,7 +5,7 @@ import java.time.Instant
 import org.scalatest.Suite
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.S3Local
@@ -13,19 +13,21 @@ import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableSQSMessageUtils extends S3Local {this: Suite =>
 
+
+
   def createValidCalmTramsformableJson(RecordID: String,
                                        RecordType: String,
                                        AltRefNo: String,
                                        RefNo: String,
                                        data: String): String = {
-    val calmTransformable =
+    val calmTransformable: Transformable =
       CalmTransformable(RecordID, RecordType, AltRefNo, RefNo, data)
 
     JsonUtil.toJson(calmTransformable).get
   }
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable: Transformable = SierraTransformable(
       sourceId = id,
       maybeBibData = None,
       itemData = Map[String, SierraItemRecord]()
@@ -46,7 +48,7 @@ trait TransformableSQSMessageUtils extends S3Local {this: Suite =>
          |}
       """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable: Transformable = SierraTransformable(
       sourceId = id,
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
       itemData = Map[String, SierraItemRecord]()
@@ -58,7 +60,7 @@ trait TransformableSQSMessageUtils extends S3Local {this: Suite =>
   def createValidMiroTransformableJson(MiroID: String,
                                        MiroCollection: String,
                                        data: String): String = {
-    val miroTransformable = MiroTransformable(MiroID, MiroCollection, data)
+    val miroTransformable: Transformable = MiroTransformable(MiroID, MiroCollection, data)
     JsonUtil.toJson(miroTransformable).get
   }
 

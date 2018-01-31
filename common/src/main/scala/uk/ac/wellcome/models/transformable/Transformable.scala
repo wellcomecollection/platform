@@ -7,16 +7,6 @@ import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Versioned
-object Transformable {
-  import uk.ac.wellcome.utils.JsonUtil._
-
-  implicit val decodeEvent: Decoder[Transformable] =
-    List[Decoder[Transformable]](
-      Decoder[CalmTransformable].widen,
-      Decoder[SierraTransformable].widen,
-      Decoder[MiroTransformable].widen
-    ).reduceLeft(_ or _)
-}
 
 case class CalmTransformable(
                               sourceId: String,
