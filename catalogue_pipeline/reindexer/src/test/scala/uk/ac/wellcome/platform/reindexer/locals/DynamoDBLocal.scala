@@ -76,7 +76,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       case Right(miroTransformable) =>
         dynamoDbClient.deleteItem(
           miroDataTableName,
-          Map("MiroID" -> new AttributeValue(miroTransformable.sourceId),
+          Map("sourceId" -> new AttributeValue(miroTransformable.sourceId),
               "MiroCollection" -> new AttributeValue(
                 miroTransformable.MiroCollection)))
       case a =>
@@ -90,7 +90,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
         dynamoDbClient.deleteItem(
           calmDataTableName,
           Map(
-            "RecordID" -> new AttributeValue(calmTransformable.sourceId),
+            "sourceId" -> new AttributeValue(calmTransformable.sourceId),
             "RecordType" -> new AttributeValue(calmTransformable.RecordType)
           ))
       case a =>
@@ -136,14 +136,14 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       new CreateTableRequest()
         .withTableName(calmDataTableName)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("RecordID")
+          .withAttributeName("sourceId")
           .withKeyType(KeyType.HASH))
         .withKeySchema(new KeySchemaElement()
           .withAttributeName("RecordType")
           .withKeyType(KeyType.RANGE))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("RecordID")
+            .withAttributeName("sourceId")
             .withAttributeType("S"),
           new AttributeDefinition()
             .withAttributeName("RecordType")
@@ -195,14 +195,14 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       new CreateTableRequest()
         .withTableName(miroDataTableName)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("MiroID")
+          .withAttributeName("sourceId")
           .withKeyType(KeyType.HASH))
         .withKeySchema(new KeySchemaElement()
           .withAttributeName("MiroCollection")
           .withKeyType(KeyType.RANGE))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("MiroID")
+            .withAttributeName("sourceId")
             .withAttributeType("S"),
           new AttributeDefinition()
             .withAttributeName("MiroCollection")

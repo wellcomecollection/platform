@@ -25,7 +25,7 @@ case class CalmTransformable(
     with Reindexable[String] {
 
   val reindexId: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("RecordID", sourceId),
+    HashKey("sourceId", sourceId),
     RangeKey("RecordType", RecordType)
   )
 }
@@ -45,7 +45,7 @@ case class MiroTransformable(sourceId: String,
     with Reindexable[String] {
 
   val reindexId: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("MiroID", sourceId),
+    HashKey("sourceId", sourceId),
     RangeKey("MiroCollection", MiroCollection)
   )
 }
