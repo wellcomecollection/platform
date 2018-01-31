@@ -44,6 +44,7 @@ trait DynamoDBLocal[T <: Versioned]
       .listTables()
       .getTableNames
       .foreach(dynamoDbClient.deleteTable)
+  }
 
   private def createTable() = {
     println(s"Creating local DynamoDB table: $tableName")

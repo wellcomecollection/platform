@@ -113,136 +113,160 @@ class SierraBibMergerFeatureTest
     }
   }
 
-//  it("should put multiple bibs from SQS into DynamoDB") {
-//    val id1 = "1000001"
-//    val record1 = SierraBibRecord(
-//      id = id1,
-//      data = bibRecordString(
-//        id = id1,
-//        updatedDate = "2001-01-01T01:01:01Z",
-//        title = "The first ferret of four"
-//      ),
-//      modifiedDate = "2001-01-01T01:01:01Z"
-//    )
-//    sendBibRecordToSQS(record1)
-//    val expectedSierraTransformable1 =
-//      SierraTransformable(bibRecord = record1, version = 1)
-//
-//    val id2 = "2000002"
-//    val record2 = SierraBibRecord(
-//      id = id2,
-//      data = bibRecordString(
-//        id = id2,
-//        updatedDate = "2002-02-02T02:02:02Z",
-//        title = "The second swan of a set"
-//      ),
-//      modifiedDate = "2002-02-02T02:02:02Z"
-//    )
-//    sendBibRecordToSQS(record2)
-//    val expectedSierraTransformable2 =
-//      SierraTransformable(bibRecord = record2, version = 1)
-//
-//    dynamoQueryEqualsValue('id -> id1)(
-//      expectedValue = expectedSierraTransformable1)
-//    dynamoQueryEqualsValue('id -> id2)(
-//      expectedValue = expectedSierraTransformable2)
-//  }
-//
-//  it("should update a bib in DynamoDB if a newer version is sent to SQS") {
-//    val id = "3000003"
-//    val oldBibRecord = SierraBibRecord(
-//      id = id,
-//      data = bibRecordString(
-//        id = id,
-//        updatedDate = "2003-03-03T03:03:03Z",
-//        title = "Old orangutans outside an office"
-//      ),
-//      modifiedDate = "2003-03-03T03:03:03Z"
-//    )
-//    val oldRecord = SierraTransformable(bibRecord = oldBibRecord, version = 1)
-//    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
-//
-//    val newTitle = "A number of new narwhals near Newmarket"
-//    val newUpdatedDate = "2004-04-04T04:04:04Z"
-//    val record = SierraBibRecord(
-//      id = id,
-//      data = bibRecordString(
-//        id = id,
-//        updatedDate = newUpdatedDate,
-//        title = newTitle
-//      ),
-//      modifiedDate = newUpdatedDate
-//    )
-//    sendBibRecordToSQS(record)
-//
-//    val expectedSierraRecord =
-//      SierraTransformable(bibRecord = record, version = 2)
-//    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
-//  }
-//
-//  it("should not update a bib in DynamoDB if an older version is sent to SQS") {
-//    val id = "6000006"
-//    val newBibRecord = SierraBibRecord(
-//      id = id,
-//      data = bibRecordString(
-//        id = id,
-//        updatedDate = "2006-06-06T06:06:06Z",
-//        title = "A presence of pristine porpoises"
-//      ),
-//      modifiedDate = "2006-06-06T06:06:06Z"
-//    )
-//    val newRecord = SierraTransformable(bibRecord = newBibRecord)
-//    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
-//    val expectedSierraRecord = SierraTransformable(bibRecord = newBibRecord)
-//
-//    val oldTitle = "A small selection of sad shellfish"
-//    val oldUpdatedDate = "2001-01-01T01:01:01Z"
-//    val record = SierraBibRecord(
-//      id = id,
-//      data = bibRecordString(
-//        id = id,
-//        updatedDate = oldUpdatedDate,
-//        title = oldTitle
-//      ),
-//      modifiedDate = oldUpdatedDate
-//    )
-//    sendBibRecordToSQS(record)
-//
-//    // Blocking in Scala is generally a bad idea; we do it here so there's
-//    // enough time for this update to have gone through (if it was going to).
-//    Thread.sleep(5000)
-//
-////    dynamoQueryEqualsValue('id -> id)(expectedValue = expectedSierraRecord)
-//  }
-//
-//  it("stores a bib from SQS if the ID already exists but no bibData") {
-//    val id = "7000007"
-//    val newRecord = SierraTransformable(sourceId = id, version = 1)
-//
-//    val title = "Inside an inquisitive igloo of ice imps"
-//    val updatedDate = "2007-07-07T07:07:07Z"
-//    val record = SierraBibRecord(
-//      id = id,
-//      data = bibRecordString(
-//        id = id,
-//        title = title,
-//        updatedDate = updatedDate
-//      ),
-//      modifiedDate = updatedDate
-//    )
-//
-//    val future = hybridStore.updateRecord[SierraTransformable](newRecord)
-//
-//    val expectedRecord = SierraTransformable(bibRecord = record, version = 2)
-//
-//    future.map { _ =>
-//      sendBibRecordToSQS(record)
-//    }
-//
-//    eventually {
-//      hybridStore.getRecord[SierraTransformable](expectedRecord.sourceId) shouldBe expectedRecord.copy(version = 3)
-//    }
-//  }
+  it("stores multiple bibs from SQS") {
+    val id1 = "1000001"
+    val record1 = SierraBibRecord(
+      id = id1,
+      data = bibRecordString(
+        id = id1,
+        updatedDate = "2001-01-01T01:01:01Z",
+        title = "The first ferret of four"
+      ),
+      modifiedDate = "2001-01-01T01:01:01Z"
+    )
+    sendBibRecordToSQS(record1)
+    val expectedSierraTransformable1 =
+      SierraTransformable(bibRecord = record1, version = 1)
+
+    val id2 = "2000002"
+    val record2 = SierraBibRecord(
+      id = id2,
+      data = bibRecordString(
+        id = id2,
+        updatedDate = "2002-02-02T02:02:02Z",
+        title = "The second swan of a set"
+      ),
+      modifiedDate = "2002-02-02T02:02:02Z"
+    )
+    sendBibRecordToSQS(record2)
+    val expectedSierraTransformable2 =
+      SierraTransformable(bibRecord = record2, version = 1)
+
+    eventually {
+      val futureRecord1 = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable1.id)
+      whenReady(futureRecord1) { record =>
+        record.get shouldBe expectedSierraTransformable1
+      }
+
+      val futureRecord2 = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable2.id)
+      whenReady(futureRecord2) { record =>
+        record.get shouldBe expectedSierraTransformable2
+      }
+    }
+  }
+
+  it("updates a bib if a newer version is sent to SQS") {
+    val id = "3000003"
+    val oldBibRecord = SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        updatedDate = "2003-03-03T03:03:03Z",
+        title = "Old orangutans outside an office"
+      ),
+      modifiedDate = "2003-03-03T03:03:03Z"
+    )
+    val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
+    hybridStore.updateRecord[SierraTransformable](oldRecord)
+
+    val newTitle = "A number of new narwhals near Newmarket"
+    val newUpdatedDate = "2004-04-04T04:04:04Z"
+    val record = SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        updatedDate = newUpdatedDate,
+        title = newTitle
+      ),
+      modifiedDate = newUpdatedDate
+    )
+    sendBibRecordToSQS(record)
+
+    val expectedSierraTransformable =
+      SierraTransformable(bibRecord = record, version = 2)
+
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        println(s"@@AWLC The future is here!")
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
+  }
+
+  it("does not update a bib if an older version is sent to SQS") {
+    val id = "6000006"
+    val newBibRecord = SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        updatedDate = "2006-06-06T06:06:06Z",
+        title = "A presence of pristine porpoises"
+      ),
+      modifiedDate = "2006-06-06T06:06:06Z"
+    )
+    sendBibRecordToSQS(newBibRecord)
+
+    val expectedSierraTransformable = SierraTransformable(bibRecord = newBibRecord, version = 1)
+
+    val oldTitle = "A small selection of sad shellfish"
+    val oldUpdatedDate = "2001-01-01T01:01:01Z"
+    val record = SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        updatedDate = oldUpdatedDate,
+        title = oldTitle
+      ),
+      modifiedDate = oldUpdatedDate
+    )
+    sendBibRecordToSQS(record)
+
+    // Blocking in Scala is generally a bad idea; we do it here so there's
+    // enough time for this update to have gone through (if it was going to).
+    Thread.sleep(5000)
+
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        println(s"@@AWLC The future is here!")
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
+  }
+
+  it("stores a bib from SQS if the ID already exists but no bibData") {
+    val id = "7000007"
+    val newRecord = SierraTransformable(sourceId = id)
+
+    val title = "Inside an inquisitive igloo of ice imps"
+    val updatedDate = "2007-07-07T07:07:07Z"
+    val record = SierraBibRecord(
+      id = id,
+      data = bibRecordString(
+        id = id,
+        title = title,
+        updatedDate = updatedDate
+      ),
+      modifiedDate = updatedDate
+    )
+
+    val future = hybridStore.updateRecord[SierraTransformable](newRecord)
+
+    future.map { _ =>
+      sendBibRecordToSQS(record)
+    }
+
+    val expectedSierraTransformable = SierraTransformable(bibRecord = record, version = 2)
+
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        println(s"@@AWLC The future is here!")
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
+  }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {
     val messageBody = toJson(record).get
