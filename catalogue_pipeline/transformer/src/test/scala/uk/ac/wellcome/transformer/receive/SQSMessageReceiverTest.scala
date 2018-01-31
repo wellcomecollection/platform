@@ -1,8 +1,6 @@
 package uk.ac.wellcome.transformer.receive
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.fasterxml.jackson.core.JsonParseException
-import io.circe.ParsingFailure
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
@@ -10,25 +8,24 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.test.utils.SNSLocal
 import uk.ac.wellcome.transformer.parsers.TransformableParser
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
 class SQSMessageReceiverTest
     extends FunSpec
     with MockitoSugar
+    with SNSLocal
     with ScalaFutures
     with Matchers
     with IntegrationPatience
@@ -68,9 +65,10 @@ class SQSMessageReceiverTest
     namespace = "record-receiver-tests",
     mock[AmazonCloudWatch]
   )
+  val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
+  val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
 
   it("should receive a message and send it to SNS client") {
-    val snsWriter = mockSNSWriter
     val recordReceiver =
       new SQSMessageReceiver(snsWriter,
                              new TransformableParser,
@@ -79,13 +77,16 @@ class SQSMessageReceiverTest
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future) { _ =>
-      verify(snsWriter).writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+      val messages = listMessagesReceivedFromSNS()
+      messages should have size 1
+      messages.head.message shouldBe JsonUtil.toJson(work).get
+      messages.head.subject shouldBe "Foo"
     }
   }
 
   it("should return a failed future if it's unable to parse the SQS message") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter,
+      new SQSMessageReceiver(snsWriter,
                              new TransformableParser,
                              new CalmTransformableTransformer,
                              metricsSender)
@@ -119,7 +120,7 @@ class SQSMessageReceiverTest
   it(
     "should return a failed future if it's unable to transform the transformable object") {
     val recordReceiver =
-      new SQSMessageReceiver(mockSNSWriter,
+      new SQSMessageReceiver(snsWriter,
                              new TransformableParser,
                              new CalmTransformableTransformer,
                              metricsSender)
