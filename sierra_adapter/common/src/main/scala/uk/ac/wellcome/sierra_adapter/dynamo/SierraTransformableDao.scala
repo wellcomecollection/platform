@@ -37,8 +37,8 @@ class SierraTransformableDao @Inject()(
 
     table
       .given(
-        not(attributeExists('id)) or
-          (attributeExists('id) and 'version < newVersion)
+        not(attributeExists('sourceId)) or
+          (attributeExists('sourceId) and 'version < newVersion)
       )
       .put(record.copy(version = newVersion))
   }
@@ -54,7 +54,7 @@ class SierraTransformableDao @Inject()(
   }
 
   def getRecord(id: String): Future[Option[SierraTransformable]] = Future {
-    scanamoExec(table.get('id -> id)) match {
+    scanamoExec(table.get('sourceId -> id)) match {
       case Some(Right(record)) => Some(record)
       case Some(Left(scanamoError)) =>
         val exception = new RuntimeException(scanamoError.toString)

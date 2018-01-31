@@ -93,7 +93,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
 
       whenReady(sierraTransformableDao.updateRecord(sierraTransformable)) {
         _ =>
-          dynamoQueryEqualsValue('id -> id)(
+          dynamoQueryEqualsValue('sourceId -> id)(
             expectedValue = expectedSierraRecord)
       }
     }
@@ -111,7 +111,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
       whenReady(sierraTransformableDao.updateRecord(newerSierraTransformable)) {
         _ =>
           Scanamo
-            .get[SierraTransformable](dynamoDbClient)(tableName)('id -> id)
+            .get[SierraTransformable](dynamoDbClient)(tableName)('sourceId -> id)
             .get shouldBe Right(
             newerSierraTransformable.copy(version = 3)
           )
@@ -130,7 +130,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
       whenReady(sierraTransformableDao.updateRecord(sierraTransformable)) {
         _ =>
           Scanamo
-            .get[SierraTransformable](dynamoDbClient)(tableName)('id -> id)
+            .get[SierraTransformable](dynamoDbClient)(tableName)('sourceId -> id)
             .get shouldBe Right(
             sierraTransformable.copy(version = 2)
           )
@@ -156,7 +156,7 @@ class SierraTransformableDaoTest extends FunSpec with SierraTestUtils {
           ex shouldBe a[ConditionalCheckFailedException]
 
           Scanamo
-            .get[SierraTransformable](dynamoDbClient)(tableName)('id -> id)
+            .get[SierraTransformable](dynamoDbClient)(tableName)('sourceId -> id)
             .get shouldBe Right(
             newerSierraTransformable
           )
