@@ -8,9 +8,14 @@ import scala.concurrent.Future
 import scala.io.Source
 
 class S3ContentRetriever(s3Client: AmazonS3, bucketName: String) {
-  def getS3Content(s3Key: String): Future[String] = Future{
-    Source.fromInputStream(s3Client.getObject(bucketName, s3Key).getObjectContent).mkString
-  }.recover{
-    case ex: AmazonS3Exception if ex.getErrorCode == "NoSuchKey" => throw GracefulFailureException(ex)
-  }
+  def getS3Content(s3Key: String): Future[String] =
+    Future {
+      Source
+        .fromInputStream(
+          s3Client.getObject(bucketName, s3Key).getObjectContent)
+        .mkString
+    }.recover {
+      case ex: AmazonS3Exception if ex.getErrorCode == "NoSuchKey" =>
+        throw GracefulFailureException(ex)
+    }
 }
