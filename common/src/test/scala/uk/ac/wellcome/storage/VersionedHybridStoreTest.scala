@@ -19,7 +19,7 @@ class VersionedHybridStoreTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with VersionedHybridStoreLocal[ExampleRecord] {
+    with VersionedHybridStoreLocal {
 
   implicit val testVersionUpdater = new VersionUpdater[ExampleRecord] {
     override def updateVersion(testVersioned: ExampleRecord,
@@ -28,11 +28,10 @@ class VersionedHybridStoreTest
     }
   }
 
-  override lazy val evidence: DynamoFormat[ExampleRecord] =
-    DynamoFormat[ExampleRecord]
+  override lazy val evidence: DynamoFormat[HybridRecord] = DynamoFormat[HybridRecord]
 
   override lazy val tableName: String = "versioned-hybrid-store-test"
-  val bucketName = "versioned-hybrid-store-test"
+  override lazy val bucketName = "versioned-hybrid-store-test"
 
   it("stores a versioned record if it has never been seen before") {
     val record = ExampleRecord(
