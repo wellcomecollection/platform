@@ -28,7 +28,8 @@ class VersionedHybridStoreTest
     }
   }
 
-  override lazy val evidence: DynamoFormat[HybridRecord] = DynamoFormat[HybridRecord]
+  override lazy val evidence: DynamoFormat[HybridRecord] =
+    DynamoFormat[HybridRecord]
 
   override lazy val tableName: String = "versioned-hybrid-store-test"
   override lazy val bucketName = "versioned-hybrid-store-test"
