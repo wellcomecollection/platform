@@ -15,7 +15,11 @@ class CalmParserTest
   val AltRefNo = "AB/CD/12"
   val data = """{"foo": ["bar"], "AccessStatus": ["TopSekrit"]}"""
   val calmRecord =
-    createValidCalmTramsformableJson(RecordID, RecordType, AltRefNo, RefNo, data)
+    createValidCalmTramsformableJson(RecordID,
+                                     RecordType,
+                                     AltRefNo,
+                                     RefNo,
+                                     data)
 
   it("should parse a record into a calm case class") {
     val calmParser = new TransformableParser

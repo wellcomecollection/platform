@@ -34,23 +34,25 @@ class SQSMessageReceiverTest
     with IntegrationPatience
     with TransformableSQSMessageUtils {
 
-  val calmSqsMessage: SQSMessage = sqsMessage(createValidCalmTramsformableJson(
-    "abcdef",
-    "collection",
-    "AB/CD/12",
-    "AB/CD/12",
-    """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
-  ))
+  val calmSqsMessage: SQSMessage = sqsMessage(
+    createValidCalmTramsformableJson(
+      "abcdef",
+      "collection",
+      "AB/CD/12",
+      "AB/CD/12",
+      """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
+    ))
 
   val invalidCalmSqsMessage: SQSMessage = sqsMessage(createInvalidJson)
 
-  val failingTransformCalmSqsMessage: SQSMessage = sqsMessage(createValidCalmTramsformableJson(
-    "abcdef",
-    "collection",
-    "AB/CD/12",
-    "AB/CD/12",
-    """not a json string"""
-  ))
+  val failingTransformCalmSqsMessage: SQSMessage = sqsMessage(
+    createValidCalmTramsformableJson(
+      "abcdef",
+      "collection",
+      "AB/CD/12",
+      "AB/CD/12",
+      """not a json string"""
+    ))
 
   val failingTransformMiroSqsMessage: SQSMessage =
     sqsMessage(createValidMiroTransformableJson("""{}"""))
