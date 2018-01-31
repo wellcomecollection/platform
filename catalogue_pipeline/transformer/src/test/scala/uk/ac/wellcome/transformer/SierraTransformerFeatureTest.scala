@@ -33,13 +33,13 @@ class SierraTransformerFeatureTest
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
-    val sqsMessage = createValidSierraBibSQSMessage(
+    val calmSqsMessage = sqsMessage(createValidSierraTransformableJson(
       id,
       title,
       lastModifiedDate
-    )
+    ))
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(calmSqsMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()

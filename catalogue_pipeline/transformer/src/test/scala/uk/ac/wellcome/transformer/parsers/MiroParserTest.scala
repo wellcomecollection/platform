@@ -18,8 +18,8 @@ class MiroParserTest
     val MiroID = "1234"
     val MiroCollection = "Images-A"
     val data = buildJSONForWork(""""image_title": "this is the image title"""")
-    val sQSMessage = createValidMiroRecord(MiroID, MiroCollection, data)
-    val triedMiroTransformable = miroParser.extractTransformable(sQSMessage)
+    val miroJson = createValidMiroTransformableJson(MiroID, MiroCollection, data)
+    val triedMiroTransformable = miroParser.extractTransformable(miroJson)
 
     triedMiroTransformable.isSuccess shouldBe true
     triedMiroTransformable.get shouldBe a[MiroTransformable]

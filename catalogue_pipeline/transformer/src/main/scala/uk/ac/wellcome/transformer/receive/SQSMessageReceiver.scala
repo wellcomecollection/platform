@@ -32,7 +32,7 @@ class SQSMessageReceiver(
       () => {
         val triedWork = for {
           transformableRecord <- transformableParser.extractTransformable(
-            message)
+            message.body)
           cleanRecord <- transformTransformable(transformableRecord)
         } yield cleanRecord
 

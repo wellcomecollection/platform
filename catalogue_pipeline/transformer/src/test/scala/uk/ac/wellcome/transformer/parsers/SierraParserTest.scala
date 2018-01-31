@@ -27,13 +27,13 @@ class SierraParserTest
          |}
       """.stripMargin
 
-    val sqsMessage =
-      createValidSierraBibSQSMessage(id, title, lastModifiedDate)
+    val sierraTransformableJson =
+      createValidSierraTransformableJson(id, title, lastModifiedDate)
 
     val sierraParser = new TransformableParser
 
     val triedSierraTransformable =
-      sierraParser.extractTransformable(sqsMessage)
+      sierraParser.extractTransformable(sierraTransformableJson)
 
     triedSierraTransformable.isSuccess shouldBe true
     triedSierraTransformable.get shouldBe a[SierraTransformable]

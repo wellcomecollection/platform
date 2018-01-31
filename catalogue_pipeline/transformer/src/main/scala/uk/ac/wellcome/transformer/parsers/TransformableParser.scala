@@ -7,8 +7,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.Try
 
 class TransformableParser extends Logging {
-  final def extractTransformable(message: SQSMessage): Try[Transformable] =
-    fromJson[Transformable](message.body)
+  final def extractTransformable(message: String): Try[Transformable] =
+    fromJson[Transformable](message)
       .recover {
         case e: Throwable =>
           error("Error extracting Transformable case class", e)

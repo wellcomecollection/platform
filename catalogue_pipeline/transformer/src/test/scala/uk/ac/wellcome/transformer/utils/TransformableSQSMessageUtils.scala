@@ -17,15 +17,15 @@ import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableSQSMessageUtils {
 
-  def createValidCalmSQSMessage(RecordID: String,
-                                RecordType: String,
-                                AltRefNo: String,
-                                RefNo: String,
-                                data: String): SQSMessage = {
+  def createValidCalmTramsformableJson(RecordID: String,
+                                       RecordType: String,
+                                       AltRefNo: String,
+                                       RefNo: String,
+                                       data: String): String = {
     val calmTransformable =
       CalmTransformable(RecordID, RecordType, AltRefNo, RefNo, data)
 
-    sqsMessage(JsonUtil.toJson(calmTransformable).get)
+    JsonUtil.toJson(calmTransformable).get
   }
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
@@ -38,9 +38,9 @@ trait TransformableSQSMessageUtils {
     sqsMessage(JsonUtil.toJson(sierraTransformable).get)
   }
 
-  def createValidSierraBibSQSMessage(id: String,
-                                     title: String,
-                                     lastModifiedDate: Instant): SQSMessage = {
+  def createValidSierraTransformableJson(id: String,
+                                         title: String,
+                                         lastModifiedDate: Instant): String = {
     val data =
       s"""
          |{
@@ -56,24 +56,23 @@ trait TransformableSQSMessageUtils {
       itemData = Map[String, SierraItemRecord]()
     )
 
-    sqsMessage(JsonUtil.toJson(sierraTransformable).get)
+    JsonUtil.toJson(sierraTransformable).get
   }
 
-  def createValidMiroSQSMessage(data: String): SQSMessage = {
+  def createValidMiroTransformableJson(data: String): String = {
     val miroTransformable = MiroTransformable("id", "collection", data)
 
-    sqsMessage(JsonUtil.toJson(miroTransformable).get)
+    JsonUtil.toJson(miroTransformable).get
   }
 
-  def createValidMiroRecord(MiroID: String,
-                            MiroCollection: String,
-                            data: String): SQSMessage = {
+  def createValidMiroTransformableJson(MiroID: String,
+                                       MiroCollection: String,
+                                       data: String): String = {
     val miroTransformable = MiroTransformable(MiroID, MiroCollection, data)
-    val value = JsonUtil.toJson(miroTransformable).get
-    sqsMessage(value)
+    JsonUtil.toJson(miroTransformable).get
   }
 
-  def createInvalidRecord: SQSMessage = sqsMessage("not a json string")
+  def createInvalidJson: String = "not a json string"
 
   def sqsMessage(message: String) = {
     SQSMessage(None,
