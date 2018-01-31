@@ -43,7 +43,7 @@ class SierraItemMergerUpdaterServiceTest
                             ),
                             version = 1)
 
-      dynamoQueryEqualsValue('id -> bibId)(
+      dynamoQueryEqualsValue('sourceId -> bibId)(
         expectedValue = expectedSierraTransformable)
     }
   }
@@ -118,7 +118,7 @@ class SierraItemMergerUpdaterServiceTest
           version = 1
         )
 
-      dynamoQueryEqualsValue('id -> bibIdNotExisting)(
+      dynamoQueryEqualsValue('sourceId -> bibIdNotExisting)(
         expectedValue = expectedNewSierraRecord)
 
       val expectedUpdatedSierraRecord = oldRecord.copy(
@@ -129,12 +129,12 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibIdWithOldData)(
+      dynamoQueryEqualsValue('sourceId -> bibIdWithOldData)(
         expectedValue = expectedUpdatedSierraRecord)
 
       val expectedUnchangedSierraRecord = newRecord
 
-      dynamoQueryEqualsValue('id -> bibIdWithNewerData)(
+      dynamoQueryEqualsValue('sourceId -> bibIdWithNewerData)(
         expectedValue = expectedUnchangedSierraRecord)
     }
   }
@@ -170,7 +170,7 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibId)(
+      dynamoQueryEqualsValue('sourceId -> bibId)(
         expectedValue = expectedSierraRecord)
     }
   }
@@ -232,9 +232,9 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(
+      dynamoQueryEqualsValue('sourceId -> bibId1)(
         expectedValue = expectedSierraRecord1)
-      dynamoQueryEqualsValue('id -> bibId2)(
+      dynamoQueryEqualsValue('sourceId -> bibId2)(
         expectedValue = expectedSierraRecord2)
     }
   }
@@ -293,7 +293,7 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(
+      dynamoQueryEqualsValue('sourceId -> bibId1)(
         expectedValue = expectedSierraRecord1)
     }
   }
@@ -354,9 +354,9 @@ class SierraItemMergerUpdaterServiceTest
         itemData = expectedItemData
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(
+      dynamoQueryEqualsValue('sourceId -> bibId1)(
         expectedValue = expectedSierraRecord1)
-      dynamoQueryEqualsValue('id -> bibId2)(
+      dynamoQueryEqualsValue('sourceId -> bibId2)(
         expectedValue = expectedSierraRecord2)
     }
   }
@@ -385,7 +385,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
-      dynamoQueryEqualsValue('id -> bibId)(expectedValue = newRecord)
+      dynamoQueryEqualsValue('sourceId -> bibId)(expectedValue = newRecord)
     }
   }
 
@@ -414,7 +414,7 @@ class SierraItemMergerUpdaterServiceTest
         version = 2
       )
 
-      dynamoQueryEqualsValue('id -> bibId)(
+      dynamoQueryEqualsValue('sourceId -> bibId)(
         expectedValue = expectedSierraRecord)
     }
   }

@@ -43,7 +43,7 @@ class SierraItemMergerFeatureTest
     )
 
     eventually {
-      dynamoQueryEqualsValue('id -> bibId)(
+      dynamoQueryEqualsValue('sourceId -> bibId)(
         expectedValue = expectedSierraTransformable)
     }
   }
@@ -86,10 +86,10 @@ class SierraItemMergerFeatureTest
         version = 1
       )
 
-      dynamoQueryEqualsValue('id -> bibId1)(
+      dynamoQueryEqualsValue('sourceId -> bibId1)(
         expectedValue = expectedSierraTransformable1)
 
-      dynamoQueryEqualsValue('id -> bibId2)(
+      dynamoQueryEqualsValue('sourceId -> bibId2)(
         expectedValue = expectedSierraTransformable2)
 
     }
