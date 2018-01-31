@@ -191,7 +191,7 @@ class SierraBibMergerFeatureTest
 
   it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
     val id = "7000007"
-    val newRecord = SierraTransformable(id = id, version = 1)
+    val newRecord = SierraTransformable(sourceId = id, version = 1)
     Scanamo.put(dynamoDbClient)(tableName)(newRecord)
 
     val title = "Inside an inquisitive igloo of ice imps"

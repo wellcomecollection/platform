@@ -8,13 +8,13 @@ import uk.ac.wellcome.test.utils.SierraData
 class SierraTransformableTest extends FunSpec with Matchers with SierraData {
 
   it("should allow creation of SierraTransformable with no data") {
-    SierraTransformable(id = "111")
+    SierraTransformable(sourceId = "111")
   }
 
   it("should allow creation from only a SierraBibRecord") {
     val bibRecord = sierraBibRecord(id = "101")
     val mergedRecord = SierraTransformable(bibRecord = bibRecord)
-    mergedRecord.id shouldEqual bibRecord.id
+    mergedRecord.sourceId shouldEqual bibRecord.id
     mergedRecord.maybeBibData.get shouldEqual bibRecord
   }
 
@@ -29,7 +29,7 @@ class SierraTransformableTest extends FunSpec with Matchers with SierraData {
   }
 
   it("should be at version 0 when first created") {
-    val record = SierraTransformable(id = "555")
+    val record = SierraTransformable(sourceId = "555")
     record.version shouldEqual 0
   }
 

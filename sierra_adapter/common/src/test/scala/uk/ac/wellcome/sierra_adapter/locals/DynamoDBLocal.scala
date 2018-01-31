@@ -28,7 +28,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       case Right(item) =>
         dynamoDbClient.deleteItem(
           tableName,
-          Map("id" -> new AttributeValue(item.id))
+          Map("id" -> new AttributeValue(item.sourceId))
         )
       case error =>
         throw new Exception(

@@ -15,7 +15,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData {
       bibIds = List("b888")
     )
 
-    val sierraTransformable = SierraTransformable(id = "b888")
+    val sierraTransformable = SierraTransformable(sourceId = "b888")
     val result = ItemLinker.linkItemRecord(sierraTransformable, record)
 
     result.itemData(record.id) shouldBe record
@@ -24,7 +24,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData {
   it("should update itemData when merging item records with newer data") {
     val itemId = "i999"
     val sierraTransformable = SierraTransformable(
-      id = "b999",
+      sourceId = "b999",
       itemData = Map(
         itemId -> sierraItemRecord(
           id = itemId,
@@ -49,7 +49,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData {
   it("should return itself when merging item records with stale data") {
     val itemId = "i111"
     val sierraTransformable = SierraTransformable(
-      id = "b111",
+      sourceId = "b111",
       itemData = Map(
         itemId -> sierraItemRecord(
           id = itemId,
@@ -83,7 +83,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData {
       bibIds = List("b121")
     )
 
-    val sierraTransformable = SierraTransformable(id = "b121")
+    val sierraTransformable = SierraTransformable(sourceId = "b121")
     val result1 = ItemLinker.linkItemRecord(sierraTransformable, record1)
     val result2 = ItemLinker.linkItemRecord(result1, record2)
 
@@ -103,7 +103,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData {
       unlinkedBibIds = List()
     )
 
-    val sierraTransformable = SierraTransformable(id = bibId)
+    val sierraTransformable = SierraTransformable(sourceId = bibId)
 
     val caught = intercept[RuntimeException] {
       ItemLinker.linkItemRecord(sierraTransformable, record)

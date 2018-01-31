@@ -25,7 +25,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
     )
 
     val sierraTransformable = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -57,7 +57,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
     )
 
     val sierraTransformable = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -90,7 +90,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
     )
 
     val sierraTransformable = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -120,7 +120,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
     )
 
     val sierraTransformable = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(record.id -> record)
     )
 

@@ -49,7 +49,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       .map(
         i =>
           MiroTransformable(
-            MiroID = s"Image$i",
+            sourceId = s"Image$i",
             MiroCollection = "Collection",
             data = bigString,
             ReindexVersion = reindexVersion
@@ -76,7 +76,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       case Right(miroTransformable) =>
         dynamoDbClient.deleteItem(
           miroDataTableName,
-          Map("MiroID" -> new AttributeValue(miroTransformable.MiroID),
+          Map("MiroID" -> new AttributeValue(miroTransformable.sourceId),
               "MiroCollection" -> new AttributeValue(
                 miroTransformable.MiroCollection)))
       case a =>
@@ -90,7 +90,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
         dynamoDbClient.deleteItem(
           calmDataTableName,
           Map(
-            "RecordID" -> new AttributeValue(calmTransformable.RecordID),
+            "RecordID" -> new AttributeValue(calmTransformable.sourceId),
             "RecordType" -> new AttributeValue(calmTransformable.RecordType)
           ))
       case a =>

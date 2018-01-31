@@ -1,5 +1,7 @@
 package uk.ac.wellcome.transformer.receive
 
+import java.time.Instant
+
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
@@ -10,10 +12,12 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
-import uk.ac.wellcome.transformer.parsers.TransformableParser
 import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -31,28 +35,7 @@ class SQSMessageReceiverTest
     with IntegrationPatience
     with TransformableSQSMessageUtils {
 
-  val calmSqsMessage: SQSMessage = sqsMessage(
-    createValidCalmTramsformableJson(
-      "abcdef",
-      "collection",
-      "AB/CD/12",
-      "AB/CD/12",
-      """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
-    ))
-
-  val invalidCalmSqsMessage: SQSMessage = sqsMessage(createInvalidJson)
-
-  val failingTransformCalmSqsMessage: SQSMessage = sqsMessage(
-    createValidCalmTramsformableJson(
-      "abcdef",
-      "collection",
-      "AB/CD/12",
-      "AB/CD/12",
-      """not a json string"""
-    ))
-
-  val failingTransformMiroSqsMessage: SQSMessage =
-    sqsMessage(createValidMiroTransformableJson("""{}"""))
+  override lazy val bucketName: String = "test-sqs-message-receiver-bucket"
 
   val sourceIdentifier =
     SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
@@ -67,13 +50,24 @@ class SQSMessageReceiverTest
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
+  private val versionedObjectStore = new VersionedObjectStore(s3Client, bucketName)
+  val recordReceiver =
+    new SQSMessageReceiver(snsWriter,
+      versionedObjectStore,
+      new CalmTransformableTransformer,
+      metricsSender)
 
   it("should receive a message and send it to SNS client") {
-    val recordReceiver =
-      new SQSMessageReceiver(snsWriter,
-                             new TransformableParser,
-                             new CalmTransformableTransformer,
-                             metricsSender)
+    val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
+      createValidCalmTramsformableJson(
+        RecordID = "abcdef",
+        RecordType = "collection",
+        AltRefNo = "AB/CD/12",
+        RefNo = "AB/CD/12",
+        data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
+      ))
+
+
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
     whenReady(future) { _ =>
@@ -85,11 +79,7 @@ class SQSMessageReceiverTest
   }
 
   it("should return a failed future if it's unable to parse the SQS message") {
-    val recordReceiver =
-      new SQSMessageReceiver(snsWriter,
-                             new TransformableParser,
-                             new CalmTransformableTransformer,
-                             metricsSender)
+    val invalidCalmSqsMessage: SQSMessage = hybridRecordSqsMessage("not a json string")
 
     val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
@@ -103,7 +93,7 @@ class SQSMessageReceiverTest
 
     val recordReceiver =
       new SQSMessageReceiver(snsWriter,
-                             new TransformableParser,
+        versionedObjectStore,
                              new SierraTransformableTransformer,
                              metricsSender)
 
@@ -119,11 +109,14 @@ class SQSMessageReceiverTest
 
   it(
     "should return a failed future if it's unable to transform the transformable object") {
-    val recordReceiver =
-      new SQSMessageReceiver(snsWriter,
-                             new TransformableParser,
-                             new CalmTransformableTransformer,
-                             metricsSender)
+    val failingTransformCalmSqsMessage: SQSMessage = hybridRecordSqsMessage(
+      createValidCalmTramsformableJson(
+        RecordID = "abcdef",
+        RecordType = "collection",
+        AltRefNo = "AB/CD/12",
+        RefNo = "AB/CD/12",
+        data = """not a json string"""
+      ))
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
@@ -133,15 +126,18 @@ class SQSMessageReceiverTest
   }
 
   it(
-    "should return a failed future if it's unable to publish the unified item") {
+    "should return a failed future if it's unable to publish the work") {
+    val id = "b123"
+    val message = hybridRecordSqsMessage(JsonUtil.toJson(SierraTransformable(sourceId = id, bibData = JsonUtil.toJson(SierraBibRecord(id = id, data = s"""{"id": "$id"}""", modifiedDate = Instant.now)).get)).get)
+
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
       new SQSMessageReceiver(mockSNS,
-                             new TransformableParser,
-                             new CalmTransformableTransformer,
+        versionedObjectStore,
+                             new SierraTransformableTransformer,
                              metricsSender)
 
-    val future = recordReceiver.receiveMessage(calmSqsMessage)
+    val future = recordReceiver.receiveMessage(message)
 
     whenReady(future.failed) { x =>
       x.getMessage should be("Failed publishing message")

@@ -29,14 +29,14 @@ class MiroReindexTargetServiceTest
 
     val inShardMiroTransformables = List(
       MiroTransformable(
-        MiroID = "Image_A1",
+        sourceId = "Image_A1",
         MiroCollection = "Images-A",
         data = s""""{"image_title": "An almanac about armadillos"}""",
         ReindexShard = "Images-A",
         ReindexVersion = currentVersion
       ),
       MiroTransformable(
-        MiroID = "Image_A2",
+        sourceId = "Image_A2",
         MiroCollection = "Images-A",
         data = s""""{"image_title": "Asking after an aardvark"}""",
         ReindexShard = "Images-A",
@@ -46,14 +46,14 @@ class MiroReindexTargetServiceTest
 
     val diffShardMiroTransformables = List(
       MiroTransformable(
-        MiroID = "Image_B1",
+        sourceId = "Image_B1",
         MiroCollection = "Images-B",
         data = s""""{"image_title": "Buying books about beavers"}""",
         ReindexShard = "Images-B",
         ReindexVersion = currentVersion
       ),
       MiroTransformable(
-        MiroID = "Image_C1",
+        sourceId = "Image_C1",
         MiroCollection = "Images-C",
         data = s""""{"image_title": "Calling a crafty caterpillar"}""",
         ReindexShard = "Images-C",
@@ -109,7 +109,7 @@ class MiroReindexTargetServiceTest
 
     val outOfdateMiroTransformableList = List(
       MiroTransformable(
-        MiroID = "Image1",
+        sourceId = "Image1",
         MiroCollection = "Images-A",
         data = s"""{"image_title": "title"}""",
         ReindexVersion = currentVersion
@@ -118,7 +118,7 @@ class MiroReindexTargetServiceTest
 
     val inDateMiroTransferrableList = List(
       MiroTransformable(
-        MiroID = "Image2",
+        sourceId = "Image2",
         MiroCollection = "Images-A",
         data = s"""{"image_title": "title"}""",
         ReindexVersion = requestedVersion

@@ -54,7 +54,7 @@ trait S3Local extends BeforeAndAfterEach with Logging { this: Suite =>
       s3Client.createBucket(bucket.getName)
     }
 
-    s3Client.createBucket(bucketName).getName
+    s3Client.createBucket(bucketName)
   }
 
   def getContentFromS3(bucketName: String, key: String): String = {

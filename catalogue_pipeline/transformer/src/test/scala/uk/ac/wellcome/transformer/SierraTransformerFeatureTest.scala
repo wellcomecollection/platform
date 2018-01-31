@@ -17,6 +17,7 @@ class SierraTransformerFeatureTest
     with TransformerFeatureTest
     with TransformableSQSMessageUtils {
 
+  override lazy val bucketName: String = "test-sierra-transformer-feature-test-bucket"
   val queueUrl: String = createQueueAndReturnUrl("test_sierra_transformer")
   override val flags: Map[String, String] = Map(
     "transformer.source" -> "SierraData",
@@ -33,7 +34,7 @@ class SierraTransformerFeatureTest
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
-    val calmSqsMessage = sqsMessage(
+    val calmSqsMessage = hybridRecordSqsMessage(
       createValidSierraTransformableJson(
         id,
         title,

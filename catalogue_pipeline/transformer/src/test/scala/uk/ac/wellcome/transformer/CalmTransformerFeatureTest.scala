@@ -27,7 +27,7 @@ class CalmTransformerFeatureTest
   it(
     "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     val calmTransformable =
-      CalmTransformable(RecordID = "RecordID1",
+      CalmTransformable(sourceId = "RecordID1",
                         RecordType = "Collection",
                         AltRefNo = "AltRefNo1",
                         RefNo = "RefNo1",
@@ -46,7 +46,7 @@ class CalmTransformerFeatureTest
     }
 
     val calmTransformable2 =
-      CalmTransformable(RecordID = "RecordID2",
+      CalmTransformable(sourceId = "RecordID2",
                         RecordType = "Collection",
                         AltRefNo = "AltRefNo2",
                         RefNo = "RefNo2",

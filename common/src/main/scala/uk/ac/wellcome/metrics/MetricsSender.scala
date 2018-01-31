@@ -18,9 +18,9 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
                               amazonCloudWatch: AmazonCloudWatch)
     extends Logging {
 
-  def timeAndCount[T](metricName: String, fun: () => Future[T]): Future[T] = {
+  def timeAndCount[T](metricName: String, fun: => Future[T]): Future[T] = {
     val start = new Date()
-    val future = Future.successful(()).flatMap(_ => fun())
+    val future = Future.successful(()).flatMap(_ => fun)
 
     future.onComplete {
       case Success(_) =>

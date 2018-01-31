@@ -1,14 +1,12 @@
 package uk.ac.wellcome.models.transformable
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import io.circe.Decoder
 import cats.syntax.functor._
+import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.utils.JsonUtil._
 
-sealed trait Transformable
+sealed trait Transformable extends Versioned
 object Transformable {
   import uk.ac.wellcome.utils.JsonUtil._
 
@@ -21,37 +19,39 @@ object Transformable {
 }
 
 case class CalmTransformable(
-  RecordID: String,
-  RecordType: String,
-  AltRefNo: String,
-  RefNo: String,
-  data: String,
-  ReindexShard: String = "default",
-  ReindexVersion: Int = 0
+                              sourceId: String,
+                              RecordType: String,
+                              AltRefNo: String,
+                              RefNo: String,
+                              data: String,
+                              ReindexShard: String = "default",
+                              ReindexVersion: Int = 0,
+                              version: Int = 0,
+                              sourceName: String = "calm"
 ) extends Transformable
     with Reindexable[String] {
 
-  val id: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("RecordID", RecordID),
+  val reindexId: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("RecordID", sourceId),
     RangeKey("RecordType", RecordType)
   )
-
 }
 
 case class CalmTransformableData(
   AccessStatus: Array[String]
-) extends Transformable
+)
 
-case class MiroTransformable(MiroID: String,
+case class MiroTransformable(sourceId: String,
                              MiroCollection: String,
                              data: String,
                              ReindexShard: String = "default",
-                             ReindexVersion: Int = 0)
+                             sourceName: String = "miro",
+                             ReindexVersion: Int = 0,version: Int =1)
     extends Transformable
     with Reindexable[String] {
 
-  val id: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("MiroID", MiroID),
+  val reindexId: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("MiroID", sourceId),
     RangeKey("MiroCollection", MiroCollection)
   )
 }
@@ -71,27 +71,28 @@ case class MiroTransformable(MiroID: String,
   *
   */
 case class SierraTransformable(
-  id: String,
-  maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
-  version: Int = 0
+                                sourceId: String,
+                                sourceName: String = "sierra",
+                                maybeBibData: Option[SierraBibRecord] = None,
+                                itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord](),
+                                version: Int = 0
 ) extends Transformable
 
 object SierraTransformable {
-  def apply(id: String, bibData: String): SierraTransformable = {
+  def apply(sourceId: String, bibData: String): SierraTransformable = {
     val bibRecord = fromJson[SierraBibRecord](bibData).get
-    SierraTransformable(id = id, maybeBibData = Some(bibRecord))
+    SierraTransformable(sourceId = sourceId, maybeBibData = Some(bibRecord))
   }
 
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(id = bibRecord.id, maybeBibData = Some(bibRecord))
+    SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
 
-  def apply(id: String, itemRecord: SierraItemRecord): SierraTransformable =
-    SierraTransformable(id = id, itemData = Map(itemRecord.id -> itemRecord))
+  def apply(sourceId: String, itemRecord: SierraItemRecord): SierraTransformable =
+    SierraTransformable(sourceId = sourceId, itemData = Map(itemRecord.id -> itemRecord))
 
   def apply(bibRecord: SierraBibRecord, version: Int): SierraTransformable =
     SierraTransformable(
-      id = bibRecord.id,
+      sourceId = bibRecord.id,
       maybeBibData = Some(bibRecord),
       version = version
     )

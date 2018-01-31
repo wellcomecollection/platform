@@ -37,7 +37,7 @@ class SierraItemMergerFeatureTest
     sendItemRecordToSQS(record)
 
     val expectedSierraTransformable = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       itemData = Map(id -> record),
       version = 1
     )
@@ -75,13 +75,13 @@ class SierraItemMergerFeatureTest
     eventually {
 
       val expectedSierraTransformable1 = SierraTransformable(
-        id = bibId1,
+        sourceId = bibId1,
         itemData = Map(id1 -> record1),
         version = 1
       )
 
       val expectedSierraTransformable2 = SierraTransformable(
-        id = bibId2,
+        sourceId = bibId2,
         itemData = Map(id2 -> record2),
         version = 1
       )
