@@ -58,7 +58,6 @@ class SQSMessageReceiverTest
   val recordReceiver =
     new SQSMessageReceiver(snsWriter,
                            versionedObjectStore,
-                           new CalmTransformableTransformer,
                            metricsSender)
 
   it("should receive a message and send it to SNS client") {
@@ -98,7 +97,6 @@ class SQSMessageReceiverTest
     val recordReceiver =
       new SQSMessageReceiver(snsWriter,
                              versionedObjectStore,
-                             new SierraTransformableTransformer,
                              metricsSender)
 
     val future = recordReceiver.receiveMessage(
@@ -146,7 +144,6 @@ class SQSMessageReceiverTest
     val recordReceiver =
       new SQSMessageReceiver(mockSNS,
                              versionedObjectStore,
-                             new SierraTransformableTransformer,
                              metricsSender)
 
     val future = recordReceiver.receiveMessage(message)

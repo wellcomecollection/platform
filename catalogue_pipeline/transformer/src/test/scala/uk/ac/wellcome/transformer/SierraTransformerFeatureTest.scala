@@ -21,7 +21,6 @@ class SierraTransformerFeatureTest
     "test-sierra-transformer-feature-test-bucket"
   val queueUrl: String = createQueueAndReturnUrl("test_sierra_transformer")
   override val flags: Map[String, String] = Map(
-    "transformer.source" -> "SierraData",
     "aws.region" -> "eu-west-1",
     "aws.sqs.queue.url" -> queueUrl,
     "aws.sqs.waitTime" -> "1",

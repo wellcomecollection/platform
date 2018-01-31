@@ -16,9 +16,7 @@ class StartupTest
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
-    flags = Map(
-      "transformer.source" -> "MiroData"
-    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalFlags ++ s3LocalFlags
+    flags = cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalFlags ++ s3LocalFlags
   )
 
   test("server starts up correctly") {
