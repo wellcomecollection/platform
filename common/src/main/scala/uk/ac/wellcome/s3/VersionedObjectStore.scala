@@ -11,12 +11,13 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.io.Source
+import scala.util.hashing.MurmurHash3
 
 class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T]): Future[String] = {
     Future.fromTry(JsonUtil.toJson(versionedObject)).map { content =>
-      val contentHash = md5(content)
+      val contentHash = MurmurHash3.stringHash(content)
       val key =
         s"${versionedObject.sourceName}/${versionedObject.sourceId}/${versionedObject.version}/$contentHash.json"
 
@@ -35,13 +36,5 @@ class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
 
     getObject.flatMap(s3ObjectContent =>
       Future.fromTry(JsonUtil.fromJson[T](s3ObjectContent)))
-  }
-
-  private def md5(s: String): String = {
-    MessageDigest
-      .getInstance("MD5")
-      .digest(s.getBytes)
-      .map { "%02x".format(_) }
-      .foldLeft("") { _ + _ }
   }
 }
