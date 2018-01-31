@@ -4,9 +4,8 @@ import java.security.MessageDigest
 
 import com.amazonaws.services.s3.AmazonS3
 import io.circe.{Decoder, Encoder}
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -15,11 +14,17 @@ import scala.util.hashing.MurmurHash3
 
 class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
   def put[T <: Versioned](versionedObject: T)(
-    implicit encoder: Encoder[T]): Future[String] = {
-    Future.fromTry(JsonUtil.toJson(versionedObject)).map { content =>
+    implicit encoder: Encoder[T],
+    versionUpdater: VersionUpdater[T]): Future[String] = {
+
+    val newVersion = versionedObject.version + 1
+    val newObject =
+      versionUpdater.updateVersion(versionedObject, newVersion = newVersion)
+
+    Future.fromTry(JsonUtil.toJson(newObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content)
       val key =
-        s"${versionedObject.sourceName}/${versionedObject.sourceId}/${versionedObject.version}/$contentHash.json"
+        s"${newObject.sourceName}/${newObject.sourceId}/${newObject.version}/$contentHash.json"
 
       s3Client.putObject(bucketName, key, content)
 
