@@ -3,7 +3,7 @@ package uk.ac.wellcome.s3
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.test.utils.{JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -20,7 +20,14 @@ class VersionedObjectStoreTest
     with JsonTestUtil
     with ScalaFutures {
 
-  val bucketName = createBucketAndReturnName("source-object-store")
+  val bucketName = "source-object-store"
+
+  implicit val testVersionUpdater = new VersionUpdater[TestObject] {
+    override def updateVersion(testVersioned: TestObject,
+                               newVersion: Int): TestObject = {
+      testVersioned.copy(version = newVersion)
+    }
+  }
 
   it("stores a versioned object with path id/version/hash") {
 
@@ -34,18 +41,18 @@ class VersionedObjectStoreTest
     val writtenToS3 = objectStore.put(testObject)
 
     whenReady(writtenToS3) { actualKey =>
-      val expectedJson = JsonUtil.toJson(testObject).get
-      val expectedHash = "75c6238d32ce27012cc919afa69512f0"
+      val expectedJson =
+        JsonUtil.toJson(testObject.copy(version = version + 1)).get
+      val expectedHash = "81f1e6d19651d5cad8d00582b8d0482a"
 
-      val expectedKey = s"${sourceName}/$id/$version/$expectedHash.json"
+      val expectedKey = s"${sourceName}/$id/${version + 1}/$expectedHash.json"
+      actualKey shouldBe expectedKey
 
       val jsonFromS3 = getJsonFromS3(
         bucketName,
         expectedKey
       ).noSpaces
-
       assertJsonStringsAreEqual(jsonFromS3, expectedJson)
-      actualKey shouldBe expectedKey
     }
   }
 
@@ -62,7 +69,8 @@ class VersionedObjectStoreTest
 
     whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) {
       actualTestObject =>
-        actualTestObject shouldBe testObject
+        val expectedObject = testObject.copy(version = testObject.version + 1)
+        actualTestObject shouldBe expectedObject
     }
   }
 

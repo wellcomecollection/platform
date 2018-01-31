@@ -28,7 +28,7 @@ class SequentialS3SinkTest
     super.afterAll()
   }
 
-  val bucketName = createBucketAndReturnName("sequential-s3-sink-test")
+  val bucketName = "sequential-s3-sink-test"
 
   it("puts a single JSON in S3") {
     val sink =
