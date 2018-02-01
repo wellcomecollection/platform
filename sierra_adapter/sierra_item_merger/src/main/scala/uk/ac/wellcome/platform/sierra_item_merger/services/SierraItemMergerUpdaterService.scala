@@ -16,7 +16,6 @@ import uk.ac.wellcome.dynamo._
 
 import uk.ac.wellcome.utils.JsonUtil._
 
-
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
@@ -45,7 +44,8 @@ class SierraItemMergerUpdaterService @Inject()(
               ItemLinker.linkItemRecord(existingSierraTransformable,
                                         itemRecord)
             if (mergedRecord != existingSierraTransformable)
-              versionedHybridStore.updateRecord[SierraTransformable](mergedRecord)
+              versionedHybridStore.updateRecord[SierraTransformable](
+                mergedRecord)
             else Future.successful(())
           case None =>
             versionedHybridStore.updateRecord[SierraTransformable](
@@ -65,7 +65,8 @@ class SierraItemMergerUpdaterService @Inject()(
             val mergedRecord =
               ItemUnlinker.unlinkItemRecord(record, itemRecord)
             if (mergedRecord != record)
-              versionedHybridStore.updateRecord[SierraTransformable](mergedRecord)
+              versionedHybridStore.updateRecord[SierraTransformable](
+                mergedRecord)
             else Future.successful(())
           // In the case we cannot find the bib record
           // assume we're too early and put the message back

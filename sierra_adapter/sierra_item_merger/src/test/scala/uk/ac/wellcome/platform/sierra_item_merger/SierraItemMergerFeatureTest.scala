@@ -10,12 +10,11 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
 
-
 class SierraItemMergerFeatureTest
     extends FunSpec
-      with FeatureTestMixin
-      with AmazonCloudWatchFlag
-      with SierraItemMergerTestUtil {
+    with FeatureTestMixin
+    with AmazonCloudWatchFlag
+    with SierraItemMergerTestUtil {
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),

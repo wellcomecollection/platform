@@ -13,15 +13,13 @@ import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraItemMergerTestUtil
-  extends Matchers
+    extends Matchers
     with Eventually
     with ScalaFutures
     with MockitoSugar
     with ExtendedPatience
     with SQSLocal
-    with VersionedHybridStoreLocal {
-
-  this: Suite =>
+    with VersionedHybridStoreLocal { this: Suite =>
 
   val queueUrl = createQueueAndReturnUrl("test_item_merger")
 
