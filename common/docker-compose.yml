@@ -7,7 +7,7 @@ sqs:
   ports:
     - "9324:9324"
 elasticsearch:
-  image: docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+  image: docker.elastic.co/elasticsearch/elasticsearch:5.6.6
   ports:
     - "9200:9200"
     - "9300:9300"
@@ -15,6 +15,7 @@ elasticsearch:
     - "http.host=0.0.0.0"
     - "transport.host=0.0.0.0"
     - "cluster.name=wellcome"
+    - "ES_JAVA_OPTS=-Xms750m -Xmx750m"
 dynamodb:
   image: peopleperhour/dynamodb
   ports:

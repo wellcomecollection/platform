@@ -41,9 +41,8 @@ class VersionedObjectStoreTest
     val writtenToS3 = objectStore.put(testObject)
 
     whenReady(writtenToS3) { actualKey =>
-      val expectedJson =
-        JsonUtil.toJson(testObject.copy(version = version + 1)).get
-      val expectedHash = "81f1e6d19651d5cad8d00582b8d0482a"
+      val expectedJson = JsonUtil.toJson(testObject.copy(version = 2)).get
+      val expectedHash = "974513547"
 
       val expectedKey = s"${sourceName}/$id/${version + 1}/$expectedHash.json"
       actualKey shouldBe expectedKey
@@ -52,6 +51,7 @@ class VersionedObjectStoreTest
         bucketName,
         expectedKey
       ).noSpaces
+
       assertJsonStringsAreEqual(jsonFromS3, expectedJson)
     }
   }
