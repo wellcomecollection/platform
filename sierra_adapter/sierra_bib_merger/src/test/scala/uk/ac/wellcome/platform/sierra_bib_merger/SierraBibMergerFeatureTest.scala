@@ -198,7 +198,6 @@ class SierraBibMergerFeatureTest
       val futureRecord = hybridStore.getRecord[SierraTransformable](
         expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
-        println(s"@@AWLC The future is here!")
         record.get shouldBe expectedSierraTransformable
       }
     }
@@ -241,7 +240,6 @@ class SierraBibMergerFeatureTest
       val futureRecord = hybridStore.getRecord[SierraTransformable](
         expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
-        println(s"@@AWLC The future is here!")
         record.get shouldBe expectedSierraTransformable
       }
     }
@@ -276,7 +274,6 @@ class SierraBibMergerFeatureTest
       val futureRecord = hybridStore.getRecord[SierraTransformable](
         expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
-        println(s"@@AWLC The future is here!")
         record.get shouldBe expectedSierraTransformable
       }
     }
