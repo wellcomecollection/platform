@@ -8,7 +8,7 @@ module "transformer" {
   release_id         = "${var.release_ids["transformer"]}"
 
   env_vars = {
-    sns_arn              = "${module.ingest_pipeline_sue.id_minter_topic_arn}"
+    sns_arn              = "${module.id_minter_topic.arn}"
     transformer_queue_id = "${module.transformer_queue.id}"
     metrics_namespace    = "transformer"
   }

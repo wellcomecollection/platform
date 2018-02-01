@@ -9,11 +9,11 @@ data "template_file" "es_cluster_host_ingestor" {
 
 module "ingestor" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
-  name   = "ingestor_${var.name}"
+  name   = "ingestor"
 
   source_queue_name  = "${module.es_ingest_queue.name}"
   source_queue_arn   = "${module.es_ingest_queue.arn}"
-  ecr_repository_url = "${var.ingestor_repository_url}"
+  ecr_repository_url = "${module.ecr_repository_ingestor.repository_url}"
   release_id         = "${var.release_ids["ingestor"]}"
 
   env_vars = {
@@ -31,13 +31,13 @@ module "ingestor" {
 
   env_vars_length = 10
 
-  alb_priority = "${random_integer.priority_ingestor.result}"
+  alb_priority = 107
 
-  cluster_name               = "${var.cluster_name}"
-  vpc_id                     = "${var.vpc_id}"
-  alb_cloudwatch_id          = "${var.services_alb["cloudwatch_id"]}"
-  alb_listener_https_arn     = "${var.services_alb["listener_https_arn"]}"
-  alb_listener_http_arn      = "${var.services_alb["listener_http_arn"]}"
-  alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
+  cluster_name = "${aws_ecs_cluster.services.name}"
+  vpc_id       = "${module.vpc_services.vpc_id}"
+  alb_cloudwatch_id          = "${module.services_alb.cloudwatch_id}"
+  alb_listener_https_arn     = "${module.services_alb.listener_https_arn}"
+  alb_listener_http_arn      = "${module.services_alb.listener_http_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }
