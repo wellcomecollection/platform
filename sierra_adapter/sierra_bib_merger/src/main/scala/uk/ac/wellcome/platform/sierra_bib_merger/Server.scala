@@ -25,6 +25,8 @@ class Server extends HttpServer {
     AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,
+    S3ClientModule,
+    S3ConfigModule,
     AkkaModule
   )
 

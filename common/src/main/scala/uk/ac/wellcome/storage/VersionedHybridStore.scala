@@ -1,5 +1,6 @@
 package uk.ac.wellcome.storage
 
+import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.{
@@ -19,8 +20,10 @@ case class HybridRecord(
   s3key: String
 ) extends Versioned
 
-class VersionedHybridStore(versionedObjectStore: VersionedObjectStore,
-                           versionedDao: VersionedDao) {
+class VersionedHybridStore @Inject()(
+  versionedObjectStore: VersionedObjectStore,
+  versionedDao: VersionedDao
+) {
 
   implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
     override def updateVersion(testVersioned: HybridRecord,

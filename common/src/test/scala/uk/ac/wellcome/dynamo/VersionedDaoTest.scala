@@ -47,7 +47,7 @@ class VersionedDaoTest
   val versionedDao =
     new VersionedDao(dynamoDbClient, DynamoConfig(tableName))
 
-  private val erichedDynamoFormat: DynamoFormat[TestVersioned] = Versioned
+  private val enrichedDynamoFormat: DynamoFormat[TestVersioned] = Versioned
     .toVersionedDynamoFormatWrapper[TestVersioned]
     .enrichedDynamoFormat
 
@@ -60,7 +60,7 @@ class VersionedDaoTest
                                         version = 0)
 
       Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        erichedDynamoFormat)
+        enrichedDynamoFormat)
 
       whenReady(versionedDao.getRecord[TestVersioned](testVersioned.id)) {
         record =>
@@ -75,7 +75,7 @@ class VersionedDaoTest
                                         version = 0)
 
       Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        erichedDynamoFormat)
+        enrichedDynamoFormat)
 
       whenReady(versionedDao.getRecord[TestVersioned]("testSource/b88888")) {
         record =>
@@ -130,7 +130,7 @@ class VersionedDaoTest
       val newerTestVersioned = testVersioned.copy(version = 2)
 
       Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        erichedDynamoFormat)
+        enrichedDynamoFormat)
 
       whenReady(versionedDao.updateRecord[TestVersioned](newerTestVersioned)) {
         _ =>
@@ -152,7 +152,7 @@ class VersionedDaoTest
                                         version = 1)
 
       Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        erichedDynamoFormat)
+        enrichedDynamoFormat)
 
       whenReady(versionedDao.updateRecord(testVersioned)) { _ =>
         Scanamo
@@ -178,7 +178,7 @@ class VersionedDaoTest
                                              version = 2)
 
       Scanamo.put(dynamoDbClient)(tableName)(newerTestVersioned)(
-        erichedDynamoFormat)
+        enrichedDynamoFormat)
 
       whenReady(versionedDao.updateRecord(testVersioned).failed) { ex =>
         ex shouldBe a[ConditionalCheckFailedException]
