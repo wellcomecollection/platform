@@ -3,6 +3,9 @@ package uk.ac.wellcome.s3
 import java.security.MessageDigest
 
 import com.amazonaws.services.s3.AmazonS3
+import com.google.inject.Inject
+import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.utils.JsonUtil
@@ -11,7 +14,10 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.io.Source
 
-class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
+class VersionedObjectStore @Inject()(
+  s3Client: AmazonS3,
+  @Flag("aws.s3.bucketName") bucketName: String)
+    extends Logging {
   def put[T <: Versioned](versionedObject: T)(
     implicit encoder: Encoder[T],
     versionUpdater: VersionUpdater[T]): Future[String] = {
@@ -33,13 +39,16 @@ class VersionedObjectStore(s3Client: AmazonS3, bucketName: String) {
 
   def get[T <: Versioned](key: String)(
     implicit decoder: Decoder[T]): Future[T] = {
+
     val getObject = Future {
       val s3Object = s3Client.getObject(bucketName, key)
       Source.fromInputStream(s3Object.getObjectContent).mkString
     }
 
-    getObject.flatMap(s3ObjectContent =>
-      Future.fromTry(JsonUtil.fromJson[T](s3ObjectContent)))
+    getObject.flatMap(s3ObjectContent => {
+      info(s"Retrieved content $s3ObjectContent")
+      Future.fromTry(JsonUtil.fromJson[T](s3ObjectContent))
+    })
   }
 
   private def md5(s: String): String = {

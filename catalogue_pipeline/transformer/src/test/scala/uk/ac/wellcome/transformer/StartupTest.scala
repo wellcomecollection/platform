@@ -10,14 +10,13 @@ class StartupTest
     with StartupLogbackOverride
     with AmazonCloudWatchFlag
     with SQSLocal
-    with SNSLocal {
-
+    with SNSLocal
+    with S3Local {
+  override lazy val bucketName: String = "startup-bucket"
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
-    flags = Map(
-      "transformer.source" -> "MiroData"
-    ) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalFlags
+    flags = cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ snsLocalFlags ++ s3LocalFlags
   )
 
   test("server starts up correctly") {

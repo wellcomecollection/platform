@@ -28,7 +28,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       case Right(item) =>
         dynamoDbClient.deleteItem(
           tableName,
-          Map("id" -> new AttributeValue(item.id))
+          Map("sourceId" -> new AttributeValue(item.sourceId))
         )
       case error =>
         throw new Exception(
@@ -46,11 +46,11 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
       new CreateTableRequest()
         .withTableName(tableName)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
+          .withAttributeName("sourceId")
           .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("id")
+            .withAttributeName("sourceId")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()

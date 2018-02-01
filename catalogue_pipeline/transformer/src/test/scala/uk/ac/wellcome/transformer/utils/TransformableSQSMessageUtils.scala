@@ -2,45 +2,49 @@ package uk.ac.wellcome.transformer.utils
 
 import java.time.Instant
 
+import org.scalatest.Suite
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
   MiroTransformable,
-  SierraTransformable
+  SierraTransformable,
+  Transformable
 }
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.storage.HybridRecord
+import uk.ac.wellcome.test.utils.S3Local
 import uk.ac.wellcome.utils.JsonUtil
 
-trait TransformableSQSMessageUtils {
+trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
 
-  def createValidCalmSQSMessage(RecordID: String,
-                                RecordType: String,
-                                AltRefNo: String,
-                                RefNo: String,
-                                data: String): SQSMessage = {
+  def createValidCalmTramsformableJson(RecordID: String,
+                                       RecordType: String,
+                                       AltRefNo: String,
+                                       RefNo: String,
+                                       data: String): String = {
     val calmTransformable =
       CalmTransformable(RecordID, RecordType, AltRefNo, RefNo, data)
 
-    sqsMessage(JsonUtil.toJson(calmTransformable).get)
+    JsonUtil.toJson(calmTransformable).get
   }
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData = None,
       itemData = Map[String, SierraItemRecord]()
     )
 
-    sqsMessage(JsonUtil.toJson(sierraTransformable).get)
+    hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get, "sierra")
   }
 
-  def createValidSierraBibSQSMessage(id: String,
-                                     title: String,
-                                     lastModifiedDate: Instant): SQSMessage = {
+  def createValidSierraTransformableJson(id: String,
+                                         title: String,
+                                         lastModifiedDate: Instant): String = {
     val data =
       s"""
          |{
@@ -51,35 +55,38 @@ trait TransformableSQSMessageUtils {
       """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
       itemData = Map[String, SierraItemRecord]()
     )
 
-    sqsMessage(JsonUtil.toJson(sierraTransformable).get)
+    JsonUtil.toJson(sierraTransformable).get
   }
 
-  def createValidMiroSQSMessage(data: String): SQSMessage = {
-    val miroTransformable = MiroTransformable("id", "collection", data)
-
-    sqsMessage(JsonUtil.toJson(miroTransformable).get)
+  def createValidMiroTransformableJson(MiroID: String,
+                                       MiroCollection: String,
+                                       data: String): String = {
+    val miroTransformable =
+      MiroTransformable(MiroID, MiroCollection, data)
+    JsonUtil.toJson(miroTransformable).get
   }
 
-  def createValidMiroRecord(MiroID: String,
-                            MiroCollection: String,
-                            data: String): SQSMessage = {
-    val miroTransformable = MiroTransformable(MiroID, MiroCollection, data)
-    val value = JsonUtil.toJson(miroTransformable).get
-    sqsMessage(value)
-  }
+  def hybridRecordSqsMessage(message: String, testSource: String) = {
+    val key = "testSource/1/testId/dshg548.json"
+    s3Client.putObject(bucketName, key, message)
 
-  def createInvalidRecord: SQSMessage = sqsMessage("not a json string")
-
-  def sqsMessage(message: String) = {
-    SQSMessage(None,
-               message,
-               "test_transformer_topic",
-               "notification",
-               "the_time")
+    SQSMessage(
+      None,
+      JsonUtil
+        .toJson(
+          HybridRecord(version = 1,
+                       sourceId = "testId",
+                       sourceName = testSource,
+                       s3key = key))
+        .get,
+      "test_transformer_topic",
+      "notification",
+      "the_time"
+    )
   }
 }
