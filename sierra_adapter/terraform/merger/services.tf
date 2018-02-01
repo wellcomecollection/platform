@@ -23,9 +23,10 @@ module "sierra_merger_service" {
     windows_queue_url = "${module.updates_queue.id}"
     metrics_namespace = "sierra_${local.resource_type_singular}_merger"
     dynamo_table_name = "${var.merged_dynamo_table_name}"
+    bucket_name ="${var.bucket_name}"
   }
 
-  env_vars_length = 3
+  env_vars_length = 4
 
   cluster_name               = "${var.cluster_name}"
   vpc_id                     = "${var.vpc_id}"
