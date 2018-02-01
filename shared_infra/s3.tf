@@ -116,3 +116,8 @@ resource "aws_s3_bucket" "wellcomecollection-images" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket" "dynamodb_assets" {
+  bucket = "wellcomecollection-dynamodb-assets"
+  acl    = "private"
+}
