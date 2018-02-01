@@ -1,8 +1,8 @@
-resource "aws_dynamodb_table" "sierradata_table" {
-  name             = "SierraData_Merged"
+resource "aws_dynamodb_table" "table" {
+  name             = "${var.table_name}"
   read_capacity    = 1
   write_capacity   = 1
-  hash_key         = "id"
+  hash_key         = "sourceId"
   stream_enabled   = true
   stream_view_type = "NEW_AND_OLD_IMAGES"
 
@@ -21,10 +21,10 @@ resource "aws_dynamodb_table" "sierradata_table" {
   }
 }
 
-module "sierradata_dynamo_autoscaling" {
+module "sourcedata_dynamo_autoscaling" {
   source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=dynamodb-autoscaling"
 
-  table_name = "${aws_dynamodb_table.sierradata_table.name}"
+  table_name = "${aws_dynamodb_table.table.name}"
 
   enable_read_scaling     = true
   read_target_utilization = 70

@@ -8,7 +8,7 @@ module "transformer_dlq_alarm" {
   name   = "transformer_dlq_alarm"
 }
 
-module "sierra_transformer_topic" {
+module "transformer_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "sierra_transformer"
+  name   = "transformer"
 }

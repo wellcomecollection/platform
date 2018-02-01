@@ -8,12 +8,12 @@ module "miro_transformer_queue" {
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
-module "sierra_transformer_queue" {
+module "transformer_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v1.1.0"
-  queue_name  = "sierra_transformer_queue"
+  queue_name  = "transformer_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.sierra_transformer_topic.name}"]
+  topic_names = ["${module.transformer_topic.name}"]
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
