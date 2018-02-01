@@ -76,7 +76,8 @@ class MiroTransformerFeatureTest
     val miroTransformable =
       MiroTransformable(miroID, "Images-A", message)
 
-    val sqsMessage = hybridRecordSqsMessage(JsonUtil.toJson(miroTransformable).get, "miro")
+    val sqsMessage =
+      hybridRecordSqsMessage(JsonUtil.toJson(miroTransformable).get, "miro")
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
   }

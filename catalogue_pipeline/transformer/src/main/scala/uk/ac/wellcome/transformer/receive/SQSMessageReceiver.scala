@@ -61,9 +61,12 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
 
   private def getTransformable(hybridRecord: HybridRecord) = {
     hybridRecord.sourceName match {
-      case "miro" => versionedObjectStore.get[MiroTransformable] (hybridRecord.s3key)
-      case "calm" => versionedObjectStore.get[CalmTransformable] (hybridRecord.s3key)
-      case "sierra" => versionedObjectStore.get[SierraTransformable] (hybridRecord.s3key)
+      case "miro" =>
+        versionedObjectStore.get[MiroTransformable](hybridRecord.s3key)
+      case "calm" =>
+        versionedObjectStore.get[CalmTransformable](hybridRecord.s3key)
+      case "sierra" =>
+        versionedObjectStore.get[SierraTransformable](hybridRecord.s3key)
     }
   }
 

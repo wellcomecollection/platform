@@ -59,13 +59,16 @@ class SQSMessageReceiverTest
     new SQSMessageReceiver(snsWriter, versionedObjectStore, metricsSender)
 
   it("should receive a message and send it to SNS client") {
-    val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(createValidCalmTramsformableJson(
-            RecordID = "abcdef",
-            RecordType = "collection",
-            AltRefNo = "AB/CD/12",
-            RefNo = "AB/CD/12",
-            data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
-          ), "calm")
+    val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
+      createValidCalmTramsformableJson(
+        RecordID = "abcdef",
+        RecordType = "collection",
+        AltRefNo = "AB/CD/12",
+        RefNo = "AB/CD/12",
+        data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
+      ),
+      "calm"
+    )
 
     val future = recordReceiver.receiveMessage(calmSqsMessage)
 
@@ -106,13 +109,15 @@ class SQSMessageReceiverTest
 
   it(
     "should return a failed future if it's unable to transform the transformable object") {
-    val failingTransformCalmSqsMessage: SQSMessage = hybridRecordSqsMessage(createValidCalmTramsformableJson(
-            RecordID = "abcdef",
-            RecordType = "collection",
-            AltRefNo = "AB/CD/12",
-            RefNo = "AB/CD/12",
-            data = """not a json string"""
-          ), "calm")
+    val failingTransformCalmSqsMessage: SQSMessage =
+      hybridRecordSqsMessage(createValidCalmTramsformableJson(
+                               RecordID = "abcdef",
+                               RecordType = "collection",
+                               AltRefNo = "AB/CD/12",
+                               RefNo = "AB/CD/12",
+                               data = """not a json string"""
+                             ),
+                             "calm")
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
@@ -132,7 +137,8 @@ class SQSMessageReceiverTest
                                               modifiedDate = Instant.now))
                             .get)
     val message =
-      hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get, "sierra")
+      hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get,
+                             "sierra")
 
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
