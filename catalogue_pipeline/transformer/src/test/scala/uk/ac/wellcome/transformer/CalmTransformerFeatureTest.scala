@@ -32,14 +32,14 @@ class CalmTransformerFeatureTest
 
   it(
     "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
-    val calmTransformable: Transformable =
+    val calmTransformable =
       CalmTransformable(sourceId = "RecordID1",
                         RecordType = "Collection",
                         AltRefNo = "AltRefNo1",
                         RefNo = "RefNo1",
                         data = """{"AccessStatus": ["public"]}""")
     val calmHybridRecordMessage =
-      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable).get)
+      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable).get, "calm")
     sqsClient.sendMessage(queueUrl,
                           JsonUtil.toJson(calmHybridRecordMessage).get)
 
@@ -49,14 +49,14 @@ class CalmTransformerFeatureTest
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
     }
 
-    val calmTransformable2: Transformable =
+    val calmTransformable2 =
       CalmTransformable(sourceId = "RecordID2",
                         RecordType = "Collection",
                         AltRefNo = "AltRefNo2",
                         RefNo = "RefNo2",
                         data = """{"AccessStatus": ["restricted"]}""")
     val calmHybridRecordMessage2 =
-      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable2).get)
+      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable2).get, "calm")
     sqsClient.sendMessage(queueUrl,
                           JsonUtil.toJson(calmHybridRecordMessage2).get)
 

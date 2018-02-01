@@ -42,8 +42,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
         val futurePublishAttempt = for {
           hybridRecord <- Future.fromTry(
             JsonUtil.fromJson[HybridRecord](message.body))
-          transformableRecord <- versionedObjectStore.get[Transformable](
-            hybridRecord.s3key)
+          transformableRecord <- getTransformable(hybridRecord)
           cleanRecord <- Future.fromTry(
             transformTransformable(transformableRecord))
           publishResult <- publishMessage(cleanRecord)
@@ -58,6 +57,14 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
           .map(_ => ())
       }
     )
+  }
+
+  private def getTransformable(hybridRecord: HybridRecord) = {
+    hybridRecord.sourceName match {
+      case "miro" => versionedObjectStore.get[MiroTransformable] (hybridRecord.s3key)
+      case "calm" => versionedObjectStore.get[CalmTransformable] (hybridRecord.s3key)
+      case "sierra" => versionedObjectStore.get[SierraTransformable] (hybridRecord.s3key)
+    }
   }
 
   private def transformTransformable(

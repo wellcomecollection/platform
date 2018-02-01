@@ -26,20 +26,20 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
                                        AltRefNo: String,
                                        RefNo: String,
                                        data: String): String = {
-    val calmTransformable: Transformable =
+    val calmTransformable =
       CalmTransformable(RecordID, RecordType, AltRefNo, RefNo, data)
 
     JsonUtil.toJson(calmTransformable).get
   }
 
   def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
-    val sierraTransformable: Transformable = SierraTransformable(
+    val sierraTransformable = SierraTransformable(
       sourceId = id,
       maybeBibData = None,
       itemData = Map[String, SierraItemRecord]()
     )
 
-    hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get)
+    hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get, "sierra")
   }
 
   def createValidSierraTransformableJson(id: String,
@@ -54,7 +54,7 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
          |}
       """.stripMargin
 
-    val sierraTransformable: Transformable = SierraTransformable(
+    val sierraTransformable = SierraTransformable(
       sourceId = id,
       maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
       itemData = Map[String, SierraItemRecord]()
@@ -66,12 +66,12 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
   def createValidMiroTransformableJson(MiroID: String,
                                        MiroCollection: String,
                                        data: String): String = {
-    val miroTransformable: Transformable =
+    val miroTransformable =
       MiroTransformable(MiroID, MiroCollection, data)
     JsonUtil.toJson(miroTransformable).get
   }
 
-  def hybridRecordSqsMessage(message: String) = {
+  def hybridRecordSqsMessage(message: String, testSource: String) = {
     val key = "testSource/1/testId/dshg548.json"
     s3Client.putObject(bucketName, key, message)
 
@@ -81,7 +81,7 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
         .toJson(
           HybridRecord(version = 1,
                        sourceId = "testId",
-                       sourceName = "testSource",
+                       sourceName = testSource,
                        s3key = key))
         .get,
       "test_transformer_topic",
