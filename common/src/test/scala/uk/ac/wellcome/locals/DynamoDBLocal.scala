@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.query.UniqueKey
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, Suite}
+import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
@@ -12,7 +12,6 @@ import scala.collection.JavaConversions._
 
 trait DynamoDBLocal[T <: Versioned]
     extends BeforeAndAfterEach
-    with BeforeAndAfterAll
     with DynamoDBLocalClients
     with Eventually
     with Matchers { this: Suite =>
@@ -20,23 +19,15 @@ trait DynamoDBLocal[T <: Versioned]
   implicit val evidence: DynamoFormat[T]
   val tableName: String
 
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    deleteTable
-    createTable
-  }
-
-  override def afterAll(): Unit = {
-    deleteTable
-    super.afterAll()
-  }
+  deleteTable()
+  private val createTableResult = createTable()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearTable
+    clearTable()
   }
 
-  private def clearTable: List[DeleteItemResult] =
+  private def clearTable(): List[DeleteItemResult] =
     Scanamo.scan[T](dynamoDbClient)(tableName).map {
       case Right(item) =>
         dynamoDbClient.deleteItem(
@@ -48,13 +39,16 @@ trait DynamoDBLocal[T <: Versioned]
           s"Unable to clear the table $tableName error $error")
     }
 
-  private def deleteTable() =
+  private def deleteTable() = {
     dynamoDbClient
       .listTables()
       .getTableNames
       .foreach(dynamoDbClient.deleteTable)
+  }
 
-  private def createTable =
+  private def createTable() = {
+    println(s"Creating local DynamoDB table: $tableName")
+
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(tableName)
@@ -69,6 +63,7 @@ trait DynamoDBLocal[T <: Versioned]
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
+  }
 
   def dynamoQueryEqualsValue(key: UniqueKey[_])(expectedValue: T)(
     implicit evidence: DynamoFormat[T]) = {

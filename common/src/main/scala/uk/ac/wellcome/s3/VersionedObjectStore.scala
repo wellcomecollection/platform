@@ -31,7 +31,9 @@ class VersionedObjectStore @Inject()(
       val key =
         s"${newObject.sourceName}/${newObject.sourceId}/${newObject.version}/$contentHash.json"
 
+      info(s"Attempting to PUT object to s3://$bucketName/$key")
       s3Client.putObject(bucketName, key, content)
+      info(s"Successfully PUT object to s3://$bucketName/$key")
 
       key
     }
@@ -40,13 +42,16 @@ class VersionedObjectStore @Inject()(
   def get[T <: Versioned](key: String)(
     implicit decoder: Decoder[T]): Future[T] = {
 
+    info(s"Attempting to GET object from s3://$bucketName/$key")
+
     val getObject = Future {
       val s3Object = s3Client.getObject(bucketName, key)
       Source.fromInputStream(s3Object.getObjectContent).mkString
     }
 
     getObject.flatMap(s3ObjectContent => {
-      info(s"Retrieved content $s3ObjectContent")
+      info(s"Successful GET object from s3://$bucketName/$key")
+
       Future.fromTry(JsonUtil.fromJson[T](s3ObjectContent))
     })
   }

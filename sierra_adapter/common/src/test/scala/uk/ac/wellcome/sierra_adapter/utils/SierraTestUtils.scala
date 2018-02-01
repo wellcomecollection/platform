@@ -5,25 +5,20 @@ import com.gu.scanamo.query.UniqueKey
 import org.scalatest.{Matchers, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.sierra_adapter.locals.DynamoDBLocal
+import uk.ac.wellcome.locals.DynamoDBLocal
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.VersionUpdater
 
 trait SierraTestUtils
-    extends DynamoDBLocal
-    with Matchers
+    extends Matchers
     with Eventually
     with ScalaFutures
     with MockitoSugar
     with ExtendedPatience { this: Suite =>
-
-  def dynamoQueryEqualsValue[T: DynamoFormat](key: UniqueKey[_])(
-    expectedValue: T) = {
-
-    println(s"Searching DynamoDB for expectedValue = $expectedValue")
-
-    eventually {
-      val actualValue = Scanamo.get[T](dynamoDbClient)(tableName)(key).get
-      actualValue shouldEqual Right(expectedValue)
-    }
-  }
 }

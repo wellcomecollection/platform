@@ -2,28 +2,52 @@ package uk.ac.wellcome.platform.sierra_bib_merger
 
 import akka.actor.ActorSystem
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
-import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
-import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
+
+import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+
+import uk.ac.wellcome.storage.VersionedHybridStoreLocal
+
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.dynamo._
 
 class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with AmazonCloudWatchFlag
     with SQSLocal
-    with SierraTestUtils {
+    with Eventually
+    with MockitoSugar
+    with ExtendedPatience
+    with ScalaFutures
+    with VersionedHybridStoreLocal {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
 
+  implicit val sierraTransformableUpdater =
+    new VersionUpdater[SierraTransformable] {
+      override def updateVersion(sierraTransformable: SierraTransformable,
+                                 newVersion: Int): SierraTransformable = {
+        sierraTransformable.copy(version = newVersion)
+      }
+    }
+
+  override lazy val tableName = "sierra-bib-merger-feature-test-table"
+  override lazy val bucketName = "sierra-bib-merger-feature-test-bucket"
   val queueUrl = createQueueAndReturnUrl("test_bib_merger")
 
   override protected def server = new EmbeddedHttpServer(
@@ -31,8 +55,9 @@ class SierraBibMergerFeatureTest
     flags = Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.merger.tableName" -> tableName
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+      "aws.s3.bucketName" -> bucketName,
+      "aws.dynamo.dynamoTable.tableName" -> tableName
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ s3LocalFlags
   )
 
   def bibRecordString(id: String,
@@ -68,7 +93,7 @@ class SierraBibMergerFeatureTest
       |    }
     """.stripMargin
 
-  it("should put a bib from SQS into DynamoDB") {
+  it("should store a bib in the hybrid store") {
     val id = "1000001"
     val record = SierraBibRecord(
       id = id,
@@ -79,15 +104,23 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2001-01-01T01:01:01Z"
     )
+
     sendBibRecordToSQS(record)
+
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 1)
 
-    dynamoQueryEqualsValue('sourceId -> id)(
-      expectedValue = expectedSierraTransformable)
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
+
+      whenReady(futureRecord) { record =>
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
   }
 
-  it("should put multiple bibs from SQS into DynamoDB") {
+  it("stores multiple bibs from SQS") {
     val id1 = "1000001"
     val record1 = SierraBibRecord(
       id = id1,
@@ -116,13 +149,22 @@ class SierraBibMergerFeatureTest
     val expectedSierraTransformable2 =
       SierraTransformable(bibRecord = record2, version = 1)
 
-    dynamoQueryEqualsValue('sourceId -> id1)(
-      expectedValue = expectedSierraTransformable1)
-    dynamoQueryEqualsValue('sourceId -> id2)(
-      expectedValue = expectedSierraTransformable2)
+    eventually {
+      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable1.id)
+      whenReady(futureRecord1) { record =>
+        record.get shouldBe expectedSierraTransformable1
+      }
+
+      val futureRecord2 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable2.id)
+      whenReady(futureRecord2) { record =>
+        record.get shouldBe expectedSierraTransformable2
+      }
+    }
   }
 
-  it("should update a bib in DynamoDB if a newer version is sent to SQS") {
+  it("updates a bib if a newer version is sent to SQS") {
     val id = "3000003"
     val oldBibRecord = SierraBibRecord(
       id = id,
@@ -133,8 +175,8 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2003-03-03T03:03:03Z"
     )
-    val oldRecord = SierraTransformable(bibRecord = oldBibRecord, version = 1)
-    Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+    val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
+    hybridStore.updateRecord[SierraTransformable](oldRecord)
 
     val newTitle = "A number of new narwhals near Newmarket"
     val newUpdatedDate = "2004-04-04T04:04:04Z"
@@ -149,13 +191,20 @@ class SierraBibMergerFeatureTest
     )
     sendBibRecordToSQS(record)
 
-    val expectedSierraRecord =
+    val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 2)
-    dynamoQueryEqualsValue('sourceId -> id)(
-      expectedValue = expectedSierraRecord)
+
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        println(s"@@AWLC The future is here!")
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
   }
 
-  it("should not update a bib in DynamoDB if an older version is sent to SQS") {
+  it("does not update a bib if an older version is sent to SQS") {
     val id = "6000006"
     val newBibRecord = SierraBibRecord(
       id = id,
@@ -166,9 +215,10 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2006-06-06T06:06:06Z"
     )
-    val newRecord = SierraTransformable(bibRecord = newBibRecord)
-    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
-    val expectedSierraRecord = SierraTransformable(bibRecord = newBibRecord)
+    sendBibRecordToSQS(newBibRecord)
+
+    val expectedSierraTransformable =
+      SierraTransformable(bibRecord = newBibRecord, version = 1)
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
@@ -187,14 +237,19 @@ class SierraBibMergerFeatureTest
     // enough time for this update to have gone through (if it was going to).
     Thread.sleep(5000)
 
-    dynamoQueryEqualsValue('sourceId -> id)(
-      expectedValue = expectedSierraRecord)
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        println(s"@@AWLC The future is here!")
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
   }
 
-  it("should put a bib from SQS into DynamoDB if the ID exists but no bibData") {
+  it("stores a bib from SQS if the ID already exists but no bibData") {
     val id = "7000007"
-    val newRecord = SierraTransformable(sourceId = id, version = 1)
-    Scanamo.put(dynamoDbClient)(tableName)(newRecord)
+    val newRecord = SierraTransformable(sourceId = id)
 
     val title = "Inside an inquisitive igloo of ice imps"
     val updatedDate = "2007-07-07T07:07:07Z"
@@ -208,12 +263,23 @@ class SierraBibMergerFeatureTest
       modifiedDate = updatedDate
     )
 
-    sendBibRecordToSQS(record)
-    val expectedSierraRecord =
+    val future = hybridStore.updateRecord[SierraTransformable](newRecord)
+
+    future.map { _ =>
+      sendBibRecordToSQS(record)
+    }
+
+    val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 2)
 
-    dynamoQueryEqualsValue('sourceId -> id)(
-      expectedValue = expectedSierraRecord)
+    eventually {
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        println(s"@@AWLC The future is here!")
+        record.get shouldBe expectedSierraTransformable
+      }
+    }
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {

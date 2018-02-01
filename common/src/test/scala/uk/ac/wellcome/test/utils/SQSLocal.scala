@@ -13,8 +13,8 @@ trait SQSLocal
     with ExtendedPatience { this: Suite =>
 
   private val sqsEndpointUrl = "http://localhost:9324"
-  private val accessKey = "access"
-  private val secretKey = "secret"
+  private val accessKey = "accessKey1"
+  private val secretKey = "verySecretKey1"
 
   val sqsLocalFlags = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,

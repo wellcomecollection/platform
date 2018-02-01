@@ -33,8 +33,11 @@ class SierraItemMergerUpdaterService @Inject()(
             else Future.successful(())
           case None =>
             sierraTransformableDao.updateRecord(
-              SierraTransformable(bibId,
-                                  itemData = Map(itemRecord.id -> itemRecord)))
+              SierraTransformable(
+                sourceId = bibId,
+                itemData = Map(itemRecord.id -> itemRecord)
+              )
+            )
         }
     }
 

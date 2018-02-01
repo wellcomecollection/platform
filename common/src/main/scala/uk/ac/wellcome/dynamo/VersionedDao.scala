@@ -37,26 +37,44 @@ class VersionedDao @Inject()(
   def updateRecord[T <: Versioned](record: T)(
     implicit evidence: VersionedDynamoFormatWrapper[T],
     versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
-    debug(s"About to update record $record")
+    info(s"Attempting to update Dynamo record: ${record.id}")
+
     Scanamo.exec(dynamoDbClient)(putRecord(record)) match {
       case Left(err) =>
-        warn(s"Failed updating record ${record.sourceId}", err)
+        warn(s"Failed to updating Dynamo record: ${record.id}", err)
+
         throw err
-      case Right(_) => ()
+      case Right(_) => {
+        info(s"Successfully updated Dynamo record: ${record.id}")
+      }
     }
   }
 
   def getRecord[T <: Versioned](id: String)(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
+
+    info(s"Attempting to retrieve Dynamo record: $id")
     Scanamo.exec(dynamoDbClient)(table.get('id -> id)) match {
-      case Some(Right(record)) => Some(record)
+      case Some(Right(record)) => {
+        info(s"Successfully retrieved Dynamo record: ${record.id}")
+
+        Some(record)
+      }
       case Some(Left(scanamoError)) =>
         val exception = new RuntimeException(scanamoError.toString)
-        error(s"An error occurred while retrieving $id from DynamoDB",
-              exception)
+
+        error(
+          s"An error occurred while retrieving $id from DynamoDB",
+          exception
+        )
+
         throw exception
-      case None => None
+      case None => {
+        info(s"No Dynamo record found for id: $id")
+
+        None
+      }
     }
   }
 }

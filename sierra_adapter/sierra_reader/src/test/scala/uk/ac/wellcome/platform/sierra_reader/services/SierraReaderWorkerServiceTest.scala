@@ -36,7 +36,7 @@ class SierraReaderWorkerServiceTest
     with BeforeAndAfterAll {
 
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
-  val bucketName = "sierra-reader-test-bucket"
+  override lazy val bucketName = "sierra-reader-test-bucket"
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]
