@@ -27,7 +27,7 @@ class CalmReindexTargetServiceTest
 
     val outOfdateCalmTransformableList = List(
       CalmTransformable(
-        RecordID = "RecordID1",
+        sourceId = "RecordID1",
         RecordType = "Collection",
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",
@@ -37,7 +37,7 @@ class CalmReindexTargetServiceTest
 
     val inDateCalmTransferrableList = List(
       CalmTransformable(
-        RecordID = "RecordID2",
+        sourceId = "RecordID2",
         RecordType = "Collection",
         AltRefNo = "AltRefNo2",
         RefNo = "RefNo2",

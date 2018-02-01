@@ -29,7 +29,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     MiroCollection: String = "TestCollection"
   ): Work = {
     val miroTransformable = MiroTransformable(
-      MiroID = MiroID,
+      sourceId = MiroID,
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )
@@ -46,7 +46,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     MiroCollection: String = "TestCollection"
   ) = {
     val miroTransformable = MiroTransformable(
-      MiroID = MiroID,
+      sourceId = MiroID,
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )

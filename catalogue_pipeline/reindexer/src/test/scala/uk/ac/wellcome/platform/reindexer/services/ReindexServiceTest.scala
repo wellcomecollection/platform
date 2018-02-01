@@ -61,7 +61,7 @@ class ReindexServiceTest
 
     val calmTransformableList = List(
       CalmTransformable(
-        RecordID = "RecordID1",
+        sourceId = "RecordID1",
         RecordType = "Collection",
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",
@@ -104,7 +104,7 @@ class ReindexServiceTest
 
     val calmTransformableList = List(
       CalmTransformable(
-        RecordID = "RecordID1",
+        sourceId = "RecordID1",
         RecordType = "Collection",
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",

@@ -9,50 +9,43 @@ import cats.syntax.functor._
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.utils.JsonUtil._
 
-sealed trait Transformable
-object Transformable {
-  import uk.ac.wellcome.utils.JsonUtil._
-
-  implicit val decodeEvent: Decoder[Transformable] =
-    List[Decoder[Transformable]](
-      Decoder[CalmTransformable].widen,
-      Decoder[SierraTransformable].widen,
-      Decoder[MiroTransformable].widen
-    ).reduceLeft(_ or _)
-}
+sealed trait Transformable extends Versioned
 
 case class CalmTransformable(
-  RecordID: String,
+  sourceId: String,
   RecordType: String,
   AltRefNo: String,
   RefNo: String,
   data: String,
   ReindexShard: String = "default",
-  ReindexVersion: Int = 0
+  ReindexVersion: Int = 0,
+  version: Int = 0,
+  sourceName: String = "calm"
 ) extends Transformable
     with Reindexable[String] {
 
-  val id: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("RecordID", RecordID),
+  val reindexId: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("sourceId", sourceId),
     RangeKey("RecordType", RecordType)
   )
-
 }
 
 case class CalmTransformableData(
   AccessStatus: Array[String]
-) extends Transformable
+)
 
-case class MiroTransformable(MiroID: String,
+case class MiroTransformable(sourceId: String,
                              MiroCollection: String,
                              data: String,
                              ReindexShard: String = "default",
-                             ReindexVersion: Int = 0)
+                             sourceName: String = "miro",
+                             ReindexVersion: Int = 0,
+                             version: Int = 1)
     extends Transformable
     with Reindexable[String] {
 
-  val id: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("MiroID", MiroID),
+  val reindexId: ItemIdentifier[String] = ItemIdentifier(
+    HashKey("sourceId", sourceId),
     RangeKey("MiroCollection", MiroCollection)
   )
 }
