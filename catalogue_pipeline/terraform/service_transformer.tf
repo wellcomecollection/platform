@@ -11,9 +11,10 @@ module "transformer" {
     sns_arn              = "${module.id_minter_topic.arn}"
     transformer_queue_id = "${module.transformer_queue.id}"
     metrics_namespace    = "transformer"
+    bucket_name    = "${module.versioned-hybrid-store.bucket_name}"
   }
 
-  env_vars_length = 3
+  env_vars_length = 4
 
   alb_priority = "108"
 
