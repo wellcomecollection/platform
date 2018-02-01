@@ -33,8 +33,8 @@ module "ingestor" {
 
   alb_priority = 107
 
-  cluster_name = "${aws_ecs_cluster.services.name}"
-  vpc_id       = "${module.vpc_services.vpc_id}"
+  cluster_name               = "${aws_ecs_cluster.services.name}"
+  vpc_id                     = "${module.vpc_services.vpc_id}"
   alb_cloudwatch_id          = "${module.services_alb.cloudwatch_id}"
   alb_listener_https_arn     = "${module.services_alb.listener_https_arn}"
   alb_listener_http_arn      = "${module.services_alb.listener_http_arn}"
