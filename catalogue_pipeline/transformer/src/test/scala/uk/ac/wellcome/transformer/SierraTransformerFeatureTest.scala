@@ -17,14 +17,16 @@ class SierraTransformerFeatureTest
     with TransformerFeatureTest
     with TransformableSQSMessageUtils {
 
+  override lazy val bucketName: String =
+    "test-sierra-transformer-feature-test-bucket"
   val queueUrl: String = createQueueAndReturnUrl("test_sierra_transformer")
   override val flags: Map[String, String] = Map(
-    "transformer.source" -> "SierraData",
     "aws.region" -> "eu-west-1",
     "aws.sqs.queue.url" -> queueUrl,
     "aws.sqs.waitTime" -> "1",
     "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "sierra-transformer"
+    "aws.metrics.namespace" -> "sierra-transformer",
+    "aws.s3.bucketName" -> bucketName
   )
 
   it("should transform sierra records, and publish them to the given topic") {
@@ -33,13 +35,16 @@ class SierraTransformerFeatureTest
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
-    val sqsMessage = createValidSierraBibSQSMessage(
-      id,
-      title,
-      lastModifiedDate
-    )
+    val sierraHybridRecordMessage =
+      hybridRecordSqsMessage(createValidSierraTransformableJson(
+                               id,
+                               title,
+                               lastModifiedDate
+                             ),
+                             "sierra")
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queueUrl,
+                          JsonUtil.toJson(sierraHybridRecordMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
