@@ -9,7 +9,7 @@ class BibMergerTest extends FunSpec with Matchers {
   describe("merging with a SierraBibRecord") {
     it("should merge data from a bibRecord when empty") {
       val record = sierraBibRecord(id = "222")
-      val originalRecord = SierraTransformable(id = "222")
+      val originalRecord = SierraTransformable(sourceId = "222")
 
       val newRecord = BibMerger.mergeBibRecord(originalRecord, record)
       newRecord.maybeBibData.get shouldEqual record
@@ -17,7 +17,7 @@ class BibMergerTest extends FunSpec with Matchers {
 
     it("should only merge bib records with matching ids") {
       val record = sierraBibRecord(id = "333")
-      val originalRecord = SierraTransformable(id = "444")
+      val originalRecord = SierraTransformable(sourceId = "444")
 
       val caught = intercept[RuntimeException] {
         BibMerger.mergeBibRecord(originalRecord, record)
@@ -27,7 +27,7 @@ class BibMergerTest extends FunSpec with Matchers {
 
     it("should never increment the version when mergeBibRecord is called") {
       val record = sierraBibRecord(id = "666")
-      val originalRecord = SierraTransformable(id = "666", version = 10)
+      val originalRecord = SierraTransformable(sourceId = "666", version = 10)
       val newRecord = BibMerger.mergeBibRecord(originalRecord, record)
       newRecord.version shouldEqual 10
     }
@@ -41,7 +41,7 @@ class BibMergerTest extends FunSpec with Matchers {
       )
 
       val sierraTransformable = SierraTransformable(
-        id = "777",
+        sourceId = "777",
         maybeBibData = Some(
           sierraBibRecord(
             id = "777",
@@ -63,7 +63,7 @@ class BibMergerTest extends FunSpec with Matchers {
       )
 
       val sierraTransformable = SierraTransformable(
-        id = "888",
+        sourceId = "888",
         maybeBibData = Some(
           sierraBibRecord(
             id = "888",

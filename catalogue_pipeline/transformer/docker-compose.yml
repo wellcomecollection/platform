@@ -6,3 +6,7 @@ sqs:
   image: s12v/elasticmq
   ports:
     - "9324:9324"
+s3:
+  image: scality/s3server:mem-latest
+  ports:
+    - "33333:8000"

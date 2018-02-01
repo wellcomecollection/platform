@@ -38,7 +38,7 @@ class SierraTransformableTransformerTest
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
@@ -93,7 +93,7 @@ class SierraTransformableTransformerTest
           |}""".stripMargin
 
     val transformable = SierraTransformable(
-      id = bibId,
+      sourceId = bibId,
       maybeBibData = Some(
         SierraBibRecord(id = bibId,
                         data = bibData,
@@ -122,7 +122,7 @@ class SierraTransformableTransformerTest
 
   it("should not perform a transformation without bibData") {
     val sierraTransformable =
-      SierraTransformable(id = "000", maybeBibData = None)
+      SierraTransformable(sourceId = "000", maybeBibData = None)
 
     val transformedSierraRecord = transformer.transform(sierraTransformable)
     transformedSierraRecord.isSuccess shouldBe true
@@ -133,7 +133,7 @@ class SierraTransformableTransformerTest
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
     val sierraTransformable = SierraTransformable(
-      id = "b111",
+      sourceId = "b111",
       maybeBibData = None,
       itemData = Map(
         "i111" -> sierraItemRecord(
@@ -204,7 +204,7 @@ class SierraTransformableTransformerTest
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
@@ -240,7 +240,7 @@ class SierraTransformableTransformerTest
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
@@ -272,7 +272,7 @@ class SierraTransformableTransformerTest
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
@@ -303,7 +303,7 @@ class SierraTransformableTransformerTest
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
@@ -358,7 +358,7 @@ class SierraTransformableTransformerTest
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      id = id,
+      sourceId = id,
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
