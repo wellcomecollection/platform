@@ -24,8 +24,6 @@ class SierraItemMergerUpdaterService @Inject()(
   metrics: MetricsSender
 ) extends Logging {
 
-  lazy implicit val decoder = deriveDecoder[SierraTransformable]
-
   implicit val sierraTransformableUpdater =
     new VersionUpdater[SierraTransformable] {
       override def updateVersion(sierraTransformable: SierraTransformable,
