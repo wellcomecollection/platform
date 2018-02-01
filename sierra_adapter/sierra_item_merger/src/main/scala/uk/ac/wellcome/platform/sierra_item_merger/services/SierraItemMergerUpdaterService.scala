@@ -17,7 +17,7 @@ import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.utils.JsonUtil._
 
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
@@ -38,7 +38,7 @@ class SierraItemMergerUpdaterService @Inject()(
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
       versionedHybridStore
-        .getRecord[SierraTransformable](bibId)
+        .getRecord[SierraTransformable](s"sierra/$bibId")
         .flatMap {
           case Some(existingSierraTransformable) =>
             val mergedRecord =
@@ -59,7 +59,7 @@ class SierraItemMergerUpdaterService @Inject()(
 
     val unlinkUpdateFutures = itemRecord.unlinkedBibIds.map { unlinkedBibId =>
       versionedHybridStore
-        .getRecord[SierraTransformable](unlinkedBibId)
+        .getRecord[SierraTransformable](s"sierra/$unlinkedBibId")
         .flatMap {
           case Some(record) =>
             val mergedRecord =
@@ -73,7 +73,7 @@ class SierraItemMergerUpdaterService @Inject()(
             Future.failed(
               GracefulFailureException(
                 new RuntimeException(
-                  s"Missing Bib record to unlink: $unlinkedBibId.")
+                  s"Missing Bib record to unlink: $unlinkedBibId")
               ))
         }
     }

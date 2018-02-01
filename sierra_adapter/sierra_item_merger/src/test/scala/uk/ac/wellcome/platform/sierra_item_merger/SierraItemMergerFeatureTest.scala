@@ -4,12 +4,11 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
-import uk.ac.wellcome.dynamo._
-import com.gu.scanamo.syntax._
-import uk.ac.wellcome.models.VersionUpdater
+import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.models.transformable.SierraTransformable
+
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.dynamo._
 
 
 class SierraItemMergerFeatureTest
