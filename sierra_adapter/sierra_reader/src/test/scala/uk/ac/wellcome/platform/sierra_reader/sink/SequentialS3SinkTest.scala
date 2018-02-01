@@ -28,7 +28,7 @@ class SequentialS3SinkTest
     super.afterAll()
   }
 
-  val bucketName = "sequential-s3-sink-test"
+  override lazy val bucketName = "sequential-s3-sink-test"
 
   it("puts a single JSON in S3") {
     val sink =

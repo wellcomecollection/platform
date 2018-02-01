@@ -5,9 +5,10 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
-import uk.ac.wellcome.dynamo._
-import com.gu.scanamo.syntax._
 import uk.ac.wellcome.models.transformable.SierraTransformable
+
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.dynamo._
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -20,11 +21,12 @@ class SierraItemMergerFeatureTest
     flags = Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.merger.tableName" -> tableName
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+      "aws.s3.bucketName" -> bucketName,
+      "aws.dynamo.dynamoTable.tableName" -> tableName
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ s3LocalFlags
   )
 
-  it("puts an item from SQS into DynamoDB") {
+  it("stores an item from SQS") {
     val id = "i1000001"
     val bibId = "b1000001"
 
@@ -43,12 +45,15 @@ class SierraItemMergerFeatureTest
     )
 
     eventually {
-      dynamoQueryEqualsValue('sourceId -> bibId)(
-        expectedValue = expectedSierraTransformable)
+      val futureRecord = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable.id)
+      whenReady(futureRecord) { record =>
+        record.get shouldBe expectedSierraTransformable
+      }
     }
   }
 
-  it("puts multiple items from SQS into DynamoDB") {
+  it("stores multiple items from SQS") {
     val bibId1 = "b1000001"
 
     val id1 = "1000001"
@@ -73,7 +78,6 @@ class SierraItemMergerFeatureTest
     sendItemRecordToSQS(record2)
 
     eventually {
-
       val expectedSierraTransformable1 = SierraTransformable(
         sourceId = bibId1,
         itemData = Map(id1 -> record1),
@@ -86,12 +90,17 @@ class SierraItemMergerFeatureTest
         version = 1
       )
 
-      dynamoQueryEqualsValue('sourceId -> bibId1)(
-        expectedValue = expectedSierraTransformable1)
+      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable1.id)
+      whenReady(futureRecord1) { record =>
+        record.get shouldBe expectedSierraTransformable1
+      }
 
-      dynamoQueryEqualsValue('sourceId -> bibId2)(
-        expectedValue = expectedSierraTransformable2)
-
+      val futureRecord2 = hybridStore.getRecord[SierraTransformable](
+        expectedSierraTransformable2.id)
+      whenReady(futureRecord2) { record =>
+        record.get shouldBe expectedSierraTransformable2
+      }
     }
   }
 }

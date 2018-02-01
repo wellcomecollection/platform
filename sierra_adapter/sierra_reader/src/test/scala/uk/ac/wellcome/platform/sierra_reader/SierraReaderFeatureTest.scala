@@ -16,7 +16,7 @@ class SierraReaderFeatureTest
     with Matchers
     with ExtendedPatience {
   val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
-  val bucketName = "sierra-reader-feature-test-bucket"
+  override lazy val bucketName = "sierra-reader-feature-test-bucket"
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),

@@ -18,10 +18,11 @@ trait DynamoDBLocalClients { this: Suite =>
 
   private val accessKey = "access"
   private val secretKey = "secret"
+
   val dynamoDbLocalEndpointFlags: Map[String, String] =
     Map(
-      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
       "aws.region" -> "localhost",
+      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
       "aws.dynamoDb.accessKey" -> accessKey,
       "aws.dynamoDb.secretKey" -> secretKey
     )

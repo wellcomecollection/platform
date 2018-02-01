@@ -1,17 +1,40 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
-import org.scalatest.Suite
+import io.circe.generic.extras.semiauto.deriveDecoder
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{Matchers, Suite}
+import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
-import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.storage.VersionedHybridStoreLocal
+import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal {
-
-  this: Suite =>
+trait SierraItemMergerTestUtil
+    extends Matchers
+    with Eventually
+    with ScalaFutures
+    with MockitoSugar
+    with ExtendedPatience
+    with SQSLocal
+    with VersionedHybridStoreLocal { this: Suite =>
 
   val queueUrl = createQueueAndReturnUrl("test_item_merger")
+
+  implicit val sierraTransformableUpdater =
+    new VersionUpdater[SierraTransformable] {
+      override def updateVersion(sierraTransformable: SierraTransformable,
+                                 newVersion: Int): SierraTransformable = {
+        sierraTransformable.copy(version = newVersion)
+      }
+    }
+
+  override lazy val tableName = "sierra-item-merger-feature-test-table"
+  override lazy val bucketName = "sierra-item-merger-feature-test-bucket"
+
+  lazy implicit val decoder = deriveDecoder[SierraTransformable]
 
   private def itemRecordString(id: String,
                                updatedDate: String,
