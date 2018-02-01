@@ -2,4 +2,4 @@
 -aws.sqs.queue.url=${transformer_queue_id}
 -aws.sns.topic.arn=${sns_arn}
 -aws.metrics.namespace=${metrics_namespace}
--transformer.source=${source_table_name}
+-aws.s3.bucketName=${bucket_name}
