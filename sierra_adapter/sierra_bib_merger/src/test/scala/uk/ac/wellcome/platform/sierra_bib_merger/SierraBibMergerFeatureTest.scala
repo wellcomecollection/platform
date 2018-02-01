@@ -9,7 +9,11 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
 
 import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.SierraTransformable
@@ -19,7 +23,6 @@ import uk.ac.wellcome.storage.VersionedHybridStoreLocal
 
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
-
 
 class SierraBibMergerFeatureTest
     extends FunSpec
