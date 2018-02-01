@@ -15,6 +15,7 @@ elasticsearch:
     - "http.host=0.0.0.0"
     - "transport.host=0.0.0.0"
     - "cluster.name=wellcome"
+    - "ES_JAVA_OPTS=-Xms750m -Xmx750m"
 dynamodb:
   image: peopleperhour/dynamodb
   ports:

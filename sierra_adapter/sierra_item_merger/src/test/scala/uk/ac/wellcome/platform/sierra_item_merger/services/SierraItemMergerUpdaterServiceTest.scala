@@ -121,6 +121,7 @@ class SierraItemMergerUpdaterServiceTest
           itemData = Map(itemRecord.id -> itemRecord),
           version = 2
         )
+    }
 //
 //      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
 //        expectedNewSierraTransformable.id)
@@ -149,8 +150,7 @@ class SierraItemMergerUpdaterServiceTest
 //      whenReady(futureRecord3) { record =>
 //        record.get shouldBe expectedUnchangedSierraTranformable
 //      }
-    }
-  }
+//  }
 //
 //  it("updates an item if it receives an update with a newer date") {
 //    val id = "i3000003"

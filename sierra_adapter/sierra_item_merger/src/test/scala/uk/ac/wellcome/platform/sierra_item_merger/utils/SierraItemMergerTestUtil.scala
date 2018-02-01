@@ -1,17 +1,25 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
 import io.circe.generic.extras.semiauto.deriveDecoder
-import org.scalatest.Suite
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
 import uk.ac.wellcome.storage.VersionedHybridStoreLocal
-import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait SierraItemMergerTestUtil extends SierraTestUtils with SQSLocal with VersionedHybridStoreLocal {
+trait SierraItemMergerTestUtil
+  extends Matchers
+    with Eventually
+    with ScalaFutures
+    with MockitoSugar
+    with ExtendedPatience
+    with SQSLocal
+    with VersionedHybridStoreLocal {
 
   this: Suite =>
 

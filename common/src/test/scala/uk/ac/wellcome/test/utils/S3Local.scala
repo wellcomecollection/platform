@@ -31,8 +31,8 @@ trait S3Local extends BeforeAndAfterEach with Logging { this: Suite =>
   val s3LocalFlags: Map[String, String] =
     Map(
       "aws.s3.endpoint" -> localS3EndpointUrl,
-      "aws.accessKey" -> accessKey,
-      "aws.secretKey" -> secretKey,
+      "aws.s3.accessKey" -> accessKey,
+      "aws.s3.secretKey" -> secretKey,
       "aws.region" -> "localhost"
     )
 
@@ -48,6 +48,7 @@ trait S3Local extends BeforeAndAfterEach with Logging { this: Suite =>
     .build()
 
   s3Client.createBucket(bucketName)
+
   override def beforeEach(): Unit = {
     super.beforeEach()
     val bucketList = s3Client.listBuckets()

@@ -4,26 +4,31 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.Work
-import uk.ac.wellcome.models.transformable.MiroTransformable
+import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.transformer.utils.TransformerFeatureTest
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 class MiroTransformerFeatureTest
     extends FunSpec
     with TransformerFeatureTest
     with Matchers
-    with MiroTransformableWrapper {
-
+    with MiroTransformableWrapper
+    with TransformableSQSMessageUtils {
+  override lazy val bucketName: String =
+    "test-miro-transformer-feature-test-bucket"
   val queueUrl: String = createQueueAndReturnUrl("test_miro_transformer")
   override val flags: Map[String, String] = Map(
-    "transformer.source" -> "MiroData",
     "aws.region" -> "eu-west-1",
     "aws.sqs.queue.url" -> queueUrl,
     "aws.sqs.waitTime" -> "1",
     "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "miro-transformer"
+    "aws.metrics.namespace" -> "miro-transformer",
+    "aws.s3.bucketName" -> bucketName
   )
 
   it("""
@@ -68,13 +73,11 @@ class MiroTransformerFeatureTest
         }"""
 
   private def sendMiroImageToSQS(miroID: String, message: String) = {
-    val miroTransformable = MiroTransformable(miroID, "Images-A", message)
+    val miroTransformable =
+      MiroTransformable(miroID, "Images-A", message)
 
-    val sqsMessage = SQSMessage(Some("subject"),
-                                JsonUtil.toJson(miroTransformable).get,
-                                "topic",
-                                "messageType",
-                                "timestamp")
+    val sqsMessage =
+      hybridRecordSqsMessage(JsonUtil.toJson(miroTransformable).get, "miro")
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
   }

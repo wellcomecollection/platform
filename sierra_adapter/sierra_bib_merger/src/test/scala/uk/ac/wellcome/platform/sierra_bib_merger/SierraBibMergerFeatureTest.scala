@@ -6,27 +6,28 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SQSLocal
-}
-import uk.ac.wellcome.sierra_adapter.utils.SierraTestUtils
-import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+
 import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+
 import uk.ac.wellcome.storage.VersionedHybridStoreLocal
+
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.dynamo._
+
 
 class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with AmazonCloudWatchFlag
     with SQSLocal
-    with SierraTestUtils
+    with Eventually
+    with MockitoSugar
     with ExtendedPatience
     with ScalaFutures
     with VersionedHybridStoreLocal {
@@ -100,6 +101,7 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2001-01-01T01:01:01Z"
     )
+
     sendBibRecordToSQS(record)
 
     val expectedSierraTransformable =
@@ -108,6 +110,7 @@ class SierraBibMergerFeatureTest
     eventually {
       val futureRecord = hybridStore.getRecord[SierraTransformable](
         expectedSierraTransformable.id)
+
       whenReady(futureRecord) { record =>
         record.get shouldBe expectedSierraTransformable
       }

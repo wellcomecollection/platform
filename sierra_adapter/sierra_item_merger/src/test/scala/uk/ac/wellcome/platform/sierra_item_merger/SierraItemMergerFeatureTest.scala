@@ -79,7 +79,6 @@ class SierraItemMergerFeatureTest
 
     sendItemRecordToSQS(record2)
 
-
     eventually {
       val expectedSierraTransformable1 = SierraTransformable(
         sourceId = bibId1,
