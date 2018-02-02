@@ -13,6 +13,4 @@ locals {
   service_scheduler_topic_publish_policy = "${data.terraform_remote_state.shared_infra.service_scheduler_topic_publish_policy}"
 
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
-
-  sierradata_table_stream_arn = "${data.terraform_remote_state.sierra_adapter.sierradata_table_stream_arn}"
 }

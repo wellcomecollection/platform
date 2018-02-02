@@ -25,3 +25,15 @@ output "table_miro_data_arn" {
 output "table_miro_data_name" {
   value = "${aws_dynamodb_table.miro_table.name}"
 }
+
+output "vhs_full_access_policy" {
+  value = "${module.versioned-hybrid-store.full_access_policy}"
+}
+
+output "vhs_table_name" {
+  value = "${module.versioned-hybrid-store.table_name}"
+}
+
+output "vhs_bucket_name" {
+  value = "${module.versioned-hybrid-store.bucket_name}"
+}

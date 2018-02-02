@@ -29,13 +29,7 @@ variable "rds_password" {
   description = "Password7 for the RDS database"
 }
 
-variable "es_config_ingestor_mel" {
-  description = "ElasticCloud config for the ingestor"
-  type        = "map"
-  default     = {}
-}
-
-variable "es_config_ingestor_sue" {
+variable "es_config_ingestor" {
   description = "ElasticCloud config for the ingestor"
   type        = "map"
   default     = {}
