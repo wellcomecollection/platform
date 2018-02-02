@@ -22,3 +22,5 @@ variable "aws_region" {
 }
 
 variable "account_id" {}
+variable "vhs_full_access_policy" {}
+variable "bucket_name" {}

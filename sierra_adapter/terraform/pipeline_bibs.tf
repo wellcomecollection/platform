@@ -48,7 +48,7 @@ module "bibs_merger" {
 
   release_id = "${var.release_ids["sierra_bib_merger"]}"
 
-  merged_dynamo_table_name = "${aws_dynamodb_table.sierradata_table.name}"
+  merged_dynamo_table_name = "${local.vhs_table_name}"
 
   updates_topic_name = "${module.bibs_reader.topic_name}"
 
@@ -64,4 +64,8 @@ module "bibs_merger" {
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
+
+  vhs_full_access_policy = "${local.vhs_full_access_policy}"
+
+  bucket_name = "${local.vhs_bucket_name}"
 }

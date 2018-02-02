@@ -1,17 +1,17 @@
-module "sierra_transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
-  name   = "sierra_transformer"
+module "transformer" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
+  name   = "transformer"
 
-  source_queue_name  = "${module.sierra_transformer_queue.name}"
-  source_queue_arn   = "${module.sierra_transformer_queue.arn}"
+  source_queue_name  = "${module.transformer_queue.name}"
+  source_queue_arn   = "${module.transformer_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_transformer.repository_url}"
   release_id         = "${var.release_ids["transformer"]}"
 
   env_vars = {
-    sns_arn              = "${module.ingest_pipeline_sue.id_minter_topic_arn}"
-    transformer_queue_id = "${module.sierra_transformer_queue.id}"
-    source_table_name    = "SierraData"
-    metrics_namespace    = "sierra-transformer"
+    sns_arn              = "${module.id_minter_topic.arn}"
+    transformer_queue_id = "${module.transformer_queue.id}"
+    metrics_namespace    = "transformer"
+    bucket_name          = "${module.versioned-hybrid-store.bucket_name}"
   }
 
   env_vars_length = 4
@@ -27,12 +27,12 @@ module "sierra_transformer" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }
 
-module "sierra_transformer_dynamo_to_sns" {
+module "transformer_dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
 
   name           = "sierra"
-  src_stream_arn = "${local.sierradata_table_stream_arn}"
-  dst_topic_arn  = "${module.sierra_transformer_topic.arn}"
+  src_stream_arn = "${module.versioned-hybrid-store.table_stream_arn}"
+  dst_topic_arn  = "${module.transformer_topic.arn}"
 
   stream_view_type = "NEW_IMAGE_ONLY"
 
