@@ -1,5 +1,5 @@
 module "transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v5.0.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
   name   = "transformer"
 
   source_queue_name  = "${module.transformer_queue.name}"
