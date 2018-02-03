@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "sierra_data" {
-  bucket = "wellcomecollection-sierra-adapter-data"
+resource "aws_s3_bucket" "sierra_reader" {
+  bucket = "wellcomecollection-sierra-reader-data"
 
   #  lifecycle_rule {
   #    id      = "records_bibs"
