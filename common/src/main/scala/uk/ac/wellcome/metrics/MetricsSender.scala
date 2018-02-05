@@ -4,7 +4,12 @@ import java.util.Date
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
+import akka.stream.{
+  ActorMaterializer,
+  OverflowStrategy,
+  QueueOfferResult,
+  ThrottleMode
+}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
@@ -106,7 +111,8 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
     sendToStream(metricDatum)
   }
 
-  private def sendToStream(metricDatum: MetricDatum): Future[QueueOfferResult] = {
+  private def sendToStream(
+    metricDatum: MetricDatum): Future[QueueOfferResult] = {
     sourceQueue.offer(metricDatum).recoverWith {
       case _: IllegalStateException =>
         // If it fails offering a MetricDatum because the buffer is full, retry
