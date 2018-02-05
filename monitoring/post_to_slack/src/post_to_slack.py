@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
 Sends slack notifications for alarms events
@@ -8,7 +7,6 @@ import datetime as dt
 import json
 import os
 import re
-from urllib.parse import quote
 
 import attr
 import boto3
