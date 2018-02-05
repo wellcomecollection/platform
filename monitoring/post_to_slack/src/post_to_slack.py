@@ -15,7 +15,9 @@ import boto3
 import requests
 
 from cloudwatch_alarms import ThresholdMessage
-from platform_alarms import guess_cloudwatch_log_group
+from platform_alarms import (
+    guess_cloudwatch_log_group, guess_cloudwatch_search_terms
+)
 
 
 @attr.s
@@ -84,20 +86,6 @@ class Alarm:
     # The methods and properties below pull out the relevant info.
 
     @property
-    def cloudwatch_search_terms(self):
-        """
-        Returns a list of potentially useful search terms in CloudWatch.
-        """
-        if self.name == 'loris-alb-target-500-errors':
-            return ['"HTTP/1.0 500"']
-        elif self.name.startswith('lambda'):
-            return ['Traceback', 'Task timed out after']
-        elif self.name.startswith('api_'):
-            return ['"HTTP 500"']
-        else:
-            return []
-
-    @property
     def cloudwatch_timeframe(self):
         """
         Try to work out a likely timeframe for CloudWatch errors.
@@ -122,7 +110,7 @@ class Alarm:
                     group=log_group_name,
                     timeframe=timeframe
                 )
-                for search_term in self.cloudwatch_search_terms
+                for search_term in guess_cloudwatch_search_terms(alarm=self)
             ]
         except ValueError as err:
             print(f'Error in cloudwatch_urls: {err}')
@@ -149,7 +137,7 @@ class Alarm:
             # We only get the first page of results.  If there's more than
             # one page, we have so many errors that not getting them all
             # in the Slack alarm is the least of our worries!
-            for term in self.cloudwatch_search_terms:
+            for term in guess_cloudwatch_search_terms(alarm=self):
                 resp = client.filter_log_events(
                     logGroupName=log_group_name,
                     startTime=startTime,
