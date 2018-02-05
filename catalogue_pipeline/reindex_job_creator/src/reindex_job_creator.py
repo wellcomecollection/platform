@@ -4,7 +4,9 @@ import os
 
 import boto3
 
-from wellcome_aws_utils.sns_utils import publish_sns_message
+from wellcome_aws_utils.sns_utils import (
+    extract_sns_messages_from_lambda_event, publish_sns_message
+)
 
 
 def main(event, _ctxt):
@@ -13,8 +15,8 @@ def main(event, _ctxt):
     sns_client = boto3.client('sns')
     topic_arn = os.environ['TOPIC_ARN']
 
-    for record in event['Records']:
-        image = record['dynamodb']['NewImage']
+    for sns_event in extract_sns_messages_from_lambda_event(event):
+        image = sns_event.message
 
         if image['desiredVersion'] > image['currentVersion']:
             print(f"{image['desiredVersion']} > {image['currentVersion']}, creating job")
