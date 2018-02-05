@@ -14,6 +14,8 @@ from urllib.parse import quote
 import boto3
 from botocore.vendored import requests
 
+from alarms import ThresholdMessage
+
 
 # Alarm reasons are sometimes of the form:
 #
@@ -67,25 +69,19 @@ class Alarm:
         """
         Try to return a more human-readable explanation for the alarm.
         """
+        try:
+            threshold = ThresholdMessage.from_message(self.state_reason)
+        except ValueError:
+            return
+
         if (
             self.name.endswith('-alb-not-enough-healthy-hosts') and
-            self.state_reason == (
-                'Threshold Crossed: no datapoints were received for 1 period '
-                'and 1 missing datapoint was treated as [Breaching].'
-            )
+            threshold.is_breaching
         ):
             return 'There are no healthy hosts in the ALB target group.'
 
-        match = DATAPOINT_RE.search(self.state_reason)
-        if match is None:
-            return
-
-        value = int(float(match.group('value')))
-
-        timestamp = match.group('timestamp')
-        time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-        display_time = (
-            time.strftime('at %H:%M:%S on %d %b %Y').replace('on 0', 'on '))
+        display_time = threshold.date.strftime(
+            'at %H:%M:%S on %d %b %Y').replace('on 0', 'on ')
 
         if self.name.startswith('loris'):
             service = 'Loris'
@@ -95,24 +91,21 @@ class Alarm:
             return
 
         if self.name.endswith('-alb-target-500-errors'):
-            if value == 1:
+            if threshold.actual_value == 1:
                 return f'The ALB spotted a 500 error in {service} {display_time}.'
             else:
-                return f'The ALB spotted multiple 500 errors ({value}) in {service} {display_time}.'
+                return f'The ALB spotted multiple 500 errors ({threshold.actual_value}) in {service} {display_time}.'
 
         elif self.name.endswith('-alb-unhealthy-hosts'):
-            if value == 1:
+            if threshold.actual_value == 1:
                 return f'There is an unhealthy host in {service} {display_time}.'
             else:
-                return f'There are multiple unhealthy hosts ({value}) in {service} {display_time}.'
+                return f'There are multiple unhealthy hosts ({threshold.actual_value}) in {service} {display_time}.'
 
         elif self.name.endswith('-alb-not-enough-healthy-hosts'):
-            threshold = re.search(
-                r'less than the threshold \((?P<value>\d+)\.0\)',
-                self.state_reason).group('value')
             return (
                 f"There aren't enough healthy hosts in {service} "
-                f'(saw {value}; expected more than {threshold}) {display_time}.'
+                f'(saw {threshold.actual_value}; expected more than {threshold.desired_value}) {display_time}.'
             )
 
     # Sometimes there's enough data in the alarm to make an educated guess
