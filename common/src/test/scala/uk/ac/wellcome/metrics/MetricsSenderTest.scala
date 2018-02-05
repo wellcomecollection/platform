@@ -128,8 +128,7 @@ class MetricsSenderTest
 
       // Each PutMetricRequest is made of 20 MetricDatum so we need
       // 20 * 150 = 3000 calls to incrementCount to get 150 PutMetricData calls
-      val futures = (1 to 3000).map(i =>
-        metricsSender.incrementCount("bar"))
+      val futures = (1 to 3000).map(i => metricsSender.incrementCount("bar"))
 
       val promisedInstant = Promise[Instant]
 
@@ -145,10 +144,10 @@ class MetricsSenderTest
         }
       }
 
-      whenReady(promisedInstant.future){ endTime =>
-          val gap: Long = ChronoUnit.MILLIS.between(startTime, endTime)
-          gap shouldBe > (expectedDuration)
-        }
+      whenReady(promisedInstant.future) { endTime =>
+        val gap: Long = ChronoUnit.MILLIS.between(startTime, endTime)
+        gap shouldBe >(expectedDuration)
+      }
     }
   }
 
