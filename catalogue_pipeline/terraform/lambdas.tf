@@ -32,4 +32,3 @@ module "trigger_reindex_job_creator_lambda" {
   lambda_function_arn  = "${module.reindex_job_creator_lambda.arn}"
   sns_trigger_arn      = "${module.reindex_shard_tracker_topic.arn}"
 }
-
