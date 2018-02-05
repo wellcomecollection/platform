@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 
 import json
+import time
 
 import boto3
+import pytest
 
 from reindex_job_creator import main
 
@@ -32,7 +34,7 @@ def test_higher_requested_version_triggers_job(queue_url):
     a job is sent to SQS.
     """
     image = {
-        'shardId': 'example/1',
+        'shardId': 'example/ge',
         'currentVersion': 2,
         'desiredVersion': 3,
     }
@@ -49,6 +51,35 @@ def test_higher_requested_version_triggers_job(queue_url):
     parsed_message = json.loads(json.loads(inner_message)['default'])
 
     assert parsed_message == {
-        'shardId': 'example/1',
+        'shardId': 'example/ge',
         'desiredVersion': 3,
     }
+
+
+@pytest.mark.parametrize('current_version', [3, 4])
+def test_lower_or_equal_requested_version_triggers_job(
+    queue_url, current_version
+):
+    """
+    If the DynamoDB table is updated so that desiredVersion <= currentVersion,
+    nothing is sent to SQS.
+    """
+    image = {
+        'shardId': 'example/leq',
+        'currentVersion': current_version,
+        'desiredVersion': 3,
+    }
+
+    main(event=_wrap(image), _ctxt=None)
+
+    # We wait several seconds -- not ideal, but gives us some guarantee that
+    # nothing is going to happen, and not just that we're checking the queue
+    # before anything has happened!
+    time.sleep(1)
+
+    sqs_client = boto3.client('sqs')
+    messages = sqs_client.receive_message(
+        QueueUrl=queue_url,
+        MaxNumberOfMessages=1
+    )
+    assert 'Messages' not in messages
