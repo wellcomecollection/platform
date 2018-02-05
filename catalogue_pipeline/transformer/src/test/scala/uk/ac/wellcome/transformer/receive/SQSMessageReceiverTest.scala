@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer.receive
 
 import java.time.Instant
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
@@ -18,10 +19,7 @@ import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
 import uk.ac.wellcome.s3.VersionedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -49,7 +47,8 @@ class SQSMessageReceiverTest
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
-    mock[AmazonCloudWatch]
+    mock[AmazonCloudWatch],
+    ActorSystem()
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))

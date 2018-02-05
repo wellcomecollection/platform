@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -7,12 +8,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{
-  IdentifierSchemes,
-  Period,
-  SourceIdentifier,
-  Work
-}
+import uk.ac.wellcome.models.{IdentifierSchemes, Period, SourceIdentifier, Work}
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -26,7 +22,7 @@ class WorkIndexerTest
     with Ingestor {
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
+    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
 
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)

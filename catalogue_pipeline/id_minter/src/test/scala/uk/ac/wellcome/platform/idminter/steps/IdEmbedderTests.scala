@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.idminter.steps
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import io.circe.parser._
 import org.mockito.Mockito.when
@@ -28,7 +29,7 @@ class IdEmbedderTests
   )
 
   private val metricsSender =
-    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
+    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch], ActorSystem())
   private val mockIdentifierGenerator: IdentifierGenerator =
     mock[IdentifierGenerator]
 
