@@ -2,6 +2,7 @@
 branch = True
 include =
     cloudwatch_alarms.py
+    platform_alarms.py
     post_to_slack.py
 
 [report]

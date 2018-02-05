@@ -15,10 +15,7 @@ import boto3
 import requests
 
 from cloudwatch_alarms import ThresholdMessage
-
-
-class CloudWatchException(Exception):
-    pass
+from platform_alarms import guess_cloudwatch_log_group
 
 
 @attr.s
@@ -101,25 +98,6 @@ class Alarm:
             return []
 
     @property
-    def cloudwatch_log_group(self):
-        """
-        Returns the CloudWatch log group most likely to contain the error.
-        """
-        if self.name == 'loris-alb-target-500-errors':
-            return 'platform/loris'
-        elif self.name.startswith('lambda'):
-            lambda_name = self.name.split('-')[1]
-            return f'/aws/lambda/{lambda_name}'
-        elif self.name == 'api_romulus_v1-alb-target-500-errors':
-            return 'platform/api_romulus_v1'
-        elif self.name == 'api_remus_v1-alb-target-500-errors':
-            return 'platform/api_remus_v1'
-        else:
-            raise CloudWatchException(
-                "I don't know where to look for logs for %r" % self.name
-            )
-
-    @property
     def cloudwatch_timeframe(self):
         """
         Try to work out a likely timeframe for CloudWatch errors.
@@ -136,16 +114,18 @@ class Alarm:
         Return some CloudWatch URLs that might be useful to check.
         """
         try:
-            group = self.cloudwatch_log_group
+            log_group_name = guess_cloudwatch_log_group(alarm=self)
             timeframe = self.cloudwatch_timeframe
             return [
                 self._build_cloudwatch_url(
-                    search_term=search_term, group=group, timeframe=timeframe
+                    search_term=search_term,
+                    group=log_group_name,
+                    timeframe=timeframe
                 )
                 for search_term in self.cloudwatch_search_terms
             ]
-        except CloudWatchException as exc:
-            print(f'Error in cloudwatch_urls: {exc}')
+        except ValueError as err:
+            print(f'Error in cloudwatch_urls: {err}')
             return []
 
     def cloudwatch_messages(self):
@@ -157,6 +137,8 @@ class Alarm:
         messages = []
 
         try:
+            log_group_name = guess_cloudwatch_log_group(alarm=self)
+
             # CloudWatch wants these parameters specified as seconds since
             # 1 Jan 1970 00:00:00, so convert to that first.
             timeframe = self.cloudwatch_timeframe
@@ -169,7 +151,7 @@ class Alarm:
             # in the Slack alarm is the least of our worries!
             for term in self.cloudwatch_search_terms:
                 resp = client.filter_log_events(
-                    logGroupName=self.cloudwatch_log_group,
+                    logGroupName=log_group_name,
                     startTime=startTime,
                     endTime=endTime,
                     filterPattern=term
