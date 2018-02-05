@@ -4,7 +4,6 @@ import os
 
 import boto3
 
-from wellcome_aws_utils.dynamo_event import DynamoEvent
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
