@@ -23,17 +23,29 @@ THRESHOLD_RE = re.compile(
     r'the threshold \((?P<desired_value>\d+)\.0\).'
 )
 
+# We may also get a message of the form:
+#
+#   Threshold Crossed: no datapoints were received for 1 period
+#   and 1 missing datapoint was treated as [Breaching].
+#
+MISSING_DATE_RE = re.compile(
+    r'^Threshold Crossed: no datapoints were received for \d+ period '
+    r'and \d missing datapoint was treated as \[Breaching\]\.$'
+)
+
 
 @attr.s
 class ThresholdMessage:
     """Holds information about a "threshold crossed" message."""
-    actual_value = attr.ib(converter=int)
-    desired_value = attr.ib(converter=int)
+    is_breaching = attr.ib()
+
+    actual_value = attr.ib(converter=lambda v: int(v) if v is not None else None)
+    desired_value = attr.ib(converter=lambda v: int(v) if v is not None else None)
 
     # Datetime strings in alarms are of the form DD/MM/YY HH:MM:SS.
     # For example: "03/02/18 16:13:00" or "05/02/18 06:38:00".
     date = attr.ib(
-        converter=lambda dt: datetime.strptime(dt, '%d/%m/%y %H:%M:%S')
+        converter=lambda dt: datetime.strptime(dt, '%d/%m/%y %H:%M:%S') if dt is not None else None
     )
 
     # e.g. 'greater than or equal to', 'less than'
@@ -41,8 +53,18 @@ class ThresholdMessage:
 
     @classmethod
     def from_message(cls, message):
+        match = MISSING_DATE_RE.match(message)
+        if match is not None:
+            return cls(
+                is_breaching=True,
+                actual_value=None,
+                desired_value=None,
+                date=None,
+                operator=None
+            )
+
         match = THRESHOLD_RE.match(message)
         if match is None:
             raise ValueError(f'Unable to parse message {message!r}')
 
-        return cls(**match.groupdict())
+        return cls(**match.groupdict(), is_breaching=False)
