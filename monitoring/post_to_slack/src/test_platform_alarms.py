@@ -26,8 +26,7 @@ class Alarm:
     ('lambda-post_to_slack-errors', '/aws/lambda/post_to_slack'),
 ])
 def test_guess_cloudwatch_log_group(alarm_name, expected_log_group_name):
-    alarm = Alarm(name=alarm_name)
-    assert guess_cloudwatch_log_group(alarm) == expected_log_group_name
+    assert guess_cloudwatch_log_group(alarm_name) == expected_log_group_name
 
 
 @pytest.mark.parametrize('bad_alarm_name', [
@@ -35,9 +34,8 @@ def test_guess_cloudwatch_log_group(alarm_name, expected_log_group_name):
     'winnipeg-not-enoguh-healthy-hosts',
 ])
 def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
-    alarm = Alarm(name=bad_alarm_name)
     with pytest.raises(ValueError):
-        guess_cloudwatch_log_group(alarm)
+        guess_cloudwatch_log_group(bad_alarm_name)
 
 
 @pytest.mark.parametrize('alarm_name, expected_search_terms', [

@@ -104,7 +104,7 @@ class Alarm:
         Return some CloudWatch URLs that might be useful to check.
         """
         try:
-            log_group_name = guess_cloudwatch_log_group(alarm=self)
+            log_group_name = guess_cloudwatch_log_group(alarm_name=self.name)
             timeframe = self.cloudwatch_timeframe
             return [
                 build_cloudwatch_url(
@@ -128,7 +128,7 @@ class Alarm:
         messages = []
 
         try:
-            log_group_name = guess_cloudwatch_log_group(alarm=self)
+            log_group_name = guess_cloudwatch_log_group(alarm_name=self.name)
 
             # CloudWatch wants these parameters specified as seconds since
             # 1 Jan 1970 00:00:00, so convert to that first.
