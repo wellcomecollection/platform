@@ -46,7 +46,8 @@ class SierraItemsToDynamoWorkerServiceTest
   val mockCloudWatch = mock[AmazonCloudWatch]
 
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
-  val mockMetrics = new MetricsSender("namespace", mockCloudWatch, ActorSystem())
+  val mockMetrics =
+    new MetricsSender("namespace", mockCloudWatch, ActorSystem())
 
   var worker: Option[SierraItemsToDynamoWorkerService] = None
   val actorSystem = ActorSystem()

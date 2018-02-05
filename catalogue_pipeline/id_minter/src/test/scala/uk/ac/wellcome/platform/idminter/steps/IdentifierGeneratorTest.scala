@@ -22,7 +22,9 @@ class IdentifierGeneratorTest
     with MockitoSugar {
 
   private val metricsSender =
-    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch], ActorSystem())
+    new MetricsSender("id_minter_test_metrics",
+                      mock[AmazonCloudWatch],
+                      ActorSystem())
 
   private val knownIdentifierSchemes =
     List(IdentifierSchemes.miroImageNumber,
