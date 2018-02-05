@@ -33,7 +33,6 @@ class SQSReaderTest
 
     var receivedMessages: List[Message] = Nil
 
-
     val futureMessages = sqsReader.retrieveAndDeleteMessages(message => {
       receivedMessages = message :: receivedMessages
       Future.successful(())
