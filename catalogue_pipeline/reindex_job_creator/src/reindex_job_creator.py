@@ -17,6 +17,12 @@ def main(event, _ctxt):
     for record in event['Records']:
         image = record['dynamodb']['NewImage']
 
+        if image['desiredVersion'] > image['currentVersion']:
+            print(f"{image['desiredVersion']} > {image['currentVersion']}, creating job")
+        else:
+            print(f"{image['desiredVersion']} <= {image['currentVersion']}, nothing to do")
+            continue
+
         message = {
             'shardId': image['shardId'],
             'desiredVersion': image['desiredVersion'],
