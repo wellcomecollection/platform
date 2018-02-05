@@ -82,3 +82,12 @@ def build_cloudwatch_url(
         f'start={start_date.strftime("%Y-%m-%dT%H:%M:%SZ")};'
         f'end={end_date.strftime("%Y-%m-%dT%H:%M:%SZ")};'
     )
+
+
+def datetime_to_cloudwatch_ts(dt):
+    """
+    Convert a Python ``datetime`` instance to a CloudWatch timestamp,
+    the number of milliseconds after Jan 1, 1970 00:00:00 UTC.
+    """
+    epoch = datetime(1970, 1, 1, 0, 0, 0)
+    return int((dt - epoch).total_seconds()) * 1000

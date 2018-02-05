@@ -11,7 +11,11 @@ import attr
 import boto3
 import requests
 
-from cloudwatch_alarms import build_cloudwatch_url, ThresholdMessage
+from cloudwatch_alarms import (
+    build_cloudwatch_url,
+    datetime_to_cloudwatch_ts,
+    ThresholdMessage
+)
 from platform_alarms import (
     get_human_message,
     guess_cloudwatch_log_group,
@@ -91,9 +95,8 @@ class Alarm:
             # CloudWatch wants these parameters specified as seconds since
             # 1 Jan 1970 00:00:00, so convert to that first.
             timeframe = self.cloudwatch_timeframe
-            epoch = dt.datetime(1970, 1, 1, 0, 0, 0)
-            startTime = int((timeframe.start - epoch).total_seconds() * 1000)
-            endTime = int((timeframe.end - epoch).total_seconds() * 1000)
+            startTime = datetime_to_cloudwatch_ts(timeframe.start)
+            endTime = datetime_to_cloudwatch_ts(timeframe.end)
 
             # We only get the first page of results.  If there's more than
             # one page, we have so many errors that not getting them all
@@ -107,8 +110,8 @@ class Alarm:
                 )
                 messages.extend([e['message'] for e in resp['events']])
 
-        except Exception as exc:
-            print(f'Error in cloudwatch_messages: {exc}')
+        except Exception as err:
+            print(f'Error in cloudwatch_messages: {err!r}')
 
         return messages
 
@@ -128,7 +131,7 @@ def to_bitly(sess, url, access_token):
         return url
 
 
-def prepare_slack_payload(alarm, bitly_access_token):
+def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     if is_critical_error(alarm_name=alarm.name):
         slack_data = {
             'username': 'cloudwatch-alarm',
@@ -168,7 +171,7 @@ def prepare_slack_payload(alarm, bitly_access_token):
 
     cloudwatch_urls = alarm.cloudwatch_urls()
     if cloudwatch_urls:
-        sess = requests.Session()
+        sess = sess or requests.Session()
         cloudwatch_url_str = ' / '.join([
             to_bitly(sess=sess, url=url, access_token=bitly_access_token)
             for url in cloudwatch_urls
