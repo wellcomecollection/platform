@@ -173,6 +173,10 @@ $(1)-test:
 
 $(1)-publish:
 	$(call publish_lambda,$(2))
+
+$(ROOT)/$(2)/src/requirements.txt: $(ROOT)/$(2)/src/requirements.in
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
 endef
 
 
