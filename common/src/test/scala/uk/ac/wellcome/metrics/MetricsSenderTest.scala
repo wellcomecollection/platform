@@ -29,7 +29,8 @@ class MetricsSenderTest
   describe("timeAndCount") {
     it("should record the time and count of a successful future") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
-      val metricsSender = new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val metricsSender =
+        new MetricsSender("test", amazonCloudWatch, actorSystem)
       val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val expectedResult = "foo"
@@ -47,7 +48,7 @@ class MetricsSenderTest
           val putMetricDataRequest = capture.getValue
           val metricData = putMetricDataRequest.getMetricData
           metricData should have size 2
-          metricData.exists { metricDatum  =>
+          metricData.exists { metricDatum =>
             (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "success"
           } shouldBe true
 
@@ -60,7 +61,8 @@ class MetricsSenderTest
 
     it("should record the time and count of a failed future") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
-      val metricsSender = new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val metricsSender =
+        new MetricsSender("test", amazonCloudWatch, actorSystem)
       val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val timedFunction = () => Future { throw new RuntimeException() }
@@ -89,15 +91,17 @@ class MetricsSenderTest
 
     it("should group 20 MetricDatum into one PutMetricDataRequest") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
-      val metricsSender = new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val metricsSender =
+        new MetricsSender("test", amazonCloudWatch, actorSystem)
       val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val emptyFunction = () => Future.successful(())
       val metricName = "bar"
 
-      val futures = (1 to 15).map(i => metricsSender.timeAndCount(s"${i}_$metricName", emptyFunction))
+      val futures = (1 to 15).map(i =>
+        metricsSender.timeAndCount(s"${i}_$metricName", emptyFunction))
 
-      whenReady(Future.sequence(futures)){ _ =>
+      whenReady(Future.sequence(futures)) { _ =>
         eventually {
           verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
@@ -114,7 +118,8 @@ class MetricsSenderTest
   describe("incrementCount") {
     it("should putMetricData with the correct value") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
-      val metricsSender = new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val metricsSender =
+        new MetricsSender("test", amazonCloudWatch, actorSystem)
       val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val expectedValue = 3.0F
@@ -133,7 +138,8 @@ class MetricsSenderTest
   describe("sendTime") {
     it("should putMetricData with the correct value") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
-      val metricsSender = new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val metricsSender =
+        new MetricsSender("test", amazonCloudWatch, actorSystem)
       val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val expectedValue = 5 millis
