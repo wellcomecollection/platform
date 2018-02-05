@@ -36,24 +36,8 @@ class Alarm:
         return self.message['AlarmName']
 
     @property
-    def namespace(self):
-        return self.message['Trigger']['Namespace']
-
-    @property
-    def metric_name(self):
-        return self.message['Trigger']['MetricName']
-
-    @property
-    def dimensions(self):
-        return self.message['Trigger']['Dimensions']
-
-    @property
     def state_reason(self):
         return self.message['NewStateReason']
-
-    @property
-    def state_change_time(self):
-        return self.message['StateChangeTime']
 
     def human_reason(self):
         """
