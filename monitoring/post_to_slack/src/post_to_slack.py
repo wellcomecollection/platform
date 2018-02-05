@@ -4,7 +4,6 @@
 Sends slack notifications for alarms events
 """
 
-import collections
 import datetime as dt
 import json
 import os
@@ -16,22 +15,6 @@ import boto3
 from botocore.vendored import requests
 
 from alarms import ThresholdMessage
-
-
-# Alarm reasons are sometimes of the form:
-#
-#     Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was
-#     greater than or equal to the threshold (1.0).
-#
-# This regex is meant to match the datapoint in square brackets.
-DATAPOINT_RE = re.compile(r'''
-    \[
-      (?P<value>[0-9.]+)\s
-      \(
-        (?P<timestamp>[0-9]{2}/[0-9]{2}/[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2})
-      \)
-    \]
-''', flags=re.VERBOSE)
 
 
 class CloudWatchException(Exception):
@@ -163,8 +146,6 @@ class Alarm:
             start=threshold.date - dt.timedelta(seconds=300),
             end=threshold.date - dt.timedelta(seconds=300)
         )
-
-        return timeframe(start=start, end=end)
 
     def cloudwatch_urls(self):
         """
