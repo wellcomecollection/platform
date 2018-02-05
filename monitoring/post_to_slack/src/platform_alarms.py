@@ -26,3 +26,17 @@ def guess_cloudwatch_log_group(alarm):
     raise ValueError(
         f"Unable to guess log group name for alarm name={alarm.name!r}"
     )
+
+
+def guess_cloudwatch_search_terms(alarm):
+    """Guess some search terms that might be useful in CloudWatch."""
+    if alarm.name == 'loris-alb-target-500-errors':
+        return ['"HTTP/1.0 500"']
+
+    if alarm.name.startswith('lambda'):
+        return ['Traceback', 'Task timed out after']
+
+    if alarm.name.startswith('api_') and alarm.name.endswith('-500-errors'):
+        return ['"HTTP 500"']
+
+    return []
