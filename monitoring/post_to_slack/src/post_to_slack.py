@@ -17,7 +17,8 @@ from platform_alarms import (
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
-    should_be_sent_to_main_channel
+    should_be_sent_to_main_channel,
+    simplify_message
 )
 
 
@@ -170,67 +171,6 @@ def to_bitly(url, access_token):
             return url
 
     return ' / '.join([_to_bity_single_url(u) for u in url.split(' / ')])
-
-
-def simplify_message(message):
-    """
-    Sometimes a CloudWatch message includes information that we don't want
-    to appear in Slack -- e.g. date/time.
-
-    This function tries to strip out extra bits from the message, so we get
-    a tight and focused error appearing in Slack.
-    """
-    # Scala messages have a prefix that gives us a timestamp and thread info:
-    #
-    #     14:02:47.249 [ForkJoinPool-2-worker-17]
-    #
-    # Bin it!
-    message = re.sub(
-        r'\d{2}:\d{2}:\d{2}\.\d{3} \[ForkJoinPool-\d+-worker-\d+\] ', '',
-        message
-    )
-
-    # Loris messages have a bunch of origin and UWSGI information as a prefix:
-    #
-    #     [pid: 86|app: 0|req: 195/3682] 172.17.0.5 () {40 vars in 879
-    #       bytes} [Tue Oct 10 19:37:06 2017]
-    #
-    # Discard it!
-    message = re.sub(
-        r'\[pid: \d+\|app: \d+\|req: \d+/\d+\] '
-        r'\d+\.\d+\.\d+\.\d+ \(\) '
-        r'{\d+ vars in \d+ bytes} '
-        r'\[[A-Za-z0-9: ]+\]', '', message
-    )
-
-    # Loris messages also have an uninteresting suffix:
-    #
-    #     3 headers in 147 bytes (1 switches on core 0)
-    #
-    # Throw it away!
-    message = re.sub(
-        r'\d+ headers in \d+ bytes \(\d+ switches on core \d+\)', '', message
-    )
-
-    # Loris logs tell us information that isn't helpful for debugging:
-    #
-    #      => generated 271 bytes in 988 msecs
-    #
-    # Expunge-inate!
-    message = re.sub(r'=> generated \d+ bytes in \d+ msecs ', '', message)
-
-    # Lambda timeouts have an opaque prefix:
-    #
-    #     2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task
-    #     timed out after 10.01 seconds
-    #
-    # Drop it!
-    message = re.sub(
-        r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z '
-        r'[0-9a-f-]+ (?=Task timed out)', '', message
-    )
-
-    return message.strip()
 
 
 def prepare_slack_payload(alarm, bitly_access_token):
