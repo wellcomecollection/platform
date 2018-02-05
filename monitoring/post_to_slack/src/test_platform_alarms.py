@@ -47,8 +47,7 @@ def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
     ('lambda-post_to_slack-errors', ['Traceback', 'Task timed out after']),
 ])
 def test_guess_cloudwatch_search_terms(alarm_name, expected_search_terms):
-    alarm = Alarm(name=alarm_name)
-    assert guess_cloudwatch_search_terms(alarm) == expected_search_terms
+    assert guess_cloudwatch_search_terms(alarm_name) == expected_search_terms
 
 
 @pytest.mark.parametrize('alarm_name, should_send_to_main', [

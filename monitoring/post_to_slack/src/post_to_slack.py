@@ -113,7 +113,8 @@ class Alarm:
                     start_date=timeframe.start,
                     end_date=timeframe.end
                 )
-                for search_term in guess_cloudwatch_search_terms(alarm=self)
+                for search_term in guess_cloudwatch_search_terms(
+                    alarm_name=self.name)
             ]
         except ValueError as err:
             print(f'Error in cloudwatch_urls: {err}')
@@ -140,7 +141,7 @@ class Alarm:
             # We only get the first page of results.  If there's more than
             # one page, we have so many errors that not getting them all
             # in the Slack alarm is the least of our worries!
-            for term in guess_cloudwatch_search_terms(alarm=self):
+            for term in guess_cloudwatch_search_terms(alarm_name=self.name):
                 resp = client.filter_log_events(
                     logGroupName=log_group_name,
                     startTime=startTime,
