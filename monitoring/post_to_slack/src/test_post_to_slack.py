@@ -196,38 +196,3 @@ class TestAlarm:
     def test_human_reason(self, alarm_data, expected_reason):
         a = post_to_slack.Alarm(json.dumps(alarm_data))
         assert a.human_reason() == expected_reason
-
-
-@pytest.mark.parametrize('message, expected', [
-    # We correctly strip timestamp and thread information from Scala logs
-    (
-        '13:25:56.965 [ForkJoinPool-1-worker-61] ERROR u.a.w.p.a.f.e.ElasticsearchResponseExceptionMapper - Sending HTTP 500 from ElasticsearchResponseExceptionMapper (Error (com.fasterxml.jackson.core.JsonParseException: Unrecognized token ‘No’: was expecting ‘null’, ‘true’, ‘false’ or NaN',
-        'ERROR u.a.w.p.a.f.e.ElasticsearchResponseExceptionMapper - Sending HTTP 500 from ElasticsearchResponseExceptionMapper (Error (com.fasterxml.jackson.core.JsonParseException: Unrecognized token ‘No’: was expecting ‘null’, ‘true’, ‘false’ or NaN'
-    ),
-
-    # We strip UWGSI and timestamp prefixes from Loris logs
-    (
-        '[pid: 88|app: 0|req: 1871/9531] 172.17.0.4 () {46 vars in 937 bytes} [Wed Oct 11 22:42:03 2017] GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg (HTTP/1.0 500)',
-        'GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg (HTTP/1.0 500)',
-    ),
-
-    # We strip UWSGI suffixes from Loris logs
-    (
-        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg (HTTP/1.0 500) 3 headers in 147 bytes (1 switches on core 0)',
-        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg (HTTP/1.0 500)'
-    ),
-
-    # We strip byte count and timings from Loris logs
-    (
-        'GET //s3:L0009000/L0009709.jpg/full/282,/0/default.jpg => generated 271 bytes in 988 msecs (HTTP/1.0 500)',
-        'GET //s3:L0009000/L0009709.jpg/full/282,/0/default.jpg (HTTP/1.0 500)',
-    ),
-
-    # We strip the timestamp and Lambda ID from timeout errors
-    (
-        '2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task timed out after 10.01 seconds',
-        'Task timed out after 10.01 seconds'
-    ),
-])
-def test_simplify_message(message, expected):
-    assert post_to_slack.simplify_message(message) == expected
