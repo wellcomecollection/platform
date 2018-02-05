@@ -24,7 +24,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
   implicit val materialiser = ActorMaterializer()
 
   // According to https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
-  // PutMetricData supports at maximum 20 MetricDatum per PutMetricDataRequest.
+  // PutMetricData supports a maximum of 20 MetricDatum per PutMetricDataRequest.
   // The maximum number of PutMetricData requests is 150 per second.
   private val metricDataListMaxSize = 20
   private val maxPutMetricDataRequestsPerSecond = 150
@@ -32,7 +32,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
   val sourceQueue: SourceQueueWithComplete[MetricDatum] =
     Source.queue[MetricDatum](100, OverflowStrategy.backpressure)
       // Group the MetricDatum objects into lists of at max 20 items.
-      // Send smaller chunks if more not appearing within 10 seconds
+      // Send smaller chunks if not appearing within 10 seconds
       .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize, 10 seconds))(Keep.left)
       // Make sure we don't exceed aws rate limit
       .throttle(maxPutMetricDataRequestsPerSecond, 1 second, 0, ThrottleMode.shaping)

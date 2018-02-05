@@ -86,6 +86,29 @@ class MetricsSenderTest
         }
       }
     }
+
+    it("should group 20 MetricDatum into one PutMetricDataRequest") {
+      val amazonCloudWatch = mock[AmazonCloudWatch]
+      val metricsSender = new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
+
+      val emptyFunction = () => Future.successful(())
+      val metricName = "bar"
+
+      val futures = (1 to 15).map(i => metricsSender.timeAndCount(s"${i}_$metricName", emptyFunction))
+
+      whenReady(Future.sequence(futures)){ _ =>
+        eventually {
+          verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
+
+          val putMetricDataRequests = capture.getAllValues
+          putMetricDataRequests should have size 2
+
+          putMetricDataRequests.head.getMetricData should have size 20
+          putMetricDataRequests.tail.head.getMetricData should have size 10
+        }
+      }
+    }
   }
 
   describe("incrementCount") {
