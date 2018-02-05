@@ -140,7 +140,7 @@ class MetricsSenderTest
 
           putMetricDataRequests should have size 150
 
-          promisedInstant.trySuccess(Instant.now())
+          promisedInstant.success(Instant.now())
         }
       }
 
