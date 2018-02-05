@@ -32,7 +32,7 @@ def test_guess_cloudwatch_log_group(alarm_name, expected_log_group_name):
 
 @pytest.mark.parametrize('bad_alarm_name', [
     'api_remus_v2-alb-target-500-errors',
-    'winnipeg-not-enoguh-healthy-hosts',
+    'winnipeg-not-enough-healthy-hosts',
 ])
 def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
     with pytest.raises(ValueError):

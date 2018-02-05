@@ -1,0 +1,77 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome%3Fregion%3Deu-west-1%23logEventViewer%3Agroup%3Dplatform%2Fapi_remus_v1%3Bfilter%3D%2522HTTP%2520500%2522%3Bstart%3D2001-01-01T11%3A55%3A00Z%3Bend%3D2001-01-01T11%3A55%3A00Z%3B"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 200, \"data\": {\"link_save\": {\"link\": \"http://amzn.to/2GP0seZ\", \"aggregate_link\": \"http://bit.ly/2GP0svv\", \"long_url\": \"https://eu-west-1.console.aws.amazon.com/cloudwatch/home?region=eu-west-1#logEventViewer:group=platform/api_remus_v1;filter=%22HTTP%20500%22;start=2001-01-01T11:55:00Z;end=2001-01-01T11:55:00Z;\", \"new_link\": 1, \"user_hash\": \"2GP0seZ\"}}, \"status_txt\": \"OK\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:35 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "253",
+          "Connection": "keep-alive",
+          "Etag": "\"728543fb882671bad69b2683a918a579d5f5e971\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome%3Fregion%3Deu-west-1%23logEventViewer%3Agroup%3Dplatform%2Fapi_remus_v1%3Bfilter%3D%2522HTTP%2520500%2522%3Bstart%3D2001-01-01T11%3A55%3A00Z%3Bend%3D2001-01-01T11%3A55%3A00Z%3B"
+      },
+      "recorded_at": "2018-02-05T13:29:44"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome%3Fregion%3Deu-west-1%23logEventViewer%3Agroup%3Dplatform%2Floris%3Bfilter%3D%2522HTTP%2F1.0%2520500%2522%3Bstart%3D2001-01-01T11%3A55%3A00Z%3Bend%3D2001-01-01T11%3A55%3A00Z%3B&access_token=<ACCESS_TOKEN>"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 200, \"data\": {\"link_save\": {\"link\": \"http://amzn.to/2scjfO8\", \"aggregate_link\": \"http://bit.ly/2sa2gfw\", \"long_url\": \"https://eu-west-1.console.aws.amazon.com/cloudwatch/home?region=eu-west-1#logEventViewer:group=platform/loris;filter=%22HTTP/1.0%20500%22;start=2001-01-01T11:55:00Z;end=2001-01-01T11:55:00Z;\", \"new_link\": 1, \"user_hash\": \"2scjfO8\"}}, \"status_txt\": \"OK\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:35 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "253",
+          "Connection": "keep-alive",
+          "Etag": "\"728543fb882671bad69b2683a918a579d5f5e971\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome%3Fregion%3Deu-west-1%23logEventViewer%3Agroup%3Dplatform%2Floris%3Bfilter%3D%2522HTTP%2F1.0%2520500%2522%3Bstart%3D2001-01-01T11%3A55%3A00Z%3Bend%3D2001-01-01T11%3A55%3A00Z%3B&access_token=<ACCESS_TOKEN>"
+      },
+      "recorded_at": "2018-02-05T13:29:44"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
