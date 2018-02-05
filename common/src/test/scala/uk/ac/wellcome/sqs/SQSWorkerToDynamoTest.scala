@@ -40,7 +40,7 @@ class SQSWorkerToDynamoTest
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
   private val metricsSender: MetricsSender =
-    new MetricsSender("namespace", mockCloudWatch)
+    new MetricsSender("namespace", mockCloudWatch, ActorSystem())
 
   val testMessage = SQSMessage(
     subject = Some("subject"),
