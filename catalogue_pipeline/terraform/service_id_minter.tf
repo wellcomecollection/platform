@@ -16,8 +16,8 @@ module "id_minter" {
     topic_arn   = "${module.es_ingest_topic.arn}"
   }
 
-  memory = "2048"
-  cpu    = "512"
+  memory = "2560"
+  cpu    = "1024"
 
   env_vars_length = 6
 

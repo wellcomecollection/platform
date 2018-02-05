@@ -2,7 +2,7 @@ module "transformer" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
   name   = "transformer"
 
-  memory = "2048"
+  memory = "2560"
   cpu    = "512"
 
   source_queue_name  = "${module.transformer_queue.name}"
