@@ -50,3 +50,8 @@ resource "aws_iam_role_policy" "id_minter_cloudwatch" {
   role   = "${module.id_minter.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
+
+resource "aws_iam_role_policy" "allow_reindex_job_creator_publish_to_sns" {
+  role   = "${module.reindex_job_creator_lambda.role_name}"
+  policy = "${module.reindex_jobs_topic.publish_policy}"
+}
