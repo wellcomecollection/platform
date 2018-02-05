@@ -4,7 +4,7 @@ import datetime as dt
 
 import pytest
 
-from alarms import ThresholdMessage
+from cloudwatch_alarms import ThresholdMessage
 
 
 class TestThresholdMessage:

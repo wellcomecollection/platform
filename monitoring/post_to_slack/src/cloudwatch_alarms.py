@@ -1,7 +1,4 @@
 # -*- encoding: utf-8
-"""
-Utilities for working with CloudWatch alarms.
-"""
 
 from datetime import datetime
 import re
