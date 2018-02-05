@@ -167,7 +167,7 @@ def to_bitly(sess, url, access_token):
         )
         try:
             return resp.json()['data']['link_save']['link']
-        except KeyError:
+        except TypeError:  # thrown if "data" = null
             return url
 
     return ' / '.join([_to_bity_single_url(u) for u in url.split(' / ')])
