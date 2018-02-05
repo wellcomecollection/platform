@@ -18,7 +18,8 @@ class VersionedObjectStoreTest
     with S3Local
     with Matchers
     with JsonTestUtil
-    with ScalaFutures with ExtendedPatience {
+    with ScalaFutures
+    with ExtendedPatience {
 
   lazy val bucketName = "source-object-store"
 

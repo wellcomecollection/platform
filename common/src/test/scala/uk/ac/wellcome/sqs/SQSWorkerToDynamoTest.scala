@@ -78,7 +78,8 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  class ConditionalCheckFailingTestWorker(queueUrl: String, system: ActorSystem)
+  class ConditionalCheckFailingTestWorker(queueUrl: String,
+                                          system: ActorSystem)
       extends TestWorker(queueUrl: String, system) {
 
     override def store(record: TestObject): Future[Unit] = Future {
@@ -112,7 +113,8 @@ class SQSWorkerToDynamoTest
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
     val queueUrl = newQueue("blue")
 
-    val failingWorker = new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
+    val failingWorker =
+      new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
 
     failingWorker.runSQSWorker()
 
@@ -151,7 +153,8 @@ class SQSWorkerToDynamoTest
     "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
     val queueUrl = newQueue("purple")
 
-    val terminalFailingWorker = new TerminalFailingTestWorker(queueUrl, actorSystem)
+    val terminalFailingWorker =
+      new TerminalFailingTestWorker(queueUrl, actorSystem)
 
     terminalFailingWorker.runSQSWorker()
 
