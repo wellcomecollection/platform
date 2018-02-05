@@ -57,7 +57,7 @@ class Alarm:
 
         return Interval(
             start=threshold.date - dt.timedelta(seconds=300),
-            end=threshold.date - dt.timedelta(seconds=300)
+            end=threshold.date + dt.timedelta(seconds=300)
         )
 
     def cloudwatch_urls(self):
