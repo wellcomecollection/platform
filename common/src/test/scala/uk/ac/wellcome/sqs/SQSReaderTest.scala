@@ -33,7 +33,6 @@ class SQSReaderTest
 
     var receivedMessages: List[Message] = Nil
 
-    Thread.sleep(2000)
 
     val futureMessages = sqsReader.retrieveAndDeleteMessages(message => {
       receivedMessages = message :: receivedMessages
@@ -41,11 +40,13 @@ class SQSReaderTest
     })
 
     whenReady(futureMessages) { _ =>
-      receivedMessages should have size 2
-      receivedMessages.foreach { message =>
-        messageStrings should contain(message.getBody)
+      eventually {
+        receivedMessages should have size 2
+        receivedMessages.foreach { message =>
+          messageStrings should contain(message.getBody)
+        }
+        receivedMessages.head should not be equal(receivedMessages.tail.head)
       }
-      receivedMessages.head should not be equal(receivedMessages.tail.head)
     }
 
     assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)

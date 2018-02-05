@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{VersionUpdater, Versioned}
-import uk.ac.wellcome.test.utils.{JsonTestUtil, S3Local}
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -18,7 +18,7 @@ class VersionedObjectStoreTest
     with S3Local
     with Matchers
     with JsonTestUtil
-    with ScalaFutures {
+    with ScalaFutures with ExtendedPatience {
 
   lazy val bucketName = "source-object-store"
 
