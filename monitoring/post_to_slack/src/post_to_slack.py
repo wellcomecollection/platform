@@ -13,6 +13,7 @@ import requests
 
 from cloudwatch_alarms import build_cloudwatch_url, ThresholdMessage
 from platform_alarms import (
+    get_human_message,
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
@@ -38,49 +39,6 @@ class Alarm:
     @property
     def state_reason(self):
         return self.message['NewStateReason']
-
-    def human_reason(self):
-        """
-        Try to return a more human-readable explanation for the alarm.
-        """
-        try:
-            threshold = ThresholdMessage.from_message(self.state_reason)
-        except ValueError:
-            return
-
-        if (
-            self.name.endswith('-alb-not-enough-healthy-hosts') and
-            threshold.is_breaching
-        ):
-            return 'There are no healthy hosts in the ALB target group.'
-
-        display_time = threshold.date.strftime(
-            'at %H:%M:%S on %d %b %Y').replace('on 0', 'on ')
-
-        if self.name.startswith('loris'):
-            service = 'Loris'
-        elif self.name.startswith('api_'):
-            service = 'the API'
-        else:
-            return
-
-        if self.name.endswith('-alb-target-500-errors'):
-            if threshold.actual_value == 1:
-                return f'The ALB spotted a 500 error in {service} {display_time}.'
-            else:
-                return f'The ALB spotted multiple 500 errors ({threshold.actual_value}) in {service} {display_time}.'
-
-        elif self.name.endswith('-alb-unhealthy-hosts'):
-            if threshold.actual_value == 1:
-                return f'There is an unhealthy host in {service} {display_time}.'
-            else:
-                return f'There are multiple unhealthy hosts ({threshold.actual_value}) in {service} {display_time}.'
-
-        elif self.name.endswith('-alb-not-enough-healthy-hosts'):
-            return (
-                f"There aren't enough healthy hosts in {service} "
-                f'(saw {threshold.actual_value}; expected more than {threshold.desired_value}) {display_time}.'
-            )
 
     # Sometimes there's enough data in the alarm to make an educated guess
     # about useful CloudWatch logs to check, so we include that in the alarm.
@@ -190,7 +148,10 @@ def prepare_slack_payload(alarm, bitly_access_token):
             'fallback': alarm.name,
             'title': alarm.name,
             'fields': [{
-                'value': alarm.human_reason() or alarm.state_reason
+                'value': get_human_message(
+                    alarm_name=alarm.name,
+                    state_reason=alarm.state_reason
+                )
             }]
         }
     ]
