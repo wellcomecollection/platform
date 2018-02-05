@@ -11,7 +11,7 @@ locals {
 
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 
-  ecs_services_cluster_id = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_id}"
+  ecs_services_cluster_id = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
 
   terraform_apply_topic_name = "${data.terraform_remote_state.shared_infra.terraform_apply_topic_name}"
 }
