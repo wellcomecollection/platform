@@ -9,22 +9,24 @@ import pytest
 from reindex_job_creator import main
 
 
+def _wrap_single_image(image):
+    return {
+        'eventID': '81659528846ddb9826c612c16043c2ea',
+        'eventName': 'MODIFY',
+        'eventVersion': '1.1',
+        'eventSource': 'aws:dynamodb',
+        'awsRegion': 'eu-west-1',
+        'dynamodb': {
+            'NewImage': image,
+        },
+        'eventSourceARN': 'foo'
+    }
+
+
 def _wrap(image):
     """Given an image from a DynamoDB table, wrap it in an SNS event."""
     return {
-        'Records': [
-            {
-                'eventID': '81659528846ddb9826c612c16043c2ea',
-                'eventName': 'MODIFY',
-                'eventVersion': '1.1',
-                'eventSource': 'aws:dynamodb',
-                'awsRegion': 'eu-west-1',
-                'dynamodb': {
-                    'NewImage': image,
-                },
-                'eventSourceARN': 'foo'
-            }
-        ]
+        'Records': [_wrap_single_image(image)]
     }
 
 
@@ -83,3 +85,64 @@ def test_lower_or_equal_requested_version_triggers_job(
         MaxNumberOfMessages=1
     )
     assert 'Messages' not in messages
+
+
+def test_multiple_updates_trigger_jobs(queue_url):
+    """
+    If the DynamoDB table is updated so that desiredVersion > currentVersion,
+    a job is sent to SQS.
+    """
+    images = [
+        {
+            'shardId': 'example/ge',
+            'currentVersion': 5,
+            'desiredVersion': 6,
+        },
+        {
+            'shardId': 'example/eq',
+            'currentVersion': 5,
+            'desiredVersion': 5,
+        },
+        {
+            'shardId': 'example/le',
+            'currentVersion': 5,
+            'desiredVersion': 3,
+        },
+        {
+            'shardId': 'example/ge2',
+            'currentVersion': 5,
+            'desiredVersion': 7,
+        },
+    ]
+
+    event = {
+        'Records': [_wrap_single_image(img) for img in images]
+    }
+
+    main(event=event, _ctxt=None)
+
+    sqs_client = boto3.client('sqs')
+    messages = sqs_client.receive_message(
+        QueueUrl=queue_url,
+        MaxNumberOfMessages=4
+    )
+
+    assert len(messages['Messages']) == 2
+
+    message_body = messages['Messages'][0]['Body']
+    inner_message = json.loads(message_body)['Message']
+    parsed_message = json.loads(json.loads(inner_message)['default'])
+
+    assert parsed_message == {
+        'shardId': 'example/ge',
+        'desiredVersion': 6,
+    }
+
+    message_body = messages['Messages'][1]['Body']
+    inner_message = json.loads(message_body)['Message']
+    parsed_message = json.loads(json.loads(inner_message)['default'])
+
+    assert parsed_message == {
+        'shardId': 'example/ge2',
+        'desiredVersion': 7,
+    }
