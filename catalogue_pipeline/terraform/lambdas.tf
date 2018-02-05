@@ -22,7 +22,7 @@ module "reindex_job_creator_lambda" {
     TOPIC_ARN = "${module.reindex_jobs_topic.arn}"
   }
 
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
 
 module "trigger_reindex_job_creator_lambda" {
