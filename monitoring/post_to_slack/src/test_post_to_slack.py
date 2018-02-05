@@ -27,7 +27,7 @@ def alarm_reason():
 
 @pytest.fixture
 def event(critical_hook, alarm_name, alarm_reason):
-    noncritical_hook = 'https://api.slack.com/hooks/example_non-critical'
+    noncritical_hook = 'https://api.slack.com/hooks/example_critical'
 
     os.environ['CRITICAL_SLACK_WEBHOOK'] = critical_hook
     os.environ['NONCRITICAL_SLACK_WEBHOOK'] = noncritical_hook
@@ -231,16 +231,3 @@ class TestAlarm:
 ])
 def test_simplify_message(message, expected):
     assert post_to_slack.simplify_message(message) == expected
-
-
-@pytest.mark.parametrize('name, is_critical', [
-    ('lambda-notify_old_deploys-errors', False),
-    ('api_remus_v1-alb-target-500-errors', True),
-    ('api_remus_v2-alb-target-500-errors', True),
-    ('es_ingest_queue_mel_dlq_not_empty', False),
-    ('unknown_alarm', True),
-])
-def test_alarm_is_critical(name, is_critical):
-    metadata = {'AlarmName': name}
-    alarm = post_to_slack.Alarm(json.dumps(metadata))
-    assert alarm.is_critical == is_critical

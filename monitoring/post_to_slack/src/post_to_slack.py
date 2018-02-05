@@ -14,7 +14,10 @@ import requests
 
 from cloudwatch_alarms import build_cloudwatch_url, ThresholdMessage
 from platform_alarms import (
-    guess_cloudwatch_log_group, guess_cloudwatch_search_terms
+    guess_cloudwatch_log_group,
+    guess_cloudwatch_search_terms,
+    is_critical_error,
+    should_be_sent_to_main_channel
 )
 
 
@@ -150,29 +153,6 @@ class Alarm:
 
         return messages
 
-    @property
-    def is_critical(self):
-        """Returns True if this is a critical alarm."""
-        # Alarms for the API or Loris are *always* critical.
-        if any(p in self.name for p in ['api_remus', 'api_romulus', 'loris']):
-            return True
-
-        # Lambdas and DLQ alarms are *never* critical.
-        if (
-            self.name.endswith('dlq_not_empty') or
-            self.name.startswith('lambda-')
-        ):
-            return False
-
-        # Alarms in the service stack are *never* critical.
-        if self.name.startswith(
-            ('id_minter', 'ingestor', 'transformer'),
-        ):
-            return False
-
-        # Otherwise default to True, because we don't know what this alarm is.
-        return True
-
 
 def to_bitly(url, access_token):
     """
@@ -254,7 +234,7 @@ def simplify_message(message):
 
 
 def prepare_slack_payload(alarm, bitly_access_token):
-    if alarm.is_critical:
+    if is_critical_error(alarm_name=alarm.name):
         slack_data = {
             'username': 'cloudwatch-alarm',
             'icon_emoji': ':rotating_light:',
@@ -313,7 +293,7 @@ def main(event, context):
 
     print('Sending message %s' % json.dumps(slack_data))
 
-    if alarm.is_critical:
+    if should_be_sent_to_main_channel(alarm_name=alarm.name):
         webhook_url = slack_critical_hook
     else:
         webhook_url = slack_noncritical_hook

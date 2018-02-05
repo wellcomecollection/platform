@@ -4,7 +4,10 @@ import attr
 import pytest
 
 from platform_alarms import (
-    guess_cloudwatch_log_group, guess_cloudwatch_search_terms
+    guess_cloudwatch_log_group,
+    guess_cloudwatch_search_terms,
+    is_critical_error,
+    should_be_sent_to_main_channel
 )
 
 
@@ -47,3 +50,37 @@ def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
 def test_guess_cloudwatch_search_terms(alarm_name, expected_search_terms):
     alarm = Alarm(name=alarm_name)
     assert guess_cloudwatch_search_terms(alarm) == expected_search_terms
+
+
+@pytest.mark.parametrize('alarm_name, should_send_to_main', [
+    ('api_romulus_v1-alb-target-400-errors', True),
+    ('api_remus_v1-alb-target-500-errors', True),
+    ('loris-alb-not-enough-healthy-hosts', True),
+    ('id_minter-alb-unhealthy-hosts', False),
+    ('ingestor-alb-unhealthy-hosts', False),
+    ('transformer-alb-not-enough-healthy-hosts', False),
+    ('grafana-alb-target-500-errors', False),
+    ('IngestorWorkerService_TerminalFailure', False),
+    ('sierra_items_windows_dlq_not_empty', False),
+    ('lambda-post_to_slack-errors', False),
+    ('unknown-alarm-type', False),
+])
+def test_should_be_sent_to_main_channel(alarm_name, should_send_to_main):
+    assert should_be_sent_to_main_channel(alarm_name) == should_send_to_main
+
+
+@pytest.mark.parametrize('alarm_name, expected_is_critical_error', [
+    ('api_romulus_v1-alb-target-400-errors', True),
+    ('api_remus_v1-alb-target-500-errors', True),
+    ('loris-alb-not-enough-healthy-hosts', True),
+    ('id_minter-alb-unhealthy-hosts', True),
+    ('ingestor-alb-unhealthy-hosts', True),
+    ('transformer-alb-not-enough-healthy-hosts', True),
+    ('grafana-alb-target-500-errors', True),
+    ('IngestorWorkerService_TerminalFailure', True),
+    ('sierra_items_windows_dlq_not_empty', False),
+    ('lambda-post_to_slack-errors', False),
+    ('unknown-alarm-type', True),
+])
+def test_is_critical_error(alarm_name, expected_is_critical_error):
+    assert is_critical_error(alarm_name) == expected_is_critical_error

@@ -40,3 +40,40 @@ def guess_cloudwatch_search_terms(alarm):
         return ['"HTTP 500"']
 
     return []
+
+
+def should_be_sent_to_main_channel(alarm_name):
+    """Should this alarm be sent to the main channel?"""
+    # Alarms for the API or Loris always go the main channel.
+    if any(p in alarm_name for p in ['api_remus', 'api_romulus', 'loris']):
+        return True
+
+    # Otherwise default to False, because we don't know what this alarm is.
+    return False
+
+
+def is_critical_error(alarm_name):
+    """Is this a critical error (True) or just a warning (False)?"""
+    # Alarms for the API or Loris are always critical.
+    if any(p in alarm_name for p in ['api_remus', 'api_romulus', 'loris']):
+        return True
+
+    # Any alarms to do with healthy/unhealthy hosts are critical.
+    if alarm_name.endswith((
+        '-not-enough-healthy-hosts',
+        '-unhealthy-hosts',
+        '-500-errors',
+        '_TerminalFailure',
+    )):
+        return True
+
+    # DLQ errors are warnings, not errors.
+    if alarm_name.endswith(('_dlq_not_empty',)):
+        return False
+
+    # Lambda errors are warnings, not errors.
+    if alarm_name.startswith('lambda-') and alarm_name.endswith('-errors'):
+        return False
+
+    # Otherwise default to True, because we don't know what this alarm is.
+    return True
