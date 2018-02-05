@@ -1,5 +1,8 @@
 package uk.ac.wellcome.metrics
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.PutMetricDataRequest
@@ -11,7 +14,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
 
 class MetricsSenderTest
@@ -112,6 +115,38 @@ class MetricsSenderTest
           putMetricDataRequests.tail.head.getMetricData should have size 10
         }
       }
+    }
+
+    it("should take at least one second to make 150 PutMetricData requests") {
+      val amazonCloudWatch = mock[AmazonCloudWatch]
+      val metricsSender =
+        new MetricsSender("test", amazonCloudWatch, actorSystem)
+      val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
+
+      val expectedDuration = (1 second).toMillis
+      val startTime = Instant.now
+      val futures = (1 to 3000).map(i =>
+        metricsSender.incrementCount("bar"))
+
+      val promisedInstant = Promise[Instant]
+
+      whenReady(Future.sequence(futures)) { _ =>
+        eventually {
+          verify(amazonCloudWatch, times(150)).putMetricData(capture.capture())
+
+          val putMetricDataRequests = capture.getAllValues
+
+          putMetricDataRequests should have size 150
+
+          promisedInstant.trySuccess(Instant.now())
+        }
+      }
+
+      whenReady(promisedInstant.future){ endTime =>
+          val gap: Long = ChronoUnit.MILLIS.between(startTime, endTime)
+
+          gap shouldBe > (expectedDuration)
+        }
     }
   }
 
