@@ -1,0 +1,437 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 500, \"data\": null, \"status_txt\": \"MISSING_ARG_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:33 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "76",
+          "Connection": "keep-alive",
+          "Etag": "\"c842f6932d4ad668e15f865c399efe26285a8a61\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:43"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 403, \"data\": null, \"status_txt\": \"INVALID_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:34 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "72",
+          "Connection": "keep-alive",
+          "Etag": "\"f71bd1f26c0b2aa5f4d3464f71d5f62d09edf742\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:43"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 200, \"data\": {\"link_save\": {\"link\": \"http://amzn.to/2GQzbsA\", \"aggregate_link\": \"http://bit.ly/2GQGCAc\", \"long_url\": \"https://us-east-1.console.aws.amazon.com/cloudwatch/home\", \"new_link\": 1, \"user_hash\": \"2GQzbsA\"}}, \"status_txt\": \"OK\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:35 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "253",
+          "Connection": "keep-alive",
+          "Etag": "\"728543fb882671bad69b2683a918a579d5f5e971\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:44"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 500, \"data\": null, \"status_txt\": \"MISSING_ARG_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:44 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "76",
+          "Connection": "keep-alive",
+          "Etag": "\"c842f6932d4ad668e15f865c399efe26285a8a61\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:53"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 403, \"data\": null, \"status_txt\": \"INVALID_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:44 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "72",
+          "Connection": "keep-alive",
+          "Etag": "\"f71bd1f26c0b2aa5f4d3464f71d5f62d09edf742\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:54"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 304, \"data\": {\"link_save\": {\"link\": \"http://amzn.to/2GQzbsA\", \"aggregate_link\": \"http://bit.ly/2GQGCAc\", \"long_url\": \"https://us-east-1.console.aws.amazon.com/cloudwatch/home\", \"new_link\": 0, \"user_hash\": \"2GQzbsA\"}}, \"status_txt\": \"LINK_ALREADY_EXISTS\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:45 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "270",
+          "Connection": "keep-alive",
+          "Etag": "\"068debcffbf041b97028d7896c182af8cc26308c\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:54"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 500, \"data\": null, \"status_txt\": \"MISSING_ARG_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:48 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "76",
+          "Connection": "keep-alive",
+          "Etag": "\"c842f6932d4ad668e15f865c399efe26285a8a61\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:57"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 403, \"data\": null, \"status_txt\": \"INVALID_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:48 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "72",
+          "Connection": "keep-alive",
+          "Etag": "\"f71bd1f26c0b2aa5f4d3464f71d5f62d09edf742\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:58"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 304, \"data\": {\"link_save\": {\"link\": \"http://amzn.to/2GQzbsA\", \"aggregate_link\": \"http://bit.ly/2GQGCAc\", \"long_url\": \"https://us-east-1.console.aws.amazon.com/cloudwatch/home\", \"new_link\": 0, \"user_hash\": \"2GQzbsA\"}}, \"status_txt\": \"LINK_ALREADY_EXISTS\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:49 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "270",
+          "Connection": "keep-alive",
+          "Etag": "\"068debcffbf041b97028d7896c182af8cc26308c\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:29:58"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 500, \"data\": null, \"status_txt\": \"MISSING_ARG_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:51 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "76",
+          "Connection": "keep-alive",
+          "Etag": "\"c842f6932d4ad668e15f865c399efe26285a8a61\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:30:01"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 403, \"data\": null, \"status_txt\": \"INVALID_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:52 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "72",
+          "Connection": "keep-alive",
+          "Etag": "\"f71bd1f26c0b2aa5f4d3464f71d5f62d09edf742\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=invalid_t0k3n&longUrl=https%3A%2F%2Feu-west-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:30:01"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": "python-requests/2.18.4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "*/*",
+          "Connection": "keep-alive"
+        },
+        "method": "GET",
+        "uri": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"status_code\": 403, \"data\": null, \"status_txt\": \"INVALID_ACCESS_TOKEN\"}"
+        },
+        "headers": {
+          "Server": "nginx",
+          "Date": "Mon, 05 Feb 2018 13:29:52 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "72",
+          "Connection": "keep-alive",
+          "Etag": "\"f71bd1f26c0b2aa5f4d3464f71d5f62d09edf742\""
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api-ssl.bitly.com/v3/user/link_save?access_token=<ACCESS_TOKEN>&longUrl=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fcloudwatch%2Fhome"
+      },
+      "recorded_at": "2018-02-05T13:30:02"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
