@@ -52,19 +52,13 @@ resource "aws_dynamodb_table" "reindex_shard_tracker" {
   write_capacity = 1
 
   hash_key  = "shardId"
-  range_key = "currentVersion"
-
+  
   stream_enabled   = true
   stream_view_type = "NEW_IMAGE"
 
   attribute {
     name = "shardId"
     type = "S"
-  }
-
-  attribute {
-    name = "currentVersion"
-    type = "N"
   }
 
   lifecycle {
