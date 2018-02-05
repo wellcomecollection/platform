@@ -30,15 +30,15 @@ def guess_cloudwatch_log_group(alarm_name):
     )
 
 
-def guess_cloudwatch_search_terms(alarm):
+def guess_cloudwatch_search_terms(alarm_name):
     """Guess some search terms that might be useful in CloudWatch."""
-    if alarm.name == 'loris-alb-target-500-errors':
+    if alarm_name == 'loris-alb-target-500-errors':
         return ['"HTTP/1.0 500"']
 
-    if alarm.name.startswith('lambda'):
+    if alarm_name.startswith('lambda'):
         return ['Traceback', 'Task timed out after']
 
-    if alarm.name.startswith('api_') and alarm.name.endswith('-500-errors'):
+    if alarm_name.startswith('api_') and alarm_name.endswith('-500-errors'):
         return ['"HTTP 500"']
 
     return []
