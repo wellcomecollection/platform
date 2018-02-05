@@ -76,6 +76,7 @@ class SQSWorkerTest
         any[() => Future[Unit]]()
       )
     }
+    worker.cancelRun()
   }
 
   it("does not fail the TryBackoff run when unable to parse a message") {
@@ -85,5 +86,7 @@ class SQSWorkerTest
     Thread.sleep(worker.totalWait.toMillis + 1000)
 
     verify(metricsSender, never()).incrementCount(anyString(), anyDouble())
+
+    worker.cancelRun()
   }
 }

@@ -4,24 +4,21 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
-import com.amazonaws.services.sqs.model.PurgeQueueRequest
-import io.circe
+import io.circe.Decoder
 import org.mockito.Matchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.test.utils.SQSLocal
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.collection.JavaConversions._
-import io.circe.Decoder
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 case class TestObject(foo: String)
 
@@ -30,13 +27,14 @@ class SQSWorkerToDynamoTest
     with SQSLocal
     with MockitoSugar
     with ScalaFutures
-    with BeforeAndAfterEach
+    with BeforeAndAfterAll
     with Matchers
     with Eventually {
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]
 
+  val actorSystem = ActorSystem()
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
   private val metricsSender: MetricsSender =
@@ -59,10 +57,10 @@ class SQSWorkerToDynamoTest
     queueUrl
   }
 
-  class TestWorker(queueUrl: String)
+  class TestWorker(queueUrl: String, system: ActorSystem)
       extends SQSWorkerToDynamo[TestObject](
         new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-        ActorSystem(),
+        system,
         metricsSender) {
     override lazy val totalWait = 1.second
 
@@ -80,16 +78,16 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  class ConditionalCheckFailingTestWorker(queueUrl: String)
-      extends TestWorker(queueUrl: String) {
+  class ConditionalCheckFailingTestWorker(queueUrl: String, system: ActorSystem)
+      extends TestWorker(queueUrl: String, system) {
 
     override def store(record: TestObject): Future[Unit] = Future {
       throw new ConditionalCheckFailedException("Wrong!")
     }
   }
 
-  class TerminalFailingTestWorker(queueUrl: String)
-      extends TestWorker(queueUrl: String) {
+  class TerminalFailingTestWorker(queueUrl: String, system: ActorSystem)
+      extends TestWorker(queueUrl: String, system) {
 
     override def store(record: TestObject): Future[Unit] = Future {
       throw new RuntimeException("Wrong!")
@@ -99,7 +97,7 @@ class SQSWorkerToDynamoTest
   it("processes messages") {
     val queueUrl = newQueue("red")
 
-    val worker = new TestWorker(queueUrl)
+    val worker = new TestWorker(queueUrl, actorSystem)
 
     worker.runSQSWorker()
 
@@ -114,7 +112,7 @@ class SQSWorkerToDynamoTest
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
     val queueUrl = newQueue("blue")
 
-    val failingWorker = new ConditionalCheckFailingTestWorker(queueUrl)
+    val failingWorker = new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
 
     failingWorker.runSQSWorker()
 
@@ -128,7 +126,7 @@ class SQSWorkerToDynamoTest
   it("fails gracefully when a conversion fails") {
     val queueUrl = newQueue("green")
 
-    val worker = new TestWorker(queueUrl)
+    val worker = new TestWorker(queueUrl, actorSystem)
 
     worker.runSQSWorker()
 
@@ -153,7 +151,7 @@ class SQSWorkerToDynamoTest
     "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
     val queueUrl = newQueue("purple")
 
-    val terminalFailingWorker = new TerminalFailingTestWorker(queueUrl)
+    val terminalFailingWorker = new TerminalFailingTestWorker(queueUrl, actorSystem)
 
     terminalFailingWorker.runSQSWorker()
 
@@ -162,5 +160,10 @@ class SQSWorkerToDynamoTest
     eventually {
       terminalFailingWorker.terminalFailure shouldBe true
     }
+  }
+
+  override def afterAll(): Unit = {
+    super.afterAll()
+    actorSystem.terminate()
   }
 }
