@@ -7,7 +7,7 @@ module "lambda_schedule_reindexer" {
   environment_variables = {
     SCHEDULER_TOPIC_ARN = "${local.service_scheduler_topic_arn}"
     DYNAMO_TABLE_NAME   = "${aws_dynamodb_table.miro_table.name}"
-    CLUSTER_NAME        = "${aws_ecs_cluster.services.name}"
+    CLUSTER_NAME        = "${module.catalogue_pipeline_cluster.cluster_name}"
     REINDEXERS          = "${aws_dynamodb_table.miro_table.name}=miro_reindexer"
   }
 
