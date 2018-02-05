@@ -6,7 +6,6 @@ Sends slack notifications for alarms events
 import datetime as dt
 import json
 import os
-import re
 
 import attr
 import boto3
