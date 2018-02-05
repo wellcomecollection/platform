@@ -16,6 +16,9 @@ module "id_minter" {
     topic_arn   = "${module.es_ingest_topic.arn}"
   }
 
+  memory = "2048"
+  cpu    = "512"
+
   env_vars_length = 6
 
   cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
