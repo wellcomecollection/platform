@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import re
+from urllib.parse import quote as urlquote
 
 import attr
 
@@ -65,3 +66,19 @@ class ThresholdMessage:
             raise ValueError(f'Unable to parse message {message!r}')
 
         return cls(**match.groupdict(), is_breaching=False)
+
+
+def build_cloudwatch_url(
+    search_term, log_group_name, start_date, end_date, region='eu-west-1'
+):
+    """
+    Builds a URL that opens the CloudWatch Console with the given filters.
+    """
+    return (
+        f'https://{region}.console.aws.amazon.com/cloudwatch/home'
+        f'?region={region}'
+        f'#logEventViewer:group={log_group_name};'
+        f'filter={urlquote(search_term)};'
+        f'start={start_date.strftime("%Y-%m-%dT%H:%M:%SZ")};'
+        f'end={end_date.strftime("%Y-%m-%dT%H:%M:%SZ")};'
+    )

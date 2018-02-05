@@ -14,7 +14,7 @@ import attr
 import boto3
 import requests
 
-from cloudwatch_alarms import ThresholdMessage
+from cloudwatch_alarms import build_cloudwatch_url, ThresholdMessage
 from platform_alarms import (
     guess_cloudwatch_log_group, guess_cloudwatch_search_terms
 )
@@ -105,10 +105,11 @@ class Alarm:
             log_group_name = guess_cloudwatch_log_group(alarm=self)
             timeframe = self.cloudwatch_timeframe
             return [
-                self._build_cloudwatch_url(
+                build_cloudwatch_url(
                     search_term=search_term,
-                    group=log_group_name,
-                    timeframe=timeframe
+                    log_group_name=log_group_name,
+                    start_date=timeframe.start,
+                    end_date=timeframe.end
                 )
                 for search_term in guess_cloudwatch_search_terms(alarm=self)
             ]
@@ -150,21 +151,6 @@ class Alarm:
             print(f'Error in cloudwatch_messages: {exc}')
 
         return messages
-
-    @staticmethod
-    def _build_cloudwatch_url(search_term, group, timeframe):
-        return (
-            'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
-            '?region=eu-west-1'
-            f'#logEventViewer:group={group};'
-
-            # Look for strings matching 'HTTP/1.0 500'
-            f'filter={quote(search_term)};'
-
-            # And add the date parameters to filter to the exact time
-            f'start={timeframe.start.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-            f'end={timeframe.end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-        )
 
     @property
     def is_critical(self):
