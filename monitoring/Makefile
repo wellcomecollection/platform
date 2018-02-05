@@ -20,7 +20,7 @@ include $(ROOT)/monitoring/load_test/Makefile
 
 POST_TO_SLACK = $(ROOT)/monitoring/post_to_slack
 
-$(POST_TO_SLACK)/requirements.txt: $(POST_TO_SLACK)/requirements.in
+$(POST_TO_SLACK)/src/requirements.txt: $(POST_TO_SLACK)/src/requirements.in
 	docker run --rm --volume $(POST_TO_SLACK):/src --rm micktwomey/pip-tools
 
 
