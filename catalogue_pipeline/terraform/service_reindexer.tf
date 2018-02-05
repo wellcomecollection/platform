@@ -2,12 +2,12 @@ module "miro_reindexer" {
   source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v5.0.2"
   name   = "miro_reindexer"
 
-  cluster_id = "${aws_ecs_cluster.services.id}"
+  cluster_id = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id     = "${module.vpc_services.vpc_id}"
   app_uri    = "${module.ecr_repository_reindexer.repository_url}:${var.release_ids["reindexer"]}"
 
-  listener_https_arn = "${module.services_alb.listener_https_arn}"
-  listener_http_arn  = "${module.services_alb.listener_http_arn}"
+  listener_https_arn = "${module.catalogue_pipeline_cluster.alb_listener_https_arn}"
+  listener_http_arn  = "${module.catalogue_pipeline_cluster.alb_listener_http_arn}"
   path_pattern       = "/miro_reindexer/*"
   alb_priority       = "104"
 
@@ -27,7 +27,7 @@ module "miro_reindexer" {
 
   env_vars_length = 3
 
-  loadbalancer_cloudwatch_id   = "${module.services_alb.cloudwatch_id}"
+  loadbalancer_cloudwatch_id   = "${module.catalogue_pipeline_cluster.alb_cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
   client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
 
