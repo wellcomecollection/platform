@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.reindexer.services
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
@@ -61,7 +62,7 @@ class CalmReindexTargetServiceTest
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val metricsSender: MetricsSender =
-      new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
+      new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
 
     val reindexTargetService = new ReindexTargetService[CalmTransformable](
       dynamoDBClient = dynamoDbClient,

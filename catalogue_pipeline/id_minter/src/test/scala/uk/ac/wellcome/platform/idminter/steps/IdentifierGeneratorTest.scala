@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.idminter.steps
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -21,7 +22,7 @@ class IdentifierGeneratorTest
     with MockitoSugar {
 
   private val metricsSender =
-    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch])
+    new MetricsSender("id_minter_test_metrics", mock[AmazonCloudWatch], ActorSystem())
 
   private val knownIdentifierSchemes =
     List(IdentifierSchemes.miroImageNumber,
