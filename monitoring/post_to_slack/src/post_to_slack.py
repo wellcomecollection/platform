@@ -14,7 +14,7 @@ import attr
 import boto3
 from botocore.vendored import requests
 
-from alarms import ThresholdMessage
+from cloudwatch_alarms import ThresholdMessage
 
 
 class CloudWatchException(Exception):
