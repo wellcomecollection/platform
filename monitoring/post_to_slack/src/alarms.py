@@ -25,8 +25,8 @@ THRESHOLD_RE = re.compile(
 
 
 @attr.s
-class Threshold:
-    """Holds information about a "threshold crossed" error."""
+class ThresholdMessage:
+    """Holds information about a "threshold crossed" message."""
     actual_value = attr.ib(converter=int)
     desired_value = attr.ib(converter=int)
 
