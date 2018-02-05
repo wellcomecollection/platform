@@ -155,13 +155,13 @@ class Alarm:
         return messages
 
 
-def to_bitly(url, access_token):
+def to_bitly(sess, url, access_token):
     """
     Try to shorten a URL with bit.ly.  If it fails, just return the
     original URL.
     """
     def _to_bity_single_url(url):
-        resp = requests.get(
+        resp = sess.get(
             'https://api-ssl.bitly.com/v3/user/link_save',
             params={'access_token': access_token, 'longUrl': url}
         )
@@ -210,8 +210,9 @@ def prepare_slack_payload(alarm, bitly_access_token):
 
     cloudwatch_urls = alarm.cloudwatch_urls()
     if cloudwatch_urls:
+        sess = requests.Session()
         cloudwatch_url_str = ' / '.join([
-            to_bitly(url=url, access_token=bitly_access_token)
+            to_bitly(sess=sess, url=url, access_token=bitly_access_token)
             for url in cloudwatch_urls
         ])
         slack_data['attachments'][0]['fields'].append({
