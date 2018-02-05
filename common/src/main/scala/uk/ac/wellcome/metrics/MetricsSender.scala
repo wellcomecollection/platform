@@ -3,7 +3,12 @@ package uk.ac.wellcome.metrics
 import java.util.Date
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
+import akka.stream.{
+  ActorMaterializer,
+  OverflowStrategy,
+  QueueOfferResult,
+  ThrottleMode
+}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
@@ -18,7 +23,8 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
-                              amazonCloudWatch: AmazonCloudWatch, actorSystem: ActorSystem)
+                              amazonCloudWatch: AmazonCloudWatch,
+                              actorSystem: ActorSystem)
     extends Logging {
   implicit val system = actorSystem
   implicit val materialiser = ActorMaterializer()
@@ -30,19 +36,26 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
   private val maxPutMetricDataRequestsPerSecond = 150
 
   val sourceQueue: SourceQueueWithComplete[MetricDatum] =
-    Source.queue[MetricDatum](100, OverflowStrategy.backpressure)
+    Source
+      .queue[MetricDatum](100, OverflowStrategy.backpressure)
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
-      .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize, 10 seconds))(Keep.left)
+      .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize,
+                                              10 seconds))(Keep.left)
       // Make sure we don't exceed aws rate limit
-      .throttle(maxPutMetricDataRequestsPerSecond, 1 second, 0, ThrottleMode.shaping)
-      .to(Sink.foreach(metricDataSeq =>
-    amazonCloudWatch.putMetricData(
-      new PutMetricDataRequest()
-        .withNamespace(namespace)
-        .withMetricData(metricDataSeq: _*)
-    )
-  )).run()
+      .throttle(maxPutMetricDataRequestsPerSecond,
+                1 second,
+                0,
+                ThrottleMode.shaping)
+      .to(
+        Sink.foreach(
+          metricDataSeq =>
+            amazonCloudWatch.putMetricData(
+              new PutMetricDataRequest()
+                .withNamespace(namespace)
+                .withMetricData(metricDataSeq: _*)
+          )))
+      .run()
 
   def timeAndCount[T](metricName: String, fun: () => Future[T]): Future[T] = {
     val start = new Date()
@@ -84,18 +97,18 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
     time: Duration,
     dimensions: Map[String, String] = Map()): Future[QueueOfferResult] = {
 
-      val metricDatum = new MetricDatum()
-        .withMetricName(metricName)
-        .withDimensions(
-          dimensions.foldLeft(Nil: List[Dimension])((acc, pair) => {
-            val dimension =
-              new Dimension().withName(pair._1).withValue(pair._2)
-            dimension :: acc
-          }))
-        .withValue(time.toMillis.toDouble)
-        .withUnit(StandardUnit.Milliseconds)
-        .withTimestamp(new Date())
-      sourceQueue.offer(metricDatum)
+    val metricDatum = new MetricDatum()
+      .withMetricName(metricName)
+      .withDimensions(
+        dimensions.foldLeft(Nil: List[Dimension])((acc, pair) => {
+          val dimension =
+            new Dimension().withName(pair._1).withValue(pair._2)
+          dimension :: acc
+        }))
+      .withValue(time.toMillis.toDouble)
+      .withUnit(StandardUnit.Milliseconds)
+      .withTimestamp(new Date())
+    sourceQueue.offer(metricDatum)
 
   }
 }
