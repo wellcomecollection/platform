@@ -12,7 +12,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.Reindex
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable
+}
 import uk.ac.wellcome.platform.reindexer.models.ReindexAttempt
 import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -33,7 +36,9 @@ class ReindexServiceTest
   )
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
+    new MetricsSender(namespace = "reindexer-tests",
+                      mock[AmazonCloudWatch],
+                      ActorSystem())
 
   def createReindexService =
     new ReindexService[CalmTransformable](
@@ -48,7 +53,9 @@ class ReindexServiceTest
         targetTableName = "CalmData",
         metricsSender = metricsSender
       ),
-      new MetricsSender("reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
+      new MetricsSender("reindexer-tests",
+                        mock[AmazonCloudWatch],
+                        ActorSystem())
     )
 
   val currentVersion = 1
@@ -134,7 +141,9 @@ class ReindexServiceTest
         reindexShard
       ),
       calmReindexTargetService,
-      new MetricsSender("reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
+      new MetricsSender("reindexer-tests",
+                        mock[AmazonCloudWatch],
+                        ActorSystem())
     )
 
     whenReady(reindexService.run) { _ =>
