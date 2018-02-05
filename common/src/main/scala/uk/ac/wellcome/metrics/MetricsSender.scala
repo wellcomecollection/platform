@@ -37,7 +37,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
 
   val sourceQueue: SourceQueueWithComplete[MetricDatum] =
     Source
-      .queue[MetricDatum](1000, OverflowStrategy.backpressure)
+      .queue[MetricDatum](5000, OverflowStrategy.backpressure)
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
       .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize,
@@ -111,12 +111,5 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
     sendToStream(metricDatum)
   }
 
-  private def sendToStream(
-    metricDatum: MetricDatum): Future[QueueOfferResult] = {
-    sourceQueue.offer(metricDatum).recoverWith {
-      case _: IllegalStateException =>
-        // If it fails offering a MetricDatum because the buffer is full, retry
-        sendToStream(metricDatum)
-    }
-  }
+  private def sendToStream(metricDatum: MetricDatum): Future[QueueOfferResult] = sourceQueue.offer(metricDatum)
 }
