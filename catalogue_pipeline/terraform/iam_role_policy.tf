@@ -32,14 +32,6 @@ resource "aws_iam_role_policy" "reindexer_cloudwatch" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-# Policies for the schedule_reindexer task
-
-resource "aws_iam_role_policy" "lambda_schedule_reindexer_sns" {
-  name   = "lambda_schedule_reindexer_sns"
-  role   = "${module.lambda_schedule_reindexer.role_name}"
-  policy = "${local.service_scheduler_topic_publish_policy}"
-}
-
 # Role policies for the Elasticsearch ingestor
 
 resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {
