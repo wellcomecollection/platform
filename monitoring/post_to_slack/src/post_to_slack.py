@@ -250,6 +250,12 @@ class Alarm:
         ):
             return False
 
+        # Alarms in the service stack are *never* critical.
+        if self.name.startswith(
+            ('id_minter', 'ingestor', 'transformer'),
+        ):
+            return False
+
         # Otherwise default to True, because we don't know what this alarm is.
         return True
 
