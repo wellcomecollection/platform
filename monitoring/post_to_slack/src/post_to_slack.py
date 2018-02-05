@@ -12,7 +12,7 @@ from urllib.parse import quote
 
 import attr
 import boto3
-from botocore.vendored import requests
+import requests
 
 from cloudwatch_alarms import ThresholdMessage
 
