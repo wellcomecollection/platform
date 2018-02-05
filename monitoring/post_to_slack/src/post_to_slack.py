@@ -11,6 +11,7 @@ import os
 import re
 from urllib.parse import quote
 
+import attr
 import boto3
 from botocore.vendored import requests
 
@@ -35,6 +36,12 @@ DATAPOINT_RE = re.compile(r'''
 
 class CloudWatchException(Exception):
     pass
+
+
+@attr.s
+class Interval:
+    start = attr.ib()
+    end = attr.ib()
 
 
 class Alarm:
@@ -150,17 +157,12 @@ class Alarm:
         """
         Try to work out a likely timeframe for CloudWatch errors.
         """
-        timeframe = collections.namedtuple('timeframe', ['start', 'end'])
-        match = DATAPOINT_RE.search(self.state_reason)
-        if match is None:
-            raise CloudWatchException(
-                "I can't find a timeframe for reason %r" % self.reason
-            )
+        threshold = ThresholdMessage.from_message(self.state_reason)
 
-        timestamp = match.group('timestamp')
-        time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-        start = time - dt.timedelta(seconds=300)
-        end = time + dt.timedelta(seconds=300)
+        return Interval(
+            start=threshold.date - dt.timedelta(seconds=300),
+            end=threshold.date - dt.timedelta(seconds=300)
+        )
 
         return timeframe(start=start, end=end)
 
