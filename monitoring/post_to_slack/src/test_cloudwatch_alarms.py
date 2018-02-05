@@ -4,7 +4,7 @@ import datetime as dt
 
 import pytest
 
-from cloudwatch_alarms import ThresholdMessage
+from cloudwatch_alarms import build_cloudwatch_url, ThresholdMessage
 
 
 class TestThresholdMessage:
@@ -60,3 +60,18 @@ class TestThresholdMessage:
     def test_is_breaking(self, message, is_breaching):
         t = ThresholdMessage.from_message(message)
         assert t.is_breaching == is_breaching
+
+
+def test_build_cloudwatch_url():
+    url = build_cloudwatch_url(
+        search_term='HTTP500',
+        log_group_name='platform/loris',
+        start_date=dt.datetime(2018, 3, 5, 6, 28, 0),
+        end_date=dt.datetime(2018, 3, 5, 6, 34, 0),
+        region='us-east-1'
+    )
+    assert url == (
+        'https://us-east-1.console.aws.amazon.com/cloudwatch/home'
+        '?region=us-east-1#logEventViewer:group=platform/loris;'
+        'filter=HTTP500;start=2018-03-05T06:28:00Z;end=2018-03-05T06:34:00Z;'
+    )
