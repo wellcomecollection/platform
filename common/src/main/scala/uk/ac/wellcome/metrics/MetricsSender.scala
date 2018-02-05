@@ -111,5 +111,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
     sendToStream(metricDatum)
   }
 
-  private def sendToStream(metricDatum: MetricDatum): Future[QueueOfferResult] = sourceQueue.offer(metricDatum)
+  private def sendToStream(
+    metricDatum: MetricDatum): Future[QueueOfferResult] =
+    sourceQueue.offer(metricDatum)
 }
