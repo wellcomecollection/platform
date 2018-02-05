@@ -128,7 +128,7 @@ def test_post_to_slack(mock_post, event, critical_hook, alarm_name):
 
 
 with Betamax.configure() as config:
-    config.cassette_library_dir = 'fixtures'
+    config.cassette_library_dir = '.'
 
     access_token = os.environ.get('BITLY_ACCESS_TOKEN', 'testtoken')
     config.define_cassette_placeholder('<ACCESS_TOKEN>', access_token)

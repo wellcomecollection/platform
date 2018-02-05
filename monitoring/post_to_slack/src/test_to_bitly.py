@@ -10,7 +10,7 @@ from post_to_slack import to_bitly
 
 
 with Betamax.configure() as config:
-    config.cassette_library_dir = 'fixtures'
+    config.cassette_library_dir = '.'
 
     access_token = os.environ.get('BITLY_ACCESS_TOKEN', 'testtoken')
     config.define_cassette_placeholder('<ACCESS_TOKEN>', access_token)
@@ -20,7 +20,7 @@ with Betamax.configure() as config:
 def sess():
     session = requests.Session()
     with Betamax(session) as vcr:
-        vcr.use_cassette('to_bitly', record='once')
+        vcr.use_cassette('test_to_bitly', record='once')
         yield session
 
 
