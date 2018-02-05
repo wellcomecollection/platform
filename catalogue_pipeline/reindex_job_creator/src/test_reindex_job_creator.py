@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+import json
+
 import boto3
 
 from reindex_job_creator import main
