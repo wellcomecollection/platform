@@ -1,5 +1,5 @@
 module "catalogue_pipeline_cluster" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=asg_sg"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v6.4.1"
   name   = "catalogue-pipeline"
 
   vpc_subnets = ["${module.vpc_services.subnets}"]
