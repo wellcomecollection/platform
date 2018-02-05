@@ -3,18 +3,13 @@ package uk.ac.wellcome.metrics
 import java.util.Date
 
 import akka.actor.ActorSystem
-import akka.stream.{
-  ActorMaterializer,
-  OverflowStrategy,
-  QueueOfferResult,
-  ThrottleMode
-}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
+import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
-import com.twitter.inject.annotations.Flag
 import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
@@ -37,7 +32,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
 
   val sourceQueue: SourceQueueWithComplete[MetricDatum] =
     Source
-      .queue[MetricDatum](3000, OverflowStrategy.backpressure)
+      .queue[MetricDatum](1000, OverflowStrategy.backpressure)
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
       .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize,
@@ -89,7 +84,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
       .withValue(count)
       .withUnit(StandardUnit.Count)
       .withTimestamp(new Date())
-    sourceQueue.offer(metricDatum)
+    sendToStream(metricDatum)
   }
 
   def sendTime(
@@ -108,7 +103,14 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
       .withValue(time.toMillis.toDouble)
       .withUnit(StandardUnit.Milliseconds)
       .withTimestamp(new Date())
-    sourceQueue.offer(metricDatum)
+    sendToStream(metricDatum)
+  }
 
+  private def sendToStream(metricDatum: MetricDatum): Future[QueueOfferResult] = {
+    sourceQueue.offer(metricDatum).recoverWith {
+      case _: IllegalStateException =>
+        // If it fails offering a MetricDatum because the buffer is full, retry
+        sendToStream(metricDatum)
+    }
   }
 }
