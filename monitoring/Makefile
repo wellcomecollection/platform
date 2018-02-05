@@ -18,12 +18,6 @@ include $(ROOT)/monitoring/ecs_dashboard/Makefile
 include $(ROOT)/monitoring/load_test/Makefile
 
 
-POST_TO_SLACK = $(ROOT)/monitoring/post_to_slack
-
-$(POST_TO_SLACK)/src/requirements.txt: $(POST_TO_SLACK)/src/requirements.in
-	docker run --rm --volume $(POST_TO_SLACK):/src --rm micktwomey/pip-tools
-
-
 monitoring-test: gatling_to_cloudwatch-test \
 				 notify_old_deploys-test \
 				 post_to_slack-test \
