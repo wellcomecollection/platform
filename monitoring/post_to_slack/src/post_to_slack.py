@@ -1,38 +1,27 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
 Sends slack notifications for alarms events
 """
 
-import collections
 import datetime as dt
 import json
 import os
 import re
-from urllib.parse import quote
 
+import attr
 import boto3
-from botocore.vendored import requests
+import requests
+
+from cloudwatch_alarms import build_cloudwatch_url, ThresholdMessage
+from platform_alarms import (
+    guess_cloudwatch_log_group, guess_cloudwatch_search_terms
+)
 
 
-# Alarm reasons are sometimes of the form:
-#
-#     Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was
-#     greater than or equal to the threshold (1.0).
-#
-# This regex is meant to match the datapoint in square brackets.
-DATAPOINT_RE = re.compile(r'''
-    \[
-      (?P<value>[0-9.]+)\s
-      \(
-        (?P<timestamp>[0-9]{2}/[0-9]{2}/[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2})
-      \)
-    \]
-''', flags=re.VERBOSE)
-
-
-class CloudWatchException(Exception):
-    pass
+@attr.s
+class Interval:
+    start = attr.ib()
+    end = attr.ib()
 
 
 class Alarm:
@@ -44,48 +33,26 @@ class Alarm:
         return self.message['AlarmName']
 
     @property
-    def namespace(self):
-        return self.message['Trigger']['Namespace']
-
-    @property
-    def metric_name(self):
-        return self.message['Trigger']['MetricName']
-
-    @property
-    def dimensions(self):
-        return self.message['Trigger']['Dimensions']
-
-    @property
     def state_reason(self):
         return self.message['NewStateReason']
-
-    @property
-    def state_change_time(self):
-        return self.message['StateChangeTime']
 
     def human_reason(self):
         """
         Try to return a more human-readable explanation for the alarm.
         """
+        try:
+            threshold = ThresholdMessage.from_message(self.state_reason)
+        except ValueError:
+            return
+
         if (
             self.name.endswith('-alb-not-enough-healthy-hosts') and
-            self.state_reason == (
-                'Threshold Crossed: no datapoints were received for 1 period '
-                'and 1 missing datapoint was treated as [Breaching].'
-            )
+            threshold.is_breaching
         ):
             return 'There are no healthy hosts in the ALB target group.'
 
-        match = DATAPOINT_RE.search(self.state_reason)
-        if match is None:
-            return
-
-        value = int(float(match.group('value')))
-
-        timestamp = match.group('timestamp')
-        time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-        display_time = (
-            time.strftime('at %H:%M:%S on %d %b %Y').replace('on 0', 'on '))
+        display_time = threshold.date.strftime(
+            'at %H:%M:%S on %d %b %Y').replace('on 0', 'on ')
 
         if self.name.startswith('loris'):
             service = 'Loris'
@@ -95,24 +62,21 @@ class Alarm:
             return
 
         if self.name.endswith('-alb-target-500-errors'):
-            if value == 1:
+            if threshold.actual_value == 1:
                 return f'The ALB spotted a 500 error in {service} {display_time}.'
             else:
-                return f'The ALB spotted multiple 500 errors ({value}) in {service} {display_time}.'
+                return f'The ALB spotted multiple 500 errors ({threshold.actual_value}) in {service} {display_time}.'
 
         elif self.name.endswith('-alb-unhealthy-hosts'):
-            if value == 1:
+            if threshold.actual_value == 1:
                 return f'There is an unhealthy host in {service} {display_time}.'
             else:
-                return f'There are multiple unhealthy hosts ({value}) in {service} {display_time}.'
+                return f'There are multiple unhealthy hosts ({threshold.actual_value}) in {service} {display_time}.'
 
         elif self.name.endswith('-alb-not-enough-healthy-hosts'):
-            threshold = re.search(
-                r'less than the threshold \((?P<value>\d+)\.0\)',
-                self.state_reason).group('value')
             return (
                 f"There aren't enough healthy hosts in {service} "
-                f'(saw {value}; expected more than {threshold}) {display_time}.'
+                f'(saw {threshold.actual_value}; expected more than {threshold.desired_value}) {display_time}.'
             )
 
     # Sometimes there's enough data in the alarm to make an educated guess
@@ -120,72 +84,35 @@ class Alarm:
     # The methods and properties below pull out the relevant info.
 
     @property
-    def cloudwatch_search_terms(self):
-        """
-        Returns a list of potentially useful search terms in CloudWatch.
-        """
-        if self.name == 'loris-alb-target-500-errors':
-            return ['"HTTP/1.0 500"']
-        elif self.name.startswith('lambda'):
-            return ['Traceback', 'Task timed out after']
-        elif self.name.startswith('api_'):
-            return ['"HTTP 500"']
-        else:
-            return []
-
-    @property
-    def cloudwatch_log_group(self):
-        """
-        Returns the CloudWatch log group most likely to contain the error.
-        """
-        if self.name == 'loris-alb-target-500-errors':
-            return 'platform/loris'
-        elif self.name.startswith('lambda'):
-            lambda_name = self.name.split('-')[1]
-            return f'/aws/lambda/{lambda_name}'
-        elif self.name == 'api_romulus_v1-alb-target-500-errors':
-            return 'platform/api_romulus_v1'
-        elif self.name == 'api_remus_v1-alb-target-500-errors':
-            return 'platform/api_remus_v1'
-        else:
-            raise CloudWatchException(
-                "I don't know where to look for logs for %r" % self.name
-            )
-
-    @property
     def cloudwatch_timeframe(self):
         """
         Try to work out a likely timeframe for CloudWatch errors.
         """
-        timeframe = collections.namedtuple('timeframe', ['start', 'end'])
-        match = DATAPOINT_RE.search(self.state_reason)
-        if match is None:
-            raise CloudWatchException(
-                "I can't find a timeframe for reason %r" % self.reason
-            )
+        threshold = ThresholdMessage.from_message(self.state_reason)
 
-        timestamp = match.group('timestamp')
-        time = dt.datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-        start = time - dt.timedelta(seconds=300)
-        end = time + dt.timedelta(seconds=300)
-
-        return timeframe(start=start, end=end)
+        return Interval(
+            start=threshold.date - dt.timedelta(seconds=300),
+            end=threshold.date - dt.timedelta(seconds=300)
+        )
 
     def cloudwatch_urls(self):
         """
         Return some CloudWatch URLs that might be useful to check.
         """
         try:
-            group = self.cloudwatch_log_group
+            log_group_name = guess_cloudwatch_log_group(alarm=self)
             timeframe = self.cloudwatch_timeframe
             return [
-                self._build_cloudwatch_url(
-                    search_term=search_term, group=group, timeframe=timeframe
+                build_cloudwatch_url(
+                    search_term=search_term,
+                    log_group_name=log_group_name,
+                    start_date=timeframe.start,
+                    end_date=timeframe.end
                 )
-                for search_term in self.cloudwatch_search_terms
+                for search_term in guess_cloudwatch_search_terms(alarm=self)
             ]
-        except CloudWatchException as exc:
-            print(f'Error in cloudwatch_urls: {exc}')
+        except ValueError as err:
+            print(f'Error in cloudwatch_urls: {err}')
             return []
 
     def cloudwatch_messages(self):
@@ -197,6 +124,8 @@ class Alarm:
         messages = []
 
         try:
+            log_group_name = guess_cloudwatch_log_group(alarm=self)
+
             # CloudWatch wants these parameters specified as seconds since
             # 1 Jan 1970 00:00:00, so convert to that first.
             timeframe = self.cloudwatch_timeframe
@@ -207,9 +136,9 @@ class Alarm:
             # We only get the first page of results.  If there's more than
             # one page, we have so many errors that not getting them all
             # in the Slack alarm is the least of our worries!
-            for term in self.cloudwatch_search_terms:
+            for term in guess_cloudwatch_search_terms(alarm=self):
                 resp = client.filter_log_events(
-                    logGroupName=self.cloudwatch_log_group,
+                    logGroupName=log_group_name,
                     startTime=startTime,
                     endTime=endTime,
                     filterPattern=term
@@ -220,21 +149,6 @@ class Alarm:
             print(f'Error in cloudwatch_messages: {exc}')
 
         return messages
-
-    @staticmethod
-    def _build_cloudwatch_url(search_term, group, timeframe):
-        return (
-            'https://eu-west-1.console.aws.amazon.com/cloudwatch/home'
-            '?region=eu-west-1'
-            f'#logEventViewer:group={group};'
-
-            # Look for strings matching 'HTTP/1.0 500'
-            f'filter={quote(search_term)};'
-
-            # And add the date parameters to filter to the exact time
-            f'start={timeframe.start.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-            f'end={timeframe.end.strftime("%Y-%m-%dT%H:%M:%SZ")};'
-        )
 
     @property
     def is_critical(self):
@@ -247,6 +161,12 @@ class Alarm:
         if (
             self.name.endswith('dlq_not_empty') or
             self.name.startswith('lambda-')
+        ):
+            return False
+
+        # Alarms in the service stack are *never* critical.
+        if self.name.startswith(
+            ('id_minter', 'ingestor', 'transformer'),
         ):
             return False
 

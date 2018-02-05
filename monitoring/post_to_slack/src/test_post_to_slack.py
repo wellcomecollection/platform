@@ -20,7 +20,7 @@ def alarm_name():
 @pytest.fixture
 def alarm_reason():
     return (
-        "Threshold Crossed: 1 datapoint (4.0) was "
+        "Threshold Crossed: 1 datapoint [1.0 (05/02/18 06:28:00)] was "
         "greater than or equal to the threshold (1.0)."
     )
 
