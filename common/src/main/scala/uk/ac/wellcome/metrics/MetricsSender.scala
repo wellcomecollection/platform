@@ -37,7 +37,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
 
   val sourceQueue: SourceQueueWithComplete[MetricDatum] =
     Source
-      .queue[MetricDatum](100, OverflowStrategy.backpressure)
+      .queue[MetricDatum](3000, OverflowStrategy.backpressure)
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
       .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize,
