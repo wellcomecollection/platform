@@ -1,7 +1,8 @@
 [run]
 branch = True
 include =
-    alarms.py
+    cloudwatch_alarms.py
+    post_to_slack.py
 
 [report]
 show_missing = True
