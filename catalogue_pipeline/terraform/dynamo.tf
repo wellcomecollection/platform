@@ -77,7 +77,7 @@ resource "aws_dynamodb_table" "reindex_shard_tracker" {
   }
 }
 
-module "reindexer_dynamo_autoscaling" {
+module "reindex_shard_tracker_autoscaling" {
   source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=dynamodb-autoscaling"
 
   table_name = "${aws_dynamodb_table.reindex_shard_tracker.name}"
