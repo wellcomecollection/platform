@@ -138,7 +138,7 @@ with Betamax.configure() as config:
 def sess():
     session = requests.Session()
     with Betamax(session) as vcr:
-        vcr.use_cassette('test_post_to_slack')  #, record='all')
+        vcr.use_cassette('test_post_to_slack')
         yield session
 
 
@@ -208,7 +208,7 @@ class TestPrepareSlackPayload:
             'NewStateReason': 'Threshold Crossed: 1 datapoint [4.0 (01/01/01 12:00:00)] was greater than or equal to the threshold (1.0).',
         }))
 
-        payload = post_to_slack.prepare_slack_payload(
+        post_to_slack.prepare_slack_payload(
             alarm=alarm, bitly_access_token=access_token, sess=sess
         )
 
