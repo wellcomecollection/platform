@@ -22,7 +22,9 @@ class MiroReindexTargetServiceTest
     with ExtendedPatience {
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
+    new MetricsSender(namespace = "reindexer-tests",
+                      mock[AmazonCloudWatch],
+                      ActorSystem())
 
   it("should only update images in the specified ReindexShard") {
     val currentVersion = 1

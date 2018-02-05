@@ -62,7 +62,9 @@ class CalmReindexTargetServiceTest
     Scanamo.put(dynamoDbClient)(reindexTableName)(reindex)
 
     val metricsSender: MetricsSender =
-      new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
+      new MetricsSender(namespace = "reindexer-tests",
+                        mock[AmazonCloudWatch],
+                        ActorSystem())
 
     val reindexTargetService = new ReindexTargetService[CalmTransformable](
       dynamoDBClient = dynamoDbClient,
