@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.reindexer.services
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
@@ -21,7 +22,7 @@ class MiroReindexTargetServiceTest
     with ExtendedPatience {
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch])
+    new MetricsSender(namespace = "reindexer-tests", mock[AmazonCloudWatch], ActorSystem())
 
   it("should only update images in the specified ReindexShard") {
     val currentVersion = 1
