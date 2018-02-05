@@ -4,6 +4,7 @@ import attr
 import pytest
 
 from platform_alarms import (
+    get_human_message,
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
@@ -117,3 +118,82 @@ def test_is_critical_error(alarm_name, expected_is_critical_error):
 ])
 def test_simplify_message(message, expected):
     assert simplify_message(message) == expected
+
+
+@pytest.mark.parametrize('alarm_name, state_reason, expected_message', [
+    (
+        'sierra_items_windows_dlq_not_empty',
+        'Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was greater than the threshold (0.0).',
+        'There is 1 item on the sierra_items_windows DLQ.'
+    ),
+    (
+        'transformer_dlq_not_empty',
+        'Threshold Crossed: 1 datapoint [3.0 (01/01/01 12:00:00)] was greater than the threshold (0.0).',
+        'There are 3 items on the transformer DLQ.'
+    ),
+    (
+        'id_minter_dlq_not_empty',
+        'Threshold Crossed: 1 datapoint [17.0 (01/01/01 12:00:36)] was greater than the threshold (0.0).',
+        'There are 17 items on the id_minter DLQ.'
+    ),
+
+    (
+        'id_minter-alb-unhealthy-hosts',
+        'Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was greater than the threshold (0.0).',
+        'There is 1 unhealthy target in the id_minter ALB target group.'
+    ),
+    (
+        'loris-alb-unhealthy-hosts',
+        'Threshold Crossed: 1 datapoint [3.0 (01/01/01 12:00:00)] was greater than the threshold (0.0).',
+        'There are 3 unhealthy targets in the loris ALB target group.'
+    ),
+
+    (
+        'api_romulus_v1-alb-not-enough-healthy-hosts',
+        'Threshold Crossed: 1 datapoint [0.0 (09/01/18 10:36:00)] was less than the threshold (1.0).',
+        "There aren't enough healthy targets in the api_romulus_v1 ALB target group (saw 0, expected at least 1)."
+    ),
+    (
+        'ingestor-alb-not-enough-healthy-hosts',
+        'Threshold Crossed: 1 datapoint [2.0 (09/01/18 10:36:00)] was less than the threshold (3.0).',
+        "There aren't enough healthy targets in the ingestor ALB target group (saw 2, expected at least 3)."
+    ),
+    (
+        'api_remus_v1-alb-not-enough-healthy-hosts',
+        'Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [Breaching].',
+        'There are no healthy hosts in the api_remus_v1 ALB target group.'
+    ),
+
+    (
+        'api_remus_v1-alb-target-500-errors',
+        'Threshold Crossed: 1 datapoint [3.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
+        'There were multiple 500 errors (3) from the api_remus_v1 ALB target group.'
+    ),
+    (
+        'grafana-alb-target-500-errors',
+        'Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
+        'There was a 500 error from the grafana ALB target group.'
+    ),
+
+    (
+        'lambda-update_ecs_service_size-errors',
+        'Threshold Crossed: 1 datapoint [1.0 (02/02/18 13:20:00)] was greater than or equal to the threshold (1.0).)',
+        'There was an error in the update_ecs_service_size Lambda.'
+    ),
+    (
+        'lambda-post_to_slack-errors',
+        'Threshold Crossed: 1 datapoint [4.0 (02/02/18 13:20:00)] was greater than or equal to the threshold (1.0).)',
+        'There were 4 errors in the post_to_slack Lambda.'
+    ),
+
+    (
+        'unrecognised-alarm-name',
+        'Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was less than the threshold (0.0).',
+        'Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was less than the threshold (0.0).',
+    ),
+])
+def test_get_human_message(alarm_name, state_reason, expected_message):
+    message = get_human_message(
+        alarm_name=alarm_name, state_reason=state_reason
+    )
+    assert message == expected_message
