@@ -15,7 +15,7 @@ import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.platform.reindexer.models.{ReindexJob, ReindexStatus}
+import uk.ac.wellcome.platform.reindexer.models.ReindexJob
 import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -64,9 +64,10 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
 
     if (performedUpdates) {
       info(s"ReindexTargetService completed batch of ${updatedResults.length}")
-      metricsSender.incrementCount("reindex-updated-items",
-                                   updatedResults.length)
-      ReindexStatus.progress(updatedResults.length, 1)
+      metricsSender.incrementCount(
+        "reindex-updated-items",
+        updatedResults.length
+      )
     }
 
     performedUpdates
@@ -85,7 +86,7 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
     )
 
   def runReindex(reindexJob: ReindexJob)(
-      implicit evidence: DynamoFormat[T]): Future[Unit] = {
+      implicit evidence: DynamoFormat[T]): Future[Unit] = Future {
 
     info(s"ReindexTargetService running $reindexJob")
 
