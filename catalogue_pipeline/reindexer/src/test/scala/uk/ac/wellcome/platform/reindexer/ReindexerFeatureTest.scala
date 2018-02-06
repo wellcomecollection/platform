@@ -56,13 +56,6 @@ class ReindexerFeatureTest
 
     eventually {
       Scanamo.scan[MiroTransformable](dynamoDbClient)(miroDataTableName) should contain theSameElementsAs expectedMiroTransformableList
-
-      server.httpGet(
-        path = "/management/healthcheck",
-        andExpect = Created,
-        withJsonBody =
-          s"""{"recordsProcessed" : "${itemsToPut.length}","state" : "success","batch" : "$numberOfbatches"}"""
-      )
     }
 
     server.close()

@@ -8,13 +8,13 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
+import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules.{
   AkkaModule,
   AmazonCloudWatchModule,
   DynamoClientModule,
   PlatformDynamoConfigModule
 }
-import uk.ac.wellcome.platform.reindexer.controllers.ManagementController
 import uk.ac.wellcome.platform.reindexer.modules.ReindexModule
 
 object ServerMain extends Server
@@ -26,10 +26,6 @@ class Server extends HttpServer {
                              DynamoClientModule,
                              ReindexModule,
                              AkkaModule)
-
-  flag[Int]("reindex.maxAttempts",
-            3,
-            "Maximum number of times to retry a reindex operation")
 
   override def configureHttp(router: HttpRouter) {
     router
