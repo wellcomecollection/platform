@@ -15,7 +15,7 @@ import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexJob, ReindexStatus}
+import uk.ac.wellcome.platform.reindexer.models.{ReindexJob, ReindexStatus}
 import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
