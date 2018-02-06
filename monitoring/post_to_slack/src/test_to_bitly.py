@@ -20,7 +20,7 @@ with Betamax.configure() as config:
 def sess():
     session = requests.Session()
     with Betamax(session) as vcr:
-        vcr.use_cassette('test_to_bitly', record='once')
+        vcr.use_cassette('test_to_bitly')
         yield session
 
 

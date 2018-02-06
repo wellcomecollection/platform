@@ -128,6 +128,7 @@ def to_bitly(sess, url, access_token):
     try:
         return resp.json()['data']['link_save']['link']
     except TypeError:  # thrown if "data" = null
+        print(f'response from bit.ly: {resp.json()}')
         return url
 
 
