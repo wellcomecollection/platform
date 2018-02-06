@@ -89,8 +89,7 @@ class ReindexModuleTest
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
-        "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
-        "aws.dynamo.calmData.tableName" -> "CalmData",
+        "aws.dynamo.tableName" -> "ReindexTracker",
         "reindex.target.tableName" -> "CalmData"
       ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
     )

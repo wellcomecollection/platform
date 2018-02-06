@@ -21,8 +21,6 @@ class ReindexTrackerService @Inject()(
   @Flag("reindex.target.reindexShard") targetReindexShard: String
 ) extends Logging {
 
-  private val reindexTrackerTableConfigId = "reindex"
-
   private val reindexTrackerTableName = dynamoConfig.table
   private val reindexTable = Table[Reindex](reindexTrackerTableName)
 

@@ -22,7 +22,7 @@ class ReindexerFeatureTest
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
-        "aws.dynamo.reindexTracker.tableName" -> reindexTableName,
+        "aws.dynamo.tableName" -> reindexTableName,
         "reindex.target.tableName" -> "MiroData",
         "reindex.target.reindexShard" -> "default"
       ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
