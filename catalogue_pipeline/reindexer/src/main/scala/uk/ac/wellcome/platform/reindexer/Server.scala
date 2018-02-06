@@ -27,10 +27,6 @@ class Server extends HttpServer {
                              ReindexModule,
                              AkkaModule)
 
-  flag[Int]("reindex.maxAttempts",
-            3,
-            "Maximum number of times to retry a reindex operation")
-
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
