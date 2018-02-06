@@ -10,11 +10,6 @@ import pytest
 
 from complete_reindex import _run, _process_reindex_tracker_update_job, _update_versioned_item
 
-os.environ = {
-    "AWS_ACCESS_KEY_ID": "fake",
-    "AWS_SECRET_ACCESS_KEY": "fake"
-}
-
 def _create_table(dynamodb, table_name):
     dynamodb.create_table(
         TableName=table_name,
@@ -39,6 +34,11 @@ def _create_table(dynamodb, table_name):
 
 @pytest.fixture
 def reindex_shard_tracker_table():
+    os.environ = {
+        "AWS_ACCESS_KEY_ID": "fake",
+        "AWS_SECRET_ACCESS_KEY": "fake"
+    }
+
     dynamodb = boto3.resource('dynamodb', endpoint_url='http://dynamodb:8000')
     dynamodb_client = boto3.client('dynamodb')
 
