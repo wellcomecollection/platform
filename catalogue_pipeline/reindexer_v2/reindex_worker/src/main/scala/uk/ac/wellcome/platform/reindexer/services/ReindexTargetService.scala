@@ -16,46 +16,59 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
+import uk.ac.wellcome.models.{VersionedDynamoFormatWrapper, VersionUpdater}
 import uk.ac.wellcome.platform.reindexer.models.ReindexJob
 import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
+import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ReindexTargetService[T <: Reindexable] @Inject()(
+class ReindexTargetService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   metricsSender: MetricsSender,
   versionedDao: VersionedDao,
   @Flag("reindex.sourceData.tableName") targetTableName: String)
     extends Logging {
 
-  type ScanamoQueryResult = Either[DynamoReadError, T]
+  implicit val versionUpdater = new VersionUpdater[HybridRecord] {
+    override def updateVersion(
+      record: HybridRecord,
+      newVersion: Int): HybridRecord =
+        record.copy(version = newVersion)
+  }
+
+  type ScanamoQueryResult = Either[DynamoReadError, HybridRecord]
   type ScanamoQueryResultFunction = (List[ScanamoQueryResult]) => Boolean
 
   private val gsiName = "reindexTracker"
 
-  private def scanamoUpdate(
-    key: UniqueKey[_],
-    updateExpression: UpdateExpression)(implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] = {
-      Scanamo.update[T](dynamoDBClient)(targetTableName)(key, updateExpression)
-  }
-
   private def scanamoQueryStreamFunction(
     queryRequest: ScanamoQueryRequest,
     resultFunction: ScanamoQueryResultFunction
-  )(implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
-    ScanamoQueryStream.run[T, Boolean](queryRequest, resultFunction)
+  )(implicit evidence: DynamoFormat[HybridRecord]): ScanamoOps[List[Boolean]] =
+    ScanamoQueryStream.run[HybridRecord, Boolean](queryRequest, resultFunction)
 
   private def updateVersion(desiredVersion: Int)(
     resultGroup: List[ScanamoQueryResult])(
-    implicit evidence: DynamoFormat[T]): Boolean = {
+    implicit evidence: VersionedDynamoFormatWrapper[HybridRecord], versionUpdater: VersionUpdater[HybridRecord]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(hybridRecord) => {
-        scanamoUpdate(
-          'id -> hybridRecord.id,
-          set('ReindexVersion -> desiredVersion)
-        )
+        val existingRecord = versionedDao.getRecord[HybridRecord](id = hybridRecord.id)
+        existingRecord.map { possibleRecord =>
+
+          // getRecord() returns an Option[HybridRecord] because you may be
+          // looking up a non-existent ID; since the ID came from the table we
+          // can assume the record exists!
+          val record = possibleRecord.get
+
+          val updatedRecord = record.copy(reindexVersion = desiredVersion)
+          versionedDao.updateRecord[HybridRecord](updatedRecord)(
+            evidence = evidence,
+            versionUpdater = versionUpdater
+          )
+        }
       }
     }
 
@@ -85,7 +98,7 @@ class ReindexTargetService[T <: Reindexable] @Inject()(
     )
 
   def runReindex(reindexJob: ReindexJob)(
-      implicit evidence: DynamoFormat[T]): Future[Unit] = Future {
+      implicit evidence: DynamoFormat[HybridRecord]): Future[Unit] = Future {
 
     info(s"ReindexTargetService running $reindexJob")
 
