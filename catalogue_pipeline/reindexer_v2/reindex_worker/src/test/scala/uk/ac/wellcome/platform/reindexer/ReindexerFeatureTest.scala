@@ -40,7 +40,7 @@ class ReindexerFeatureTest
       generateMiroTransformablesInBatches(numberOfbatches, currentVersion)
 
     val expectedMiroTransformableList = itemsToPut.map(item => {
-      Right(item.copy(ReindexVersion = requestedVersion))
+      Right(item.copy(reindexVersion = requestedVersion))
     })
 
     val reindex = Reindex(miroDataTableName,

@@ -12,6 +12,7 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.update.UpdateExpression
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
@@ -21,23 +22,23 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ReindexTargetService[T <: Reindexable[String]] @Inject()(
+class ReindexTargetService[T <: Reindexable] @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   metricsSender: MetricsSender,
+  versionedDao: VersionedDao,
   @Flag("reindex.sourceData.tableName") targetTableName: String)
     extends Logging {
 
   type ScanamoQueryResult = Either[DynamoReadError, T]
+  type ScanamoQueryResultFunction = (List[ScanamoQueryResult]) => Boolean
 
-  type ScanamoQueryResultFunction =
-    (List[ScanamoQueryResult]) => Boolean
+  private val gsiName = "reindexTracker"
 
-  private val gsiName = "ReindexTracker"
-
-  private def scanamoUpdate(k: UniqueKey[_],
-                            updateExpression: UpdateExpression)(
-    implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] =
-    Scanamo.update[T](dynamoDBClient)(targetTableName)(k, updateExpression)
+  private def scanamoUpdate(
+    key: UniqueKey[_],
+    updateExpression: UpdateExpression)(implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] = {
+      Scanamo.update[T](dynamoDBClient)(targetTableName)(key, updateExpression)
+  }
 
   private def scanamoQueryStreamFunction(
     queryRequest: ScanamoQueryRequest,

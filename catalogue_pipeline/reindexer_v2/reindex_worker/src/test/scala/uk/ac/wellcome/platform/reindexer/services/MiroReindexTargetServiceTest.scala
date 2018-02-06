@@ -35,15 +35,15 @@ class MiroReindexTargetServiceTest
         sourceId = "Image_A1",
         MiroCollection = "Images-A",
         data = s""""{"image_title": "An almanac about armadillos"}""",
-        ReindexShard = "Images-A",
-        ReindexVersion = currentVersion
+        reindexShard = "Images-A",
+        reindexVersion = currentVersion
       ),
       MiroTransformable(
         sourceId = "Image_A2",
         MiroCollection = "Images-A",
         data = s""""{"image_title": "Asking after an aardvark"}""",
-        ReindexShard = "Images-A",
-        ReindexVersion = currentVersion
+        reindexShard = "Images-A",
+        reindexVersion = currentVersion
       )
     )
 
@@ -52,15 +52,15 @@ class MiroReindexTargetServiceTest
         sourceId = "Image_B1",
         MiroCollection = "Images-B",
         data = s""""{"image_title": "Buying books about beavers"}""",
-        ReindexShard = "Images-B",
-        ReindexVersion = currentVersion
+        reindexShard = "Images-B",
+        reindexVersion = currentVersion
       ),
       MiroTransformable(
         sourceId = "Image_C1",
         MiroCollection = "Images-C",
         data = s""""{"image_title": "Calling a crafty caterpillar"}""",
-        ReindexShard = "Images-C",
-        ReindexVersion = currentVersion
+        reindexShard = "Images-C",
+        reindexVersion = currentVersion
       )
     )
 
@@ -86,7 +86,7 @@ class MiroReindexTargetServiceTest
       new ReindexTargetService[MiroTransformable](
         dynamoDBClient = dynamoDbClient,
         targetTableName = "MiroData",
-        targetReindexShard = inShardMiroTransformables.head.ReindexShard,
+        targetReindexShard = inShardMiroTransformables.head.reindexShard,
         metricsSender = metricsSender
       )
 
@@ -96,7 +96,7 @@ class MiroReindexTargetServiceTest
         val reindexVersions = Scanamo
           .scan[MiroTransformable](dynamoDbClient)(miroDataTableName)
           .map {
-            case Right(miroTranformable) => miroTranformable.ReindexVersion
+            case Right(miroTranformable) => miroTranformable.reindexVersion
           }
 
         reindexVersions.filter { _ == currentVersion }.length shouldBe diffShardMiroTransformables.length
@@ -115,7 +115,7 @@ class MiroReindexTargetServiceTest
         sourceId = "Image1",
         MiroCollection = "Images-A",
         data = s"""{"image_title": "title"}""",
-        ReindexVersion = currentVersion
+        reindexVersion = currentVersion
       )
     )
 
@@ -124,7 +124,7 @@ class MiroReindexTargetServiceTest
         sourceId = "Image2",
         MiroCollection = "Images-A",
         data = s"""{"image_title": "title"}""",
-        ReindexVersion = requestedVersion
+        reindexVersion = requestedVersion
       )
     )
 
@@ -160,7 +160,7 @@ class MiroReindexTargetServiceTest
         Scanamo
           .scan[MiroTransformable](dynamoDbClient)(miroDataTableName)
           .map {
-            case Right(miroTranformable) => miroTranformable.ReindexVersion
+            case Right(miroTranformable) => miroTranformable.reindexVersion
           } should contain only requestedVersion
     }
   }

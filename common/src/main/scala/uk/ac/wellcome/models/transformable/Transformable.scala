@@ -12,23 +12,16 @@ import uk.ac.wellcome.utils.JsonUtil._
 sealed trait Transformable extends Versioned
 
 case class CalmTransformable(
-  sourceId: String,
-  RecordType: String,
-  AltRefNo: String,
-  RefNo: String,
-  data: String,
-  ReindexShard: String = "default",
-  ReindexVersion: Int = 0,
-  version: Int = 0,
-  sourceName: String = "calm"
-) extends Transformable
-    with Reindexable[String] {
-
-  val reindexId: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("sourceId", sourceId),
-    RangeKey("RecordType", RecordType)
-  )
-}
+                              sourceId: String,
+                              RecordType: String,
+                              AltRefNo: String,
+                              RefNo: String,
+                              data: String,
+                              reindexShard: String = "default",
+                              reindexVersion: Int = 0,
+                              version: Int = 0,
+                              sourceName: String = "calm"
+) extends Transformable with Reindexable
 
 case class CalmTransformableData(
   AccessStatus: Array[String]
@@ -37,18 +30,12 @@ case class CalmTransformableData(
 case class MiroTransformable(sourceId: String,
                              MiroCollection: String,
                              data: String,
-                             ReindexShard: String = "default",
+                             reindexShard: String = "default",
                              sourceName: String = "miro",
-                             ReindexVersion: Int = 0,
+                             reindexVersion: Int = 0,
                              version: Int = 1)
     extends Transformable
-    with Reindexable[String] {
-
-  val reindexId: ItemIdentifier[String] = ItemIdentifier(
-    HashKey("sourceId", sourceId),
-    RangeKey("MiroCollection", MiroCollection)
-  )
-}
+    with Reindexable
 
 /** Represents a row in the DynamoDB database of "merged" Sierra records;
   * that is, records that contain data for both bibs and

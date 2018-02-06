@@ -52,7 +52,7 @@ trait DynamoDBLocal extends BeforeAndAfterEach with DynamoDBLocalClients {
             sourceId = s"Image$i",
             MiroCollection = "Collection",
             data = bigString,
-            ReindexVersion = reindexVersion
+            reindexVersion = reindexVersion
         ))
       .toList
   }

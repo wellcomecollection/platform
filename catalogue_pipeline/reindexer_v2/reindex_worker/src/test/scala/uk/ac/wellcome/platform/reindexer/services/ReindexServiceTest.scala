@@ -68,11 +68,11 @@ class ReindexServiceTest
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",
         data = """{"AccessStatus": ["public"]}""",
-        ReindexVersion = currentVersion
+        reindexVersion = currentVersion
       ))
 
     val expectedCalmTransformableList = calmTransformableList
-      .map(_.copy(ReindexVersion = requestedVersion))
+      .map(_.copy(reindexVersion = requestedVersion))
       .map(Right(_))
 
     calmTransformableList.foreach(
@@ -111,7 +111,7 @@ class ReindexServiceTest
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",
         data = """{"AccessStatus": ["public"]}""",
-        ReindexVersion = currentVersion
+        reindexVersion = currentVersion
       ))
 
     // We need to use mockito matchers to assert on the implicit dynamo format

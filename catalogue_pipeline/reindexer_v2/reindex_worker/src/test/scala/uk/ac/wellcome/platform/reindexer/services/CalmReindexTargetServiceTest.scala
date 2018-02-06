@@ -33,7 +33,7 @@ class CalmReindexTargetServiceTest
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",
         data = """{"AccessStatus": ["public"]}""",
-        ReindexVersion = 1
+        reindexVersion = 1
       ))
 
     val inDateCalmTransferrableList = List(
@@ -43,13 +43,13 @@ class CalmReindexTargetServiceTest
         AltRefNo = "AltRefNo2",
         RefNo = "RefNo2",
         data = """{"AccessStatus": ["public"]}""",
-        ReindexVersion = 2
+        reindexVersion = 2
       ))
 
     val calmTransformableList = outOfdateCalmTransformableList ++ inDateCalmTransferrableList
 
     val expectedCalmTransformableList =
-      outOfdateCalmTransformableList.map(_.copy(ReindexVersion = 2))
+      outOfdateCalmTransformableList.map(_.copy(reindexVersion = 2))
 
     val reindex = Reindex(calmDataTableName,
                           reindexShard,
