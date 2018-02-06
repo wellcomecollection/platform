@@ -51,11 +51,9 @@ class ReindexTargetService[T <: Reindexable] @Inject()(
     implicit evidence: DynamoFormat[T]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
-      case Right(miroTransformable) => {
-        val reindexItem = Reindexable.getReindexItem(miroTransformable)
-
+      case Right(hybridRecord) => {
         scanamoUpdate(
-          reindexItem.hashKey and reindexItem.rangeKey,
+          'id -> hybridRecord.id,
           set('ReindexVersion -> desiredVersion)
         )
       }
