@@ -23,8 +23,7 @@ import scala.concurrent.Future
 class ReindexTargetService[T <: Reindexable[String]] @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   metricsSender: MetricsSender,
-  @Flag("reindex.target.tableName") targetTableName: String,
-  @Flag("reindex.target.reindexShard") targetReindexShard: String = "default")
+  @Flag("reindex.sourceData.tableName") targetTableName: String)
     extends Logging {
 
   type ScanamoQueryResult = Either[DynamoReadError, T]
@@ -39,10 +38,11 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
     implicit evidence: DynamoFormat[T]): Either[DynamoReadError, T] =
     Scanamo.update[T](dynamoDBClient)(targetTableName)(k, updateExpression)
 
-  private def scanamoQueryStreamFunction(queryRequest: ScanamoQueryRequest,
-                                         f: ScanamoQueryResultFunction)(
-    implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
-    ScanamoQueryStream.run[T, Boolean](queryRequest, f)
+  private def scanamoQueryStreamFunction(
+    queryRequest: ScanamoQueryRequest,
+    resultFunction: ScanamoQueryResultFunction
+  )(implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
+    ScanamoQueryStream.run[T, Boolean](queryRequest, resultFunction)
 
   private def updateVersion(requestedVersion: Int)(
     resultGroup: List[ScanamoQueryResult])(
@@ -69,34 +69,36 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
     performedUpdates
   }
 
-  private def createScanamoQueryRequest(
-    requestedVersion: Int): ScanamoQueryRequest =
+  private def createScanamoQueryRequest(reindexJob: ReindexJob): ScanamoQueryRequest =
     ScanamoQueryRequest(
       targetTableName,
       Some(gsiName),
       Query(
         AndQueryCondition(
-          KeyEquals('ReindexShard, targetReindexShard),
-          KeyIs('ReindexVersion, LT, requestedVersion)
+          KeyEquals('reindexShard, reindexJob.shardId),
+          KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
         )),
       ScanamoQueryOptions.default
     )
 
-  def runReindex(reindexAttempt: ReindexAttempt)(
-    implicit evidence: DynamoFormat[T]): Future[ReindexAttempt] = {
-    val requestedVersion = reindexAttempt.reindex.RequestedVersion
+  def runReindex(reindexJob: ReindexJob)(
+      implicit evidence: DynamoFormat[T]): Future[Unit] = {
 
-    info(s"ReindexTargetService running $reindexAttempt")
+    info(s"ReindexTargetService running $reindexJob")
 
-    val scanamoQueryRequest: ScanamoQueryRequest =
-      createScanamoQueryRequest(requestedVersion)
+    val scanamoQueryRequest = createScanamoQueryRequest(reindexJob)
 
-    val ops = scanamoQueryStreamFunction(scanamoQueryRequest,
-                                         updateVersion(requestedVersion))
+    val ops = scanamoQueryStreamFunction(
+      queryRequest = scanamoQueryRequest,
+      resultFunction = updateVersion(requestedVersion)
+    )
 
-    Future(Scanamo.exec(dynamoDBClient)(ops)).map(r => {
-      reindexAttempt.copy(successful = !r.contains(false),
-                          attempt = reindexAttempt.attempt + 1)
-    })
+    Scanamo.exec(dynamoDBClient)(ops) match {
+      case Right(_) =>
+        info(s"Successfully processed reindex job $reindexJob")
+      case Left(err) =>
+        warn(s"Failed to process reindex job $reindexJob", err)
+        throw err
+    }
   }
 }
