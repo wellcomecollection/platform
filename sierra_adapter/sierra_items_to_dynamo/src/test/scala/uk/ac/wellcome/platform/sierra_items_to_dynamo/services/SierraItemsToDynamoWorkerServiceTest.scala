@@ -71,7 +71,7 @@ class SierraItemsToDynamoWorkerServiceTest
         dynamoInserter = new DynamoInserter(
           sierraItemRecordDao = new SierraItemRecordDao(
             dynamoDbClient,
-            ynamoConfig(tableName)
+            DynamoConfig(tableName)
           )
         )
       ))
