@@ -14,9 +14,9 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.reindexer Reindexer"
 
   override val modules = Seq(
-    PlatformDynamoConfigModule,
     AmazonCloudWatchModule,
     DynamoClientModule,
+    DynamoConfigModule,
     SQSClientModule,
     SQSConfigModule,
     S3ClientModule,
