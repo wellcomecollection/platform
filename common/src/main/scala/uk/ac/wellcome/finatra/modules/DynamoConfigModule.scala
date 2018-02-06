@@ -13,5 +13,5 @@ object DynamoConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesDynamoConfig(): DynamoConfig =
-    DynamoConfig(tableName = tableName())
+    DynamoConfig(table = tableName())
 }
