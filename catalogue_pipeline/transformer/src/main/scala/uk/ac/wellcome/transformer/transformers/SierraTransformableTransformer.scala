@@ -21,7 +21,7 @@ class SierraTransformableTransformer
     with Logging {
 
   private def extractItemData(itemRecord: SierraItemRecord) = {
-    info(s"Attempting to transform $itemRecord")
+    info(s"Attempting to transform ${itemRecord.id}")
 
     fromJson[SierraItemData](itemRecord.data) match {
       case Success(sierraItemData) =>
@@ -52,7 +52,7 @@ class SierraTransformableTransformer
   ): Try[Option[Work]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
-        info(s"Attempting to transform $bibData")
+        info(s"Attempting to transform ${bibData.id}")
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(

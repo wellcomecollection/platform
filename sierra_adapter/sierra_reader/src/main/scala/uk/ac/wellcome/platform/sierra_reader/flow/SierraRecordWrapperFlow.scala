@@ -29,7 +29,7 @@ object SierraRecordWrapperFlow extends Logging {
     resourceType: SierraResourceTypes.Value): SierraRecord = {
     val json = addIDPrefix(json = unprefixedJson,
                            resourceType: SierraResourceTypes.Value)
-    logger.info(s"Creating record from ${json.noSpaces}")
+    logger.debug(s"Creating record from ${json.noSpaces}")
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
     maybeUpdatedDate match {
       case Some(updatedDate) =>
