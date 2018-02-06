@@ -12,9 +12,10 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.update.UpdateExpression
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexStatus}
+import uk.ac.wellcome.platform.reindexer.models.{ReindexAttempt, ReindexJob, ReindexStatus}
 import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -44,7 +45,7 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
   )(implicit evidence: DynamoFormat[T]): ScanamoOps[List[Boolean]] =
     ScanamoQueryStream.run[T, Boolean](queryRequest, resultFunction)
 
-  private def updateVersion(requestedVersion: Int)(
+  private def updateVersion(desiredVersion: Int)(
     resultGroup: List[ScanamoQueryResult])(
     implicit evidence: DynamoFormat[T]): Boolean = {
     val updatedResults = resultGroup.map {
@@ -52,8 +53,10 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
       case Right(miroTransformable) => {
         val reindexItem = Reindexable.getReindexItem(miroTransformable)
 
-        scanamoUpdate(reindexItem.hashKey and reindexItem.rangeKey,
-                      set('ReindexVersion -> requestedVersion))
+        scanamoUpdate(
+          reindexItem.hashKey and reindexItem.rangeKey,
+          set('ReindexVersion -> desiredVersion)
+        )
       }
     }
 
@@ -90,15 +93,17 @@ class ReindexTargetService[T <: Reindexable[String]] @Inject()(
 
     val ops = scanamoQueryStreamFunction(
       queryRequest = scanamoQueryRequest,
-      resultFunction = updateVersion(requestedVersion)
+      resultFunction = updateVersion(reindexJob.desiredVersion)
     )
 
-    Scanamo.exec(dynamoDBClient)(ops) match {
-      case Right(_) =>
-        info(s"Successfully processed reindex job $reindexJob")
-      case Left(err) =>
-        warn(s"Failed to process reindex job $reindexJob", err)
-        throw err
+    val result: Seq[Boolean] = Scanamo.exec(dynamoDBClient)(ops)
+
+    if (result.contains(false)) {
+      throw GracefulFailureException(new RuntimeException(
+        "Not all records were successfully processed!"
+      ))
+    } else {
+      info(s"Successfully processed reindex job $reindexJob")
     }
   }
 }

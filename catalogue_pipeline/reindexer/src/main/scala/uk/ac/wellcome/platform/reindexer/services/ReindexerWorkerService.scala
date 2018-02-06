@@ -5,8 +5,12 @@ import com.google.inject.Inject
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.platform.reindexer.models.ReindexJob
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class ReindexerWorkerService @Inject()(
   targetService: ReindexTargetService,
