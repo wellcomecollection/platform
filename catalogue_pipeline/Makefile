@@ -5,7 +5,7 @@ STACK_ROOT 	= catalogue_pipeline
 
 SBT_APPS 	= id_minter ingestor reindexer transformer
 ECS_TASKS 	=
-LAMBDAS 	= schedule_reindexer
+LAMBDAS 	= reindex_job_creator
 
 TF_NAME 	= catalogue_pipeline
 TF_PATH 	= $(ROOT)/catalogue_pipeline/terraform
