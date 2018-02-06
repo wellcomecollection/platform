@@ -7,7 +7,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.reindexer.modules.ReindexModule
-import uk.ac.wellcome.platform.reindexer.modules.{ReindexModule, ReindexerWorkerModule}
+import uk.ac.wellcome.platform.reindexer.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
 
