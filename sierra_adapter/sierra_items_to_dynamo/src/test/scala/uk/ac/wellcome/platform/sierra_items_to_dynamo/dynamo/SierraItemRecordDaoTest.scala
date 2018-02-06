@@ -55,7 +55,7 @@ class SierraItemRecordDaoTest
     it("should fail if an exception is thrown by dynamoDbClient") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val sierraItemRecordDao =
-        new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
+        new SierraItemRecordDao(dynamoDbClient, dynamoConfig)
 
       val expectedException = new RuntimeException("BLERGH")
       when(dynamoDbClient.getItem(any[GetItemRequest]))
@@ -121,7 +121,7 @@ class SierraItemRecordDaoTest
 
       val dynamoDbClient = mock[AmazonDynamoDB]
       val sierraItemRecordDao =
-        new SierraItemRecordDao(dynamoDbClient, dynamoConfigMap)
+        new SierraItemRecordDao(dynamoDbClient, dynamoConfig)
 
       val expectedException = new RuntimeException("BLERGH")
       when(dynamoDbClient.putItem(any[PutItemRequest]))
