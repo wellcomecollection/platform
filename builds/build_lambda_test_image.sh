@@ -45,8 +45,15 @@ then
   then
     DOCKERFILE=$SRC/.Dockerfile
     echo "FROM wellcome/test_lambda:latest"              > $DOCKERFILE
-    echo "COPY requirements.txt /requirements.txt"      >> $DOCKERFILE
+    echo "COPY requirements.txt /"                      >> $DOCKERFILE
     echo "RUN pip3 install -r /requirements.txt"        >> $DOCKERFILE
+
+    if [[ -f $ROOT/$SRC/test_requirements.txt ]]
+    then
+      echo "COPY test_requirements.txt /"               >> $DOCKERFILE
+      echo "RUN pip3 install -r /test_requirements.txt" >> $DOCKERFILE
+    fi
+
     docker build --tag $DOCKER_IMAGE --file $DOCKERFILE $SRC
   fi
 else
