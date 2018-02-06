@@ -1,61 +1,77 @@
 package uk.ac.wellcome.platform.reindexer
 
-import com.gu.scanamo.Scanamo
-import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.Reindex
+import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
+import uk.ac.wellcome.platform.reindexer.models.ReindexJob
+import uk.ac.wellcome.storage.VersionedHybridStoreLocal
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
+import uk.ac.wellcome.utils.JsonUtil._
 
 class ReindexerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
-    with ExtendedPatience
-    with DynamoDBLocal
-    with AmazonCloudWatchFlag {
+    with VersionedHybridStoreLocal
+    with AmazonCloudWatchFlag
+    with SQSLocal
+    with ScalaFutures {
+
+  val bucketName = "reindexer-feature-test-bucket"
+  val tableName = "reindexer-feature-test-table"
+  val queueUrl = createQueueAndReturnUrl("reindexer-feature-test-q")
+
+  implicit val sierraTransformableUpdater =
+    new VersionUpdater[MiroTransformable] {
+      override def updateVersion(miroTransformable: MiroTransformable,
+                                 newVersion: Int): MiroTransformable = {
+        miroTransformable.copy(version = newVersion)
+      }
+    }
 
   val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
-        "aws.dynamo.tableName" -> reindexTableName,
-        "reindex.target.tableName" -> "MiroData",
-        "reindex.target.reindexShard" -> "default"
+        "aws.dynamo.tableName" -> tableName
       ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
     )
 
   val currentVersion = 1
-  val requestedVersion = 2
+  val desiredVersion = 5
 
-  it(
-    "should increment the reindexVersion to the value requested on all items of a table in need of reindex"
-  ) {
+  it("should increase the reindexVersion on every record that needs a reindex") {
+    val numberOfRecords = 4
 
-    val numberOfbatches = 4
-    val itemsToPut =
-      generateMiroTransformablesInBatches(numberOfbatches, currentVersion)
+    (1 to numberOfRecords).map { i =>
+      hybridStore.updateRecord[MiroTransformable](
+        MiroTransformable(
+          sourceId = s"V00000$i",
+          MiroCollection = "images-V",
+          data = """{"title": "A visualisation of various vultures"}""",
+          reindexShard = "miro",
+          reindexVersion = 1
+        )
+      )
+    }
 
-    val expectedMiroTransformableList = itemsToPut.map(item => {
-      Right(item.copy(reindexVersion = requestedVersion))
-    })
-
-    val reindex = Reindex(miroDataTableName,
-                          reindexShard,
-                          requestedVersion,
-                          currentVersion)
-    val reindexList = List(reindex)
-
-    itemsToPut.foreach(Scanamo.put(dynamoDbClient)(miroDataTableName))
-    reindexList.foreach(Scanamo.put(dynamoDbClient)(reindexTableName))
+    val reindexJob = ReindexJob(
+      shardId = "miro",
+      desiredVersion = desiredVersion
+    )
 
     server.start()
+    sqsClient.sendMessage(queueUrl, toJson(reindexJob).get)
 
     eventually {
-      Scanamo.scan[MiroTransformable](dynamoDbClient)(miroDataTableName) should contain theSameElementsAs expectedMiroTransformableList
+      (1 to numberOfRecords).map { i =>
+        val recordFuture = hybridStore.getRecord[MiroTransformable](id = s"miro/V00000$i")
+        whenReady(recordFuture) { record: Option[MiroTransformable] =>
+          record.get.reindexVersion shouldBe desiredVersion
+        }
+      }
     }
 
     server.close()
