@@ -22,7 +22,7 @@ class SierraItemMergerFeatureTest
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
       "aws.s3.bucketName" -> bucketName,
-      "aws.dynamo.dynamoTable.tableName" -> tableName
+      "aws.dynamo.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ s3LocalFlags
   )
 

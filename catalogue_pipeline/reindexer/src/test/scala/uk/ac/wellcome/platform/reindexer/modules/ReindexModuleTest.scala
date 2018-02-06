@@ -35,11 +35,6 @@ class ReindexModuleTest
   val currentVersion = 1
   val requestedVersion = 2
 
-  val dynamoConfigs = Map(
-    "reindex" -> DynamoConfig(table = reindexTableName),
-    "calm" -> DynamoConfig(table = calmDataTableName)
-  )
-
   var maybeServer: Option[EmbeddedHttpServer] = None
 
   override def afterEach(): Unit = maybeServer.foreach(_.close())

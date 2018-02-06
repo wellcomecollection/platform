@@ -19,7 +19,7 @@ class Server extends HttpServer {
   override val modules = Seq(
     AmazonCloudWatchModule,
     AWSConfigModule,
-    PlatformDynamoConfigModule,
+    DynamoConfigModule,
     AkkaModule,
     SQSClientModule,
     SQSConfigModule,
