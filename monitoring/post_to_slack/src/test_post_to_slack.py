@@ -1,9 +1,17 @@
+# -*- encoding: utf-8 -*-
+
+import datetime as dt
 import json
 import os
 
+from betamax import Betamax
+import boto3
 import mock
+import moto
 import pytest
+import requests
 
+from cloudwatch_alarms import datetime_to_cloudwatch_ts
 import post_to_slack
 
 
@@ -27,7 +35,7 @@ def alarm_reason():
 
 @pytest.fixture
 def event(critical_hook, alarm_name, alarm_reason):
-    noncritical_hook = 'https://api.slack.com/hooks/example_non-critical'
+    noncritical_hook = 'https://api.slack.com/hooks/example_critical'
 
     os.environ['CRITICAL_SLACK_WEBHOOK'] = critical_hook
     os.environ['NONCRITICAL_SLACK_WEBHOOK'] = noncritical_hook
@@ -97,9 +105,7 @@ def event(critical_hook, alarm_name, alarm_reason):
 
 
 @mock.patch('post_to_slack.requests.post')
-def test_post_to_slack(
-    mock_post, event, critical_hook, alarm_name, alarm_reason
-):
+def test_post_to_slack(mock_post, event, critical_hook, alarm_name):
     mock_post.return_value.ok = True
 
     post_to_slack.main(event, context=None)
@@ -116,131 +122,94 @@ def test_post_to_slack(
     assert attachment['fallback'] == alarm_name
     assert attachment['title'] == alarm_name
     assert len(attachment['fields']) == 1
-    assert attachment['fields'][0]['value'] == alarm_reason
+    assert (
+        attachment['fields'][0]['value'] ==
+        'There was a 500 error from the api ALB target group.')
 
 
-class TestAlarm:
+with Betamax.configure() as config:
+    config.cassette_library_dir = '.'
 
-    @pytest.mark.parametrize('alarm_data, expected_reason', [
-        (
-            {
-                'AlarmName': 'loris-alb-target-500-errors',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
-            },
-            'The ALB spotted a 500 error in Loris at 10:55:00 on 11 Aug 2018.'
-        ),
-        (
-            {
-                'AlarmName': 'api_romulus-alb-target-500-errors',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
-            },
-            'The ALB spotted a 500 error in the API at 10:55:00 on 11 Aug 2018.'
-        ),
-        (
-            {
-                'AlarmName': 'api_remus-alb-target-500-errors',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
-            },
-            'The ALB spotted multiple 500 errors (3) in the API at 10:55:00 on 11 Aug 2018.'
-        ),
-        (
-            {
-                'AlarmName': 'api_remus-alb-target-500-errors',
-                'NewStateReason': 'Some other thing',
-            },
-            None
-        ),
-        (
-            {
-                'AlarmName': 'unrecognised-name',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (11/08/18 10:55:00)] was greater than or equal to the threshold (1.0).',
-            },
-            None
-        ),
-        (
-            {
-                'AlarmName': 'api_remus_v1-alb-not-enough-healthy-hosts',
-                'NewStateReason': 'Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [Breaching].',
-            },
-            "There are no healthy hosts in the ALB target group."
-        ),
-        (
-            {
-                'AlarmName': 'api_remus_v1-alb-unhealthy-hosts',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (09/01/18 10:23:00)] was greater than or equal to the threshold (1.0).',
-            },
-            "There is an unhealthy host in the API at 10:23:00 on 9 Jan 2018."
-        ),
-        (
-            {
-                'AlarmName': 'api_remus_v1-alb-unhealthy-hosts',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (10/02/19 10:26:00)] was greater than or equal to the threshold (1.0).',
-            },
-            "There are multiple unhealthy hosts (3) in the API at 10:26:00 on 10 Feb 2019."
-        ),
-        (
-            {
-                'AlarmName': 'api_romulus_v1-alb-not-enough-healthy-hosts',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [0.0 (09/01/18 10:36:00)] was less than the threshold (0.0).',
-            },
-            "There aren't enough healthy hosts in the API (saw 0; expected more than 0) at 10:36:00 on 9 Jan 2018."
-        ),
-        (
-            {
-                'AlarmName': 'api_romulus_v1-alb-not-enough-healthy-hosts',
-                'NewStateReason': 'Threshold Crossed: 1 datapoint [3.0 (09/01/18 10:36:00)] was less than the threshold (5.0).',
-            },
-            "There aren't enough healthy hosts in the API (saw 3; expected more than 5) at 10:36:00 on 9 Jan 2018."
-        ),
-    ])
-    def test_human_reason(self, alarm_data, expected_reason):
-        a = post_to_slack.Alarm(json.dumps(alarm_data))
-        assert a.human_reason() == expected_reason
+    access_token = os.environ.get('BITLY_ACCESS_TOKEN', 'testtoken')
+    config.define_cassette_placeholder('<ACCESS_TOKEN>', access_token)
 
 
-@pytest.mark.parametrize('message, expected', [
-    # We correctly strip timestamp and thread information from Scala logs
-    (
-        '13:25:56.965 [ForkJoinPool-1-worker-61] ERROR u.a.w.p.a.f.e.ElasticsearchResponseExceptionMapper - Sending HTTP 500 from ElasticsearchResponseExceptionMapper (Error (com.fasterxml.jackson.core.JsonParseException: Unrecognized token ‘No’: was expecting ‘null’, ‘true’, ‘false’ or NaN',
-        'ERROR u.a.w.p.a.f.e.ElasticsearchResponseExceptionMapper - Sending HTTP 500 from ElasticsearchResponseExceptionMapper (Error (com.fasterxml.jackson.core.JsonParseException: Unrecognized token ‘No’: was expecting ‘null’, ‘true’, ‘false’ or NaN'
-    ),
-
-    # We strip UWGSI and timestamp prefixes from Loris logs
-    (
-        '[pid: 88|app: 0|req: 1871/9531] 172.17.0.4 () {46 vars in 937 bytes} [Wed Oct 11 22:42:03 2017] GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg (HTTP/1.0 500)',
-        'GET //wordpress:2014/05/untitled3.png/full/320,/0/default.jpg (HTTP/1.0 500)',
-    ),
-
-    # We strip UWSGI suffixes from Loris logs
-    (
-        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg (HTTP/1.0 500) 3 headers in 147 bytes (1 switches on core 0)',
-        'GET //wordpress:2014/05/untitled2.png/full/320,/0/default.jpg (HTTP/1.0 500)'
-    ),
-
-    # We strip byte count and timings from Loris logs
-    (
-        'GET //s3:L0009000/L0009709.jpg/full/282,/0/default.jpg => generated 271 bytes in 988 msecs (HTTP/1.0 500)',
-        'GET //s3:L0009000/L0009709.jpg/full/282,/0/default.jpg (HTTP/1.0 500)',
-    ),
-
-    # We strip the timestamp and Lambda ID from timeout errors
-    (
-        '2017-10-12T13:18:31.917Z d1fdfca5-af4f-11e7-a100-030f2a39c6f6 Task timed out after 10.01 seconds',
-        'Task timed out after 10.01 seconds'
-    ),
-])
-def test_simplify_message(message, expected):
-    assert post_to_slack.simplify_message(message) == expected
+@pytest.fixture
+def sess():
+    session = requests.Session()
+    with Betamax(session) as vcr:
+        vcr.use_cassette('test_post_to_slack')
+        yield session
 
 
-@pytest.mark.parametrize('name, is_critical', [
-    ('lambda-notify_old_deploys-errors', False),
-    ('api_remus_v1-alb-target-500-errors', True),
-    ('api_remus_v2-alb-target-500-errors', True),
-    ('es_ingest_queue_mel_dlq_not_empty', False),
-    ('unknown_alarm', True),
-])
-def test_alarm_is_critical(name, is_critical):
-    metadata = {'AlarmName': name}
-    alarm = post_to_slack.Alarm(json.dumps(metadata))
-    assert alarm.is_critical == is_critical
+class TestPrepareSlackPayload:
+
+    @moto.mock_logs
+    def test_critical_is_alarm(self, sess):
+        alarm = post_to_slack.Alarm(json.dumps({
+            'AlarmName': 'api_remus_v1-alb-target-500-errors',
+            'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was greater than or equal to the threshold (1.0).',
+        }))
+        payload = post_to_slack.prepare_slack_payload(
+            alarm=alarm, bitly_access_token=access_token, sess=sess
+        )
+
+        assert payload['username'] == 'cloudwatch-alarm'
+        assert payload['icon_emoji'] == ':rotating_light:'
+        assert payload['attachments'][0]['color'] == 'danger'
+
+    @moto.mock_logs
+    def test_non_critical_is_warning(self, sess):
+        alarm = post_to_slack.Alarm(json.dumps({
+            'AlarmName': 'sierra_bibs_merger_queue_dlq_not_empty',
+            'NewStateReason': 'Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was greater than or equal to the threshold (1.0).',
+        }))
+        payload = post_to_slack.prepare_slack_payload(
+            alarm=alarm, bitly_access_token=access_token, sess=sess
+        )
+
+        assert payload['username'] == 'cloudwatch-warning'
+        assert payload['icon_emoji'] == ':warning:'
+        assert payload['attachments'][0]['color'] == 'warning'
+
+    @pytest.mark.skip(
+        reason="filter_log_events() isn't implemented in moto"
+    )
+    @moto.mock_logs
+    def test_including_cloudwatch_messages(self, sess):
+        # Populate the CloudWatch log stream with a bunch of logs, then
+        # we'll check we get something broadly sensible at the end.
+        client = boto3.client('logs')
+        client.create_log_group(logGroupName='platform/loris')
+        client.create_log_stream(
+            logGroupName='platform/loris',
+            logStreamName='logstream001'
+        )
+
+        def _event(minute, status_code):
+            return {
+                'timestamp': datetime_to_cloudwatch_ts(dt.datetime(2000, 1, 1, 12, minute, 0, 0)),
+                'message': f'[Mon Jan 1 12:{minute}:00 2001] GET /V0{status_code}.jpg/full/300,/0/default.jpg => generated 1000 bytes in 10 msecs (HTTP/1.0 {status_code})'
+            }
+
+        client.put_log_events(
+            logGroupName='platform/loris',
+            logStreamName='logstream001',
+            logEvents=[
+                _event(minute=minute, status_code=status_code)
+                for minute, status_code in enumerate([
+                    200, 200, 500, 200, 500, 500, 200, 500, 200, 200, 500, 200
+                ], start=22)
+            ]
+        )
+
+        alarm = post_to_slack.Alarm(json.dumps({
+            'AlarmName': 'loris-alb-target-500-errors',
+            'NewStateReason': 'Threshold Crossed: 1 datapoint [4.0 (01/01/01 12:00:00)] was greater than or equal to the threshold (1.0).',
+        }))
+
+        post_to_slack.prepare_slack_payload(
+            alarm=alarm, bitly_access_token=access_token, sess=sess
+        )
+
+        # TODO: Make an assertion on the payload about the log events we see.
