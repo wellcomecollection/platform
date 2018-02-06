@@ -35,7 +35,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
     extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
-    info(s"Starting to process message $message")
+    debug(s"Starting to process message $message")
     metricsSender.timeAndCount(
       "ingest-time",
       () => {
@@ -51,7 +51,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
         futurePublishAttempt
           .recover {
             case e: ParsingFailure =>
-              info("Recoverable failure extracting workfrom record", e)
+              info("Recoverable failure parsing HybridRecord from message", e)
               throw GracefulFailureException(e)
           }
           .map(_ => ())
@@ -74,7 +74,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
     transformable: Transformable): Try[Option[Work]] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable) map { transformed =>
-      info(s"Transformed record $transformed")
+      debug(s"Transformed record to $transformed")
       transformed
     } recover {
       case e: Throwable =>
