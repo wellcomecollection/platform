@@ -29,7 +29,7 @@ class WorkIndexer @Inject()(
     metricsSender.timeAndCount[IndexResponse](
       "ingestor-index-work",
       () => {
-        info(s"Indexing work $work")
+        info(s"Indexing work ${work.id}")
 
         elasticClient
           .execute {
@@ -37,7 +37,7 @@ class WorkIndexer @Inject()(
           }
           .recover {
             case e: Throwable =>
-              error(s"Error indexing work $work into Elasticsearch", e)
+              error(s"Error indexing work ${work.id} into Elasticsearch", e)
               throw e
           }
       }
