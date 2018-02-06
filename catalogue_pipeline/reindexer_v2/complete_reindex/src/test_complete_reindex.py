@@ -8,17 +8,15 @@ from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
 import pytest
 
-from complete_reindex import main, _process_reindex_tracker_update_job, _update_versioned_item
+from complete_reindex import _run, _process_reindex_tracker_update_job, _update_versioned_item
 
+os.environ = {
+    "AWS_ACCESS_KEY_ID": "fake",
+    "AWS_SECRET_ACCESS_KEY": "fake"
+}
 
-@pytest.fixture
-def reindex_shard_tracker_table():
-    mock_dynamodb2().start()
-    dynamodb = boto3.resource('dynamodb')
-
-    table_name = "ReindexShardTracker"
-
-    table = dynamodb.create_table(
+def _create_table(dynamodb, table_name):
+    dynamodb.create_table(
         TableName=table_name,
         KeySchema=[
             {
@@ -30,14 +28,6 @@ def reindex_shard_tracker_table():
             {
                 'AttributeName': "shardId",
                 'AttributeType': "S"
-            },
-            {
-                'AttributeName': "currentVersion",
-                'AttributeType': "N"
-            },
-            {
-                'AttributeName': "desiredVersion",
-                'AttributeType': "N"
             }
         ],
         ProvisionedThroughput={
@@ -45,9 +35,28 @@ def reindex_shard_tracker_table():
             'WriteCapacityUnits': 1
         }
     )
-    yield table
-    mock_dynamodb2().stop()
 
+
+@pytest.fixture
+def reindex_shard_tracker_table():
+    dynamodb = boto3.resource('dynamodb', endpoint_url='http://dynamodb:8000')
+    dynamodb_client = boto3.client('dynamodb')
+
+    table_name = "ReindexShardTracker"
+
+    try:
+        _create_table(dynamodb, table_name)
+    except dynamodb_client.exceptions.ResourceInUseException:
+        table = dynamodb.Table(table_name)
+        table.delete()
+        _create_table(dynamodb, table_name)
+        pass
+
+    table = dynamodb.Table(table_name)
+
+    yield table
+
+    table.delete()
 
 shard_id = "shard_id"
 current_version = 1
@@ -100,7 +109,7 @@ def test_request_reindex(reindex_shard_tracker_table):
         }
     )
 
-    main(example_event, {})
+    _run(table, example_event)
 
     dynamodb_response = table.get_item(Key={'shardId': shard_id})
 
@@ -130,7 +139,7 @@ def test_request_reindex_does_not_revert_current_version_update(reindex_shard_tr
         }
     )
 
-    main(example_event, {})
+    _run(table, example_event)
 
     dynamodb_response = table.get_item(Key={'shardId': shard_id})
 
@@ -142,37 +151,37 @@ def test_request_reindex_does_not_revert_current_version_update(reindex_shard_tr
     assert dynamodb_response['Item']['version'] == 0
 
 
-# def test_request_reindex_throws_conditional_update_exception(reindex_shard_tracker_table):
-#     table = reindex_shard_tracker_table
-#
-#     os.environ = {
-#         "TABLE_NAME": table.table_name
-#     }
-#
-#     table.put_item(
-#         Item={
-#             'shardId': shard_id,
-#             'currentVersion': 1,
-#             'desiredVersion': 3,
-#             'version': 0,
-#         }
-#     )
-#
-#     job = _process_reindex_tracker_update_job(table, {
-#         "shardId": shard_id,
-#         "completedReindexVersion": 3
-#     })
-#
-#     table.put_item(
-#         Item={
-#             'shardId': shard_id,
-#             'currentVersion': 2,
-#             'desiredVersion': 2,
-#             'version': 1,
-#         }
-#     )
-#
-#     with pytest.raises(ClientError) as e:
-#         _update_versioned_item(table, job['dynamo_item'], job['desired_item'])
-#         assert e.value.response['Error']['Code'] != 'ConditionalCheckFailedException'
+def test_request_reindex_throws_conditional_update_exception(reindex_shard_tracker_table):
+    table = reindex_shard_tracker_table
+
+    os.environ = {
+        "TABLE_NAME": table.table_name
+    }
+
+    table.put_item(
+        Item={
+            'shardId': shard_id,
+            'currentVersion': 1,
+            'desiredVersion': 3,
+            'version': 0,
+        }
+    )
+
+    job = _process_reindex_tracker_update_job(table, {
+        "shardId": shard_id,
+        "completedReindexVersion": 3
+    })
+
+    table.put_item(
+        Item={
+            'shardId': shard_id,
+            'currentVersion': 2,
+            'desiredVersion': 2,
+            'version': 1,
+        }
+    )
+
+    with pytest.raises(ClientError) as e:
+        _update_versioned_item(table, job['dynamo_item'], job['desired_item'])
+        assert e.value.response['Error']['Code'] != 'ConditionalCheckFailedException'
 

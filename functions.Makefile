@@ -60,13 +60,25 @@ endef
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	$(ROOT)/builds/docker_run.py --aws -- \
-		--volume $(ROOT)/$(1)/src:/data \
-		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
-		--env INSTALL_DEPENDENCIES=false \
-		--env FIND_MATCH_PATHS="/data" --tty \
-		wellcome/test_lambda_$(shell basename $(1)):latest
+	$(ROOT)/builds/docker_run.py \
+	    --dind -- \
+		--volume $(ROOT):/repo \
+        test_builder:latest $(ROOT) $(1)
+
+#	$(ROOT)/builds/build_lambda_test_image.sh $(1)
+#
+#	$(ROOT)/builds/docker_run.py \
+#	    --dind -- \
+#        --volume $(ROOT)/$(1):/rootfs/$(1) \
+#        -w /rootfs/$(1) \
+#        docker/compose:1.13.0 up -d &
+#
+#	$(ROOT)/builds/docker_run.py --aws -- \
+#		--volume $(ROOT)/$(1)/src:/data \
+#		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
+#		--env INSTALL_DEPENDENCIES=false \
+#		--env FIND_MATCH_PATHS="/data" --tty \
+#		wellcome/test_lambda_$(shell basename $(1)):latest
 endef
 
 

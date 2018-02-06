@@ -36,6 +36,9 @@ def _process_reindex_tracker_update_job(table, message):
     completed_reindex_version = message['completedReindexVersion']
 
     dynamodb_response = table.get_item(Key={'shardId': shard_id})
+
+    print(dynamodb_response)
+
     dynamo_item = dynamodb_response['Item']
 
     print(f'Retrieved {dynamo_item}')
@@ -57,6 +60,12 @@ def _process_reindex_tracker_update_job(table, message):
         "desired_item": desired_item
     }
 
+def _run(table, event):
+    for record in sns_utils.extract_sns_messages_from_lambda_event(event):
+        job = _process_reindex_tracker_update_job(table, record.message)
+
+    if job is not None:
+        _update_versioned_item(table, job['dynamo_item'], job['desired_item'])
 
 def main(event, _):
     print(f'event = {event!r}')
@@ -65,8 +74,4 @@ def main(event, _):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
-    for record in sns_utils.extract_sns_messages_from_lambda_event(event):
-        job = _process_reindex_tracker_update_job(table, record.message)
-
-        if job is not None:
-            _update_versioned_item(table, job['dynamo_item'], job['desired_item'])
+    _run(table, event)
