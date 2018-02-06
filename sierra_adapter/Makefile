@@ -17,13 +17,6 @@ TF_IS_PUBLIC_FACING = false
 $(val $(call stack_setup))
 
 
-SIERRA_WINDOW_GENERATOR = $(ROOT)/sierra_adapter/sierra_window_generator
-
-$(SIERRA_WINDOW_GENERATOR)/src/requirements.txt: $(SIERRA_WINDOW_GENERATOR)/src/requirements.in
-	$(ROOT)/builds/docker_run.py -- \
-		--volume $(SIERRA_WINDOW_GENERATOR)/src:/src micktwomey/pip-tools
-
-
 $(ROOT)/.docker/sierra_adapter_progress:
 	echo "FROM python:3-alpine\nRUN pip3 install attrs boto3" | docker build --tag sierra_adapter_progress -
 	mkdir -p $(ROOT)/.docker
