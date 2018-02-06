@@ -5,7 +5,9 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.reindexer.services.ReindexerWorkerService
 
 object ReindexerWorkerModule extends TwitterModule {
-  flag[String]("reindex.sourceData.tableName", "SourceData", "Name of the DynamoDB SourceData table")
+  flag[String]("reindex.sourceData.tableName",
+               "SourceData",
+               "Name of the DynamoDB SourceData table")
 
   override def singletonStartup(injector: Injector) {
     val workerService = injector.instance[ReindexerWorkerService]

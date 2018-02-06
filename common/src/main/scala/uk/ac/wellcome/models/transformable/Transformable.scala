@@ -12,16 +12,17 @@ import uk.ac.wellcome.utils.JsonUtil._
 sealed trait Transformable extends Versioned
 
 case class CalmTransformable(
-                              sourceId: String,
-                              RecordType: String,
-                              AltRefNo: String,
-                              RefNo: String,
-                              data: String,
-                              reindexShard: String = "default",
-                              reindexVersion: Int = 0,
-                              version: Int = 0,
-                              sourceName: String = "calm"
-) extends Transformable with Reindexable
+  sourceId: String,
+  RecordType: String,
+  AltRefNo: String,
+  RefNo: String,
+  data: String,
+  reindexShard: String = "default",
+  reindexVersion: Int = 0,
+  version: Int = 0,
+  sourceName: String = "calm"
+) extends Transformable
+    with Reindexable
 
 case class CalmTransformableData(
   AccessStatus: Array[String]

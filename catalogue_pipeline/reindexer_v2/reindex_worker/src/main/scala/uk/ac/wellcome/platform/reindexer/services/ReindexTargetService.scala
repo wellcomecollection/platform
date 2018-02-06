@@ -32,10 +32,9 @@ class ReindexTargetService @Inject()(
     extends Logging {
 
   implicit val versionUpdater = new VersionUpdater[HybridRecord] {
-    override def updateVersion(
-      record: HybridRecord,
-      newVersion: Int): HybridRecord =
-        record.copy(version = newVersion)
+    override def updateVersion(record: HybridRecord,
+                               newVersion: Int): HybridRecord =
+      record.copy(version = newVersion)
   }
 
   type ScanamoQueryResult = Either[DynamoReadError, HybridRecord]
@@ -51,13 +50,14 @@ class ReindexTargetService @Inject()(
 
   private def updateVersion(desiredVersion: Int)(
     resultGroup: List[ScanamoQueryResult])(
-    implicit evidence: VersionedDynamoFormatWrapper[HybridRecord], versionUpdater: VersionUpdater[HybridRecord]): Boolean = {
+    implicit evidence: VersionedDynamoFormatWrapper[HybridRecord],
+    versionUpdater: VersionUpdater[HybridRecord]): Boolean = {
     val updatedResults = resultGroup.map {
       case Left(e) => Left(e)
       case Right(hybridRecord) => {
-        val existingRecord = versionedDao.getRecord[HybridRecord](id = hybridRecord.id)
+        val existingRecord =
+          versionedDao.getRecord[HybridRecord](id = hybridRecord.id)
         existingRecord.map { possibleRecord =>
-
           // getRecord() returns an Option[HybridRecord] because you may be
           // looking up a non-existent ID; since the ID came from the table we
           // can assume the record exists!
@@ -85,7 +85,8 @@ class ReindexTargetService @Inject()(
     performedUpdates
   }
 
-  private def createScanamoQueryRequest(reindexJob: ReindexJob): ScanamoQueryRequest =
+  private def createScanamoQueryRequest(
+    reindexJob: ReindexJob): ScanamoQueryRequest =
     ScanamoQueryRequest(
       targetTableName,
       Some(gsiName),
@@ -98,7 +99,7 @@ class ReindexTargetService @Inject()(
     )
 
   def runReindex(reindexJob: ReindexJob)(
-      implicit evidence: DynamoFormat[HybridRecord]): Future[Unit] = Future {
+    implicit evidence: DynamoFormat[HybridRecord]): Future[Unit] = Future {
 
     info(s"ReindexTargetService running $reindexJob")
 
@@ -112,9 +113,10 @@ class ReindexTargetService @Inject()(
     val result: Seq[Boolean] = Scanamo.exec(dynamoDBClient)(ops)
 
     if (result.contains(false)) {
-      throw GracefulFailureException(new RuntimeException(
-        "Not all records were successfully processed!"
-      ))
+      throw GracefulFailureException(
+        new RuntimeException(
+          "Not all records were successfully processed!"
+        ))
     } else {
       info(s"Successfully processed reindex job $reindexJob")
     }

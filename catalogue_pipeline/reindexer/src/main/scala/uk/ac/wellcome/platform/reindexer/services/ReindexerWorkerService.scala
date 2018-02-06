@@ -22,7 +22,8 @@ class ReindexerWorkerService @Inject()(
 
   override def processMessage(message: SQSMessage): Future[Unit] = Future {
     fromJson[ReindexJob](message.body) match {
-      case Success(reindexJob) => targetService.runReindex(reindexJob = reindexJob).map(_ => ())
+      case Success(reindexJob) =>
+        targetService.runReindex(reindexJob = reindexJob).map(_ => ())
       case Failure(err) => throw GracefulFailureException(err)
     }
   }

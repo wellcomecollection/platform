@@ -4,7 +4,11 @@ import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormatWrapper}
+import uk.ac.wellcome.models.{
+  VersionUpdater,
+  Versioned,
+  VersionedDynamoFormatWrapper
+}
 import uk.ac.wellcome.s3.VersionedObjectStore
 
 import scala.concurrent.Future
@@ -17,7 +21,8 @@ case class HybridRecord(
   s3key: String,
   reindexShard: String = "default",
   reindexVersion: Int = 0
-) extends Reindexable with Versioned
+) extends Reindexable
+    with Versioned
 
 class VersionedHybridStore @Inject()(
   versionedObjectStore: VersionedObjectStore,
