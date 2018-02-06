@@ -2,11 +2,7 @@ package uk.ac.wellcome.platform.reindexer
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
@@ -21,6 +17,10 @@ class Server extends HttpServer {
     PlatformDynamoConfigModule,
     AmazonCloudWatchModule,
     DynamoClientModule,
+    SQSClientModule,
+    SQSConfigModule,
+    S3ClientModule,
+    S3ConfigModule,
     ReindexerWorkerModule,
     AkkaModule
   )

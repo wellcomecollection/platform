@@ -1,24 +1,28 @@
 package uk.ac.wellcome.platform.reindexer
 
 import com.google.inject.Stage
+import com.gu.scanamo.DynamoFormat
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.platform.reindexer.locals.DynamoDBLocal
+import uk.ac.wellcome.locals.DynamoDBLocal
+import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, StartupLogbackOverride}
 
 class StartupTest
     extends FeatureTest
     with StartupLogbackOverride
-    with DynamoDBLocal
+    with DynamoDBLocal[HybridRecord]
     with AmazonCloudWatchFlag {
+
+  implicit val evidence: DynamoFormat[HybridRecord] = DynamoFormat[HybridRecord]
+
+  override lazy val tableName = "reindexer-startup-test-table"
 
   val server = new EmbeddedHttpServer(
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
     flags = Map(
-      "aws.dynamo.tableName" -> "ReindexTracker",
-      "reindex.target.tableName" -> "MiroData",
-      "reindex.target.reindexShard" -> "default"
+      "aws.dynamo.tableName" -> tableName
     ) ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag
   )
 

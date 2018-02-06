@@ -19,11 +19,11 @@ class ReindexerFeatureTest
     with SQSLocal
     with ScalaFutures {
 
-  val bucketName = "reindexer-feature-test-bucket"
-  val tableName = "reindexer-feature-test-table"
+  override lazy val bucketName = "reindexer-feature-test-bucket"
+  override lazy val tableName = "reindexerTable"
   val queueUrl = createQueueAndReturnUrl("reindexer-feature-test-q")
 
-  implicit val sierraTransformableUpdater =
+  implicit val miroTransformableUpdater =
     new VersionUpdater[MiroTransformable] {
       override def updateVersion(miroTransformable: MiroTransformable,
                                  newVersion: Int): MiroTransformable = {

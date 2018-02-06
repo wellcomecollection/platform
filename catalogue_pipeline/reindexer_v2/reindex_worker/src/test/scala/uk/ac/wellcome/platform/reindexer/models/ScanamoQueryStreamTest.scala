@@ -21,7 +21,7 @@ class ScanamoQueryStreamTest
     with DynamoDBLocal[MiroTransformable]
     with Matchers {
 
-  val tableName = "scanamo-query-stream-test-table"
+  override lazy val tableName = "scanamo-query-stream-test-table"
   val bigString = "_" * maxDynamoItemSizeinKb
 
   override lazy val evidence: DynamoFormat[MiroTransformable] =

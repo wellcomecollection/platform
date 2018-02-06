@@ -29,10 +29,10 @@ case class CalmTransformableData(
 )
 
 case class MiroTransformable(sourceId: String,
+                             sourceName: String = "miro",
                              MiroCollection: String,
                              data: String,
                              reindexShard: String = "default",
-                             sourceName: String = "miro",
                              reindexVersion: Int = 0,
                              version: Int = 1)
     extends Transformable
