@@ -1,5 +1,8 @@
 # -*- encoding: utf-8 -*-
 
+import json
+import os
+
 import attr
 import boto3
 import requests
@@ -13,6 +16,12 @@ class CurrencyAmount:
     # into floats is a little cheaty, but a floating-point error here is
     # insignificant, so we'll take the risk!
     amount = attr.ib(converter=float)
+
+    def __str__(self):
+        if self.unit == 'USD':
+            return f'${self.amount:.2f}'
+        else:
+            return f'{self.unit} {self.amount:.2f}'
 
     def __gt__(self, other):
         if self.unit != other.unit:
@@ -37,8 +46,17 @@ class Budget:
     data = attr.ib()
 
     @property
+    def name(self):
+        return self.data['BudgetName']
+
+    @property
     def budget_limit(self):
         spend = self.data['BudgetLimit']
+        return CurrencyAmount(unit=spend['Unit'], amount=spend['Amount'])
+
+    @property
+    def current_spend(self):
+        spend = self.data['CalculatedSpend']['ActualSpend']
         return CurrencyAmount(unit=spend['Unit'], amount=spend['Amount'])
 
     @property
@@ -60,14 +78,47 @@ def get_budgets(account_id):
         yield Budget(b)
 
 
-def main():
-    budgets = get_budgets(account_id='760097843905')
+def build_slack_payload(budget):
+    """
+    Builds the payload that is sent to the Slack webhook about
+    our budget overspend.
+    """
+    return {
+        'username': 'aws-budgets',
+        'icon_emoji': ':money_with_wings:',
+        'attachments': [
+            {
+                'color': 'warning',
+                'title': f'{budget.name} is forecast for an overspend!',
+                'fields': [{
+                    'value': '\n'.join([
+                        f'Budget:   {budget.budget_limit}',
+                        f'Current:  {budget.current_spend}',
+                        f'Forecast: {budget.forecasted_spend}',
+                    ])
+                }]
+            }
+        ]
+    }
 
-    bad_budgets = [b for b in budgets if b.budget_limit < b.forecasted_spend]
 
-    from pprint import pprint
-    pprint(bad_budgets)
+def main(account_id, hook_url):
+    budgets = get_budgets(account_id=account_id)
+
+    for b in budgets:
+        if b.budget_limit < b.forecasted_spend:
+            payload = build_slack_payload(budget=b)
+            resp = requests.post(
+                hook_url,
+                data=json.dumps(payload),
+                headers={'Content-Type': 'application/json'}
+            )
+            resp.raise_for_status()
 
 
 if __name__ == '__main__':
-    main()
+
+    account_id = os.environ['ACCOUNT_ID']
+    hook_url = os.environ['SLACK_WEBHOOK']
+
+    main(account_id=account_id, hook_url=hook_url)
