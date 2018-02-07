@@ -21,16 +21,19 @@ module "ecr_repository_slack_budget_bot" {
   name   = "slack_budget_bot"
 }
 
+data "aws_ecs_cluster" "services" {
+  cluster_name = "${var.ecs_services_cluster_id}"
+}
+
 module "scheduled_slack_budget" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs_task_schedule?ref=v1.0.0"
 
-  cloudwatch_event_rule_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
-  cluster_arn                = "${var.ecs_services_cluster_id}"
+  cloudwatch_event_rule_name = "${aws_cloudwatch_event_rule.every_day_at_8am.name}"
+  cluster_arn                = "${data.aws_ecs_cluster.services.arn}"
   task_definition_arn        = "${module.slack_budget_bot.task_definition_arn}"
 }
 
-resource "aws_cloudwatch_event_rule" "every_5_minutes" {
-  name                = "every_5_minutes_lambdas"
-  description         = "Fires every 5 minutes"
-  schedule_expression = "rate(5 minutes)"
+resource "aws_cloudwatch_event_rule" "every_day_at_8am" {
+  name                = "every_day_at_8am"
+  schedule_expression = "cron(0 8 * * ? *)"
 }

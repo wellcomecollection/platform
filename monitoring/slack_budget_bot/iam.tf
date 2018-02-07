@@ -22,7 +22,7 @@ resource "aws_iam_role_policy" "allow_s3_write" {
 data "aws_iam_policy_document" "allow_describe_budgets" {
   statement {
     actions = [
-      "budgets:DescribeBudgets",
+      "budgets:ViewBudget",
     ]
 
     resources = [
