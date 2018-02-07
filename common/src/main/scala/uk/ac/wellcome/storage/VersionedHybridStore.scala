@@ -3,11 +3,7 @@ package uk.ac.wellcome.storage
 import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
-import uk.ac.wellcome.models.{
-  VersionUpdater,
-  Versioned,
-  VersionedDynamoFormatWrapper
-}
+import uk.ac.wellcome.models.{VersionUpdater, Versioned, VersionedDynamoFormatWrapper}
 import uk.ac.wellcome.s3.VersionedObjectStore
 
 import scala.concurrent.Future
@@ -32,22 +28,49 @@ class VersionedHybridStore @Inject()(
     }
   }
 
-  def updateRecord[T <: Versioned](record: T)(
+  def updateRecord[T <: Versioned](record: T)(t: T => T)(
     implicit evidence: VersionedDynamoFormatWrapper[T],
     versionUpdater: VersionUpdater[T],
-    encoder: Encoder[T]): Future[Unit] = {
-    val futureKey = versionedObjectStore.put(record)
+    decoder: Decoder[T],
+    encoder: Encoder[T]
+  ): Future[Unit] = {
 
-    futureKey.flatMap { key =>
-      val hybridRecord = HybridRecord(
-        version = record.version,
-        sourceId = record.sourceId,
-        sourceName = record.sourceName,
-        s3key = key
-      )
+    val dynamoRecord: Future[Option[HybridRecord]] =
+      versionedDao.getRecord[HybridRecord](id = record.id)
 
-      versionedDao.updateRecord(hybridRecord)
+    val eventualMaybeTuple = dynamoRecord.flatMap {
+      case Some(r) => {
+        versionedObjectStore.get[T](r.s3key).map { s3Record =>
+          Some((r, s3Record))
+        }
+      }
+      case None => Future.successful(None)
     }
+
+    eventualMaybeTuple.flatMap {
+        case Some((hybridRecord, s3Record)) => {
+          val futureKey = versionedObjectStore.put(t(s3Record))
+          futureKey.flatMap { key =>
+            val newHybridRecord = hybridRecord.copy(s3key = key)
+
+            versionedDao.updateRecord(newHybridRecord)
+          }
+        }
+        case None => {
+          val futureKey = versionedObjectStore.put(record)
+
+          futureKey.flatMap { key =>
+            val hybridRecord = HybridRecord(
+              version = record.version,
+              sourceId = record.sourceId,
+              sourceName = record.sourceName,
+              s3key = key
+            )
+
+            versionedDao.updateRecord(hybridRecord)
+          }
+        }
+      }
   }
 
   def getRecord[T <: Versioned](id: String)(
