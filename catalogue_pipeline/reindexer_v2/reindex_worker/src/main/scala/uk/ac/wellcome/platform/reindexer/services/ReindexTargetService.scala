@@ -68,6 +68,7 @@ class ReindexTargetService @Inject()(
             )
           }
 
+          // TODO: what if desiredVersion < reindexVersion?
           val updatedRecord = record.copy(reindexVersion = desiredVersion)
           versionedDao.updateRecord[HybridRecord](updatedRecord)(
             evidence = evidence,
