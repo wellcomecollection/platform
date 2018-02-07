@@ -215,7 +215,7 @@ def draw_diagram(budgets):
     return 'figure.png'
 
 
-def main(account_id, hook_url):
+def main(account_id, hook_url, s3_bucket):
     all_budgets = get_budgets(account_id=account_id)
 
     overspend_budgets = [
@@ -256,5 +256,6 @@ if __name__ == '__main__':
 
     account_id = os.environ['ACCOUNT_ID']
     hook_url = os.environ['SLACK_WEBHOOK']
+    s3_bucket = os.environ['S3_BUCKET']
 
-    main(account_id=account_id, hook_url=hook_url)
+    main(account_id=account_id, hook_url=hook_url, s3_bucket=s3_bucket)
