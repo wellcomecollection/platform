@@ -4,8 +4,8 @@ include $(ROOT)/functions.Makefile
 STACK_ROOT  = monitoring
 
 SBT_APPS    =
-ECS_TASKS   =
-LAMBDAS     = post_to_slack slack_budget_bot terraform_tracker
+ECS_TASKS   = slack_budget_bot
+LAMBDAS     = post_to_slack terraform_tracker
 
 TF_NAME     = monitoring
 TF_PATH     = $(ROOT)/$(STACK_ROOT)
