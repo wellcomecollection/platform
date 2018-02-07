@@ -7,7 +7,14 @@
 attrs==17.4.0
 certifi==2018.1.18        # via requests
 chardet==3.0.4            # via requests
+cycler==0.10.0            # via matplotlib
 idna==2.6                 # via requests
+matplotlib==2.1.2
 num2words==0.5.6
+numpy==1.14.0             # via matplotlib
+pyparsing==2.2.0          # via matplotlib
+python-dateutil==2.6.1    # via matplotlib
+pytz==2017.3              # via matplotlib
 requests==2.18.4
+six==1.11.0               # via cycler, matplotlib, python-dateutil
 urllib3==1.22             # via requests
