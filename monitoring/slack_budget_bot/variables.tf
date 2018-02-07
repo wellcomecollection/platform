@@ -1,5 +1,5 @@
 variable "release_ids" {
-  type        = "map"
+  type = "map"
 }
 
 variable "slack_webhook" {}
