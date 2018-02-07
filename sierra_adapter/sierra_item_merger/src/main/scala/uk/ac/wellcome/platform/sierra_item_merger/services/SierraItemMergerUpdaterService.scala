@@ -34,47 +34,26 @@ class SierraItemMergerUpdaterService @Inject()(
 
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
-      versionedHybridStore
-        .getRecord[SierraTransformable](s"sierra/$bibId")
-        .flatMap {
-          case Some(existingSierraTransformable) =>
-            val mergedRecord =
-              ItemLinker.linkItemRecord(existingSierraTransformable,
-                                        itemRecord)
-            if (mergedRecord != existingSierraTransformable)
-              versionedHybridStore.updateRecord[SierraTransformable](
-                mergedRecord)
-            else Future.successful(())
-          case None =>
-            versionedHybridStore.updateRecord[SierraTransformable](
-              SierraTransformable(
-                sourceId = bibId,
-                itemData = Map(itemRecord.id -> itemRecord)
-              )
-            )
-        }
+      versionedHybridStore.updateRecord(SierraTransformable(
+        sourceId = bibId,
+        itemData = Map(itemRecord.id -> itemRecord)
+      ))(existingSierraTransformable => {
+          ItemLinker.linkItemRecord(
+            existingSierraTransformable,
+            itemRecord
+          )
+      })
     }
 
-    val unlinkUpdateFutures = itemRecord.unlinkedBibIds.map { unlinkedBibId =>
-      versionedHybridStore
-        .getRecord[SierraTransformable](s"sierra/$unlinkedBibId")
-        .flatMap {
-          case Some(record) =>
-            val mergedRecord =
-              ItemUnlinker.unlinkItemRecord(record, itemRecord)
-            if (mergedRecord != record)
-              versionedHybridStore.updateRecord[SierraTransformable](
-                mergedRecord)
-            else Future.successful(())
-          // In the case we cannot find the bib record
-          // assume we're too early and put the message back
-          case None =>
-            Future.failed(
-              GracefulFailureException(
-                new RuntimeException(
-                  s"Missing Bib record to unlink: $unlinkedBibId")
-              ))
-        }
+    val unlinkUpdateFutures: Seq[Future[Unit]] = itemRecord.unlinkedBibIds.map { unlinkedBibId =>
+      versionedHybridStore.updateRecord(
+        throw GracefulFailureException(
+          new RuntimeException(
+            s"Missing Bib record to unlink: $unlinkedBibId")
+        )
+      )((record: SierraTransformable) =>
+        ItemUnlinker.unlinkItemRecord(record, itemRecord)
+      )
     }
 
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures).map(_ => ())

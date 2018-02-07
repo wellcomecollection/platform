@@ -4,12 +4,22 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.DynamoReadError
 
-trait Versioned {
+trait Sourced {
+  val sourceId: String
+  val sourceName: String
+}
+
+trait Identifiable {
+  val id: String
+}
+
+trait Versioned extends Sourced with Identifiable {
   val version: Int
+
   val sourceId: String
   val sourceName: String
 
-  val id: String = s"$sourceName/$sourceId"
+  override val id: String = s"$sourceName/$sourceId"
 }
 
 object Versioned {
