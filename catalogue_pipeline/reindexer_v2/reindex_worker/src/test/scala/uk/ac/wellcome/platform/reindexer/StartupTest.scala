@@ -14,7 +14,8 @@ class StartupTest
     with DynamoDBLocal[HybridRecord]
     with AmazonCloudWatchFlag {
 
-  implicit val evidence: DynamoFormat[HybridRecord] = DynamoFormat[HybridRecord]
+  implicit val evidence: DynamoFormat[HybridRecord] =
+    DynamoFormat[HybridRecord]
 
   override lazy val tableName = "reindexer-startup-test-table"
 

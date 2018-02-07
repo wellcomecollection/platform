@@ -63,9 +63,10 @@ class ReindexTargetService @Inject()(
           // assume the record exists.  It would be very unusual not to!
           val record = possibleRecord match {
             case Some(r) => r
-            case None => throw new RuntimeException(
-              s"Asked to reindex a missing record ${existingRecord.id}, but it's not in the table!"
-            )
+            case None =>
+              throw new RuntimeException(
+                s"Asked to reindex a missing record ${existingRecord.id}, but it's not in the table!"
+              )
           }
 
           // TODO: what if desiredVersion < reindexVersion?

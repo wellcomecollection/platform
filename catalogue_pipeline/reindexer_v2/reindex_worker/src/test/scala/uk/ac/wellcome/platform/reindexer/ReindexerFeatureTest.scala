@@ -67,7 +67,8 @@ class ReindexerFeatureTest
 
     eventually {
       (1 to numberOfRecords).map { i =>
-        val recordFuture = hybridStore.getRecord[MiroTransformable](id = s"miro/V00000$i")
+        val recordFuture =
+          hybridStore.getRecord[MiroTransformable](id = s"miro/V00000$i")
         whenReady(recordFuture) { record: Option[MiroTransformable] =>
           record.get.reindexVersion shouldBe desiredVersion
         }
