@@ -16,7 +16,7 @@ class StartupTest
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
     flags = Map(
-      "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
+      "aws.dynamo.tableName" -> "ReindexTracker",
       "reindex.target.tableName" -> "MiroData",
       "reindex.target.reindexShard" -> "default"
     ) ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag

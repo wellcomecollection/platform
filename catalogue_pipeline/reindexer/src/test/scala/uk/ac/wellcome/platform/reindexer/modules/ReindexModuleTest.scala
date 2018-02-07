@@ -35,11 +35,6 @@ class ReindexModuleTest
   val currentVersion = 1
   val requestedVersion = 2
 
-  val dynamoConfigs = Map(
-    "reindex" -> DynamoConfig(table = reindexTableName),
-    "calm" -> DynamoConfig(table = calmDataTableName)
-  )
-
   var maybeServer: Option[EmbeddedHttpServer] = None
 
   override def afterEach(): Unit = maybeServer.foreach(_.close())
@@ -94,8 +89,7 @@ class ReindexModuleTest
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
-        "aws.dynamo.reindexTracker.tableName" -> "ReindexTracker",
-        "aws.dynamo.calmData.tableName" -> "CalmData",
+        "aws.dynamo.tableName" -> "ReindexTracker",
         "reindex.target.tableName" -> "CalmData"
       ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
     )

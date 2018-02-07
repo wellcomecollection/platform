@@ -15,8 +15,7 @@ class ReindexTrackerServiceTest
     with DynamoDBLocal
     with ExtendedPatience {
 
-  val dynamoConfigs = Map("reindex" -> DynamoConfig(table = reindexTableName),
-                          "calm" -> DynamoConfig(table = calmDataTableName))
+  val dynamoConfig = DynamoConfig(table = reindexTableName)
 
   it(
     "should return the index and shard in need of reindexing"
@@ -41,7 +40,7 @@ class ReindexTrackerServiceTest
 
     val reindexTrackerService = new ReindexTrackerService(
       dynamoDbClient,
-      dynamoConfigs,
+      dynamoConfig,
       expectedTable,
       expectedShard
     )

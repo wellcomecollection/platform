@@ -30,10 +30,7 @@ class ReindexServiceTest
     with ExtendedPatience
     with MockitoSugar {
 
-  val dynamoConfigs = Map(
-    "reindex" -> DynamoConfig(table = reindexTableName),
-    "calm" -> DynamoConfig(table = calmDataTableName)
-  )
+  val dynamoConfig = DynamoConfig(table = reindexTableName)
 
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests",
@@ -44,7 +41,7 @@ class ReindexServiceTest
     new ReindexService[CalmTransformable](
       new ReindexTrackerService(
         dynamoDbClient,
-        dynamoConfigs,
+        dynamoConfig,
         "CalmData",
         reindexShard
       ),
@@ -136,7 +133,7 @@ class ReindexServiceTest
     val reindexService = new ReindexService[CalmTransformable](
       new ReindexTrackerService(
         dynamoDbClient,
-        dynamoConfigs,
+        dynamoConfig,
         "CalmData",
         reindexShard
       ),
