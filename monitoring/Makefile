@@ -5,7 +5,7 @@ STACK_ROOT  = monitoring
 
 SBT_APPS    =
 ECS_TASKS   =
-LAMBDAS     = post_to_slack terraform_tracker
+LAMBDAS     = post_to_slack slack_budget_bot terraform_tracker
 
 TF_NAME     = monitoring
 TF_PATH     = $(ROOT)/$(STACK_ROOT)
