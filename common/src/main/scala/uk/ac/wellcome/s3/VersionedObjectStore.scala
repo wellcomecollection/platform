@@ -40,7 +40,7 @@ class VersionedObjectStore @Inject()(
     }
   }
 
-  def get[T <: Versioned](key: String)(
+  def get[T](key: String)(
     implicit decoder: Decoder[T]): Future[T] = {
 
     info(s"Attempting to GET object from s3://$bucketName/$key")

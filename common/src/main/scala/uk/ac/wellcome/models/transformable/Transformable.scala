@@ -9,11 +9,6 @@ import cats.syntax.functor._
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait Sourced {
-  val sourceId: String
-  val sourceName: String
-}
-
 sealed trait Transformable extends Versioned
 
 case class CalmTransformable(
