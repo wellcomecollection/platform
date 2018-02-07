@@ -9,7 +9,7 @@ class ServerTest extends FeatureTest {
   val server = new EmbeddedHttpServer(
     new Server(),
     flags = Map(
-      "aws.dynamo.merger.tableName" -> "foo"
+      "aws.dynamo.tableName" -> "serverTest"
     )
   )
 

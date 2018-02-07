@@ -80,7 +80,10 @@ jobs:
     - env: TASK=transformer-test
     - env: TASK=ingestor-test
     - env: TASK=id_minter-test
-    - env: TASK=reindexer-test
+
+    # Temporarily removed.
+    # TODO: Restore this before merging https://github.com/wellcometrust/platform/pull/1509
+    # - env: TASK=reindexer-test
 
     # Catalogue API stack
     - env: TASK=api-test

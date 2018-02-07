@@ -16,19 +16,12 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class ReindexTrackerService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
-  dynamoConfigs: Map[String, DynamoConfig],
+  dynamoConfig: DynamoConfig,
   @Flag("reindex.target.tableName") reindexTargetTableName: String,
   @Flag("reindex.target.reindexShard") targetReindexShard: String
 ) extends Logging {
 
-  private val reindexTrackerTableConfigId = "reindex"
-
-  private val reindexTrackerConfig = dynamoConfigs.getOrElse(
-    reindexTrackerTableConfigId,
-    throw new RuntimeException(
-      s"ReindexTracker ($reindexTrackerTableConfigId) dynamo config not available!"))
-
-  private val reindexTrackerTableName = reindexTrackerConfig.table
+  private val reindexTrackerTableName = dynamoConfig.table
   private val reindexTable = Table[Reindex](reindexTrackerTableName)
 
   def updateReindex(reindexAttempt: ReindexAttempt) = Future {

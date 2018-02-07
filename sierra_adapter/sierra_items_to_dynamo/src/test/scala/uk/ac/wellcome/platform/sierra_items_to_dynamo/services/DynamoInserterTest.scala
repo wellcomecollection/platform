@@ -32,7 +32,9 @@ class DynamoInserterTest
   val dynamoInserter = new DynamoInserter(
     new SierraItemRecordDao(
       dynamoDbClient,
-      dynamoConfigs = Map("sierraToDynamo" -> DynamoConfig(tableName))))
+      dynamoConfig = DynamoConfig(tableName)
+    )
+  )
 
   it("ingests a json item into DynamoDB") {
     val id = "100001"
