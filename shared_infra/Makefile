@@ -10,6 +10,7 @@ LAMBDAS     = drain_ecs_container_instance \
               ecs_ec2_instance_tagger \
               run_ecs_task \
               service_scheduler \
+              slack_budget_bot \
               update_ecs_service_size
 
 TF_NAME     = shared_infra
