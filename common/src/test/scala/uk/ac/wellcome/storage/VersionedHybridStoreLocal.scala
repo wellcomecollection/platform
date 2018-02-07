@@ -36,7 +36,7 @@ trait VersionedHybridStoreLocal
     dynamoRecord.isRight shouldBe true
     val hybridRecord = dynamoRecord.right.get
 
-    hybridRecord.version shouldBe (record.version + 1)
+    hybridRecord.version shouldBe record.version
     hybridRecord.sourceId shouldBe record.sourceId
     hybridRecord.sourceName shouldBe record.sourceName
 
