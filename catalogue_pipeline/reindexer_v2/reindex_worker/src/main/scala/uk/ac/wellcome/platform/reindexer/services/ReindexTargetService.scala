@@ -60,8 +60,13 @@ class ReindexTargetService @Inject()(
         existingRecord.map { possibleRecord =>
           // getRecord() returns an Option[HybridRecord] because you may be
           // looking up a non-existent ID; since the ID came from the table we
-          // can assume the record exists!
-          val record = possibleRecord.get
+          // assume the record exists.  It would be very unusual not to!
+          val record = possibleRecord match {
+            case Some(r) => r
+            case None => throw new RuntimeException(
+              s"Asked to reindex a missing record ${record.id}, but it's not in the table!"
+            )
+          }
 
           val updatedRecord = record.copy(reindexVersion = desiredVersion)
           versionedDao.updateRecord[HybridRecord](updatedRecord)(
