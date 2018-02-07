@@ -42,14 +42,46 @@ class VersionedHybridStoreTest
       content = "One ocelot in orange"
     )
 
-    val future = hybridStore.updateRecord(record)
+    val expectedRecord = record.copy(version = 2)
+
+    val future = hybridStore.updateRecord(record)(identity)
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
-        record = record,
-        expectedJson = toJson(record.copy(version = record.version + 1)).get
+        record = expectedRecord,
+        expectedJson = toJson(expectedRecord).get
       )
     }
+  }
+
+  it("applies the given transformation to an existing record") {
+    val record = ExampleRecord(
+      version = 1,
+      sourceId = "1111",
+      sourceName = "Test1111",
+      content = "One ocelot in orange"
+    )
+
+    val expectedRecord = record
+      .copy(
+        content = "new content",
+        version = 3
+      )
+
+    val t = (e: ExampleRecord) => e.copy(content = "new content")
+
+    val future = hybridStore.updateRecord(record)(identity).flatMap(_ =>
+      hybridStore.updateRecord(record)(t)
+    )
+
+    whenReady(future) { _ =>
+      assertHybridRecordIsStoredCorrectly(
+        record = expectedRecord,
+        expectedJson =
+          toJson(expectedRecord).get
+      )
+    }
+
   }
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
@@ -65,43 +97,20 @@ class VersionedHybridStoreTest
       content = "Throwing turquoise tangerines in Tanzania"
     )
 
-    val future = hybridStore.updateRecord(record)
+    val expectedRecord = updatedRecord.copy(version = 4)
+
+    val future = hybridStore.updateRecord(record)(identity)
 
     val updatedFuture = future.flatMap { _ =>
-      hybridStore.updateRecord(updatedRecord)
+      hybridStore.updateRecord(updatedRecord)(_ => updatedRecord)
     }
 
     whenReady(updatedFuture) { _ =>
       assertHybridRecordIsStoredCorrectly(
-        record = updatedRecord,
+        record = expectedRecord,
         expectedJson =
-          toJson(updatedRecord.copy(version = updatedRecord.version + 1)).get
+          toJson(expectedRecord).get
       )
-    }
-  }
-
-  it(
-    "throws a ConditionalCheckFailedException if it gets an older version of an existing record") {
-    val record = ExampleRecord(
-      version = 4,
-      sourceId = "4444",
-      sourceName = "Test4444",
-      content = "Four fiery foxes freezing in Finland"
-    )
-
-    val olderRecord = record.copy(
-      version = 1,
-      content = "Old otters eating oats"
-    )
-
-    val future = hybridStore.updateRecord(record)
-
-    val updatedFuture = future.flatMap { _ =>
-      hybridStore.updateRecord(olderRecord)
-    }
-
-    whenReady(updatedFuture.failed) { ex =>
-      ex shouldBe a[ConditionalCheckFailedException]
     }
   }
 
@@ -121,7 +130,7 @@ class VersionedHybridStoreTest
       content = "Five fishing flinging flint"
     )
 
-    val putFuture = hybridStore.updateRecord(record)
+    val putFuture = hybridStore.updateRecord(record)(identity)
 
     val getFuture = putFuture.flatMap { _ =>
       hybridStore.getRecord[ExampleRecord](record.id)
