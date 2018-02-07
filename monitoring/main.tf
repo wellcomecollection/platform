@@ -74,9 +74,11 @@ module "post_to_slack" {
 module "slack_budget_bot" {
   source = "slack_budget_bot"
 
+  slack_webhook = "${var.non_critical_slack_webhook}"
   release_ids = "${var.release_ids}"
   dashboard_bucket_id = "${var.dash_bucket}"
   account_id = "${data.aws_caller_identity.current.account_id}"
+  ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 }
 
 module "terraform_tracker" {
