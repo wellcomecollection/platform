@@ -16,10 +16,6 @@ output "bucket_miro_images_sync_id" {
 
 # Outputs required for Loris
 
-output "cloudfront_logs_domain_name" {
-  value = "${aws_s3_bucket.cloudfront-logs.bucket_domain_name}"
-}
-
 output "vpc_api_id" {
   value = "${module.vpc_api.vpc_id}"
 }
