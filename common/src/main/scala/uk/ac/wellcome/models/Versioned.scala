@@ -9,17 +9,13 @@ trait Sourced {
   val sourceName: String
 }
 
-trait Identifiable {
-  val id: String
-}
-
-trait Versioned extends Sourced with Identifiable {
+trait Versioned extends Sourced  {
   val version: Int
 
   val sourceId: String
   val sourceName: String
 
-  override val id: String = s"$sourceName/$sourceId"
+  val id: String = s"$sourceName/$sourceId"
 }
 
 object Versioned {

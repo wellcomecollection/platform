@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
+import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import org.scalatest.FunSpec
 import uk.ac.wellcome.metrics.MetricsSender
@@ -9,7 +10,7 @@ import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.s3.VersionedObjectStore
-import uk.ac.wellcome.storage.VersionedHybridStore
+import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -100,7 +101,7 @@ class SierraItemMergerUpdaterServiceTest
       )
     )
 
-    val f1 = hybridStore.updateRecord[SierraTransformable](oldRecord)
+    val f1 = hybridStore.updateRecord[SierraTransformable](oldRecord.id)(oldRecord)(identity)
 
     val anotherItem = sierraItemRecord(
       id = "i999",
@@ -120,7 +121,7 @@ class SierraItemMergerUpdaterServiceTest
       )
     )
 
-    val f2 = hybridStore.updateRecord[SierraTransformable](newRecord)
+    val f2 = hybridStore.updateRecord[SierraTransformable](newRecord.id)(newRecord)(identity)
     whenReady(Future.sequence(List(f1, f2))) { _ =>
       whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
         val expectedNewSierraTransformable =
@@ -176,7 +177,7 @@ class SierraItemMergerUpdaterServiceTest
         ))
     )
 
-    val f1 = hybridStore.updateRecord[SierraTransformable](oldRecord)
+    val f1 = hybridStore.updateRecord[SierraTransformable](oldRecord.id)(oldRecord)(identity)
 
     whenReady(f1) { _ =>
       val newItemRecord = sierraItemRecord(
@@ -228,11 +229,11 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f1 =
-      hybridStore.updateRecord[SierraTransformable](sierraTransformable1)
+      hybridStore.updateRecord[SierraTransformable](sierraTransformable1.id)(sierraTransformable1)(_ => sierraTransformable1)
     val f2 =
-      hybridStore.updateRecord[SierraTransformable](sierraTransformable2)
+      hybridStore.updateRecord[SierraTransformable](sierraTransformable2.id)(sierraTransformable2)(identity)
 
-    whenReady(Future.sequence(List(f1, f2))) { _ =>
+    val eventualUnits = Future.sequence(List(f1, f2))
       val unlinkItemRecord = itemRecord.copy(
         bibIds = List(bibId2),
         unlinkedBibIds = List(bibId1),
@@ -247,7 +248,7 @@ class SierraItemMergerUpdaterServiceTest
         )
       )
 
-      whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+      whenReady(eventualUnits.flatMap( _ => sierraUpdaterService.update(unlinkItemRecord))) { _ =>
         val expectedSierraRecord1 = sierraTransformable1.copy(
           itemData = Map.empty,
           version = 2
@@ -270,7 +271,6 @@ class SierraItemMergerUpdaterServiceTest
           record.get shouldBe expectedSierraRecord2
         }
       }
-    }
   }
 
   it("unlinks and updates a bib from a single call") {
@@ -300,9 +300,9 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f1 =
-      hybridStore.updateRecord[SierraTransformable](sierraTransformable1)
+      hybridStore.updateRecord[SierraTransformable](sierraTransformable1.id)(sierraTransformable1)(identity)
     val f2 =
-      hybridStore.updateRecord[SierraTransformable](sierraTransformable2)
+      hybridStore.updateRecord[SierraTransformable](sierraTransformable2.id)(sierraTransformable2)(identity)
 
     val unlinkItemRecord = itemRecord.copy(
       bibIds = List(bibId2),
@@ -364,9 +364,9 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f1 =
-      hybridStore.updateRecord[SierraTransformable](sierraTransformable1)
+      hybridStore.updateRecord[SierraTransformable](sierraTransformable1.id)(sierraTransformable1)(identity)
     val f2 =
-      hybridStore.updateRecord[SierraTransformable](sierraTransformable2)
+      hybridStore.updateRecord[SierraTransformable](sierraTransformable2.id)(sierraTransformable2)(identity)
 
     val unlinkItemRecord = itemRecord.copy(
       bibIds = List(bibId2),
@@ -424,7 +424,7 @@ class SierraItemMergerUpdaterServiceTest
         ))
     )
 
-    val f1 = hybridStore.updateRecord[SierraTransformable](sierraRecord)
+    val f1 = hybridStore.updateRecord[SierraTransformable](sierraRecord.id)(sierraRecord)(identity)
 
     val oldItemRecord = sierraItemRecord(
       id = id,
@@ -450,7 +450,7 @@ class SierraItemMergerUpdaterServiceTest
       sourceId = bibId
     )
 
-    val f1 = hybridStore.updateRecord[SierraTransformable](sierraRecord)
+    val f1 = hybridStore.updateRecord[SierraTransformable](sierraRecord.id)(sierraRecord)(identity)
 
     val itemRecord = sierraItemRecord(
       id = "i7000007",
@@ -477,58 +477,32 @@ class SierraItemMergerUpdaterServiceTest
     }
   }
 
-  it("returns a failed future if getting and item from the dao fails") {
-    val failingVersionedHybridStore = mock[VersionedHybridStore]
-    val failingUpdaterService = new SierraItemMergerUpdaterService(
-      failingVersionedHybridStore,
-      mock[MetricsSender]
-    )
+  it("returns a failed future if putting an item fails") {
+
+    val failingVersionedDao = mock[VersionedDao]
 
     val expectedException = new RuntimeException("BOOOM!")
 
     when(
-      failingVersionedHybridStore.getRecord(
+      failingVersionedDao.getRecord[HybridRecord](
         any[String]
-      )(decoder = any[Decoder[SierraTransformable]]))
+      )(
+        any[DynamoFormat[HybridRecord]]
+      ))
       .thenReturn(Future.failed(expectedException))
 
-    val itemRecord = sierraItemRecord(
-      "i000",
-      "2007-07-07T07:07:07Z",
-      List("b242")
+    val failingVersionedHybridStore = new VersionedHybridStore(
+      versionedObjectStore =
+        new VersionedObjectStore(s3Client = s3Client, bucketName = bucketName),
+      versionedDao = failingVersionedDao
     )
 
-    whenReady(failingUpdaterService.update(itemRecord).failed) { ex =>
-      ex shouldBe expectedException
-    }
-  }
-
-  it("returns a failed future if putting an item fails") {
-    val failingVersionedHybridStore = mock[VersionedHybridStore]
     val failingUpdaterService = new SierraItemMergerUpdaterService(
       failingVersionedHybridStore,
       mock[MetricsSender]
     )
 
-    val expectedException = new RuntimeException("BOOOM!")
-
     val bibId = "b242"
-    val newRecord = SierraTransformable(sourceId = bibId, version = 1)
-
-    when(
-      failingVersionedHybridStore.getRecord(
-        any[String]
-      )(decoder = any[Decoder[SierraTransformable]]))
-      .thenReturn(Future.successful(Some(newRecord)))
-
-    when(
-      failingVersionedHybridStore.updateRecord[SierraTransformable](
-        any[SierraTransformable]
-      )(
-        evidence = any[VersionedDynamoFormatWrapper[SierraTransformable]],
-        versionUpdater = any[VersionUpdater[SierraTransformable]],
-        encoder = any[Encoder[SierraTransformable]]
-      )).thenReturn(Future.failed(expectedException))
 
     val itemRecord = sierraItemRecord(
       "i000",
