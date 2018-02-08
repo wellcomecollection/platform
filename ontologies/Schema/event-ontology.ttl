@@ -19,6 +19,7 @@ wev:Event rdf:type owl:Class ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
     
 wev:Exhibition rdf:type owl:Class ;
+    rdfs:subClassOf wev:Event ;
     rdfs:label "Exhibition"@en ;
     rdfs:comment "An organised presention and display of items."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .  
@@ -48,6 +49,25 @@ wev:Audience rdf:type owl:Class ;
     rdfs:comment "Who the event was designed for. For example schools, youth, researchers, experts."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
     
+wev:Season rdf:type owl:Class ;
+    rdfs:label "Season"@en ;
+    rdfs:comment "A season of thematic content and events."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
+        
+wev:Exhibit rdf:type owl:Class ;
+    rdfs:label "Exhibit"@en ;
+    rdfs:comment "Display a work of art or item of interest in an art gallery or museum. Here the empahsis is on the story that is told by placing the work in the context of the exhibition."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .         
+
+wev:Work rdf:type owl:Class ;
+    rdfs:label "Work"@en ;
+    rdfs:comment "A physically or digitally held work."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .  
+    
+wev:Article rdf:type owl:Class ;
+    rdfs:label "Article"@en ;
+    rdfs:comment "A editorially created peice of content."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .           
       
 #### object properties ####
 
@@ -86,6 +106,26 @@ wev:eventSeries rdf:type owl:ObjectProperty ;
     rdfs:range wev:EventSeries ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
 
+wev:exhibits rdf:type owl:ObjectProperty ;
+    rdfs:label "exhibits"@en ;
+    rdfs:comment "Relates an exhibition to an exhibited work."@en ;
+    rdfs:domain wev:Exhibtion ;
+    rdfs:range wev:Exhibit ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+
+wev:exhibitedWork rdf:type owl:ObjectProperty ;
+    rdfs:label "exhibitedWork"@en ;
+    rdfs:comment "Relates an exhibit to the exhibited work."@en ;
+    rdfs:domain wev:Exhibit ;
+    rdfs:range wev:Work ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+
+wev:physicalDescription rdf:type owl:ObjectProperty ;
+    rdfs:label "physicalDescription"@en ;
+    rdfs:comment "Relates an exhibtion to its physical description."@en ;
+    rdfs:domain wev:Exhibition ;
+    rdfs:range wev:Article ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
 
 ####### data properties #####
 
