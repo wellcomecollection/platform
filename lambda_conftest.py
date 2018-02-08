@@ -26,8 +26,8 @@ def docker_compose_file(pytestconfig):
     return os.path.join(str(pytestconfig.rootdir), 'docker-compose.yml')
 
 
-def _is_responsive_function(condition):
-    def is_responsive(endpoint_url):
+def _is_responsive(endpoint_url, condition):
+    def is_responsive():
         try:
             resp = requests.get(endpoint_url)
             if condition(resp):
@@ -45,11 +45,14 @@ def dynamodb_client(docker_services, docker_ip):
     )
 
     docker_services.wait_until_responsive(
-       timeout=5.0, pause=0.1,
-       check=_is_responsive_function(lambda r:
-           r.status_code == 400 and
-           r.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
-       )
+        timeout=5.0, pause=0.1,
+        check=_is_responsive(
+            endpoint_url,
+            lambda r: (
+                r.status_code == 400 and
+                r.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
+            )
+        )
     )
 
     yield boto3.client('dynamodb', endpoint_url=endpoint_url)
@@ -62,11 +65,12 @@ def s3_client(docker_services, docker_ip):
     )
 
     docker_services.wait_until_responsive(
-       timeout=10.0, pause=0.1,
-       check=_is_responsive_function(lambda r: (
+        timeout=10.0, pause=0.1,
+        check=_is_responsive(
+            endpoint_url,lambda r: (
             r.status_code == 403 and
             '<Code>AccessDenied</Code>' in r.text)
-       )
+        )
     )
 
     yield boto3.client(
@@ -84,8 +88,8 @@ def sqs_client(docker_services, docker_ip):
     )
 
     docker_services.wait_until_responsive(
-       timeout=5.0, pause=0.1,
-       check=_is_responsive_function(lambda r: r.status_code == 404)
+        timeout=5.0, pause=0.1,
+        check=_is_responsive(endpoint_url, lambda r: r.status_code == 404)
     )
 
     yield boto3.client('sqs', endpoint_url=endpoint_url)
@@ -99,7 +103,7 @@ def sns_client(docker_services, docker_ip):
 
     docker_services.wait_until_responsive(
        timeout=5.0, pause=0.1,
-       check=_is_responsive_function(lambda r: r.status_code == 200)
+       check=_is_responsive(endpoint_url, lambda r: r.status_code == 200)
     )
 
     client = boto3.client('sns', endpoint_url=endpoint_url)
@@ -179,40 +183,40 @@ def queue_url(sns_client, sqs_client, topic_arn):
     yield queue_url
 
 
-@pytest.fixture
-def moto_topic_arn():
-    """Creates an SNS topic in moto, and yields the new topic ARN."""
-    with mock_sns():
-        sns_client = boto3.client('sns')
-        topic_name = 'test-lambda-topic'
+# @pytest.fixture
+# def moto_topic_arn():
+#     """Creates an SNS topic in moto, and yields the new topic ARN."""
+#     with mock_sns():
+#         sns_client = boto3.client('sns')
+#         topic_name = 'test-lambda-topic'
+#
+#         resp = sns_client.create_topic(Name=topic_name)
+#         topic_arn = resp['TopicArn']
+#
+#         # Our Lambdas all read their topic ARN from the environment, so we
+#         # set it here.
+#         os.environ.update({'TOPIC_ARN': topic_arn})
+#
+#         yield topic_arn
 
-        resp = sns_client.create_topic(Name=topic_name)
-        topic_arn = resp['TopicArn']
 
-        # Our Lambdas all read their topic ARN from the environment, so we
-        # set it here.
-        os.environ.update({'TOPIC_ARN': topic_arn})
-
-        yield topic_arn
-
-
-@pytest.fixture
-def moto_queue_url(moto_topic_arn):
-    """
-    Creates an SQS queue in moto, subscribes it to an SNS topic, and
-    yields the new queue URL.
-    """
-    with mock_sqs():
-        sns_client = boto3.client('sns')
-        sqs_client = boto3.client('sqs')
-        queue_name = 'test-lambda-queue'
-
-        resp = sqs_client.create_queue(QueueName=queue_name)
-        queue_url = resp['QueueUrl']
-
-        sns_client.subscribe(
-            TopicArn=moto_topic_arn,
-            Protocol='sqs',
-            Endpoint=f'arn:aws:sqs:eu-west-1:123456789012:{queue_name}'
-        )
-        yield queue_url
+# @pytest.fixture
+# def moto_queue_url(moto_topic_arn):
+#     """
+#     Creates an SQS queue in moto, subscribes it to an SNS topic, and
+#     yields the new queue URL.
+#     """
+#     with mock_sqs():
+#         sns_client = boto3.client('sns')
+#         sqs_client = boto3.client('sqs')
+#         queue_name = 'test-lambda-queue'
+#
+#         resp = sqs_client.create_queue(QueueName=queue_name)
+#         queue_url = resp['QueueUrl']
+#
+#         sns_client.subscribe(
+#             TopicArn=moto_topic_arn,
+#             Protocol='sqs',
+#             Endpoint=f'arn:aws:sqs:eu-west-1:123456789012:{queue_name}'
+#         )
+#         yield queue_url
