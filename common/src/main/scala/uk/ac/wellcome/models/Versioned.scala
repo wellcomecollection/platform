@@ -9,13 +9,13 @@ trait Sourced {
   val sourceName: String
 }
 
-trait Versioned extends Sourced  {
+trait Versioned extends Sourced {
   val version: Int
 
   val sourceId: String
   val sourceName: String
 
-  val id: String = Versioned.id(sourceName,sourceId)
+  val id: String = Versioned.id(sourceName, sourceId)
 }
 
 object Versioned {
@@ -23,7 +23,7 @@ object Versioned {
     implicit dynamoFormat: DynamoFormat[T]): VersionedDynamoFormatWrapper[T] =
     new VersionedDynamoFormatWrapper[T](dynamoFormat)
 
-  def id(sourceName:String, sourceId: String) = s"$sourceName/$sourceId"
+  def id(sourceName: String, sourceId: String) = s"$sourceName/$sourceId"
 }
 
 class VersionedDynamoFormatWrapper[T <: Versioned](

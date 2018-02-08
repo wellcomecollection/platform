@@ -31,9 +31,10 @@ class SierraBibMergerUpdaterService @Inject()(
     }
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = {
-    versionedHybridStore.updateRecord("sierra", bibRecord.id)(SierraTransformable(bibRecord))(
+    versionedHybridStore.updateRecord("sierra", bibRecord.id)(
+      SierraTransformable(bibRecord))(
       existingSierraTransformable => {
-          BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
+        BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
       }
     )
   }

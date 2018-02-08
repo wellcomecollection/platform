@@ -43,7 +43,8 @@ class VersionedHybridStoreTest
 
     val expectedRecord = record.copy(version = 2)
 
-    val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(identity)
+    val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(
+      record)(identity)
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
@@ -69,15 +70,17 @@ class VersionedHybridStoreTest
 
     val t = (e: ExampleRecord) => e.copy(content = "new content")
 
-    val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(identity).flatMap(_ =>
-      hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(t)
-    )
+    val future =
+      hybridStore
+        .updateRecord(record.sourceName, record.sourceId)(record)(identity)
+        .flatMap(_ =>
+          hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(
+            t))
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
         record = expectedRecord,
-        expectedJson =
-          toJson(expectedRecord).get
+        expectedJson = toJson(expectedRecord).get
       )
     }
 
@@ -98,17 +101,19 @@ class VersionedHybridStoreTest
 
     val expectedRecord = updatedRecord.copy(version = 4)
 
-    val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(identity)
+    val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(
+      record)(identity)
 
     val updatedFuture = future.flatMap { _ =>
-      hybridStore.updateRecord(updatedRecord.sourceName, updatedRecord.sourceId)(updatedRecord)(_ => updatedRecord)
+      hybridStore.updateRecord(updatedRecord.sourceName,
+                               updatedRecord.sourceId)(updatedRecord)(_ =>
+        updatedRecord)
     }
 
     whenReady(updatedFuture) { _ =>
       assertHybridRecordIsStoredCorrectly(
         record = expectedRecord,
-        expectedJson =
-          toJson(expectedRecord).get
+        expectedJson = toJson(expectedRecord).get
       )
     }
   }
@@ -129,7 +134,8 @@ class VersionedHybridStoreTest
       content = "Five fishing flinging flint"
     )
 
-    val putFuture = hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(identity)
+    val putFuture = hybridStore.updateRecord(record.sourceName,
+                                             record.sourceId)(record)(identity)
 
     val getFuture = putFuture.flatMap { _ =>
       hybridStore.getRecord[ExampleRecord](record.id)
@@ -149,8 +155,10 @@ class VersionedHybridStoreTest
     )
 
     val future = for {
-      _ <-hybridStore.updateRecord(record.sourceName, record.sourceId)(record) (identity)
-      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(identity)
+      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(
+        record)(identity)
+      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(
+        record)(identity)
       result <- hybridStore.getRecord[ExampleRecord](record.id)
     } yield result
 
@@ -167,10 +175,11 @@ class VersionedHybridStoreTest
       content = "Five fishing flinging flint"
     )
 
-    val future = hybridStore.updateRecord("sierra","not_the_same_id")(record)(identity)
+    val future =
+      hybridStore.updateRecord("sierra", "not_the_same_id")(record)(identity)
 
     whenReady(future.failed) { e: Throwable =>
-      e shouldBe a [IllegalArgumentException]
+      e shouldBe a[IllegalArgumentException]
     }
   }
 
@@ -185,12 +194,14 @@ class VersionedHybridStoreTest
     val recordWithDifferentId = record.copy(sourceId = "not_the_same_id")
 
     val future = for {
-      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(identity)
-      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(_ => recordWithDifferentId)
+      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(
+        record)(identity)
+      _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(
+        record)(_ => recordWithDifferentId)
     } yield ()
 
     whenReady(future.failed) { e: Throwable =>
-      e shouldBe a [IllegalArgumentException]
+      e shouldBe a[IllegalArgumentException]
     }
   }
 }

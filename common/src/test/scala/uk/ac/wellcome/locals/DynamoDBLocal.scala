@@ -14,7 +14,8 @@ trait DynamoDBLocal[T <: Versioned]
     extends BeforeAndAfterEach
     with DynamoDBLocalClients
     with Eventually
-    with Matchers with ExtendedPatience{ this: Suite =>
+    with Matchers
+    with ExtendedPatience { this: Suite =>
 
   implicit val evidence: DynamoFormat[T]
   val tableName: String
@@ -64,9 +65,11 @@ trait DynamoDBLocal[T <: Versioned]
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
 
-    eventually{
+    eventually {
       dynamoDbClient
-        .describeTable(tableName).getTable.getTableStatus shouldBe "ACTIVE"
+        .describeTable(tableName)
+        .getTable
+        .getTableStatus shouldBe "ACTIVE"
 
     }
   }
