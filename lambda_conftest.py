@@ -67,8 +67,8 @@ def s3_client(docker_services, docker_ip):
         timeout=10.0, pause=0.1,
         check=_is_responsive(
             endpoint_url, lambda r: (
-            r.status_code == 403 and
-            '<Code>AccessDenied</Code>' in r.text)
+                r.status_code == 403 and
+                '<Code>AccessDenied</Code>' in r.text)
         )
     )
 
@@ -101,8 +101,8 @@ def sns_client(docker_services, docker_ip):
     )
 
     docker_services.wait_until_responsive(
-       timeout=5.0, pause=0.1,
-       check=_is_responsive(endpoint_url, lambda r: r.status_code == 200)
+        timeout=5.0, pause=0.1,
+        check=_is_responsive(endpoint_url, lambda r: r.status_code == 200)
     )
 
     client = boto3.client('sns', endpoint_url=endpoint_url)
