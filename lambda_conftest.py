@@ -181,7 +181,7 @@ def sns_client(docker_services, docker_ip):
 
 
 @pytest.fixture
-def topic_arn(sns_client):
+def topic_arn(sns_client, docker_services, docker_ip):
     """Creates an SNS topic in moto, and yields the new topic ARN."""
     topic_name = 'test-lambda-topic'
 
@@ -193,6 +193,13 @@ def topic_arn(sns_client):
     os.environ.update({'TOPIC_ARN': topic_arn})
 
     yield topic_arn
+
+    # This clears all the messages on the topic at the end of the test,
+    # so the next test gets an empty topic.
+    endpoint_url = (
+        f'http://{docker_ip}:{docker_services.port_for("sns", 9292)}'
+    )
+    requests.delete(f'{endpoint_url}/messages')
 
 
 @pytest.fixture
