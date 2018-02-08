@@ -22,12 +22,3 @@ resource "aws_s3_bucket" "miro-images-sync" {
     }
   }
 }
-
-resource "aws_s3_bucket" "cloudfront-logs" {
-  bucket = "wellcome-platform-cloudfront-logs"
-  acl    = "private"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
