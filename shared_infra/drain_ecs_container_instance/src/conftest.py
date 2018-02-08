@@ -143,3 +143,8 @@ def ecs_task(ecs_cluster_name, ecs_cluster_arn, ecs_container_instance_arn):
     )
     assert len(tasks['taskArns']) == 1
     yield
+
+
+@pytest.fixture
+def lifecycle_hook_name():
+    return 'monitoring-cluster-LifecycleHook-OENP6M5XGYVM'
