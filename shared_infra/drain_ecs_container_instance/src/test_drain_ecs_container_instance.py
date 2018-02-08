@@ -4,63 +4,16 @@ import json
 
 import boto3
 from mock import Mock
-from moto.ec2 import utils as ec2_utils
 import pytest
 
 import drain_ecs_container_instance
 
 
 @pytest.fixture()
-def ecs_cluster(ec2_instance_id):
-    fake_ecs_client = boto3.client('ecs')
-    fake_ec2_client = boto3.client('ec2')
-
-    cluster_name = 'test_ecs_cluster'
-    print(f"Creating ecs cluster {cluster_name}")
-    cluster_response = fake_ecs_client.create_cluster(
-        clusterName=cluster_name
-    )
-
-    ec2 = boto3.resource('ec2')
-    instance = ec2.Instance(ec2_instance_id)
-
-    instance_id_document = json.dumps(
-        ec2_utils.generate_instance_identity_document(instance)
-    )
-
-    container_instance_resp = fake_ecs_client.register_container_instance(
-        cluster=cluster_name,
-        instanceIdentityDocument=instance_id_document
-    )
-
-    container_instance_arn = \
-        container_instance_resp['containerInstance']['containerInstanceArn']
-    cluster_arn = cluster_response['cluster']['clusterArn']
-
-    fake_ec2_client.create_tags(
-        Resources=[
-            ec2_instance_id,
-        ],
-        Tags=[
-            {
-                'Key': 'clusterArn',
-                'Value': cluster_arn
-            },
-            {
-                'Key': 'containerInstanceArn',
-                'Value': container_instance_arn
-            }
-        ]
-    )
-    yield cluster_arn, cluster_arn, container_instance_arn
-
-
-@pytest.fixture()
-def ecs_task(ecs_cluster):
+def ecs_task(ecs_cluster_name, ecs_cluster_arn, ecs_container_instance_arn):
     fake_ecs_client = boto3.client('ecs')
     task_name = 'test_ecs_task'
     print(f"Creating task {task_name}")
-    cluster_name, cluster_arn, container_instance_arn = ecs_cluster
     fake_ecs_client.register_task_definition(
         family=task_name,
         containerDefinitions=[
@@ -80,7 +33,7 @@ def ecs_task(ecs_cluster):
     )
 
     fake_ecs_client.run_task(
-        cluster=cluster_name,
+        cluster=ecs_cluster_name,
         overrides={},
         taskDefinition=task_name,
         count=1,
@@ -88,8 +41,8 @@ def ecs_task(ecs_cluster):
     )
 
     tasks = fake_ecs_client.list_tasks(
-        cluster=cluster_arn,
-        containerInstance=container_instance_arn
+        cluster=ecs_cluster_arn,
+        containerInstance=ecs_container_instance_arn
     )
     assert len(tasks['taskArns']) == 1
     yield
@@ -167,8 +120,7 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster(
 def test_complete_ec2_shutdown_ecs_cluster_no_tasks(
         autoscaling_group_name,
         ec2_instance_id,
-        ec2_terminating_message,
-        ecs_cluster):
+        ec2_terminating_message):
     fake_ec2_client = boto3.client('ec2')
     fake_ecs_client = boto3.client('ecs')
     fake_sns_client = boto3.client('sns')
