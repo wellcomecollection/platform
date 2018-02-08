@@ -14,7 +14,7 @@ module "items_reader" {
 
   resource_type = "items"
 
-  bucket_name        = "${aws_s3_bucket.sierra_reader.id}"
+  bucket_name        = "${aws_s3_bucket.sierra_adapter.id}"
   windows_topic_name = "${module.items_window_generator.topic_name}"
 
   sierra_fields = "${var.sierra_items_fields}"
