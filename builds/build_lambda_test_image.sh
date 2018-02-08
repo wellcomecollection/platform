@@ -26,10 +26,6 @@ DOCKER_IMAGE="wellcome/test_lambda_$LABEL"
 # Root of the repo
 ROOT=$(git rev-parse --show-toplevel)
 
-# Marker which indicates the image has been created
-MARKER=$ROOT/.docker/lambda_test_$LABEL
-
-
 
 # If we don't already have the image, pull it now.
 if ! docker inspect --type=image wellcome/test_lambda >/dev/null 2>&1
@@ -39,26 +35,25 @@ fi
 
 # If a requirements.txt file exists, we need to check if it's more up-to-date
 # than the existing Lambda image, and rebuild if so.
-if [[ -f $ROOT/$SRC/requirements.txt ]]
+if [[ -f $ROOT/$SRC/requirements.txt || -f $ROOT/$SRC/test_requirements.txt ]]
 then
-  if [[ ! -f $MARKER || $MARKER -ot $ROOT/$SRC/requirements.txt ]]
+
+  DOCKERFILE=$SRC/.Dockerfile
+  echo "FROM wellcome/test_lambda:latest"               > $DOCKERFILE
+
+  if [[ -f $ROOT/$SRC/requirements.txt ]]
   then
-    DOCKERFILE=$SRC/.Dockerfile
-    echo "FROM wellcome/test_lambda:latest"              > $DOCKERFILE
     echo "COPY requirements.txt /"                      >> $DOCKERFILE
     echo "RUN pip3 install -r /requirements.txt"        >> $DOCKERFILE
-
-    if [[ -f $ROOT/$SRC/test_requirements.txt ]]
-    then
-      echo "COPY test_requirements.txt /"               >> $DOCKERFILE
-      echo "RUN pip3 install -r /test_requirements.txt" >> $DOCKERFILE
-    fi
-
-    docker build --tag $DOCKER_IMAGE --file $DOCKERFILE $SRC
   fi
+
+  if [[ -f $ROOT/$SRC/test_requirements.txt ]]
+  then
+    echo "COPY test_requirements.txt /"                 >> $DOCKERFILE
+    echo "RUN pip3 install -r /test_requirements.txt"   >> $DOCKERFILE
+  fi
+
+  docker build --tag $DOCKER_IMAGE --file $DOCKERFILE $SRC
 else
   docker tag wellcome/test_lambda $DOCKER_IMAGE
 fi
-
-mkdir -p $ROOT/.docker
-touch $MARKER
