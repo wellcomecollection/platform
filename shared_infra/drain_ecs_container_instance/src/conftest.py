@@ -148,3 +148,8 @@ def ecs_task(ecs_cluster_name, ecs_cluster_arn, ecs_container_instance_arn):
 @pytest.fixture
 def lifecycle_hook_name():
     return 'monitoring-cluster-LifecycleHook-OENP6M5XGYVM'
+
+
+@pytest.fixture
+def lifecycle_action_token():
+    return '78c16884-6bd4-4296-ac0c-2da9eb6a0d29'

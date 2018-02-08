@@ -10,8 +10,7 @@ import drain_ecs_container_instance
 
 
 @pytest.fixture()
-def ec2_terminating_message(lifecycle_hook_name, moto_topic_arn, autoscaling_group_name, ec2_instance_id):
-    lifecycle_action_token = "78c16884-6bd4-4296-ac0c-2da9eb6a0d29"
+def ec2_terminating_message(lifecycle_hook_name, lifecycle_action_token, moto_topic_arn, autoscaling_group_name, ec2_instance_id):
     message = {
         "LifecycleHookName": lifecycle_hook_name,
         "AccountId": "account_id",
@@ -43,7 +42,7 @@ def ec2_terminating_message(lifecycle_hook_name, moto_topic_arn, autoscaling_gro
                 'Type': 'Notification',
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
-    yield lifecycle_action_token, event, message
+    yield event, message
 
 
 def test_complete_ec2_shutdown_if_no_ecs_cluster(
@@ -55,7 +54,7 @@ def test_complete_ec2_shutdown_if_no_ecs_cluster(
     fake_ecs_client = boto3.client('ecs')
     fake_sns_client = boto3.client('sns')
 
-    _, event, _ = ec2_terminating_message
+    event, _ = ec2_terminating_message
 
     mocked_asg_client = Mock()
 
@@ -86,7 +85,7 @@ def test_complete_ec2_shutdown_ecs_cluster_no_tasks(
     fake_ecs_client = boto3.client('ecs')
     fake_sns_client = boto3.client('sns')
 
-    _, event, _ = ec2_terminating_message
+    event, _ = ec2_terminating_message
 
     mocked_asg_client = Mock()
 
@@ -110,6 +109,7 @@ def test_complete_ec2_shutdown_ecs_cluster_no_tasks(
 
 def test_drain_ecs_instance_if_running_tasks(
         lifecycle_hook_name,
+        lifecycle_action_token,
         autoscaling_group_name,
         ec2_instance_id,
         ecs_task,
@@ -120,8 +120,7 @@ def test_drain_ecs_instance_if_running_tasks(
     fake_sqs_client = boto3.client('sqs')
     fake_sns_client = boto3.client('sns')
 
-    lifecycle_action_token, \
-        event, \
+    event, \
         message = ec2_terminating_message
 
     mocked_asg_client = Mock()
