@@ -1,10 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 import datetime as dt
-import json
 import os
 
-import boto3
 import mock
 
 from sierra_window_generator import build_window, main
