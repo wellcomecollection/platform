@@ -28,13 +28,13 @@ class VersionedHybridStore @Inject()(
     }
   }
 
-  def updateRecord[T <: Versioned](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
+  def updateRecord[T <: Versioned](sourceName: String, sourceId: String)(ifNotExisting: => T)(ifExisting: T => T)(
     implicit evidence: VersionedDynamoFormatWrapper[T],
     versionUpdater: VersionUpdater[T],
     decoder: Decoder[T],
     encoder: Encoder[T]
   ): Future[Unit] = {
-
+    val id = Versioned.id(sourceName, sourceId)
     val dynamoRecord: Future[Option[HybridRecord]] =
       versionedDao.getRecord[HybridRecord](id = id)
 
