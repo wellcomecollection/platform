@@ -49,10 +49,12 @@ class Budget:
 
     @property
     def name(self):
-        return (self.data['BudgetName']
-            .replace('budget', '')
-            .replace('Budget', '')
-            .strip())
+        return (
+            self.data['BudgetName']
+                .replace('budget', '')
+                .replace('Budget', '')
+                .strip()
+        )
 
     @property
     def budget_limit(self):
@@ -115,7 +117,6 @@ def draw_diagram(budgets):
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
     from matplotlib.patches import Rectangle
-    from matplotlib.text import Annotation
 
     # Define some parameters.  The Slack image previews are ~360x150px, so
     # we need fonts and sizes that fit that well.
