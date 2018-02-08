@@ -28,6 +28,11 @@ class VersionedHybridStore @Inject()(
     }
   }
 
+  private case class VersionedHybridObject[T <: Versioned](
+    hybridRecord: HybridRecord,
+    s3Object: T
+  )
+
   def updateRecord[T <: Versioned](sourceName: String, sourceId: String)(ifNotExisting: => T)(ifExisting: T => T)(
     implicit evidence: VersionedDynamoFormatWrapper[T],
     versionUpdater: VersionUpdater[T],
@@ -35,68 +40,54 @@ class VersionedHybridStore @Inject()(
     encoder: Encoder[T]
   ): Future[Unit] = {
     val id = Versioned.id(sourceName, sourceId)
-    val dynamoRecord: Future[Option[HybridRecord]] =
-      versionedDao.getRecord[HybridRecord](id = id)
 
-    val eventualMaybeTuple = dynamoRecord.flatMap {
-      case Some(r) => {
-        versionedObjectStore.get[T](r.s3key).map { s3Record =>
-          Some((r, s3Record))
+    getObject[T](id).flatMap {
+      case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
+        val transformedS3Record = ifExisting(s3Record)
+
+        if(transformedS3Record != s3Record) {
+          putObject(id, transformedS3Record, key => hybridRecord.copy(s3key = key))
+        } else {
+          Future.successful(())
         }
-      }
-      case None => Future.successful(None)
-    }
 
-    eventualMaybeTuple.flatMap {
-        case Some((hybridRecord, s3Record)) =>
-          val transformedS3Record = ifExisting(s3Record)
-
-          if(transformedS3Record.id != id)
-            throw new IllegalArgumentException("ID provided does not match ID in record.")
-
-          if(transformedS3Record != s3Record) {
-
-            val futureKey = versionedObjectStore.put(transformedS3Record)
-            futureKey.flatMap { key =>
-              val newHybridRecord = hybridRecord.copy(s3key = key)
-
-              versionedDao.updateRecord(newHybridRecord)
-            }
-          }else {
-            Future.successful(())
-          }
-        case None =>
-
-          if(ifNotExisting.id != id)
-            throw new IllegalArgumentException("ID provided does not match ID in record.")
-
-          val futureKey = versionedObjectStore.put(ifNotExisting)
-
-          futureKey.flatMap { key =>
-            val hybridRecord = HybridRecord(
-              version = ifNotExisting.version,
-              sourceId = ifNotExisting.sourceId,
-              sourceName = ifNotExisting.sourceName,
-              s3key = key
-            )
-
-            versionedDao.updateRecord(hybridRecord)
-          }
+      case None => putObject(id, ifNotExisting, key => HybridRecord(
+          version = ifNotExisting.version,
+          sourceId = ifNotExisting.sourceId,
+          sourceName = ifNotExisting.sourceName,
+          s3key = key
+        ))
     }
   }
 
   def getRecord[T <: Versioned](id: String)(
-    implicit decoder: Decoder[T]): Future[Option[T]] = {
+    implicit decoder: Decoder[T]): Future[Option[T]] =
+    getObject[T](id).map { maybeObject => maybeObject.map(_.s3Object) }
+
+  private def getObject[T <: Versioned](id: String)(implicit decoder: Decoder[T]):
+  Future[Option[VersionedHybridObject[T]]] = {
+
     val dynamoRecord: Future[Option[HybridRecord]] =
       versionedDao.getRecord[HybridRecord](id = id)
 
     dynamoRecord.flatMap {
-      case Some(r) => {
-        versionedObjectStore.get[T](r.s3key).map {
-          Some(_)
+      case Some(hybridRecord) => {
+        versionedObjectStore.get[T](hybridRecord.s3key).map { s3Record =>
+          Some(VersionedHybridObject(hybridRecord, s3Record))
         }
       }
       case None => Future.successful(None)
     }
+  }
+
+  private def putObject[T <: Versioned](id: String, versionedObject: T, f: (String) => HybridRecord)(
+    implicit encoder: Encoder[T],
+    versionUpdater: VersionUpdater[T]
+  ) = {
+    if(versionedObject.id != id)
+      throw new IllegalArgumentException("ID provided does not match ID in record.")
+
+    val futureKey = versionedObjectStore.put(versionedObject)
+    futureKey.flatMap { key => versionedDao.updateRecord(f(key)) }
   }
 }
