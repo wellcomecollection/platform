@@ -23,4 +23,14 @@ resource "aws_s3_bucket" "dashboard" {
       days = 30
     }
   }
+
+  lifecycle_rule {
+    id      = "budget_graphs"
+    prefix  = "budget_graphs/"
+    enabled = true
+
+    expiration {
+      days = 30
+    }
+  }
 }
