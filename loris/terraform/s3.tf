@@ -11,3 +11,12 @@ resource "aws_s3_bucket" "wellcomecollection-miro-images-public" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket" "cloudfront_logs" {
+  bucket = "wellcomecollection-platform-logs-cloudfront"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
