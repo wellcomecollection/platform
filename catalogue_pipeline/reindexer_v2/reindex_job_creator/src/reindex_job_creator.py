@@ -9,10 +9,10 @@ from wellcome_aws_utils.sns_utils import (
 )
 
 
-def main(event, _ctxt):
+def main(event, _ctxt=None, sns_client=None):
     print(f'event={event!r}')
 
-    sns_client = boto3.client('sns')
+    sns_client = sns_client or boto3.client('sns')
     topic_arn = os.environ['TOPIC_ARN']
 
     for sns_event in extract_sns_messages_from_lambda_event(event):
