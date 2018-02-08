@@ -117,7 +117,7 @@ def ecs_task(ecs_cluster):
 
 
 @pytest.fixture()
-def ec2_terminating_message(topic_arn, autoscaling_group):
+def ec2_terminating_message(moto_topic_arn, autoscaling_group):
     autoscaling_group_name, instance_id = autoscaling_group
     lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
 
@@ -149,7 +149,7 @@ def ec2_terminating_message(topic_arn, autoscaling_group):
                 'SigningCertUrl': 'https://certificate.pem',
                 'Subject': None,
                 'Timestamp': '2017-07-10T12:43:55.664Z',
-                'TopicArn': topic_arn,
+                'TopicArn': moto_topic_arn,
                 'Type': 'Notification',
                 'UnsubscribeUrl': 'https://unsubscribe-url'
             }}]}
@@ -223,7 +223,7 @@ def test_drain_ecs_instance_if_running_tasks(
         autoscaling_group,
         ecs_task,
         ec2_terminating_message,
-        queue_url):
+        moto_queue_url):
     fake_ec2_client = boto3.client('ec2')
     fake_ecs_client = boto3.client('ecs')
     fake_sqs_client = boto3.client('sqs')
@@ -271,7 +271,7 @@ def test_drain_ecs_instance_if_running_tasks(
         .assert_not_called()
 
     messages = fake_sqs_client.receive_message(
-        QueueUrl=queue_url,
+        QueueUrl=moto_queue_url,
         MaxNumberOfMessages=1
     )
     message_body = messages['Messages'][0]['Body']
