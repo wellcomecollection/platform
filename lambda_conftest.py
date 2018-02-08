@@ -26,20 +26,16 @@ def docker_compose_file(pytestconfig):
     return os.path.join(str(pytestconfig.rootdir), 'docker-compose.yml')
 
 
-def _dynamodb_is_responsive(endpoint_url):
-    """
-    Check if our DynamoDB container has started.  We GET the / path,
-    and check we get a 400 error that indicates we need auth!
-    """
-    try:
-        resp = requests.get(endpoint_url)
-        if (
-            resp.status_code == 400 and
-            resp.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
-        ):
-            return True
-    except requests.exceptions.ConnectionError:
-        return False
+def _is_responsive_function(condition):
+    def is_responsive(endpoint_url):
+        try:
+            resp = requests.get(endpoint_url)
+            if condition(resp):
+                return True
+        except requests.exceptions.ConnectionError:
+            return False
+
+    return is_responsive
 
 
 @pytest.fixture(scope='session')
@@ -50,26 +46,13 @@ def dynamodb_client(docker_services, docker_ip):
 
     docker_services.wait_until_responsive(
        timeout=5.0, pause=0.1,
-       check=lambda: _dynamodb_is_responsive(endpoint_url)
+       check=_is_responsive_function(lambda r:
+           r.status_code == 400 and
+           r.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
+       )
     )
 
     yield boto3.client('dynamodb', endpoint_url=endpoint_url)
-
-
-def _s3_is_responsive(endpoint_url):
-    """
-    Check if our S3 container has started.  We GET the / path,
-    and check we get a 403 error that indicates we need auth!
-    """
-    try:
-        resp = requests.get(endpoint_url)
-        if (
-            resp.status_code == 403 and
-            '<Code>AccessDenied</Code>' in resp.text
-        ):
-            return True
-    except requests.exceptions.ConnectionError:
-        return False
 
 
 @pytest.fixture(scope='session')
@@ -80,7 +63,10 @@ def s3_client(docker_services, docker_ip):
 
     docker_services.wait_until_responsive(
        timeout=10.0, pause=0.1,
-       check=lambda: _s3_is_responsive(endpoint_url)
+       check=_is_responsive_function(lambda r: (
+            r.status_code == 403 and
+            '<Code>AccessDenied</Code>' in r.text)
+       )
     )
 
     yield boto3.client(
@@ -91,20 +77,6 @@ def s3_client(docker_services, docker_ip):
     )
 
 
-def _sqs_is_responsive(endpoint_url):
-    """
-    Check if our SQS container has started.  We GET the / path,
-    and check we get a 404 error that indicates we're looking up a
-    non-existent queue.
-    """
-    try:
-        resp = requests.get(endpoint_url)
-        if resp.status_code == 404:
-            return True
-    except requests.exceptions.ConnectionError:
-        return False
-
-
 @pytest.fixture(scope='session')
 def sqs_client(docker_services, docker_ip):
     endpoint_url = (
@@ -113,24 +85,10 @@ def sqs_client(docker_services, docker_ip):
 
     docker_services.wait_until_responsive(
        timeout=5.0, pause=0.1,
-       check=lambda: _sqs_is_responsive(endpoint_url)
+       check=_is_responsive_function(lambda r: r.status_code == 404)
     )
 
     yield boto3.client('sqs', endpoint_url=endpoint_url)
-
-
-def _sns_is_responsive(endpoint_url):
-    """
-    Check if our SQS container has started.  We GET the / path,
-    and check we get a 404 error that indicates we're looking up a
-    non-existent queue.
-    """
-    try:
-        resp = requests.get(endpoint_url)
-        if resp.status_code == 200:
-            return True
-    except requests.exceptions.ConnectionError:
-        return False
 
 
 @pytest.fixture(scope='session')
@@ -141,7 +99,7 @@ def sns_client(docker_services, docker_ip):
 
     docker_services.wait_until_responsive(
        timeout=5.0, pause=0.1,
-       check=lambda: _sns_is_responsive(endpoint_url)
+       check=_is_responsive_function(lambda r: r.status_code == 200)
     )
 
     client = boto3.client('sns', endpoint_url=endpoint_url)
