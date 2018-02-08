@@ -8,6 +8,7 @@ import os
 import boto3
 from moto import mock_sns, mock_sqs
 import pytest
+import requests
 
 
 def pytest_runtest_setup(item):
@@ -57,3 +58,38 @@ def queue_url(topic_arn):
             Endpoint=f'arn:aws:sqs:eu-west-1:123456789012:{queue_name}'
         )
         yield queue_url
+
+
+@pytest.fixture(scope='session')
+def docker_compose_file(pytestconfig):
+    return os.path.join(str(pytestconfig.rootdir), 'docker-compose.yml')
+
+
+def _dynamodb_is_responsive(url):
+    """
+    Check if our DynamoDB container has started.  We GET the / path,
+    and check we get a 400 error that indicates we need auth!
+    """
+    try:
+        resp = requests.get(url)
+        if (
+            resp.status_code == 400 and
+            resp.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
+        ):
+            return True
+    except requests.exceptions.ConnectionError:
+        return False
+
+
+@pytest.fixture(scope='session')
+def dynamodb_resource(docker_services, docker_ip):
+    endpoint_url = (
+        f'http://{docker_ip}:{docker_services.port_for("dynamodb", 8000)}'
+    )
+
+    docker_services.wait_until_responsive(
+       timeout=5.0, pause=0.1,
+       check=lambda: _dynamodb_is_responsive(url)
+    )
+
+    yield boto3.resource('dynamodb', endpoint_url=endpoint_url)

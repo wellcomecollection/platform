@@ -61,7 +61,8 @@ endef
 #
 define test_lambda
 	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/builds/docker_run.py --aws --dind -- \
+		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
 		--env INSTALL_DEPENDENCIES=false \
