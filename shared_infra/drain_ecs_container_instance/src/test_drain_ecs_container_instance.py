@@ -10,45 +10,6 @@ import drain_ecs_container_instance
 
 
 @pytest.fixture()
-def ecs_task(ecs_cluster_name, ecs_cluster_arn, ecs_container_instance_arn):
-    fake_ecs_client = boto3.client('ecs')
-    task_name = 'test_ecs_task'
-    print(f"Creating task {task_name}")
-    fake_ecs_client.register_task_definition(
-        family=task_name,
-        containerDefinitions=[
-            {
-                'name': 'hello_world',
-                'image': 'docker/hello-world:latest',
-                'cpu': 1024,
-                'memory': 400,
-                'essential': True,
-                'environment': [{
-                    'name': 'AWS_ACCESS_KEY_ID',
-                    'value': 'SOME_ACCESS_KEY'
-                }],
-                'logConfiguration': {'logDriver': 'json-file'}
-            }
-        ]
-    )
-
-    fake_ecs_client.run_task(
-        cluster=ecs_cluster_name,
-        overrides={},
-        taskDefinition=task_name,
-        count=1,
-        startedBy='moto'
-    )
-
-    tasks = fake_ecs_client.list_tasks(
-        cluster=ecs_cluster_arn,
-        containerInstance=ecs_container_instance_arn
-    )
-    assert len(tasks['taskArns']) == 1
-    yield
-
-
-@pytest.fixture()
 def ec2_terminating_message(moto_topic_arn, autoscaling_group_name, ec2_instance_id):
     lifecycle_hook_name = "monitoring-cluster-LifecycleHook-OENP6M5XGYVM"
 
