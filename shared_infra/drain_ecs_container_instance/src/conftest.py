@@ -153,3 +153,49 @@ def lifecycle_hook_name():
 @pytest.fixture
 def lifecycle_action_token():
     return '78c16884-6bd4-4296-ac0c-2da9eb6a0d29'
+
+
+@pytest.fixture
+def ec2_terminating_message(
+    lifecycle_hook_name,
+    autoscaling_group_name,
+    ec2_instance_id,
+    lifecycle_action_token
+):
+    return {
+        "LifecycleHookName": lifecycle_hook_name,
+        "AccountId": "account_id",
+        "RequestId": "f29364ad-8523-4d58-9a70-3537f4edec15",
+        "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
+        "AutoScalingGroupName": autoscaling_group_name,
+        "Service": "AWS Auto Scaling",
+        "Time": "2017-07-10T12:36:05.857Z",
+        "EC2InstanceId": ec2_instance_id,
+        "LifecycleActionToken": lifecycle_action_token
+    }
+
+
+@pytest.fixture
+def ec2_terminating_event(ec2_terminating_message, moto_topic_arn):
+    return {
+        'Records': [
+            {
+                'EventSource': 'aws:sns',
+                'EventSubscriptionArn': 'arn:aws:sns:region:account_id:ec2_terminating_topic:stuff',
+                'EventVersion': '1.0',
+                'Sns': {
+                    'Message': json.dumps(ec2_terminating_message),
+                    'MessageAttributes': {},
+                    'MessageId': 'a4416c50-9ec6-5a8e-934a-3d8de60d1428',
+                    'Signature': 'signature',
+                    'SignatureVersion': '1',
+                    'SigningCertUrl': 'https://certificate.pem',
+                    'Subject': None,
+                    'Timestamp': '2017-07-10T12:43:55.664Z',
+                    'TopicArn': moto_topic_arn,
+                    'Type': 'Notification',
+                    'UnsubscribeUrl': 'https://unsubscribe-url'
+                }
+            }
+        ]
+    }
