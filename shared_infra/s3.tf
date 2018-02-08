@@ -37,26 +37,6 @@ resource "aws_s3_bucket" "infra" {
   }
 }
 
-resource "aws_s3_bucket" "alb-logs" {
-  bucket = "wellcomecollection-alb-logs"
-  acl    = "private"
-
-  policy = "${data.aws_iam_policy_document.alb_logs.json}"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  lifecycle_rule {
-    id      = "expire_alb_logs"
-    enabled = true
-
-    expiration {
-      days = 30
-    }
-  }
-}
-
 locals {
   alb_logs_bucket_name = "wellcomecollection-platform-logs-alb"
 }
