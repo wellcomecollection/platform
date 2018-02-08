@@ -4,11 +4,8 @@
 """
 
 import os
-from collections import namedtuple
 
 from boto3.dynamodb.conditions import Attr
-from botocore.exceptions import ClientError
-
 import boto3
 
 from wellcome_aws_utils import sns_utils
@@ -58,6 +55,14 @@ def _process_reindex_tracker_update_job(table, message):
     }
 
 
+def _run(table, event):
+    for record in sns_utils.extract_sns_messages_from_lambda_event(event):
+        job = _process_reindex_tracker_update_job(table, record.message)
+
+    if job is not None:
+        _update_versioned_item(table, job['dynamo_item'], job['desired_item'])
+
+
 def main(event, _):
     print(f'event = {event!r}')
 
@@ -65,8 +70,4 @@ def main(event, _):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
-    for record in sns_utils.extract_sns_messages_from_lambda_event(event):
-        job = _process_reindex_tracker_update_job(table, record.message)
-
-        if job is not None:
-            _update_versioned_item(table, job['dynamo_item'], job['desired_item'])
+    _run(table, event)
