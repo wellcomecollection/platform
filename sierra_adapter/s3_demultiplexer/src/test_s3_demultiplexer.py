@@ -44,8 +44,5 @@ def test_end_to_end_demultiplexer(s3_client, sns_client, topic_arn):
         sns_client=sns_client
     )
 
-    actual_messages = [
-        json.loads(json.loads(m[':message'])['default'])
-        for m in sns_client.list_messages()
-    ]
+    actual_messages = [m[':message'] for m in sns_client.list_messages()]
     assert actual_messages == records

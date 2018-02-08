@@ -164,9 +164,14 @@ def sns_client(docker_services, docker_ip):
     #   :received_at: 2017-04-18 13:20:45.289912607 +00:00
 
     def list_messages():
-        resp = requests.get(f'{endpoint_url}')
+        import json
         import yaml
-        return yaml.safe_load(resp.text)['messages']
+
+        resp = requests.get(f'{endpoint_url}')
+        data = yaml.safe_load(resp.text)['messages']
+        for d in data:
+            d[':message'] = json.loads(json.loads(d[':message'])['default'])
+        return data
 
     # We monkey-patch this method into the SNS client, so it's available
     # in tests.  Dynamism FTW.
