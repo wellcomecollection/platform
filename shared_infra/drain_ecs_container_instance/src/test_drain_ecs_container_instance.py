@@ -4,7 +4,6 @@ import json
 
 import boto3
 from mock import Mock
-import pytest
 
 import drain_ecs_container_instance
 
