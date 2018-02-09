@@ -61,7 +61,8 @@ endef
 #
 define test_lambda
 	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/builds/docker_run.py --aws --dind -- \
+		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
 		--env INSTALL_DEPENDENCIES=false \
@@ -168,11 +169,26 @@ endef
 #	$2 - Path to the Lambda source directory.
 #
 define __lambda_target_template
-$(1)-test:
+$(1)-test: $(ROOT)/.docker/test_lambda_$(1)
 	$(call test_lambda,$(2))
 
 $(1)-publish:
 	$(call publish_lambda,$(2))
+
+$(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt)
+	$(ROOT)/builds/build_lambda_test_image.sh $(1)
+	mkdir -p $(ROOT)/.docker
+	touch $(ROOT)/.docker/test_lambda_$(1)
+
+
+$(ROOT)/$(2)/src/requirements.txt:
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
+
+$(ROOT)/$(2)/src/test_requirements.txt:
+	$(ROOT)/builds/docker_run.py -- \
+		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
+		pip-compile test_requirements.in
 endef
 
 

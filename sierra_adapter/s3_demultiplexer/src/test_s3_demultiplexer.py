@@ -2,30 +2,24 @@
 
 import json
 
-import boto3
-from moto import mock_s3
-
 from s3_demultiplexer import main
 
 
-@mock_s3
-def test_end_to_end_demultiplexer(queue_url):
-    client = boto3.client("s3")
-
+def test_end_to_end_demultiplexer(s3_client, sns_client, topic_arn):
     records = [
         {'colour': 'red', 'letter': 'R'},
         {'colour': 'green', 'letter': 'G'},
         {'colour': 'blue', 'letter': 'B'},
     ]
 
-    client.create_bucket(Bucket='bukkit')
-    client.put_object(
+    s3_client.create_bucket(Bucket='bukkit')
+    s3_client.put_object(
         Bucket='bukkit',
         Key='test0001.json',
         Body=json.dumps(records)
     )
 
-    s3_event = {
+    event = {
         "Records": [
             {
                 "eventTime": "1970-01-01T00:00:00.000Z",
@@ -44,20 +38,11 @@ def test_end_to_end_demultiplexer(queue_url):
         ]
     }
 
-    sqs_client = boto3.client('sqs')
-
-    main(s3_event, None)
-
-    messages = sqs_client.receive_message(
-        QueueUrl=queue_url,
-        MaxNumberOfMessages=len(records)
+    main(
+        event=event,
+        s3_client=s3_client,
+        sns_client=sns_client
     )
 
-    bodies = [m['Body'] for m in messages['Messages']]
-    inner_messages = [json.loads(b)['Message'] for b in bodies]
-    actual_messages = [
-        json.loads(json.loads(inner_msg)['default'])
-        for inner_msg in inner_messages
-    ]
-
+    actual_messages = [m[':message'] for m in sns_client.list_messages()]
     assert actual_messages == records

@@ -6,29 +6,12 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.DynamoConfig
 
-trait DynamoConfigModule extends TwitterModule {
-  val tableTpl: String = "aws.dynamo.%s.tableName"
-
-  def flags(tableName: String) =
-    flag[String](tableTpl.format(tableName), "", "Name of the DynamoDB table")
-}
-
-object PlatformDynamoConfigModule extends DynamoConfigModule {
-
-  val miroTable = flags("miroData")
-  val identTable = flags("identifiers")
-  val calmTable = flags("calmData")
-  val reindexTable = flags("reindexTracker")
+object DynamoConfigModule extends TwitterModule {
+  private val tableName =
+    flag[String]("aws.dynamo.tableName", "", "Name of the DynamoDB table")
 
   @Singleton
   @Provides
-  def providesDynamoConfig(): Map[String, DynamoConfig] =
-    Map(
-      "calm" -> DynamoConfig(calmTable()),
-      "identifiers" -> DynamoConfig(identTable()),
-      "miro" -> DynamoConfig(miroTable()),
-      "reindex" -> DynamoConfig(reindexTable())
-    ).filterNot {
-      case (_, v) => v.table.isEmpty
-    }
+  def providesDynamoConfig(): DynamoConfig =
+    DynamoConfig(table = tableName())
 }

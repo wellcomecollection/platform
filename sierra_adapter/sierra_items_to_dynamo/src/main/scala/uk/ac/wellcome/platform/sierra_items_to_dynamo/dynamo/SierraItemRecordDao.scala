@@ -14,17 +14,8 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
-                                    dynamoConfigs: Map[String, DynamoConfig])
+                                    dynamoConfig: DynamoConfig)
     extends Logging {
-
-  private val tableConfigId = "sierraToDynamo"
-
-  private val dynamoConfig = dynamoConfigs.getOrElse(
-    tableConfigId,
-    throw new RuntimeException(
-      s"SierraTransformableDao ($tableConfigId) dynamo config not available!"
-    )
-  )
 
   val table = Table[SierraItemRecord](dynamoConfig.table)
 

@@ -4,18 +4,22 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.DynamoReadError
 
-trait Versioned {
-  val version: Int
+trait Sourced {
   val sourceId: String
   val sourceName: String
+}
 
-  val id: String = s"$sourceName/$sourceId"
+trait Versioned extends Sourced {
+  val version: Int
+  val id: String = Versioned.id(sourceName, sourceId)
 }
 
 object Versioned {
   implicit def toVersionedDynamoFormatWrapper[T <: Versioned](
     implicit dynamoFormat: DynamoFormat[T]): VersionedDynamoFormatWrapper[T] =
     new VersionedDynamoFormatWrapper[T](dynamoFormat)
+
+  def id(sourceName: String, sourceId: String) = s"$sourceName/$sourceId"
 }
 
 class VersionedDynamoFormatWrapper[T <: Versioned](

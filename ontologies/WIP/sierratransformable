@@ -75,7 +75,7 @@
    * 4. For "100" type as "Person"
    * 5. For "110" type as "Organisation"
    * 6. For "111" type as "Event"
-   * 7. If subfield 0 contains a value use to populate "identifiers" after stripping first two letters (ls, sh). Check we want to do this. Platform "authority" is defined by first two letters of code; n or nr. Indicators can also help disabiguate the authority. 
+   * 7. If subfield 0 contains a value to use to populate "identifiers" after stripping first two letters (ls, sh). Check we want to do this. Platform "authority" is defined by first two letters of code; n or nr. Indicators can also help disabiguate the authority. 
    * 8. For all other subfields populate "qualifiers" apart from 6,9,4 populate "qualifierType" with the subfield type (kebab-case) 
    * 9. For subfield "d" and "f" type as "Period", for all other subfields provide no type
    * 10. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
@@ -88,9 +88,25 @@
    *  "creators": [
    *     {
    *        "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
-   *        "type": "QualifiedConcept" , 
-   *        "concept": {
-   *           "label": "Jacobs, Philip P",
+   *        "type": "Person" , 
+   *        "identifiers": [
+   *        {
+   *           "value": "2005016805",
+   *           "type": "Identifier",
+   *           "identifierScheme": "lcsh"
+   *        }
+   *        ]
+   *     } 
+   *     ]
+   *
+   *
+      * Example:
+   *  "contributors": [
+   *     {
+   *        "type": "Contribution" , 
+   *        "agents": {
+   *           "id": "a24s7qf3" ,
+   *           "name": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
    *           "type": "Person",
    *           "identifiers": [
    *        {
@@ -99,21 +115,36 @@
    *           "identifierScheme": "lcsh"
    *        }
    *        ]
-   *     },
-   *     "qualifiers": [
+   *     },   
+   *     "contributionType": [
    *        {
-   *           "qualifierType": "fuller-form-of-name" ,        
-   *           "label": "Philip Peter",
-   *           "type": "Name"  
-   *        } ,
-   *        {
-   *           "qualifierType": "associated-time" ,
-   *           "label": "1879-1940",
-   *           "type": "Period"
+   *           "contributionType": "editor" ,        
+   *           "label": "Editor",
+   *           "type": "ContributionType"  
    *        } 
-   *     ]
-   *  }
+   *     ] ,
+   *     "affiliation" :
+   *       {
+   *           "type": "Affiliation"
+   *            "affiliatedWith" :
+   *              {
+   *                   "id": "a8y98yy8" ,
+   *                   "label": "University of Birmingham",
+   *                   "type": "Organisation" 
+   *                       "identifiers": [
+   *                        {
+   *                            "value": "2005016805",
+   *                            "type": "Identifier",
+   *                            "identifierScheme": "lcsh"
+   *                        }
+   *                        ]                  
+   *              }
+   *       }
+   *  } ,
    * ],
+   *
+   *
+
    *
    */
 

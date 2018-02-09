@@ -1,9 +1,7 @@
 # -*- encoding: utf-8 -*-
 
-import json
 import os
 
-import boto3
 import pytest
 
 import dynamo_to_sns
@@ -129,18 +127,17 @@ def _dynamo_event(event_name, old_image=None, new_image=None):
     ),
 ])
 def test_end_to_end_feature_test(
-    queue_url, input_event, expected_message, stream_view_type
+    sns_client, topic_arn, input_event, expected_message, stream_view_type
 ):
     if stream_view_type is not None:
         os.environ.update({'STREAM_VIEW_TYPE': stream_view_type})
 
     event = {'Records': [input_event]}
-    dynamo_to_sns.main(event=event, context=None)
+    dynamo_to_sns.main(event=event, sns_client=sns_client)
 
-    _assert_sqs_has_message(
-        expected_message=expected_message,
-        queue_url=queue_url
-    )
+    messages = sns_client.list_messages()
+    assert len(messages) == 1
+    assert messages[0][':message'] == expected_message
 
 
 def test_invalid_stream_view_type_is_error(topic_arn):
@@ -150,17 +147,4 @@ def test_invalid_stream_view_type_is_error(topic_arn):
     event = {'Records': [input_event]}
 
     with pytest.raises(ValueError):
-        dynamo_to_sns.main(event=event, context=None)
-
-
-def _assert_sqs_has_message(queue_url, expected_message):
-    sqs_client = boto3.client('sqs')
-    messages = sqs_client.receive_message(
-        QueueUrl=queue_url,
-        MaxNumberOfMessages=1
-    )
-
-    assert len(messages['Messages']) == 1
-    message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
-    assert json.loads(json.loads(inner_message)['default']) == expected_message
+        dynamo_to_sns.main(event=event)

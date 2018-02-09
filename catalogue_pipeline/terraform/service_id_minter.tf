@@ -16,16 +16,19 @@ module "id_minter" {
     topic_arn   = "${module.es_ingest_topic.arn}"
   }
 
+  memory = 2048
+  cpu    = 512
+
   env_vars_length = 6
 
-  cluster_name = "${aws_ecs_cluster.services.name}"
+  cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id       = "${module.vpc_services.vpc_id}"
 
   alb_priority = 105
 
-  alb_cloudwatch_id          = "${module.services_alb.cloudwatch_id}"
-  alb_listener_https_arn     = "${module.services_alb.listener_https_arn}"
-  alb_listener_http_arn      = "${module.services_alb.listener_http_arn}"
+  alb_cloudwatch_id          = "${module.catalogue_pipeline_cluster.alb_cloudwatch_id}"
+  alb_listener_https_arn     = "${module.catalogue_pipeline_cluster.alb_listener_https_arn}"
+  alb_listener_http_arn      = "${module.catalogue_pipeline_cluster.alb_listener_http_arn}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 }

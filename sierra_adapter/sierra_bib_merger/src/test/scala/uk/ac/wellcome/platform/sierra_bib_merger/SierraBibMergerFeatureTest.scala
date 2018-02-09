@@ -56,7 +56,7 @@ class SierraBibMergerFeatureTest
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
       "aws.s3.bucketName" -> bucketName,
-      "aws.dynamo.dynamoTable.tableName" -> tableName
+      "aws.dynamo.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ s3LocalFlags
   )
 
@@ -176,7 +176,9 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2003-03-03T03:03:03Z"
     )
     val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
-    hybridStore.updateRecord[SierraTransformable](oldRecord)
+    hybridStore.updateRecord[SierraTransformable](
+      oldRecord.sourceName,
+      oldRecord.sourceId)(oldRecord)(identity)
 
     val newTitle = "A number of new narwhals near Newmarket"
     val newUpdatedDate = "2004-04-04T04:04:04Z"
@@ -261,7 +263,9 @@ class SierraBibMergerFeatureTest
       modifiedDate = updatedDate
     )
 
-    val future = hybridStore.updateRecord[SierraTransformable](newRecord)
+    val future = hybridStore.updateRecord[SierraTransformable](
+      newRecord.sourceName,
+      newRecord.sourceId)(newRecord)(identity)
 
     future.map { _ =>
       sendBibRecordToSQS(record)

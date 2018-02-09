@@ -20,12 +20,17 @@ war:Article rdf:type owl:Class ;
     
 war:ArticleType rdf:type owl:Class ;
     rdfs:label "ArticleType"@en ;
-    rdfs:comment "A type of article"@en ;
+    rdfs:comment "The editoiral intent or form used by the creator. This is seperate from format. Example would be analysis or interview that could be a video or text based transcript."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
     
 war:ArticleSeries rdf:type owl:Class ;
     rdfs:label "ArticleSeries"@en ;
-    rdfs:comment "An article series"@en ;
+    rdfs:comment "A branded series of articles that can be taken together or individually."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .  
+
+war:ArticleFormat rdf:type owl:Class ;
+    rdfs:label "ArticleFormat"@en ;
+    rdfs:comment "The primary format or document type of the article. For example video, text or audio."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .  
 
     
@@ -36,6 +41,13 @@ war:articleType rdf:type owl:ObjectProperty ;
     rdfs:comment "Relates an article to its type."@en ;
     rdfs:domain war:Article ;
     rdfs:range war:ArticleType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
+
+war:articleFormat rdf:type owl:ObjectProperty ;
+    rdfs:label "articleFormat"@en ;
+    rdfs:comment "Relates an article to its format."@en ;
+    rdfs:domain war:Article ;
+    rdfs:range war:ArticleFormat ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
 
 war:articleSeries rdf:type owl:ObjectProperty ;

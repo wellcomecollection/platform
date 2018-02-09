@@ -25,11 +25,6 @@ variable "release_ids" {
   type        = "map"
 }
 
-variable "dash_bucket" {
-  description = "S3 bucket hosting our dashboard"
-  default     = "wellcome-platform-dash"
-}
-
 variable "key_name" {
   description = "Name of AWS key pair"
 }

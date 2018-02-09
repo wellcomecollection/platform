@@ -1,3 +1,7 @@
+data "aws_s3_bucket" "monitoring" {
+  bucket = "${var.monitoring_bucket_id}"
+}
+
 data "aws_iam_policy_document" "s3_put_dashboard_status" {
   statement {
     actions = [
@@ -7,7 +11,7 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
     ]
 
     resources = [
-      "${aws_s3_bucket.dashboard.arn}/data/*",
+      "${data.aws_s3_bucket.monitoring.arn}/data/*",
     ]
   }
 }

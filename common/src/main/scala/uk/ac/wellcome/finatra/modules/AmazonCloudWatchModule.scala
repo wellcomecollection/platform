@@ -1,5 +1,6 @@
 package uk.ac.wellcome.finatra.modules
 
+import akka.actor.ActorSystem
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.cloudwatch.{
   AmazonCloudWatch,
@@ -21,8 +22,9 @@ object AmazonCloudWatchModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch) =
-    new MetricsSender(awsNamespace(), amazonCloudWatch)
+  def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch,
+                            actorSystem: ActorSystem) =
+    new MetricsSender(awsNamespace(), amazonCloudWatch, actorSystem)
 
   @Provides
   @Singleton

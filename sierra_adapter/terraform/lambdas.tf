@@ -1,5 +1,5 @@
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = "${aws_s3_bucket.sierra_reader.id}"
+  bucket = "${aws_s3_bucket.sierra_adapter.id}"
 
   lambda_function {
     lambda_function_arn = "${module.bibs_reader.demultiplexer_arn}"

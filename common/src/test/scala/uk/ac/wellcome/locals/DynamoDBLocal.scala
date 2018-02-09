@@ -6,7 +6,7 @@ import com.gu.scanamo.query.UniqueKey
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
 import uk.ac.wellcome.models.Versioned
-import uk.ac.wellcome.test.utils.DynamoDBLocalClients
+import uk.ac.wellcome.test.utils.{DynamoDBLocalClients, ExtendedPatience}
 
 import scala.collection.JavaConversions._
 
@@ -14,13 +14,14 @@ trait DynamoDBLocal[T <: Versioned]
     extends BeforeAndAfterEach
     with DynamoDBLocalClients
     with Eventually
-    with Matchers { this: Suite =>
+    with Matchers
+    with ExtendedPatience { this: Suite =>
 
   implicit val evidence: DynamoFormat[T]
   val tableName: String
 
   deleteTable()
-  private val createTableResult = createTable()
+  createTable()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -63,6 +64,14 @@ trait DynamoDBLocal[T <: Versioned]
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L)))
+
+    eventually {
+      dynamoDbClient
+        .describeTable(tableName)
+        .getTable
+        .getTableStatus shouldBe "ACTIVE"
+
+    }
   }
 
   def dynamoQueryEqualsValue(key: UniqueKey[_])(expectedValue: T)(

@@ -36,7 +36,7 @@ class SierraItemsToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
-      "aws.dynamo.sierraToDynamo.tableName" -> tableName
+      "aws.dynamo.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 

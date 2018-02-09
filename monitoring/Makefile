@@ -4,7 +4,7 @@ include $(ROOT)/functions.Makefile
 STACK_ROOT  = monitoring
 
 SBT_APPS    =
-ECS_TASKS   =
+ECS_TASKS   = slack_budget_bot
 LAMBDAS     = post_to_slack terraform_tracker
 
 TF_NAME     = monitoring
@@ -16,12 +16,6 @@ $(val $(call stack_setup))
 include $(ROOT)/monitoring/deployment_tracking/Makefile
 include $(ROOT)/monitoring/ecs_dashboard/Makefile
 include $(ROOT)/monitoring/load_test/Makefile
-
-
-POST_TO_SLACK = $(ROOT)/monitoring/post_to_slack
-
-$(POST_TO_SLACK)/src/requirements.txt: $(POST_TO_SLACK)/src/requirements.in
-	docker run --rm --volume $(POST_TO_SLACK):/src --rm micktwomey/pip-tools
 
 
 monitoring-test: gatling_to_cloudwatch-test \

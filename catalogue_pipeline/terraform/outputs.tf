@@ -7,15 +7,11 @@ output "dynamodb_table_reindex_tracker_stream_arn" {
 }
 
 output "ecs_services_cluster_name" {
-  value = "${aws_ecs_cluster.services.name}"
+  value = "${module.catalogue_pipeline_cluster.cluster_name}"
 }
 
 output "miro_transformer_topic_publish_policy" {
   value = "${module.miro_transformer_topic.publish_policy}"
-}
-
-output "ecs_services_cluster_id" {
-  value = "${aws_ecs_cluster.services.id}"
 }
 
 output "table_miro_data_arn" {

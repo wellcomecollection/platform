@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer.receive
 
 import java.time.Instant
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
@@ -49,7 +50,8 @@ class SQSMessageReceiverTest
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
-    mock[AmazonCloudWatch]
+    mock[AmazonCloudWatch],
+    ActorSystem()
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))

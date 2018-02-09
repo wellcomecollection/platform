@@ -29,8 +29,7 @@ class VersionedDaoTest
     with DynamoDBLocal[TestVersioned]
     with ScalaFutures
     with MockitoSugar
-    with Matchers
-    with ExtendedPatience {
+    with Matchers {
 
   override lazy val evidence: DynamoFormat[TestVersioned] =
     DynamoFormat[TestVersioned]

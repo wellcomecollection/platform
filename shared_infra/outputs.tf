@@ -43,7 +43,7 @@ output "ec2_terminating_topic_publish_policy" {
 }
 
 output "bucket_alb_logs_id" {
-  value = "${aws_s3_bucket.alb-logs.id}"
+  value = "${aws_s3_bucket.alb_logs.id}"
 }
 
 output "travis_ci_aws_id" {
@@ -52,14 +52,6 @@ output "travis_ci_aws_id" {
 
 output "travis_ci_aws_secret" {
   value = "${aws_iam_access_key.travis_ci.encrypted_secret}"
-}
-
-output "service_scheduler_topic_arn" {
-  value = "${module.service_scheduler_topic.arn}"
-}
-
-output "service_scheduler_topic_publish_policy" {
-  value = "${module.service_scheduler_topic.publish_policy}"
 }
 
 output "bucket_wellcomecollection_images_name" {

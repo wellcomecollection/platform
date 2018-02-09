@@ -31,23 +31,11 @@ class SierraBibMergerUpdaterService @Inject()(
     }
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = {
-
-    versionedHybridStore
-      .getRecord[SierraTransformable](
-        id = s"sierra/${bibRecord.id}"
-      )
-      .flatMap {
-        case Some(existingSierraTransformable) =>
-          val mergedRecord =
-            BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
-          if (mergedRecord != existingSierraTransformable)
-            versionedHybridStore.updateRecord[SierraTransformable](
-              mergedRecord)
-          else Future.successful(())
-        case None =>
-          versionedHybridStore.updateRecord[SierraTransformable](
-            SierraTransformable(bibRecord)
-          )
+    versionedHybridStore.updateRecord("sierra", bibRecord.id)(
+      SierraTransformable(bibRecord))(
+      existingSierraTransformable => {
+        BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
       }
+    )
   }
 }

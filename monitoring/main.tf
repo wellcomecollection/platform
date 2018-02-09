@@ -36,7 +36,7 @@ module "ecs_dashboard" {
   source = "ecs_dashboard"
 
   dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
-  dash_bucket               = "${var.dash_bucket}"
+  monitoring_bucket_id      = "${aws_s3_bucket.monitoring.id}"
 
   every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
@@ -47,8 +47,7 @@ module "ecs_dashboard" {
 module "load_test" {
   source = "load_test"
 
-  bucket_dashboard_id  = "${module.ecs_dashboard.bucket_dashboard_id}"
-  bucket_dashboard_arn = "${module.ecs_dashboard.bucket_dashboard_arn}"
+  monitoring_bucket_id = "${aws_s3_bucket.monitoring.id}"
 
   release_ids             = "${var.release_ids}"
   every_5_minutes_name    = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
@@ -69,6 +68,16 @@ module "post_to_slack" {
   dlq_alarm_arn                                   = "${local.dlq_alarm_arn}"
   bitly_access_token                              = "${var.bitly_access_token}"
   ec2_instance_terminating_for_too_long_alarm_arn = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
+}
+
+module "slack_budget_bot" {
+  source = "slack_budget_bot"
+
+  slack_webhook           = "${var.non_critical_slack_webhook}"
+  release_ids             = "${var.release_ids}"
+  monitoring_bucket_id    = "${aws_s3_bucket.monitoring.id}"
+  account_id              = "${data.aws_caller_identity.current.account_id}"
+  ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 }
 
 module "terraform_tracker" {

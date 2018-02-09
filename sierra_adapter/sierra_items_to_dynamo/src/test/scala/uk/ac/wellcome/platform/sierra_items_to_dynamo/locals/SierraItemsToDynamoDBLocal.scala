@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.locals
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 
 import scala.collection.JavaConversions._
@@ -12,6 +13,8 @@ trait SierraItemsToDynamoDBLocal
     with DynamoDBLocalClients { this: Suite =>
 
   val tableName = "SierraData"
+
+  val dynamoConfig = DynamoConfig(tableName)
 
   override def beforeEach(): Unit = {
     super.beforeEach()

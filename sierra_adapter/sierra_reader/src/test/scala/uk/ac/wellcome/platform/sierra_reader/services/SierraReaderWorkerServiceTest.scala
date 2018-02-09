@@ -43,7 +43,8 @@ class SierraReaderWorkerServiceTest
 
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
-  val mockMetrics = new MetricsSender("namespace", mockCloudWatch)
+  val mockMetrics =
+    new MetricsSender("namespace", mockCloudWatch, ActorSystem())
 
   var worker: Option[SierraReaderWorkerService] = None
   val actorSystem = ActorSystem()
