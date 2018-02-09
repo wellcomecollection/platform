@@ -5,7 +5,7 @@ module "slack_budget_bot" {
   task_role_arn = "${module.ecs_slack_budget_bot_iam.task_role_arn}"
 
   env_vars = [
-    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.dashboard_bucket_id}\"}",
+    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket_id}\"}",
     "{\"name\": \"ACCOUNT_ID\", \"value\": \"${var.account_id}\"}",
     "{\"name\": \"SLACK_WEBHOOK\", \"value\": \"${var.slack_webhook}\"}",
   ]

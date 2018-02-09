@@ -7,4 +7,4 @@ variable "release_ids" {
 }
 
 variable "aws_region" {}
-variable "dashboard_bucket_id" {}
+variable "monitoring_bucket_id" {}
