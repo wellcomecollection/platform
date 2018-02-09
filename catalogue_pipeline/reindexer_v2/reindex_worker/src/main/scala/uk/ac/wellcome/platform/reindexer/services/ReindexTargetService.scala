@@ -15,17 +15,19 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{VersionUpdater, VersionedDynamoFormatWrapper}
-import uk.ac.wellcome.platform.reindexer.models.{ReindexJob, ScanamoQueryStream}
+import uk.ac.wellcome.platform.reindexer.models.{
+  ReindexJob,
+  ScanamoQueryStream
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ReindexTargetService @Inject()(
-  dynamoDBClient: AmazonDynamoDB,
-  metricsSender: MetricsSender,
-  versionedDao: VersionedDao,
-  dynamoConfig: DynamoConfig)
+class ReindexTargetService @Inject()(dynamoDBClient: AmazonDynamoDB,
+                                     metricsSender: MetricsSender,
+                                     versionedDao: VersionedDao,
+                                     dynamoConfig: DynamoConfig)
     extends Logging {
 
   implicit val versionUpdater = new VersionUpdater[HybridRecord] {

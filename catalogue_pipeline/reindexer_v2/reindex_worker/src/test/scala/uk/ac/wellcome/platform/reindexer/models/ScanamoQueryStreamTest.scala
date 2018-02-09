@@ -55,7 +55,6 @@ class ScanamoQueryStreamTest
 
     val expectedItemsStored = itemsToPut.map(Right(_))
 
-
     val scanamoQueryRequest = ScanamoQueryRequest(
       tableName,
       Some(indexName),
@@ -73,8 +72,7 @@ class ScanamoQueryStreamTest
     }
 
     val ops = ScanamoQueryStream
-      .run[HybridRecord,
-           List[Either[DynamoReadError, HybridRecord]]](
+      .run[HybridRecord, List[Either[DynamoReadError, HybridRecord]]](
         scanamoQueryRequest,
         updateVersion)
 

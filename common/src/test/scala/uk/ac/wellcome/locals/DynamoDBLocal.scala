@@ -73,17 +73,20 @@ trait DynamoDBLocal[T <: Versioned]
           .withWriteCapacityUnits(1L))
         .withGlobalSecondaryIndexes(
           new GlobalSecondaryIndex()
-            .withIndexName(indexName).withProjection(new Projection().withProjectionType(ProjectionType.ALL))
+            .withIndexName(indexName)
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
             .withKeySchema(
               new KeySchemaElement()
                 .withAttributeName("reindexShard")
                 .withKeyType(KeyType.HASH),
               new KeySchemaElement()
                 .withAttributeName("reindexVersion")
-                .withKeyType(KeyType.RANGE))
-        .withProvisionedThroughput(new ProvisionedThroughput()
-          .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L))))
+                .withKeyType(KeyType.RANGE)
+            )
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))))
 
     eventually {
       dynamoDbClient
