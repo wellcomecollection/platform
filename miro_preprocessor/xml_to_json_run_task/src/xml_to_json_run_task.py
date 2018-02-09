@@ -31,7 +31,7 @@ def command_for_xml_to_json_task(event, cluster_name, container_name, task_defin
     }
 
 
-def main(event, _):
+def main(event, _ctxt=None, sns_client=None):
     print(f'event = {event!r}')
 
     topic_arn = os.environ["TOPIC_ARN"]
@@ -39,7 +39,7 @@ def main(event, _):
     container_name = os.environ["CONTAINER_NAME"]
     task_definition = os.environ["TASK_DEFINITION_ARN"]
 
-    sns_client = boto3.client('sns')
+    sns_client = sns_client or boto3.client('sns')
 
     s3_events = s3_utils.parse_s3_record(event=event)
     task_commands = [command_for_xml_to_json_task(
