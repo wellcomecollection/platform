@@ -56,7 +56,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       case Right(hybridRecord) => {
         val existingRecord =
           versionedDao.getRecord[HybridRecord](id = hybridRecord.id)
-        existingRecord.map { possibleRecord =>
+        existingRecord.flatMap { possibleRecord =>
           // getRecord() returns an Option[HybridRecord] because you may be
           // looking up a non-existent ID; since the ID came from the table we
           // assume the record exists.  It would be very unusual not to!

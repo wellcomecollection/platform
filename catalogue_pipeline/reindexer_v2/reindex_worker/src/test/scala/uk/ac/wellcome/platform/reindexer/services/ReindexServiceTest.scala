@@ -11,7 +11,6 @@ import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.platform.reindexer.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -73,6 +72,8 @@ class ReindexServiceTest
       Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat)
     )
 
+    val expectedUpdatedRecords = inShardRecords.map(record => record.copy(reindexVersion = desiredVersion, version = record.version + 1))
+
     val reindexService =
       new ReindexService(
         dynamoDBClient = dynamoDbClient,
@@ -81,16 +82,13 @@ class ReindexServiceTest
         versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient, DynamoConfig(tableName))
       )
 
-    whenReady(reindexService.runReindex(reindexJob)) {
-      reindexAttempt =>
-        val reindexVersions = Scanamo
-          .scan[HybridRecord](dynamoDbClient)(tableName)
-          .map {
-            case Right(record) => record.reindexVersion
-          }
+    whenReady(reindexService.runReindex(reindexJob)) { _ =>
 
-        reindexVersions.count(_ == currentVersion) shouldBe notInShardRecords.length
-        reindexVersions.count(_ == desiredVersion) shouldBe inShardRecords.length
+        val hybridRecords = Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map (_.right.get)
+
+        hybridRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
+        hybridRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+
     }
   }
 }

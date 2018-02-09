@@ -48,20 +48,18 @@ class ReindexerFeatureTest
   it("increases the reindexVersion on every record that needs a reindex") {
     val numberOfRecords = 4
 
-    val putRecords = (1 to numberOfRecords).map(i => {
-      val record = HybridRecord(version = 1,
+    val hybridRecords = (1 to numberOfRecords).map(i => {
+      HybridRecord(version = 1,
         sourceId = s"id$i",
         sourceName = "source",
         s3key = "s3://bucket/key",
         reindexShard = shardName,
         reindexVersion = currentVersion)
-
-      Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat)
-
-      record
     })
 
-    val expectedRecords = putRecords.map(record => record.copy(reindexVersion = desiredVersion, version = record.version + 1))
+    hybridRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_)(enrichedDynamoFormat))
+
+    val expectedRecords = hybridRecords.map(record => record.copy(reindexVersion = desiredVersion, version = record.version + 1))
 
     val reindexJob = ReindexJob(
       shardId = shardName,
