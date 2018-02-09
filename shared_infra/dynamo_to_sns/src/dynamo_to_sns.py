@@ -38,13 +38,13 @@ def get_sns_messages(trigger_event, stream_view_type):
             )
 
 
-def main(event, context):
+def main(event, _ctxt=None, sns_client=None):
     print(f'Received event: {event!r}')
 
     topic_arn = os.environ['TOPIC_ARN']
     stream_view_type = os.environ.get('STREAM_VIEW_TYPE', 'FULL_EVENT')
 
-    sns_client = boto3.client('sns')
+    sns_client = sns_client or boto3.client('sns')
 
     for message in get_sns_messages(
         trigger_event=event,
