@@ -11,10 +11,6 @@ trait Sourced {
 
 trait Versioned extends Sourced {
   val version: Int
-
-  val sourceId: String
-  val sourceName: String
-
   val id: String = Versioned.id(sourceName, sourceId)
 }
 
