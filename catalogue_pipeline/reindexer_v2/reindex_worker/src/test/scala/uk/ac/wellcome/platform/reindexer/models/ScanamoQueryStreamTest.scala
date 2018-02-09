@@ -99,5 +99,4 @@ class ScanamoQueryStreamTest
     AttributeValueSizeCalculator.calculateAttributeSizeInBytes(attributeValue)
   }
 
-
 }
