@@ -20,6 +20,7 @@ trait DynamoDBLocal[T <: Versioned]
   implicit val evidence: DynamoFormat[T]
   val tableName: String
 
+  val indexName: String = "reindexTracker"
   deleteTable()
   createTable()
 
@@ -59,11 +60,30 @@ trait DynamoDBLocal[T <: Versioned]
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")
-            .withAttributeType("S")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("reindexShard")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("reindexVersion")
+            .withAttributeType("N")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L)))
+          .withWriteCapacityUnits(1L))
+        .withGlobalSecondaryIndexes(
+          new GlobalSecondaryIndex()
+            .withIndexName(indexName).withProjection(new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(
+              new KeySchemaElement()
+                .withAttributeName("reindexShard")
+                .withKeyType(KeyType.HASH),
+              new KeySchemaElement()
+                .withAttributeName("reindexVersion")
+                .withKeyType(KeyType.RANGE))
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))))
 
     eventually {
       dynamoDbClient

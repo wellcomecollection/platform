@@ -3,22 +3,19 @@ package uk.ac.wellcome.platform.reindexer.services
 import javax.inject.Inject
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.ops.ScanamoOps
-import com.gu.scanamo.query.{UniqueKey, _}
+import com.gu.scanamo.query._
 import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.update.UpdateExpression
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.models.{VersionedDynamoFormatWrapper, VersionUpdater}
-import uk.ac.wellcome.platform.reindexer.models.ReindexJob
-import uk.ac.wellcome.reindexer.models.ScanamoQueryStream
+import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.{VersionUpdater, VersionedDynamoFormatWrapper}
+import uk.ac.wellcome.platform.reindexer.models.{ReindexJob, ScanamoQueryStream}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -28,7 +25,7 @@ class ReindexTargetService @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   metricsSender: MetricsSender,
   versionedDao: VersionedDao,
-  @Flag("reindex.sourceData.tableName") targetTableName: String)
+  dynamoConfig: DynamoConfig)
     extends Logging {
 
   implicit val versionUpdater = new VersionUpdater[HybridRecord] {
@@ -95,7 +92,7 @@ class ReindexTargetService @Inject()(
   private def createScanamoQueryRequest(
     reindexJob: ReindexJob): ScanamoQueryRequest =
     ScanamoQueryRequest(
-      targetTableName,
+      dynamoConfig.table,
       Some(gsiName),
       Query(
         AndQueryCondition(

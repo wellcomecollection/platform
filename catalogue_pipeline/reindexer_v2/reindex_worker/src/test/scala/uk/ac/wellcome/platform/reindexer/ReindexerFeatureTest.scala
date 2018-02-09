@@ -46,15 +46,16 @@ class ReindexerFeatureTest
     val numberOfRecords = 4
 
     (1 to numberOfRecords).map { i =>
-      hybridStore.updateRecord[MiroTransformable](
+      val sourceId = s"V00000$i"
+      hybridStore.updateRecord[MiroTransformable]("miro", sourceId)(
         MiroTransformable(
-          sourceId = s"V00000$i",
+          sourceId = sourceId,
           MiroCollection = "images-V",
           data = """{"title": "A visualisation of various vultures"}""",
           reindexShard = "miro",
           reindexVersion = 1
         )
-      )
+      )(identity)
     }
 
     val reindexJob = ReindexJob(
