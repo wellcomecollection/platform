@@ -11,6 +11,8 @@ reindex shards for each source at a manageable size.
 
 """
 
+import hashlib
+
 
 def choose_shard_id_length(source_size, target_shard_size):
     """
@@ -36,3 +38,21 @@ def choose_shard_id_length(source_size, target_shard_size):
         f'Unable to pick shard ID length for source_size={source_size!r} '
         f'and target_shard_size={target_shard_size!r} -- too many shards!'
     )
+
+
+def create_reindex_shard(source_name, source_id, source_size):
+    """Create the reindex shard for a given document."""
+    shard_id_length = choose_shard_id_length(
+        source_size=source_size,
+        target_shard_size=1000
+    )
+
+    # We use hashing for reproducibility, and *not* for cryptographic
+    # purposes.  Using MD5 or truncating your hashes are both super bad
+    # if you want security!
+    h = hashlib.md5()
+    h.update(source_id.encode('utf8'))
+    shard_id = h.hexdigest()[:shard_id_length]
+
+    return f'{source_name}/{shard_id}'
+
