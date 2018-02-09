@@ -81,9 +81,9 @@ jobs:
     - env: TASK=ingestor-test
     - env: TASK=id_minter-test
 
-    # Temporarily removed.
-    # TODO: Restore this before merging https://github.com/wellcometrust/platform/pull/1509
-    # - env: TASK=reindexer-test
+    # Reindexer stack
+    - env: TASK=reindexer_v2/reindex_job_creator-test
+    - env: TASK=reindexer_v2/complete_reindexer-test
 
     # Catalogue API stack
     - env: TASK=api-test
