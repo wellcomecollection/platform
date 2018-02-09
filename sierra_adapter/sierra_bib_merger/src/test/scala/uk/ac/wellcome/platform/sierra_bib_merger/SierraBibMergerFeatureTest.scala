@@ -216,6 +216,10 @@ class SierraBibMergerFeatureTest
 
     sendBibRecordToSQS(record)
 
+    // Blocking in Scala is generally a bad idea; we do it here so there's
+    // enough time for this update to have gone through (if it was going to).
+    Thread.sleep(5000)
+
     assertStored(expectedSierraTransformable)
   }
 
