@@ -251,11 +251,13 @@ class SierraBibMergerFeatureTest
 
   private def assertStored(expectedRecord: SierraTransformable) = eventually {
     val actualRecord =
-      Await.result(
-        hybridStore
-          .getRecord[SierraTransformable](expectedRecord.id),
-        5 seconds
-      ).get
+      Await
+        .result(
+          hybridStore
+            .getRecord[SierraTransformable](expectedRecord.id),
+          5 seconds
+        )
+        .get
 
     actualRecord shouldBe expectedRecord
   }
