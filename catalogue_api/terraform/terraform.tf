@@ -3,7 +3,7 @@ terraform {
 
   backend "s3" {
     bucket         = "platform-infra"
-    key            = "platform.tfstate"
+    key            = "terraform/catalogue_api.tfstate"
     dynamodb_table = "terraform-locktable"
     region         = "eu-west-1"
   }
@@ -14,7 +14,7 @@ data "terraform_remote_state" "shared_infra" {
 
   config {
     bucket = "platform-infra"
-    key    = "platform-lambda.tfstate"
+    key    = "terraform/shared_infra.tfstate"
     region = "eu-west-1"
   }
 }
