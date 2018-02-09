@@ -14,7 +14,7 @@ data "terraform_remote_state" "catalogue_pipeline" {
 
   config {
     bucket = "platform-infra"
-    key    = "platform-pipeline.tfstate"
+    key    = "terraform/catalogue_pipeline.tfstate"
     region = "eu-west-1"
   }
 }
@@ -24,7 +24,7 @@ data "terraform_remote_state" "shared_infra" {
 
   config {
     bucket = "platform-infra"
-    key    = "platform-lambda.tfstate"
+    key    = "terraform/shared_infra.tfstate"
     region = "eu-west-1"
   }
 }
