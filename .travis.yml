@@ -84,7 +84,7 @@ jobs:
     # Temporarily removed.
     # TODO: Restore this before merging https://github.com/wellcometrust/platform/pull/1509
     # - env: TASK=reindexer-test
-    - env: reindexer_lambdas-test
+    - env: TASK=reindexer_lambdas-test
 
     # Catalogue API stack
     - env: TASK=api-test
