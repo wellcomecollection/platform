@@ -3,7 +3,7 @@ terraform {
 
   backend "s3" {
     bucket         = "platform-infra"
-    key            = "platform-lambda.tfstate"
+    key            = "terraform/shared_infra.tfstate"
     dynamodb_table = "terraform-locktable"
     region         = "eu-west-1"
   }
