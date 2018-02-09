@@ -1,5 +1,5 @@
-data "aws_s3_bucket" "dashboard" {
-  bucket = "${var.dashboard_bucket_id}"
+data "aws_s3_bucket" "monitoring" {
+  bucket = "${var.monitoring_bucket_id}"
 }
 
 data "aws_iam_policy_document" "allow_s3_write" {
@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "allow_s3_write" {
     ]
 
     resources = [
-      "${data.aws_s3_bucket.dashboard.arn}/budget_graphs/*",
+      "${data.aws_s3_bucket.monitoring.arn}/budget_graphs/*",
     ]
   }
 }
