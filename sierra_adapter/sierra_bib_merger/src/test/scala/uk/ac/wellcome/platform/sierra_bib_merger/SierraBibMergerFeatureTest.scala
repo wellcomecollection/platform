@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
 import akka.actor.ActorSystem
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
@@ -246,10 +249,15 @@ class SierraBibMergerFeatureTest
     assertStored(expectedSierraTransformable)
   }
 
-  private def assertStored(t: SierraTransformable) = eventually {
-    hybridStore.getRecord[SierraTransformable](t.id).map((record) => {
-      record.get shouldBe t
-    })
+  private def assertStored(expectedRecord: SierraTransformable) = eventually {
+    val actualRecord =
+      Await.result(
+        hybridStore
+          .getRecord[SierraTransformable](expectedRecord.id),
+        5 seconds
+      ).get
+
+    actualRecord shouldBe expectedRecord
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {
