@@ -33,8 +33,8 @@ then
   docker pull wellcome/test_lambda:latest
 fi
 
-# If a requirements.txt file exists, we need to check if it's more up-to-date
-# than the existing Lambda image, and rebuild if so.
+# We compile the requirements into the test image, so we can skip
+# rebuilding it locally on subsequent runs.
 if [[ -f $ROOT/$SRC/requirements.txt || -f $ROOT/$SRC/test_requirements.txt ]]
 then
 
