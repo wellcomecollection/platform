@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "dashboard" {
-  bucket = "wellcomecollection-platform-dashboard"
+resource "aws_s3_bucket" "monitoring" {
+  bucket = "wellcomecollection-platform-monitoring"
   acl    = "public-read"
 
   cors_rule {

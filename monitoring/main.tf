@@ -36,7 +36,7 @@ module "ecs_dashboard" {
   source = "ecs_dashboard"
 
   dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
-  dashboard_bucket_id       = "${aws_s3_bucket.dashboard.id}"
+  dashboard_bucket_id       = "${aws_s3_bucket.monitoring.id}"
 
   every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
@@ -47,7 +47,7 @@ module "ecs_dashboard" {
 module "load_test" {
   source = "load_test"
 
-  dashboard_bucket_id  = "${aws_s3_bucket.dashboard.id}"
+  dashboard_bucket_id  = "${aws_s3_bucket.monitoring.id}"
 
   release_ids             = "${var.release_ids}"
   every_5_minutes_name    = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
@@ -75,7 +75,7 @@ module "slack_budget_bot" {
 
   slack_webhook           = "${var.non_critical_slack_webhook}"
   release_ids             = "${var.release_ids}"
-  dashboard_bucket_id     = "${aws_s3_bucket.dashboard.id}"
+  dashboard_bucket_id     = "${aws_s3_bucket.monitoring.id}"
   account_id              = "${data.aws_caller_identity.current.account_id}"
   ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 }
