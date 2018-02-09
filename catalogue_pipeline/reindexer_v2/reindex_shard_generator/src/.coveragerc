@@ -1,0 +1,7 @@
+[run]
+branch = True
+include =
+    shard_manager.py
+
+[report]
+show_missing = True
