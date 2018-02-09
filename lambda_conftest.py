@@ -58,6 +58,26 @@ def dynamodb_client(docker_services, docker_ip):
 
 
 @pytest.fixture(scope='session')
+def dynamodb_resource(docker_services, docker_ip):
+    endpoint_url = (
+        f'http://{docker_ip}:{docker_services.port_for("dynamodb", 8000)}'
+    )
+
+    docker_services.wait_until_responsive(
+        timeout=5.0, pause=0.1,
+        check=_is_responsive(
+            endpoint_url,
+            lambda r: (
+                    r.status_code == 400 and
+                    r.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
+            )
+        )
+    )
+
+    yield boto3.resource('dynamodb', endpoint_url=endpoint_url)
+
+
+@pytest.fixture(scope='session')
 def s3_client(docker_services, docker_ip):
     endpoint_url = (
         f'http://{docker_ip}:{docker_services.port_for("s3", 8000)}'

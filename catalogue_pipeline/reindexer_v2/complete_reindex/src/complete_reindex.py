@@ -33,13 +33,14 @@ def _process_reindex_tracker_update_job(table, message):
     completed_reindex_version = message['completedReindexVersion']
 
     dynamodb_response = table.get_item(Key={'shardId': shard_id})
+
     dynamo_item = dynamodb_response['Item']
 
     print(f'Retrieved {dynamo_item}')
 
     dynamo_current_version = dynamo_item['currentVersion']
 
-    if(dynamo_current_version >= completed_reindex_version):
+    if (dynamo_current_version >= completed_reindex_version):
         print(f'Update for {shard_id} discarded as current version advanced.')
         return
 
