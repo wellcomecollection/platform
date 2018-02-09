@@ -4,7 +4,9 @@ lint-python:
 	$(ROOT)/builds/docker_run.py -- \
 		--volume $(ROOT):/data \
 		--workdir /data \
-		wellcome/flake8:latest --exclude .git,__pycache__,target,.terraform --ignore=E501
+		wellcome/flake8:latest \
+		    --exclude .git,__pycache__,target,.terraform \
+		    --ignore=E501,E126
 
 lint-js:
 	$(ROOT)/builds/docker_run.py -- \
