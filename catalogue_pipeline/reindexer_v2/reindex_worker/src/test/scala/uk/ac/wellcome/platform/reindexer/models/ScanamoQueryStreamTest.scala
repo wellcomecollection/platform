@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.reindexer.models
 
+import shapeless.ops.hlist._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
@@ -10,9 +11,12 @@ import uk.ac.wellcome.test.utils.DynamoConstants._
 
 import scala.collection.mutable.ListBuffer
 import com.gu.scanamo.syntax._
+import shapeless.{HList, LabelledGeneric, Witness}
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.{Versioned, VersionedDynamoFormatWrapper}
 import uk.ac.wellcome.storage.HybridRecord
+import scala.collection.JavaConverters._
+import scala.collection.JavaConversions._
 
 class ScanamoQueryStreamTest
     extends FunSpec
@@ -23,7 +27,7 @@ class ScanamoQueryStreamTest
     with Matchers {
 
   override lazy val tableName = "scanamo-query-stream-test-table"
-  val bigString = "_" * maxDynamoItemSizeinKb
+  val bigString = "_" * maxDynamoItemSizeinbytes
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -36,9 +40,7 @@ class ScanamoQueryStreamTest
     type ResultGroup = List[Either[DynamoReadError, HybridRecord]]
     val resultGroups: ListBuffer[ResultGroup] = new ListBuffer[ResultGroup]()
 
-    val expectedBatchCount = 4
-
-    val itemsToPut = (1 to expectedBatchCount).map { i =>
+    val itemsToPut = (1 to 10).map { i =>
       HybridRecord(
         sourceId = s"Image$i",
         sourceName = "some-source",
@@ -48,6 +50,13 @@ class ScanamoQueryStreamTest
         s3key = bigString
       )
     }.toList
+
+    val totalNumberOfBytes = itemsToPut.foldLeft(0)((acc, hybridRecord) => {
+      val recordSizeInBytes = calculateRecordSize(hybridRecord)
+      acc + recordSizeInBytes
+    })
+
+    val expectedBatchCount = totalNumberOfBytes/maxDynamoQueryResultSizeInBytes
 
     itemsToPut.foreach { item =>
       Scanamo.put(dynamoDbClient)(tableName)(item)(enrichedDynamoFormat)
@@ -81,6 +90,14 @@ class ScanamoQueryStreamTest
     val actualItemsStored: ResultGroup = resultGroups.toList.flatten
 
     actualItemsStored should contain theSameElementsAs expectedItemsStored
+
     resultGroups.length shouldBe expectedBatchCount
   }
+
+  def calculateRecordSize[R <: HList](hybridRecord: HybridRecord)(implicit versionedDynamoFormatWrapper: VersionedDynamoFormatWrapper[HybridRecord]): Int  = {
+    val attributeValue = versionedDynamoFormatWrapper.enrichedDynamoFormat.write(hybridRecord)
+    AttributeValueSizeCalculator.calculateAttributeSizeInBytes(attributeValue)
+  }
+
+
 }
