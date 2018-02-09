@@ -14,10 +14,10 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class ReindexerWorkerService @Inject()(
-  targetService: ReindexTargetService,
-  reader: SQSReader,
-  system: ActorSystem,
-  metrics: MetricsSender
+                                        targetService: ReindexService,
+                                        reader: SQSReader,
+                                        system: ActorSystem,
+                                        metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] = Future {

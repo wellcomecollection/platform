@@ -24,10 +24,10 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ReindexTargetService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                                     metricsSender: MetricsSender,
-                                     versionedDao: VersionedDao,
-                                     dynamoConfig: DynamoConfig)
+class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
+                               metricsSender: MetricsSender,
+                               versionedDao: VersionedDao,
+                               dynamoConfig: DynamoConfig)
     extends Logging {
 
   implicit val versionUpdater = new VersionUpdater[HybridRecord] {
