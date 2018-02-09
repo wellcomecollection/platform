@@ -60,16 +60,19 @@ data "aws_iam_policy_document" "travis_permissions" {
   }
 }
 
-data "aws_iam_policy_document" "alb_logs" {
+data "aws_iam_policy_document" "s3_alb_logs" {
   statement {
     actions = [
       "s3:PutObject",
     ]
 
     resources = [
-      "arn:aws:s3:::wellcomecollection-alb-logs/*",
+      "arn:aws:s3:::${local.alb_logs_bucket_name}/*",
     ]
 
+    # This is the Account ID for Elastic Load Balancing; not another
+    # AWS account at Wellcome.
+    # See https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html
     principals {
       identifiers = ["arn:aws:iam::156460612806:root"]
       type        = "AWS"

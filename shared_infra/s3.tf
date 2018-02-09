@@ -37,11 +37,15 @@ resource "aws_s3_bucket" "infra" {
   }
 }
 
-resource "aws_s3_bucket" "alb-logs" {
-  bucket = "wellcomecollection-alb-logs"
+locals {
+  alb_logs_bucket_name = "wellcomecollection-platform-logs-alb"
+}
+
+resource "aws_s3_bucket" "alb_logs" {
+  bucket = "${local.alb_logs_bucket_name}"
   acl    = "private"
 
-  policy = "${data.aws_iam_policy_document.alb_logs.json}"
+  policy = "${data.aws_iam_policy_document.s3_alb_logs.json}"
 
   lifecycle {
     prevent_destroy = true
