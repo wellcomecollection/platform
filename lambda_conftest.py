@@ -11,7 +11,6 @@ import requests
 
 
 def pytest_runtest_setup(item):
-
     # Set a default region before we start running tests.
     #
     # Without this line, boto3 complains about not having a region defined
@@ -48,8 +47,8 @@ def dynamodb_client(docker_services, docker_ip):
         check=_is_responsive(
             endpoint_url,
             lambda r: (
-                r.status_code == 400 and
-                r.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
+                    r.status_code == 400 and
+                    r.json()['__type'] == 'com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken'
             )
         )
     )
@@ -87,8 +86,8 @@ def s3_client(docker_services, docker_ip):
         timeout=10.0, pause=0.1,
         check=_is_responsive(
             endpoint_url, lambda r: (
-                r.status_code == 403 and
-                '<Code>AccessDenied</Code>' in r.text)
+                    r.status_code == 403 and
+                    '<Code>AccessDenied</Code>' in r.text)
         )
     )
 
