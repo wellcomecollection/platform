@@ -9,7 +9,7 @@ module "gatling_loris" {
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
     "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
     "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
-    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.bucket_dashboard_id}\"}",
+    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket_id}\"}",
   ]
 }
 
@@ -29,7 +29,7 @@ module "gatling_catalogue_api" {
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
     "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
     "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
-    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.bucket_dashboard_id}\"}",
+    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket_id}\"}",
   ]
 }
 
@@ -44,6 +44,6 @@ module "gatling_digital_experience" {
     "{\"name\": \"AWS_DEFAULT_REGION\", \"value\": \"${var.aws_region}\"}",
     "{\"name\": \"FAILED_TOPIC_ARN\", \"value\": \"${module.load_test_failure_alarm.arn}\"}",
     "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
-    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.bucket_dashboard_id}\"}",
+    "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket_id}\"}",
   ]
 }

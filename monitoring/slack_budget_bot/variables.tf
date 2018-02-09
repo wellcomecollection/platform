@@ -3,6 +3,6 @@ variable "release_ids" {
 }
 
 variable "slack_webhook" {}
-variable "dashboard_bucket_id" {}
+variable "monitoring_bucket_id" {}
 variable "account_id" {}
 variable "ecs_services_cluster_id" {}
