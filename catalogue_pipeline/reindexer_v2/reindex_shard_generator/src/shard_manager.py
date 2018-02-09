@@ -44,7 +44,7 @@ def create_reindex_shard(source_name, source_id, source_size):
     """Create the reindex shard for a given document."""
     shard_id_length = choose_shard_id_length(
         source_size=source_size,
-        target_shard_size=1000
+        target_shard_size=1500
     )
 
     # We use hashing for reproducibility, and *not* for cryptographic

@@ -1,6 +1,7 @@
 [run]
 branch = True
 include =
+    reindex_shard_generator.py
     shard_manager.py
 
 [report]

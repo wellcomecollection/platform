@@ -1,26 +1,64 @@
 # -*- encoding: utf-8
 
+import os
+
+import boto3
+
+from shard_manager import create_reindex_shard
+
 from wellcome_aws_utils.sns_utils import extract_sns_messages_from_lambda_event
 
 
-def filter_rows_that_need_shard(rows):
-    """
-    Given a series of DynamoDB rows, generate just the rows that need
-    new shards.
-    """
-    for r in rows:
-        if r['reindexShard'] == 'default':
-            yield r
-        else:
-            print(f'{r["id"]} already has a non-default reindex shard')
+SOURCE_SIZES = {
+    'sierra': 5e7,
+    'miro': 2.5e5,
+}
 
 
-def main(event, _ctxt=None):
+def main(event, _ctxt=None, dynamodb_client=None):
     print(f'event={event!r}')
 
-    for sns_event in extract_sns_messages_from_lambda_event(event):
-        image = sns_event.message
+    dynamodb_client = dynamodb_client or boto3.client('dynamodb')
+    table_name = os.environ['TABLE_NAME']
 
-        # if image['reindexShard'] != 'default':
-        #     print(f'{image["id"]} already has a reindex shard; skipping')
-        #     continue
+    for sns_event in extract_sns_messages_from_lambda_event(event):
+        row = sns_event.message
+
+        # If we've already looked at this row before, there's nothing
+        # for us to do -- we can skip to the next row.
+        if row.get('reindexShard') != 'default':
+            print(
+                f'{row["id"]} already has a non-default reindexShard; skipping'
+            )
+            continue
+
+        new_reindex_shard = create_reindex_shard(
+            source_id=row['sourceId'],
+            source_name=row['sourceName'],
+            source_size=SOURCE_SIZES[row['sourceName']]
+        )
+
+        # In that case, we call GetItem to get the current version of the
+        # row.  This means we can do a Conditional Update to avoid overriding
+        # another edit.
+        current_row = dynamodb_client.get_item(
+            TableName=table_name,
+            Key={'id': {'S': row['id']}},
+            AttributesToGet=['version']
+        )
+        current_version = current_row['Item']['version']['N']
+
+        # Then we call UpdateItem.  We only need to change the version and
+        # the reindexShard fields, and we condition it on the version
+        # incrementing by 1.
+        ddb.update_item(
+            TableName=table_name,
+            Key={'id': {'S': row['id']}},
+            UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
+            ConditionExpression='version < :currentVersion',
+            ExpressionAttributeValues={
+                ':currentVersion': {'N': current_version},
+                ':newVersion': {'N': current_version + 1},
+                ':reindexShard': {'S': new_reindex_shard},
+            }
+        )
