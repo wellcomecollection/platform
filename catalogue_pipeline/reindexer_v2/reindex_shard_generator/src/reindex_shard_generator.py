@@ -24,19 +24,19 @@ def main(event, _ctxt=None, dynamodb_client=None):
     for sns_event in extract_sns_messages_from_lambda_event(event):
         row = sns_event.message
 
-        # If we've already looked at this row before, there's nothing
-        # for us to do -- we can skip to the next row.
-        if row.get('reindexShard') != 'default':
-            print(
-                f'{row["id"]} already has a non-default reindexShard; skipping'
-            )
-            continue
-
         new_reindex_shard = create_reindex_shard(
             source_id=row['sourceId'],
             source_name=row['sourceName'],
             source_size=SOURCE_SIZES[row['sourceName']]
         )
+
+        # If the reindex shard doesn't match the current schema, we'll
+        # create a new one.
+        if row.get('reindexShard') != new_reindex_shard:
+            print(
+                f'{row["id"]} already has an up-to-date reindexShard; skipping'
+            )
+            continue
 
         # In that case, we call GetItem to get the current version of the
         # row.  This means we can do a Conditional Update to avoid overriding
