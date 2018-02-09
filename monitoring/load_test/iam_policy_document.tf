@@ -10,6 +10,10 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   }
 }
 
+data "aws_s3_bucket" "dashboard" {
+  bucket = "${var.dashboard_bucket_id}"
+}
+
 data "aws_iam_policy_document" "s3_put_gatling_reports" {
   statement {
     actions = [
@@ -19,7 +23,7 @@ data "aws_iam_policy_document" "s3_put_gatling_reports" {
     ]
 
     resources = [
-      "${var.bucket_dashboard_arn}/gatling/*",
+      "${data.aws_s3_bucket.dashboard.arn}/gatling/*",
     ]
   }
 }
