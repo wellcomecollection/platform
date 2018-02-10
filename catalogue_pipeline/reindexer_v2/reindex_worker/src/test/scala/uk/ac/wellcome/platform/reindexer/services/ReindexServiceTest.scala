@@ -30,7 +30,6 @@ class ReindexServiceTest
                       mock[AmazonCloudWatch],
                       ActorSystem())
 
-
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
@@ -45,11 +44,11 @@ class ReindexServiceTest
     val shardName = "shard"
 
     val exampleRecord = HybridRecord(version = 1,
-      sourceId = "id",
-      sourceName = "source",
-      s3key = "s3://bucket/key",
-      reindexShard = shardName,
-      reindexVersion = currentVersion)
+                                     sourceId = "id",
+                                     sourceName = "source",
+                                     s3key = "s3://bucket/key",
+                                     reindexShard = shardName,
+                                     reindexVersion = currentVersion)
 
     val inShardRecords = List(
       exampleRecord.copy(sourceId = "id1"),
@@ -57,7 +56,8 @@ class ReindexServiceTest
     )
 
     val notInShardRecords = List(
-      exampleRecord.copy(sourceId = "id3", reindexShard = "not_the_same_shard"),
+      exampleRecord.copy(sourceId = "id3",
+                         reindexShard = "not_the_same_shard"),
       exampleRecord.copy(sourceId = "id4", reindexShard = "not_the_same_shard")
     )
 
@@ -69,25 +69,28 @@ class ReindexServiceTest
     val recordList = inShardRecords ++ notInShardRecords
 
     recordList.foreach(record =>
-      Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat)
-    )
+      Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat))
 
-    val expectedUpdatedRecords = inShardRecords.map(record => record.copy(reindexVersion = desiredVersion, version = record.version + 1))
+    val expectedUpdatedRecords = inShardRecords.map(
+      record =>
+        record.copy(reindexVersion = desiredVersion,
+                    version = record.version + 1))
 
     val reindexService =
       new ReindexService(
         dynamoDBClient = dynamoDbClient,
         dynamoConfig = DynamoConfig(tableName),
         metricsSender = metricsSender,
-        versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient, DynamoConfig(tableName))
+        versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
+                                        DynamoConfig(tableName))
       )
 
     whenReady(reindexService.runReindex(reindexJob)) { _ =>
+      val hybridRecords =
+        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
 
-        val hybridRecords = Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map (_.right.get)
-
-        hybridRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
-        hybridRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+      hybridRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
+      hybridRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
 
     }
   }

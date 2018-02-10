@@ -15,7 +15,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 class ReindexerFeatureTest
     extends FunSpec
     with Matchers
-    with Eventually with DynamoDBLocal[HybridRecord]
+    with Eventually
+    with DynamoDBLocal[HybridRecord]
     with AmazonCloudWatchFlag
     with SQSLocal
     with ScalaFutures {
@@ -50,16 +51,20 @@ class ReindexerFeatureTest
 
     val hybridRecords = (1 to numberOfRecords).map(i => {
       HybridRecord(version = 1,
-        sourceId = s"id$i",
-        sourceName = "source",
-        s3key = "s3://bucket/key",
-        reindexShard = shardName,
-        reindexVersion = currentVersion)
+                   sourceId = s"id$i",
+                   sourceName = "source",
+                   s3key = "s3://bucket/key",
+                   reindexShard = shardName,
+                   reindexVersion = currentVersion)
     })
 
-    hybridRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_)(enrichedDynamoFormat))
+    hybridRecords.foreach(
+      Scanamo.put(dynamoDbClient)(tableName)(_)(enrichedDynamoFormat))
 
-    val expectedRecords = hybridRecords.map(record => record.copy(reindexVersion = desiredVersion, version = record.version + 1))
+    val expectedRecords = hybridRecords.map(
+      record =>
+        record.copy(reindexVersion = desiredVersion,
+                    version = record.version + 1))
 
     val reindexJob = ReindexJob(
       shardId = shardName,
@@ -67,11 +72,13 @@ class ReindexerFeatureTest
     )
 
     server.start()
-    val sqsMessage = SQSMessage(None, toJson(reindexJob).get, "topic", "message", "now")
+    val sqsMessage =
+      SQSMessage(None, toJson(reindexJob).get, "topic", "message", "now")
     sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     eventually {
-      val actualRecords = Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+      val actualRecords =
+        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
 
       actualRecords should contain theSameElementsAs expectedRecords
     }

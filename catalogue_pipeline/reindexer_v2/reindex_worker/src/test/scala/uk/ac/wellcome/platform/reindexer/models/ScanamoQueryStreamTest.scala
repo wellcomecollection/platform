@@ -56,7 +56,7 @@ class ScanamoQueryStreamTest
       acc + recordSizeInBytes
     })
 
-    val expectedBatchCount = totalNumberOfBytes/maxDynamoQueryResultSizeInBytes
+    val expectedBatchCount = totalNumberOfBytes / maxDynamoQueryResultSizeInBytes
 
     itemsToPut.foreach { item =>
       Scanamo.put(dynamoDbClient)(tableName)(item)(enrichedDynamoFormat)
@@ -94,8 +94,11 @@ class ScanamoQueryStreamTest
     resultGroups.length shouldBe expectedBatchCount
   }
 
-  def calculateRecordSize[R <: HList](hybridRecord: HybridRecord)(implicit versionedDynamoFormatWrapper: VersionedDynamoFormatWrapper[HybridRecord]): Int  = {
-    val attributeValue = versionedDynamoFormatWrapper.enrichedDynamoFormat.write(hybridRecord)
+  def calculateRecordSize[R <: HList](hybridRecord: HybridRecord)(
+    implicit versionedDynamoFormatWrapper: VersionedDynamoFormatWrapper[
+      HybridRecord]): Int = {
+    val attributeValue =
+      versionedDynamoFormatWrapper.enrichedDynamoFormat.write(hybridRecord)
     AttributeValueSizeCalculator.calculateAttributeSizeInBytes(attributeValue)
   }
 

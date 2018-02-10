@@ -20,34 +20,30 @@ object AttributeValueSizeCalculator {
     if (value.getB != null) {
       val b = value.getB
       attrValSize += b.remaining
-    }
-    else if (value.getS != null) {
+    } else if (value.getS != null) {
       val s = value.getS
       attrValSize += s.getBytes(UTF8).length
-    }
-    else if (value.getN != null) attrValSize += MAX_NUMBER_OF_BYTES_FOR_NUMBER
+    } else if (value.getN != null)
+      attrValSize += MAX_NUMBER_OF_BYTES_FOR_NUMBER
     else if (value.getBS != null) {
       val bs = value.getBS
       import scala.collection.JavaConversions._
       for (b <- bs) {
         if (b != null) attrValSize += b.remaining
       }
-    }
-    else if (value.getSS != null) {
+    } else if (value.getSS != null) {
       val ss = value.getSS
       import scala.collection.JavaConversions._
       for (s <- ss) {
         if (s != null) attrValSize += s.getBytes(UTF8).length
       }
-    }
-    else if (value.getNS != null) {
+    } else if (value.getNS != null) {
       val ns = value.getNS
       import scala.collection.JavaConversions._
       for (n <- ns) {
         if (n != null) attrValSize += MAX_NUMBER_OF_BYTES_FOR_NUMBER
       }
-    }
-    else if (value.getBOOL != null) attrValSize += 1
+    } else if (value.getBOOL != null) attrValSize += 1
     else if (value.getNULL != null) attrValSize += 1
     else if (value.getM != null) {
       import scala.collection.JavaConversions._
@@ -57,11 +53,10 @@ object AttributeValueSizeCalculator {
         attrValSize += BASE_LOGICAL_SIZE_OF_NESTED_TYPES
       }
       attrValSize += LOGICAL_SIZE_OF_EMPTY_DOCUMENT
-    }
-    else if (value.getL != null) {
+    } else if (value.getL != null) {
       val list = value.getL
       var i = 0
-      while ( {
+      while ({
         i < list.size
       }) {
         attrValSize += calculateAttributeSizeInBytes(list.get(i))
