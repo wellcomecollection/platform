@@ -80,7 +80,11 @@ jobs:
     - env: TASK=transformer-test
     - env: TASK=ingestor-test
     - env: TASK=id_minter-test
+
+    # Reindexer stack
     - env: TASK=reindexer-test
+    - env: TASK=reindexer_v2/reindex_job_creator-test
+    - env: TASK=reindexer_v2/complete_reindex-test
 
     # Catalogue API stack
     - env: TASK=api-test

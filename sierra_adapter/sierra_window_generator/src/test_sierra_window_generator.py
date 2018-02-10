@@ -1,10 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 import datetime as dt
-import json
 import os
 
-import boto3
 import mock
 
 from sierra_window_generator import build_window, main
@@ -25,22 +23,15 @@ def test_build_window():
 
 
 @mock.patch('datetime.datetime', patched_datetime)
-def test_end_to_end(queue_url):
+def test_end_to_end(sns_client, topic_arn):
     os.environ['WINDOW_LENGTH_MINUTES'] = '25'
 
     # This Lambda doesn't read anything from its event or context
-    main(None, None)
+    main(sns_client=sns_client)
 
-    sqs_client = boto3.client('sqs')
-    messages = sqs_client.receive_message(
-        QueueUrl=queue_url,
-        MaxNumberOfMessages=1
-    )
-    message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
-    parsed_message = json.loads(json.loads(inner_message)['default'])
-
-    assert parsed_message == {
+    messages = sns_client.list_messages()
+    assert len(messages) == 1
+    assert messages[0][':message'] == {
         'start': '2011-06-20T23:35:00+00:00',
         'end': '2011-06-21T00:00:00+00:00',
     }

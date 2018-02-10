@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "dashboard" {
-  bucket = "${var.dash_bucket}"
+resource "aws_s3_bucket" "monitoring" {
+  bucket = "wellcomecollection-platform-monitoring"
   acl    = "public-read"
 
   cors_rule {
@@ -15,8 +15,8 @@ resource "aws_s3_bucket" "dashboard" {
   }
 
   lifecycle_rule {
-    id      = "gatling"
-    prefix  = "gatling/"
+    id      = "budget_graphs"
+    prefix  = "budget_graphs/"
     enabled = true
 
     expiration {
@@ -25,8 +25,8 @@ resource "aws_s3_bucket" "dashboard" {
   }
 
   lifecycle_rule {
-    id      = "budget_graphs"
-    prefix  = "budget_graphs/"
+    id      = "gatling"
+    prefix  = "gatling/"
     enabled = true
 
     expiration {

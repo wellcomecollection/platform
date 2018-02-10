@@ -2,9 +2,6 @@
 
 import os
 
-import boto3
-import json
-
 import xml_to_json_run_task
 
 
@@ -29,10 +26,7 @@ def s3_event():
     }
 
 
-def test_xml_to_json_run_task(queue_url):
-    e = s3_event()
-
-    sqs_client = boto3.client('sqs')
+def test_xml_to_json_run_task(sns_client, topic_arn):
 
     cluster_name = "cluster_name"
     container_name = "container_name"
@@ -44,19 +38,11 @@ def test_xml_to_json_run_task(queue_url):
         'TASK_DEFINITION_ARN': task_definition_arn,
     })
 
-    xml_to_json_run_task.main(e, {})
+    xml_to_json_run_task.main(event=s3_event(), sns_client=sns_client)
 
-    messages = sqs_client.receive_message(
-        QueueUrl=queue_url,
-        MaxNumberOfMessages=1
-    )
-
-    message_body = messages['Messages'][0]['Body']
-    inner_message = json.loads(message_body)['Message']
-
-    actual_message = json.loads(
-        json.loads(inner_message)['default']
-    )
+    messages = sns_client.list_messages()
+    assert len(messages) == 1
+    actual_message = messages[0][':message']
 
     expected_message = {
         "cluster_name": cluster_name,

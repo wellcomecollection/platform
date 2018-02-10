@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
 import akka.actor.ActorSystem
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
@@ -110,14 +113,7 @@ class SierraBibMergerFeatureTest
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 1)
 
-    eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable.id)
-
-      whenReady(futureRecord) { record =>
-        record.get shouldBe expectedSierraTransformable
-      }
-    }
+    assertStored(expectedSierraTransformable)
   }
 
   it("stores multiple bibs from SQS") {
@@ -149,19 +145,8 @@ class SierraBibMergerFeatureTest
     val expectedSierraTransformable2 =
       SierraTransformable(bibRecord = record2, version = 1)
 
-    eventually {
-      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable1.id)
-      whenReady(futureRecord1) { record =>
-        record.get shouldBe expectedSierraTransformable1
-      }
-
-      val futureRecord2 = hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable2.id)
-      whenReady(futureRecord2) { record =>
-        record.get shouldBe expectedSierraTransformable2
-      }
-    }
+    assertStored(expectedSierraTransformable1)
+    assertStored(expectedSierraTransformable2)
   }
 
   it("updates a bib if a newer version is sent to SQS") {
@@ -175,6 +160,7 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2003-03-03T03:03:03Z"
     )
+
     val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
     hybridStore.updateRecord[SierraTransformable](
       oldRecord.sourceName,
@@ -191,18 +177,13 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = newUpdatedDate
     )
+
     sendBibRecordToSQS(record)
 
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 2)
 
-    eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable.id)
-      whenReady(futureRecord) { record =>
-        record.get shouldBe expectedSierraTransformable
-      }
-    }
+    assertStored(expectedSierraTransformable)
   }
 
   it("does not update a bib if an older version is sent to SQS") {
@@ -232,19 +213,14 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = oldUpdatedDate
     )
+
     sendBibRecordToSQS(record)
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
     Thread.sleep(5000)
 
-    eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable.id)
-      whenReady(futureRecord) { record =>
-        record.get shouldBe expectedSierraTransformable
-      }
-    }
+    assertStored(expectedSierraTransformable)
   }
 
   it("stores a bib from SQS if the ID already exists but no bibData") {
@@ -274,13 +250,20 @@ class SierraBibMergerFeatureTest
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 2)
 
-    eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](
-        expectedSierraTransformable.id)
-      whenReady(futureRecord) { record =>
-        record.get shouldBe expectedSierraTransformable
-      }
-    }
+    assertStored(expectedSierraTransformable)
+  }
+
+  private def assertStored(expectedRecord: SierraTransformable) = eventually {
+    val actualRecord =
+      Await
+        .result(
+          hybridStore
+            .getRecord[SierraTransformable](expectedRecord.id),
+          5 seconds
+        )
+        .get
+
+    actualRecord shouldBe expectedRecord
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {

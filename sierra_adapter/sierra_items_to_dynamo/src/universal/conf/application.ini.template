@@ -1,3 +1,3 @@
--aws.dynamo.sierraToDynamo.tableName=${dynamo_table_name}
+-aws.dynamo.tableName=${dynamo_table_name}
 -aws.sqs.queue.url=${demultiplexer_queue_url}
 -aws.metrics.namespace=${metrics_namespace}

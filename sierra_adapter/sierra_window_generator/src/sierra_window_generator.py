@@ -26,8 +26,10 @@ def build_window(minutes):
     }
 
 
-def main(event, _):
+def main(event=None, _ctxt=None, sns_client=None):
     print(f'event = {event!r}')
+
+    sns_client = sns_client or boto3.client('sns')
 
     topic_arn = os.environ['TOPIC_ARN']
     window_length_minutes = int(os.environ['WINDOW_LENGTH_MINUTES'])
@@ -37,7 +39,6 @@ def main(event, _):
 
     message = build_window(minutes=window_length_minutes)
 
-    sns_client = boto3.client('sns')
     publish_sns_message(
         sns_client=sns_client,
         topic_arn=topic_arn,
