@@ -44,11 +44,11 @@ class ReindexServiceTest
     val shardName = "shard"
 
     val exampleRecord = HybridRecord(version = 1,
-      sourceId = "id",
-      sourceName = "source",
-      s3key = "s3://bucket/key",
-      reindexShard = shardName,
-      reindexVersion = currentVersion)
+                                     sourceId = "id",
+                                     sourceName = "source",
+                                     s3key = "s3://bucket/key",
+                                     reindexShard = shardName,
+                                     reindexVersion = currentVersion)
 
     val newerRecord = exampleRecord.copy(
       sourceId = "id1",
@@ -81,7 +81,7 @@ class ReindexServiceTest
         dynamoConfig = DynamoConfig(tableName),
         metricsSender = metricsSender,
         versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
-          DynamoConfig(tableName))
+                                        DynamoConfig(tableName))
       )
 
     val reindexJob = ReindexJob(
