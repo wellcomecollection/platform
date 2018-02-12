@@ -91,7 +91,6 @@ class ReindexServiceTest
 
       hybridRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
       hybridRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
-
     }
   }
 }
