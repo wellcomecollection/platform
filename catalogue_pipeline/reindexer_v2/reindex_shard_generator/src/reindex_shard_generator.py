@@ -3,10 +3,9 @@
 import os
 
 import boto3
+from wellcome_aws_utils.sns_utils import extract_sns_messages_from_lambda_event
 
 from shard_manager import create_reindex_shard
-
-from wellcome_aws_utils.sns_utils import extract_sns_messages_from_lambda_event
 
 
 SOURCE_SIZES = {
