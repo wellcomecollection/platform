@@ -37,6 +37,66 @@ class ReindexServiceTest
     .toVersionedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
+  it("only updates records with a lower than desired reindexVersion") {
+    val currentVersion = 1
+    val desiredVersion = 2
+
+    val shardName = "shard"
+
+    val exampleRecord = HybridRecord(version = 1,
+      sourceId = "id",
+      sourceName = "source",
+      s3key = "s3://bucket/key",
+      reindexShard = shardName,
+      reindexVersion = currentVersion)
+
+    val newerRecord = exampleRecord.copy(
+      sourceId = "id1",
+      reindexVersion = desiredVersion + 1
+    )
+
+    val olderRecord = exampleRecord.copy(
+      sourceId = "id2"
+    )
+
+    val records = List(
+      newerRecord,
+      olderRecord
+    )
+
+    val expectedRecords = List(
+      newerRecord,
+      olderRecord.copy(
+        reindexVersion = desiredVersion,
+        version = 2
+      )
+    )
+
+    records.foreach(record =>
+      Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat))
+
+    val reindexService =
+      new ReindexService(
+        dynamoDBClient = dynamoDbClient,
+        dynamoConfig = DynamoConfig(tableName),
+        metricsSender = metricsSender,
+        versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
+          DynamoConfig(tableName))
+      )
+
+    val reindexJob = ReindexJob(
+      shardId = shardName,
+      desiredVersion = desiredVersion
+    )
+
+    whenReady(reindexService.runReindex(reindexJob)) { _ =>
+      val hybridRecords =
+        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+
+      hybridRecords should contain theSameElementsAs expectedRecords
+    }
+  }
+
   it("updates records in the specified shard") {
     val currentVersion = 1
     val desiredVersion = 2
