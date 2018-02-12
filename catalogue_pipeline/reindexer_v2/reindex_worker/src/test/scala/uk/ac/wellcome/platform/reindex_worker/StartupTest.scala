@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer
+package uk.ac.wellcome.platform.reindex_worker
 
 import com.google.inject.Stage
 import com.gu.scanamo.DynamoFormat

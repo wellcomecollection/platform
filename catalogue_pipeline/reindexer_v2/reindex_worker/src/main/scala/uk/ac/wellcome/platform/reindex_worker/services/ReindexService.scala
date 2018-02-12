@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer.services
+package uk.ac.wellcome.platform.reindex_worker.services
 
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{VersionUpdater, VersionedDynamoFormatWrapper}
-import uk.ac.wellcome.platform.reindexer.models.{ReindexJob, ScanamoQueryStream}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ScanamoQueryStream}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

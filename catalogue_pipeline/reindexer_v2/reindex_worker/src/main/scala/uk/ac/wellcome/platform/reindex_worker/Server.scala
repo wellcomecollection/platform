@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer
+package uk.ac.wellcome.platform.reindex_worker
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
@@ -10,7 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.reindexer.modules.ReindexerWorkerModule
+import uk.ac.wellcome.platform.reindex_worker.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
 

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer.models
+package uk.ac.wellcome.platform.reindex_worker.models
 
 object AttributeValueSizeCalculator {
   // Copied from https://github.com/awslabs/dynamodb-janusgraph-storage-backend/blob/0.5.4/src/main/java/com/amazon/titan/diskstorage/dynamodb/DynamoDBDelegate.java#L1065

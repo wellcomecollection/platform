@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer
+package uk.ac.wellcome.platform.reindex_worker
 
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
@@ -7,7 +7,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindexer.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._

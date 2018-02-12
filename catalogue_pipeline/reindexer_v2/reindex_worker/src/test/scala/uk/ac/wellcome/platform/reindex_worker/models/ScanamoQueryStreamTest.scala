@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer.models
+package uk.ac.wellcome.platform.reindex_worker.models
 
 import shapeless.ops.hlist._
 import com.gu.scanamo.{DynamoFormat, Scanamo}

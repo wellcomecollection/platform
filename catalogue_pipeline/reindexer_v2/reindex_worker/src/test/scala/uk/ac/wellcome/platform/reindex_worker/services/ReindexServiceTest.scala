@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindexer.services
+package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
@@ -11,7 +11,7 @@ import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.platform.reindexer.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 

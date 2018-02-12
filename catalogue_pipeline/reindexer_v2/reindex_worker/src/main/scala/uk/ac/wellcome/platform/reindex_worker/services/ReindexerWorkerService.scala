@@ -1,11 +1,11 @@
-package uk.ac.wellcome.platform.reindexer.services
+package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindexer.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
