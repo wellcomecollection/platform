@@ -1,5 +1,4 @@
--aws.dynamo.miroData.tableName=MiroData
--aws.dynamo.reindexTracker.tableName=ReindexTracker
--reindex.target.tableName=MiroData
--reindex.target.reindexShard=${reindex_shard}
+-aws.dynamo.tableName=${dynamo_table_name}
+-aws.sns.topic.arn=${reindex_complete_topic_arn}
+-aws.sqs.queue.url=${reindex_jobs_queue_url}
 -aws.metrics.namespace=${metrics_namespace}
