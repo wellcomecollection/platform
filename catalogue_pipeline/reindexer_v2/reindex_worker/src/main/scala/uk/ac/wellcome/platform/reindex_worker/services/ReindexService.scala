@@ -15,7 +15,10 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{VersionUpdater, VersionedDynamoFormatWrapper}
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ScanamoQueryStream}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  ReindexJob,
+  ScanamoQueryStream
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -35,26 +38,30 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   }
 
   type ScanamoQueryResult = Either[DynamoReadError, HybridRecord]
-  type ScanamoQueryResultFunction = (List[ScanamoQueryResult]) => Future[Boolean]
+  type ScanamoQueryResultFunction =
+    (List[ScanamoQueryResult]) => Future[Boolean]
 
   private val gsiName = "reindexTracker"
 
   private def scanamoQueryStreamFunction(
     queryRequest: ScanamoQueryRequest,
     resultFunction: ScanamoQueryResultFunction
-  )(implicit evidence: DynamoFormat[HybridRecord]): ScanamoOps[List[Future[Boolean]]] =
-    ScanamoQueryStream.run[HybridRecord, Future[Boolean]](queryRequest, resultFunction)
+  )(implicit evidence: DynamoFormat[HybridRecord])
+    : ScanamoOps[List[Future[Boolean]]] =
+    ScanamoQueryStream
+      .run[HybridRecord, Future[Boolean]](queryRequest, resultFunction)
 
   private def getRecord(hybridRecord: HybridRecord): Future[HybridRecord] = {
     val existingRecord =
       versionedDao.getRecord[HybridRecord](id = hybridRecord.id)
 
-    existingRecord.map {
-      optionalRecord: Option[HybridRecord] => optionalRecord match {
+    existingRecord.map { optionalRecord: Option[HybridRecord] =>
+      optionalRecord match {
         case Some(r) => r
-        case None => throw new RuntimeException(
-          s"Asked to reindex a missing record ${hybridRecord.id}, but it's not in the table!"
-        )
+        case None =>
+          throw new RuntimeException(
+            s"Asked to reindex a missing record ${hybridRecord.id}, but it's not in the table!"
+          )
       }
     }
   }
@@ -83,11 +90,12 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   ): Future[Boolean] = {
 
     val updates: Seq[Future[Unit]] = resultGroup.map {
-      case Left(e: DynamoReadError) => Future.failed(
-        new Exception(
-          s"DynamoReadError: ${DynamoReadError.describe(e)}"
+      case Left(e: DynamoReadError) =>
+        Future.failed(
+          new Exception(
+            s"DynamoReadError: ${DynamoReadError.describe(e)}"
+          )
         )
-      )
       case Right(hybridRecord: HybridRecord) => {
         getRecord(hybridRecord).flatMap { record =>
           updateRecord(record, desiredVersion)
@@ -95,18 +103,21 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       }
     }
 
-    Future.sequence(updates).map(_ => {
-      info(s"ReindexTargetService completed batch of ${updates.length}")
+    Future
+      .sequence(updates)
+      .map(_ => {
+        info(s"ReindexTargetService completed batch of ${updates.length}")
 
-      metricsSender.incrementCount(
-        "reindex-updated-items",
-        updates.length
-      )
+        metricsSender.incrementCount(
+          "reindex-updated-items",
+          updates.length
+        )
 
-      true
-    }).recover {
-      case _ => false
-    }
+        true
+      })
+      .recover {
+        case _ => false
+      }
   }
 
   private def createScanamoQueryRequest(
@@ -134,15 +145,16 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       resultFunction = updateQueryResults(reindexJob.desiredVersion)
     )
 
-    Future.sequence(Scanamo.exec(dynamoDBClient)(ops)).map( result =>
-      if (result.contains(false)) {
-        throw GracefulFailureException(
-          new RuntimeException(
-            "Not all records were successfully processed!"
-          ))
-      } else {
-        info(s"Successfully processed reindex job $reindexJob")
-      }
-    )
+    Future
+      .sequence(Scanamo.exec(dynamoDBClient)(ops))
+      .map(result =>
+        if (result.contains(false)) {
+          throw GracefulFailureException(
+            new RuntimeException(
+              "Not all records were successfully processed!"
+            ))
+        } else {
+          info(s"Successfully processed reindex job $reindexJob")
+      })
   }
 }
