@@ -43,6 +43,7 @@ class ReindexerFeatureTest
       new Server(),
       flags = Map(
         "aws.dynamo.tableName" -> tableName,
+        "aws.region" -> "eu-west-1",
         "aws.sns.topic.arn" -> topicArn,
         "aws.sqs.queue.url" -> queueUrl
       ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
@@ -136,6 +137,7 @@ class ReindexerFeatureTest
         new Server(),
         flags = Map(
           "aws.dynamo.tableName" -> "not_a_real_table",
+          "aws.region" -> "eu-west-1",
           "aws.sns.topic.arn" -> topicArn,
           "aws.sqs.queue.url" -> queueUrl
         ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
