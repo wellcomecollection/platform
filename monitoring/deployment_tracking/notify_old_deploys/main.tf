@@ -12,6 +12,8 @@ module "lambda_notify_old_deploys" {
     AGE_BOUNDARY_MINS = "5"
   }
 
+  timeout = 10
+
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_key          = "lambdas/monitoring/deployment_tracking/notify_old_deploys.zip"
 }
