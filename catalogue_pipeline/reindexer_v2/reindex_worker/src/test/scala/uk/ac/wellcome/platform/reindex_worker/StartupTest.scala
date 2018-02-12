@@ -23,7 +23,8 @@ class StartupTest
     stage = Stage.PRODUCTION,
     twitterServer = new Server,
     flags = Map(
-      "aws.dynamo.tableName" -> tableName
+      "aws.dynamo.tableName" -> tableName,
+      "aws.region" -> "eu-west-1"
     ) ++ dynamoDbLocalEndpointFlags ++ cloudWatchLocalEndpointFlag
   )
 
