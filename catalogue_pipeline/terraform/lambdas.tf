@@ -31,7 +31,7 @@ module "trigger_reindex_job_creator_lambda" {
   lambda_function_name = "${module.reindex_job_creator_lambda.function_name}"
   lambda_function_arn  = "${module.reindex_job_creator_lambda.arn}"
 
-  sns_trigger_arn      = "${module.reindex_shard_tracker_topic.arn}"
+  sns_trigger_arn = "${module.reindex_shard_tracker_topic.arn}"
 }
 
 # Role policies for the reindex_job_creator
@@ -62,7 +62,7 @@ module "complete_reindex_lambda" {
   lambda_function_name = "${module.complete_reindex_lambda.function_name}"
   lambda_function_arn  = "${module.complete_reindex_lambda.arn}"
 
-  sns_trigger_arn      = "${data.aws_sns_topic.reindex_jobs_complete_topic.arn}"
+  sns_trigger_arn = "${data.aws_sns_topic.reindex_jobs_complete_topic.arn}"
 }
 
 # Role policies for the complete_reindex_lambda
