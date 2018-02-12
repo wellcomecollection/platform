@@ -55,4 +55,3 @@ def create_reindex_shard(source_name, source_id, source_size):
     shard_id = h.hexdigest()[:shard_id_length]
 
     return f'{source_name}/{shard_id}'
-

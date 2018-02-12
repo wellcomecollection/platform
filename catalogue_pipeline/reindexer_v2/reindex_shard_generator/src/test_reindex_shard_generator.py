@@ -8,14 +8,14 @@ import pytest
 from reindex_shard_generator import main
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def table_name():
     name = 'test_reindex_shard_generator-table'
     os.environ.update({'TABLE_NAME': name})
     return name
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def source_data_table(dynamodb_client, table_name):
     dynamodb_client.create_table(
         TableName=table_name,
@@ -93,23 +93,82 @@ def test_adds_shard_to_new_record(dynamodb_client, source_data_table):
     dynamodb_client.put_item(
         TableName=source_data_table,
         Item={
-            'id': {'S': 'sierra/b0000001'},
+            'id': {'S': 'sierra/b1111111'},
             'sourceName': {'S': 'sierra'},
-            'sourceId': {'S': 'b0000001'},
+            'sourceId': {'S': 'b1111111'},
             'version': {'N': '1'},
         }
     )
 
     event = _wrap({
-        'id': 'sierra/b0000001',
+        'id': 'sierra/b1111111',
         'sourceName': 'sierra',
-        'sourceId': 'b0000001',
+        'sourceId': 'b1111111',
         'version': 1
     })
 
     main(event=event, dynamodb_client=dynamodb_client)
 
-    from pprint import pprint
+    item = dynamodb_client.get_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b1111111'}}
+    )
+    assert item['Item']['reindexShard']['S'] == 'sierra/2a20'
 
-    pprint(dynamodb_client.list_tables())
-    assert False
+
+def test_updates_shard_on_old_record(dynamodb_client, source_data_table):
+    dynamodb_client.put_item(
+        TableName=source_data_table,
+        Item={
+            'id': {'S': 'sierra/b2222222'},
+            'sourceName': {'S': 'sierra'},
+            'sourceId': {'S': 'b2222222'},
+            'reindexShard': {'S': 'oldReindexShard'},
+            'version': {'N': '2'},
+        }
+    )
+
+    event = _wrap({
+        'id': 'sierra/b2222222',
+        'sourceName': 'sierra',
+        'sourceId': 'b2222222',
+        'reindexShard': 'oldReindexShard',
+        'version': 2
+    })
+
+    main(event=event, dynamodb_client=dynamodb_client)
+
+    item = dynamodb_client.get_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b2222222'}}
+    )
+    assert item['Item']['reindexShard']['S'] == 'sierra/1cfc'
+
+
+def test_does_nothing_if_shard_up_to_date(dynamodb_client, source_data_table):
+    dynamodb_client.put_item(
+        TableName=source_data_table,
+        Item={
+            'id': {'S': 'sierra/b3333333'},
+            'sourceName': {'S': 'sierra'},
+            'sourceId': {'S': 'b3333333'},
+            'reindexShard': {'S': 'sierra/838d'},
+            'version': {'N': '3'},
+        }
+    )
+
+    event = _wrap({
+        'id': 'sierra/b3333333',
+        'sourceName': 'sierra',
+        'sourceId': 'b3333333',
+        'reindexShard': 'sierra/838d',
+        'version': 3
+    })
+
+    main(event=event, dynamodb_client=dynamodb_client)
+
+    item = dynamodb_client.get_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b3333333'}}
+    )
+    assert item['Item']['version']['N'] == '3'

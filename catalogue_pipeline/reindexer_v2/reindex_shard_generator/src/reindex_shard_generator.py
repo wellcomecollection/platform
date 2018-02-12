@@ -37,6 +37,8 @@ def main(event, _ctxt=None, dynamodb_client=None):
                 f'{row["id"]} already has an up-to-date reindexShard; skipping'
             )
             continue
+        else:
+            print(f'Adding new reindex shard {new_reindex_shard}')
 
         # In that case, we call GetItem to get the current version of the
         # row.  This means we can do a Conditional Update to avoid overriding
