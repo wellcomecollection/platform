@@ -32,7 +32,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
 
         # If the reindex shard doesn't match the current schema, we'll
         # create a new one.
-        if row.get('reindexShard') != new_reindex_shard:
+        if row.get('reindexShard') == new_reindex_shard:
             print(
                 f'{row["id"]} already has an up-to-date reindexShard; skipping'
             )
@@ -46,19 +46,18 @@ def main(event, _ctxt=None, dynamodb_client=None):
             Key={'id': {'S': row['id']}},
             AttributesToGet=['version']
         )
-        current_version = current_row['Item']['version']['N']
+        current_version = int(current_row['Item']['version']['N'])
 
         # Then we call UpdateItem.  We only need to change the version and
         # the reindexShard fields, and we condition it on the version
         # incrementing by 1.
-        ddb.update_item(
+        dynamodb_client.update_item(
             TableName=table_name,
             Key={'id': {'S': row['id']}},
             UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
-            ConditionExpression='version < :currentVersion',
+            ConditionExpression='version < :newVersion',
             ExpressionAttributeValues={
-                ':currentVersion': {'N': current_version},
-                ':newVersion': {'N': current_version + 1},
+                ':newVersion': {'N': str(current_version + 1)},
                 ':reindexShard': {'S': new_reindex_shard},
             }
         )
