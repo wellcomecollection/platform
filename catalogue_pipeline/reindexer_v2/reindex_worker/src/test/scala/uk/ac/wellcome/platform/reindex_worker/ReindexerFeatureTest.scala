@@ -122,4 +122,28 @@ class ReindexerFeatureTest
 
     server.close()
   }
+
+  it("does not send a message if it cannot complete a reindex") {
+    val expectedRecords = createReindexableData
+
+    val badServer: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = Map(
+          "aws.dynamo.tableName" -> "not_a_real_table",
+          "aws.sns.topic.arn" -> topicArn,
+          "aws.sqs.queue.url" -> queueUrl
+        ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
+      )
+
+    badServer.start()
+
+    // We wait some time to ensure that the message is not processed
+    Thread.sleep(5000)
+
+    val messages = listMessagesReceivedFromSNS()
+    messages should have size 0
+
+    badServer.close()
+  }
 }
