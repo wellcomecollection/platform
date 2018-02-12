@@ -1,35 +1,51 @@
-module "miro_reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform.git//service?ref=v5.0.2"
-  name   = "miro_reindexer"
+module "reindexer" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
+  name   = "reindexer"
 
-  cluster_id = "${module.catalogue_pipeline_cluster.cluster_name}"
-  vpc_id     = "${module.vpc_services.vpc_id}"
-  app_uri    = "${module.ecr_repository_reindexer.repository_url}:${var.release_ids["reindexer"]}"
+  source_queue_name = "${module.reindexer_queue.name}"
+  source_queue_arn  = "${module.reindexer_queue.arn}"
 
-  listener_https_arn = "${module.catalogue_pipeline_cluster.alb_listener_https_arn}"
-  listener_http_arn  = "${module.catalogue_pipeline_cluster.alb_listener_http_arn}"
-  path_pattern       = "/miro_reindexer/*"
-  alb_priority       = "104"
+  ecr_repository_url = "${module.ecr_repository_ingestor.repository_url}"
+  release_id         = "${var.release_ids["reindexer"]}"
 
   cpu    = 512
   memory = 1024
 
-  desired_count = "0"
-
-  deployment_minimum_healthy_percent = "0"
-  deployment_maximum_percent         = "200"
-
   env_vars = {
-    miro_table_name    = "${aws_dynamodb_table.miro_table.name}"
-    reindex_table_name = "${aws_dynamodb_table.reindex_tracker.name}"
-    metrics_namespace  = "miro-reindexer"
+    dynamo_table_name    = "${module.versioned-hybrid-store.table_name}"
+    reindex_complete_topic_arn = "${data.aws_sns_topic.reindex_jobs_complete_topic.arn}"
+    reindex_jobs_queue_url = "${module.reindexer_queue.arn}"
+    metrics_namespace  = "reindexer"
   }
 
-  env_vars_length = 3
+  env_vars_length = 4
 
-  loadbalancer_cloudwatch_id   = "${module.catalogue_pipeline_cluster.alb_cloudwatch_id}"
-  server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
+  cluster_name               = "${module.catalogue_pipeline_cluster.cluster_name}"
+  vpc_id                     = "${module.vpc_services.vpc_id}"
+  alb_cloudwatch_id          = "${module.catalogue_pipeline_cluster.alb_cloudwatch_id}"
+  alb_listener_https_arn     = "${module.catalogue_pipeline_cluster.alb_listener_https_arn}"
+  alb_listener_http_arn      = "${module.catalogue_pipeline_cluster.alb_listener_http_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+}
 
-  https_domain = "services.wellcomecollection.org"
+data "aws_sns_topic" "reindex_jobs_complete_topic" {
+  name = "${module.reindex_jobs_complete_topic.name}"
+}
+
+# Role policies for the reindexer
+
+resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {
+  role   = "${module.reindexer.task_role_name}"
+  policy = "${module.reindex_jobs_complete_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "reindexer_tracker_table" {
+  role   = "${module.reindexer.task_role_name}"
+  policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
+}
+
+resource "aws_iam_role_policy" "reindexer_task_cloudwatch_metric" {
+  role   = "${module.reindexer.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
