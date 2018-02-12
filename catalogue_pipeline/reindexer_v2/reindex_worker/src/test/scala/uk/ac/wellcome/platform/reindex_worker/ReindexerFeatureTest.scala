@@ -7,7 +7,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  CompletedReindexJob,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
@@ -55,11 +58,11 @@ class ReindexerFeatureTest
 
     val hybridRecords = (1 to numberOfRecords).map(i => {
       HybridRecord(version = 1,
-        sourceId = s"id$i",
-        sourceName = "source",
-        s3key = "s3://bucket/key",
-        reindexShard = shardName,
-        reindexVersion = currentVersion)
+                   sourceId = s"id$i",
+                   sourceName = "source",
+                   s3key = "s3://bucket/key",
+                   reindexShard = shardName,
+                   reindexVersion = currentVersion)
     })
 
     hybridRecords.foreach(
@@ -68,7 +71,7 @@ class ReindexerFeatureTest
     val expectedRecords = hybridRecords.map(
       record =>
         record.copy(reindexVersion = desiredVersion,
-          version = record.version + 1))
+                    version = record.version + 1))
 
     val reindexJob = ReindexJob(
       shardId = shardName,
@@ -114,9 +117,11 @@ class ReindexerFeatureTest
 
       messages should have size 1
 
-      JsonUtil.fromJson[CompletedReindexJob](
-        messages.head.message
-      ).get shouldBe expectedMessage
+      JsonUtil
+        .fromJson[CompletedReindexJob](
+          messages.head.message
+        )
+        .get shouldBe expectedMessage
 
     }
 

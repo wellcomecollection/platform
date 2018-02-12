@@ -175,11 +175,13 @@ class SierraBibMergerFeatureTest
       modifiedDate = newUpdatedDate
     )
 
-    hybridStore.updateRecord[SierraTransformable](
-      oldRecord.sourceName,
-      oldRecord.sourceId)(oldRecord)(identity).map { _ =>
-      sendBibRecordToSQS(record)
-    }
+    hybridStore
+      .updateRecord[SierraTransformable](
+        oldRecord.sourceName,
+        oldRecord.sourceId)(oldRecord)(identity)
+      .map { _ =>
+        sendBibRecordToSQS(record)
+      }
 
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 2)
@@ -214,11 +216,14 @@ class SierraBibMergerFeatureTest
       modifiedDate = oldUpdatedDate
     )
 
-    hybridStore.updateRecord[SierraTransformable](
-      expectedSierraTransformable.sourceName,
-      expectedSierraTransformable.sourceId)(expectedSierraTransformable)(identity).map { _ =>
-      sendBibRecordToSQS(record)
-    }
+    hybridStore
+      .updateRecord[SierraTransformable](
+        expectedSierraTransformable.sourceName,
+        expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
+        identity)
+      .map { _ =>
+        sendBibRecordToSQS(record)
+      }
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
