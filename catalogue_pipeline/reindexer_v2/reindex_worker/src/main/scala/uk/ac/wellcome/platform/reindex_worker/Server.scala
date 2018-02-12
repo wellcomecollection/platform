@@ -23,6 +23,8 @@ class Server extends HttpServer {
     DynamoConfigModule,
     SQSClientModule,
     SQSConfigModule,
+    SNSClientModule,
+    SNSConfigModule,
     S3ClientModule,
     S3ConfigModule,
     ReindexerWorkerModule,

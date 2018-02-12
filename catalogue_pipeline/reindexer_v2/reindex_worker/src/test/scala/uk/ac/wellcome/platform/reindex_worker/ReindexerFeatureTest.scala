@@ -7,9 +7,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob}
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SQSLocal}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
+import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ReindexerFeatureTest
@@ -19,6 +20,7 @@ class ReindexerFeatureTest
     with DynamoDBLocal[HybridRecord]
     with AmazonCloudWatchFlag
     with SQSLocal
+    with SNSLocal
     with ScalaFutures {
 
   override lazy val tableName: String = "table"
@@ -31,14 +33,16 @@ class ReindexerFeatureTest
     .enrichedDynamoFormat
 
   val queueUrl = createQueueAndReturnUrl("reindexer-feature-test-q")
+  val topicArn = createTopicAndReturnArn("test_reindexer")
 
   val server: EmbeddedHttpServer =
     new EmbeddedHttpServer(
       new Server(),
       flags = Map(
         "aws.dynamo.tableName" -> tableName,
+        "aws.sns.topic.arn" -> topicArn,
         "aws.sqs.queue.url" -> queueUrl
-      ) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
+      ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
     )
 
   val currentVersion = 1
@@ -46,16 +50,16 @@ class ReindexerFeatureTest
 
   val shardName = "shard"
 
-  it("increases the reindexVersion on every record that needs a reindex") {
+  private def createReindexableData: List[HybridRecord] = {
     val numberOfRecords = 4
 
     val hybridRecords = (1 to numberOfRecords).map(i => {
       HybridRecord(version = 1,
-                   sourceId = s"id$i",
-                   sourceName = "source",
-                   s3key = "s3://bucket/key",
-                   reindexShard = shardName,
-                   reindexVersion = currentVersion)
+        sourceId = s"id$i",
+        sourceName = "source",
+        s3key = "s3://bucket/key",
+        reindexShard = shardName,
+        reindexVersion = currentVersion)
     })
 
     hybridRecords.foreach(
@@ -64,23 +68,56 @@ class ReindexerFeatureTest
     val expectedRecords = hybridRecords.map(
       record =>
         record.copy(reindexVersion = desiredVersion,
-                    version = record.version + 1))
+          version = record.version + 1))
 
     val reindexJob = ReindexJob(
       shardId = shardName,
       desiredVersion = desiredVersion
     )
 
-    server.start()
     val sqsMessage =
       SQSMessage(None, toJson(reindexJob).get, "topic", "message", "now")
     sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+
+    expectedRecords.toList
+  }
+
+  it("increases the reindexVersion on every record that needs a reindex") {
+    val expectedRecords = createReindexableData
+
+    server.start()
 
     eventually {
       val actualRecords =
         Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
 
       actualRecords should contain theSameElementsAs expectedRecords
+    }
+
+    server.close()
+
+  }
+
+  it("sends an SNS notice for a completed reindex") {
+    val expectedRecords = createReindexableData
+
+    server.start()
+
+    val expectedMessage = CompletedReindexJob(
+      shardId = shardName,
+      completedReindexVersion = desiredVersion
+    )
+
+    eventually {
+
+      val messages = listMessagesReceivedFromSNS()
+
+      messages should have size 1
+
+      JsonUtil.fromJson[CompletedReindexJob](
+        messages.head.message
+      ).get shouldBe expectedMessage
+
     }
 
     server.close()
