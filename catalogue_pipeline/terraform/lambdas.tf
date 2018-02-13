@@ -67,7 +67,7 @@ module "trigger_complete_reindex_lambda" {
 
 # Role policies for the complete_reindex_lambda
 
-resource "aws_iam_role_policy" "reindexer_tracker_table" {
+resource "aws_iam_role_policy" "complete_reindex_lambda_reindexer_tracker_table" {
   role   = "${module.complete_reindex_lambda.role_name}"
   policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
 }
