@@ -15,13 +15,12 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     extends Logging {
   val defaultSubject = "subject-not-specified"
 
-  def writeMessage(message: String,
-                   subject: Option[String]): Future[PublishAttempt] =
+  def writeMessage(message: String, subject: String): Future[PublishAttempt] =
     Future {
       blocking {
         info(
           s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
-        snsClient.publish(toPublishRequest(message, subject))
+        snsClient.publish(toPublishRequest(message = message, subject = subject))
       }
     }.map { publishResult =>
         info(s"Published message ${publishResult.getMessageId}")
@@ -33,9 +32,6 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
           throw e
       }
 
-  private def toPublishRequest(message: String, subject: Option[String]) = {
-    new PublishRequest(snsConfig.topicArn,
-                       message,
-                       subject.getOrElse(defaultSubject))
-  }
+  private def toPublishRequest(message: String, subject) =
+    new PublishRequest(snsConfig.topicArn, message, subject)
 }
