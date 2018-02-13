@@ -31,18 +31,4 @@ shared_infra-publish:	drain_ecs_container_instance-publish \
 						ecs_ec2_instance_tagger-publish \
 						run_ecs_task-publish \
 						service_scheduler-publish \
-						update_ecs_service_size-publish \
-						sqs_freezeray-publish	\
-						sqs_redrive-publish
-
-
-FREEZERAY = $(ROOT)/shared_infra/sqs_freezeray
-
-$(FREEZERAY)/requirements.txt: $(FREEZERAY)/requirements.in
-	docker run --rm --volume $(FREEZERAY):/src --rm micktwomey/pip-tools
-
-
-SQS_REDRIVE = $(ROOT)/shared_infra/sqs_redrive
-
-$(SQS_REDRIVE)/requirements.txt: $(SQS_REDRIVE)/requirements.in
-	docker run --rm --volume $(SQS_REDRIVE):/src --rm micktwomey/pip-tools
+						update_ecs_service_size-publish
