@@ -15,23 +15,6 @@ resource "aws_iam_role_policy" "transformer_task_cloudwatch_metric" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-# Role policies for the miro_reindexer service
-
-resource "aws_iam_role_policy" "reindexer_tracker_table" {
-  role   = "${module.miro_reindexer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
-}
-
-resource "aws_iam_role_policy" "reindexer_target_miro" {
-  role   = "${module.miro_reindexer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.reindex_target_miro.json}"
-}
-
-resource "aws_iam_role_policy" "reindexer_cloudwatch" {
-  role   = "${module.miro_reindexer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
-}
-
 # Role policies for the Elasticsearch ingestor
 
 resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {

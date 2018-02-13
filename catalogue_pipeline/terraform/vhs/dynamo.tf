@@ -11,6 +11,25 @@ resource "aws_dynamodb_table" "table" {
     type = "S"
   }
 
+  attribute {
+    name = "reindexShard"
+    type = "S"
+  }
+
+  attribute {
+    name = "reindexVersion"
+    type = "N"
+  }
+
+  global_secondary_index {
+    name            = "reindexTracker"
+    hash_key        = "reindexShard"
+    range_key       = "reindexVersion"
+    write_capacity  = 1
+    read_capacity   = 1
+    projection_type = "ALL"
+  }
+
   lifecycle {
     prevent_destroy = true
 

@@ -82,6 +82,7 @@ jobs:
     - env: TASK=id_minter-test
 
     # Reindexer stack
+    - env: TASK=reindex_worker-test
     - env: TASK=reindexer_v2/reindex_job_creator-test
     - env: TASK=reindexer_v2/complete_reindex-test
 

@@ -1,3 +1,11 @@
+sns:
+  image: wellcome/fake-sns
+  ports:
+    - "9292:9292"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"
 dynamodb:
   image: peopleperhour/dynamodb
   ports:

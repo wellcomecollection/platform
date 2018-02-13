@@ -1,4 +1,4 @@
-package uk.ac.wellcome.reindexer.models
+package uk.ac.wellcome.platform.reindex_worker.models
 
 import java.util
 import scala.collection.JavaConverters._
@@ -37,7 +37,7 @@ object ScanamoQueryStream {
     f: (List[Either[DynamoReadError, T]]) => Y): ScanamoOps[List[Y]] = {
     def runMore(lastKey: Option[EvaluationKey]): ScanamoOps[List[Y]] = {
       for {
-        queryResult <- exec(lastKey.foldLeft(req)(withExclusiveStartKey(_, _)))
+        queryResult <- exec(lastKey.foldLeft(req)(withExclusiveStartKey))
         results = items(queryResult).asScala.map(ScanamoFree.read[T]).toList
         // This is where we hook into the batch of results
         processedResult = f(results)

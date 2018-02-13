@@ -67,7 +67,12 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
                                        MiroCollection: String,
                                        data: String): String = {
     val miroTransformable =
-      MiroTransformable(MiroID, MiroCollection, data)
+      MiroTransformable(
+        sourceId = MiroID,
+        MiroCollection = MiroCollection,
+        data = data
+      )
+
     JsonUtil.toJson(miroTransformable).get
   }
 
