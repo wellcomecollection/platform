@@ -26,8 +26,9 @@ def main(event, _ctxt=None, dynamodb_client=None):
     for sns_event in extract_sns_messages_from_lambda_event(event):
         row = sns_event.message
 
+        source_id = row['sourceId']
         new_reindex_shard = create_reindex_shard(
-            source_id=row['sourceId'],
+            source_id=source_id,
             source_name=row['sourceName'],
             source_size=SOURCE_SIZES[row['sourceName']],
             shard_size=SHARD_SIZE
@@ -62,3 +63,5 @@ def main(event, _ctxt=None, dynamodb_client=None):
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
                 raise
+            else:
+                print(f'Adding shard for source_id: {source_id} failed with ConditionalCheckFailedException')

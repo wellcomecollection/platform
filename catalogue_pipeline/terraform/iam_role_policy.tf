@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "allow_reindex_job_creator_publish_to_sns" {
 
 # Role policies for the shard generator lambda
 
-resource "aws_iam_role_policy" "allow_shard_generator_to_access_vhs" {
+resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
   role   = "${module.shard_generator_lambda.role_name}"
-  policy = "${module.versioned-hybrid-store.full_access_policy}"
+  policy = "${module.versioned-hybrid-store.dynamo_put_policy}"
 }

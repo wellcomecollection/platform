@@ -50,7 +50,7 @@ def source_data_table(dynamodb_client, table_name):
     # So we wait for the table to be created before yielding to the test.
     #
     # Link:  https://boto3.readthedocs.io/en/stable/reference/services/dynamodb.html#DynamoDB.Client.create_table
-    for i in range(10):
+    for _ in range(10):
         resp = dynamodb_client.describe_table(TableName=table_name)
 
         if resp['Table']['TableStatus'] == 'ACTIVE':
