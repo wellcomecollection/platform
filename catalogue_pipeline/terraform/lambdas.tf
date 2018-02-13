@@ -90,7 +90,7 @@ module "shard_generator_lambda" {
 module "trigger_shard_generator_lambda" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//lambda/trigger_dynamo?ref=v6.4.0"
 
-  stream_arn = "${module.versioned-hybrid-store.table_stream_arn}"
+  stream_arn    = "${module.versioned-hybrid-store.table_stream_arn}"
   function_arn  = "${module.shard_generator_lambda.arn}"
-  function_role      = "${module.shard_generator_lambda.role_name}"
+  function_role = "${module.shard_generator_lambda.role_name}"
 }
