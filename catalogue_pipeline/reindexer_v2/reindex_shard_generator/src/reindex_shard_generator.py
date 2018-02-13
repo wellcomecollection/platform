@@ -10,9 +10,11 @@ from shard_manager import create_reindex_shard
 
 
 SOURCE_SIZES = {
-    'sierra': 5e7,
+    'sierra': 5e6,
     'miro': 2.5e5,
 }
+
+SHARD_SIZE = 1500
 
 
 def main(event, _ctxt=None, dynamodb_client=None):
@@ -27,7 +29,8 @@ def main(event, _ctxt=None, dynamodb_client=None):
         new_reindex_shard = create_reindex_shard(
             source_id=row['sourceId'],
             source_name=row['sourceName'],
-            source_size=SOURCE_SIZES[row['sourceName']]
+            source_size=SOURCE_SIZES[row['sourceName']],
+            shard_size=SHARD_SIZE
         )
 
         # If the reindex shard doesn't match the current schema, we'll
@@ -57,7 +60,5 @@ def main(event, _ctxt=None, dynamodb_client=None):
                 }
             )
         except botocore.exceptions.ClientError as e:
-            # Ignore the ConditionalCheckFailedException, bubble up
-            # other exceptions.
             if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
                 raise
