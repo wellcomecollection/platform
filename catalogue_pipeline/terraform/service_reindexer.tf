@@ -12,10 +12,10 @@ module "reindexer" {
   memory = 1024
 
   env_vars = {
-    dynamo_table_name    = "${module.versioned-hybrid-store.table_name}"
+    dynamo_table_name          = "${module.versioned-hybrid-store.table_name}"
     reindex_complete_topic_arn = "${data.aws_sns_topic.reindex_jobs_complete_topic.arn}"
-    reindex_jobs_queue_url = "${module.reindexer_queue.arn}"
-    metrics_namespace  = "reindexer"
+    reindex_jobs_queue_url     = "${module.reindexer_queue.arn}"
+    metrics_namespace          = "reindexer"
   }
 
   env_vars_length = 4
