@@ -97,7 +97,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
       snsWriter
         .writeMessage(
           message = JsonUtil.toJson(work).get,
-          subject = "source: ${this.getClass.getSimpleName}.publishMessage"
+          subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
         )
         .map(publishAttempt => Some(publishAttempt))
     }
