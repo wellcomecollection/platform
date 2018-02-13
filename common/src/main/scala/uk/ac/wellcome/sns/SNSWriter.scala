@@ -31,6 +31,6 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
           throw e
       }
 
-  private def toPublishRequest(message: String, subject) =
+  private def toPublishRequest(message: String, subject: String) =
     new PublishRequest(snsConfig.topicArn, message, subject)
 }
