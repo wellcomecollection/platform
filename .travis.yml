@@ -90,9 +90,6 @@ jobs:
     # (not under active development)
     # - env: TASK=api_docs-build
 
-    # Miro preprocessor stack  (not under active development)
-    # - env: TASK=miro_preprocessor-test
-
     # Shared infra stack
     - env: TASK=shared_infra-test
 
