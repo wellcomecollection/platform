@@ -13,6 +13,7 @@ reindex shards for each source at a manageable size.
 
 import math
 
+
 def create_reindex_shard(source_name, source_id, source_size, shard_size):
     ascii_source_id = int(''.join(str(ord(c)) for c in source_id))
 
