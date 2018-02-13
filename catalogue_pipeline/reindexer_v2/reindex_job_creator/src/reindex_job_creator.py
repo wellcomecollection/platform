@@ -33,5 +33,5 @@ def main(event, _ctxt=None, sns_client=None):
             sns_client=sns_client,
             topic_arn=topic_arn,
             message=message,
-            subject='Reindex job from reindex_job_creator'
+            subject='source: reindex_job_creator.main'
         )
