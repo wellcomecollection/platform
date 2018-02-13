@@ -162,9 +162,6 @@ class SierraBibMergerFeatureTest
     )
 
     val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
-    hybridStore.updateRecord[SierraTransformable](
-      oldRecord.sourceName,
-      oldRecord.sourceId)(oldRecord)(identity)
 
     val newTitle = "A number of new narwhals near Newmarket"
     val newUpdatedDate = "2004-04-04T04:04:04Z"
@@ -178,7 +175,13 @@ class SierraBibMergerFeatureTest
       modifiedDate = newUpdatedDate
     )
 
-    sendBibRecordToSQS(record)
+    hybridStore
+      .updateRecord[SierraTransformable](
+        oldRecord.sourceName,
+        oldRecord.sourceId)(oldRecord)(identity)
+      .map { _ =>
+        sendBibRecordToSQS(record)
+      }
 
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = record, version = 2)
@@ -197,7 +200,6 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2006-06-06T06:06:06Z"
     )
-    sendBibRecordToSQS(newBibRecord)
 
     val expectedSierraTransformable =
       SierraTransformable(bibRecord = newBibRecord, version = 1)
@@ -214,13 +216,20 @@ class SierraBibMergerFeatureTest
       modifiedDate = oldUpdatedDate
     )
 
-    sendBibRecordToSQS(record)
+    hybridStore
+      .updateRecord[SierraTransformable](
+        expectedSierraTransformable.sourceName,
+        expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
+        identity)
+      .map { _ =>
+        sendBibRecordToSQS(record)
+      }
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
     // enough time for this update to have gone through (if it was going to).
     Thread.sleep(5000)
 
-    assertStored(expectedSierraTransformable)
+    assertStored(expectedSierraTransformable.copy(version = 2))
   }
 
   it("stores a bib from SQS if the ID already exists but no bibData") {

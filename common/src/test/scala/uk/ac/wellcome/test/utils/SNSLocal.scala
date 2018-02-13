@@ -18,6 +18,7 @@ trait SNSLocal extends BeforeAndAfterEach with Logging { this: Suite =>
   private val localSNSEndpointUrl = "http://localhost:9292"
   private val accessKey = "access"
   private val secretKey = "secret"
+
   val snsLocalFlags: Map[String, String] =
     Map("aws.sns.endpoint" -> localSNSEndpointUrl,
         "aws.sns.accessKey" -> accessKey,

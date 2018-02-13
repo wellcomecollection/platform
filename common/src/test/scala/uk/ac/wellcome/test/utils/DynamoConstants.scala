@@ -1,6 +1,6 @@
 package uk.ac.wellcome.test.utils
 
 object DynamoConstants {
-  final val maxDynamoItemSizeinKb = 400000
-  final val maxDynamoQueryResultSizeInKb = 1000000
+  final val maxDynamoItemSizeinbytes = 400000
+  final val maxDynamoQueryResultSizeInBytes = 1000000
 }

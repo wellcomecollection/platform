@@ -72,9 +72,13 @@ class MiroTransformerFeatureTest
           "image_tech_file_size": ["100000"]
         }"""
 
-  private def sendMiroImageToSQS(miroID: String, message: String) = {
+  private def sendMiroImageToSQS(miroID: String, data: String) = {
     val miroTransformable =
-      MiroTransformable(miroID, "Images-A", message)
+      MiroTransformable(
+        sourceId = miroID,
+        MiroCollection = "Images-A",
+        data = data
+      )
 
     val sqsMessage =
       hybridRecordSqsMessage(JsonUtil.toJson(miroTransformable).get, "miro")
