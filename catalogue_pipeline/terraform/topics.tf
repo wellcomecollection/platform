@@ -34,6 +34,6 @@ module "reindex_jobs_topic" {
 }
 
 module "reindex_jobs_complete_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v6.4.2"
   name   = "reindex_jobs_complete"
 }

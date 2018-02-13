@@ -13,7 +13,7 @@ module "reindexer" {
 
   env_vars = {
     dynamo_table_name          = "${module.versioned-hybrid-store.table_name}"
-    reindex_complete_topic_arn = "${data.aws_sns_topic.reindex_jobs_complete_topic.arn}"
+    reindex_complete_topic_arn = "${module.reindex_jobs_complete_topic.arn}"
     reindex_jobs_queue_url     = "${module.reindexer_queue.arn}"
     metrics_namespace          = "reindexer"
   }
@@ -27,10 +27,6 @@ module "reindexer" {
   alb_listener_http_arn      = "${module.catalogue_pipeline_cluster.alb_listener_http_arn}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-}
-
-data "aws_sns_topic" "reindex_jobs_complete_topic" {
-  name = "${module.reindex_jobs_complete_topic.name}"
 }
 
 # Role policies for the reindexer
