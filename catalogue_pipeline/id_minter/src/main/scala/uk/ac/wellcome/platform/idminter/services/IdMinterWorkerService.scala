@@ -30,7 +30,7 @@ class IdMinterWorkerService @Inject()(
       workWithCanonicalId <- idEmbedder.embedId(json)
       _ <- writer.writeMessage(
         message = workWithCanonicalId.toString(),
-        subject = "source: IdMinterWorkerService.processMessage"
+        subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
 
