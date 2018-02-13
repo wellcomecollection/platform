@@ -45,7 +45,7 @@ module "complete_reindex_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
 
   name   = "complete_reindex"
-  s3_key = "lambdas/catalogue_pipeline/reindex_job_creator.zip"
+  s3_key = "lambdas/catalogue_pipeline/reindexer_v2/reindex_job_creator.zip"
 
   description = "Mark reindex work as done in the reindex tracker table."
 
@@ -76,7 +76,7 @@ module "shard_generator_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v6.4.0"
 
   name   = "reindex_job_creator"
-  s3_key = "lambdas/catalogue_pipeline/reindex_shard_generator.zip"
+  s3_key = "lambdas/catalogue_pipeline/reindexer_v2/reindex_shard_generator.zip"
 
   description = "Generate reindexShards for items in the ${module.versioned-hybrid-store.table_name} table"
 
