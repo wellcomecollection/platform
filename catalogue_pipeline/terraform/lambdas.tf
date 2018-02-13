@@ -56,7 +56,7 @@ module "complete_reindex_lambda" {
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
 
-module "complete_reindex_lambda" {
+module "trigger_complete_reindex_lambda" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.complete_reindex_lambda.function_name}"
