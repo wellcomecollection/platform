@@ -53,5 +53,6 @@ def main(event, _ctxt=None, sns_client=None):
         publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
-            message=message
+            message=message,
+            subject=f'source: dynamo_to_sns ({topic_arn})'
         )
