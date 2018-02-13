@@ -172,3 +172,24 @@ def test_does_nothing_if_shard_up_to_date(dynamodb_client, source_data_table):
         Key={'id': {'S': 'sierra/b3333333'}}
     )
     assert item['Item']['version']['N'] == '3'
+
+
+def test_does_not_override_record_with_old_version(dynamodb_client, source_data_table):
+    dynamodb_client.put_item(
+        TableName=source_data_table,
+        Item=_dynamodb_item(id='sierra/b3333333', version=3)
+    )
+
+    event = _sns_event(
+        id='sierra/b3333333',
+        version=2
+    )
+
+    main(event=event, dynamodb_client=dynamodb_client)
+
+    item = dynamodb_client.get_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b3333333'}}
+    )
+    assert item['Item']['version']['N'] == '3'
+    assert 'reindexShard' not in item['Item']

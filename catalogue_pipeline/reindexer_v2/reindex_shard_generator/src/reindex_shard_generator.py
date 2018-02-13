@@ -3,6 +3,7 @@
 import os
 
 import boto3
+import botocore
 from wellcome_aws_utils.sns_utils import extract_sns_messages_from_lambda_event
 
 from shard_manager import create_reindex_shard
@@ -39,26 +40,24 @@ def main(event, _ctxt=None, dynamodb_client=None):
         else:
             print(f'Adding new reindex shard {new_reindex_shard}')
 
-        # In that case, we call GetItem to get the current version of the
-        # row.  This means we can do a Conditional Update to avoid overriding
-        # another edit.
-        current_row = dynamodb_client.get_item(
-            TableName=table_name,
-            Key={'id': {'S': row['id']}},
-            AttributesToGet=['version']
-        )
-        current_version = int(current_row['Item']['version']['N'])
+        version = row['version']
 
-        # Then we call UpdateItem.  We only need to change the version and
-        # the reindexShard fields, and we condition it on the version
-        # incrementing by 1.
-        dynamodb_client.update_item(
-            TableName=table_name,
-            Key={'id': {'S': row['id']}},
-            UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
-            ConditionExpression='version < :newVersion',
-            ExpressionAttributeValues={
-                ':newVersion': {'N': str(current_version + 1)},
-                ':reindexShard': {'S': new_reindex_shard},
-            }
-        )
+        try:
+            # Then we call UpdateItem.  We only need to change the version and
+            # the reindexShard fields, and we condition it on the version
+            # incrementing by 1.
+            dynamodb_client.update_item(
+                TableName=table_name,
+                Key={'id': {'S': row['id']}},
+                UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
+                ConditionExpression='version < :newVersion',
+                ExpressionAttributeValues={
+                    ':newVersion': {'N': str(version + 1)},
+                    ':reindexShard': {'S': new_reindex_shard},
+                }
+            )
+        except botocore.exceptions.ClientError as e:
+            # Ignore the ConditionalCheckFailedException, bubble up
+            # other exceptions.
+            if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
+                raise
