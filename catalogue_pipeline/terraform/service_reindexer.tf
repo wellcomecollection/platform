@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "reindexer_tracker_table" {
   policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
 }
 
-resource "aws_iam_role_policy" "reindexer_task_cloudwatch_metric" {
+resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
   role   = "${module.reindexer.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
