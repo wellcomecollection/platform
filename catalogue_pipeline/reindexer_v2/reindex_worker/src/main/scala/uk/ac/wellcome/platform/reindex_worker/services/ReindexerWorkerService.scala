@@ -32,7 +32,7 @@ class ReindexerWorkerService @Inject()(
           _ <- targetService.runReindex(reindexJob = reindexJob)
           message <- Future.fromTry(toJson(CompletedReindexJob(reindexJob)))
           result <- snsWriter.writeMessage(
-            subject = "source: ReindexerWorkerService.processMessage",
+            subject = s"source: ${this.getClass.getSimpleName}.processMessage",
             message = message
           )
         } yield result
