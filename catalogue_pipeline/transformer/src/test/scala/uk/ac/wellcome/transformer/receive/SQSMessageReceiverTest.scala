@@ -78,7 +78,7 @@ class SQSMessageReceiverTest
       val messages = listMessagesReceivedFromSNS()
       messages should have size 1
       messages.head.message shouldBe JsonUtil.toJson(work).get
-      messages.head.subject shouldBe "Foo"
+      messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
     }
   }
 
