@@ -19,7 +19,8 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
       blocking {
         info(
           s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
-        snsClient.publish(toPublishRequest(message = message, subject = subject))
+        snsClient.publish(
+          toPublishRequest(message = message, subject = subject))
       }
     }.map { publishResult =>
         info(s"Published message ${publishResult.getMessageId}")
