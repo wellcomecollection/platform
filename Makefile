@@ -6,7 +6,6 @@ include loris/Makefile
 include shared_infra/Makefile
 include catalogue_api/Makefile
 include catalogue_pipeline/Makefile
-include miro_preprocessor/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
 include sierra_adapter/Makefile
