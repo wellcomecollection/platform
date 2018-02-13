@@ -13,7 +13,6 @@ case class PublishAttempt(id: Either[Throwable, String])
 
 class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     extends Logging {
-  val defaultSubject = "subject-not-specified"
 
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =
     Future {
