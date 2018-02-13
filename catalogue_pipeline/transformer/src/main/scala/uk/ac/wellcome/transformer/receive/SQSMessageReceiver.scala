@@ -95,7 +95,10 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
     maybeWork: Option[Work]): Future[Option[PublishAttempt]] =
     maybeWork.fold(Future.successful(None: Option[PublishAttempt])) { work =>
       snsWriter
-        .writeMessage(JsonUtil.toJson(work).get, Some("Foo"))
+        .writeMessage(
+          message = JsonUtil.toJson(work).get,
+          subject = "source: SQSMessageReceiver.publishMessage"
+        )
         .map(publishAttempt => Some(publishAttempt))
     }
 }

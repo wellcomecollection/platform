@@ -105,7 +105,7 @@ class SQSMessageReceiverTest
 
     whenReady(future) { x =>
       verify(snsWriter, Mockito.never())
-        .writeMessage(anyString, any[Option[String]])
+        .writeMessage(anyString, any[String])
     }
   }
 
@@ -155,14 +155,14 @@ class SQSMessageReceiverTest
 
   private def mockSNSWriter = {
     val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[Option[String]]))
+    when(mockSNS.writeMessage(anyString(), any[String]))
       .thenReturn(Future { PublishAttempt(Right("1234")) })
     mockSNS
   }
 
   private def mockFailPublishMessage = {
     val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[Option[String]]))
+    when(mockSNS.writeMessage(anyString(), any[String]))
       .thenReturn(
         Future.failed(new RuntimeException("Failed publishing message")))
     mockSNS
