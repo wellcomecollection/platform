@@ -18,6 +18,6 @@ output "full_access_policy" {
   value = "${data.aws_iam_policy_document.full_access_policy.json}"
 }
 
-output "dynamo_put_policy" {
-  value = "${data.aws_iam_policy_document.dynamo_put_policy.json}"
+output "dynamo_update_policy" {
+  value = "${data.aws_iam_policy_document.dynamo_update_policy.json}"
 }
