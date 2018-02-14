@@ -28,8 +28,10 @@ class IdMinterWorkerService @Inject()(
     for {
       json <- Future.fromTry(parseMessageIntoJson(message))
       workWithCanonicalId <- idEmbedder.embedId(json)
-      _ <- writer.writeMessage(workWithCanonicalId.toString(),
-                               Some(snsSubject))
+      _ <- writer.writeMessage(
+        message = workWithCanonicalId.toString(),
+        subject = s"source: ${this.getClass.getSimpleName}.processMessage"
+      )
     } yield ()
 
   private def parseMessageIntoJson(message: SQSMessage): Try[Json] = {

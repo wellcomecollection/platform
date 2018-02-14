@@ -52,5 +52,6 @@ def main(event, _ctxt=None, s3_client=None, sns_client=None):
         sns_utils.publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
-            message=r
+            message=r,
+            subject='source: s3_demultiplexer.main'
         )
