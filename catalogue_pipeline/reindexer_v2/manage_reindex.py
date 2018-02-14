@@ -19,8 +19,6 @@ Options:
 
 """
 
-import time
-
 import boto3
 import docopt
 import tqdm
