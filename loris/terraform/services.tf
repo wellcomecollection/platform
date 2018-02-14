@@ -3,7 +3,7 @@ module "loris" {
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   vpc_id             = "${local.vpc_api_id}"
-  app_uri            = "${module.ecr_loris.repository_url}:${var.release_ids["loris"]}"
+  app_uri            = "wellcome/loris:latest"
   nginx_uri          = "${module.ecr_nginx_loris.repository_url}:${var.release_ids["nginx_loris"]}"
   listener_https_arn = "${module.loris_alb.listener_https_arn}"
   listener_http_arn  = "${module.loris_alb.listener_http_arn}"
@@ -22,7 +22,7 @@ module "loris" {
   deployment_maximum_percent         = "200"
 
   volume_name      = "loris"
-  volume_host_path = "${module.loris_userdata.efs_mount_directory}/loris"
+  volume_host_path = "${module.loris_userdata.mount_directory}/loris"
   container_path   = "/mnt/loris"
 
   loadbalancer_cloudwatch_id   = "${module.loris_alb.cloudwatch_id}"
