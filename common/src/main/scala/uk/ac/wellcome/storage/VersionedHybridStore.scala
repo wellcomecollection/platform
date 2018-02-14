@@ -9,7 +9,7 @@ import uk.ac.wellcome.models.{
   Versioned,
   VersionedDynamoFormatWrapper
 }
-import uk.ac.wellcome.s3.VersionedObjectStore
+import uk.ac.wellcome.s3.SourcedObjectStore
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext._
@@ -25,7 +25,7 @@ case class HybridRecord(
     with Versioned
 
 class VersionedHybridStore @Inject()(
-  versionedObjectStore: VersionedObjectStore,
+  sourcedObjectStore: SourcedObjectStore,
   versionedDao: VersionedDao
 ) {
 
@@ -89,7 +89,7 @@ class VersionedHybridStore @Inject()(
 
     dynamoRecord.flatMap {
       case Some(hybridRecord) => {
-        versionedObjectStore.get[T](hybridRecord.s3key).map { s3Record =>
+        sourcedObjectStore.get[T](hybridRecord.s3key).map { s3Record =>
           Some(VersionedHybridObject(hybridRecord, s3Record))
         }
       }
@@ -107,7 +107,13 @@ class VersionedHybridStore @Inject()(
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
 
-    val futureKey = versionedObjectStore.put(versionedObject)
+    // The versioned DAO automatically increments the version on any new
+    // records.  The sourcedObjectStore doesn't, so we bump it here to be
+    // consistent.
+    val futureKey = sourcedObjectStore.put(
+      versionUpdater.updateVersion(versionedObject,
+                                   newVersion = versionedObject.version + 1))
+
     futureKey.flatMap { key =>
       versionedDao.updateRecord(f(key))
     }

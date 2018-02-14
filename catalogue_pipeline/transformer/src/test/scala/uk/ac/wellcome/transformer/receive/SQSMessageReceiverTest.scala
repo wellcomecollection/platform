@@ -16,7 +16,7 @@ import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.s3.VersionedObjectStore
+import uk.ac.wellcome.s3.SourcedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
 import uk.ac.wellcome.transformer.transformers.{
@@ -55,10 +55,9 @@ class SQSMessageReceiverTest
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
-  private val versionedObjectStore =
-    new VersionedObjectStore(s3Client, bucketName)
+  private val sourcedObjectStore = new SourcedObjectStore(s3Client, bucketName)
   val recordReceiver =
-    new SQSMessageReceiver(snsWriter, versionedObjectStore, metricsSender)
+    new SQSMessageReceiver(snsWriter, sourcedObjectStore, metricsSender)
 
   it("should receive a message and send it to SNS client") {
     val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
@@ -97,7 +96,7 @@ class SQSMessageReceiverTest
     val snsWriter = mockSNSWriter
 
     val recordReceiver =
-      new SQSMessageReceiver(snsWriter, versionedObjectStore, metricsSender)
+      new SQSMessageReceiver(snsWriter, sourcedObjectStore, metricsSender)
 
     val future = recordReceiver.receiveMessage(
       createValidEmptySierraBibSQSMessage("000")
@@ -144,7 +143,7 @@ class SQSMessageReceiverTest
 
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new SQSMessageReceiver(mockSNS, versionedObjectStore, metricsSender)
+      new SQSMessageReceiver(mockSNS, sourcedObjectStore, metricsSender)
 
     val future = recordReceiver.receiveMessage(message)
 
