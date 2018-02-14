@@ -85,7 +85,7 @@ def create_shards(prefix, desired_version, count, table_name):
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
-    default_table_name = 'AlexTest'
+    default_table_name = 'ReindexShardTracker'
 
     if args['update-shards']:
         prefix = args['--prefix']
