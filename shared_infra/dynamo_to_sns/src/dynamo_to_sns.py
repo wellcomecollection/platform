@@ -42,6 +42,7 @@ def main(event, _ctxt=None, sns_client=None):
     print(f'Received event: {event!r}')
 
     topic_arn = os.environ['TOPIC_ARN']
+    topic_name = topic_arn.split(":")[-1]
     stream_view_type = os.environ.get('STREAM_VIEW_TYPE', 'FULL_EVENT')
 
     sns_client = sns_client or boto3.client('sns')
@@ -53,5 +54,6 @@ def main(event, _ctxt=None, sns_client=None):
         publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
-            message=message
+            message=message,
+            subject=f'source: dynamo_to_sns ({topic_name})'
         )
