@@ -24,6 +24,7 @@ import time
 import attr
 import boto3
 import docopt
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 
 @attr.s
@@ -39,55 +40,20 @@ class Shard:
         }
 
 
-def _batch_write(shards, table_name):
-    """
-    Given a list of ``Shard`` instances, write them all into ``table_name``.
-    """
-    dynamodb_client = boto3.client('dynamodb')
-
-    # This is a slightly idiomatic way to run the loop; the reason is that
-    # ``batch_write_item`` may sometimes fail to PUT an item, in which case we
-    # want to retry it.  So we whittle down this list until everything
-    # PUTs successfully.
-    while shards:
-
-        # We can send up to 25 items in a single ``batch_write_item`` request.
-        next_batch = shards[:25]
-
-        put_requests = [
-            {'PutRequest': {'Item': shard.as_dynamodb}} for shard in next_batch
-        ]
-
-        resp = dynamodb_client.batch_write_item(
-            RequestItems={table_name: put_requests}
-        )
-
-        # If an item fails to PUT correctly, it appears in the
-        # "UnprocessedItems" field of the response.  If so, we send it back
-        # around for processing again.  Otherwise, we can delete it.
-        # from pprint import pprint
-        # pprint(resp['UnprocessedItems'])
-        try:
-            missing_items = [
-                request['PutRequest']['Item']
-                for request in resp['UnprocessedItems'][table_name]
-            ]
-        except KeyError:
-            missing_items = []
-
-        for item in next_batch:
-            if item.as_dynamodb in missing_items:
-                continue
-            else:
-                shards.remove(item)
-
-        print(f'{len(next_batch) - len(missing_items)} shards placed successfully!')
-
-        # Ideally this would be an exponential backoff, but it's not worth
-        # writing that complexity for a script that will be used infrequently.
-        if missing_items:
-            print(f'{len(missing_items)} failed to process, sleeping briefly...')
-            time.sleep(1)
+@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, max=10))
+def _update_shard(client, table_name, shard):
+    client.update_item(
+        TableName=table_name,
+        Key={'shardId': {'S': shard.shardId}},
+        UpdateExpression=(
+            'SET desiredVersion = :desiredVersion, '
+            'currentVersion = if_not_exists(currentVersion, :initialCurrentVersion)'
+        ),
+        ExpressionAttributeValues={
+            ':desiredVersion': {'N': str(shard.desiredVersion)},
+            ':initialCurrentVersion': {'N': '1'},
+        }
+    )
 
 
 def create_shards(prefix, desired_version, count, table_name):
@@ -97,7 +63,27 @@ def create_shards(prefix, desired_version, count, table_name):
         for i in range(count)
     ]
 
-    _batch_write(shards=new_shards, table_name=table_name)
+    client = boto3.client('dynamodb')
+
+    # Implementation note: this is potentially quite slow, as we make a new
+    # UPDATE request for every shard we want to write to DynamoDB.  The
+    # reason is that if we just PUT an item, we delete whatever's already
+    # there -- potentially including the currentVersion.
+    #
+    # We could speed this up slightly by:
+    #
+    #   1.  GET the current row (if any)
+    #   2.  Construct the new row, and try to PUT that, using a conditional
+    #       update to check nobody has updated :currentVersion in the meantime
+    #   3.  Repeat 1-2 until we get an update that succeeds
+    #
+    # That would be significantly more complicated to implement, so for now
+    # we choose simplicity over speed.
+    #
+    # If you're finding this script to be too slow, this is where to start.
+    for shard in shards:
+        print(f'Processing shard {shard.shardId}')
+        _update_shard(client=client, table_name=table_name, shard=shard)
 
 
 if __name__ == '__main__':
