@@ -72,12 +72,16 @@ def affects_tests(path, task):
         'loris': ['loris'],
         'id_minter': ['catalogue_pipeline/id_minter'],
         'ingestor': ['catalogue_pipeline/ingestor'],
-        'reindexer': ['catalogue_pipeline/reindexer'],
         'transformer': ['catalogue_pipeline/transformer'],
         'api': ['catalogue_api'],
         'monitoring': ['monitoring'],
         'shared_infra': ['shared_infra'],
         'nginx': ['nginx'],
+
+        'reindexer_worker': ['catalogue_pipeline/reindexer_v2/reindexer_worker'],
+        'reindexer_v2/reindex_job_creator': ['catalogue_pipeline/reindexer_v2/reindex_job_creator'],
+        'reindexer_v2/complete_reindex': ['catalogue_pipeline/reindexer_v2/complete_reindex'],
+        'reindexer_v2/reindex_shard_generator': ['catalogue_pipeline/reindexer_v2/reindex_shard_generator'],
 
         's3_demultiplexer': ['sierra_adapter/s3_demultiplexer'],
         'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
@@ -105,7 +109,10 @@ def affects_tests(path, task):
         'loris',
         'id_minter',
         'ingestor',
-        'reindexer',
+        'reindexer_worker',
+        'reindexer_v2/reindex_job_creator',
+        'reindexer_v2/complete_reindex',
+        'reindexer_v2/reindex_shard_generator',
         'transformer',
         'api',
         'monitoring',
@@ -147,6 +154,9 @@ def affects_tests(path, task):
         'shared_infra',
         's3_demultiplexer',
         'sierra_window_generator',
+        'reindexer_v2/reindex_job_creator',
+        'reindexer_v2/complete_reindex',
+        'reindexer_v2/reindex_shard_generator',
     )
     if (
         task.startswith(sbt_free_tasks) and
