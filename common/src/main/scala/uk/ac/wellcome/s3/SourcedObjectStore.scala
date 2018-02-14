@@ -33,8 +33,7 @@ class SourcedObjectStore @Inject()(
       //  2.  Adjacent objects are stored in shards that are far apart,
       //      e.g. b0001 and b0002 are separated by nine shards.
       //
-      val s3Shard = sourcedObject.sourceId
-        .reverse
+      val s3Shard = sourcedObject.sourceId.reverse
         .slice(0, 2)
 
       val key =

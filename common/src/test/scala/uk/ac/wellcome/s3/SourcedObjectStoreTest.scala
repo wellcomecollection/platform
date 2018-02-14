@@ -10,8 +10,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class TestObject(sourceId: String, sourceName: String)
-    extends Sourced
+case class TestObject(sourceId: String, sourceName: String) extends Sourced
 
 class SourcedObjectStoreTest
     extends FunSpec
@@ -62,7 +61,8 @@ class SourcedObjectStoreTest
     val writtenToS3 = objectStore.put(testObject)
 
     whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) {
-      actualTestObject => actualTestObject shouldBe testObject
+      actualTestObject =>
+        actualTestObject shouldBe testObject
     }
   }
 
