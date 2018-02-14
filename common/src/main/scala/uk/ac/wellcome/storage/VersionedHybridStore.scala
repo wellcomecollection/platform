@@ -111,9 +111,8 @@ class VersionedHybridStore @Inject()(
     // records.  The sourcedObjectStore doesn't, so we bump it here to be
     // consistent.
     val futureKey = sourcedObjectStore.put(
-      versionUpdater.updateVersion(
-        versionedObject,
-        newVersion = versionedObject.version + 1))
+      versionUpdater.updateVersion(versionedObject,
+                                   newVersion = versionedObject.version + 1))
 
     futureKey.flatMap { key =>
       versionedDao.updateRecord(f(key))
