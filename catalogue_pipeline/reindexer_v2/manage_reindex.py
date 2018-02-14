@@ -21,36 +21,26 @@ Options:
 
 import time
 
-import attr
 import boto3
 import docopt
 from tenacity import retry, stop_after_attempt, wait_exponential
-
-
-@attr.s
-class Shard:
-    shardId = attr.ib()
-    desiredVersion = attr.ib()
-
-    @property
-    def as_dynamodb(self):
-        return {
-            'shardId': {'S': self.shardId},
-            'desiredVersion': {'N': str(self.desiredVersion)},
-        }
 
 
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, max=10))
 def _update_shard(client, table_name, shard):
     client.update_item(
         TableName=table_name,
-        Key={'shardId': {'S': shard.shardId}},
+        Key={'shardId': {'S': shard['shardId']}},
+
+        # We want to update the desiredVersion of every row in the table, and
+        # set the currentVersion to 1, but *only* if there isn't already an
+        # existing value of currentVersion in the table.
         UpdateExpression=(
             'SET desiredVersion = :desiredVersion, '
             'currentVersion = if_not_exists(currentVersion, :initialCurrentVersion)'
         ),
         ExpressionAttributeValues={
-            ':desiredVersion': {'N': str(shard.desiredVersion)},
+            ':desiredVersion': {'N': str(shard['desiredVersion'])},
             ':initialCurrentVersion': {'N': '1'},
         }
     )
@@ -59,7 +49,7 @@ def _update_shard(client, table_name, shard):
 def create_shards(prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
-        Shard(shardId=f'{prefix}/{i}', desiredVersion=desired_version)
+        {'shardId': f'{prefix}/{i}', 'desiredVersion': desired_version}
         for i in range(count)
     ]
 
