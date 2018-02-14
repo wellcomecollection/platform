@@ -34,14 +34,23 @@ resource "aws_iam_role_policy" "id_minter_cloudwatch" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-resource "aws_iam_role_policy" "allow_reindex_job_creator_publish_to_sns" {
-  role   = "${module.reindex_job_creator_lambda.role_name}"
-  policy = "${module.reindex_jobs_topic.publish_policy}"
-}
-
 # Role policies for the shard generator lambda
 
 resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
   role   = "${module.shard_generator_lambda.role_name}"
   policy = "${module.versioned-hybrid-store.dynamo_put_policy}"
+}
+
+# Role policies for the reindex_job_creator
+
+resource "aws_iam_role_policy" "reindex_job_creator_lambda_sns" {
+  role   = "${module.reindex_job_creator_lambda.role_name}"
+  policy = "${module.reindex_jobs_topic.publish_policy}"
+}
+
+# Role policies for the complete_reindex_lambda
+
+resource "aws_iam_role_policy" "complete_reindex_lambda_reindexer_tracker_table" {
+  role   = "${module.complete_reindex_lambda.role_name}"
+  policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
 }
