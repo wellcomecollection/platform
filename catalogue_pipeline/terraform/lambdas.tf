@@ -66,6 +66,8 @@ module "shard_generator_lambda" {
 
   description = "Generate reindexShards for items in the ${module.versioned-hybrid-store.table_name} table"
 
+  timeout = 60
+
   environment_variables = {
     TABLE_NAME = "${module.versioned-hybrid-store.table_name}"
   }
@@ -79,4 +81,6 @@ module "trigger_shard_generator_lambda" {
   stream_arn    = "${module.versioned-hybrid-store.table_stream_arn}"
   function_arn  = "${module.shard_generator_lambda.arn}"
   function_role = "${module.shard_generator_lambda.role_name}"
+
+  batch_size = 50
 }
