@@ -71,8 +71,8 @@ def create_shards(prefix, desired_version, count, table_name):
     # we choose simplicity over speed.
     #
     # If you're finding this script to be too slow, this is where to start.
-    for shard in shards:
-        print(f'Processing shard {shard.shardId}')
+    for shard in new_shards:
+        print(f'Processing shard {shard["shardId"]}')
         _update_shard(client=client, table_name=table_name, shard=shard)
 
 
