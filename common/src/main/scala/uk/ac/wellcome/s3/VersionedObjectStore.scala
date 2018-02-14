@@ -15,7 +15,7 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-class VersionedObjectStore @Inject()(
+class SourcedObjectStore @Inject()(
   s3Client: AmazonS3,
   @Flag("aws.s3.bucketName") bucketName: String)
     extends Logging {

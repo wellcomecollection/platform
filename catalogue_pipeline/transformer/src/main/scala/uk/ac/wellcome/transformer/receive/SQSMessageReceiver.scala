@@ -13,7 +13,7 @@ import uk.ac.wellcome.models.transformable.{
   SierraTransformable,
   Transformable
 }
-import uk.ac.wellcome.s3.VersionedObjectStore
+import uk.ac.wellcome.s3.SourcedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.transformer.transformers.{
@@ -30,7 +30,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
-                                   versionedObjectStore: VersionedObjectStore,
+                                   sourcedObjectStore: SourcedObjectStore,
                                    metricsSender: MetricsSender)
     extends Logging {
 
@@ -62,11 +62,11 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
   private def getTransformable(hybridRecord: HybridRecord) = {
     hybridRecord.sourceName match {
       case "miro" =>
-        versionedObjectStore.get[MiroTransformable](hybridRecord.s3key)
+        sourcedObjectStore.get[MiroTransformable](hybridRecord.s3key)
       case "calm" =>
-        versionedObjectStore.get[CalmTransformable](hybridRecord.s3key)
+        sourcedObjectStore.get[CalmTransformable](hybridRecord.s3key)
       case "sierra" =>
-        versionedObjectStore.get[SierraTransformable](hybridRecord.s3key)
+        sourcedObjectStore.get[SierraTransformable](hybridRecord.s3key)
     }
   }
 

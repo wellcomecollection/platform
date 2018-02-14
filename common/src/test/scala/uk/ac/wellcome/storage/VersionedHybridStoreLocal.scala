@@ -7,7 +7,7 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.Versioned
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.s3.VersionedObjectStore
+import uk.ac.wellcome.s3.SourcedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
 trait VersionedHybridStoreLocal
@@ -20,8 +20,8 @@ trait VersionedHybridStoreLocal
     DynamoFormat[HybridRecord]
 
   val hybridStore = new VersionedHybridStore(
-    versionedObjectStore =
-      new VersionedObjectStore(s3Client = s3Client, bucketName = bucketName),
+    sourcedObjectStore =
+      new SourcedObjectStore(s3Client = s3Client, bucketName = bucketName),
     versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
                                     dynamoConfig = DynamoConfig(
                                       table = tableName
