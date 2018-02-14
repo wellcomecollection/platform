@@ -38,7 +38,7 @@ resource "aws_iam_role_policy" "id_minter_cloudwatch" {
 
 resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
   role   = "${module.shard_generator_lambda.role_name}"
-  policy = "${module.versioned-hybrid-store.dynamo_put_policy}"
+  policy = "${module.versioned-hybrid-store.dynamo_update_policy}"
 }
 
 # Role policies for the reindex_job_creator

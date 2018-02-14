@@ -51,9 +51,10 @@ data "aws_iam_policy_document" "full_access_policy" {
   }
 }
 
-data "aws_iam_policy_document" "dynamo_put_policy" {
+data "aws_iam_policy_document" "dynamo_update_policy" {
   statement {
     actions = [
+      "dynamodb:UpdateItem",
       "dynamodb:PutItem",
     ]
 
