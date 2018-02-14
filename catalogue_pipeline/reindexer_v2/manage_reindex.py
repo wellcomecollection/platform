@@ -4,6 +4,7 @@
 Create/update reindex shards in the reindex shard tracker table.
 
 Usage: manage_reindex.py create-shards --prefix=<PREFIX> --count=<COUNT> [--table=<TABLE>]
+       manage_reindex.py -h | --help
 
 Actions:
   create-shards         Create a new set of shards in the reindex shard tracker
@@ -13,6 +14,7 @@ Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
   --count=<COUNT>       How many shards to create in the table
   --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
+  -h --help             Print this help message
 
 """
 
