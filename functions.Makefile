@@ -177,7 +177,7 @@ $(1)-publish:
 
 $(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt)
 	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	mkdir -p `dirname $(ROOT)/.docker/test_lambda_$(1)`
+	mkdir -p $(shell dirname $(ROOT)/.docker/test_lambda_$(1))
 	touch $(ROOT)/.docker/test_lambda_$(1)
 
 $(ROOT)/$(2)/src/requirements.txt:

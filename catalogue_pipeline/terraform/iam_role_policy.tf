@@ -38,3 +38,10 @@ resource "aws_iam_role_policy" "allow_reindex_job_creator_publish_to_sns" {
   role   = "${module.reindex_job_creator_lambda.role_name}"
   policy = "${module.reindex_jobs_topic.publish_policy}"
 }
+
+# Role policies for the shard generator lambda
+
+resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
+  role   = "${module.shard_generator_lambda.role_name}"
+  policy = "${module.versioned-hybrid-store.dynamo_put_policy}"
+}

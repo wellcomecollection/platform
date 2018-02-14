@@ -50,3 +50,15 @@ data "aws_iam_policy_document" "full_access_policy" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "dynamo_put_policy" {
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.table.arn}",
+    ]
+  }
+}
