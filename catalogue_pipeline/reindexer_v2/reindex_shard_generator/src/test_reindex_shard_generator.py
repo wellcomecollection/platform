@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import json
 import os
 
 import pytest
@@ -70,23 +69,23 @@ def source_data_table(dynamodb_client, table_name):
 def _wrap(row):
     return {
         'Records': [{
-            'EventSource': 'aws:sns',
-            'EventVersion': '1.0',
-            'EventSubscriptionArn': 'arn:aws:sns:eu-west-1:1234567890:reindex_table_updates:667a974d-d129-436a-a277-209604e31a5f',
-            'Sns': {
-                'Type': 'Notification',
-                'MessageId': 'bcae81e8-6124-5e11-8cf0-d31a17b9ff4c',
-                'TopicArn': 'arn:aws:sns:eu-west-1:1234567890:reindex_table_updates',
-                'Subject': 'default-subject',
-                'Message': json.dumps(row),
-                'Timestamp': '2018-02-05T15:12:29.459Z',
-                'SignatureVersion': '1',
-                'Signature': '<SNIP>',
-                'SigningCertUrl': '<SNUP>',
-                'MessageAttributes': {}
-            }
-        }]
-    }
+            'eventID': 'a2ddf34215abc74d90efa4f70843ce4b',
+            'eventName': 'MODIFY',
+            'eventVersion': '1.1',
+            'eventSource': 'aws:dynamodb',
+            'awsRegion': 'eu-west-1',
+            'dynamodb': {
+                'ApproximateCreationDateTime': 1518608280.0,
+                'Keys': {
+                    'id': {'S': 'sierra/b2097560'}
+                },
+                'NewImage': row,
+                'SequenceNumber': '475718600000000014074466230',
+                'SizeBytes': 207,
+                'StreamViewType':
+                    'NEW_AND_OLD_IMAGES'},
+            'eventSourceARN': 'arn:aws:dynamodb:eu-west-1:1234567:table/SourceData/stream/2018-02-01T16:28:30.956'
+        }]}
 
 
 def _dynamodb_item(id, reindex_shard=None, version=1):
@@ -103,16 +102,8 @@ def _dynamodb_item(id, reindex_shard=None, version=1):
     return data
 
 
-def _sns_event(id, reindex_shard=None, version=1):
-    source_name, source_id = id.split('/')
-    data = {
-        'id': id,
-        'sourceName': source_name,
-        'sourceId': source_id,
-        'version': version
-    }
-    if reindex_shard:
-        data['reindexShard'] = reindex_shard
+def _dynamo_event(id, reindex_shard=None, version=1):
+    data = _dynamodb_item(id, reindex_shard, version)
     return _wrap(data)
 
 
@@ -122,7 +113,7 @@ def test_adds_shard_to_new_record(dynamodb_client, source_data_table):
         Item=_dynamodb_item(id='sierra/b1111111')
     )
 
-    event = _sns_event(id='sierra/b1111111')
+    event = _dynamo_event(id='sierra/b1111111')
 
     main(event=event, dynamodb_client=dynamodb_client)
 
@@ -139,7 +130,7 @@ def test_updates_shard_on_old_record(dynamodb_client, source_data_table):
         Item=_dynamodb_item(id='sierra/b2222222')
     )
 
-    event = _sns_event(
+    event = _dynamo_event(
         id='sierra/b2222222',
         reindex_shard='oldReindexShard'
     )
@@ -159,7 +150,7 @@ def test_does_nothing_if_shard_up_to_date(dynamodb_client, source_data_table):
         Item=_dynamodb_item(id='sierra/b3333333', version=3)
     )
 
-    event = _sns_event(
+    event = _dynamo_event(
         id='sierra/b3333333',
         reindex_shard='sierra/3325',
         version=3
@@ -180,7 +171,7 @@ def test_does_not_override_record_with_old_version(dynamodb_client, source_data_
         Item=_dynamodb_item(id='sierra/b3333333', version=3)
     )
 
-    event = _sns_event(
+    event = _dynamo_event(
         id='sierra/b3333333',
         version=2
     )
@@ -193,3 +184,38 @@ def test_does_not_override_record_with_old_version(dynamodb_client, source_data_
     )
     assert item['Item']['version']['N'] == '3'
     assert 'reindexShard' not in item['Item']
+
+
+def test_does_nothing_if_it_receives_a_delete_update(dynamodb_client, source_data_table):
+    dynamodb_client.delete_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b3333333'}}
+    )
+
+    event = {
+        'Records': [{
+            "eventID": "7de3041dd709b024af6f29e4fa13d34c",
+            "eventName": "REMOVE",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "us-west-2",
+            "dynamodb": {
+                'ApproximateCreationDateTime': 1518608280.0,
+                'Keys': {
+                    'id': {'S': 'sierra/b2097560'}
+                },
+                'SequenceNumber': '475718600000000014074466230',
+                'SizeBytes': 207,
+                'OldImage': _dynamodb_item('sierra/b3333333', 3),
+                'StreamViewType': 'NEW_AND_OLD_IMAGES'
+            },
+            "eventSourceARN": ''}]
+    }
+
+    main(event=event, dynamodb_client=dynamodb_client)
+
+    item = dynamodb_client.get_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b3333333'}}
+    )
+    assert 'Item' not in item
