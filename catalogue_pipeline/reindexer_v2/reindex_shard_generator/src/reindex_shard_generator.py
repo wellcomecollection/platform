@@ -4,7 +4,7 @@ import os
 
 import boto3
 import botocore
-from wellcome_aws_utils.sns_utils import extract_sns_messages_from_lambda_event
+from wellcome_aws_utils.dynamo_event import DynamoEvent
 
 from shard_manager import create_reindex_shard
 
@@ -23,14 +23,21 @@ def main(event, _ctxt=None, dynamodb_client=None):
     dynamodb_client = dynamodb_client or boto3.client('dynamodb')
     table_name = os.environ['TABLE_NAME']
 
-    for sns_event in extract_sns_messages_from_lambda_event(event):
-        row = sns_event.message
+    for record in event['Records']:
+        dynamo_event = DynamoEvent(record)
+        row = dynamo_event.new_image(deserialize_values=True)
+
+        if not row:
+            print("no NewImage key in dynamo update event, skipping")
+            continue
 
         source_id = row['sourceId']
+        source_name = row['sourceName']
+        print(source_name)
         new_reindex_shard = create_reindex_shard(
             source_id=source_id,
             source_name=row['sourceName'],
-            source_size=SOURCE_SIZES[row['sourceName']],
+            source_size=SOURCE_SIZES[source_name],
             shard_size=SHARD_SIZE
         )
 
