@@ -3,15 +3,15 @@ package uk.ac.wellcome.s3
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{VersionUpdater, Versioned}
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class TestObject(sourceId: String, sourceName: String, version: Int)
-    extends Versioned
+case class TestObject(sourceId: String, sourceName: String)
+    extends Sourced
 
 class SourcedObjectStoreTest
     extends FunSpec
@@ -23,13 +23,6 @@ class SourcedObjectStoreTest
 
   lazy val bucketName = "source-object-store"
 
-  implicit val testVersionUpdater = new VersionUpdater[TestObject] {
-    override def updateVersion(testVersioned: TestObject,
-                               newVersion: Int): TestObject = {
-      testVersioned.copy(version = newVersion)
-    }
-  }
-
   it("stores a versioned object with path id/version/hash") {
 
     val id = "b123"
@@ -37,15 +30,15 @@ class SourcedObjectStoreTest
     val sourceName = "testSource"
 
     val objectStore = new SourcedObjectStore(s3Client, bucketName)
-    val testObject = TestObject(id, sourceName, version)
+    val testObject = TestObject(sourceId = id, sourceName = sourceName)
 
     val writtenToS3 = objectStore.put(testObject)
 
     whenReady(writtenToS3) { actualKey =>
-      val expectedJson = JsonUtil.toJson(testObject.copy(version = 2)).get
-      val expectedHash = "974513547"
+      val expectedJson = JsonUtil.toJson(testObject).get
+      val expectedHash = "112520602"
 
-      val expectedKey = s"${sourceName}/$id/${version + 1}/$expectedHash.json"
+      val expectedKey = s"${sourceName}/$id/32/$expectedHash.json"
       actualKey shouldBe expectedKey
 
       val jsonFromS3 = getJsonFromS3(
@@ -64,14 +57,12 @@ class SourcedObjectStoreTest
     val sourceName = "anotherTestSource"
 
     val objectStore = new SourcedObjectStore(s3Client, bucketName)
-    val testObject = TestObject(id, sourceName, version)
+    val testObject = TestObject(sourceId = id, sourceName = sourceName)
 
     val writtenToS3 = objectStore.put(testObject)
 
     whenReady(writtenToS3.flatMap(objectStore.get[TestObject])) {
-      actualTestObject =>
-        val expectedObject = testObject.copy(version = testObject.version + 1)
-        actualTestObject shouldBe expectedObject
+      actualTestObject => actualTestObject shouldBe testObject
     }
   }
 
