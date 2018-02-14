@@ -33,7 +33,6 @@ def main(event, _ctxt=None, dynamodb_client=None):
 
         source_id = row['sourceId']
         source_name = row['sourceName']
-        print(source_name)
         new_reindex_shard = create_reindex_shard(
             source_id=source_id,
             source_name=row['sourceName'],
