@@ -3,16 +3,17 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: manage_reindex.py create-shards --prefix=<PREFIX> --count=<COUNT> [--table=<TABLE>]
+Usage: manage_reindex.py update-shards --prefix=<PREFIX> --count=<COUNT> [--desired_version=<VERSION>] [--table=<TABLE>]
        manage_reindex.py -h | --help
 
 Actions:
-  create-shards         Create a new set of shards in the reindex shard tracker
-                        table with requestedVersion = currentVersion = 1
+  update-shards         Create or update shards in the reindex tracker table.
 
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
   --count=<COUNT>       How many shards to create in the table
+  --desired_version=<VERSION>
+                        Desired version of all rows in the reindexed table
   --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
   -h --help             Print this help message
 
@@ -28,14 +29,12 @@ import docopt
 @attr.s
 class Shard:
     shardId = attr.ib()
-    currentVersion = attr.ib()
     desiredVersion = attr.ib()
 
     @property
     def as_dynamodb(self):
         return {
             'shardId': {'S': self.shardId},
-            'currentVersion': {'N': str(self.currentVersion)},
             'desiredVersion': {'N': str(self.desiredVersion)},
         }
 
@@ -91,10 +90,10 @@ def _batch_write(shards, table_name):
             time.sleep(1)
 
 
-def create_shards(prefix, count, table_name):
+def create_shards(prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
-        Shard(shardId=f'{prefix}/{i}', currentVersion=1, desiredVersion=1)
+        Shard(shardId=f'{prefix}/{i}', desiredVersion=desired_version)
         for i in range(count)
     ]
 
@@ -106,9 +105,15 @@ if __name__ == '__main__':
 
     default_table_name = 'AlexTest'
 
-    if args['create-shards']:
+    if args['update-shards']:
         prefix = args['--prefix']
         count = int(args['--count'])
+        desired_version = int(args['--desired_version'] or '1')
         table_name = args['--table'] or default_table_name
 
-        create_shards(prefix=prefix, count=count, table_name=table_name)
+        create_shards(
+            prefix=prefix,
+            desired_version=desired_version,
+            count=count,
+            table_name=table_name
+        )
