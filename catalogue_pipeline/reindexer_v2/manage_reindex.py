@@ -34,8 +34,8 @@ import tqdm
 #  2. The whole process is idempotent, so it's enough to bump the capacity
 #     and re-run the prefix.
 #
-# FWIW, I was able to create >5000 shards with WriteCapacity=1 on a test table,
-# so this may be a theoretical concern!
+# FWIW, I was able to create >5000 shards with WriteCapacity=1 and autoscaling
+# on a test table, so this may be a theoretical concern!
 
 def _update_shard(client, table_name, shard):
     client.update_item(
