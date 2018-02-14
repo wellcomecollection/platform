@@ -22,11 +22,17 @@ Options:
 import time
 
 import boto3
+from botocore.exceptions import ClientError
 import docopt
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+)
 
 
-@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, max=10))
+@retry(
+    retry=retry_if_exception_type(ClientError),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, max=10))
 def _update_shard(client, table_name, shard):
     client.update_item(
         TableName=table_name,
