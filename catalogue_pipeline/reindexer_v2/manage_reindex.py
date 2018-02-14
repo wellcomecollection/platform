@@ -22,17 +22,23 @@ Options:
 import time
 
 import boto3
-from botocore.exceptions import ClientError
 import docopt
-from tenacity import (
-    retry, retry_if_exception_type, stop_after_attempt, wait_exponential
-)
+import tqdm
 
 
-@retry(
-    retry=retry_if_exception_type(ClientError),
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, max=10))
+# Implementation note: this code may fail if you hit the write limit on
+# DynamoDB, and interrupt midway through updating a prefix.
+#
+#  1. Decorating this function with the tenacity library
+#     (http://tenacity.readthedocs.io/en/latest/) should make it more likely
+#     to succeed, as it will retry in case of error.
+#
+#  2. The whole process is idempotent, so it's enough to bump the capacity
+#     and re-run the prefix.
+#
+# FWIW, I was able to create >5000 shards with WriteCapacity=1 on a test table,
+# so this may be a theoretical concern!
+
 def _update_shard(client, table_name, shard):
     client.update_item(
         TableName=table_name,
@@ -77,8 +83,7 @@ def create_shards(prefix, desired_version, count, table_name):
     # we choose simplicity over speed.
     #
     # If you're finding this script to be too slow, this is where to start.
-    for shard in new_shards:
-        print(f'Processing shard {shard["shardId"]}')
+    for shard in tqdm.tqdm(new_shards):
         _update_shard(client=client, table_name=table_name, shard=shard)
 
 
