@@ -38,26 +38,23 @@ class Shard:
         }
 
 
-def create_shards(prefix, count, table_name):
-    """Create new shards in the table."""
+def _batch_write(shards, table_name):
+    """
+    Given a list of ``Shard`` instances, write them all into ``table_name``.
+    """
     dynamodb_client = boto3.client('dynamodb')
-
-    new_shards = [
-        Shard(shardId=f'{prefix}/{i}', currentVersion=1, desiredVersion=1)
-        for i in range(count)
-    ]
 
     # This is a slightly idiomatic way to run the loop; the reason is that
     # ``batch_write_item`` may sometimes fail to PUT an item, in which case we
     # want to retry it.  So we whittle down this list until everything
     # PUTs successfully.
-    while new_shards:
+    while shards:
 
         # We can send up to 25 items in a single ``batch_write_item`` request.
-        next_chunk = new_shards[:25]
+        next_batch = shards[:25]
 
         put_requests = [
-            {'PutRequest': {'Item': shard.as_dynamodb}} for shard in next_chunk
+            {'PutRequest': {'Item': shard.as_dynamodb}} for shard in next_batch
         ]
 
         resp = dynamodb_client.batch_write_item(
@@ -77,19 +74,29 @@ def create_shards(prefix, count, table_name):
         except KeyError:
             missing_items = []
 
-        for item in next_chunk:
+        for item in next_batch:
             if item.as_dynamodb in missing_items:
                 continue
             else:
-                new_shards.remove(item)
+                shards.remove(item)
 
-        print(f'{len(next_chunk) - len(missing_items)} shards placed successfully!')
+        print(f'{len(next_batch) - len(missing_items)} shards placed successfully!')
 
         # Ideally this would be an exponential backoff, but it's not worth
         # writing that complexity for a script that will be used infrequently.
         if missing_items:
             print(f'{len(missing_items)} failed to process, sleeping briefly...')
             time.sleep(1)
+
+
+def create_shards(prefix, count, table_name):
+    """Create new shards in the table."""
+    new_shards = [
+        Shard(shardId=f'{prefix}/{i}', currentVersion=1, desiredVersion=1)
+        for i in range(count)
+    ]
+
+    _batch_write(shards=new_shards, table_name=table_name)
 
 
 if __name__ == '__main__':
