@@ -16,11 +16,80 @@ Options:
 
 """
 
+import time
+
+import attr
+import boto3
 import docopt
+
+
+@attr.s
+class Shard:
+    shardId = attr.ib()
+    currentVersion = attr.ib()
+    desiredVersion = attr.ib()
+
+    @property
+    def as_dynamodb(self):
+        return {
+            'shardId': {'S': self.shardId},
+            'currentVersion': {'N': str(self.currentVersion)},
+            'desiredVersion': {'N': str(self.desiredVersion)},
+        }
 
 
 def create_shards(prefix, count, table_name):
     """Create new shards in the table."""
+    dynamodb_client = boto3.client('dynamodb')
+
+    new_shards = [
+        Shard(shardId=f'{prefix}/{i}', currentVersion=1, desiredVersion=1)
+        for i in range(count)
+    ]
+
+    # This is a slightly idiomatic way to run the loop; the reason is that
+    # ``batch_write_item`` may sometimes fail to PUT an item, in which case we
+    # want to retry it.  So we whittle down this list until everything
+    # PUTs successfully.
+    while new_shards:
+
+        # We can send up to 25 items in a single ``batch_write_item`` request.
+        next_chunk = new_shards[:25]
+
+        put_requests = [
+            {'PutRequest': {'Item': shard.as_dynamodb}} for shard in next_chunk
+        ]
+
+        resp = dynamodb_client.batch_write_item(
+            RequestItems={table_name: put_requests}
+        )
+
+        # If an item fails to PUT correctly, it appears in the
+        # "UnprocessedItems" field of the response.  If so, we send it back
+        # around for processing again.  Otherwise, we can delete it.
+        # from pprint import pprint
+        # pprint(resp['UnprocessedItems'])
+        try:
+            missing_items = [
+                request['PutRequest']['Item']
+                for request in resp['UnprocessedItems'][table_name]
+            ]
+        except KeyError:
+            missing_items = []
+
+        for item in next_chunk:
+            if item.as_dynamodb in missing_items:
+                continue
+            else:
+                new_shards.remove(item)
+
+        print(f'{len(next_chunk) - len(missing_items)} shards placed successfully!')
+
+        # Ideally this would be an exponential backoff, but it's not worth
+        # writing that complexity for a script that will be used infrequently.
+        if missing_items:
+            print(f'{len(missing_items)} failed to process, sleeping briefly...')
+            time.sleep(1)
 
 
 if __name__ == '__main__':
