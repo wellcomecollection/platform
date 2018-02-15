@@ -5,7 +5,7 @@ data "aws_iam_policy_document" "reindex_tracker_table" {
     ]
 
     resources = [
-      "${aws_dynamodb_table.reindex_tracker.arn}",
+      "${aws_dynamodb_table.reindex_shard_tracker.arn}",
     ]
   }
 }
