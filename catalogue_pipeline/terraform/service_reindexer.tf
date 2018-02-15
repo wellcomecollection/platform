@@ -5,7 +5,7 @@ module "reindexer" {
   source_queue_name = "${module.reindexer_queue.name}"
   source_queue_arn  = "${module.reindexer_queue.arn}"
 
-  ecr_repository_url = "${module.ecr_repository_ingestor.repository_url}"
+  ecr_repository_url = "${module.ecr_repository_reindexer.repository_url}"
   release_id         = "${var.release_ids["reindexer"]}"
 
   cpu    = 512
