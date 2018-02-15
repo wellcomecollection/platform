@@ -82,6 +82,7 @@ def affects_tests(path, task):
         'reindexer_v2/reindex_job_creator': ['catalogue_pipeline/reindexer_v2/reindex_job_creator'],
         'reindexer_v2/complete_reindex': ['catalogue_pipeline/reindexer_v2/complete_reindex'],
         'reindexer_v2/reindex_shard_generator': ['catalogue_pipeline/reindexer_v2/reindex_shard_generator'],
+        'reindexer_v2/resharder': ['catalogue_pipeline/reindexer_v2/resharder'],
 
         's3_demultiplexer': ['sierra_adapter/s3_demultiplexer'],
         'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
@@ -113,6 +114,7 @@ def affects_tests(path, task):
         'reindexer_v2/reindex_job_creator',
         'reindexer_v2/complete_reindex',
         'reindexer_v2/reindex_shard_generator',
+        'reindexer_v2/resharder',
         'transformer',
         'api',
         'monitoring',
@@ -157,6 +159,7 @@ def affects_tests(path, task):
         'reindexer_v2/reindex_job_creator',
         'reindexer_v2/complete_reindex',
         'reindexer_v2/reindex_shard_generator',
+        'reindexer_v2/resharder',
     )
     if (
         task.startswith(sbt_free_tasks) and
