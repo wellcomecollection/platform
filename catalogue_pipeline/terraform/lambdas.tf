@@ -44,6 +44,8 @@ module "complete_reindex_lambda" {
 
   description = "Mark reindex work as done in the reindex tracker table."
 
+  timeout = 10
+
   environment_variables = {
     TABLE_NAME = "${aws_dynamodb_table.reindex_shard_tracker.name}"
   }
