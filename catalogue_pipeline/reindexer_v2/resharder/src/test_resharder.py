@@ -60,8 +60,6 @@ def test_updates_old_row(
     assert item['Item']['resharded']['BOOL'] == True
     assert item['Item']['version']['N'] == '2'
 
-    print(s3_client.list_objects(Bucket=source_bucket_name))
-
     resp = s3_client.get_object(
         Bucket=source_bucket_name,
         Key='sierra/32/b2222223/abc.json'
