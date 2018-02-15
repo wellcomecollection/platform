@@ -7,7 +7,8 @@ SBT_APPS 	= id_minter ingestor reindex_worker transformer
 ECS_TASKS 	=
 LAMBDAS 	= reindexer_v2/complete_reindex \
               reindexer_v2/reindex_job_creator \
-              reindexer_v2/reindex_shard_generator
+              reindexer_v2/reindex_shard_generator \
+			  reindexer_v2/resharder
 
 TF_NAME 	= catalogue_pipeline
 TF_PATH 	= $(ROOT)/catalogue_pipeline/terraform
