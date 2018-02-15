@@ -57,7 +57,7 @@ def test_updates_old_row(
         Key={'id': {'S': 'sierra/b2222223'}}
     )
 
-    assert item['Item']['resharded']['BOOL'] == True
+    assert item['Item']['resharded']['BOOL'] is True
     assert item['Item']['version']['N'] == '2'
 
     resp = s3_client.get_object(
