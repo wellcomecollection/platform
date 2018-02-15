@@ -14,7 +14,7 @@ def table_name():
 
 @pytest.fixture(scope='session')
 def reindex_shard_tracker_table(dynamodb_client, table_name):
-    table = dynamodb_client.create_table(
+    dynamodb_client.create_table(
         TableName=table_name,
         KeySchema=[
             {

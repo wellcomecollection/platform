@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 
 import json
-import os
 import time
 
 from botocore.exceptions import ClientError
@@ -20,6 +19,7 @@ example_message = {
 }
 
 encoded_example_message = json.dumps(example_message)
+
 
 def _event(shard_id, completed_version):
     message = {
