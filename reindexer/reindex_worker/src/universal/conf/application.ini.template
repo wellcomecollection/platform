@@ -1,4 +1,4 @@
 -aws.dynamo.tableName=${dynamo_table_name}
 -aws.sns.topic.arn=${reindex_complete_topic_arn}
--aws.sqs.queue.url=${reindex_jobs_queue_url}
+-aws.sqs.queue.url=${reindex_jobs_queue_id}
 -aws.metrics.namespace=${metrics_namespace}
