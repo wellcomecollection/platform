@@ -4,7 +4,7 @@ module "lambda_update_service_list" {
 
   name        = "update_service_list"
   description = "Publish ECS service status summary to S3"
-  timeout     = 15
+  timeout     = 30
 
   environment_variables = {
     BUCKET_NAME     = "${var.monitoring_bucket_id}"
