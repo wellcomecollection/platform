@@ -34,7 +34,7 @@ lazy val transformer = doSharedSetup(project, "catalogue_pipeline/transformer")
 lazy val id_minter = doSharedSetup(project, "catalogue_pipeline/id_minter")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
-lazy val reindex_worker = doSharedSetup(project, "catalogue_pipeline/reindexer_v2/reindex_worker")
+lazy val reindex_worker = doSharedSetup(project, "reindexer/reindex_worker")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
 def doSharedSierraSetup(project: Project, folder: String) =
