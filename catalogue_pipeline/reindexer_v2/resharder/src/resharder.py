@@ -3,7 +3,6 @@
 import os
 
 import boto3
-import botocore
 from wellcome_aws_utils.dynamo_event import DynamoEvent
 
 
