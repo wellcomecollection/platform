@@ -5,7 +5,7 @@ ADD target/universal/stage /opt/docker
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
-ENV project=reindexer
+ENV project=reindex_worker
 
 USER daemon
 CMD ["/run.sh"]
