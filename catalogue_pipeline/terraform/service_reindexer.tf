@@ -9,7 +9,7 @@ module "reindexer" {
   release_id         = "${var.release_ids["reindex_worker"]}"
 
   cpu    = 512
-  memory = 1024
+  memory = 2048
 
   env_vars = {
     dynamo_table_name          = "${module.versioned-hybrid-store.table_name}"
