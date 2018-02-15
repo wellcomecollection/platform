@@ -55,6 +55,9 @@ lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .settings(libraryDependencies ++= Dependencies.sierraItemMergerDependencies)
 
+lazy val relater = doSharedSierraSetup(project, "catalogue_pipeline/relater")
+  .settings(libraryDependencies ++= Dependencies.relaterDependencies)
+
 lazy val root = (project in file("."))
   .aggregate(
     common,
@@ -67,5 +70,6 @@ lazy val root = (project in file("."))
     sierra_reader,
     sierra_items_to_dynamo,
     sierra_bib_merger,
-    sierra_item_merger
+    sierra_item_merger,
+    relater
   )

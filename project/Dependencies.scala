@@ -18,6 +18,7 @@ object Dependencies {
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val sierraStreamsSourceVersion = "0.2"
+    val tinkerPopGremlin = "3.2.5.2"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -110,4 +111,10 @@ object Dependencies {
   val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
 
   val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies
+
+  val relaterDependencies: Seq[ModuleID] = Seq(
+    "com.michaelpollmeier" %% "gremlin-scala" % versions.tinkerPopGremlin,
+    "org.janusgraph" % "janusgraph-core" % "0.2.0",
+    "org.apache.tinkerpop" % "gremlin-driver" % "3.2.5"
+  )
 }

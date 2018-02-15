@@ -2,10 +2,7 @@ FROM openjdk:8-jdk
 
 RUN apt-get update && apt-get install -y maven git docker
 
-
-ARG gitusername
-ARG gitpassword
-RUN git clone https://$gitusername:$gitpassword@github.com/amcp/dynamodb-janusgraph-storage-backend.git
+RUN git clone https://github.com/amcp/dynamodb-janusgraph-storage-backend.git
 
 WORKDIR /dynamodb-janusgraph-storage-backend
 

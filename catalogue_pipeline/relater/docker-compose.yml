@@ -1,0 +1,17 @@
+version: "2"
+services:
+  dynamodb:
+    image: peopleperhour/dynamodb
+    ports:
+      - "45678:8000"
+  janusgraph:
+    image: wellcome/janusgraph-dynamodb:with-endpoint
+    links:
+      - dynamodb
+    ports:
+      - "45679:8182"
+    environment:
+        - "aws_region=eu-west-1"
+        - "endpoint=http://dynamodb:8000"
+        - "accesskey=access"
+        - "secretkey=secret"

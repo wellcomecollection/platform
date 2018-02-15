@@ -27,15 +27,15 @@ storage.backend=com.amazon.janusgraph.diskstorage.dynamodb.DynamoDBStoreManager
 storage.dynamodb.client.credentials.class-name=com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 storage.dynamodb.client.credentials.constructor-args=
 storage.dynamodb.client.signing-region=${aws_region}
-storage.dynamodb.stores.edgestore.initial-capacity-read=12
-storage.dynamodb.stores.edgestore.initial-capacity-write=12
-storage.dynamodb.stores.edgestore.read-rate=12
-storage.dynamodb.stores.edgestore.write-rate=12
+storage.dynamodb.stores.edgestore.initial-capacity-read=1
+storage.dynamodb.stores.edgestore.initial-capacity-write=1
+storage.dynamodb.stores.edgestore.read-rate=1
+storage.dynamodb.stores.edgestore.write-rate=1
 
-storage.dynamodb.stores.graphindex.initial-capacity-read=9
-storage.dynamodb.stores.graphindex.initial-capacity-write=9
-storage.dynamodb.stores.graphindex.read-rate=9
-storage.dynamodb.stores.graphindex.write-rate=9
+storage.dynamodb.stores.graphindex.initial-capacity-read=1
+storage.dynamodb.stores.graphindex.initial-capacity-write=1
+storage.dynamodb.stores.graphindex.read-rate=1
+storage.dynamodb.stores.graphindex.write-rate=1
 
 storage.dynamodb.stores.systemlog.initial-capacity-read=1
 storage.dynamodb.stores.systemlog.initial-capacity-write=1
