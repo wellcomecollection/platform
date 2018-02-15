@@ -23,18 +23,14 @@ def main(event, _ctxt=None, s3_client=None, dynamodb_client=None):
             print("no NewImage key in dynamo update event, skipping")
             continue
 
-        from pprint import pprint
-        pprint(row)
-
         if row.get('resharded'):
             print(f'{row["sourceId"]} has already been resharded')
             continue
 
         old_key = row['s3key']
-        print(old_key)
 
         shard = row['sourceId'][::-1][:2]
-        new_key = f'{row["sourceName"]}/{row["sourceId"]}/{row["sourceId"]}/{shard}/{os.path.basename(old_key)}'
+        new_key = f'{row["sourceName"]}/{shard}/{row["sourceId"]}/{os.path.basename(old_key)}'
 
         s3_client.copy_object(
             Bucket=bucket_name,
@@ -49,7 +45,7 @@ def main(event, _ctxt=None, s3_client=None, dynamodb_client=None):
 
         dynamodb_client.update_item(
             TableName=table_name,
-            Key={'id': {'S': row['sourceId']}},
+            Key={'id': {'S': row['id']}},
             UpdateExpression='SET version = :newVersion, resharded = :true, s3key = :newKey',
             ConditionExpression='version < :newVersion',
             ExpressionAttributeValues={

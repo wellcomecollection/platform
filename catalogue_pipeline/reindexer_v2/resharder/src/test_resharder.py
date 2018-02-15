@@ -11,20 +11,14 @@ from resharder import main
 def test_ignores_already_resharded_row(
     dynamodb_client, source_data_table, s3_client, source_bucket
 ):
-    dynamodb_client.put_item(
-        TableName=source_data_table,
-        Item=_dynamodb_item(
-            id='sierra/b1111111',
-            s3key='sierra/b1111111.json',
-            resharded=True
-        )
-    )
-
-    event = _dynamo_event(
+    item = _dynamodb_item(
         id='sierra/b1111111',
         s3key='sierra/b1111111.json',
         resharded=True
     )
+    dynamodb_client.put_item(TableName=source_data_table, Item=item)
+
+    event = _wrap(item)
 
     main(event=event, dynamodb_client=dynamodb_client, s3_client=s3_client)
 
@@ -41,43 +35,36 @@ def test_ignores_already_resharded_row(
 def test_updates_old_row(
     dynamodb_client, source_data_table, s3_client, source_bucket_name, source_bucket
 ):
-    dynamodb_client.put_item(
-        TableName=source_data_table,
-        Item=_dynamodb_item(
-            id='sierra/b2222223',
-            s3key='sierra/b2222223.json'
-        )
+    item = _dynamodb_item(
+        id='sierra/b2222223',
+        s3key='sierra/b2222223/abc.json'
     )
+
+    resp = dynamodb_client.put_item(TableName=source_data_table, Item=item)
+    time.sleep(1)
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        Key='sierra/b2222223.json',
+        Key='sierra/b2222223/abc.json',
         Body=b'hello world'
     )
 
-    event = _dynamo_event(
-        id='sierra/b2222223',
-        s3key='sierra/b2222223.json'
-    )
-
+    event = _wrap(item)
     main(event=event, dynamodb_client=dynamodb_client, s3_client=s3_client)
-
-    time.sleep(1)
 
     item = dynamodb_client.get_item(
         TableName=source_data_table,
         Key={'id': {'S': 'sierra/b2222223'}}
     )
 
-    from pprint import pprint
-    pprint(item)
-
-    assert item['Item']['resharded']['BOOL'] == 'TRUE'
+    assert item['Item']['resharded']['BOOL'] == True
     assert item['Item']['version']['N'] == '2'
+
+    print(s3_client.list_objects(Bucket=source_bucket_name))
 
     resp = s3_client.get_object(
         Bucket=source_bucket_name,
-        Key='sierra/32/b2222223.json'
+        Key='sierra/32/b2222223/abc.json'
     )
     body = resp['Body'].read()
     assert body == b'hello world'
