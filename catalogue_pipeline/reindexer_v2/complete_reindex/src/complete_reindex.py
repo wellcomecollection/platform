@@ -11,9 +11,19 @@ import boto3
 from wellcome_aws_utils import sns_utils
 
 
+def _get_item_version(dynamo_item):
+    dynamo_item_version = 1
+
+    if 'version' in dynamo_item:
+        dynamo_item_version = dynamo_item['version']
+
+    return dynamo_item_version
+
+
 def _update_versioned_item(table, dynamo_item, desired_item):
-    current_dynamo_conditional_update_version = dynamo_item['version']
-    desired_dynamo_conditional_update_version = dynamo_item['version'] + 1
+    desired_dynamo_conditional_update_version = (
+            _get_item_version(dynamo_item) + 1
+    )
 
     new_dynamo_item = {**dynamo_item, **desired_item}
     new_dynamo_item['version'] = desired_dynamo_conditional_update_version
@@ -22,8 +32,8 @@ def _update_versioned_item(table, dynamo_item, desired_item):
 
     table.put_item(
         Item=new_dynamo_item,
-        ConditionExpression=Attr('version').eq(
-            current_dynamo_conditional_update_version
+        ConditionExpression=Attr('version').not_exists() | Attr('version').lt(
+            desired_dynamo_conditional_update_version
         )
     )
 
