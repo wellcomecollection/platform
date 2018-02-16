@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "reindex_tracker_table" {
+data "aws_iam_policy_document" "reindex_shard_tracker_table" {
   statement {
     actions = [
       "dynamodb:*",

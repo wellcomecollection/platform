@@ -41,6 +41,11 @@ resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
+resource "aws_iam_role_policy" "reindexer_reindexer_tracker_table" {
+  role   = "${module.reindexer.task_role_name}"
+  policy = "${data.aws_iam_policy_document.reindex_shard_tracker_table.json}"
+}
+
 resource "aws_iam_role_policy" "reindexer_allow_table_access" {
   role   = "${module.reindexer.task_role_name}"
   policy = "${module.versioned-hybrid-store.full_access_policy}"
