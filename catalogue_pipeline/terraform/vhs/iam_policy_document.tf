@@ -36,6 +36,9 @@ data "aws_iam_policy_document" "full_access_policy" {
 
     resources = [
       "${aws_dynamodb_table.table.arn}",
+
+      # Allow access to the GSIs on the table
+      "${aws_dynamodb_table.table.arn}/*",
     ]
   }
 

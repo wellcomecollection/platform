@@ -5,16 +5,16 @@ module "reindexer" {
   source_queue_name = "${module.reindexer_queue.name}"
   source_queue_arn  = "${module.reindexer_queue.arn}"
 
-  ecr_repository_url = "${module.ecr_repository_reindexer.repository_url}"
-  release_id         = "${var.release_ids["reindexer"]}"
+  ecr_repository_url = "${module.ecr_repository_reindex_worker.repository_url}"
+  release_id         = "${var.release_ids["reindex_worker"]}"
 
   cpu    = 512
-  memory = 1024
+  memory = 2048
 
   env_vars = {
     dynamo_table_name          = "${module.versioned-hybrid-store.table_name}"
     reindex_complete_topic_arn = "${module.reindex_jobs_complete_topic.arn}"
-    reindex_jobs_queue_url     = "${module.reindexer_queue.arn}"
+    reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
     metrics_namespace          = "reindexer"
   }
 
@@ -36,12 +36,17 @@ resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {
   policy = "${module.reindex_jobs_complete_topic.publish_policy}"
 }
 
+resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
+  role   = "${module.reindexer.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
 resource "aws_iam_role_policy" "reindexer_reindexer_tracker_table" {
   role   = "${module.reindexer.task_role_name}"
   policy = "${data.aws_iam_policy_document.reindex_shard_tracker_table.json}"
 }
 
-resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
+resource "aws_iam_role_policy" "reindexer_allow_table_access" {
   role   = "${module.reindexer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+  policy = "${module.versioned-hybrid-store.full_access_policy}"
 }
