@@ -8,6 +8,7 @@ include catalogue_api/Makefile
 include catalogue_pipeline/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
+include reindexer/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
 

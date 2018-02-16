@@ -2,7 +2,7 @@ module "resharder_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v6.4.0"
 
   name   = "resharder"
-  s3_key = "lambdas/catalogue_pipeline/reindexer_v2/resharder.zip"
+  s3_key = "lambdas/reindexer/resharder.zip"
 
   description = "Reshard S3 keys in the source-data table"
 

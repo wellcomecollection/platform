@@ -48,10 +48,10 @@ module "sourcedata_dynamo_autoscaling" {
   enable_read_scaling     = true
   read_target_utilization = 70
   read_min_capacity       = 1
-  read_max_capacity       = 150
+  read_max_capacity       = 300
 
   enable_write_scaling     = true
   write_target_utilization = 70
   write_min_capacity       = 1
-  write_max_capacity       = 150
+  write_max_capacity       = 300
 }
