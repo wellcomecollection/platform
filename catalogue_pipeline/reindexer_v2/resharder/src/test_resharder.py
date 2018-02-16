@@ -8,30 +8,6 @@ import pytest
 from resharder import main
 
 
-def test_ignores_already_resharded_row(
-    dynamodb_client, source_data_table, s3_client, source_bucket
-):
-    item = _dynamodb_item(
-        id='sierra/b1111111',
-        s3key='sierra/b1111111.json',
-        resharded=True
-    )
-    dynamodb_client.put_item(TableName=source_data_table, Item=item)
-
-    event = _wrap(item)
-
-    main(event=event, dynamodb_client=dynamodb_client, s3_client=s3_client)
-
-    time.sleep(1)
-
-    item = dynamodb_client.get_item(
-        TableName=source_data_table,
-        Key={'id': {'S': 'sierra/b1111111'}}
-    )
-
-    assert item['Item']['version']['N'] == '1'
-
-
 def test_updates_old_row(
     dynamodb_client, source_data_table, s3_client, source_bucket_name, source_bucket
 ):
@@ -57,7 +33,6 @@ def test_updates_old_row(
         Key={'id': {'S': 'sierra/b2222223'}}
     )
 
-    assert item['Item']['resharded']['BOOL'] is True
     assert item['Item']['version']['N'] == '2'
     assert item['Item']['s3key']['S'] == 'sierra/32/b2222223/abc.json'
 
@@ -171,9 +146,6 @@ def _dynamodb_item(id, s3key, resharded=None, version=1):
         'version': {'N': str(version)},
         's3key': {'S': s3key},
     }
-
-    if resharded is not None:
-        data['resharded'] = {'BOOL': resharded}
 
     return data
 

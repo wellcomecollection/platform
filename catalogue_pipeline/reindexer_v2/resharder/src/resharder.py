@@ -23,10 +23,6 @@ def main(event, _ctxt=None, s3_client=None, dynamodb_client=None):
             print("no NewImage key in dynamo update event, skipping")
             continue
 
-        if row.get('resharded'):
-            print(f'{row["sourceId"]} has already been resharded')
-            continue
-
         old_key = row['s3key']
 
         shard = row['sourceId'][::-1][:2]
@@ -46,7 +42,7 @@ def main(event, _ctxt=None, s3_client=None, dynamodb_client=None):
         dynamodb_client.update_item(
             TableName=table_name,
             Key={'id': {'S': row['id']}},
-            UpdateExpression='SET version = :newVersion, resharded = :true, s3key = :newKey',
+            UpdateExpression='SET version = :newVersion, s3key = :newKey',
             ConditionExpression='version < :newVersion',
             ExpressionAttributeValues={
                 ':newVersion': {'N': str(version + 1)},
