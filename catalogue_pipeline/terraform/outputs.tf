@@ -2,10 +2,6 @@ output "dynamodb_table_miro_table_name" {
   value = "${aws_dynamodb_table.miro_table.name}"
 }
 
-output "dynamodb_table_reindex_tracker_stream_arn" {
-  value = "${aws_dynamodb_table.reindex_tracker.stream_arn}"
-}
-
 output "ecs_services_cluster_name" {
   value = "${module.catalogue_pipeline_cluster.cluster_name}"
 }
