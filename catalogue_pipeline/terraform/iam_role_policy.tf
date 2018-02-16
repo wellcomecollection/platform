@@ -52,5 +52,5 @@ resource "aws_iam_role_policy" "reindex_job_creator_lambda_sns" {
 
 resource "aws_iam_role_policy" "complete_reindex_lambda_reindexer_tracker_table" {
   role   = "${module.complete_reindex_lambda.role_name}"
-  policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
+  policy = "${data.aws_iam_policy_document.reindex_shard_tracker_table.json}"
 }
