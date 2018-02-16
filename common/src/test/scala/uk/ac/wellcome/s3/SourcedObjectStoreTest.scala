@@ -37,7 +37,7 @@ class SourcedObjectStoreTest
       val expectedJson = JsonUtil.toJson(testObject).get
       val expectedHash = "1125206027"
 
-      val expectedKey = s"${sourceName}/$id/32/$expectedHash.json"
+      val expectedKey = s"${sourceName}/32/$id/$expectedHash.json"
       actualKey shouldBe expectedKey
 
       val jsonFromS3 = getJsonFromS3(

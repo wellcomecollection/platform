@@ -37,7 +37,7 @@ class SourcedObjectStore @Inject()(
         .slice(0, 2)
 
       val key =
-        s"${sourcedObject.sourceName}/${sourcedObject.sourceId}/${s3Shard}/$contentHash.json"
+        s"${sourcedObject.sourceName}/${s3Shard}/${sourcedObject.sourceId}/$contentHash.json"
 
       info(s"Attempting to PUT object to s3://$bucketName/$key")
       s3Client.putObject(bucketName, key, content)
