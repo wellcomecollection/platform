@@ -36,9 +36,9 @@ resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {
   policy = "${module.reindex_jobs_complete_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "reindexer_tracker_table" {
+resource "aws_iam_role_policy" "reindexer_reindexer_tracker_table" {
   role   = "${module.reindexer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.reindex_tracker_table.json}"
+  policy = "${data.aws_iam_policy_document.reindex_shard_tracker_table.json}"
 }
 
 resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
