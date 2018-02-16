@@ -143,7 +143,6 @@ def test_request_reindex_throws_conditional_update_exception(reindex_shard_track
             'shardId': shard_id,
             'currentVersion': 1,
             'desiredVersion': 3,
-            'version': 0,
         }
     )
 
@@ -157,7 +156,7 @@ def test_request_reindex_throws_conditional_update_exception(reindex_shard_track
             'shardId': shard_id,
             'currentVersion': 2,
             'desiredVersion': 2,
-            'version': 1,
+            'version': 2,
         }
     )
 
