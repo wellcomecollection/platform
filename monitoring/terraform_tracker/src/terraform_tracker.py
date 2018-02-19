@@ -30,6 +30,7 @@ def to_bitly(url, access_token):
 def main(event, context):
     print(f'event = {event!r}')
 
+    infra_bucket = os.environ['INFRA_BUCKET']
     slack_webhook = os.environ['SLACK_WEBHOOK']
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
 
@@ -44,7 +45,7 @@ def main(event, context):
     username = data['username']
     key = data['key']
 
-    key_url = f'https://console.aws.amazon.com/s3/object/platform-infra/{key}?region=eu-west-1&tab=overview'
+    key_url = f'https://console.aws.amazon.com/s3/object/{infra_bucket}/{key}?region=eu-west-1&tab=overview'
     display_url = to_bitly(key_url, access_token=bitly_access_token)
 
     stack = {
