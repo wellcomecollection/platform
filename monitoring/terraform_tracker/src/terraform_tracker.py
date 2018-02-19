@@ -14,17 +14,14 @@ def to_bitly(url, access_token):
     Try to shorten a URL with bit.ly.  If it fails, just return the
     original URL.
     """
-    def _to_bity_single_url(url):
-        resp = requests.get(
-            'https://api-ssl.bitly.com/v3/user/link_save',
-            params={'access_token': access_token, 'longUrl': url}
-        )
-        try:
-            return resp.json()['data']['link_save']['link']
-        except KeyError:
-            return url
-
-    return ' / '.join([_to_bity_single_url(u) for u in url.split(' / ')])
+    resp = requests.get(
+        'https://api-ssl.bitly.com/v3/user/link_save',
+        params={'access_token': access_token, 'longUrl': url}
+    )
+    try:
+        return resp.json()['data']['link_save']['link']
+    except KeyError:
+        return url
 
 
 def main(event, context):
