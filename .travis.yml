@@ -86,7 +86,6 @@ jobs:
     - env: TASK=reindex_job_creator-test
     - env: TASK=complete_reindex-test
     - env: TASK=reindex_shard_generator-test
-    - env: TASK=resharder-test
 
     # Catalogue API stack
     - env: TASK=api-test
