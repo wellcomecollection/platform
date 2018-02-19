@@ -10,7 +10,11 @@ import org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 
-class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAfterEach{
+class RelaterTest
+    extends FunSpec
+    with Matchers
+    with Eventually
+    with BeforeAndAfterEach {
   private val graph = buildGraph(buildCluster())
 
   override def beforeEach(): Unit = {
@@ -29,12 +33,13 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
     relater.updateNode(Node("A", List("B", "C")))
 
     executeOnGraph { graph =>
-        val vertices = graph.V().label().toList
-        vertices should contain theSameElementsAs List("A", "B", "C")
+      val vertices = graph.V().label().toList
+      vertices should contain theSameElementsAs List("A", "B", "C")
 
-        val connectedNodes = graph.V().hasLabel("A").out("same-as").label().toList
+      val connectedNodes =
+        graph.V().hasLabel("A").out("same-as").label().toList
 
-        connectedNodes should contain theSameElementsAs List("B", "C")
+      connectedNodes should contain theSameElementsAs List("B", "C")
     }
   }
 
@@ -42,7 +47,15 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
     executeOnGraph { graph =>
       val vertexA = graph.addV("A").next()
       val vertexB = graph.addV("B").next()
-      graph.V(vertexA.id).as("a").V(vertexB.id).as("b").addE("same-as").from("a").to("b").iterate()
+      graph
+        .V(vertexA.id)
+        .as("a")
+        .V(vertexB.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
     }
 
     val connectedNodes = graph.V().hasLabel("A").out("same-as").label().toList
@@ -55,9 +68,10 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
       val vertices = graph.V().label().toList
       vertices should contain theSameElementsAs List("A", "B", "C")
 
-      val connectedNodes = graph.V().hasLabel("A").out("same-as").label().toList
+      val connectedNodes =
+        graph.V().hasLabel("A").out("same-as").label().toList
 
-        connectedNodes should contain theSameElementsAs List("B", "C")
+      connectedNodes should contain theSameElementsAs List("B", "C")
     }
   }
 
@@ -66,8 +80,24 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
       val vertexA = graph.addV("A").next()
       val vertexB = graph.addV("B").next()
       val vertexC = graph.addV("C").next()
-      graph.V(vertexA.id).as("a").V(vertexB.id).as("b").addE("same-as").from("a").to("b").iterate()
-      graph.V(vertexA.id).as("a").V(vertexC.id).as("b").addE("same-as").from("a").to("b").iterate()
+      graph
+        .V(vertexA.id)
+        .as("a")
+        .V(vertexB.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
+      graph
+        .V(vertexA.id)
+        .as("a")
+        .V(vertexC.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
     }
 
     val connectedNodes = graph.V().hasLabel("A").out("same-as").label().toList
@@ -80,7 +110,8 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
       val vertices = graph.V().label().toList
       vertices should contain theSameElementsAs List("A", "B", "C", "D")
 
-      val connectedNodes = graph.V().hasLabel("A").out("same-as").label().toList
+      val connectedNodes =
+        graph.V().hasLabel("A").out("same-as").label().toList
 
       connectedNodes should contain theSameElementsAs List("D")
     }
@@ -92,12 +123,39 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
       val vertexB = graph.addV("B").next()
       val vertexC = graph.addV("C").next()
       val vertexD = graph.addV("D").next()
-      graph.V(vertexA.id).as("a").V(vertexB.id).as("b").addE("same-as").from("a").to("b").iterate()
-      graph.V(vertexC.id).as("a").V(vertexA.id).as("b").addE("same-as").from("a").to("b").iterate()
-      graph.V(vertexD.id).as("a").V(vertexC.id).as("b").addE("same-as").from("a").to("b").iterate()
+      graph
+        .V(vertexA.id)
+        .as("a")
+        .V(vertexB.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
+      graph
+        .V(vertexC.id)
+        .as("a")
+        .V(vertexA.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
+      graph
+        .V(vertexD.id)
+        .as("a")
+        .V(vertexC.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
     }
 
-    relater.getConnectedGraph("A") should contain theSameElementsAs List("A", "B", "C", "D")
+    relater.getConnectedGraph("A") should contain theSameElementsAs List("A",
+                                                                         "B",
+                                                                         "C",
+                                                                         "D")
   }
 
   it("handles connected graphs with cycles") {
@@ -106,13 +164,48 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
       val vertexB = graph.addV("B").next()
       val vertexC = graph.addV("C").next()
       val vertexD = graph.addV("D").next()
-      graph.V(vertexA.id).as("a").V(vertexB.id).as("b").addE("same-as").from("a").to("b").iterate()
-      graph.V(vertexC.id).as("a").V(vertexA.id).as("b").addE("same-as").from("a").to("b").iterate()
-      graph.V(vertexD.id).as("a").V(vertexC.id).as("b").addE("same-as").from("a").to("b").iterate()
-      graph.V(vertexB.id).as("a").V(vertexD.id).as("b").addE("same-as").from("a").to("b").iterate()
+      graph
+        .V(vertexA.id)
+        .as("a")
+        .V(vertexB.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
+      graph
+        .V(vertexC.id)
+        .as("a")
+        .V(vertexA.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
+      graph
+        .V(vertexD.id)
+        .as("a")
+        .V(vertexC.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
+      graph
+        .V(vertexB.id)
+        .as("a")
+        .V(vertexD.id)
+        .as("b")
+        .addE("same-as")
+        .from("a")
+        .to("b")
+        .iterate()
     }
 
-    relater.getConnectedGraph("A") should contain theSameElementsAs List("A", "B", "C", "D")
+    relater.getConnectedGraph("A") should contain theSameElementsAs List("A",
+                                                                         "B",
+                                                                         "C",
+                                                                         "D")
   }
 
   it("return the node as a single connected graph") {
@@ -133,11 +226,20 @@ class RelaterTest extends FunSpec with Matchers with Eventually with BeforeAndAf
   }
 
   private def buildGraph(cluster: Cluster) = {
-    JanusGraphFactory.open("inmemory").traversal().withRemote(DriverRemoteConnection.using(cluster))
+    JanusGraphFactory
+      .open("inmemory")
+      .traversal()
+      .withRemote(DriverRemoteConnection.using(cluster))
   }
 
   private def buildCluster() = {
-    val serializer = new GryoMessageSerializerV1d0(GryoMapper.build().addRegistry(JanusGraphIoRegistry.getInstance()))
-    Cluster.build().addContactPoint("localhost").port(45679).serializer(serializer).create()
+    val serializer = new GryoMessageSerializerV1d0(
+      GryoMapper.build().addRegistry(JanusGraphIoRegistry.getInstance()))
+    Cluster
+      .build()
+      .addContactPoint("localhost")
+      .port(45679)
+      .serializer(serializer)
+      .create()
   }
 }
