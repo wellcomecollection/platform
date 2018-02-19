@@ -1,6 +1,6 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
-lint-python:
+lint-python: build_setup
 	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT):/data \
 		--workdir /data \
@@ -8,23 +8,23 @@ lint-python:
 		    --exclude .git,__pycache__,target,.terraform \
 		    --ignore=E501,E122,E126
 
-lint-js:
+lint-js: build_setup
 	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT):/data \
 		wellcome/jslint:latest
 
-format-terraform:
+format-terraform: build_setup
 	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
 		--workdir /repo \
 		hashicorp/terraform:light fmt
 
-format-scala:
+format-scala: build_setup
 	$(ROOT)/.scripts/docker_run.py --sbt -- \
 		--volume $(ROOT):/repo \
 		wellcome/scalafmt
 
-format-json:
+format-json: build_setup
 	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT):/src \
 		--workdir /src \
