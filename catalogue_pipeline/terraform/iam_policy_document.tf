@@ -10,19 +10,6 @@ data "aws_iam_policy_document" "reindex_shard_tracker_table" {
   }
 }
 
-data "aws_iam_policy_document" "reindex_target_miro" {
-  statement {
-    actions = [
-      "dynamodb:*",
-    ]
-
-    resources = [
-      "${aws_dynamodb_table.miro_table.arn}",
-      "${aws_dynamodb_table.miro_table.arn}/index/ReindexTracker",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   statement {
     actions = [
