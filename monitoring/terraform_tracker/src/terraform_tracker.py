@@ -55,7 +55,7 @@ def main(event, context):
     #
     stack = data['stack'].replace('terraform/', '').replace('.tfstate', '')
 
-    message = f'{username} has run "terraform apply" in the {stack} stack.'
+    lines = [f'{username} has run "terraform apply" in the {stack} stack.']
 
     try:
         git_branch = data['git_branch']
@@ -65,17 +65,16 @@ def main(event, context):
         # which doesn't provide Git information.
         pass
     else:
-        message += f'\nGit branch: {git_branch} ({git_commit[:7]}).'
+        lines.append(f'\nGit branch: {git_branch} ({git_commit[:7]}).')
+
+    lines.append(display_url)
 
     slack_data = {
         'username': 'terraform-tracker',
         'icon_emoji': ':terraform:',
         'attachments': [{
             'color': '#5C4EE5',
-            'fields': [
-                {'value': message},
-                {'value': display_url}
-            ]
+            'fields': [{'value': l} for l in lines]
         }]
     }
 
