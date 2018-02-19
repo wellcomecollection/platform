@@ -2,6 +2,7 @@ include functions.Makefile
 
 include formatting.Makefile
 
+include assets/Makefile
 include loris/Makefile
 include shared_infra/Makefile
 include catalogue_api/Makefile
