@@ -1,31 +1,50 @@
 # -*- encoding: utf-8 -*-
 
 import json
-import time
+import os
 
 from botocore.exceptions import ClientError
 import pytest
 
-from complete_reindex import main
+from complete_reindex import _run, _process_reindex_tracker_update_job, _update_versioned_item
 
 
-shard_id = "shard_id"
-current_version = 1
-desired_version = 2
+@pytest.fixture
+def reindex_shard_tracker_table(dynamodb_resource):
+    table_name = "ReindexShardTracker"
 
-example_message = {
-    "shardId": shard_id,
-    "completedReindexVersion": desired_version
-}
+    table = dynamodb_resource.create_table(
+        TableName=table_name,
+        KeySchema=[
+            {
+                'AttributeName': 'shardId',
+                'KeyType': 'HASH'
+            }
+        ],
+        AttributeDefinitions=[
+            {
+                'AttributeName': "shardId",
+                'AttributeType': "S"
+            }
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        }
+    )
 
-encoded_example_message = json.dumps(example_message)
+    yield table
+
+    table.delete()
 
 
-def _event(shard_id, completed_version):
-    message = {
-        'shardId': shard_id,
-        'completedReindexVersion': completed_version
+def _create_event(shard_id, current_version, desired_version):
+    example_message = {
+        "shardId": shard_id,
+        "completedReindexVersion": desired_version
     }
+
+    encoded_example_message = json.dumps(example_message)
 
     return {
         "Records": [
@@ -39,7 +58,7 @@ def _event(shard_id, completed_version):
                     "Signature": "EXAMPLE",
                     "SigningCertUrl": "EXAMPLE",
                     "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
-                    "Message": json.dumps(message),
+                    "Message": encoded_example_message,
                     "MessageAttributes": {},
                     "Type": "Notification",
                     "UnsubscribeUrl": "EXAMPLE",
@@ -51,103 +70,130 @@ def _event(shard_id, completed_version):
     }
 
 
-example_event = {
-    "Records": [
-        {
-            "EventVersion": "1.0",
-            "EventSubscriptionArn": "eventsubscriptionarn",
-            "EventSource": "aws:sns",
-            "Sns": {
-                "SignatureVersion": "1",
-                "Timestamp": "1970-01-01T00:00:00.000Z",
-                "Signature": "EXAMPLE",
-                "SigningCertUrl": "EXAMPLE",
-                "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
-                "Message": encoded_example_message,
-                "MessageAttributes": {},
-                "Type": "Notification",
-                "UnsubscribeUrl": "EXAMPLE",
-                "TopicArn": "topicarn",
-                "Subject": "TestInvoke"
-            }
-        }
-    ]
-}
+def test_request_reindex(reindex_shard_tracker_table):
+    table = reindex_shard_tracker_table
+
+    os.environ = {
+        "TABLE_NAME": table.table_name
+    }
+
+    shard_id = "shard_id"
+    another_shard_id = "an_unrelated_shard"
+    current_version = 1
+    desired_version = 2
+
+    item1 = {
+        'shardId': shard_id,
+        'currentVersion': current_version,
+        'desiredVersion': desired_version,
+        'version': 0,
+    }
+
+    item2 = {
+        'shardId': another_shard_id,
+        'currentVersion': current_version,
+        'desiredVersion': desired_version,
+        'version': 0,
+    }
+
+    event1 = _create_event(
+        shard_id,
+        current_version,
+        desired_version
+    )
+
+    event2 = _create_event(
+        another_shard_id,
+        current_version,
+        desired_version
+    )
+
+    table.put_item(Item=item1)
+    table.put_item(Item=item2)
+
+    _run(table, event1)
+    _run(table, event2)
+
+    response_item = table.get_item(Key={'shardId': shard_id})
+
+    print(response_item)
+
+    assert response_item['Item']['shardId'] == shard_id
+    assert response_item['Item']['currentVersion'] == desired_version
+    assert response_item['Item']['desiredVersion'] == desired_version
+    assert response_item['Item']['version'] == 1
 
 
-def test_applies_update(dynamodb_client, reindex_shard_tracker_table):
-    dynamodb_client.put_item(
-        TableName=reindex_shard_tracker_table,
+def test_request_reindex_does_not_revert_current_version_update(reindex_shard_tracker_table):
+    table = reindex_shard_tracker_table
+
+    os.environ = {
+        "TABLE_NAME": table.table_name
+    }
+
+    shard_id = "shard_id"
+    current_version = 1
+    desired_version = 2
+
+    updated_version = 4
+
+    event1 = _create_event(
+        shard_id,
+        current_version,
+        desired_version
+    )
+
+    item = {
+        'shardId': shard_id,
+        'currentVersion': updated_version,
+        'desiredVersion': updated_version,
+        'version': 0,
+    }
+
+    table.put_item(Item=item)
+
+    _run(table, event1)
+
+    response_item = table.get_item(Key={'shardId': shard_id})
+
+    assert response_item['Item']['shardId'] == shard_id
+    assert response_item['Item']['currentVersion'] == updated_version
+    assert response_item['Item']['desiredVersion'] == updated_version
+    assert response_item['Item']['version'] == 0
+
+
+def test_request_reindex_throws_conditional_update_exception(reindex_shard_tracker_table):
+    table = reindex_shard_tracker_table
+
+    os.environ = {
+        "TABLE_NAME": table.table_name
+    }
+
+    shard_id = "shard_id"
+
+    table.put_item(
         Item={
-            'shardId': {'S': 'example/111'},
-            'currentVersion': {'N': '1'},
-            'desiredVersion': {'N': '3'},
+            'shardId': shard_id,
+            'currentVersion': 1,
+            'desiredVersion': 3,
         }
     )
 
-    main(
-        event=_event(shard_id='example/111', completed_version=3),
-        dynamodb_client=dynamodb_client
-    )
+    item = _process_reindex_tracker_update_job(table, {
+        "shardId": shard_id,
+        "completedReindexVersion": 3
+    })
 
-    resp = dynamodb_client.get_item(
-        TableName=reindex_shard_tracker_table,
-        Key={'shardId': {'S': 'example/111'}}
-    )
-
-    assert resp['Item']['shardId']['S'] == 'example/111'
-    assert resp['Item']['currentVersion']['N'] == '3'
-    assert resp['Item']['desiredVersion']['N'] == '3'
-
-
-def test_does_not_rollback_current_version(dynamodb_client, reindex_shard_tracker_table):
-    dynamodb_client.put_item(
-        TableName=reindex_shard_tracker_table,
+    table.put_item(
         Item={
-            'shardId': {'S': 'example/222'},
-            'currentVersion': {'N': '2'},
-            'desiredVersion': {'N': '2'},
+            'shardId': shard_id,
+            'currentVersion': 2,
+            'desiredVersion': 2,
+            'version': 2,
         }
     )
 
-    main(
-        event=_event(shard_id='example/222', completed_version=1),
-        dynamodb_client=dynamodb_client
-    )
-
-    # Give the update time to apply, if it's going to.
-    time.sleep(1)
-
-    resp = dynamodb_client.get_item(
-        TableName=reindex_shard_tracker_table,
-        Key={'shardId': {'S': 'example/222'}}
-    )
-
-    assert resp['Item']['shardId']['S'] == 'example/222'
-    assert resp['Item']['currentVersion']['N'] == '2'
-    assert resp['Item']['desiredVersion']['N'] == '2'
-
-
-def test_other_clienterror_is_raised(dynamodb_client, reindex_shard_tracker_table):
-    dynamodb_client.put_item(
-        TableName=reindex_shard_tracker_table,
-        Item={
-            'shardId': {'S': 'example/222'},
-            'currentVersion': {'N': '2'},
-            'desiredVersion': {'N': '2'},
-        }
-    )
-
-    old_update = dynamodb_client.update_item
-
-    def bad_update_items(**kwargs):
-        kwargs['TableName'] = 'doesnotexist'
-        old_update(**kwargs)
-
-    dynamodb_client.update_item = bad_update_items
-
-    with pytest.raises(ClientError):
-        main(
-            event=_event(shard_id='example/222', completed_version=3),
-            dynamodb_client=dynamodb_client
-        )
+    with pytest.raises(ClientError) as e:
+        _update_versioned_item(table, item)
+        assert e.value.response['Error']['Code'] == 'ConditionalCheckFailedException'
+#
