@@ -23,6 +23,7 @@ case class HybridRecord(
   reindexShard: String = "default",
   reindexVersion: Int = 0
 ) extends Reindexable
+    with Sourced
     with Versioned
 
 class VersionedHybridStore @Inject()(

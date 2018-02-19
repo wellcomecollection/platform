@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage
 import com.gu.scanamo.DynamoFormat
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{VersionUpdater, Versioned}
+import uk.ac.wellcome.models.{Sourced, VersionUpdater, Versioned}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -12,7 +12,7 @@ case class ExampleRecord(
   sourceId: String,
   sourceName: String,
   content: String
-) extends Versioned
+) extends Versioned with Sourced
 
 class VersionedHybridStoreTest
     extends FunSpec

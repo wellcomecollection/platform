@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models
 
-trait Versioned extends Sourced {
+trait Versioned {
   val version: Int
 }
 
