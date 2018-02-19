@@ -28,6 +28,8 @@ module "transformer" {
   alb_listener_http_arn      = "${module.catalogue_pipeline_cluster.alb_listener_http_arn}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+
+  enable_alb_alarm = false
 }
 
 module "transformer_dynamo_to_sns" {
