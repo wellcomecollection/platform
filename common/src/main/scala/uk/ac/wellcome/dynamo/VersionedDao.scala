@@ -9,6 +9,7 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{
   VersionUpdater,
   Versioned,
+  Sourced,
   SourcedDynamoFormatWrapper
 }
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -34,7 +35,7 @@ class VersionedDao @Inject()(
       .put(versionUpdater.updateVersion(record, newVersion))
   }
 
-  def updateRecord[T <: Versioned](record: T)(
+  def updateRecord[T <: Versioned with Sourced](record: T)(
     implicit evidence: SourcedDynamoFormatWrapper[T],
     versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
     info(s"Attempting to update Dynamo record: ${record.id}")
@@ -50,7 +51,7 @@ class VersionedDao @Inject()(
     }
   }
 
-  def getRecord[T <: Versioned](id: String)(
+  def getRecord[T <: Versioned with Sourced](id: String)(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
 
