@@ -1,14 +1,33 @@
 ROOT = $(shell git rev-parse --show-toplevel)
+DOCKER_RUN_ROOT=$(ROOT)
 INFRA_BUCKET = platform-infra
 
+export DOCKER_RUN_ROOT
 
 ifndef UPTODATE_GIT_DEFINED
-uptodate-git:
-	$(ROOT)/builds/is_up_to_date_with_master.sh
+uptodate-git: build_setup
+	$(ROOT)/.scripts/is_up_to_date_with_master.sh
 
 UPTODATE_GIT_DEFINED = true
 endif
 
+.scripts:
+	mkdir $(ROOT)/.scripts
+
+# Get docker_run.py script
+.scripts/docker_run.py: .scripts
+	wget https://raw.githubusercontent.com/wellcometrust/docker_run/master/docker_run.py -P .scripts
+	chmod u+x .scripts/docker_run.py
+
+# Get is_up_to_date_with_master.sh script
+.scripts/is_up_to_date_with_master.sh: .scripts
+	wget https://raw.githubusercontent.com/wellcometrust/docker_run/master/scripts/is_up_to_date_with_master.sh  -P .scripts
+	chmod u+x .scripts/is_up_to_date_with_master.sh
+
+# Get the build scripts required
+build_setup: \
+	.scripts/is_up_to_date_with_master.sh \
+	.scripts/docker_run.py
 
 # Run a 'terraform plan' step.
 #
@@ -18,7 +37,7 @@ endif
 #
 define terraform_plan
 	make uptodate-git
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(1):/data \
 		--env OP=plan \
 		--env GET_PLATFORM_TFVARS=true \
@@ -34,7 +53,7 @@ endef
 #
 define terraform_apply
 	make uptodate-git
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(1):/data \
 		--env OP=apply \
 		wellcome/terraform_wrapper:latest
@@ -47,7 +66,7 @@ endef
 #   $1 - Path to the Lambda src directory, relative to the root of the repo.
 #
 define publish_lambda
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
 		wellcome/publish_lambda:latest \
 		"$(1)/src" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)"
@@ -60,8 +79,8 @@ endef
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
+	$(ROOT)/.scripts/build_lambda_test_image.sh $(1)
+	$(ROOT)/.scripts/docker_run.py --aws --dind -- \
 		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
@@ -78,7 +97,9 @@ endef
 #   $2 - Path to the Dockerfile, relative to the root of the repo.
 #
 define build_image
-	$(ROOT)/builds/docker_run.py \
+	make build_setup
+
+	$(ROOT)/.scripts/docker_run.py \
 	    --dind -- \
 	    wellcome/image_builder:latest \
             --project=$(1) \
@@ -92,7 +113,7 @@ endef
 #   $1 - Name of the Docker image.
 #
 define publish_service
-	$(ROOT)/builds/docker_run.py \
+	$(ROOT)/.scripts/docker_run.py \
 	    --aws --dind -- \
 	    wellcome/publish_service:latest \
 	        --project="$(1)" \
@@ -107,7 +128,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_test
-	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+	$(ROOT)/.scripts/docker_run.py --dind --sbt --root -- \
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";dockerComposeUp;test;dockerComposeStop"
@@ -120,7 +141,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_build
-	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+	$(ROOT)/.scripts/docker_run.py --dind --sbt --root -- \
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";stage"
@@ -221,6 +242,7 @@ endef
 #	$TF_IS_PUBLIC_FACING    Is this a public-facing stack?  (true/false)
 #
 define stack_setup
+make build_setup
 
 # The structure of each of these lines is as follows:
 #
