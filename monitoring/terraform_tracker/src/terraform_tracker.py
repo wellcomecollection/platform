@@ -48,15 +48,12 @@ def main(event, context):
     key_url = f'https://console.aws.amazon.com/s3/object/{infra_bucket}/{key}?region=eu-west-1&tab=overview'
     display_url = to_bitly(key_url, access_token=bitly_access_token)
 
-    stack = {
-        'platform.tfstate': 'catalogue_api',
-        'platform-pipeline.tfstate': 'catalogue_pipeline',
-        'platform-lambda.tfstate': 'shared_infra',
-    }.get(data["stack"], data["stack"])
-
-    stack = stack.replace('platform-', '').replace('terraform/', '')
-    if stack.endswith('.tfstate'):
-        stack = stack[:-len('.tfstate')]
+    # Our state files are stored in S3, with names such as:
+    #
+    #   terraform/assets.tfstate
+    #   terraform/catalogue_api.tfstate
+    #
+    stack = data['stack'].replace('terraform/', '').replace('.tfstate', '')
 
     message = f'{username} has run "terraform apply" in the {stack} stack.'
 
