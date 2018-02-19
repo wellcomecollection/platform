@@ -6,10 +6,10 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import io.circe.Decoder
 import cats.syntax.functor._
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.utils.JsonUtil._
 
-sealed trait Transformable extends Versioned
+sealed trait Transformable extends Sourced
 
 case class CalmTransformable(
   sourceId: String,
@@ -17,12 +17,8 @@ case class CalmTransformable(
   AltRefNo: String,
   RefNo: String,
   data: String,
-  reindexShard: String = "default",
-  reindexVersion: Int = 0,
-  version: Int = 0,
   sourceName: String = "calm"
 ) extends Transformable
-    with Reindexable
 
 case class CalmTransformableData(
   AccessStatus: Array[String]
@@ -31,12 +27,8 @@ case class CalmTransformableData(
 case class MiroTransformable(sourceId: String,
                              sourceName: String = "miro",
                              MiroCollection: String,
-                             data: String,
-                             reindexShard: String = "default",
-                             reindexVersion: Int = 0,
-                             version: Int = 1)
+                             data: String)
     extends Transformable
-    with Reindexable
 
 /** Represents a row in the DynamoDB database of "merged" Sierra records;
   * that is, records that contain data for both bibs and
@@ -53,13 +45,11 @@ case class MiroTransformable(sourceId: String,
   *
   */
 case class SierraTransformable(
-  version: Int = 0,
   sourceId: String,
   sourceName: String = "sierra",
   maybeBibData: Option[SierraBibRecord] = None,
   itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord]()
 ) extends Transformable
-    with Versioned
 
 object SierraTransformable {
   def apply(sourceId: String, bibData: String): SierraTransformable = {
@@ -75,11 +65,4 @@ object SierraTransformable {
             itemRecord: SierraItemRecord): SierraTransformable =
     SierraTransformable(sourceId = sourceId,
                         itemData = Map(itemRecord.id -> itemRecord))
-
-  def apply(bibRecord: SierraBibRecord, version: Int): SierraTransformable =
-    SierraTransformable(
-      sourceId = bibRecord.id,
-      maybeBibData = Some(bibRecord),
-      version = version
-    )
 }
