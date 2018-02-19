@@ -8,7 +8,7 @@ ECS_TASKS   = update_api_docs
 LAMBDAS     =
 
 TF_NAME     = catalogue_api
-TF_PATH     = $(ROOT)/$(STACK_ROOT)/terraform
+TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
