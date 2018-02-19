@@ -34,7 +34,7 @@ class ReindexServiceTest
     DynamoFormat[HybridRecord]
 
   private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Versioned
-    .toVersionedDynamoFormatWrapper[HybridRecord]
+    .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   it("only updates records with a lower than desired reindexVersion") {
