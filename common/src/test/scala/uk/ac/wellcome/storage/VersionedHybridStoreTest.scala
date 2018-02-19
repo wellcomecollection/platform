@@ -12,7 +12,8 @@ case class ExampleRecord(
   sourceId: String,
   sourceName: String,
   content: String
-) extends Versioned with Sourced
+) extends Versioned
+    with Sourced
 
 class VersionedHybridStoreTest
     extends FunSpec

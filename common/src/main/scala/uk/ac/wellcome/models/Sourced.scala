@@ -18,8 +18,7 @@ object Sourced {
   def id(sourceName: String, sourceId: String) = s"$sourceName/$sourceId"
 }
 
-class SourcedDynamoFormatWrapper[T <: Sourced](
-  dynamoFormat: DynamoFormat[T]) {
+class SourcedDynamoFormatWrapper[T <: Sourced](dynamoFormat: DynamoFormat[T]) {
   val enrichedDynamoFormat = new DynamoFormat[T] {
     override def read(av: AttributeValue): Either[DynamoReadError, T] =
       dynamoFormat.read(av)

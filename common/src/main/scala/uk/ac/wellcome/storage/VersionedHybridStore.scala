@@ -67,15 +67,14 @@ class VersionedHybridStore @Inject()(
         putObject(
           id = id,
           sourcedObject = ifNotExisting,
-          f = key => HybridRecord(
-
-            // If this record doesn't exist already, then we can start it
-            // at version 0 and not worry about a newer version elsewhere.
-            version = 0,
-
-            sourceId = ifNotExisting.sourceId,
-            sourceName = ifNotExisting.sourceName,
-            s3key = key
+          f = key =>
+            HybridRecord(
+              // If this record doesn't exist already, then we can start it
+              // at version 0 and not worry about a newer version elsewhere.
+              version = 0,
+              sourceId = ifNotExisting.sourceId,
+              sourceName = ifNotExisting.sourceName,
+              s3key = key
           )
         )
     }

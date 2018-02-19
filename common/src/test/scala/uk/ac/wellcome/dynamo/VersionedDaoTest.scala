@@ -22,7 +22,8 @@ case class TestVersioned(sourceId: String,
                          sourceName: String,
                          somethingElse: String,
                          version: Int)
-    extends Versioned with Sourced
+    extends Versioned
+    with Sourced
 
 class VersionedDaoTest
     extends FunSpec
