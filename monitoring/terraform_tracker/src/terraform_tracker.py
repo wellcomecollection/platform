@@ -57,16 +57,27 @@ def main(event, context):
     if stack.endswith('.tfstate'):
         stack = stack[:-len('.tfstate')]
 
+    message = f'{username} has run "terraform apply" in the {stack} stack.'
+
+    try:
+        git_branch = data['git_branch']
+        git_commit = data['git_commit']
+    except KeyError:
+        # The user is running an older version of the Terraform Docker image
+        # which doesn't provide Git information.
+        pass
+    else:
+        message += f'\nGit branch: {git_branch} ({git_commit[:7]}).'
+
     slack_data = {
         'username': 'terraform-tracker',
         'icon_emoji': ':terraform:',
         'attachments': [{
             'color': '#5C4EE5',
-            'fields': [{
-                'value': f'{username} has run "terraform apply" in the {stack} stack.'
-            }, {
-                'value': display_url
-            }]
+            'fields': [
+                {'value': message},
+                {'value': display_url}
+            ]
         }]
     }
 
