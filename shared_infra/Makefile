@@ -13,7 +13,7 @@ LAMBDAS     = drain_ecs_container_instance \
               update_ecs_service_size
 
 TF_NAME     = shared_infra
-TF_PATH     = $(ROOT)/$(STACK_ROOT)
+TF_PATH     = $(STACK_ROOT)
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))

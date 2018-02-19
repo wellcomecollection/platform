@@ -8,7 +8,7 @@ ECS_TASKS 	=
 LAMBDAS 	=
 
 TF_NAME 	= assets
-TF_PATH 	= $(ROOT)/assets/terraform
+TF_PATH 	= assets/terraform
 
 # Not technically public facing, but we want double-approval on
 # changes here!

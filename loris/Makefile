@@ -8,7 +8,7 @@ ECS_TASKS 	= loris cache_cleaner
 LAMBDAS 	=
 
 TF_NAME 	= loris
-TF_PATH 	= $(ROOT)/loris/terraform
+TF_PATH 	= loris/terraform
 TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))

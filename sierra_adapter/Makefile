@@ -11,7 +11,7 @@ ECS_TASKS   =
 LAMBDAS     = s3_demultiplexer sierra_window_generator
 
 TF_NAME     = sierra_adapter
-TF_PATH     = $(ROOT)/$(STACK_ROOT)/terraform
+TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
