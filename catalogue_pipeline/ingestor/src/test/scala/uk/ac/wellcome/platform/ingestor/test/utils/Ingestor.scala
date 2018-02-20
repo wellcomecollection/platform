@@ -60,7 +60,8 @@ trait Ingestor
   def createWork(canonicalId: String,
                  sourceId: String,
                  title: String,
-                 visible: Boolean = true): Work = {
+                 visible: Boolean = true,
+                 version: Int = 1): Work = {
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,
       sourceId
@@ -68,6 +69,7 @@ trait Ingestor
 
     Work(title = Some(title),
          sourceIdentifier = sourceIdentifier,
+      version = version,
          identifiers = List(sourceIdentifier),
          canonicalId = Some(canonicalId),
          visible = visible)
