@@ -22,6 +22,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |    "value": "value"
       |  },
+      |  "version": 1,
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
@@ -105,6 +106,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |    "value": "value"
       |  },
+      |  "version": 1,
       |  "canonicalId" : null,
       |  "identifiers": [
       |    {

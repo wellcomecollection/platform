@@ -79,6 +79,7 @@ class WorksIndex @Inject()(client: HttpClient,
       keywordField("canonicalId"),
       booleanField("visible"),
       keywordField("type"),
+      intField("version"),
       sourceIdentifier,
       identifiers,
       textField("title").fields(
