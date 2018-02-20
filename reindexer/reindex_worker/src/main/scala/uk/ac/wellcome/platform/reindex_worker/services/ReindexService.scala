@@ -44,7 +44,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     implicit evidence: SourcedDynamoFormatWrapper[HybridRecord])
     : Future[List[Unit]] = {
 
-    info(s"ReindexTargetService running $reindexJob")
+    info(s"ReindexService running $reindexJob")
 
     val table = Table[HybridRecord](dynamoConfig.table)
 
