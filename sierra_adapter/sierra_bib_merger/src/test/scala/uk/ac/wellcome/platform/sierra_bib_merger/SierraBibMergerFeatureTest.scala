@@ -101,8 +101,7 @@ class SierraBibMergerFeatureTest
 
     sendBibRecordToSQS(record)
 
-    val expectedSierraTransformable =
-      SierraTransformable(bibRecord = record, version = 1)
+    val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
     assertStored(expectedSierraTransformable)
   }
@@ -119,8 +118,7 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
     sendBibRecordToSQS(record1)
-    val expectedSierraTransformable1 =
-      SierraTransformable(bibRecord = record1, version = 1)
+    val expectedSierraTransformable1 = SierraTransformable(bibRecord = record1)
 
     val id2 = "2000002"
     val record2 = SierraBibRecord(
@@ -133,8 +131,7 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2002-02-02T02:02:02Z"
     )
     sendBibRecordToSQS(record2)
-    val expectedSierraTransformable2 =
-      SierraTransformable(bibRecord = record2, version = 1)
+    val expectedSierraTransformable2 = SierraTransformable(bibRecord = record2)
 
     assertStored(expectedSierraTransformable1)
     assertStored(expectedSierraTransformable2)
@@ -174,8 +171,7 @@ class SierraBibMergerFeatureTest
         sendBibRecordToSQS(record)
       }
 
-    val expectedSierraTransformable =
-      SierraTransformable(bibRecord = record, version = 2)
+    val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
     assertStored(expectedSierraTransformable)
   }
@@ -192,8 +188,7 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2006-06-06T06:06:06Z"
     )
 
-    val expectedSierraTransformable =
-      SierraTransformable(bibRecord = newBibRecord, version = 1)
+    val expectedSierraTransformable = SierraTransformable(bibRecord = newBibRecord)
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
@@ -220,7 +215,7 @@ class SierraBibMergerFeatureTest
     // enough time for this update to have gone through (if it was going to).
     Thread.sleep(5000)
 
-    assertStored(expectedSierraTransformable.copy(version = 2))
+    assertStored(expectedSierraTransformable)
   }
 
   it("stores a bib from SQS if the ID already exists but no bibData") {
@@ -247,8 +242,7 @@ class SierraBibMergerFeatureTest
       sendBibRecordToSQS(record)
     }
 
-    val expectedSierraTransformable =
-      SierraTransformable(bibRecord = record, version = 2)
+    val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
     assertStored(expectedSierraTransformable)
   }
