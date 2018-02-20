@@ -28,8 +28,10 @@ trait VersionedHybridStoreLocal
                                     ))
   )
 
-  def assertHybridRecordIsStoredCorrectly(record: Versioned,
-                                          expectedJson: String) = {
+  def assertHybridRecordIsStoredCorrectly[T <: Versioned with Sourced](
+    record: T,
+    expectedJson: String
+  ) = {
     val dynamoRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get
