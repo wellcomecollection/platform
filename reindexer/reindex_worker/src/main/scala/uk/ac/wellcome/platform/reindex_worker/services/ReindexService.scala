@@ -5,6 +5,7 @@ import javax.inject.Inject
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.ops.ScanamoOps
+import com.gu.scanamo._
 import com.gu.scanamo.query._
 import com.gu.scanamo.request.{ScanamoQueryOptions, ScanamoQueryRequest}
 import com.gu.scanamo.syntax._
@@ -14,15 +15,12 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{VersionUpdater, SourcedDynamoFormatWrapper}
-import uk.ac.wellcome.platform.reindex_worker.models.{
-  ReindexJob,
-  ScanamoQueryStream
-}
+import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper, VersionUpdater}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ScanamoQueryStream}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.collection.immutable
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
 class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
@@ -30,6 +28,10 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
                                versionedDao: VersionedDao,
                                dynamoConfig: DynamoConfig)
     extends Logging {
+
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
+    .toSourcedDynamoFormatWrapper[HybridRecord]
+    .enrichedDynamoFormat
 
   implicit val versionUpdater = new VersionUpdater[HybridRecord] {
     override def updateVersion(record: HybridRecord,
@@ -134,27 +136,36 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     )
 
   def runReindex(reindexJob: ReindexJob)(
-    implicit evidence: DynamoFormat[HybridRecord]): Future[Unit] = {
+    implicit evidence: SourcedDynamoFormatWrapper[HybridRecord]): Future[List[Unit]] = {
 
     info(s"ReindexTargetService running $reindexJob")
 
-    val scanamoQueryRequest = createScanamoQueryRequest(reindexJob)
+    val table = Table[HybridRecord](dynamoConfig.table)
+    val index = table.index("reindexTracker")
 
-    val ops: ScanamoOps[List[Future[Boolean]]] = scanamoQueryStreamFunction(
-      queryRequest = scanamoQueryRequest,
-      resultFunction = updateQueryResults(reindexJob.desiredVersion)
+    // We start by querying DynamoDB for every record in the reindex sha
+    val queryResults: List[Either[DynamoReadError, HybridRecord]] = Scanamo.exec(dynamoDBClient)(
+      index.query(
+        'reindexShard -> reindexJob.shardId and
+        KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+      )
     )
 
-    Future
-      .sequence(Scanamo.exec(dynamoDBClient)(ops))
-      .map(result =>
-        if (result.contains(false)) {
-          throw GracefulFailureException(
-            new RuntimeException(
-              "Not all records were successfully processed!"
-            ))
-        } else {
-          info(s"Successfully processed reindex job $reindexJob")
-      })
+    val outdatedRecords = queryResults.map {
+      case Left(err: DynamoReadError) => {
+                  warn(s"Failed to read Dynamo records for $reindexJob: $err")
+                  throw GracefulFailureException(
+                    new RuntimeException(s"Error in the DynamoDB query: $err")
+                  )
+      }
+      case Right(r: HybridRecord) => r
+    }
+
+    val updates: List[Future[Unit]] = outdatedRecords.map { hybridRecord =>
+      val updatedRecord = hybridRecord.copy(reindexVersion = reindexJob.desiredVersion)
+      versionedDao.updateRecord[HybridRecord](updatedRecord)(evidence = evidence, versionUpdater = versionUpdater)
+    }
+
+    Future.sequence(updates)
   }
 }
