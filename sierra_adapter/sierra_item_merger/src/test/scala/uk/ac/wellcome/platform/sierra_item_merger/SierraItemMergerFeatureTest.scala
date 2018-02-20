@@ -40,8 +40,7 @@ class SierraItemMergerFeatureTest
 
     val expectedSierraTransformable = SierraTransformable(
       sourceId = bibId,
-      itemData = Map(id -> record),
-      version = 1
+      itemData = Map(id -> record)
     )
 
     eventually {
@@ -80,14 +79,12 @@ class SierraItemMergerFeatureTest
     eventually {
       val expectedSierraTransformable1 = SierraTransformable(
         sourceId = bibId1,
-        itemData = Map(id1 -> record1),
-        version = 1
+        itemData = Map(id1 -> record1)
       )
 
       val expectedSierraTransformable2 = SierraTransformable(
         sourceId = bibId2,
-        itemData = Map(id2 -> record2),
-        version = 1
+        itemData = Map(id2 -> record2)
       )
 
       val futureRecord1 = hybridStore.getRecord[SierraTransformable](
