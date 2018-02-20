@@ -10,8 +10,16 @@ output "vhs_full_access_policy" {
   value = "${module.versioned-hybrid-store.full_access_policy}"
 }
 
+output "vhs_dynamo_update_policy" {
+  value = "${module.versioned-hybrid-store.full_access_policy}"
+}
+
 output "vhs_table_name" {
   value = "${module.versioned-hybrid-store.table_name}"
+}
+
+output "vhs_table_stream_arn" {
+  value = "${module.versioned-hybrid-store.table_stream_arn}"
 }
 
 output "vhs_bucket_name" {
