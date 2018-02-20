@@ -6,12 +6,12 @@ output "miro_transformer_topic_publish_policy" {
   value = "${module.miro_transformer_topic.publish_policy}"
 }
 
-output "vhs_full_access_policy" {
-  value = "${module.versioned-hybrid-store.full_access_policy}"
+output "vhs_dynamodb_full_access_policy" {
+  value = "${module.versioned-hybrid-store.dynamodb_full_access_policy}"
 }
 
-output "vhs_dynamo_update_policy" {
-  value = "${module.versioned-hybrid-store.full_access_policy}"
+output "vhs_dynamodb_update_policy" {
+  value = "${module.versioned-hybrid-store.dynamodb_update_policy}"
 }
 
 output "vhs_table_name" {
