@@ -159,9 +159,9 @@ class VersionedHybridStoreTest
       content = "Five fishing flinging flint"
     )
 
-    val future = hybridStore.updateRecord(
-      sourceName = record.sourceName,
-      sourceId = "not_the_same_id")(record)(identity)
+    val future =
+      hybridStore.updateRecord(sourceName = record.sourceName,
+                               sourceId = "not_the_same_id")(record)(identity)
 
     whenReady(future.failed) { e: Throwable =>
       e shouldBe a[IllegalArgumentException]
