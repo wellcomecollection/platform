@@ -206,6 +206,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   val unidentifiedWork = Work(
     title = Some("title"),
     sourceIdentifier = identifier,
+    version = 1,
     identifiers = List(identifier),
     description = Some("description"),
     lettering = Some("lettering"),
@@ -221,6 +222,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   val identifiedWork = Work(
     title = unidentifiedWork.title,
     sourceIdentifier = identifier,
+    version = 1,
     identifiers = unidentifiedWork.identifiers,
     canonicalId = Some("canonicalId"),
     description = unidentifiedWork.description,
@@ -271,6 +273,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   it("should have an ontology type 'Work' when serialised to JSON") {
     val work = Work(title = Some("A book about a blue whale"),
                     sourceIdentifier = identifier,
+                    version = 1,
                     identifiers = List(identifier))
     val jsonString = toJson(work).get
 
