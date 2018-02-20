@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= catalogue_pipeline
 
-SBT_APPS 	= id_minter ingestor transformer
+SBT_APPS 	= id_minter ingestor transformer recorder
 ECS_TASKS 	=
 LAMBDAS 	=
 

@@ -28,7 +28,8 @@ cache:
     - catalogue_pipeline/id_minter/target
     - catalogue_pipeline/ingestor/target
     - catalogue_pipeline/transformer/target
-    - catalogue_pipeline/reindexer/target
+    - catalogue_pipeline/recorder/target
+    - reindexer/reindex_worker/target
     - common/target
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
@@ -79,6 +80,7 @@ jobs:
     - env: TASK=sbt-common-test
     - env: TASK=transformer-test
     - env: TASK=ingestor-test
+    - env: TASK=recorder-test
     - env: TASK=id_minter-test
 
     # Reindexer stack
