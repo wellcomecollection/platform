@@ -5,6 +5,10 @@ resource "aws_s3_bucket" "platform_infra" {
   lifecycle {
     prevent_destroy = true
   }
+
+  versioning {
+    enabled = true
+  }
 }
 
 resource "aws_s3_bucket" "infra" {
