@@ -7,6 +7,7 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
+import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -33,7 +34,7 @@ class WorkIndexer @Inject()(
 
         elasticClient
           .execute {
-            indexInto(esIndex / esType).id(work.id).doc(work)
+            indexInto(esIndex / esType).version(work.version).versionType(VersionType.EXTERNAL_GTE).id(work.id).doc(work)
           }
           .recover {
             case e: Throwable =>
