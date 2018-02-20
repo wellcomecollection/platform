@@ -31,8 +31,6 @@ module "reindexer" {
   enable_alb_alarm = false
 }
 
-# Role policies for the reindexer
-
 resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {
   role   = "${module.reindexer.task_role_name}"
   policy = "${module.reindex_jobs_complete_topic.publish_policy}"
