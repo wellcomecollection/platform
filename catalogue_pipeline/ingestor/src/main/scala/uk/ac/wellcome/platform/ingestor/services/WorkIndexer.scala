@@ -34,7 +34,11 @@ class WorkIndexer @Inject()(
 
         elasticClient
           .execute {
-            indexInto(esIndex / esType).version(work.version).versionType(VersionType.EXTERNAL_GTE).id(work.id).doc(work)
+            indexInto(esIndex / esType)
+              .version(work.version)
+              .versionType(VersionType.EXTERNAL_GTE)
+              .id(work.id)
+              .doc(work)
           }
           .recover {
             case e: Throwable =>
