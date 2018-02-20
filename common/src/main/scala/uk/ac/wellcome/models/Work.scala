@@ -20,7 +20,8 @@ case class Work(title: Option[String],
                 publishers: List[AbstractAgent] = Nil,
                 visible: Boolean = true,
                 ontologyType: String = "Work")
-    extends Identifiable with Versioned
+    extends Identifiable
+    with Versioned
 
 case object Work extends Indexable[Work] {
   override def json(t: Work): String =
