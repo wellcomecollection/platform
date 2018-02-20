@@ -73,7 +73,6 @@ class VersionedHybridStoreTest
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
     val record = ExampleRecord(
-      version = 2,
       sourceId = "2222",
       sourceName = "Test2222",
       content = "Two teal turtles in Tenerife"
