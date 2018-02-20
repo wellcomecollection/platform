@@ -18,7 +18,6 @@ import uk.ac.wellcome.test.utils.{
   SQSLocal
 }
 
-import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
@@ -40,14 +39,6 @@ class SierraBibMergerFeatureTest
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
-
-  implicit val sierraTransformableUpdater =
-    new VersionUpdater[SierraTransformable] {
-      override def updateVersion(sierraTransformable: SierraTransformable,
-                                 newVersion: Int): SierraTransformable = {
-        sierraTransformable.copy(version = newVersion)
-      }
-    }
 
   override lazy val tableName = "sierra-bib-merger-feature-test-table"
   override lazy val bucketName = "sierra-bib-merger-feature-test-bucket"
