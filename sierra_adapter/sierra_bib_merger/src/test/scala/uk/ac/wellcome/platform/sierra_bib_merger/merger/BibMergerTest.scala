@@ -25,13 +25,6 @@ class BibMergerTest extends FunSpec with Matchers {
       caught.getMessage shouldEqual "Non-matching bib ids 333 != 444"
     }
 
-    it("should never increment the version when mergeBibRecord is called") {
-      val record = sierraBibRecord(id = "666")
-      val originalRecord = SierraTransformable(sourceId = "666", version = 10)
-      val newRecord = BibMerger.mergeBibRecord(originalRecord, record)
-      newRecord.version shouldEqual 10
-    }
-
     it(
       "should return the unmerged record when merging bib records with stale data") {
       val record = sierraBibRecord(
