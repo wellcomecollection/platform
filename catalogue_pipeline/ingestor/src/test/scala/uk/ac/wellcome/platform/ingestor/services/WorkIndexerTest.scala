@@ -48,16 +48,15 @@ class WorkIndexerTest
     }
   }
 
-  it(
-    "does not add a work with a lower version") {
-    val work = createWork("5678", "1234", "A multiplicity of mice", version = 3)
+  it("does not add a work with a lower version") {
+    val work =
+      createWork("5678", "1234", "A multiplicity of mice", version = 3)
 
     insertIntoElasticSearch(work)
 
     val future = workIndexer.indexWork(work.copy(version = 1))
 
     whenReady(future) { _ =>
-
       // give elasticsearch enough time to ingest the work
       Thread.sleep(700)
 
@@ -65,9 +64,11 @@ class WorkIndexerTest
     }
   }
 
-  it(
-    "replaces a work with the same version") {
-    val work = createWork(canonicalId = "5678", sourceId = "1234", title = "A multiplicity of mice", version = 3)
+  it("replaces a work with the same version") {
+    val work = createWork(canonicalId = "5678",
+                          sourceId = "1234",
+                          title = "A multiplicity of mice",
+                          version = 3)
 
     insertIntoElasticSearch(work)
 
