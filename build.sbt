@@ -34,6 +34,9 @@ lazy val transformer = doSharedSetup(project, "catalogue_pipeline/transformer")
 lazy val id_minter = doSharedSetup(project, "catalogue_pipeline/id_minter")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
+lazy val recorder = doSharedSierraSetup(project, "catalogue_pipeline/recorder")
+  .settings(libraryDependencies ++= Dependencies.recorderDependencies)
+
 lazy val reindex_worker = doSharedSetup(project, "reindexer/reindex_worker")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
