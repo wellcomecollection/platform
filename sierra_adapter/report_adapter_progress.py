@@ -11,7 +11,7 @@ import attr
 import boto3
 
 
-BUCKET = 'wellcomecollection-sierra-adapter-data'
+BUCKET = 'wellcomecollection-platform-adapters-sierra'
 
 
 def get_matching_s3_keys(bucket, prefix=''):

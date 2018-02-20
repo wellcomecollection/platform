@@ -5,7 +5,6 @@ import com.twitter.inject.Logging
 import io.circe.generic.extras.semiauto.deriveDecoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.VersionUpdater
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
@@ -23,14 +22,6 @@ class SierraItemMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore,
   metrics: MetricsSender
 ) extends Logging {
-
-  implicit val sierraTransformableUpdater =
-    new VersionUpdater[SierraTransformable] {
-      override def updateVersion(sierraTransformable: SierraTransformable,
-                                 newVersion: Int): SierraTransformable = {
-        sierraTransformable.copy(version = newVersion)
-      }
-    }
 
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>

@@ -8,7 +8,7 @@ ECS_TASKS 	=
 LAMBDAS 	=
 
 TF_NAME 	= catalogue_pipeline
-TF_PATH 	= $(ROOT)/catalogue_pipeline/terraform
+TF_PATH 	= catalogue_pipeline/terraform
 
 TF_IS_PUBLIC_FACING = false
 

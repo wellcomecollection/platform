@@ -5,7 +5,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
@@ -31,8 +31,8 @@ class ReindexerFeatureTest
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Versioned
-    .toVersionedDynamoFormatWrapper[HybridRecord]
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
+    .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   val queueUrl = createQueueAndReturnUrl("reindexer-feature-test-q")

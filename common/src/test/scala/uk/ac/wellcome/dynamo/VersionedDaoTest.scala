@@ -15,7 +15,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{VersionUpdater, Versioned}
+import uk.ac.wellcome.models.{Sourced, VersionUpdater, Versioned}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 case class TestVersioned(sourceId: String,
@@ -23,6 +23,7 @@ case class TestVersioned(sourceId: String,
                          somethingElse: String,
                          version: Int)
     extends Versioned
+    with Sourced
 
 class VersionedDaoTest
     extends FunSpec
@@ -46,8 +47,8 @@ class VersionedDaoTest
   val versionedDao =
     new VersionedDao(dynamoDbClient, DynamoConfig(tableName))
 
-  private val enrichedDynamoFormat: DynamoFormat[TestVersioned] = Versioned
-    .toVersionedDynamoFormatWrapper[TestVersioned]
+  private val enrichedDynamoFormat: DynamoFormat[TestVersioned] = Sourced
+    .toSourcedDynamoFormatWrapper[TestVersioned]
     .enrichedDynamoFormat
 
   describe("get a record") {

@@ -9,7 +9,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
@@ -33,8 +33,8 @@ class ReindexServiceTest
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Versioned
-    .toVersionedDynamoFormatWrapper[HybridRecord]
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
+    .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   it("only updates records with a lower than desired reindexVersion") {

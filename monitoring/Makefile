@@ -8,7 +8,7 @@ ECS_TASKS   = slack_budget_bot
 LAMBDAS     = post_to_slack terraform_tracker
 
 TF_NAME     = monitoring
-TF_PATH     = $(ROOT)/$(STACK_ROOT)
+TF_PATH     = $(STACK_ROOT)
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))

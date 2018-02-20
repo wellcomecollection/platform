@@ -38,7 +38,8 @@ build_setup: \
 define terraform_plan
 	make uptodate-git
 	$(ROOT)/.scripts/docker_run.py --aws -- \
-		--volume $(1):/data \
+		--volume $(ROOT):/data \
+		--workdir /data/$(1) \
 		--env OP=plan \
 		--env GET_PLATFORM_TFVARS=true \
 		--env IS_PUBLIC_FACING=$(2) \
@@ -54,7 +55,8 @@ endef
 define terraform_apply
 	make uptodate-git
 	$(ROOT)/.scripts/docker_run.py --aws -- \
-		--volume $(1):/data \
+		--volume $(ROOT):/data \
+		--workdir /data/$(1) \
 		--env OP=apply \
 		wellcome/terraform_wrapper:latest
 endef
@@ -197,16 +199,16 @@ $(1)-publish:
 	$(call publish_lambda,$(2))
 
 $(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt)
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
+	$(ROOT)/.scripts/build_lambda_test_image.sh $(1)
 	mkdir -p $(shell dirname $(ROOT)/.docker/test_lambda_$(1))
 	touch $(ROOT)/.docker/test_lambda_$(1)
 
 $(ROOT)/$(2)/src/requirements.txt:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
 
 $(ROOT)/$(2)/src/test_requirements.txt:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
 		pip-compile test_requirements.in
 endef
