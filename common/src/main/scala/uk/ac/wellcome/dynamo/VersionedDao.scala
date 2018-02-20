@@ -21,7 +21,7 @@ class VersionedDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  private def putRecord[T <: Versioned](record: T)(
+  private def putRecord[T <: Versioned with Sourced](record: T)(
     implicit evidence: SourcedDynamoFormatWrapper[T],
     versionUpdater: VersionUpdater[T]) = {
     implicit val dynamoFormat = evidence.enrichedDynamoFormat
