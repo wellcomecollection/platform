@@ -36,7 +36,7 @@ class IdMinterFeatureTest
 
     val work = Work(title = Some(title),
                     sourceIdentifier = identifier,
-      version = 1,
+                    version = 1,
                     identifiers = List(identifier))
 
     val sqsMessage = SQSMessage(
