@@ -27,5 +27,5 @@ module "trigger_shard_generator_lambda" {
 
 resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
   role   = "${module.shard_generator_lambda.role_name}"
-  policy = "${local.vhs_dynamo_update_policy}"
+  policy = "${local.vhs_dynamodb_update_policy}"
 }
