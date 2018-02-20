@@ -6,6 +6,7 @@ import io.circe.Decoder
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorkerToDynamo}
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 

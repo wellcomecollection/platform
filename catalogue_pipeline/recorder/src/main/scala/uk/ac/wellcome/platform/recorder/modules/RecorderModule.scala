@@ -5,7 +5,7 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
 import uk.ac.wellcome.utils.TryBackoff
 
-object SierraBibMergerModule extends TwitterModule with TryBackoff {
+object RecorderModule extends TwitterModule with TryBackoff {
 
   override lazy val continuous: Boolean = false
 
