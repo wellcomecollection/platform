@@ -104,7 +104,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     Future
       .sequence(updates)
       .map(_ => {
-        info(s"ReindexTargetService completed batch of ${updates.length} / ${resultGroup.length}")
+        info(
+          s"ReindexTargetService completed batch of ${updates.length} / ${resultGroup.length}")
 
         metricsSender.incrementCount(
           "reindex-updated-items",
