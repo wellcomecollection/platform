@@ -9,6 +9,7 @@ class PublishersTest extends ApiWorksTestBase {
     val work = Work(
       canonicalId = Some("zm9q6c6h"),
       sourceIdentifier = sourceIdentifier,
+      version =1,
       title = Some("A zoo of zebras doing zumba"),
       publishers = List()
     )
@@ -43,6 +44,7 @@ class PublishersTest extends ApiWorksTestBase {
     val work = Work(
       canonicalId = Some("patkj4ds"),
       sourceIdentifier = sourceIdentifier,
+      version =1,
       title = Some("A party of purple panthers in Paris"),
       publishers = List(
         Agent("Percy Parrot"),
@@ -89,6 +91,7 @@ class PublishersTest extends ApiWorksTestBase {
     val work = Work(
       canonicalId = Some("v9w6cz66"),
       sourceIdentifier = sourceIdentifier,
+      version =1,
       title = Some("Vultures vying for victory"),
       publishers = List(
         Agent("Vivian Violet"),
