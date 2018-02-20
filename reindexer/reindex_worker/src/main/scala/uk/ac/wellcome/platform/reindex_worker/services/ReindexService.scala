@@ -92,9 +92,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     val updates: Seq[Future[Unit]] = resultGroup.map {
       case Left(e: DynamoReadError) =>
         Future.failed(
-          new Exception(
-            s"DynamoReadError: ${DynamoReadError.describe(e)}"
-          )
+          new Exception(s"DynamoReadError: ${DynamoReadError.describe(e)}")
         )
       case Right(hybridRecord: HybridRecord) => {
         getRecord(hybridRecord).flatMap { record =>
@@ -106,7 +104,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     Future
       .sequence(updates)
       .map(_ => {
-        info(s"ReindexTargetService completed batch of ${updates.length}")
+        info(
+          s"ReindexTargetService completed batch of ${updates.length} / ${resultGroup.length}")
 
         metricsSender.incrementCount(
           "reindex-updated-items",
