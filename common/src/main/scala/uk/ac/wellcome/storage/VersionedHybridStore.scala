@@ -7,7 +7,8 @@ import uk.ac.wellcome.models.transformable.Reindexable
 import uk.ac.wellcome.models.{
   VersionUpdater,
   Versioned,
-  VersionedDynamoFormatWrapper
+  Sourced,
+  SourcedDynamoFormatWrapper
 }
 import uk.ac.wellcome.s3.SourcedObjectStore
 
@@ -22,6 +23,7 @@ case class HybridRecord(
   reindexShard: String = "default",
   reindexVersion: Int = 0
 ) extends Reindexable
+    with Sourced
     with Versioned
 
 class VersionedHybridStore @Inject()(
@@ -36,19 +38,18 @@ class VersionedHybridStore @Inject()(
     }
   }
 
-  private case class VersionedHybridObject[T <: Versioned](
+  private case class VersionedHybridObject[T <: Sourced](
     hybridRecord: HybridRecord,
     s3Object: T
   )
 
-  def updateRecord[T <: Versioned](sourceName: String, sourceId: String)(
+  def updateRecord[T <: Sourced](sourceName: String, sourceId: String)(
     ifNotExisting: => T)(ifExisting: T => T)(
-    implicit evidence: VersionedDynamoFormatWrapper[T],
-    versionUpdater: VersionUpdater[T],
+    implicit evidence: SourcedDynamoFormatWrapper[T],
     decoder: Decoder[T],
     encoder: Encoder[T]
   ): Future[Unit] = {
-    val id = Versioned.id(sourceName, sourceId)
+    val id = Sourced.id(sourceName, sourceId)
 
     getObject[T](id).flatMap {
       case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
@@ -63,25 +64,29 @@ class VersionedHybridStore @Inject()(
         }
 
       case None =>
-        putObject(id,
-                  ifNotExisting,
-                  key =>
-                    HybridRecord(
-                      version = ifNotExisting.version,
-                      sourceId = ifNotExisting.sourceId,
-                      sourceName = ifNotExisting.sourceName,
-                      s3key = key
-                  ))
+        putObject(
+          id = id,
+          sourcedObject = ifNotExisting,
+          f = key =>
+            HybridRecord(
+              // If this record doesn't exist already, then we can start it
+              // at version 0 and not worry about a newer version elsewhere.
+              version = 0,
+              sourceId = ifNotExisting.sourceId,
+              sourceName = ifNotExisting.sourceName,
+              s3key = key
+          )
+        )
     }
   }
 
-  def getRecord[T <: Versioned](id: String)(
+  def getRecord[T <: Sourced](id: String)(
     implicit decoder: Decoder[T]): Future[Option[T]] =
     getObject[T](id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
 
-  private def getObject[T <: Versioned](id: String)(
+  private def getObject[T <: Sourced](id: String)(
     implicit decoder: Decoder[T]): Future[Option[VersionedHybridObject[T]]] = {
 
     val dynamoRecord: Future[Option[HybridRecord]] =
@@ -97,22 +102,16 @@ class VersionedHybridStore @Inject()(
     }
   }
 
-  private def putObject[T <: Versioned](id: String,
-                                        versionedObject: T,
-                                        f: (String) => HybridRecord)(
-    implicit encoder: Encoder[T],
-    versionUpdater: VersionUpdater[T]
+  private def putObject[T <: Sourced](id: String,
+                                      sourcedObject: T,
+                                      f: (String) => HybridRecord)(
+    implicit encoder: Encoder[T]
   ) = {
-    if (versionedObject.id != id)
+    if (sourcedObject.id != id)
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
 
-    // The versioned DAO automatically increments the version on any new
-    // records.  The sourcedObjectStore doesn't, so we bump it here to be
-    // consistent.
-    val futureKey = sourcedObjectStore.put(
-      versionUpdater.updateVersion(versionedObject,
-                                   newVersion = versionedObject.version + 1))
+    val futureKey = sourcedObjectStore.put(sourcedObject)
 
     futureKey.flatMap { key =>
       versionedDao.updateRecord(f(key))

@@ -5,7 +5,7 @@ import com.gu.scanamo.syntax._
 import org.scalatest.Suite
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.s3.SourcedObjectStore
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
@@ -28,7 +28,7 @@ trait VersionedHybridStoreLocal
                                     ))
   )
 
-  def assertHybridRecordIsStoredCorrectly(record: Versioned,
+  def assertHybridRecordIsStoredCorrectly(record: Sourced,
                                           expectedJson: String) = {
     val dynamoRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
@@ -36,7 +36,6 @@ trait VersionedHybridStoreLocal
     dynamoRecord.isRight shouldBe true
     val hybridRecord = dynamoRecord.right.get
 
-    hybridRecord.version shouldBe record.version
     hybridRecord.sourceId shouldBe record.sourceId
     hybridRecord.sourceName shouldBe record.sourceName
 

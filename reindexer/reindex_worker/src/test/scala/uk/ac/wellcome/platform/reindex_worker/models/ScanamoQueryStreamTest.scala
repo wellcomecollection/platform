@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 import com.gu.scanamo.syntax._
 import shapeless.{HList, LabelledGeneric, Witness}
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.{Versioned, VersionedDynamoFormatWrapper}
+import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.storage.HybridRecord
 import scala.collection.JavaConverters._
 import scala.collection.JavaConversions._
@@ -32,8 +32,8 @@ class ScanamoQueryStreamTest
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Versioned
-    .toVersionedDynamoFormatWrapper[HybridRecord]
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
+    .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   it("should run a given function for each batch from the query provided") {
@@ -95,7 +95,7 @@ class ScanamoQueryStreamTest
   }
 
   def calculateRecordSize[R <: HList](hybridRecord: HybridRecord)(
-    implicit versionedDynamoFormatWrapper: VersionedDynamoFormatWrapper[
+    implicit versionedDynamoFormatWrapper: SourcedDynamoFormatWrapper[
       HybridRecord]): Int = {
     val attributeValue =
       versionedDynamoFormatWrapper.enrichedDynamoFormat.write(hybridRecord)
