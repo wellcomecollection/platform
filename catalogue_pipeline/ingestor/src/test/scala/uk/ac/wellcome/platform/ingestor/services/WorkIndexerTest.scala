@@ -2,14 +2,12 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.sksamuel.elastic4s.http.ElasticDsl.{search, _}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
@@ -64,6 +62,20 @@ class WorkIndexerTest
       Thread.sleep(700)
 
       assertElasticsearchEventuallyHasWork(work)
+    }
+  }
+
+  it(
+    "replaces a work with the same version") {
+    val work = createWork(canonicalId = "5678", sourceId = "1234", title = "A multiplicity of mice", version = 3)
+
+    insertIntoElasticSearch(work)
+
+    val updatedWork = work.copy(title = Some("boring title"))
+    val future = workIndexer.indexWork(updatedWork)
+
+    whenReady(future) { _ =>
+      assertElasticsearchEventuallyHasWork(updatedWork)
     }
   }
 }
