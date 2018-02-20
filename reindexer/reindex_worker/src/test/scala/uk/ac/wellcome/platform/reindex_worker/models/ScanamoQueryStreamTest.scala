@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 import com.gu.scanamo.syntax._
 import shapeless.{HList, LabelledGeneric, Witness}
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.{Versioned, SourcedDynamoFormatWrapper}
+import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.storage.HybridRecord
 import scala.collection.JavaConverters._
 import scala.collection.JavaConversions._
@@ -32,7 +32,7 @@ class ScanamoQueryStreamTest
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Versioned
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
     .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
