@@ -14,7 +14,7 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{VersionUpdater, VersionedDynamoFormatWrapper}
+import uk.ac.wellcome.models.{VersionUpdater, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ScanamoQueryStream
@@ -70,7 +70,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     hybridRecord: HybridRecord,
     desiredVersion: Int
   )(
-    implicit evidence: VersionedDynamoFormatWrapper[HybridRecord],
+    implicit evidence: SourcedDynamoFormatWrapper[HybridRecord],
     versionUpdater: VersionUpdater[HybridRecord]
   ): Future[Unit] = {
     // TODO: what if desiredVersion < reindexVersion?
@@ -85,7 +85,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   def updateQueryResults(desiredVersion: Int)(
     resultGroup: List[ScanamoQueryResult]
   )(
-    implicit evidence: VersionedDynamoFormatWrapper[HybridRecord],
+    implicit evidence: SourcedDynamoFormatWrapper[HybridRecord],
     versionUpdater: VersionUpdater[HybridRecord]
   ): Future[Boolean] = {
 

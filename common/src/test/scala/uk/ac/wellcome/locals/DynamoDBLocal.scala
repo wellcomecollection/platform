@@ -5,12 +5,12 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.query.UniqueKey
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterEach, Matchers, Suite}
-import uk.ac.wellcome.models.Versioned
+import uk.ac.wellcome.models.{Sourced, Versioned}
 import uk.ac.wellcome.test.utils.{DynamoDBLocalClients, ExtendedPatience}
 
 import scala.collection.JavaConversions._
 
-trait DynamoDBLocal[T <: Versioned]
+trait DynamoDBLocal[T <: Versioned with Sourced]
     extends BeforeAndAfterEach
     with DynamoDBLocalClients
     with Eventually
