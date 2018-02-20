@@ -40,10 +40,3 @@ resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
   role   = "${module.shard_generator_lambda.role_name}"
   policy = "${module.versioned-hybrid-store.dynamo_update_policy}"
 }
-
-# Role policies for the complete_reindex_lambda
-
-resource "aws_iam_role_policy" "complete_reindex_lambda_reindexer_tracker_table" {
-  role   = "${module.complete_reindex_lambda.role_name}"
-  policy = "${data.aws_iam_policy_document.reindex_shard_tracker_table.json}"
-}
