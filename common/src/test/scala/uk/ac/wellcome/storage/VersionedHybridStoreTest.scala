@@ -8,7 +8,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
 
 case class ExampleRecord(
-  version: Int,
   sourceId: String,
   sourceName: String,
   content: String
