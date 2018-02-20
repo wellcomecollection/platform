@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage
 import com.gu.scanamo.DynamoFormat
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{Sourced, VersionUpdater, Versioned}
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -12,21 +12,13 @@ case class ExampleRecord(
   sourceId: String,
   sourceName: String,
   content: String
-) extends Versioned
-    with Sourced
+) extends Sourced
 
 class VersionedHybridStoreTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with VersionedHybridStoreLocal {
-
-  implicit val testVersionUpdater = new VersionUpdater[ExampleRecord] {
-    override def updateVersion(testVersioned: ExampleRecord,
-                               newVersion: Int): ExampleRecord = {
-      testVersioned.copy(version = newVersion)
-    }
-  }
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -36,38 +28,31 @@ class VersionedHybridStoreTest
 
   it("stores a versioned record if it has never been seen before") {
     val record = ExampleRecord(
-      version = 1,
       sourceId = "1111",
       sourceName = "Test1111",
       content = "One ocelot in orange"
     )
-
-    val expectedRecord = record.copy(version = 2)
 
     val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(
       record)(identity)
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
-        record = expectedRecord,
-        expectedJson = toJson(expectedRecord).get
+        record = record,
+        expectedJson = toJson(record).get
       )
     }
   }
 
   it("applies the given transformation to an existing record") {
     val record = ExampleRecord(
-      version = 1,
       sourceId = "1111",
       sourceName = "Test1111",
       content = "One ocelot in orange"
     )
 
     val expectedRecord = record
-      .copy(
-        content = "new content",
-        version = 3
-      )
+      .copy(content = "new content")
 
     val t = (e: ExampleRecord) => e.copy(content = "new content")
 
@@ -96,11 +81,8 @@ class VersionedHybridStoreTest
     )
 
     val updatedRecord = record.copy(
-      version = 3,
       content = "Throwing turquoise tangerines in Tanzania"
     )
-
-    val expectedRecord = updatedRecord.copy(version = 4)
 
     val future = hybridStore.updateRecord(record.sourceName, record.sourceId)(
       record)(identity)
@@ -113,8 +95,8 @@ class VersionedHybridStoreTest
 
     whenReady(updatedFuture) { _ =>
       assertHybridRecordIsStoredCorrectly(
-        record = expectedRecord,
-        expectedJson = toJson(expectedRecord).get
+        record = updatedRecord,
+        expectedJson = toJson(updatedRecord).get
       )
     }
   }
@@ -129,7 +111,6 @@ class VersionedHybridStoreTest
 
   it("returns a future of Some[ExampleRecord] if the record exists") {
     val record = ExampleRecord(
-      version = 5,
       sourceId = "5555",
       sourceName = "Test5555",
       content = "Five fishing flinging flint"
@@ -143,13 +124,16 @@ class VersionedHybridStoreTest
     }
 
     whenReady(getFuture) { result =>
-      result shouldBe Some(record.copy(version = record.version + 1))
+      result shouldBe Some(record)
     }
   }
 
+  // TODO: This test no longer tells us anything useful, because we don't
+  // expose the version directly.
+  //
+  // We should modify the test so that 'ifExisting' makes it appear unmodified.
   it("does not create a new version of a record if it's not modified") {
     val record = ExampleRecord(
-      version = 0,
       sourceId = "5555",
       sourceName = "Test5555",
       content = "Five fishing flinging flint"
@@ -164,20 +148,20 @@ class VersionedHybridStoreTest
     } yield result
 
     whenReady(future) { result =>
-      result.get.version shouldBe 1
+      result shouldBe Some(record)
     }
   }
 
   it("does not allow creation of records with a different id than indicated") {
     val record = ExampleRecord(
-      version = 0,
       sourceId = "8934",
       sourceName = "Test5555",
       content = "Five fishing flinging flint"
     )
 
-    val future =
-      hybridStore.updateRecord("sierra", "not_the_same_id")(record)(identity)
+    val future = hybridStore.updateRecord(
+      sourceName = record.sourceName,
+      sourceId = "not_the_same_id")(record)(identity)
 
     whenReady(future.failed) { e: Throwable =>
       e shouldBe a[IllegalArgumentException]
@@ -186,7 +170,6 @@ class VersionedHybridStoreTest
 
   it("does not allow transformation to a record with a different id") {
     val record = ExampleRecord(
-      version = 0,
       sourceId = "8934",
       sourceName = "Test5555",
       content = "Five fishing flinging flint"
