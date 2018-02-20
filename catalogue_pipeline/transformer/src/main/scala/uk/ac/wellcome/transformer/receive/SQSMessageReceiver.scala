@@ -70,12 +70,13 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
     }
   }
 
-  private def transformTransformable(
-    transformable: Transformable, version: Int): Try[Option[Work]] = {
+  private def transformTransformable(transformable: Transformable,
+                                     version: Int): Try[Option[Work]] = {
     val transformableTransformer = chooseTransformer(transformable)
-    transformableTransformer.transform(transformable, version) map { transformed =>
-      debug(s"Transformed record to $transformed")
-      transformed
+    transformableTransformer.transform(transformable, version) map {
+      transformed =>
+        debug(s"Transformed record to $transformed")
+        transformed
     } recover {
       case e: Throwable =>
         error("Failed to perform transform to unified item", e)

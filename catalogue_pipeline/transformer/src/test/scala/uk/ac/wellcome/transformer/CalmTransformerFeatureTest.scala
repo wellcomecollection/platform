@@ -84,7 +84,7 @@ class CalmTransformerFeatureTest
       .toJson(
         Work(title = Some("placeholder title for a Calm record"),
              sourceIdentifier = sourceIdentifier,
-          version =1 ,
+             version = 1,
              identifiers = List(sourceIdentifier)))
       .get
   }
