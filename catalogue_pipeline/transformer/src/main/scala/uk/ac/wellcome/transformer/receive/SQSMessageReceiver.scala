@@ -44,7 +44,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
             JsonUtil.fromJson[HybridRecord](message.body))
           transformableRecord <- getTransformable(hybridRecord)
           cleanRecord <- Future.fromTry(
-            transformTransformable(transformableRecord))
+            transformTransformable(transformableRecord, hybridRecord.version))
           publishResult <- publishMessage(cleanRecord)
         } yield publishResult
 
@@ -71,9 +71,9 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
   }
 
   private def transformTransformable(
-    transformable: Transformable): Try[Option[Work]] = {
+    transformable: Transformable, version: Int): Try[Option[Work]] = {
     val transformableTransformer = chooseTransformer(transformable)
-    transformableTransformer.transform(transformable) map { transformed =>
+    transformableTransformer.transform(transformable, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
     } recover {

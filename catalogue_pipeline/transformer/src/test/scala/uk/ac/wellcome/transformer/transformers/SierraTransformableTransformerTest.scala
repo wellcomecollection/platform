@@ -51,7 +51,7 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
 
     transformedSierraRecord.isSuccess shouldBe true
     val work = transformedSierraRecord.get.get
@@ -107,7 +107,7 @@ class SierraTransformableTransformerTest
                                    version = 1))
     )
 
-    val triedMaybeWork = transformer.transform(transformable)
+    val triedMaybeWork = transformer.transform(transformable, version = 1)
     triedMaybeWork.isSuccess shouldBe true
     triedMaybeWork.get.isDefined shouldBe true
     val work = triedMaybeWork.get.get
@@ -124,7 +124,7 @@ class SierraTransformableTransformerTest
     val sierraTransformable =
       SierraTransformable(sourceId = "000", maybeBibData = None)
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get shouldBe None
@@ -144,7 +144,7 @@ class SierraTransformableTransformerTest
         ))
     )
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
     transformedSierraRecord.get shouldBe None
   }
@@ -208,7 +208,7 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
     val identifier =
@@ -218,6 +218,7 @@ class SierraTransformableTransformerTest
       Work(
         title = Some(title),
         sourceIdentifier = identifier,
+        version = 1,
         identifiers = List(identifier),
         description = Some("A delightful description of a dead daisy."),
         publishers = List(Organisation(label = "Peaceful Poetry")),
@@ -244,7 +245,7 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
     val identifier =
@@ -253,6 +254,7 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.get shouldBe Some(
       Work(title = Some(title),
            sourceIdentifier = identifier,
+        version =1,
            identifiers = List(identifier),
            visible = false)
     )
@@ -276,7 +278,7 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
     val identifier =
@@ -285,6 +287,7 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.get shouldBe Some(
       Work(title = Some(title),
            sourceIdentifier = identifier,
+        version = 1,
            identifiers = List(identifier),
            visible = false)
     )
@@ -317,7 +320,7 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
 
     transformedSierraRecord.isSuccess shouldBe true
     val work = transformedSierraRecord.get.get
@@ -362,7 +365,7 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-    val transformedSierraRecord = transformer.transform(sierraTransformable)
+    val transformedSierraRecord = transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get.get.title shouldBe None
