@@ -50,6 +50,8 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )
-    transformer.transform(miroTransformable, version =1).isSuccess shouldBe false
+    transformer
+      .transform(miroTransformable, version = 1)
+      .isSuccess shouldBe false
   }
 }
