@@ -86,6 +86,7 @@ module "items_merger" {
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
-  vhs_full_access_policy = "${local.vhs_full_access_policy}"
-  bucket_name            = "${local.vhs_bucket_name}"
+  vhs_dynamodb_full_access_policy = "${local.vhs_dynamodb_full_access_policy}"
+
+  bucket_name = "${local.vhs_bucket_name}"
 }
