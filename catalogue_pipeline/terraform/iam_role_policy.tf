@@ -41,13 +41,6 @@ resource "aws_iam_role_policy" "allow_shard_generator_put_vhs" {
   policy = "${module.versioned-hybrid-store.dynamo_update_policy}"
 }
 
-# Role policies for the reindex_job_creator
-
-resource "aws_iam_role_policy" "reindex_job_creator_lambda_sns" {
-  role   = "${module.reindex_job_creator_lambda.role_name}"
-  policy = "${module.reindex_jobs_topic.publish_policy}"
-}
-
 # Role policies for the complete_reindex_lambda
 
 resource "aws_iam_role_policy" "complete_reindex_lambda_reindexer_tracker_table" {
