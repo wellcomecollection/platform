@@ -46,6 +46,7 @@ class SQSMessageReceiverTest
 
   val work = Work(title = Some("placeholder title for a Calm record"),
                   sourceIdentifier = sourceIdentifier,
+    version = 1,
                   identifiers = List(sourceIdentifier))
 
   val metricsSender: MetricsSender = new MetricsSender(
@@ -77,6 +78,33 @@ class SQSMessageReceiverTest
       val messages = listMessagesReceivedFromSNS()
       messages should have size 1
       messages.head.message shouldBe JsonUtil.toJson(work).get
+      messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+    }
+  }
+  it("should receive a message and add the version to the transformed work") {
+    val id = "b001"
+    val title = "A pot of possums"
+    val lastModifiedDate = Instant.now()
+    val version = 5
+
+    val sierraMessage: SQSMessage = hybridRecordSqsMessage(
+      createValidSierraTransformableJson(id,
+        title,
+        lastModifiedDate
+      ),
+      "sierra",
+      version = version
+    )
+
+    val future = recordReceiver.receiveMessage(sierraMessage)
+
+    whenReady(future) { _ =>
+      val messages = listMessagesReceivedFromSNS()
+      messages should have size 1
+      messages.head.message shouldBe JsonUtil.toJson(Work(title = Some(title),
+        sourceIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id),
+        version = version,
+        identifiers = List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)))).get
       messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
     }
   }
