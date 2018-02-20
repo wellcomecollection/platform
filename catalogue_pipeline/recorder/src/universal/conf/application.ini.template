@@ -1,0 +1,4 @@
+-aws.sqs.queue.url=${windows_queue_url}
+-aws.metrics.namespace=${metrics_namespace}
+-aws.s3.bucketName=${bucket_name}
+-aws.dynamo.tableName=${dynamo_table_name}
