@@ -18,16 +18,6 @@ module "ecr_repository_ingestor" {
   name   = "ingestor"
 }
 
-module "ecr_repository_reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "reindexer"
-}
-
-module "ecr_repository_reindex_worker" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "reindex_worker"
-}
-
 module "ecr_repository_elasticdump" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "elasticdump"
