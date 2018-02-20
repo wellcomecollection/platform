@@ -188,7 +188,8 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2006-06-06T06:06:06Z"
     )
 
-    val expectedSierraTransformable = SierraTransformable(bibRecord = newBibRecord)
+    val expectedSierraTransformable =
+      SierraTransformable(bibRecord = newBibRecord)
 
     val oldTitle = "A small selection of sad shellfish"
     val oldUpdatedDate = "2001-01-01T01:01:01Z"
