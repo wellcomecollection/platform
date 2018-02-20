@@ -148,8 +148,8 @@ class SierraItemMergerUpdaterServiceTest
           record.get shouldBe expectedUpdatedSierraTransformable
         }
 
-        val futureRecord3 = hybridStore.getRecord[SierraTransformable](
-          newRecord.id)
+        val futureRecord3 =
+          hybridStore.getRecord[SierraTransformable](newRecord.id)
         whenReady(futureRecord3) { record =>
           record.get shouldBe newRecord
         }
