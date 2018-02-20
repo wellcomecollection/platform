@@ -69,7 +69,7 @@ trait Ingestor
 
     Work(title = Some(title),
          sourceIdentifier = sourceIdentifier,
-      version = version,
+         version = version,
          identifiers = List(sourceIdentifier),
          canonicalId = Some(canonicalId),
          visible = visible)
