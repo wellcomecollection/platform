@@ -34,7 +34,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       data = buildJSONForWork(data)
     )
 
-    val triedMaybeWork = transformer.transform(miroTransformable)
+    val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
     if (triedMaybeWork.isFailure) triedMaybeWork.failed.get.printStackTrace()
     triedMaybeWork.isSuccess shouldBe true
     triedMaybeWork.get.get
@@ -50,6 +50,6 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )
-    transformer.transform(miroTransformable).isSuccess shouldBe false
+    transformer.transform(miroTransformable, version =1).isSuccess shouldBe false
   }
 }
