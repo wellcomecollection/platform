@@ -24,8 +24,9 @@ class IngestorWorkerService @Inject()(
     fromJson[Work](message.body) match {
       case Success(work) =>
         identifiedWorkIndexer.indexWork(work = work).map(_ => ())
-      case Failure(err) => Future {
-        throw GracefulFailureException(err)
-      }
+      case Failure(err) =>
+        Future {
+          throw GracefulFailureException(err)
+        }
     }
 }
