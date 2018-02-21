@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.sierra_bib_merger.modules
 import javax.inject.Singleton
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
 import com.google.inject.Provides
 import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
