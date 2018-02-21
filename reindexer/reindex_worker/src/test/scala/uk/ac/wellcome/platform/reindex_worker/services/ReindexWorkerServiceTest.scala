@@ -13,7 +13,12 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
-import uk.ac.wellcome.models.aws.{DynamoConfig, SNSConfig, SQSConfig, SQSMessage}
+import uk.ac.wellcome.models.aws.{
+  DynamoConfig,
+  SNSConfig,
+  SQSConfig,
+  SQSMessage
+}
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
@@ -25,14 +30,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[HybridRecord] with MockitoSugar with SNSLocal with SQSLocal with ScalaFutures {
+class ReindexWorkerServiceTest
+    extends FunSpec
+    with Matchers
+    with DynamoDBLocal[HybridRecord]
+    with MockitoSugar
+    with SNSLocal
+    with SQSLocal
+    with ScalaFutures {
 
   val actorSystem = ActorSystem()
 
   val metricsSender: MetricsSender =
     new MetricsSender(namespace = "reindexer-tests",
-      mock[AmazonCloudWatch],
-      actorSystem)
+                      mock[AmazonCloudWatch],
+                      actorSystem)
 
   override lazy val tableName = "reindex-worker-service-test"
 
@@ -55,13 +67,17 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
     val hybridRecord = HybridRecord(
       version = 1,
       sourceId = "sierra",
-      sourceName = "111", s3key = "s3://reindexWST/example.json", reindexShard = reindexJob.shardId, reindexVersion = reindexJob.desiredVersion - 1
+      sourceName = "111",
+      s3key = "s3://reindexWST/example.json",
+      reindexShard = reindexJob.shardId,
+      reindexVersion = reindexJob.desiredVersion - 1
     )
 
     Scanamo.put(dynamoDbClient)(tableName)(hybridRecord)(enrichedDynamoFormat)
 
     val expectedRecords = List(
-      hybridRecord.copy(version = hybridRecord.version + 1, reindexVersion = reindexJob.desiredVersion)
+      hybridRecord.copy(version = hybridRecord.version + 1,
+                        reindexVersion = reindexJob.desiredVersion)
     )
 
     val invalidSqsMessage = SQSMessage(
@@ -84,7 +100,8 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
     }
   }
 
-  it("returns a failed Future if it cannot parse the SQS message as a ReindexJob") {
+  it(
+    "returns a failed Future if it cannot parse the SQS message as a ReindexJob") {
     val sqsMessage = SQSMessage(
       subject = None,
       body = "<xml>What is JSON.</xl?>",
@@ -99,7 +116,8 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
 
     whenReady(future.failed) { result =>
       result shouldBe a[GracefulFailureException]
-      result.getMessage should include("expected json value got < (line 1, column 1)")
+      result.getMessage should include(
+        "expected json value got < (line 1, column 1)")
     }
   }
 
@@ -123,13 +141,16 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
 
     whenReady(future.failed) { result =>
       result shouldBe a[GracefulFailureException]
-      result.getMessage should include("Cannot do operations on a non-existent table")
+      result.getMessage should include(
+        "Cannot do operations on a non-existent table")
     }
   }
 
   it("returns a failed Future if the reindex job fails after a delay") {
     val targetService = mock[ReindexService]
-    when(targetService.runReindex(any[ReindexJob])(any[SourcedDynamoFormatWrapper[HybridRecord]]))
+    when(
+      targetService.runReindex(any[ReindexJob])(
+        any[SourcedDynamoFormatWrapper[HybridRecord]]))
       .thenReturn(Future {
         Thread.sleep(500)
         throw new RuntimeException("This took too long")
@@ -164,7 +185,8 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
     }
   }
 
-  private def reindexWorkerService(dynamoTableName: String = tableName): ReindexWorkerService = {
+  private def reindexWorkerService(
+    dynamoTableName: String = tableName): ReindexWorkerService = {
     new ReindexWorkerService(
       targetService = new ReindexService(
         dynamoDBClient = dynamoDbClient,
