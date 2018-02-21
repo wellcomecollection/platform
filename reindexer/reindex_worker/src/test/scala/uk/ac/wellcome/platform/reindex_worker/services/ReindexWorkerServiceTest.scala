@@ -80,7 +80,7 @@ class ReindexWorkerServiceTest
                         reindexVersion = reindexJob.desiredVersion)
     )
 
-    val invalidSqsMessage = SQSMessage(
+    val sqsMessage = SQSMessage(
       subject = None,
       body = toJson(reindexJob).get,
       topic = "topic",
@@ -90,7 +90,7 @@ class ReindexWorkerServiceTest
 
     val service = reindexWorkerService()
 
-    val future = service.processMessage(message = invalidSqsMessage)
+    val future = service.processMessage(message = sqsMessage)
 
     whenReady(future) { _ =>
       val actualRecords: List[HybridRecord] =
@@ -147,13 +147,15 @@ class ReindexWorkerServiceTest
   }
 
   it("returns a failed Future if the reindex job fails after a delay") {
+    val exception = new RuntimeException("This took too long")
+
     val targetService = mock[ReindexService]
     when(
       targetService.runReindex(any[ReindexJob])(
         any[SourcedDynamoFormatWrapper[HybridRecord]]))
       .thenReturn(Future {
         Thread.sleep(500)
-        throw new RuntimeException("This took too long")
+        throw exception
       })
 
     val service = new ReindexWorkerService(
@@ -180,8 +182,7 @@ class ReindexWorkerServiceTest
     val future = service.processMessage(message = sqsMessage)
 
     whenReady(future.failed) { result =>
-      result shouldBe a[GracefulFailureException]
-      result.getMessage should include("This took too long")
+      result shouldBe GracefulFailureException(exception)
     }
   }
 

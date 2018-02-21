@@ -74,7 +74,7 @@ class IngestorWorkerServiceTest
     val brokenRestClient: RestClient = RestClient
       .builder(new HttpHost("localhost", 9800, "http"))
       .setHttpClientConfigCallback(
-        new ElasticCredentials("elastic", "badpassword"))
+        new ElasticCredentials("elastic", "changeme"))
       .build()
 
     val brokenElasticClient: HttpClient =
@@ -103,9 +103,11 @@ class IngestorWorkerServiceTest
     val sqsMessage = messageFromString(toJson(work).get)
     val future = service.processMessage(sqsMessage)
 
+    // The exact exception isn't so important -- we just care that it's
+    // *not* a GracefulFailureException, as problems with Elasticsearch
+    // should trigger the TryBackoff behaviour.
     whenReady(future.failed) { result =>
       result shouldBe a[ConnectException]
-      result.getMessage should include("Connection refused")
     }
   }
 

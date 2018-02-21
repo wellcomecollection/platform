@@ -67,27 +67,31 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       }
 
     val futureOutdatedRecords: Future[List[HybridRecord]] = futureResults.map {
-      results =>
-        results.map {
-          case Left(err: DynamoReadError) => {
-            warn(s"Failed to read Dynamo records for $reindexJob: $err")
-            throw GracefulFailureException(
-              new RuntimeException(s"Error in the DynamoDB query: $err")
-            )
-          }
-          case Right(r: HybridRecord) => r
-        }
+      results => results.map { extractHybridRecord(_) }
     }
 
     // Then we PUT all the records.  It might be more efficient to do a
     // bulk update, but this will do for now.
     futureOutdatedRecords.flatMap { (outdatedRecords: List[HybridRecord]) =>
-      val results = outdatedRecords.map { hybridRecord =>
-        val updatedRecord =
-          hybridRecord.copy(reindexVersion = reindexJob.desiredVersion)
-        versionedDao.updateRecord[HybridRecord](updatedRecord)
-      }
-      Future.sequence(results)
+      Future.sequence(outdatedRecords.map {
+        updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion)
+      })
     }
+  }
+
+  private def extractHybridRecord(scanamoResult: Either[DynamoReadError, HybridRecord]): HybridRecord =
+    scanamoResult match {
+      case Left(err: DynamoReadError) => {
+        warn(s"Failed to read Dynamo records: $err")
+        throw GracefulFailureException(
+          new RuntimeException(s"Error in the DynamoDB query: $err")
+        )
+      }
+      case Right(r: HybridRecord) => r
+    }
+
+  private def updateIndividualRecord(record: HybridRecord, desiredVersion: Int): Future[Unit] = {
+    val updatedRecord = record.copy(reindexVersion = desiredVersion)
+    versionedDao.updateRecord[HybridRecord](updatedRecord)
   }
 }
