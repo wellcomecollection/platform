@@ -7,9 +7,7 @@ import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.{
   AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder,
-  AmazonDynamoDBStreams,
-  AmazonDynamoDBStreamsClientBuilder
+  AmazonDynamoDBClientBuilder
 }
 
 trait DynamoDBLocalClients { this: Suite =>
@@ -32,13 +30,6 @@ trait DynamoDBLocalClients { this: Suite =>
       new BasicAWSCredentials(accessKey, secretKey))
 
   val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
-    .standard()
-    .withCredentials(dynamoDBLocalCredentialsProvider)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
-
-  val streamsClient: AmazonDynamoDBStreams = AmazonDynamoDBStreamsClientBuilder
     .standard()
     .withCredentials(dynamoDBLocalCredentialsProvider)
     .withEndpointConfiguration(

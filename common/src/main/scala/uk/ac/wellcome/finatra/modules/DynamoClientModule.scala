@@ -28,23 +28,6 @@ object DynamoClientModule extends TwitterModule {
     createAwsClient(awsConfig, standardDynamoDBClientBuilder)
   }
 
-  @Singleton
-  @Provides
-  def providesDynamoStreamsClient(
-    awsConfig: AWSConfig): AmazonDynamoDBStreams = {
-    val standardDynamoStreamsClientBuilder = AmazonDynamoDBStreamsClientBuilder
-      .standard()
-    createAwsClient(awsConfig, standardDynamoStreamsClientBuilder)
-  }
-
-  @Singleton
-  @Provides
-  def providesDynamoAsyncClient(awsConfig: AWSConfig): AmazonDynamoDBAsync = {
-    val standardDynamoDbAsyncClientBuilder = AmazonDynamoDBAsyncClientBuilder
-      .standard()
-    createAwsClient(awsConfig, standardDynamoDbAsyncClientBuilder)
-  }
-
   private def createAwsClient[T <: AwsClientBuilder[_, _], J](
     awsConfig: AWSConfig,
     awsClientBuilder: AwsClientBuilder[T, J]): J = {
