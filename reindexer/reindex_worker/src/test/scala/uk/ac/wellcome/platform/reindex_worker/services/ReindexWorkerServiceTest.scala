@@ -61,7 +61,7 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
       hybridRecord.copy(version = hybridRecord.version + 1, reindexVersion = reindexJob.desiredVersion)
     )
 
-    val sqsMessage = SQSMessage(
+    val invalidSqsMessage = SQSMessage(
       subject = None,
       body = toJson(reindexJob).get,
       topic = "topic",
@@ -71,7 +71,7 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
 
     val service = reindexWorkerService()
 
-    val future = service.processMessage(message = sqsMessage)
+    val future = service.processMessage(message = invalidSqsMessage)
 
     whenReady(future) { _ =>
       val actualRecords: List[HybridRecord] =
@@ -100,16 +100,40 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
     }
   }
 
-  private def reindexWorkerService(): ReindexWorkerService = {
+  it("returns a failed Future if the reindex job fails") {
+    val reindexJob = ReindexJob(
+      shardId = "sierra/333",
+      desiredVersion = 3
+    )
+
+    val sqsMessage = SQSMessage(
+      subject = None,
+      body = toJson(reindexJob).get,
+      topic = "topic",
+      messageType = "message",
+      timestamp = "now"
+    )
+
+    val service = reindexWorkerService(dynamoTableName = "does-not-exist")
+
+    val future = service.processMessage(message = sqsMessage)
+
+    whenReady(future.failed) { result =>
+      result shouldBe a[GracefulFailureException]
+      result.getMessage should include("Cannot do operations on a non-existent table")
+    }
+  }
+
+  private def reindexWorkerService(dynamoTableName: String = tableName): ReindexWorkerService = {
     new ReindexWorkerService(
       targetService = new ReindexService(
         dynamoDBClient = dynamoDbClient,
         metricsSender = metricsSender,
         versionedDao = new VersionedDao(
           dynamoDbClient = dynamoDbClient,
-          dynamoConfig = DynamoConfig(table = tableName)
+          dynamoConfig = DynamoConfig(table = dynamoTableName)
         ),
-        dynamoConfig = DynamoConfig(table = tableName)
+        dynamoConfig = DynamoConfig(table = dynamoTableName)
       ),
       reader = new SQSReader(
         sqsClient = sqsClient,
