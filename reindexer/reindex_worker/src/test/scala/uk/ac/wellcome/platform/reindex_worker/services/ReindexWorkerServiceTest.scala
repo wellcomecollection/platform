@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
@@ -9,6 +10,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.{DynamoConfig, SNSConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
@@ -33,6 +35,10 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
+    .toSourcedDynamoFormatWrapper[HybridRecord]
+    .enrichedDynamoFormat
+
   val queueUrl = createQueueAndReturnUrl("reindex-worker-service-test-q")
   val topicArn = createTopicAndReturnArn("reindex-worker-service-test-topic")
 
@@ -42,10 +48,16 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
       desiredVersion = 6
     )
 
+    val hybridRecord = HybridRecord(
+      version = 1,
+      sourceId = "sierra",
+      sourceName = "111", s3key = "s3://reindexWST/example.json", reindexShard = reindexJob.shardId, reindexVersion = reindexJob.desiredVersion - 1
+    )
+
+    Scanamo.put(dynamoDbClient)(tableName)(hybridRecord)(enrichedDynamoFormat)
+
     val expectedRecords = List(
-      HybridRecord(
-        version = 2, sourceId = "sierra", sourceName = "111", s3key = "s3://reindexWST/example.json", reindexShard = reindexJob.shardId, reindexVersion = reindexJob.desiredVersion - 1
-      )
+      hybridRecord.copy(version = hybridRecord.version + 1, reindexVersion = reindexJob.desiredVersion)
     )
 
     val sqsMessage = SQSMessage(
