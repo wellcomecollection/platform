@@ -56,17 +56,35 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     // large, this might cause out-of-memory errors -- in practice, we're
     // hoping that the shards/individual records are small enough for this
     // not to be a problem.
-    val queryResults: List[Either[DynamoReadError, HybridRecord]] =
-      Scanamo.exec(dynamoDBClient)(
-        index.query(
-          'reindexShard -> reindexJob.shardId and
-            KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+    val futureResults: Future[List[Either[DynamoReadError, HybridRecord]]] =
+      Future {
+        Scanamo.exec(dynamoDBClient)(
+          index.query(
+            'reindexShard -> reindexJob.shardId and
+              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+          )
         )
-      )
+      }
 
-    val outdatedRecords = queryResults.map {
+    val futureOutdatedRecords: Future[List[HybridRecord]] = futureResults.map {
+      results =>
+        results.map { extractHybridRecord(_) }
+    }
+
+    // Then we PUT all the records.  It might be more efficient to do a
+    // bulk update, but this will do for now.
+    futureOutdatedRecords.flatMap { (outdatedRecords: List[HybridRecord]) =>
+      Future.sequence(outdatedRecords.map {
+        updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion)
+      })
+    }
+  }
+
+  private def extractHybridRecord(
+    scanamoResult: Either[DynamoReadError, HybridRecord]): HybridRecord =
+    scanamoResult match {
       case Left(err: DynamoReadError) => {
-        warn(s"Failed to read Dynamo records for $reindexJob: $err")
+        warn(s"Failed to read Dynamo records: $err")
         throw GracefulFailureException(
           new RuntimeException(s"Error in the DynamoDB query: $err")
         )
@@ -74,17 +92,9 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       case Right(r: HybridRecord) => r
     }
 
-    // Then we PUT all the records.  It might be more efficient to do a
-    // bulk update, but this will do for now.
-    val updates: List[Future[Unit]] = outdatedRecords.map { hybridRecord =>
-      val updatedRecord =
-        hybridRecord.copy(reindexVersion = reindexJob.desiredVersion)
-      versionedDao.updateRecord[HybridRecord](updatedRecord)(evidence =
-                                                               evidence,
-                                                             versionUpdater =
-                                                               versionUpdater)
-    }
-
-    Future.sequence(updates)
+  private def updateIndividualRecord(record: HybridRecord,
+                                     desiredVersion: Int): Future[Unit] = {
+    val updatedRecord = record.copy(reindexVersion = desiredVersion)
+    versionedDao.updateRecord[HybridRecord](updatedRecord)
   }
 }
