@@ -56,25 +56,27 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     // large, this might cause out-of-memory errors -- in practice, we're
     // hoping that the shards/individual records are small enough for this
     // not to be a problem.
-    val futureResults: Future[List[Either[DynamoReadError, HybridRecord]]] = Future {
-      Scanamo.exec(dynamoDBClient)(
-        index.query(
-          'reindexShard -> reindexJob.shardId and
-            KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
-        )
-      )
-    }
-
-    val futureOutdatedRecords: Future[List[HybridRecord]] = futureResults.map { results =>
-      results.map {
-        case Left(err: DynamoReadError) => {
-          warn(s"Failed to read Dynamo records for $reindexJob: $err")
-          throw GracefulFailureException(
-            new RuntimeException(s"Error in the DynamoDB query: $err")
+    val futureResults: Future[List[Either[DynamoReadError, HybridRecord]]] =
+      Future {
+        Scanamo.exec(dynamoDBClient)(
+          index.query(
+            'reindexShard -> reindexJob.shardId and
+              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
           )
-        }
-        case Right(r: HybridRecord) => r
+        )
       }
+
+    val futureOutdatedRecords: Future[List[HybridRecord]] = futureResults.map {
+      results =>
+        results.map {
+          case Left(err: DynamoReadError) => {
+            warn(s"Failed to read Dynamo records for $reindexJob: $err")
+            throw GracefulFailureException(
+              new RuntimeException(s"Error in the DynamoDB query: $err")
+            )
+          }
+          case Right(r: HybridRecord) => r
+        }
     }
 
     // Then we PUT all the records.  It might be more efficient to do a
@@ -84,7 +86,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
         val updatedRecord =
           hybridRecord.copy(reindexVersion = reindexJob.desiredVersion)
         versionedDao.updateRecord[HybridRecord](updatedRecord)(
-          evidence = evidence, versionUpdater = versionUpdater)
+          evidence = evidence,
+          versionUpdater = versionUpdater)
       }
       Future.sequence(results)
     }

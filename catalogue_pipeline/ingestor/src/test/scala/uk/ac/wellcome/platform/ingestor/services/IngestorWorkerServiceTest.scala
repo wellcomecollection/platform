@@ -73,10 +73,12 @@ class IngestorWorkerServiceTest
   it("returns a failed Future if indexing into Elasticsearch fails") {
     val brokenRestClient: RestClient = RestClient
       .builder(new HttpHost("localhost", 9800, "http"))
-      .setHttpClientConfigCallback(new ElasticCredentials("elastic", "badpassword"))
+      .setHttpClientConfigCallback(
+        new ElasticCredentials("elastic", "badpassword"))
       .build()
 
-    val brokenElasticClient: HttpClient = HttpClient.fromRestClient(brokenRestClient)
+    val brokenElasticClient: HttpClient =
+      HttpClient.fromRestClient(brokenRestClient)
 
     val brokenWorkIndexer = new WorkIndexer(
       esIndex = indexName,
