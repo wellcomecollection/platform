@@ -17,7 +17,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class ReindexerWorkerService @Inject()(
+class ReindexWorkerService @Inject()(
   targetService: ReindexService,
   reader: SQSReader,
   snsWriter: SNSWriter,
