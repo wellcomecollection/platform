@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -151,6 +152,28 @@ class ReindexServiceTest
 
       hybridRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
       hybridRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+    }
+  }
+
+  it("returns a failed Future if there's a DynamoDB error") {
+    val service = new ReindexService(
+      dynamoDBClient = dynamoDbClient,
+      metricsSender = metricsSender,
+      versionedDao = new VersionedDao(
+        dynamoDbClient = dynamoDbClient,
+        dynamoConfig = DynamoConfig(table = "does-not-exist")
+      ),
+      dynamoConfig = DynamoConfig(table = "does-not-exist")
+    )
+
+    val reindexJob = ReindexJob(
+      shardId = "sierra/000",
+      desiredVersion = 2
+    )
+
+    val future = service.runReindex(reindexJob)
+    whenReady(future.failed) {
+      _ shouldBe a[ResourceNotFoundException]
     }
   }
 }
