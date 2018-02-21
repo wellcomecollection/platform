@@ -1,0 +1,98 @@
+package uk.ac.wellcome.platform.reindex_worker.services
+
+import akka.actor.ActorSystem
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.gu.scanamo.{DynamoFormat, Scanamo}
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.locals.DynamoDBLocal
+import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.aws.{DynamoConfig, SNSConfig, SQSConfig, SQSMessage}
+import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.sns.SNSWriter
+import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.storage.HybridRecord
+import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
+import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.duration._
+
+class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[HybridRecord] with MockitoSugar with SNSLocal with SQSLocal with ScalaFutures {
+
+  val actorSystem = ActorSystem()
+
+  val metricsSender: MetricsSender =
+    new MetricsSender(namespace = "reindexer-tests",
+      mock[AmazonCloudWatch],
+      actorSystem)
+
+  override lazy val tableName = "reindex-worker-service-test"
+
+  override lazy val evidence: DynamoFormat[HybridRecord] =
+    DynamoFormat[HybridRecord]
+
+  val queueUrl = createQueueAndReturnUrl("reindex-worker-service-test-q")
+  val topicArn = createTopicAndReturnArn("reindex-worker-service-test-topic")
+
+  it("returns a successful Future if the reindex completes correctly") {
+    val reindexJob = ReindexJob(
+      shardId = "sierra/123",
+      desiredVersion = 6
+    )
+
+    val expectedRecords = List(
+      HybridRecord(
+        version = 2, sourceId = "sierra", sourceName = "111", s3key = "s3://reindexWST/example.json", reindexShard = reindexJob.shardId, reindexVersion = reindexJob.desiredVersion - 1
+      )
+    )
+
+    val sqsMessage = SQSMessage(
+      subject = None,
+      body = toJson(reindexJob).get,
+      topic = "topic",
+      messageType = "message",
+      timestamp = "now"
+    )
+
+    val service = reindexWorkerService()
+
+    val future = service.processMessage(message = sqsMessage)
+
+    whenReady(future) { _ =>
+      val actualRecords: List[HybridRecord] =
+        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+
+      actualRecords shouldBe expectedRecords
+    }
+  }
+
+  private def reindexWorkerService(): ReindexWorkerService = {
+    new ReindexWorkerService(
+      targetService = new ReindexService(
+        dynamoDBClient = dynamoDbClient,
+        metricsSender = metricsSender,
+        versionedDao = new VersionedDao(
+          dynamoDbClient = dynamoDbClient,
+          dynamoConfig = DynamoConfig(table = tableName)
+        ),
+        dynamoConfig = DynamoConfig(table = tableName)
+      ),
+      reader = new SQSReader(
+        sqsClient = sqsClient,
+        sqsConfig = SQSConfig(
+          queueUrl = queueUrl,
+          waitTime = 1 second,
+          maxMessages = 1
+        )
+      ),
+      snsWriter = new SNSWriter(
+        snsClient = snsClient,
+        snsConfig = SNSConfig(topicArn = topicArn)
+      ),
+      system = actorSystem,
+      metrics = metricsSender
+    )
+  }
+}
