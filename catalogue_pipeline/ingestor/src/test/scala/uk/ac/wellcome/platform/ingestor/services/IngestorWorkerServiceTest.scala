@@ -1,7 +1,12 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.sksamuel.elastic4s.http.HttpClient
+import org.apache.http.HttpHost
+import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -9,6 +14,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -61,6 +67,43 @@ class IngestorWorkerServiceTest
 
     whenReady(future.failed) { exception =>
       exception shouldBe a[GracefulFailureException]
+    }
+  }
+
+  it("returns a failed Future if indexing into Elasticsearch fails") {
+    val brokenRestClient: RestClient = RestClient
+      .builder(new HttpHost("localhost", 9800, "http"))
+      .setHttpClientConfigCallback(new ElasticCredentials("elastic", "badpassword"))
+      .build()
+
+    val brokenElasticClient: HttpClient = HttpClient.fromRestClient(brokenRestClient)
+
+    val brokenWorkIndexer = new WorkIndexer(
+      esIndex = indexName,
+      esType = itemType,
+      elasticClient = brokenElasticClient,
+      metricsSender = metricsSender
+    )
+
+    val service = new IngestorWorkerService(
+      identifiedWorkIndexer = brokenWorkIndexer,
+      reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+      system = actorSystem,
+      metrics = metricsSender
+    )
+
+    val work = createWork(
+      canonicalId = "b4aurznb",
+      sourceId = "B000765",
+      title = "A broken beach of basilisks"
+    )
+
+    val sqsMessage = messageFromString(toJson(work).get)
+    val future = service.processMessage(sqsMessage)
+
+    whenReady(future.failed) { result =>
+      result shouldBe a[ConnectException]
+      result.getMessage should include("Connection refused")
     }
   }
 
