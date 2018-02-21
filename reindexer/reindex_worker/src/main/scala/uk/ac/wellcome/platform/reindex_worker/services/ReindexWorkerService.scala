@@ -25,19 +25,20 @@ class ReindexWorkerService @Inject()(
   metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
-  override def processMessage(message: SQSMessage): Future[Unit] = Future {
+  override def processMessage(message: SQSMessage): Future[Unit] =
     fromJson[ReindexJob](message.body) match {
-      case Success(reindexJob) =>
-        for {
+      case Success(reindexJob) => {
+        val result = for {
           _ <- targetService.runReindex(reindexJob = reindexJob)
           message <- Future.fromTry(toJson(CompletedReindexJob(reindexJob)))
           result <- snsWriter.writeMessage(
             subject = s"source: ${this.getClass.getSimpleName}.processMessage",
             message = message
           )
-        } yield result
+        } yield ()
+        result.recover { case err => throw GracefulFailureException(err) }
+      }
 
       case Failure(err) => throw GracefulFailureException(err)
     }
-  }
 }
