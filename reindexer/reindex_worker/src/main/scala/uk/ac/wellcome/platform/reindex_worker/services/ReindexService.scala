@@ -67,7 +67,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       }
 
     val futureOutdatedRecords: Future[List[HybridRecord]] = futureResults.map {
-      results => results.map { extractHybridRecord(_) }
+      results =>
+        results.map { extractHybridRecord(_) }
     }
 
     // Then we PUT all the records.  It might be more efficient to do a
@@ -79,7 +80,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     }
   }
 
-  private def extractHybridRecord(scanamoResult: Either[DynamoReadError, HybridRecord]): HybridRecord =
+  private def extractHybridRecord(
+    scanamoResult: Either[DynamoReadError, HybridRecord]): HybridRecord =
     scanamoResult match {
       case Left(err: DynamoReadError) => {
         warn(s"Failed to read Dynamo records: $err")
@@ -90,7 +92,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       case Right(r: HybridRecord) => r
     }
 
-  private def updateIndividualRecord(record: HybridRecord, desiredVersion: Int): Future[Unit] = {
+  private def updateIndividualRecord(record: HybridRecord,
+                                     desiredVersion: Int): Future[Unit] = {
     val updatedRecord = record.copy(reindexVersion = desiredVersion)
     versionedDao.updateRecord[HybridRecord](updatedRecord)
   }
