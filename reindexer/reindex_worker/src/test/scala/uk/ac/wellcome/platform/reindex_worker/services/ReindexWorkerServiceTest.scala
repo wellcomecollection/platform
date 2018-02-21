@@ -122,7 +122,8 @@ class ReindexWorkerServiceTest
   }
 
   it("returns a failed Future if the reindex job fails") {
-    val exception = new RuntimeException("Flobberworm!  Fickle failure frustrates my fortunes!")
+    val exception = new RuntimeException(
+      "Flobberworm!  Fickle failure frustrates my fortunes!")
 
     val targetService = mock[ReindexService]
     when(
