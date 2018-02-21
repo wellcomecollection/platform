@@ -8,6 +8,7 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Sourced
@@ -77,6 +78,25 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
         Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
 
       actualRecords shouldBe expectedRecords
+    }
+  }
+
+  it("returns a failed Future if it cannot parse the SQS message as a ReindexJob") {
+    val sqsMessage = SQSMessage(
+      subject = None,
+      body = "<xml>What is JSON.</xl?>",
+      topic = "topic",
+      messageType = "message",
+      timestamp = "now"
+    )
+
+    val service = reindexWorkerService()
+
+    val future = service.processMessage(message = sqsMessage)
+
+    whenReady(future.failed) { result =>
+      result shouldBe a[GracefulFailureException]
+      result.getMessage should include("expected json value got < (line 1, column 1)")
     }
   }
 
