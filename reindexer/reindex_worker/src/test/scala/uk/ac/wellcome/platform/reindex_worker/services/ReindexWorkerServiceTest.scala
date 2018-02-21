@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.gu.scanamo.error.DynamoReadError
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
@@ -11,7 +12,7 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.models.aws.{DynamoConfig, SNSConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
@@ -20,6 +21,8 @@ import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[HybridRecord] with MockitoSugar with SNSLocal with SQSLocal with ScalaFutures {
@@ -121,6 +124,43 @@ class ReindexWorkerServiceTest extends FunSpec with Matchers with DynamoDBLocal[
     whenReady(future.failed) { result =>
       result shouldBe a[GracefulFailureException]
       result.getMessage should include("Cannot do operations on a non-existent table")
+    }
+  }
+
+  it("returns a failed Future if the reindex job fails after a delay") {
+    val targetService = mock[ReindexService]
+    when(targetService.runReindex(any[ReindexJob])(any[SourcedDynamoFormatWrapper[HybridRecord]]))
+      .thenReturn(Future {
+        Thread.sleep(500)
+        throw new RuntimeException("This took too long")
+      })
+
+    val service = new ReindexWorkerService(
+      targetService = targetService,
+      reader = mock[SQSReader],
+      snsWriter = mock[SNSWriter],
+      system = actorSystem,
+      metrics = metricsSender
+    )
+
+    val reindexJob = ReindexJob(
+      shardId = "sierra/444",
+      desiredVersion = 4
+    )
+
+    val sqsMessage = SQSMessage(
+      subject = None,
+      body = toJson(reindexJob).get,
+      topic = "topic",
+      messageType = "message",
+      timestamp = "now"
+    )
+
+    val future = service.processMessage(message = sqsMessage)
+
+    whenReady(future.failed) { result =>
+      result shouldBe a[GracefulFailureException]
+      result.getMessage should include("This took too long")
     }
   }
 
