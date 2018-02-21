@@ -38,24 +38,6 @@ UPTODATE_GIT_DEFINED = true
 
 endif
 
-.scripts:
-	mkdir $(ROOT)/.scripts
-
-# Get docker_run.py script
-.scripts/docker_run.py: .scripts
-	wget https://raw.githubusercontent.com/wellcometrust/docker_run/master/docker_run.py -P .scripts
-	chmod u+x .scripts/docker_run.py
-
-# Get is_up_to_date_with_master.sh script
-.scripts/is_up_to_date_with_master.sh: .scripts
-	wget https://raw.githubusercontent.com/wellcometrust/docker_run/master/scripts/is_up_to_date_with_master.sh  -P .scripts
-	chmod u+x .scripts/is_up_to_date_with_master.sh
-
-# Get the build scripts required
-build_setup: \
-	.scripts/is_up_to_date_with_master.sh \
-	.scripts/docker_run.py
-
 # Run a 'terraform plan' step.
 #
 # Args:
@@ -184,14 +166,14 @@ endef
 #	$2 - Root of the project's source code.
 #
 define __sbt_target_template
-$(1)-build:
+$(1)-build: build_setup
 	$(call sbt_build,$(1))
 	$(call build_image,$(1),$(2)/Dockerfile)
 
-$(1)-test:
+$(1)-test: build_setup
 	$(call sbt_test,$(1))
 
-$(1)-publish: $(1)-build
+$(1)-publish: $(1)-build build_setup
 	$(call publish_service,$(1))
 endef
 
@@ -204,10 +186,10 @@ endef
 #	$3 - Is this a public-facing stack?  (true/false)
 #
 define __terraform_target_template
-$(1)-terraform-plan:
+$(1)-terraform-plan: build_setup
 	$(call terraform_plan,$(2),$(3))
 
-$(1)-terraform-apply:
+$(1)-terraform-apply: build_setup
 	$(call terraform_apply,$(2))
 endef
 
@@ -219,22 +201,22 @@ endef
 #	$2 - Path to the Lambda source directory.
 #
 define __lambda_target_template
-$(1)-test: $(ROOT)/.docker/test_lambda_$(1)
+$(1)-test: $(ROOT)/.docker/test_lambda_$(1) build_setup
 	$(call test_lambda,$(2))
 
-$(1)-publish:
+$(1)-publish: build_setup
 	$(call publish_lambda,$(2))
 
-$(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt)
+$(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt) build_setup
 	$(ROOT)/.scripts/build_lambda_test_image.sh $(1)
 	mkdir -p $(shell dirname $(ROOT)/.docker/test_lambda_$(1))
 	touch $(ROOT)/.docker/test_lambda_$(1)
 
-$(ROOT)/$(2)/src/requirements.txt:
+$(ROOT)/$(2)/src/requirements.txt: build_setup
 	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
 
-$(ROOT)/$(2)/src/test_requirements.txt:
+$(ROOT)/$(2)/src/test_requirements.txt: build_setup
 	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
 		pip-compile test_requirements.in
@@ -248,10 +230,10 @@ endef
 #	$2 - Path to the associated Dockerfile.
 #
 define __ecs_target_template
-$(1)-build:
+$(1)-build: build_setup
 	$(call build_image,$(1),$(2))
 
-$(1)-publish: $(1)-build
+$(1)-publish: $(1)-build build_setup
 	$(call publish_service,$(1))
 endef
 
@@ -271,8 +253,6 @@ endef
 #	$TF_IS_PUBLIC_FACING    Is this a public-facing stack?  (true/false)
 #
 define stack_setup
-make build_setup
-
 # The structure of each of these lines is as follows:
 #
 #	$(foreach name,$(NAMES),
