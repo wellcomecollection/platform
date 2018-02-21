@@ -38,7 +38,9 @@ trait IndexedElasticSearchLocal
       val jsonDoc = toJson(work).get
 
       val result: Future[IndexResponse] = elasticClient.execute(
-        indexInto(index / itemType).version(work.version).versionType(VersionType.EXTERNAL_GTE)
+        indexInto(index / itemType)
+          .version(work.version)
+          .versionType(VersionType.EXTERNAL_GTE)
           .id(work.id)
           .doc(jsonDoc)
       )

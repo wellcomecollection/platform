@@ -22,7 +22,8 @@ class WorkIndexer @Inject()(
   @Flag("es.type") esType: String,
   elasticClient: HttpClient,
   metricsSender: MetricsSender
-) extends Logging with ElasticsearchExceptionManager {
+) extends Logging
+    with ElasticsearchExceptionManager {
 
   def indexWork(work: Work): Future[Any] = {
 
@@ -43,8 +44,11 @@ class WorkIndexer @Inject()(
               .doc(work)
           }
           .recover {
-            case e: ResponseException if getErrorType(e).contains("version_conflict_engine_exception") =>
-              warn(s"Trying to ingest work ${work.id} with older version: skipping.")
+            case e: ResponseException
+                if getErrorType(e).contains(
+                  "version_conflict_engine_exception") =>
+              warn(
+                s"Trying to ingest work ${work.id} with older version: skipping.")
               ()
             case e: Throwable =>
               error(s"Error indexing work ${work.id} into Elasticsearch", e)
