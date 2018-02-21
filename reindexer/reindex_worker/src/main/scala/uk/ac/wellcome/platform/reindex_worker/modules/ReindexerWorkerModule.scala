@@ -2,12 +2,12 @@ package uk.ac.wellcome.platform.reindex_worker.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.reindex_worker.services.ReindexerWorkerService
+import uk.ac.wellcome.platform.reindex_worker.services.ReindexWorkerService
 
 object ReindexerWorkerModule extends TwitterModule {
 
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[ReindexerWorkerService]
+    val workerService = injector.instance[ReindexWorkerService]
 
     workerService.runSQSWorker()
 
@@ -18,7 +18,7 @@ object ReindexerWorkerModule extends TwitterModule {
     info("Terminating SQS worker")
 
     val system = injector.instance[ActorSystem]
-    val workerService = injector.instance[ReindexerWorkerService]
+    val workerService = injector.instance[ReindexWorkerService]
 
     workerService.cancelRun()
     system.terminate()
