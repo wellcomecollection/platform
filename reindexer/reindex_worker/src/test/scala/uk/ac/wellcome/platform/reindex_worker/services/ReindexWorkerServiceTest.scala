@@ -122,41 +122,13 @@ class ReindexWorkerServiceTest
   }
 
   it("returns a failed Future if the reindex job fails") {
-    val reindexJob = ReindexJob(
-      shardId = "sierra/333",
-      desiredVersion = 3
-    )
-
-    val sqsMessage = SQSMessage(
-      subject = None,
-      body = toJson(reindexJob).get,
-      topic = "topic",
-      messageType = "message",
-      timestamp = "now"
-    )
-
-    val service = reindexWorkerService(dynamoTableName = "does-not-exist")
-
-    val future = service.processMessage(message = sqsMessage)
-
-    whenReady(future.failed) { result =>
-      result shouldBe a[GracefulFailureException]
-      result.getMessage should include(
-        "Cannot do operations on a non-existent table")
-    }
-  }
-
-  it("returns a failed Future if the reindex job fails after a delay") {
-    val exception = new RuntimeException("This took too long")
+    val exception = new RuntimeException("Flobberworm!  Fickle failure frustrates my fortunes!")
 
     val targetService = mock[ReindexService]
     when(
       targetService.runReindex(any[ReindexJob])(
         any[SourcedDynamoFormatWrapper[HybridRecord]]))
-      .thenReturn(Future {
-        Thread.sleep(500)
-        throw exception
-      })
+      .thenReturn(Future { throw exception })
 
     val service = new ReindexWorkerService(
       targetService = targetService,
@@ -181,9 +153,7 @@ class ReindexWorkerServiceTest
 
     val future = service.processMessage(message = sqsMessage)
 
-    whenReady(future.failed) { result =>
-      result shouldBe GracefulFailureException(exception)
-    }
+    whenReady(future.failed) { _ shouldBe exception }
   }
 
   private def reindexWorkerService(
