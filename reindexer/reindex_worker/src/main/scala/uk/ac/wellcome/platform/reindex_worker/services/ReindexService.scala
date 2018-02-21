@@ -85,9 +85,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
       val results = outdatedRecords.map { hybridRecord =>
         val updatedRecord =
           hybridRecord.copy(reindexVersion = reindexJob.desiredVersion)
-        versionedDao.updateRecord[HybridRecord](updatedRecord)(
-          evidence = evidence,
-          versionUpdater = versionUpdater)
+        versionedDao.updateRecord[HybridRecord](updatedRecord)
       }
       Future.sequence(results)
     }
