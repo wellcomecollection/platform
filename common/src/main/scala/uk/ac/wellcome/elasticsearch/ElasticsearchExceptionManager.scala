@@ -25,10 +25,10 @@ trait ElasticsearchExceptionManager {
       .tail
       .headOption
 
-    maybeJsonDocument.flatMap {jsonDocument =>
-
+    maybeJsonDocument.flatMap { jsonDocument =>
       parse(jsonDocument).toTry match {
-        case Success(jsonObject) => root.error.`type`.string.getOption(jsonObject)
+        case Success(jsonObject) =>
+          root.error.`type`.string.getOption(jsonObject)
         case Failure(_) => None
       }
     }
