@@ -64,16 +64,6 @@ class IngestorWorkerServiceTest
     }
   }
 
-  it(
-    "should not return a NullPointerException if the document is the string null") {
-    val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
-    val future = service.processMessage(sqsMessage)
-
-    whenReady(future.failed) { exception =>
-      exception shouldBe a[GracefulFailureException]
-    }
-  }
-
   private def messageFromString(body: String): SQSMessage =
     SQSMessage(
       subject = Some("inserting-identified-work-test"),
