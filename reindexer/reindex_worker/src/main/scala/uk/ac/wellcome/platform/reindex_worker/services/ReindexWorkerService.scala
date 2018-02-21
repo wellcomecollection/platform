@@ -39,6 +39,8 @@ class ReindexWorkerService @Inject()(
         result.recover { case err => throw GracefulFailureException(err) }
       }
 
-      case Failure(err) => throw GracefulFailureException(err)
+      case Failure(err) => Future {
+        throw GracefulFailureException(err)
+      }
     }
 }
