@@ -7,7 +7,10 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 
 import scala.util.Success
 
-class ElasticsearchExceptionManagerTest extends FunSpec with Matchers with ElasticSearchLocal {
+class ElasticsearchExceptionManagerTest
+    extends FunSpec
+    with Matchers
+    with ElasticSearchLocal {
 
   it("extracts the errorType from an elasticsearch exception") {
     val resp = elasticClient
@@ -19,7 +22,8 @@ class ElasticsearchExceptionManagerTest extends FunSpec with Matchers with Elast
     val elasticsearchManager = new ElasticsearchExceptionManager {}
 
     whenReady(resp.failed) { ex =>
-      elasticsearchManager.getErrorType(ex.asInstanceOf[ResponseException]) shouldBe Some("index_not_found_exception")
+      elasticsearchManager.getErrorType(ex.asInstanceOf[ResponseException]) shouldBe Some(
+        "index_not_found_exception")
     }
   }
 
