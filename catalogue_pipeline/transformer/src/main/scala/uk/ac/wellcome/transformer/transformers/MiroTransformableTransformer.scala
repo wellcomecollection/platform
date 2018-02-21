@@ -30,8 +30,8 @@ class MiroTransformableTransformer
   val contributorMap =
     toMap[String](Source.fromInputStream(stream).mkString).get
 
-  override def transformForType(
-    miroTransformable: MiroTransformable): Try[Option[Work]] = Try {
+  override def transformForType(miroTransformable: MiroTransformable,
+                                version: Int): Try[Option[Work]] = Try {
 
     val miroData = MiroTransformableData.create(miroTransformable.data)
     val (title, description) = getTitleAndDescription(miroData)
@@ -41,6 +41,7 @@ class MiroTransformableTransformer
         title = Some(title),
         sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
                                             miroTransformable.sourceId),
+        version = version,
         identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
         description = description,
         lettering = miroData.suppLettering,

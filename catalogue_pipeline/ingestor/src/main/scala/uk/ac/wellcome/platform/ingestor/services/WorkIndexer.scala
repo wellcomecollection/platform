@@ -7,6 +7,9 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
+import org.elasticsearch.client.ResponseException
+import org.elasticsearch.index.VersionType
+import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.Work
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -19,23 +22,34 @@ class WorkIndexer @Inject()(
   @Flag("es.type") esType: String,
   elasticClient: HttpClient,
   metricsSender: MetricsSender
-) extends Logging {
+) extends Logging
+    with ElasticsearchExceptionManager {
 
-  def indexWork(work: Work): Future[IndexResponse] = {
+  def indexWork(work: Work): Future[Any] = {
 
     // This is required for elastic4s, not Circe
     implicit val jsonMapper = Work
 
-    metricsSender.timeAndCount[IndexResponse](
+    metricsSender.timeAndCount[Any](
       "ingestor-index-work",
       () => {
         info(s"Indexing work ${work.id}")
 
         elasticClient
           .execute {
-            indexInto(esIndex / esType).id(work.id).doc(work)
+            indexInto(esIndex / esType)
+              .version(work.version)
+              .versionType(VersionType.EXTERNAL_GTE)
+              .id(work.id)
+              .doc(work)
           }
           .recover {
+            case e: ResponseException
+                if getErrorType(e).contains(
+                  "version_conflict_engine_exception") =>
+              warn(
+                s"Trying to ingest work ${work.id} with older version: skipping.")
+              ()
             case e: Throwable =>
               error(s"Error indexing work ${work.id} into Elasticsearch", e)
               throw e

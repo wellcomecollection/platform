@@ -42,6 +42,7 @@ trait IdMinterTestUtils
 
     val work = Work(title = Some("A query about a queue of quails"),
                     sourceIdentifier = identifier,
+                    version = 1,
                     identifiers = List(identifier))
 
     SQSMessage(Some("subject"),

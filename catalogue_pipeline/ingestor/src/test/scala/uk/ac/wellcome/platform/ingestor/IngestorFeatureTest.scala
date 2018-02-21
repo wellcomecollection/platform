@@ -36,6 +36,7 @@ class IngestorFeatureTest
       .toJson(
         Work(title = Some("A type of a tame turtle"),
              sourceIdentifier = sourceIdentifier,
+             version = 1,
              identifiers = List(sourceIdentifier),
              canonicalId = Some("1234"))
       )

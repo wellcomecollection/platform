@@ -12,8 +12,8 @@ import scala.util.Try
 
 class CalmTransformableTransformer
     extends TransformableTransformer[CalmTransformable] {
-  override def transformForType(
-    calmTransformable: CalmTransformable): Try[Option[Work]] =
+  override def transformForType(calmTransformable: CalmTransformable,
+                                version: Int): Try[Option[Work]] =
     fromJson[CalmTransformableData](calmTransformable.data)
       .map(
         _ =>
@@ -24,6 +24,7 @@ class CalmTransformableTransformer
                 IdentifierSchemes.calmPlaceholder,
                 "value"
               ),
+              version = version,
               identifiers = List(
                 SourceIdentifier(
                   IdentifierSchemes.calmPlaceholder,

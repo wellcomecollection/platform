@@ -11,6 +11,7 @@ class LocationsTest extends ApiWorksTestBase {
     val work = Work(
       canonicalId = Some("zm9q6c6h"),
       sourceIdentifier = sourceIdentifier,
+      version = 1,
       title = Some("A zoo of zebras doing zumba"),
       items = List(
         Item(canonicalId = Some("mhberjwy7"),

@@ -2,6 +2,7 @@ package uk.ac.wellcome.test.utils
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.index.IndexResponse
+import org.elasticsearch.index.VersionType
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.models.Work
@@ -38,6 +39,8 @@ trait IndexedElasticSearchLocal
 
       val result: Future[IndexResponse] = elasticClient.execute(
         indexInto(index / itemType)
+          .version(work.version)
+          .versionType(VersionType.EXTERNAL_GTE)
           .id(work.id)
           .doc(jsonDoc)
       )

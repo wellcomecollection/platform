@@ -48,7 +48,8 @@ class SierraTransformableTransformer
   }
 
   override def transformForType(
-    sierraTransformable: SierraTransformable
+    sierraTransformable: SierraTransformable,
+    version: Int
   ): Try[Option[Work]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
@@ -62,6 +63,7 @@ class SierraTransformableTransformer
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
                 sierraBibData.id
               ),
+              version = version,
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
               lettering = getLettering(sierraBibData),

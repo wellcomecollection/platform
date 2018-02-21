@@ -9,6 +9,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
     val work = Work(
       title = Some("An irritating imp is immune from items"),
       sourceIdentifier = sourceIdentifier,
+      version = 1,
       identifiers = List(sourceIdentifier),
       canonicalId = Some("abcdef12")
     )
@@ -30,6 +31,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
     val work = Work(
       title = Some("Inside an irate igloo"),
       sourceIdentifier = sourceIdentifier,
+      version = 1,
       identifiers = List(sourceIdentifier),
       canonicalId = Some("b4heraz7"),
       items = List(item)
@@ -51,6 +53,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
   it("correctly parses a work without any identifiers") {
     val work = Work(title = Some("An irascible iguana invites impudence"),
                     sourceIdentifier = sourceIdentifier,
+                    version = 1,
                     identifiers = Nil,
                     canonicalId = Some("xtsx8hwk"))
 
@@ -66,6 +69,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       val work = Work(
         title = Some("A goading giraffe is galling"),
         sourceIdentifier = sourceIdentifier,
+        version = 1,
         identifiers = Nil,
         canonicalId = Some("gsfmhw7v"),
         publishers = List()
@@ -79,6 +83,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       val work = Work(
         title = Some("A hammerhead hamster is harrowing"),
         sourceIdentifier = sourceIdentifier,
+        version = 1,
         identifiers = Nil,
         canonicalId = Some("hz2hrba9"),
         publishers = List(
@@ -98,6 +103,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       val work = Work(
         title = Some("Jumping over jackals in Japan"),
         sourceIdentifier = sourceIdentifier,
+        version = 1,
         identifiers = Nil,
         canonicalId = Some("j7tw9jv3"),
         publishers = List(

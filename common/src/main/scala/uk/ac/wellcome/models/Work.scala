@@ -6,6 +6,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 /** A representation of a work in our ontology */
 case class Work(title: Option[String],
                 sourceIdentifier: SourceIdentifier,
+                version: Int,
                 identifiers: List[SourceIdentifier] = List(),
                 canonicalId: Option[String] = None,
                 description: Option[String] = None,
@@ -20,6 +21,7 @@ case class Work(title: Option[String],
                 visible: Boolean = true,
                 ontologyType: String = "Work")
     extends Identifiable
+    with Versioned
 
 case object Work extends Indexable[Work] {
   override def json(t: Work): String =

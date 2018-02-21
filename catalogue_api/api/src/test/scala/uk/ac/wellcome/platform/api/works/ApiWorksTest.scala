@@ -182,6 +182,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
     val workWithCopyright = Work(title = Some("A scarf on a squirrel"),
                                  sourceIdentifier = sourceIdentifier,
+                                 version = 1,
                                  canonicalId = Some("yxh928a"),
                                  items = List(item))
     insertIntoElasticSearch(workWithCopyright)
@@ -466,6 +467,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     val workWithSubjects = Work(
       title = Some("A seal selling seaweed sandwiches in Scotland"),
       sourceIdentifier = sourceIdentifier,
+      version = 1,
       identifiers = List(),
       canonicalId = Some("test_subject1"),
       subjects = List(Concept("fish"), Concept("gardening"))
@@ -500,6 +502,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     val workWithSubjects = Work(
       title = Some("A guppy in a greenhouse"),
       sourceIdentifier = sourceIdentifier,
+      version = 1,
       identifiers = List(),
       canonicalId = Some("test_subject1"),
       genres = List(Concept("woodwork"), Concept("etching"))

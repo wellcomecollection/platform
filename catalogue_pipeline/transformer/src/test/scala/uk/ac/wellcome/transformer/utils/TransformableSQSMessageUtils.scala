@@ -76,7 +76,9 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
     JsonUtil.toJson(miroTransformable).get
   }
 
-  def hybridRecordSqsMessage(message: String, testSource: String) = {
+  def hybridRecordSqsMessage(message: String,
+                             testSource: String,
+                             version: Int = 1) = {
     val key = "testSource/1/testId/dshg548.json"
     s3Client.putObject(bucketName, key, message)
 
@@ -84,7 +86,7 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
       None,
       JsonUtil
         .toJson(
-          HybridRecord(version = 1,
+          HybridRecord(version = version,
                        sourceId = "testId",
                        sourceName = testSource,
                        s3key = key))
