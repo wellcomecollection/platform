@@ -275,6 +275,8 @@ def unpack_aws_directory():
     """
     import os
 
+    print('*** Loading AWS credentials for Travis', flush=True)
+
     # This directory should never pre-exist on Travis!  If it does, something
     # has gone wrong, and we should fail immediately.
     aws_dir = os.path.join(os.environ['HOME'], '.aws')
