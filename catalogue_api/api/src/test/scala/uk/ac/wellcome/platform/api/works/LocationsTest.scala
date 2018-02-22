@@ -9,12 +9,12 @@ class LocationsTest extends ApiWorksTestBase {
       PhysicalLocation(locationType = "smeg",
                        label = "a stack of slick slimes")
     val work = IdentifiedWork(
-      canonicalId = Some("zm9q6c6h"),
+      canonicalId = "zm9q6c6h",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       title = Some("A zoo of zebras doing zumba"),
       items = List(
-        Item(canonicalId = Some("mhberjwy7"),
+        Item(canonicalId = "mhberjwy7",
              sourceIdentifier = sourceIdentifier,
              locations = List(physicalLocation)))
     )

@@ -23,7 +23,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
   it("correctly parses items on a work") {
     val item = Item(
-      canonicalId = Some("c3a599u5"),
+      canonicalId = "c3a599u5",
       sourceIdentifier = sourceIdentifier,
       identifiers = List(sourceIdentifier),
       locations = List()
@@ -33,7 +33,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(sourceIdentifier),
-      canonicalId = Some("b4heraz7"),
+      canonicalId = "b4heraz7",
       items = List(item)
     )
 
@@ -71,7 +71,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
         sourceIdentifier = sourceIdentifier,
         version = 1,
         identifiers = Nil,
-        canonicalId = Some("gsfmhw7v"),
+        canonicalId = "gsfmhw7v",
         publishers = List()
       )
 
@@ -85,7 +85,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
         sourceIdentifier = sourceIdentifier,
         version = 1,
         identifiers = Nil,
-        canonicalId = Some("hz2hrba9"),
+        canonicalId = "hz2hrba9",
         publishers = List(
           Agent("Henry Hare"),
           Agent("Harriet Heron")
@@ -105,7 +105,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
         sourceIdentifier = sourceIdentifier,
         version = 1,
         identifiers = Nil,
-        canonicalId = Some("j7tw9jv3"),
+        canonicalId = "j7tw9jv3",
         publishers = List(
           Agent("Janet Jackson"),
           Organisation("Juniper Journals")
