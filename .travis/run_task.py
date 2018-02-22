@@ -27,7 +27,7 @@ import sys
 
 from should_publish import should_publish
 from should_run_tests import should_run_tests
-from travistooling import make, rreplace, unpack_aws_directory
+from travistooling import make, rreplace, unpack_secrets
 
 
 def main():
@@ -40,6 +40,8 @@ def main():
         print("*** We don't need to run tests, exiting early", flush=True)
         return 0
 
+    unpack_secrets()
+
     make(task)
 
     publish_task = rreplace(task, 'build', 'publish', count=1)
@@ -47,7 +49,6 @@ def main():
 
     if should_publish(task=task, travis_event_type=travis_event_type):
         print("*** We're going to run the publish task", flush=True)
-        unpack_aws_directory()
         dry_run = False
     else:
         print("*** We don't need to actually run the publish task", flush=True)
