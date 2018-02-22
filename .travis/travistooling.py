@@ -294,7 +294,7 @@ def unpack_secrets():
 
     import zipfile
     zf = zipfile.ZipFile('secrets.zip')
-    zf.extractall(path='secrets')
+    zf.extractall(path='.')
 
     os.makedirs(os.path.join(os.environ['HOME'], '.aws'), exist_ok=True)
     for f in ['config', 'credentials']:
