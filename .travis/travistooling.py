@@ -265,3 +265,33 @@ def rreplace(string, old, new, count=None):
 
     # Then join back together with ``new``
     return new.join(parts)
+
+
+def unpack_aws_directory():
+    """
+    We store our AWS credentials for Travis in an encrypted ZIP bundle.
+
+    This unencrypts the credentials, and copies them into place.
+    """
+    import os
+
+    # This directory should never pre-exist on Travis!  If it does, something
+    # has gone wrong, and we should fail immediately.
+    aws_dir = os.path.join(os.environ['HOME'], '.aws')
+    assert not os.path.exists(aws_dir)
+
+    # Unencrypted the encrypted ZIP file.
+    subprocess.check_call([
+        'openssl', 'aes-256-cbc',
+        '-K', os.environ['encrypted_83630750896a_key'],
+        '-iv', os.environ['encrypted_83630750896a_iv'],
+        '-in', '.travis/aws_dir.zip.enc',
+        '-out', '.travis/aws_dir.zip', '-d'
+    ])
+
+    import zipfile
+    zf = zipfile.ZipFile('.travis/aws_dir.zip')
+    zf.extractall(path=aws_dir)
+
+    assert os.path.exists(os.path.join(aws_dir, 'config'))
+    assert os.path.exists(os.path.join(aws_dir, 'credentials'))
