@@ -40,6 +40,8 @@ module "bibs_reader" {
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "bibs_merger" {
