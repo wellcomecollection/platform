@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.{Id, IdDynamoFormatWrapper, VersionedDao}
 import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.models.{ VersionUpdater, Versioned}
+import uk.ac.wellcome.models.{VersionUpdater, Versioned}
 import uk.ac.wellcome.s3.ObjectStore
 
 import scala.concurrent.Future
@@ -15,8 +15,8 @@ trait HybridRecord extends Versioned with Id {
 }
 
 class VersionedHybridStore @Inject()(
-                                      sourcedObjectStore: ObjectStore,
-                                      versionedDao: VersionedDao
+  sourcedObjectStore: ObjectStore,
+  versionedDao: VersionedDao
 ) {
 
 //  implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
@@ -31,12 +31,14 @@ class VersionedHybridStore @Inject()(
     s3Object: T
   )
 
-  def updateRecord[T <: Id, G <: HybridRecord](id: String, hybridRecordGenerator: (T,String) => G, keyGenerator: T => String)(
-    ifNotExisting: => T)(ifExisting: T => T)(
-                                          implicit evidence: IdDynamoFormatWrapper[G],
-                                          versionUpdater: VersionUpdater[G],
-                                          decoder: Decoder[T],
-                                          encoder: Encoder[T]
+  def updateRecord[T <: Id, G <: HybridRecord](
+    id: String,
+    hybridRecordGenerator: (T, String) => G,
+    keyGenerator: T => String)(ifNotExisting: => T)(ifExisting: T => T)(
+    implicit evidence: IdDynamoFormatWrapper[G],
+    versionUpdater: VersionUpdater[G],
+    decoder: Decoder[T],
+    encoder: Encoder[T]
   ): Future[Unit] = {
 
     getObject[T](id).flatMap {
@@ -46,9 +48,8 @@ class VersionedHybridStore @Inject()(
         if (transformedS3Record != s3Record) {
           putObject(id,
                     transformedS3Record,
-                    hybridRecordGenerator(transformedS3Record,_),
-                    keyGenerator
-              )
+                    hybridRecordGenerator(transformedS3Record, _),
+                    keyGenerator)
         } else {
           Future.successful(())
         }
@@ -57,7 +58,7 @@ class VersionedHybridStore @Inject()(
         putObject(
           id = id,
           sourcedObject = ifNotExisting,
-          f = hybridRecordGenerator(ifNotExisting,_),
+          f = hybridRecordGenerator(ifNotExisting, _),
           keyGenerator
         )
     }
@@ -86,8 +87,8 @@ class VersionedHybridStore @Inject()(
   }
 
   private def putObject[T <: Id](id: String,
-                                      sourcedObject: T,
-                                      f: (String) => HybridRecord,
+                                 sourcedObject: T,
+                                 f: (String) => HybridRecord,
                                  keyGenerator: T => String)(
     implicit encoder: Encoder[T]
   ) = {

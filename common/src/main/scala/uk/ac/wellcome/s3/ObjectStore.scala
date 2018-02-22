@@ -15,11 +15,10 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-class ObjectStore @Inject()(
-  s3Client: AmazonS3,
-  @Flag("aws.s3.bucketName") bucketName: String)
+class ObjectStore @Inject()(s3Client: AmazonS3,
+                            @Flag("aws.s3.bucketName") bucketName: String)
     extends Logging {
-  def put[T](sourcedObject: T)(keyPrefix : T => String)(
+  def put[T](sourcedObject: T)(keyPrefix: T => String)(
     implicit encoder: Encoder[T]): Future[String] = {
 
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>

@@ -19,7 +19,7 @@ trait Id {
 
 object Id {
   implicit def toIdDynamoFormatWrapper[T <: Id](
-                                                 implicit dynamoFormat: DynamoFormat[T]): IdDynamoFormatWrapper[T] =
+    implicit dynamoFormat: DynamoFormat[T]): IdDynamoFormatWrapper[T] =
     new IdDynamoFormatWrapper[T](dynamoFormat)
 }
 
