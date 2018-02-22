@@ -109,8 +109,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     value = "value"
   )
 
-  val item = Item(
-    canonicalId = Some("canonicalId"),
+  val item = IdentifiedItem(
+    canonicalId = "canonicalId",
     sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
