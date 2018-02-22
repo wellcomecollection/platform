@@ -11,7 +11,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(sourceIdentifier),
-      canonicalId = Some("abcdef12")
+      canonicalId = "abcdef12"
     )
 
     val displayWork = DisplayWork(
@@ -22,7 +22,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
   }
 
   it("correctly parses items on a work") {
-    val item = Item(
+    val item = IdentifiedItem(
       canonicalId = "c3a599u5",
       sourceIdentifier = sourceIdentifier,
       identifiers = List(sourceIdentifier),
@@ -42,7 +42,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       includes = WorksIncludes(items = true)
     )
     val displayItem = displayWork.items.get.head
-    displayItem.id shouldBe item.canonicalId.get
+    displayItem.id shouldBe item.canonicalId
   }
 
   val sourceIdentifier = SourceIdentifier(
@@ -55,7 +55,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
                     sourceIdentifier = sourceIdentifier,
                     version = 1,
                     identifiers = Nil,
-                    canonicalId = Some("xtsx8hwk"))
+                    canonicalId = "xtsx8hwk")
 
     val displayWork = DisplayWork(
       work = work,

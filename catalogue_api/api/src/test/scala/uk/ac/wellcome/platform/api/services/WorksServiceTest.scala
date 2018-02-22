@@ -39,9 +39,9 @@ class WorksServiceTest
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
-      displayWork.results.head shouldBe DisplayWork(works(0).id,
+      displayWork.results.head shouldBe DisplayWork(works(0).canonicalId,
                                                     works(0).title.get)
-      displayWork.results.tail.head shouldBe DisplayWork(works(1).id,
+      displayWork.results.tail.head shouldBe DisplayWork(works(1).canonicalId,
                                                          works(1).title.get)
     }
   }
@@ -51,7 +51,7 @@ class WorksServiceTest
 
     insertIntoElasticSearch(works: _*)
 
-    val recordsFuture = worksService.findWorkById(works.head.id)
+    val recordsFuture = worksService.findWorkById(works.head.canonicalId)
 
     whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
@@ -80,7 +80,7 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workDodo.id, workDodo.title.get)
+      works.results.head shouldBe DisplayWork(workDodo.canonicalId, workDodo.title.get)
     }
   }
 
@@ -167,7 +167,7 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workEmu.id, workEmu.title.get)
+      works.results.head shouldBe DisplayWork(workEmu.canonicalId, workEmu.title.get)
     }
   }
 
