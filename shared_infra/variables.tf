@@ -5,7 +5,6 @@ variable "aws_region" {
 
 variable "infra_bucket" {
   description = "S3 bucket storing our configuration"
-  default     = "platform-infra"
 }
 
 variable "release_ids" {

@@ -6,6 +6,7 @@ module "lambda_drain_ecs_container_instance" {
   timeout     = 60
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/drain_ecs_container_instance.zip"
 }
 

@@ -12,7 +12,9 @@ module "lambda_service_deployment_status" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
-  s3_key          = "lambdas/monitoring/deployment_tracking/service_deployment_status.zip"
+
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/monitoring/deployment_tracking/service_deployment_status.zip"
 }
 
 module "trigger_service_deployment_status" {

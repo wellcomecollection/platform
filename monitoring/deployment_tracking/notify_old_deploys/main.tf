@@ -15,7 +15,9 @@ module "lambda_notify_old_deploys" {
   timeout = 10
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
-  s3_key          = "lambdas/monitoring/deployment_tracking/notify_old_deploys.zip"
+
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/monitoring/deployment_tracking/notify_old_deploys.zip"
 }
 
 module "trigger_notify_old_deploys" {

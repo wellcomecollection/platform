@@ -7,6 +7,7 @@ module "lambda_run_ecs_task" {
   description = "Run an ECS task from a message published to SNS"
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/run_ecs_task.zip"
 }
 

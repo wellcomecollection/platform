@@ -1,5 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-INFRA_BUCKET = platform-infra
+INFRA_BUCKET = wellcomecollection-platform-infra
 
 
 ifndef UPTODATE_GIT_DEFINED

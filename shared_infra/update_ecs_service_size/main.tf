@@ -6,6 +6,7 @@ module "lambda_update_ecs_service_size" {
   description = "Update the desired count of an ECS service"
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/update_ecs_service_size.zip"
 }
 

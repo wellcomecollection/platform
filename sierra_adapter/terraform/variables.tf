@@ -17,3 +17,5 @@ variable "sierra_oauth_secret" {}
 
 variable "sierra_bibs_fields" {}
 variable "sierra_items_fields" {}
+
+variable "infra_bucket" {}

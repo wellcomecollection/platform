@@ -1,5 +1,6 @@
 module "s3_demultiplexer_lambda" {
   source      = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.3"
+  s3_bucket   = "${var.infra_bucket}"
   s3_key      = "lambdas/sierra_adapter/s3_demultiplexer.zip"
   module_name = "s3_demultiplexer"
 

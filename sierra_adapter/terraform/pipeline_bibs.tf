@@ -7,6 +7,7 @@ module "bibs_window_generator" {
   trigger_interval_minutes = 15
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  infra_bucket           = "${var.infra_bucket}"
 }
 
 module "bibs_reader" {
@@ -39,6 +40,8 @@ module "bibs_reader" {
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "bibs_merger" {
