@@ -1,16 +1,12 @@
 package uk.ac.wellcome.transformer
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, Transformable}
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
-import uk.ac.wellcome.test.utils.{MessageInfo, S3Local}
-import uk.ac.wellcome.transformer.utils.{
-  TransformableSQSMessageUtils,
-  TransformerFeatureTest
-}
+import uk.ac.wellcome.models.transformable.CalmTransformable
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.test.utils.MessageInfo
+import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 class CalmTransformerFeatureTest
     extends FunSpec
@@ -82,7 +78,7 @@ class CalmTransformerFeatureTest
     //currently for calm data we only output hardcoded sample values
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        Work(title = Some("placeholder title for a Calm record"),
+        UnidentifiedWork(title = Some("placeholder title for a Calm record"),
              sourceIdentifier = sourceIdentifier,
              version = 1,
              identifiers = List(sourceIdentifier)))

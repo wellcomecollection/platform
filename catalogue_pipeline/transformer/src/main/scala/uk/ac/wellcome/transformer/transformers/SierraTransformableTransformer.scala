@@ -26,7 +26,7 @@ class SierraTransformableTransformer
     fromJson[SierraItemData](itemRecord.data) match {
       case Success(sierraItemData) =>
         Some(
-          Item(
+          UnidentifiedItem(
             sourceIdentifier = SourceIdentifier(
               IdentifierSchemes.sierraSystemNumber,
               sierraItemData.id
@@ -50,14 +50,14 @@ class SierraTransformableTransformer
   override def transformForType(
     sierraTransformable: SierraTransformable,
     version: Int
-  ): Try[Option[Work]] = {
+  ): Try[Option[UnidentifiedWork]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
         info(s"Attempting to transform ${bibData.id}")
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(
-            Work(
+            UnidentifiedWork(
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.UnidentifiedWork
 import uk.ac.wellcome.models.transformable.MiroTransformable
 
 /** MiroTransformable looks for several fields in the source JSON -- if they're
@@ -27,7 +27,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     data: String,
     MiroID: String = "M0000001",
     MiroCollection: String = "TestCollection"
-  ): Work = {
+  ): UnidentifiedWork = {
     val miroTransformable = MiroTransformable(
       sourceId = MiroID,
       MiroCollection = MiroCollection,
