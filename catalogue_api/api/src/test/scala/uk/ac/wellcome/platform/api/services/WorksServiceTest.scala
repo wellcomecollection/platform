@@ -80,7 +80,8 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workDodo.canonicalId, workDodo.title.get)
+      works.results.head shouldBe DisplayWork(workDodo.canonicalId,
+                                              workDodo.title.get)
     }
   }
 
@@ -167,7 +168,8 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workEmu.canonicalId, workEmu.title.get)
+      works.results.head shouldBe DisplayWork(workEmu.canonicalId,
+                                              workEmu.title.get)
     }
   }
 

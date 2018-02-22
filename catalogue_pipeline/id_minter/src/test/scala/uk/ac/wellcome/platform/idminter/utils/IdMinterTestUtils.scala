@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.idminter.utils
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.Server
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
@@ -40,10 +44,11 @@ trait IdMinterTestUtils
     val identifier =
       SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
 
-    val work = UnidentifiedWork(title = Some("A query about a queue of quails"),
-                    sourceIdentifier = identifier,
-                    version = 1,
-                    identifiers = List(identifier))
+    val work = UnidentifiedWork(
+      title = Some("A query about a queue of quails"),
+      sourceIdentifier = identifier,
+      version = 1,
+      identifiers = List(identifier))
 
     SQSMessage(Some("subject"),
                JsonUtil.toJson(work).get,

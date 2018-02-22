@@ -35,9 +35,9 @@ class IdMinterFeatureTest
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
 
     val work = UnidentifiedWork(title = Some(title),
-                    sourceIdentifier = identifier,
-                    version = 1,
-                    identifiers = List(identifier))
+                                sourceIdentifier = identifier,
+                                version = 1,
+                                identifiers = List(identifier))
 
     val sqsMessage = SQSMessage(
       Some("subject"),
