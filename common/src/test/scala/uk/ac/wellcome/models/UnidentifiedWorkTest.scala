@@ -1,10 +1,10 @@
 package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
-class WorkTest extends FunSpec with Matchers with JsonTestUtil {
+class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   private val license_CCBYJson =
     s"""{
@@ -13,90 +13,6 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
             "url": "${License_CCBY.url}",
             "type": "License"
           }"""
-
-  val identifiedWorkJson: String =
-    s"""
-      |{
-      |  "title": "title",
-      |  "sourceIdentifier": {
-      |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
-      |    "value": "value"
-      |  },
-      |  "version": 1,
-      |  "identifiers": [
-      |    {
-      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
-      |      "value": "value"
-      |    }
-      |  ],
-      |  "canonicalId": "canonicalId",
-      |  "description": "description",
-      |  "lettering": "lettering",
-      |  "createdDate": {
-      |    "label": "period",
-      |    "type": "Period"
-      |  },
-      |  "subjects": [
-      |    {
-      |      "label": "subject",
-      |      "type": "Concept"
-      |    }
-      |  ],
-      |  "creators": [
-      |    {
-      |      "label": "47",
-      |      "type": "Agent"
-      |    }
-      |  ],
-      |  "genres": [
-      |    {
-      |      "label": "genre",
-      |      "type": "Concept"
-      |    }
-      |  ],
-      |  "thumbnail": {
-      |    "locationType": "location",
-      |    "url" : "",
-      |    "credit" : null,
-      |    "license": $license_CCBYJson,
-      |    "type": "DigitalLocation"
-      |  },
-      |  "items": [
-      |    {
-      |      "canonicalId": "canonicalId",
-      |      "sourceIdentifier": {
-      |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
-      |        "value": "value"
-      |      },
-      |      "identifiers": [
-      |        {
-      |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
-      |          "value": "value"
-      |        }
-      |      ],
-      |      "locations": [
-      |        {
-      |          "locationType": "location",
-      |          "url" : "",
-      |          "credit" : null,
-      |          "license": $license_CCBYJson,
-      |          "type": "DigitalLocation"
-      |        }
-      |      ],
-      |      "visible":true,
-      |      "type": "Item"
-      |    }
-      |  ],
-      |  "publishers": [
-      |    {
-      |      "label": "MIT Press",
-      |      "type": "Organisation"
-      |    }
-      |  ],
-      |  "visible":true,
-      |  "type": "Work"
-      |}
-    """.stripMargin
 
   val unidentifiedWorkJson: String =
     s"""
@@ -205,7 +121,7 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val publishers = List(publisher)
-  val unidentifiedWork = Work(
+  val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
     sourceIdentifier = identifier,
     version = 1,
@@ -221,23 +137,6 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
     publishers = publishers
   )
 
-  val identifiedWork = Work(
-    title = unidentifiedWork.title,
-    sourceIdentifier = identifier,
-    version = 1,
-    identifiers = unidentifiedWork.identifiers,
-    canonicalId = Some("canonicalId"),
-    description = unidentifiedWork.description,
-    lettering = unidentifiedWork.lettering,
-    createdDate = unidentifiedWork.createdDate,
-    subjects = unidentifiedWork.subjects,
-    creators = unidentifiedWork.creators,
-    genres = unidentifiedWork.genres,
-    thumbnail = unidentifiedWork.thumbnail,
-    items = unidentifiedWork.items,
-    publishers = publishers
-  )
-
   it("should serialise an unidentified Work as JSON") {
     val result = toJson(unidentifiedWork)
 
@@ -247,37 +146,14 @@ class WorkTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   it("should deserialize a JSON string as a unidentified Work") {
-    val result = fromJson[Work](unidentifiedWorkJson)
+    val result = fromJson[UnidentifiedWork](unidentifiedWorkJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe unidentifiedWork
   }
 
-  it("should serialise an identified Item as Work") {
-    val result = toJson(identifiedWork)
-
-    result.isSuccess shouldBe true
-    assertJsonStringsAreEqual(result.get, identifiedWorkJson)
-  }
-
-  it("should deserialize a JSON string as a identified Item") {
-    val result = fromJson[Work](identifiedWorkJson)
-
-    result.isSuccess shouldBe true
-    result.get shouldBe identifiedWork
-  }
-
-  it(
-    "should throw an UnidentifiableException when trying to get the id of an unidentified Work") {
-    an[UnidentifiableException] should be thrownBy unidentifiedWork.id
-  }
-
   it("should have an ontology type 'Work' when serialised to JSON") {
-    val work = Work(title = Some("A book about a blue whale"),
-                    sourceIdentifier = identifier,
-                    version = 1,
-                    identifiers = List(identifier))
-    val jsonString = toJson(work).get
+    val jsonString = toJson(unidentifiedWork).get
 
     jsonString.contains("""type":"Work"""") should be(true)
   }

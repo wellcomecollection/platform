@@ -33,11 +33,11 @@ class WorksIndexTest
     ensureIndexDeleted(indexName)
   }
 
-  implicitly[Arbitrary[Work]]
+  implicitly[Arbitrary[IdentifiedWork]]
 
   it("puts a valid work") {
 
-    forAll { sampleWork: Work =>
+    forAll { sampleWork: IdentifiedWork =>
       ensureIndexDeleted(indexName)
       createAndWaitIndexIsCreated(worksIndex, indexName)
 
