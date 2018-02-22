@@ -16,7 +16,6 @@ val                subjects: List[Concept]
 val                creators: List[Agent]
 val                genres: List[Concept]
 val                thumbnail: Option[Location]
-val                items: List[Item]
 val                publishers: List[AbstractAgent]
 val                visible: Boolean
 val                ontologyType: String
@@ -33,7 +32,7 @@ case class UnidentifiedWork(title: Option[String],
                 creators: List[Agent] = Nil,
                 genres: List[Concept] = Nil,
                 thumbnail: Option[Location] = None,
-                items: List[Item] = Nil,
+                items: List[UnidentifiedItem] = Nil,
                 publishers: List[AbstractAgent] = Nil,
                 visible: Boolean = true,
                 ontologyType: String = "Work") extends Work
@@ -50,7 +49,7 @@ case class IdentifiedWork(canonicalId: String,
                 creators: List[Agent] = Nil,
                 genres: List[Concept] = Nil,
                 thumbnail: Option[Location] = None,
-                items: List[Item] = Nil,
+                items: List[IdentifiedItem] = Nil,
                 publishers: List[AbstractAgent] = Nil,
                 visible: Boolean = true,
                 ontologyType: String = "Work") extends Work
