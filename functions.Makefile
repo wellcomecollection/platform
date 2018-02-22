@@ -89,7 +89,10 @@ endef
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
+	$(ROOT)/builds/docker_run.py --aws --dind -- \
+		--volume $(ROOT):/repo \
+		wellcome/build_test_lambda $(1)
+
 	$(ROOT)/builds/docker_run.py --aws --dind -- \
 		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
