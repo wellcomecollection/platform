@@ -34,7 +34,7 @@ class IdMinterFeatureTest
     val identifier =
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
 
-    val work = Work(title = Some(title),
+    val work = UnidentifiedWork(title = Some(title),
                     sourceIdentifier = identifier,
                     version = 1,
                     identifiers = List(identifier))
@@ -53,7 +53,7 @@ class IdMinterFeatureTest
     )
 
     def getWorksFromMessages(messages: Seq[MessageInfo]) =
-      messages.map(m => fromJson[Work](m.message).get)
+      messages.map(m => fromJson[IdentifiedWork](m.message).get)
 
     sendMessage
 
