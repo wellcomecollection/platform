@@ -8,7 +8,7 @@ class LocationsTest extends ApiWorksTestBase {
     val physicalLocation: Location =
       PhysicalLocation(locationType = "smeg",
                        label = "a stack of slick slimes")
-    val work = Work(
+    val work = IdentifiedWork(
       canonicalId = Some("zm9q6c6h"),
       sourceIdentifier = sourceIdentifier,
       version = 1,

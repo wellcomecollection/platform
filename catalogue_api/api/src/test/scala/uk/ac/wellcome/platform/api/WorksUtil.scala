@@ -19,7 +19,7 @@ trait WorksUtil {
 
   def createWorks(count: Int,
                   start: Int = 1,
-                  visible: Boolean = true): Seq[Work] =
+                  visible: Boolean = true): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
         workWith(
@@ -33,15 +33,15 @@ trait WorksUtil {
           visible = visible
       ))
 
-  def workWith(canonicalId: String, title: String): Work =
-    Work(title = Some(title),
+  def workWith(canonicalId: String, title: String): IdentifiedWork =
+    IdentifiedWork(title = Some(title),
          sourceIdentifier = sourceIdentifier,
          version = 1,
          identifiers = List(sourceIdentifier),
          canonicalId = Some(canonicalId))
 
-  def workWith(canonicalId: String, title: String, visible: Boolean): Work =
-    Work(title = Some(title),
+  def workWith(canonicalId: String, title: String, visible: Boolean): IdentifiedWork =
+    IdentifiedWork(title = Some(title),
          sourceIdentifier = sourceIdentifier,
          version = 1,
          identifiers = List(sourceIdentifier),
@@ -53,8 +53,8 @@ trait WorksUtil {
     title: String,
     identifiers: List[SourceIdentifier] = List(),
     items: List[Item] = List()
-  ): Work =
-    Work(title = Some(title),
+  ): IdentifiedWork =
+    IdentifiedWork(title = Some(title),
          sourceIdentifier = sourceIdentifier,
          version = 1,
          identifiers = identifiers,
@@ -65,8 +65,8 @@ trait WorksUtil {
     canonicalId: String,
     title: String,
     thumbnail: Location
-  ): Work =
-    Work(
+  ): IdentifiedWork =
+    IdentifiedWork(
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -84,8 +84,8 @@ trait WorksUtil {
                createdDate: Period,
                creator: Agent,
                items: List[Item],
-               visible: Boolean): Work =
-    Work(
+               visible: Boolean): IdentifiedWork =
+    IdentifiedWork(
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,

@@ -17,7 +17,7 @@ class ApiWorksTestBase
   val indexName = "works"
   val itemType = "work"
 
-  implicit val jsonMapper = Work
+  implicit val jsonMapper = IdentifiedWork
   override val server =
     new EmbeddedHttpServer(
       new Server,

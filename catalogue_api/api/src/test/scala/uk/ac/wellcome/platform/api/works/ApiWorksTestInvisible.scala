@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.IdentifiedWork
 
 class ApiWorksTestInvisible extends ApiWorksTestBase {
 
@@ -34,7 +34,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
     // Then we index two ordinary works into Elasticsearch.
     val works = createWorks(2)
 
-    val worksToIndex: Seq[Work] = Seq[Work](deletedWork) ++ works
+    val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
     insertIntoElasticSearch(worksToIndex: _*)
 
     eventually {
