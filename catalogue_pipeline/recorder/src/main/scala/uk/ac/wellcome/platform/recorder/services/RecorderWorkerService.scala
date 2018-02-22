@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.UnidentifiedWork
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorkerToDynamo}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -14,11 +14,11 @@ class RecorderWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender
-) extends SQSWorkerToDynamo[Work](reader, system, metrics) {
+) extends SQSWorkerToDynamo[UnidentifiedWork](reader, system, metrics) {
 
-  override implicit val decoder = implicitly[Decoder[Work]]
+  override implicit val decoder = implicitly[Decoder[UnidentifiedWork]]
 
-  override def store(work: Work): Future[Unit] =
+  override def store(work: UnidentifiedWork): Future[Unit] =
     Future.successful(())
 
 }
