@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.transformers
 import java.io.InputStream
 
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -31,13 +31,13 @@ class MiroTransformableTransformer
     toMap[String](Source.fromInputStream(stream).mkString).get
 
   override def transformForType(miroTransformable: MiroTransformable,
-                                version: Int): Try[Option[Work]] = Try {
+                                version: Int): Try[Option[UnidentifiedWork]] = Try {
 
     val miroData = MiroTransformableData.create(miroTransformable.data)
     val (title, description) = getTitleAndDescription(miroData)
 
     Some(
-      Work(
+      UnidentifiedWork(
         title = Some(title),
         sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
                                             miroTransformable.sourceId),
@@ -302,9 +302,9 @@ class MiroTransformableTransformer
   }
 
   private def getItems(miroData: MiroTransformableData,
-                       miroId: String): List[Item] = {
+                       miroId: String): List[UnidentifiedItem] = {
     List(
-      Item(
+      UnidentifiedItem(
         sourceIdentifier =
           SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId),
         identifiers = List(

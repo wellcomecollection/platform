@@ -15,14 +15,11 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.s3.SourcedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -44,7 +41,7 @@ class SQSMessageReceiverTest
   val sourceIdentifier =
     SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
 
-  val work = Work(title = Some("placeholder title for a Calm record"),
+  val work = UnidentifiedWork(title = Some("placeholder title for a Calm record"),
                   sourceIdentifier = sourceIdentifier,
                   version = 1,
                   identifiers = List(sourceIdentifier))
@@ -99,7 +96,7 @@ class SQSMessageReceiverTest
       val messages = listMessagesReceivedFromSNS()
       messages should have size 1
       messages.head.message shouldBe JsonUtil
-        .toJson(Work(
+        .toJson(UnidentifiedWork(
           title = Some(title),
           sourceIdentifier =
             SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id),

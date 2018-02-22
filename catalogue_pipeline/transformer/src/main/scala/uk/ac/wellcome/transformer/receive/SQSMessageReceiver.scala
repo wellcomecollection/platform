@@ -5,23 +5,13 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.{UnidentifiedWork, Work}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.s3.SourcedObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer,
-  TransformableTransformer
-}
+import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer, TransformableTransformer}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -71,7 +61,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
   }
 
   private def transformTransformable(transformable: Transformable,
-                                     version: Int): Try[Option[Work]] = {
+                                     version: Int): Try[Option[UnidentifiedWork]] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable, version) map {
       transformed =>
@@ -93,7 +83,7 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
   }
 
   private def publishMessage(
-    maybeWork: Option[Work]): Future[Option[PublishAttempt]] =
+    maybeWork: Option[UnidentifiedWork]): Future[Option[PublishAttempt]] =
     maybeWork.fold(Future.successful(None: Option[PublishAttempt])) { work =>
       snsWriter
         .writeMessage(
