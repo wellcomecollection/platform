@@ -7,6 +7,7 @@ module "items_window_generator" {
   trigger_interval_minutes = 15
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  infra_bucket           = "${var.infra_bucket}"
 }
 
 module "items_reader" {
