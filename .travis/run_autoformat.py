@@ -11,7 +11,7 @@ auto-formatted (yet).
 import os
 import sys
 
-from travistooling import changed_files, git, make, check_call
+from travistooling import changed_files, git, make
 
 
 if __name__ == '__main__':
