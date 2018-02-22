@@ -46,7 +46,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = Work(title = Some("crap"),
+    val originalWork = UnidentifiedWork(title = Some("crap"),
                             sourceIdentifier = identifier,
                             version = 1,
                             canonicalId = None)
@@ -81,7 +81,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = Work(title = Some("crap"),
+    val originalWork = UnidentifiedWork(title = Some("crap"),
                             sourceIdentifier = identifier,
                             version = 1,
                             canonicalId = None)
@@ -125,7 +125,7 @@ class IdEmbedderTests
       locations = List()
     )
 
-    val originalWork = Work(title = Some("crap"),
+    val originalWork = UnidentifiedWork(title = Some("crap"),
                             sourceIdentifier = identifier,
                             version = 1,
                             canonicalId = None,
@@ -167,7 +167,7 @@ class IdEmbedderTests
     )
 
     whenReady(eventualWork) { json =>
-      val work = fromJson[Work](json.toString()).get
+      val work = fromJson[UnidentifiedWork](json.toString()).get
 
       val actualItem1 = work.items.head
       val actualItem2 = work.items.tail.head
