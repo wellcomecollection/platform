@@ -125,9 +125,4 @@ class ItemTest extends FunSpec with Matchers with JsonTestUtil {
     result.isSuccess shouldBe true
     result.get shouldBe identifiedItem
   }
-
-  it(
-    "should throw an UnidentifiableException when trying to get the id of an unidentified Item") {
-    an[UnidentifiableException] should be thrownBy unidentifiedItem.id
-  }
 }
