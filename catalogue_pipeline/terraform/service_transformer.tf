@@ -1,9 +1,9 @@
 module "transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=customise-max-min-tasks"
   name   = "transformer"
 
   memory = "2560"
-  cpu    = "512"
+  cpu    = "1024"
 
   source_queue_name  = "${module.transformer_queue.name}"
   source_queue_arn   = "${module.transformer_queue.arn}"
@@ -30,6 +30,8 @@ module "transformer" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 
   enable_alb_alarm = false
+
+  max_capacity = 10
 }
 
 module "transformer_dynamo_to_sns" {

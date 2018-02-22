@@ -29,12 +29,12 @@ module "reindex_shard_tracker_autoscaling" {
   table_name = "${aws_dynamodb_table.reindex_shard_tracker.name}"
 
   enable_read_scaling     = true
-  read_target_utilization = 70
+  read_target_utilization = 50
   read_min_capacity       = 1
   read_max_capacity       = 20
 
   enable_write_scaling     = true
-  write_target_utilization = 70
+  write_target_utilization = 50
   write_min_capacity       = 1
   write_max_capacity       = 20
 }
