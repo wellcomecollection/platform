@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.{Item, Location, SourceIdentifier}
+import uk.ac.wellcome.models.{IdentifiedItem, Location, SourceIdentifier}
 
 @ApiModel(
   value = "Item",
@@ -28,7 +28,7 @@ case class DisplayItem(
 }
 
 object DisplayItem {
-  def apply(item: Item, includesIdentifiers: Boolean): DisplayItem = {
+  def apply(item: IdentifiedItem, includesIdentifiers: Boolean): DisplayItem = {
     DisplayItem(
       id = item.canonicalId,
       identifiers =
