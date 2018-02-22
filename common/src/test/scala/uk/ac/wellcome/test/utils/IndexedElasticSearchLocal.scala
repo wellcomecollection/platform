@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.http.index.IndexResponse
 import org.elasticsearch.index.VersionType
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.elasticsearch.WorksIndex
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -29,7 +29,7 @@ trait IndexedElasticSearchLocal
     createIndex(indexName)
   }
 
-  def insertIntoElasticSearchWithIndex(index: String, works: Work*) = {
+  def insertIntoElasticSearchWithIndex(index: String, works: IdentifiedWork*) = {
     if (index != indexName) {
       createIndex(index)
     }
@@ -41,7 +41,7 @@ trait IndexedElasticSearchLocal
         indexInto(index / itemType)
           .version(work.version)
           .versionType(VersionType.EXTERNAL_GTE)
-          .id(work.id)
+          .id(work.canonicalId)
           .doc(jsonDoc)
       )
 
@@ -59,6 +59,6 @@ trait IndexedElasticSearchLocal
     }
   }
 
-  def insertIntoElasticSearch(works: Work*): Unit =
+  def insertIntoElasticSearch(works: IdentifiedWork*): Unit =
     insertIntoElasticSearchWithIndex(indexName, works: _*)
 }
