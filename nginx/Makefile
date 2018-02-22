@@ -8,7 +8,7 @@ include $(ROOT)/functions.Makefile
 #   $1 - Name of the variant.
 #
 define nginx_build_image
-	$(ROOT)/builds/docker_run.py \
+	$(ROOT)/docker_run.py \
 		--dind -- \
 		wellcome/image_builder:latest \
             --project=nginx \

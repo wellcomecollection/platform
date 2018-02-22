@@ -23,7 +23,7 @@ $(ROOT)/.docker/sierra_adapter_progress:
 	touch $(ROOT)/.docker/sierra_adapter_progress
 
 sierra_adapter_progress: $(ROOT)/.docker/sierra_adapter_progress
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT)/$(STACK_ROOT):/src \
 		sierra_adapter_progress \
 		python /src/report_adapter_progress.py
