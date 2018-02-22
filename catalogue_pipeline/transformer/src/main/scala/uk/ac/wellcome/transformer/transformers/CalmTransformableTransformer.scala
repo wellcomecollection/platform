@@ -1,11 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  CalmTransformableData,
-  Transformable
-}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.transformable.{CalmTransformable, CalmTransformableData}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Try
@@ -13,12 +9,12 @@ import scala.util.Try
 class CalmTransformableTransformer
     extends TransformableTransformer[CalmTransformable] {
   override def transformForType(calmTransformable: CalmTransformable,
-                                version: Int): Try[Option[Work]] =
+                                version: Int): Try[Option[UnidentifiedWork]] =
     fromJson[CalmTransformableData](calmTransformable.data)
       .map(
         _ =>
           Some(
-            Work(
+            UnidentifiedWork(
               title = Some("placeholder title for a Calm record"),
               sourceIdentifier = SourceIdentifier(
                 IdentifierSchemes.calmPlaceholder,

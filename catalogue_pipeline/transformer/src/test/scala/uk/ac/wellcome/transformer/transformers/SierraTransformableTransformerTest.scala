@@ -63,11 +63,11 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
 
     work.items shouldBe List(
-      Item(
+      UnidentifiedItem(
         sourceIdentifier = sourceIdentifier1,
         identifiers = List(sourceIdentifier1)
       ),
-      Item(
+      UnidentifiedItem(
         sourceIdentifier = sourceIdentifier2,
         identifiers = List(sourceIdentifier2)
       )
@@ -115,7 +115,7 @@ class SierraTransformableTransformerTest
     work.items should have size 1
     val expectedSourceIdentifier =
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, itemId)
-    work.items.head shouldBe Item(
+    work.items.head shouldBe UnidentifiedItem(
       sourceIdentifier = expectedSourceIdentifier,
       identifiers = List(expectedSourceIdentifier),
       locations = List(PhysicalLocation(locationType, locationLabel)))
@@ -219,7 +219,7 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      Work(
+      UnidentifiedWork(
         title = Some(title),
         sourceIdentifier = identifier,
         version = 1,
@@ -257,7 +257,7 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      Work(title = Some(title),
+      UnidentifiedWork(title = Some(title),
            sourceIdentifier = identifier,
            version = 1,
            identifiers = List(identifier),
@@ -291,7 +291,7 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      Work(title = Some(title),
+      UnidentifiedWork(title = Some(title),
            sourceIdentifier = identifier,
            version = 1,
            identifiers = List(identifier),
@@ -338,11 +338,11 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
 
     work.items shouldBe List(
-      Item(
+      UnidentifiedItem(
         sourceIdentifier = sourceIdentifier1,
         identifiers = List(sourceIdentifier1)
       ),
-      Item(
+      UnidentifiedItem(
         sourceIdentifier = sourceIdentifier2,
         identifiers = List(sourceIdentifier2),
         visible = false
