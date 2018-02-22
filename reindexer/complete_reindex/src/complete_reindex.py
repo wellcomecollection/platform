@@ -5,7 +5,7 @@ import os
 from boto3.dynamodb.conditions import Attr
 import boto3
 from botocore.exceptions import ClientError
-from tenacity import *
+from tenacity import retry, wait_exponential, retry_if_exception
 from wellcome_aws_utils import sns_utils
 
 
