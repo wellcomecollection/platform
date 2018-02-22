@@ -45,7 +45,7 @@ endif
 #
 define terraform_plan
 	make uptodate-git
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
 		--env OP=plan \
@@ -62,7 +62,7 @@ endef
 #
 define terraform_apply
 	make uptodate-git
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
 		--env OP=apply \
@@ -76,7 +76,7 @@ endef
 #   $1 - Path to the Lambda src directory, relative to the root of the repo.
 #
 define publish_lambda
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
 		wellcome/publish_lambda:latest \
 		"$(1)/src" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)"
@@ -89,11 +89,11 @@ endef
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
+	$(ROOT)/docker_run.py --aws --dind -- \
 		--volume $(ROOT):/repo \
 		wellcome/build_test_lambda $(1)
 
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
+	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
@@ -110,7 +110,7 @@ endef
 #   $2 - Path to the Dockerfile, relative to the root of the repo.
 #
 define build_image
-	$(ROOT)/builds/docker_run.py \
+	$(ROOT)/docker_run.py \
 	    --dind -- \
 	    wellcome/image_builder:latest \
             --project=$(1) \
@@ -124,7 +124,7 @@ endef
 #   $1 - Name of the Docker image.
 #
 define publish_service
-	$(ROOT)/builds/docker_run.py \
+	$(ROOT)/docker_run.py \
 	    --aws --dind -- \
 	    wellcome/publish_service:latest \
 	        --project="$(1)" \
@@ -139,7 +139,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_test
-	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";dockerComposeUp;test;dockerComposeStop"
@@ -152,7 +152,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_build
-	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";stage"
@@ -208,11 +208,11 @@ $(1)-publish:
 	$(call publish_lambda,$(2))
 
 $(ROOT)/$(2)/src/requirements.txt:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
 
 $(ROOT)/$(2)/src/test_requirements.txt:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
 		pip-compile test_requirements.in
 endef

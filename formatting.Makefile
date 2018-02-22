@@ -1,7 +1,7 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 
 lint-python:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
 		--workdir /data \
 		wellcome/flake8:latest \
@@ -9,23 +9,23 @@ lint-python:
 		    --ignore=E501,E122,E126
 
 lint-js:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
 		wellcome/jslint:latest
 
 format-terraform:
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
 		--workdir /repo \
 		hashicorp/terraform:light fmt
 
 format-scala:
-	$(ROOT)/builds/docker_run.py --sbt -- \
+	$(ROOT)/docker_run.py --sbt -- \
 		--volume $(ROOT):/repo \
 		wellcome/scalafmt
 
 format-json:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/src \
 		--workdir /src \
 		wellcome/format_json:latest
