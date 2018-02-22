@@ -42,7 +42,6 @@ script:
 
 env:
   global:
-    - CONFIG_BUCKET=platform-infra
     - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
 
 jobs:
