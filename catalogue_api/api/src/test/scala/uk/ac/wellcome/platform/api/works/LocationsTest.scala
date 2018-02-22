@@ -15,8 +15,8 @@ class LocationsTest extends ApiWorksTestBase {
       title = Some("A zoo of zebras doing zumba"),
       items = List(
         IdentifiedItem(canonicalId = "mhberjwy7",
-             sourceIdentifier = sourceIdentifier,
-             locations = List(physicalLocation)))
+                       sourceIdentifier = sourceIdentifier,
+                       locations = List(physicalLocation)))
     )
 
     insertIntoElasticSearch(work)

@@ -258,10 +258,10 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get shouldBe Some(
       UnidentifiedWork(title = Some(title),
-           sourceIdentifier = identifier,
-           version = 1,
-           identifiers = List(identifier),
-           visible = false)
+                       sourceIdentifier = identifier,
+                       version = 1,
+                       identifiers = List(identifier),
+                       visible = false)
     )
   }
 
@@ -292,10 +292,10 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get shouldBe Some(
       UnidentifiedWork(title = Some(title),
-           sourceIdentifier = identifier,
-           version = 1,
-           identifiers = List(identifier),
-           visible = false)
+                       sourceIdentifier = identifier,
+                       version = 1,
+                       identifiers = List(identifier),
+                       visible = false)
     )
   }
 

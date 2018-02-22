@@ -4,8 +4,16 @@ import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork, Work}
-import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork,
+  Work
+}
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 class SierraTransformerFeatureTest
@@ -52,7 +60,8 @@ class SierraTransformerFeatureTest
         id
       )
 
-      val actualWork = JsonUtil.fromJson[UnidentifiedWork](snsMessages.head.message).get
+      val actualWork =
+        JsonUtil.fromJson[UnidentifiedWork](snsMessages.head.message).get
 
       actualWork.sourceIdentifier shouldBe sourceIdentifier
       actualWork.title shouldBe Some(title)

@@ -51,7 +51,9 @@ class WorkIndexer @Inject()(
                 s"Trying to ingest work ${work.canonicalId} with older version: skipping.")
               ()
             case e: Throwable =>
-              error(s"Error indexing work ${work.canonicalId} into Elasticsearch", e)
+              error(
+                s"Error indexing work ${work.canonicalId} into Elasticsearch",
+                e)
               throw e
           }
       }
