@@ -38,14 +38,14 @@ trait WorksUtil {
          sourceIdentifier = sourceIdentifier,
          version = 1,
          identifiers = List(sourceIdentifier),
-         canonicalId = Some(canonicalId))
+         canonicalId = canonicalId)
 
   def workWith(canonicalId: String, title: String, visible: Boolean): IdentifiedWork =
     IdentifiedWork(title = Some(title),
          sourceIdentifier = sourceIdentifier,
          version = 1,
          identifiers = List(sourceIdentifier),
-         canonicalId = Some(canonicalId),
+         canonicalId = canonicalId,
          visible = visible)
 
   def workWith(
@@ -58,7 +58,7 @@ trait WorksUtil {
          sourceIdentifier = sourceIdentifier,
          version = 1,
          identifiers = identifiers,
-         canonicalId = Some(canonicalId),
+         canonicalId = canonicalId,
          items = items)
 
   def identifiedWorkWith(
@@ -73,7 +73,7 @@ trait WorksUtil {
       identifiers = List(
         SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
       ),
-      canonicalId = Some(canonicalId),
+      canonicalId = canonicalId,
       thumbnail = Some(thumbnail)
     )
 
@@ -90,7 +90,7 @@ trait WorksUtil {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(sourceIdentifier),
-      canonicalId = Some(canonicalId),
+      canonicalId = canonicalId,
       description = Some(description),
       lettering = Some(lettering),
       createdDate = Some(createdDate),
@@ -122,7 +122,7 @@ trait WorksUtil {
     identifier: SourceIdentifier,
     location: Location
   ): Item = Item(
-    canonicalId = Some(canonicalId),
+    canonicalId = canonicalId,
     sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
