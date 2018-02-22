@@ -30,6 +30,8 @@ module "deployment_tracking" {
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "ecs_dashboard" {
@@ -42,6 +44,8 @@ module "ecs_dashboard" {
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "load_test" {
@@ -55,6 +59,8 @@ module "load_test" {
   ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "post_to_slack" {
@@ -68,6 +74,8 @@ module "post_to_slack" {
   dlq_alarm_arn                                   = "${local.dlq_alarm_arn}"
   bitly_access_token                              = "${var.bitly_access_token}"
   ec2_instance_terminating_for_too_long_alarm_arn = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "slack_budget_bot" {
@@ -85,7 +93,7 @@ module "terraform_tracker" {
   lambda_error_alarm_arn     = "${local.lambda_error_alarm_arn}"
   terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
 
-  infra_bucket       = "platform-infra"
+  infra_bucket       = "${var.infra_bucket}"
   slack_webhook      = "${var.non_critical_slack_webhook}"
   bitly_access_token = "${var.bitly_access_token}"
 }

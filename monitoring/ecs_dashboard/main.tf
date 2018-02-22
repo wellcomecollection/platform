@@ -8,4 +8,5 @@ module "update_service_list" {
   dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
 
   lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
+  infra_bucket           = "${var.infra_bucket}"
 }
