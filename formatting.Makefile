@@ -19,6 +19,11 @@ format-terraform:
 		--workdir /repo \
 		hashicorp/terraform:light fmt
 
+format-python:
+	$(ROOT)/docker_run.py -- \
+		--volume $(ROOT):/repo \
+		wellcome/format_python
+
 format-scala:
 	$(ROOT)/docker_run.py --sbt -- \
 		--volume $(ROOT):/repo \
@@ -30,7 +35,7 @@ format-json:
 		--workdir /src \
 		wellcome/format_json:latest
 
-format: format-terraform format-scala format-json
+format: format-terraform format-scala format-python format-json
 
 check-format: format lint-python lint-ontologies
 	git diff --exit-code
