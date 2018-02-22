@@ -1,5 +1,5 @@
 module "transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=customise-max-min-tasks"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
   name   = "transformer"
 
   memory = "2560"
@@ -31,7 +31,7 @@ module "transformer" {
 
   enable_alb_alarm = false
 
-  max_capacity = 10
+  max_capacity = 15
 }
 
 module "transformer_dynamo_to_sns" {
