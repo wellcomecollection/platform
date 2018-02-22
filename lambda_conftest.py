@@ -53,7 +53,12 @@ def dynamodb_client(docker_services, docker_ip):
         )
     )
 
-    yield boto3.client('dynamodb', endpoint_url=endpoint_url)
+    yield boto3.client(
+        'dynamodb',
+        aws_access_key_id='testAccessKey',
+        aws_secret_access_key='testSecretAccessKey',
+        endpoint_url=endpoint_url
+    )
 
 
 @pytest.fixture(scope='session')
@@ -73,7 +78,12 @@ def dynamodb_resource(docker_services, docker_ip):
         )
     )
 
-    yield boto3.resource('dynamodb', endpoint_url=endpoint_url)
+    yield boto3.resource(
+        'dynamodb',
+        aws_access_key_id='testAccessKey',
+        aws_secret_access_key='testSecretAccessKey',
+        endpoint_url=endpoint_url
+    )
 
 
 @pytest.fixture(scope='session')
@@ -91,6 +101,7 @@ def s3_client(docker_services, docker_ip):
         )
     )
 
+    # These credentials are required for the scality/s3server image we use.
     yield boto3.client(
         's3',
         aws_access_key_id='accessKey1',
@@ -124,7 +135,12 @@ def sns_client(docker_services, docker_ip):
         check=_is_responsive(endpoint_url, lambda r: r.status_code == 200)
     )
 
-    client = boto3.client('sns', endpoint_url=endpoint_url)
+    client = boto3.client(
+        'sns',
+        aws_access_key_id='testAccessKey',
+        aws_secret_access_key='testSecretAccessKey',
+        endpoint_url=endpoint_url
+    )
 
     # This is a sample returned by the fake-sns implementation:
     # ---
