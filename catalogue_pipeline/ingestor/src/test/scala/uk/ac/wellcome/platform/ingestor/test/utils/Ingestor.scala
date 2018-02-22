@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.ingestor.test.utils
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.ingestor.Server
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
@@ -42,7 +42,7 @@ trait Ingestor
     )
   }
 
-  def assertElasticsearchEventuallyHasWork(work: Work) = {
+  def assertElasticsearchEventuallyHasWork(work: IdentifiedWork) = {
     val workJson = toJson(work).get
 
     eventually {
@@ -61,17 +61,17 @@ trait Ingestor
                  sourceId: String,
                  title: String,
                  visible: Boolean = true,
-                 version: Int = 1): Work = {
+                 version: Int = 1): IdentifiedWork = {
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,
       sourceId
     )
 
-    Work(title = Some(title),
+    IdentifiedWork(title = Some(title),
          sourceIdentifier = sourceIdentifier,
          version = version,
          identifiers = List(sourceIdentifier),
-         canonicalId = Some(canonicalId),
+         canonicalId = canonicalId,
          visible = visible)
   }
 }

@@ -11,7 +11,7 @@ import org.elasticsearch.client.ResponseException
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -25,10 +25,10 @@ class WorkIndexer @Inject()(
 ) extends Logging
     with ElasticsearchExceptionManager {
 
-  def indexWork(work: Work): Future[Any] = {
+  def indexWork(work: IdentifiedWork): Future[Any] = {
 
     // This is required for elastic4s, not Circe
-    implicit val jsonMapper = Work
+    implicit val jsonMapper = IdentifiedWork
 
     metricsSender.timeAndCount[Any](
       "ingestor-index-work",
