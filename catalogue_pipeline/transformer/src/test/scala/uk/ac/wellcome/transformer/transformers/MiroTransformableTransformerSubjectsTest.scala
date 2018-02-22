@@ -78,8 +78,7 @@ class MiroTransformableTransformerSubjectsTest
     val identifier =
       SourceIdentifier(IdentifierSchemes.miroImageNumber, "M0000001")
 
-    item shouldBe Item(
-      None,
+    item shouldBe UnidentifiedItem(
       identifier,
       List(identifier),
       List(
