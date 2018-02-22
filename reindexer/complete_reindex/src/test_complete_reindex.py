@@ -6,7 +6,7 @@ import os
 from botocore.exceptions import ClientError
 import pytest
 
-from complete_reindex import _run, _process_reindex_tracker_update_job, _update_versioned_item
+from complete_reindex import _run, _process_reindex_tracker_update_job, _update_versioned_item, should_retry
 
 
 @pytest.fixture
@@ -68,6 +68,25 @@ def _create_event(shard_id, current_version, desired_version):
             }
         ]
     }
+
+
+def test_should_retry():
+    err_good = ClientError({
+        'Error': {
+            'Code': 'ProvisionedThroughputExceededException',
+            'Message': 'oops'
+        }
+    },'testing')
+
+    err_bad = ClientError({
+        'Error': {
+            'Code': 'Bangarang!',
+            'Message': 'oops'
+        }
+    },'testing')
+
+    assert should_retry(err_good) == True
+    assert should_retry(err_bad) == False
 
 
 def test_request_reindex(reindex_shard_tracker_table):

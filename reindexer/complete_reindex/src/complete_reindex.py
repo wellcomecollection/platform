@@ -4,10 +4,23 @@ import os
 
 from boto3.dynamodb.conditions import Attr
 import boto3
-
+from botocore.exceptions import ClientError
+from tenacity import *
 from wellcome_aws_utils import sns_utils
 
 
+def should_retry(err):
+    if isinstance(err, ClientError):
+        if err.response['Error']['Code'] == 'ProvisionedThroughputExceededException':
+            return True
+
+    return False
+
+
+@retry(
+    wait=wait_exponential(multiplier=1, max=10),
+    retry=retry_if_exception(should_retry)
+)
 def _update_versioned_item(table, item):
     print(f'Attempting conditional update to {item}')
 
@@ -21,6 +34,10 @@ def _update_versioned_item(table, item):
     print(f'Successful update to {item}')
 
 
+@retry(
+    wait=wait_exponential(multiplier=1, max=10),
+    retry=retry_if_exception(should_retry)
+)
 def _process_reindex_tracker_update_job(table, message):
     shard_id = message['shardId']
     completed_reindex_version = message['completedReindexVersion']
