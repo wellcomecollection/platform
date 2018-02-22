@@ -24,7 +24,7 @@ format-scala:
 		--volume $(ROOT):/repo \
 		wellcome/scalafmt
 
-format-json: build_setup
+format-json:
 	$(ROOT)/builds/docker_run.py -- \
 		--volume $(ROOT):/src \
 		--workdir /src \
