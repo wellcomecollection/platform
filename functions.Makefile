@@ -201,16 +201,11 @@ endef
 #	$2 - Path to the Lambda source directory.
 #
 define __lambda_target_template
-$(1)-test: $(ROOT)/.docker/test_lambda_$(1)
+$(1)-test: 
 	$(call test_lambda,$(2))
 
 $(1)-publish:
 	$(call publish_lambda,$(2))
-
-$(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt)
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	mkdir -p $(shell dirname $(ROOT)/.docker/test_lambda_$(1))
-	touch $(ROOT)/.docker/test_lambda_$(1)
 
 $(ROOT)/$(2)/src/requirements.txt:
 	$(ROOT)/builds/docker_run.py -- \
