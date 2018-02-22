@@ -13,7 +13,7 @@ import uk.ac.wellcome.models.transformable.{
   SierraTransformable,
   Transformable
 }
-import uk.ac.wellcome.s3.SourcedObjectStore
+import uk.ac.wellcome.s3.ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.transformer.transformers.{
@@ -30,7 +30,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
-                                   sourcedObjectStore: SourcedObjectStore,
+                                   sourcedObjectStore: ObjectStore,
                                    metricsSender: MetricsSender)
     extends Logging {
 

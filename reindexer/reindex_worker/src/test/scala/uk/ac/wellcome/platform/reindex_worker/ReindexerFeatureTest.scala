@@ -32,7 +32,7 @@ class ReindexerFeatureTest
     DynamoFormat[HybridRecord]
 
   private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
-    .toSourcedDynamoFormatWrapper[HybridRecord]
+    .toIdDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   val queueUrl = createQueueAndReturnUrl("reindexer-feature-test-q")
