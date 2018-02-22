@@ -7,7 +7,10 @@ import uk.ac.wellcome.models.{UnidentifiedWork, Work}
 import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
 import uk.ac.wellcome.test.utils.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 
 class MiroTransformerFeatureTest
@@ -54,7 +57,8 @@ class MiroTransformerFeatureTest
   private def assertSNSMessageContains(snsMessage: MessageInfo,
                                        miroID: String,
                                        imageTitle: String) = {
-    val parsedWork = JsonUtil.fromJson[UnidentifiedWork](snsMessage.message).get
+    val parsedWork =
+      JsonUtil.fromJson[UnidentifiedWork](snsMessage.message).get
     parsedWork.identifiers.head.value shouldBe miroID
     parsedWork.title shouldBe Some(imageTitle)
   }

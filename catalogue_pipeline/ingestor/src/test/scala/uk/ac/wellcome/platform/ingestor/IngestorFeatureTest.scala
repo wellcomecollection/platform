@@ -7,7 +7,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -35,10 +39,10 @@ class IngestorFeatureTest
     val workString = JsonUtil
       .toJson(
         IdentifiedWork(title = Some("A type of a tame turtle"),
-             sourceIdentifier = sourceIdentifier,
-             version = 1,
-             identifiers = List(sourceIdentifier),
-             canonicalId = "1234")
+                       sourceIdentifier = sourceIdentifier,
+                       version = 1,
+                       identifiers = List(sourceIdentifier),
+                       canonicalId = "1234")
       )
       .get
 

@@ -180,11 +180,12 @@ class ApiWorksTest extends ApiWorksTestBase {
       identifiers = List(),
       locations = List(location)
     )
-    val workWithCopyright = IdentifiedWork(title = Some("A scarf on a squirrel"),
-                                 sourceIdentifier = sourceIdentifier,
-                                 version = 1,
-                                 canonicalId = "yxh928a",
-                                 items = List(item))
+    val workWithCopyright = IdentifiedWork(title =
+                                             Some("A scarf on a squirrel"),
+                                           sourceIdentifier = sourceIdentifier,
+                                           version = 1,
+                                           canonicalId = "yxh928a",
+                                           items = List(item))
     insertIntoElasticSearch(workWithCopyright)
 
     eventually {

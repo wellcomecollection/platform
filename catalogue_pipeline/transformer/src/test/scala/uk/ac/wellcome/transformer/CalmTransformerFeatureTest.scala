@@ -2,9 +2,16 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.CalmTransformable
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.transformer.utils.{TransformableSQSMessageUtils, TransformerFeatureTest}
+import uk.ac.wellcome.transformer.utils.{
+  TransformableSQSMessageUtils,
+  TransformerFeatureTest
+}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -79,9 +86,9 @@ class CalmTransformerFeatureTest
     snsMessage.message shouldBe JsonUtil
       .toJson(
         UnidentifiedWork(title = Some("placeholder title for a Calm record"),
-             sourceIdentifier = sourceIdentifier,
-             version = 1,
-             identifiers = List(sourceIdentifier)))
+                         sourceIdentifier = sourceIdentifier,
+                         version = 1,
+                         identifiers = List(sourceIdentifier)))
       .get
   }
 }

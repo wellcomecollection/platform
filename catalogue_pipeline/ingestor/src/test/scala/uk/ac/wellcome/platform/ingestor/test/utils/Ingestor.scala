@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.ingestor.test.utils
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.ingestor.Server
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
@@ -68,10 +72,10 @@ trait Ingestor
     )
 
     IdentifiedWork(title = Some(title),
-         sourceIdentifier = sourceIdentifier,
-         version = version,
-         identifiers = List(sourceIdentifier),
-         canonicalId = canonicalId,
-         visible = visible)
+                   sourceIdentifier = sourceIdentifier,
+                   version = version,
+                   identifiers = List(sourceIdentifier),
+                   canonicalId = canonicalId,
+                   visible = visible)
   }
 }

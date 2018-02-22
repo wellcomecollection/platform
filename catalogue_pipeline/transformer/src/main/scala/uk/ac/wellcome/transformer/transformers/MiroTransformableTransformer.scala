@@ -31,29 +31,31 @@ class MiroTransformableTransformer
     toMap[String](Source.fromInputStream(stream).mkString).get
 
   override def transformForType(miroTransformable: MiroTransformable,
-                                version: Int): Try[Option[UnidentifiedWork]] = Try {
+                                version: Int): Try[Option[UnidentifiedWork]] =
+    Try {
 
-    val miroData = MiroTransformableData.create(miroTransformable.data)
-    val (title, description) = getTitleAndDescription(miroData)
+      val miroData = MiroTransformableData.create(miroTransformable.data)
+      val (title, description) = getTitleAndDescription(miroData)
 
-    Some(
-      UnidentifiedWork(
-        title = Some(title),
-        sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber,
-                                            miroTransformable.sourceId),
-        version = version,
-        identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
-        description = description,
-        lettering = miroData.suppLettering,
-        createdDate =
-          getCreatedDate(miroData, miroTransformable.MiroCollection),
-        subjects = getSubjects(miroData),
-        creators = getCreators(miroData),
-        genres = getGenres(miroData),
-        thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
-        items = getItems(miroData, miroTransformable.sourceId)
-      ))
-  }
+      Some(
+        UnidentifiedWork(
+          title = Some(title),
+          sourceIdentifier =
+            SourceIdentifier(IdentifierSchemes.miroImageNumber,
+                             miroTransformable.sourceId),
+          version = version,
+          identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
+          description = description,
+          lettering = miroData.suppLettering,
+          createdDate =
+            getCreatedDate(miroData, miroTransformable.MiroCollection),
+          subjects = getSubjects(miroData),
+          creators = getCreators(miroData),
+          genres = getGenres(miroData),
+          thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+          items = getItems(miroData, miroTransformable.sourceId)
+        ))
+    }
 
   /*
    * Populate the title and description.  The rules are as follows:
