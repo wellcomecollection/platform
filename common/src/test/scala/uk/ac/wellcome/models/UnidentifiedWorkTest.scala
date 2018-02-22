@@ -110,7 +110,6 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val item = UnidentifiedItem(
-    canonicalId = Some("canonicalId"),
     sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
