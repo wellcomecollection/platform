@@ -62,7 +62,6 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  },
       |  "items": [
       |    {
-      |      "canonicalId": "canonicalId",
       |      "sourceIdentifier": {
       |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |        "value": "value"
