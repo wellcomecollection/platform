@@ -26,10 +26,6 @@ class IdentifierGeneratorTest
                       mock[AmazonCloudWatch],
                       ActorSystem())
 
-  private val knownIdentifierSchemes =
-    List(IdentifierSchemes.miroImageNumber,
-         IdentifierSchemes.sierraSystemNumber)
-
   val identifierGenerator = new IdentifierGenerator(
     new IdentifiersDao(DB.connect(), identifiersTable),
     metricsSender
