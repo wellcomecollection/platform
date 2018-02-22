@@ -10,7 +10,7 @@ import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifierSchemes, Item, SourceIdentifier, Work}
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 import scala.util.Try
@@ -48,8 +48,7 @@ class IdEmbedderTests
 
     val originalWork = UnidentifiedWork(title = Some("crap"),
                             sourceIdentifier = identifier,
-                            version = 1,
-                            canonicalId = None)
+                            version = 1)
 
     val newCanonicalId = "5467"
 
@@ -65,7 +64,12 @@ class IdEmbedderTests
       ).right.get
     )
 
-    val expectedWork = originalWork.copy(canonicalId = Some(newCanonicalId))
+    val expectedWork = IdentifiedWork(
+      canonicalId = newCanonicalId,
+      title = originalWork.title,
+      sourceIdentifier = originalWork.sourceIdentifier,
+      version = originalWork.version
+    )
 
     whenReady(newWorkFuture) { newWorkJson =>
       assertJsonStringsAreEqual(
@@ -83,8 +87,7 @@ class IdEmbedderTests
 
     val originalWork = UnidentifiedWork(title = Some("crap"),
                             sourceIdentifier = identifier,
-                            version = 1,
-                            canonicalId = None)
+                            version = 1)
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -110,14 +113,12 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalItem1 = Item(
-      canonicalId = None,
+    val originalItem1 = UnidentifiedItem(
       sourceIdentifier = identifier,
       locations = List()
     )
 
-    val originalItem2 = Item(
-      canonicalId = None,
+    val originalItem2 = UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
         IdentifierSchemes.miroImageNumber,
         value = "1235"
@@ -128,7 +129,6 @@ class IdEmbedderTests
     val originalWork = UnidentifiedWork(title = Some("crap"),
                             sourceIdentifier = identifier,
                             version = 1,
-                            canonicalId = None,
                             items = List(originalItem1, originalItem2))
 
     val newItemCanonicalId1 = "item1-canonical-id"
@@ -158,12 +158,14 @@ class IdEmbedderTests
       ).right.get
     )
 
-    val expectedItem1 = originalItem1.copy(
-      canonicalId = Some(newItemCanonicalId1)
+    val expectedItem1 = IdentifiedItem(
+      sourceIdentifier = originalItem1.sourceIdentifier,
+      canonicalId = newItemCanonicalId1
     )
 
-    val expectedItem2 = originalItem2.copy(
-      canonicalId = Some(newItemCanonicalId2)
+    val expectedItem2 = IdentifiedItem(
+      sourceIdentifier = originalItem2.sourceIdentifier,
+      canonicalId = newItemCanonicalId2
     )
 
     whenReady(eventualWork) { json =>

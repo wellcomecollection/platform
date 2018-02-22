@@ -30,7 +30,7 @@ case class DisplayItem(
 object DisplayItem {
   def apply(item: Item, includesIdentifiers: Boolean): DisplayItem = {
     DisplayItem(
-      id = item.id,
+      id = item.canonicalId,
       identifiers =
         if (includesIdentifiers)
           // If there aren't any identifiers on the item JSON, Jackson puts a
