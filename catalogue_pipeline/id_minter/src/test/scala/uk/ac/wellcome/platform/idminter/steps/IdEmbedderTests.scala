@@ -169,7 +169,7 @@ class IdEmbedderTests
     )
 
     whenReady(eventualWork) { json =>
-      val work = fromJson[UnidentifiedWork](json.toString()).get
+      val work = fromJson[IdentifiedWork](json.toString()).get
 
       val actualItem1 = work.items.head
       val actualItem2 = work.items.tail.head
