@@ -64,7 +64,7 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   it("should deserialize a JSON string as a unidentified Item") {
-    val result = JsonUtil.fromJson[Item](unidentifiedItemJson)
+    val result = JsonUtil.fromJson[UnidentifiedItem](unidentifiedItemJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe unidentifiedItem
