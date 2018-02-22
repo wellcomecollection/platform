@@ -2,7 +2,7 @@
 
 import pytest
 
-import tooling
+import travistooling as tooling
 
 
 @pytest.mark.parametrize('path, task, expected_result', [

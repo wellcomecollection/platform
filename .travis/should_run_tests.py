@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-from tooling import changed_files, fprint as print, make_decision
+from travistooling import changed_files, fprint as print, make_decision
 
 
 def should_run_tests(task, travis_event_type):

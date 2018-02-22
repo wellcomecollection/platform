@@ -5,7 +5,7 @@ from __future__ import print_function
 import os
 import subprocess
 
-from tooling import changed_files, fprint as print, make_decision
+from travistooling import changed_files, fprint as print, make_decision
 
 
 def should_publish(task, travis_event_type):

@@ -12,7 +12,7 @@ import os
 import subprocess
 import sys
 
-from tooling import changed_files, git, make
+from travistooling import changed_files, git, make
 
 
 if __name__ == '__main__':
