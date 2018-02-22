@@ -6,3 +6,5 @@ variable "every_minute_name" {}
 variable "dashboard_assumable_roles" {
   type = "list"
 }
+
+variable "infra_bucket" {}

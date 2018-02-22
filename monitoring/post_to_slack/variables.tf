@@ -12,3 +12,5 @@ variable "critical_slack_webhook" {
 variable "non_critical_slack_webhook" {
   description = "Incoming Webhook URL to send non-critical Slack notifications"
 }
+
+variable "infra_bucket" {}

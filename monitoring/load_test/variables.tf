@@ -8,3 +8,4 @@ variable "release_ids" {
 
 variable "aws_region" {}
 variable "monitoring_bucket_id" {}
+variable "infra_bucket" {}

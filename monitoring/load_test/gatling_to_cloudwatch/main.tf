@@ -7,6 +7,8 @@ module "lambda_gatling_to_cloudwatch" {
   timeout     = 5
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+
+  infra_bucket = "${var.infra_bucket}"
 }
 
 module "trigger_gatling_to_cloudwatch" {
