@@ -41,8 +41,8 @@ class ElasticsearchServiceTest
     )
     whenReady(sortedSearchResultByCanonicalId) { result =>
       val works = result.hits.hits.map { DisplayWork(_) }
-      works.head shouldBe DisplayWork(work3.id, work3.title.get)
-      works.last shouldBe DisplayWork(work1.id, work1.title.get)
+      works.head shouldBe DisplayWork(work3.canonicalId, work3.title.get)
+      works.last shouldBe DisplayWork(work1.canonicalId, work1.title.get)
     }
 
     // TODO: canonicalID is the only user-defined field that we can sort on.

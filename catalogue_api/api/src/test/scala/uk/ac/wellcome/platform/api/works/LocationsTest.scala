@@ -14,7 +14,7 @@ class LocationsTest extends ApiWorksTestBase {
       version = 1,
       title = Some("A zoo of zebras doing zumba"),
       items = List(
-        Item(canonicalId = "mhberjwy7",
+        IdentifiedItem(canonicalId = "mhberjwy7",
              sourceIdentifier = sourceIdentifier,
              locations = List(physicalLocation)))
     )
@@ -23,13 +23,13 @@ class LocationsTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work.canonicalId.get}",
+                          | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "items": [ ${items(work.items)} ],

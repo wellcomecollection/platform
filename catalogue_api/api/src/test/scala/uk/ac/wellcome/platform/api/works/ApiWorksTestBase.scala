@@ -42,11 +42,11 @@ class ApiWorksTestBase
     |  "results": []
     |}""".stripMargin
 
-  def items(its: List[Item]) =
+  def items(its: List[IdentifiedItem]) =
     its
       .map { it =>
         s"""{
-          "id": "${it.canonicalId.get}",
+          "id": "${it.canonicalId}",
           "type": "${it.ontologyType}",
           "locations": [
             ${locations(it.locations)}
