@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.{Agent, Organisation, Work}
 class PublishersTest extends ApiWorksTestBase {
 
   it("includes an empty publishers field if the work has no publishers") {
-    val work = Work(
+    val work = IdentifiedWork(
       canonicalId = Some("zm9q6c6h"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -41,7 +41,7 @@ class PublishersTest extends ApiWorksTestBase {
   }
 
   it("includes the publishers field for agent publishers") {
-    val work = Work(
+    val work = IdentifiedWork(
       canonicalId = Some("patkj4ds"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -88,7 +88,7 @@ class PublishersTest extends ApiWorksTestBase {
   }
 
   it("includes the publishers field with a mixture of agents/organisations") {
-    val work = Work(
+    val work = IdentifiedWork(
       canonicalId = Some("v9w6cz66"),
       sourceIdentifier = sourceIdentifier,
       version = 1,

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.Work
+import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
@@ -121,7 +121,7 @@ class ElasticsearchServiceTest
   }
 
   private def toDisplayWorks(
-    works: Seq[Work],
+    works: Seq[IdentifiedWork],
     worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] =
     works.map(DisplayWork(_, worksIncludes)).sortBy(_.id).toList
 

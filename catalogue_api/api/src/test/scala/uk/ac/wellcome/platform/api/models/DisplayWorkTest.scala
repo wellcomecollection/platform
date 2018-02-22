@@ -6,7 +6,7 @@ import uk.ac.wellcome.models._
 class DisplayWorkTest extends FunSpec with Matchers {
 
   it("correctly parses a Work without any items") {
-    val work = Work(
+    val work = IdentifiedWork(
       title = Some("An irritating imp is immune from items"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -28,7 +28,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
       identifiers = List(sourceIdentifier),
       locations = List()
     )
-    val work = Work(
+    val work = IdentifiedWork(
       title = Some("Inside an irate igloo"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -51,7 +51,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
   )
 
   it("correctly parses a work without any identifiers") {
-    val work = Work(title = Some("An irascible iguana invites impudence"),
+    val work = IdentifiedWork(title = Some("An irascible iguana invites impudence"),
                     sourceIdentifier = sourceIdentifier,
                     version = 1,
                     identifiers = Nil,
@@ -66,7 +66,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
   describe("publishers") {
     it("parses a work without any publishers") {
-      val work = Work(
+      val work = IdentifiedWork(
         title = Some("A goading giraffe is galling"),
         sourceIdentifier = sourceIdentifier,
         version = 1,
@@ -80,7 +80,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
     }
 
     it("parses a work with agent publishers") {
-      val work = Work(
+      val work = IdentifiedWork(
         title = Some("A hammerhead hamster is harrowing"),
         sourceIdentifier = sourceIdentifier,
         version = 1,
@@ -100,7 +100,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
     }
 
     it("parses a work with agents and organisations as publishers") {
-      val work = Work(
+      val work = IdentifiedWork(
         title = Some("Jumping over jackals in Japan"),
         sourceIdentifier = sourceIdentifier,
         version = 1,

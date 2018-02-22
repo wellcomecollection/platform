@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.{Item, SourceIdentifier, Work}
+import uk.ac.wellcome.models.{Item, SourceIdentifier, IdentifiedWork}
 import uk.ac.wellcome.utils.JsonUtil._
 
 @JsonIgnoreProperties(Array("visible"))
@@ -73,9 +73,9 @@ case class DisplayWork(
 
 case object DisplayWork {
 
-  def apply(work: Work, includes: WorksIncludes): DisplayWork = {
+  def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWork = {
     DisplayWork(
-      id = work.id,
+      id = work.canonicalId,
       title = work.title.get,
       description = work.description,
       lettering = work.lettering,
@@ -101,7 +101,7 @@ case object DisplayWork {
     )
   }
 
-  def apply(work: Work): DisplayWork =
+  def apply(work: IdentifiedWork): DisplayWork =
     DisplayWork(work = work, includes = WorksIncludes())
 
   def apply(hit: SearchHit): DisplayWork =
@@ -116,7 +116,7 @@ case object DisplayWork {
   }
 
   private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    fromJson[Work](document) match {
+    fromJson[IdentifiedWork](document) match {
       case Success(work) => DisplayWork(work = work, includes = includes)
       case Failure(e) =>
         throw new RuntimeException(
