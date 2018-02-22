@@ -12,6 +12,17 @@ ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
 
+def check_call(command):
+    """
+    A wrapped version of subprocess.check_call that doesn't print a traceback
+    if the command fails.
+    """
+    print('*** Running %r' % ' '.join(command), flush=True)
+    rc = subprocess.call(command)
+    if rc != 0:
+        sys.exit(rc)
+
+
 def fprint(*args, **kwargs):
     kwargs['flush'] = True
     print(*args, **kwargs)
@@ -244,16 +255,11 @@ def make(task, dry_run=False):
         command = ['make', '--dry-run', task]
     else:
         command = ['make', task]
-    print('*** Running %r' % command, flush=True)
-    rc = subprocess.call(command)
-    if rc != 0:
-        sys.exit(rc)
+    check_call(command)
 
 
 def git(*args):
-    command = ['git'] + list(args)
-    print('*** Running %r' % command, flush=True)
-    subprocess.check_call(command)
+    check_call(['git'] + list(args))
 
 
 def rreplace(string, old, new, count=None):
@@ -265,3 +271,35 @@ def rreplace(string, old, new, count=None):
 
     # Then join back together with ``new``
     return new.join(parts)
+
+
+def unpack_aws_directory():
+    """
+    We store our AWS credentials for Travis in an encrypted ZIP bundle.
+
+    This unencrypts the credentials, and copies them into place.
+    """
+    import os
+
+    print('*** Loading AWS credentials for Travis', flush=True)
+
+    # This directory should never pre-exist on Travis!  If it does, something
+    # has gone wrong, and we should fail immediately.
+    aws_dir = os.path.join(os.environ['HOME'], '.aws')
+    assert not os.path.exists(aws_dir)
+
+    # Unencrypted the encrypted ZIP file.
+    check_call([
+        'openssl', 'aes-256-cbc',
+        '-K', os.environ['encrypted_83630750896a_key'],
+        '-iv', os.environ['encrypted_83630750896a_iv'],
+        '-in', '.travis/aws_dir.zip.enc',
+        '-out', '.travis/aws_dir.zip', '-d'
+    ])
+
+    import zipfile
+    zf = zipfile.ZipFile('.travis/aws_dir.zip')
+    zf.extractall(path=aws_dir)
+
+    assert os.path.exists(os.path.join(aws_dir, 'config'))
+    assert os.path.exists(os.path.join(aws_dir, 'credentials'))
