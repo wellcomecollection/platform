@@ -22,7 +22,7 @@ format-terraform:
 format-python:
 	$(ROOT)/builds/docker_run.py -- \
 		--volume $(ROOT):/repo \
-		pyformat
+		wellcome/format_python
 
 format-scala:
 	$(ROOT)/docker_run.py --sbt -- \
