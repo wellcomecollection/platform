@@ -13,8 +13,12 @@ shared_infra/.releases
 .releases
 .docker
 .lambda_zips
-id_rsa
 .Dockerfile
+
+# Files which are encrypted before they're sent to Travis
+id_rsa
+aws_dir.zip
+.travis/credentials
 
 ### Gatling ###
 /gatling/results/*
