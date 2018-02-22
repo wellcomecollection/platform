@@ -11,7 +11,6 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class IngestorWorkerService @Inject()(
   identifiedWorkIndexer: WorkIndexer,
@@ -20,11 +19,9 @@ class IngestorWorkerService @Inject()(
   metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
-  override def processMessage(message: SQSMessage): Future[Unit] = Future {
-    fromJson[Work](message.body) match {
-      case Success(work) =>
-        identifiedWorkIndexer.indexWork(work = work).map(_ => ())
-      case Failure(err) => throw GracefulFailureException(err)
-    }
-  }
+  override def processMessage(message: SQSMessage): Future[Unit] =
+    for {
+      work <- Future.fromTry(fromJson[Work](message.body))
+      _ <- identifiedWorkIndexer.indexWork(work = work)
+    } yield ()
 }

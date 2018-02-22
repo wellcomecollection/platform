@@ -20,7 +20,7 @@ abstract class SQSWorkerToDynamo[T](
   implicit val decoder: Decoder[T]
   def store(t: T): Future[Unit]
 
-  override def processMessage(message: SQSMessage): Future[Unit] = {
+  override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       t <- Future.fromTry(fromJson[T](message.body))
       _ <- store(t).recover {
@@ -29,5 +29,4 @@ abstract class SQSWorkerToDynamo[T](
           throw GracefulFailureException(e)
       }
     } yield ()
-  }
 }
