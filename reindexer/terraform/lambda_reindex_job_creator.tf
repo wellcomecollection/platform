@@ -1,8 +1,9 @@
 module "reindex_job_creator_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
 
-  name   = "reindex_job_creator"
-  s3_key = "lambdas/reindexer/reindex_job_creator.zip"
+  name      = "reindex_job_creator"
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/reindexer/reindex_job_creator.zip"
 
   description = "Generate jobs for the reindexer from the ${aws_dynamodb_table.reindex_shard_tracker.id} table"
 

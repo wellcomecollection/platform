@@ -1,8 +1,9 @@
 module "complete_reindex_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
 
-  name   = "complete_reindex"
-  s3_key = "lambdas/reindexer/complete_reindex.zip"
+  name      = "complete_reindex"
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/reindexer/complete_reindex.zip"
 
   description = "Mark reindex work as done in the ${aws_dynamodb_table.reindex_shard_tracker.name} table."
 
