@@ -66,7 +66,7 @@ class IdentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   it("should deserialize a JSON string as a identified Item") {
-    val result = JsonUtil.fromJson[Item](identifiedItemJson)
+    val result = JsonUtil.fromJson[IdentifiedItem](identifiedItemJson)
 
     result.isSuccess shouldBe true
     result.get shouldBe identifiedItem
