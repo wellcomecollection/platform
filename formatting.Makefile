@@ -24,11 +24,11 @@ format-scala:
 		--volume $(ROOT):/repo \
 		wellcome/scalafmt
 
-format-json:
+format-json: build_setup
 	$(ROOT)/builds/docker_run.py -- \
 		--volume $(ROOT):/src \
 		--workdir /src \
-		python:3-alpine python builds/format_json.py
+		wellcome/format_json:latest
 
 format: format-terraform format-scala format-json
 
