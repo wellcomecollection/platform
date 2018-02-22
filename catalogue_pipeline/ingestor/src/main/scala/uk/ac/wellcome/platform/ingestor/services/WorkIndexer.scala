@@ -33,14 +33,14 @@ class WorkIndexer @Inject()(
     metricsSender.timeAndCount[Any](
       "ingestor-index-work",
       () => {
-        info(s"Indexing work ${work.id}")
+        info(s"Indexing work ${work.canonicalId}")
 
         elasticClient
           .execute {
             indexInto(esIndex / esType)
               .version(work.version)
               .versionType(VersionType.EXTERNAL_GTE)
-              .id(work.id)
+              .id(work.canonicalId)
               .doc(work)
           }
           .recover {
@@ -48,10 +48,10 @@ class WorkIndexer @Inject()(
                 if getErrorType(e).contains(
                   "version_conflict_engine_exception") =>
               warn(
-                s"Trying to ingest work ${work.id} with older version: skipping.")
+                s"Trying to ingest work ${work.canonicalId} with older version: skipping.")
               ()
             case e: Throwable =>
-              error(s"Error indexing work ${work.id} into Elasticsearch", e)
+              error(s"Error indexing work ${work.canonicalId} into Elasticsearch", e)
               throw e
           }
       }
