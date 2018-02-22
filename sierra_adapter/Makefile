@@ -22,14 +22,14 @@ $(ROOT)/.docker/sierra_adapter_progress:
 	mkdir -p $(ROOT)/.docker
 	touch $(ROOT)/.docker/sierra_adapter_progress
 
-sierra_adapter_progress: $(ROOT)/.docker/sierra_adapter_progress
+sierra_adapter_progress: $(ROOT)/.docker/sierra_adapter_progress build_setup
 	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(ROOT)/$(STACK_ROOT):/src \
 		sierra_adapter_progress \
 		python /src/report_adapter_progress.py
 
 
-sierra_common-test:
+sierra_common-test: build_setup
 	$(call sbt_test,sierra_adapter_common)
 
 sierra_common-publish:

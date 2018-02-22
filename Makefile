@@ -25,7 +25,7 @@ include nginx/Makefile
 build_setup: \
 	.scripts/docker_run.py
 
-sbt-common-test:
+sbt-common-test: build_setup
 	$(call sbt_test,common)
 
 sbt-common-publish:
