@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "platform_infra" {
 }
 
 resource "aws_s3_bucket" "infra" {
-  bucket = "${var.infra_bucket}"
+  bucket = "platform-infra"
   acl    = "private"
 
   lifecycle {
