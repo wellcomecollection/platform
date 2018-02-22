@@ -14,7 +14,7 @@ data "terraform_remote_state" "shared_infra" {
 
   config {
     bucket = "wellcomecollection-platform-infra"
-    key                   = "terraform/shared_infra.tfstate"
+    key    = "terraform/shared_infra.tfstate"
     region = "eu-west-1"
   }
 }
