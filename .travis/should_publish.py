@@ -3,9 +3,10 @@
 from __future__ import print_function
 
 import os
-import subprocess
 
-from travistooling import changed_files, fprint as print, make_decision
+from travistooling import (
+    changed_files, check_call, fprint as print, make_decision
+)
 
 
 def should_publish(task, travis_event_type):
@@ -27,7 +28,7 @@ def should_publish(task, travis_event_type):
         print('*** Task %s does not have a publish step' % task)
         return False
 
-    subprocess.check_call(['git', 'fetch', 'origin'])
+    check_call(['git', 'fetch', 'origin'])
 
     return make_decision(
         changed_files=changed_files(os.environ['TRAVIS_COMMIT_RANGE']),

@@ -2,7 +2,11 @@
 
 from __future__ import print_function
 
-from travistooling import changed_files, fprint as print, make_decision
+import os
+
+from travistooling import (
+    changed_files, check_call, fprint as print, make_decision
+)
 
 
 def should_run_tests(task, travis_event_type):
@@ -21,9 +25,7 @@ def should_run_tests(task, travis_event_type):
     if travis_event_type == 'pull_request':
         files = changed_files('HEAD', 'master')
     else:
-        import os
-        import subprocess
-        subprocess.check_call(['git', 'fetch', 'origin'])
+        check_call(['git', 'fetch', 'origin'])
         files = changed_files(os.environ['TRAVIS_COMMIT_RANGE'])
 
     return make_decision(

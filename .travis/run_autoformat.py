@@ -9,10 +9,9 @@ auto-formatted (yet).
 """
 
 import os
-import subprocess
 import sys
 
-from travistooling import changed_files, git, make
+from travistooling import changed_files, check_call, git, make
 
 
 if __name__ == '__main__':
@@ -39,14 +38,14 @@ if __name__ == '__main__':
         )
 
         # Unencrypt the SSH key.
-        subprocess.check_call([
+        check_call([
             'openssl', 'aes-256-cbc',
             '-K', os.environ['encrypted_83630750896a_key'],
             '-iv', os.environ['encrypted_83630750896a_iv'],
             '-in', '.travis/id_rsa.enc',
             '-out', 'id_rsa', '-d'
         ])
-        subprocess.check_call(['chmod', '400', 'id_rsa'])
+        check_call(['chmod', '400', 'id_rsa'])
 
         # We checkout the branch before we add the commit, so we don't
         # include the merge commit that Travis makes.
@@ -57,6 +56,8 @@ if __name__ == '__main__':
         git('commit', '-m', 'Apply auto-formatting rules')
         git('push', 'ssh-origin', 'HEAD:%s' % branch)
 
+        # We exit here to fail the build, so Travis will skip to the next
+        # build, which includes the autoformat commit.
         sys.exit(1)
     else:
         print('*** There were no changes from auto-formatting', flush=True)
