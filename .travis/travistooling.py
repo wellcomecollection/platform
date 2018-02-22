@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 
+import os
 import subprocess
 import sys
 
@@ -273,33 +274,33 @@ def rreplace(string, old, new, count=None):
     return new.join(parts)
 
 
-def unpack_aws_directory():
+def unpack_secrets():
     """
-    We store our AWS credentials for Travis in an encrypted ZIP bundle.
+    We store our AWS credentials and SSH keys for Travis in an
+    encrypted ZIP bundle.
 
     This unencrypts the credentials, and copies them into place.
     """
-    import os
-
-    print('*** Loading AWS credentials for Travis', flush=True)
-
-    # This directory should never pre-exist on Travis!  If it does, something
-    # has gone wrong, and we should fail immediately.
-    aws_dir = os.path.join(os.environ['HOME'], '.aws')
-    assert not os.path.exists(aws_dir)
+    print('*** Loading secrets for Travis', flush=True)
 
     # Unencrypted the encrypted ZIP file.
     check_call([
         'openssl', 'aes-256-cbc',
         '-K', os.environ['encrypted_83630750896a_key'],
         '-iv', os.environ['encrypted_83630750896a_iv'],
-        '-in', '.travis/aws_dir.zip.enc',
-        '-out', '.travis/aws_dir.zip', '-d'
+        '-in', 'secrets.zip.enc',
+        '-out', 'secrets.zip', '-d'
     ])
 
     import zipfile
-    zf = zipfile.ZipFile('.travis/aws_dir.zip')
-    zf.extractall(path=aws_dir)
+    zf = zipfile.ZipFile('secrets.zip')
+    zf.extractall(path='.')
 
-    assert os.path.exists(os.path.join(aws_dir, 'config'))
-    assert os.path.exists(os.path.join(aws_dir, 'credentials'))
+    os.makedirs(os.path.join(os.environ['HOME'], '.aws'), exist_ok=True)
+    for f in ['config', 'credentials']:
+        os.rename(
+            src=os.path.join('secrets', f),
+            dst=os.path.join(os.environ['HOME'], '.aws', f)
+        )
+
+    check_call(['chmod', '400', 'secrets/id_rsa'])

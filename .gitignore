@@ -16,9 +16,8 @@ shared_infra/.releases
 .Dockerfile
 
 # Files which are encrypted before they're sent to Travis
-id_rsa
-aws_dir.zip
-.travis/credentials
+secrets
+secrets.zip
 
 ### Gatling ###
 /gatling/results/*

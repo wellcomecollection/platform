@@ -11,7 +11,7 @@ auto-formatted (yet).
 import os
 import sys
 
-from travistooling import changed_files, check_call, git, make
+from travistooling import changed_files, git, make
 
 
 if __name__ == '__main__':
@@ -30,22 +30,12 @@ if __name__ == '__main__':
 
         git('config', 'user.name', 'Travis CI on behalf of Wellcome')
         git('config', 'user.email', 'wellcomedigitalplatform@wellcome.ac.uk')
-        git('config', 'core.sshCommand', 'ssh -i id_rsa')
+        git('config', 'core.sshCommand', 'ssh -i secrets/id_rsa')
 
         git(
             'remote', 'add', 'ssh-origin',
             'git@github.com:wellcometrust/platform.git'
         )
-
-        # Unencrypt the SSH key.
-        check_call([
-            'openssl', 'aes-256-cbc',
-            '-K', os.environ['encrypted_83630750896a_key'],
-            '-iv', os.environ['encrypted_83630750896a_iv'],
-            '-in', '.travis/id_rsa.enc',
-            '-out', 'id_rsa', '-d'
-        ])
-        check_call(['chmod', '400', 'id_rsa'])
 
         # We checkout the branch before we add the commit, so we don't
         # include the merge commit that Travis makes.
