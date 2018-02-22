@@ -20,7 +20,7 @@ format-terraform:
 		hashicorp/terraform:light fmt
 
 format-python:
-	$(ROOT)/builds/docker_run.py -- \
+	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/repo \
 		wellcome/format_python
 
