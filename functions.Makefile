@@ -1,6 +1,8 @@
 ROOT = $(shell git rev-parse --show-toplevel)
+DOCKER_RUN_ROOT=$(ROOT)
 INFRA_BUCKET = platform-infra
 
+export DOCKER_RUN_ROOT
 
 ifndef UPTODATE_GIT_DEFINED
 
@@ -36,7 +38,6 @@ UPTODATE_GIT_DEFINED = true
 
 endif
 
-
 # Run a 'terraform plan' step.
 #
 # Args:
@@ -45,7 +46,7 @@ endif
 #
 define terraform_plan
 	make uptodate-git
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
 		--env OP=plan \
@@ -62,7 +63,7 @@ endef
 #
 define terraform_apply
 	make uptodate-git
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
 		--env OP=apply \
@@ -76,7 +77,7 @@ endef
 #   $1 - Path to the Lambda src directory, relative to the root of the repo.
 #
 define publish_lambda
-	$(ROOT)/builds/docker_run.py --aws -- \
+	$(ROOT)/.scripts/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \
 		wellcome/publish_lambda:latest \
 		"$(1)/src" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)"
@@ -89,8 +90,8 @@ endef
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
 define test_lambda
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
-	$(ROOT)/builds/docker_run.py --aws --dind -- \
+	$(ROOT)/.scripts/build_lambda_test_image.sh $(1)
+	$(ROOT)/.scripts/docker_run.py --aws --dind -- \
 		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
@@ -107,7 +108,9 @@ endef
 #   $2 - Path to the Dockerfile, relative to the root of the repo.
 #
 define build_image
-	$(ROOT)/builds/docker_run.py \
+	make build_setup
+
+	$(ROOT)/.scripts/docker_run.py \
 	    --dind -- \
 	    wellcome/image_builder:latest \
             --project=$(1) \
@@ -121,7 +124,7 @@ endef
 #   $1 - Name of the Docker image.
 #
 define publish_service
-	$(ROOT)/builds/docker_run.py \
+	$(ROOT)/.scripts/docker_run.py \
 	    --aws --dind -- \
 	    wellcome/publish_service:latest \
 	        --project="$(1)" \
@@ -136,7 +139,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_test
-	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+	$(ROOT)/.scripts/docker_run.py --dind --sbt --root -- \
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";dockerComposeUp;test;dockerComposeStop"
@@ -149,7 +152,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_build
-	$(ROOT)/builds/docker_run.py --dind --sbt --root -- \
+	$(ROOT)/.scripts/docker_run.py --dind --sbt --root -- \
 		--net host \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";stage"
@@ -163,14 +166,14 @@ endef
 #	$2 - Root of the project's source code.
 #
 define __sbt_target_template
-$(1)-build:
+$(1)-build: build_setup
 	$(call sbt_build,$(1))
 	$(call build_image,$(1),$(2)/Dockerfile)
 
-$(1)-test:
+$(1)-test: build_setup
 	$(call sbt_test,$(1))
 
-$(1)-publish: $(1)-build
+$(1)-publish: $(1)-build build_setup
 	$(call publish_service,$(1))
 endef
 
@@ -183,10 +186,10 @@ endef
 #	$3 - Is this a public-facing stack?  (true/false)
 #
 define __terraform_target_template
-$(1)-terraform-plan:
+$(1)-terraform-plan: build_setup
 	$(call terraform_plan,$(2),$(3))
 
-$(1)-terraform-apply:
+$(1)-terraform-apply: build_setup
 	$(call terraform_apply,$(2))
 endef
 
@@ -198,23 +201,23 @@ endef
 #	$2 - Path to the Lambda source directory.
 #
 define __lambda_target_template
-$(1)-test: $(ROOT)/.docker/test_lambda_$(1)
+$(1)-test: $(ROOT)/.docker/test_lambda_$(1) build_setup
 	$(call test_lambda,$(2))
 
-$(1)-publish:
+$(1)-publish: build_setup
 	$(call publish_lambda,$(2))
 
-$(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt)
-	$(ROOT)/builds/build_lambda_test_image.sh $(1)
+$(ROOT)/.docker/test_lambda_$(1): $(wildcard $(ROOT)/$(2)/src/*requirements.txt) build_setup
+	$(ROOT)/.scripts/build_lambda_test_image.sh $(1)
 	mkdir -p $(shell dirname $(ROOT)/.docker/test_lambda_$(1))
 	touch $(ROOT)/.docker/test_lambda_$(1)
 
-$(ROOT)/$(2)/src/requirements.txt:
-	$(ROOT)/builds/docker_run.py -- \
+$(ROOT)/$(2)/src/requirements.txt: build_setup
+	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
 
-$(ROOT)/$(2)/src/test_requirements.txt:
-	$(ROOT)/builds/docker_run.py -- \
+$(ROOT)/$(2)/src/test_requirements.txt: build_setup
+	$(ROOT)/.scripts/docker_run.py -- \
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
 		pip-compile test_requirements.in
 endef
@@ -227,10 +230,10 @@ endef
 #	$2 - Path to the associated Dockerfile.
 #
 define __ecs_target_template
-$(1)-build:
+$(1)-build: build_setup
 	$(call build_image,$(1),$(2))
 
-$(1)-publish: $(1)-build
+$(1)-publish: $(1)-build build_setup
 	$(call publish_service,$(1))
 endef
 
@@ -250,7 +253,6 @@ endef
 #	$TF_IS_PUBLIC_FACING    Is this a public-facing stack?  (true/false)
 #
 define stack_setup
-
 # The structure of each of these lines is as follows:
 #
 #	$(foreach name,$(NAMES),

@@ -1,5 +1,6 @@
 ### Project Specific ###
 
+.scripts
 .idea
 *.iml
 .lambda_hashes.json
