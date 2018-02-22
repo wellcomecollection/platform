@@ -52,7 +52,7 @@ trait WorksUtil {
     canonicalId: String,
     title: String,
     identifiers: List[SourceIdentifier] = List(),
-    items: List[Item] = List()
+    items: List[IdentifiedItem] = List()
   ): IdentifiedWork =
     IdentifiedWork(title = Some(title),
          sourceIdentifier = sourceIdentifier,
@@ -83,7 +83,7 @@ trait WorksUtil {
                lettering: String,
                createdDate: Period,
                creator: Agent,
-               items: List[Item],
+               items: List[IdentifiedItem],
                visible: Boolean): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),
@@ -99,7 +99,7 @@ trait WorksUtil {
       visible = visible
     )
 
-  def defaultItem: Item = {
+  def defaultItem: IdentifiedItem = {
     itemWith(
       "item-canonical-id",
       defaultSourceIdentifier,
@@ -121,7 +121,7 @@ trait WorksUtil {
     canonicalId: String,
     identifier: SourceIdentifier,
     location: Location
-  ): Item = Item(
+  ): IdentifiedItem = IdentifiedItem(
     canonicalId = canonicalId,
     sourceIdentifier = identifier,
     identifiers = List(identifier),
