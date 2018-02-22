@@ -175,7 +175,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       license = License_CCBY
     )
     val item = Item(
-      canonicalId = Some("chu27a8"),
+      canonicalId = "chu27a8",
       sourceIdentifier = sourceIdentifier,
       identifiers = List(),
       locations = List(location)
@@ -183,7 +183,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     val workWithCopyright = Work(title = Some("A scarf on a squirrel"),
                                  sourceIdentifier = sourceIdentifier,
                                  version = 1,
-                                 canonicalId = Some("yxh928a"),
+                                 canonicalId = "yxh928a",
                                  items = List(item))
     insertIntoElasticSearch(workWithCopyright)
 
@@ -469,7 +469,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(),
-      canonicalId = Some("test_subject1"),
+      canonicalId = "test_subject1",
       subjects = List(Concept("fish"), Concept("gardening"))
     )
     insertIntoElasticSearch(workWithSubjects)
@@ -504,7 +504,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(),
-      canonicalId = Some("test_subject1"),
+      canonicalId = "test_subject1",
       genres = List(Concept("woodwork"), Concept("etching"))
     )
     insertIntoElasticSearch(workWithSubjects)
