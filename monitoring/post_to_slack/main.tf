@@ -1,6 +1,8 @@
 module "lambda_post_to_slack" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
-  s3_key = "lambdas/monitoring/post_to_slack.zip"
+
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/monitoring/post_to_slack.zip"
 
   name        = "post_to_slack"
   description = "Post notification to Slack when an alarm is triggered"

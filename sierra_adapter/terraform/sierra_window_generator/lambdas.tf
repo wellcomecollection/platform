@@ -3,6 +3,7 @@ module "window_generator_lambda" {
 
   name = "sierra_${var.resource_type}_window_generator"
 
+  s3_bucket   = "${var.infra_bucket}"
   s3_key      = "lambdas/sierra_adapter/sierra_window_generator.zip"
   module_name = "sierra_window_generator"
 

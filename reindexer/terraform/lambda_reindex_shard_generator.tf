@@ -1,8 +1,9 @@
 module "shard_generator_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v6.4.0"
 
-  name   = "reindex_shard_generator"
-  s3_key = "lambdas/reindexer/reindex_shard_generator.zip"
+  name      = "reindex_shard_generator"
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/reindexer/reindex_shard_generator.zip"
 
   description = "Generate reindexShards for items in the ${local.vhs_table_name} table"
 

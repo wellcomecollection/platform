@@ -1,6 +1,8 @@
 module "lambda_update_service_list" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
-  s3_key = "lambdas/monitoring/ecs_dashboard/update_service_list.zip"
+
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/monitoring/ecs_dashboard/update_service_list.zip"
 
   name        = "update_service_list"
   description = "Publish ECS service status summary to S3"

@@ -1,6 +1,8 @@
 module "lambda_gatling_to_cloudwatch" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
-  s3_key = "lambdas/monitoring/load_test/gatling_to_cloudwatch.zip"
+
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/monitoring/load_test/gatling_to_cloudwatch.zip"
 
   name        = "gatling_to_cloudwatch"
   description = "Record gatling results as CloudWatch metrics"
