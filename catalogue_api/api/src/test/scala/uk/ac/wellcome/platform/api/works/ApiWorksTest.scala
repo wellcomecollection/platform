@@ -22,7 +22,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${works(0).id}",
+                          |     "id": "${works(0).canonicalId}",
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
                           |     "lettering": "${works(0).lettering.get}",
@@ -35,7 +35,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |   },
                           |   {
                           |     "type": "Work",
-                          |     "id": "${works(1).id}",
+                          |     "id": "${works(1).canonicalId}",
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
                           |     "lettering": "${works(1).lettering.get}",
@@ -48,7 +48,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |   },
                           |   {
                           |     "type": "Work",
-                          |     "id": "${works(2).id}",
+                          |     "id": "${works(2).canonicalId}",
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
                           |     "lettering": "${works(2).lettering.get}",
@@ -118,13 +118,13 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work.canonicalId.get}",
+                          | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "items": [ ${items(work.items)} ],
@@ -148,13 +148,13 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId.get}?includes=items",
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work.canonicalId.get}",
+                          | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "items": [ ],
@@ -174,13 +174,13 @@ class ApiWorksTest extends ApiWorksTestBase {
       credit = Some("Wellcome Collection"),
       license = License_CCBY
     )
-    val item = Item(
+    val item = IdentifiedItem(
       canonicalId = "chu27a8",
       sourceIdentifier = sourceIdentifier,
       identifiers = List(),
       locations = List(location)
     )
-    val workWithCopyright = Work(title = Some("A scarf on a squirrel"),
+    val workWithCopyright = IdentifiedWork(title = Some("A scarf on a squirrel"),
                                  sourceIdentifier = sourceIdentifier,
                                  version = 1,
                                  canonicalId = "yxh928a",
@@ -197,7 +197,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           |  "results": [
           |   {
           |     "type": "Work",
-          |     "id": "${workWithCopyright.id}",
+          |     "id": "${workWithCopyright.canonicalId}",
           |     "title": "${workWithCopyright.title.get}",
           |     "creators": [ ],
           |     "subjects": [ ],
@@ -205,7 +205,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           |     "publishers": [ ],
           |     "items": [
           |       {
-          |         "id": "${item.canonicalId.get}",
+          |         "id": "${item.canonicalId}",
           |         "type": "${item.ontologyType}",
           |         "locations": [
           |           {
@@ -245,7 +245,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${works(1).id}",
+                          |     "id": "${works(1).canonicalId}",
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
                           |     "lettering": "${works(1).lettering.get}",
@@ -274,7 +274,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${works(0).id}",
+                          |     "id": "${works(0).canonicalId}",
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
                           |     "lettering": "${works(0).lettering.get}",
@@ -303,7 +303,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${works(2).id}",
+                          |     "id": "${works(2).canonicalId}",
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
                           |     "lettering": "${works(2).lettering.get}",
@@ -450,7 +450,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work1.id}",
+                          |     "id": "${work1.canonicalId}",
                           |     "title": "${work1.title.get}",
                           |     "creators": [],
                           |     "subjects": [ ],
@@ -464,7 +464,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should include subject information in API responses") {
-    val workWithSubjects = Work(
+    val workWithSubjects = IdentifiedWork(
       title = Some("A seal selling seaweed sandwiches in Scotland"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -484,7 +484,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${workWithSubjects.id}",
+                          |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [ ${concepts(
@@ -499,7 +499,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should include genre information in API responses") {
-    val workWithSubjects = Work(
+    val workWithSubjects = IdentifiedWork(
       title = Some("A guppy in a greenhouse"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -519,7 +519,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${workWithSubjects.id}",
+                          |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [ ],
@@ -568,7 +568,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work1.id}",
+                          |     "id": "${work1.canonicalId}",
                           |     "title": "${work1.title.get}",
                           |     "creators": [ ],
                           |     "identifiers": [ ${identifier(identifier1)} ],
@@ -578,7 +578,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |   },
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work2.id}",
+                          |     "id": "${work2.canonicalId}",
                           |     "title": "${work2.title.get}",
                           |     "creators": [ ],
                           |     "identifiers": [ ${identifier(identifier2)} ],
@@ -608,13 +608,13 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.id}?includes=identifiers",
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work.id}",
+                          | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "identifiers": [ ${identifier(srcIdentifier)} ],
@@ -638,13 +638,13 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.id}?includes=identifiers",
+        path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work.id}",
+                          | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "identifiers": [ ],
@@ -673,13 +673,13 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work.id}",
+        path = s"/$apiPrefix/works/${work.canonicalId}",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work.id}",
+                          | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
                           | "subjects": [ ],
@@ -692,13 +692,13 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     eventually {
       server.httpGet(
-        path = s"/$apiPrefix/works/${work_alt.id}?_index=alt_records",
+        path = s"/$apiPrefix/works/${work_alt.canonicalId}?_index=alt_records",
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
                           | "@context": "https://localhost:8888/$apiPrefix/context.json",
                           | "type": "Work",
-                          | "id": "${work_alt.id}",
+                          | "id": "${work_alt.canonicalId}",
                           | "title": "${work_alt.title.get}",
                           | "creators": [ ],
                           | "subjects": [ ],
@@ -734,7 +734,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work.id}",
+                          |     "id": "${work.canonicalId}",
                           |     "title": "${work.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
@@ -757,7 +757,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work_alt.id}",
+                          |     "id": "${work_alt.canonicalId}",
                           |     "title": "${work_alt.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
@@ -839,7 +839,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work.id}",
+                          |     "id": "${work.canonicalId}",
                           |     "title": "${work.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
@@ -876,7 +876,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |  "results": [
                           |   {
                           |     "type": "Work",
-                          |     "id": "${work.id}",
+                          |     "id": "${work.canonicalId}",
                           |     "title": "${work.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],

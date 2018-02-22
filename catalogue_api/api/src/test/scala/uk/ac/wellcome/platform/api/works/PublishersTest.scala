@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
-import uk.ac.wellcome.models.{Agent, Organisation, Work}
+import uk.ac.wellcome.models.{Agent, IdentifiedWork, Organisation}
 
 class PublishersTest extends ApiWorksTestBase {
 
@@ -26,7 +26,7 @@ class PublishersTest extends ApiWorksTestBase {
           |  "results": [
           |    {
           |      "type": "Work",
-          |      "id": "${work.id}",
+          |      "id": "${work}",
           |      "title": "${work.title.get}",
           |      "creators": [ ],
           |      "subjects": [ ],
@@ -64,7 +64,7 @@ class PublishersTest extends ApiWorksTestBase {
           |  "results": [
           |    {
           |      "type": "Work",
-          |      "id": "${work.id}",
+          |      "id": "${work}",
           |      "title": "${work.title.get}",
           |      "creators": [ ],
           |      "subjects": [ ],
@@ -111,7 +111,7 @@ class PublishersTest extends ApiWorksTestBase {
           |  "results": [
           |    {
           |      "type": "Work",
-          |      "id": "${work.id}",
+          |      "id": "${work.canonicalId}",
           |      "title": "${work.title.get}",
           |      "creators": [ ],
           |      "subjects": [ ],
