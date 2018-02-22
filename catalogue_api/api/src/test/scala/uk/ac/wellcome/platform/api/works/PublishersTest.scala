@@ -26,7 +26,7 @@ class PublishersTest extends ApiWorksTestBase {
           |  "results": [
           |    {
           |      "type": "Work",
-          |      "id": "${work}",
+          |      "id": "${work.canonicalId}",
           |      "title": "${work.title.get}",
           |      "creators": [ ],
           |      "subjects": [ ],
@@ -64,7 +64,7 @@ class PublishersTest extends ApiWorksTestBase {
           |  "results": [
           |    {
           |      "type": "Work",
-          |      "id": "${work}",
+          |      "id": "${work.canonicalId}",
           |      "title": "${work.title.get}",
           |      "creators": [ ],
           |      "subjects": [ ],
