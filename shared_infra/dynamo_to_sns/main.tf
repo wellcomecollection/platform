@@ -13,6 +13,7 @@ module "lambda_dynamo_to_sns" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/dynamo_to_sns.zip"
 }
 
