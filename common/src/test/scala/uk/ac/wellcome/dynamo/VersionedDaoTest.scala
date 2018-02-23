@@ -48,7 +48,7 @@ class VersionedDaoTest
     new VersionedDao(dynamoDbClient, DynamoConfig(tableName))
 
   private val enrichedDynamoFormat: DynamoFormat[TestVersioned] = Sourced
-    .toSourcedDynamoFormatWrapper[TestVersioned]
+    .toIdDynamoFormatWrapper[TestVersioned]
     .enrichedDynamoFormat
 
   describe("get a record") {

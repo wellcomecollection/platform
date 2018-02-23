@@ -12,7 +12,7 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
+import uk.ac.wellcome.models.{Sourced, IdDynamoFormatWrapper}
 import uk.ac.wellcome.models.aws.{
   DynamoConfig,
   SNSConfig,
@@ -52,7 +52,7 @@ class ReindexWorkerServiceTest
     DynamoFormat[HybridRecord]
 
   private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
-    .toSourcedDynamoFormatWrapper[HybridRecord]
+    .toIdDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   val queueUrl = createQueueAndReturnUrl("reindex-worker-service-test-q")
@@ -128,7 +128,7 @@ class ReindexWorkerServiceTest
     val targetService = mock[ReindexService]
     when(
       targetService.runReindex(any[ReindexJob])(
-        any[SourcedDynamoFormatWrapper[HybridRecord]]))
+        any[IdDynamoFormatWrapper[HybridRecord]]))
       .thenReturn(Future { throw exception })
 
     val service = new ReindexWorkerService(

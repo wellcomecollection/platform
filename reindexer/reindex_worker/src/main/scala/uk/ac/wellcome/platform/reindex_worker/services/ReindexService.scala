@@ -9,15 +9,11 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.dynamo.{IdDynamoFormatWrapper, VersionedDao}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{
-  Sourced,
-  SourcedDynamoFormatWrapper,
-  VersionUpdater
-}
+import uk.ac.wellcome.models.{Sourced, VersionUpdater}
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -30,8 +26,8 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
                                dynamoConfig: DynamoConfig)
     extends Logging {
 
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
-    .toSourcedDynamoFormatWrapper[HybridRecord]
+  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Id.
+    .toIdDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
   implicit val versionUpdater = new VersionUpdater[HybridRecord] {
@@ -41,7 +37,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   }
 
   def runReindex(reindexJob: ReindexJob)(
-    implicit evidence: SourcedDynamoFormatWrapper[HybridRecord])
+    implicit evidence: IdDynamoFormatWrapper[HybridRecord])
     : Future[List[Unit]] = {
 
     info(s"ReindexService running $reindexJob")

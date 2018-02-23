@@ -15,29 +15,30 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-class SourcedObjectStore @Inject()(
-  s3Client: AmazonS3,
-  @Flag("aws.s3.bucketName") bucketName: String)
+class ObjectStore @Inject()(s3Client: AmazonS3,
+                            @Flag("aws.s3.bucketName") bucketName: String)
     extends Logging {
-  def put[T <: Sourced](sourcedObject: T)(
+  def put[T](sourcedObject: T)(keyPrefix: T => String)(
     implicit encoder: Encoder[T]): Future[String] = {
 
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
+// TODO move this somewhere
+//      // To spread objects evenly in our S3 bucket, we take the last two
+//      // characters of the ID and reverse them.  This ensures that:
+//      //
+//      //  1.  It's easy for a person to find the S3 data corresponding to
+//      //      a given source ID.
+//      //  2.  Adjacent objects are stored in shards that are far apart,
+//      //      e.g. b0001 and b0002 are separated by nine shards.
+//      //
+//      val s3Shard = sourcedObject.sourceId.reverse
+//        .slice(0, 2)
+//
+//      val key =
+//        s"${sourcedObject.sourceName}/${s3Shard}/${sourcedObject.sourceId}/$contentHash.json"
 
-      // To spread objects evenly in our S3 bucket, we take the last two
-      // characters of the ID and reverse them.  This ensures that:
-      //
-      //  1.  It's easy for a person to find the S3 data corresponding to
-      //      a given source ID.
-      //  2.  Adjacent objects are stored in shards that are far apart,
-      //      e.g. b0001 and b0002 are separated by nine shards.
-      //
-      val s3Shard = sourcedObject.sourceId.reverse
-        .slice(0, 2)
-
-      val key =
-        s"${sourcedObject.sourceName}/${s3Shard}/${sourcedObject.sourceId}/$contentHash.json"
+      val key = s"${keyPrefix(sourcedObject)}/$contentHash.json"
 
       info(s"Attempting to PUT object to s3://$bucketName/$key")
       s3Client.putObject(bucketName, key, content)

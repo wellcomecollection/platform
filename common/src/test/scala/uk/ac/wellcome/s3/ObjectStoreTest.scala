@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(sourceId: String, sourceName: String) extends Sourced
 
-class SourcedObjectStoreTest
+class ObjectStoreTest
     extends FunSpec
     with S3Local
     with Matchers
@@ -28,7 +28,7 @@ class SourcedObjectStoreTest
     val version = 1
     val sourceName = "testSource"
 
-    val objectStore = new SourcedObjectStore(s3Client, bucketName)
+    val objectStore = new ObjectStore(s3Client, bucketName)
     val testObject = TestObject(sourceId = id, sourceName = sourceName)
 
     val writtenToS3 = objectStore.put(testObject)
@@ -55,7 +55,7 @@ class SourcedObjectStoreTest
     val version = 2
     val sourceName = "anotherTestSource"
 
-    val objectStore = new SourcedObjectStore(s3Client, bucketName)
+    val objectStore = new ObjectStore(s3Client, bucketName)
     val testObject = TestObject(sourceId = id, sourceName = sourceName)
 
     val writtenToS3 = objectStore.put(testObject)
@@ -67,7 +67,7 @@ class SourcedObjectStoreTest
   }
 
   it("throws an exception when retrieving a missing object") {
-    val objectStore = new SourcedObjectStore(s3Client, bucketName)
+    val objectStore = new ObjectStore(s3Client, bucketName)
 
     whenReady(objectStore.get[TestObject]("not/a/real/object").failed) {
       exception =>
