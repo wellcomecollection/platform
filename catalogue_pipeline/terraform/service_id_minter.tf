@@ -1,5 +1,5 @@
 module "id_minter" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
   name   = "id_minter"
 
   source_queue_name  = "${module.id_minter_queue.name}"
@@ -33,4 +33,6 @@ module "id_minter" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 
   enable_alb_alarm = false
+
+  max_capacity = 15
 }
