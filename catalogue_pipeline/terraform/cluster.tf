@@ -14,4 +14,6 @@ module "catalogue_pipeline_cluster" {
   ec2_instance_terminating_for_too_long_alarm_arn = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
 
   alb_log_bucket_id = "${local.bucket_alb_logs_id}"
+
+  asg_spot_max = "10"
 }
