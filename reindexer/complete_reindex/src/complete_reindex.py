@@ -11,8 +11,7 @@ from wellcome_aws_utils import sns_utils
 
 def should_retry(err):
     if isinstance(err, ClientError):
-        if err.response['Error']['Code'] == 'ProvisionedThroughputExceededException':
-            return True
+        return err.response['Error']['Code'] == 'ProvisionedThroughputExceededException'
 
     return False
 

@@ -76,17 +76,18 @@ def test_should_retry():
             'Code': 'ProvisionedThroughputExceededException',
             'Message': 'oops'
         }
-    },'testing')
+    }, 'testing')
 
     err_bad = ClientError({
         'Error': {
             'Code': 'Bangarang!',
             'Message': 'oops'
         }
-    },'testing')
+    }, 'testing')
 
     assert should_retry(err_good) == True
     assert should_retry(err_bad) == False
+    assert should_retry(AssertionError("foo")) == False
 
 
 def test_request_reindex(reindex_shard_tracker_table):
