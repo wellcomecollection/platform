@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.sierra_bib_merger
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import akka.actor.ActorSystem
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
@@ -12,19 +11,15 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SQSLocal
-}
-
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-
-import uk.ac.wellcome.storage.VersionedHybridStoreLocal
-
+import uk.ac.wellcome.storage.{ExampleRecord, VersionedHybridStoreLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.s3.KeyPrefixGenerator
+
 
 class SierraBibMergerFeatureTest
     extends FunSpec
@@ -35,7 +30,7 @@ class SierraBibMergerFeatureTest
     with MockitoSugar
     with ExtendedPatience
     with ScalaFutures
-    with VersionedHybridStoreLocal {
+    with VersionedHybridStoreLocal[SierraTransformable] {
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
@@ -43,6 +38,11 @@ class SierraBibMergerFeatureTest
   override lazy val tableName = "sierra-bib-merger-feature-test-table"
   override lazy val bucketName = "sierra-bib-merger-feature-test-bucket"
   val queueUrl = createQueueAndReturnUrl("test_bib_merger")
+
+  override lazy val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
+    new KeyPrefixGenerator[Sourced] {
+      override def generate(obj: Sourced): String = "/"
+    }
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),
@@ -164,7 +164,7 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord[SierraTransformable](
+      .updateRecord(
         oldRecord.sourceName,
         oldRecord.sourceId)(oldRecord)(identity)
       .map { _ =>
@@ -204,7 +204,7 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord[SierraTransformable](
+      .updateRecord(
         expectedSierraTransformable.sourceName,
         expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
         identity)
@@ -235,7 +235,7 @@ class SierraBibMergerFeatureTest
       modifiedDate = updatedDate
     )
 
-    val future = hybridStore.updateRecord[SierraTransformable](
+    val future = hybridStore.updateRecord(
       newRecord.sourceName,
       newRecord.sourceId)(newRecord)(identity)
 
@@ -253,7 +253,7 @@ class SierraBibMergerFeatureTest
       Await
         .result(
           hybridStore
-            .getRecord[SierraTransformable](expectedRecord.id),
+            .getRecord(expectedRecord.id),
           5 seconds
         )
         .get

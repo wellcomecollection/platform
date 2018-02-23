@@ -20,7 +20,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.s3.SourcedObjectStore
+import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
 import uk.ac.wellcome.transformer.transformers.{
@@ -61,7 +61,7 @@ class SQSMessageReceiverTest
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
-  private val sourcedObjectStore = new SourcedObjectStore(s3Client, bucketName)
+  private val sourcedObjectStore = new S3ObjectStore(s3Client, bucketName)
   val recordReceiver =
     new SQSMessageReceiver(snsWriter, sourcedObjectStore, metricsSender)
 

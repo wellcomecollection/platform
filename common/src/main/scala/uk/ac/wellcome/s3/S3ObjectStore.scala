@@ -15,11 +15,25 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-class SourcedObjectStore @Inject()(
+
+trait KeyPrefixGenerator[-T] {
+  def generate(obj: T): String
+}
+
+class SourcedKeyPrefixGenerator @Inject() extends KeyPrefixGenerator[Sourced] {
+  override def generate(obj: Sourced): String = {
+    val s3Shard = obj.sourceId.reverse.slice(0, 2)
+
+    s"${obj.sourceName}/${s3Shard}/${obj.sourceId}"
+  }
+}
+
+class S3ObjectStore[T] @Inject()(
   s3Client: AmazonS3,
-  @Flag("aws.s3.bucketName") bucketName: String)
-    extends Logging {
-  def put[T <: Sourced](sourcedObject: T)(
+  @Flag("aws.s3.bucketName") bucketName: String,
+    keyPrefixGenerator: KeyPrefixGenerator[T]
+  ) extends Logging {
+  def put(sourcedObject: T)(
     implicit encoder: Encoder[T]): Future[String] = {
 
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
@@ -33,11 +47,16 @@ class SourcedObjectStore @Inject()(
       //  2.  Adjacent objects are stored in shards that are far apart,
       //      e.g. b0001 and b0002 are separated by nine shards.
       //
-      val s3Shard = sourcedObject.sourceId.reverse
-        .slice(0, 2)
+//      val s3Shard = sourcedObject.sourceId.reverse
+//        .slice(0, 2)
+//
 
-      val key =
-        s"${sourcedObject.sourceName}/${s3Shard}/${sourcedObject.sourceId}/$contentHash.json"
+      val dirtyPrefix = keyPrefixGenerator.generate(sourcedObject)
+      val prefixCleaningRegex = "^/|/$".r
+
+      val prefix = prefixCleaningRegex.replaceAllIn(dirtyPrefix, "")
+
+      val key = s"$prefix/$contentHash.json"
 
       info(s"Attempting to PUT object to s3://$bucketName/$key")
       s3Client.putObject(bucketName, key, content)
@@ -47,7 +66,7 @@ class SourcedObjectStore @Inject()(
     }
   }
 
-  def get[T](key: String)(implicit decoder: Decoder[T]): Future[T] = {
+  def get(key: String)(implicit decoder: Decoder[T]): Future[T] = {
 
     info(s"Attempting to GET object from s3://$bucketName/$key")
 

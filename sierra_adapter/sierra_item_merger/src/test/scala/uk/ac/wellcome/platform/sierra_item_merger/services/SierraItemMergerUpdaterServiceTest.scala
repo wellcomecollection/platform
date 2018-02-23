@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.s3.SourcedObjectStore
+import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 
 import scala.concurrent.{Await, Future}
@@ -22,7 +22,7 @@ class SierraItemMergerUpdaterServiceTest
 
   val sierraUpdaterService = new SierraItemMergerUpdaterService(
     versionedHybridStore = new VersionedHybridStore(
-      new SourcedObjectStore(
+      new S3ObjectStore(
         s3Client = s3Client,
         bucketName = bucketName
       ),
@@ -498,7 +498,7 @@ class SierraItemMergerUpdaterServiceTest
 
     val failingVersionedHybridStore = new VersionedHybridStore(
       sourcedObjectStore =
-        new SourcedObjectStore(s3Client = s3Client, bucketName = bucketName),
+        new S3ObjectStore(s3Client = s3Client, bucketName = bucketName),
       versionedDao = failingVersionedDao
     )
 
