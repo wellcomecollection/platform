@@ -27,8 +27,8 @@ case class HybridRecord(
     with Versioned
 
 class VersionedHybridStore[T <: Sourced] @Inject()(
-                                                    sourcedObjectStore: S3ObjectStore[T],
-                                                    versionedDao: VersionedDao
+  sourcedObjectStore: S3ObjectStore[T],
+  versionedDao: VersionedDao
 ) {
 
   implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
@@ -43,8 +43,8 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
     s3Object: T
   )
 
-  def updateRecord(sourceName: String, sourceId: String)(
-    ifNotExisting: => T)(ifExisting: T => T)(
+  def updateRecord(sourceName: String, sourceId: String)(ifNotExisting: => T)(
+    ifExisting: T => T)(
     implicit evidence: SourcedDynamoFormatWrapper[T],
     decoder: Decoder[T],
     encoder: Encoder[T]
@@ -80,8 +80,7 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
     }
   }
 
-  def getRecord(id: String)(
-    implicit decoder: Decoder[T]): Future[Option[T]] =
+  def getRecord(id: String)(implicit decoder: Decoder[T]): Future[Option[T]] =
     getObject(id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
@@ -103,8 +102,8 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
   }
 
   private def putObject(id: String,
-                                      sourcedObject: T,
-                                      f: (String) => HybridRecord)(
+                        sourcedObject: T,
+                        f: (String) => HybridRecord)(
     implicit encoder: Encoder[T]
   ) = {
     if (sourcedObject.id != id)

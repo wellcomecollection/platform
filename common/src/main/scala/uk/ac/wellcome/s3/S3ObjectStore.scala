@@ -15,7 +15,6 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-
 trait KeyPrefixGenerator[-T] {
   def generate(obj: T): String
 }
@@ -31,10 +30,9 @@ class SourcedKeyPrefixGenerator @Inject() extends KeyPrefixGenerator[Sourced] {
 class S3ObjectStore[T] @Inject()(
   s3Client: AmazonS3,
   @Flag("aws.s3.bucketName") bucketName: String,
-    keyPrefixGenerator: KeyPrefixGenerator[T]
-  ) extends Logging {
-  def put(sourcedObject: T)(
-    implicit encoder: Encoder[T]): Future[String] = {
+  keyPrefixGenerator: KeyPrefixGenerator[T]
+) extends Logging {
+  def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
 
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)

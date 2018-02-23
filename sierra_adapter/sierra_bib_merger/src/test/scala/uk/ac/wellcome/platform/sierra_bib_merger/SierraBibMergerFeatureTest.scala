@@ -11,7 +11,11 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.storage.{ExampleRecord, VersionedHybridStoreLocal}
@@ -19,7 +23,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.s3.KeyPrefixGenerator
-
 
 class SierraBibMergerFeatureTest
     extends FunSpec
@@ -164,9 +167,8 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(
-        oldRecord.sourceName,
-        oldRecord.sourceId)(oldRecord)(identity)
+      .updateRecord(oldRecord.sourceName, oldRecord.sourceId)(oldRecord)(
+        identity)
       .map { _ =>
         sendBibRecordToSQS(record)
       }
@@ -204,10 +206,9 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(
-        expectedSierraTransformable.sourceName,
-        expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
-        identity)
+      .updateRecord(expectedSierraTransformable.sourceName,
+                    expectedSierraTransformable.sourceId)(
+        expectedSierraTransformable)(identity)
       .map { _ =>
         sendBibRecordToSQS(record)
       }
@@ -235,9 +236,9 @@ class SierraBibMergerFeatureTest
       modifiedDate = updatedDate
     )
 
-    val future = hybridStore.updateRecord(
-      newRecord.sourceName,
-      newRecord.sourceId)(newRecord)(identity)
+    val future =
+      hybridStore.updateRecord(newRecord.sourceName, newRecord.sourceId)(
+        newRecord)(identity)
 
     future.map { _ =>
       sendBibRecordToSQS(record)

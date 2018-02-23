@@ -22,20 +22,18 @@ trait VersionedHybridStoreLocal[T <: Sourced]
   val keyPrefixGenerator: KeyPrefixGenerator[T]
 
   val hybridStore = new VersionedHybridStore(
-    sourcedObjectStore =
-      new S3ObjectStore(
-        s3Client = s3Client,
-        bucketName = bucketName,
-        keyPrefixGenerator = keyPrefixGenerator
-      ),
+    sourcedObjectStore = new S3ObjectStore(
+      s3Client = s3Client,
+      bucketName = bucketName,
+      keyPrefixGenerator = keyPrefixGenerator
+    ),
     versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
                                     dynamoConfig = DynamoConfig(
                                       table = tableName
                                     ))
   )
 
-  def assertHybridRecordIsStoredCorrectly(record: T,
-                                          expectedJson: String) = {
+  def assertHybridRecordIsStoredCorrectly(record: T, expectedJson: String) = {
     val dynamoRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get
