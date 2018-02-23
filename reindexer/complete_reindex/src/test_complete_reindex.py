@@ -85,9 +85,9 @@ def test_should_retry():
         }
     }, 'testing')
 
-    assert should_retry(err_good) == True
-    assert should_retry(err_bad) == False
-    assert should_retry(AssertionError("foo")) == False
+    assert should_retry(err_good) is True
+    assert should_retry(err_bad) is False
+    assert should_retry(AssertionError("foo")) is False
 
 
 def test_request_reindex(reindex_shard_tracker_table):
