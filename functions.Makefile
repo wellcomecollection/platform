@@ -49,7 +49,9 @@ define terraform_plan
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
 		--env OP=plan \
-		--env GET_PLATFORM_TFVARS=true \
+		--env GET_TFVARS=true \
+		--env BUCKET_NAME=wellcomecollection-platform-infra \
+		--env OBJECT_KEY=terraform.tfvars \
 		--env IS_PUBLIC_FACING=$(2) \
 		wellcome/terraform_wrapper:latest
 endef
@@ -65,6 +67,7 @@ define terraform_apply
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
+		--env BUCKET_NAME=wellcomecollection-platform-infra \
 		--env OP=apply \
 		wellcome/terraform_wrapper:latest
 endef
