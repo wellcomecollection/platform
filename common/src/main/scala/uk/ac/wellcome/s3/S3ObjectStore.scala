@@ -15,6 +15,16 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
+
+// KeyPrefixGenerator is contravariant for type T
+//
+// Practically this means `KeyPrefixGenerator[Sourced]` is a
+// subclass of `KeyPrefixGenerator[SierraTransformable]`
+// so it will be accepted in the S3ObjectStore for all types
+// extending Sourced. This prevents us from having to write
+// SierraTransformableKeyPrefixGenerator etc. etc.
+//
+
 trait KeyPrefixGenerator[-T] {
   def generate(obj: T): String
 }
