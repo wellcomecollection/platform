@@ -31,3 +31,14 @@ data "aws_iam_policy_document" "describe_services" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "assume_roles" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    resources = [
+      "arn:aws:iam::130871440101:role/platform-team-assume-role",
+      "arn:aws:iam::299497370133:role/platform-team-assume-role",
+    ]
+  }
+}
