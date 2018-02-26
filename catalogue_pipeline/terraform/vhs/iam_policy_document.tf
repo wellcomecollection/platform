@@ -22,8 +22,8 @@ data "aws_iam_policy_document" "read_policy" {
     ]
 
     resources = [
-      "${aws_s3_bucket.sierra_data.arn}/",
-      "${aws_s3_bucket.sierra_data.arn}/*",
+      "${aws_s3_bucket.bucket.arn}/",
+      "${aws_s3_bucket.bucket.arn}/*",
     ]
   }
 }
@@ -48,8 +48,8 @@ data "aws_iam_policy_document" "dynamodb_full_access_policy" {
     ]
 
     resources = [
-      "${aws_s3_bucket.sierra_data.arn}/",
-      "${aws_s3_bucket.sierra_data.arn}/*",
+      "${aws_s3_bucket.bucket.arn}/",
+      "${aws_s3_bucket.bucket.arn}/*",
     ]
   }
 }

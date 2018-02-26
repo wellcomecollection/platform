@@ -7,7 +7,7 @@ output "table_name" {
 }
 
 output "bucket_name" {
-  value = "${aws_s3_bucket.sierra_data.id}"
+  value = "${aws_s3_bucket.bucket.id}"
 }
 
 output "read_policy" {
