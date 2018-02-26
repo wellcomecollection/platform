@@ -38,16 +38,6 @@ resource "aws_s3_bucket" "infra" {
       days = 30
     }
   }
-
-  lifecycle_rule {
-    id      = "terraform_plans"
-    prefix  = "terraform_plans/"
-    enabled = true
-
-    expiration {
-      days = 30
-    }
-  }
 }
 
 locals {
