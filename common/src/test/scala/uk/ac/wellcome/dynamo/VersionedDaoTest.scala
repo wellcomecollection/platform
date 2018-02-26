@@ -1,11 +1,8 @@
 package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  ConditionalCheckFailedException,
-  GetItemRequest,
-  PutItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{AttributeValue, ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
@@ -15,15 +12,12 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{Sourced, VersionUpdater, Versioned}
+import uk.ac.wellcome.models.{Id, VersionUpdater, Versioned}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-case class TestVersioned(sourceId: String,
-                         sourceName: String,
-                         somethingElse: String,
-                         version: Int)
-    extends Versioned
-    with Sourced
+
+case class TestVersioned(id: String, data: String, version: Int)
+    extends Versioned with Id
 
 class VersionedDaoTest
     extends FunSpec
@@ -47,21 +41,16 @@ class VersionedDaoTest
   val versionedDao =
     new VersionedDao(dynamoDbClient, DynamoConfig(tableName))
 
-  private val enrichedDynamoFormat: DynamoFormat[TestVersioned] = Sourced
-    .toSourcedDynamoFormatWrapper[TestVersioned]
-    .enrichedDynamoFormat
-
   describe("get a record") {
     it("returns a future of a record if its in dynamo") {
 
       val testVersioned = TestVersioned(
-        sourceId = "b110101001",
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 0)
+        id = "testSource/b110101001",
+        data = "whatever",
+        version = 0
+      )
 
-      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        enrichedDynamoFormat)
+      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)
 
       whenReady(versionedDao.getRecord[TestVersioned](testVersioned.id)) {
         record =>
@@ -71,13 +60,12 @@ class VersionedDaoTest
 
     it("returns a future of None if the record isn't in dynamo") {
       val testVersioned = TestVersioned(
-        sourceId = "b110101001",
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 0)
+        id = "testSource/b110101001",
+        data = "whatever",
+        version = 0
+      )
 
-      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        enrichedDynamoFormat)
+      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)
 
       whenReady(versionedDao.getRecord[TestVersioned]("testSource/b88888")) {
         record =>
@@ -109,10 +97,10 @@ class VersionedDaoTest
       val sourceId = "b1111"
 
       val testVersioned = TestVersioned(
-        sourceId = sourceId,
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 0)
+        id = "testSource/b1111",
+        data = "whatever",
+        version = 0
+      )
 
       val expectedTestVersioned = testVersioned.copy(version = 1)
 
@@ -126,15 +114,14 @@ class VersionedDaoTest
       val sourceId = "b1111"
 
       val testVersioned = TestVersioned(
-        sourceId = sourceId,
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 1)
+        id = "testSource/b1111",
+        data = "whatever",
+        version = 0
+      )
 
       val newerTestVersioned = testVersioned.copy(version = 2)
 
-      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        enrichedDynamoFormat)
+      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)
 
       whenReady(versionedDao.updateRecord[TestVersioned](newerTestVersioned)) {
         _ =>
@@ -148,16 +135,14 @@ class VersionedDaoTest
     }
 
     it("updates a record if it already exists and has the same version") {
-      val sourceId = "b1111"
 
       val testVersioned = TestVersioned(
-        sourceId = sourceId,
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 1)
+        id = "testSource/b1111",
+        data = "whatever",
+        version = 1
+      )
 
-      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)(
-        enrichedDynamoFormat)
+      Scanamo.put(dynamoDbClient)(tableName)(testVersioned)
 
       whenReady(versionedDao.updateRecord(testVersioned)) { _ =>
         Scanamo
@@ -173,19 +158,18 @@ class VersionedDaoTest
       val sourceId = "b1111"
 
       val testVersioned = TestVersioned(
-        sourceId = sourceId,
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 1)
+        id = "testSource/b1111",
+        data = "whatever",
+        version = 1
+      )
 
       val newerTestVersioned = TestVersioned(
-        sourceId = sourceId,
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 2)
+        id = "testSource/b1111",
+        data = "whatever",
+        version = 2
+      )
 
-      Scanamo.put(dynamoDbClient)(tableName)(newerTestVersioned)(
-        enrichedDynamoFormat)
+      Scanamo.put(dynamoDbClient)(tableName)(newerTestVersioned)
 
       whenReady(versionedDao.updateRecord(testVersioned).failed) { ex =>
         ex shouldBe a[ConditionalCheckFailedException]
@@ -209,10 +193,10 @@ class VersionedDaoTest
         new VersionedDao(dynamoDbClient, DynamoConfig(tableName))
 
       val testVersioned = TestVersioned(
-        sourceId = "b1111",
-        sourceName = "testSource",
-        somethingElse = "whatever",
-        version = 1)
+        id = "testSource/b1111",
+        data = "whatever",
+        version = 1
+      )
 
       whenReady(failingDao.updateRecord(testVersioned).failed) { ex =>
         ex shouldBe expectedException
