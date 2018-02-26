@@ -43,5 +43,5 @@ resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
 
 resource "aws_iam_role_policy" "reindexer_allow_table_access" {
   role   = "${module.reindexer.task_role_name}"
-  policy = "${local.vhs_dynamodb_full_access_policy}"
+  policy = "${local.vhs_full_access_policy}"
 }
