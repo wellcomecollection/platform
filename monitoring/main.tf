@@ -38,7 +38,7 @@ module "ecs_dashboard" {
   source = "ecs_dashboard"
 
   dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
-  monitoring_bucket_id      = "${aws_s3_bucket.monitoring.id}"
+  dashboard_bucket          = "${aws_s3_bucket.dashboard.id}"
 
   every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
