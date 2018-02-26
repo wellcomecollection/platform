@@ -9,7 +9,7 @@ module "lambda_terraform_tracker" {
   timeout     = 10
 
   environment_variables = {
-    INFRA_BUCKET       = "${var.infra_bucket}"
+    INFRA_BUCKET       = "${var.monitoring_bucket}"
     SLACK_WEBHOOK      = "${var.slack_webhook}"
     BITLY_ACCESS_TOKEN = "${var.bitly_access_token}"
   }

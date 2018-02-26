@@ -94,6 +94,8 @@ module "terraform_tracker" {
   terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
 
   infra_bucket       = "${var.infra_bucket}"
+
+  monitoring_bucket  = "${aws_s3_bucket.monitoring.id}"
   slack_webhook      = "${var.non_critical_slack_webhook}"
   bitly_access_token = "${var.bitly_access_token}"
 }
