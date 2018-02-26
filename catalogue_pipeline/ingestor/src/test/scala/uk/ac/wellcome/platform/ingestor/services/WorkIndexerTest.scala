@@ -19,9 +19,10 @@ class WorkIndexerTest
     with Ingestor {
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests",
-                      mock[AmazonCloudWatch],
-                      ActorSystem())
+    new MetricsSender(
+      namespace = "reindexer-tests",
+      mock[AmazonCloudWatch],
+      ActorSystem())
 
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
@@ -65,10 +66,11 @@ class WorkIndexerTest
   }
 
   it("replaces a work with the same version") {
-    val work = createWork(canonicalId = "5678",
-                          sourceId = "1234",
-                          title = "A multiplicity of mice",
-                          version = 3)
+    val work = createWork(
+      canonicalId = "5678",
+      sourceId = "1234",
+      title = "A multiplicity of mice",
+      version = 3)
 
     insertIntoElasticSearch(work)
 

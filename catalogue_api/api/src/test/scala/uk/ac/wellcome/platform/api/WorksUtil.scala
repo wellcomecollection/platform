@@ -34,21 +34,23 @@ trait WorksUtil {
       ))
 
   def workWith(canonicalId: String, title: String): IdentifiedWork =
-    IdentifiedWork(title = Some(title),
-                   sourceIdentifier = sourceIdentifier,
-                   version = 1,
-                   identifiers = List(sourceIdentifier),
-                   canonicalId = canonicalId)
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = List(sourceIdentifier),
+      canonicalId = canonicalId)
 
   def workWith(canonicalId: String,
                title: String,
                visible: Boolean): IdentifiedWork =
-    IdentifiedWork(title = Some(title),
-                   sourceIdentifier = sourceIdentifier,
-                   version = 1,
-                   identifiers = List(sourceIdentifier),
-                   canonicalId = canonicalId,
-                   visible = visible)
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = List(sourceIdentifier),
+      canonicalId = canonicalId,
+      visible = visible)
 
   def workWith(
     canonicalId: String,
@@ -56,12 +58,13 @@ trait WorksUtil {
     identifiers: List[SourceIdentifier] = List(),
     items: List[IdentifiedItem] = List()
   ): IdentifiedWork =
-    IdentifiedWork(title = Some(title),
-                   sourceIdentifier = sourceIdentifier,
-                   version = 1,
-                   identifiers = identifiers,
-                   canonicalId = canonicalId,
-                   items = items)
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = identifiers,
+      canonicalId = canonicalId,
+      items = items)
 
   def identifiedWorkWith(
     canonicalId: String,

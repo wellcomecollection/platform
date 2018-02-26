@@ -42,12 +42,14 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
-        "i111" -> sierraItemRecord(id = "i111",
-                                   title = title,
-                                   bibIds = List(id)),
-        "i222" -> sierraItemRecord(id = "i222",
-                                   title = title,
-                                   bibIds = List(id))
+        "i111" -> sierraItemRecord(
+          id = "i111",
+          title = title,
+          bibIds = List(id)),
+        "i222" -> sierraItemRecord(
+          id = "i222",
+          title = title,
+          bibIds = List(id))
       )
     )
 
@@ -96,16 +98,18 @@ class SierraTransformableTransformerTest
     val transformable = SierraTransformable(
       sourceId = bibId,
       maybeBibData = Some(
-        SierraBibRecord(id = bibId,
-                        data = bibData,
-                        modifiedDate = modifiedDate)),
+        SierraBibRecord(
+          id = bibId,
+          data = bibData,
+          modifiedDate = modifiedDate)),
       itemData = Map(
-        itemId -> SierraItemRecord(id = itemId,
-                                   data = itemData,
-                                   modifiedDate = modifiedDate,
-                                   bibIds = List(bibId),
-                                   unlinkedBibIds = Nil,
-                                   version = 1))
+        itemId -> SierraItemRecord(
+          id = itemId,
+          data = itemData,
+          modifiedDate = modifiedDate,
+          bibIds = List(bibId),
+          unlinkedBibIds = Nil,
+          version = 1))
     )
 
     val triedMaybeWork = transformer.transform(transformable, version = 1)
@@ -257,11 +261,12 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      UnidentifiedWork(title = Some(title),
-                       sourceIdentifier = identifier,
-                       version = 1,
-                       identifiers = List(identifier),
-                       visible = false)
+      UnidentifiedWork(
+        title = Some(title),
+        sourceIdentifier = identifier,
+        version = 1,
+        identifiers = List(identifier),
+        visible = false)
     )
   }
 
@@ -291,11 +296,12 @@ class SierraTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
 
     transformedSierraRecord.get shouldBe Some(
-      UnidentifiedWork(title = Some(title),
-                       sourceIdentifier = identifier,
-                       version = 1,
-                       identifiers = List(identifier),
-                       visible = false)
+      UnidentifiedWork(
+        title = Some(title),
+        sourceIdentifier = identifier,
+        version = 1,
+        identifiers = List(identifier),
+        visible = false)
     )
   }
 
@@ -316,13 +322,15 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
-        "i111" -> sierraItemRecord(id = "i111",
-                                   title = title,
-                                   bibIds = List(id)),
-        "i222" -> sierraItemRecord(id = "i222",
-                                   title = title,
-                                   deleted = true,
-                                   bibIds = List(id))
+        "i111" -> sierraItemRecord(
+          id = "i111",
+          title = title,
+          bibIds = List(id)),
+        "i222" -> sierraItemRecord(
+          id = "i222",
+          title = title,
+          deleted = true,
+          bibIds = List(id))
       )
     )
 

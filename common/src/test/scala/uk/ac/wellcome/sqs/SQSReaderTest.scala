@@ -53,9 +53,10 @@ class SQSReaderTest
 
   it("should return a failed future if reading from the SQS queue fails") {
     val sqsConfig =
-      SQSConfig("not a valid queue url",
-                waitTime = 20 seconds,
-                maxMessages = 1)
+      SQSConfig(
+        "not a valid queue url",
+        waitTime = 20 seconds,
+        maxMessages = 1)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
     val futureMessages =
@@ -72,9 +73,10 @@ class SQSReaderTest
       SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail"
-    val messageStrings = List("This is the first message",
-                              failingMessage,
-                              "This is the final message")
+    val messageStrings = List(
+      "This is the first message",
+      failingMessage,
+      "This is the final message")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
@@ -98,9 +100,10 @@ class SQSReaderTest
       SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail"
-    val messageStrings = List("This is the first message",
-                              failingMessage,
-                              "This is the final message")
+    val messageStrings = List(
+      "This is the first message",
+      failingMessage,
+      "This is the final message")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)
@@ -124,9 +127,10 @@ class SQSReaderTest
       SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages = 10)
 
     val failingMessage = "This message will fail gracefully"
-    val messageStrings = List("This is the first message",
-                              failingMessage,
-                              "This is the final message")
+    val messageStrings = List(
+      "This is the first message",
+      failingMessage,
+      "This is the final message")
     messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
     val sqsReader =
       new SQSReader(sqsClient, sqsConfig)

@@ -34,11 +34,11 @@ class SierraItemRecordDaoTest
 
     it("should return an item record if it exists in the database") {
       val id = "i111"
-      val sierraItemRecord = SierraItemRecord(id = id,
-                                              data = "{}",
-                                              modifiedDate =
-                                                "2005-01-01T00:00:00Z",
-                                              bibIds = List())
+      val sierraItemRecord = SierraItemRecord(
+        id = id,
+        data = "{}",
+        modifiedDate = "2005-01-01T00:00:00Z",
+        bibIds = List())
       Scanamo.put(dynamoDbClient)(tableName)(sierraItemRecord)
 
       whenReady(sierraItemRecordDao.getItem(id = id)) { maybeItem =>
@@ -71,11 +71,11 @@ class SierraItemRecordDaoTest
 
     it("should insert an item") {
       val id = "i111"
-      val sierraItemRecord = SierraItemRecord(id = id,
-                                              data = "{}",
-                                              modifiedDate =
-                                                "2005-01-01T00:00:00Z",
-                                              bibIds = List())
+      val sierraItemRecord = SierraItemRecord(
+        id = id,
+        data = "{}",
+        modifiedDate = "2005-01-01T00:00:00Z",
+        bibIds = List())
 
       whenReady(sierraItemRecordDao.updateItem(sierraItemRecord)) { _ =>
         Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id) shouldBe Some(
@@ -87,11 +87,11 @@ class SierraItemRecordDaoTest
 
     it("does not update an existing item if the update has a lower version") {
       val id = "i111"
-      val sierraItemRecord = SierraItemRecord(id = id,
-                                              data = "old data!",
-                                              modifiedDate =
-                                                "2005-01-01T00:00:00Z",
-                                              bibIds = List())
+      val sierraItemRecord = SierraItemRecord(
+        id = id,
+        data = "old data!",
+        modifiedDate = "2005-01-01T00:00:00Z",
+        bibIds = List())
 
       val newerSierraItemRecord = sierraItemRecord.copy(
         version = 1,
@@ -113,11 +113,11 @@ class SierraItemRecordDaoTest
     }
 
     it("should fail if an exception is thrown by dynamoDbClient") {
-      val sierraItemRecord = SierraItemRecord(id = "i111",
-                                              data = "{}",
-                                              modifiedDate =
-                                                "2005-01-01T00:00:00Z",
-                                              bibIds = List())
+      val sierraItemRecord = SierraItemRecord(
+        id = "i111",
+        data = "{}",
+        modifiedDate = "2005-01-01T00:00:00Z",
+        bibIds = List())
 
       val dynamoDbClient = mock[AmazonDynamoDB]
       val sierraItemRecordDao =

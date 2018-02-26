@@ -11,9 +11,10 @@ import scala.util.Try
 
 case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
   def toBibRecord: SierraBibRecord =
-    SierraBibRecord(id = this.id,
-                    data = this.data,
-                    modifiedDate = this.modifiedDate)
+    SierraBibRecord(
+      id = this.id,
+      data = this.data,
+      modifiedDate = this.modifiedDate)
 
   def toItemRecord: Try[SierraItemRecord] =
     for {
@@ -27,10 +28,11 @@ case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
           throw new InvalidArgumentException("Found non string in bibIds"))
       }.toList
     } yield {
-      SierraItemRecord(id = this.id,
-                       data = this.data,
-                       modifiedDate = this.modifiedDate,
-                       bibIds = bibIds)
+      SierraItemRecord(
+        id = this.id,
+        data = this.data,
+        modifiedDate = this.modifiedDate,
+        bibIds = bibIds)
     }
 }
 

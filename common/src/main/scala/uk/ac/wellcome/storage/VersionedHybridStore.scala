@@ -5,10 +5,10 @@ import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.transformable.Reindexable
 import uk.ac.wellcome.models.{
-  VersionUpdater,
-  Versioned,
   Sourced,
-  SourcedDynamoFormatWrapper
+  SourcedDynamoFormatWrapper,
+  VersionUpdater,
+  Versioned
 }
 import uk.ac.wellcome.s3.S3ObjectStore
 
@@ -56,9 +56,10 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
         val transformedS3Record = ifExisting(s3Record)
 
         if (transformedS3Record != s3Record) {
-          putObject(id,
-                    transformedS3Record,
-                    key => hybridRecord.copy(s3key = key))
+          putObject(
+            id,
+            transformedS3Record,
+            key => hybridRecord.copy(s3key = key))
         } else {
           Future.successful(())
         }

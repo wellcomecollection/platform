@@ -71,11 +71,12 @@ trait Ingestor
       sourceId
     )
 
-    IdentifiedWork(title = Some(title),
-                   sourceIdentifier = sourceIdentifier,
-                   version = version,
-                   identifiers = List(sourceIdentifier),
-                   canonicalId = canonicalId,
-                   visible = visible)
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = version,
+      identifiers = List(sourceIdentifier),
+      canonicalId = canonicalId,
+      visible = visible)
   }
 }

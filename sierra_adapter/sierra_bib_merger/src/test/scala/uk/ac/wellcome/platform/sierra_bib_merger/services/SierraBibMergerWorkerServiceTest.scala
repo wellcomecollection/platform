@@ -33,12 +33,14 @@ class SierraBibMergerWorkerServiceTest
                                                   metricsSender,
                                                   mergerUpdaterService)
 
+
     val future = worker.processMessage(
-      SQSMessage(subject = Some("default-subject"),
-                 body = "null",
-                 topic = "",
-                 messageType = "",
-                 timestamp = ""))
+      SQSMessage(
+        subject = Some("default-subject"),
+        body = "null",
+        topic = "",
+        messageType = "",
+        timestamp = ""))
 
     whenReady(future.failed) { ex =>
       ex shouldBe a[GracefulFailureException]

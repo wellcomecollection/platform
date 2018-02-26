@@ -41,15 +41,17 @@ class SierraTransformerFeatureTest
     val lastModifiedDate = Instant.now()
 
     val sierraHybridRecordMessage =
-      hybridRecordSqsMessage(createValidSierraTransformableJson(
-                               id,
-                               title,
-                               lastModifiedDate
-                             ),
-                             "sierra")
+      hybridRecordSqsMessage(
+        createValidSierraTransformableJson(
+          id,
+          title,
+          lastModifiedDate
+        ),
+        "sierra")
 
-    sqsClient.sendMessage(queueUrl,
-                          JsonUtil.toJson(sierraHybridRecordMessage).get)
+    sqsClient.sendMessage(
+      queueUrl,
+      JsonUtil.toJson(sierraHybridRecordMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()

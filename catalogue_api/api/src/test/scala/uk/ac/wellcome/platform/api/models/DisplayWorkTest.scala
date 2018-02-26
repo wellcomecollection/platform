@@ -51,12 +51,12 @@ class DisplayWorkTest extends FunSpec with Matchers {
   )
 
   it("correctly parses a work without any identifiers") {
-    val work = IdentifiedWork(title =
-                                Some("An irascible iguana invites impudence"),
-                              sourceIdentifier = sourceIdentifier,
-                              version = 1,
-                              identifiers = Nil,
-                              canonicalId = "xtsx8hwk")
+    val work = IdentifiedWork(
+      title = Some("An irascible iguana invites impudence"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = Nil,
+      canonicalId = "xtsx8hwk")
 
     val displayWork = DisplayWork(
       work = work,
@@ -116,8 +116,9 @@ class DisplayWorkTest extends FunSpec with Matchers {
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
         new DisplayAgent(label = "Janet Jackson", ontologyType = "Agent"),
-        new DisplayAgent(label = "Juniper Journals",
-                         ontologyType = "Organisation")
+        new DisplayAgent(
+          label = "Juniper Journals",
+          ontologyType = "Organisation")
       )
     }
   }

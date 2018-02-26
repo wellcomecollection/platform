@@ -6,12 +6,14 @@ import uk.ac.wellcome.platform.idminter.database.TableProvisioner
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 
 object IdMinterWorkerModule extends TwitterModule {
-  val database = flag[String]("aws.rds.identifiers.database",
-                              "",
-                              "Name of the identifiers database")
-  val tableName = flag[String]("aws.rds.identifiers.table",
-                               "",
-                               "Name of the identifiers table")
+  val database = flag[String](
+    "aws.rds.identifiers.database",
+    "",
+    "Name of the identifiers database")
+  val tableName = flag[String](
+    "aws.rds.identifiers.table",
+    "",
+    "Name of the identifiers table")
 
   override def singletonStartup(injector: Injector) {
     val tableProvisioner = injector.instance[TableProvisioner]
