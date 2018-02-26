@@ -5,12 +5,12 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.Suite
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.models.{Id, Sourced}
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
-trait VersionedHybridStoreLocal[T <: Sourced]
+trait VersionedHybridStoreLocal[T <: Id]
     extends DynamoDBLocal[HybridRecord]
     with S3Local
     with JsonTestUtil
@@ -40,9 +40,6 @@ trait VersionedHybridStoreLocal[T <: Sourced]
       .get
     dynamoRecord.isRight shouldBe true
     val hybridRecord = dynamoRecord.right.get
-
-    hybridRecord.sourceId shouldBe record.sourceId
-    hybridRecord.sourceName shouldBe record.sourceName
 
     val s3key = hybridRecord.s3key
 
