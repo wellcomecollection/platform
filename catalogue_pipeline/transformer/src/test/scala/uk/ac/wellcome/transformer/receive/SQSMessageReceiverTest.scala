@@ -61,9 +61,8 @@ class SQSMessageReceiverTest
   )
   val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
   val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
-  private val sourcedObjectStore = new S3ObjectStore(s3Client, bucketName)
   val recordReceiver =
-    new SQSMessageReceiver(snsWriter, sourcedObjectStore, metricsSender)
+    new SQSMessageReceiver(snsWriter, s3Client, bucketName, metricsSender)
 
   it("should receive a message and send it to SNS client") {
     val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
@@ -132,7 +131,7 @@ class SQSMessageReceiverTest
     val snsWriter = mockSNSWriter
 
     val recordReceiver =
-      new SQSMessageReceiver(snsWriter, sourcedObjectStore, metricsSender)
+      new SQSMessageReceiver(snsWriter, s3Client, bucketName, metricsSender)
 
     val future = recordReceiver.receiveMessage(
       createValidEmptySierraBibSQSMessage("000")
@@ -179,7 +178,7 @@ class SQSMessageReceiverTest
 
     val mockSNS = mockFailPublishMessage
     val recordReceiver =
-      new SQSMessageReceiver(mockSNS, sourcedObjectStore, metricsSender)
+      new SQSMessageReceiver(mockSNS, s3Client, bucketName, metricsSender)
 
     val future = recordReceiver.receiveMessage(message)
 

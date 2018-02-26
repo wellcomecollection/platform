@@ -36,37 +36,34 @@ class S3ObjectStore[T] @Inject()(
   def put(sourcedObject: T)(
     implicit encoder: Encoder[T]): Future[String] = {
 
-    Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
-      val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
-
-      // To spread objects evenly in our S3 bucket, we take the last two
-      // characters of the ID and reverse them.  This ensures that:
-      //
-      //  1.  It's easy for a person to find the S3 data corresponding to
-      //      a given source ID.
-      //  2.  Adjacent objects are stored in shards that are far apart,
-      //      e.g. b0001 and b0002 are separated by nine shards.
-      //
-//      val s3Shard = sourcedObject.sourceId.reverse
-//        .slice(0, 2)
-//
-
-      val dirtyPrefix = keyPrefixGenerator.generate(sourcedObject)
-      val prefixCleaningRegex = "^/|/$".r
-
-      val prefix = prefixCleaningRegex.replaceAllIn(dirtyPrefix, "")
-
-      val key = s"$prefix/$contentHash.json"
-
-      info(s"Attempting to PUT object to s3://$bucketName/$key")
-      s3Client.putObject(bucketName, key, content)
-      info(s"Successfully PUT object to s3://$bucketName/$key")
-
-      key
-    }
+    val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
+    S3ObjectStore.put[T](s3Client, bucketName)(keyPrefix)(sourcedObject)
   }
 
   def get(key: String)(implicit decoder: Decoder[T]): Future[T] = {
+    S3ObjectStore.get[T](s3Client, bucketName)(key)
+  }
+}
+
+object S3ObjectStore extends Logging {
+  def put[T](s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(sourcedObject: T)(
+    implicit encoder: Encoder[T]): Future[String] =  Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
+    val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
+
+    val prefixCleaningRegex = "^/|/$".r
+
+    val prefix = prefixCleaningRegex.replaceAllIn(keyPrefix, "")
+
+    val key = s"$prefix/$contentHash.json"
+
+    info(s"Attempting to PUT object to s3://$bucketName/$key")
+    s3Client.putObject(bucketName, key, content)
+    info(s"Successfully PUT object to s3://$bucketName/$key")
+
+    key
+  }
+
+  def get[T](s3Client: AmazonS3, bucketName: String)(key: String)(implicit decoder: Decoder[T]): Future[T] = {
 
     info(s"Attempting to GET object from s3://$bucketName/$key")
 
@@ -82,3 +79,4 @@ class S3ObjectStore[T] @Inject()(
     })
   }
 }
+
