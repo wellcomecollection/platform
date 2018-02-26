@@ -25,6 +25,6 @@ $(ROOT)/.docker/ecs_dashboard:
 ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ECS_DASHBOARD)/client:/dashboard \
-		--env BUCKET_NAME=wellcome-platform-dash \
-		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcome-platform-dash/ \
+		--env BUCKET_NAME=wellcomecollection-platform-dashboard \
+		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcomecollection-platform-dashboard/ \
 		ecs_dashboard
