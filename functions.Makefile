@@ -67,7 +67,7 @@ define terraform_apply
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
-		--env BUCKET_NAME=wellcomecollection-platform-infra \
+		--env BUCKET_NAME=wellcomecollection-platform-monitoring \
 		--env OP=apply \
 		wellcome/terraform_wrapper:latest
 endef
