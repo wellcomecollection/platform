@@ -67,10 +67,11 @@ object S3ObjectStore extends Logging {
     sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] =
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
-
-      val prefixCleaningRegex = "^/|/$".r
-
-      val prefix = prefixCleaningRegex.replaceAllIn(keyPrefix, "")
+      
+      // Ensure that keyPrefix here is normalised for concatenating with contentHash
+      val prefix = keyPrefix
+        .stripPrefix("/")
+        .stripSuffix("/")
 
       val key = s"$prefix/$contentHash.json"
 
