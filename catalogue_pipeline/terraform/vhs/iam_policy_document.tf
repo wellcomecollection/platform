@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "read_policy" {
   }
 }
 
-data "aws_iam_policy_document" "dynamodb_full_access_policy" {
+data "aws_iam_policy_document" "full_access_policy" {
   statement {
     actions = [
       "dynamodb:*",
