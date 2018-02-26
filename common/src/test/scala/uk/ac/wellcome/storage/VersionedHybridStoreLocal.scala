@@ -21,7 +21,7 @@ trait VersionedHybridStoreLocal[T <: Sourced]
 
   val keyPrefixGenerator: KeyPrefixGenerator[T]
 
-  val hybridStore = new VersionedHybridStore(
+  val hybridStore = new VersionedHybridStore[T](
     sourcedObjectStore = new S3ObjectStore(
       s3Client = s3Client,
       bucketName = bucketName,

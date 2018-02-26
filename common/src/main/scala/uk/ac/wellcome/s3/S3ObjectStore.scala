@@ -53,24 +53,26 @@ class S3ObjectStore[T] @Inject()(
 }
 
 object S3ObjectStore extends Logging {
-  def put[T](s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(sourcedObject: T)(
-    implicit encoder: Encoder[T]): Future[String] =  Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
-    val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
+  def put[T](s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
+    sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] =
+    Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
+      val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
 
-    val prefixCleaningRegex = "^/|/$".r
+      val prefixCleaningRegex = "^/|/$".r
 
-    val prefix = prefixCleaningRegex.replaceAllIn(keyPrefix, "")
+      val prefix = prefixCleaningRegex.replaceAllIn(keyPrefix, "")
 
-    val key = s"$prefix/$contentHash.json"
+      val key = s"$prefix/$contentHash.json"
 
-    info(s"Attempting to PUT object to s3://$bucketName/$key")
-    s3Client.putObject(bucketName, key, content)
-    info(s"Successfully PUT object to s3://$bucketName/$key")
+      info(s"Attempting to PUT object to s3://$bucketName/$key")
+      s3Client.putObject(bucketName, key, content)
+      info(s"Successfully PUT object to s3://$bucketName/$key")
 
-    key
-  }
+      key
+    }
 
-  def get[T](s3Client: AmazonS3, bucketName: String)(key: String)(implicit decoder: Decoder[T]): Future[T] = {
+  def get[T](s3Client: AmazonS3, bucketName: String)(key: String)(
+    implicit decoder: Decoder[T]): Future[T] = {
 
     info(s"Attempting to GET object from s3://$bucketName/$key")
 
@@ -86,4 +88,3 @@ object S3ObjectStore extends Logging {
     })
   }
 }
-
