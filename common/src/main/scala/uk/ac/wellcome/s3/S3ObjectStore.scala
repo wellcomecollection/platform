@@ -19,6 +19,15 @@ trait KeyPrefixGenerator[-T] {
   def generate(obj: T): String
 }
 
+// To spread objects evenly in our S3 bucket, we take the last two
+// characters of the ID and reverse them.  This ensures that:
+//
+//  1.  It's easy for a person to find the S3 data corresponding to
+//      a given source ID.
+//
+//  2.  Adjacent objects are stored in shards that are far apart,
+//      e.g. b0001 and b0002 are separated by nine shards.
+
 class SourcedKeyPrefixGenerator @Inject() extends KeyPrefixGenerator[Sourced] {
   override def generate(obj: Sourced): String = {
     val s3Shard = obj.sourceId.reverse.slice(0, 2)
