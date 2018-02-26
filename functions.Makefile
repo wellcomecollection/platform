@@ -204,7 +204,7 @@ endef
 #	$2 - Path to the Lambda source directory.
 #
 define __lambda_target_template
-$(1)-test: 
+$(1)-test:
 	$(call test_lambda,$(2))
 
 $(1)-publish:
