@@ -18,7 +18,7 @@ trait SierraItemMergerTestUtil
     with MockitoSugar
     with ExtendedPatience
     with SQSLocal
-    with VersionedHybridStoreLocal { this: Suite =>
+    with VersionedHybridStoreLocal[SierraTransformable] { this: Suite =>
 
   val queueUrl = createQueueAndReturnUrl("test_item_merger")
 

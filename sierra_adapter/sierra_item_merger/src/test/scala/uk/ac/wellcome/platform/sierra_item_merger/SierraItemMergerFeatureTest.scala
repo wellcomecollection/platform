@@ -6,9 +6,10 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.models.transformable.SierraTransformable
-
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.s3.KeyPrefixGenerator
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -25,6 +26,11 @@ class SierraItemMergerFeatureTest
       "aws.dynamo.tableName" -> tableName
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ s3LocalFlags
   )
+
+  override lazy val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
+    new KeyPrefixGenerator[Sourced] {
+      override def generate(obj: Sourced): String = "/"
+    }
 
   it("stores an item from SQS") {
     val id = "i1000001"
@@ -44,7 +50,7 @@ class SierraItemMergerFeatureTest
     )
 
     eventually {
-      val futureRecord = hybridStore.getRecord[SierraTransformable](
+      val futureRecord = hybridStore.getRecord(
         expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
         record.get shouldBe expectedSierraTransformable
@@ -87,13 +93,13 @@ class SierraItemMergerFeatureTest
         itemData = Map(id2 -> record2)
       )
 
-      val futureRecord1 = hybridStore.getRecord[SierraTransformable](
+      val futureRecord1 = hybridStore.getRecord(
         expectedSierraTransformable1.id)
       whenReady(futureRecord1) { record =>
         record.get shouldBe expectedSierraTransformable1
       }
 
-      val futureRecord2 = hybridStore.getRecord[SierraTransformable](
+      val futureRecord2 = hybridStore.getRecord(
         expectedSierraTransformable2.id)
       whenReady(futureRecord2) { record =>
         record.get shouldBe expectedSierraTransformable2
