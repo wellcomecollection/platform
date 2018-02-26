@@ -83,7 +83,7 @@ module "slack_budget_bot" {
 
   slack_webhook           = "${var.non_critical_slack_webhook}"
   release_ids             = "${var.release_ids}"
-  monitoring_bucket_id    = "${aws_s3_bucket.monitoring.id}"
+  monitoring_bucket_id    = "${aws_s3_bucket.dashboard.id}"
   account_id              = "${data.aws_caller_identity.current.account_id}"
   ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 }
