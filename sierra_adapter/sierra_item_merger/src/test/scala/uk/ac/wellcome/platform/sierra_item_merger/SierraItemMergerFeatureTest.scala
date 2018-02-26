@@ -50,8 +50,7 @@ class SierraItemMergerFeatureTest
     )
 
     eventually {
-      val futureRecord = hybridStore.getRecord(
-        expectedSierraTransformable.id)
+      val futureRecord = hybridStore.getRecord(expectedSierraTransformable.id)
       whenReady(futureRecord) { record =>
         record.get shouldBe expectedSierraTransformable
       }
@@ -93,14 +92,14 @@ class SierraItemMergerFeatureTest
         itemData = Map(id2 -> record2)
       )
 
-      val futureRecord1 = hybridStore.getRecord(
-        expectedSierraTransformable1.id)
+      val futureRecord1 =
+        hybridStore.getRecord(expectedSierraTransformable1.id)
       whenReady(futureRecord1) { record =>
         record.get shouldBe expectedSierraTransformable1
       }
 
-      val futureRecord2 = hybridStore.getRecord(
-        expectedSierraTransformable2.id)
+      val futureRecord2 =
+        hybridStore.getRecord(expectedSierraTransformable2.id)
       whenReady(futureRecord2) { record =>
         record.get shouldBe expectedSierraTransformable2
       }
