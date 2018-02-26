@@ -8,7 +8,7 @@ module "lambda_ecs_ec2_instance_tagger" {
   timeout     = 10
 
   environment_variables = {
-    BUCKET_NAME = "${var.bucket_infra_id}"
+    BUCKET_NAME = "${var.infra_bucket}"
     OBJECT_PATH = "tmp/ecs_ec2_instance_tagger"
   }
 

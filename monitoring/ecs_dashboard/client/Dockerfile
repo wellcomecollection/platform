@@ -1,10 +1,10 @@
-FROM node:8
+FROM alpine
 
-LABEL maintainer "Alex Chan <a.chan@wellcome.ac.uk>"
+LABEL maintainer "Digital Platform <wellcomedigitalplatform@wellcome.ac.uk>"
 LABEL description "Used for deploying our ECS dashboard to AWS"
 
-RUN apt-get update
-RUN apt-get install --yes awscli jq
+RUN apk update && apk add jq nodejs py2-pip
+RUN pip install awscli
 
 VOLUME ["/dashboard"]
 WORKDIR /dashboard

@@ -44,8 +44,8 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${aws_s3_bucket.infra.arn}/lambdas/*",
-      "${aws_s3_bucket.infra.arn}/releases/*",
+      "${aws_s3_bucket.platform_infra.arn}/lambdas/*",
+      "${aws_s3_bucket.platform_infra.arn}/releases/*",
     ]
   }
 
@@ -114,7 +114,7 @@ data "aws_iam_policy_document" "upload_sqs_freeze" {
     ]
 
     resources = [
-      "${aws_s3_bucket.infra.arn}/sqs/*",
+      "${aws_s3_bucket.platform_infra.arn}/sqs/*",
     ]
   }
 }
