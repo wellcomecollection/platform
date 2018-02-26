@@ -21,25 +21,6 @@ resource "aws_s3_bucket" "platform_infra" {
   }
 }
 
-resource "aws_s3_bucket" "infra" {
-  bucket = "platform-infra"
-  acl    = "private"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  lifecycle_rule {
-    id      = "elasticdump"
-    prefix  = "elasticdump/"
-    enabled = true
-
-    expiration {
-      days = 30
-    }
-  }
-}
-
 locals {
   alb_logs_bucket_name = "wellcomecollection-platform-logs-alb"
 }
