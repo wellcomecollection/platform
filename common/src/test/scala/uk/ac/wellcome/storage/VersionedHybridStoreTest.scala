@@ -1,12 +1,17 @@
 package uk.ac.wellcome.storage
 
-import com.gu.scanamo.DynamoFormat
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{Id, Sourced}
-import uk.ac.wellcome.s3.KeyPrefixGenerator
+import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.{Id, Sourced, Versioned}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
+import com.gu.scanamo.syntax._
+
+import scala.annotation.Annotation
 
 case class ExampleRecord(
   id: String,
@@ -17,12 +22,9 @@ class VersionedHybridStoreTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with VersionedHybridStoreLocal[ExampleRecord] {
+    with VersionedHybridStoreLocal {
 
-  override lazy val keyPrefixGenerator: KeyPrefixGenerator[ExampleRecord] =
-    new KeyPrefixGenerator[ExampleRecord] {
-      override def generate(obj: ExampleRecord): String = "/"
-    }
+  val hybridStore = createHybridStore[ExampleRecord]
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -157,5 +159,34 @@ class VersionedHybridStoreTest
     whenReady(future.failed) { e: Throwable =>
       e shouldBe a[IllegalArgumentException]
     }
+  }
+
+  it("should copy some tagged fields into the record in dynamo") {
+    case class CopyToDynamo() extends Annotation
+
+    case class TaggedExampleRecord(id: String,
+                                   something: String,
+                                    @CopyToDynamo taggedSomething: String
+                                  ) extends Id
+
+    val taggedContent = "this goes in dynamo"
+    val record = TaggedExampleRecord(id = "11111", something = "whatever", taggedSomething = taggedContent)
+
+    case class ExtendedHybridRecord(id: String, version: Int, s3key: String, taggedSomething: String) extends Versioned with Id
+
+    val hybridStore = createHybridStore[TaggedExampleRecord]
+
+    whenReady(hybridStore.updateRecord(record.id)(record)(identity)) { _ =>
+      val maybeResult = Scanamo.get[ExtendedHybridRecord](dynamoDbClient)(tableName)('id -> record.id)
+      maybeResult shouldBe defined
+      maybeResult.get.isRight shouldBe true
+      val hybridRecord = maybeResult.get.right.get
+
+      hybridRecord.id shouldBe record.id
+      hybridRecord.version shouldBe 1
+      hybridRecord.taggedSomething shouldBe taggedContent
+    }
+
+
   }
 }
