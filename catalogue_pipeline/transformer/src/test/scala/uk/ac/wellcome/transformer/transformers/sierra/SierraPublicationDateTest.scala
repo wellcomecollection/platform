@@ -14,21 +14,20 @@ class SierraPublicationDateTest extends FunSpec with Matchers with SierraData {
   val transformer = new SierraPublicationDate {}
 
   it("extracts publication date from MARC field 260 with subfield c") {
-    val
-      varFields = List(
-        VarField(
-          fieldTag = "?",
-          marcTag = "260",
-          indicator1 = " ",
-          indicator2 = " ",
-          subfields = List(
-            MarcSubfield(
-              tag = "c",
-              content = "1923."
-            )
+    val varFields = List(
+      VarField(
+        fieldTag = "?",
+        marcTag = "260",
+        indicator1 = " ",
+        indicator2 = " ",
+        subfields = List(
+          MarcSubfield(
+            tag = "c",
+            content = "1923."
           )
         )
       )
+    )
 
     val bibData = SierraBibData(
       id = "b1234567",

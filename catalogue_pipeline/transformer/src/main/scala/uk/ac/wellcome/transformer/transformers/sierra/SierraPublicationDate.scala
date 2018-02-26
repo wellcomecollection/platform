@@ -5,13 +5,14 @@ import uk.ac.wellcome.models.Period
 
 trait SierraPublicationDate {
 
-  private def findSubfield(bibData: SierraBibData, tag: String, subfieldTag: String): Option[MarcSubfield] =
-    {
-      for {
-        varField <- bibData.varFields if varField.marcTag.contains(tag)
-        subfield <- varField.subfields if subfieldTag == subfield.tag
-      } yield subfield
-    }.headOption
+  private def findSubfield(bibData: SierraBibData,
+                           tag: String,
+                           subfieldTag: String): Option[MarcSubfield] = {
+    for {
+      varField <- bibData.varFields if varField.marcTag.contains(tag)
+      subfield <- varField.subfields if subfieldTag == subfield.tag
+    } yield subfield
+  }.headOption
 
   // Populate wwork:publicationDate.
   //
@@ -20,6 +21,8 @@ trait SierraPublicationDate {
   // https://www.loc.gov/marc/bibliographic/bd260.html
   //
   def getPublicationDate(bibData: SierraBibData): Option[Period] =
-    findSubfield(bibData, "260", "c").map{ c => Period(c.content) }
+    findSubfield(bibData, "260", "c").map { c =>
+      Period(c.content)
+    }
 
 }
