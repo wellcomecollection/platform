@@ -51,8 +51,9 @@ class SierraItemRecordDao @Inject()(dynamoDbClient: AmazonDynamoDB,
       case Some(Left(readError)) =>
         val exception = new RuntimeException(
           s"An error occurred while retrieving item $id: $readError")
-        error(s"An error occurred while retrieving item $id: $readError",
-              exception)
+        error(
+          s"An error occurred while retrieving item $id: $readError",
+          exception)
         throw exception
     }
   }

@@ -31,9 +31,10 @@ class IngestorWorkerServiceTest
     with Ingestor {
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests",
-                      mock[AmazonCloudWatch],
-                      ActorSystem())
+    new MetricsSender(
+      namespace = "reindexer-tests",
+      mock[AmazonCloudWatch],
+      ActorSystem())
 
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)

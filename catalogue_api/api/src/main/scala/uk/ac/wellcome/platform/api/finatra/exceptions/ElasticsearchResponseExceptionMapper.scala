@@ -91,12 +91,14 @@ class ElasticsearchResponseExceptionMapper @Inject()(
         resultSizePattern.findFirstMatchIn(reason) match {
           case Some(s) => {
             val size = s.group(1)
-            userError(s"Only the first $size works are available in the API.",
-                      exception)
+            userError(
+              s"Only the first $size works are available in the API.",
+              exception)
           }
           case _ => {
-            serverError(s"Unknown error in search phase execution: $reason",
-                        exception)
+            serverError(
+              s"Unknown error in search phase execution: $reason",
+              exception)
           }
         }
       }

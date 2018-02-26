@@ -86,10 +86,11 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
       None,
       JsonUtil
         .toJson(
-          HybridRecord(version = version,
-                       sourceId = "testId",
-                       sourceName = testSource,
-                       s3key = key))
+          HybridRecord(
+            version = version,
+            sourceId = "testId",
+            sourceName = testSource,
+            s3key = key))
         .get,
       "test_transformer_topic",
       "notification",

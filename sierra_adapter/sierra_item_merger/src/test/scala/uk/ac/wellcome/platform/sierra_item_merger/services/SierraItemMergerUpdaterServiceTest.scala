@@ -44,11 +44,12 @@ class SierraItemMergerUpdaterServiceTest
 
     whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
       val expectedSierraTransformable =
-        SierraTransformable(sourceId = bibId,
-                            maybeBibData = None,
-                            itemData = Map(
-                              newItemRecord.id -> newItemRecord
-                            ))
+        SierraTransformable(
+          sourceId = bibId,
+          maybeBibData = None,
+          itemData = Map(
+            newItemRecord.id -> newItemRecord
+          ))
 
       val futureRecord1 = hybridStore.getRecord[SierraTransformable](
         expectedSierraTransformable.id)

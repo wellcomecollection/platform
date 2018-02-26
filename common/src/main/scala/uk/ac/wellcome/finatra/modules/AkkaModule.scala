@@ -5,7 +5,7 @@ import uk.ac.wellcome.utils.GuiceAkkaExtension
 import akka.actor.ActorSystem
 import com.google.inject.Provides
 import com.google.inject.Injector
-import com.twitter.inject.{TwitterModule, InjectorModule}
+import com.twitter.inject.{InjectorModule, TwitterModule}
 
 object AkkaModule extends TwitterModule {
   override val modules = Seq(InjectorModule)

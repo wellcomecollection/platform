@@ -14,8 +14,9 @@ class ServerTest extends FeatureTest {
   )
 
   test("it shows the healthcheck message") {
-    server.httpGet(path = "/management/healthcheck",
-                   andExpect = Ok,
-                   withJsonBody = """{"message": "ok"}""")
+    server.httpGet(
+      path = "/management/healthcheck",
+      andExpect = Ok,
+      withJsonBody = """{"message": "ok"}""")
   }
 }

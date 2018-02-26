@@ -29,9 +29,10 @@ class IdEmbedderTests
   )
 
   private val metricsSender =
-    new MetricsSender("id_minter_test_metrics",
-                      mock[AmazonCloudWatch],
-                      ActorSystem())
+    new MetricsSender(
+      "id_minter_test_metrics",
+      mock[AmazonCloudWatch],
+      ActorSystem())
   private val mockIdentifierGenerator: IdentifierGenerator =
     mock[IdentifierGenerator]
 
@@ -46,9 +47,10 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = UnidentifiedWork(title = Some("crap"),
-                                        sourceIdentifier = identifier,
-                                        version = 1)
+    val originalWork = UnidentifiedWork(
+      title = Some("crap"),
+      sourceIdentifier = identifier,
+      version = 1)
 
     val newCanonicalId = "5467"
 
@@ -85,9 +87,10 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = UnidentifiedWork(title = Some("crap"),
-                                        sourceIdentifier = identifier,
-                                        version = 1)
+    val originalWork = UnidentifiedWork(
+      title = Some("crap"),
+      sourceIdentifier = identifier,
+      version = 1)
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -126,11 +129,11 @@ class IdEmbedderTests
       locations = List()
     )
 
-    val originalWork = UnidentifiedWork(title = Some("crap"),
-                                        sourceIdentifier = identifier,
-                                        version = 1,
-                                        items =
-                                          List(originalItem1, originalItem2))
+    val originalWork = UnidentifiedWork(
+      title = Some("crap"),
+      sourceIdentifier = identifier,
+      version = 1,
+      items = List(originalItem1, originalItem2))
 
     val newItemCanonicalId1 = "item1-canonical-id"
     val newItemCanonicalId2 = "item2-canonical-id"

@@ -7,10 +7,10 @@ import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{
-  VersionUpdater,
-  Versioned,
   Sourced,
-  SourcedDynamoFormatWrapper
+  SourcedDynamoFormatWrapper,
+  VersionUpdater,
+  Versioned
 }
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
