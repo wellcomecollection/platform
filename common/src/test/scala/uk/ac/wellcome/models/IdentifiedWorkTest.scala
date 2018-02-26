@@ -121,6 +121,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val publishers = List(publisher)
+
   val identifiedWork = IdentifiedWork(
     canonicalId = "canonicalId",
     title = Some("title"),

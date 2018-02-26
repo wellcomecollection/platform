@@ -35,7 +35,8 @@ case class UnidentifiedWork(title: Option[String],
                             items: List[UnidentifiedItem] = Nil,
                             publishers: List[AbstractAgent] = Nil,
                             visible: Boolean = true,
-                            ontologyType: String = "Work")
+                            ontologyType: String = "Work",
+                            publicationDate: Option[Period] = None)
     extends Work
 
 case class IdentifiedWork(canonicalId: String,

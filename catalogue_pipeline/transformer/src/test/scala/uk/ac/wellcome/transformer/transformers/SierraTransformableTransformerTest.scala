@@ -179,6 +179,10 @@ class SierraTransformableTransformerTest
           MarcSubfield(
             tag = "a",
             content = "A delightful description of a dead daisy."
+          ),
+          MarcSubfield(
+            tag = "c",
+            content = "1923."
           )
         )
       )
@@ -194,7 +198,22 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val marcFields = publisherFields ++ descriptionFields ++ letteringFields
+    val publishingDateFields = List(
+      VarField(
+        fieldTag = "?",
+        marcTag = "260",
+        indicator1 = " ",
+        indicator2 = " ",
+        subfields = List(
+          MarcSubfield(
+            tag = "c",
+            content = "1923."
+          )
+        )
+      )
+    )
+
+    val marcFields = publisherFields ++ descriptionFields ++ letteringFields ++ publishingDateFields
 
     val data =
       s"""
@@ -226,7 +245,8 @@ class SierraTransformableTransformerTest
         identifiers = List(identifier),
         description = Some("A delightful description of a dead daisy."),
         publishers = List(Organisation(label = "Peaceful Poetry")),
-        lettering = Some(lettering)
+        lettering = Some(lettering),
+        publicationDate = Some(Period("1923."))
       )
     )
   }
@@ -261,7 +281,8 @@ class SierraTransformableTransformerTest
                        sourceIdentifier = identifier,
                        version = 1,
                        identifiers = List(identifier),
-                       visible = false)
+                       visible = false,
+                       publicationDate = None)
     )
   }
 
@@ -295,7 +316,8 @@ class SierraTransformableTransformerTest
                        sourceIdentifier = identifier,
                        version = 1,
                        identifiers = List(identifier),
-                       visible = false)
+                       visible = false,
+                       publicationDate = None)
     )
   }
 
@@ -378,4 +400,5 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get.get.title shouldBe None
   }
+
 }

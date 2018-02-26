@@ -18,6 +18,7 @@ class SierraTransformableTransformer
     with SierraPublishers
     with SierraTitle
     with SierraLocation
+    with SierraPublicationDate
     with Logging {
 
   private def extractItemData(itemRecord: SierraItemRecord) = {
@@ -73,7 +74,8 @@ class SierraTransformableTransformer
                 .flatMap(extractItemData)
                 .toList,
               publishers = getPublishers(sierraBibData),
-              visible = !(sierraBibData.deleted || sierraBibData.suppressed)
+              visible = !(sierraBibData.deleted || sierraBibData.suppressed),
+              publicationDate = getPublicationDate(sierraBibData)
             ))
         }
 
