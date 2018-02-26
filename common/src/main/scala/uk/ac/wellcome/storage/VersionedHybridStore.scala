@@ -3,25 +3,19 @@ package uk.ac.wellcome.storage
 import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
-import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper, VersionUpdater, Versioned}
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
 
 case class HybridRecord(
+  id: String,
   version: Int,
-  sourceId: String,
-  sourceName: String,
-  s3key: String,
-  reindexShard: String = "default",
-  reindexVersion: Int = 0
-) extends Reindexable
-    with Sourced
-    with Versioned
+  s3key: String
+) extends Versioned with Id
 
-class VersionedHybridStore[T <: Sourced] @Inject()(
+class VersionedHybridStore[T <: Id] @Inject()(
   sourcedObjectStore: S3ObjectStore[T],
   versionedDao: VersionedDao
 ) {
@@ -38,12 +32,11 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
     s3Object: T
   )
 
-  def updateRecord(sourceName: String, sourceId: String)(ifNotExisting: => T)(
+  def updateRecord(id: String)(ifNotExisting: => T)(
     ifExisting: T => T)(
     implicit decoder: Decoder[T],
     encoder: Encoder[T]
   ): Future[Unit] = {
-    val id = Sourced.id(sourceName, sourceId)
 
     getObject(id).flatMap {
       case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
@@ -66,9 +59,8 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
             HybridRecord(
               // If this record doesn't exist already, then we can start it
               // at version 0 and not worry about a newer version elsewhere.
+              id = id,
               version = 0,
-              sourceId = ifNotExisting.sourceId,
-              sourceName = ifNotExisting.sourceName,
               s3key = key
           )
         )
