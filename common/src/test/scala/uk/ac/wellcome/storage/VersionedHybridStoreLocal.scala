@@ -27,10 +27,11 @@ trait VersionedHybridStoreLocal[T <: Sourced]
       bucketName = bucketName,
       keyPrefixGenerator = keyPrefixGenerator
     ),
-    versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
-                                    dynamoConfig = DynamoConfig(
-                                      table = tableName
-                                    ))
+    versionedDao = new VersionedDao(
+      dynamoDbClient = dynamoDbClient,
+      dynamoConfig = DynamoConfig(
+        table = tableName
+      ))
   )
 
   def assertHybridRecordIsStoredCorrectly(record: T, expectedJson: String) = {
