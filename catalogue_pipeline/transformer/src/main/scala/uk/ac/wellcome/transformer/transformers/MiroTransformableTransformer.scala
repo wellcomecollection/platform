@@ -40,9 +40,9 @@ class MiroTransformableTransformer
       Some(
         UnidentifiedWork(
           title = Some(title),
-          sourceIdentifier =
-            SourceIdentifier(IdentifierSchemes.miroImageNumber,
-                             miroTransformable.sourceId),
+          sourceIdentifier = SourceIdentifier(
+            IdentifierSchemes.miroImageNumber,
+            miroTransformable.sourceId),
           version = version,
           identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
           description = description,
@@ -210,8 +210,9 @@ class MiroTransformableTransformer
     // put them all in the same identifier scheme, because we're not doing
     // any transformation or cleaning.
     val libraryRefsList: List[SourceIdentifier] =
-      zipMiroFields(keys = miroData.libraryRefDepartment,
-                    values = miroData.libraryRefId)
+      zipMiroFields(
+        keys = miroData.libraryRefDepartment,
+        values = miroData.libraryRefId)
         .collect {
           case (Some(label), Some(value)) =>
             SourceIdentifier(
@@ -350,18 +351,24 @@ class MiroTransformableTransformer
       // them up.
       case Some(line) =>
         Some(line
-          .replaceAll("Adrian Wressell, Heart of England NHSFT",
-                      "Adrian Wressell, Heart of England NHS FT")
-          .replaceAll("Andrew Dilley,Jane Greening & Bruce Lynn",
-                      "Andrew Dilley, Jane Greening & Bruce Lynn")
-          .replaceAll("Andrew Dilley,Nicola DeLeon & Bruce Lynn",
-                      "Andrew Dilley, Nicola De Leon & Bruce Lynn")
-          .replaceAll("Ashley Prytherch, Royal Surrey County Hospital NHS Foundation Trust",
-                      "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
-          .replaceAll("David Gregory & Debbie Marshall",
-                      "David Gregory and Debbie Marshall")
-          .replaceAll("David Gregory&Debbie Marshall",
-                      "David Gregory and Debbie Marshall")
+          .replaceAll(
+            "Adrian Wressell, Heart of England NHSFT",
+            "Adrian Wressell, Heart of England NHS FT")
+          .replaceAll(
+            "Andrew Dilley,Jane Greening & Bruce Lynn",
+            "Andrew Dilley, Jane Greening & Bruce Lynn")
+          .replaceAll(
+            "Andrew Dilley,Nicola DeLeon & Bruce Lynn",
+            "Andrew Dilley, Nicola De Leon & Bruce Lynn")
+          .replaceAll(
+            "Ashley Prytherch, Royal Surrey County Hospital NHS Foundation Trust",
+            "Ashley Prytherch, Royal Surrey County Hospital NHS FT")
+          .replaceAll(
+            "David Gregory & Debbie Marshall",
+            "David Gregory and Debbie Marshall")
+          .replaceAll(
+            "David Gregory&Debbie Marshall",
+            "David Gregory and Debbie Marshall")
           .replaceAll("Geraldine Thompson.", "Geraldine Thompson")
           .replaceAll("John & Penny Hubley.", "John & Penny Hubley")
           .replaceAll(

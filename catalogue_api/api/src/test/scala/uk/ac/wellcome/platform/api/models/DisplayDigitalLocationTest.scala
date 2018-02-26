@@ -52,8 +52,9 @@ class DisplayLocationTest extends FunSpec with Matchers {
 
       val displayLocation = DisplayLocation(physicalLocation)
 
-      displayLocation shouldBe DisplayPhysicalLocation(locationType,
-                                                       locationLabel)
+      displayLocation shouldBe DisplayPhysicalLocation(
+        locationType,
+        locationLabel)
     }
   }
 }

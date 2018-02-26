@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.{Item, SourceIdentifier, IdentifiedWork}
+import uk.ac.wellcome.models.{IdentifiedWork, Item, SourceIdentifier}
 import uk.ac.wellcome.utils.JsonUtil._
 
 @JsonIgnoreProperties(Array("visible"))

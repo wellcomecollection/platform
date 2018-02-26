@@ -6,7 +6,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.utils.{TryBackoff, JsonUtil}
+import uk.ac.wellcome.utils.{JsonUtil, TryBackoff}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import scala.util.Try

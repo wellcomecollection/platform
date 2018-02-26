@@ -27,8 +27,9 @@ object SierraRecordWrapperFlow extends Logging {
   private def createSierraRecord(
     unprefixedJson: Json,
     resourceType: SierraResourceTypes.Value): SierraRecord = {
-    val json = addIDPrefix(json = unprefixedJson,
-                           resourceType: SierraResourceTypes.Value)
+    val json = addIDPrefix(
+      json = unprefixedJson,
+      resourceType: SierraResourceTypes.Value)
     logger.debug(s"Creating record from ${json.noSpaces}")
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
     maybeUpdatedDate match {

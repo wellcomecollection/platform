@@ -7,7 +7,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.{blocking, Future}
 
 case class PublishAttempt(id: Either[Throwable, String])
 

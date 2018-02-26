@@ -58,9 +58,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .responseWith[DisplayError](400, "Bad Request Error")
         .responseWith[DisplayError](404, "Not Found Error")
         .responseWith[DisplayError](500, "Internal Server Error")
-        .queryParam[Int]("page",
-                         "The page to return from the result list",
-                         required = false)
+        .queryParam[Int](
+          "page",
+          "The page to return from the result list",
+          required = false)
         .queryParam[Int](
           "pageSize",
           "The number of works to return per page (default: 10)",
@@ -139,9 +140,10 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
       worksService
-        .findWorkById(request.id,
-                      request.includes.getOrElse(WorksIncludes()),
-                      index = request._index)
+        .findWorkById(
+          request.id,
+          request.includes.getOrElse(WorksIncludes()),
+          index = request._index)
         .map {
 
           // If the work is visible, we return the complete work.  If it's
@@ -170,8 +172,9 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
                 Some(s"Work not found for identifier ${request.id}")
             )
             response.notFound.json(
-              ResultResponse(context = contextUri,
-                             result = DisplayError(result))
+              ResultResponse(
+                context = contextUri,
+                result = DisplayError(result))
             )
           }
         }

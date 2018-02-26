@@ -12,9 +12,10 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object AmazonCloudWatchModule extends TwitterModule {
-  private val awsNamespace = flag[String]("aws.metrics.namespace",
-                                          "",
-                                          "Namespace for cloudwatch metrics")
+  private val awsNamespace = flag[String](
+    "aws.metrics.namespace",
+    "",
+    "Namespace for cloudwatch metrics")
   private val awsEndpoint = flag[String](
     "aws.cloudWatch.endpoint",
     "",

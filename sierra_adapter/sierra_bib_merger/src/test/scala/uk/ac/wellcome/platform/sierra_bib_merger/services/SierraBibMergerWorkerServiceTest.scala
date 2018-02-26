@@ -24,19 +24,22 @@ class SierraBibMergerWorkerServiceTest
     val sqsReader = mock[SQSReader]
     val metricsSender = mock[MetricsSender]
     val mergerUpdaterService =
-      new SierraBibMergerUpdaterService(mock[VersionedHybridStore],
-                                        metricsSender)
-    val worker = new SierraBibMergerWorkerService(sqsReader,
-                                                  ActorSystem(),
-                                                  metricsSender,
-                                                  mergerUpdaterService)
+      new SierraBibMergerUpdaterService(
+        mock[VersionedHybridStore],
+        metricsSender)
+    val worker = new SierraBibMergerWorkerService(
+      sqsReader,
+      ActorSystem(),
+      metricsSender,
+      mergerUpdaterService)
 
     val future = worker.processMessage(
-      SQSMessage(subject = Some("default-subject"),
-                 body = "null",
-                 topic = "",
-                 messageType = "",
-                 timestamp = ""))
+      SQSMessage(
+        subject = Some("default-subject"),
+        body = "null",
+        topic = "",
+        messageType = "",
+        timestamp = ""))
 
     whenReady(future.failed) { ex =>
       ex shouldBe a[GracefulFailureException]

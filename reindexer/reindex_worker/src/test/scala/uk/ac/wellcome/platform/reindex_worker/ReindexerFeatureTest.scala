@@ -58,12 +58,13 @@ class ReindexerFeatureTest
     val numberOfRecords = 4
 
     val hybridRecords = (1 to numberOfRecords).map(i => {
-      HybridRecord(version = 1,
-                   sourceId = s"id$i",
-                   sourceName = "source",
-                   s3key = "s3://bucket/key",
-                   reindexShard = shardName,
-                   reindexVersion = currentVersion)
+      HybridRecord(
+        version = 1,
+        sourceId = s"id$i",
+        sourceName = "source",
+        s3key = "s3://bucket/key",
+        reindexShard = shardName,
+        reindexVersion = currentVersion)
     })
 
     hybridRecords.foreach(
@@ -71,8 +72,8 @@ class ReindexerFeatureTest
 
     val expectedRecords = hybridRecords.map(
       record =>
-        record.copy(reindexVersion = desiredVersion,
-                    version = record.version + 1))
+        record
+          .copy(reindexVersion = desiredVersion, version = record.version + 1))
 
     val reindexJob = ReindexJob(
       shardId = shardName,

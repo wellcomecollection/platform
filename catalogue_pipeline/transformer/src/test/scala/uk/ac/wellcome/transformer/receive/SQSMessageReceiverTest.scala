@@ -48,11 +48,11 @@ class SQSMessageReceiverTest
   val sourceIdentifier =
     SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
 
-  val work = UnidentifiedWork(title =
-                                Some("placeholder title for a Calm record"),
-                              sourceIdentifier = sourceIdentifier,
-                              version = 1,
-                              identifiers = List(sourceIdentifier))
+  val work = UnidentifiedWork(
+    title = Some("placeholder title for a Calm record"),
+    sourceIdentifier = sourceIdentifier,
+    version = 1,
+    identifiers = List(sourceIdentifier))
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
@@ -147,14 +147,15 @@ class SQSMessageReceiverTest
   it(
     "should return a failed future if it's unable to transform the transformable object") {
     val failingTransformCalmSqsMessage: SQSMessage =
-      hybridRecordSqsMessage(createValidCalmTramsformableJson(
-                               RecordID = "abcdef",
-                               RecordType = "collection",
-                               AltRefNo = "AB/CD/12",
-                               RefNo = "AB/CD/12",
-                               data = """not a json string"""
-                             ),
-                             "calm")
+      hybridRecordSqsMessage(
+        createValidCalmTramsformableJson(
+          RecordID = "abcdef",
+          RecordType = "collection",
+          AltRefNo = "AB/CD/12",
+          RefNo = "AB/CD/12",
+          data = """not a json string"""
+        ),
+        "calm")
 
     val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
@@ -166,16 +167,19 @@ class SQSMessageReceiverTest
   it("should return a failed future if it's unable to publish the work") {
     val id = "b123"
     val sierraTransformable: Transformable =
-      SierraTransformable(sourceId = id,
-                          bibData = JsonUtil
-                            .toJson(
-                              SierraBibRecord(id = id,
-                                              data = s"""{"id": "$id"}""",
-                                              modifiedDate = Instant.now))
-                            .get)
+      SierraTransformable(
+        sourceId = id,
+        bibData = JsonUtil
+          .toJson(
+            SierraBibRecord(
+              id = id,
+              data = s"""{"id": "$id"}""",
+              modifiedDate = Instant.now))
+          .get)
     val message =
-      hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get,
-                             "sierra")
+      hybridRecordSqsMessage(
+        JsonUtil.toJson(sierraTransformable).get,
+        "sierra")
 
     val mockSNS = mockFailPublishMessage
     val recordReceiver =

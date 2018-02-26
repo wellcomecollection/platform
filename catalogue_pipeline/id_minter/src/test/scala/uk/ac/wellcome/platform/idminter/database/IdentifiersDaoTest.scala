@@ -105,8 +105,9 @@ class IdentifiersDaoTest
         select
           .from(identifiersTable as identifiersTable.i)
           .where
-          .eq(identifiersTable.i.SourceSystem,
-              IdentifierSchemes.miroImageNumber.toString)
+          .eq(
+            identifiersTable.i.SourceSystem,
+            IdentifierSchemes.miroImageNumber.toString)
           .and
           .eq(identifiersTable.i.CanonicalId, identifier.CanonicalId)
       }.map(Identifier(identifiersTable.i)).single.apply()

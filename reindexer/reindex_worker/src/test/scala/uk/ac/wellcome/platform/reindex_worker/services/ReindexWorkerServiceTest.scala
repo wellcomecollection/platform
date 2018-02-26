@@ -42,9 +42,10 @@ class ReindexWorkerServiceTest
   val actorSystem = ActorSystem()
 
   val metricsSender: MetricsSender =
-    new MetricsSender(namespace = "reindexer-tests",
-                      mock[AmazonCloudWatch],
-                      actorSystem)
+    new MetricsSender(
+      namespace = "reindexer-tests",
+      mock[AmazonCloudWatch],
+      actorSystem)
 
   override lazy val tableName = "reindex-worker-service-test"
 
@@ -76,8 +77,9 @@ class ReindexWorkerServiceTest
     Scanamo.put(dynamoDbClient)(tableName)(hybridRecord)(enrichedDynamoFormat)
 
     val expectedRecords = List(
-      hybridRecord.copy(version = hybridRecord.version + 1,
-                        reindexVersion = reindexJob.desiredVersion)
+      hybridRecord.copy(
+        version = hybridRecord.version + 1,
+        reindexVersion = reindexJob.desiredVersion)
     )
 
     val sqsMessage = SQSMessage(

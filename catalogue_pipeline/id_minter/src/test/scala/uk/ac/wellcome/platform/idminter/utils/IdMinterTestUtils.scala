@@ -50,11 +50,12 @@ trait IdMinterTestUtils
       version = 1,
       identifiers = List(identifier))
 
-    SQSMessage(Some("subject"),
-               JsonUtil.toJson(work).get,
-               "topic",
-               "messageType",
-               "timestamp")
+    SQSMessage(
+      Some("subject"),
+      JsonUtil.toJson(work).get,
+      "topic",
+      "messageType",
+      "timestamp")
   }
 
   def assertMessageIsNotDeleted(): Unit = {
