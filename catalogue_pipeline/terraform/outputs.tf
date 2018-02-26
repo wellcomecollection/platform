@@ -7,23 +7,23 @@ output "miro_transformer_topic_publish_policy" {
 }
 
 output "vhs_full_access_policy" {
-  value = "${module.versioned-hybrid-store.full_access_policy}"
+  value = "${module.vhs_sourcedata.full_access_policy}"
 }
 
 output "vhs_dynamodb_update_policy" {
-  value = "${module.versioned-hybrid-store.dynamodb_update_policy}"
+  value = "${module.vhs_sourcedata.dynamodb_update_policy}"
 }
 
 output "vhs_table_name" {
-  value = "${module.versioned-hybrid-store.table_name}"
+  value = "${module.vhs_sourcedata.table_name}"
 }
 
 output "vhs_table_stream_arn" {
-  value = "${module.versioned-hybrid-store.table_stream_arn}"
+  value = "${module.vhs_sourcedata.table_stream_arn}"
 }
 
 output "vhs_bucket_name" {
-  value = "${module.versioned-hybrid-store.bucket_name}"
+  value = "${module.vhs_sourcedata.bucket_name}"
 }
 
 output "vpc_services_id" {
