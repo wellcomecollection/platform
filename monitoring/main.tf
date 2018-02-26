@@ -93,7 +93,7 @@ module "terraform_tracker" {
   lambda_error_alarm_arn     = "${local.lambda_error_alarm_arn}"
   terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
 
-  infra_bucket       = "${var.infra_bucket}"
+  infra_bucket = "${var.infra_bucket}"
 
   monitoring_bucket  = "${aws_s3_bucket.monitoring.id}"
   slack_webhook      = "${var.non_critical_slack_webhook}"
