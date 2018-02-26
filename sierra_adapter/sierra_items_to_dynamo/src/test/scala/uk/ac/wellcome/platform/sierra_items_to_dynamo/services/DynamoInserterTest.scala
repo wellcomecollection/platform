@@ -252,10 +252,11 @@ class DynamoInserterTest
       .thenReturn(
         Future.successful(
           Some(
-            SierraItemRecord(id = "500005",
-                             "{}",
-                             "2001-01-01T00:00:00Z",
-                             List()))))
+            SierraItemRecord(
+              id = "500005",
+              "{}",
+              "2001-01-01T00:00:00Z",
+              List()))))
 
     when(mockedDao.updateItem(any[SierraItemRecord]))
       .thenThrow(expectedException)

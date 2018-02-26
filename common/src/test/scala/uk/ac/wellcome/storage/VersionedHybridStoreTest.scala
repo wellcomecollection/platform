@@ -86,9 +86,9 @@ class VersionedHybridStoreTest
       record)(identity)
 
     val updatedFuture = future.flatMap { _ =>
-      hybridStore.updateRecord(updatedRecord.sourceName,
-                               updatedRecord.sourceId)(updatedRecord)(_ =>
-        updatedRecord)
+      hybridStore.updateRecord(
+        updatedRecord.sourceName,
+        updatedRecord.sourceId)(updatedRecord)(_ => updatedRecord)
     }
 
     whenReady(updatedFuture) { _ =>
@@ -114,8 +114,9 @@ class VersionedHybridStoreTest
       content = "Five fishing flinging flint"
     )
 
-    val putFuture = hybridStore.updateRecord(record.sourceName,
-                                             record.sourceId)(record)(identity)
+    val putFuture =
+      hybridStore.updateRecord(record.sourceName, record.sourceId)(record)(
+        identity)
 
     val getFuture = putFuture.flatMap { _ =>
       hybridStore.getRecord[ExampleRecord](record.id)
@@ -158,8 +159,9 @@ class VersionedHybridStoreTest
     )
 
     val future =
-      hybridStore.updateRecord(sourceName = record.sourceName,
-                               sourceId = "not_the_same_id")(record)(identity)
+      hybridStore.updateRecord(
+        sourceName = record.sourceName,
+        sourceId = "not_the_same_id")(record)(identity)
 
     whenReady(future.failed) { e: Throwable =>
       e shouldBe a[IllegalArgumentException]

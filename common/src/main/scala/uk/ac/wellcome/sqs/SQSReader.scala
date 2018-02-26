@@ -12,7 +12,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.collection.JavaConversions._
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.{blocking, Future}
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     extends Logging {
@@ -42,8 +42,9 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
       }
     } recover {
       case exception: Throwable =>
-        error(s"Error retrieving messages from queue ${sqsConfig.queueUrl}",
-              exception)
+        error(
+          s"Error retrieving messages from queue ${sqsConfig.queueUrl}",
+          exception)
         throw exception
     }
 
@@ -83,8 +84,9 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
     Future {
       blocking {
         sqsClient.deleteMessage(
-          new DeleteMessageRequest(sqsConfig.queueUrl,
-                                   message.getReceiptHandle)
+          new DeleteMessageRequest(
+            sqsConfig.queueUrl,
+            message.getReceiptHandle)
         )
         info(s"Deleted message ${message.getMessageId}")
       }

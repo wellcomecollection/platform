@@ -6,17 +6,19 @@ import uk.ac.wellcome.models._
 class LocationsTest extends ApiWorksTestBase {
   it("should render a physical location correctly") {
     val physicalLocation: Location =
-      PhysicalLocation(locationType = "smeg",
-                       label = "a stack of slick slimes")
+      PhysicalLocation(
+        locationType = "smeg",
+        label = "a stack of slick slimes")
     val work = IdentifiedWork(
       canonicalId = "zm9q6c6h",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       title = Some("A zoo of zebras doing zumba"),
       items = List(
-        IdentifiedItem(canonicalId = "mhberjwy7",
-                       sourceIdentifier = sourceIdentifier,
-                       locations = List(physicalLocation)))
+        IdentifiedItem(
+          canonicalId = "mhberjwy7",
+          sourceIdentifier = sourceIdentifier,
+          locations = List(physicalLocation)))
     )
 
     insertIntoElasticSearch(work)

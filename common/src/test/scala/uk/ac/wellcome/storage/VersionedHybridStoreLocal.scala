@@ -22,10 +22,11 @@ trait VersionedHybridStoreLocal
   val hybridStore = new VersionedHybridStore(
     sourcedObjectStore =
       new SourcedObjectStore(s3Client = s3Client, bucketName = bucketName),
-    versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
-                                    dynamoConfig = DynamoConfig(
-                                      table = tableName
-                                    ))
+    versionedDao = new VersionedDao(
+      dynamoDbClient = dynamoDbClient,
+      dynamoConfig = DynamoConfig(
+        table = tableName
+      ))
   )
 
   def assertHybridRecordIsStoredCorrectly(record: Sourced,

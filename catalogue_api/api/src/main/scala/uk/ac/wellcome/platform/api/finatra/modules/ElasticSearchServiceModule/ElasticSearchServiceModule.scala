@@ -9,17 +9,19 @@ import uk.ac.wellcome.platform.api.services.ElasticSearchService
 object ElasticSearchServiceModule extends TwitterModule {
   override val modules = Seq(ElasticClientModule)
 
-  private val defaultIndex = flag[String](name = "es.index",
-                                          default = "records",
-                                          help = "ES index name")
+  private val defaultIndex = flag[String](
+    name = "es.index",
+    default = "records",
+    help = "ES index name")
   private val documentType =
     flag[String](name = "es.type", default = "item", help = "ES document type")
 
   @Provides
   def providesElasticSearchService(
     elasticClient: HttpClient): ElasticSearchService =
-    new ElasticSearchService(defaultIndex = defaultIndex(),
-                             documentType = documentType(),
-                             elasticClient = elasticClient)
+    new ElasticSearchService(
+      defaultIndex = defaultIndex(),
+      documentType = documentType(),
+      elasticClient = elasticClient)
 
 }

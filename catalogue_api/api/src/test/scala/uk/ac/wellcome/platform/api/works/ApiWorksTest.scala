@@ -67,14 +67,15 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should return a single work when requested with id") {
-    val work = workWith(canonicalId = canonicalId,
-                        title = title,
-                        description = description,
-                        lettering = lettering,
-                        createdDate = period,
-                        creator = agent,
-                        items = List(defaultItem),
-                        visible = true)
+    val work = workWith(
+      canonicalId = canonicalId,
+      title = title,
+      description = description,
+      lettering = lettering,
+      createdDate = period,
+      creator = agent,
+      items = List(defaultItem),
+      visible = true)
 
     insertIntoElasticSearch(work)
 
@@ -180,12 +181,12 @@ class ApiWorksTest extends ApiWorksTestBase {
       identifiers = List(),
       locations = List(location)
     )
-    val workWithCopyright = IdentifiedWork(title =
-                                             Some("A scarf on a squirrel"),
-                                           sourceIdentifier = sourceIdentifier,
-                                           version = 1,
-                                           canonicalId = "yxh928a",
-                                           items = List(item))
+    val workWithCopyright = IdentifiedWork(
+      title = Some("A scarf on a squirrel"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      canonicalId = "yxh928a",
+      items = List(item))
     insertIntoElasticSearch(workWithCopyright)
 
     eventually {
@@ -238,9 +239,10 @@ class ApiWorksTest extends ApiWorksTestBase {
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  ${resultList(pageSize = 1,
-                                          totalPages = 3,
-                                          totalResults = 3)},
+                          |  ${resultList(
+                            pageSize = 1,
+                            totalPages = 3,
+                            totalResults = 3)},
                           |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
                           |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
                           |  "results": [
@@ -268,9 +270,10 @@ class ApiWorksTest extends ApiWorksTestBase {
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  ${resultList(pageSize = 1,
-                                          totalPages = 3,
-                                          totalResults = 3)},
+                          |  ${resultList(
+                            pageSize = 1,
+                            totalPages = 3,
+                            totalResults = 3)},
                           |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
@@ -297,9 +300,10 @@ class ApiWorksTest extends ApiWorksTestBase {
         andExpect = Status.Ok,
         withJsonBody = s"""
                           |{
-                          |  ${resultList(pageSize = 1,
-                                          totalPages = 3,
-                                          totalResults = 3)},
+                          |  ${resultList(
+                            pageSize = 1,
+                            totalPages = 3,
+                            totalResults = 3)},
                           |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                           |  "results": [
                           |   {
