@@ -28,7 +28,8 @@ class S3ObjectStoreTest
     val prefix = "foo"
 
     val objectStore = new S3ObjectStore(
-      s3Client, bucketName,
+      s3Client,
+      bucketName,
       new KeyPrefixGenerator[TestObject] {
         override def generate(obj: TestObject): String = prefix
       }
@@ -59,7 +60,8 @@ class S3ObjectStoreTest
     val prefix = "/foo"
 
     val objectStore = new S3ObjectStore(
-      s3Client, bucketName,
+      s3Client,
+      bucketName,
       new KeyPrefixGenerator[TestObject] {
         override def generate(obj: TestObject): String = prefix
       }
@@ -81,7 +83,8 @@ class S3ObjectStoreTest
     val prefix = "foo/"
 
     val objectStore = new S3ObjectStore(
-      s3Client, bucketName,
+      s3Client,
+      bucketName,
       new KeyPrefixGenerator[TestObject] {
         override def generate(obj: TestObject): String = prefix
       }
@@ -104,7 +107,8 @@ class S3ObjectStoreTest
     val prefix = "foo"
 
     val objectStore = new S3ObjectStore(
-      s3Client, bucketName,
+      s3Client,
+      bucketName,
       new KeyPrefixGenerator[TestObject] {
         override def generate(obj: TestObject): String = prefix
       }
@@ -114,26 +118,25 @@ class S3ObjectStoreTest
 
     val writtenToS3 = objectStore.put(testObject)
 
-    whenReady(writtenToS3.flatMap(objectStore.get)) {
-      actualTestObject =>
-        actualTestObject shouldBe testObject
+    whenReady(writtenToS3.flatMap(objectStore.get)) { actualTestObject =>
+      actualTestObject shouldBe testObject
     }
   }
 
   it("throws an exception when retrieving a missing object") {
     val objectStore = new S3ObjectStore(
-      s3Client, bucketName,
+      s3Client,
+      bucketName,
       new KeyPrefixGenerator[TestObject] {
         override def generate(obj: TestObject): String = "doesnt_matter"
       }
     )
 
-    whenReady(objectStore.get("not/a/real/object").failed) {
-      exception =>
-        exception shouldBe a[AmazonS3Exception]
-        exception
-          .asInstanceOf[AmazonS3Exception]
-          .getErrorCode shouldBe "NoSuchKey"
+    whenReady(objectStore.get("not/a/real/object").failed) { exception =>
+      exception shouldBe a[AmazonS3Exception]
+      exception
+        .asInstanceOf[AmazonS3Exception]
+        .getErrorCode shouldBe "NoSuchKey"
 
     }
   }
