@@ -1,4 +1,4 @@
-variable "monitoring_bucket_id" {}
+variable "dashboard_bucket" {}
 
 variable "dashboard_assumable_roles" {
   type = "list"

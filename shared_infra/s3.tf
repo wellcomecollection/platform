@@ -2,23 +2,6 @@ resource "aws_s3_bucket" "platform_infra" {
   bucket = "wellcomecollection-platform-infra"
   acl    = "private"
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  versioning {
-    enabled = true
-  }
-}
-
-resource "aws_s3_bucket" "infra" {
-  bucket = "platform-infra"
-  acl    = "private"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
   lifecycle_rule {
     id      = "tmp"
     prefix  = "tmp/"
@@ -29,24 +12,12 @@ resource "aws_s3_bucket" "infra" {
     }
   }
 
-  lifecycle_rule {
-    id      = "elasticdump"
-    prefix  = "elasticdump/"
-    enabled = true
-
-    expiration {
-      days = 30
-    }
+  lifecycle {
+    prevent_destroy = true
   }
 
-  lifecycle_rule {
-    id      = "terraform_plans"
-    prefix  = "terraform_plans/"
+  versioning {
     enabled = true
-
-    expiration {
-      days = 30
-    }
   }
 }
 

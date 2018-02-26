@@ -8,6 +8,6 @@ variable "slack_webhook" {
 
 variable "bitly_access_token" {}
 
-variable "infra_bucket" {
-  description = "Bucket where 'terraform plan' outputs are saved"
-}
+variable "monitoring_bucket" {}
+
+variable "infra_bucket" {}

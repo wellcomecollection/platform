@@ -1,5 +1,5 @@
-data "aws_s3_bucket" "monitoring" {
-  bucket = "${var.monitoring_bucket_id}"
+data "aws_s3_bucket" "dashboard" {
+  bucket = "${var.dashboard_bucket}"
 }
 
 data "aws_iam_policy_document" "s3_put_dashboard_status" {
@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "s3_put_dashboard_status" {
     ]
 
     resources = [
-      "${data.aws_s3_bucket.monitoring.arn}/data/*",
+      "${data.aws_s3_bucket.dashboard.arn}/data/*",
     ]
   }
 }
@@ -28,6 +28,17 @@ data "aws_iam_policy_document" "describe_services" {
 
     resources = [
       "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "assume_roles" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    resources = [
+      "arn:aws:iam::130871440101:role/platform-team-assume-role",
+      "arn:aws:iam::299497370133:role/platform-team-assume-role",
     ]
   }
 }
