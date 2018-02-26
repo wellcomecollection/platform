@@ -15,7 +15,6 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-
 // KeyPrefixGenerator is contravariant for type T
 //
 // Practically this means `KeyPrefixGenerator[Sourced]` is a
@@ -67,7 +66,7 @@ object S3ObjectStore extends Logging {
     sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] =
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
-      
+
       // Ensure that keyPrefix here is normalised for concatenating with contentHash
       val prefix = keyPrefix
         .stripPrefix("/")
