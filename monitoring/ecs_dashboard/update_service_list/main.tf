@@ -9,7 +9,7 @@ module "lambda_update_service_list" {
   timeout     = 30
 
   environment_variables = {
-    BUCKET_NAME     = "${var.monitoring_bucket_id}"
+    BUCKET_NAME     = "${var.dashboard_bucket}"
     OBJECT_KEY      = "data/ecs_status.json"
     ASSUMABLE_ROLES = "${join(",", var.dashboard_assumable_roles)}"
   }

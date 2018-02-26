@@ -38,7 +38,7 @@ module "ecs_dashboard" {
   source = "ecs_dashboard"
 
   dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
-  monitoring_bucket_id      = "${aws_s3_bucket.monitoring.id}"
+  dashboard_bucket          = "${aws_s3_bucket.dashboard.id}"
 
   every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
@@ -83,7 +83,7 @@ module "slack_budget_bot" {
 
   slack_webhook           = "${var.non_critical_slack_webhook}"
   release_ids             = "${var.release_ids}"
-  monitoring_bucket_id    = "${aws_s3_bucket.monitoring.id}"
+  monitoring_bucket_id    = "${aws_s3_bucket.dashboard.id}"
   account_id              = "${data.aws_caller_identity.current.account_id}"
   ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 }
@@ -93,7 +93,9 @@ module "terraform_tracker" {
   lambda_error_alarm_arn     = "${local.lambda_error_alarm_arn}"
   terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
 
-  infra_bucket       = "${var.infra_bucket}"
+  infra_bucket = "${var.infra_bucket}"
+
+  monitoring_bucket  = "${aws_s3_bucket.monitoring.id}"
   slack_webhook      = "${var.non_critical_slack_webhook}"
   bitly_access_token = "${var.bitly_access_token}"
 }
