@@ -64,6 +64,7 @@ class VersionedDaoTest
     }
 
     it("returns a future of None if the record isn't in dynamo") {
+
       val testVersioned = TestVersioned(
         id = "testSource/b110101001",
         data = "whatever",

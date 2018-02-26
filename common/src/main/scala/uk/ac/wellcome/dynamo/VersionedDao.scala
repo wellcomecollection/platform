@@ -1,13 +1,14 @@
 package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.google.inject.Inject
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{Id, VersionUpdater, Versioned}
-
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
