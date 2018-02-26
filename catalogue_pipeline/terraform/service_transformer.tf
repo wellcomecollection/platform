@@ -14,7 +14,7 @@ module "transformer" {
     sns_arn              = "${module.id_minter_topic.arn}"
     transformer_queue_id = "${module.transformer_queue.id}"
     metrics_namespace    = "transformer"
-    bucket_name          = "${module.versioned-hybrid-store.bucket_name}"
+    bucket_name          = "${module.vhs_sourcedata.bucket_name}"
   }
 
   env_vars_length = 4
@@ -38,7 +38,7 @@ module "transformer_dynamo_to_sns" {
   source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
 
   name           = "sierra"
-  src_stream_arn = "${module.versioned-hybrid-store.table_stream_arn}"
+  src_stream_arn = "${module.vhs_sourcedata.table_stream_arn}"
   dst_topic_arn  = "${module.transformer_topic.arn}"
 
   stream_view_type = "NEW_IMAGE_ONLY"
