@@ -3,6 +3,7 @@ package uk.ac.wellcome.transformer.transformers
 import uk.ac.wellcome.models.UnidentifiedWork
 import uk.ac.wellcome.models.transformable.Transformable
 
+import scala.reflect.ClassTag
 import scala.util.Try
 
 trait TransformableTransformer[+T <: Transformable] {
@@ -11,7 +12,7 @@ trait TransformableTransformer[+T <: Transformable] {
     version: Int): Try[Option[UnidentifiedWork]]
 
   def transform(transformable: Transformable,
-                version: Int): Try[Option[UnidentifiedWork]] =
+                version: Int)(implicit tag: ClassTag[T]): Try[Option[UnidentifiedWork]] =
     Try {
       transformable match {
         case t: T => transformForType(t, version)
