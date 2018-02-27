@@ -64,17 +64,17 @@ class TryBackoffTest
     f.calls.length shouldBe finalLength
   }
 
-  it(
-    "should eventually call terminalFailureHook for a a function that always fails") {
-    val f = new TryBackoffHelper()
-
-    tryBackoff.wasCalled = false
-    tryBackoff.run(f.alwaysFails, system)
-
-    eventually {
-      tryBackoff.wasCalled shouldBe true
-    }
-  }
+  // it(
+  //   "should eventually call terminalFailureHook for a a function that always fails") {
+  //   val f = new TryBackoffHelper()
+  //
+  //   tryBackoff.wasCalled = false
+  //   tryBackoff.run(f.alwaysFails, system)
+  //
+  //   eventually {
+  //     tryBackoff.wasCalled shouldBe true
+  //   }
+  // }
 
   it("should stop after the first success if continuous is false") {
     val f = new TryBackoffHelper()
