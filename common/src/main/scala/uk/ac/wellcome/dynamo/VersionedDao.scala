@@ -16,10 +16,13 @@ class VersionedDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  private def putRecord[T <: Versioned with Id](record: T)(
+  private def putRecord[T](record: T)(
     implicit evidence: DynamoFormat[T],
-    versionUpdater: VersionUpdater[T]) = {
-    val newVersion = record.version + 1
+    versionUpdater: VersionUpdater[T],
+    versionGetter: VersionGetter[T]
+  ) = {
+    val version = versionGetter.version(record)
+    val newVersion = version + 1
 
     Table[T](dynamoConfig.table)
       .given(
@@ -29,18 +32,22 @@ class VersionedDao @Inject()(
       .put(versionUpdater.updateVersion(record, newVersion))
   }
 
-  def updateRecord[T <: Versioned with Id](record: T)(
+  def updateRecord[T](record: T)(
     implicit evidence: DynamoFormat[T],
-    versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
-    info(s"Attempting to update Dynamo record: ${record.id}")
+    versionUpdater: VersionUpdater[T],
+    idGetter: IdGetter[T],
+    versionGetter: VersionGetter[T]
+  ): Future[Unit] = Future {
+    val id = idGetter.id(record)
+    info(s"Attempting to update Dynamo record: $id")
 
     Scanamo.exec(dynamoDbClient)(putRecord(record)) match {
       case Left(err) =>
-        warn(s"Failed to updating Dynamo record: ${record.id}", err)
+        warn(s"Failed to updating Dynamo record: $id", err)
 
         throw err
       case Right(_) => {
-        info(s"Successfully updated Dynamo record: ${record.id}")
+        info(s"Successfully updated Dynamo record: $id")
       }
     }
   }
