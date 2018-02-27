@@ -104,8 +104,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       val expectedItem = UnidentifiedItem(
         sourceIdentifier = sourceIdentifier,
         identifiers = List(sourceIdentifier),
-        locations = List(),
-        visible = true
+        locations = List()
       )
 
       transformer.transformItemData(item) shouldBe Some(expectedItem)

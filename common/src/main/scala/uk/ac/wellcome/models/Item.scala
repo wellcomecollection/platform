@@ -12,7 +12,6 @@ case class UnidentifiedItem(
   sourceIdentifier: SourceIdentifier,
   identifiers: List[SourceIdentifier] = Nil,
   locations: List[Location] = List(),
-  visible: Boolean = true,
   ontologyType: String = "Item"
 ) extends Identifiable
     with Item
@@ -22,7 +21,6 @@ case class IdentifiedItem(
   sourceIdentifier: SourceIdentifier,
   identifiers: List[SourceIdentifier] = Nil,
   locations: List[Location] = List(),
-  visible: Boolean = true,
   ontologyType: String = "Item"
 ) extends Identifiable
     with Item

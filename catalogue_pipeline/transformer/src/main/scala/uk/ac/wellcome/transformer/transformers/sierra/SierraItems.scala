@@ -45,8 +45,7 @@ trait SierraItems extends Logging with SierraLocation {
             sierraItemData.id
           )
         ),
-        locations = getLocation(sierraItemData).toList,
-        visible = !sierraItemData.deleted
+        locations = getLocation(sierraItemData).toList
       ))
     }
   }
