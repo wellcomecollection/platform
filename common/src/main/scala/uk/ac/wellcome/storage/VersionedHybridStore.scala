@@ -14,7 +14,8 @@ case class HybridRecord(
   id: String,
   version: Int,
   s3key: String
-) extends Versioned with Id
+) extends Versioned
+    with Id
 
 case class CopyToDynamo() extends Annotation
 
@@ -35,8 +36,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
     s3Object: T
   )
 
-  def updateRecord(id: String)(ifNotExisting: => T)(
-    ifExisting: T => T)(
+  def updateRecord(id: String)(ifNotExisting: => T)(ifExisting: T => T)(
     implicit decoder: Decoder[T],
     encoder: Encoder[T]
   ): Future[Unit] = {
