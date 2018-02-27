@@ -4,6 +4,6 @@ trait Versioned {
   val version: Int
 }
 
-trait VersionUpdater[T <: Versioned] {
+trait VersionUpdater[T] {
   def updateVersion(versioned: T, newVersion: Int): T
 }

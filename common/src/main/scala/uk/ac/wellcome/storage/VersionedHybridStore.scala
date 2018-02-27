@@ -1,16 +1,51 @@
 package uk.ac.wellcome.storage
 
 import com.google.inject.Inject
+import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import shapeless.ops.hlist.{LeftFolder, Prepend, Zip}
 import shapeless.{Id => ShapelessId, _}
-import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.dynamo.{IdGetter, VersionGetter, VersionedDao}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.annotation.Annotation
 import scala.concurrent.Future
+
+trait HybridRecordEnricher[T] {
+  type Out
+  def enrich(record: T, version: Int)(s3key: String): Out
+}
+
+object Collector extends Poly2{
+  implicit def some[L <: HList, FT] =
+    at[L, (FT, Some[CopyToDynamo])]{case (accumulatorList,(fieldtype, _) ) => fieldtype :: accumulatorList}
+  implicit def none[L <: HList, FT] =
+    at[L, (FT, None.type)]{case (accumulatorList,_) => accumulatorList }
+}
+
+object HybridRecordEnricher {
+  type Aux[A, R] = HybridRecordEnricher[A] { type Out = R }
+  def apply[T](implicit enricher: HybridRecordEnricher[T]) = enricher
+
+  def create[T, O](f: (T, Int,String) => O) = new HybridRecordEnricher[T] {
+    type Out = O
+    override def enrich(record: T, version: Int)(s3key: String): Out = f(record,version,s3key)
+  }
+
+  implicit def enricher[T <: Id, R <: HList,A <: HList, D <: HList, E <: HList, F <: HList](implicit tgen: LabelledGeneric.Aux[T, R], hybridGen: LabelledGeneric.Aux[HybridRecord,F],
+                                                                                   annotations: Annotations.Aux[CopyToDynamo, T, A], zipper: Zip.Aux[R :: A :: HNil, D],
+                                                                                   leftFolder: LeftFolder.Aux[D, HList, Collector.type, E], prepend: Prepend[F,E]) = create {
+    (record: T, version: Int, s3key: String) => {
+      val hybridRecord = HybridRecord(record.id, version, s3key)
+      val recordAsHlist = tgen.to(record)
+      val recordWithAnnotations = recordAsHlist.zip(annotations.apply())
+      val taggedFields = recordWithAnnotations.foldLeft(HNil: HList)(Collector)
+      hybridGen.to(hybridRecord) ::: taggedFields
+    }
+  }
+}
 
 case class HybridRecord(
   id: String,
@@ -25,13 +60,6 @@ class VersionedHybridStore[T <: Id] @Inject()(
   versionedDao: VersionedDao
 ) {
 
-  object Collector extends Poly2{
-    implicit def some[L <: HList, FT] =
-      at[L, (FT, Some[CopyToDynamo])]{case (accumulatorList,(fieldtype, _) ) => fieldtype :: accumulatorList}
-    implicit def none[L <: HList, FT] =
-      at[L, (FT, None.type)]{case (accumulatorList,_) => accumulatorList }
-  }
-
   implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
     override def updateVersion(testVersioned: HybridRecord,
                                newVersion: Int): HybridRecord = {
@@ -44,27 +72,36 @@ class VersionedHybridStore[T <: Id] @Inject()(
     s3Object: T
   )
 
-  private def buildHybridRecordHList[R <: HList,A <: HList, D <: HList, E <: HList, F <: HList](record: T, version: Int)(s3key: String)
-                                    (implicit tgen: LabelledGeneric.Aux[T, R], hybridGen: LabelledGeneric.Aux[HybridRecord,F],
-                                     annotations: Annotations.Aux[CopyToDynamo, T, A], zipper: Zip.Aux[R :: A :: HNil, D],
-                                     leftFolder: LeftFolder.Aux[D, HList, Collector.type, E], prepend: Prepend[F,E]) = {
-    val hybridRecord = HybridRecord(record.id, version, s3key)
-
-    val repr= tgen.to(record)
-
-    val value = repr.zip(annotations.apply())
-
-    val taggedFields = value.foldLeft(HNil: HList)(Collector)
-
-    hybridGen.to(hybridRecord) ::: taggedFields
-
-  }
-
-  def updateRecord(id: String)(ifNotExisting: => T)(
+  def updateRecord[O](id: String)(ifNotExisting: => T)(
     ifExisting: T => T)(
     implicit decoder: Decoder[T],
-    encoder: Encoder[T]
+    encoder: Encoder[T],
+    enricher: HybridRecordEnricher.Aux[T,O],
+    dynamoFormat: DynamoFormat[O],
+    versionUpdater: VersionUpdater[O],
+    idGetter: IdGetter[O],
+    versionGetter: VersionGetter[O]
   ): Future[Unit] = {
+
+    def putObject(id: String,
+                  sourcedObject: T,
+                  f: (String) => O)(
+                   implicit encoder: Encoder[T],
+                   dynamoFormat: DynamoFormat[O],
+                   versionUpdater: VersionUpdater[O],
+                   idGetter: IdGetter[O],
+                   versionGetter: VersionGetter[O]
+                 ) = {
+      if (sourcedObject.id != id)
+        throw new IllegalArgumentException(
+          "ID provided does not match ID in record.")
+
+      val futureKey = sourcedObjectStore.put(sourcedObject)
+
+      futureKey.flatMap { key =>
+        versionedDao.updateRecord(f(key))
+      }
+    }
 
     getObject(id).flatMap {
       case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
@@ -74,7 +111,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
           putObject(
             id,
             transformedS3Record,
-            buildHybridRecordHList(transformedS3Record, hybridRecord.version))
+            enricher.enrich(transformedS3Record, hybridRecord.version))
         } else {
           Future.successful(())
         }
@@ -83,7 +120,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
         putObject(
           id = id,
           ifNotExisting,
-          f = buildHybridRecordHList(ifNotExisting, 0))
+          enricher.enrich(ifNotExisting, 0))
 
     }
   }
@@ -109,19 +146,4 @@ class VersionedHybridStore[T <: Id] @Inject()(
     }
   }
 
-  private def putObject[A <: HList](id: String,
-                        sourcedObject: T,
-                        f: (String) => A)(
-    implicit encoder: Encoder[T]
-  ) = {
-    if (sourcedObject.id != id)
-      throw new IllegalArgumentException(
-        "ID provided does not match ID in record.")
-
-    val futureKey = sourcedObjectStore.put(sourcedObject)
-
-    futureKey.flatMap { key =>
-      versionedDao.updateRecord(f(key))
-    }
-  }
 }
