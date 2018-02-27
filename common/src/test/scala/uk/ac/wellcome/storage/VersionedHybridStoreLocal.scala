@@ -1,31 +1,28 @@
 package uk.ac.wellcome.storage
 
+import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.Suite
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
-trait VersionedHybridStoreLocal[T <: Sourced]
+trait VersionedHybridStoreLocal
     extends DynamoDBLocal[HybridRecord]
     with S3Local
     with JsonTestUtil
     with ExtendedPatience { this: Suite =>
 
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
-
-  val keyPrefixGenerator: KeyPrefixGenerator[T]
-
-  val hybridStore = new VersionedHybridStore[T](
+  def createHybridStore[T <: Id] = new VersionedHybridStore[T](
     sourcedObjectStore = new S3ObjectStore(
       s3Client = s3Client,
       bucketName = bucketName,
-      keyPrefixGenerator = keyPrefixGenerator
+      keyPrefixGenerator = new KeyPrefixGenerator[T] {
+        override def generate(obj: T): String = "/"
+      }
     ),
     versionedDao = new VersionedDao(
       dynamoDbClient = dynamoDbClient,
@@ -34,15 +31,13 @@ trait VersionedHybridStoreLocal[T <: Sourced]
       ))
   )
 
-  def assertHybridRecordIsStoredCorrectly(record: T, expectedJson: String) = {
+  def assertHybridRecordIsStoredCorrectly[T <: Id](record: T,
+                                                   expectedJson: String) = {
     val dynamoRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get
     dynamoRecord.isRight shouldBe true
     val hybridRecord = dynamoRecord.right.get
-
-    hybridRecord.sourceId shouldBe record.sourceId
-    hybridRecord.sourceName shouldBe record.sourceName
 
     val s3key = hybridRecord.s3key
 
