@@ -101,7 +101,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
         locations = List()
       )
 
-      transformer.transformItemData(item) shouldBe Some(expectedItem)
+      transformer.transformItemData(item) shouldBe expectedItem
     }
   }
 
