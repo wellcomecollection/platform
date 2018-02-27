@@ -95,6 +95,6 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   private def updateIndividualRecord(record: HybridRecord,
                                      desiredVersion: Int): Future[Unit] = {
     val updatedRecord = record.copy(reindexVersion = desiredVersion)
-    versionedDao.updateRecord[HybridRecord](updatedRecord)
+    versionedDao.updateRecord[HybridRecord](updatedRecord)(enrichedDynamoFormat, versionUpdater)
   }
 }
