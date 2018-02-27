@@ -28,11 +28,11 @@ class SierraBibMergerWorkerServiceTest
       new SierraBibMergerUpdaterService(
         mock[VersionedHybridStore[SierraTransformable]],
         metricsSender)
-    val worker = new SierraBibMergerWorkerService(sqsReader,
-                                                  ActorSystem(),
-                                                  metricsSender,
-                                                  mergerUpdaterService)
-
+    val worker = new SierraBibMergerWorkerService(
+      sqsReader,
+      ActorSystem(),
+      metricsSender,
+      mergerUpdaterService)
 
     val future = worker.processMessage(
       SQSMessage(

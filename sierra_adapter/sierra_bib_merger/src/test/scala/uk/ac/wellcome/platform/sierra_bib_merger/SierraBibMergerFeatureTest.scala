@@ -206,9 +206,10 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(expectedSierraTransformable.sourceName,
-                    expectedSierraTransformable.sourceId)(
-        expectedSierraTransformable)(identity)
+      .updateRecord(
+        expectedSierraTransformable.sourceName,
+        expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
+        identity)
       .map { _ =>
         sendBibRecordToSQS(record)
       }
