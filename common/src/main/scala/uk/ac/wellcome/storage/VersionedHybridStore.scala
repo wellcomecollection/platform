@@ -7,6 +7,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
+import scala.annotation.Annotation
 import scala.concurrent.Future
 
 case class HybridRecord(
@@ -15,7 +16,9 @@ case class HybridRecord(
   s3key: String
 ) extends Versioned with Id
 
-class VersionedHybridStore[T <: Id] @Inject()(
+case class CopyToDynamo() extends Annotation
+
+class VersionedHybridStore[T <: ModelsId] @Inject()(
   sourcedObjectStore: S3ObjectStore[T],
   versionedDao: VersionedDao
 ) {
