@@ -162,11 +162,9 @@ class VersionedHybridStoreTest
   }
 
   it("should copy some tagged fields into the record in dynamo") {
-    case class CopyToDynamo() extends Annotation
-
     case class TaggedExampleRecord(id: String,
                                    something: String,
-                                    @CopyToDynamo taggedSomething: String
+                                   @CopyToDynamo taggedSomething: String
                                   ) extends Id
 
     val taggedContent = "this goes in dynamo"
