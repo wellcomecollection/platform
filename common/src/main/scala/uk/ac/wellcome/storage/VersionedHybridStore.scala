@@ -4,7 +4,12 @@ import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.transformable.Reindexable
-import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper, VersionUpdater, Versioned}
+import uk.ac.wellcome.models.{
+  Sourced,
+  SourcedDynamoFormatWrapper,
+  VersionUpdater,
+  Versioned
+}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
