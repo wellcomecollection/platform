@@ -14,6 +14,7 @@ class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
     with SierraDescription
+    with SierraItems
     with SierraLettering
     with SierraPublishers
     with SierraTitle
