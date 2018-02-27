@@ -7,10 +7,10 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.s3.SourcedObjectStore
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil, S3Local}
 
-trait VersionedHybridStoreLocal
+trait VersionedHybridStoreLocal[T <: Sourced]
     extends DynamoDBLocal[HybridRecord]
     with S3Local
     with JsonTestUtil
@@ -19,9 +19,14 @@ trait VersionedHybridStoreLocal
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  val hybridStore = new VersionedHybridStore(
-    sourcedObjectStore =
-      new SourcedObjectStore(s3Client = s3Client, bucketName = bucketName),
+  val keyPrefixGenerator: KeyPrefixGenerator[T]
+
+  val hybridStore = new VersionedHybridStore[T](
+    sourcedObjectStore = new S3ObjectStore(
+      s3Client = s3Client,
+      bucketName = bucketName,
+      keyPrefixGenerator = keyPrefixGenerator
+    ),
     versionedDao = new VersionedDao(
       dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(
@@ -29,8 +34,7 @@ trait VersionedHybridStoreLocal
       ))
   )
 
-  def assertHybridRecordIsStoredCorrectly(record: Sourced,
-                                          expectedJson: String) = {
+  def assertHybridRecordIsStoredCorrectly(record: T, expectedJson: String) = {
     val dynamoRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get

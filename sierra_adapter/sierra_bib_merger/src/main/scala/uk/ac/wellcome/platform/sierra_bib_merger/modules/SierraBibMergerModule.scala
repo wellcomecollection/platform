@@ -1,17 +1,8 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.modules
 
-import javax.inject.Singleton
-
 import akka.actor.ActorSystem
-import com.google.inject.Provides
-import com.twitter.app.Flag
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.platform.sierra_bib_merger.services.{
-  SierraBibMergerUpdaterService,
-  SierraBibMergerWorkerService
-}
+import uk.ac.wellcome.platform.sierra_bib_merger.services.SierraBibMergerWorkerService
 import uk.ac.wellcome.utils.TryBackoff
 
 object SierraBibMergerModule extends TwitterModule with TryBackoff {
