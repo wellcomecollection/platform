@@ -15,14 +15,23 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-// KeyPrefixGenerator is contravariant for type T
+// '-T' means KeyPrefixGenerator is contravariant for type T
 //
-// Practically this means `KeyPrefixGenerator[Sourced]` is a
-// subclass of `KeyPrefixGenerator[SierraTransformable]`
-// so it will be accepted in the S3ObjectStore for all types
-// extending Sourced. This prevents us from having to write
-// SierraTransformableKeyPrefixGenerator etc. etc.
+// This means that if S is a subclass of T, then KeyPrefixGenerator[T]
+// is a subclass of KeyPrefixGenerator[S] (the class hierarchy is reversed).
 //
+// For example,
+//
+//      Sourced < SierraTransformable
+//
+// but
+//
+//      KeyPrefixGenerator[SierraTransformable] < KeyPrefixGenerator[Sourced]
+//
+// In S3ObjectStore, we need a KeyPrefixGenerator[T], where T is usually some
+// subclass of Sourced (this is the way we use it, not a strict requirement).
+// This contravariance allows us to define a single KeyPrefixGenerator[Sourced]
+// and use it on all instances, even though T is some subclass of Sourced.
 
 trait KeyPrefixGenerator[-T] {
   def generate(obj: T): String
@@ -51,7 +60,6 @@ class S3ObjectStore[T] @Inject()(
   keyPrefixGenerator: KeyPrefixGenerator[T]
 ) extends Logging {
   def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
-
     val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
     S3ObjectStore.put[T](s3Client, bucketName)(keyPrefix)(sourcedObject)
   }
