@@ -40,8 +40,6 @@ case class MiroTransformable(sourceId: String,
   *   - `maybeBibData`: data from the associated bib.  This may be None if
   *     we've received an item but haven't had the bib yet.
   *   - `itemData`: a map from item IDs to item records
-  *   - `version`: used to track updates to the record in DynamoDB.  The exact
-  *     value at any time is unimportant, but it should only ever increase.
   *
   */
 case class SierraTransformable(
