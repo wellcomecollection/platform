@@ -18,26 +18,7 @@ class SierraTransformableTransformer
     with SierraLettering
     with SierraPublishers
     with SierraTitle
-    with SierraLocation
     with Logging {
-
-  private def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
-    info(s"Attempting to transform ${sierraItemData.id}")
-    UnidentifiedItem(
-      sourceIdentifier = SourceIdentifier(
-        IdentifierSchemes.sierraSystemNumber,
-        sierraItemData.id
-      ),
-      identifiers = List(
-        SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraSystemNumber,
-          sierraItemData.id
-        )
-      ),
-      locations = getLocation(sierraItemData).toList,
-      visible = !sierraItemData.deleted
-    )
-  }
 
   override def transformForType(
     sierraTransformable: SierraTransformable,
@@ -59,8 +40,7 @@ class SierraTransformableTransformer
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
               lettering = getLettering(sierraBibData),
-              items = extractItemData(sierraTransformable)
-                .map(transformItemData),
+              items = getItems(sierraTransformable),
               publishers = getPublishers(sierraBibData),
               visible = !(sierraBibData.deleted || sierraBibData.suppressed)
             ))
