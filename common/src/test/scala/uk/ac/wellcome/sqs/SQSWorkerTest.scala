@@ -34,7 +34,7 @@ class SQSWorkerTest
       any[() => Future[Unit]].apply
     )
   ).thenReturn(
-    Future.successful()
+    Future.successful(())
   )
 
   sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
@@ -47,7 +47,7 @@ class SQSWorkerTest
     override lazy val totalWait = 1.second
 
     override def processMessage(message: SQSMessage): Future[Unit] =
-      Future.successful()
+      Future.successful(())
   }
 
   val worker = new TestWorker()
