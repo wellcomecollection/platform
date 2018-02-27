@@ -26,22 +26,20 @@ abstract class SQSWorker(sqsReader: SQSReader,
     info(s"Starting $workerName.")
 
     sqsReader.retrieveAndDeleteMessages { message =>
-      Future
-        .fromTry(extractMessage(message))
-        .flatMap(m => {
-          debug(s"Processing message: $m")
+      for {
+        m <- Future.fromTry(extractMessage(message))
+        _ <- Future.successful { debug(s"Processing message: $m") }
+        metricName = s"${workerName}_ProcessMessage"
+        _ <- metricsSender.timeAndCount(metricName, () => processMessage(m))
+      } yield ()
 
-          metricsSender.timeAndCount(
-            s"${workerName}_ProcessMessage",
-            () => processMessage(m)
-          )
-        })
     }
   }
 
-  private def extractMessage(sqsMessage: Message): Try[SQSMessage] =
+  private def extractMessage(sqsMessage: Message) =
     JsonUtil.fromJson[SQSMessage](sqsMessage.getBody)
 
-  override def terminalFailureHook(): Unit =
+  override def terminalFailureHook() =
     metricsSender.incrementCount(s"${workerName}_TerminalFailure")
+
 }
