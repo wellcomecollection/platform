@@ -2,6 +2,8 @@ package uk.ac.wellcome.storage
 
 import com.google.inject.Inject
 import io.circe.{Decoder, Encoder}
+import shapeless.ops.hlist.{LeftFolder, Prepend, Zip}
+import shapeless.{Id => ShapelessId, _}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.s3.S3ObjectStore
@@ -23,6 +25,13 @@ class VersionedHybridStore[T <: Id] @Inject()(
   versionedDao: VersionedDao
 ) {
 
+  object Collector extends Poly2{
+    implicit def some[L <: HList, FT] =
+      at[L, (FT, Some[CopyToDynamo])]{case (accumulatorList,(fieldtype, _) ) => fieldtype :: accumulatorList}
+    implicit def none[L <: HList, FT] =
+      at[L, (FT, None.type)]{case (accumulatorList,_) => accumulatorList }
+  }
+
   implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
     override def updateVersion(testVersioned: HybridRecord,
                                newVersion: Int): HybridRecord = {
@@ -34,6 +43,22 @@ class VersionedHybridStore[T <: Id] @Inject()(
     hybridRecord: HybridRecord,
     s3Object: T
   )
+
+  private def buildHybridRecordHList[R <: HList,A <: HList, D <: HList, E <: HList, F <: HList](record: T, version: Int)(s3key: String)
+                                    (implicit tgen: LabelledGeneric.Aux[T, R], hybridGen: LabelledGeneric.Aux[HybridRecord,F],
+                                     annotations: Annotations.Aux[CopyToDynamo, T, A], zipper: Zip.Aux[R :: A :: HNil, D],
+                                     leftFolder: LeftFolder.Aux[D, HList, Collector.type, E], prepend: Prepend[F,E]) = {
+    val hybridRecord = HybridRecord(record.id, version, s3key)
+
+    val repr= tgen.to(record)
+
+    val value = repr.zip(annotations.apply())
+
+    val taggedFields = value.foldLeft(HNil: HList)(Collector)
+
+    hybridGen.to(hybridRecord) ::: taggedFields
+
+  }
 
   def updateRecord(id: String)(ifNotExisting: => T)(
     ifExisting: T => T)(
@@ -49,7 +74,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
           putObject(
             id,
             transformedS3Record,
-            key => hybridRecord.copy(s3key = key))
+            buildHybridRecordHList(transformedS3Record, hybridRecord.version))
         } else {
           Future.successful(())
         }
@@ -57,16 +82,9 @@ class VersionedHybridStore[T <: Id] @Inject()(
       case None =>
         putObject(
           id = id,
-          sourcedObject = ifNotExisting,
-          f = key =>
-            HybridRecord(
-              // If this record doesn't exist already, then we can start it
-              // at version 0 and not worry about a newer version elsewhere.
-              id = id,
-              version = 0,
-              s3key = key
-          )
-        )
+          ifNotExisting,
+          f = buildHybridRecordHList(ifNotExisting, 0))
+
     }
   }
 
@@ -91,9 +109,9 @@ class VersionedHybridStore[T <: Id] @Inject()(
     }
   }
 
-  private def putObject(id: String,
+  private def putObject[A <: HList](id: String,
                         sourcedObject: T,
-                        f: (String) => HybridRecord)(
+                        f: (String) => A)(
     implicit encoder: Encoder[T]
   ) = {
     if (sourcedObject.id != id)
