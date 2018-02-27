@@ -18,7 +18,7 @@ case class HybridRecord(
 
 case class CopyToDynamo() extends Annotation
 
-class VersionedHybridStore[T <: ModelsId] @Inject()(
+class VersionedHybridStore[T <: Id] @Inject()(
   sourcedObjectStore: S3ObjectStore[T],
   versionedDao: VersionedDao
 ) {
@@ -94,10 +94,8 @@ class VersionedHybridStore[T <: ModelsId] @Inject()(
   private def putObject(id: String,
                         sourcedObject: T,
                         f: (String) => HybridRecord)(
-    implicit encoder: Encoder[T],
-    formatWrapper: SourcedDynamoFormatWrapper[HybridRecord]
+    implicit encoder: Encoder[T]
   ) = {
-    implicit val dynamoFormat = formatWrapper.enrichedDynamoFormat
     if (sourcedObject.id != id)
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
