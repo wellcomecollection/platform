@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.Suite
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal

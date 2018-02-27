@@ -5,13 +5,8 @@ import com.google.inject.Inject
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
+import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{
-  Sourced,
-  SourcedDynamoFormatWrapper,
-  VersionUpdater,
-  Versioned
-}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -21,10 +16,9 @@ class VersionedDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  private def putRecord[T <: Versioned with Sourced](record: T)(
-    implicit evidence: SourcedDynamoFormatWrapper[T],
+  private def putRecord[T <: Versioned with Id](record: T)(
+    implicit evidence: DynamoFormat[T],
     versionUpdater: VersionUpdater[T]) = {
-    implicit val dynamoFormat = evidence.enrichedDynamoFormat
     val newVersion = record.version + 1
 
     Table[T](dynamoConfig.table)
@@ -35,8 +29,8 @@ class VersionedDao @Inject()(
       .put(versionUpdater.updateVersion(record, newVersion))
   }
 
-  def updateRecord[T <: Versioned with Sourced](record: T)(
-    implicit evidence: SourcedDynamoFormatWrapper[T],
+  def updateRecord[T <: Versioned with Id](record: T)(
+    implicit evidence: DynamoFormat[T],
     versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
     info(s"Attempting to update Dynamo record: ${record.id}")
 
@@ -51,7 +45,7 @@ class VersionedDao @Inject()(
     }
   }
 
-  def getRecord[T <: Versioned with Sourced](id: String)(
+  def getRecord[T <: Versioned with Id](id: String)(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
 
