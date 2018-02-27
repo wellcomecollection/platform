@@ -4,7 +4,6 @@ sealed trait Item extends Identifiable {
   val sourceIdentifier: SourceIdentifier
   val identifiers: List[SourceIdentifier]
   val locations: List[Location]
-  val visible: Boolean
   val ontologyType: String
 }
 
