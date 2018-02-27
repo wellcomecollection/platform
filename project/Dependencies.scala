@@ -5,6 +5,7 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.4.17"
     val aws = "1.11.95"
+    val apacheLogging = "2.8.2"
     val finatra = "2.8.0"
     val guice = "4.0"
     val logback = "1.1.8"
@@ -40,6 +41,8 @@ object Dependencies {
     "org.flywaydb" % "flyway-core" % "4.2.0"
   )
   val esDependencies: Seq[ModuleID] = Seq(
+    "org.apache.logging.log4j" % "log4j-core" % versions.apacheLogging,
+    "org.apache.logging.log4j" % "log4j-api" % versions.apacheLogging,
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
