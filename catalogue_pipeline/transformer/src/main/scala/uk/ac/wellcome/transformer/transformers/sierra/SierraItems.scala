@@ -29,31 +29,27 @@ trait SierraItems extends Logging with SierraLocation {
       .flatten
   }
 
-  def transformItemData(sierraItemData: SierraItemData): Option[UnidentifiedItem] = {
+  def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
     info(s"Attempting to transform ${sierraItemData.id}")
-    if (sierraItemData.deleted) {
-      None
-    } else {
-      Some(UnidentifiedItem(
-        sourceIdentifier = SourceIdentifier(
-          IdentifierSchemes.sierraSystemNumber,
+    UnidentifiedItem(
+      sourceIdentifier = SourceIdentifier(
+        IdentifierSchemes.sierraSystemNumber,
+        sierraItemData.id
+      ),
+      identifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.sierraSystemNumber,
           sierraItemData.id
-        ),
-        identifiers = List(
-          SourceIdentifier(
-            identifierScheme = IdentifierSchemes.sierraSystemNumber,
-            sierraItemData.id
-          )
-        ),
-        locations = getLocation(sierraItemData).toList
-      ))
-    }
+        )
+      ),
+      locations = getLocation(sierraItemData).toList
+    )
   }
 
   def getItems(
     sierraTransformable: SierraTransformable): List[UnidentifiedItem] = {
     extractItemData(sierraTransformable)
+      .filterNot { _.deleted }
       .map(transformItemData)
-      .flatten
   }
 }

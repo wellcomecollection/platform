@@ -87,13 +87,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
   }
 
   describe("transformItemData") {
-    it("returns None if an item is deleted") {
-      val item = SierraItemData(id = "i4000001", deleted = true)
-
-      transformer.transformItemData(item) shouldBe None
-    }
-
-    it("returns Some[UnidentifiedItem] if an item is not deleted") {
+    it("returns UnidentifiedItem if an item is not deleted") {
       val item = SierraItemData(id = "i4000002", deleted = false)
 
       val sourceIdentifier = SourceIdentifier(
