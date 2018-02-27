@@ -21,31 +21,22 @@ class SierraTransformableTransformer
     with SierraLocation
     with Logging {
 
-  private def extractItemData(itemRecord: SierraItemRecord) = {
-    info(s"Attempting to transform ${itemRecord.id}")
-
-    fromJson[SierraItemData](itemRecord.data) match {
-      case Success(sierraItemData) =>
-        Some(
-          UnidentifiedItem(
-            sourceIdentifier = SourceIdentifier(
-              IdentifierSchemes.sierraSystemNumber,
-              sierraItemData.id
-            ),
-            identifiers = List(
-              SourceIdentifier(
-                identifierScheme = IdentifierSchemes.sierraSystemNumber,
-                sierraItemData.id
-              )
-            ),
-            locations = getLocation(sierraItemData).toList,
-            visible = !sierraItemData.deleted
-          ))
-      case Failure(e) => {
-        error(s"Failed to parse item!", e)
-        None
-      }
-    }
+  private def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
+    info(s"Attempting to transform ${sierraItemData.id}")
+    UnidentifiedItem(
+      sourceIdentifier = SourceIdentifier(
+        IdentifierSchemes.sierraSystemNumber,
+        sierraItemData.id
+      ),
+      identifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          sierraItemData.id
+        )
+      ),
+      locations = getLocation(sierraItemData).toList,
+      visible = !sierraItemData.deleted
+    )
   }
 
   override def transformForType(
@@ -68,11 +59,8 @@ class SierraTransformableTransformer
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
               lettering = getLettering(sierraBibData),
-              items = Option(sierraTransformable.itemData)
-                .getOrElse(Map.empty)
-                .values
-                .flatMap(extractItemData)
-                .toList,
+              items = extractItemData(sierraTransformable)
+                .map(transformItemData),
               publishers = getPublishers(sierraBibData),
               visible = !(sierraBibData.deleted || sierraBibData.suppressed)
             ))
