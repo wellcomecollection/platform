@@ -29,9 +29,9 @@ trait SierraItems extends Logging with SierraLocation {
       .flatten
   }
 
-  def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
+  def transformItemData(sierraItemData: SierraItemData): Option[UnidentifiedItem] = {
     info(s"Attempting to transform ${sierraItemData.id}")
-    UnidentifiedItem(
+    Some(UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
         IdentifierSchemes.sierraSystemNumber,
         sierraItemData.id
@@ -44,12 +44,13 @@ trait SierraItems extends Logging with SierraLocation {
       ),
       locations = getLocation(sierraItemData).toList,
       visible = !sierraItemData.deleted
-    )
+    ))
   }
 
   def getItems(
     sierraTransformable: SierraTransformable): List[UnidentifiedItem] = {
     extractItemData(sierraTransformable)
       .map(transformItemData)
+      .flatten
   }
 }
