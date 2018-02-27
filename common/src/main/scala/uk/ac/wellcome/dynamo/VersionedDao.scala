@@ -11,7 +11,6 @@ import uk.ac.wellcome.models.{Id, VersionUpdater, Versioned}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
-
 class VersionedDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig

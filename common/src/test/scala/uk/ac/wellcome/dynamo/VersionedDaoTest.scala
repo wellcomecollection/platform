@@ -1,7 +1,12 @@
 package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{AttributeValue, ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  AttributeValue,
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
@@ -15,9 +20,9 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Id, VersionUpdater, Versioned}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-
 case class TestVersioned(id: String, data: String, version: Int)
-    extends Versioned with Id
+    extends Versioned
+    with Id
 
 class VersionedDaoTest
     extends FunSpec
