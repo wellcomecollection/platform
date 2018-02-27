@@ -11,9 +11,9 @@ import uk.ac.wellcome.models.{
   Versioned
 }
 import uk.ac.wellcome.s3.S3ObjectStore
+import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
-import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 case class HybridRecord(
   version: Int,
@@ -45,8 +45,7 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
 
   def updateRecord(sourceName: String, sourceId: String)(ifNotExisting: => T)(
     ifExisting: T => T)(
-    implicit evidence: SourcedDynamoFormatWrapper[T],
-    decoder: Decoder[T],
+    implicit decoder: Decoder[T],
     encoder: Encoder[T]
   ): Future[Unit] = {
     val id = Sourced.id(sourceName, sourceId)
@@ -105,8 +104,10 @@ class VersionedHybridStore[T <: Sourced] @Inject()(
   private def putObject(id: String,
                         sourcedObject: T,
                         f: (String) => HybridRecord)(
-    implicit encoder: Encoder[T]
+    implicit encoder: Encoder[T],
+    formatWrapper: SourcedDynamoFormatWrapper[HybridRecord]
   ) = {
+    implicit val dynamoFormat = formatWrapper.enrichedDynamoFormat
     if (sourcedObject.id != id)
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
