@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
-  versionedHybridStore: VersionedHybridStore,
+  versionedHybridStore: VersionedHybridStore[SierraTransformable],
   metrics: MetricsSender
 ) extends Logging {
 

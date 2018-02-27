@@ -4,6 +4,7 @@ import com.gu.scanamo.DynamoFormat
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.s3.KeyPrefixGenerator
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -17,7 +18,12 @@ class VersionedHybridStoreTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with VersionedHybridStoreLocal {
+    with VersionedHybridStoreLocal[ExampleRecord] {
+
+  override lazy val keyPrefixGenerator: KeyPrefixGenerator[ExampleRecord] =
+    new KeyPrefixGenerator[ExampleRecord] {
+      override def generate(obj: ExampleRecord): String = "/"
+    }
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -100,7 +106,7 @@ class VersionedHybridStoreTest
   }
 
   it("returns a future of None for a non-existent record") {
-    val future = hybridStore.getRecord[ExampleRecord](id = "does/notexist")
+    val future = hybridStore.getRecord(id = "does/notexist")
 
     whenReady(future) { result =>
       result shouldBe None
@@ -119,7 +125,7 @@ class VersionedHybridStoreTest
         identity)
 
     val getFuture = putFuture.flatMap { _ =>
-      hybridStore.getRecord[ExampleRecord](record.id)
+      hybridStore.getRecord(record.id)
     }
 
     whenReady(getFuture) { result =>
@@ -143,7 +149,7 @@ class VersionedHybridStoreTest
         record)(identity)
       _ <- hybridStore.updateRecord(record.sourceName, record.sourceId)(
         record)(identity)
-      result <- hybridStore.getRecord[ExampleRecord](record.id)
+      result <- hybridStore.getRecord(record.id)
     } yield result
 
     whenReady(future) { result =>
