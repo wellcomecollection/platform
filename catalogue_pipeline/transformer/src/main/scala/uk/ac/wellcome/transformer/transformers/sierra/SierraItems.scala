@@ -12,10 +12,9 @@ import uk.ac.wellcome.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraItems extends Logging with SierraLocation {
-  def extractItemData(sierraTransformable: SierraTransformable): List[SierraItemData] = {
-    sierraTransformable
-      .itemData
-      .values
+  def extractItemData(
+    sierraTransformable: SierraTransformable): List[SierraItemData] = {
+    sierraTransformable.itemData.values
       .map { _.data }
       .map { jsonString =>
         fromJson[SierraItemData](jsonString) match {
@@ -48,7 +47,8 @@ trait SierraItems extends Logging with SierraLocation {
     )
   }
 
-  def getItems(sierraTransformable: SierraTransformable): List[UnidentifiedItem] = {
+  def getItems(
+    sierraTransformable: SierraTransformable): List[UnidentifiedItem] = {
     extractItemData(sierraTransformable)
       .map(transformItemData)
   }
