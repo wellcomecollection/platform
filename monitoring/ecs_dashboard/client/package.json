@@ -24,5 +24,5 @@
     "eject": "react-scripts eject",
     "flow": "flow"
   },
-  "homepage": "https://s3-eu-west-1.amazonaws.com/wellcomecollection-platform-dashboard/"
+  "homepage": "https://wellcomecollection-platform-dashboard.s3.amazonaws.com"
 }

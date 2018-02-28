@@ -16,15 +16,14 @@ $(val $(call stack_setup))
 
 ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
 
-$(ROOT)/.docker/ecs_dashboard:
-	$(ROOT)/builds/build_ci_docker_image.py \
-		--project=ecs_dashboard \
-		--dir=$(ECS_DASHBOARD)/client \
-		--file=$(ECS_DASHBOARD)/client/Dockerfile
+build_deployment_container:
+	docker build \
+		-f client/Dockerfile client/ \
+		--tag ecs_dashboard
 
-ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
+ecs_dashboard_client-publish: build_deployment_container
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ECS_DASHBOARD)/client:/dashboard \
 		--env BUCKET_NAME=wellcomecollection-platform-dashboard \
-		--env PATH_PREFIX=https://s3-eu-west-1.amazonaws.com/wellcomecollection-platform-dashboard/ \
+		--env PATH_PREFIX=https://wellcomecollection-platform-dashboard.s3.amazonaws.com \
 		ecs_dashboard
