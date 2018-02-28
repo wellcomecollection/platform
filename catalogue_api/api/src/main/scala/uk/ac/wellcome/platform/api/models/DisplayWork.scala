@@ -102,8 +102,8 @@ case object DisplayWork {
           })
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
-      publicationDate = work.publicationDate.map { DisplayPeriod(_) } visible =
-        work.visible
+      publicationDate = work.publicationDate.map { DisplayPeriod(_) },
+      visible = work.visible
     )
   }
 
