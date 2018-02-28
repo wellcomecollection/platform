@@ -12,12 +12,12 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import scala.annotation.Annotation
 import scala.concurrent.Future
 
-
 case class HybridRecord(
   id: String,
   version: Int,
   s3key: String
-) extends Versioned with Id
+) extends Versioned
+    with Id
 
 case class CopyToDynamo() extends Annotation
 
@@ -31,11 +31,10 @@ class VersionedHybridStore[T <: Id] @Inject()(
     s3Object: T
   )
 
-  def updateRecord[O](id: String)(ifNotExisting: => T)(
-    ifExisting: T => T)(
+  def updateRecord[O](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
     implicit decoder: Decoder[T],
     encoder: Encoder[T],
-    enricher: HybridRecordEnricher.Aux[T,O],
+    enricher: HybridRecordEnricher.Aux[T, O],
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
@@ -50,7 +49,9 @@ class VersionedHybridStore[T <: Id] @Inject()(
           putObject(
             id,
             transformedS3Record,
-            enricher.enrichedHybridRecordHList(transformedS3Record, hybridRecord.version))
+            enricher.enrichedHybridRecordHList(
+              transformedS3Record,
+              hybridRecord.version))
         } else {
           Future.successful(())
         }
@@ -69,15 +70,13 @@ class VersionedHybridStore[T <: Id] @Inject()(
       maybeObject.map(_.s3Object)
     }
 
-  private def putObject[O](id: String,
-                sourcedObject: T,
-                f: (String) => O)(
-                 implicit encoder: Encoder[T],
-                 dynamoFormat: DynamoFormat[O],
-                 versionUpdater: VersionUpdater[O],
-                 idGetter: IdGetter[O],
-                 versionGetter: VersionGetter[O]
-               ) = {
+  private def putObject[O](id: String, sourcedObject: T, f: (String) => O)(
+    implicit encoder: Encoder[T],
+    dynamoFormat: DynamoFormat[O],
+    versionUpdater: VersionUpdater[O],
+    idGetter: IdGetter[O],
+    versionGetter: VersionGetter[O]
+  ) = {
     if (sourcedObject.id != id)
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")

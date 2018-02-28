@@ -40,8 +40,7 @@ class VersionedHybridStoreTest
       content = "One ocelot in orange"
     )
 
-    val future = hybridStore.updateRecord(record.id)(
-      record)(identity)
+    val future = hybridStore.updateRecord(record.id)(record)(identity)
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
@@ -65,9 +64,7 @@ class VersionedHybridStoreTest
     val future =
       hybridStore
         .updateRecord(record.id)(record)(identity)
-        .flatMap(_ =>
-          hybridStore.updateRecord(record.id)(record)(
-            t))
+        .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t))
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
@@ -88,8 +85,7 @@ class VersionedHybridStoreTest
       content = "Throwing turquoise tangerines in Tanzania"
     )
 
-    val future = hybridStore.updateRecord(record.id)(
-      record)(identity)
+    val future = hybridStore.updateRecord(record.id)(record)(identity)
 
     val updatedFuture = future.flatMap { _ =>
       hybridStore.updateRecord(updatedRecord.id)(updatedRecord)(_ =>
@@ -152,10 +148,9 @@ class VersionedHybridStoreTest
     val recordWithDifferentId = record.copy(id = "not_the_same_id")
 
     val future = for {
-      _ <- hybridStore.updateRecord(record.id)(
-        record)(identity)
-      _ <- hybridStore.updateRecord(record.id)(
-        record)(_ => recordWithDifferentId)
+      _ <- hybridStore.updateRecord(record.id)(record)(identity)
+      _ <- hybridStore.updateRecord(record.id)(record)(_ =>
+        recordWithDifferentId)
     } yield ()
 
     whenReady(future.failed) { e: Throwable =>
@@ -166,18 +161,27 @@ class VersionedHybridStoreTest
   it("should copy some tagged fields into the record in dynamo") {
     case class TaggedExampleRecord(id: String,
                                    something: String,
-                                   @CopyToDynamo taggedSomething: String
-                                  ) extends Id
+                                   @CopyToDynamo taggedSomething: String)
+        extends Id
 
     val taggedContent = "this goes in dynamo"
-    val record = TaggedExampleRecord(id = "11111", something = "whatever", taggedSomething = taggedContent)
+    val record = TaggedExampleRecord(
+      id = "11111",
+      something = "whatever",
+      taggedSomething = taggedContent)
 
-    case class ExtendedHybridRecord(id: String, version: Int, s3key: String, taggedSomething: String) extends Versioned with Id
+    case class ExtendedHybridRecord(id: String,
+                                    version: Int,
+                                    s3key: String,
+                                    taggedSomething: String)
+        extends Versioned
+        with Id
 
     val hybridStore = createHybridStore[TaggedExampleRecord]
 
     whenReady(hybridStore.updateRecord(record.id)(record)(identity)) { _ =>
-      val maybeResult = Scanamo.get[ExtendedHybridRecord](dynamoDbClient)(tableName)('id -> record.id)
+      val maybeResult = Scanamo.get[ExtendedHybridRecord](dynamoDbClient)(
+        tableName)('id -> record.id)
       maybeResult shouldBe defined
       maybeResult.get.isRight shouldBe true
       val hybridRecord = maybeResult.get.right.get
@@ -186,7 +190,6 @@ class VersionedHybridStoreTest
       hybridRecord.version shouldBe 1
       hybridRecord.taggedSomething shouldBe taggedContent
     }
-
 
   }
 }
