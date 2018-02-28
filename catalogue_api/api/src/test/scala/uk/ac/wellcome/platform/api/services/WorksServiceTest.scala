@@ -57,7 +57,7 @@ class WorksServiceTest
 
     whenReady(recordsFuture) { records =>
       records.isDefined shouldBe true
-      records.get shouldBe DisplayWork(works.head, WorksIncludes())
+      records.get shouldBe works.head
     }
   }
 
@@ -175,33 +175,6 @@ class WorksServiceTest
       works.results.head shouldBe DisplayWork(
         workEmu.canonicalId,
         workEmu.title.get)
-    }
-  }
-
-  it("should return identifiers if specified in the includes for findWorkById") {
-    val canonicalId = "1234"
-
-    val title = "image title"
-    val miroId = "abcdef"
-    val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = workWith(
-      canonicalId,
-      title,
-      identifiers = List(
-        SourceIdentifier(identifierScheme = identifierScheme, value = miroId)))
-    insertIntoElasticSearch(work)
-
-    val getByIdResult = worksService.findWorkById(
-      canonicalId,
-      includes = WorksIncludes(identifiers = true)
-    )
-
-    whenReady(getByIdResult) { maybeDisplayWork =>
-      maybeDisplayWork.isDefined shouldBe true
-      maybeDisplayWork.get.identifiers.isDefined shouldBe true
-      maybeDisplayWork.get.identifiers.get shouldBe List(
-        DisplayIdentifier(identifierScheme = identifierScheme, value = miroId))
-
     }
   }
 
