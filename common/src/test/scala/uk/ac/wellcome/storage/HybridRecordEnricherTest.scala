@@ -18,12 +18,17 @@ class HybridRecordEnricherTest extends FunSpec with Matchers {
     val version = 3
     val s3Key = "s3Key"
     val hList = hybridRecordEnricher.enrichedHybridRecordHList(
-      TestRecordWithNoTags(id, "something"), version)(s3Key)
+      TestRecordWithNoTags(id, "something"),
+      version)(s3Key)
 
     gen.from(hList) shouldBe HybridRecord(id, version, s3Key)
   }
 
-  case class TestRecordWithTags(id: String, something: String, @CopyToDynamo tagged1: Int, @CopyToDynamo tagged2: String) extends Id
+  case class TestRecordWithTags(id: String,
+                                something: String,
+                                @CopyToDynamo tagged1: Int,
+                                @CopyToDynamo tagged2: String)
+      extends Id
 
   it("""generates a HList with all the fields from HybridRecord
         and all of the tagged fields from record""") {
@@ -36,16 +41,16 @@ class HybridRecordEnricherTest extends FunSpec with Matchers {
     val taggedInt = 1111
     val taggedString = "taggedString"
     val hList = hybridRecordEnricher.enrichedHybridRecordHList(
-      TestRecordWithTags(id, "something", taggedInt, taggedString), version)(s3Key)
+      TestRecordWithTags(id, "something", taggedInt, taggedString),
+      version)(s3Key)
 
     val expectedHList =
       ("id" ->> id) ::
-      ("version" ->> version) ::
-      ("s3key" ->> s3Key) ::
-      ("tagged1" ->> taggedInt) ::
-      ("tagged2" ->> taggedString) :: HNil
+        ("version" ->> version) ::
+        ("s3key" ->> s3Key) ::
+        ("tagged1" ->> taggedInt) ::
+        ("tagged2" ->> taggedString) :: HNil
 
     hList shouldBe expectedHList
   }
 }
-
