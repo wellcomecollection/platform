@@ -11,8 +11,8 @@ trait TransformableTransformer[+T <: Transformable] {
     t: T,
     version: Int): Try[Option[UnidentifiedWork]]
 
-  def transform(transformable: Transformable,
-                version: Int)(implicit tag: ClassTag[T]): Try[Option[UnidentifiedWork]] =
+  def transform(transformable: Transformable, version: Int)(
+    implicit tag: ClassTag[T]): Try[Option[UnidentifiedWork]] =
     Try {
       transformable match {
         case t: T => transformForType(t, version)
