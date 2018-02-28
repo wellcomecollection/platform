@@ -47,9 +47,10 @@ trait SierraDescription {
           // We never expect to see this in practice.  If we do, we should
           // refuse to process it, and if/when we see it we can decide how
           // it should be handled.  For now, just throw an exception.
-          case (None, Some(b)) => throw new RuntimeException(
-            s"Saw a MARC field 520 with $$b but no $$a? $bibData"
-          )
+          case (None, Some(b)) =>
+            throw new RuntimeException(
+              s"Saw a MARC field 520 with $$b but no $$a? $bibData"
+            )
         }
       }) match {
       case Nil => None
