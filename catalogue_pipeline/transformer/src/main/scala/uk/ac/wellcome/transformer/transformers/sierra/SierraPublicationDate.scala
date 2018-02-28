@@ -16,7 +16,13 @@ trait SierraPublicationDate {
 
   // Populate wwork:publicationDate.
   //
-  // We use MARC field "260" and subfield "c"
+  // We use MARC field "260" and subfield "c".  For now, we just pass through
+  // the string directly -- we're not doing any parsing of the date yet.
+  //
+  // Notes:
+  //  - Both the MARC field 260 and subfield $c are repeatable.  For now
+  //    we just grab them all and join them with semicolons.
+  //    TODO: Decide a proper strategy for doing this!
   //
   // https://www.loc.gov/marc/bibliographic/bd260.html
   //
