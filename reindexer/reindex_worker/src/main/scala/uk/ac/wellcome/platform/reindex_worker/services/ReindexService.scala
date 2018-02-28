@@ -4,10 +4,9 @@ import javax.inject.Inject
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo._
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.{DynamoFormat, Scanamo, _}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -16,7 +15,6 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.type_classes.VersionUpdater
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -30,12 +28,6 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
   private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
     .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
-
-  implicit val versionUpdater = new VersionUpdater[HybridRecord] {
-    override def updateVersion(record: HybridRecord,
-                               newVersion: Int): HybridRecord =
-      record.copy(version = newVersion)
-  }
 
   def runReindex(reindexJob: ReindexJob)(
     implicit evidence: SourcedDynamoFormatWrapper[HybridRecord])
