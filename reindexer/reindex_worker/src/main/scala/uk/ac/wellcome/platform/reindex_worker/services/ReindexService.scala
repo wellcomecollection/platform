@@ -13,13 +13,10 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.models.{
-  Sourced,
-  SourcedDynamoFormatWrapper,
-  VersionUpdater
-}
+import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.HybridRecord
+import uk.ac.wellcome.type_classes.VersionUpdater
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future

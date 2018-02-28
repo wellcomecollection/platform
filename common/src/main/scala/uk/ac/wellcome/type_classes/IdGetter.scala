@@ -1,4 +1,4 @@
-package uk.ac.wellcome.dynamo
+package uk.ac.wellcome.type_classes
 
 import shapeless._
 import shapeless.labelled.FieldType
