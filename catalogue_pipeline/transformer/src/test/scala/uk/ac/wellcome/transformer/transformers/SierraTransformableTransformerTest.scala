@@ -305,59 +305,6 @@ class SierraTransformableTransformerTest
     )
   }
 
-  it("makes deleted items on a work invisible") {
-    val id = "b5757575"
-    val title = "A morning mixture of molasses and muesli"
-    val data =
-      s"""
-         |{
-         | "id": "$id",
-         | "title": "$title",
-         | "varFields": []
-         |}
-        """.stripMargin
-
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
-      itemData = Map(
-        "i111" -> sierraItemRecord(
-          id = "i111",
-          title = title,
-          bibIds = List(id)),
-        "i222" -> sierraItemRecord(
-          id = "i222",
-          title = title,
-          deleted = true,
-          bibIds = List(id))
-      )
-    )
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-
-    transformedSierraRecord.isSuccess shouldBe true
-    val work = transformedSierraRecord.get.get
-
-    val sourceIdentifier1 =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i111")
-    val sourceIdentifier2 =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
-
-    work.items shouldBe List(
-      UnidentifiedItem(
-        sourceIdentifier = sourceIdentifier1,
-        identifiers = List(sourceIdentifier1)
-      ),
-      UnidentifiedItem(
-        sourceIdentifier = sourceIdentifier2,
-        identifiers = List(sourceIdentifier2),
-        visible = false
-      )
-    )
-  }
-
   it("transforms bib records that don't have a title") {
     // This example is taken from a failure observed in the transformer, based on
     // real records from Sierra.

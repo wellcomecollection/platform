@@ -34,7 +34,6 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type": "DigitalLocation"
       |    }
       |  ],
-      |  "visible":true,
       |  "type": "Item"
       |}
     """.stripMargin
