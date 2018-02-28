@@ -18,3 +18,5 @@ variable "aws_region" {
 }
 
 variable "account_id" {}
+
+variable "infra_bucket" {}
