@@ -72,8 +72,6 @@ class IdentifiersDaoTest
       ontologyType = ontologyType
     )
 
-    triedLookup shouldBe a[Success[Option[String]]]
-
     val identifier = triedLookup.get.get
     identifier shouldBe identifier
   }
@@ -85,8 +83,6 @@ class IdentifiersDaoTest
       sourceIdentifier = sourceIdentifier,
       ontologyType = ontologyType
     )
-
-    triedLookup shouldBe a[Success[Option[String]]]
 
     val identifier = triedLookup.get
     identifier shouldBe None
@@ -198,13 +194,13 @@ class IdentifiersDaoTest
     assertInsertingIdentifierSucceeds(identifier)
 
     val triedSave = identifiersDao.saveIdentifier(duplicateIdentifier)
-    triedSave shouldBe a[Failure[SQLIntegrityConstraintViolationException]]
+    triedSave shouldBe a[Failure[_]]
+    triedSave.failed.get shouldBe a[SQLIntegrityConstraintViolationException]
   }
 
   /* Helper method.  Insert a record and check that it succeeds. */
   private def assertInsertingIdentifierSucceeds(identifier: Identifier) = {
     val triedSave = identifiersDao.saveIdentifier(identifier)
-    triedSave shouldBe a[Success[String]]
     triedSave shouldBe Success(1)
   }
 }

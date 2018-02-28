@@ -15,6 +15,8 @@ object Common {
       "-Yclosure-elim",
       "-Yinline",
       "-Xverify",
+      "-Xfatal-warnings",
+      "-Yinline-warnings:false",
       "-feature",
       "-language:postfixOps"
     ),
