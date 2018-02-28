@@ -5,6 +5,7 @@ import shapeless.labelled.FieldType
 import shapeless.ops.record.Updater
 import shapeless.record._
 
+// Type class that updates the version field on an instance of T
 trait VersionUpdater[T] {
   def updateVersion(versioned: T, newVersion: Int): T
 }
@@ -22,14 +23,12 @@ object VersionUpdater {
       def updateVersion(t: T, version: Int) = f(t,version)
   }
 
-  implicit def elementVersionUpdater[L <: HList](implicit updater: Updater.Aux[L, versionField, L]) = createVersionUpdater[L] {(t: L, newVersion: Int) =>
+  // Generates a VersionUpdater for an arbitrary HList
+  implicit def hlistVersionUpdater[L <: HList](implicit updater: Updater.Aux[L, versionField, L]) = createVersionUpdater[L] {(t: L, newVersion: Int) =>
     t.updated('version, newVersion)
   }
 
-  implicit def hlistVersionUpdater[L <: HList, H](implicit versionGetter: VersionUpdater[L]) = createVersionUpdater[H :: L]{ (t: H :: L, newVersion: Int) =>
-    t.head :: versionGetter.updateVersion(t.tail,newVersion)
-  }
-
+  // Generates an VersionUpdater for a case class using the VersionUpdater for its HLists representation
   implicit def productVersionUpdater[C, T](implicit gen: LabelledGeneric.Aux[C,T], versionGetter: VersionUpdater[T]) = createVersionUpdater[C]{(t: C, newVersion: Int)=>
     gen.from(versionGetter.updateVersion(gen.to(t), newVersion))
   }
