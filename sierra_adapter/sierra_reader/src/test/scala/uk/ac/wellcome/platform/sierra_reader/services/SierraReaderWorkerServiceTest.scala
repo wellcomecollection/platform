@@ -90,7 +90,7 @@ class SierraReaderWorkerServiceTest
       batchSize = 10,
       resourceType = SierraResourceTypes.bibs
     )
-    worker.get.runSQSWorker()
+
     val message =
       """
         |{
@@ -129,7 +129,7 @@ class SierraReaderWorkerServiceTest
       batchSize = 50,
       resourceType = SierraResourceTypes.items
     )
-    worker.get.runSQSWorker()
+
     val message =
       """
         |{
@@ -189,7 +189,6 @@ class SierraReaderWorkerServiceTest
     )
 
     // Then we trigger the reader, and we expect it to fill in the rest.
-    worker.get.runSQSWorker()
     val message =
       """
         |{
@@ -271,7 +270,7 @@ class SierraReaderWorkerServiceTest
 
   private def stopWorker(worker: Option[SierraReaderWorkerService]) = {
     eventually {
-      worker.fold(true)(_.cancelRun()) shouldBe true
+      worker.fold(true)(_.stop()) shouldBe true
     }
   }
 }
