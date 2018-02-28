@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.Transformable
 import scala.reflect.ClassTag
 import scala.util.Try
 
-trait TransformableTransformer[+T <: Transformable] {
+trait TransformableTransformer[T <: Transformable] {
   protected[this] def transformForType(
     t: T,
     version: Int): Try[Option[UnidentifiedWork]]
