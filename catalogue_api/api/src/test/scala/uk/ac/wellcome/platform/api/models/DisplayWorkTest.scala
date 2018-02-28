@@ -128,7 +128,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
       title = Some("Calling a cacophany of cats to consume carrots"),
       canonicalId = "c4kauupf",
       sourceIdentifier = sourceIdentifier,
-      publicationDate = Some(Period("c1900"))
+      publicationDate = Some(Period("c1900")),
+      version = 1
     )
 
     val displayWork = DisplayWork(work)

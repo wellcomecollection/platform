@@ -10,7 +10,8 @@ class PublicationDateTest extends ApiWorksTestBase {
       canonicalId = "arfj5cj4",
       sourceIdentifier = sourceIdentifier,
       title = Some("Asking aging armadillos for another appraisal"),
-      publicationDate = None
+      publicationDate = None,
+      version = 1
     )
 
     insertIntoElasticSearch(work)
@@ -44,7 +45,8 @@ class PublicationDateTest extends ApiWorksTestBase {
       canonicalId = "avfpwgrr",
       sourceIdentifier = sourceIdentifier,
       title = Some("Ahoy!  Armoured angelfish are attacking the armada!"),
-      publicationDate = Some(Period("1923"))
+      publicationDate = Some(Period("1923")),
+      version = 1
     )
 
     insertIntoElasticSearch(work)
