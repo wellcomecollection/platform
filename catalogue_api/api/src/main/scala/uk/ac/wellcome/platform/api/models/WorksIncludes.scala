@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.api.models
 
-import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException}
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{
   DeserializationContext,
-  JsonDeserializer,
-  JsonMappingException
+  JsonDeserializer
 }
 
 case class WorksIncludes(
@@ -15,7 +14,7 @@ case class WorksIncludes(
 )
 
 class WorksIncludesParsingException(msg: String)
-    extends JsonMappingException(msg: String)
+    extends JsonProcessingException(msg: String)
 
 case object WorksIncludes {
 
