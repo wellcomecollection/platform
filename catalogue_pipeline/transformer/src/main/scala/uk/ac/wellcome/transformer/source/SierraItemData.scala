@@ -3,9 +3,9 @@ package uk.ac.wellcome.transformer.source
 case class SierraItemData(
   id: String,
   deleted: Boolean = false,
-  location: Option[SierraLocation] = None,
+  location: Option[SierraItemLocation] = None,
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
 )
 
-case class SierraLocation(code: String, name: String)
+case class SierraItemLocation(code: String, name: String)
