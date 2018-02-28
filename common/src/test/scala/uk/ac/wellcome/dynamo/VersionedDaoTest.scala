@@ -88,9 +88,8 @@ class VersionedDaoTest
     }
   }
 
-  describe("update a merged sierra record") {
+  describe("update a record") {
     it("inserts a new record if it doesn't already exist") {
-      val sourceId = "b1111"
 
       val testVersioned = TestVersioned(
         id = "testSource/b1111",
@@ -107,7 +106,6 @@ class VersionedDaoTest
     }
 
     it("updates an existing record if the update has a higher version") {
-      val sourceId = "b1111"
 
       val testVersioned = TestVersioned(
         id = "testSource/b1111",
@@ -151,8 +149,6 @@ class VersionedDaoTest
     }
 
     it("does not update an existing record if the update has a lower version") {
-      val sourceId = "b1111"
-
       val testVersioned = TestVersioned(
         id = "testSource/b1111",
         data = "whatever",
