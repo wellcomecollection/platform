@@ -24,6 +24,8 @@ class VersionedHybridStoreTest
     with ScalaFutures
     with VersionedHybridStoreLocal {
 
+  import uk.ac.wellcome.dynamo._
+
   val hybridStore = createHybridStore[ExampleRecord]
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
