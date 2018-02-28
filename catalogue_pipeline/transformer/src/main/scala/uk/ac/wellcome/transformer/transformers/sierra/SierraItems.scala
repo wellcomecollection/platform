@@ -42,14 +42,14 @@ trait SierraItems extends Logging with SierraLocation {
           sierraItemData.id
         )
       ),
-      locations = getLocation(sierraItemData).toList,
-      visible = !sierraItemData.deleted
+      locations = getLocation(sierraItemData).toList
     )
   }
 
   def getItems(
     sierraTransformable: SierraTransformable): List[UnidentifiedItem] = {
     extractItemData(sierraTransformable)
+      .filterNot { _.deleted }
       .map(transformItemData)
   }
 }

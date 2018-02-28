@@ -2,6 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import java.time.Instant
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedItem
+}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.test.utils.SierraData
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -78,6 +83,54 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       )
 
       transformer.extractItemData(transformable) shouldBe List(item)
+    }
+  }
+
+  describe("transformItemData") {
+    it("returns UnidentifiedItem if an item is not deleted") {
+      val item = SierraItemData(id = "i4000002", deleted = false)
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        value = "i4000002"
+      )
+
+      val expectedItem = UnidentifiedItem(
+        sourceIdentifier = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        locations = List()
+      )
+
+      transformer.transformItemData(item) shouldBe expectedItem
+    }
+  }
+
+  describe("getItems") {
+    it("removes items with deleted=true") {
+      val item1 = SierraItemData(id = "i3000001", deleted = true)
+      val item2 = SierraItemData(id = "i3000002", deleted = false)
+
+      val itemData = Map(
+        item1.id -> SierraItemRecord(
+          id = item1.id,
+          data = toJson(item1).get,
+          modifiedDate = Instant.now,
+          bibIds = List()
+        ),
+        item2.id -> SierraItemRecord(
+          id = item2.id,
+          data = toJson(item2).get,
+          modifiedDate = Instant.now,
+          bibIds = List()
+        )
+      )
+
+      val transformable = SierraTransformable(
+        sourceId = "b3333333",
+        itemData = itemData
+      )
+
+      transformer.getItems(transformable) should have size (1)
     }
   }
 }
