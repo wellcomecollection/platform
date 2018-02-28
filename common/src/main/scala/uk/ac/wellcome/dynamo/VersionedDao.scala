@@ -7,6 +7,7 @@ import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
