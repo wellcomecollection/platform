@@ -93,6 +93,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
 
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
+      val includes = request.includes.getOrElse(WorksIncludes())
 
       val works = request.query match {
         case Some(queryString) =>
@@ -100,14 +101,14 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
             queryString,
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = request.includes.getOrElse(WorksIncludes()),
+            includes = includes,
             index = request._index
           )
         case None =>
           worksService.listWorks(
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = request.includes.getOrElse(WorksIncludes()),
+            includes = includes,
             index = request._index
           )
       }
