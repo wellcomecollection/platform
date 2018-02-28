@@ -24,12 +24,10 @@ object SierraReaderModule extends TwitterModule {
     "",
     "List of fields to include in the Sierra API response")
 
+  // eagerly load worker service
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[SierraReaderWorkerService]
-
-    workerService.runSQSWorker()
-
     super.singletonStartup(injector)
+    injector.instance[SierraReaderWorkerService]
   }
 
   override def singletonShutdown(injector: Injector) {
@@ -38,7 +36,7 @@ object SierraReaderModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[SierraReaderWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
 

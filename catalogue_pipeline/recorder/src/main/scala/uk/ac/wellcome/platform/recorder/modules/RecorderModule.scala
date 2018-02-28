@@ -3,18 +3,13 @@ package uk.ac.wellcome.platform.recorder.modules
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
-import uk.ac.wellcome.utils.TryBackoff
 
-object RecorderModule extends TwitterModule with TryBackoff {
+object RecorderModule extends TwitterModule {
 
-  override lazy val continuous: Boolean = false
-
+  // eagerly load worker service
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[RecorderWorkerService]
-
-    workerService.runSQSWorker()
-
     super.singletonStartup(injector)
+    injector.instance[RecorderWorkerService]
   }
 
   override def singletonShutdown(injector: Injector) {
@@ -23,7 +18,7 @@ object RecorderModule extends TwitterModule with TryBackoff {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[RecorderWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
 }

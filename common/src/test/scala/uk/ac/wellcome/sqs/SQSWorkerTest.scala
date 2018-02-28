@@ -44,7 +44,7 @@ class SQSWorkerTest
         new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         ActorSystem(),
         metricsSender) {
-    override lazy val totalWait = 1.second
+    override lazy val poll = 1.second
 
     override def processMessage(message: SQSMessage): Future[Unit] =
       Future.successful(())
@@ -53,8 +53,6 @@ class SQSWorkerTest
   val worker = new TestWorker()
 
   it("processes messages") {
-    worker.runSQSWorker()
-
     val testMessage = SQSMessage(
       subject = Some("subject"),
       messageType = "messageType",
@@ -76,17 +74,16 @@ class SQSWorkerTest
         any[() => Future[Unit]]()
       )
     }
-    worker.cancelRun()
+    worker.stop()
   }
 
-  it("does not fail the TryBackoff run when unable to parse a message") {
-    worker.runSQSWorker()
+  it("does not report an error when unable to parse a message") {
     sqsClient.sendMessage(queueUrl, "this is not valid Json")
 
-    Thread.sleep(worker.totalWait.toMillis + 1000)
+    Thread.sleep(worker.poll.toMillis + 1000)
 
     verify(metricsSender, never()).incrementCount(anyString(), anyDouble())
 
-    worker.cancelRun()
+    worker.stop()
   }
 }

@@ -25,7 +25,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
 
   def retrieveAndDeleteMessages(
     process: Message => Future[Unit]): Future[Unit] = {
-    val eventuallyProcessedMessages =
+    val eventuallyProcessMessages =
       for {
         _ <- Future.successful {
           debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
@@ -46,7 +46,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
         ()
       }
 
-    eventuallyProcessedMessages recover {
+    eventuallyProcessMessages recover {
       case exception: Throwable =>
         error(
           s"Error retrieving messages from queue ${sqsConfig.queueUrl}",

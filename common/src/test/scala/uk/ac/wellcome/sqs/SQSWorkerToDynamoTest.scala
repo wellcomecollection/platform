@@ -62,7 +62,7 @@ class SQSWorkerToDynamoTest
         new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system,
         metricsSender) {
-    override lazy val totalWait = 1.second
+    override lazy val poll = 1.second
 
     override implicit val decoder = Decoder[TestObject]
 
@@ -100,8 +100,6 @@ class SQSWorkerToDynamoTest
 
     val worker = new TestWorker(queueUrl, actorSystem)
 
-    worker.runSQSWorker()
-
     sqsClient.sendMessage(queueUrl, testMessageJson)
 
     eventually {
@@ -116,11 +114,9 @@ class SQSWorkerToDynamoTest
     val failingWorker =
       new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
 
-    failingWorker.runSQSWorker()
-
     sqsClient.sendMessage(queueUrl, testMessageJson)
 
-    Thread.sleep(failingWorker.totalWait.toMillis + 2000)
+    Thread.sleep(failingWorker.poll.toMillis + 2000)
 
     failingWorker.terminalFailure shouldBe false
   }
@@ -129,8 +125,6 @@ class SQSWorkerToDynamoTest
     val queueUrl = newQueue("green")
 
     val worker = new TestWorker(queueUrl, actorSystem)
-
-    worker.runSQSWorker()
 
     val invalidBodyTestMessage = SQSMessage(
       subject = Some("subject"),
@@ -144,7 +138,7 @@ class SQSWorkerToDynamoTest
 
     sqsClient.sendMessage(queueUrl, invalidBodyTestMessageJson)
 
-    Thread.sleep(worker.totalWait.toMillis + 2000)
+    Thread.sleep(worker.poll.toMillis + 2000)
 
     worker.terminalFailure shouldBe false
   }
@@ -155,8 +149,6 @@ class SQSWorkerToDynamoTest
 
     val terminalFailingWorker =
       new TerminalFailingTestWorker(queueUrl, actorSystem)
-
-    terminalFailingWorker.runSQSWorker()
 
     sqsClient.sendMessage(queueUrl, testMessageJson)
 

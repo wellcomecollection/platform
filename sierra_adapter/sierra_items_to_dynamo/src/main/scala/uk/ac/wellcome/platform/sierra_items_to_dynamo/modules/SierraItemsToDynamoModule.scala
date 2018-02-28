@@ -5,12 +5,11 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.SierraItemsToDynamoWorkerService
 
 object SierraItemsToDynamoModule extends TwitterModule {
+
+  // eagerly load worker service
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[SierraItemsToDynamoWorkerService]
-
-    workerService.runSQSWorker()
-
     super.singletonStartup(injector)
+    injector.instance[SierraItemsToDynamoWorkerService]
   }
 
   override def singletonShutdown(injector: Injector) {
@@ -19,7 +18,7 @@ object SierraItemsToDynamoModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[SierraItemsToDynamoWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
 }

@@ -8,8 +8,6 @@ object TransformerWorkerModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {
     val workerService = injector.instance[TransformerWorkerService]
 
-    workerService.runSQSWorker()
-
     super.singletonStartup(injector)
   }
 
@@ -19,7 +17,7 @@ object TransformerWorkerModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[TransformerWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
 }

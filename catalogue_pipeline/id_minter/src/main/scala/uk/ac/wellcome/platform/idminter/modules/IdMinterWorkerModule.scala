@@ -17,11 +17,10 @@ object IdMinterWorkerModule extends TwitterModule {
 
   override def singletonStartup(injector: Injector) {
     val tableProvisioner = injector.instance[TableProvisioner]
-    val workerService = injector.instance[IdMinterWorkerService]
 
     tableProvisioner.provision(database(), tableName())
-    workerService.runSQSWorker()
 
+    injector.instance[IdMinterWorkerService]
     super.singletonStartup(injector)
   }
 
@@ -31,7 +30,7 @@ object IdMinterWorkerModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[IdMinterWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
 }
