@@ -140,15 +140,19 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
       worksService
-        .findWorkById(
-          request.id,
-          request.includes.getOrElse(WorksIncludes()),
-          index = request._index)
+        .findWorkById(canonicalId = request.id, index = request._index)
+        .map {
+          case Some(work) => DisplayWork(
+            work = work,
+            includes = request.includes.getOrElse(WorksIncludes())
+          )
+          case None => None
+        }
         .map {
 
           // If the work is visible, we return the complete work.  If it's
           // present but hidden, we need to return an HTTP 410 Gone.
-          case Some(work) =>
+          case Some(work: DisplayWork) =>
             if (work.visible) {
               response.ok.json(
                 ResultResponse(context = contextUri, result = work))
