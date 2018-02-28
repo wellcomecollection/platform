@@ -136,7 +136,6 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-
     // TRIVIA: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
     // for steam locomotives, reaching 126 mph.
     publicationDate = Some(Period("3 July 1938"))

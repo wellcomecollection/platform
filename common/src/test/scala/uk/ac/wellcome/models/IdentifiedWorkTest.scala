@@ -141,7 +141,6 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-
     // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
     // read "There is no news", followed by 15 minutes of piano music.
     publicationDate = Some(Period("18 April 1930"))
