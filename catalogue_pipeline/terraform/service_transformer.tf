@@ -35,7 +35,7 @@ module "transformer" {
 }
 
 module "transformer_dynamo_to_sns" {
-  source = "git::https://github.com/wellcometrust/platform.git//shared_infra/dynamo_to_sns"
+  source = "../../shared_infra/dynamo_to_sns"
 
   name           = "sierra"
   src_stream_arn = "${module.vhs_sourcedata.table_stream_arn}"
