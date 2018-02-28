@@ -16,12 +16,15 @@ $(val $(call stack_setup))
 
 ECS_DASHBOARD = $(ROOT)/monitoring/ecs_dashboard
 
-build_deployment_container:
+$(ROOT)/.docker/ecs_dashboard:
 	docker build \
 		-f client/Dockerfile client/ \
 		--tag ecs_dashboard
 
-ecs_dashboard_client-publish: build_deployment_container
+	mkdir -p $(ROOT)/.docker; \
+	touch $(ROOT)/.docker/ecs_dashboard
+
+ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ECS_DASHBOARD)/client:/dashboard \
 		--env BUCKET_NAME=wellcomecollection-platform-dashboard \
