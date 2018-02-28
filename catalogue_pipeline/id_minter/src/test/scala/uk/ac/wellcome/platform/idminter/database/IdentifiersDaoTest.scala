@@ -201,6 +201,6 @@ class IdentifiersDaoTest
   /* Helper method.  Insert a record and check that it succeeds. */
   private def assertInsertingIdentifierSucceeds(identifier: Identifier) = {
     val triedSave = identifiersDao.saveIdentifier(identifier)
-    triedSave shouldBe Success("1")
+    triedSave shouldBe Success(1)
   }
 }
