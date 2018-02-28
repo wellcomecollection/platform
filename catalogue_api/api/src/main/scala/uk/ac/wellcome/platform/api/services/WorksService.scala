@@ -16,6 +16,11 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
+case class ResultList(
+  results: List[IdentifiedWork],
+  totalResults: Int
+)
+
 @Singleton
 class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
@@ -32,8 +37,7 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
 
   def listWorks(pageSize: Int = defaultPageSize,
                 pageNumber: Int = 1,
-                includes: WorksIncludes = WorksIncludes(),
-                index: Option[String] = None): Future[DisplayResultList] =
+                index: Option[String] = None): Future[ResultList] =
     searchService
       .listResults(
         sortByField = "canonicalId",
@@ -41,13 +45,19 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
         from = (pageNumber - 1) * pageSize,
         index = index
       )
-      .map { DisplayResultList(_, pageSize, includes) }
+      .map { searchResponse =>
+        ResultList(
+          results = searchResponse.hits.hits.map {
+            jsonToIdentifiedWork(_.sourceAsString)
+          },
+          totalResults = searchResponse.totalHits.toInt
+        )
+      }
 
   def searchWorks(query: String,
                   pageSize: Int = defaultPageSize,
                   pageNumber: Int = 1,
-                  includes: WorksIncludes = WorksIncludes(),
-                  index: Option[String] = None): Future[DisplayResultList] =
+                  index: Option[String] = None): Future[ResultList] =
     searchService
       .simpleStringQueryResults(
         query,
@@ -55,7 +65,14 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
         from = (pageNumber - 1) * pageSize,
         index = index
       )
-      .map { DisplayResultList(_, pageSize, includes) }
+      .map { searchResponse =>
+        ResultList(
+          results = searchResponse.hits.hits.map {
+            jsonToIdentifiedWork(_.sourceAsString)
+          },
+          totalResults = searchResponse.totalHits.toInt
+        )
+      }
 
   private def jsonToIdentifiedWork(document: String): IdentifiedWork =
     fromJson[IdentifiedWork](document) match {

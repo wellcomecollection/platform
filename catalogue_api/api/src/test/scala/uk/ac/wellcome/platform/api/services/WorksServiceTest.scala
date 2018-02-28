@@ -82,9 +82,7 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(
-        workDodo.canonicalId,
-        workDodo.title.get)
+      works.results.head shouldBe workDodo
     }
   }
 
@@ -100,47 +98,7 @@ class WorksServiceTest
     val displayWorksFuture = worksService.listWorks(pageSize = 10)
 
     whenReady(displayWorksFuture) { works =>
-      works.totalPages shouldBe 0
-    }
-  }
-
-  it(
-    "should return the correct totalPages for the number of results and pageSize") {
-    val works = createWorks(2)
-
-    insertIntoElasticSearch(works: _*)
-
-    val displayWorksFuture = worksService.listWorks(pageSize = 1)
-
-    whenReady(displayWorksFuture) { works =>
-      works.totalPages shouldBe 2
-    }
-  }
-
-  it("should return the correct number of results per page for the pageSize") {
-    val works = createWorks(3)
-
-    insertIntoElasticSearch(works: _*)
-
-    val displayWorksFuture = worksService.listWorks(pageSize = 2)
-
-    whenReady(displayWorksFuture) { works =>
-      works.results.length shouldBe 2
-    }
-  }
-
-  it("should display the correct page when asked") {
-    val works = createWorks(3)
-
-    insertIntoElasticSearch(works: _*)
-
-    val displayWorksFuture =
-      worksService.listWorks(pageSize = 1, pageNumber = 2)
-
-    whenReady(displayWorksFuture) { receivedWorks =>
-      receivedWorks.results.head shouldBe DisplayWork(
-        works(1),
-        WorksIncludes())
+      works.totalResults shouldBe 0
     }
   }
 
@@ -172,57 +130,7 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(
-        workEmu.canonicalId,
-        workEmu.title.get)
-    }
-  }
-
-  it("should return identifiers if specified in the includes for listWorks") {
-    val canonicalId = "1234"
-
-    val title = "image title"
-    val miroId = "abcdef"
-    val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = workWith(
-      canonicalId,
-      title,
-      identifiers = List(
-        SourceIdentifier(identifierScheme = identifierScheme, value = miroId)))
-    insertIntoElasticSearch(work)
-
-    val listWorksResult =
-      worksService.listWorks(includes = WorksIncludes(identifiers = true))
-
-    whenReady(listWorksResult) { (displayWork: DisplayResultList) =>
-      displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(identifierScheme = identifierScheme, value = miroId))
-
-    }
-  }
-
-  it("should return identifiers if specified in the includes for searchWorks") {
-    val canonicalId = "1234"
-
-    val title = "A search for a snail"
-    val miroId = "abcdef"
-    val identifierScheme = IdentifierSchemes.miroImageNumber
-    val work = workWith(
-      canonicalId,
-      title,
-      identifiers = List(
-        SourceIdentifier(identifierScheme = identifierScheme, value = miroId)))
-    insertIntoElasticSearch(work)
-
-    val searchWorksResult = worksService.searchWorks(
-      query = "snail",
-      includes = WorksIncludes(identifiers = true)
-    )
-
-    whenReady(searchWorksResult) { (displayWork: DisplayResultList) =>
-      displayWork.results.head.identifiers.get shouldBe List(
-        DisplayIdentifier(identifierScheme = identifierScheme, value = miroId))
-
+      works.results.head shouldBe workEmu
     }
   }
 }
