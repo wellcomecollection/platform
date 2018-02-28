@@ -85,7 +85,7 @@ def _count_current_shards(prefix, table_name):
             if (best_seen is None) or (s > best_seen):
                 best_seen = s
 
-    return int(best_seen.replace(prefix, '').rstrip('/'))
+    return int(best_seen.replace(prefix, '').strip('/'))
 
 
 def create_shards(prefix, desired_version, count, table_name):
