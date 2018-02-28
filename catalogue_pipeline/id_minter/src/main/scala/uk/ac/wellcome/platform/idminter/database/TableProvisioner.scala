@@ -13,9 +13,10 @@ class TableProvisioner @Inject()(@Flag("aws.rds.host") host: String,
 
   def provision(database: String, tableName: String): Unit = {
     val flyway = new Flyway()
-    flyway.setDataSource(s"jdbc:mysql://$host:$port/$database",
-                         userName,
-                         password)
+    flyway.setDataSource(
+      s"jdbc:mysql://$host:$port/$database",
+      userName,
+      password)
     flyway.setPlaceholders(
       Map("database" -> database, "tableName" -> tableName))
     flyway.migrate()

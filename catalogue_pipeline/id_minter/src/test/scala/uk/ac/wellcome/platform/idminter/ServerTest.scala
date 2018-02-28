@@ -25,8 +25,9 @@ class ServerTest
   )
 
   test("it should show the healthcheck message") {
-    server.httpGet(path = "/management/healthcheck",
-                   andExpect = Ok,
-                   withJsonBody = """{"message": "ok"}""")
+    server.httpGet(
+      path = "/management/healthcheck",
+      andExpect = Ok,
+      withJsonBody = """{"message": "ok"}""")
   }
 }

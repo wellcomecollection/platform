@@ -39,10 +39,12 @@ class WorksServiceTest
 
     displayWorksFuture map { displayWork =>
       displayWork.results should have size 2
-      displayWork.results.head shouldBe DisplayWork(works(0).canonicalId,
-                                                    works(0).title.get)
-      displayWork.results.tail.head shouldBe DisplayWork(works(1).canonicalId,
-                                                         works(1).title.get)
+      displayWork.results.head shouldBe DisplayWork(
+        works(0).canonicalId,
+        works(0).title.get)
+      displayWork.results.tail.head shouldBe DisplayWork(
+        works(1).canonicalId,
+        works(1).title.get)
     }
   }
 
@@ -80,8 +82,9 @@ class WorksServiceTest
     val searchForDodo = worksService.searchWorks("dodo")
     whenReady(searchForDodo) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workDodo.canonicalId,
-                                              workDodo.title.get)
+      works.results.head shouldBe DisplayWork(
+        workDodo.canonicalId,
+        workDodo.title.get)
     }
   }
 
@@ -135,8 +138,9 @@ class WorksServiceTest
       worksService.listWorks(pageSize = 1, pageNumber = 2)
 
     whenReady(displayWorksFuture) { receivedWorks =>
-      receivedWorks.results.head shouldBe DisplayWork(works(1),
-                                                      WorksIncludes())
+      receivedWorks.results.head shouldBe DisplayWork(
+        works(1),
+        WorksIncludes())
     }
   }
 
@@ -168,8 +172,9 @@ class WorksServiceTest
 
     whenReady(searchForEmu) { works =>
       works.results should have size 1
-      works.results.head shouldBe DisplayWork(workEmu.canonicalId,
-                                              workEmu.title.get)
+      works.results.head shouldBe DisplayWork(
+        workEmu.canonicalId,
+        workEmu.title.get)
     }
   }
 

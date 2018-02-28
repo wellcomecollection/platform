@@ -2,7 +2,7 @@ package uk.ac.wellcome.utils
 
 import akka.actor._
 import com.google.inject.name.Names
-import com.google.inject.{Key, Injector}
+import com.google.inject.{Injector, Key}
 
 /**
   * An Akka extension implementation for Guice-based injection. The Extension provides Akka access to

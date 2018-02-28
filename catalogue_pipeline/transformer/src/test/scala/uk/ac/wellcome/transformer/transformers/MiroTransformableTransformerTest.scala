@@ -372,8 +372,9 @@ class MiroTransformableTransformerTest
     )
     work.identifiers shouldBe List(
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber,
-                       expectedSierraNumber)
+      SourceIdentifier(
+        IdentifierSchemes.sierraSystemNumber,
+        expectedSierraNumber)
     )
   }
 

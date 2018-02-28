@@ -40,8 +40,6 @@ case class MiroTransformable(sourceId: String,
   *   - `maybeBibData`: data from the associated bib.  This may be None if
   *     we've received an item but haven't had the bib yet.
   *   - `itemData`: a map from item IDs to item records
-  *   - `version`: used to track updates to the record in DynamoDB.  The exact
-  *     value at any time is unimportant, but it should only ever increase.
   *
   */
 case class SierraTransformable(
@@ -58,11 +56,13 @@ object SierraTransformable {
   }
 
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sourceId = bibRecord.id,
-                        maybeBibData = Some(bibRecord))
+    SierraTransformable(
+      sourceId = bibRecord.id,
+      maybeBibData = Some(bibRecord))
 
   def apply(sourceId: String,
             itemRecord: SierraItemRecord): SierraTransformable =
-    SierraTransformable(sourceId = sourceId,
-                        itemData = Map(itemRecord.id -> itemRecord))
+    SierraTransformable(
+      sourceId = sourceId,
+      itemData = Map(itemRecord.id -> itemRecord))
 }

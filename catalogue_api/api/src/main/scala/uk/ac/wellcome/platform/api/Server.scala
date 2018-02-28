@@ -49,9 +49,10 @@ class Server extends HttpServer {
 
   flag[String](name = "es.index", default = "records", help = "ES index name")
   flag[String](name = "es.type", default = "item", help = "ES document type")
-  flag(name = "api.context",
-       default = apiPrefix() + "/context.json",
-       help = "API JSON-LD context")
+  flag(
+    name = "api.context",
+    default = apiPrefix() + "/context.json",
+    help = "API JSON-LD context")
 
   override def jacksonModule = ApiJacksonModule
 

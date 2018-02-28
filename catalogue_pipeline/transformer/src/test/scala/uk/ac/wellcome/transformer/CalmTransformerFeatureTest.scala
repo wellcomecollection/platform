@@ -36,15 +36,17 @@ class CalmTransformerFeatureTest
   it(
     "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
     val calmTransformable =
-      CalmTransformable(sourceId = "RecordID1",
-                        RecordType = "Collection",
-                        AltRefNo = "AltRefNo1",
-                        RefNo = "RefNo1",
-                        data = """{"AccessStatus": ["public"]}""")
+      CalmTransformable(
+        sourceId = "RecordID1",
+        RecordType = "Collection",
+        AltRefNo = "AltRefNo1",
+        RefNo = "RefNo1",
+        data = """{"AccessStatus": ["public"]}""")
     val calmHybridRecordMessage =
       hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable).get, "calm")
-    sqsClient.sendMessage(queueUrl,
-                          JsonUtil.toJson(calmHybridRecordMessage).get)
+    sqsClient.sendMessage(
+      queueUrl,
+      JsonUtil.toJson(calmHybridRecordMessage).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
@@ -53,23 +55,26 @@ class CalmTransformerFeatureTest
     }
 
     val calmTransformable2 =
-      CalmTransformable(sourceId = "RecordID2",
-                        RecordType = "Collection",
-                        AltRefNo = "AltRefNo2",
-                        RefNo = "RefNo2",
-                        data = """{"AccessStatus": ["restricted"]}""")
+      CalmTransformable(
+        sourceId = "RecordID2",
+        RecordType = "Collection",
+        AltRefNo = "AltRefNo2",
+        RefNo = "RefNo2",
+        data = """{"AccessStatus": ["restricted"]}""")
     val calmHybridRecordMessage2 =
       hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable2).get, "calm")
-    sqsClient.sendMessage(queueUrl,
-                          JsonUtil.toJson(calmHybridRecordMessage2).get)
+    sqsClient.sendMessage(
+      queueUrl,
+      JsonUtil.toJson(calmHybridRecordMessage2).get)
 
     eventually {
       val snsMessages = listMessagesReceivedFromSNS()
       snsMessages should have size 2
 
       assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
-      assertSNSMessageContainsCalmDataWith(snsMessages.tail.head,
-                                           Some("restricted"))
+      assertSNSMessageContainsCalmDataWith(
+        snsMessages.tail.head,
+        Some("restricted"))
     }
   }
 
@@ -85,10 +90,11 @@ class CalmTransformerFeatureTest
     //currently for calm data we only output hardcoded sample values
     snsMessage.message shouldBe JsonUtil
       .toJson(
-        UnidentifiedWork(title = Some("placeholder title for a Calm record"),
-                         sourceIdentifier = sourceIdentifier,
-                         version = 1,
-                         identifiers = List(sourceIdentifier)))
+        UnidentifiedWork(
+          title = Some("placeholder title for a Calm record"),
+          sourceIdentifier = sourceIdentifier,
+          version = 1,
+          identifiers = List(sourceIdentifier)))
       .get
   }
 }

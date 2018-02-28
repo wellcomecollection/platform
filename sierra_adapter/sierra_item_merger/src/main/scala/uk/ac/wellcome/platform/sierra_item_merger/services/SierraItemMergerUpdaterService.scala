@@ -19,7 +19,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-  versionedHybridStore: VersionedHybridStore,
+  versionedHybridStore: VersionedHybridStore[SierraTransformable],
   metrics: MetricsSender
 ) extends Logging {
 

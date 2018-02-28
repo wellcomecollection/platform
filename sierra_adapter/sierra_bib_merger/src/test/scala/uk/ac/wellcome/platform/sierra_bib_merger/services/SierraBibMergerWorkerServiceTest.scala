@@ -7,6 +7,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.storage.VersionedHybridStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -24,19 +25,22 @@ class SierraBibMergerWorkerServiceTest
     val sqsReader = mock[SQSReader]
     val metricsSender = mock[MetricsSender]
     val mergerUpdaterService =
-      new SierraBibMergerUpdaterService(mock[VersionedHybridStore],
-                                        metricsSender)
-    val worker = new SierraBibMergerWorkerService(sqsReader,
-                                                  ActorSystem(),
-                                                  metricsSender,
-                                                  mergerUpdaterService)
+      new SierraBibMergerUpdaterService(
+        mock[VersionedHybridStore[SierraTransformable]],
+        metricsSender)
+    val worker = new SierraBibMergerWorkerService(
+      sqsReader,
+      ActorSystem(),
+      metricsSender,
+      mergerUpdaterService)
 
     val future = worker.processMessage(
-      SQSMessage(subject = Some("default-subject"),
-                 body = "null",
-                 topic = "",
-                 messageType = "",
-                 timestamp = ""))
+      SQSMessage(
+        subject = Some("default-subject"),
+        body = "null",
+        topic = "",
+        messageType = "",
+        timestamp = ""))
 
     whenReady(future.failed) { ex =>
       ex shouldBe a[GracefulFailureException]

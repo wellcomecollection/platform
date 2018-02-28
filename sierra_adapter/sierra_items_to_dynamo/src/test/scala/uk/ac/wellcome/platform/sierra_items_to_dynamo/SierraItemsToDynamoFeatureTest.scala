@@ -48,11 +48,12 @@ class SierraItemsToDynamoFeatureTest
     val message = SierraRecord(id, data, modifiedDate)
 
     val sqsMessage =
-      SQSMessage(Some("subject"),
-                 toJson(message).get,
-                 "topic",
-                 "messageType",
-                 "timestamp")
+      SQSMessage(
+        Some("subject"),
+        toJson(message).get,
+        "topic",
+        "messageType",
+        "timestamp")
     sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     eventually {

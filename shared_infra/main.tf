@@ -12,9 +12,6 @@ module "drain_ecs_container_instance" {
 module "ecs_ec2_instance_tagger" {
   source = "ecs_ec2_instance_tagger"
 
-  bucket_infra_id  = "${aws_s3_bucket.infra.id}"
-  bucket_infra_arn = "${aws_s3_bucket.infra.arn}"
-
   ecs_container_instance_state_change_name = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.name}"
   ecs_container_instance_state_change_arn  = "${aws_cloudwatch_event_rule.ecs_container_instance_state_change.arn}"
 

@@ -35,31 +35,36 @@ class TableProvisionerTest
         sql"DESCRIBE $identifiersDatabase.$tableName"
           .map(
             rs =>
-              FieldDescription(rs.string("Field"),
-                               rs.string("Type"),
-                               rs.string("Null"),
-                               rs.string("Key")))
+              FieldDescription(
+                rs.string("Field"),
+                rs.string("Type"),
+                rs.string("Null"),
+                rs.string("Key")))
           .list()
           .apply()
       }
 
       fields.sortBy(_.field) shouldBe Seq(
-        FieldDescription(field = "CanonicalId",
-                         dataType = "varchar(255)",
-                         nullable = "NO",
-                         key = "PRI"),
-        FieldDescription(field = "OntologyType",
-                         dataType = "varchar(255)",
-                         nullable = "NO",
-                         key = "MUL"),
-        FieldDescription(field = "SourceSystem",
-                         dataType = "varchar(255)",
-                         nullable = "NO",
-                         key = ""),
-        FieldDescription(field = "SourceId",
-                         dataType = "varchar(255)",
-                         nullable = "NO",
-                         key = "")
+        FieldDescription(
+          field = "CanonicalId",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = "PRI"),
+        FieldDescription(
+          field = "OntologyType",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = "MUL"),
+        FieldDescription(
+          field = "SourceSystem",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = ""),
+        FieldDescription(
+          field = "SourceId",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = "")
       ).sortBy(_.field)
     }
   }

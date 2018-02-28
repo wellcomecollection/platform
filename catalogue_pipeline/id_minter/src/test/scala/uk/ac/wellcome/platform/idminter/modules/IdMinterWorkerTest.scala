@@ -33,10 +33,11 @@ class IdMinterWorkerTest
         sql"DESCRIBE $database.$tableName"
           .map(
             rs =>
-              FieldDescription(rs.string("Field"),
-                               rs.string("Type"),
-                               rs.string("Null"),
-                               rs.string("Key")))
+              FieldDescription(
+                rs.string("Field"),
+                rs.string("Type"),
+                rs.string("Null"),
+                rs.string("Key")))
           .list()
           .apply()
       }
@@ -49,10 +50,11 @@ class IdMinterWorkerTest
         sql"DESCRIBE $database.$tableName"
           .map(
             rs =>
-              FieldDescription(rs.string("Field"),
-                               rs.string("Type"),
-                               rs.string("Null"),
-                               rs.string("Key")))
+              FieldDescription(
+                rs.string("Field"),
+                rs.string("Type"),
+                rs.string("Null"),
+                rs.string("Key")))
           .list()
           .apply()
       }

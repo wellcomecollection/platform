@@ -67,7 +67,7 @@ define terraform_apply
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/data \
 		--workdir /data/$(1) \
-		--env BUCKET_NAME=wellcomecollection-platform-infra \
+		--env BUCKET_NAME=wellcomecollection-platform-monitoring \
 		--env OP=apply \
 		wellcome/terraform_wrapper:latest
 endef
@@ -204,7 +204,7 @@ endef
 #	$2 - Path to the Lambda source directory.
 #
 define __lambda_target_template
-$(1)-test: 
+$(1)-test:
 	$(call test_lambda,$(2))
 
 $(1)-publish:

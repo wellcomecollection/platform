@@ -11,6 +11,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
+import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
 
 object ServerMain extends Server
 
@@ -21,6 +22,7 @@ class Server extends HttpServer {
     DynamoConfigModule,
     DynamoClientModule,
     SierraBibMergerModule,
+    SierraKeyPrefixGeneratorModule,
     AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,

@@ -40,13 +40,15 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
       .queue[MetricDatum](5000, OverflowStrategy.backpressure)
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
-      .viaMat(Flow[MetricDatum].groupedWithin(metricDataListMaxSize,
-                                              10 seconds))(Keep.left)
+      .viaMat(
+        Flow[MetricDatum].groupedWithin(metricDataListMaxSize, 10 seconds))(
+        Keep.left)
       // Make sure we don't exceed aws rate limit
-      .throttle(maxPutMetricDataRequestsPerSecond,
-                1 second,
-                0,
-                ThrottleMode.shaping)
+      .throttle(
+        maxPutMetricDataRequestsPerSecond,
+        1 second,
+        0,
+        ThrottleMode.shaping)
       .to(
         Sink.foreach(
           metricDataSeq =>
@@ -65,16 +67,18 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
       case Success(_) =>
         val end = new Date()
         incrementCount("success")
-        sendTime(metricName,
-                 (end.getTime - start.getTime) milliseconds,
-                 Map("success" -> "true"))
+        sendTime(
+          metricName,
+          (end.getTime - start.getTime) milliseconds,
+          Map("success" -> "true"))
 
       case Failure(_) =>
         val end = new Date()
         incrementCount("failure")
-        sendTime(metricName,
-                 (end.getTime - start.getTime) milliseconds,
-                 Map("success" -> "false"))
+        sendTime(
+          metricName,
+          (end.getTime - start.getTime) milliseconds,
+          Map("success" -> "false"))
 
     }
 
