@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "sierra_data" {
-  bucket = "${var.bucket_name}"
+resource "aws_s3_bucket" "bucket" {
+  bucket = "${var.bucket_name_prefix}${lower(var.name)}"
 
   lifecycle {
     prevent_destroy = true
