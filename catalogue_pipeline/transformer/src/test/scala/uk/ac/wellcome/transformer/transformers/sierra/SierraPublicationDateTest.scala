@@ -103,7 +103,7 @@ class SierraPublicationDateTest extends FunSpec with Matchers with SierraData {
     )
 
     transformer.getPublicationDate(bibData).get shouldBe Period(
-      "1898-1945.; 1975.; 1976."))
+      "1898-1945.; 1975.; 1976.")
   }
 
 }
