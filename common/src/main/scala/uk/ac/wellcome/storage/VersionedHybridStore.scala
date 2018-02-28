@@ -82,26 +82,6 @@ class VersionedHybridStore[T <: Id] @Inject()(
     versionGetter: VersionGetter[O]
   ): Future[Unit] = {
 
-    def putObject(id: String,
-                  sourcedObject: T,
-                  f: (String) => O)(
-                   implicit encoder: Encoder[T],
-                   dynamoFormat: DynamoFormat[O],
-                   versionUpdater: VersionUpdater[O],
-                   idGetter: IdGetter[O],
-                   versionGetter: VersionGetter[O]
-                 ) = {
-      if (sourcedObject.id != id)
-        throw new IllegalArgumentException(
-          "ID provided does not match ID in record.")
-
-      val futureKey = sourcedObjectStore.put(sourcedObject)
-
-      futureKey.flatMap { key =>
-        versionedDao.updateRecord(f(key))
-      }
-    }
-
     getObject(id).flatMap {
       case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
         val transformedS3Record = ifExisting(s3Record)
@@ -128,6 +108,26 @@ class VersionedHybridStore[T <: Id] @Inject()(
     getObject(id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
+
+  private def putObject[O](id: String,
+                sourcedObject: T,
+                f: (String) => O)(
+                 implicit encoder: Encoder[T],
+                 dynamoFormat: DynamoFormat[O],
+                 versionUpdater: VersionUpdater[O],
+                 idGetter: IdGetter[O],
+                 versionGetter: VersionGetter[O]
+               ) = {
+    if (sourcedObject.id != id)
+      throw new IllegalArgumentException(
+        "ID provided does not match ID in record.")
+
+    val futureKey = sourcedObjectStore.put(sourcedObject)
+
+    futureKey.flatMap { key =>
+      versionedDao.updateRecord(f(key))
+    }
+  }
 
   private def getObject(id: String)(
     implicit decoder: Decoder[T]): Future[Option[VersionedHybridObject]] = {
