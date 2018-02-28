@@ -26,13 +26,6 @@ class VersionedHybridStore[T <: Id] @Inject()(
   versionedDao: VersionedDao
 ) {
 
-  implicit val hybridRecordVersionUpdater = new VersionUpdater[HybridRecord] {
-    override def updateVersion(testVersioned: HybridRecord,
-                               newVersion: Int): HybridRecord = {
-      testVersioned.copy(version = newVersion)
-    }
-  }
-
   private case class VersionedHybridObject(
     hybridRecord: HybridRecord,
     s3Object: T

@@ -1,8 +1,7 @@
 package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{AttributeValue, ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
-import com.gu.scanamo.error.DynamoReadError
+import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
@@ -13,8 +12,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Id, Versioned}
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.type_classes.VersionUpdater
 
 case class TestVersioned(id: String, data: String, version: Int)
     extends Versioned
@@ -29,13 +26,6 @@ class VersionedDaoTest
 
   override lazy val evidence: DynamoFormat[TestVersioned] =
     DynamoFormat[TestVersioned]
-
-  implicit val testVersionUpdater = new VersionUpdater[TestVersioned] {
-    override def updateVersion(testVersioned: TestVersioned,
-                               newVersion: Int): TestVersioned = {
-      testVersioned.copy(version = newVersion)
-    }
-  }
 
   override lazy val tableName: String = "source"
 
