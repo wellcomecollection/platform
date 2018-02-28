@@ -15,6 +15,7 @@ package object dynamo {
       _.toString
     )
 
+  // DynamoFormat for tagged HLists
   implicit def hlistDynamoFormat[T <: HList](
     implicit formatR: Lazy[DynamoFormat.ValidConstructedDynamoFormat[T]]) =
     new DynamoFormat[T] {
