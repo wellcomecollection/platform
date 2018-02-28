@@ -1,5 +1,6 @@
-module "versioned-hybrid-store" {
-  source      = "vhs"
-  bucket_name = "wellcomecollection-source-data"
-  table_name  = "SourceData"
+module "vhs_sourcedata" {
+  source = "./vhs"
+
+  name              = "SourceData"
+  table_name_prefix = ""
 }

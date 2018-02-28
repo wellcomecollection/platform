@@ -1,3 +1,9 @@
-variable "bucket_name" {}
+variable "name" {}
 
-variable "table_name" {}
+variable "bucket_name_prefix" {
+  default = "wellcomecollection-vhs-"
+}
+
+variable "table_name_prefix" {
+  default = "vhs-"
+}

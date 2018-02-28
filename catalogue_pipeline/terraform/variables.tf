@@ -13,7 +13,6 @@ variable "admin_cidr_ingress" {
 
 variable "infra_bucket" {
   description = "S3 bucket storing our configuration"
-  default     = "platform-infra"
 }
 
 variable "aws_region" {
