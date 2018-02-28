@@ -139,13 +139,11 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
+      val includes = request.includes.getOrElse(WorksIncludes())
       worksService
         .findWorkById(canonicalId = request.id, index = request._index)
         .map {
-          case Some(work) => DisplayWork(
-            work = work,
-            includes = request.includes.getOrElse(WorksIncludes())
-          )
+          case Some(work) => DisplayWork(work = work, includes = includes)
           case None => None
         }
         .map {
