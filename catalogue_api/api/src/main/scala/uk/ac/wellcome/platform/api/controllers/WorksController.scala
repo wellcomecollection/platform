@@ -101,19 +101,25 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
             queryString,
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = includes,
             index = request._index
           )
         case None =>
           worksService.listWorks(
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = includes,
             index = request._index
           )
       }
 
       works
+        .map { resultList =>
+          DisplayResultList(
+            results = resultList.results.map { DisplayWork(_, includes) }.toArray,
+            pageSize = pageSize,
+            totalPages = Math.ceil(resultList.totalResults.toDouble / pageSize.toDouble).toInt,
+            totalResults = resultList.totalResults
+          )
+        }
         .map(
           displayResultList => {
             ResultListResponse.create(
