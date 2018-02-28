@@ -2,6 +2,7 @@ package uk.ac.wellcome.dynamo
 
 import shapeless._
 import shapeless.labelled.FieldType
+import shapeless.ops.record.Selector
 import shapeless.record._
 
 
@@ -13,19 +14,18 @@ object IdGetter {
   val w = Witness(Symbol("id"))
   type id = w.T
 
+  def apply[A](implicit enc: IdGetter[A]): IdGetter[A] =
+    enc
+
   def createIdGetter[T](f: T => String): IdGetter[T] = new IdGetter[T] {
     def id(t: T) = f(t)
   }
 
-  implicit def lastElementIdGetter[L <: FieldType[id, String] :: HNil] = createIdGetter[L] {t: L =>
+  implicit def elementIdGetter[L <: HList](implicit selector: Selector.Aux[FieldType[id, String] :: L, id, String]) = createIdGetter {t: (FieldType[id, String] :: L) =>
     t.get('id)
   }
 
-  implicit def notLastElementIdGetter[L <: FieldType[id, String] :: T :: HNil, T <: HList] = createIdGetter[L] {t: L =>
-    t.get('id)
-  }
-
-  implicit def hlistIdGetter[L <: H :: T, H, T <: HList](implicit idGetter: IdGetter[T]) = createIdGetter[L]{t: L =>
+  implicit def hlistIdGetter[H, T <: HList](implicit idGetter: IdGetter[T]) = createIdGetter[H::T]{t: (H::T)=>
     idGetter.id(t.tail)
   }
 
