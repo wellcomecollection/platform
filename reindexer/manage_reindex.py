@@ -62,7 +62,6 @@ def _all_shards(table_name):
 
     kwargs = {
         'TableName': table_name,
-        'Limit': 10,
         'AttributesToGet': ['shardId']
     }
 
