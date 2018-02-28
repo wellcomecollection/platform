@@ -43,7 +43,7 @@ trait SierraPublicationDate {
     } else {
       val label = matchingSubfields
         .map { _.content }
-        .mkStrings("; ")
+        .mkString("; ")
       Some(Period(label))
     }
   }
