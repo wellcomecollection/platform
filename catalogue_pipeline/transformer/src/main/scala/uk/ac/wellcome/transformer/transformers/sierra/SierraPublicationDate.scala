@@ -32,14 +32,16 @@ trait SierraPublicationDate {
   // https://www.loc.gov/marc/bibliographic/bd260.html
   //
   def getPublicationDate(bibData: SierraBibData): Option[Period] = {
-    val matchingFields = bibData.varFields
+    val matchingSubfields = bibData.varFields
       .filter { _.marcTag == Some("260") }
-      .filter { _.subfield == Some("c") }
+      .map { _.subfields }
+      .flatten
+      .filter { _.tag == Some("c") }
 
-    if (matchingFields.isEmpty) {
+    if (matchingSubfields.isEmpty) {
       None
     } else {
-      val label = matchingFields
+      val label = matchingSubfields
         .map { _.content }
         .mkStrings("; ")
       Some(Period(label))
