@@ -84,7 +84,7 @@ class SQSReaderTest
     val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
       if (message.getBody == failingMessage)
         throw new RuntimeException(s"$failingMessage is not valid")
-      else Future.successful(message)
+      else Future.successful(())
     }
 
     whenReady(futureMessages.failed) { exception =>
@@ -111,7 +111,7 @@ class SQSReaderTest
     val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
       if (message.getBody == failingMessage)
         Future { throw new RuntimeException(s"$failingMessage is not valid") } else
-        Future.successful(message)
+        Future.successful(())
     }
 
     whenReady(futureMessages.failed) { exception =>
@@ -141,7 +141,7 @@ class SQSReaderTest
           throw GracefulFailureException(
             new RuntimeException(s"$failingMessage is not valid"))
         } else
-        Future.successful(message)
+        Future.successful(())
     }
 
     whenReady(futureMessages) { _ =>

@@ -26,11 +26,12 @@ trait SierraDescription {
   //
   // We use MARC field "520"
   //
-  // The value comes from comes subfield $a concatenated with subfield $b
+  // The value comes from comes subfield $a concatenated with subfield $b.
   //
   // Notes:
-  //  - A bib may have multiple 520 records
-  //  - If subfield $b is empty,
+  //  - A bib may have multiple 520 records, in which case we join with spaces
+  //  - If $b is empty, we just use $a
+  //  - We never expect to see a record with $b but not $a
   //
   // https://www.loc.gov/marc/bibliographic/bd520.html
   //
@@ -42,6 +43,14 @@ trait SierraDescription {
           case (Some(a), Some(b)) => acc :+ s"${a.content} ${b.content}"
           case (Some(a), None) => acc :+ a.content
           case (None, None) => acc
+
+          // We never expect to see this in practice.  If we do, we should
+          // refuse to process it, and if/when we see it we can decide how
+          // it should be handled.  For now, just throw an exception.
+          case (None, Some(b)) =>
+            throw new RuntimeException(
+              s"Saw a MARC field 520 with $$b but no $$a? $bibData"
+            )
         }
       }) match {
       case Nil => None

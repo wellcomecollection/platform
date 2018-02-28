@@ -113,7 +113,7 @@ class IdentifierGeneratorTest
       "Work"
     )
 
-    triedGeneratingId shouldBe a[Failure[Exception]]
+    triedGeneratingId shouldBe a[Failure[_]]
     triedGeneratingId.failed.get shouldBe expectedException
   }
 
@@ -125,8 +125,6 @@ class IdentifierGeneratorTest
       SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId),
       ontologyType
     )
-
-    triedId shouldBe a[Success[String]]
 
     val id = triedId.get
     id should not be (empty)

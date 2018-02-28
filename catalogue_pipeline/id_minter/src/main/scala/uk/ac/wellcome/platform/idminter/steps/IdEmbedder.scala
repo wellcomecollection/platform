@@ -61,7 +61,7 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
   private def parseSourceIdentifier(obj: JsonObject): SourceIdentifier = {
     fromJson[SourceIdentifier](obj("sourceIdentifier").get.toString()) match {
       case Success(sourceIdentifier) => sourceIdentifier
-      case Failure(exception: Error) =>
+      case Failure(exception) =>
         error(s"Error parsing source identifier: $exception")
         throw exception
     }
