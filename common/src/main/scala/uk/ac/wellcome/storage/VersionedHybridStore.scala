@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
-import shapeless.ops.hlist.{LeftFolder, Prepend, Zip}
+import shapeless.ops.hlist.{Collect, LeftFolder, Prepend, Zip}
 import shapeless.{Id => ShapelessId, _}
 import uk.ac.wellcome.dynamo.{IdGetter, VersionGetter, VersionedDao}
 import uk.ac.wellcome.models._
@@ -18,11 +18,9 @@ trait HybridRecordEnricher[T] {
   def enrich(record: T, version: Int)(s3key: String): Out
 }
 
-object Collector extends Poly2{
-  implicit def some[L <: HList, FT] =
-    at[L, (FT, Some[CopyToDynamo])]{case (accumulatorList,(fieldtype, _) ) => fieldtype :: accumulatorList}
-  implicit def none[L <: HList, FT] =
-    at[L, (FT, None.type)]{case (accumulatorList,_) => accumulatorList }
+object CollectorPoly extends Poly1{
+  implicit def some[FT] =
+    at[(FT, Some[CopyToDynamo])]{case ((fieldtype, _ )) => fieldtype}
 }
 
 object HybridRecordEnricher {
@@ -36,12 +34,12 @@ object HybridRecordEnricher {
 
   implicit def enricher[T <: Id, R <: HList,A <: HList, D <: HList, E <: HList, F <: HList](implicit tgen: LabelledGeneric.Aux[T, R], hybridGen: LabelledGeneric.Aux[HybridRecord,F],
                                                                                    annotations: Annotations.Aux[CopyToDynamo, T, A], zipper: Zip.Aux[R :: A :: HNil, D],
-                                                                                   leftFolder: LeftFolder.Aux[D, HList, Collector.type, E], prepend: Prepend[F,E]) = create {
+                                                                                            collector: Collect.Aux[D, CollectorPoly.type, E], prepend: Prepend[F,E]) = create {
     (record: T, version: Int, s3key: String) => {
       val hybridRecord = HybridRecord(record.id, version, s3key)
       val recordAsHlist = tgen.to(record)
       val recordWithAnnotations = recordAsHlist.zip(annotations.apply())
-      val taggedFields = recordWithAnnotations.foldLeft(HNil: HList)(Collector)
+      val taggedFields = recordWithAnnotations.collect(CollectorPoly)
       hybridGen.to(hybridRecord) ::: taggedFields
     }
   }
