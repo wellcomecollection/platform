@@ -1,7 +1,7 @@
-package uk.ac.wellcome.dynamo
+package uk.ac.wellcome.type_classes
 
-import shapeless.labelled.FieldType
 import shapeless._
+import shapeless.labelled.FieldType
 import shapeless.ops.record.Selector
 import shapeless.record._
 
