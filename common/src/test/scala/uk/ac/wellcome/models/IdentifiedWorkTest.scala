@@ -93,6 +93,10 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type": "Organisation"
       |    }
       |  ],
+      |  "publicationDate": {
+      |    "label": "18 April 1930",
+      |    "type": "Period"
+      |  },
       |  "visible":true,
       |  "type": "Work"
       |}
@@ -136,7 +140,11 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
-    publishers = publishers
+    publishers = publishers,
+
+    // Trivia: On 18 April 1930, the BBC had a slow news day.  The bulletin
+    // read "There is no news", followed by 15 minutes of piano music.
+    publicationDate = Some(Period("18 April 1930"))
   )
 
   it("should serialise an identified Item as Work") {

@@ -92,6 +92,10 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    }
       |  ],
       |  "visible":true,
+      |  "publicationDate": {
+      |    "label": "3 July 1938",
+      |    "type": "Period"
+      |  },
       |  "type": "Work"
       |}
     """.stripMargin
@@ -131,7 +135,11 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
-    publishers = publishers
+    publishers = publishers,
+
+    // Trivia: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
+    // for steam locomotives, reaching 126 mph.
+    publicationDate = Some(Period("3 July 1938"))
   )
 
   it("should serialise an unidentified Work as JSON") {
