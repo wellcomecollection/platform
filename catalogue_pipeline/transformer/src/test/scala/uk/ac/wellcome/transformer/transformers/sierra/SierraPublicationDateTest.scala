@@ -89,9 +89,11 @@ class SierraPublicationDateTest extends FunSpec with Matchers with SierraData {
         indicator2 = " ",
         subfields = List(
           MarcSubfield(tag = "a", content = "[New York] :"),
-          MarcSubfield(tag = "b", content = "American Statistical Association,"),
+          MarcSubfield(
+            tag = "b",
+            content = "American Statistical Association,"),
           MarcSubfield(tag = "c", content = "1975.")
-          MarcSubfield(tag = "c", content = "1976.")
+            MarcSubfield (tag = "c", content = "1976.")
         )
       )
     )

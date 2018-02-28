@@ -67,7 +67,8 @@ case class DisplayWork(
   ) publishers: List[DisplayAgent] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
-    value = "Relates the publication of a work to a date when the work has been formally published."
+    value =
+      "Relates the publication of a work to a date when the work has been formally published."
   ) publicationDate: Option[DisplayPeriod] = None,
   visible: Boolean = true
 ) {
@@ -101,8 +102,8 @@ case object DisplayWork {
           })
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
-      publicationDate = work.publicationDate.map { DisplayPeriod(_) }
-      visible = work.visible
+      publicationDate = work.publicationDate.map { DisplayPeriod(_) } visible =
+        work.visible
     )
   }
 
