@@ -36,7 +36,7 @@ trait SierraPublicationDate {
       .filter { _.marcTag == Some("260") }
       .map { _.subfields }
       .flatten
-      .filter { _.tag == Some("c") }
+      .filter { _.tag == "c" }
 
     if (matchingSubfields.isEmpty) {
       None
