@@ -24,13 +24,15 @@ trait VersionedHybridStoreLocal
         override def generate(obj: T): String = "/"
       }
     ),
-    versionedDao = new VersionedDao(dynamoDbClient = dynamoDbClient,
+    versionedDao = new VersionedDao(
+      dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(
         table = tableName
       ))
   )
 
-  def assertHybridRecordIsStoredCorrectly[T <: Id](record: T, expectedJson: String) = {
+  def assertHybridRecordIsStoredCorrectly[T <: Id](record: T,
+                                                   expectedJson: String) = {
     val dynamoRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get

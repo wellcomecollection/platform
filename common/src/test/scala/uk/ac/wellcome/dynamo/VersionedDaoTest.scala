@@ -1,7 +1,11 @@
 package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  GetItemRequest,
+  PutItemRequest
+}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
