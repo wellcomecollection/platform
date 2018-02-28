@@ -3,8 +3,6 @@ package uk.ac.wellcome.storage
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
-import shapeless.ops.hlist.{Collect, LeftFolder, Prepend, Zip}
-import shapeless.{Id => ShapelessId, _}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.s3.S3ObjectStore
@@ -14,37 +12,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import scala.annotation.Annotation
 import scala.concurrent.Future
 
-trait HybridRecordEnricher[T] {
-  type Out
-  def enrich(record: T, version: Int)(s3key: String): Out
-}
-
-object CollectorPoly extends Poly1{
-  implicit def some[FT] =
-    at[(FT, Some[CopyToDynamo])]{case ((fieldtype, _ )) => fieldtype}
-}
-
-object HybridRecordEnricher {
-  type Aux[A, R] = HybridRecordEnricher[A] { type Out = R }
-  def apply[T](implicit enricher: HybridRecordEnricher[T]) = enricher
-
-  def create[T, O](f: (T, Int,String) => O) = new HybridRecordEnricher[T] {
-    type Out = O
-    override def enrich(record: T, version: Int)(s3key: String): Out = f(record,version,s3key)
-  }
-
-  implicit def enricher[T <: Id, R <: HList,A <: HList, D <: HList, E <: HList, F <: HList](implicit tgen: LabelledGeneric.Aux[T, R], hybridGen: LabelledGeneric.Aux[HybridRecord,F],
-                                                                                   annotations: Annotations.Aux[CopyToDynamo, T, A], zipper: Zip.Aux[R :: A :: HNil, D],
-                                                                                            collector: Collect.Aux[D, CollectorPoly.type, E], prepend: Prepend[F,E]) = create {
-    (record: T, version: Int, s3key: String) => {
-      val hybridRecord = HybridRecord(record.id, version, s3key)
-      val recordAsHlist = tgen.to(record)
-      val recordWithAnnotations = recordAsHlist.zip(annotations.apply())
-      val taggedFields = recordWithAnnotations.collect(CollectorPoly)
-      hybridGen.to(hybridRecord) ::: taggedFields
-    }
-  }
-}
 
 case class HybridRecord(
   id: String,
@@ -90,7 +57,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
           putObject(
             id,
             transformedS3Record,
-            enricher.enrich(transformedS3Record, hybridRecord.version))
+            enricher.enrichedHybridRecordHList(transformedS3Record, hybridRecord.version))
         } else {
           Future.successful(())
         }
@@ -99,7 +66,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
         putObject(
           id = id,
           ifNotExisting,
-          enricher.enrich(ifNotExisting, 0))
+          enricher.enrichedHybridRecordHList(ifNotExisting, 0))
 
     }
   }
