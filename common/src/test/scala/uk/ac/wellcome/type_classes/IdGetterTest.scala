@@ -7,7 +7,7 @@ class IdGetterTest extends FunSpec with Matchers {
 
   case class TestId(something: String, id: String, somethingElse: String)
 
-  it("creates a IdGetter instance for an hlist"){
+  it("creates a IdGetter instance for an hlist") {
     val gen = LabelledGeneric[TestId]
 
     val idGetter = IdGetter[gen.Repr]
@@ -16,7 +16,7 @@ class IdGetterTest extends FunSpec with Matchers {
     idGetter.id(gen.to(TestId("something", id, "somethingElse"))) shouldBe id
   }
 
-  it("creates a IdGetter instance for a case class"){
+  it("creates a IdGetter instance for a case class") {
     val idGetter = IdGetter[TestId]
 
     val id = "1111"
