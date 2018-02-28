@@ -3,7 +3,7 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: manage_reindex.py update-shards --prefix=<PREFIX> --count=<COUNT> [--desired_version=<VERSION>] [--table=<TABLE>]
+Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] [--desired_version=<VERSION>] [--table=<TABLE>]
        manage_reindex.py -h | --help
 
 Actions:
@@ -56,6 +56,37 @@ def _update_shard(client, table_name, shard):
     )
 
 
+def _all_shards(table_name):
+    """Generates the name of all current shards."""
+    client = boto3.client('dynamodb')
+
+    kwargs = {
+        'TableName': table_name,
+        'AttributesToGet': ['shardId']
+    }
+
+    while True:
+        resp = client.scan(**kwargs)
+        for i in resp['Items']:
+            yield i['shardId']['S']
+
+        try:
+            kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
+        except KeyError:
+            break
+
+
+def _count_current_shards(prefix, table_name):
+    """How many shards are there in the current table?"""
+    best_seen = None
+    for s in _all_shards(table_name):
+        if s.startswith(prefix):
+            if (best_seen is None) or (s > best_seen):
+                best_seen = s
+
+    return int(best_seen.replace(prefix, '').strip('/'))
+
+
 def create_shards(prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
@@ -92,9 +123,12 @@ if __name__ == '__main__':
 
     if args['update-shards']:
         prefix = args['--prefix']
-        count = int(args['--count'])
+        count = int(args['--count'] or '0')
         desired_version = int(args['--desired_version'] or '1')
         table_name = args['--table'] or default_table_name
+
+        if count == 0:
+            count = _count_current_shards(table_name=table_name, prefix=prefix)
 
         create_shards(
             prefix=prefix,
