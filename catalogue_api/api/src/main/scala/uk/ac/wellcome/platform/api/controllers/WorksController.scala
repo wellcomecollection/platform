@@ -114,9 +114,12 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
       works
         .map { resultList =>
           DisplayResultList(
-            results = resultList.results.map { DisplayWork(_, includes) }.toArray,
+            results =
+              resultList.results.map { DisplayWork(_, includes) }.toArray,
             pageSize = pageSize,
-            totalPages = Math.ceil(resultList.totalResults.toDouble / pageSize.toDouble).toInt,
+            totalPages = Math
+              .ceil(resultList.totalResults.toDouble / pageSize.toDouble)
+              .toInt,
             totalResults = resultList.totalResults
           )
         }
