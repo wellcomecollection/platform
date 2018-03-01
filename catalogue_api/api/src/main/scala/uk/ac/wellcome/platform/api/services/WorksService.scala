@@ -20,8 +20,9 @@ case class ResultList(
 class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
 
-  def findWorkById(canonicalId: String,
-                   index: Option[String] = None): Future[Option[IdentifiedWork]] =
+  def findWorkById(
+    canonicalId: String,
+    index: Option[String] = None): Future[Option[IdentifiedWork]] =
     searchService
       .findResultById(canonicalId, index = index)
       .map { result =>
