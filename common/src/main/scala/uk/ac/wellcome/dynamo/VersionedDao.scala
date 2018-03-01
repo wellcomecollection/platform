@@ -53,14 +53,14 @@ class VersionedDao @Inject()(
     }
   }
 
-  def getRecord[T <: Versioned with Id](id: String)(
+  def getRecord[T](id: String)(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
 
     info(s"Attempting to retrieve Dynamo record: $id")
     Scanamo.exec(dynamoDbClient)(table.get('id -> id)) match {
       case Some(Right(record)) => {
-        info(s"Successfully retrieved Dynamo record: ${record.id}")
+        info(s"Successfully retrieved Dynamo record: $id")
 
         Some(record)
       }
