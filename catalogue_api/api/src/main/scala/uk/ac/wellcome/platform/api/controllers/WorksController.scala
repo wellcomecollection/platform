@@ -153,7 +153,8 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
       worksService
         .findWorkById(canonicalId = request.id, index = request._index)
         .map {
-          case Some(work) => Some(DisplayWork(work = work, includes = includes))
+          case Some(work) =>
+            Some(DisplayWork(work = work, includes = includes))
           case None => None
         }
         .map {
