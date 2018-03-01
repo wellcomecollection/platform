@@ -179,7 +179,7 @@ class VersionedDaoTest
       }
     }
 
-    it("inserts an HList into dynamoDB"){
+    it("inserts an HList into dynamoDB") {
       val id = "111"
       val version = 3
       val testVersioned = TestVersioned(
@@ -196,8 +196,9 @@ class VersionedDaoTest
         actualDynamoRecord <- versionedDao.getRecord[TestVersioned](id)
       } yield (actualDynamoRecord)
 
-      whenReady(future){ actualDynamoRecord =>
-        actualDynamoRecord shouldBe Some(testVersioned.copy(version = version + 1))
+      whenReady(future) { actualDynamoRecord =>
+        actualDynamoRecord shouldBe Some(
+          testVersioned.copy(version = version + 1))
       }
     }
 
