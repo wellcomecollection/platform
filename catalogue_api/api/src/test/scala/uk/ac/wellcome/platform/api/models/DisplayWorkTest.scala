@@ -122,4 +122,17 @@ class DisplayWorkTest extends FunSpec with Matchers {
       )
     }
   }
+
+  it("gets the publicationDate from a Work") {
+    val work = IdentifiedWork(
+      title = Some("Calling a cacophany of cats to consume carrots"),
+      canonicalId = "c4kauupf",
+      sourceIdentifier = sourceIdentifier,
+      publicationDate = Some(Period("c1900")),
+      version = 1
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.publicationDate shouldBe Some(DisplayPeriod("c1900"))
+  }
 }

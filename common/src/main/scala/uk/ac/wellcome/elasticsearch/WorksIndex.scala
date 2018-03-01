@@ -94,6 +94,7 @@ class WorksIndex @Inject()(client: HttpClient,
       labelledTextField("genres"),
       items,
       publishers,
+      date("publicationDate"),
       location("thumbnail")
     )
 
