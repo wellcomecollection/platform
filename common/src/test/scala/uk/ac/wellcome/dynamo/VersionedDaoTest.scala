@@ -16,6 +16,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Id, Versioned}
+import shapeless.syntax.singleton._
+import shapeless.record._
+import shapeless.{Id => ShapelessId, _}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestVersioned(id: String, data: String, version: Int)
     extends Versioned
@@ -172,6 +176,28 @@ class VersionedDaoTest
           .get shouldBe Right(
           newerTestVersioned
         )
+      }
+    }
+
+    it("inserts an HList into dynamoDB"){
+      val id = "111"
+      val version = 3
+      val testVersioned = TestVersioned(
+        id = id,
+        data = "whatever",
+        version = version
+      )
+
+      val gen = LabelledGeneric[TestVersioned]
+      val list = gen.to(testVersioned)
+
+      val future = for {
+        _ <- versionedDao.updateRecord(list)
+        actualDynamoRecord <- versionedDao.getRecord[TestVersioned](id)
+      } yield (actualDynamoRecord)
+
+      whenReady(future){ actualDynamoRecord =>
+        actualDynamoRecord shouldBe Some(testVersioned.copy(version = version + 1))
       }
     }
 
