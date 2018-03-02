@@ -27,28 +27,36 @@ class SQSWorkerTest
     val metricsSender: MetricsSender = mock[MetricsSender]
 
     when(
-      metricsSender.timeAndCount[Unit](anyString, any[() => Future[Unit]].apply
-      )
+      metricsSender
+        .timeAndCount[Unit](anyString, any[() => Future[Unit]].apply)
     ).thenReturn(
       Future.successful(())
     )
   }
 
-  case class TestWorkerFixture() extends TestWith[OneArgTest] with MockMetricSender {
+  case class TestWorkerFixture()
+      extends TestWith[OneArgTest]
+      with MockMetricSender {
 
     override def apply(test: OneArgTest) = {
       withActorSystem { actorSystem =>
         withLocalSqsQueue { queueUrl =>
-          sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
-          val sqsReader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1))
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "0"))
+          val sqsReader =
+            new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1))
 
-          val testWorker = new SQSWorker(sqsReader, actorSystem, metricsSender) {
-            override def processMessage(message: SQSMessage) =
-              Future.successful(())
-          }
+          val testWorker =
+            new SQSWorker(sqsReader, actorSystem, metricsSender) {
+              override def processMessage(message: SQSMessage) =
+                Future.successful(())
+            }
 
           try {
-            withFixture(test.toNoArgTest(TestSQSWorkerParam(metricsSender, testWorker, queueUrl)))
+            withFixture(
+              test.toNoArgTest(
+                TestSQSWorkerParam(metricsSender, testWorker, queueUrl)))
           } finally {
             testWorker.stop()
           }
@@ -59,7 +67,9 @@ class SQSWorkerTest
 
   }
 
-  case class TestSQSWorkerParam(metrics: MetricsSender, worker: SQSWorker, queueUrl: String)
+  case class TestSQSWorkerParam(metrics: MetricsSender,
+                                worker: SQSWorker,
+                                queueUrl: String)
 
   override type FixtureParam = TestSQSWorkerParam
 
@@ -102,7 +112,8 @@ class SQSWorkerTest
     sqsClient.sendMessage(fixtures.queueUrl, json)
 
     eventually {
-      verify(fixtures.metrics).incrementCount(matches(".*_TerminalFailure"), anyDouble())
+      verify(fixtures.metrics)
+        .incrementCount(matches(".*_TerminalFailure"), anyDouble())
     }
   }
 
@@ -110,7 +121,8 @@ class SQSWorkerTest
     sqsClient.sendMessage(fixtures.queueUrl, "this is not valid Json")
 
     eventually {
-      verify(fixtures.metrics, never()).incrementCount(matches(".*_TerminalFailure"), anyDouble())
+      verify(fixtures.metrics, never())
+        .incrementCount(matches(".*_TerminalFailure"), anyDouble())
     }
   }
 }
