@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
-import uk.ac.wellcome.dynamo.VersionedDao
+import uk.ac.wellcome.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
@@ -38,7 +38,8 @@ class VersionedHybridStore[T <: Id] @Inject()(
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
-    versionGetter: VersionGetter[O]
+    versionGetter: VersionGetter[O],
+    updateExpressionGenerator: UpdateExpressionGenerator[O]
   ): Future[Unit] = {
 
     getObject(id).flatMap {
@@ -75,7 +76,8 @@ class VersionedHybridStore[T <: Id] @Inject()(
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
-    versionGetter: VersionGetter[O]
+    versionGetter: VersionGetter[O],
+    updateExpressionGenerator: UpdateExpressionGenerator[O]
   ) = {
     if (sourcedObject.id != id)
       throw new IllegalArgumentException(
