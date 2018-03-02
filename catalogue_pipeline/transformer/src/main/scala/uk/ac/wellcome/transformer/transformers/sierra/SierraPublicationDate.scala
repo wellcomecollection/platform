@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import uk.ac.wellcome.transformer.source.SierraBibData
 import uk.ac.wellcome.models.Period
 
-trait SierraPublicationDate with MarcUtils {
+trait SierraPublicationDate extends MarcUtils {
 
   // Populate wwork:publicationDate.
   //
