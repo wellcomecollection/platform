@@ -14,6 +14,10 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
             "type": "License"
           }"""
 
+  // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
+  // read "There is no news", followed by 15 minutes of piano music.
+  val publicationDate = "18 April 1930"
+
   val identifiedWorkJson: String =
     s"""
       |{
@@ -93,7 +97,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    }
       |  ],
       |  "publicationDate": {
-      |    "label": "18 April 1930",
+      |    "label": "$publicationDate",
       |    "type": "Period"
       |  },
       |  "visible":true,
@@ -140,9 +144,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-    // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
-    // read "There is no news", followed by 15 minutes of piano music.
-    publicationDate = Some(Period("18 April 1930"))
+    publicationDate = Some(Period(publicationDate))
   )
 
   it("should serialise an identified Item as Work") {
