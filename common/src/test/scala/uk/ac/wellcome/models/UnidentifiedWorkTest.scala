@@ -16,7 +16,8 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   // TRIVIA: This is an extract from Marco Polo's diaries, in which he
   // mistakes a rhinoceros for a unicorn.
-  val physicalDescription = """
+  val physicalDescription =
+    """
     |Hair like that of a buffalo, feet like those of an elephant, and a horn in
     |the middle of the forehead, which is black and very thick.""".stripMargin
 
