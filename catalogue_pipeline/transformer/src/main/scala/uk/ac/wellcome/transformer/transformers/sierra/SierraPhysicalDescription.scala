@@ -1,8 +1,8 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.transformer.source.SierraBibData
 
-trait SierraPublicationDate {
+trait SierraPublicationDate with MarcUtils {
 
   // Populate wwork:physicalDescription.
   //
@@ -24,11 +24,11 @@ trait SierraPublicationDate {
   // https://www.loc.gov/marc/bibliographic/bd300.html
   //
   def getPhysicalDescription(bibData: SierraBibData): Option[String] = {
-    val matchingSubfields = bibData.varFields
-      .filter { _.marcTag == Some("300") }
-      .map { _.subfields }
-      .flatten
-      .filter { _.tag == "b" }
+    val matchingSubfields = getMatchingSubfields(
+      bibData = bibData,
+      marcTag = "300",
+      marcSubfieldTag = "c"
+    )
 
     if (matchingSubfields.isEmpty) {
       None
