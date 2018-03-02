@@ -33,7 +33,7 @@ abstract class SQSWorker(sqsReader: SQSReader,
         _ <- metricsSender.timeAndCount(metricName, () => processMessage(m))
       } yield ()
     } recover {
-      case _ : Throwable => terminalFailureHook()
+      case _: Throwable => terminalFailureHook()
     }
   }
 
