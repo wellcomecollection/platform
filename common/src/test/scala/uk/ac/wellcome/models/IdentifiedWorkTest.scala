@@ -18,6 +18,10 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   // read "There is no news", followed by 15 minutes of piano music.
   val publicationDate = "18 April 1930"
 
+  // TRIVIA: This is how Willem de Vlamingh, a Dutch scientist, described
+  // seeing the quokka when exploring near Australia.
+  val physicalDescription = "A kind of rat as big as a cat"
+
   val identifiedWorkJson: String =
     s"""
       |{
@@ -35,6 +39,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "canonicalId": "canonicalId",
       |  "description": "description",
+      |  "physicalDescription": "$physicalDescription",
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
@@ -136,6 +141,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     version = 1,
     identifiers = List(identifier),
     description = Some("description"),
+    physicalDescription = Some(physicalDescription),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
