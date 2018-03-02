@@ -10,6 +10,7 @@ trait Work extends Versioned with Identifiable {
   val version: Int
   val identifiers: List[SourceIdentifier]
   val description: Option[String]
+  val physicalDescription: Option[String]
   val lettering: Option[String]
   val createdDate: Option[Period]
   val subjects: List[Concept]
