@@ -26,6 +26,10 @@ case class DisplayWork(
     None,
   @ApiModelProperty(
     dataType = "String",
+    value = "A description of specific physical characteristics of the work.") physicalDescription: Option[String] =
+    None,
+  @ApiModelProperty(
+    dataType = "String",
     value = "Recording written text on a (usually visual) work.") lettering: Option[
     String] = None,
   @ApiModelProperty(
@@ -83,6 +87,7 @@ case object DisplayWork {
       id = work.canonicalId,
       title = work.title.get,
       description = work.description,
+      physicalDescription = work.physicalDescription,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       creators = work.creators.map { DisplayAgent(_) },
