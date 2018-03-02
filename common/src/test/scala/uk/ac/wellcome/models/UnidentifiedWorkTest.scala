@@ -14,6 +14,16 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
             "type": "License"
           }"""
 
+  // TRIVIA: This is an extract from Marco Polo's diaries, in which he
+  // mistakes a rhinoceros for a unicorn.
+  val physicalDescription = """
+    |Hair like that of a buffalo, feet like those of an elephant, and a horn in
+    |the middle of the forehead, which is black and very thick.""".stripMargin
+
+  // TRIVIA: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
+  // for steam locomotives, reaching 126 mph.
+  val publicationDate = "3 July 1938"
+
   val unidentifiedWorkJson: String =
     s"""
       |{
@@ -30,6 +40,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    }
       |  ],
       |  "description": "description",
+      |  "physicalDescription": "$physicalDescription",
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
@@ -92,7 +103,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "visible":true,
       |  "publicationDate": {
-      |    "label": "3 July 1938",
+      |    "label": "$publicationDate",
       |    "type": "Period"
       |  },
       |  "type": "Work"
@@ -127,6 +138,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     version = 1,
     identifiers = List(identifier),
     description = Some("description"),
+    physicalDescription = Some(physicalDescription),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
@@ -135,9 +147,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-    // TRIVIA: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
-    // for steam locomotives, reaching 126 mph.
-    publicationDate = Some(Period("3 July 1938"))
+    publicationDate = Some(Period(publicationDate))
   )
 
   it("should serialise an unidentified Work as JSON") {
