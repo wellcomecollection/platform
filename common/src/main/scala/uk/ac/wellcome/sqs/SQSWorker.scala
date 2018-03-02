@@ -17,7 +17,7 @@ abstract class SQSWorker(sqsReader: SQSReader,
 
   info(s"Starting SQS worker=[$workerName]")
 
-  lazy val poll = 100 milliseconds
+  lazy val poll = 1 second
   private lazy val workerName: String = this.getClass.getSimpleName
   private lazy val scheduler = actorSystem.scheduler
   private val actor = scheduler.schedule(0 seconds, poll)(processMessages())
@@ -27,13 +27,13 @@ abstract class SQSWorker(sqsReader: SQSReader,
   private def processMessages(): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
-        m <- Future.fromTry(fromJson[SQSMessage](message.getBody))
+        m <- Future.fromTry { fromJson[SQSMessage](message.getBody) }
         _ <- Future.successful { debug(s"Processing message: $m") }
         metricName = s"${workerName}_ProcessMessage"
         _ <- metricsSender.timeAndCount(metricName, () => processMessage(m))
       } yield ()
     } recover {
-      case _ => terminalFailureHook()
+      case _ : Throwable => terminalFailureHook()
     }
   }
 

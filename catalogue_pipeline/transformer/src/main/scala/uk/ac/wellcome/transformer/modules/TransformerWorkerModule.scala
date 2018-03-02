@@ -6,7 +6,7 @@ import uk.ac.wellcome.transformer.services.TransformerWorkerService
 
 object TransformerWorkerModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[TransformerWorkerService]
+    injector.instance[TransformerWorkerService]
 
     super.singletonStartup(injector)
   }
