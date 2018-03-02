@@ -26,8 +26,8 @@ case class DisplayWork(
     None,
   @ApiModelProperty(
     dataType = "String",
-    value = "A description of specific physical characteristics of the work.") physicalDescription: Option[String] =
-    None,
+    value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
+    String] = None,
   @ApiModelProperty(
     dataType = "String",
     value = "Recording written text on a (usually visual) work.") lettering: Option[

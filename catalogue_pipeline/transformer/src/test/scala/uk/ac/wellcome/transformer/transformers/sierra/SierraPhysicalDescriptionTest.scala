@@ -49,14 +49,17 @@ class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
       varFields = varFields
     )
 
-    transformer.getPhysicalDescription(bibData = bibData).get shouldBe physicalDescription
+    transformer
+      .getPhysicalDescription(bibData = bibData)
+      .get shouldBe physicalDescription
   }
 
   it("extracts a physical description where there are multiple MARC field 399") {
     val physicalDescription1 = "The queer quolls quits and quarrels"
     val physicalDescription2 = "A quintessential quadraped is quick"
 
-    val expectedPhysicalDescription = s"$physicalDescription1\n\n$physicalDescription2"
+    val expectedPhysicalDescription =
+      s"$physicalDescription1\n\n$physicalDescription2"
 
     varFields = List(
       VarField(
@@ -95,6 +98,8 @@ class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
       varFields = varFields
     )
 
-    transformer.getPhysicalDescription(bibData = bibData).get shouldBe expectedPhysicalDescription
+    transformer
+      .getPhysicalDescription(bibData = bibData)
+      .get shouldBe expectedPhysicalDescription
   }
 }

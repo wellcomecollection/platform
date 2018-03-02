@@ -14,10 +14,9 @@ trait MarcUtils {
       .filter { marcSubfields.contains(_.tag) }
   }
 
-  def getMatchingSubfields(
-    bibData: SierraBibData,
-    marcTag: String,
-    marcSubfieldTag: String): List[MarcSubfield] =
+  def getMatchingSubfields(bibData: SierraBibData,
+                           marcTag: String,
+                           marcSubfieldTag: String): List[MarcSubfield] =
     getMatchingSubfields(
       bibData = bibData,
       marcTag = marcTag,
