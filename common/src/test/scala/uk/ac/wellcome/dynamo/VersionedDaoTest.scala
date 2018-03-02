@@ -202,6 +202,41 @@ class VersionedDaoTest
       }
     }
 
+    it("does not remove fields from a record if updating only a subset of fields in a record") {
+      val id = "111"
+      val version = 3
+
+      case class FullRecord(id: String, data: String, moreData: Int, version: Int)
+        extends Versioned
+          with Id
+
+      case class PartialRecord(id: String, moreData: Int, version: Int)
+        extends Versioned
+          with Id
+
+      val fullRecord = FullRecord(
+        id = id,
+        data = "A friendly fish fry with francis and frankie in France.",
+        moreData = 0,
+        version = version
+      )
+      val newMoreData = 2
+
+      val future = for {
+        _ <- versionedDao.updateRecord(fullRecord)
+        maybePartialRecord <- versionedDao.getRecord[PartialRecord](fullRecord.id)
+        partialRecord = maybePartialRecord.get
+        updatedPartialRecord = partialRecord.copy(moreData = newMoreData)
+        _ <- versionedDao.updateRecord(updatedPartialRecord)
+        maybeFullRecord <- versionedDao.getRecord[FullRecord](id)
+      } yield maybeFullRecord
+
+      whenReady(future) { maybeFullRecord =>
+        val expectedFullRecord = fullRecord.copy(moreData = newMoreData, version = fullRecord.version + 2)
+        maybeFullRecord shouldBe Some(expectedFullRecord)
+      }
+    }
+
     it("returns a failed future if the request to dynamo fails") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val expectedException = new RuntimeException("AAAAAARGH!")
