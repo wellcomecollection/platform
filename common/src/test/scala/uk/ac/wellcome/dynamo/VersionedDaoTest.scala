@@ -202,16 +202,20 @@ class VersionedDaoTest
       }
     }
 
-    it("does not remove fields from a record if updating only a subset of fields in a record") {
+    it(
+      "does not remove fields from a record if updating only a subset of fields in a record") {
       val id = "111"
       val version = 3
 
-      case class FullRecord(id: String, data: String, moreData: Int, version: Int)
-        extends Versioned
+      case class FullRecord(id: String,
+                            data: String,
+                            moreData: Int,
+                            version: Int)
+          extends Versioned
           with Id
 
       case class PartialRecord(id: String, moreData: Int, version: Int)
-        extends Versioned
+          extends Versioned
           with Id
 
       val fullRecord = FullRecord(
@@ -224,7 +228,8 @@ class VersionedDaoTest
 
       val future = for {
         _ <- versionedDao.updateRecord(fullRecord)
-        maybePartialRecord <- versionedDao.getRecord[PartialRecord](fullRecord.id)
+        maybePartialRecord <- versionedDao.getRecord[PartialRecord](
+          fullRecord.id)
         partialRecord = maybePartialRecord.get
         updatedPartialRecord = partialRecord.copy(moreData = newMoreData)
         _ <- versionedDao.updateRecord(updatedPartialRecord)
@@ -232,7 +237,9 @@ class VersionedDaoTest
       } yield maybeFullRecord
 
       whenReady(future) { maybeFullRecord =>
-        val expectedFullRecord = fullRecord.copy(moreData = newMoreData, version = fullRecord.version + 2)
+        val expectedFullRecord = fullRecord.copy(
+          moreData = newMoreData,
+          version = fullRecord.version + 2)
         maybeFullRecord shouldBe Some(expectedFullRecord)
       }
     }
