@@ -17,7 +17,7 @@ import shapeless.ops.tuple.ToTraversable
 import shapeless.record._
 import uk.ac.wellcome.dynamo.UpdateExpressionGenerator.toUpdateExpressions
 import uk.ac.wellcome.models.aws.DynamoConfig
-import uk.ac.wellcome.type_classes.IdGetter.{IdKey, createIdGetter}
+import uk.ac.wellcome.type_classes.IdGetter.{createIdGetter, IdKey}
 import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -35,35 +35,51 @@ object UpdateExpressionGenerator {
 
   object toUpdateExpressions extends Poly1 {
     implicit def some[K <: Symbol, V](implicit witness: Witness.Aux[K],
-                                      dynamoFormat: DynamoFormat[V]): Case.Aux[FieldType[K, V], UpdateExpression] = {
+                                      dynamoFormat: DynamoFormat[V])
+      : Case.Aux[FieldType[K, V], UpdateExpression] = {
 
-      at[FieldType[K, V]] { fieldtype => {
-        val fieldValue: V = fieldtype
-        set(witness.value -> fieldValue)
-      }}
-    }
-  }
-
-  object Folder extends Poly2 {
-    implicit def fold: Case.Aux[Option[UpdateExpression], UpdateExpression, Option[UpdateExpression]] = at[Option[UpdateExpression], UpdateExpression] {
-      (maybeUpdateExpression, partUpdate) => maybeUpdateExpression match {
-        case Some(updateExpression) => Some(updateExpression and partUpdate)
-        case None => Some(partUpdate)
+      at[FieldType[K, V]] { fieldtype =>
+        {
+          val fieldValue: V = fieldtype
+          set(witness.value -> fieldValue)
+        }
       }
     }
   }
 
-  def apply[T](implicit generator: UpdateExpressionGenerator[T]) = generator
-
-  def create[T](f: (T) => Option[UpdateExpression]) = new UpdateExpressionGenerator[T] {
-    override def generateUpdateExpression(record: T) = f(record)
+  object Folder extends Poly2 {
+    implicit def fold: Case.Aux[Option[UpdateExpression],
+                                UpdateExpression,
+                                Option[UpdateExpression]] =
+      at[Option[UpdateExpression], UpdateExpression] {
+        (maybeUpdateExpression, partUpdate) =>
+          maybeUpdateExpression match {
+            case Some(updateExpression) =>
+              Some(updateExpression and partUpdate)
+            case None => Some(partUpdate)
+          }
+      }
   }
 
-  implicit def elementUpdateExpressionGenerator[L <: HList, A, B <: HList, C <: HList](
+  def apply[T](implicit generator: UpdateExpressionGenerator[T]) = generator
+
+  def create[T](f: (T) => Option[UpdateExpression]) =
+    new UpdateExpressionGenerator[T] {
+      override def generateUpdateExpression(record: T) = f(record)
+    }
+
+  implicit def elementUpdateExpressionGenerator[L <: HList,
+                                                A,
+                                                B <: HList,
+                                                C <: HList](
     implicit remover: Remover.Aux[L, IdKey, (A, B)],
     mapper: Mapper.Aux[toUpdateExpressions.type, B, C],
-    folder: LeftFolder.Aux[C, Option[UpdateExpression], Folder.type, Option[UpdateExpression]]) =
-    create { t: L => {
+    folder: LeftFolder.Aux[C,
+                           Option[UpdateExpression],
+                           Folder.type,
+                           Option[UpdateExpression]]) =
+    create { t: L =>
+      {
         val recordAsHlist = t - 'id
         val nonIdTaggedFields = recordAsHlist.map(toUpdateExpressions)
 
@@ -95,17 +111,18 @@ class VersionedDao @Inject()(
     val newVersion = version + 1
 
     val updatedRecord = versionUpdater.updateVersion(record, newVersion)
-    
-    updateExpressionGenerator.generateUpdateExpression(updatedRecord).map { updateExpression =>
-      Table[T](dynamoConfig.table)
-        .given(
-          not(attributeExists('id)) or
-            (attributeExists('id) and 'version < newVersion)
-        )
-        .update(
-          UniqueKey(KeyEquals('id, idGetter.id(record))),
-          updateExpression
-        )
+
+    updateExpressionGenerator.generateUpdateExpression(updatedRecord).map {
+      updateExpression =>
+        Table[T](dynamoConfig.table)
+          .given(
+            not(attributeExists('id)) or
+              (attributeExists('id) and 'version < newVersion)
+          )
+          .update(
+            UniqueKey(KeyEquals('id, idGetter.id(record))),
+            updateExpression
+          )
     }
   }
 
