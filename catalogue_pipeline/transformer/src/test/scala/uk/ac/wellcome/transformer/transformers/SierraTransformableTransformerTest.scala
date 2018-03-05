@@ -391,7 +391,8 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    transformedSierraRecord.get.get.physicalDescription shouldBe Some(physicalDescription)
+    transformedSierraRecord.get.get.physicalDescription shouldBe Some(
+      physicalDescription)
   }
 
 }
