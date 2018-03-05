@@ -17,17 +17,3 @@ case class DisplayResultList(
   @ApiModelProperty(name = "type", value = "A type of thing", readOnly = true)
   val ontologyType: String = "ResultList"
 }
-
-case object DisplayResultList {
-  def apply(searchResponse: SearchResponse,
-            pageSize: Int,
-            includes: WorksIncludes): DisplayResultList = {
-    DisplayResultList(
-      results = searchResponse.hits.hits.map { DisplayWork(_, includes) },
-      pageSize = pageSize,
-      totalPages =
-        Math.ceil(searchResponse.totalHits.toDouble / pageSize.toDouble).toInt,
-      totalResults = searchResponse.totalHits.toInt
-    )
-  }
-}
