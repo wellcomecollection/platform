@@ -108,4 +108,13 @@ class SierraPublicationDateTest extends FunSpec with Matchers with SierraData {
       "1898-1945.; 1975.; 1976.")
   }
 
+  it("returns None if there is no MARC field 260 with subfield $c") {
+    val bibData = SierraBibData(
+      id = "r4000004",
+      title = Some("Rattling rats reach for racoons"),
+      varFields = List()
+    )
+
+    transformer.getPublicationDate(bibData) shouldBe None
+  }
 }

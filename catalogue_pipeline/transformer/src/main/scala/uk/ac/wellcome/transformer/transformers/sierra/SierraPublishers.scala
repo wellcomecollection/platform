@@ -18,6 +18,9 @@ trait SierraPublishers {
   //    it to have both.
   //  - A bib may have a single 260 field, or multiple 264 fields.
   //  - Subfield $b may occur more than once on a field.
+  //  - If we have a field 260 without $b, we will return an empty publishers
+  //    field even if there's a 264 with $b.  Is this possible?
+  //    TODO: Check if this is possible.  Clarify our behaviour here.
   //
   // https://www.loc.gov/marc/bibliographic/bd260.html
   // https://www.loc.gov/marc/bibliographic/bd264.html

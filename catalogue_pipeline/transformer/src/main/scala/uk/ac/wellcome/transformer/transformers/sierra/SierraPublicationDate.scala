@@ -1,9 +1,9 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.transformer.source.SierraBibData
 import uk.ac.wellcome.models.Period
 
-trait SierraPublicationDate {
+trait SierraPublicationDate extends MarcUtils {
 
   // Populate wwork:publicationDate.
   //
@@ -32,11 +32,11 @@ trait SierraPublicationDate {
   // https://www.loc.gov/marc/bibliographic/bd260.html
   //
   def getPublicationDate(bibData: SierraBibData): Option[Period] = {
-    val matchingSubfields = bibData.varFields
-      .filter { _.marcTag == Some("260") }
-      .map { _.subfields }
-      .flatten
-      .filter { _.tag == "c" }
+    val matchingSubfields = getMatchingSubfields(
+      bibData = bibData,
+      marcTag = "260",
+      marcSubfieldTag = "c"
+    )
 
     if (matchingSubfields.isEmpty) {
       None

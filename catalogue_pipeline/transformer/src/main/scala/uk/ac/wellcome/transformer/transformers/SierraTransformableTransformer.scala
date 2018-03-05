@@ -14,6 +14,7 @@ class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
     with SierraDescription
+    with SierraPhysicalDescription
     with SierraItems
     with SierraLettering
     with SierraPublishers
@@ -41,6 +42,7 @@ class SierraTransformableTransformer
               version = version,
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
+              physicalDescription = getPhysicalDescription(sierraBibData),
               lettering = getLettering(sierraBibData),
               items = getItems(sierraTransformable),
               publishers = getPublishers(sierraBibData),

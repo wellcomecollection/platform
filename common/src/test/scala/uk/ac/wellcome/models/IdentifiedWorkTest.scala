@@ -14,6 +14,14 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
             "type": "License"
           }"""
 
+  // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
+  // read "There is no news", followed by 15 minutes of piano music.
+  val publicationDate = "18 April 1930"
+
+  // TRIVIA: This is how Willem de Vlamingh, a Dutch scientist, described
+  // seeing the quokka when exploring near Australia.
+  val physicalDescription = "A kind of rat as big as a cat"
+
   val identifiedWorkJson: String =
     s"""
       |{
@@ -31,6 +39,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "canonicalId": "canonicalId",
       |  "description": "description",
+      |  "physicalDescription": "$physicalDescription",
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
@@ -93,7 +102,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    }
       |  ],
       |  "publicationDate": {
-      |    "label": "18 April 1930",
+      |    "label": "$publicationDate",
       |    "type": "Period"
       |  },
       |  "visible":true,
@@ -132,6 +141,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     version = 1,
     identifiers = List(identifier),
     description = Some("description"),
+    physicalDescription = Some(physicalDescription),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
@@ -140,9 +150,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-    // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
-    // read "There is no news", followed by 15 minutes of piano music.
-    publicationDate = Some(Period("18 April 1930"))
+    publicationDate = Some(Period(publicationDate))
   )
 
   it("should serialise an identified Item as Work") {
