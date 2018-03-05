@@ -19,3 +19,10 @@ case object CompletedReindexJob {
       completedReindexVersion = reindexJob.desiredVersion
     )
 }
+
+case class ReindexRecord(
+  id: String,
+  version: Int,
+  reindexShard: String,
+  reindexVersion: Int
+)
