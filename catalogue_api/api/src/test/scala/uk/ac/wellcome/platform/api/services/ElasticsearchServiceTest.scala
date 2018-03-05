@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.services
 
+import com.sksamuel.elastic4s.http.search.SearchHit
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.IdentifiedWork
@@ -38,11 +39,7 @@ class ElasticsearchServiceTest
     assertSliceIsCorrect(
       limit = 3,
       from = 0,
-      expectedWorks = List(
-        work3,
-        work2,
-        work1
-      )
+      expectedWorks = List(work3, work2, work1).map { DisplayWork(_) }
     )
 
     // TODO: canonicalID is the only user-defined field that we can sort on.
@@ -138,7 +135,7 @@ class ElasticsearchServiceTest
     whenReady(searchResultFuture) { result =>
       result.hits should have size expectedWorks.length
       val returnedWorks = result.hits.hits
-        .map { jsonToIdentifiedWork(_.sourceAsString) }
+        .map { h: SearchHit => jsonToIdentifiedWork(h.sourceAsString) }
         .map { DisplayWork(_) }
       returnedWorks.toList shouldBe expectedWorks
     }
