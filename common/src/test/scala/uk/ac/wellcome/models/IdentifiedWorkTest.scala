@@ -18,6 +18,10 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   // read "There is no news", followed by 15 minutes of piano music.
   val publicationDate = "18 April 1930"
 
+  // TRIVIA: This isn't describing a book, but instead the allocation
+  // of disk space inside Microsoft SQL Server.
+  val extent = "A collection of eight physically contiguous pages"
+
   // TRIVIA: This is how Willem de Vlamingh, a Dutch scientist, described
   // seeing the quokka when exploring near Australia.
   val physicalDescription = "A kind of rat as big as a cat"
@@ -40,6 +44,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "canonicalId": "canonicalId",
       |  "description": "description",
       |  "physicalDescription": "$physicalDescription",
+      |  "extent": "$extent",
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
@@ -142,6 +147,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     identifiers = List(identifier),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),
+    extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),

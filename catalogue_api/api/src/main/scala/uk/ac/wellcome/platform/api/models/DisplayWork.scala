@@ -26,6 +26,11 @@ case class DisplayWork(
     String] = None,
   @ApiModelProperty(
     dataType = "String",
+    value =
+      "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
+  ) extent: Option[String] = None,
+  @ApiModelProperty(
+    dataType = "String",
     value = "Recording written text on a (usually visual) work.") lettering: Option[
     String] = None,
   @ApiModelProperty(
@@ -84,6 +89,7 @@ case object DisplayWork {
       title = work.title.get,
       description = work.description,
       physicalDescription = work.physicalDescription,
+      extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       creators = work.creators.map { DisplayAgent(_) },

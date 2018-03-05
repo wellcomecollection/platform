@@ -19,6 +19,9 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   val physicalDescription =
     "Hair like that of a buffalo, feet like those of an elephant"
 
+  // TRIVIA: This is based on Harry Potter, when we first meet Dobby.
+  val extent = "Both socks pulled up to their highest extent"
+
   // TRIVIA: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
   // for steam locomotives, reaching 126 mph.
   val publicationDate = "3 July 1938"
@@ -40,6 +43,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "description": "description",
       |  "physicalDescription": "$physicalDescription",
+      |  "extent": "$extent",
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
@@ -138,6 +142,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     identifiers = List(identifier),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),
+    extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),

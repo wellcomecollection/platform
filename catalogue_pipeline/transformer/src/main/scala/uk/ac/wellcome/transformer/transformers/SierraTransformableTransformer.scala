@@ -15,6 +15,7 @@ class SierraTransformableTransformer
     with SierraIdentifiers
     with SierraDescription
     with SierraPhysicalDescription
+    with SierraExtent
     with SierraItems
     with SierraLettering
     with SierraPublishers
@@ -43,6 +44,7 @@ class SierraTransformableTransformer
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
               physicalDescription = getPhysicalDescription(sierraBibData),
+              extent = getExtent(sierraBibData),
               lettering = getLettering(sierraBibData),
               items = getItems(sierraTransformable),
               publishers = getPublishers(sierraBibData),
