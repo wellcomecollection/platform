@@ -395,4 +395,41 @@ class SierraTransformableTransformerTest
       physicalDescription)
   }
 
+  it("includes the extent, if present") {
+    val id = "b8000008"
+    val extent = "Purple pages"
+
+    val data =
+      s"""
+        | {
+        |   "id": "$id",
+        |   "title": "English earwigs earn evidence of evil",
+        |   "varFields": [
+        |     {
+        |       "fieldTag": "a",
+        |       "marcTag": "300",
+        |       "ind1": " ",
+        |       "ind2": " ",
+        |       "subfields": [
+        |         {
+        |           "tag": "b",
+        |           "content": "$extent"
+        |         }
+        |       ]
+        |     }
+        |   ]
+        | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.extent shouldBe Some(extent)
+  }
 }
