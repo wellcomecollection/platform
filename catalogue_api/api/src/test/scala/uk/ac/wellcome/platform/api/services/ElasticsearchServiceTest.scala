@@ -135,7 +135,9 @@ class ElasticsearchServiceTest
     whenReady(searchResultFuture) { result =>
       result.hits should have size expectedWorks.length
       val returnedWorks = result.hits.hits
-        .map { h: SearchHit => jsonToIdentifiedWork(h.sourceAsString) }
+        .map { h: SearchHit =>
+          jsonToIdentifiedWork(h.sourceAsString)
+        }
         .map { DisplayWork(_) }
       returnedWorks.toList shouldBe expectedWorks
     }
