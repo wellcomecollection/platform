@@ -23,8 +23,4 @@ $(LORIS)/loris/requirements.txt: $(LORIS)/requirements.in
 		pip-compile
 
 loris-run: loris-build
-	$(ROOT)/docker_run.py --aws -- \
-		--publish 8888:8888 \
-		--env INFRA_BUCKET=$(INFRA_BUCKET) \
-		--env CONFIG_KEY=config/prod/loris.ini \
-		loris
+	$(ROOT)/docker_run.py -- --publish 8888:8888 loris
