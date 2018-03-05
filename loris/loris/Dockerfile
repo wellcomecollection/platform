@@ -34,6 +34,8 @@ COPY loris2.conf /opt/loris/etc/loris2.conf
 COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
 
+COPY wellcome_loris.py /usr/local/lib/python3.5/dist-packages
+
 EXPOSE 8888
 
 CMD ["/usr/bin/uwsgi", "--ini", "/etc/uwsgi/uwsgi.ini"]
