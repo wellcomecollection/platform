@@ -356,4 +356,43 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.get.get.title shouldBe None
   }
 
+  it("includes the physical description, if present") {
+    val id = "b7000007"
+    val physicalDescription = "A dusty depiction of dodos"
+
+    val data =
+      s"""
+        | {
+        |   "id": "$id",
+        |   "title": "Doddering dinosaurs are daring in dance",
+        |   "varFields": [
+        |     {
+        |       "fieldTag": "b",
+        |       "marcTag": "300",
+        |       "ind1": " ",
+        |       "ind2": " ",
+        |       "subfields": [
+        |         {
+        |           "tag": "b",
+        |           "content": "$physicalDescription"
+        |         }
+        |       ]
+        |     }
+        |   ]
+        | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.physicalDescription shouldBe Some(
+      physicalDescription)
+  }
+
 }
