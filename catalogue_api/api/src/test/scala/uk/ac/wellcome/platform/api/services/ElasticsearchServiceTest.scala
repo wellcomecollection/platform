@@ -6,6 +6,7 @@ import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.platform.api.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.utils.JsonUtil._
 
 class ElasticsearchServiceTest
     extends FunSpec
@@ -34,16 +35,15 @@ class ElasticsearchServiceTest
       title = "Circling a Cheetah"
     )
 
-    insertIntoElasticSearch(work1, work2, work3)
-
-    val sortedSearchResultByCanonicalId = searchService.listResults(
-      sortByField = "canonicalId"
+    assertSliceIsCorrect(
+      limit = 3,
+      from = 0,
+      expectedWorks = List(
+        work3,
+        work2,
+        work1
+      )
     )
-    whenReady(sortedSearchResultByCanonicalId) { result =>
-      val works = result.hits.hits.map { DisplayWork(_) }
-      works.head shouldBe DisplayWork(work3.canonicalId, work3.title.get)
-      works.last shouldBe DisplayWork(work1.canonicalId, work1.title.get)
-    }
 
     // TODO: canonicalID is the only user-defined field that we can sort on.
     // When we have other fields we can sort on, we should extend this test
@@ -137,8 +137,13 @@ class ElasticsearchServiceTest
     )
     whenReady(searchResultFuture) { result =>
       result.hits should have size expectedWorks.length
-      val returnedWorks = result.hits.hits.map { DisplayWork(_) }
+      val returnedWorks = result.hits.hits
+        .map { jsonToIdentifiedWork(_.sourceAsString) }
+        .map { DisplayWork(_) }
       returnedWorks.toList shouldBe expectedWorks
     }
   }
+
+  private def jsonToIdentifiedWork(document: String): IdentifiedWork =
+    fromJson[IdentifiedWork](document).get
 }
