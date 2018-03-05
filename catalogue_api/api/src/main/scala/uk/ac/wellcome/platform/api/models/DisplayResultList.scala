@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.api.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.sksamuel.elastic4s.http.search.SearchResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 
 @ApiModel(
@@ -19,15 +18,15 @@ case class DisplayResultList(
 }
 
 case object DisplayResultList {
-  def apply(searchResponse: SearchResponse,
+  def apply(resultList: ResultList,
             pageSize: Int,
-            includes: WorksIncludes): DisplayResultList = {
+            includes: WorksIncludes): DisplayResultList =
     DisplayResultList(
-      results = searchResponse.hits.hits.map { DisplayWork(_, includes) },
+      results = resultList.results.map { DisplayWork(_, includes) }.toArray,
       pageSize = pageSize,
-      totalPages =
-        Math.ceil(searchResponse.totalHits.toDouble / pageSize.toDouble).toInt,
-      totalResults = searchResponse.totalHits.toInt
+      totalPages = Math
+        .ceil(resultList.totalResults.toDouble / pageSize.toDouble)
+        .toInt,
+      totalResults = resultList.totalResults
     )
-  }
 }

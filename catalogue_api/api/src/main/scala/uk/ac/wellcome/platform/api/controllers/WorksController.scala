@@ -93,6 +93,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
 
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse((defaultPageSize))
+      val includes = request.includes.getOrElse(WorksIncludes())
 
       val works = request.query match {
         case Some(queryString) =>
@@ -100,19 +101,24 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
             queryString,
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = request.includes.getOrElse(WorksIncludes()),
             index = request._index
           )
         case None =>
           worksService.listWorks(
             pageSize = pageSize,
             pageNumber = request.page,
-            includes = request.includes.getOrElse(WorksIncludes()),
             index = request._index
           )
       }
 
       works
+        .map { resultList =>
+          DisplayResultList(
+            resultList = resultList,
+            pageSize = pageSize,
+            includes = includes
+          )
+        }
         .map(
           displayResultList => {
             ResultListResponse.create(
@@ -139,16 +145,19 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
     } { request: SingleWorkRequest =>
+      val includes = request.includes.getOrElse(WorksIncludes())
       worksService
-        .findWorkById(
-          request.id,
-          request.includes.getOrElse(WorksIncludes()),
-          index = request._index)
+        .findWorkById(canonicalId = request.id, index = request._index)
+        .map {
+          case Some(work) =>
+            Some(DisplayWork(work = work, includes = includes))
+          case None => None
+        }
         .map {
 
           // If the work is visible, we return the complete work.  If it's
           // present but hidden, we need to return an HTTP 410 Gone.
-          case Some(work) =>
+          case Some(work: DisplayWork) =>
             if (work.visible) {
               response.ok.json(
                 ResultResponse(context = contextUri, result = work))
