@@ -10,19 +10,21 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with DynamoDBLocal[HybridRecord]
+    with DynamoDBLocal[TestRecord]
     with MockitoSugar
     with ExtendedPatience {
+
+  override lazy val evidence: DynamoFormat[TestRecord] =
+    DynamoFormat[TestRecord]
 
   override lazy val tableName: String = "table"
 
@@ -32,34 +34,26 @@ class ReindexServiceTest
       mock[AmazonCloudWatch],
       ActorSystem())
 
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
+  val shardName = "shard"
+  val currentVersion = 1
+  val desiredVersion = 2
 
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
-    .toSourcedDynamoFormatWrapper[HybridRecord]
-    .enrichedDynamoFormat
+  val exampleRecord = TestRecord(
+    id = "id",
+    version = 1,
+    someData = "A ghastly gharial ganking a green golem.",
+    reindexShard = shardName,
+    reindexVersion = currentVersion
+  )
 
   it("only updates records with a lower than desired reindexVersion") {
-    val currentVersion = 1
-    val desiredVersion = 2
-
-    val shardName = "shard"
-
-    val exampleRecord = HybridRecord(
-      version = 1,
-      sourceId = "id",
-      sourceName = "source",
-      s3key = "s3://bucket/key",
-      reindexShard = shardName,
-      reindexVersion = currentVersion)
-
     val newerRecord = exampleRecord.copy(
-      sourceId = "id1",
+      id = "id1",
       reindexVersion = desiredVersion + 1
     )
 
     val olderRecord = exampleRecord.copy(
-      sourceId = "id2"
+      id = "id2"
     )
 
     val records = List(
@@ -75,8 +69,7 @@ class ReindexServiceTest
       )
     )
 
-    records.foreach(record =>
-      Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat))
+    records.foreach(record => Scanamo.put(dynamoDbClient)(tableName)(record))
 
     val reindexService =
       new ReindexService(
@@ -94,36 +87,22 @@ class ReindexServiceTest
     )
 
     whenReady(reindexService.runReindex(reindexJob)) { _ =>
-      val hybridRecords =
-        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+      val records =
+        Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
 
-      hybridRecords should contain theSameElementsAs expectedRecords
+      records should contain theSameElementsAs expectedRecords
     }
   }
 
   it("updates records in the specified shard") {
-    val currentVersion = 1
-    val desiredVersion = 2
-
-    val shardName = "shard"
-
-    val exampleRecord = HybridRecord(
-      version = 1,
-      sourceId = "id",
-      sourceName = "source",
-      s3key = "s3://bucket/key",
-      reindexShard = shardName,
-      reindexVersion = currentVersion)
-
     val inShardRecords = List(
-      exampleRecord.copy(sourceId = "id1"),
-      exampleRecord.copy(sourceId = "id2")
+      exampleRecord.copy(id = "id1"),
+      exampleRecord.copy(id = "id2")
     )
 
     val notInShardRecords = List(
-      exampleRecord
-        .copy(sourceId = "id3", reindexShard = "not_the_same_shard"),
-      exampleRecord.copy(sourceId = "id4", reindexShard = "not_the_same_shard")
+      exampleRecord.copy(id = "id3", reindexShard = "not_the_same_shard"),
+      exampleRecord.copy(id = "id4", reindexShard = "not_the_same_shard")
     )
 
     val reindexJob = ReindexJob(
@@ -133,8 +112,7 @@ class ReindexServiceTest
 
     val recordList = inShardRecords ++ notInShardRecords
 
-    recordList.foreach(record =>
-      Scanamo.put(dynamoDbClient)(tableName)(record)(enrichedDynamoFormat))
+    recordList.foreach(record => Scanamo.put(dynamoDbClient)(tableName)(record))
 
     val expectedUpdatedRecords = inShardRecords.map(
       record =>
@@ -152,11 +130,11 @@ class ReindexServiceTest
       )
 
     whenReady(reindexService.runReindex(reindexJob)) { _ =>
-      val hybridRecords =
-        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+      val testRecords =
+        Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
 
-      hybridRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
-      hybridRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+      testRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
+      testRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
     }
   }
 
