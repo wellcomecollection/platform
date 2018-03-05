@@ -1,12 +1,8 @@
 package uk.ac.wellcome.platform.api.models
 
-import scala.util.{Failure, Success}
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
-import com.sksamuel.elastic4s.http.search.SearchHit
-import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.{IdentifiedWork, Item, SourceIdentifier}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.IdentifiedWork
 
 @JsonIgnoreProperties(Array("visible"))
 @ApiModel(
@@ -114,25 +110,4 @@ case object DisplayWork {
 
   def apply(work: IdentifiedWork): DisplayWork =
     DisplayWork(work = work, includes = WorksIncludes())
-
-  def apply(hit: SearchHit): DisplayWork =
-    apply(hit, includes = WorksIncludes())
-
-  def apply(hit: SearchHit, includes: WorksIncludes): DisplayWork = {
-    jsonToDisplayWork(hit.sourceAsString, includes)
-  }
-
-  def apply(got: GetResponse, includes: WorksIncludes): DisplayWork = {
-    jsonToDisplayWork(got.sourceAsString, includes)
-  }
-
-  private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    fromJson[IdentifiedWork](document) match {
-      case Success(work) => DisplayWork(work = work, includes = includes)
-      case Failure(e) =>
-        throw new RuntimeException(
-          s"Unable to parse JSON as Work ($e): $document"
-        )
-    }
-  }
 }
