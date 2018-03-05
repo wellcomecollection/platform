@@ -27,7 +27,7 @@ trait SierraPhysicalDescription extends MarcUtils {
     val matchingSubfields = getMatchingSubfields(
       bibData = bibData,
       marcTag = "300",
-      marcSubfieldTag = "c"
+      marcSubfieldTag = "b"
     )
 
     if (matchingSubfields.isEmpty) {

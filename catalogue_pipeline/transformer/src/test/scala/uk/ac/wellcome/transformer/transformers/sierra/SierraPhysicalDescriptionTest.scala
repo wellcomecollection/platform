@@ -11,14 +11,14 @@ class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
 
   val transformer = new SierraPhysicalDescription {}
 
-  it("gets no physical if there is no MARC field 300 with subfield $c") {
+  it("gets no physical if there is no MARC field 300 with subfield $b") {
     val bibData = SierraBibData(
       id = "pd1000001",
       title = Some("Quick!  The quails are quadrupling."),
       varFields = List()
     )
 
-    transformer.getPhysicalDescription(bibData = bibData).get shouldBe None
+    transformer.getPhysicalDescription(bibData = bibData) shouldBe None
   }
 
   it("extracts physical description from MARC field 300 subfield $b") {
