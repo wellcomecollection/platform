@@ -61,7 +61,7 @@ class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
     val expectedPhysicalDescription =
       s"$physicalDescription1\n\n$physicalDescription2"
 
-    varFields = List(
+    val varFields = List(
       VarField(
         fieldTag = "?",
         marcTag = "300",
