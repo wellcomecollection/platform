@@ -16,10 +16,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   // TRIVIA: This is an extract from Marco Polo's diaries, in which he
   // mistakes a rhinoceros for a unicorn.
-  val physicalDescription =
-    """
-    |Hair like that of a buffalo, feet like those of an elephant, and a horn in
-    |the middle of the forehead, which is black and very thick.""".stripMargin
+  val physicalDescription = "Hair like that of a buffalo, feet like those of an elephant"
 
   // TRIVIA: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
   // for steam locomotives, reaching 126 mph.
