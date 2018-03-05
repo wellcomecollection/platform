@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import uk.ac.wellcome.transformer.source.SierraBibData
 
-trait SierraPublicationDate extends MarcUtils {
+trait SierraPhysicalDescription extends MarcUtils {
 
   // Populate wwork:physicalDescription.
   //
