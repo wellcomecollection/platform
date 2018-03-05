@@ -36,6 +36,8 @@ class ElasticsearchServiceTest
       title = "Circling a Cheetah"
     )
 
+    insertIntoElasticSearch(work1, work2, work3)
+
     assertSliceIsCorrect(
       limit = 3,
       from = 0,
