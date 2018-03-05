@@ -412,7 +412,7 @@ class SierraTransformableTransformerTest
         |       "ind2": " ",
         |       "subfields": [
         |         {
-        |           "tag": "b",
+        |           "tag": "a",
         |           "content": "$extent"
         |         }
         |       ]
