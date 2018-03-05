@@ -18,7 +18,9 @@ case class DisplayResultList(
 }
 
 case object DisplayResultList {
-  def apply(resultList: ResultList, pageSize: Int, includes: WorksIncludes): DisplayResultList =
+  def apply(resultList: ResultList,
+            pageSize: Int,
+            includes: WorksIncludes): DisplayResultList =
     DisplayResultList(
       results = resultList.results.map { DisplayWork(_, includes) }.toArray,
       pageSize = pageSize,
