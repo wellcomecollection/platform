@@ -52,7 +52,8 @@ jobs:
     # (not under active development)
     # - env: TASK=nginx-build
 
-    - env: TASK=sbt-common-test
+    - stage: test
+      env: TASK=sbt-common-test
 
     # Catalogue pipeline stack
     - env: TASK=transformer-test
@@ -67,8 +68,7 @@ jobs:
     - env: TASK=reindex_shard_generator-test
 
     # Sierra adapter stack.
-    - stage: test
-      env: TASK=sierra_common-test
+    - env: TASK=sierra_common-test
     - env: TASK=sierra_window_generator-test
     - env: TASK=sierra_reader-test
     - env: TASK=sierra_items_to_dynamo-test
