@@ -1,15 +1,28 @@
 FROM ubuntu:16.04
 
+
+# Install base Python and uWSGI (web server) dependencies
 RUN apt-get update && \
-    apt-get install --yes python uwsgi uwsgi-plugin-python && \
+    apt-get install --yes python3 python3-pip uwsgi uwsgi-plugin-python3 && \
     apt-get clean
 
-ENV LORIS_COMMIT a349d24b63bf1ae1af97e376304c4b1acc983639
+RUN pip3 install --upgrade pip
+
+# Imaging dependencies.  These libraries don't change much between versions
+# of Loris, so we can cache their installation.
+RUN apt-get update && \
+    apt-get install --yes libffi-dev libjpeg-turbo8-dev libfreetype6-dev zlib1g-dev \
+        liblcms2-dev liblcms2-utils libssl-dev libtiff5-dev libwebp-dev && \
+    apt-get clean
+
+
 ENV LORIS_GITHUB_USER loris-imageserver
+ENV LORIS_COMMIT 841383810cdd62ae591f532fd89330bb0be06565
 
 COPY requirements.txt /
 COPY install_loris.sh /install_loris.sh
 RUN /install_loris.sh
+
 
 # This is an sRGB color profile downloaded from
 # http://www.color.org/srgbprofiles.xalter
