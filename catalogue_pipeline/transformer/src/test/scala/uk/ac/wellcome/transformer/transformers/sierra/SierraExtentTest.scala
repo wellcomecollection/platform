@@ -11,7 +11,7 @@ class SierraExtentTest extends FunSpec with Matchers {
 
   val transformer = new SierraExtent {}
 
-  it("gets no extent if there is no MARC field 300 with subfield $a") {
+  it("gets no extent if there is no MARC field 300 with subfield $$a") {
     val bibData = SierraBibData(
       id = "e1000001",
       title = Some("Egad!  An egg exits eastwards."),
@@ -21,7 +21,7 @@ class SierraExtentTest extends FunSpec with Matchers {
     transformer.getExtent(bibData = bibData) shouldBe None
   }
 
-  it("extracts extent from MARC field 300 subfield $a") {
+  it("extracts extent from MARC field 300 subfield $$a") {
     val extent = "Eleven elephant etchings"
 
     val varFields = List(
@@ -52,7 +52,7 @@ class SierraExtentTest extends FunSpec with Matchers {
     transformer.getExtent(bibData = bibData) shouldBe Some(extent)
   }
 
-  it("extracts an extent where there are multiple MARC field 300 $a") {
+  it("extracts an extent where there are multiple MARC field 300 $$a") {
     // This is based on the "repeatable $a" example in the MARC spec.
     // https://www.loc.gov/marc/bibliographic/bd300.html
     val extent1 = "diary"
