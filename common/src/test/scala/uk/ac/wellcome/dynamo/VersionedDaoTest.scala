@@ -1,11 +1,7 @@
 package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  ConditionalCheckFailedException,
-  GetItemRequest,
-  PutItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, GetItemRequest, PutItemRequest, UpdateItemRequest}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
@@ -19,6 +15,7 @@ import uk.ac.wellcome.models.{Id, Versioned}
 import shapeless.syntax.singleton._
 import shapeless.record._
 import shapeless.{Id => ShapelessId, _}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestVersioned(id: String, data: String, version: Int)
@@ -168,7 +165,8 @@ class VersionedDaoTest
       Scanamo.put(dynamoDbClient)(tableName)(newerTestVersioned)
 
       whenReady(versionedDao.updateRecord(testVersioned).failed) { ex =>
-        ex shouldBe a[ConditionalCheckFailedException]
+        ex shouldBe a[RuntimeException]
+        ex.getMessage should include("ConditionalCheckFailedException")
 
         Scanamo
           .get[TestVersioned](dynamoDbClient)(tableName)(
@@ -247,7 +245,8 @@ class VersionedDaoTest
     it("returns a failed future if the request to dynamo fails") {
       val dynamoDbClient = mock[AmazonDynamoDB]
       val expectedException = new RuntimeException("AAAAAARGH!")
-      when(dynamoDbClient.putItem(any[PutItemRequest]))
+
+      when(dynamoDbClient.updateItem(any[UpdateItemRequest]))
         .thenThrow(expectedException)
 
       val failingDao =

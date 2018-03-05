@@ -138,11 +138,13 @@ class VersionedDao @Inject()(
 
     updateBuilder(record).map { ops =>
       Scanamo.exec(dynamoDbClient)(ops) match {
-        case Left(err) =>
-          //warn(s"Failed to updating Dynamo record: $id", err)
+        case Left(scanamoError) => {
+          val exception = new RuntimeException(scanamoError.toString)
 
-          //throw err
-          ()
+          warn(s"Failed to updating Dynamo record: $id", exception)
+
+          throw exception
+        }
         case Right(_) => {
           info(s"Successfully updated Dynamo record: $id")
         }
