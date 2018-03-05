@@ -11,7 +11,7 @@ trait MarcUtils {
       .filter { _.marcTag == Some(marcTag) }
       .map { _.subfields }
       .flatten
-      .filter { marcSubfields.contains(_.tag) }
+      .filter { subfield: MarcSubfield => marcSubfieldTags.contains(subfield.tag) }
   }
 
   def getMatchingSubfields(bibData: SierraBibData,
