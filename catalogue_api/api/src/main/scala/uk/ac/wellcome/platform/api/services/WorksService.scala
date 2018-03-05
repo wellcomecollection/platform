@@ -11,11 +11,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-case class ResultList(
-  results: List[IdentifiedWork],
-  totalResults: Int
-)
-
 @Singleton
 class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
