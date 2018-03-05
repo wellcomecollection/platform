@@ -30,7 +30,8 @@ case class DisplayWork(
     String] = None,
   @ApiModelProperty(
     dataType = "String",
-    value = "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
+    value =
+      "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
   ) extent: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
