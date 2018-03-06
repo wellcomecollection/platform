@@ -1,31 +1,16 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
-import io.circe.generic.extras.semiauto.deriveDecoder
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.storage.VersionedHybridStoreLocal
+import uk.ac.wellcome.sierra_adapter.test_utils.SourceDataVHSLocal
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraItemMergerTestUtil
-    extends Matchers
-    with Eventually
-    with ScalaFutures
-    with MockitoSugar
-    with ExtendedPatience
-    with SQSLocal
-    with VersionedHybridStoreLocal[SierraTransformable] { this: Suite =>
-
-  val queueUrl = createQueueAndReturnUrl("test_item_merger")
-
-  override lazy val tableName = "sierra-item-merger-feature-test-table"
-  override lazy val bucketName = "sierra-item-merger-feature-test-bucket"
-
-  lazy implicit val decoder = deriveDecoder[SierraTransformable]
+    extends ExtendedPatience
+    with SourceDataVHSLocal { this: Suite =>
 
   private def itemRecordString(id: String,
                                updatedDate: String,
@@ -78,16 +63,7 @@ trait SierraItemMergerTestUtil
       modifiedDate = updatedDate
     )
 
-  protected def sendItemRecordToSQS(record: SierraItemRecord) = {
-    val messageBody = toJson(record).get
+  protected def sendItemRecordToSQS(record: SierraItemRecord) =
+    sendMessageToSQS(toJson(record).get)
 
-    val message = SQSMessage(
-      subject = None,
-      body = messageBody,
-      topic = "topic",
-      messageType = "messageType",
-      timestamp = "2001-01-01T01:01:01Z"
-    )
-    sqsClient.sendMessage(queueUrl, toJson(message).get)
-  }
 }

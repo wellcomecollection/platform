@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import com.gu.scanamo.DynamoFormat
+import io.circe.{Decoder, Encoder}
 import org.scalatest.FunSpec
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
@@ -8,24 +9,22 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.s3.{
-  KeyPrefixGenerator,
-  S3ObjectStore,
-  SourcedKeyPrefixGenerator
-}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, SourcedKeyPrefixGenerator}
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.mockito.Mockito._
 import org.mockito.Matchers._
-import uk.ac.wellcome.models.Sourced
+import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
+    with MockitoSugar
     with SierraItemMergerTestUtil {
 
-  override lazy val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
+  val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
     new KeyPrefixGenerator[Sourced] {
       override def generate(obj: Sourced): String = "/"
     }
@@ -62,10 +61,7 @@ class SierraItemMergerUpdaterServiceTest
             newItemRecord.id -> newItemRecord
           ))
 
-      val futureRecord1 = hybridStore.getRecord(expectedSierraTransformable.id)
-      whenReady(futureRecord1) { record =>
-        record.get shouldBe expectedSierraTransformable
-      }
+      assertStored(expectedSierraTransformable)
     }
   }
 
@@ -107,8 +103,9 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f1 =
-      hybridStore.updateRecord(oldRecord.sourceName, oldRecord.sourceId)(
-        oldRecord)(identity)
+      hybridStore.updateRecord(oldRecord.id)(
+        oldRecord
+      )(identity)(SourceMetadata(oldRecord.sourceName))
 
     val anotherItem = sierraItemRecord(
       id = "i999",
@@ -129,8 +126,10 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f2 =
-      hybridStore.updateRecord(newRecord.sourceName, newRecord.sourceId)(
-        newRecord)(identity)
+      hybridStore.updateRecord(newRecord.id)(
+        newRecord
+      )(identity)(SourceMetadata(newRecord.sourceName))
+
     whenReady(Future.sequence(List(f1, f2))) { _ =>
       whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
         val expectedNewSierraTransformable =
@@ -140,11 +139,8 @@ class SierraItemMergerUpdaterServiceTest
             itemData = Map(itemRecord.id -> itemRecord)
           )
 
-        val futureRecord1 =
-          hybridStore.getRecord(expectedNewSierraTransformable.id)
-        whenReady(futureRecord1) { record =>
-          record.get shouldBe expectedNewSierraTransformable
-        }
+
+        assertStored(expectedNewSierraTransformable)
 
         val expectedUpdatedSierraTransformable = oldRecord.copy(
           itemData = Map(
@@ -153,17 +149,8 @@ class SierraItemMergerUpdaterServiceTest
           )
         )
 
-        val futureRecord2 =
-          hybridStore.getRecord(expectedUpdatedSierraTransformable.id)
-        whenReady(futureRecord2) { record =>
-          record.get shouldBe expectedUpdatedSierraTransformable
-        }
-
-        val futureRecord3 =
-          hybridStore.getRecord(newRecord.id)
-        whenReady(futureRecord3) { record =>
-          record.get shouldBe newRecord
-        }
+        assertStored(expectedUpdatedSierraTransformable)
+        assertStored(newRecord)
       }
     }
   }
@@ -182,9 +169,9 @@ class SierraItemMergerUpdaterServiceTest
         ))
     )
 
-    val f1 =
-      hybridStore.updateRecord(oldRecord.sourceName, oldRecord.sourceId)(
-        oldRecord)(identity)
+    val f1 = hybridStore.updateRecord(oldRecord.id)(
+      oldRecord
+    )(identity)(SourceMetadata(oldRecord.sourceName))
 
     whenReady(f1) { _ =>
       val newItemRecord = sierraItemRecord(
@@ -198,11 +185,7 @@ class SierraItemMergerUpdaterServiceTest
           itemData = Map(id -> newItemRecord)
         )
 
-        val futureRecord3 =
-          hybridStore.getRecord(expectedSierraRecord.id)
-        whenReady(futureRecord3) { record =>
-          record.get shouldBe expectedSierraRecord
-        }
+        assertStored(expectedSierraRecord)
       }
     }
   }
@@ -232,17 +215,16 @@ class SierraItemMergerUpdaterServiceTest
       sourceId = bibId2
     )
 
-    val f1 =
-      hybridStore.updateRecord(
-        sierraTransformable1.sourceName,
-        sierraTransformable1.sourceId)(sierraTransformable1)(_ =>
-        sierraTransformable1)
-    val f2 =
-      hybridStore.updateRecord(
-        sierraTransformable2.sourceName,
-        sierraTransformable2.sourceId)(sierraTransformable2)(identity)
+    val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
+      sierraTransformable1
+    )(_ => sierraTransformable1)(SourceMetadata(sierraTransformable1.sourceName))
+
+    val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
+      sierraTransformable2
+    )(identity)(SourceMetadata(sierraTransformable2.sourceName))
 
     val eventualUnits = Future.sequence(List(f1, f2))
+
     val unlinkItemRecord = itemRecord.copy(
       bibIds = List(bibId2),
       unlinkedBibIds = List(bibId1),
@@ -267,17 +249,8 @@ class SierraItemMergerUpdaterServiceTest
         itemData = expectedItemData
       )
 
-      val futureRecord1 =
-        hybridStore.getRecord(expectedSierraRecord1.id)
-      whenReady(futureRecord1) { record =>
-        record.get shouldBe expectedSierraRecord1
-      }
-
-      val futureRecord2 =
-        hybridStore.getRecord(expectedSierraRecord2.id)
-      whenReady(futureRecord2) { record =>
-        record.get shouldBe expectedSierraRecord2
-      }
+      assertStored(expectedSierraRecord1)
+      assertStored(expectedSierraRecord2)
     }
   }
 
@@ -307,15 +280,13 @@ class SierraItemMergerUpdaterServiceTest
       itemData = itemData
     )
 
-    val f1 =
-      hybridStore.updateRecord(
-        sierraTransformable1.sourceName,
-        sierraTransformable1.sourceId)(sierraTransformable1)(_ =>
-        sierraTransformable1)
-    val f2 =
-      hybridStore.updateRecord(
-        sierraTransformable2.sourceName,
-        sierraTransformable2.sourceId)(sierraTransformable2)(identity)
+    val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
+      sierraTransformable1
+    )(_ => sierraTransformable1)(SourceMetadata(sierraTransformable1.sourceName))
+
+    val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
+      sierraTransformable2
+    )(identity)(SourceMetadata(sierraTransformable2.sourceName))
 
     val unlinkItemRecord = itemRecord.copy(
       bibIds = List(bibId2),
@@ -328,6 +299,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(Future.sequence(List(f1, f2))) { _ =>
+
       whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
         val expectedSierraRecord1 = sierraTransformable1.copy(
           itemData = Map.empty
@@ -339,17 +311,13 @@ class SierraItemMergerUpdaterServiceTest
           itemData = expectedItemData
         )
 
-        val futureRecord1 =
-          hybridStore.getRecord(expectedSierraRecord1.id)
-        whenReady(futureRecord1) { record =>
-          record.get shouldBe expectedSierraRecord1
-        }
+        assertStored(expectedSierraRecord1)
       }
     }
   }
 
   it(
-    "does not unlink an item if it receives an out of date item unlink update") {
+    "does not unlink an item if it receives an out of date unlink update") {
     val itemId = "i3000003"
 
     val bibId1 = "b9000001"
@@ -374,15 +342,13 @@ class SierraItemMergerUpdaterServiceTest
       sourceId = bibId2
     )
 
-    val f1 =
-      hybridStore.updateRecord(
-        sierraTransformable1.sourceName,
-        sierraTransformable1.sourceId)(sierraTransformable1)(_ =>
-        sierraTransformable1)
-    val f2 =
-      hybridStore.updateRecord(
-        sierraTransformable2.sourceName,
-        sierraTransformable2.sourceId)(sierraTransformable2)(identity)
+    val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
+      sierraTransformable1
+    )(_ => sierraTransformable1)(SourceMetadata(sierraTransformable1.sourceName))
+
+    val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
+      sierraTransformable2
+    )(identity)(SourceMetadata(sierraTransformable2.sourceName))
 
     val unlinkItemRecord = itemRecord.copy(
       bibIds = List(bibId2),
@@ -399,7 +365,9 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(Future.sequence(List(f1, f2))) { _ =>
+
       whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+
         // In this situation the item will _not_ be unlinked from the original
         // record but will be linked to the new record (as this is the first
         // time we've seen the link so it is valid for that bib.
@@ -408,17 +376,8 @@ class SierraItemMergerUpdaterServiceTest
           itemData = expectedItemData
         )
 
-        val futureRecord1 =
-          hybridStore.getRecord(expectedSierraRecord1.id)
-        whenReady(futureRecord1) { record =>
-          record.get shouldBe expectedSierraRecord1
-        }
-
-        val futureRecord2 =
-          hybridStore.getRecord(expectedSierraRecord1.id)
-        whenReady(futureRecord2) { record =>
-          record.get shouldBe expectedSierraRecord1
-        }
+        assertStored(expectedSierraRecord1)
+        assertStored(expectedSierraRecord2)
       }
     }
   }
@@ -437,9 +396,9 @@ class SierraItemMergerUpdaterServiceTest
         ))
     )
 
-    val f1 =
-      hybridStore.updateRecord(sierraRecord.sourceName, sierraRecord.sourceId)(
-        sierraRecord)(identity)
+    val f1 = hybridStore.updateRecord(sierraRecord.id)(
+        sierraRecord
+    )(identity)(SourceMetadata(sierraRecord.sourceName))
 
     val oldItemRecord = sierraItemRecord(
       id = id,
@@ -448,12 +407,10 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(f1) { _ =>
+
       whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
-        val futureRecord1 =
-          hybridStore.getRecord(sierraRecord.id)
-        whenReady(futureRecord1) { record =>
-          record.get shouldBe sierraRecord
-        }
+
+        assertStored(sierraRecord)
       }
     }
   }
@@ -465,9 +422,9 @@ class SierraItemMergerUpdaterServiceTest
       sourceId = bibId
     )
 
-    val f1 =
-      hybridStore.updateRecord(sierraRecord.sourceName, sierraRecord.sourceId)(
-        sierraRecord)(identity)
+    val f1 = hybridStore.updateRecord(sierraRecord.id)(
+        sierraRecord
+    )(identity)(SourceMetadata(sierraRecord.sourceName))
 
     val itemRecord = sierraItemRecord(
       id = "i7000007",
@@ -484,11 +441,7 @@ class SierraItemMergerUpdaterServiceTest
           )
         )
 
-        val futureRecord1 =
-          hybridStore.getRecord(sierraRecord.id)
-        whenReady(futureRecord1) { record =>
-          record.get shouldBe expectedSierraRecord
-        }
+        assertStored(expectedSierraRecord)
       }
     }
   }
@@ -496,7 +449,6 @@ class SierraItemMergerUpdaterServiceTest
   it("returns a failed future if putting an item fails") {
 
     val failingVersionedDao = mock[VersionedDao]
-
     val expectedException = new RuntimeException("BOOOM!")
 
     when(
