@@ -57,7 +57,6 @@ class SierraReaderWorkerServiceTest
   )(testWith: TestWith[FixtureParams, Assertion]) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueue { queueUrl =>
-
         val worker = new SierraReaderWorkerService(
           reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
           s3client = s3Client,
@@ -90,7 +89,6 @@ class SierraReaderWorkerServiceTest
       batchSize = 10,
       resourceType = SierraResourceTypes.bibs
     ) { fixtures =>
-
       val message =
         """
           |{
@@ -100,11 +98,17 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
       sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
 
-      val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
-        s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+      val pageNames = List("0000.json", "0001.json", "0002.json").map {
+        label =>
+          s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
       } ++ List(
         "windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
@@ -130,7 +134,6 @@ class SierraReaderWorkerServiceTest
       batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
-
       val message =
         """
           |{
@@ -140,7 +143,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
       sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
@@ -171,7 +179,6 @@ class SierraReaderWorkerServiceTest
       batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
-
       val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
 
       // First we pre-populate S3 with files as if they'd come from a prior run of the reader.
@@ -200,7 +207,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
       sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
@@ -232,7 +244,6 @@ class SierraReaderWorkerServiceTest
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
-
       val message =
         """
           |{
@@ -241,7 +252,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
       whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
@@ -253,7 +269,6 @@ class SierraReaderWorkerServiceTest
   it(
     "does not return a GracefulFailureException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
-
       val message =
         """
           |{
@@ -263,7 +278,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
 
       whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldNot be(a[GracefulFailureException])
