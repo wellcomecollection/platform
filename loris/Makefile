@@ -16,15 +16,11 @@ $(val $(call stack_setup))
 
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
 # with a newer version of pip-tools.
-$(LORIS)/loris/requirements.txt: $(LORIS)/requirements.in
+$(ROOT)/loris/loris/requirements.txt: $(ROOT)/loris/loris/requirements.in
 	docker run --rm \
-		-v $(LORIS):/data \
+		--volume $(ROOT)/loris/loris:/data \
 		wellcome/build_tooling:latest \
 		pip-compile
 
 loris-run: loris-build
-	$(ROOT)/docker_run.py --aws -- \
-		--publish 8888:8888 \
-		--env INFRA_BUCKET=$(INFRA_BUCKET) \
-		--env CONFIG_KEY=config/prod/loris.ini \
-		loris
+	$(ROOT)/docker_run.py -- --publish 8888:8888 loris

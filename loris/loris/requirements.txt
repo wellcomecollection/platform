@@ -12,12 +12,14 @@ chardet==3.0.4            # via requests
 configobj==5.0.0
 cryptography==2.1
 idna==2.6                 # via cryptography, requests
+monotonic==1.4            # via tenacity
 netaddr==0.7.19
 olefile==0.44             # via pillow
 pillow==4.3.0
 pycparser==2.18           # via cffi
 pyjwt==1.5.3
 requests==2.18.4
-six==1.11.0               # via cryptography
+six==1.11.0               # via cryptography, tenacity
+tenacity==4.9.0
 urllib3==1.22             # via requests
 werkzeug==0.12.2
