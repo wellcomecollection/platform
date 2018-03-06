@@ -158,7 +158,7 @@ class VersionedHybridStoreTest
     }
   }
 
-  it("define a type that will be stored and extracted alongside HybridRecord") {
+  it("can store additional metadata alongside HybridRecord") {
     case class ExampleRecord(
       id: String,
       content: String
