@@ -9,7 +9,11 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, SourcedKeyPrefixGenerator}
+import uk.ac.wellcome.s3.{
+  KeyPrefixGenerator,
+  S3ObjectStore,
+  SourcedKeyPrefixGenerator
+}
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 
 import scala.concurrent.{Await, Future}
@@ -139,7 +143,6 @@ class SierraItemMergerUpdaterServiceTest
             itemData = Map(itemRecord.id -> itemRecord)
           )
 
-
         assertStored(expectedNewSierraTransformable)
 
         val expectedUpdatedSierraTransformable = oldRecord.copy(
@@ -217,7 +220,8 @@ class SierraItemMergerUpdaterServiceTest
 
     val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
       sierraTransformable1
-    )(_ => sierraTransformable1)(SourceMetadata(sierraTransformable1.sourceName))
+    )(_ => sierraTransformable1)(
+      SourceMetadata(sierraTransformable1.sourceName))
 
     val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
       sierraTransformable2
@@ -282,7 +286,8 @@ class SierraItemMergerUpdaterServiceTest
 
     val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
       sierraTransformable1
-    )(_ => sierraTransformable1)(SourceMetadata(sierraTransformable1.sourceName))
+    )(_ => sierraTransformable1)(
+      SourceMetadata(sierraTransformable1.sourceName))
 
     val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
       sierraTransformable2
@@ -299,7 +304,6 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(Future.sequence(List(f1, f2))) { _ =>
-
       whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
         val expectedSierraRecord1 = sierraTransformable1.copy(
           itemData = Map.empty
@@ -316,8 +320,7 @@ class SierraItemMergerUpdaterServiceTest
     }
   }
 
-  it(
-    "does not unlink an item if it receives an out of date unlink update") {
+  it("does not unlink an item if it receives an out of date unlink update") {
     val itemId = "i3000003"
 
     val bibId1 = "b9000001"
@@ -344,7 +347,8 @@ class SierraItemMergerUpdaterServiceTest
 
     val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
       sierraTransformable1
-    )(_ => sierraTransformable1)(SourceMetadata(sierraTransformable1.sourceName))
+    )(_ => sierraTransformable1)(
+      SourceMetadata(sierraTransformable1.sourceName))
 
     val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
       sierraTransformable2
@@ -365,9 +369,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(Future.sequence(List(f1, f2))) { _ =>
-
       whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
-
         // In this situation the item will _not_ be unlinked from the original
         // record but will be linked to the new record (as this is the first
         // time we've seen the link so it is valid for that bib.
@@ -397,7 +399,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f1 = hybridStore.updateRecord(sierraRecord.id)(
-        sierraRecord
+      sierraRecord
     )(identity)(SourceMetadata(sierraRecord.sourceName))
 
     val oldItemRecord = sierraItemRecord(
@@ -407,9 +409,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     whenReady(f1) { _ =>
-
       whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
-
         assertStored(sierraRecord)
       }
     }
@@ -423,7 +423,7 @@ class SierraItemMergerUpdaterServiceTest
     )
 
     val f1 = hybridStore.updateRecord(sierraRecord.id)(
-        sierraRecord
+      sierraRecord
     )(identity)(SourceMetadata(sierraRecord.sourceName))
 
     val itemRecord = sierraItemRecord(

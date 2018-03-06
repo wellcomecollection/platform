@@ -7,7 +7,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  CompletedReindexJob,
+  ReindexJob,
+  ReindexRecord
+}
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -19,7 +23,7 @@ case class TestRecord(
   reindexShard: String,
   reindexVersion: Int
 ) extends Versioned
-  with Id
+    with Id
 
 class ReindexerFeatureTest
     extends FunSpec
@@ -70,13 +74,14 @@ class ReindexerFeatureTest
 
     testRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_))
 
-    val expectedRecords = testRecords.map((r: TestRecord) =>
+    val expectedRecords = testRecords.map(
+      (r: TestRecord) =>
         ReindexRecord(
           id = r.id,
           version = r.version + 1,
           reindexShard = shardName,
           reindexVersion = desiredVersion
-        ))
+      ))
 
     val reindexJob = ReindexJob(
       shardId = shardName,
@@ -84,7 +89,11 @@ class ReindexerFeatureTest
     )
 
     val sqsMessage = SQSMessage(
-      None, toJson(reindexJob).get, "topic", "message", "now"
+      None,
+      toJson(reindexJob).get,
+      "topic",
+      "message",
+      "now"
     )
 
     sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)

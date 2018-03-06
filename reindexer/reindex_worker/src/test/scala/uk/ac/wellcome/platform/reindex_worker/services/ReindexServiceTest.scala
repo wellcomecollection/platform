@@ -112,7 +112,8 @@ class ReindexServiceTest
 
     val recordList = inShardRecords ++ notInShardRecords
 
-    recordList.foreach(record => Scanamo.put(dynamoDbClient)(tableName)(record))
+    recordList.foreach(record =>
+      Scanamo.put(dynamoDbClient)(tableName)(record))
 
     val expectedUpdatedRecords = inShardRecords.map(
       record =>

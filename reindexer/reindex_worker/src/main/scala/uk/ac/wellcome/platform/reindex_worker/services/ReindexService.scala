@@ -13,12 +13,14 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  ReindexJob,
+  ReindexRecord
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
-
 
 class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
                                metricsSender: MetricsSender,
@@ -49,10 +51,10 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
         )
       }
 
-    val futureOutdatedRecords: Future[List[ReindexRecord]] = futureResults.map {
-      results =>
+    val futureOutdatedRecords: Future[List[ReindexRecord]] =
+      futureResults.map { results =>
         results.map { extractRecord(_) }
-    }
+      }
 
     // Then we PUT all the records.  It might be more efficient to do a
     // bulk update, but this will do for now.

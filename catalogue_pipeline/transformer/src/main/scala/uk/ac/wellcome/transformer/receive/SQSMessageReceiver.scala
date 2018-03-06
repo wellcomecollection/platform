@@ -9,11 +9,21 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceMetadata, UnidentifiedWork, Work}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer, TransformableTransformer}
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  MiroTransformableTransformer,
+  SierraTransformableTransformer,
+  TransformableTransformer
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -34,7 +44,8 @@ class SQSMessageReceiver @Inject()(
       () => {
         val futurePublishAttempt = for {
           hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
-          sourceMetadata <- Future.fromTry(fromJson[SourceMetadata](message.body))
+          sourceMetadata <- Future.fromTry(
+            fromJson[SourceMetadata](message.body))
           transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
           cleanRecord <- Future.fromTry(
             transformTransformable(transformableRecord, hybridRecord.version))
@@ -53,9 +64,9 @@ class SQSMessageReceiver @Inject()(
   }
 
   private def getTransformable(
-                                hybridRecord: HybridRecord,
-                                sourceMetadata: SourceMetadata
-                              ) = {
+    hybridRecord: HybridRecord,
+    sourceMetadata: SourceMetadata
+  ) = {
     sourceMetadata.sourceName match {
       case "miro" =>
         S3ObjectStore.get[MiroTransformable](s3Client, bucketName)(
