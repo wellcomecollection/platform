@@ -26,4 +26,4 @@ class WellcomeTemplateHTTPResolver(TemplateHTTPResolver):
         retry=retry_if_exception_type(RequestException)
     )
     def copy_to_cache(self, ident):
-        super().copy_to_cache(self, ident)
+        return super().copy_to_cache(ident)
