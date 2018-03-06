@@ -9,7 +9,6 @@ import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
-import scala.annotation.Annotation
 import scala.concurrent.Future
 
 case class HybridRecord(
@@ -19,22 +18,21 @@ case class HybridRecord(
 ) extends Versioned
     with Id
 
-case class CopyToDynamo() extends Annotation
-
 class VersionedHybridStore[T <: Id] @Inject()(
   sourcedObjectStore: S3ObjectStore[T],
   versionedDao: VersionedDao
 ) {
 
+  case class EmptyCC()
   private case class VersionedHybridObject(
     hybridRecord: HybridRecord,
     s3Object: T
   )
 
-  def updateRecord[O](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
+  def updateRecord[O, B](id: String)(ifNotExisting: => T)(ifExisting: T => T)(metadata: B = EmptyCC())(
     implicit decoder: Decoder[T],
     encoder: Encoder[T],
-    enricher: HybridRecordEnricher.Aux[T, O],
+    enricher: HybridRecordEnricher.Aux[B, O],
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
@@ -51,8 +49,10 @@ class VersionedHybridStore[T <: Id] @Inject()(
             id,
             transformedS3Record,
             enricher.enrichedHybridRecordHList(
-              transformedS3Record,
-              hybridRecord.version))
+              id,
+              metadata,
+              hybridRecord.version)
+          )
         } else {
           Future.successful(())
         }
@@ -61,7 +61,8 @@ class VersionedHybridStore[T <: Id] @Inject()(
         putObject(
           id = id,
           ifNotExisting,
-          enricher.enrichedHybridRecordHList(ifNotExisting, 0))
+          enricher.enrichedHybridRecordHList(id, metadata, 0)
+        )
 
     }
   }
