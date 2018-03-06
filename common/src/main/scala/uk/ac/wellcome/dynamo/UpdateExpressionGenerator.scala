@@ -27,18 +27,12 @@ object UpdateExpressionGenerator {
   // Generates a UpdateExpression for an HList
   implicit def hlistExpressionGenerator[L <: HList, A, B <: HList, C <: HList](
     implicit remover: Remover.Aux[L, IdKey, (A, B)],
-    mapper: Mapper.Aux[toUpdateExpressions.type, B, C],
-    folder: LeftFolder.Aux[C,
-                           Option[UpdateExpression],
-                           combineUpdateExpressions.type,
-                           Option[UpdateExpression]]) =
+    folder: LeftFolder.Aux[B,Option[UpdateExpression],buildUpdateExpression.type,Option[UpdateExpression]]
+                                                                              ) =
     create { t: L =>
       {
         val recordAsHlist = t - 'id
-        val nonIdTaggedFields = recordAsHlist.map(toUpdateExpressions)
-
-        nonIdTaggedFields.foldLeft[Option[UpdateExpression]](None)(
-          combineUpdateExpressions)
+        recordAsHlist.foldLeft[Option[UpdateExpression]](None)(buildUpdateExpression)
       }
     }
 
@@ -50,26 +44,19 @@ object UpdateExpressionGenerator {
       updateExpressionGenerator.generateUpdateExpression(labelledGeneric.to(t))
   }
 
-  object toUpdateExpressions extends Poly1 {
-    implicit def some[K <: Symbol, V](implicit witness: Witness.Aux[K],
-                                      dynamoFormat: DynamoFormat[V])
-      : Case.Aux[FieldType[K, V], UpdateExpression] = {
+  // Creates an UpdateExpression out of a FieldType and adds it to the
+  // accumulating UpdateExpression
+  object buildUpdateExpression extends Poly2 {
+    implicit def fold[K <: Symbol,V](implicit witness: Witness.Aux[K],
+                           dynamoFormat: DynamoFormat[V]): Case.Aux[Option[UpdateExpression],
+      FieldType[K, V],
+      Option[UpdateExpression]] =
+      at[Option[UpdateExpression], FieldType[K, V]] {
+        (maybeUpdateExpression, fieldType) =>
 
-      at[FieldType[K, V]] { fieldtype =>
-        {
-          val fieldValue: V = fieldtype
-          set(witness.value -> fieldValue)
-        }
-      }
-    }
-  }
+          val fieldValue: V = fieldType
+          val partUpdate = set(witness.value -> fieldValue)
 
-  object combineUpdateExpressions extends Poly2 {
-    implicit def fold: Case.Aux[Option[UpdateExpression],
-                                UpdateExpression,
-                                Option[UpdateExpression]] =
-      at[Option[UpdateExpression], UpdateExpression] {
-        (maybeUpdateExpression, partUpdate) =>
           maybeUpdateExpression match {
             case Some(updateExpression) =>
               Some(updateExpression and partUpdate)
