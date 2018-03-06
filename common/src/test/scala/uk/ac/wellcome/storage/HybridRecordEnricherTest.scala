@@ -4,7 +4,6 @@ import org.scalatest.{FunSpec, Matchers}
 import shapeless.{the => sThe, _}
 import shapeless.syntax.singleton._
 
-
 class HybridRecordEnricherTest extends FunSpec with Matchers {
 
   case class Metadata(something: String)
@@ -19,8 +18,9 @@ class HybridRecordEnricherTest extends FunSpec with Matchers {
     val id = "1111"
     val version = 3
     val s3Key = "s3Key"
-    val hList = hybridRecordEnricher.enrichedHybridRecordHList(
-      id, metadata, version)(s3Key)
+    val hList =
+      hybridRecordEnricher.enrichedHybridRecordHList(id, metadata, version)(
+        s3Key)
 
     val expectedHList =
       ("id" ->> id) ::

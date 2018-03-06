@@ -29,7 +29,8 @@ class VersionedHybridStore[T <: Id] @Inject()(
     s3Object: T
   )
 
-  def updateRecord[O, B](id: String)(ifNotExisting: => T)(ifExisting: T => T)(metadata: B = EmptyCC())(
+  def updateRecord[O, B](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
+    metadata: B = EmptyCC())(
     implicit decoder: Decoder[T],
     encoder: Encoder[T],
     enricher: HybridRecordEnricher.Aux[B, O],
@@ -48,10 +49,8 @@ class VersionedHybridStore[T <: Id] @Inject()(
           putObject(
             id,
             transformedS3Record,
-            enricher.enrichedHybridRecordHList(
-              id,
-              metadata,
-              hybridRecord.version)
+            enricher
+              .enrichedHybridRecordHList(id, metadata, hybridRecord.version)
           )
         } else {
           Future.successful(())
