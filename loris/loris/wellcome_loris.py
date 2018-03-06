@@ -7,7 +7,7 @@ an upstream patch.
 
 """
 
-from loris.resolvers import TemplateHTTPResolver
+from loris.resolver import TemplateHTTPResolver
 from requests.exceptions import RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt
 
