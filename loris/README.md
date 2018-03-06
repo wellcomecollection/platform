@@ -21,15 +21,7 @@ Once you've changed these variables, the new version of Loris will be installed 
 Sometimes it can be convenient to test Loris locally, without pushing a new commit to GitHub -- e.g. for testing a code patch, or experimenting with config.
 You can run Loris locally with the following two commands:
 
-    make loris-build
-
-    docker run \
-        --volume $PLATFORM/terraform/services/config/templates/loris.ini.template:/opt/loris/etc/loris2.conf \
-        --volume $LORIS/loris:/usr/local/lib/python2.7/dist-packages/Loris-2.0.0-py2.7.egg/loris \
-        --volume $LORIS/www/icons:/var/www/loris2/icons \
-        --publish 8888:8888 loris
-
-where `$PLATFORM` is the root of the platform repo, and `$LORIS` is the root of a local checkout of the Loris repo.
+    make loris-run
 
 You'll then have a development version of Loris running at <http://localhost:8888>.
 
