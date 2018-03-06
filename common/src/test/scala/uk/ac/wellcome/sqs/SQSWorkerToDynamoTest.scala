@@ -7,62 +7,48 @@ import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import io.circe.Decoder
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
+import org.scalatest.Matchers
+import org.scalatest.fixture.FunSpec
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
-import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import org.scalatest.Outcome
 
 case class TestObject(foo: String)
 
 class SQSWorkerToDynamoTest
     extends FunSpec
-    with SQSLocal
     with MockitoSugar
-    with ScalaFutures
-    with BeforeAndAfterAll
     with Matchers
-    with Eventually {
+    with Eventually
+    with SqsFixtures {
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]
 
-  val actorSystem = ActorSystem()
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
   private val metricsSender: MetricsSender =
     new MetricsSender("namespace", mockCloudWatch, ActorSystem())
 
-  val testMessage = SQSMessage(
-    subject = Some("subject"),
-    messageType = "messageType",
-    topic = "topic",
-    body = """{ "foo": "bar"}""",
-    timestamp = "timestamp"
-  )
+  val testMessage = TestSqsMessage()
 
   val testMessageJson = toJson(testMessage).get
-
-  def newQueue(name: String) = {
-    val queueUrl = createQueueAndReturnUrl(name)
-    sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
-
-    queueUrl
-  }
 
   class TestWorker(queueUrl: String, system: ActorSystem)
       extends SQSWorkerToDynamo[TestObject](
         new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system,
         metricsSender) {
-    override lazy val poll = 1.second
+    override lazy val poll = 100 millisecond
 
     override implicit val decoder = Decoder[TestObject]
 
@@ -74,6 +60,7 @@ class SQSWorkerToDynamoTest
     }
 
     override def terminalFailureHook(): Unit = {
+      println(s"$this.terminalFailureHook()")
       terminalFailure = true
     }
   }
@@ -95,37 +82,54 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  it("processes messages") {
-    val queueUrl = newQueue("red")
 
-    val worker = new TestWorker(queueUrl, actorSystem)
+  object TestWorkerFixtures extends TestWith[OneArgTest, Outcome] with AkkaFixtures {
 
-    sqsClient.sendMessage(queueUrl, testMessageJson)
+    override def apply(test: OneArgTest) = {
+      withActorSystem { actorSystem =>
+        withLocalSqsQueue { queueUrl =>
+          sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
+
+          val worker: TestWorker = new TestWorker(queueUrl, actorSystem)
+          val terminalWorker: TerminalFailingTestWorker = new TerminalFailingTestWorker(queueUrl, actorSystem)
+          val conditionalCheckFailingWorker: ConditionalCheckFailingTestWorker = new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
+
+          try {
+            withFixture(test.toNoArgTest(FixtureParam(worker, terminalWorker, conditionalCheckFailingWorker, queueUrl)))
+          } finally {
+            worker.stop()
+            terminalWorker.stop()
+            conditionalCheckFailingWorker.stop()
+          }
+
+        }
+      }
+    }
+
+  }
+
+  case class FixtureParam(worker: TestWorker, terminalWorker: TerminalFailingTestWorker, conditionalCheckFailingWorker: ConditionalCheckFailingTestWorker, queueUrl: String)
+
+  override def withFixture(test: OneArgTest) = TestWorkerFixtures(test)
+
+  it("processes messages") { fixtures =>
+    sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
 
     eventually {
-      worker.processCalled shouldBe true
-      worker.terminalFailure shouldBe false
+      fixtures.worker.processCalled shouldBe true
+      fixtures.worker.terminalFailure shouldBe false
     }
   }
 
-  it("fails gracefully when receiving a ConditionalCheckFailedException") {
-    val queueUrl = newQueue("blue")
+  it("fails gracefully when receiving a ConditionalCheckFailedException") { fixtures =>
+    sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
 
-    val failingWorker =
-      new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
-
-    sqsClient.sendMessage(queueUrl, testMessageJson)
-
-    Thread.sleep(failingWorker.poll.toMillis + 2000)
-
-    failingWorker.terminalFailure shouldBe false
+    eventually {
+      fixtures.conditionalCheckFailingWorker.terminalFailure shouldBe false
+    }
   }
 
-  it("fails gracefully when a conversion fails") {
-    val queueUrl = newQueue("green")
-
-    val worker = new TestWorker(queueUrl, actorSystem)
-
+  it("fails gracefully when a conversion fails") { fixtures =>
     val invalidBodyTestMessage = SQSMessage(
       subject = Some("subject"),
       messageType = "messageType",
@@ -136,29 +140,20 @@ class SQSWorkerToDynamoTest
 
     val invalidBodyTestMessageJson = toJson(invalidBodyTestMessage).get
 
-    sqsClient.sendMessage(queueUrl, invalidBodyTestMessageJson)
-
-    Thread.sleep(worker.poll.toMillis + 2000)
-
-    worker.terminalFailure shouldBe false
-  }
-
-  it(
-    "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
-    val queueUrl = newQueue("purple")
-
-    val terminalFailingWorker =
-      new TerminalFailingTestWorker(queueUrl, actorSystem)
-
-    sqsClient.sendMessage(queueUrl, testMessageJson)
+    sqsClient.sendMessage(fixtures.queueUrl, invalidBodyTestMessageJson)
 
     eventually {
-      terminalFailingWorker.terminalFailure shouldBe true
+      fixtures.worker.terminalFailure shouldBe false
     }
   }
 
-  override def afterAll(): Unit = {
-    super.afterAll()
-    actorSystem.terminate()
+  it(
+    "fails terminally when receiving an exception other than ConditionalCheckFailedException") { fixtures =>
+    sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
+
+    eventually {
+      fixtures.terminalWorker.terminalFailure shouldBe true
+    }
   }
+
 }

@@ -15,12 +15,12 @@ import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import org.scalatest.Outcome
 
 class SQSWorkerTest
     extends FunSpec
     with MockitoSugar
     with Eventually
-    with AkkaFixtures
     with SqsFixtures {
 
   trait MockMetricSender {
@@ -34,9 +34,8 @@ class SQSWorkerTest
     )
   }
 
-  case class TestWorkerFixture()
-      extends TestWith[OneArgTest]
-      with MockMetricSender {
+
+  case class TestWorkerFixtures() extends TestWith[OneArgTest, Outcome] with MockMetricSender with AkkaFixtures {
 
     override def apply(test: OneArgTest) = {
       withActorSystem { actorSystem =>
@@ -54,9 +53,7 @@ class SQSWorkerTest
             }
 
           try {
-            withFixture(
-              test.toNoArgTest(
-                TestSQSWorkerParam(metricsSender, testWorker, queueUrl)))
+            withFixture(test.toNoArgTest(FixtureParam(metricsSender, testWorker, queueUrl)))
           } finally {
             testWorker.stop()
           }
@@ -67,13 +64,9 @@ class SQSWorkerTest
 
   }
 
-  case class TestSQSWorkerParam(metrics: MetricsSender,
-                                worker: SQSWorker,
-                                queueUrl: String)
+  case class FixtureParam(metrics: MetricsSender, worker: SQSWorker, queueUrl: String)
 
-  override type FixtureParam = TestSQSWorkerParam
-
-  override def withFixture(test: OneArgTest) = TestWorkerFixture()(test)
+  override def withFixture(test: OneArgTest) = TestWorkerFixtures()(test)
 
   def ValidSqsMessage() = SQSMessage(
     subject = Some("subject"),
