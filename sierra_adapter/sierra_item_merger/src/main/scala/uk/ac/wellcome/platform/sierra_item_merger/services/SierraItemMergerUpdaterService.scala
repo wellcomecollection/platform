@@ -45,14 +45,15 @@ class SierraItemMergerUpdaterService @Inject()(
 
     val unlinkUpdateFutures: Seq[Future[Unit]] =
       itemRecord.unlinkedBibIds.map { unlinkedBibId =>
-        versionedHybridStore.updateRecord(Sourced.id(sourceName, unlinkedBibId))(
+        versionedHybridStore.updateRecord(
+          Sourced.id(sourceName, unlinkedBibId))(
           throw GracefulFailureException(
             new RuntimeException(
               s"Missing Bib record to unlink: $unlinkedBibId")
           )
         )((record: SierraTransformable) =>
-          ItemUnlinker.unlinkItemRecord(record, itemRecord)
-        )(SourceMetadata(sourceName))
+          ItemUnlinker.unlinkItemRecord(record, itemRecord))(
+          SourceMetadata(sourceName))
       }
 
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures).map(_ => ())

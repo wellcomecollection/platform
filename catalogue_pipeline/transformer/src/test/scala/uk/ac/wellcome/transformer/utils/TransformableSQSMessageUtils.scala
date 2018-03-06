@@ -6,8 +6,16 @@ import org.scalatest.Suite
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.S3Local
 import uk.ac.wellcome.utils.JsonUtil

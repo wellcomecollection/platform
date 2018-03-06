@@ -6,22 +6,24 @@ import uk.ac.wellcome.models.Id
 
 trait HybridRecordEnricher[T] {
   type Out
-  def enrichedHybridRecordHList(id: String, metadata: T, version: Int)(s3key: String): Out
+  def enrichedHybridRecordHList(id: String, metadata: T, version: Int)(
+    s3key: String): Out
 }
 
 object HybridRecordEnricher {
   type Aux[A, R] = HybridRecordEnricher[A] { type Out = R }
   def apply[T](implicit enricher: HybridRecordEnricher[T]) = enricher
 
-  def create[T, O](f: (String, T, Int, String) => O) = new HybridRecordEnricher[T] {
-    type Out = O
-    override def enrichedHybridRecordHList(id: String, metadata: T, version: Int)(
-      s3key: String): Out = f(id, metadata, version, s3key)
-  }
+  def create[T, O](f: (String, T, Int, String) => O) =
+    new HybridRecordEnricher[T] {
+      type Out = O
+      override def enrichedHybridRecordHList(
+        id: String,
+        metadata: T,
+        version: Int)(s3key: String): Out = f(id, metadata, version, s3key)
+    }
 
-  implicit def enricher[T,
-                        R <: HList,
-                        F <: HList](
+  implicit def enricher[T, R <: HList, F <: HList](
     implicit tgen: LabelledGeneric.Aux[T, R],
     hybridGen: LabelledGeneric.Aux[HybridRecord, F],
     prepend: Prepend[F, R]) = create {

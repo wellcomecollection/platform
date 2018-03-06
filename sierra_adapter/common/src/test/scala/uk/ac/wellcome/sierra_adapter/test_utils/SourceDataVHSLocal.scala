@@ -12,7 +12,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 trait SourceDataVHSLocal
     extends ScalaFutures
     with Eventually
@@ -32,19 +31,21 @@ trait SourceDataVHSLocal
     val future = for {
       actualRecord <- hybridStore.getRecord(expectedRecord.id)
       hybridRecord <- versionedDao.getRecord[HybridRecord](expectedRecord.id)
-      sourceMetadata <- versionedDao.getRecord[SourceMetadata](expectedRecord.id)
+      sourceMetadata <- versionedDao.getRecord[SourceMetadata](
+        expectedRecord.id)
     } yield (actualRecord, hybridRecord, sourceMetadata)
 
-    whenReady(future) { case (
-      Some(actualRecord),
-      Some(hybridRecord),
-      Some(sourceMetadata)
-      ) => {
-      actualRecord shouldBe expectedRecord
-      hybridRecord.id shouldBe expectedRecord.id
-      sourceMetadata.sourceName shouldBe expectedRecord.sourceName
-    }
-    case _ => throw new RuntimeException("Failed to retrieve some records.")
+    whenReady(future) {
+      case (
+          Some(actualRecord),
+          Some(hybridRecord),
+          Some(sourceMetadata)
+          ) => {
+        actualRecord shouldBe expectedRecord
+        hybridRecord.id shouldBe expectedRecord.id
+        sourceMetadata.sourceName shouldBe expectedRecord.sourceName
+      }
+      case _ => throw new RuntimeException("Failed to retrieve some records.")
     }
   }
 

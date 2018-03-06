@@ -158,12 +158,11 @@ class VersionedHybridStoreTest
     }
   }
 
-
   it("define a type that will be stored and extracted alongside HybridRecord") {
     case class ExampleRecord(
-        id: String,
-        content: String
-      ) extends Id
+      id: String,
+      content: String
+    ) extends Id
 
     case class ExtraData(
       data: String,
@@ -187,8 +186,8 @@ class VersionedHybridStoreTest
     val future = hybridStore.updateRecord(record.id)(record)(identity)(data)
 
     whenReady(future) { _ =>
-      val maybeResult = Scanamo.get[ExtraData](dynamoDbClient)(
-        tableName)('id -> record.id)
+      val maybeResult =
+        Scanamo.get[ExtraData](dynamoDbClient)(tableName)('id -> record.id)
 
       maybeResult shouldBe defined
       maybeResult.get.isRight shouldBe true
