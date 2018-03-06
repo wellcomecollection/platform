@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage
 
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import org.scalatest.Suite
 import uk.ac.wellcome.dynamo.VersionedDao
@@ -16,6 +16,15 @@ trait VersionedHybridStoreLocal
     with JsonTestUtil
     with ExtendedPatience { this: Suite =>
 
+  override lazy val evidence: DynamoFormat[HybridRecord] =
+    DynamoFormat[HybridRecord]
+
+  val versionedDao = new VersionedDao(
+    dynamoDbClient = dynamoDbClient,
+    dynamoConfig = DynamoConfig(
+      table = tableName
+    ))
+
   def createHybridStore[T <: Id] = new VersionedHybridStore[T](
     sourcedObjectStore = new S3ObjectStore(
       s3Client = s3Client,
@@ -24,11 +33,7 @@ trait VersionedHybridStoreLocal
         override def generate(obj: T): String = "/"
       }
     ),
-    versionedDao = new VersionedDao(
-      dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(
-        table = tableName
-      ))
+    versionedDao = versionedDao
   )
 
   def assertHybridRecordIsStoredCorrectly[T <: Id](record: T,

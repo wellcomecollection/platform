@@ -7,22 +7,19 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
+import io.circe.{Decoder, Encoder}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SQSLocal
-}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.storage.{ExampleRecord, VersionedHybridStoreLocal}
+import uk.ac.wellcome.storage.{ExampleRecord, HybridRecord, VersionedHybridStoreLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.s3.KeyPrefixGenerator
+import uk.ac.wellcome.models.SourceMetadata
+
 
 class SierraBibMergerFeatureTest
     extends FunSpec
@@ -33,19 +30,20 @@ class SierraBibMergerFeatureTest
     with MockitoSugar
     with ExtendedPatience
     with ScalaFutures
-    with VersionedHybridStoreLocal[SierraTransformable] {
+    with VersionedHybridStoreLocal {
+
+  val hybridStore = createHybridStore[SierraTransformable]
 
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
 
+  implicit val decoder = Decoder[SierraTransformable]
+  implicit val encoder = Encoder[SierraTransformable]
+
   override lazy val tableName = "sierra-bib-merger-feature-test-table"
   override lazy val bucketName = "sierra-bib-merger-feature-test-bucket"
-  val queueUrl = createQueueAndReturnUrl("test_bib_merger")
 
-  override lazy val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
-    new KeyPrefixGenerator[Sourced] {
-      override def generate(obj: Sourced): String = "/"
-    }
+  val queueUrl = createQueueAndReturnUrl("test_bib_merger")
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),
@@ -167,8 +165,7 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(oldRecord.sourceName, oldRecord.sourceId)(oldRecord)(
-        identity)
+      .updateRecord(oldRecord.id)(oldRecord)(identity)()
       .map { _ =>
         sendBibRecordToSQS(record)
       }
@@ -206,10 +203,8 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(
-        expectedSierraTransformable.sourceName,
-        expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
-        identity)
+      .updateRecord(expectedSierraTransformable.id)(expectedSierraTransformable)(
+        identity)(SourceMetadata(expectedSierraTransformable.sourceName))
       .map { _ =>
         sendBibRecordToSQS(record)
       }
@@ -238,8 +233,7 @@ class SierraBibMergerFeatureTest
     )
 
     val future =
-      hybridStore.updateRecord(newRecord.sourceName, newRecord.sourceId)(
-        newRecord)(identity)
+      hybridStore.updateRecord(newRecord.id)(newRecord)(identity)()
 
     future.map { _ =>
       sendBibRecordToSQS(record)
@@ -251,16 +245,22 @@ class SierraBibMergerFeatureTest
   }
 
   private def assertStored(expectedRecord: SierraTransformable) = eventually {
-    val actualRecord =
-      Await
-        .result(
-          hybridStore
-            .getRecord(expectedRecord.id),
-          5 seconds
-        )
-        .get
+    val future = for {
+      actualRecord <- hybridStore.getRecord(expectedRecord.id)
+      hybridRecord <- versionedDao.getRecord[HybridRecord](expectedRecord.id)
+      sourceMetadata <- versionedDao.getRecord[SourceMetadata](expectedRecord.id)
+    } yield (actualRecord, hybridRecord, sourceMetadata)
 
-    actualRecord shouldBe expectedRecord
+    whenReady(future) { case (
+        Some(actualRecord),
+        Some(hybridRecord),
+        Some(sourceMetadata)
+      ) => {
+        actualRecord shouldBe expectedRecord
+        hybridRecord.id shouldBe expectedRecord.id
+        sourceMetadata.sourceName shouldBe expectedRecord.sourceName
+      }
+    }
   }
 
   private def sendBibRecordToSQS(record: SierraBibRecord) = {
