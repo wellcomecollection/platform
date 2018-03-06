@@ -34,8 +34,10 @@ class SQSWorkerTest
     )
   }
 
-
-  case class TestWorkerFixtures() extends TestWith[OneArgTest, Outcome] with MockMetricSender with AkkaFixtures {
+  case class TestWorkerFixtures()
+      extends TestWith[OneArgTest, Outcome]
+      with MockMetricSender
+      with AkkaFixtures {
 
     override def apply(test: OneArgTest) = {
       withActorSystem { actorSystem =>
@@ -53,7 +55,9 @@ class SQSWorkerTest
             }
 
           try {
-            withFixture(test.toNoArgTest(FixtureParam(metricsSender, testWorker, queueUrl)))
+            withFixture(
+              test.toNoArgTest(
+                FixtureParam(metricsSender, testWorker, queueUrl)))
           } finally {
             testWorker.stop()
           }
@@ -64,7 +68,9 @@ class SQSWorkerTest
 
   }
 
-  case class FixtureParam(metrics: MetricsSender, worker: SQSWorker, queueUrl: String)
+  case class FixtureParam(metrics: MetricsSender,
+                          worker: SQSWorker,
+                          queueUrl: String)
 
   override def withFixture(test: OneArgTest) = TestWorkerFixtures()(test)
 

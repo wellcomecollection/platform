@@ -82,20 +82,32 @@ class SQSWorkerToDynamoTest
     }
   }
 
-
-  object TestWorkerFixtures extends TestWith[OneArgTest, Outcome] with AkkaFixtures {
+  object TestWorkerFixtures
+      extends TestWith[OneArgTest, Outcome]
+      with AkkaFixtures {
 
     override def apply(test: OneArgTest) = {
       withActorSystem { actorSystem =>
         withLocalSqsQueue { queueUrl =>
-          sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "0"))
 
           val worker: TestWorker = new TestWorker(queueUrl, actorSystem)
-          val terminalWorker: TerminalFailingTestWorker = new TerminalFailingTestWorker(queueUrl, actorSystem)
-          val conditionalCheckFailingWorker: ConditionalCheckFailingTestWorker = new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
+          val terminalWorker: TerminalFailingTestWorker =
+            new TerminalFailingTestWorker(queueUrl, actorSystem)
+          val conditionalCheckFailingWorker
+            : ConditionalCheckFailingTestWorker =
+            new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
 
           try {
-            withFixture(test.toNoArgTest(FixtureParam(worker, terminalWorker, conditionalCheckFailingWorker, queueUrl)))
+            withFixture(
+              test.toNoArgTest(
+                FixtureParam(
+                  worker,
+                  terminalWorker,
+                  conditionalCheckFailingWorker,
+                  queueUrl)))
           } finally {
             worker.stop()
             terminalWorker.stop()
@@ -108,7 +120,11 @@ class SQSWorkerToDynamoTest
 
   }
 
-  case class FixtureParam(worker: TestWorker, terminalWorker: TerminalFailingTestWorker, conditionalCheckFailingWorker: ConditionalCheckFailingTestWorker, queueUrl: String)
+  case class FixtureParam(
+    worker: TestWorker,
+    terminalWorker: TerminalFailingTestWorker,
+    conditionalCheckFailingWorker: ConditionalCheckFailingTestWorker,
+    queueUrl: String)
 
   override def withFixture(test: OneArgTest) = TestWorkerFixtures(test)
 
@@ -121,12 +137,13 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  it("fails gracefully when receiving a ConditionalCheckFailedException") { fixtures =>
-    sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
+  it("fails gracefully when receiving a ConditionalCheckFailedException") {
+    fixtures =>
+      sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
 
-    eventually {
-      fixtures.conditionalCheckFailingWorker.terminalFailure shouldBe false
-    }
+      eventually {
+        fixtures.conditionalCheckFailingWorker.terminalFailure shouldBe false
+      }
   }
 
   it("fails gracefully when a conversion fails") { fixtures =>
@@ -148,12 +165,13 @@ class SQSWorkerToDynamoTest
   }
 
   it(
-    "fails terminally when receiving an exception other than ConditionalCheckFailedException") { fixtures =>
-    sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
+    "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
+    fixtures =>
+      sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
 
-    eventually {
-      fixtures.terminalWorker.terminalFailure shouldBe true
-    }
+      eventually {
+        fixtures.terminalWorker.terminalFailure shouldBe true
+      }
   }
 
 }
