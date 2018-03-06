@@ -27,11 +27,6 @@ class SierraItemMergerFeatureTest
     ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ s3LocalFlags
   )
 
-  override lazy val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
-    new KeyPrefixGenerator[Sourced] {
-      override def generate(obj: Sourced): String = "/"
-    }
-
   it("stores an item from SQS") {
     val id = "i1000001"
     val bibId = "b1000001"
@@ -49,12 +44,7 @@ class SierraItemMergerFeatureTest
       itemData = Map(id -> record)
     )
 
-    eventually {
-      val futureRecord = hybridStore.getRecord(expectedSierraTransformable.id)
-      whenReady(futureRecord) { record =>
-        record.get shouldBe expectedSierraTransformable
-      }
-    }
+    assertStored(expectedSierraTransformable)
   }
 
   it("stores multiple items from SQS") {
@@ -92,17 +82,8 @@ class SierraItemMergerFeatureTest
         itemData = Map(id2 -> record2)
       )
 
-      val futureRecord1 =
-        hybridStore.getRecord(expectedSierraTransformable1.id)
-      whenReady(futureRecord1) { record =>
-        record.get shouldBe expectedSierraTransformable1
-      }
-
-      val futureRecord2 =
-        hybridStore.getRecord(expectedSierraTransformable2.id)
-      whenReady(futureRecord2) { record =>
-        record.get shouldBe expectedSierraTransformable2
-      }
+      assertStored(expectedSierraTransformable1)
+      assertStored(expectedSierraTransformable2)
     }
   }
 }
