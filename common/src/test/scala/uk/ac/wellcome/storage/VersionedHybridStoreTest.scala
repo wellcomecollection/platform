@@ -40,7 +40,7 @@ class VersionedHybridStoreTest
       content = "One ocelot in orange"
     )
 
-    val future = hybridStore.updateRecord(record.id)(record)(identity)
+    val future = hybridStore.updateRecord(record.id)(record)(identity)()
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
@@ -63,8 +63,8 @@ class VersionedHybridStoreTest
 
     val future =
       hybridStore
-        .updateRecord(record.id)(record)(identity)
-        .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t))
+        .updateRecord(record.id)(record)(identity)()
+        .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
     whenReady(future) { _ =>
       assertHybridRecordIsStoredCorrectly(
@@ -85,11 +85,11 @@ class VersionedHybridStoreTest
       content = "Throwing turquoise tangerines in Tanzania"
     )
 
-    val future = hybridStore.updateRecord(record.id)(record)(identity)
+    val future = hybridStore.updateRecord(record.id)(record)(identity)()
 
     val updatedFuture = future.flatMap { _ =>
       hybridStore.updateRecord(updatedRecord.id)(updatedRecord)(_ =>
-        updatedRecord)
+        updatedRecord)()
     }
 
     whenReady(updatedFuture) { _ =>
@@ -114,7 +114,7 @@ class VersionedHybridStoreTest
       content = "Five fishing flinging flint"
     )
 
-    val putFuture = hybridStore.updateRecord(record.id)(record)(identity)
+    val putFuture = hybridStore.updateRecord(record.id)(record)(identity)()
 
     val getFuture = putFuture.flatMap { _ =>
       hybridStore.getRecord(record.id)
@@ -132,7 +132,7 @@ class VersionedHybridStoreTest
     )
 
     val future =
-      hybridStore.updateRecord(id = "not_the_same_id")(record)(identity)
+      hybridStore.updateRecord(id = "not_the_same_id")(record)(identity)()
 
     whenReady(future.failed) { e: Throwable =>
       e shouldBe a[IllegalArgumentException]
@@ -148,9 +148,9 @@ class VersionedHybridStoreTest
     val recordWithDifferentId = record.copy(id = "not_the_same_id")
 
     val future = for {
-      _ <- hybridStore.updateRecord(record.id)(record)(identity)
+      _ <- hybridStore.updateRecord(record.id)(record)(identity)()
       _ <- hybridStore.updateRecord(record.id)(record)(_ =>
-        recordWithDifferentId)
+        recordWithDifferentId)()
     } yield ()
 
     whenReady(future.failed) { e: Throwable =>
@@ -158,37 +158,45 @@ class VersionedHybridStoreTest
     }
   }
 
-  it("should copy some tagged fields into the record in dynamo") {
-    case class TaggedExampleRecord(id: String,
-                                   something: String,
-                                   @CopyToDynamo taggedSomething: String)
-        extends Id
 
-    val taggedContent = "this goes in dynamo"
-    val record = TaggedExampleRecord(
+  it("define a type that will be stored and extracted alongside HybridRecord") {
+    case class ExampleRecord(
+        id: String,
+        content: String
+      ) extends Id
+
+    case class ExtraData(
+      data: String,
+      number: Int
+    )
+
+    val content = "this goes in dynamo"
+
+    val record = ExampleRecord(
       id = "11111",
-      something = "whatever",
-      taggedSomething = taggedContent)
+      content = content
+    )
 
-    case class ExtendedHybridRecord(id: String,
-                                    version: Int,
-                                    s3key: String,
-                                    taggedSomething: String)
-        extends Versioned
-        with Id
+    val data = ExtraData(
+      data = "a tragic triangle of triffids",
+      number = 6
+    )
 
-    val hybridStore = createHybridStore[TaggedExampleRecord]
+    val hybridStore = createHybridStore[ExampleRecord]
 
-    whenReady(hybridStore.updateRecord(record.id)(record)(identity)) { _ =>
-      val maybeResult = Scanamo.get[ExtendedHybridRecord](dynamoDbClient)(
+    val future = hybridStore.updateRecord(record.id)(record)(identity)(data)
+
+    whenReady(future) { _ =>
+      val maybeResult = Scanamo.get[ExtraData](dynamoDbClient)(
         tableName)('id -> record.id)
+
       maybeResult shouldBe defined
       maybeResult.get.isRight shouldBe true
-      val hybridRecord = maybeResult.get.right.get
 
-      hybridRecord.id shouldBe record.id
-      hybridRecord.version shouldBe 1
-      hybridRecord.taggedSomething shouldBe taggedContent
+      val extraData = maybeResult.get.right.get
+
+      extraData.data shouldBe "a tragic triangle of triffids"
+      extraData.number shouldBe 6
     }
 
   }
