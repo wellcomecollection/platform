@@ -4,6 +4,7 @@ import shapeless.ops.hlist.{Collect, Prepend, Zip}
 import shapeless.{Id => ShapelessId, _}
 import uk.ac.wellcome.models.Id
 
+// Type class that returns a HList with all the fields from HybridRecord plus all the fields from T
 trait HybridRecordEnricher[T] {
   type Out
   def enrichedHybridRecordHList(id: String, metadata: T, version: Int)(
