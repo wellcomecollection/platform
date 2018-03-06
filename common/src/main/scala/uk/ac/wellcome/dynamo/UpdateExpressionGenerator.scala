@@ -17,7 +17,6 @@ object UpdateExpressionGenerator {
   val w = Witness(Symbol("id"))
   type IdKey = w.T
 
-
   def apply[T](implicit generator: UpdateExpressionGenerator[T]) = generator
 
   def create[T](f: (T) => Option[UpdateExpression]) =
@@ -26,10 +25,7 @@ object UpdateExpressionGenerator {
     }
 
   // Generates a UpdateExpression for an HList
-  implicit def hlistExpressionGenerator[L <: HList,
-                                                A,
-                                                B <: HList,
-                                                C <: HList](
+  implicit def hlistExpressionGenerator[L <: HList, A, B <: HList, C <: HList](
     implicit remover: Remover.Aux[L, IdKey, (A, B)],
     mapper: Mapper.Aux[toUpdateExpressions.type, B, C],
     folder: LeftFolder.Aux[C,
@@ -41,7 +37,8 @@ object UpdateExpressionGenerator {
         val recordAsHlist = t - 'id
         val nonIdTaggedFields = recordAsHlist.map(toUpdateExpressions)
 
-        nonIdTaggedFields.foldLeft[Option[UpdateExpression]](None)(combineUpdateExpressions)
+        nonIdTaggedFields.foldLeft[Option[UpdateExpression]](None)(
+          combineUpdateExpressions)
       }
     }
 
@@ -56,21 +53,21 @@ object UpdateExpressionGenerator {
   object toUpdateExpressions extends Poly1 {
     implicit def some[K <: Symbol, V](implicit witness: Witness.Aux[K],
                                       dynamoFormat: DynamoFormat[V])
-    : Case.Aux[FieldType[K, V], UpdateExpression] = {
+      : Case.Aux[FieldType[K, V], UpdateExpression] = {
 
       at[FieldType[K, V]] { fieldtype =>
-      {
-        val fieldValue: V = fieldtype
-        set(witness.value -> fieldValue)
-      }
+        {
+          val fieldValue: V = fieldtype
+          set(witness.value -> fieldValue)
+        }
       }
     }
   }
 
   object combineUpdateExpressions extends Poly2 {
     implicit def fold: Case.Aux[Option[UpdateExpression],
-      UpdateExpression,
-      Option[UpdateExpression]] =
+                                UpdateExpression,
+                                Option[UpdateExpression]] =
       at[Option[UpdateExpression], UpdateExpression] {
         (maybeUpdateExpression, partUpdate) =>
           maybeUpdateExpression match {
