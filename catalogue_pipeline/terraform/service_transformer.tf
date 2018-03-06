@@ -37,7 +37,7 @@ module "transformer" {
 module "transformer_dynamo_to_sns" {
   source = "../../shared_infra/dynamo_to_sns"
 
-  name           = "sierra"
+  name           = "sourcedata"
   src_stream_arn = "${module.vhs_sourcedata.table_stream_arn}"
   dst_topic_arn  = "${module.transformer_topic.arn}"
 
