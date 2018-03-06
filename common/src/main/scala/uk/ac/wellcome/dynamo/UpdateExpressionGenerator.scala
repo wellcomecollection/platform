@@ -27,12 +27,16 @@ object UpdateExpressionGenerator {
   // Generates a UpdateExpression for an HList
   implicit def hlistExpressionGenerator[L <: HList, A, B <: HList, C <: HList](
     implicit remover: Remover.Aux[L, IdKey, (A, B)],
-    folder: LeftFolder.Aux[B,Option[UpdateExpression],buildUpdateExpression.type,Option[UpdateExpression]]
-                                                                              ) =
+    folder: LeftFolder.Aux[B,
+                           Option[UpdateExpression],
+                           buildUpdateExpression.type,
+                           Option[UpdateExpression]]
+  ) =
     create { t: L =>
       {
         val recordAsHlist = t - 'id
-        recordAsHlist.foldLeft[Option[UpdateExpression]](None)(buildUpdateExpression)
+        recordAsHlist.foldLeft[Option[UpdateExpression]](None)(
+          buildUpdateExpression)
       }
     }
 
@@ -47,13 +51,13 @@ object UpdateExpressionGenerator {
   // Creates an UpdateExpression out of a FieldType and adds it to the
   // accumulating UpdateExpression
   object buildUpdateExpression extends Poly2 {
-    implicit def fold[K <: Symbol,V](implicit witness: Witness.Aux[K],
-                           dynamoFormat: DynamoFormat[V]): Case.Aux[Option[UpdateExpression],
-      FieldType[K, V],
-      Option[UpdateExpression]] =
+    implicit def fold[K <: Symbol, V](
+      implicit witness: Witness.Aux[K],
+      dynamoFormat: DynamoFormat[V]): Case.Aux[Option[UpdateExpression],
+                                               FieldType[K, V],
+                                               Option[UpdateExpression]] =
       at[Option[UpdateExpression], FieldType[K, V]] {
         (maybeUpdateExpression, fieldType) =>
-
           val fieldValue: V = fieldType
           val partUpdate = set(witness.value -> fieldValue)
 
