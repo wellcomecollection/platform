@@ -30,6 +30,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.Try
 
+case class SourceMetadata(sourceName: String)
+
 class SQSMessageReceiver @Inject()(
   snsWriter: SNSWriter,
   s3Client: AmazonS3,
@@ -44,7 +46,8 @@ class SQSMessageReceiver @Inject()(
       () => {
         val futurePublishAttempt = for {
           hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
-          transformableRecord <- getTransformable(hybridRecord)
+          sourceMetadata <- Future.fromTry(fromJson[SourceMetadata](message.body))
+          transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
           cleanRecord <- Future.fromTry(
             transformTransformable(transformableRecord, hybridRecord.version))
           publishResult <- publishMessage(cleanRecord)
@@ -61,8 +64,11 @@ class SQSMessageReceiver @Inject()(
     )
   }
 
-  private def getTransformable(hybridRecord: HybridRecord) = {
-    hybridRecord.sourceName match {
+  private def getTransformable(
+                                hybridRecord: HybridRecord,
+                                sourceMetadata: SourceMetadata
+                              ) = {
+    sourceMetadata.sourceName match {
       case "miro" =>
         S3ObjectStore.get[MiroTransformable](s3Client, bucketName)(
           hybridRecord.s3key)
