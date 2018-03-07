@@ -70,7 +70,7 @@ object UpdateExpressionGenerator {
   implicit def productUpdateExpressionGenerator[C, L <: HList](
     implicit labelledGeneric: LabelledGeneric.Aux[C, L],
     updateExpressionGenerator: UpdateExpressionGenerator[L]) = create[C] {
-    c: L =>
+    c: C =>
       updateExpressionGenerator.generateUpdateExpression(labelledGeneric.to(c))
   }
 
