@@ -12,10 +12,6 @@ import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 
 import scala.concurrent.ExecutionContext
 
-object SierraResourceTypes extends Enumeration {
-  val bibs, items = Value
-}
-
 object SierraRecordWrapperFlow extends Logging {
   def apply()(
     implicit executionContext: ExecutionContext)

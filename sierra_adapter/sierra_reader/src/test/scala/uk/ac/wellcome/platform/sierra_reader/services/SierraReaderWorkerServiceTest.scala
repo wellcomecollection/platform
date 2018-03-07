@@ -14,7 +14,7 @@ import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local, SQSLocal}
 import scala.collection.JavaConversions._
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
-import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
