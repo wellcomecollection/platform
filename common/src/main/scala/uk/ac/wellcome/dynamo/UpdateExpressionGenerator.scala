@@ -41,11 +41,11 @@ object UpdateExpressionGenerator {
     }
 
   // Generates an UpdateExpressionGenerator for a case class
-  implicit def productUpdateExpressionGenerator[C, T](
-    implicit labelledGeneric: LabelledGeneric.Aux[C, T],
-    updateExpressionGenerator: UpdateExpressionGenerator[T]) = create[C] {
-    t: C =>
-      updateExpressionGenerator.generateUpdateExpression(labelledGeneric.to(t))
+  implicit def productUpdateExpressionGenerator[C, L](
+    implicit labelledGeneric: LabelledGeneric.Aux[C, L],
+    updateExpressionGenerator: UpdateExpressionGenerator[L]) = create[C] {
+    c: L =>
+      updateExpressionGenerator.generateUpdateExpression(labelledGeneric.to(c))
   }
 
   // Creates an UpdateExpression out of a FieldType and adds it to the
