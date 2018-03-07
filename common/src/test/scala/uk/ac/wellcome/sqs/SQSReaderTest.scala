@@ -28,31 +28,33 @@ class SQSReaderTest
   case class FixtureParam(queueUrl: String)
 
   it(
-    "should get messages from the SQS queue, limited by the maximum number of messages and return them") { fixtures =>
-    val sqsConfig = SQSConfig(fixtures.queueUrl, waitTime = 20 seconds, maxMessages = 2)
-    val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
-    messageStrings.foreach(sqsClient.sendMessage(fixtures.queueUrl, _))
-    val sqsReader = new SQSReader(sqsClient, sqsConfig)
+    "should get messages from the SQS queue, limited by the maximum number of messages and return them") {
+    fixtures =>
+      val sqsConfig =
+        SQSConfig(fixtures.queueUrl, waitTime = 20 seconds, maxMessages = 2)
+      val messageStrings = List("someMessage1", "someMessage2", "someMessage3")
+      messageStrings.foreach(sqsClient.sendMessage(fixtures.queueUrl, _))
+      val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
-    var receivedMessages: List[Message] = Nil
+      var receivedMessages: List[Message] = Nil
 
-    val futureMessages = sqsReader.retrieveAndDeleteMessages(message => {
-      synchronized {
-        receivedMessages = message :: receivedMessages
-      }
-      Future.successful(())
-    })
-
-    whenReady(futureMessages) { _ =>
-      eventually {
-        receivedMessages should have size 2
-        receivedMessages.foreach { message =>
-          messageStrings should contain(message.getBody)
+      val futureMessages = sqsReader.retrieveAndDeleteMessages(message => {
+        synchronized {
+          receivedMessages = message :: receivedMessages
         }
-      }
+        Future.successful(())
+      })
 
-      assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
-    }
+      whenReady(futureMessages) { _ =>
+        eventually {
+          receivedMessages should have size 2
+          receivedMessages.foreach { message =>
+            messageStrings should contain(message.getBody)
+          }
+        }
+
+        assertNumberOfMessagesAfterVisibilityTimeoutIs(1, sqsReader)
+      }
   }
 
   it("should return a failed future if reading from the SQS queue fails") {
