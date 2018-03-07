@@ -42,6 +42,7 @@ object VersionUpdater {
   // In this case, because it returns the same type as it starts with,
   // we can only create a VersionUpdater for HLists that already have a
   // "version" field.  It can't add the field if it's not there already.
+  //
   implicit def hlistVersionUpdater[L <: HList](
     implicit updater: Updater.Aux[L, versionField, L]) =
     createVersionUpdater[L] { (t: L, newVersion: Int) =>
@@ -55,6 +56,7 @@ object VersionUpdater {
   //
   // gen.to(c) converts the case class C to an HList L, and gen.from(...) goes
   // in the other direction.
+  //
   implicit def productVersionUpdater[C, L](
     implicit gen: LabelledGeneric.Aux[C, L],
     versionUpdater: VersionUpdater[L]) = createVersionUpdater[C] {
