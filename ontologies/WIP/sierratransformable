@@ -103,8 +103,8 @@
       * Example:
    *  "contributors": [
    *     {
-   *        "type": "Contribution" , 
-   *        "agents": {
+   *        "type": "Contributor" , 
+   *        "agent": {
    *           "id": "a24s7qf3" ,
    *           "name": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
    *           "type": "Person",
@@ -114,32 +114,14 @@
    *           "type": "Identifier",
    *           "identifierScheme": "lcsh"
    *        }
-   *        ]
-   *     },   
-   *     "contributionType": [
+   *        ]   
+   *     "contributions": [
    *        {
-   *           "contributionType": "editor" ,        
+   *           "contribution": "editor" ,        
    *           "label": "Editor",
-   *           "type": "ContributionType"  
+   *           "type": "Contribution"  
    *        } 
    *     ] ,
-   *     "affiliation" :
-   *       {
-   *           "type": "Affiliation"
-   *            "affiliatedWith" :
-   *              {
-   *                   "id": "a8y98yy8" ,
-   *                   "label": "University of Birmingham",
-   *                   "type": "Organisation" 
-   *                       "identifiers": [
-   *                        {
-   *                            "value": "2005016805",
-   *                            "type": "Identifier",
-   *                            "identifierScheme": "lcsh"
-   *                        }
-   *                        ]                  
-   *              }
-   *       }
    *  } ,
    * ],
    *
