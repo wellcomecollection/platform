@@ -76,9 +76,6 @@ object SierraRecordWrapperFlow extends Logging {
     }
   }
 
-  def addIDPrefixToBibs(json: Json): Json =
-    root.bibIds.each.string.modify(id => s"b$id")(json)
-
   private def getId(json: Json) = {
     root.id.string.getOption(json).get
   }
