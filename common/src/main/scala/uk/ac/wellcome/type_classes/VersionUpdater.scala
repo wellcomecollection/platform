@@ -22,8 +22,8 @@ object VersionUpdater {
 
   type versionField = FieldType[version, Int]
 
-  def apply[A](implicit enc: VersionUpdater[A]): VersionUpdater[A] =
-    enc
+  def apply[A](implicit updater: VersionUpdater[A]): VersionUpdater[A] =
+    updater
 
   def createVersionUpdater[T](f: (T, Int) => T): VersionUpdater[T] =
     new VersionUpdater[T] {
