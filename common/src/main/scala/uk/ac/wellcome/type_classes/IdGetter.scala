@@ -29,9 +29,9 @@ object IdGetter {
     }
 
   // Generates an IdGetter for a case class using the IdGetter for its HLists representation
-  implicit def productIdGetter[C, T](
-    implicit labelledGeneric: LabelledGeneric.Aux[C, T],
-    idGetter: IdGetter[T]) = createIdGetter[C] { t: C =>
-    idGetter.id(labelledGeneric.to(t))
+  implicit def productIdGetter[C, L](
+    implicit labelledGeneric: LabelledGeneric.Aux[C, L],
+    idGetter: IdGetter[L]) = createIdGetter[C] { c: C =>
+    idGetter.id(labelledGeneric.to(c))
   }
 }
