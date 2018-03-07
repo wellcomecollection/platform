@@ -6,37 +6,42 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
 import uk.ac.wellcome.locals.DynamoDBLocal
-import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
-  ReindexJob
+  ReindexJob,
+  ReindexRecord
 }
-import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
 
+case class TestRecord(
+  id: String,
+  someData: String,
+  version: Int,
+  reindexShard: String,
+  reindexVersion: Int
+) extends Versioned
+    with Id
+
 class ReindexerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
-    with DynamoDBLocal[HybridRecord]
+    with DynamoDBLocal[TestRecord]
     with AmazonCloudWatchFlag
     with SqsFixtures
     with SnsFixtures
     with ScalaFutures {
 
+  override lazy val evidence: DynamoFormat[TestRecord] =
+    DynamoFormat[TestRecord]
+
   override lazy val tableName: String = "table"
-
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
-
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
-    .toSourcedDynamoFormatWrapper[HybridRecord]
-    .enrichedDynamoFormat
 
   def withServer[R](queueUrl: String, topicArn: String)(
     testWith: TestWith[EmbeddedHttpServer, R]) = {
@@ -90,33 +95,41 @@ class ReindexerFeatureTest
   private def createReindexableData(queueUrl: String): List[HybridRecord] = {
     val numberOfRecords = 4
 
-    val hybridRecords = (1 to numberOfRecords).map(i => {
-      HybridRecord(
+    val testRecords = (1 to numberOfRecords).map(i => {
+      TestRecord(
+        id = s"id$i",
         version = 1,
-        sourceId = s"id$i",
-        sourceName = "source",
-        s3key = "s3://bucket/key",
+        someData = "A ghastly gharial ganking a green golem.",
         reindexShard = shardName,
-        reindexVersion = currentVersion)
+        reindexVersion = currentVersion
+      )
     })
 
-    //TODO re-factor shared test state here into fixture method
-    hybridRecords.foreach(
-      Scanamo.put(dynamoDbClient)(tableName)(_)(enrichedDynamoFormat))
+     //TODO re-factor shared test state here into fixture method
+    testRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_))
 
-    val expectedRecords = hybridRecords.map(
-      record =>
-        record
-          .copy(reindexVersion = desiredVersion, version = record.version + 1))
+    val expectedRecords = testRecords.map(
+      (r: TestRecord) =>
+        ReindexRecord(
+          id = r.id,
+          version = r.version + 1,
+          reindexShard = shardName,
+          reindexVersion = desiredVersion
+      ))
 
     val reindexJob = ReindexJob(
       shardId = shardName,
       desiredVersion = desiredVersion
     )
-
-    val sqsMessage =
-      SQSMessage(None, toJson(reindexJob).get, "topic", "message", "now")
-
+    
+    val sqsMessage = SQSMessage(
+      None,
+      toJson(reindexJob).get,
+      "topic",
+      "message",
+      "now"
+    )
+    
     sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     expectedRecords.toList
@@ -127,7 +140,7 @@ class ReindexerFeatureTest
       withLocalSnsTopic { topicArn =>
         withServer(queueUrl, topicArn) { server =>
           sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
-
+          
           val expectedRecords = createReindexableData(queueUrl)
 
           eventually {
@@ -143,7 +156,6 @@ class ReindexerFeatureTest
       }
     }
   }
-
 
   it("sends an SNS notice for a completed reindex") { withLocalSqsQueue {
     queueUrl =>

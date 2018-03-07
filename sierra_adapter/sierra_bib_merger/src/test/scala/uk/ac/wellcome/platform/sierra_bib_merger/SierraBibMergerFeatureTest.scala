@@ -7,7 +7,8 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.FunSpec
+import io.circe.{Decoder, Encoder}
+import org.scalatest.{FunSpec, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -18,34 +19,23 @@ import uk.ac.wellcome.test.utils.{
 }
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.storage.{ExampleRecord, VersionedHybridStoreLocal}
+import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStoreLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.s3.KeyPrefixGenerator
+import uk.ac.wellcome.models.SourceMetadata
+import uk.ac.wellcome.sierra_adapter.test_utils.SourceDataVHSLocal
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraBibMergerFeatureTest
     extends FunSpec
     with FeatureTestMixin
     with AmazonCloudWatchFlag
-    with SQSLocal
     with Eventually
     with MockitoSugar
     with ExtendedPatience
     with ScalaFutures
-    with VersionedHybridStoreLocal[SierraTransformable] {
-
-  implicit val system = ActorSystem()
-  implicit val executionContext = system.dispatcher
-
-  override lazy val tableName = "sierra-bib-merger-feature-test-table"
-  override lazy val bucketName = "sierra-bib-merger-feature-test-bucket"
-  val queueUrl = createQueueAndReturnUrl("test_bib_merger")
-
-  override lazy val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
-    new KeyPrefixGenerator[Sourced] {
-      override def generate(obj: Sourced): String = "/"
-    }
+    with SourceDataVHSLocal {
 
   override protected def server = new EmbeddedHttpServer(
     new Server(),
@@ -102,7 +92,7 @@ class SierraBibMergerFeatureTest
       modifiedDate = "2001-01-01T01:01:01Z"
     )
 
-    sendBibRecordToSQS(record)
+    sendMessageToSQS(toJson(record).get)
 
     val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
@@ -120,7 +110,9 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2001-01-01T01:01:01Z"
     )
-    sendBibRecordToSQS(record1)
+
+    sendMessageToSQS(toJson(record1).get)
+
     val expectedSierraTransformable1 = SierraTransformable(bibRecord = record1)
 
     val id2 = "2000002"
@@ -133,7 +125,9 @@ class SierraBibMergerFeatureTest
       ),
       modifiedDate = "2002-02-02T02:02:02Z"
     )
-    sendBibRecordToSQS(record2)
+
+    sendMessageToSQS(toJson(record2).get)
+
     val expectedSierraTransformable2 = SierraTransformable(bibRecord = record2)
 
     assertStored(expectedSierraTransformable1)
@@ -167,10 +161,10 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(oldRecord.sourceName, oldRecord.sourceId)(oldRecord)(
-        identity)
+      .updateRecord(oldRecord.id)(oldRecord)(identity)(
+        SourceMetadata(oldRecord.sourceName))
       .map { _ =>
-        sendBibRecordToSQS(record)
+        sendMessageToSQS(toJson(record).get)
       }
 
     val expectedSierraTransformable = SierraTransformable(bibRecord = record)
@@ -206,12 +200,11 @@ class SierraBibMergerFeatureTest
     )
 
     hybridStore
-      .updateRecord(
-        expectedSierraTransformable.sourceName,
-        expectedSierraTransformable.sourceId)(expectedSierraTransformable)(
-        identity)
+      .updateRecord(expectedSierraTransformable.id)(
+        expectedSierraTransformable)(identity)(
+        SourceMetadata(expectedSierraTransformable.sourceName))
       .map { _ =>
-        sendBibRecordToSQS(record)
+        sendMessageToSQS(toJson(record).get)
       }
 
     // Blocking in Scala is generally a bad idea; we do it here so there's
@@ -238,41 +231,15 @@ class SierraBibMergerFeatureTest
     )
 
     val future =
-      hybridStore.updateRecord(newRecord.sourceName, newRecord.sourceId)(
-        newRecord)(identity)
+      hybridStore.updateRecord(newRecord.id)(newRecord)(identity)(
+        SourceMetadata(newRecord.sourceName))
 
     future.map { _ =>
-      sendBibRecordToSQS(record)
+      sendMessageToSQS(toJson(record).get)
     }
 
     val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
     assertStored(expectedSierraTransformable)
-  }
-
-  private def assertStored(expectedRecord: SierraTransformable) = eventually {
-    val actualRecord =
-      Await
-        .result(
-          hybridStore
-            .getRecord(expectedRecord.id),
-          5 seconds
-        )
-        .get
-
-    actualRecord shouldBe expectedRecord
-  }
-
-  private def sendBibRecordToSQS(record: SierraBibRecord) = {
-    val messageBody = toJson(record).get
-
-    val message = SQSMessage(
-      subject = Some("Test message sent by SierraBibMergerWorkerServiceTest"),
-      body = messageBody,
-      topic = "topic",
-      messageType = "messageType",
-      timestamp = "2001-01-01T01:01:01Z"
-    )
-    sqsClient.sendMessage(queueUrl, toJson(message).get)
   }
 }
