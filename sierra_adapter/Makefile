@@ -10,9 +10,17 @@ SBT_APPS    = sierra_bib_merger \
 ECS_TASKS   =
 LAMBDAS     = s3_demultiplexer sierra_window_generator
 
-TF_NAME     = sierra_adapter
+TF_NAME     =
 TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
+
+sierra_adapter-terraform-plan:
+	@echo "*** Disabled while we migrate all the IDs"
+	@exit 1
+
+sierra_adapter-terraform-apply:
+	@echo "*** Disabled while we migrate all the IDs"
+	@exit 1
 
 $(val $(call stack_setup))
 
