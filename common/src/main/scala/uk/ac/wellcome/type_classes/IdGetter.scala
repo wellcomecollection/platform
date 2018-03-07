@@ -5,7 +5,13 @@ import shapeless.labelled.FieldType
 import shapeless.ops.record.Selector
 import shapeless.record._
 
-// Type class that returns the id of an instances of T
+// Type class with a method for getting the ID of an instance of T.
+//
+// The type T must have a field "id".
+//
+// This isn't defined by the type hierarchy in the trait; instead it's checked
+// at compile-time by shapeless and the companion object.
+//
 trait IdGetter[T] {
   def id(t: T): String
 }
@@ -21,14 +27,29 @@ object IdGetter {
     def id(t: T) = f(t)
   }
 
-  // Generates an IdGetter for an HList returning the IdGetter for the tail of the HList
+  // Generates an IdGetter for an HList.
+  //
+  // Selector is a Shapeless type class that selects an individual field
+  // from an HList.  It takes three type parameters:
+  //
+  //  - the type of the input (L)
+  //  - the field to select (IdKey)
+  //  - the type of the returned value (String)
+  //
   implicit def hlistIdGetter[L <: HList](
     implicit selector: Selector.Aux[L, IdKey, String]) =
     createIdGetter { t: L =>
       selector(t)
     }
 
-  // Generates an IdGetter for a case class using the IdGetter for its HLists representation
+  // Generates an IdGetter for a case class ("product" in Shapeless).
+  //
+  // LabelledGeneric is a Shapeless type class that allows us to convert
+  // between case classes and their HList representation.
+  //
+  // labelledGeneric.to(c) converts the case class C to an HList L, and then we
+  // can use the constructor above.
+  //
   implicit def productIdGetter[C, L](
     implicit labelledGeneric: LabelledGeneric.Aux[C, L],
     idGetter: IdGetter[L]) = createIdGetter[C] { c: C =>
