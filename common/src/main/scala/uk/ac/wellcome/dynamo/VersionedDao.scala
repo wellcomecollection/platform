@@ -2,6 +2,8 @@ package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
+import com.gu.scanamo.error.ScanamoError
+import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.query.{KeyEquals, UniqueKey}
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
@@ -23,7 +25,7 @@ class VersionedDao @Inject()(
     versionGetter: VersionGetter[T],
     idGetter: IdGetter[T],
     updateExpressionGenerator: UpdateExpressionGenerator[T]
-  ) = {
+  ): Option[ScanamoOps[Either[ScanamoError, T]]] = {
     val version = versionGetter.version(record)
     val newVersion = version + 1
 
