@@ -86,6 +86,10 @@ class WorksIndex @Inject()(client: HttpClient,
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       textField("description").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),
+      textField("physicalDescription").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
+      textField("extent").fields(
+        textField("english").analyzer(EnglishLanguageAnalyzer)),
       textField("lettering").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
@@ -94,6 +98,7 @@ class WorksIndex @Inject()(client: HttpClient,
       labelledTextField("genres"),
       items,
       publishers,
+      date("publicationDate"),
       location("thumbnail")
     )
 

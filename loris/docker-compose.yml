@@ -4,12 +4,6 @@ services:
     build: .
     ports:
      - "8888:8888"
-    environment:
-      - INFRA_BUCKET=platform-infra
-      - CONFIG_KEY=${CONFIG_KEY}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-
   nginx:
     image: "nginx_loris:${NGINX_TAG}"
     ports:

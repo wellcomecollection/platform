@@ -14,10 +14,14 @@ class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
     with SierraDescription
+    with SierraPhysicalDescription
+    with SierraExtent
     with SierraItems
     with SierraLettering
     with SierraPublishers
     with SierraTitle
+    with SierraLocation
+    with SierraPublicationDate
     with Logging {
 
   override def transformForType(
@@ -39,10 +43,13 @@ class SierraTransformableTransformer
               version = version,
               identifiers = getIdentifiers(sierraBibData),
               description = getDescription(sierraBibData),
+              physicalDescription = getPhysicalDescription(sierraBibData),
+              extent = getExtent(sierraBibData),
               lettering = getLettering(sierraBibData),
               items = getItems(sierraTransformable),
               publishers = getPublishers(sierraBibData),
-              visible = !(sierraBibData.deleted || sierraBibData.suppressed)
+              visible = !(sierraBibData.deleted || sierraBibData.suppressed),
+              publicationDate = getPublicationDate(sierraBibData)
             ))
         }
 

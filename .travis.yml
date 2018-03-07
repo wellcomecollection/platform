@@ -52,20 +52,10 @@ jobs:
     # (not under active development)
     # - env: TASK=nginx-build
 
-    # Sierra adapter stack.  This covers multiple Scala apps, so we skip
-    # it into separate tasks to avoid running all of them any time there's
-    # a change to just one.
     - stage: test
-      env: TASK=sierra_common-test
-    - env: TASK=sierra_window_generator-test
-    - env: TASK=sierra_reader-test
-    - env: TASK=sierra_items_to_dynamo-test
-    - env: TASK=sierra_bib_merger-test
-    - env: TASK=sierra_item_merger-test
-    - env: TASK=s3_demultiplexer-test
+      env: TASK=sbt-common-test
 
     # Catalogue pipeline stack
-    - env: TASK=sbt-common-test
     - env: TASK=transformer-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
@@ -76,6 +66,15 @@ jobs:
     - env: TASK=reindex_job_creator-test
     - env: TASK=complete_reindex-test
     - env: TASK=reindex_shard_generator-test
+
+    # Sierra adapter stack.
+    - env: TASK=sierra_common-test
+    - env: TASK=sierra_window_generator-test
+    - env: TASK=sierra_reader-test
+    - env: TASK=sierra_items_to_dynamo-test
+    - env: TASK=sierra_bib_merger-test
+    - env: TASK=sierra_item_merger-test
+    - env: TASK=s3_demultiplexer-test
 
     # Catalogue API stack
     - env: TASK=api-test
