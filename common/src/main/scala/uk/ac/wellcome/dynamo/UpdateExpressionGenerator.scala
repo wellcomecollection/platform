@@ -97,7 +97,6 @@ object UpdateExpressionGenerator {
                                                Option[UpdateExpression]] =
       at[Option[UpdateExpression], FieldType[K, V]] {
         (maybeUpdateExpression, fieldType) =>
-
           // Casting to type V gives us the value of the field.
           val fieldValue: V = fieldType
 
