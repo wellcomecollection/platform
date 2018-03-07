@@ -49,7 +49,7 @@ object VersionUpdater {
       t.updated('version, newVersion)
     }
 
-  // Generates an VersionUpdater for a case class.
+  // Generates an VersionUpdater for a case class ("product" in Shapeless).
   //
   // LabelledGeneric is a Shapeless type class that allows us to convert
   // between case classes and their HList representation.
