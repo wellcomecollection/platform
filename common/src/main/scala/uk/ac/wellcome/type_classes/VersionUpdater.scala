@@ -33,8 +33,8 @@ object VersionUpdater {
 
   // Generates an VersionUpdater for a case class using the VersionUpdater for its HLists representation
   implicit def productVersionUpdater[C, T](
-                                            implicit gen: LabelledGeneric.Aux[C, T],
-                                            versionUpdater: VersionUpdater[T]) = createVersionUpdater[C] {
+    implicit gen: LabelledGeneric.Aux[C, T],
+    versionUpdater: VersionUpdater[T]) = createVersionUpdater[C] {
     (t: C, newVersion: Int) =>
       gen.from(versionUpdater.updateVersion(gen.to(t), newVersion))
   }

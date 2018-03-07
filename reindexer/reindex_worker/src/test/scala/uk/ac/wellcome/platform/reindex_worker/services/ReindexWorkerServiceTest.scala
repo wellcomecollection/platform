@@ -12,7 +12,12 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{DynamoConfig, SNSConfig, SQSConfig, SQSMessage}
+import uk.ac.wellcome.models.aws.{
+  DynamoConfig,
+  SNSConfig,
+  SQSConfig,
+  SQSMessage
+}
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
