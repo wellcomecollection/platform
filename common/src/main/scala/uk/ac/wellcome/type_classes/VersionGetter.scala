@@ -43,7 +43,7 @@ object VersionGetter {
       selector(t)
   }
 
-  // Generates an VersionGetter for a case class.
+  // Generates an VersionGetter for a case class ("product" in Shapeless).
   //
   // LabelledGeneric is a Shapeless type class that allows us to convert
   // between case classes and their HList representation.
