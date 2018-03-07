@@ -49,7 +49,7 @@ object VersionUpdater {
   // LabelledGeneric is a Shapeless type class that allows us to convert
   // between case classes and their HList representation.
   //
-  // gen.to(t) converts the case class to an HList, and gen.from(...) goes
+  // gen.to(t) converts the case class C to an HList L, and gen.from(...) goes
   // in the other direction.
   implicit def productVersionUpdater[C, L](
     implicit gen: LabelledGeneric.Aux[C, L],
