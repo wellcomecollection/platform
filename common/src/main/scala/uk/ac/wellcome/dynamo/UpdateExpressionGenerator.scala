@@ -53,8 +53,8 @@ object UpdateExpressionGenerator {
   ) =
     create { t: L =>
       {
-        val recordAsHlist = t - 'id
-        recordAsHlist.foldLeft[Option[UpdateExpression]](None)(
+        val listWithoutId = t - 'id
+        listWithoutId.foldLeft[Option[UpdateExpression]](None)(
           buildUpdateExpression)
       }
     }
