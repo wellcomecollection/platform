@@ -105,7 +105,7 @@ class ReindexerFeatureTest
       )
     })
 
-     //TODO re-factor shared test state here into fixture method
+    //TODO re-factor shared test state here into fixture method
     testRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_))
 
     val expectedRecords = testRecords.map(
@@ -121,7 +121,7 @@ class ReindexerFeatureTest
       shardId = shardName,
       desiredVersion = desiredVersion
     )
-    
+
     val sqsMessage = SQSMessage(
       None,
       toJson(reindexJob).get,
@@ -129,18 +129,20 @@ class ReindexerFeatureTest
       "message",
       "now"
     )
-    
+
     sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
     expectedRecords.toList
   }
 
-  it("increases the reindexVersion on every record that needs a reindex") { withLocalSqsQueue {
-    queueUrl =>
+  it("increases the reindexVersion on every record that needs a reindex") {
+    withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withServer(queueUrl, topicArn) { server =>
-          sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
-          
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "1"))
+
           val expectedRecords = createReindexableData(queueUrl)
 
           eventually {
@@ -157,11 +159,13 @@ class ReindexerFeatureTest
     }
   }
 
-  it("sends an SNS notice for a completed reindex") { withLocalSqsQueue {
-    queueUrl =>
+  it("sends an SNS notice for a completed reindex") {
+    withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withServer(queueUrl, topicArn) { server =>
-          sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "1"))
 
           val expectedRecords = createReindexableData(queueUrl)
 
@@ -178,8 +182,8 @@ class ReindexerFeatureTest
 
             JsonUtil
               .fromJson[CompletedReindexJob](
-              messages.head.message
-            )
+                messages.head.message
+              )
               .get shouldBe expectedMessage
 
           }
@@ -188,11 +192,13 @@ class ReindexerFeatureTest
     }
   }
 
-  it("does not send a message if it cannot complete a reindex") { withLocalSqsQueue {
-    queueUrl =>
+  it("does not send a message if it cannot complete a reindex") {
+    withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withBadServer(queueUrl, topicArn) { server =>
-          sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "1"))
 
           val expectedRecords = createReindexableData(queueUrl)
 
