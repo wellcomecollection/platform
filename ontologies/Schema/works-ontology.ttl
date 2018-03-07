@@ -190,6 +190,27 @@ wwork:title rdf:type owl:DatatypeProperty ;
     rdfs:range rdf:langString ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
         
+wwork:remainingTitle rdf:type owl:DatatypeProperty ;
+    rdfs:label "remainingTitle"@en ;
+    rdfs:comment "The remainder of the title not captured as part of the main title."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+        
+wwork:partNumber rdf:type owl:DatatypeProperty ;
+    rdfs:label "partNumber"@en ;
+    rdfs:comment "The part number the work is in a group or series of works."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+        
+wwork:partName rdf:type owl:DatatypeProperty ;
+    rdfs:label "partName"@en ;
+    rdfs:comment "The part name for the work in a group or series of works."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+        
 wwork:level rdf:type owl:DatatypeProperty ;
     rdfs:label "level"@en ;
     rdfs:comment "Indicates the position of a work within a hierarchy of works: for example, Collection, Series, Item etc. The terminology used here will typically be drawn from external systems and may not necessarily correspond directly to the terminology of this ontology: for instance, in archive catalogues the term Item may be used to describe an entity that combines properties assigned in this ontology to the Work and Item classes."@en ;
