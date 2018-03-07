@@ -50,7 +50,7 @@ object IdGetter {
   // labelledGeneric.to(c) converts the case class C to an HList L, and then we
   // can use the constructor above.
   //
-  implicit def productIdGetter[C, L](
+  implicit def productIdGetter[C, L <: HList](
     implicit labelledGeneric: LabelledGeneric.Aux[C, L],
     idGetter: IdGetter[L]) = createIdGetter[C] { c: C =>
     idGetter.id(labelledGeneric.to(c))

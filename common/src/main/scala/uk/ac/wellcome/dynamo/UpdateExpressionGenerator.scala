@@ -41,7 +41,7 @@ object UpdateExpressionGenerator {
     }
 
   // Generates an UpdateExpressionGenerator for a case class
-  implicit def productUpdateExpressionGenerator[C, L](
+  implicit def productUpdateExpressionGenerator[C, L <: HList](
     implicit labelledGeneric: LabelledGeneric.Aux[C, L],
     updateExpressionGenerator: UpdateExpressionGenerator[L]) = create[C] {
     c: L =>
