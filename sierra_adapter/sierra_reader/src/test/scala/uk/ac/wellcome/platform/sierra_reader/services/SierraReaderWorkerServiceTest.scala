@@ -271,7 +271,6 @@ class SierraReaderWorkerServiceTest
     withSierraReaderWorkerService(
       fields = "",
       apiUrl = "http://localhost:5050") { fixtures =>
-
       val message =
         """
           |{
