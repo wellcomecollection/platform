@@ -57,7 +57,7 @@ object VersionUpdater {
   // gen.to(c) converts the case class C to an HList L, and gen.from(...) goes
   // in the other direction.
   //
-  implicit def productVersionUpdater[C, L](
+  implicit def productVersionUpdater[C, L <: HList](
     implicit gen: LabelledGeneric.Aux[C, L],
     versionUpdater: VersionUpdater[L]) = createVersionUpdater[C] {
     (c: C, newVersion: Int) =>
