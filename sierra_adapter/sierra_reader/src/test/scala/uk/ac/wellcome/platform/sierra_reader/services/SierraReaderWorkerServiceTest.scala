@@ -268,7 +268,10 @@ class SierraReaderWorkerServiceTest
 
   it(
     "does not return a GracefulFailureException if it cannot reach the Sierra API") {
-    withSierraReaderWorkerService(fields = "") { fixtures =>
+    withSierraReaderWorkerService(
+      fields = "",
+      apiUrl = "http://localhost:5050") { fixtures =>
+
       val message =
         """
           |{
