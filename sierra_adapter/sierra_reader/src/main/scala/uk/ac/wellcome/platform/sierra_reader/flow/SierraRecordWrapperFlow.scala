@@ -13,10 +13,11 @@ import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import scala.concurrent.ExecutionContext
 
 object SierraRecordWrapperFlow extends Logging {
-  def apply()(
-    implicit executionContext: ExecutionContext)
+  def apply()(implicit executionContext: ExecutionContext)
     : Flow[Json, SierraRecord, NotUsed] =
-    Flow.fromFunction({ json => createSierraRecord(json)})
+    Flow.fromFunction({ json =>
+      createSierraRecord(json)
+    })
 
   private def createSierraRecord(json: Json): SierraRecord = {
     logger.debug(s"Creating record from ${json.noSpaces}")
