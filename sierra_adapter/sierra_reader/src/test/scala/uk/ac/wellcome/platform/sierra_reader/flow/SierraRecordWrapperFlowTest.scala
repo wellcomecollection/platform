@@ -30,7 +30,7 @@ class SierraRecordWrapperFlowTest
     super.afterAll()
   }
 
-  it("creates a SierraRecord from a bib with a b-prefixed ID") {
+  it("creates a SierraRecord from a bib") {
     val id = "100001"
     val updatedDate = "2013-12-13T12:43:16Z"
     val json = parse(s"""
@@ -41,13 +41,8 @@ class SierraRecordWrapperFlowTest
       """.stripMargin).right.get
 
     val expectedRecord = SierraRecord(
-      id = s"b$id",
-      data = parse(s"""
-                      |{
-                      | "id": "b$id",
-                      | "updatedDate": "$updatedDate"
-                      |}
-      """.stripMargin).right.get.noSpaces,
+      id = id,
+      data = json.noSpaces,
       modifiedDate = updatedDate
     )
 
@@ -59,8 +54,7 @@ class SierraRecordWrapperFlowTest
     }
   }
 
-  it(
-    "creates a SierraRecord from an item with i-prefixed item ID and b-prefixed bibIds") {
+  it("creates a SierraRecord from an item") {
     val id = "400004"
     val updatedDate = "2014-04-14T14:14:14Z"
     val json = parse(s"""
@@ -72,14 +66,8 @@ class SierraRecordWrapperFlowTest
       """.stripMargin).right.get
 
     val expectedRecord = SierraRecord(
-      id = s"i$id",
-      data = parse(s"""
-                      |{
-                      | "id": "i$id",
-                      | "updatedDate": "$updatedDate",
-                      | "bibIds": ["b4", "b44", "b444", "b4444"]
-                      |}
-      """.stripMargin).right.get.noSpaces,
+      id = id,
+      data = json.noSpaces,
       modifiedDate = updatedDate
     )
 
@@ -101,14 +89,8 @@ class SierraRecordWrapperFlowTest
                        |}""".stripMargin).right.get
 
     val expectedRecord = SierraRecord(
-      id = s"b$id",
-      data = parse(s"""
-        |{
-        | "id": "b$id",
-        | "deletedDate" : "$deletedDate",
-        | "deleted" : true
-        |}
-      """.stripMargin).right.get.noSpaces,
+      id = id,
+      data = json.noSpaces,
       modifiedDate = s"${deletedDate}T00:00:00Z"
     )
 
