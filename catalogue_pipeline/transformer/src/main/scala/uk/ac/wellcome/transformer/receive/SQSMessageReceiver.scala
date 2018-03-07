@@ -7,7 +7,7 @@ import com.twitter.inject.annotations.Flag
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{UnidentifiedWork, Work}
+import uk.ac.wellcome.models.{SourceMetadata, UnidentifiedWork, Work}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
@@ -44,7 +44,9 @@ class SQSMessageReceiver @Inject()(
       () => {
         val futurePublishAttempt = for {
           hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
-          transformableRecord <- getTransformable(hybridRecord)
+          sourceMetadata <- Future.fromTry(
+            fromJson[SourceMetadata](message.body))
+          transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
           cleanRecord <- Future.fromTry(
             transformTransformable(transformableRecord, hybridRecord.version))
           publishResult <- publishMessage(cleanRecord)
@@ -61,8 +63,11 @@ class SQSMessageReceiver @Inject()(
     )
   }
 
-  private def getTransformable(hybridRecord: HybridRecord) = {
-    hybridRecord.sourceName match {
+  private def getTransformable(
+    hybridRecord: HybridRecord,
+    sourceMetadata: SourceMetadata
+  ) = {
+    sourceMetadata.sourceName match {
       case "miro" =>
         S3ObjectStore.get[MiroTransformable](s3Client, bucketName)(
           hybridRecord.s3key)

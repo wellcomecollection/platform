@@ -3,6 +3,7 @@ package uk.ac.wellcome.transformer.utils
 import java.time.Instant
 
 import org.scalatest.Suite
+import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.{
@@ -77,21 +78,41 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
   }
 
   def hybridRecordSqsMessage(message: String,
-                             testSource: String,
+                             sourceName: String,
                              version: Int = 1) = {
+
     val key = "testSource/1/testId/dshg548.json"
     s3Client.putObject(bucketName, key, message)
 
+    val hybridRecord = HybridRecord(
+      id = "testId",
+      version = version,
+      s3key = key
+    )
+
+    val sourceMetadata = SourceMetadata(
+      sourceName = sourceName
+    )
+
+    case class JoinedCaseClass(
+      id: String,
+      version: Int,
+      s3key: String,
+      sourceName: String
+    )
+
+    val joinedCaseClass = JoinedCaseClass(
+      id = hybridRecord.id,
+      version = hybridRecord.version,
+      s3key = hybridRecord.s3key,
+      sourceName = sourceMetadata.sourceName
+    )
+
+    val hListJson = JsonUtil.toJson(joinedCaseClass).get
+
     SQSMessage(
       None,
-      JsonUtil
-        .toJson(
-          HybridRecord(
-            version = version,
-            sourceId = "testId",
-            sourceName = testSource,
-            s3key = key))
-        .get,
+      hListJson,
       "test_transformer_topic",
       "notification",
       "the_time"
