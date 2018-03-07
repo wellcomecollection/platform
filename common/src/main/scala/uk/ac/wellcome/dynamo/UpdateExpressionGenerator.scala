@@ -44,8 +44,8 @@ object UpdateExpressionGenerator {
   //  - the operation (buildUpdateExpression.type)
   //  - the output (Option[UpdateExpression])
   //
-  implicit def hlistExpressionGenerator[L <: HList, A, B <: HList, C <: HList](
-    implicit remover: Remover.Aux[L, IdKey, (A, B)],
+  implicit def hlistExpressionGenerator[L <: HList, B <: HList, C <: HList](
+    implicit remover: Remover.Aux[L, IdKey, (String, B)],
     folder: LeftFolder.Aux[B,
                            Option[UpdateExpression],
                            buildUpdateExpression.type,
