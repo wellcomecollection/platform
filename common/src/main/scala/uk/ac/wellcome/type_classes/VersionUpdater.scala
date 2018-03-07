@@ -33,11 +33,15 @@ object VersionUpdater {
   // Generates a VersionUpdater for an arbitrary HList.
   //
   // Updater is a Shapeless type class that can update fields on an HList
-  // (a "record" in Shapeless terminology).
+  // (a "record" in Shapeless terminology).  It takes three type parameters:
   //
-  // In this case, it takes L as an input, modifies versionField, and returns
-  // another instance of L.  This means we can only create a VersionUpdater
-  // for HLists that already have a "version" field,
+  //  - the original record (L)
+  //  - the field to update (versionField)
+  //  - the new record (L)
+  //
+  // In this case, because it returns the same type as it starts with,
+  // we can only create a VersionUpdater for HLists that already have a
+  // "version" field.  It can't add the field if it's not there already.
   implicit def hlistVersionUpdater[L <: HList](
     implicit updater: Updater.Aux[L, versionField, L]) =
     createVersionUpdater[L] { (t: L, newVersion: Int) =>
@@ -49,12 +53,12 @@ object VersionUpdater {
   // LabelledGeneric is a Shapeless type class that allows us to convert
   // between case classes and their HList representation.
   //
-  // gen.to(t) converts the case class C to an HList L, and gen.from(...) goes
+  // gen.to(c) converts the case class C to an HList L, and gen.from(...) goes
   // in the other direction.
   implicit def productVersionUpdater[C, L](
     implicit gen: LabelledGeneric.Aux[C, L],
     versionUpdater: VersionUpdater[L]) = createVersionUpdater[C] {
-    (t: C, newVersion: Int) =>
-      gen.from(versionUpdater.updateVersion(gen.to(t), newVersion))
+    (c: C, newVersion: Int) =>
+      gen.from(versionUpdater.updateVersion(gen.to(c), newVersion))
   }
 }
