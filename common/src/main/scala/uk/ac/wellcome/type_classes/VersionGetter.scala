@@ -50,6 +50,7 @@ object VersionGetter {
   //
   // labelledGeneric.to(c) converts the case class C to an HList L, and then we
   // can use the constructor above.
+  //
   implicit def productVersionGetter[C, L](
     implicit labelledGeneric: LabelledGeneric.Aux[C, L],
     versionGetter: VersionGetter[L]) = createVersionGetter[C] { c: C =>
