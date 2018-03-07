@@ -117,8 +117,6 @@ class SierraReaderWorkerServiceTest
       getRecordsFromS3(pageNames(0)) should have size 10
       getRecordsFromS3(pageNames(1)) should have size 10
       getRecordsFromS3(pageNames(2)) should have size 9
-
-      getRecordsFromS3(pageNames(0)).head.id should startWith("b")
     }
   }
 
@@ -158,8 +156,6 @@ class SierraReaderWorkerServiceTest
       getRecordsFromS3(pageNames(1)) should have size 50
       getRecordsFromS3(pageNames(2)) should have size 50
       getRecordsFromS3(pageNames(3)) should have size 7
-
-      getRecordsFromS3(pageNames(0)).head.id should startWith("i")
     }
   }
 
