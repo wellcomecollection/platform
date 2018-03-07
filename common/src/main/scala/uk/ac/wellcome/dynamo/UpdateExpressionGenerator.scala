@@ -24,7 +24,26 @@ object UpdateExpressionGenerator {
       override def generateUpdateExpression(record: T) = f(record)
     }
 
-  // Generates a UpdateExpression for an HList
+  // Generate an UpdateExpression for an HList.
+  //
+  // Specifically, it creates a Scanamo UpdateExpression that updates
+  // every field in the HList except "id".
+  //
+  // Remover is a Shapeless type class that removes fields from an HList.
+  // It takes three type parameters:
+  //
+  //  - the input (L)
+  //  - the field to remove (IdKey)
+  //  - a tuple containing the removed value, and the remaining HList (A, B)
+  //
+  // LeftFolder is a Shapeless type class that left folds over an HList.
+  // It takes four type parameters:
+  //
+  //  - the input (B)
+  //  - the accumulated value (Option[UpdateExpression])
+  //  - the operation (buildUpdateExpression.type)
+  //  - the output (Option[UpdateExpression])
+  //
   implicit def hlistExpressionGenerator[L <: HList, A, B <: HList, C <: HList](
     implicit remover: Remover.Aux[L, IdKey, (A, B)],
     folder: LeftFolder.Aux[B,
@@ -40,7 +59,14 @@ object UpdateExpressionGenerator {
       }
     }
 
-  // Generates an UpdateExpressionGenerator for a case class
+  // Generates an UpdateExpressionGenerator for a case class ("product" in Shapeless).
+  //
+  // LabelledGeneric is a Shapeless type class that allows us to convert
+  // between case classes and their HList representation.
+  //
+  // labelledGeneric.to(c) converts the case class C to an HList L, and then we
+  // can use the constructor above.
+  //
   implicit def productUpdateExpressionGenerator[C, L <: HList](
     implicit labelledGeneric: LabelledGeneric.Aux[C, L],
     updateExpressionGenerator: UpdateExpressionGenerator[L]) = create[C] {
@@ -49,7 +75,20 @@ object UpdateExpressionGenerator {
   }
 
   // Creates an UpdateExpression out of a FieldType and adds it to the
-  // accumulating UpdateExpression
+  // accumulating UpdateExpression.
+  //
+  // Poly2 is a Shapeless type class that represents a polymorphic function
+  // with two arguments.  For more info, see § 7.2 "Polymorphic functions" of
+  // "The Type Astronaut’s Guide to Shapeless".
+  //
+  // Case is a Shapeless type class where the polymorphic function is defined.
+  // Because 'fold' is a function with two arguments, there are three type
+  // parameters:
+  //
+  //  - The first input (Option[UpdateExpression])
+  //  - The second input (FieldType[K, V])
+  //  - The return value (Option[UpdateExpression])
+  //
   object buildUpdateExpression extends Poly2 {
     implicit def fold[K <: Symbol, V](
       implicit witness: Witness.Aux[K],
@@ -58,7 +97,11 @@ object UpdateExpressionGenerator {
                                                Option[UpdateExpression]] =
       at[Option[UpdateExpression], FieldType[K, V]] {
         (maybeUpdateExpression, fieldType) =>
+
+          // Casting to type V gives us the value of the field.
           val fieldValue: V = fieldType
+
+          // This is an Update for a single field in the Scanamo DSL.
           val partUpdate = set(witness.value -> fieldValue)
 
           maybeUpdateExpression match {
