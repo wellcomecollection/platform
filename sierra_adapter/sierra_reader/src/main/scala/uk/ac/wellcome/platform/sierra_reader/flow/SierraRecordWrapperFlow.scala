@@ -25,11 +25,8 @@ object SierraRecordWrapperFlow extends Logging {
     })
 
   private def createSierraRecord(
-    unprefixedJson: Json,
+    json: Json,
     resourceType: SierraResourceTypes.Value): SierraRecord = {
-    val json = addIDPrefix(
-      json = unprefixedJson,
-      resourceType: SierraResourceTypes.Value)
     logger.debug(s"Creating record from ${json.noSpaces}")
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
     maybeUpdatedDate match {
@@ -54,26 +51,6 @@ object SierraRecordWrapperFlow extends Logging {
       .parse(root.deletedDate.string.getOption(json).get, formatter)
       .atStartOfDay()
       .toInstant(ZoneOffset.UTC)
-  }
-
-  // Sierra assigns IDs for bibs and items in the same namespace.  A record
-  // with ID "1234567" could be a bib or an item (or something else!).
-  //
-  // Outside Sierra, IDs are prefixed with a little to denote what type of
-  // record they are, e.g. "b1234567" and "i1234567" refer to a bib and item,
-  // respectively.
-  //
-  // This updates the ID in a block of JSON to add this disambiguating prefix.
-  private def addIDPrefix(json: Json,
-                          resourceType: SierraResourceTypes.Value): Json = {
-    resourceType match {
-      case SierraResourceTypes.bibs =>
-        root.id.string.modify(id => s"b$id")(json)
-      case SierraResourceTypes.items => {
-        val identifiedJson = root.id.string.modify(id => s"i$id")(json)
-        root.bibIds.each.string.modify(id => s"b$id")(identifiedJson)
-      }
-    }
   }
 
   private def getId(json: Json) = {
