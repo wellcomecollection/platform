@@ -19,10 +19,7 @@ class SierraRecordWrapperFlowTest
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val bibWrapperFlow = SierraRecordWrapperFlow(
-    resourceType = SierraResourceTypes.bibs)
-  val itemWrapperFlow = SierraRecordWrapperFlow(
-    resourceType = SierraResourceTypes.items)
+  val wrapperFlow = SierraRecordWrapperFlow()
 
   override def afterAll(): Unit = {
     system.terminate()
@@ -47,7 +44,7 @@ class SierraRecordWrapperFlowTest
     )
 
     val futureRecord =
-      Source.single(json).via(bibWrapperFlow).runWith(Sink.head)
+      Source.single(json).via(wrapperFlow).runWith(Sink.head)
 
     whenReady(futureRecord) { sierraRecord =>
       sierraRecord shouldBe expectedRecord
@@ -72,7 +69,7 @@ class SierraRecordWrapperFlowTest
     )
 
     val futureRecord =
-      Source.single(json).via(itemWrapperFlow).runWith(Sink.head)
+      Source.single(json).via(wrapperFlow).runWith(Sink.head)
 
     whenReady(futureRecord) { sierraRecord =>
       sierraRecord shouldBe expectedRecord
@@ -95,7 +92,7 @@ class SierraRecordWrapperFlowTest
     )
 
     val futureRecord =
-      Source.single(json).via(bibWrapperFlow).runWith(Sink.head)
+      Source.single(json).via(wrapperFlow).runWith(Sink.head)
 
     whenReady(futureRecord) { sierraRecord =>
       sierraRecord shouldBe expectedRecord
@@ -112,7 +109,7 @@ class SierraRecordWrapperFlowTest
        """.stripMargin).right.get
 
     val futureUnit =
-      Source.single(invalidSierraJson).via(bibWrapperFlow).runWith(Sink.head)
+      Source.single(invalidSierraJson).via(wrapperFlow).runWith(Sink.head)
     whenReady(futureUnit.failed) { _ =>
       ()
     }
