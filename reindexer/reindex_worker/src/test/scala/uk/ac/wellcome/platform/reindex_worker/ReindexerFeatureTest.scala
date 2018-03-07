@@ -8,14 +8,16 @@ import org.scalatest.fixture.FunSpec
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  CompletedReindexJob,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
-
 
 class ReindexerFeatureTest
     extends FunSpec
@@ -36,7 +38,8 @@ class ReindexerFeatureTest
     .toSourcedDynamoFormatWrapper[HybridRecord]
     .enrichedDynamoFormat
 
-  def withServer[R](queueUrl: String, topicArn: String)(testWith: TestWith[EmbeddedHttpServer, R]) = {
+  def withServer[R](queueUrl: String, topicArn: String)(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
@@ -57,14 +60,16 @@ class ReindexerFeatureTest
     }
   }
 
-  override def withFixture(testWith: OneArgTest) = withLocalSqsQueue { queueUrl =>
-    withLocalSnsTopic { topicArn =>
-      withServer(queueUrl, topicArn) { server =>
-        sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+  override def withFixture(testWith: OneArgTest) = withLocalSqsQueue {
+    queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withServer(queueUrl, topicArn) { server =>
+          sqsClient
+            .setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
-        testWith(FixtureParam(queueUrl, topicArn))
+          testWith(FixtureParam(queueUrl, topicArn))
+        }
       }
-    }
   }
 
   case class FixtureParam(queueUrl: String, topicArn: String)
@@ -109,15 +114,18 @@ class ReindexerFeatureTest
     expectedRecords.toList
   }
 
-  it("increases the reindexVersion on every record that needs a reindex") { fixtures =>
-    val expectedRecords = createReindexableData(fixtures.queueUrl)
+  it("increases the reindexVersion on every record that needs a reindex") {
+    fixtures =>
+      val expectedRecords = createReindexableData(fixtures.queueUrl)
 
-    eventually {
-      val actualRecords =
-        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+      eventually {
+        val actualRecords =
+          Scanamo
+            .scan[HybridRecord](dynamoDbClient)(tableName)
+            .map(_.right.get)
 
-      actualRecords should contain theSameElementsAs expectedRecords
-    }
+        actualRecords should contain theSameElementsAs expectedRecords
+      }
   }
 
   it("sends an SNS notice for a completed reindex") { fixtures =>
