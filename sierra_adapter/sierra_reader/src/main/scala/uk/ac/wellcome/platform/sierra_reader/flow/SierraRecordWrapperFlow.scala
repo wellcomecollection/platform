@@ -17,7 +17,7 @@ object SierraResourceTypes extends Enumeration {
 }
 
 object SierraRecordWrapperFlow extends Logging {
-  def apply(resourceType: SierraResourceTypes.Value)(
+  def apply()(
     implicit executionContext: ExecutionContext)
     : Flow[Json, SierraRecord, NotUsed] =
     Flow.fromFunction({ json => createSierraRecord(json)})

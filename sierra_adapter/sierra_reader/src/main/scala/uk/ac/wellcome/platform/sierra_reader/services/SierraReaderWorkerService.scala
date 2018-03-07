@@ -74,7 +74,7 @@ class SierraReaderWorkerService @Inject()(
       SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
         resourceType = resourceType.toString,
         params)
-        .via(SierraRecordWrapperFlow(resourceType = resourceType))
+        .via(SierraRecordWrapperFlow())
         .grouped(batchSize)
         .map(recordBatch => recordBatch.asJson)
         .zipWithIndex
