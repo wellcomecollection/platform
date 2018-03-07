@@ -20,13 +20,9 @@ object SierraRecordWrapperFlow extends Logging {
   def apply(resourceType: SierraResourceTypes.Value)(
     implicit executionContext: ExecutionContext)
     : Flow[Json, SierraRecord, NotUsed] =
-    Flow.fromFunction({ json =>
-      createSierraRecord(json, resourceType)
-    })
+    Flow.fromFunction({ json => createSierraRecord(json)})
 
-  private def createSierraRecord(
-    json: Json,
-    resourceType: SierraResourceTypes.Value): SierraRecord = {
+  private def createSierraRecord(json: Json): SierraRecord = {
     logger.debug(s"Creating record from ${json.noSpaces}")
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
     maybeUpdatedDate match {
