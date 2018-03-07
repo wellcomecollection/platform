@@ -1,11 +1,3 @@
-output "bucket_miro_data_id" {
-  value = "${aws_s3_bucket.miro-data.id}"
-}
-
-output "bucket_miro_data_arn" {
-  value = "${aws_s3_bucket.miro-data.arn}"
-}
-
 output "bucket_miro_images_sync_arn" {
   value = "${aws_s3_bucket.miro-images-sync.arn}"
 }

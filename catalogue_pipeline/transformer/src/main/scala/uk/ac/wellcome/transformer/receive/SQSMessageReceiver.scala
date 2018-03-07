@@ -25,7 +25,6 @@ import uk.ac.wellcome.transformer.transformers.{
   TransformableTransformer
 }
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
@@ -44,8 +43,7 @@ class SQSMessageReceiver @Inject()(
       "ingest-time",
       () => {
         val futurePublishAttempt = for {
-          hybridRecord <- Future.fromTry(
-            JsonUtil.fromJson[HybridRecord](message.body))
+          hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
           transformableRecord <- getTransformable(hybridRecord)
           cleanRecord <- Future.fromTry(
             transformTransformable(transformableRecord, hybridRecord.version))
@@ -105,7 +103,7 @@ class SQSMessageReceiver @Inject()(
     maybeWork.fold(Future.successful(None: Option[PublishAttempt])) { work =>
       snsWriter
         .writeMessage(
-          message = JsonUtil.toJson(work).get,
+          message = toJson(work).get,
           subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
         )
         .map(publishAttempt => Some(publishAttempt))

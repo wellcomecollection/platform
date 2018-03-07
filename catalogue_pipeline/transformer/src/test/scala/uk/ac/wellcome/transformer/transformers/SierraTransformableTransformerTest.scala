@@ -183,6 +183,10 @@ class SierraTransformableTransformerTest
           MarcSubfield(
             tag = "a",
             content = "A delightful description of a dead daisy."
+          ),
+          MarcSubfield(
+            tag = "c",
+            content = "1923."
           )
         )
       )
@@ -198,7 +202,22 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val marcFields = publisherFields ++ descriptionFields ++ letteringFields
+    val publishingDateFields = List(
+      VarField(
+        fieldTag = "?",
+        marcTag = "260",
+        indicator1 = " ",
+        indicator2 = " ",
+        subfields = List(
+          MarcSubfield(
+            tag = "c",
+            content = "1923."
+          )
+        )
+      )
+    )
+
+    val marcFields = publisherFields ++ descriptionFields ++ letteringFields ++ publishingDateFields
 
     val data =
       s"""
@@ -230,7 +249,8 @@ class SierraTransformableTransformerTest
         identifiers = List(identifier),
         description = Some("A delightful description of a dead daisy."),
         publishers = List(Organisation(label = "Peaceful Poetry")),
-        lettering = Some(lettering)
+        lettering = Some(lettering),
+        publicationDate = Some(Period("1923."))
       )
     )
   }
@@ -266,7 +286,8 @@ class SierraTransformableTransformerTest
         sourceIdentifier = identifier,
         version = 1,
         identifiers = List(identifier),
-        visible = false)
+        visible = false,
+        publicationDate = None)
     )
   }
 
@@ -301,7 +322,8 @@ class SierraTransformableTransformerTest
         sourceIdentifier = identifier,
         version = 1,
         identifiers = List(identifier),
-        visible = false)
+        visible = false,
+        publicationDate = None)
     )
   }
 
@@ -332,5 +354,82 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get.get.title shouldBe None
+  }
+
+  it("includes the physical description, if present") {
+    val id = "b7000007"
+    val physicalDescription = "A dusty depiction of dodos"
+
+    val data =
+      s"""
+        | {
+        |   "id": "$id",
+        |   "title": "Doddering dinosaurs are daring in dance",
+        |   "varFields": [
+        |     {
+        |       "fieldTag": "b",
+        |       "marcTag": "300",
+        |       "ind1": " ",
+        |       "ind2": " ",
+        |       "subfields": [
+        |         {
+        |           "tag": "b",
+        |           "content": "$physicalDescription"
+        |         }
+        |       ]
+        |     }
+        |   ]
+        | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.physicalDescription shouldBe Some(
+      physicalDescription)
+  }
+
+  it("includes the extent, if present") {
+    val id = "b8000008"
+    val extent = "Purple pages"
+
+    val data =
+      s"""
+        | {
+        |   "id": "$id",
+        |   "title": "English earwigs earn evidence of evil",
+        |   "varFields": [
+        |     {
+        |       "fieldTag": "a",
+        |       "marcTag": "300",
+        |       "ind1": " ",
+        |       "ind2": " ",
+        |       "subfields": [
+        |         {
+        |           "tag": "a",
+        |           "content": "$extent"
+        |         }
+        |       ]
+        |     }
+        |   ]
+        | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.extent shouldBe Some(extent)
   }
 }

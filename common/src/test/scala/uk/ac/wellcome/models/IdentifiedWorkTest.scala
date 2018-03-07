@@ -14,6 +14,18 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
             "type": "License"
           }"""
 
+  // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
+  // read "There is no news", followed by 15 minutes of piano music.
+  val publicationDate = "18 April 1930"
+
+  // TRIVIA: This isn't describing a book, but instead the allocation
+  // of disk space inside Microsoft SQL Server.
+  val extent = "A collection of eight physically contiguous pages"
+
+  // TRIVIA: This is how Willem de Vlamingh, a Dutch scientist, described
+  // seeing the quokka when exploring near Australia.
+  val physicalDescription = "A kind of rat as big as a cat"
+
   val identifiedWorkJson: String =
     s"""
       |{
@@ -31,6 +43,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "canonicalId": "canonicalId",
       |  "description": "description",
+      |  "physicalDescription": "$physicalDescription",
+      |  "extent": "$extent",
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
@@ -92,6 +106,10 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type": "Organisation"
       |    }
       |  ],
+      |  "publicationDate": {
+      |    "label": "$publicationDate",
+      |    "type": "Period"
+      |  },
       |  "visible":true,
       |  "type": "Work"
       |}
@@ -120,6 +138,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val publishers = List(publisher)
+
   val identifiedWork = IdentifiedWork(
     canonicalId = "canonicalId",
     title = Some("title"),
@@ -127,6 +146,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     version = 1,
     identifiers = List(identifier),
     description = Some("description"),
+    physicalDescription = Some(physicalDescription),
+    extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
@@ -134,7 +155,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
-    publishers = publishers
+    publishers = publishers,
+    publicationDate = Some(Period(publicationDate))
   )
 
   it("should serialise an identified Item as Work") {

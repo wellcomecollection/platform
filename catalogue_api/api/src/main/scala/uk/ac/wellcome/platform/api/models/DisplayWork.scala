@@ -1,12 +1,8 @@
 package uk.ac.wellcome.platform.api.models
 
-import scala.util.{Failure, Success}
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
-import com.sksamuel.elastic4s.http.search.SearchHit
-import com.sksamuel.elastic4s.http.get.GetResponse
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.{IdentifiedWork, Item, SourceIdentifier}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.IdentifiedWork
 
 @JsonIgnoreProperties(Array("visible"))
 @ApiModel(
@@ -24,6 +20,15 @@ case class DisplayWork(
     dataType = "String",
     value = "A description given to a thing.") description: Option[String] =
     None,
+  @ApiModelProperty(
+    dataType = "String",
+    value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
+    String] = None,
+  @ApiModelProperty(
+    dataType = "String",
+    value =
+      "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
+  ) extent: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
     value = "Recording written text on a (usually visual) work.") lettering: Option[
@@ -65,6 +70,11 @@ case class DisplayWork(
     dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAgent] = List(),
+  @ApiModelProperty(
+    dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
+    value =
+      "Relates the publication of a work to a date when the work has been formally published."
+  ) publicationDate: Option[DisplayPeriod] = None,
   visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
@@ -78,6 +88,8 @@ case object DisplayWork {
       id = work.canonicalId,
       title = work.title.get,
       description = work.description,
+      physicalDescription = work.physicalDescription,
+      extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       creators = work.creators.map { DisplayAgent(_) },
@@ -97,31 +109,11 @@ case object DisplayWork {
           })
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
+      publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       visible = work.visible
     )
   }
 
   def apply(work: IdentifiedWork): DisplayWork =
     DisplayWork(work = work, includes = WorksIncludes())
-
-  def apply(hit: SearchHit): DisplayWork =
-    apply(hit, includes = WorksIncludes())
-
-  def apply(hit: SearchHit, includes: WorksIncludes): DisplayWork = {
-    jsonToDisplayWork(hit.sourceAsString, includes)
-  }
-
-  def apply(got: GetResponse, includes: WorksIncludes): DisplayWork = {
-    jsonToDisplayWork(got.sourceAsString, includes)
-  }
-
-  private def jsonToDisplayWork(document: String, includes: WorksIncludes) = {
-    fromJson[IdentifiedWork](document) match {
-      case Success(work) => DisplayWork(work = work, includes = includes)
-      case Failure(e) =>
-        throw new RuntimeException(
-          s"Unable to parse JSON as Work ($e): $document"
-        )
-    }
-  }
 }

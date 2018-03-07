@@ -122,4 +122,47 @@ class DisplayWorkTest extends FunSpec with Matchers {
       )
     }
   }
+
+  it("gets the publicationDate from a Work") {
+    val work = IdentifiedWork(
+      title = Some("Calling a cacophany of cats to consume carrots"),
+      canonicalId = "c4kauupf",
+      sourceIdentifier = sourceIdentifier,
+      publicationDate = Some(Period("c1900")),
+      version = 1
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.publicationDate shouldBe Some(DisplayPeriod("c1900"))
+  }
+
+  it("gets the physicalDescription from a Work") {
+    val physicalDescription = "A magnificent mural of magpies"
+
+    val work = IdentifiedWork(
+      title = Some("Moving a mighty mouse to Madagascar"),
+      canonicalId = "mtc2wvrg",
+      sourceIdentifier = sourceIdentifier,
+      physicalDescription = Some(physicalDescription),
+      version = 1
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.physicalDescription shouldBe Some(physicalDescription)
+  }
+
+  it("gets the extent from a Work") {
+    val extent = "Bound in boxes of bark"
+
+    val work = IdentifiedWork(
+      title = Some("Brilliant beeches in Bucharest"),
+      canonicalId = "bmnppscn",
+      sourceIdentifier = sourceIdentifier,
+      extent = Some(extent),
+      version = 1
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.extent shouldBe Some(extent)
+  }
 }

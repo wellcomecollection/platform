@@ -7,5 +7,7 @@ module "reindex_shard_tracker_dynamo_to_sns" {
 
   stream_view_type = "NEW_IMAGE_ONLY"
 
+  infra_bucket = "${var.infra_bucket}"
+
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }
