@@ -39,15 +39,50 @@
 
    /* Populate wwork:title. The rules are as follows:
    * 
-   * 1. For all bibliographic records use bib record "title".
+   * 1. For all bibliographic records use bib 245 a.
+   * 2. Populate wwork:title with contents of 245 a.
    *
-   * Note: Sierra populates this field from field 245 subfield a and b. Does title in sierra also draw from n and p? n is the part number and p is the part name. For example: Medical societies ephemera.|nBox 1.
-   *
-   * Punctutation works as follows: n follows a fullstop unless following an abbrev. p also follows a full stop (after a and b) except after n when it follows a comma. For our purposes we retain the punctuation as it is used for presenting the concatentated set of titles in a consistent way.
    * Example:
-   *  "title": "The tuberculosis worker : a handbook on methods and programs of tuberculosis work",
+   *  "title": "The tuberculosis worker",
    */
 
+
+   /* Populate wwork:remainingTitle. The rules are as follows:
+   * 
+   * 1. For all bibliographic records use bib 245 b.
+   * 2. Populate wwork:remainingTitle with contents of 245 b.
+   *
+   * Example: 
+   *    "remainingTitle" : "a handbook on methods and programs of tuberculosis work"
+   */
+   
+   
+   /* Populate wwork:partNumber. The rules are as follows:
+   * 
+   * 1. For all bibliographic records use 245 n.
+   * 2. Populate wwork:partNumber with contents of 245 n .
+   *
+   * Example:
+   *  "partName": "Part III",
+   */
+   
+   /* Populate wwork:partName. The rules are as follows:
+   * 
+   * 1. For all bibliographic records use 245 p.
+   * 2. Populate wwork:partName with contents of 245 p .
+   *
+   * Example:
+   *  "partName": "1987-1995, At the bungalow",
+   */
+
+   /* Populate wwork:alternativeTitle. The rules are as follows:
+   * 
+   * 1. For all bibliographic records use 246 a excluding 246 06 a.
+   * 2. Populate wwork:alternativeTitle with contents of 246 a .
+   *
+   * Example:
+   *  "partName": "1987-1995, At the bungalow",
+   */
 
    /* Populate wwork:language. Rules
    * 
@@ -103,8 +138,8 @@
       * Example:
    *  "contributors": [
    *     {
-   *        "type": "Contribution" , 
-   *        "agents": {
+   *        "type": "Contributor" , 
+   *        "agent": {
    *           "id": "a24s7qf3" ,
    *           "name": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
    *           "type": "Person",
@@ -114,32 +149,14 @@
    *           "type": "Identifier",
    *           "identifierScheme": "lcsh"
    *        }
-   *        ]
-   *     },   
-   *     "contributionType": [
+   *        ]   
+   *     "contributions": [
    *        {
-   *           "contributionType": "editor" ,        
+   *           "contribution": "editor" ,        
    *           "label": "Editor",
-   *           "type": "ContributionType"  
+   *           "type": "Contribution"  
    *        } 
    *     ] ,
-   *     "affiliation" :
-   *       {
-   *           "type": "Affiliation"
-   *            "affiliatedWith" :
-   *              {
-   *                   "id": "a8y98yy8" ,
-   *                   "label": "University of Birmingham",
-   *                   "type": "Organisation" 
-   *                       "identifiers": [
-   *                        {
-   *                            "value": "2005016805",
-   *                            "type": "Identifier",
-   *                            "identifierScheme": "lcsh"
-   *                        }
-   *                        ]                  
-   *              }
-   *       }
    *  } ,
    * ],
    *
@@ -323,7 +340,7 @@
    /* Populate wwork:lettering: Rules:
    *
    *  1. For bibliographic records where "246" is popuated with "1" as the first indicator and a second indicator of "6" 
-   *  2. Populate "lettering" 
+   *  2. Populate "lettering" with "246" a.
    *  3. If record is archive, image or journals look at 749 but not subfield "6". Need to check how we identify these records. Archive will come through CALM anyway
    * 
    * Example:
