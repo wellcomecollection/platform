@@ -5,6 +5,8 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import scala.util.Random
+import uk.ac.wellcome.models.aws.SQSMessage
+import scala.util.Try
 
 trait SqsFixtures {
 
@@ -28,15 +30,27 @@ trait SqsFixtures {
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
 
-  def withLocalSqsQueue(testWith: TestWith[String]) = {
-    val queueName = Random.alphanumeric take 10 mkString
+  def withLocalSqsQueue[R](testWith: TestWith[String, R]) = {
+    val queueName: String = Random.alphanumeric take 10 mkString
     val url = sqsClient.createQueue(queueName).getQueueUrl
 
     try {
       testWith(url)
     } finally {
-      sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(url))
+      Try { sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(url)) }
+      Try { sqsClient.deleteQueue(url) }
     }
+  }
+
+  object TestSqsMessage {
+    def apply() =
+      SQSMessage(
+        subject = Some("subject"),
+        messageType = "messageType",
+        topic = "topic",
+        body = """{ "foo": "bar"}""",
+        timestamp = "timestamp"
+      )
   }
 
 }

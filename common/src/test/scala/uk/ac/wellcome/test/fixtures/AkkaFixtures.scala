@@ -5,7 +5,7 @@ import org.scalatest.concurrent.Eventually
 
 trait AkkaFixtures extends Eventually {
 
-  def withActorSystem(testWith: TestWith[ActorSystem]) = {
+  def withActorSystem[R](testWith: TestWith[ActorSystem, R]) = {
     val actorSystem = ActorSystem()
 
     try {
