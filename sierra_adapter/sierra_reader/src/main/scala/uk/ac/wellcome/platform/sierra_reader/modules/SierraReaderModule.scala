@@ -6,8 +6,8 @@ import akka.actor.ActorSystem
 import com.google.inject.Provides
 import com.twitter.inject.annotations.Flag
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
-import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes.{
+import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes.{
   bibs,
   items
 }
