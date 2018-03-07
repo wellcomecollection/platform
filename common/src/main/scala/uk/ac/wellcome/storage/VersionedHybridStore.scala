@@ -23,17 +23,26 @@ class VersionedHybridStore[T <: Id] @Inject()(
   versionedDao: VersionedDao
 ) {
 
-  case class EmptyCC()
+  case class EmptyMetadata()
   private case class VersionedHybridObject(
     hybridRecord: HybridRecord,
     s3Object: T
   )
 
-  def updateRecord[O, B](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
-    metadata: B = EmptyCC())(
+  // Store a single record in DynamoDB.
+  //
+  // You pass it a record and optionally a case class containing some metadata (type M).
+  // The metadata parameter is useful if you have some additional detail you don't want
+  // to store on your primary model.
+  //
+  // The two are combined into a single HList with the HybridRecordEnricher of type O,
+  // and this record is what gets saved to DynamoDB.
+  //
+  def updateRecord[O, M](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
+    metadata: M = EmptyMetadata())(
     implicit decoder: Decoder[T],
     encoder: Encoder[T],
-    enricher: HybridRecordEnricher.Aux[B, O],
+    enricher: HybridRecordEnricher.Aux[M, O],
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
@@ -50,7 +59,10 @@ class VersionedHybridStore[T <: Id] @Inject()(
             id,
             transformedS3Record,
             enricher
-              .enrichedHybridRecordHList(id, metadata, hybridRecord.version)
+              .enrichedHybridRecordHList(
+                id = id,
+                metadata = metadata,
+                version = hybridRecord.version)
           )
         } else {
           Future.successful(())
@@ -60,7 +72,11 @@ class VersionedHybridStore[T <: Id] @Inject()(
         putObject(
           id = id,
           ifNotExisting,
-          enricher.enrichedHybridRecordHList(id, metadata, 0)
+          enricher.enrichedHybridRecordHList(
+            id = id,
+            metadata = metadata,
+            version = 0
+          )
         )
 
     }
