@@ -1,99 +1,177 @@
 package uk.ac.wellcome.platform.idminter
 
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.{BeforeAndAfterEach, FunSpec}
-import scalikejdbc._
+
+import org.scalatest.concurrent.Eventually
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.idminter.utils.IdMinterTestUtils
-import uk.ac.wellcome.test.utils.MessageInfo
+import uk.ac.wellcome.test.fixtures.{MessageInfo, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil
+
+import scala.collection.JavaConversions._
 
 class IdMinterFeatureTest
     extends FunSpec
-    with FeatureTestMixin
-    with IdMinterTestUtils
-    with BeforeAndAfterEach {
+    with SqsFixtures
+    with SnsFixtures
+    with fixtures.IdentifiersDatabase
+    with fixtures.Server
+    with ExtendedPatience
+    with Eventually
+    with Matchers {
 
-  override val server: EmbeddedHttpServer = defineServer
-  private val i = identifiersTable.i
+  private def getWorksFromMessages(messages: List[MessageInfo]) =
+    messages.map(m => fromJson[IdentifiedWork](m.message).get)
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    sql"TRUNCATE TABLE $identifiersDatabase.$identifiersTableName"
-      .execute()
-      .apply()
-  }
-
-  it(
-    "mints the same ID for SourcedWorks that have matching source identifiers") {
-    val miroID = "M0001234"
-    val title = "A limerick about a lion"
-
+  private def generateSqsMessage(MiroID: String): SQSMessage = {
     val identifier =
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
 
     val work = UnidentifiedWork(
-      title = Some(title),
+      title = Some("A query about a queue of quails"),
       sourceIdentifier = identifier,
       version = 1,
       identifiers = List(identifier))
 
-    val sqsMessage = SQSMessage(
+    SQSMessage(
       Some("subject"),
-      toJson(work).get,
+      JsonUtil.toJson(work).get,
       "topic",
       "messageType",
-      "timestamp"
-    )
+      "timestamp")
+  }
 
-    def sendMessage = sqsClient.sendMessage(
-      idMinterQueue,
-      toJson(sqsMessage).get
-    )
 
-    def getWorksFromMessages(messages: Seq[MessageInfo]) =
-      messages.map(m => fromJson[IdentifiedWork](m.message).get)
-
-    sendMessage
-
-    eventually {
-      val messages = listMessagesReceivedFromSNS()
-      messages should have size (1)
-
-      val work = getWorksFromMessages(messages).head
-
-      work.identifiers.head.value shouldBe miroID
-      work.title shouldBe Some(title)
-    }
-
-    sendMessage
+  private def assertMessageIsNotDeleted(queueUrl: String): Unit = {
+    // After a message is read, it stays invisible for 1 second and then it gets sent again.
+    // So we wait for longer than the visibility timeout and then we assert that it has become
+    // invisible again, which means that the id_minter picked it up again,
+    // and so it wasn't deleted as part of the first run.
+    // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
+    Thread.sleep(2000)
 
     eventually {
-      val moreMessages = listMessagesReceivedFromSNS()
-      moreMessages should have size (2)
-
-      val works = getWorksFromMessages(moreMessages)
-
-      works.head shouldBe works.tail.head
+      sqsClient
+        .getQueueAttributes(
+          queueUrl,
+          List("ApproximateNumberOfMessagesNotVisible")
+        )
+        .getAttributes
+        .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
     }
+  }
 
+  it("mints the same ID for SourcedWorks that have matching source identifiers") {
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withIdentifiersDatabase { dbConfig =>
+
+          val flags = Map(
+            "aws.rds.identifiers.database" -> dbConfig.databaseName,
+            "aws.rds.identifiers.table" -> dbConfig.tableName,
+            "aws.region" -> "localhost",
+            "aws.sqs.queue.url" -> queueUrl,
+            "aws.sqs.waitTime" -> "1",
+            "aws.sns.topic.arn" -> topicArn
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ mySqlLocalEndpointFlags
+
+          withServer(flags) { _ =>
+            sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+
+            val miroID = "M0001234"
+            val title = "A limerick about a lion"
+
+            val identifier =
+              SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
+
+            val work = UnidentifiedWork(
+              title = Some(title),
+              sourceIdentifier = identifier,
+              version = 1,
+              identifiers = List(identifier))
+
+            val sqsMessage = SQSMessage(
+              Some("subject"),
+              toJson(work).get,
+              "topic",
+              "messageType",
+              "timestamp"
+            )
+
+            def sendMessage = sqsClient.sendMessage(
+              queueUrl,
+              toJson(sqsMessage).get
+            )
+
+            sqsClient.sendMessage(
+              queueUrl,
+              toJson(sqsMessage).get
+            )
+
+            eventually {
+              val messages = listMessagesReceivedFromSNS(topicArn)
+              messages should have size (1)
+
+              val work = getWorksFromMessages(messages).head
+
+              work.identifiers.head.value shouldBe miroID
+              work.title shouldBe Some(title)
+            }
+
+            sqsClient.sendMessage(
+              queueUrl,
+              toJson(sqsMessage).get
+            )
+
+            eventually {
+              val moreMessages = listMessagesReceivedFromSNS(topicArn)
+              moreMessages should have size (2)
+
+              val works = getWorksFromMessages(moreMessages)
+
+              works.head shouldBe works.tail.head
+            }
+          }
+        }
+      }
+    }
   }
 
   it("continues if something fails processing a message") {
-    sqsClient.sendMessage(idMinterQueue, "not a json string")
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withIdentifiersDatabase { dbConfig =>
 
-    val miroId = "1234"
-    val sqsMessage = generateSqsMessage(miroId)
+          val flags = Map(
+            "aws.rds.identifiers.database" -> dbConfig.databaseName,
+            "aws.rds.identifiers.table" -> dbConfig.tableName,
+            "aws.region" -> "localhost",
+            "aws.sqs.queue.url" -> queueUrl,
+            "aws.sqs.waitTime" -> "1",
+            "aws.sns.topic.arn" -> topicArn
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ mySqlLocalEndpointFlags
 
-    sqsClient.sendMessage(idMinterQueue, toJson(sqsMessage).get)
+          withServer(flags) { _ =>
+            sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "10"))
 
-    eventually {
-      val messages = listMessagesReceivedFromSNS()
-      messages should have size (1)
+            sqsClient.sendMessage(queueUrl, "not a json string")
+
+            val miroId = "1234"
+            val sqsMessage = generateSqsMessage(miroId)
+
+            sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+
+            eventually {
+              val messages = listMessagesReceivedFromSNS(queueUrl)
+              messages should have size (1)
+            }
+
+            assertMessageIsNotDeleted(queueUrl)
+          }
+        }
+      }
     }
-
-    assertMessageIsNotDeleted()
   }
 }
