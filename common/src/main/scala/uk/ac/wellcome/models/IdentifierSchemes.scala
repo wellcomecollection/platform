@@ -40,7 +40,8 @@ object IdentifierSchemes extends Logging {
     miroLibraryReference,
     calmPlaceholder,
     calmAltRefNo,
-    sierraSystemNumber)
+    sierraSystemNumber,
+    marcCountries)
 
   @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
   @JsonSerialize(using = classOf[IdentifierSchemeSerialiser])
@@ -72,6 +73,10 @@ object IdentifierSchemes extends Logging {
     override def toString: String = "sierra-system-number"
   }
 
+  case object marcCountries extends IdentifierScheme {
+    override def toString: String = "marc-countries"
+  }
+
   def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
     identifierScheme match {
@@ -85,6 +90,8 @@ object IdentifierSchemes extends Logging {
         IdentifierSchemes.calmPlaceholder
       case s: String if s == IdentifierSchemes.miroLibraryReference.toString =>
         IdentifierSchemes.miroLibraryReference
+      case s: String if s == IdentifierSchemes.marcCountries.toString =>
+        IdentifierSchemes.marcCountries
       case identifierScheme =>
         val errorMessage = s"$identifierScheme is not a valid identifierScheme"
         error(errorMessage)
