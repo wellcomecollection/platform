@@ -4,6 +4,7 @@
 import json
 import os
 import re
+import sys
 
 import boto3
 import mmh3
@@ -15,14 +16,14 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('SourceData')
 
 
-def items():
+def items(kwargs=None):
     """Generate all items from a DynamoDB table."""
-    kwargs = {}
+    if kwargs is None:
+        kwargs = {}
     while True:
         resp = table.scan(**kwargs)
         yield from resp['Items']
         kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
-        break
 
 
 def _transform_itemdata(itemdata):
@@ -103,18 +104,35 @@ def transform_item(item):
     return item
 
 
-for item in items():
+from botocore.exceptions import ClientError
+from tenacity import *
 
-    old_item = item.copy()
-    new_item = transform_item(item)
-    if old_item == new_item:
-        print('.', end='', flush=True)
-        continue
-    print(f'Processing {old_item["id"]}')
-    table.put_item(Item=new_item)
-    table.delete_item(Key={'id': old_item['id']})
-    s3_client.delete_object(
-        Bucket='wellcomecollection-vhs-sourcedata',
-        Key=old_item['s3key']
-    )
-    break
+
+@retry(
+    retry=retry_if_exception_type(ClientError),
+    wait=wait_exponential(multiplier=1, max=10)
+)
+def main():
+    try:
+        kwargs = {'ExclusiveStartKey': {'id': sys.argv[1]}}
+    except IndexError:
+        kwargs = {}
+    for item in items(kwargs):
+
+        old_item = item.copy()
+        new_item = transform_item(item)
+        if old_item == new_item:
+            print('.', end='', flush=True)
+            continue
+        print(f'Processing {old_item["id"]}')
+        table.put_item(Item=new_item)
+        table.delete_item(Key={'id': old_item['id']})
+        s3_client.delete_object(
+            Bucket='wellcomecollection-vhs-sourcedata',
+            Key=old_item['s3key']
+        )
+    # break
+
+
+if __name__ == '__main__':
+    main()
