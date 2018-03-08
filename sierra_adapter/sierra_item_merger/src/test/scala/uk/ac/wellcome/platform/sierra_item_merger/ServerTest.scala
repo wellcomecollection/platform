@@ -17,7 +17,7 @@ class ServerTest extends FeatureTest
     new Server(),
     flags = Map(
       "aws.dynamo.tableName" -> "serverTest"
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+    ) ++ s3LocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
   test("it shows the healthcheck message") {
