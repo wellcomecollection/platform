@@ -55,7 +55,9 @@ class SierraReaderWorkerService @Inject()(
   private def runSierraStream(
     window: String,
     windowStatus: WindowStatus): Future[PutObjectResult] = {
+
     info(s"Running the stream with window=$window and status=$windowStatus")
+
     val baseParams = Map("updatedDate" -> window, "fields" -> fields)
     val params = windowStatus.id match {
       case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
@@ -68,6 +70,7 @@ class SierraReaderWorkerService @Inject()(
       keyPrefix = windowManager.buildWindowShard(window),
       offset = windowStatus.offset
     )
+
     val outcome =
       SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
         resourceType = resourceType.toString,

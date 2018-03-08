@@ -80,7 +80,7 @@ class SierraItemsToDynamoWorkerServiceTest
   it("reads a sierra record from sqs an inserts it into DynamoDb") {
     worker = createSierraWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields")
-    worker.get.runSQSWorker()
+
     val id = "i12345"
     val bibId = "b54321"
     val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
@@ -126,7 +126,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
   private def stopWorker(worker: Option[SierraItemsToDynamoWorkerService]) = {
     eventually {
-      worker.fold(true)(_.cancelRun()) shouldBe true
+      worker.fold(true)(_.stop()) shouldBe true
     }
   }
 }

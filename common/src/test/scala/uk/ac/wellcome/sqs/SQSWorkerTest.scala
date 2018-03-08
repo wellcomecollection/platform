@@ -1,92 +1,127 @@
 package uk.ac.wellcome.sqs
 
-import akka.actor.ActorSystem
-import org.mockito.Matchers.{any, anyDouble, anyString, contains}
-import org.mockito.Mockito
+import org.mockito.Matchers.{any, anyDouble, anyString, contains, matches}
 import org.mockito.Mockito.{never, times, verify, when}
-import org.scalatest.FunSpec
+import org.scalatest.fixture.FunSpec
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
-import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import org.scalatest.Outcome
 
 class SQSWorkerTest
     extends FunSpec
-    with SQSLocal
     with MockitoSugar
-    with Eventually {
+    with Eventually
+    with SqsFixtures {
 
-  val queueUrl = createQueueAndReturnUrl("worker-test-queue")
+  trait MockMetricSender {
+    val metricsSender: MetricsSender = mock[MetricsSender]
 
-  private val metricsSender: MetricsSender = mock[MetricsSender]
-
-  when(
-    metricsSender.timeAndCount[Unit](
-      anyString(),
-      any[() => Future[Unit]].apply
-    )
-  ).thenReturn(
-    Future.successful(())
-  )
-
-  sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
-
-  class TestWorker
-      extends SQSWorker(
-        new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-        ActorSystem(),
-        metricsSender) {
-    override lazy val totalWait = 1.second
-
-    override def processMessage(message: SQSMessage): Future[Unit] =
+    when(
+      metricsSender
+        .timeAndCount[Unit](anyString, any[() => Future[Unit]].apply)
+    ).thenReturn(
       Future.successful(())
+    )
   }
 
-  val worker = new TestWorker()
+  case class TestWorkerFixtures()
+      extends TestWith[OneArgTest, Outcome]
+      with MockMetricSender
+      with AkkaFixtures {
 
-  it("processes messages") {
-    worker.runSQSWorker()
+    override def apply(test: OneArgTest) = {
+      withActorSystem { actorSystem =>
+        withLocalSqsQueue { queueUrl =>
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "0"))
+          val sqsReader =
+            new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1))
 
-    val testMessage = SQSMessage(
-      subject = Some("subject"),
-      messageType = "messageType",
-      topic = "topic",
-      body = "body",
-      timestamp = "timestamp"
-    )
+          val testWorker =
+            new SQSWorker(sqsReader, actorSystem, metricsSender) {
+              override def processMessage(message: SQSMessage) =
+                Future.successful(())
+            }
 
-    val testMessageJson = toJson(testMessage).get
+          try {
+            withFixture(
+              test.toNoArgTest(
+                FixtureParam(metricsSender, testWorker, queueUrl)))
+          } finally {
+            testWorker.stop()
+          }
 
-    sqsClient.sendMessage(queueUrl, testMessageJson)
+        }
+      }
+    }
+
+  }
+
+  case class FixtureParam(metrics: MetricsSender,
+                          worker: SQSWorker,
+                          queueUrl: String)
+
+  override def withFixture(test: OneArgTest) = TestWorkerFixtures()(test)
+
+  def ValidSqsMessage() = SQSMessage(
+    subject = Some("subject"),
+    messageType = "messageType",
+    topic = "topic",
+    body = "body",
+    timestamp = "timestamp"
+  )
+
+  it("processes messages") { fixtures =>
+    val json = toJson(ValidSqsMessage()).get
+
+    sqsClient.sendMessage(fixtures.queueUrl, json)
 
     eventually {
       verify(
-        metricsSender,
+        fixtures.metrics,
         times(1)
       ).timeAndCount(
-        contains("TestWorker_ProcessMessage"),
-        any[() => Future[Unit]]()
+        matches(".*_ProcessMessage"),
+        any()
       )
     }
-    worker.cancelRun()
   }
 
-  it("does not fail the TryBackoff run when unable to parse a message") {
-    worker.runSQSWorker()
-    sqsClient.sendMessage(queueUrl, "this is not valid Json")
+  it("does report an error when a runtime error occurs") { fixtures =>
+    when(
+      fixtures.metrics.timeAndCount[Unit](
+        anyString(),
+        any[() => Future[Unit]].apply
+      )
+    ).thenThrow(new RuntimeException)
 
-    Thread.sleep(worker.totalWait.toMillis + 1000)
+    val json = toJson(ValidSqsMessage()).get
 
-    verify(metricsSender, never()).incrementCount(anyString(), anyDouble())
+    sqsClient.sendMessage(fixtures.queueUrl, json)
 
-    worker.cancelRun()
+    eventually {
+      verify(fixtures.metrics)
+        .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+    }
+  }
+
+  it("does not report an error when unable to parse a message") { fixtures =>
+    sqsClient.sendMessage(fixtures.queueUrl, "this is not valid Json")
+
+    eventually {
+      verify(fixtures.metrics, never())
+        .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+    }
   }
 }

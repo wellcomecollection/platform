@@ -8,12 +8,10 @@ object IngestorWorkerModule extends TwitterModule {
   private val esIndex = flag[String]("es.index", "records", "ES index name")
   private val esType = flag[String]("es.type", "item", "ES document type")
 
+  // eagerly load worker service
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[IngestorWorkerService]
-
-    workerService.runSQSWorker()
-
     super.singletonStartup(injector)
+    injector.instance[IngestorWorkerService]
   }
 
   override def singletonShutdown(injector: Injector) {
@@ -22,7 +20,7 @@ object IngestorWorkerModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[IngestorWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
 }
