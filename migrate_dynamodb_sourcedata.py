@@ -72,13 +72,13 @@ def transform_s3_data(json_string):
 
 
 def transform_item(item):
-    print(f'Processing {item["id"]}')
 
     prefix, id = item['id'].split('/')
     if prefix == 'sierra':
         new_id = id.lstrip('b')
         assert re.match(r'^\d{7}$', new_id)
         item['id'] = '/'.join([prefix, new_id])
+        item['sourceId'] = new_id
 
         s3_json_string = s3_client.get_object(
             Bucket='wellcomecollection-vhs-sourcedata',
@@ -88,7 +88,8 @@ def transform_item(item):
         if s3_json_string != new_s3_json_string:
             s3_hash = mmh3.hash(new_s3_json_string)
             new_key = os.path.join(
-                os.path.dirname(item['s3key']),
+                os.path.dirname(os.path.dirname(item['s3key'])),
+                new_id,
                 f'{s3_hash}.json'
             )
             s3_client.put_object(
@@ -102,17 +103,18 @@ def transform_item(item):
     return item
 
 
-# for item in items():
+for item in items():
 
-item = table.get_item(Key={'id': 'sierra/b1919592'})['Item']
-
-old_item = item.copy()
-new_item = transform_item(item)
-from pprint import pprint
-pprint(new_item)
-# if old_item == new_item:
-#     continue
-# print(new_item)
-table.put_item(Item=new_item)
-# table.delete_item(Key={'id': old_item['id']})
-# break
+    old_item = item.copy()
+    new_item = transform_item(item)
+    if old_item == new_item:
+        print('.', end='', flush=True)
+        continue
+    print(f'Processing {old_item["id"]}')
+    table.put_item(Item=new_item)
+    table.delete_item(Key={'id': old_item['id']})
+    s3_client.delete_object(
+        Bucket='wellcomecollection-vhs-sourcedata',
+        Key=old_item['s3key']
+    )
+    break
