@@ -42,8 +42,6 @@ def transform_item(item):
     return item
 
 
-from botocore.exceptions import ClientError
-from tenacity import *
 
 def main():
     try:
