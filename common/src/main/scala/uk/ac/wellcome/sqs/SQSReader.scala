@@ -24,75 +24,77 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
   // If the timeout expires before the consumer sends a delete request, the message is unhidden and can be read by another consumer.
 
   def retrieveAndDeleteMessages(
-    process: Message => Future[Unit]): Future[Unit] =
-    Future {
-      blocking {
-        debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
-        receiveMessages()
-      }
-    } flatMap { messages =>
-      if (messages.nonEmpty)
-        info(
-          s"Received messages ${messages.map { _.getMessageId }} from queue ${sqsConfig.queueUrl}")
-      else
-        debug(
-          s"Received messages ${messages.map { _.getMessageId }} from queue ${sqsConfig.queueUrl}")
-      processAndDeleteMessages(messages, process).map { _ =>
+    process: Message => Future[Unit]): Future[Unit] = {
+    val eventuallyProcessMessages =
+      for {
+        _ <- Future.successful {
+          debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
+        }
+        ms <- receiveMessages()
+        _ <- Future.sequence { ms.map { processAndDeleteMessage(_, process) } }
+      } yield {
+        val messageIds = ms.map { _.getMessageId }
+
+        if (ms.nonEmpty) {
+          info(
+            s"Received messages $messageIds from queue ${sqsConfig.queueUrl}")
+        } else {
+          debug(
+            s"Received messages $messageIds from queue ${sqsConfig.queueUrl}")
+        }
+
         ()
       }
-    } recover {
+
+    eventuallyProcessMessages recover {
       case exception: Throwable =>
         error(
-          s"Error retrieving messages from queue ${sqsConfig.queueUrl}",
+          s"Error processing messages from queue ${sqsConfig.queueUrl}",
           exception)
         throw exception
     }
-
-  private def receiveMessages() = {
-    sqsClient
-      .receiveMessage(
-        new ReceiveMessageRequest(sqsConfig.queueUrl)
-          .withWaitTimeSeconds(sqsConfig.waitTime.toSeconds.toInt)
-          .withMaxNumberOfMessages(sqsConfig.maxMessages))
-      .getMessages
-      .toList
   }
 
-  private def processAndDeleteMessages(messages: List[Message],
-                                       process: Message => Future[Unit]) =
-    Future.sequence(messages.map { message =>
-      Future
-        .successful(())
-        .flatMap(_ => {
-          info(s"Processing message ${message.getMessageId}")
-          process(message)
-        })
-        .flatMap(_ => deleteMessage(message))
-        .recover {
-          case e: GracefulFailureException =>
-            warn(
-              s"An error occurred while processing the message ${message.getMessageId}",
-              e)
-            ()
-          case e: Throwable =>
-            error(s"Error processing message ${message.getMessageId}", e)
-            throw e
-        }
-    })
+  private def receiveMessages() = Future {
+    blocking {
+      sqsClient
+        .receiveMessage(
+          new ReceiveMessageRequest(sqsConfig.queueUrl)
+            .withWaitTimeSeconds(sqsConfig.waitTime.toSeconds.toInt)
+            .withMaxNumberOfMessages(sqsConfig.maxMessages)
+        )
+        .getMessages
+        .toList
+    }
+  }
 
-  private def deleteMessage(message: Message): Future[Unit] =
+  private def processAndDeleteMessage(message: Message,
+                                      process: Message => Future[Unit]) = {
+    val eventuallyProcessAndDelete =
+      for {
+        _ <- Future.successful {
+          info(s"Processing message ${message.getMessageId}")
+        }
+        _ <- process(message)
+        _ <- deleteMessage(message)
+      } yield ()
+
+    eventuallyProcessAndDelete recover {
+      case e: GracefulFailureException =>
+        warn(s"Error processing the message=[${message.getMessageId}]", e)
+        ()
+      case e: Throwable => throw e
+    }
+  }
+
+  private def deleteMessage(message: Message) =
     Future {
       blocking {
-        sqsClient.deleteMessage(
-          new DeleteMessageRequest(
-            sqsConfig.queueUrl,
-            message.getReceiptHandle)
-        )
+        val request = new DeleteMessageRequest(
+          sqsConfig.queueUrl,
+          message.getReceiptHandle)
+        sqsClient.deleteMessage(request)
         info(s"Deleted message ${message.getMessageId}")
       }
-    }.recover {
-      case e: Throwable =>
-        error(s"Failed deleting message ${message.getMessageId}", e)
-        throw e
     }
 }

@@ -6,12 +6,10 @@ import uk.ac.wellcome.platform.reindex_worker.services.ReindexWorkerService
 
 object ReindexerWorkerModule extends TwitterModule {
 
+  // eagerly load worker service
   override def singletonStartup(injector: Injector) {
-    val workerService = injector.instance[ReindexWorkerService]
-
-    workerService.runSQSWorker()
-
     super.singletonStartup(injector)
+    injector.instance[ReindexWorkerService]
   }
 
   override def singletonShutdown(injector: Injector) {
@@ -20,7 +18,8 @@ object ReindexerWorkerModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[ReindexWorkerService]
 
-    workerService.cancelRun()
+    workerService.stop()
     system.terminate()
   }
+
 }

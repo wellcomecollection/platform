@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.reindex_worker
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.Matchers
+import org.scalatest.FunSpec
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -12,9 +13,11 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord
 }
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
+import scala.collection.JavaConversions._
 
 case class TestRecord(
   id: String,
@@ -31,8 +34,8 @@ class ReindexerFeatureTest
     with Eventually
     with DynamoDBLocal[TestRecord]
     with AmazonCloudWatchFlag
-    with SQSLocal
-    with SNSLocal
+    with SqsFixtures
+    with SnsFixtures
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[TestRecord] =
@@ -40,26 +43,56 @@ class ReindexerFeatureTest
 
   override lazy val tableName: String = "table"
 
-  val queueUrl = createQueueAndReturnUrl("reindexer-feature-test-q")
-  val topicArn = createTopicAndReturnArn("test_reindexer")
+  def withServer[R](queueUrl: String, topicArn: String)(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = Map(
+          "aws.dynamo.tableName" -> tableName,
+          "aws.region" -> "eu-west-1",
+          "aws.sns.topic.arn" -> topicArn,
+          "aws.sqs.queue.url" -> queueUrl
+        ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
+      )
 
-  val server: EmbeddedHttpServer =
-    new EmbeddedHttpServer(
-      new Server(),
-      flags = Map(
-        "aws.dynamo.tableName" -> tableName,
-        "aws.region" -> "eu-west-1",
-        "aws.sns.topic.arn" -> topicArn,
-        "aws.sqs.queue.url" -> queueUrl
-      ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
-    )
+    server.start()
+
+    try {
+      testWith(server)
+    } finally {
+      server.close()
+    }
+  }
+
+  def withBadServer[R](queueUrl: String, topicArn: String)(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = Map(
+          "aws.dynamo.tableName" -> "not_a_real_table",
+          "aws.region" -> "eu-west-1",
+          "aws.sns.topic.arn" -> topicArn,
+          "aws.sqs.queue.url" -> queueUrl
+        ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
+      )
+
+    server.start()
+
+    try {
+      testWith(server)
+    } finally {
+      server.close()
+    }
+  }
 
   val currentVersion = 1
   val desiredVersion = 5
 
   val shardName = "shard"
 
-  private def createReindexableData: List[ReindexRecord] = {
+  private def createReindexableData(queueUrl: String): List[ReindexRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -72,6 +105,7 @@ class ReindexerFeatureTest
       )
     })
 
+    //TODO re-factor shared test state here into fixture method
     testRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_))
 
     val expectedRecords = testRecords.map(
@@ -102,70 +136,79 @@ class ReindexerFeatureTest
   }
 
   it("increases the reindexVersion on every record that needs a reindex") {
-    val expectedRecords = createReindexableData
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withServer(queueUrl, topicArn) { server =>
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "1"))
 
-    server.start()
+          val expectedRecords = createReindexableData(queueUrl)
 
-    eventually {
-      val actualRecords =
-        Scanamo.scan[ReindexRecord](dynamoDbClient)(tableName).map(_.right.get)
+          eventually {
+            val actualRecords =
+              Scanamo
+                .scan[ReindexRecord](dynamoDbClient)(tableName)
+                .map(_.right.get)
 
-      actualRecords should contain theSameElementsAs expectedRecords
+            actualRecords should contain theSameElementsAs expectedRecords
+          }
+
+        }
+      }
     }
-
-    server.close()
-
   }
 
   it("sends an SNS notice for a completed reindex") {
-    val expectedRecords = createReindexableData
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withServer(queueUrl, topicArn) { server =>
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "1"))
 
-    server.start()
+          val expectedRecords = createReindexableData(queueUrl)
 
-    val expectedMessage = CompletedReindexJob(
-      shardId = shardName,
-      completedReindexVersion = desiredVersion
-    )
+          val expectedMessage = CompletedReindexJob(
+            shardId = shardName,
+            completedReindexVersion = desiredVersion
+          )
 
-    eventually {
+          eventually {
 
-      val messages = listMessagesReceivedFromSNS()
+            val messages = listMessagesReceivedFromSNS(topicArn)
 
-      messages should have size 1
+            messages should have size 1
 
-      JsonUtil
-        .fromJson[CompletedReindexJob](
-          messages.head.message
-        )
-        .get shouldBe expectedMessage
+            JsonUtil
+              .fromJson[CompletedReindexJob](
+                messages.head.message
+              )
+              .get shouldBe expectedMessage
 
+          }
+        }
+      }
     }
-
-    server.close()
   }
 
   it("does not send a message if it cannot complete a reindex") {
-    val expectedRecords = createReindexableData
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withBadServer(queueUrl, topicArn) { server =>
+          sqsClient.setQueueAttributes(
+            queueUrl,
+            Map("VisibilityTimeout" -> "1"))
 
-    val badServer: EmbeddedHttpServer =
-      new EmbeddedHttpServer(
-        new Server(),
-        flags = Map(
-          "aws.dynamo.tableName" -> "not_a_real_table",
-          "aws.region" -> "eu-west-1",
-          "aws.sns.topic.arn" -> topicArn,
-          "aws.sqs.queue.url" -> queueUrl
-        ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags
-      )
+          val expectedRecords = createReindexableData(queueUrl)
 
-    badServer.start()
+          // We wait some time to ensure that the message is not processed
+          Thread.sleep(5000)
 
-    // We wait some time to ensure that the message is not processed
-    Thread.sleep(5000)
-
-    val messages = listMessagesReceivedFromSNS()
-    messages should have size 0
-
-    badServer.close()
+          val messages = listMessagesReceivedFromSNS(topicArn)
+          messages should have size 0
+        }
+      }
+    }
   }
 }
