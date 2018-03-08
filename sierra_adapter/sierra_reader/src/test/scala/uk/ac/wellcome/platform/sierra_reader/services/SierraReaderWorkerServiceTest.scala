@@ -16,7 +16,6 @@ import uk.ac.wellcome.test.fixtures._
 import scala.collection.JavaConversions._
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
-import uk.ac.wellcome.platform.sierra_reader.flow.SierraResourceTypes
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
@@ -25,6 +24,7 @@ import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 
 class SierraReaderWorkerServiceTest
     extends FunSpec
@@ -121,8 +121,6 @@ class SierraReaderWorkerServiceTest
         getRecordsFromS3(pageNames(0)) should have size 10
         getRecordsFromS3(pageNames(1)) should have size 10
         getRecordsFromS3(pageNames(2)) should have size 9
-
-        getRecordsFromS3(pageNames(0)).head.id should startWith("b")
       }
     }
   }
@@ -167,8 +165,6 @@ class SierraReaderWorkerServiceTest
         getRecordsFromS3(pageNames(1)) should have size 50
         getRecordsFromS3(pageNames(2)) should have size 50
         getRecordsFromS3(pageNames(3)) should have size 7
-
-        getRecordsFromS3(pageNames(0)).head.id should startWith("i")
       }
     }
   }
