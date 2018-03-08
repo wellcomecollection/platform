@@ -104,6 +104,7 @@ class SierraReaderWorkerServiceTest
           "topic",
           "messageType",
           "timestamp")
+
       sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
