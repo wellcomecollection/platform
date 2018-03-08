@@ -42,7 +42,6 @@ def transform_item(item):
     return item
 
 
-
 def main():
     try:
         kwargs = {'ExclusiveStartKey': {'id': sys.argv[1]}}
