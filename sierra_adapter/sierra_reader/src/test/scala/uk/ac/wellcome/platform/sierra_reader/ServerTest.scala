@@ -5,10 +5,11 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, S3Local, SQSLocal}
 
-class ServerTest extends FeatureTest
-  with AmazonCloudWatchFlag
-  with S3Local
-  with SQSLocal {
+class ServerTest
+    extends FeatureTest
+    with AmazonCloudWatchFlag
+    with S3Local
+    with SQSLocal {
 
   override lazy val bucketName = "sierra-reader-servertest-bucket"
 
