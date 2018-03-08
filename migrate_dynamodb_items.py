@@ -6,8 +6,7 @@ import re
 import sys
 
 import boto3
-from botocore.exceptions import ClientError
-from tenacity import *
+
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('SierraData_items')
@@ -41,6 +40,7 @@ def transform_item(item):
     item['data'] = json.dumps(data, separators=(',', ':'))
 
     return item
+
 
 
 def main():
