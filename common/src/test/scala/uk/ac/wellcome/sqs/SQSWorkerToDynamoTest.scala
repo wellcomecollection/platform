@@ -21,6 +21,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import org.scalatest.Outcome
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 case class TestObject(foo: String)
 
@@ -29,6 +30,7 @@ class SQSWorkerToDynamoTest
     with MockitoSugar
     with Matchers
     with Eventually
+    with ExtendedPatience
     with SqsFixtures {
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
@@ -48,6 +50,7 @@ class SQSWorkerToDynamoTest
         new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
         system,
         metricsSender) {
+
     override lazy val poll = 100 millisecond
 
     override implicit val decoder = Decoder[TestObject]
