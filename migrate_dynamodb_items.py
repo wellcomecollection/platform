@@ -3,6 +3,7 @@
 
 import json
 import re
+import sys
 
 import boto3
 
@@ -11,19 +12,17 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('SierraData_items')
 
 
-def items():
+def items(kwargs=None):
     """Generate all items from a DynamoDB table."""
-    kwargs = {}
+    if kwargs is None:
+        kwargs = {}
     while True:
         resp = table.scan(**kwargs)
         yield from resp['Items']
         kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
-        break
 
 
 def transform_item(item):
-    print(f'Processing {item["id"]}')
-
     item['id'] = item['id'].lstrip('i')
     assert re.match(r'^\d{7}$', item['id'])
 
@@ -43,11 +42,26 @@ def transform_item(item):
     return item
 
 
-for item in items():
-    old_item = item.copy()
-    new_item = transform_item(item)
-    if old_item == new_item:
-        continue
-    table.put_item(Item=new_item)
-    # table.delete_item(Key={'id': item['id']})
-    break
+from botocore.exceptions import ClientError
+from tenacity import *
+
+def main():
+    try:
+        kwargs = {'ExclusiveStartKey': {'id': sys.argv[1]}}
+    except IndexError:
+        kwargs = {}
+
+    for item in items(kwargs):
+        print(f'Starting {item["id"]}')
+        old_item = item.copy()
+        new_item = transform_item(item)
+        if old_item == new_item:
+            print(f'Skipping {item["id"]}')
+            continue
+        print(f'Processing {item["id"]}')
+        table.put_item(Item=new_item)
+        table.delete_item(Key={'id': old_item['id']})
+
+
+if __name__ == '__main__':
+    main()
