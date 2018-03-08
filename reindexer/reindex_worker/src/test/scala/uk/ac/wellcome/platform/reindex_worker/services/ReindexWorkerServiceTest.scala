@@ -2,27 +2,26 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import com.gu.scanamo.{DynamoFormat, Scanamo}
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.locals.DynamoDBLocal
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{Sourced, SourcedDynamoFormatWrapper}
 import uk.ac.wellcome.models.aws.{
   DynamoConfig,
   SNSConfig,
   SQSConfig,
   SQSMessage
 }
+import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -33,7 +32,7 @@ import scala.concurrent.duration._
 class ReindexWorkerServiceTest
     extends FunSpec
     with Matchers
-    with DynamoDBLocal[HybridRecord]
+    with DynamoDBLocal[TestRecord]
     with MockitoSugar
     with SNSLocal
     with SQSLocal
@@ -47,14 +46,10 @@ class ReindexWorkerServiceTest
       mock[AmazonCloudWatch],
       actorSystem)
 
-  override lazy val tableName = "reindex-worker-service-test"
+  override lazy val tableName = "table"
 
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
-
-  private val enrichedDynamoFormat: DynamoFormat[HybridRecord] = Sourced
-    .toSourcedDynamoFormatWrapper[HybridRecord]
-    .enrichedDynamoFormat
+  override lazy val evidence: DynamoFormat[TestRecord] =
+    DynamoFormat[TestRecord]
 
   val queueUrl = createQueueAndReturnUrl("reindex-worker-service-test-q")
   val topicArn = createTopicAndReturnArn("reindex-worker-service-test-topic")
@@ -65,21 +60,21 @@ class ReindexWorkerServiceTest
       desiredVersion = 6
     )
 
-    val hybridRecord = HybridRecord(
+    val testRecord = TestRecord(
+      id = "id/111",
       version = 1,
-      sourceId = "sierra",
-      sourceName = "111",
-      s3key = "s3://reindexWST/example.json",
+      someData = "A dire daliance directly dancing due down.",
       reindexShard = reindexJob.shardId,
       reindexVersion = reindexJob.desiredVersion - 1
     )
 
-    Scanamo.put(dynamoDbClient)(tableName)(hybridRecord)(enrichedDynamoFormat)
+    Scanamo.put(dynamoDbClient)(tableName)(testRecord)
 
     val expectedRecords = List(
-      hybridRecord.copy(
-        version = hybridRecord.version + 1,
-        reindexVersion = reindexJob.desiredVersion)
+      testRecord.copy(
+        version = testRecord.version + 1,
+        reindexVersion = reindexJob.desiredVersion
+      )
     )
 
     val sqsMessage = SQSMessage(
@@ -95,8 +90,8 @@ class ReindexWorkerServiceTest
     val future = service.processMessage(message = sqsMessage)
 
     whenReady(future) { _ =>
-      val actualRecords: List[HybridRecord] =
-        Scanamo.scan[HybridRecord](dynamoDbClient)(tableName).map(_.right.get)
+      val actualRecords: List[TestRecord] =
+        Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
 
       actualRecords shouldBe expectedRecords
     }
@@ -125,12 +120,10 @@ class ReindexWorkerServiceTest
 
   it("returns a failed Future if the reindex job fails") {
     val exception = new RuntimeException(
-      "Flobberworm!  Fickle failure frustrates my fortunes!")
+      "Flobberworm! Fickle failure frustrates my fortunes!")
 
     val targetService = mock[ReindexService]
-    when(
-      targetService.runReindex(any[ReindexJob])(
-        any[SourcedDynamoFormatWrapper[HybridRecord]]))
+    when(targetService.runReindex(any[ReindexJob]))
       .thenReturn(Future { throw exception })
 
     val service = new ReindexWorkerService(
