@@ -14,7 +14,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
 }
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
