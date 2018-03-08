@@ -2,11 +2,14 @@ package uk.ac.wellcome.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
+import com.gu.scanamo.error.ScanamoError
+import com.gu.scanamo.ops.ScanamoOps
+import com.gu.scanamo.query.{KeyEquals, UniqueKey}
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -16,43 +19,66 @@ class VersionedDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  private def putRecord[T <: Versioned with Id](record: T)(
+  private def updateBuilder[T](record: T)(
     implicit evidence: DynamoFormat[T],
-    versionUpdater: VersionUpdater[T]) = {
-    val newVersion = record.version + 1
+    versionUpdater: VersionUpdater[T],
+    versionGetter: VersionGetter[T],
+    idGetter: IdGetter[T],
+    updateExpressionGenerator: UpdateExpressionGenerator[T]
+  ): Option[ScanamoOps[Either[ScanamoError, T]]] = {
+    val version = versionGetter.version(record)
+    val newVersion = version + 1
 
-    Table[T](dynamoConfig.table)
-      .given(
-        not(attributeExists('id)) or
-          (attributeExists('id) and 'version < newVersion)
-      )
-      .put(versionUpdater.updateVersion(record, newVersion))
+    val updatedRecord = versionUpdater.updateVersion(record, newVersion)
+
+    updateExpressionGenerator.generateUpdateExpression(updatedRecord).map {
+      updateExpression =>
+        Table[T](dynamoConfig.table)
+          .given(
+            not(attributeExists('id)) or
+              (attributeExists('id) and 'version < newVersion)
+          )
+          .update(
+            UniqueKey(KeyEquals('id, idGetter.id(record))),
+            updateExpression
+          )
+    }
   }
 
-  def updateRecord[T <: Versioned with Id](record: T)(
+  def updateRecord[T](record: T)(
     implicit evidence: DynamoFormat[T],
-    versionUpdater: VersionUpdater[T]): Future[Unit] = Future {
-    info(s"Attempting to update Dynamo record: ${record.id}")
+    versionUpdater: VersionUpdater[T],
+    idGetter: IdGetter[T],
+    versionGetter: VersionGetter[T],
+    updateExpressionGenerator: UpdateExpressionGenerator[T]
+  ): Future[Unit] = Future {
+    val id = idGetter.id(record)
+    info(s"Attempting to update Dynamo record: $id")
 
-    Scanamo.exec(dynamoDbClient)(putRecord(record)) match {
-      case Left(err) =>
-        warn(s"Failed to updating Dynamo record: ${record.id}", err)
+    updateBuilder(record).map { ops =>
+      Scanamo.exec(dynamoDbClient)(ops) match {
+        case Left(scanamoError) => {
+          val exception = new RuntimeException(scanamoError.toString)
 
-        throw err
-      case Right(_) => {
-        info(s"Successfully updated Dynamo record: ${record.id}")
+          warn(s"Failed to updating Dynamo record: $id", exception)
+
+          throw exception
+        }
+        case Right(_) => {
+          info(s"Successfully updated Dynamo record: $id")
+        }
       }
     }
   }
 
-  def getRecord[T <: Versioned with Id](id: String)(
+  def getRecord[T](id: String)(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
 
     info(s"Attempting to retrieve Dynamo record: $id")
     Scanamo.exec(dynamoDbClient)(table.get('id -> id)) match {
       case Some(Right(record)) => {
-        info(s"Successfully retrieved Dynamo record: ${record.id}")
+        info(s"Successfully retrieved Dynamo record: $id")
 
         Some(record)
       }
