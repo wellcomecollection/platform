@@ -12,11 +12,13 @@ class ServerTest extends FeatureTest
   with SQSLocal {
 
   override lazy val bucketName = "sierra-item-merger-servertest-bucket"
+  val queueUrl = createQueueAndReturnUrl("sierra-item-merger-servertest-q")
 
   val server = new EmbeddedHttpServer(
     new Server(),
     flags = Map(
-      "aws.dynamo.tableName" -> "serverTest"
+      "aws.dynamo.tableName" -> "serverTest",
+      "aws.sqs.queue.url" -> queueUrl
     ) ++ s3LocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
   )
 
