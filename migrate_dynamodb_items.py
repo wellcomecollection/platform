@@ -45,6 +45,10 @@ def transform_item(item):
 from botocore.exceptions import ClientError
 from tenacity import *
 
+@retry(
+    retry=retry_if_exception_type(ClientError),
+    wait=wait_exponential(multiplier=1, max=10)
+)
 def main():
     try:
         kwargs = {'ExclusiveStartKey': {'id': sys.argv[1]}}
@@ -52,13 +56,12 @@ def main():
         kwargs = {}
 
     for item in items(kwargs):
-        print(f'Starting {item["id"]}')
         old_item = item.copy()
         new_item = transform_item(item)
         if old_item == new_item:
-            print(f'Skipping {item["id"]}')
+            print('.', end='', flush=True)
             continue
-        print(f'Processing {item["id"]}')
+        print(f'\nProcessing {old_item["id"]}')
         table.put_item(Item=new_item)
         table.delete_item(Key={'id': old_item['id']})
 
