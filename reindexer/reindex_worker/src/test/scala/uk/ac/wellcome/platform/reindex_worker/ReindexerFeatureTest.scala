@@ -92,7 +92,7 @@ class ReindexerFeatureTest
 
   val shardName = "shard"
 
-  private def createReindexableData(queueUrl: String): List[HybridRecord] = {
+  private def createReindexableData(queueUrl: String): List[ReindexRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -148,7 +148,7 @@ class ReindexerFeatureTest
           eventually {
             val actualRecords =
               Scanamo
-                .scan[HybridRecord](dynamoDbClient)(tableName)
+                .scan[ReindexRecord](dynamoDbClient)(tableName)
                 .map(_.right.get)
 
             actualRecords should contain theSameElementsAs expectedRecords
