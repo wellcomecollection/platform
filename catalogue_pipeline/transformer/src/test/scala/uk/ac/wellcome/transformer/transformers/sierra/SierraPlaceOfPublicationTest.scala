@@ -2,7 +2,12 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.transformer.source.{Country, MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  Country,
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraPlaceOfPublicationTest extends FunSpec with Matchers {
 
@@ -25,8 +30,7 @@ class SierraPlaceOfPublicationTest extends FunSpec with Matchers {
 
     val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
 
-    bibWithPlaceOfPublication shouldBe List(
-      Place(label = content))
+    bibWithPlaceOfPublication shouldBe List(Place(label = content))
   }
 
   it("ignores subfields other than a") {
