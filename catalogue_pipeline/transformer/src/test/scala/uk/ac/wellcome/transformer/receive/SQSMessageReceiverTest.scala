@@ -15,7 +15,11 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
