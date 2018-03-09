@@ -23,6 +23,7 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
+                              @Flag("aws.metrics.flushInterval") flushInterval: FiniteDuration,
                               amazonCloudWatch: AmazonCloudWatch,
                               actorSystem: ActorSystem)
     extends Logging {
@@ -41,7 +42,7 @@ class MetricsSender @Inject()(@Flag("aws.metrics.namespace") namespace: String,
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
       .viaMat(
-        Flow[MetricDatum].groupedWithin(metricDataListMaxSize, 10 seconds))(
+        Flow[MetricDatum].groupedWithin(metricDataListMaxSize, flushInterval))(
         Keep.left)
       // Make sure we don't exceed aws rate limit
       .throttle(
