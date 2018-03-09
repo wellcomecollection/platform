@@ -263,7 +263,7 @@ class IdEmbedderTests
           "identifierScheme": "${sourceIdentifier.identifierScheme}",
           "value": "${sourceIdentifier.value}"
         },
-        "type": "$ontologyType"
+        "ontologyType": "$ontologyType"
       }
       """
 
@@ -274,7 +274,7 @@ class IdEmbedderTests
           "identifierScheme": "${sourceIdentifier.identifierScheme}",
           "value": "${sourceIdentifier.value}"
         },
-        "type": "$ontologyType"
+        "ontologyType": "$ontologyType"
       }
       """
 
@@ -313,7 +313,7 @@ class IdEmbedderTests
             "identifierScheme": "${sourceIdentifier.identifierScheme}",
             "value": "${sourceIdentifier.value}"
           },
-          "type": "$ontologyType"
+          "ontologyType": "$ontologyType"
         }
       }
       """
@@ -328,7 +328,7 @@ class IdEmbedderTests
             "identifierScheme": "${sourceIdentifier.identifierScheme}",
             "value": "${sourceIdentifier.value}"
           },
-          "type": "$ontologyType"
+          "ontologyType": "$ontologyType"
         }
       }
       """
