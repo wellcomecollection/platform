@@ -37,25 +37,28 @@ class IdentifierGeneratorTest
                                         identifiersTable: IdentifiersTable
                                         )
 
-  def withIdentifierGenerator[R](testWith: TestWith[IdentifierGeneratorFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
+  def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] = None)(testWith: TestWith[IdentifierGeneratorFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
     val identifiersTable: IdentifiersTable =
       new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
 
     new TableProvisioner(host, port, username, password)
       .provision(dbConfig.databaseName, dbConfig.tableName)
 
-    val identifierGenerator = new IdentifierGenerator(
-      new IdentifiersDao(DB.connect(), identifiersTable),
-      metricsSender
+    val identifiersDao = maybeIdentifiersDao.getOrElse(
+      new IdentifiersDao(DB.connect(), identifiersTable)
     )
 
+    val identifierGenerator = new IdentifierGenerator(
+      identifiersDao,
+      metricsSender
+    )
     eventually {
       testWith(IdentifierGeneratorFixtures(identifierGenerator, identifiersTable))
     }
   }
 
   it("queries the database and return a matching canonical id") {
-    withIdentifierGenerator { fixtures =>
+    withIdentifierGenerator() { fixtures =>
       withSQL {
         insert
           .into(fixtures.identifiersTable)
@@ -77,7 +80,7 @@ class IdentifierGeneratorTest
   }
 
   it("generates and saves a new identifier") {
-    withIdentifierGenerator { fixtures =>
+    withIdentifierGenerator() { fixtures =>
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
@@ -110,31 +113,31 @@ class IdentifierGeneratorTest
   }
 
   it("returns a failure if it fails registering a new identifier") {
-    withIdentifierGenerator { fixtures =>
-      val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.miroImageNumber,
-        value = "1234"
-      )
+    val identifiersDao = mock[IdentifiersDao]
+    val identifierGenerator = new IdentifierGenerator(
+      identifiersDao,
+      metricsSender
+    )
 
-      val identifiersDao = mock[IdentifiersDao]
-      val identifierGenerator = new IdentifierGenerator(
-        identifiersDao,
-        metricsSender
-      )
+    val sourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      value = "1234"
+    )
 
-      val triedLookup = identifiersDao.lookupId(
-        sourceIdentifier = sourceIdentifier,
-        ontologyType = "Work"
-      )
+    val triedLookup = identifiersDao.lookupId(
+      sourceIdentifier = sourceIdentifier,
+      ontologyType = "Work"
+    )
 
-      when(triedLookup)
-        .thenReturn(Success(None))
+    when(triedLookup)
+      .thenReturn(Success(None))
 
-      val expectedException = new Exception("Noooo")
+    val expectedException = new Exception("Noooo")
 
-      when(identifiersDao.saveIdentifier(any[Identifier]()))
-        .thenReturn(Failure(expectedException))
+    when(identifiersDao.saveIdentifier(any[Identifier]()))
+      .thenReturn(Failure(expectedException))
 
+    withIdentifierGenerator(Some(identifiersDao)) { fixtures =>
       val triedGeneratingId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         sourceIdentifier,
         "Work"
@@ -146,7 +149,7 @@ class IdentifierGeneratorTest
   }
 
   it("should preserve the ontologyType when generating a new identifier") {
-    withIdentifierGenerator { fixtures =>
+    withIdentifierGenerator() { fixtures =>
 
       val ontologyType = "Item"
       val miroId = "1234"
