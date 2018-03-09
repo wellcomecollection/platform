@@ -12,6 +12,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
 import uk.ac.wellcome.platform.idminter.fixtures
+import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -21,8 +22,6 @@ import scala.util.{Failure, Success}
 class IdentifierGeneratorTest
   extends FunSpec
     with fixtures.IdentifiersDatabase
-    with Eventually
-    with ExtendedPatience
     with Matchers
     with MockitoSugar {
 
@@ -34,7 +33,8 @@ class IdentifierGeneratorTest
 
   case class IdentifierGeneratorFixtures(
                                         identifierGenerator: IdentifierGenerator,
-                                        identifiersTable: IdentifiersTable
+                                        identifiersTable: IdentifiersTable,
+                                        dbConfig: DatabaseConfig
                                         )
 
   def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] = None)(testWith: TestWith[IdentifierGeneratorFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
@@ -52,13 +52,18 @@ class IdentifierGeneratorTest
       identifiersDao,
       metricsSender
     )
-    eventually {
-      testWith(IdentifierGeneratorFixtures(identifierGenerator, identifiersTable))
-    }
+
+    eventuallyTableExists(dbConfig)
+
+    testWith(
+      IdentifierGeneratorFixtures(identifierGenerator, identifiersTable, dbConfig))
   }
 
   it("queries the database and return a matching canonical id") {
     withIdentifierGenerator() { fixtures =>
+
+      implicit val session = fixtures.dbConfig.session
+
       withSQL {
         insert
           .into(fixtures.identifiersTable)
@@ -81,6 +86,8 @@ class IdentifierGeneratorTest
 
   it("generates and saves a new identifier") {
     withIdentifierGenerator() { fixtures =>
+
+      implicit val session = fixtures.dbConfig.session
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
@@ -150,6 +157,8 @@ class IdentifierGeneratorTest
 
   it("should preserve the ontologyType when generating a new identifier") {
     withIdentifierGenerator() { fixtures =>
+
+      implicit val session = fixtures.dbConfig.session
 
       val ontologyType = "Item"
       val miroId = "1234"

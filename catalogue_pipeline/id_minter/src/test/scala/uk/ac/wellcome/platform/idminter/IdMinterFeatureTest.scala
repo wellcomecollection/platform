@@ -76,6 +76,9 @@ class IdMinterFeatureTest
           ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { _ =>
+
+            eventuallyTableExists(dbConfig)
+
             sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
             val miroID = "M0001234"
@@ -144,7 +147,7 @@ class IdMinterFeatureTest
           ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { _ =>
-            sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "10"))
+            sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
 
             sqsClient.sendMessage(queueUrl, "not a json string")
 
@@ -154,7 +157,7 @@ class IdMinterFeatureTest
             sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
             eventually {
-              val messages = listMessagesReceivedFromSNS(queueUrl)
+              val messages = listMessagesReceivedFromSNS(topicArn)
               messages should have size (1)
             }
 
