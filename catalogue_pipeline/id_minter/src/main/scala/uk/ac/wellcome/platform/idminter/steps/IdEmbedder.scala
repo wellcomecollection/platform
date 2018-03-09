@@ -46,7 +46,7 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
   private def addIdentifierToJsonObject(obj: JsonObject): JsonObject = {
     if (obj.contains("sourceIdentifier")) {
       val sourceIdentifier = parseSourceIdentifier(obj)
-      val ontologyType = obj("type").get.asString.get
+      val ontologyType = obj("ontologyType").get.asString.get
 
       val canonicalId = identifierGenerator
         .retrieveOrGenerateCanonicalId(
