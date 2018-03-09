@@ -31,7 +31,8 @@ class PublishersTest extends ApiWorksTestBase {
           |      "creators": [ ],
           |      "subjects": [ ],
           |      "genres": [ ],
-          |      "publishers": [ ]
+          |      "publishers": [ ],
+          |      "placesOfPublication": [ ]
           |    }
           |  ]
           |}
@@ -78,7 +79,8 @@ class PublishersTest extends ApiWorksTestBase {
           |          "label": "${work.publishers(1).label}",
           |          "type": "Agent"
           |        }
-          |      ]
+          |      ],
+          |      "placesOfPublication": [ ]
           |    }
           |  ]
           |}
@@ -125,7 +127,8 @@ class PublishersTest extends ApiWorksTestBase {
           |          "label": "${work.publishers(1).label}",
           |          "type": "Organisation"
           |        }
-          |      ]
+          |      ],
+          |      "placesOfPublication": [ ]
           |    }
           |  ]
           |}

@@ -40,7 +40,7 @@ case class UnidentifiedWork(title: Option[String],
                             items: List[UnidentifiedItem] = Nil,
                             publishers: List[AbstractAgent] = Nil,
                             publicationDate: Option[Period] = None,
-                            placesOfPublication: List[PlaceOfPublication] = Nil,
+                            placesOfPublication: List[Place] = Nil,
                             visible: Boolean = true,
                             ontologyType: String = "Work")
     extends Work
@@ -62,7 +62,7 @@ case class IdentifiedWork(canonicalId: String,
                           items: List[IdentifiedItem] = Nil,
                           publishers: List[AbstractAgent] = Nil,
                           publicationDate: Option[Period] = None,
-                          placesOfPublication: List[PlaceOfPublication] = Nil,
+                          placesOfPublication: List[Place] = Nil,
                           visible: Boolean = true,
                           ontologyType: String = "Work")
     extends Work
