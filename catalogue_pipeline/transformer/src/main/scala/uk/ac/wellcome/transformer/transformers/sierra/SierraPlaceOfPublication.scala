@@ -3,8 +3,8 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
 
-trait SierraPlacesOfPublication {
-  def getPlacesOfPublication(
+trait SierraPlaceOfPublication {
+  def getPlaceOfPublication(
     bibData: SierraBibData): List[UnidentifiedOrUnidentifieablePlaceOfPublication] = {
     val unidentifiablePlaceOfPublications = bibData.varFields.collect {
       case VarField(_, None, Some("260"), _, _, subfields) =>

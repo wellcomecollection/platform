@@ -93,8 +93,8 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |          "url" : "",
       |          "credit" : null,
       |          "license": $license_CCBYJson,
-      |          "ontologyType": "DigitalLocation",
-      |          "type": "DigitalLocation"
+      |          "type": "DigitalLocation",
+      |          "ontologyType": "DigitalLocation"
       |        }
       |      ],
       |      "ontologyType": "Item"
@@ -112,6 +112,28 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "label": "$publicationDate",
       |    "ontologyType": "Period"
       |  },
+      |  "placeOfPublication": [
+      |   {
+      |     "label": "Madrid",
+      |     "type": "UnidentifiablePlaceOfPublication",
+      |     "ontologyType": "Place"
+      |   },
+      |   {
+      |     "label": "Spain",
+      |     "sourceIdentifier": {
+      |       "value": "sp",
+      |       "identifierScheme": "${IdentifierSchemes.marcCountries.toString}"
+      |     },
+      |     "identifiers": [
+      |       {
+      |         "value": "sp",
+      |         "identifierScheme": "${IdentifierSchemes.marcCountries.toString}"
+      |       }
+      |     ],
+      |     "type": "UnidentifiedPlaceOfPublication",
+      |     "ontologyType": "Place"
+      |   }
+      |  ],
       |  "ontologyType": "Work"
       |}
     """.stripMargin
@@ -154,7 +176,17 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-    publicationDate = Some(Period(publicationDate))
+    publicationDate = Some(Period(publicationDate)),
+    placeOfPublication = List(
+      UnidentifiablePlaceOfPublication("Madrid"),
+      UnidentifiedPlaceOfPublication(
+        "Spain",
+        sourceIdentifier =
+          SourceIdentifier(IdentifierSchemes.marcCountries, "sp"),
+        identifiers =
+          List(SourceIdentifier(IdentifierSchemes.marcCountries, "sp"))
+      )
+    )
   )
 
   it("should serialise an unidentified Work as JSON") {
