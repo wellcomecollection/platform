@@ -468,7 +468,8 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    transformedSierraRecord.get.get.placesOfPublication shouldBe List(Place(label = place))
+    transformedSierraRecord.get.get.placesOfPublication shouldBe List(
+      Place(label = place))
 
   }
 }
