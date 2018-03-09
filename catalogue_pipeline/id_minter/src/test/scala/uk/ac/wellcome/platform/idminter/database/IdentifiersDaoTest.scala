@@ -15,29 +15,31 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.util.{Failure, Success}
 
 case class IdentifiersDaoFixtures(
-                                 identifiersDao: IdentifiersDao,
-                                 identifiersTable: IdentifiersTable,
-                                 dbConfig: DatabaseConfig
-                                 )
+  identifiersDao: IdentifiersDao,
+  identifiersTable: IdentifiersTable,
+  dbConfig: DatabaseConfig
+)
 
 class IdentifiersDaoTest
     extends FunSpec
-      with fixtures.IdentifiersDatabase
-      with Matchers {
+    with fixtures.IdentifiersDatabase
+    with Matchers {
 
-  def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
-    val identifiersTable: IdentifiersTable =
-      new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
+  def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]) =
+    withIdentifiersDatabase[R] { dbConfig =>
+      val identifiersTable: IdentifiersTable =
+        new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
 
-    new TableProvisioner(host, port, username, password)
-      .provision(dbConfig.databaseName, dbConfig.tableName)
+      new TableProvisioner(host, port, username, password)
+        .provision(dbConfig.databaseName, dbConfig.tableName)
 
-    val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
+      val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-    eventuallyTableExists(dbConfig)
+      eventuallyTableExists(dbConfig)
 
-    testWith(IdentifiersDaoFixtures(identifiersDao, identifiersTable, dbConfig))
-  }
+      testWith(
+        IdentifiersDaoFixtures(identifiersDao, identifiersTable, dbConfig))
+    }
 
   describe("lookupID") {
     it("gets an Identifier if it finds a matching SourceSystem and SourceId") {
@@ -48,7 +50,8 @@ class IdentifiersDaoTest
           SourceSystem = IdentifierSchemes.miroImageNumber.toString,
           OntologyType = "t-t-t-turtles"
         )
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
+          1))
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -64,9 +67,9 @@ class IdentifiersDaoTest
       }
     }
 
-    it("does not get an identifier if there is no matching SourceSystem and SourceId") {
+    it(
+      "does not get an identifier if there is no matching SourceSystem and SourceId") {
       withIdentifiersDao { fixtures =>
-
         val identifier = Identifier(
           CanonicalId = "A turtle turns to try to taste",
           SourceId = "A tangerine",
@@ -74,7 +77,8 @@ class IdentifiersDaoTest
           OntologyType = "t-t-t-turtles"
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
+          1))
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
@@ -120,7 +124,6 @@ class IdentifiersDaoTest
   describe("saveIdentifier") {
     it("inserts the provided identifier into the database") {
       withIdentifiersDao { fixtures =>
-
         implicit val session = fixtures.dbConfig.session
 
         val identifier = Identifier(
@@ -138,7 +141,9 @@ class IdentifiersDaoTest
               fixtures.identifiersTable.i.SourceSystem,
               IdentifierSchemes.miroImageNumber.toString)
             .and
-            .eq(fixtures.identifiersTable.i.CanonicalId, identifier.CanonicalId)
+            .eq(
+              fixtures.identifiersTable.i.CanonicalId,
+              identifier.CanonicalId)
         }.map(Identifier(fixtures.identifiersTable.i)).single.apply()
 
         maybeIdentifier shouldBe defined
@@ -148,7 +153,6 @@ class IdentifiersDaoTest
 
     it("fails to insert a record with a duplicate CanonicalId") {
       withIdentifiersDao { fixtures =>
-
         val identifier = new Identifier(
           CanonicalId = "A failed field of flowers",
           SourceId = "A farm full of fruit",
@@ -162,19 +166,21 @@ class IdentifiersDaoTest
           OntologyType = "Fuels"
         )
 
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
+          1))
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
-
-        val triedSave = fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
+        val triedSave =
+          fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
 
         triedSave shouldBe a[Failure[_]]
-        triedSave.failed.get shouldBe a[SQLIntegrityConstraintViolationException]
+        triedSave.failed.get shouldBe a[
+          SQLIntegrityConstraintViolationException]
       }
     }
 
-    it("saves records with the same SourceSystem and SourceId but different OntologyType") {
+    it(
+      "saves records with the same SourceSystem and SourceId but different OntologyType") {
       withIdentifiersDao { fixtures =>
-
         val identifier = new Identifier(
           CanonicalId = "A mountain of muesli",
           SourceSystem = "A maize made of maze",
@@ -189,14 +195,16 @@ class IdentifiersDaoTest
           OntologyType = "Fruits"
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
-        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
+          1))
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe (Success(
+          1))
       }
     }
 
-    it("saves records with different SourceId but the same OntologyType and SourceSystem") {
+    it(
+      "saves records with different SourceId but the same OntologyType and SourceSystem") {
       withIdentifiersDao { fixtures =>
-
         val identifier = new Identifier(
           CanonicalId = "Overflowing with okra",
           SourceId = "Olive oil in an orchard",
@@ -210,14 +218,16 @@ class IdentifiersDaoTest
           OntologyType = identifier.OntologyType
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
-        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
+          1))
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe (Success(
+          1))
       }
     }
 
-    it("does not insert records with the same SourceId, SourceSystem and OntologyType") {
+    it(
+      "does not insert records with the same SourceId, SourceSystem and OntologyType") {
       withIdentifiersDao { fixtures =>
-
         val identifier = new Identifier(
           CanonicalId = "A surplus of strawberries",
           SourceId = "Sunflower seeds in a sack",
@@ -231,12 +241,15 @@ class IdentifiersDaoTest
           OntologyType = identifier.OntologyType
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
+          1))
 
-        val triedSave = fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
+        val triedSave =
+          fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
 
         triedSave shouldBe a[Failure[_]]
-        triedSave.failed.get shouldBe a[SQLIntegrityConstraintViolationException]
+        triedSave.failed.get shouldBe a[
+          SQLIntegrityConstraintViolationException]
       }
     }
   }

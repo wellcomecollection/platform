@@ -10,7 +10,10 @@ import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
+import uk.ac.wellcome.platform.idminter.database.{
+  IdentifiersDao,
+  TableProvisioner
+}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
@@ -20,7 +23,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.util.{Failure, Success}
 
 class IdentifierGeneratorTest
-  extends FunSpec
+    extends FunSpec
     with fixtures.IdentifiersDatabase
     with Matchers
     with MockitoSugar {
@@ -32,36 +35,41 @@ class IdentifierGeneratorTest
       ActorSystem())
 
   case class IdentifierGeneratorFixtures(
-                                        identifierGenerator: IdentifierGenerator,
-                                        identifiersTable: IdentifiersTable,
-                                        dbConfig: DatabaseConfig
-                                        )
+    identifierGenerator: IdentifierGenerator,
+    identifiersTable: IdentifiersTable,
+    dbConfig: DatabaseConfig
+  )
 
-  def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] = None)(testWith: TestWith[IdentifierGeneratorFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
-    val identifiersTable: IdentifiersTable =
-      new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
+  def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] =
+                                   None)(
+    testWith: TestWith[IdentifierGeneratorFixtures, R]) =
+    withIdentifiersDatabase[R] { dbConfig =>
+      val identifiersTable: IdentifiersTable =
+        new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
 
-    new TableProvisioner(host, port, username, password)
-      .provision(dbConfig.databaseName, dbConfig.tableName)
+      new TableProvisioner(host, port, username, password)
+        .provision(dbConfig.databaseName, dbConfig.tableName)
 
-    val identifiersDao = maybeIdentifiersDao.getOrElse(
-      new IdentifiersDao(DB.connect(), identifiersTable)
-    )
+      val identifiersDao = maybeIdentifiersDao.getOrElse(
+        new IdentifiersDao(DB.connect(), identifiersTable)
+      )
 
-    val identifierGenerator = new IdentifierGenerator(
-      identifiersDao,
-      metricsSender
-    )
+      val identifierGenerator = new IdentifierGenerator(
+        identifiersDao,
+        metricsSender
+      )
 
-    eventuallyTableExists(dbConfig)
+      eventuallyTableExists(dbConfig)
 
-    testWith(
-      IdentifierGeneratorFixtures(identifierGenerator, identifiersTable, dbConfig))
-  }
+      testWith(
+        IdentifierGeneratorFixtures(
+          identifierGenerator,
+          identifiersTable,
+          dbConfig))
+    }
 
   it("queries the database and return a matching canonical id") {
     withIdentifierGenerator() { fixtures =>
-
       implicit val session = fixtures.dbConfig.session
 
       withSQL {
@@ -86,7 +94,6 @@ class IdentifierGeneratorTest
 
   it("generates and saves a new identifier") {
     withIdentifierGenerator() { fixtures =>
-
       implicit val session = fixtures.dbConfig.session
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
@@ -145,10 +152,11 @@ class IdentifierGeneratorTest
       .thenReturn(Failure(expectedException))
 
     withIdentifierGenerator(Some(identifiersDao)) { fixtures =>
-      val triedGeneratingId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        sourceIdentifier,
-        "Work"
-      )
+      val triedGeneratingId =
+        fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
+          sourceIdentifier,
+          "Work"
+        )
 
       triedGeneratingId shouldBe a[Failure[_]]
       triedGeneratingId.failed.get shouldBe expectedException
@@ -157,7 +165,6 @@ class IdentifierGeneratorTest
 
   it("should preserve the ontologyType when generating a new identifier") {
     withIdentifierGenerator() { fixtures =>
-
       implicit val session = fixtures.dbConfig.session
 
       val ontologyType = "Item"
