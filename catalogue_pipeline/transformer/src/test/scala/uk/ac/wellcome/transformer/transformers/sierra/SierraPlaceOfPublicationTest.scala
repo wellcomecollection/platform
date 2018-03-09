@@ -4,9 +4,9 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.transformer.source.{Country, MarcSubfield, SierraBibData, VarField}
 
-class SierraPlacesOfPublicationTest extends FunSpec with Matchers {
+class SierraPlaceOfPublicationTest extends FunSpec with Matchers {
 
-  val transformer = new SierraPlacesOfPublication {}
+  val transformer = new SierraPlaceOfPublication {}
 
   it(
     "creates a place of publication with no identifier from field 260 subfield a") {
@@ -23,7 +23,7 @@ class SierraPlacesOfPublicationTest extends FunSpec with Matchers {
           subfields = List(MarcSubfield(tag = "a", content = content))))
     )
 
-    val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
+    val bibWithPlaceOfPublication = transformer.getPlaceOfPublication(bibData)
 
     bibWithPlaceOfPublication shouldBe List(
       UnidentifiablePlaceOfPublication(label = content))
@@ -43,7 +43,7 @@ class SierraPlacesOfPublicationTest extends FunSpec with Matchers {
           subfields = List(MarcSubfield(tag = "b", content = content))))
     )
 
-    val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
+    val bibWithPlaceOfPublication = transformer.getPlaceOfPublication(bibData)
 
     bibWithPlaceOfPublication shouldBe Nil
   }
@@ -55,7 +55,7 @@ class SierraPlacesOfPublicationTest extends FunSpec with Matchers {
       country = Some(Country(code = "nyu", name = "New York"))
     )
 
-    val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
+    val bibWithPlaceOfPublication = transformer.getPlaceOfPublication(bibData)
 
     bibWithPlaceOfPublication shouldBe List(
       UnidentifiedPlaceOfPublication(

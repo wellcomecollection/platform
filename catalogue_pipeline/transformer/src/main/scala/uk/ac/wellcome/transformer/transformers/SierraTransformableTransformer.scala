@@ -22,7 +22,7 @@ class SierraTransformableTransformer
     with SierraTitle
     with SierraLocation
     with SierraPublicationDate
-    with SierraPlacesOfPublication
+    with SierraPlaceOfPublication
     with Logging {
 
   override def transformForType(
@@ -51,7 +51,7 @@ class SierraTransformableTransformer
               publishers = getPublishers(sierraBibData),
               visible = !(sierraBibData.deleted || sierraBibData.suppressed),
               publicationDate = getPublicationDate(sierraBibData),
-              placesOfPublication = getPlacesOfPublication(sierraBibData)
+              placeOfPublication = getPlaceOfPublication(sierraBibData)
             ))
         }
 
