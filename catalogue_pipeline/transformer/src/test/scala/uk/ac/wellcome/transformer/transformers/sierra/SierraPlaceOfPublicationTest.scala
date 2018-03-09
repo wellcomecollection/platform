@@ -23,10 +23,10 @@ class SierraPlaceOfPublicationTest extends FunSpec with Matchers {
           subfields = List(MarcSubfield(tag = "a", content = content))))
     )
 
-    val bibWithPlaceOfPublication = transformer.getPlaceOfPublication(bibData)
+    val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
 
     bibWithPlaceOfPublication shouldBe List(
-      UnidentifiablePlaceOfPublication(label = content))
+      PlaceOfPublication(label = content))
   }
 
   it("ignores subfields other than a") {
@@ -43,28 +43,9 @@ class SierraPlaceOfPublicationTest extends FunSpec with Matchers {
           subfields = List(MarcSubfield(tag = "b", content = content))))
     )
 
-    val bibWithPlaceOfPublication = transformer.getPlaceOfPublication(bibData)
+    val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
 
     bibWithPlaceOfPublication shouldBe Nil
-  }
-
-  it("gets a place of publication with an identifier from the country field") {
-    val bibData = SierraBibData(
-      id = "1234567",
-      title = None,
-      country = Some(Country(code = "nyu", name = "New York"))
-    )
-
-    val bibWithPlaceOfPublication = transformer.getPlaceOfPublication(bibData)
-
-    bibWithPlaceOfPublication shouldBe List(
-      UnidentifiedPlaceOfPublication(
-        label = "New York",
-        sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.marcCountries, "nyu"),
-        identifiers =
-          List(SourceIdentifier(IdentifierSchemes.marcCountries, "nyu"))
-      ))
   }
 
 }

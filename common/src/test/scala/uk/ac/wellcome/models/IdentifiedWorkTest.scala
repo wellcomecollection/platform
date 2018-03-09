@@ -113,21 +113,9 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "label": "$publicationDate",
       |    "ontologyType": "Period"
       |  },
-      |  "placeOfPublication": [{
+      |  "placesOfPublication": [{
       |   "label": "Spain",
-      |   "canonicalId": "placeCanonicalId",
-      |   "sourceIdentifier": {
-      |     "identifierScheme": "marc-countries",
-      |     "value": "sp"
-      |   },
-      |   "identifiers": [
-      |     {
-      |       "identifierScheme": "marc-countries",
-      |       "value": "sp"
-      |     }
-      |   ],
-      |   "ontologyType": "Place",
-      |   "type": "IdentifiedPlaceOfPublication"
+      |   "ontologyType": "Place"
       |  }],
       |  "visible":true,
       |  "ontologyType": "Work"
@@ -176,15 +164,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placeOfPublication = List(
-      IdentifiedPlaceOfPublication(
-        label = "Spain",
-        canonicalId = "placeCanonicalId",
-        sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.marcCountries, "sp"),
-        identifiers =
-          List(SourceIdentifier(IdentifierSchemes.marcCountries, "sp"))
-      ))
+    placesOfPublication = List(PlaceOfPublication(label = "Spain"))
   )
 
   it("should serialise an identified Item as Work") {
