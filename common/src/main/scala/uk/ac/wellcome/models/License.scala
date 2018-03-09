@@ -18,7 +18,7 @@ object License extends Logging {
         ("licenseType", Json.fromString(license.licenseType)),
         ("label", Json.fromString(license.label)),
         ("url", Json.fromString(license.url)),
-        ("type", Json.fromString(license.ontologyType))
+        ("ontologyType", Json.fromString(license.ontologyType))
     ))
 
   implicit val licenseDecoder = Decoder.instance[License](cursor =>

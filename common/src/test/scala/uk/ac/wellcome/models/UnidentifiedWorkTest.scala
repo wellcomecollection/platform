@@ -11,7 +11,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
             "licenseType": "${License_CCBY.licenseType}",
             "label": "${License_CCBY.label}",
             "url": "${License_CCBY.url}",
-            "type": "License"
+            "ontologyType": "License"
           }"""
 
   // TRIVIA: This is an extract from Marco Polo's diaries, in which he
@@ -47,24 +47,24 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "lettering": "lettering",
       |  "createdDate": {
       |    "label": "period",
-      |    "type": "Period"
+      |    "ontologyType": "Period"
       |  },
       |  "subjects": [
       |    {
       |      "label": "subject",
-      |      "type": "Concept"
+      |      "ontologyType": "Concept"
       |    }
       |  ],
       |  "creators": [
       |    {
       |      "label": "47",
-      |      "type": "Agent"
+      |      "ontologyType": "Agent"
       |    }
       |  ],
       |  "genres": [
       |    {
       |      "label": "genre",
-      |      "type": "Concept"
+      |      "ontologyType": "Concept"
       |    }
       |  ],
       |  "thumbnail": {
@@ -72,7 +72,8 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "url" : "",
       |    "credit" : null,
       |    "license": $license_CCBYJson,
-      |    "type": "DigitalLocation"
+      |    "type": "DigitalLocation",
+      |    "ontologyType": "DigitalLocation"
       |  },
       |  "items": [
       |    {
@@ -92,24 +93,26 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |          "url" : "",
       |          "credit" : null,
       |          "license": $license_CCBYJson,
+      |          "ontologyType": "DigitalLocation",
       |          "type": "DigitalLocation"
       |        }
       |      ],
-      |      "type": "Item"
+      |      "ontologyType": "Item"
       |    }
       |  ],
       |  "publishers": [
       |    {
       |      "label": "MIT Press",
-      |      "type": "Organisation"
+      |      "type": "Organisation",
+      |      "ontologyType": "Organisation"
       |    }
       |  ],
       |  "visible":true,
       |  "publicationDate": {
       |    "label": "$publicationDate",
-      |    "type": "Period"
+      |    "ontologyType": "Period"
       |  },
-      |  "type": "Work"
+      |  "ontologyType": "Work"
       |}
     """.stripMargin
 
@@ -172,6 +175,6 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   it("should have an ontology type 'Work' when serialised to JSON") {
     val jsonString = toJson(unidentifiedWork).get
 
-    jsonString.contains("""type":"Work"""") should be(true)
+    jsonString.contains("""ontologyType":"Work"""") should be(true)
   }
 }
