@@ -105,14 +105,30 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "publishers": [
       |    {
       |      "label": "MIT Press",
-      |      "type": "Organisation",
-      |      "ontologyType": "Organisation"
+      |      "ontologyType": "Organisation",
+      |      "type": "Organisation"
       |    }
       |  ],
       |  "publicationDate": {
       |    "label": "$publicationDate",
       |    "ontologyType": "Period"
       |  },
+      |  "placeOfPublication": [{
+      |   "label": "Spain",
+      |   "canonicalId": "placeCanonicalId",
+      |   "sourceIdentifier": {
+      |     "identifierScheme": "marc-countries",
+      |     "value": "sp"
+      |   },
+      |   "identifiers": [
+      |     {
+      |       "identifierScheme": "marc-countries",
+      |       "value": "sp"
+      |     }
+      |   ],
+      |   "ontologyType": "Place",
+      |   "type": "IdentifiedPlaceOfPublication"
+      |  }],
       |  "visible":true,
       |  "ontologyType": "Work"
       |}
@@ -159,7 +175,16 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
-    publicationDate = Some(Period(publicationDate))
+    publicationDate = Some(Period(publicationDate)),
+    placeOfPublication = List(
+      IdentifiedPlaceOfPublication(
+        label = "Spain",
+        canonicalId = "placeCanonicalId",
+        sourceIdentifier =
+          SourceIdentifier(IdentifierSchemes.marcCountries, "sp"),
+        identifiers =
+          List(SourceIdentifier(IdentifierSchemes.marcCountries, "sp"))
+      ))
   )
 
   it("should serialise an identified Item as Work") {
