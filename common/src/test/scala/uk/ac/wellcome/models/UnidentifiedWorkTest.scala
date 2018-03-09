@@ -161,7 +161,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(PlaceOfPublication("Madrid"))
+    placesOfPublication = List(Place("Madrid"))
   )
 
   it("should serialise an unidentified Work as JSON") {

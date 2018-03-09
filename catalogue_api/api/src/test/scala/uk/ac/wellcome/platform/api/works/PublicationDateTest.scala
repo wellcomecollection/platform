@@ -31,7 +31,8 @@ class PublicationDateTest extends ApiWorksTestBase {
           |      "creators": [ ],
           |      "subjects": [ ],
           |      "genres": [ ],
-          |      "publishers": [ ]
+          |      "publishers": [ ],
+          |      "placesOfPublication": [ ]
           |    }
           |  ]
           |}
@@ -70,7 +71,8 @@ class PublicationDateTest extends ApiWorksTestBase {
           |       "publicationDate": {
           |         "label": "${work.publicationDate.get.label}",
           |         "type": "Period"
-          |       }
+          |       },
+          |      "placesOfPublication": [ ]
           |     }
           |   ]
           |}
