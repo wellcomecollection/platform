@@ -1,8 +1,12 @@
 package uk.ac.wellcome.platform.idminter.fixtures
 
+import org.scalatest.Matchers
+import org.scalatest.concurrent.Eventually
 import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
+import uk.ac.wellcome.platform.idminter.database.FieldDescription
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
 
@@ -11,21 +15,67 @@ case class DatabaseConfig(
   tableName: String,
   database: SQLSyntax,
   table: SQLSyntax,
-  flags: Map[String,String]
+  flags: Map[String,String],
+  session: AutoSession.type
 )
 
-trait IdentifiersDatabase {
+trait IdentifiersDatabase
+  extends Eventually
+    with ExtendedPatience
+    with Matchers {
+
   val host = "localhost"
   val port = "3307"
   val username = "root"
   val password = "password"
 
-  Class.forName("com.mysql.jdbc.Driver")
-  ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
+  def eventuallyTableExists(databaseConfig: DatabaseConfig) = eventually {
+    val database = databaseConfig.database
+    val table = databaseConfig.table
 
-  implicit val session = AutoSession
+    val fields = DB readOnly { implicit session =>
+      sql"DESCRIBE $database.$table"
+        .map(
+          rs =>
+            FieldDescription(
+              rs.string("Field"),
+              rs.string("Type"),
+              rs.string("Null"),
+              rs.string("Key")))
+        .list()
+        .apply()
+    }
+
+    fields.sortBy(_.field) shouldBe Seq(
+      FieldDescription(
+        field = "CanonicalId",
+        dataType = "varchar(255)",
+        nullable = "NO",
+        key = "PRI"),
+      FieldDescription(
+        field = "OntologyType",
+        dataType = "varchar(255)",
+        nullable = "NO",
+        key = "MUL"),
+      FieldDescription(
+        field = "SourceSystem",
+        dataType = "varchar(255)",
+        nullable = "NO",
+        key = ""),
+      FieldDescription(
+        field = "SourceId",
+        dataType = "varchar(255)",
+        nullable = "NO",
+        key = "")
+    ).sortBy(_.field)
+  }
 
   def withIdentifiersDatabase[R](testWith: TestWith[DatabaseConfig, R]) = {
+    Class.forName("com.mysql.jdbc.Driver")
+    ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
+
+    implicit val session = AutoSession
+
     val databaseName: String = Random.alphanumeric take 10 mkString
     val tableName: String = Random.alphanumeric take 10 mkString
 
@@ -49,7 +99,8 @@ trait IdentifiersDatabase {
         tableName = tableName,
         database = identifiersDatabase,
         table = identifiersTable,
-        flags = flags
+        flags = flags,
+        session = session
       )
 
       testWith(config)

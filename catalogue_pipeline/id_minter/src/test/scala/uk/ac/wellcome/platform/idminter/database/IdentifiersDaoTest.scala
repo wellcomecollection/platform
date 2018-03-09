@@ -7,6 +7,7 @@ import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.fixtures
+import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -15,14 +16,13 @@ import scala.util.{Failure, Success}
 
 case class IdentifiersDaoFixtures(
                                  identifiersDao: IdentifiersDao,
-                                 identifiersTable: IdentifiersTable
+                                 identifiersTable: IdentifiersTable,
+                                 dbConfig: DatabaseConfig
                                  )
 
 class IdentifiersDaoTest
     extends FunSpec
       with fixtures.IdentifiersDatabase
-      with Eventually
-      with ExtendedPatience
       with Matchers {
 
   def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
@@ -34,9 +34,9 @@ class IdentifiersDaoTest
 
     val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-    eventually {
-      testWith(IdentifiersDaoFixtures(identifiersDao, identifiersTable))
-    }
+    eventuallyTableExists(dbConfig)
+
+    testWith(IdentifiersDaoFixtures(identifiersDao, identifiersTable, dbConfig))
   }
 
   describe("lookupID") {
@@ -48,7 +48,7 @@ class IdentifiersDaoTest
           SourceSystem = IdentifierSchemes.miroImageNumber.toString,
           OntologyType = "t-t-t-turtles"
         )
-        assertInsertingIdentifierSucceeds(fixtures.identifiersDao, identifier)
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -73,7 +73,8 @@ class IdentifiersDaoTest
           SourceSystem = IdentifierSchemes.miroImageNumber.toString,
           OntologyType = "t-t-t-turtles"
         )
-        assertInsertingIdentifierSucceeds(fixtures.identifiersDao, identifier)
+
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
@@ -120,6 +121,8 @@ class IdentifiersDaoTest
     it("inserts the provided identifier into the database") {
       withIdentifiersDao { fixtures =>
 
+        implicit val session = fixtures.dbConfig.session
+
         val identifier = Identifier(
           CanonicalId = "A provision of porpoises",
           OntologyType = "Work",
@@ -159,11 +162,13 @@ class IdentifiersDaoTest
           OntologyType = "Fuels"
         )
 
-        assertInsertingDuplicateFails(
-          fixtures.identifiersDao,
-          identifier,
-          duplicateIdentifier
-        )
+
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+
+        val triedSave = fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
+
+        triedSave shouldBe a[Failure[_]]
+        triedSave.failed.get shouldBe a[SQLIntegrityConstraintViolationException]
       }
     }
 
@@ -183,8 +188,9 @@ class IdentifiersDaoTest
           SourceId = "A maize made of maze",
           OntologyType = "Fruits"
         )
-        assertInsertingIdentifierSucceeds(fixtures.identifiersDao, identifier)
-        assertInsertingIdentifierSucceeds(fixtures.identifiersDao, secondIdentifier)
+
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe(Success(1))
       }
     }
 
@@ -203,8 +209,9 @@ class IdentifiersDaoTest
           SourceSystem = "A hedge maze in Loughborough",
           OntologyType = identifier.OntologyType
         )
-        assertInsertingIdentifierSucceeds(fixtures.identifiersDao, identifier)
-        assertInsertingIdentifierSucceeds(fixtures.identifiersDao, secondIdentifier)
+
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe(Success(1))
       }
     }
 
@@ -224,28 +231,13 @@ class IdentifiersDaoTest
           OntologyType = identifier.OntologyType
         )
 
-        assertInsertingDuplicateFails(fixtures.identifiersDao, identifier, duplicateIdentifier)
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe(Success(1))
+
+        val triedSave = fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
+
+        triedSave shouldBe a[Failure[_]]
+        triedSave.failed.get shouldBe a[SQLIntegrityConstraintViolationException]
       }
     }
-  }
-
-  /* Helper method.  Given two records, try to insert them both, and check
-   * that integrity checks in the database reject the second record.
-   */
-  private def assertInsertingDuplicateFails(identifiersDao: IdentifiersDao,
-                                            identifier: Identifier,
-                                            duplicateIdentifier: Identifier) = {
-
-    assertInsertingIdentifierSucceeds(identifiersDao, identifier)
-
-    val triedSave = identifiersDao.saveIdentifier(duplicateIdentifier)
-    triedSave shouldBe a[Failure[_]]
-    triedSave.failed.get shouldBe a[SQLIntegrityConstraintViolationException]
-  }
-
-  /* Helper method.  Insert a record and check that it succeeds. */
-  private def assertInsertingIdentifierSucceeds(identifiersDao: IdentifiersDao, identifier: Identifier) = {
-    val triedSave = identifiersDao.saveIdentifier(identifier)
-    triedSave shouldBe Success(1)
   }
 }
