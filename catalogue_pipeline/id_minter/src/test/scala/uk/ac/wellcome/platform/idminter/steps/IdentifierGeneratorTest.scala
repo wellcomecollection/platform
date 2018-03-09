@@ -4,23 +4,27 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.{Failure, Success}
 
 class IdentifierGeneratorTest
-    extends FunSpec
-      with fixtures.IdentifiersDatabase
-      with Matchers
-      with MockitoSugar {
+  extends FunSpec
+    with fixtures.IdentifiersDatabase
+    with Eventually
+    with ExtendedPatience
+    with Matchers
+    with MockitoSugar {
 
   private val metricsSender =
     new MetricsSender(
@@ -37,12 +41,17 @@ class IdentifierGeneratorTest
     val identifiersTable: IdentifiersTable =
       new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
 
+    new TableProvisioner(host, port, username, password)
+      .provision(dbConfig.databaseName, dbConfig.tableName)
+
     val identifierGenerator = new IdentifierGenerator(
       new IdentifiersDao(DB.connect(), identifiersTable),
       metricsSender
     )
 
-    testWith(IdentifierGeneratorFixtures(identifierGenerator,identifiersTable))
+    eventually {
+      testWith(IdentifierGeneratorFixtures(identifierGenerator, identifiersTable))
+    }
   }
 
   it("queries the database and return a matching canonical id") {

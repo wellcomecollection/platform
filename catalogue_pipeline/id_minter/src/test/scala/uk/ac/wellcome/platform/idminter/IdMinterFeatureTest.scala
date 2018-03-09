@@ -69,13 +69,11 @@ class IdMinterFeatureTest
         withIdentifiersDatabase { dbConfig =>
 
           val flags = Map(
-            "aws.rds.identifiers.database" -> dbConfig.databaseName,
-            "aws.rds.identifiers.table" -> dbConfig.tableName,
             "aws.region" -> "localhost",
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sqs.waitTime" -> "1",
             "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ mySqlLocalEndpointFlags
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { _ =>
             sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
@@ -98,11 +96,6 @@ class IdMinterFeatureTest
               "topic",
               "messageType",
               "timestamp"
-            )
-
-            def sendMessage = sqsClient.sendMessage(
-              queueUrl,
-              toJson(sqsMessage).get
             )
 
             sqsClient.sendMessage(
@@ -145,13 +138,10 @@ class IdMinterFeatureTest
         withIdentifiersDatabase { dbConfig =>
 
           val flags = Map(
-            "aws.rds.identifiers.database" -> dbConfig.databaseName,
-            "aws.rds.identifiers.table" -> dbConfig.tableName,
-            "aws.region" -> "localhost",
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sqs.waitTime" -> "1",
             "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ mySqlLocalEndpointFlags
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { _ =>
             sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "10"))

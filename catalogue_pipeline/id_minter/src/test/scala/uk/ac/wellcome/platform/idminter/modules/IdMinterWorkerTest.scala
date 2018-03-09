@@ -29,13 +29,11 @@ class IdMinterWorkerTest
         withIdentifiersDatabase { dbConfig =>
 
           val flags = Map(
-            "aws.rds.identifiers.database" -> dbConfig.databaseName,
-            "aws.rds.identifiers.table" -> dbConfig.tableName,
             "aws.region" -> "localhost",
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sqs.waitTime" -> "1",
             "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ mySqlLocalEndpointFlags
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           val identifiersDao = mock[IdentifiersDao]
 
@@ -43,27 +41,12 @@ class IdMinterWorkerTest
             server.bind[IdentifiersDao](identifiersDao)
           }) { _  =>
 
-            val databaseName = dbConfig.databaseName
-            val tableName = dbConfig.tableName
-
-            intercept[SQLSyntaxErrorException] {
-              DB readOnly { implicit session =>
-                sql"DESCRIBE $databaseName.$tableName"
-                  .map(
-                    rs =>
-                      FieldDescription(
-                        rs.string("Field"),
-                        rs.string("Type"),
-                        rs.string("Null"),
-                        rs.string("Key")))
-                  .list()
-                  .apply()
-              }
-            }
+            val database = dbConfig.database
+            val table = dbConfig.table
 
             eventually {
               val fields = DB readOnly { implicit session =>
-                sql"DESCRIBE $databaseName.$tableName"
+                sql"DESCRIBE $database.$table"
                   .map(
                     rs =>
                       FieldDescription(

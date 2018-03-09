@@ -8,7 +8,10 @@ import scala.util.Random
 
 case class DatabaseConfig(
   databaseName: String,
-  tableName: String
+  tableName: String,
+  database: SQLSyntax,
+  table: SQLSyntax,
+  flags: Map[String,String]
 )
 
 trait IdentifiersDatabase {
@@ -19,34 +22,34 @@ trait IdentifiersDatabase {
 
   Class.forName("com.mysql.jdbc.Driver")
   ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
+
   implicit val session = AutoSession
-
-  val mySqlLocalEndpointFlags: Map[String, String] =
-    Map("aws.rds.host" -> host,
-      "aws.rds.port" -> port,
-      "aws.rds.userName" -> username,
-      "aws.rds.password" -> password
-    )
-
 
   def withIdentifiersDatabase[R](testWith: TestWith[DatabaseConfig, R]) = {
     val databaseName: String = Random.alphanumeric take 10 mkString
     val tableName: String = Random.alphanumeric take 10 mkString
 
     val identifiersDatabase: SQLSyntax = SQLSyntax.createUnsafely(databaseName)
-    val identifiersTableName: SQLSyntax = SQLSyntax.createUnsafely(tableName)
+    val identifiersTable: SQLSyntax = SQLSyntax.createUnsafely(tableName)
 
     try {
-      sql"CREATE DATABASE $identifiersDatabase;".execute().apply()
+      sql"CREATE DATABASE $identifiersDatabase".execute().apply()
 
-      val flags = mySqlLocalEndpointFlags ++ Map(
+      val flags = Map(
+        "aws.rds.host" -> host,
+        "aws.rds.port" -> port,
+        "aws.rds.userName" -> username,
+        "aws.rds.password" -> password,
         "aws.rds.identifiers.table" -> tableName,
         "aws.rds.identifiers.database" -> databaseName
       )
 
       val config = DatabaseConfig(
         databaseName = databaseName,
-        tableName = tableName
+        tableName = tableName,
+        database = identifiersDatabase,
+        table = identifiersTable,
+        flags = flags
       )
 
       testWith(config)
