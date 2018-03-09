@@ -6,7 +6,7 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{SnsFixtures, SqsFixtures}
 
 class ServerTest
-  extends FunSpec
+    extends FunSpec
     with fixtures.Server
     with SqsFixtures
     with SnsFixtures
@@ -16,7 +16,6 @@ class ServerTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
-
           val flags = Map(
             "aws.region" -> "localhost",
             "aws.sqs.queue.url" -> queueUrl,

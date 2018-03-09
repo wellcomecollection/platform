@@ -18,7 +18,6 @@ class TableProvisionerTest
 
   it("should create the Identifiers table") {
     withIdentifiersDatabase { databaseConfig =>
-
       val database = databaseConfig.database
       val table = databaseConfig.table
 
@@ -27,7 +26,6 @@ class TableProvisionerTest
 
       new TableProvisioner(host, port, username, password)
         .provision(databaseName, tableName)
-
 
       eventuallyTableExists(databaseConfig)
     }

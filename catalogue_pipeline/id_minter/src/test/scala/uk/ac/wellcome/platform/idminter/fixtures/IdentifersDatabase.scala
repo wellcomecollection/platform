@@ -15,12 +15,12 @@ case class DatabaseConfig(
   tableName: String,
   database: SQLSyntax,
   table: SQLSyntax,
-  flags: Map[String,String],
+  flags: Map[String, String],
   session: AutoSession.type
 )
 
 trait IdentifiersDatabase
-  extends Eventually
+    extends Eventually
     with ExtendedPatience
     with Matchers {
 

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.idminter
 
-
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -43,7 +42,6 @@ class IdMinterFeatureTest
       "timestamp")
   }
 
-
   private def assertMessageIsNotDeleted(queueUrl: String): Unit = {
     // After a message is read, it stays invisible for 1 second and then it gets sent again.
     // So we wait for longer than the visibility timeout and then we assert that it has become
@@ -63,11 +61,11 @@ class IdMinterFeatureTest
     }
   }
 
-  it("mints the same ID for SourcedWorks that have matching source identifiers") {
+  it(
+    "mints the same ID for SourcedWorks that have matching source identifiers") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
-
           val flags = Map(
             "aws.region" -> "localhost",
             "aws.sqs.queue.url" -> queueUrl,
@@ -76,10 +74,11 @@ class IdMinterFeatureTest
           ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { _ =>
-
             eventuallyTableExists(dbConfig)
 
-            sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+            sqsClient.setQueueAttributes(
+              queueUrl,
+              Map("VisibilityTimeout" -> "1"))
 
             val miroID = "M0001234"
             val title = "A limerick about a lion"
@@ -139,7 +138,6 @@ class IdMinterFeatureTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
-
           val flags = Map(
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sqs.waitTime" -> "1",
@@ -147,7 +145,9 @@ class IdMinterFeatureTest
           ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { _ =>
-            sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
+            sqsClient.setQueueAttributes(
+              queueUrl,
+              Map("VisibilityTimeout" -> "1"))
 
             sqsClient.sendMessage(queueUrl, "not a json string")
 

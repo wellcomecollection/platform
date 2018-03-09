@@ -8,7 +8,7 @@ import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 
 trait Server extends AmazonCloudWatchFlag { this: Suite =>
   def withServer[R](
-    flags:Map[String,String],
+    flags: Map[String, String],
     modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity
   )(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
