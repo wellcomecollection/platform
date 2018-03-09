@@ -45,7 +45,7 @@ class SierraReaderWorkerServiceTest
   when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
 
   val mockMetrics =
-    new MetricsSender("namespace", mockCloudWatch, ActorSystem())
+    new MetricsSender("namespace", 100 milliseconds, mockCloudWatch, ActorSystem())
 
   case class FixtureParams(worker: SierraReaderWorkerService, queueUrl: String)
 

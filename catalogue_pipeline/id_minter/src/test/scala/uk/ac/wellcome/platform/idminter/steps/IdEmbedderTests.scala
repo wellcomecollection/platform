@@ -12,6 +12,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
+import scala.concurrent.duration._
 
 import scala.util.Try
 
@@ -31,6 +32,7 @@ class IdEmbedderTests
   private val metricsSender =
     new MetricsSender(
       "id_minter_test_metrics",
+      100 milliseconds,
       mock[AmazonCloudWatch],
       ActorSystem())
   private val mockIdentifierGenerator: IdentifierGenerator =

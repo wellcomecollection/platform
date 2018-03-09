@@ -12,6 +12,7 @@ import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.IdentifiersMysqlLocal
+import scala.concurrent.duration._
 
 import scala.util.{Failure, Success}
 
@@ -24,6 +25,7 @@ class IdentifierGeneratorTest
   private val metricsSender =
     new MetricsSender(
       "id_minter_test_metrics",
+      100 milliseconds,
       mock[AmazonCloudWatch],
       ActorSystem())
 
