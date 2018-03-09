@@ -10,7 +10,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
-import org.scalatest.fixture.FunSpec
+import org.scalatest.FunSpec
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -20,7 +20,6 @@ import uk.ac.wellcome.test.fixtures._
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import org.scalatest.Outcome
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 case class TestObject(foo: String)
@@ -31,6 +30,7 @@ class SQSWorkerToDynamoTest
     with Matchers
     with Eventually
     with ExtendedPatience
+    with AkkaFixtures
     with SqsFixtures {
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
@@ -67,118 +67,103 @@ class SQSWorkerToDynamoTest
     }
 
     override def terminalFailureHook(): Unit = {
-      println(s"$this.terminalFailureHook()")
       terminalFailure = true
     }
   }
 
-  class ConditionalCheckFailingTestWorker(queueUrl: String,
-                                          system: ActorSystem)
-      extends TestWorker(queueUrl: String, system) {
+  type TestWorkerFactory = (String, ActorSystem) => TestWorker
 
-    override def store(record: TestObject): Future[Unit] = Future {
-      throw new ConditionalCheckFailedException("Wrong!")
-    }
-  }
+  def defaultTestWorkerFactory(queueUrl: String, system: ActorSystem) =
+    new TestWorker(queueUrl, system)
 
-  class TerminalFailingTestWorker(queueUrl: String, system: ActorSystem)
-      extends TestWorker(queueUrl: String, system) {
-
-    override def store(record: TestObject): Future[Unit] = Future {
-      throw new RuntimeException("Wrong!")
-    }
-  }
-
-  object TestWorkerFixtures
-      extends TestWith[OneArgTest, Outcome]
-      with AkkaFixtures {
-
-    override def apply(test: OneArgTest) = {
-      withActorSystem { actorSystem =>
-        withLocalSqsQueue { queueUrl =>
-          sqsClient.setQueueAttributes(
-            queueUrl,
-            Map("VisibilityTimeout" -> "0"))
-
-          val worker: TestWorker = new TestWorker(queueUrl, actorSystem)
-          val terminalWorker: TerminalFailingTestWorker =
-            new TerminalFailingTestWorker(queueUrl, actorSystem)
-          val conditionalCheckFailingWorker
-            : ConditionalCheckFailingTestWorker =
-            new ConditionalCheckFailingTestWorker(queueUrl, actorSystem)
-
-          try {
-            withFixture(
-              test.toNoArgTest(
-                FixtureParam(
-                  worker,
-                  terminalWorker,
-                  conditionalCheckFailingWorker,
-                  queueUrl)))
-          } finally {
-            worker.stop()
-            terminalWorker.stop()
-            conditionalCheckFailingWorker.stop()
-          }
-
-        }
+  def conditionalCheckFailingTestWorkerFactory(queueUrl: String,
+                                               system: ActorSystem) =
+    new TestWorker(queueUrl: String, system) {
+      override def store(record: TestObject): Future[Unit] = Future {
+        throw new ConditionalCheckFailedException("Wrong!")
       }
     }
 
+  def terminalTestWorkerFactory(queueUrl: String, system: ActorSystem) =
+    new TestWorker(queueUrl: String, system) {
+      override def store(record: TestObject): Future[Unit] = Future {
+        throw new RuntimeException("Wrong!")
+      }
+    }
+
+  def withTestWorker[R](testWorkFactory: TestWorkerFactory =
+                          defaultTestWorkerFactory)(
+    testWith: TestWith[(TestWorker, String), R]) = {
+    withActorSystem { system =>
+      withLocalSqsQueue { queueUrl =>
+        sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
+
+        val worker = testWorkFactory(queueUrl, system)
+
+        try {
+          testWith((worker, queueUrl))
+        } finally {
+          worker.stop()
+        }
+
+      }
+    }
   }
 
-  case class FixtureParam(
-    worker: TestWorker,
-    terminalWorker: TerminalFailingTestWorker,
-    conditionalCheckFailingWorker: ConditionalCheckFailingTestWorker,
-    queueUrl: String)
+  it("processes messages") {
+    withTestWorker() {
+      case (worker, queueUrl) =>
+        sqsClient.sendMessage(queueUrl, testMessageJson)
 
-  override def withFixture(test: OneArgTest) = TestWorkerFixtures(test)
-
-  it("processes messages") { fixtures =>
-    sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
-
-    eventually {
-      fixtures.worker.processCalled shouldBe true
-      fixtures.worker.terminalFailure shouldBe false
+        eventually {
+          worker.processCalled shouldBe true
+          worker.terminalFailure shouldBe false
+        }
     }
   }
 
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
-    fixtures =>
-      sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
+    withTestWorker(conditionalCheckFailingTestWorkerFactory) {
+      case (worker, queueUrl) =>
+        sqsClient.sendMessage(queueUrl, testMessageJson)
 
-      eventually {
-        fixtures.conditionalCheckFailingWorker.terminalFailure shouldBe false
-      }
+        eventually {
+          worker.terminalFailure shouldBe false
+        }
+    }
   }
 
-  it("fails gracefully when a conversion fails") { fixtures =>
-    val invalidBodyTestMessage = SQSMessage(
-      subject = Some("subject"),
-      messageType = "messageType",
-      topic = "topic",
-      body = "not valid json",
-      timestamp = "timestamp"
-    )
+  it("fails gracefully when a conversion fails") {
+    withTestWorker(terminalTestWorkerFactory) {
+      case (worker, queueUrl) =>
+        val invalidBodyTestMessage = SQSMessage(
+          subject = Some("subject"),
+          messageType = "messageType",
+          topic = "topic",
+          body = "not valid json",
+          timestamp = "timestamp"
+        )
 
-    val invalidBodyTestMessageJson = toJson(invalidBodyTestMessage).get
+        val invalidBodyTestMessageJson = toJson(invalidBodyTestMessage).get
 
-    sqsClient.sendMessage(fixtures.queueUrl, invalidBodyTestMessageJson)
+        sqsClient.sendMessage(queueUrl, invalidBodyTestMessageJson)
 
-    eventually {
-      fixtures.worker.terminalFailure shouldBe false
+        eventually {
+          worker.terminalFailure shouldBe false
+        }
     }
   }
 
   it(
     "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
-    fixtures =>
-      sqsClient.sendMessage(fixtures.queueUrl, testMessageJson)
+    withTestWorker(terminalTestWorkerFactory) {
+      case (worker, queueUrl) =>
+        sqsClient.sendMessage(queueUrl, testMessageJson)
 
-      eventually {
-        fixtures.terminalWorker.terminalFailure shouldBe true
-      }
+        eventually {
+          worker.terminalFailure shouldBe true
+        }
+    }
   }
 
 }
