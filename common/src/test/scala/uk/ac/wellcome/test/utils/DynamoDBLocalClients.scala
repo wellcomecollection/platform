@@ -10,7 +10,7 @@ import com.amazonaws.services.dynamodbv2.{
   AmazonDynamoDBClientBuilder
 }
 
-trait DynamoDBLocalClients { this: Suite =>
+trait DynamoDBLocalClients {
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
 
