@@ -51,7 +51,7 @@ class SierraTransformableTransformer
               publishers = getPublishers(sierraBibData),
               visible = !(sierraBibData.deleted || sierraBibData.suppressed),
               publicationDate = getPublicationDate(sierraBibData),
-              placeOfPublication = getPlaceOfPublication(sierraBibData)
+              placesOfPublication = getPlacesOfPublication(sierraBibData)
             ))
         }
 

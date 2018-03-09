@@ -112,25 +112,9 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "label": "$publicationDate",
       |    "ontologyType": "Period"
       |  },
-      |  "placeOfPublication": [
+      |  "placesOfPublication": [
       |   {
       |     "label": "Madrid",
-      |     "type": "UnidentifiablePlaceOfPublication",
-      |     "ontologyType": "Place"
-      |   },
-      |   {
-      |     "label": "Spain",
-      |     "sourceIdentifier": {
-      |       "value": "sp",
-      |       "identifierScheme": "${IdentifierSchemes.marcCountries.toString}"
-      |     },
-      |     "identifiers": [
-      |       {
-      |         "value": "sp",
-      |         "identifierScheme": "${IdentifierSchemes.marcCountries.toString}"
-      |       }
-      |     ],
-      |     "type": "UnidentifiedPlaceOfPublication",
       |     "ontologyType": "Place"
       |   }
       |  ],
@@ -177,16 +161,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placeOfPublication = List(
-      UnidentifiablePlaceOfPublication("Madrid"),
-      UnidentifiedPlaceOfPublication(
-        "Spain",
-        sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.marcCountries, "sp"),
-        identifiers =
-          List(SourceIdentifier(IdentifierSchemes.marcCountries, "sp"))
-      )
-    )
+    placesOfPublication = List(PlaceOfPublication("Madrid"))
   )
 
   it("should serialise an unidentified Work as JSON") {
