@@ -26,7 +26,7 @@ class SierraPlaceOfPublicationTest extends FunSpec with Matchers {
     val bibWithPlaceOfPublication = transformer.getPlacesOfPublication(bibData)
 
     bibWithPlaceOfPublication shouldBe List(
-      PlaceOfPublication(label = content))
+      Place(label = content))
   }
 
   it("ignores subfields other than a") {

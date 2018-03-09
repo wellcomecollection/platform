@@ -37,7 +37,8 @@ class LocationsTest extends ApiWorksTestBase {
                           | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
-                          | "publishers": [ ]
+                          | "publishers": [ ],
+                          | "placesOfPublication": [ ]
                           |}
           """.stripMargin
       )

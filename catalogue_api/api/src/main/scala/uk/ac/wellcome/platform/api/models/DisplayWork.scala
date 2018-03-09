@@ -71,6 +71,10 @@ case class DisplayWork(
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAgent] = List(),
   @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayPlace]",
+    value = "Show a list of places of publication."
+  ) placesOfPublication: List[DisplayPlace] = List(),
+  @ApiModelProperty(
     dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
     value =
       "Relates the publication of a work to a date when the work has been formally published."
@@ -110,6 +114,7 @@ case object DisplayWork {
         else None,
       publishers = work.publishers.map(DisplayAgent(_)),
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
+      placesOfPublication = work.placesOfPublication.map{ DisplayPlace(_) },
       visible = work.visible
     )
   }

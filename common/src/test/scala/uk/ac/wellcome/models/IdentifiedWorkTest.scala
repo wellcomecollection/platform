@@ -164,7 +164,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(PlaceOfPublication(label = "Spain"))
+    placesOfPublication = List(Place(label = "Spain"))
   )
 
   it("should serialise an identified Item as Work") {
