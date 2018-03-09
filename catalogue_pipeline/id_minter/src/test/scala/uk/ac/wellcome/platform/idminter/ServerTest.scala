@@ -18,13 +18,11 @@ class ServerTest
         withIdentifiersDatabase { dbConfig =>
 
           val flags = Map(
-            "aws.rds.identifiers.database" -> dbConfig.databaseName,
-            "aws.rds.identifiers.table" -> dbConfig.tableName,
             "aws.region" -> "localhost",
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sqs.waitTime" -> "1",
             "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ mySqlLocalEndpointFlags
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
           withServer(flags) { server =>
             server.httpGet(

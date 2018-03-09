@@ -2,12 +2,14 @@ package uk.ac.wellcome.platform.idminter.database
 
 import java.sql.SQLIntegrityConstraintViolationException
 
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.{Failure, Success}
 
@@ -19,20 +21,26 @@ case class IdentifiersDaoFixtures(
 class IdentifiersDaoTest
     extends FunSpec
       with fixtures.IdentifiersDatabase
+      with Eventually
+      with ExtendedPatience
       with Matchers {
 
   def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]) = withIdentifiersDatabase[R] { dbConfig =>
     val identifiersTable: IdentifiersTable =
       new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
 
+    new TableProvisioner(host, port, username, password)
+      .provision(dbConfig.databaseName, dbConfig.tableName)
+
     val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-    testWith(IdentifiersDaoFixtures(identifiersDao, identifiersTable))
+    eventually {
+      testWith(IdentifiersDaoFixtures(identifiersDao, identifiersTable))
+    }
   }
 
   describe("lookupID") {
-    it(
-      "gets an Identifier if it can find a matching SourceSystem and SourceId") {
+    it("gets an Identifier if it finds a matching SourceSystem and SourceId") {
       withIdentifiersDao { fixtures =>
         val identifier = Identifier(
           CanonicalId = "A turtle turns to try to taste",
@@ -56,7 +64,7 @@ class IdentifiersDaoTest
       }
     }
 
-    it("gets no identifier if there is no matching SourceSystem and SourceId") {
+    it("does not get an identifier if there is no matching SourceSystem and SourceId") {
       withIdentifiersDao { fixtures =>
 
         val identifier = Identifier(
@@ -109,7 +117,7 @@ class IdentifiersDaoTest
   }
 
   describe("saveIdentifier") {
-    it("should insert the provided identifier into the database") {
+    it("inserts the provided identifier into the database") {
       withIdentifiersDao { fixtures =>
 
         val identifier = Identifier(
@@ -135,7 +143,7 @@ class IdentifiersDaoTest
       }
     }
 
-    it("should fail to insert a record with a duplicate CanonicalId") {
+    it("fails to insert a record with a duplicate CanonicalId") {
       withIdentifiersDao { fixtures =>
 
         val identifier = new Identifier(
