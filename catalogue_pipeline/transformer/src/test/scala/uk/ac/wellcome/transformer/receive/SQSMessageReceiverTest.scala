@@ -13,26 +13,22 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
-import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.{
   IdentifierSchemes,
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.utils.SNSLocal
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  SierraTransformableTransformer
-}
 import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 class SQSMessageReceiverTest
     extends FunSpec
@@ -56,6 +52,7 @@ class SQSMessageReceiverTest
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
+    100 milliseconds,
     mock[AmazonCloudWatch],
     ActorSystem()
   )
