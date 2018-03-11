@@ -40,10 +40,10 @@ object AmazonCloudWatchModule extends TwitterModule {
   def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch,
                             actorSystem: ActorSystem) =
     new MetricsSender(
-      awsNamespace(),
-      flushInterval(),
-      amazonCloudWatch,
-      actorSystem)
+      namespace = awsNamespace(),
+      flushInterval = flushInterval(),
+      amazonCloudWatch = amazonCloudWatch,
+      actorSystem = actorSystem)
 
   @Provides
   @Singleton
