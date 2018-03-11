@@ -26,7 +26,7 @@ class IdentifiersDaoTest
     with Matchers {
 
   def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]) =
-    withIdentifiersDatabase[R] { dbConfig =>
+    withIdentifiersDatabase { dbConfig =>
       val identifiersTable: IdentifiersTable =
         new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
 
