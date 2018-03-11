@@ -7,15 +7,29 @@ import com.amazonaws.services.cloudwatch.{
   AmazonCloudWatchClientBuilder
 }
 import com.google.inject.{Provides, Singleton}
+import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.AWSConfig
 
+import scala.concurrent.duration._
+
 object AmazonCloudWatchModule extends TwitterModule {
-  private val awsNamespace = flag[String](
+  implicit val finteDurationFlaggable =
+    Flaggable.mandatory[FiniteDuration](config =>
+      Duration.apply(config).asInstanceOf[FiniteDuration])
+
+  val awsNamespace = flag[String](
     "aws.metrics.namespace",
     "",
     "Namespace for cloudwatch metrics")
+
+  val flushInterval = flag[FiniteDuration](
+    "aws.metrics.flushInterval",
+    10 minutes,
+    "Interval within which metrics get flushed to cloudwatch. A short interval will result in an increased number of PutMetric requests."
+  )
+
   private val awsEndpoint = flag[String](
     "aws.cloudWatch.endpoint",
     "",
@@ -25,7 +39,11 @@ object AmazonCloudWatchModule extends TwitterModule {
   @Singleton
   def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch,
                             actorSystem: ActorSystem) =
-    new MetricsSender(awsNamespace(), amazonCloudWatch, actorSystem)
+    new MetricsSender(
+      namespace = awsNamespace(),
+      flushInterval = flushInterval(),
+      amazonCloudWatch = amazonCloudWatch,
+      actorSystem = actorSystem)
 
   @Provides
   @Singleton

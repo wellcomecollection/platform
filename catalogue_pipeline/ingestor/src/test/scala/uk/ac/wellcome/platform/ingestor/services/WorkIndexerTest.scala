@@ -8,6 +8,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import scala.concurrent.duration._
 
 import scala.concurrent.Future
 
@@ -21,6 +22,7 @@ class WorkIndexerTest
   val metricsSender: MetricsSender =
     new MetricsSender(
       namespace = "reindexer-tests",
+      100 milliseconds,
       mock[AmazonCloudWatch],
       ActorSystem())
 
