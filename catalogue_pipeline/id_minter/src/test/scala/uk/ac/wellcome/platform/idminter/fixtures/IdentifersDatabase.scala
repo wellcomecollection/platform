@@ -109,8 +109,6 @@ trait IdentifiersDatabase
       DB localTx { implicit session =>
         sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
       }
-
-      session.close()
     }
   }
 }
