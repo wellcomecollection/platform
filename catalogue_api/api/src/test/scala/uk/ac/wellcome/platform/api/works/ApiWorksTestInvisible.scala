@@ -55,7 +55,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "creators": [ ${agent(works(0).creators(0))} ],
           |     "subjects": [ ],
           |     "genres": [ ],
-          |     "publishers": [ ]
+          |     "publishers": [ ],
+          |     "placesOfPublication": [ ]
           |   },
           |   {
           |     "type": "Work",
@@ -67,7 +68,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "creators": [ ${agent(works(1).creators(0))} ],
           |     "subjects": [ ],
           |     "genres": [ ],
-          |     "publishers": [ ]
+          |     "publishers": [ ],
+          |     "placesOfPublication": [ ]
           |   }
           |  ]
           |}
@@ -103,7 +105,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "creators": [],
           |     "subjects": [ ],
           |     "genres": [ ],
-          |     "publishers": [ ]
+          |     "publishers": [ ],
+          |     "placesOfPublication": [ ]
           |   }
           |  ]
           |}""".stripMargin

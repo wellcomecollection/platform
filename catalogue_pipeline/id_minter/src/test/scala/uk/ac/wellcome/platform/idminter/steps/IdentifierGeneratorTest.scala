@@ -4,22 +4,19 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.database.{
-  IdentifiersDao,
-  TableProvisioner
-}
+import uk.ac.wellcome.platform.idminter.database.TableProvisioner
+import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
-import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
-import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class IdentifierGeneratorTest
@@ -31,6 +28,7 @@ class IdentifierGeneratorTest
   private val metricsSender =
     new MetricsSender(
       "id_minter_test_metrics",
+      100 milliseconds,
       mock[AmazonCloudWatch],
       ActorSystem())
 

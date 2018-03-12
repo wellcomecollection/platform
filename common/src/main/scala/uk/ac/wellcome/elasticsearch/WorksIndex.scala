@@ -21,7 +21,7 @@ class WorksIndex @Inject()(client: HttpClient,
   val indexName = name
 
   val license = objectField("license").fields(
-    keywordField("type"),
+    keywordField("ontologyType"),
     keywordField("licenseType"),
     textField("label"),
     textField("url")
@@ -29,14 +29,14 @@ class WorksIndex @Inject()(client: HttpClient,
 
   val sourceIdentifier = objectField("sourceIdentifier")
     .fields(
-      keywordField("type"),
+      keywordField("ontologyType"),
       keywordField("identifierScheme"),
       keywordField("value")
     )
 
   val identifiers = objectField("identifiers")
     .fields(
-      keywordField("type"),
+      keywordField("ontologyType"),
       keywordField("identifierScheme"),
       keywordField("value")
     )
@@ -44,6 +44,7 @@ class WorksIndex @Inject()(client: HttpClient,
   def location(fieldName: String = "locations") =
     objectField(fieldName).fields(
       keywordField("type"),
+      keywordField("ontologyType"),
       keywordField("locationType"),
       keywordField("label"),
       textField("url"),
@@ -53,12 +54,12 @@ class WorksIndex @Inject()(client: HttpClient,
 
   def date(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
-    keywordField("type")
+    keywordField("ontologyType")
   )
 
   def labelledTextField(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
-    keywordField("type")
+    keywordField("ontologyType")
   )
 
   val items = objectField("items").fields(
@@ -67,18 +68,19 @@ class WorksIndex @Inject()(client: HttpClient,
     identifiers,
     location(),
     booleanField("visible"),
-    keywordField("type")
+    keywordField("ontologyType")
   )
   val publishers = objectField("publishers").fields(
     textField("label"),
-    keywordField("type")
+    keywordField("type"),
+    keywordField("ontologyType")
   )
 
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
     Seq(
       keywordField("canonicalId"),
       booleanField("visible"),
-      keywordField("type"),
+      keywordField("ontologyType"),
       intField("version"),
       sourceIdentifier,
       identifiers,
@@ -96,6 +98,7 @@ class WorksIndex @Inject()(client: HttpClient,
       labelledTextField("creators"),
       labelledTextField("subjects"),
       labelledTextField("genres"),
+      labelledTextField("placesOfPublication"),
       items,
       publishers,
       date("publicationDate"),
