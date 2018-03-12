@@ -46,21 +46,6 @@ trait Ingestor
     )
   }
 
-  def assertElasticsearchEventuallyHasWork(work: IdentifiedWork) = {
-    val workJson = toJson(work).get
-
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-        .map { _.hits.hits }
-        .await
-
-      hits should have size 1
-
-      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
-    }
-  }
-
   def createWork(canonicalId: String,
                  sourceId: String,
                  title: String,
