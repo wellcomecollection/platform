@@ -113,6 +113,5 @@ trait IdentifiersDatabase
       session.close()
     }
 
-
   }
 }
