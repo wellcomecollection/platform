@@ -4,13 +4,13 @@ import com.sksamuel.elastic4s.ElasticDsl.{deleteIndex, index}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import uk.ac.wellcome.test.fixtures.SqsFixtures
+import uk.ac.wellcome.test.fixtures.{ServerFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 class IngestorIndexTest
     extends FunSpec
     with IndexedElasticSearchLocal
-    with fixtures.Server
+    with ServerFixtures[Server]
     with SqsFixtures
     with Matchers
     with ScalaFutures {

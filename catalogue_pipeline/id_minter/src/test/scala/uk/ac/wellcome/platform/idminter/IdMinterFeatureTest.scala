@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.{IdentifierSchemes, _}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.fixtures.{MessageInfo, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{MessageInfo, ServerFixtures, SnsFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -16,7 +16,7 @@ class IdMinterFeatureTest
     with SqsFixtures
     with SnsFixtures
     with fixtures.IdentifiersDatabase
-    with fixtures.Server
+    with ServerFixtures[Server]
     with ExtendedPatience
     with Eventually
     with Matchers {
