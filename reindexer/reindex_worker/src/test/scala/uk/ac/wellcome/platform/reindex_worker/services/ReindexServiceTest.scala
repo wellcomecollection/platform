@@ -14,6 +14,7 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import scala.concurrent.duration._
 
 class ReindexServiceTest
     extends FunSpec
@@ -31,6 +32,7 @@ class ReindexServiceTest
   val metricsSender: MetricsSender =
     new MetricsSender(
       namespace = "reindexer-tests",
+      100 milliseconds,
       mock[AmazonCloudWatch],
       ActorSystem())
 

@@ -30,12 +30,13 @@ class IdentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |        "licenseType": "${License_CCBY.licenseType}",
       |        "label": "${License_CCBY.label}",
       |        "url": "${License_CCBY.url}",
-      |        "type": "License"
+      |        "ontologyType": "License"
       |      },
-      |      "type": "DigitalLocation"
+      |      "type": "DigitalLocation",
+      |      "ontologyType": "DigitalLocation"
       |    }
       |  ],
-      |  "type": "Item"
+      |  "ontologyType": "Item"
       |}
     """.stripMargin
 

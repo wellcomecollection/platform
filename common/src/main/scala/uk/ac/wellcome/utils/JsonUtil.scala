@@ -16,10 +16,6 @@ object JsonUtil extends AutoDerivation with TimeInstances with Logging {
   implicit val customConfig: Configuration =
     Configuration.default.withDefaults
       .withDiscriminator("type")
-      .copy(transformMemberNames = {
-        case "ontologyType" => "type"
-        case other => other
-      })
 
   def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] =
     Try(value.asJson.noSpaces)

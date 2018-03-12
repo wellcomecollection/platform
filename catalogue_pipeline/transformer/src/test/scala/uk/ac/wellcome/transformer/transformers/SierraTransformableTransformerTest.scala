@@ -432,4 +432,44 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get.get.extent shouldBe Some(extent)
   }
+
+  it("includes place of publications") {
+    val id = "b8000008"
+    val place = "Purple pages"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "English earwigs earn evidence of evil",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "a",
+         |       "marcTag": "260",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$place"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.placesOfPublication should contain only Place(
+      label = place)
+
+  }
 }
