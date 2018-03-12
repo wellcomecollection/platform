@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.fixtures
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{clusterHealth, deleteIndex, indexExists}
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
