@@ -4,12 +4,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.api.WorksUtil
-import uk.ac.wellcome.platform.api.models.{
-  DisplayIdentifier,
-  DisplayResultList,
-  DisplayWork,
-  WorksIncludes
-}
+import uk.ac.wellcome.models.display.{DisplayIdentifier, DisplayWork}
+import uk.ac.wellcome.platform.api.models.{DisplayResultList, WorksIncludes}
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 
 import scala.concurrent.ExecutionContext.Implicits.global
