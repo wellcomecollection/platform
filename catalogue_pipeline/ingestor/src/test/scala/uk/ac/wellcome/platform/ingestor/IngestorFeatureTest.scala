@@ -6,8 +6,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.test.fixtures.SqsFixtures
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
+import uk.ac.wellcome.test.fixtures.{ElasticsearchFixtures, SqsFixtures}
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
@@ -19,7 +19,7 @@ class IngestorFeatureTest
     with JsonTestUtil
     with ScalaFutures
     with fixtures.Server
-    with IndexedElasticSearchLocal
+    with ElasticsearchFixtures
     with SqsFixtures {
 
   val indexName = "works"
@@ -62,20 +62,22 @@ class IngestorFeatureTest
         "aws.sqs.waitTime" -> "1"
       ) ++ sqsLocalFlags ++ esLocalFlags
 
-      withServer(flags) { _ =>
-        eventually {
-          val hitsFuture = elasticClient
-            .execute(search(s"$indexName/$itemType").matchAllQuery())
-            .map {
-              _.hits.hits
-            }
-          whenReady(hitsFuture) { hits =>
-            hits should have size 1
+      withLocalElasticsearchIndex(indexName, itemType) { _ =>
+        withServer(flags) { _ =>
+          eventually {
+            val hitsFuture = elasticClient
+              .execute(search(s"$indexName/$itemType").matchAllQuery())
+              .map {
+                _.hits.hits
+              }
+            whenReady(hitsFuture) { hits =>
+              hits should have size 1
 
-            assertJsonStringsAreEqual(
-              hits.head.sourceAsString,
-              workString
-            )
+              assertJsonStringsAreEqual(
+                hits.head.sourceAsString,
+                workString
+              )
+            }
           }
         }
       }
