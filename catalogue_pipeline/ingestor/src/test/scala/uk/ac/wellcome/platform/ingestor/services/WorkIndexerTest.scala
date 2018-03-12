@@ -6,7 +6,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -40,7 +44,10 @@ class WorkIndexerTest
       val future = workIndexer.indexWork(work)
 
       whenReady(future) { _ =>
-        assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+        assertElasticsearchEventuallyHasWork(
+          work,
+          indexName = indexName,
+          itemType = itemType)
       }
     }
   }
@@ -55,7 +62,10 @@ class WorkIndexerTest
       )
 
       whenReady(future) { _ =>
-        assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+        assertElasticsearchEventuallyHasWork(
+          work,
+          indexName = indexName,
+          itemType = itemType)
       }
     }
   }
@@ -73,7 +83,10 @@ class WorkIndexerTest
         // give elasticsearch enough time to ingest the work
         Thread.sleep(700)
 
-        assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+        assertElasticsearchEventuallyHasWork(
+          work,
+          indexName = indexName,
+          itemType = itemType)
       }
     }
   }
@@ -92,7 +105,10 @@ class WorkIndexerTest
       val future = workIndexer.indexWork(updatedWork)
 
       whenReady(future) { _ =>
-        assertElasticsearchEventuallyHasWork(updatedWork, indexName = indexName, itemType = itemType)
+        assertElasticsearchEventuallyHasWork(
+          updatedWork,
+          indexName = indexName,
+          itemType = itemType)
       }
     }
   }

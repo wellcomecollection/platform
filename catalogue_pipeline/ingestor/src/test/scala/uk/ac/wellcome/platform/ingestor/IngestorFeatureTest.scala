@@ -5,7 +5,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.test.fixtures.{ElasticsearchFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -112,7 +116,6 @@ class IngestorFeatureTest
       ) ++ sqsLocalFlags ++ esLocalFlags
 
       withServer(flags) { _ =>
-
         // After a message is read, it stays invisible for 1 second and then it gets sent again.
         // So we wait for longer than the visibility timeout and then we assert that it has become
         // invisible again, which means that the ingestor picked it up again,

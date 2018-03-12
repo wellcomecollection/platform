@@ -14,7 +14,11 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.finatra.modules.ElasticCredentials
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.fixtures.{ElasticsearchFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -75,19 +79,23 @@ class IngestorWorkerServiceTest
     val sqsMessage = messageFromString(toJson(work).get)
 
     withLocalSqsQueue { queueUrl =>
-      withLocalElasticsearchIndex(indexName = indexName, itemType = itemType) { _ =>
-        val service = new IngestorWorkerService(
-          identifiedWorkIndexer = workIndexer,
-          reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-          system = actorSystem,
-          metrics = metricsSender
-        )
+      withLocalElasticsearchIndex(indexName = indexName, itemType = itemType) {
+        _ =>
+          val service = new IngestorWorkerService(
+            identifiedWorkIndexer = workIndexer,
+            reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+            system = actorSystem,
+            metrics = metricsSender
+          )
 
-        service.processMessage(sqsMessage)
+          service.processMessage(sqsMessage)
 
-        eventually {
-          assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
-        }
+          eventually {
+            assertElasticsearchEventuallyHasWork(
+              work,
+              indexName = indexName,
+              itemType = itemType)
+          }
       }
     }
   }

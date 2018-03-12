@@ -47,7 +47,8 @@ trait ElasticsearchFixtures
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
-  def withLocalElasticsearchIndex[R](indexName: String, itemType: String)(testWith: TestWith[String, R]) = {
+  def withLocalElasticsearchIndex[R](indexName: String, itemType: String)(
+    testWith: TestWith[String, R]) = {
     val index = new WorksIndex(
       client = elasticClient,
       name = indexName,
@@ -55,7 +56,8 @@ trait ElasticsearchFixtures
     )
 
     index.create.map { _ =>
-      elasticClient.execute(indexExists(indexName)).await.isExists should be(true)
+      elasticClient.execute(indexExists(indexName)).await.isExists should be(
+        true)
     }.await
 
     try {
@@ -65,7 +67,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def assertElasticsearchEventuallyHasWork(work: IdentifiedWork, indexName: String, itemType: String) = {
+  def assertElasticsearchEventuallyHasWork(work: IdentifiedWork,
+                                           indexName: String,
+                                           itemType: String) = {
     val workJson = toJson(work).get
 
     eventually {
@@ -80,7 +84,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def insertIntoElasticsearch(indexName: String, itemType: String, works: IdentifiedWork*) = {
+  def insertIntoElasticsearch(indexName: String,
+                              itemType: String,
+                              works: IdentifiedWork*) = {
     works.foreach { work =>
       val jsonDoc = toJson(work).get
 
