@@ -100,33 +100,23 @@ class IdMinterFeatureTest
               "timestamp"
             )
 
-            sqsClient.sendMessage(
-              queueUrl,
-              toJson(sqsMessage).get
-            )
+            val messageCount = 5
+
+            (1 to messageCount).foreach { _ =>
+              sqsClient.sendMessage(
+                queueUrl,
+                toJson(sqsMessage).get
+              )
+            }
 
             eventually {
               val messages = listMessagesReceivedFromSNS(topicArn)
-              messages should have size (1)
+              messages should have size (messageCount)
 
-              val work = getWorksFromMessages(messages).head
-
-              work.identifiers.head.value shouldBe miroID
-              work.title shouldBe Some(title)
-            }
-
-            sqsClient.sendMessage(
-              queueUrl,
-              toJson(sqsMessage).get
-            )
-
-            eventually {
-              val moreMessages = listMessagesReceivedFromSNS(topicArn)
-              moreMessages should have size (2)
-
-              val works = getWorksFromMessages(moreMessages)
-
-              works.head shouldBe works.tail.head
+              getWorksFromMessages(messages).foreach { work =>
+                work.identifiers.head.value shouldBe miroID
+                work.title shouldBe Some(title)
+              }
             }
           }
         }
