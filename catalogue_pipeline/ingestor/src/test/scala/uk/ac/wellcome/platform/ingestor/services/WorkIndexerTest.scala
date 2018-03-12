@@ -7,7 +7,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.duration._
@@ -18,7 +18,7 @@ class WorkIndexerTest
     with ScalaFutures
     with Matchers
     with MockitoSugar
-    with IndexedElasticSearchLocal {
+    with ElasticsearchFixtures {
 
   val metricsSender: MetricsSender =
     new MetricsSender(
@@ -35,10 +35,13 @@ class WorkIndexerTest
 
   it("should insert an identified Work into Elasticsearch") {
     val work = createWork("5678", "1234", "An identified igloo")
-    val future = workIndexer.indexWork(work)
 
-    whenReady(future) { _ =>
-      assertElasticsearchEventuallyHasWork(work)
+    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+      val future = workIndexer.indexWork(work)
+
+      whenReady(future) { _ =>
+        assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+      }
     }
   }
 
@@ -46,12 +49,14 @@ class WorkIndexerTest
     "should add only one record when multiple records with same id are ingested") {
     val work = createWork("5678", "1234", "A multiplicity of mice")
 
-    val future = Future.sequence(
-      (1 to 2).map(_ => workIndexer.indexWork(work))
-    )
+    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+      val future = Future.sequence(
+        (1 to 2).map(_ => workIndexer.indexWork(work))
+      )
 
-    whenReady(future) { _ =>
-      assertElasticsearchEventuallyHasWork(work)
+      whenReady(future) { _ =>
+        assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+      }
     }
   }
 
@@ -59,15 +64,17 @@ class WorkIndexerTest
     val work =
       createWork("5678", "1234", "A multiplicity of mice", version = 3)
 
-    insertIntoElasticSearch(work)
+    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+      insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
-    val future = workIndexer.indexWork(work.copy(version = 1))
+      val future = workIndexer.indexWork(work.copy(version = 1))
 
-    whenReady(future) { _ =>
-      // give elasticsearch enough time to ingest the work
-      Thread.sleep(700)
+      whenReady(future) { _ =>
+        // give elasticsearch enough time to ingest the work
+        Thread.sleep(700)
 
-      assertElasticsearchEventuallyHasWork(work)
+        assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+      }
     }
   }
 
@@ -78,13 +85,15 @@ class WorkIndexerTest
       title = "A multiplicity of mice",
       version = 3)
 
-    insertIntoElasticSearch(work)
+    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+      insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
-    val updatedWork = work.copy(title = Some("boring title"))
-    val future = workIndexer.indexWork(updatedWork)
+      val updatedWork = work.copy(title = Some("boring title"))
+      val future = workIndexer.indexWork(updatedWork)
 
-    whenReady(future) { _ =>
-      assertElasticsearchEventuallyHasWork(updatedWork)
+      whenReady(future) { _ =>
+        assertElasticsearchEventuallyHasWork(updatedWork, indexName = indexName, itemType = itemType)
+      }
     }
   }
 
