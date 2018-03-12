@@ -6,10 +6,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.platform.ingestor.test.utils.Ingestor
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import scala.concurrent.duration._
 
+import scala.concurrent.duration._
 import scala.concurrent.Future
 
 class WorkIndexerTest
@@ -17,7 +18,7 @@ class WorkIndexerTest
     with ScalaFutures
     with Matchers
     with MockitoSugar
-    with Ingestor {
+    with IndexedElasticSearchLocal {
 
   val metricsSender: MetricsSender =
     new MetricsSender(
@@ -25,6 +26,9 @@ class WorkIndexerTest
       100 milliseconds,
       mock[AmazonCloudWatch],
       ActorSystem())
+
+  val indexName = "works"
+  val itemType = "work"
 
   val workIndexer =
     new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
@@ -82,5 +86,24 @@ class WorkIndexerTest
     whenReady(future) { _ =>
       assertElasticsearchEventuallyHasWork(updatedWork)
     }
+  }
+
+  def createWork(canonicalId: String,
+                 sourceId: String,
+                 title: String,
+                 visible: Boolean = true,
+                 version: Int = 1): IdentifiedWork = {
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      sourceId
+    )
+
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = version,
+      identifiers = List(sourceIdentifier),
+      canonicalId = canonicalId,
+      visible = visible)
   }
 }
