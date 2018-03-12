@@ -16,8 +16,8 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.fixtures.SqsFixtures
-import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
+import uk.ac.wellcome.test.fixtures.{ElasticsearchFixtures, SqsFixtures}
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -29,7 +29,7 @@ class IngestorWorkerServiceTest
     with Matchers
     with MockitoSugar
     with JsonTestUtil
-    with IndexedElasticSearchLocal
+    with ElasticsearchFixtures
     with SqsFixtures {
 
   val indexName = "works"
@@ -75,17 +75,19 @@ class IngestorWorkerServiceTest
     val sqsMessage = messageFromString(toJson(work).get)
 
     withLocalSqsQueue { queueUrl =>
-      val service = new IngestorWorkerService(
-        identifiedWorkIndexer = workIndexer,
-        reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-        system = actorSystem,
-        metrics = metricsSender
-      )
+      withLocalElasticsearchIndex(indexName = indexName, itemType = itemType) { _ =>
+        val service = new IngestorWorkerService(
+          identifiedWorkIndexer = workIndexer,
+          reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+          system = actorSystem,
+          metrics = metricsSender
+        )
 
-      service.processMessage(sqsMessage)
+        service.processMessage(sqsMessage)
 
-      eventually {
-        assertElasticsearchEventuallyHasWork(work)
+        eventually {
+          assertElasticsearchEventuallyHasWork(work, indexName = indexName, itemType = itemType)
+        }
       }
     }
   }
@@ -94,6 +96,13 @@ class IngestorWorkerServiceTest
     val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
 
     withLocalSqsQueue { queueUrl =>
+      val workIndexer = new WorkIndexer(
+        esIndex = indexName,
+        esType = itemType,
+        elasticClient = elasticClient,
+        metricsSender = metricsSender
+      )
+
       val service = new IngestorWorkerService(
         identifiedWorkIndexer = workIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
@@ -120,8 +129,8 @@ class IngestorWorkerServiceTest
       HttpClient.fromRestClient(brokenRestClient)
 
     val brokenWorkIndexer = new WorkIndexer(
-      esIndex = indexName,
-      esType = itemType,
+      esIndex = "works",
+      esType = "work",
       elasticClient = brokenElasticClient,
       metricsSender = metricsSender
     )
