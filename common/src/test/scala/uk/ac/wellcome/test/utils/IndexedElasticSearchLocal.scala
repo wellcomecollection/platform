@@ -18,6 +18,14 @@ trait IndexedElasticSearchLocal
   val indexName: String
   val itemType: String
 
+  def esLocalFlags = Map(
+    "es.host" -> "localhost",
+    "es.port" -> "9200",
+    "es.name" -> "wellcome",
+    "es.index" -> indexName,
+    "es.type" -> itemType
+  )
+
   private def createIndex(index: String) = {
     ensureIndexDeleted(index)
     new WorksIndex(elasticClient, index, itemType).create.map { _ =>
