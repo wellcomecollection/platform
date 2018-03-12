@@ -61,13 +61,16 @@ jobs:
     - env: TASK=recorder-test
     - env: TASK=id_minter-test
 
+    # Data API stack
+    - env: TASK=snapshot_scheduler-test
+
     # Reindexer stack
     - env: TASK=reindex_worker-test
     - env: TASK=reindex_job_creator-test
     - env: TASK=complete_reindex-test
     - env: TASK=reindex_shard_generator-test
 
-    # Sierra adapter stack.
+    # Sierra adapter stack
     - env: TASK=sierra_common-test
     - env: TASK=sierra_window_generator-test
     - env: TASK=sierra_reader-test

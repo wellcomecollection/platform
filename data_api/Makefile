@@ -5,10 +5,10 @@ STACK_ROOT  = data_api
 
 SBT_APPS    =
 ECS_TASKS   =
-LAMBDAS     =
+LAMBDAS     = snapshot_scheduler
 
 TF_NAME     = data_api
-TF_PATH     = $(STACK_ROOT)
+TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
