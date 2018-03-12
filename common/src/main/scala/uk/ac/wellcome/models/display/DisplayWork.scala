@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.display
 
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
 
 @JsonIgnoreProperties(Array("visible"))
 @ApiModel(

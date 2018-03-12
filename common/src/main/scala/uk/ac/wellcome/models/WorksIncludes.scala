@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.models
+package uk.ac.wellcome.models
 
 import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException}
 import com.fasterxml.jackson.databind.module.SimpleModule

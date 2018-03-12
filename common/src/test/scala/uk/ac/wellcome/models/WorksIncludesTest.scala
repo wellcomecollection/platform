@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.models
+package uk.ac.wellcome.models
 
 import org.scalatest.{FunSpec, Matchers}
 
