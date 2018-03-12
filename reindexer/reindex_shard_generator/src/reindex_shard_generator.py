@@ -31,10 +31,10 @@ def main(event, _ctxt=None, dynamodb_client=None):
             print("no NewImage key in dynamo update event, skipping")
             continue
 
-        source_id = row['sourceId']
+        id = row['id']
         source_name = row['sourceName']
         new_reindex_shard = create_reindex_shard(
-            source_id=source_id,
+            id=id,
             source_name=row['sourceName'],
             source_size=SOURCE_SIZES[source_name],
             shard_size=SHARD_SIZE
@@ -58,7 +58,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
             # incrementing by 1.
             dynamodb_client.update_item(
                 TableName=table_name,
-                Key={'id': {'S': row['id']}},
+                Key={'id': {'S': id}},
                 UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
                 ConditionExpression='version < :newVersion',
                 ExpressionAttributeValues={
@@ -70,4 +70,4 @@ def main(event, _ctxt=None, dynamodb_client=None):
             if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
                 raise
             else:
-                print(f'Adding shard for source_id: {source_id} failed with ConditionalCheckFailedException')
+                print(f'Adding shard for id: {id} failed with ConditionalCheckFailedException')
