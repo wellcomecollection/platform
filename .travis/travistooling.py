@@ -102,6 +102,8 @@ def affects_tests(path, task):
         'sierra_items_to_dynamo': ['sierra_adapter/sierra_items_to_dynamo'],
         'sierra_bib_merger': ['sierra_adapter/sierra_bib_merger'],
         'sierra_item_merger': ['sierra_adapter/sierra_item_merger'],
+
+        'snapshot_scheduler': ['data_api/snapshot_scheduler'],
     }
 
     # If we have a change to a file which is specific to a particular task,
@@ -132,6 +134,7 @@ def affects_tests(path, task):
         'monitoring',
         'shared_infra',
         'nginx',
+        'snapshot_scheduler',
     )
     if (
         task.startswith(sierra_free_tasks) and
@@ -147,6 +150,7 @@ def affects_tests(path, task):
     sbt_common_free_tasks = (
         's3_demultiplexer',
         'sierra_window_generator',
+        'snapshot_scheduler',
     )
     if (
         task.startswith(sbt_common_free_tasks) and
@@ -172,6 +176,7 @@ def affects_tests(path, task):
         'complete_reindex',
         'reindex_shard_generator',
         'resharder',
+        'snapshot_scheduler',
     )
     if (
         task.startswith(sbt_free_tasks) and
