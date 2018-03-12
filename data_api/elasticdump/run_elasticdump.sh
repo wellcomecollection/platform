@@ -26,12 +26,12 @@ es_url="https://$es_username:$es_password@$es_name.$es_region.aws.found.io:$es_p
 
 elasticdump \
   --input="$es_url" \
-  --output=index.json \
+  --output=index.txt \
   --type=data
 
-cat index.json | gzip > index.json.gz
+cat index.json | gzip > index.txt.gz
 
-aws s3 cp index.json.gz s3://$infra_bucket/elasticdump/$(date +"%s")_$es_index.txt
+aws s3 cp index.txt.gz s3://$infra_bucket/elasticdump/$(date +"%s")_$es_index.txt.gz
 
 aws sqs delete-message \
   --queue-url=$sqs_queue_url \
