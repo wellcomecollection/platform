@@ -82,29 +82,28 @@ trait IdentifiersDatabase
     val identifiersDatabase: SQLSyntax = SQLSyntax.createUnsafely(databaseName)
     val identifiersTable: SQLSyntax = SQLSyntax.createUnsafely(tableName)
 
+    val flags = Map(
+      "aws.rds.host" -> host,
+      "aws.rds.port" -> port,
+      "aws.rds.userName" -> username,
+      "aws.rds.password" -> password,
+      "aws.rds.identifiers.table" -> tableName,
+      "aws.rds.identifiers.database" -> databaseName
+    )
+
+    val config = DatabaseConfig(
+      databaseName = databaseName,
+      tableName = tableName,
+      database = identifiersDatabase,
+      table = identifiersTable,
+      flags = flags,
+      session = session
+    )
+
     try {
       sql"CREATE DATABASE $identifiersDatabase".execute().apply()
 
-      val flags = Map(
-        "aws.rds.host" -> host,
-        "aws.rds.port" -> port,
-        "aws.rds.userName" -> username,
-        "aws.rds.password" -> password,
-        "aws.rds.identifiers.table" -> tableName,
-        "aws.rds.identifiers.database" -> databaseName
-      )
-
-      val config = DatabaseConfig(
-        databaseName = databaseName,
-        tableName = tableName,
-        database = identifiersDatabase,
-        table = identifiersTable,
-        flags = flags,
-        session = session
-      )
-
       testWith(config)
-
     } finally {
       DB localTx { implicit session =>
         sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()
