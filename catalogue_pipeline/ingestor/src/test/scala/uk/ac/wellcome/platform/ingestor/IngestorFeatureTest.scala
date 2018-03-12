@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.test.fixtures.{ServerFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.SqsFixtures
 import uk.ac.wellcome.test.utils.{IndexedElasticSearchLocal, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -18,7 +18,7 @@ class IngestorFeatureTest
     with Matchers
     with JsonTestUtil
     with ScalaFutures
-    with ServerFixtures[Server]
+    with fixtures.Server
     with IndexedElasticSearchLocal
     with SqsFixtures {
 

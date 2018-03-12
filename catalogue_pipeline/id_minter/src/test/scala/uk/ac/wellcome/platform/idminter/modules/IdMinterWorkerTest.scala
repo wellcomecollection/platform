@@ -7,9 +7,12 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import scalikejdbc._
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
-import uk.ac.wellcome.platform.idminter.{Server, fixtures}
-import uk.ac.wellcome.test.fixtures.{ServerFixtures, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
+import uk.ac.wellcome.platform.idminter.{fixtures, Server}
+import uk.ac.wellcome.test.fixtures.{SnsFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdMinterWorkerTest
@@ -17,7 +20,7 @@ class IdMinterWorkerTest
     with SqsFixtures
     with SnsFixtures
     with fixtures.IdentifiersDatabase
-    with ServerFixtures[Server]
+    with fixtures.Server
     with Eventually
     with ExtendedPatience
     with Matchers

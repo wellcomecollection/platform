@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.idminter
-
 import com.twitter.finagle.http.Status._
+import com.twitter.finatra.http.EmbeddedHttpServer
+import com.twitter.inject.server.FeatureTest
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{ServerFixtures, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{SnsFixtures, SqsFixtures}
 
 class ServerTest
     extends FunSpec
-    with ServerFixtures[Server]
+    with fixtures.Server
     with SqsFixtures
     with SnsFixtures
     with fixtures.IdentifiersDatabase {

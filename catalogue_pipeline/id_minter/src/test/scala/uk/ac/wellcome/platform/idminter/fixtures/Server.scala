@@ -1,11 +1,12 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.platform.idminter.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.Ports
 import org.scalatest.Suite
+import uk.ac.wellcome.platform.idminter.{Server => AppServer}
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 
-trait ServerFixtures[ServerType <: Ports] extends AmazonCloudWatchFlag { this: Suite =>
+trait Server extends AmazonCloudWatchFlag { this: Suite =>
   def withServer[R](
     flags: Map[String, String],
     modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity
@@ -13,7 +14,7 @@ trait ServerFixtures[ServerType <: Ports] extends AmazonCloudWatchFlag { this: S
 
     val server: EmbeddedHttpServer = modifyServer(
       new EmbeddedHttpServer(
-        new ServerType(),
+        new AppServer(),
         flags = Map(
           "aws.region" -> "localhost"
         ) ++ flags ++ cloudWatchLocalEndpointFlag
