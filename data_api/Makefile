@@ -5,7 +5,7 @@ STACK_ROOT  = data_api
 
 SBT_APPS    =
 ECS_TASKS   =
-LAMBDAS     =
+LAMBDAS     = snapshot_scheduler
 
 TF_NAME     = data_api
 TF_PATH     = $(STACK_ROOT)
