@@ -8,13 +8,9 @@ import com.twitter.inject.annotations.Flag
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import scala.collection.JavaConverters._
-import uk.ac.wellcome.models.Error
+import uk.ac.wellcome.models.{Error, WorksIncludes}
 import uk.ac.wellcome.platform.api.ApiSwagger
-import uk.ac.wellcome.platform.api.models.{
-  DisplayError,
-  DisplayResultList,
-  WorksIncludes
-}
+import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 
 import uk.ac.wellcome.models.display.DisplayWork
 import uk.ac.wellcome.platform.api.responses.{
