@@ -2,32 +2,35 @@ package uk.ac.wellcome.platform.idminter
 import com.twitter.finagle.http.Status._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.platform.idminter.utils.{
-  IdentifiersTableInfo,
-  MysqlLocal
-}
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, SNSLocal, SQSLocal}
+import org.scalatest.FunSpec
+import uk.ac.wellcome.test.fixtures.{SnsFixtures, SqsFixtures}
 
 class ServerTest
-    extends FeatureTest
-    with SNSLocal
-    with MysqlLocal
-    with IdentifiersTableInfo
-    with AmazonCloudWatchFlag
-    with SQSLocal {
+    extends FunSpec
+    with fixtures.Server
+    with SqsFixtures
+    with SnsFixtures
+    with fixtures.IdentifiersDatabase {
 
-  val server = new EmbeddedHttpServer(
-    new Server(),
-    flags = snsLocalFlags ++
-      sqsLocalFlags ++
-      identifiersMySqlLocalFlags ++
-      cloudWatchLocalEndpointFlag
-  )
+  it("shows the healthcheck message") {
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withIdentifiersDatabase { dbConfig =>
+          val flags = Map(
+            "aws.region" -> "localhost",
+            "aws.sqs.queue.url" -> queueUrl,
+            "aws.sqs.waitTime" -> "1",
+            "aws.sns.topic.arn" -> topicArn
+          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
 
-  test("it should show the healthcheck message") {
-    server.httpGet(
-      path = "/management/healthcheck",
-      andExpect = Ok,
-      withJsonBody = """{"message": "ok"}""")
+          withServer(flags) { server =>
+            server.httpGet(
+              path = "/management/healthcheck",
+              andExpect = Ok,
+              withJsonBody = """{"message": "ok"}""")
+          }
+        }
+      }
+    }
   }
 }
