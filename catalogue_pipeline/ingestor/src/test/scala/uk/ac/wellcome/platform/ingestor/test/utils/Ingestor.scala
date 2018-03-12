@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor.test.utils
 
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.ac.wellcome.models.{
@@ -15,15 +14,13 @@ import uk.ac.wellcome.test.utils.{
   JsonTestUtil,
   SQSLocal
 }
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 trait Ingestor
     extends IndexedElasticSearchLocal
     with SQSLocal
     with BeforeAndAfterEach
-    with AmazonCloudWatchFlag
-    with JsonTestUtil { this: Suite =>
+    with AmazonCloudWatchFlag { this: Suite =>
 
   val queueUrl = createQueueAndReturnUrl("test_es_ingestor_queue")
 
