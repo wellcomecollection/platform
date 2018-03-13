@@ -89,7 +89,9 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies ++ swaggerDependencies
 
-  val commonDisplayDependencies: Seq[ModuleID] = commonDependencies
+  val commonDisplayDependencies: Seq[ModuleID] = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % "test"
+  ) ++ swaggerDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
