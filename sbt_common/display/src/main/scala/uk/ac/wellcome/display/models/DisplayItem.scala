@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models.display
+package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
@@ -14,12 +14,12 @@ case class DisplayItem(
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: String,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.models.display.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.models.display.DisplayLocation]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayLocation]",
     value = "List of locations that provide access to the item"
   ) locations: List[DisplayLocation] = List()
 ) {

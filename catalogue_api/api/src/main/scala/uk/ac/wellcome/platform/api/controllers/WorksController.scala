@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.{Error, WorksIncludes}
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 
-import uk.ac.wellcome.models.display.DisplayWork
+import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
