@@ -11,6 +11,7 @@ include catalogue_pipeline/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
 include reindexer/Makefile
+include sbt_common/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
 
