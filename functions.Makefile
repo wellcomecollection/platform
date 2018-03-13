@@ -149,6 +149,20 @@ define sbt_test
 endef
 
 
+
+# Test an sbt project without docker-compose.
+#
+# Args:
+#   $1 - Name of the project.
+#
+define sbt_test_no_docker
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" "test"
+endef
+
+
 # Build an sbt project.
 #
 # Args:
