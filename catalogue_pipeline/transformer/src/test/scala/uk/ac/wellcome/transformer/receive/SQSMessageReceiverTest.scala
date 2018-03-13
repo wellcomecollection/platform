@@ -56,8 +56,6 @@ class SQSMessageReceiverTest
     ActorSystem()
   )
 
-
-
   def withSQSMessageReceiver[R](
                      topicArn: String,
                      bucketName: String,
@@ -72,6 +70,7 @@ class SQSMessageReceiverTest
   }
 
   it("receives a message and send it to SNS client") {
+
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
@@ -118,7 +117,7 @@ class SQSMessageReceiverTest
             val sierraMessage: SQSMessage = hybridRecordSqsMessage(
               message = createValidSierraTransformableJson(id, title, lastModifiedDate),
               sourceName = "sierra",
-              version = 1,
+              version = version,
               s3Client = s3Client,
               bucketName = bucketName
             )
