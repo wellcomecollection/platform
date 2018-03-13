@@ -14,11 +14,11 @@ reindex shards for each source at a manageable size.
 import math
 
 
-def create_reindex_shard(source_name, source_id, source_size, shard_size):
-    ascii_source_id = int(''.join(str(ord(c)) for c in source_id))
+def create_reindex_shard(source_name, id, source_size, shard_size):
+    ascii_id = int(''.join(str(ord(c)) for c in id))
 
     number_of_shards = math.ceil(source_size / shard_size)
 
-    shard_id = ascii_source_id % number_of_shards
+    shard_id = ascii_id % number_of_shards
 
     return f'{source_name}/{shard_id}'
