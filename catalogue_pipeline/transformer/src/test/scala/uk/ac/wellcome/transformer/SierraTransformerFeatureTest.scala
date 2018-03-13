@@ -26,7 +26,7 @@ class SierraTransformerFeatureTest
     with ExtendedPatience
     with TransformableMessageUtils {
 
-  it("should transform sierra records, and publish them to the given topic") {
+  it("transforms sierra records and publishes the result to the given topic") {
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>

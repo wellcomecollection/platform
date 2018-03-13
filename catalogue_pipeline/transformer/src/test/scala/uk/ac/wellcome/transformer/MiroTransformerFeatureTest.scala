@@ -24,7 +24,7 @@ class MiroTransformerFeatureTest
     with MiroTransformableWrapper
     with TransformableMessageUtils {
 
-  it("should transform miro records, and publish them to the given topic") {
+  it("transforms miro records and publishes the result to the given topic") {
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
