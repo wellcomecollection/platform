@@ -43,7 +43,6 @@ class ServerTest
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
           withServer(queueUrl, topicArn, bucketName) { server =>
-
             server.httpGet(
               path = "/management/healthcheck",
               andExpect = Ok,
