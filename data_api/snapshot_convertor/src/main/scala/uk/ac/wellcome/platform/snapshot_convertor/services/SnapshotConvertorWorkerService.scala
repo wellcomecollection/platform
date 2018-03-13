@@ -16,7 +16,8 @@ case class ConversionJob()
 case class CompletedConversionJob()
 
 object CompletedConversionJob {
-  def apply(conversionJob: ConversionJob): CompletedConversionJob = CompletedConversionJob()
+  def apply(conversionJob: ConversionJob): CompletedConversionJob =
+    CompletedConversionJob()
 }
 
 class SnapshotConvertorWorkerService @Inject()(
