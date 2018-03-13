@@ -31,6 +31,9 @@ cache:
     - catalogue_pipeline/recorder/target
     - reindexer/reindex_worker/target
     - common/target
+
+    - sbt_common/display/target
+
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
     - sierra_adapter/sierra_items_to_dynamo/target
@@ -54,6 +57,7 @@ jobs:
 
     - stage: test
       env: TASK=sbt-common-test
+    - env: TASK=sbt-display-test
 
     # Catalogue pipeline stack
     - env: TASK=transformer-test

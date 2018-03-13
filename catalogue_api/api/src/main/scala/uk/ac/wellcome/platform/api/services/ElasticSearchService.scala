@@ -8,7 +8,6 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future

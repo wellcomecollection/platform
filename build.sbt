@@ -17,9 +17,14 @@ lazy val common = project
   .settings(Common.settings: _*)
   .settings(DockerCompose.settings: _*)
   .enablePlugins(DockerComposePlugin)
-  .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
+  .settings(libraryDependencies ++= Dependencies.commonDependencies)
+
+lazy val common_display = doSharedSetup(project, "sbt_common/display")
+  .settings(Common.settings: _*)
+  .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 lazy val api = doSharedSetup(project, "catalogue_api/api")
+  .dependsOn(common_display % "compile->compile;test->test")
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
@@ -61,6 +66,7 @@ lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierr
 lazy val root = (project in file("."))
   .aggregate(
     common,
+    common_display,
     api,
     ingestor,
     transformer,
