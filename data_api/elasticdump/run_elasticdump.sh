@@ -37,7 +37,7 @@ cat index.txt | gzip > index.txt.gz
 #
 # which are human-readable, unambiguous, and easy to browse in the S3 Console.
 #
-key=$(date +"%Y")/$(date +"%M")/$(date +"%Y-%M-%d")_$es_index.txt.gz
+key=$(date +"%Y")/$(date +"%m")/$(date +"%Y-%m-%d")_$es_index.txt.gz
 
 aws s3 cp index.txt.gz s3://$upload_bucket/elasticdump/$key
 
