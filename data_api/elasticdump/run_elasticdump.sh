@@ -31,7 +31,7 @@ elasticdump \
 
 cat index.json | gzip > index.txt.gz
 
-aws s3 cp index.txt.gz s3://$infra_bucket/elasticdump/$(date +"%s")_$es_index.txt.gz
+aws s3 cp index.txt.gz s3://$upload_bucket/elasticdump/$(date +"%s")_$es_index.txt.gz
 
 aws sqs delete-message \
   --queue-url=$sqs_queue_url \

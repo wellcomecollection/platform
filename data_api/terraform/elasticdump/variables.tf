@@ -9,4 +9,5 @@ variable "releae_ids" {
 
 variable "cluster_name" {}
 variable "vpc_id" {}
-s
+
+variable "upload_bucket" {}

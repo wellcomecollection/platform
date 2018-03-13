@@ -9,6 +9,7 @@ module "elasticdump" {
 
   env_vars = {
     sqs_queue_url = "${module.elasticdump_queue.url}"
+    upload_bucket = "${var.upload_bucket}"
     es_username
     es_password
     es_name
@@ -20,7 +21,7 @@ module "elasticdump" {
   memory = 1024
   cpu    = 512
 
-  env_vars_length = 7
+  env_vars_length = 8
 
   cluster_name = "${var.cluster_name}"
   vpc_id       = "${var.vpc_id}"
