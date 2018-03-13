@@ -15,7 +15,8 @@ import uk.ac.wellcome.platform.reindex_worker.modules.SnapshotConvertorWorkerMod
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name = "uk.ac.wellcome.platform.snapshot_convertor SnapshotConvertor"
+  override val name =
+    "uk.ac.wellcome.platform.snapshot_convertor SnapshotConvertor"
 
   override val modules = Seq(
     AmazonCloudWatchModule,

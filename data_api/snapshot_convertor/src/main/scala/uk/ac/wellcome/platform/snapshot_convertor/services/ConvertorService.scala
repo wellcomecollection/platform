@@ -20,8 +20,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class ConvertorService @Inject()()
-    extends Logging {
+class ConvertorService @Inject()() extends Logging {
 
   def runConversion(conversionJob: ConversionJob): Future[Unit] = {
     info(s"ConvertorService running $conversionJob")

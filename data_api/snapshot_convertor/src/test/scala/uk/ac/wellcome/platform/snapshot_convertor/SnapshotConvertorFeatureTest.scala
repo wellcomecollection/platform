@@ -45,8 +45,7 @@ class SnapshotConvertorFeatureTest
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketname =>
           withServer(queueUrl, topicArn, bucketName: String) { server =>
-
-          true shouldBe false
+            true shouldBe false
 
           }
         }
