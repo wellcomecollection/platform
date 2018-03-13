@@ -17,9 +17,10 @@ lazy val common = project
   .settings(Common.settings: _*)
   .settings(DockerCompose.settings: _*)
   .enablePlugins(DockerComposePlugin)
-  .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
+  .settings(libraryDependencies ++= Dependencies.commonDependencies)
 
-lazy val common_display = doSharedSetup(project, "sbt_common/display")
+lazy val common_display = project
+  .settings(Common.settings: _*)
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 lazy val api = doSharedSetup(project, "catalogue_api/api")
