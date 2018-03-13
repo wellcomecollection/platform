@@ -7,8 +7,16 @@ import org.scalatest.Suite
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.S3Local
 import uk.ac.wellcome.utils.JsonUtil
@@ -84,8 +92,7 @@ trait TransformableMessageUtils {
                              sourceName: String,
                              version: Int = 1,
                              s3Client: AmazonS3,
-                             bucketName: String
-                            ) = {
+                             bucketName: String) = {
 
     val key = "testSource/1/testId/dshg548.json"
     s3Client.putObject(bucketName, key, message)
@@ -101,11 +108,11 @@ trait TransformableMessageUtils {
     )
 
     case class JoinedCaseClass(
-                                id: String,
-                                version: Int,
-                                s3key: String,
-                                sourceName: String
-                              )
+      id: String,
+      version: Int,
+      s3key: String,
+      sourceName: String
+    )
 
     val joinedCaseClass = JoinedCaseClass(
       id = hybridRecord.id,

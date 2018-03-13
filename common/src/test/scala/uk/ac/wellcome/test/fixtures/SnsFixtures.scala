@@ -9,7 +9,6 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import scala.util.Random
 
-
 trait SnsFixtures {
 
   private val localSNSEndpointUrl = "http://localhost:9292"

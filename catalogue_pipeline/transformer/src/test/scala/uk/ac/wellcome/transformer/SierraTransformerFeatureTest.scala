@@ -5,12 +5,15 @@ import java.time.Instant
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
-
 
 class SierraTransformerFeatureTest
     extends FunSpec
@@ -27,7 +30,6 @@ class SierraTransformerFeatureTest
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
-
           val flags: Map[String, String] = Map(
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sns.topic.arn" -> topicArn,
@@ -37,7 +39,6 @@ class SierraTransformerFeatureTest
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
           withServer(flags) { _ =>
-
             val id = "b001"
             val title = "A pot of possums"
             val lastModifiedDate = Instant.now()
@@ -52,7 +53,8 @@ class SierraTransformerFeatureTest
                 sourceName = "sierra",
                 version = 1,
                 s3Client = s3Client,
-                bucketName= bucketName)
+                bucketName = bucketName
+              )
 
             sqsClient.sendMessage(
               queueUrl,
@@ -69,7 +71,9 @@ class SierraTransformerFeatureTest
               )
 
               val actualWork =
-                JsonUtil.fromJson[UnidentifiedWork](snsMessages.head.message).get
+                JsonUtil
+                  .fromJson[UnidentifiedWork](snsMessages.head.message)
+                  .get
 
               actualWork.sourceIdentifier shouldBe sourceIdentifier
               actualWork.title shouldBe Some(title)

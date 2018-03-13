@@ -16,6 +16,7 @@ import scala.util.Random
 
 
 trait S3 {
+
   private val localS3EndpointUrl = "http://localhost:33333"
 
   private val accessKey = "accessKey1"
