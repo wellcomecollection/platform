@@ -12,7 +12,7 @@ module "snapshot_convertor" {
     source_bucket_name = "${aws_s3_bucket.private_data.id}"
     target_bucket_name = "${aws_s3_bucket.public_data.id}"
 
-    queue_url = "${module.snapshot_convertor_topic.id}"
+    queue_url = "${module.snapshot_convertor_queue.id}"
     topic_arn = "${module.snapshot_conversion_complete_topic.arn}"
   }
 
