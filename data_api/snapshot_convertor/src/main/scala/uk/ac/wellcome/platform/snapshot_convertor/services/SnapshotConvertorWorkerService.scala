@@ -13,6 +13,12 @@ import scala.concurrent.Future
 
 case class ConversionJob()
 
+case class CompletedConversionJob()
+
+object CompletedConversionJob {
+  def apply(conversionJob: ConversionJob): CompletedConversionJob = CompletedConversionJob()
+}
+
 class SnapshotConvertorWorkerService @Inject()(
   convertorService: ConvertorService,
   reader: SQSReader,

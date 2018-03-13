@@ -16,7 +16,7 @@ object SnapshotConvertorWorkerModule extends TwitterModule {
     info("Terminating SQS worker")
 
     val system = injector.instance[ActorSystem]
-    val workerService = injector.instance[ReindexWorkerService]
+    val workerService = injector.instance[SnapshotConvertorWorkerService]
 
     workerService.stop()
     system.terminate()

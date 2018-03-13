@@ -1,14 +1,14 @@
 package uk.ac.wellcome.platform.snapshot_convertor
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.twitter.finagle.http.Status.Ok
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures._
-import scala.collection.JavaConversions._
+import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 
-class SnapshotConvertorFeatureTest
+class ServerTest
     extends FunSpec
     with Matchers
     with Eventually
@@ -40,12 +40,16 @@ class SnapshotConvertorFeatureTest
     }
   }
 
-  it("does not fail") {
+  it("shows the healthcheck message") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
-        withLocalS3Bucket { bucketname =>
-          withServer(queueUrl, topicArn, bucketName: String) { server =>
-            true shouldBe false
+        withLocalS3Bucket { bucketName =>
+          withServer(queueUrl, topicArn, bucketName) { server =>
+
+            server.httpGet(
+              path = "/management/healthcheck",
+              andExpect = Ok,
+              withJsonBody = """{"message": "ok"}""")
 
           }
         }

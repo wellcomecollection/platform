@@ -10,7 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.reindex_worker.modules.SnapshotConvertorWorkerModule
+import uk.ac.wellcome.platform.snapshot_convertor.modules.SnapshotConvertorWorkerModule
 
 object ServerMain extends Server
 
@@ -20,6 +20,7 @@ class Server extends HttpServer {
 
   override val modules = Seq(
     AmazonCloudWatchModule,
+    AWSConfigModule,
     SQSClientModule,
     SQSConfigModule,
     SNSClientModule,
