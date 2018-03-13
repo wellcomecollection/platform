@@ -85,7 +85,7 @@ class CalmTransformerFeatureTest
     snsMessage.message shouldBe JsonUtil
       .toJson(
         UnidentifiedWork(
-          title = Some("placeholder title for a Calm record"),
+          title = Some("placeholder title"),
           sourceIdentifier = sourceIdentifier,
           version = 1,
           identifiers = List(sourceIdentifier)))
