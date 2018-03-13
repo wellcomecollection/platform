@@ -10,8 +10,6 @@ import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 
 class ServerTest
     extends FunSpec
-    with Matchers
-    with Eventually
     with AmazonCloudWatchFlag
     with SqsFixtures
     with SnsFixtures
@@ -45,6 +43,7 @@ class ServerTest
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
           withServer(queueUrl, topicArn, bucketName) { server =>
+
             server.httpGet(
               path = "/management/healthcheck",
               andExpect = Ok,

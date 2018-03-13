@@ -18,8 +18,11 @@ object SnapshotConvertorWorkerModule extends TwitterModule {
     val system = injector.instance[ActorSystem]
     val workerService = injector.instance[SnapshotConvertorWorkerService]
 
-    workerService.stop()
-    system.terminate()
+    try {
+      workerService.stop()
+    } finally {
+      system.terminate()
+    }
   }
 
 }

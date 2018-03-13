@@ -1,12 +1,12 @@
 module "snapshot_convertor" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.0.0"
   name   = "snapshot_convertor"
 
   source_queue_name = "${module.snapshot_convertor_topic.name}"
   source_queue_arn  = "${module.snapshot_convertor_topic.arn}"
 
   ecr_repository_url = "${module.ecr_repository_snapshot_convertor.repository_url}"
-  release_id         = "${var.release_ids["id_minter"]}"
+  release_id         = "${var.release_ids["snapshot_convertor"]}"
 
   env_vars = {
     source_bucket_name = "${aws_s3_bucket.private_data.id}"
@@ -23,8 +23,6 @@ module "snapshot_convertor" {
 
   cluster_name = "${module.data_api_cluster.cluster_name}"
   vpc_id       = "${module.vpc_data_api.vpc_id}"
-
-  alb_priority = 105
 
   alb_cloudwatch_id          = "${module.data_api_cluster.alb_cloudwatch_id}"
   alb_listener_https_arn     = "${module.data_api_cluster.alb_listener_https_arn}"
