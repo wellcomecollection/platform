@@ -2,8 +2,8 @@ module "snapshot_convertor" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
   name   = "snapshot_convertor"
 
-  source_queue_name  = "${module.snapshot_convertor_topic.name}"
-  source_queue_arn   = "${module.snapshot_convertor_topic.arn}"
+  source_queue_name = "${module.snapshot_convertor_topic.name}"
+  source_queue_arn  = "${module.snapshot_convertor_topic.arn}"
 
   ecr_repository_url = "${module.ecr_repository_snapshot_convertor.repository_url}"
   release_id         = "${var.release_ids["id_minter"]}"
@@ -12,8 +12,8 @@ module "snapshot_convertor" {
     source_bucket_name = "${aws_s3_bucket.private_data.id}"
     target_bucket_name = "${aws_s3_bucket.public_data.id}"
 
-    queue_url   = "${module.snapshot_convertor_topic.id}"
-    topic_arn   = "${module.snapshot_conversion_complete_topic.arn}"
+    queue_url = "${module.snapshot_convertor_topic.id}"
+    topic_arn = "${module.snapshot_conversion_complete_topic.arn}"
   }
 
   memory = 2048

@@ -10,7 +10,6 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   }
 }
 
-
 data "aws_iam_policy_document" "private_data_bucket_full_access_policy" {
   statement {
     actions = [
