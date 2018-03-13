@@ -13,10 +13,19 @@ import scala.concurrent.Future
 
 trait IndexedElasticSearchLocal
     extends ElasticSearchLocal
-    with BeforeAndAfterEach { this: Suite =>
+    with BeforeAndAfterEach
+    with JsonTestUtil { this: Suite =>
 
   val indexName: String
   val itemType: String
+
+  def esLocalFlags = Map(
+    "es.host" -> "localhost",
+    "es.port" -> "9200",
+    "es.name" -> "wellcome",
+    "es.index" -> indexName,
+    "es.type" -> itemType
+  )
 
   private def createIndex(index: String) = {
     ensureIndexDeleted(index)
@@ -61,4 +70,19 @@ trait IndexedElasticSearchLocal
 
   def insertIntoElasticSearch(works: IdentifiedWork*): Unit =
     insertIntoElasticSearchWithIndex(indexName, works: _*)
+
+  def assertElasticsearchEventuallyHasWork(work: IdentifiedWork) = {
+    val workJson = toJson(work).get
+
+    eventually {
+      val hits = elasticClient
+        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
+        .map { _.hits.hits }
+        .await
+
+      hits should have size 1
+
+      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
+    }
+  }
 }
