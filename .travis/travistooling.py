@@ -135,6 +135,8 @@ def affects_tests(path, task):
         'shared_infra',
         'nginx',
         'snapshot_scheduler',
+        'sbt-display',
+        'sbt-common',
     )
     if (
         task.startswith(sierra_free_tasks) and

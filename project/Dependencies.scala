@@ -61,6 +61,10 @@ object Dependencies {
     "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test"
   )
 
+  val swaggerDependencies = Seq(
+    "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
+  )
+
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
@@ -85,13 +89,15 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
+  val commonDisplayDependencies: Seq[ModuleID] = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % "test"
+  ) ++ swaggerDependencies
+
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ dynamoDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
-    "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
-  )
+  val apiDependencies: Seq[ModuleID] = commonDependencies
 
   val transformerDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies

@@ -18,7 +18,7 @@ import uk.ac.wellcome.platform.api.finatra.exceptions.{
   ElasticsearchResponseExceptionMapper,
   GeneralExceptionMapper
 }
-import uk.ac.wellcome.platform.api.models.WorksIncludesDeserializerModule
+import uk.ac.wellcome.models.WorksIncludesDeserializerModule
 
 object ServerMain extends Server
 object ApiSwagger extends Swagger

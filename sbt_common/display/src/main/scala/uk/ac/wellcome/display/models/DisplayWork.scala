@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.api.models
+package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
 
 @JsonIgnoreProperties(Array("visible"))
 @ApiModel(
@@ -34,48 +34,48 @@ case class DisplayWork(
     value = "Recording written text on a (usually visual) work.") lettering: Option[
     String] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
     value =
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) creators: List[DisplayAgent] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.platform.api.models.DisplayConcept",
+    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
   ) subjects: List[DisplayConcept] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.platform.api.models.DisplayConcept",
+    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
     value = "Relates a work to the genre that describes the work's content.") genres: List[
     DisplayConcept] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.platform.api.models.DisplayLocation",
+    dataType = "uk.ac.wellcome.display.models.DisplayLocation",
     value =
       "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayItem]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAgent] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.platform.api.models.DisplayPlace]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
     value = "Show a list of places of publication."
   ) placesOfPublication: List[DisplayPlace] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.platform.api.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
     value =
       "Relates the publication of a work to a date when the work has been formally published."
   ) publicationDate: Option[DisplayPeriod] = None,
