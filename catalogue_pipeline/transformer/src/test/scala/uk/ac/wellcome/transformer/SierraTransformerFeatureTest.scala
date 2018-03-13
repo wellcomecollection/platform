@@ -39,6 +39,7 @@ class SierraTransformerFeatureTest
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
           withServer(flags) { _ =>
+
             val id = "b001"
             val title = "A pot of possums"
             val lastModifiedDate = Instant.now()

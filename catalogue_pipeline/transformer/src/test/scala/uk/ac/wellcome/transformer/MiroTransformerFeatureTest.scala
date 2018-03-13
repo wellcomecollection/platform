@@ -1,56 +1,72 @@
 package uk.ac.wellcome.transformer
 
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{UnidentifiedWork, Work}
-import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
-import uk.ac.wellcome.test.utils.MessageInfo
+import uk.ac.wellcome.models.{UnidentifiedWork}
+import uk.ac.wellcome.models.transformable.{MiroTransformable}
+import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.fixtures.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.transformer.utils.{
-  TransformableSQSMessageUtils,
-  TransformerFeatureTest
-}
+import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 
 class MiroTransformerFeatureTest
-    extends FunSpec
-    with TransformerFeatureTest
+  extends FunSpec
     with Matchers
+    with SqsFixtures
+    with SnsFixtures
+    with S3
+    with fixtures.Server
+    with Eventually
+    with ExtendedPatience
     with MiroTransformableWrapper
-    with TransformableSQSMessageUtils {
-  override lazy val bucketName: String =
-    "test-miro-transformer-feature-test-bucket"
-  val queueUrl: String = createQueueAndReturnUrl("test_miro_transformer")
-  override val flags: Map[String, String] = Map(
-    "aws.region" -> "eu-west-1",
-    "aws.sqs.queue.url" -> queueUrl,
-    "aws.sqs.waitTime" -> "1",
-    "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "miro-transformer",
-    "aws.s3.bucketName" -> bucketName
-  )
+    with TransformableMessageUtils {
 
-  it("""
-      should poll the Dynamo stream for Miro records, transform into Work
-      instances, and push them into the id_minter SNS topic where those
-      messages are transformable
-      """) {
+  it("should transform miro records, and publish them to the given topic") {
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val flags: Map[String, String] = Map(
+            "aws.sqs.queue.url" -> queueUrl,
+            "aws.sns.topic.arn" -> topicArn,
+            "aws.s3.bucketName" -> bucketName,
+            "aws.sqs.waitTime" -> "1",
+            "aws.metrics.namespace" -> "sierra-transformer"
+          ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
-    val miroID = "M0000001"
-    val title = "A guide for a giraffe"
+          withServer(flags) { _ =>
 
-    val secondMiroID = "M0000002"
-    val secondTitle = "A song about a snake"
+            val miroID = "M0000001"
+            val title = "A guide for a giraffe"
 
-    sendMiroImageToSQS(miroID, shouldNotTransformMessage(title))
-    sendMiroImageToSQS(secondMiroID, shouldTransformMessage(secondTitle))
+            val secondMiroID = "M0000002"
+            val secondTitle = "A song about a snake"
 
-    eventually {
-      val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size (1)
+            sendMiroImageToSQS(
+              miroID = miroID,
+              data = shouldNotTransformMessage(title),
+              bucketName = bucketName,
+              queueUrl = queueUrl
+            )
 
-      assertSNSMessageContains(snsMessages.head, secondMiroID, secondTitle)
+            sendMiroImageToSQS(
+              miroID = secondMiroID,
+              data = shouldTransformMessage(secondTitle),
+              bucketName = bucketName,
+              queueUrl = queueUrl
+            )
+
+            eventually {
+              val snsMessages = listMessagesReceivedFromSNS(topicArn)
+              snsMessages should have size (1)
+
+              assertSNSMessageContains(snsMessages.head, secondMiroID, secondTitle)
+            }
+          }
+        }
+      }
     }
   }
 
@@ -73,7 +89,12 @@ class MiroTransformerFeatureTest
           "image_tech_file_size": ["100000"]
         }"""
 
-  private def sendMiroImageToSQS(miroID: String, data: String) = {
+  private def sendMiroImageToSQS(
+                                  miroID: String,
+                                  data: String,
+                                  bucketName: String,
+                                  queueUrl: String
+                                ) = {
     val miroTransformable =
       MiroTransformable(
         sourceId = miroID,
@@ -82,7 +103,13 @@ class MiroTransformerFeatureTest
       )
 
     val sqsMessage =
-      hybridRecordSqsMessage(JsonUtil.toJson(miroTransformable).get, "miro")
+      hybridRecordSqsMessage(
+        message = JsonUtil.toJson(miroTransformable).get,
+        sourceName = "miro",
+        version = 1,
+        s3Client = s3Client,
+        bucketName = bucketName
+      )
 
     sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
   }
