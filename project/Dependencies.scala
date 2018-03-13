@@ -112,6 +112,8 @@ object Dependencies {
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
+  val snapshotConvertorDependencies: Seq[ModuleID] = commonDependencies
+
   val recorderDependencies: Seq[ModuleID] = Seq()
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
