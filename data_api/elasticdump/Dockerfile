@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk update && apk add jq nodejs python3
+RUN apk update && apk add bash jq nodejs python3
 RUN pip3 install awscli
 RUN npm install -g elasticdump
 

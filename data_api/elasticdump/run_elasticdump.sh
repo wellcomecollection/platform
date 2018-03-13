@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -o errexit
 set -o nounset
@@ -29,9 +29,17 @@ elasticdump \
   --output=index.txt \
   --type=data
 
-cat index.json | gzip > index.txt.gz
+cat index.txt | gzip > index.txt.gz
 
-aws s3 cp index.txt.gz s3://$upload_bucket/elasticdump/$(date +"%s")_$es_index.txt.gz
+# This creates keys of the form
+#
+#   2018/03/2018-03-13_myindexname.txt.gz
+#
+# which are human-readable, unambiguous, and easy to browse in the S3 Console.
+#
+key=$(date +"%Y")/$(date +"%M")/$(date +"%Y-%M-%d")_$es_index.txt.gz
+
+aws s3 cp index.txt.gz s3://$upload_bucket/elasticdump/$key
 
 aws sqs delete-message \
   --queue-url=$sqs_queue_url \
