@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.models.WorksIncludes
-import uk.ac.wellcome.models.display.DisplayWork
+import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil._
 
