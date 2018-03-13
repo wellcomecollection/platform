@@ -24,6 +24,7 @@ lazy val common_display = project
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 lazy val api = doSharedSetup(project, "catalogue_api/api")
+  .dependsOn(common_display % "compile->compile;test->test")
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
