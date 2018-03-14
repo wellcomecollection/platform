@@ -16,25 +16,28 @@ trait SierraCheckDigits {
   // scala> addCheckDigit("1952770", recordType = SierraRecordTypes.items)
   // res1: String = i19527706
   //
-  def addCheckDigit(sierraId: String, recordType: SierraRecordTypes.Value): String = {
+  def addCheckDigit(sierraId: String,
+                    recordType: SierraRecordTypes.Value): String = {
 
     // First check that we're being passed a 7-digit numeric ID -- anything
     // else is an error.
     val regexMatch = """^([0-9]{7})$""".r.unapplySeq(sierraId)
     val checkDigit = regexMatch match {
       case Some(s) => getCheckDigit(s.head)
-      case _ => throw new RuntimeException(
-        s"Expected 7-digit numeric ID, got $sierraId"
-      )
+      case _ =>
+        throw new RuntimeException(
+          s"Expected 7-digit numeric ID, got $sierraId"
+        )
     }
 
     // Then pick the record type prefix.
     val prefix = recordType match {
       case SierraRecordTypes.bibs => "b"
       case SierraRecordTypes.items => "i"
-      case _ => throw new RuntimeException(
-        s"Received unrecognised record type: $recordType"
-      )
+      case _ =>
+        throw new RuntimeException(
+          s"Received unrecognised record type: $recordType"
+        )
     }
 
     s"$prefix$sierraId$checkDigit"
@@ -58,8 +61,7 @@ trait SierraCheckDigits {
   // Sierra ID.
   //
   private def getCheckDigit(sierraId: String): String = {
-    val remainder = sierraId
-      .reverse
+    val remainder = sierraId.reverse
       .zip(Stream from 2)
       .map { case (char: Char, count: Int) => char.toString.toInt * count }
       .foldLeft(0)(_ + _) % 11
