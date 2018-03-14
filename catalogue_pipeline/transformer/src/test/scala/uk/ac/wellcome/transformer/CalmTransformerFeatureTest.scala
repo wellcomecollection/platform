@@ -1,5 +1,6 @@
 package uk.ac.wellcome.transformer
 
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.CalmTransformable
 import uk.ac.wellcome.models.{
@@ -7,34 +8,24 @@ import uk.ac.wellcome.models.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.test.utils.MessageInfo
-import uk.ac.wellcome.transformer.utils.{
-  TransformableSQSMessageUtils,
-  TransformerFeatureTest
-}
+import uk.ac.wellcome.test.fixtures.{MessageInfo, S3, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class CalmTransformerFeatureTest
     extends FunSpec
-    with TransformerFeatureTest
     with Matchers
-    with TransformableSQSMessageUtils {
+    with SqsFixtures
+    with SnsFixtures
+    with S3
+    with fixtures.Server
+    with Eventually
+    with ExtendedPatience
+    with TransformableMessageUtils {
 
-  override lazy val bucketName: String =
-    "test-calm-transformer-feature-test-bucket"
-  val queueUrl: String = createQueueAndReturnUrl("test_calm_transformer")
-  override val flags: Map[String, String] = Map(
-    "aws.region" -> "eu-west-1",
-    "aws.sqs.queue.url" -> queueUrl,
-    "aws.sqs.waitTime" -> "1",
-    "aws.sns.topic.arn" -> idMinterTopicArn,
-    "aws.metrics.namespace" -> "calm-transformer",
-    "aws.s3.bucketName" -> bucketName
-  )
-
-  it(
-    "should poll the dynamo stream for calm data, transform it into unified items and push them into the id_minter SNS topic") {
+  it("transforms miro records and publishes the result to the given topic") {
     val calmTransformable =
       CalmTransformable(
         sourceId = "RecordID1",
@@ -42,39 +33,43 @@ class CalmTransformerFeatureTest
         AltRefNo = "AltRefNo1",
         RefNo = "RefNo1",
         data = """{"AccessStatus": ["public"]}""")
-    val calmHybridRecordMessage =
-      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable).get, "calm")
-    sqsClient.sendMessage(
-      queueUrl,
-      JsonUtil.toJson(calmHybridRecordMessage).get)
 
-    eventually {
-      val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size 1
-      assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
-    }
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val calmHybridRecordMessage = hybridRecordSqsMessage(
+            message = JsonUtil.toJson(calmTransformable).get,
+            sourceName = "calm",
+            version = 1,
+            s3Client = s3Client,
+            bucketName = bucketName
+          )
 
-    val calmTransformable2 =
-      CalmTransformable(
-        sourceId = "RecordID2",
-        RecordType = "Collection",
-        AltRefNo = "AltRefNo2",
-        RefNo = "RefNo2",
-        data = """{"AccessStatus": ["restricted"]}""")
-    val calmHybridRecordMessage2 =
-      hybridRecordSqsMessage(JsonUtil.toJson(calmTransformable2).get, "calm")
-    sqsClient.sendMessage(
-      queueUrl,
-      JsonUtil.toJson(calmHybridRecordMessage2).get)
+          val flags: Map[String, String] = Map(
+            "aws.sqs.queue.url" -> queueUrl,
+            "aws.sns.topic.arn" -> topicArn,
+            "aws.s3.bucketName" -> bucketName,
+            "aws.sqs.waitTime" -> "1",
+            "aws.metrics.namespace" -> "sierra-transformer"
+          ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
-    eventually {
-      val snsMessages = listMessagesReceivedFromSNS()
-      snsMessages should have size 2
+          withServer(flags) { _ =>
+            sqsClient.sendMessage(
+              queueUrl,
+              JsonUtil.toJson(calmHybridRecordMessage).get
+            )
 
-      assertSNSMessageContainsCalmDataWith(snsMessages.head, Some("public"))
-      assertSNSMessageContainsCalmDataWith(
-        snsMessages.tail.head,
-        Some("restricted"))
+            eventually {
+              val snsMessages = listMessagesReceivedFromSNS(topicArn)
+              snsMessages should have size 1
+              assertSNSMessageContainsCalmDataWith(
+                snsMessage = snsMessages.head,
+                AccessStatus = Some("public")
+              )
+            }
+          }
+        }
+      }
     }
   }
 
@@ -91,7 +86,7 @@ class CalmTransformerFeatureTest
     snsMessage.message shouldBe JsonUtil
       .toJson(
         UnidentifiedWork(
-          title = Some("placeholder title for a Calm record"),
+          title = Some("placeholder title"),
           sourceIdentifier = sourceIdentifier,
           version = 1,
           identifiers = List(sourceIdentifier)))

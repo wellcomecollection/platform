@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer.utils
 
 import java.time.Instant
 
+import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.Suite
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
@@ -20,8 +21,7 @@ import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.utils.S3Local
 import uk.ac.wellcome.utils.JsonUtil
 
-trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
-
+trait TransformableMessageUtils {
   def createValidCalmTramsformableJson(RecordID: String,
                                        RecordType: String,
                                        AltRefNo: String,
@@ -33,14 +33,25 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
     JsonUtil.toJson(calmTransformable).get
   }
 
-  def createValidEmptySierraBibSQSMessage(id: String): SQSMessage = {
+  def createValidEmptySierraBibSQSMessage(
+    id: String,
+    s3Client: AmazonS3,
+    bucketName: String
+  ): SQSMessage = {
+
     val sierraTransformable = SierraTransformable(
       sourceId = id,
       maybeBibData = None,
       itemData = Map[String, SierraItemRecord]()
     )
 
-    hybridRecordSqsMessage(JsonUtil.toJson(sierraTransformable).get, "sierra")
+    hybridRecordSqsMessage(
+      message = JsonUtil.toJson(sierraTransformable).get,
+      sourceName = "sierra",
+      version = 1,
+      s3Client = s3Client,
+      bucketName = bucketName
+    )
   }
 
   def createValidSierraTransformableJson(id: String,
@@ -79,7 +90,9 @@ trait TransformableSQSMessageUtils extends S3Local { this: Suite =>
 
   def hybridRecordSqsMessage(message: String,
                              sourceName: String,
-                             version: Int = 1) = {
+                             version: Int = 1,
+                             s3Client: AmazonS3,
+                             bucketName: String) = {
 
     val key = "testSource/1/testId/dshg548.json"
     s3Client.putObject(bucketName, key, message)
