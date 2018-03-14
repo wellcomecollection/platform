@@ -16,12 +16,7 @@ class ServerTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = Map(
-            "aws.region" -> "localhost",
-            "aws.sqs.queue.url" -> queueUrl,
-            "aws.sqs.waitTime" -> "1",
-            "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
 
           withServer(flags) { server =>
             server.httpGet(

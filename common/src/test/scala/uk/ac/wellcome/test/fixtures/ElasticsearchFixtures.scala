@@ -29,10 +29,12 @@ trait ElasticsearchFixtures
   private val esPort = "9200"
   private val esName = "wellcome"
 
-  val esLocalFlags = Map(
+  def esLocalFlags(indexName: String, itemType: String) = Map(
     "es.host" -> esHost,
     "es.port" -> esPort,
-    "es.name" -> esName
+    "es.name" -> esName,
+    "es.index" -> indexName,
+    "es.type" -> itemType
   )
 
   val restClient: RestClient = RestClient

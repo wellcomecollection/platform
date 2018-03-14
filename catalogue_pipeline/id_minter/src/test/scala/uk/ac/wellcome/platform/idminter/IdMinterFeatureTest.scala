@@ -66,19 +66,10 @@ class IdMinterFeatureTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = Map(
-            "aws.region" -> "localhost",
-            "aws.sqs.queue.url" -> queueUrl,
-            "aws.sqs.waitTime" -> "1",
-            "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
 
           withServer(flags) { _ =>
             eventuallyTableExists(dbConfig)
-
-            sqsClient.setQueueAttributes(
-              queueUrl,
-              Map("VisibilityTimeout" -> "1"))
 
             val miroID = "M0001234"
             val title = "A limerick about a lion"
@@ -128,17 +119,9 @@ class IdMinterFeatureTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = Map(
-            "aws.sqs.queue.url" -> queueUrl,
-            "aws.sqs.waitTime" -> "1",
-            "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
 
           withServer(flags) { _ =>
-            sqsClient.setQueueAttributes(
-              queueUrl,
-              Map("VisibilityTimeout" -> "1"))
-
             sqsClient.sendMessage(queueUrl, "not a json string")
 
             val miroId = "1234"

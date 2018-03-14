@@ -46,12 +46,9 @@ class CalmTransformerFeatureTest
           )
 
           val flags: Map[String, String] = Map(
-            "aws.sqs.queue.url" -> queueUrl,
-            "aws.sns.topic.arn" -> topicArn,
-            "aws.s3.bucketName" -> bucketName,
-            "aws.sqs.waitTime" -> "1",
             "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
+          ) ++ s3LocalFlags(bucketName) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
+            queueUrl)
 
           withServer(flags) { _ =>
             sqsClient.sendMessage(

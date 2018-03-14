@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
 import scala.util.Random
+import scala.collection.JavaConversions._
 import uk.ac.wellcome.models.aws.SQSMessage
 
 import scala.util.Try
@@ -23,11 +24,13 @@ trait SqsFixtures {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  val sqsLocalFlags = Map(
+  def sqsLocalFlags(queueUrl: String) = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.sqs.accessKey" -> accessKey,
     "aws.sqs.secretKey" -> secretKey,
-    "aws.region" -> "localhost"
+    "aws.region" -> "localhost",
+    "aws.sqs.queue.url" -> queueUrl,
+    "aws.sqs.waitTime" -> "1"
   )
 
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder
@@ -41,6 +44,8 @@ trait SqsFixtures {
   def withLocalSqsQueue[R](testWith: TestWith[String, R]) = {
     val queueName: String = Random.alphanumeric take 10 mkString
     val url = sqsClient.createQueue(queueName).getQueueUrl
+
+    sqsClient.setQueueAttributes(url, Map("VisibilityTimeout" -> "1"))
 
     try {
       testWith(url)
