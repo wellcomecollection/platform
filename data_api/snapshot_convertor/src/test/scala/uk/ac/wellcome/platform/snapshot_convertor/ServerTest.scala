@@ -21,7 +21,8 @@ class ServerTest
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
-        flags = snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName)
+        flags = snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags(
+          queueUrl) ++ s3LocalFlags(bucketName)
       )
 
     server.start()
