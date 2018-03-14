@@ -42,8 +42,6 @@ trait SierraCheckDigits {
 
   // Quoting from the Sierra manual:
   //
-  // Quoting from the Sierra manual:
-  //
   //    Check digits may be any one of 11 possible digits (0, 1, 2, 3, 4, 5, 6,
   //    7, 8, 9, or x).
   //
