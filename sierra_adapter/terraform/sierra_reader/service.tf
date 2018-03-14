@@ -2,15 +2,14 @@ locals {
   service_name = "sierra_${var.resource_type}_reader"
 }
 
-data "aws_ecs_cluster" "cluster" {
-  cluster_name = "${var.cluster_name}"
-}
-
 module "sierra_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/service?ref=v5.3.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
   name   = "${local.service_name}"
 
-  app_uri = "${var.ecr_repository_url}:${var.release_id}"
+  source_queue_name  = "${module.windows_queue.name}"
+  source_queue_arn   = "${module.windows_queue.arn}"
+  ecr_repository_url = "${var.ecr_repository_url}"
+  release_id         = "${var.release_id}"
 
   env_vars = {
     resource_type = "${var.resource_type}"
@@ -30,21 +29,19 @@ module "sierra_reader_service" {
 
   env_vars_length = 9
 
-  path_pattern = "/${local.service_name}/*"
-
   cpu    = 512
   memory = 2048
 
-  deployment_minimum_healthy_percent = 0
-  deployment_maximum_percent         = 200
+  cluster_name = "${var.cluster_name}"
+  vpc_id       = "${var.vpc_id}"
 
-  cluster_id                   = "${data.aws_ecs_cluster.cluster.arn}"
-  vpc_id                       = "${var.vpc_id}"
-  loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
-  listener_https_arn           = "${var.alb_listener_https_arn}"
-  listener_http_arn            = "${var.alb_listener_http_arn}"
-  client_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  server_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
+  alb_listener_https_arn     = "${var.alb_listener_https_arn}"
+  alb_listener_http_arn      = "${var.alb_listener_http_arn}"
+  alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
 
-  https_domain = "services.wellcomecollection.org"
+  enable_alb_alarm = false
+
+  max_capacity = 15
 }
