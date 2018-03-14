@@ -24,5 +24,5 @@ resource "aws_iam_role_policy" "snapshot_convertor_cloudwatch" {
 
 resource "aws_iam_role_policy" "allow_s3_elasticdump_write" {
   role   = "${module.elasticdump.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_s3_write.json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_elasticdump_write.json}"
 }
