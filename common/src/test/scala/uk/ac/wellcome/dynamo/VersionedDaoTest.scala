@@ -20,6 +20,7 @@ import uk.ac.wellcome.models.{Id, Versioned}
 import shapeless.syntax.singleton._
 import shapeless.record._
 import shapeless.{Id => ShapelessId, _}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -33,6 +34,7 @@ class VersionedDaoTest
     extends FunSpec
     with LocalDynamoDb[TestVersioned]
     with ScalaFutures
+    with ExtendedPatience
     with MockitoSugar
     with Matchers {
 

@@ -8,8 +8,10 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
+
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 case class TestObject(
   id: String,
@@ -31,26 +33,20 @@ case class BadTestObject(
 
 class ElasticSearchIndexTest
     extends FunSpec
-    with ElasticSearchLocal
+    with ElasticsearchFixtures
     with ScalaFutures
     with Eventually
     with Matchers
     with JsonTestUtil
     with BeforeAndAfterEach {
 
-  val testIndexName = "test_index"
   val testType = "thing"
 
-  override def beforeEach(): Unit = {
-    ensureIndexDeleted(testIndexName)
-  }
+  object TestIndex extends ElasticSearchIndex {
 
-  class TestIndex extends ElasticSearchIndex {
-
-    val httpClient: HttpClient = elasticClient
-    val indexName: String = testIndexName
-
-    val mappingDefinition = mapping(testType)
+    override val httpClient: HttpClient = elasticClient
+    override val indexName = "test_index"
+    override val mappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
@@ -59,12 +55,11 @@ class ElasticSearchIndexTest
       )
   }
 
-  class CompatibleTestIndex extends ElasticSearchIndex {
+  object CompatibleTestIndex extends ElasticSearchIndex {
 
-    val httpClient: HttpClient = elasticClient
-    val indexName: String = testIndexName
-
-    val mappingDefinition = mapping(testType)
+    override val httpClient = elasticClient
+    override val indexName = "test_index"
+    override val mappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
@@ -74,76 +69,77 @@ class ElasticSearchIndexTest
       )
   }
 
-  val testIndex = new TestIndex()
-  val compatibleTestIndex = new CompatibleTestIndex()
-
   it("creates an index into which doc of the expected type can be put") {
-    createAndWaitIndexIsCreated(testIndex, testIndexName)
+    withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
 
-    val testObject = TestObject("id", "description", true)
-    val testObjectJson = JsonUtil.toJson(testObject).get
+      val testObject = TestObject("id", "description", true)
+      val testObjectJson = JsonUtil.toJson(testObject).get
 
-    elasticClient
-      .execute(
-        indexInto(testIndexName / testType)
-          .doc(testObjectJson))
+      eventually {
+        for {
+          indexName <- eventuallyIndexName
+        } yield {
+          elasticClient
+            .execute(
+              indexInto(indexName / testType)
+                .doc(testObjectJson))
 
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$testIndexName/$testType").matchAllQuery())
-        .map {
-          _.hits.hits
+                val hits = elasticClient
+            .execute(search(s"$indexName/$testType").matchAllQuery())
+            .map {
+              _.hits.hits
+            }
+            .await
+          hits should have size 1
+
+          assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)
         }
-        .await
-      hits should have size 1
-
-      assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)
+      }
     }
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    createAndWaitIndexIsCreated(testIndex, testIndexName)
+    withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
 
-    val badTestObject = BadTestObject("id", 5)
-    val badTestObjectJson = JsonUtil.toJson(badTestObject).get
+      val badTestObject = BadTestObject("id", 5)
+      val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
-    val eventualIndexResponse = elasticClient
-      .execute(
-        indexInto(testIndexName / testType)
-          .doc(badTestObjectJson))
+      val eventuallyResponse =
+        for {
+          indexName <- eventuallyIndexName
+          response <- elasticClient.execute(indexInto(indexName / testType).doc(badTestObjectJson))
+        } yield response
 
-    whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a[ResponseException]
+      whenReady(eventuallyResponse.failed) { exception =>
+        exception shouldBe a[ResponseException]
+      }
     }
   }
 
   it("updates an already existing index with a compatible mapping") {
-    createAndWaitIndexIsCreated(testIndex, testIndexName)
+    withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
+      withLocalElasticsearchIndex(CompatibleTestIndex) { eventuallyCompatibleIndexName =>
 
-    createAndWaitIndexIsCreated(compatibleTestIndex, testIndexName)
+        val compatibleTestObject =
+          CompatibleTestObject("id", "description", 5, true)
+        val compatibleTestObjectJson = JsonUtil.toJson(compatibleTestObject).get
 
-    val compatibleTestObject =
-      CompatibleTestObject("id", "description", 5, true)
-    val compatibleTestObjectJson = JsonUtil.toJson(compatibleTestObject).get
+        eventually {
+          for {
+            _ <- eventuallyIndexName
+            testIndexName <- eventuallyCompatibleIndexName
+            _ <- elasticClient.execute(indexInto(testIndexName / testType)doc(compatibleTestObjectJson))
+            hits <- elasticClient.execute(search(s"$testIndexName/$testType").matchAllQuery()).map { _.hits.hits }
+          } yield {
+            hits should have size 1
 
-    elasticClient
-      .execute(
-        indexInto(testIndexName / testType)
-          .doc(compatibleTestObjectJson))
-
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$testIndexName/$testType").matchAllQuery())
-        .map {
-          _.hits.hits
+            assertJsonStringsAreEqual(
+              hits.head.sourceAsString,
+              compatibleTestObjectJson
+            )
+          }
         }
-        .await
-      hits should have size 1
-
-      assertJsonStringsAreEqual(
-        hits.head.sourceAsString,
-        compatibleTestObjectJson
-      )
+      }
     }
   }
 }

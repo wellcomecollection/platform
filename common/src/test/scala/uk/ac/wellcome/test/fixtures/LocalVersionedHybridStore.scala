@@ -8,12 +8,10 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.storage.VersionedHybridStore
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
-import uk.ac.wellcome.test.utils.S3Local
-import org.scalatest.Suite
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDb[HybridRecord]
-    with S3Local { this: Suite =>
+    with S3 {
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -26,10 +24,10 @@ trait LocalVersionedHybridStore
     }
   }
 
-  def withVersionedHybridStore[T <: Id, R](
+  def withVersionedHybridStore[T <: Id, R](bucketName: String)(
     testWith: TestWith[(VersionedHybridStore[T], String), R]) = {
-    withVersionedDao {
-      case (dao, tableName) =>
+    withVersionedDao { case (dao, tableName) =>
+
         val store = new VersionedHybridStore[T](
           sourcedObjectStore = new S3ObjectStore(
             s3Client = s3Client,
@@ -45,7 +43,7 @@ trait LocalVersionedHybridStore
     }
   }
 
-  def getJsonFor[T <: Id](tableName: String, record: T) = {
+  def getJsonFor[T <: Id](bucketName: String, tableName: String, record: T) = {
     val hybridRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get

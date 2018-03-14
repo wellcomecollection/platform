@@ -5,7 +5,8 @@ import org.scalacheck.Arbitrary
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
+import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
 import com.sksamuel.elastic4s.http.ElasticDsl._
@@ -13,69 +14,56 @@ import org.elasticsearch.client.ResponseException
 import org.scalatest.prop.PropertyChecks
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class WorksIndexTest
     extends FunSpec
-    with ElasticSearchLocal
+    with ElasticsearchFixtures
     with ScalaFutures
     with Eventually
+    with ExtendedPatience
     with Matchers
     with JsonTestUtil
     with BeforeAndAfterEach
     with PropertyChecks {
 
-  val indexName = "works"
-  val itemType = "work"
-
-  val worksIndex = new WorksIndex(elasticClient, indexName, itemType)
-
-  override def beforeEach(): Unit = {
-    ensureIndexDeleted(indexName)
-  }
-
   implicitly[Arbitrary[IdentifiedWork]]
 
   it("puts a valid work") {
-
     forAll { sampleWork: IdentifiedWork =>
-      ensureIndexDeleted(indexName)
-      createAndWaitIndexIsCreated(worksIndex, indexName)
+      withLocalElasticsearchIndex("works", "work") { eventuallyIndexName =>
+        val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
-      val sampleWorkJson = JsonUtil.toJson(sampleWork).get
+        eventually {
+          for {
+            indexName <- eventuallyIndexName
+             _ <- elasticClient.execute(indexInto(indexName / "work").doc(sampleWorkJson))
+             hits <- elasticClient.execute(search(s"$indexName/work").matchAllQuery()).map {_.hits.hits }
+          } yield {
+            hits should have size 1
 
-      elasticClient
-        .execute(
-          indexInto(indexName / itemType)
-            .doc(sampleWorkJson))
-
-      eventually {
-        val hits = elasticClient
-          .execute(search(s"$indexName/$itemType").matchAllQuery())
-          .map {
-            _.hits.hits
+            assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
           }
-          .await
-
-        hits should have size 1
-
-        assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
+        }
       }
     }
   }
 
   it("does not put an invalid work") {
-    createAndWaitIndexIsCreated(worksIndex, indexName)
+      withLocalElasticsearchIndex("works", "work") { eventuallyIndexName =>
 
-    val badTestObject = BadTestObject("id", 5)
-    val badTestObjectJson = JsonUtil.toJson(badTestObject).get
+      val badTestObject = BadTestObject("id", 5)
+      val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
-    val eventualIndexResponse = elasticClient
-      .execute(
-        indexInto(indexName / itemType)
-          .doc(badTestObjectJson))
+      val eventualResponse =
+        for {
+          indexName <- eventuallyIndexName
+          response <- elasticClient.execute(indexInto(indexName / "work").doc(badTestObjectJson))
+        } yield response
 
-    whenReady(eventualIndexResponse.failed) { exception =>
-      exception shouldBe a[ResponseException]
+      whenReady(eventualResponse.failed) { exception =>
+        exception shouldBe a[ResponseException]
+      }
     }
   }
 
