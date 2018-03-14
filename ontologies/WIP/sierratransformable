@@ -177,7 +177,7 @@
    * 8. For each subfield, for subfields a-z ingnore 0-7, populate "qualifiers" with a "label", type "Concept" (subfield "y" type as "Period" and type z as "Place") and populate "qualiferType" with the subfield name kebab-case.
    * 
    *
-   * Note: need to removing trailing punctuation on subfields
+   * Note: need to removing trailing punctuation on subfields?
    *
    *
    *"genres": [
@@ -374,7 +374,7 @@
    /* wwwork:physicalDescription
    * 
    * 1. For bibliographic records where "300" subfield "b" are populated
-   * 2. Populate "physcialDetails"
+   * 2. Populate "physicalDescription"
    * 3. 
    *
    * Example:
