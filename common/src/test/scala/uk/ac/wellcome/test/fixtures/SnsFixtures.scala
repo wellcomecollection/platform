@@ -16,12 +16,13 @@ trait SnsFixtures {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  val snsLocalFlags: Map[String, String] =
-    Map(
-      "aws.sns.endpoint" -> localSNSEndpointUrl,
-      "aws.sns.accessKey" -> accessKey,
-      "aws.sns.secretKey" -> secretKey,
-      "aws.region" -> "localhost")
+  def snsLocalFlags(topicArn: String) = Map(
+    "aws.sns.endpoint" -> localSNSEndpointUrl,
+    "aws.sns.accessKey" -> accessKey,
+    "aws.sns.secretKey" -> secretKey,
+    "aws.region" -> "localhost",
+    "aws.sns.topic.arn" -> topicArn
+  )
 
   val snsClient: AmazonSNS = AmazonSNSClientBuilder
     .standard()
