@@ -69,8 +69,18 @@ object IdentifierSchemes extends Logging {
     override def toString: String = "calm-altrefno"
   }
 
+  // Represents the full form of a Sierra record number, including the record
+  // type prefix ("b" for bibs, "i" for items, etc.) and the check digit.
+  // Examples: b17828636, i17832846
   case object sierraSystemNumber extends IdentifierScheme {
     override def toString: String = "sierra-system-number"
+  }
+
+  // Represents the internal form of a Sierra record number, with no record
+  // type prefix or check digit.  7 digits.
+  // Examples: 1782863, 1783284
+  case object sierraIdentifier extends IdentifierScheme {
+    override def toString: String = "sierra-identifier"
   }
 
   case object marcCountries extends IdentifierScheme {
