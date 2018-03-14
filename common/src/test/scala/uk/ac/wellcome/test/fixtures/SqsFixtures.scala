@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
 import scala.util.Random
+import scala.collection.JavaConversions._
 import uk.ac.wellcome.models.aws.SQSMessage
 
 import scala.util.Try
