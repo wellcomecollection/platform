@@ -21,11 +21,7 @@ class ServerTest
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
-        flags = Map(
-          "aws.region" -> "eu-west-1",
-          "aws.sns.topic.arn" -> topicArn,
-          "aws.sqs.queue.url" -> queueUrl
-        ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ s3LocalFlags(bucketName)
+        flags = snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName)
       )
 
     server.start()
