@@ -50,7 +50,8 @@ class ReindexerFeatureTest
         new Server(),
         flags = Map(
           "aws.dynamo.tableName" -> tableName
-        ) ++ snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags(queueUrl)
+        ) ++ snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags(
+          queueUrl)
       )
 
     server.start()
@@ -69,7 +70,8 @@ class ReindexerFeatureTest
         new Server(),
         flags = Map(
           "aws.dynamo.tableName" -> "not_a_real_table"
-        ) ++ snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags(queueUrl)
+        ) ++ snsLocalFlags(topicArn) ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags ++ sqsLocalFlags(
+          queueUrl)
       )
 
     server.start()
