@@ -31,11 +31,8 @@ class IdMinterWorkerTest
       withLocalSnsTopic { topicArn =>
         withIdentifiersDatabase { dbConfig =>
           val flags = Map(
-            "aws.region" -> "localhost",
-            "aws.sqs.queue.url" -> queueUrl,
-            "aws.sqs.waitTime" -> "1",
             "aws.sns.topic.arn" -> topicArn
-          ) ++ sqsLocalFlags ++ snsLocalFlags ++ dbConfig.flags
+          ) ++ sqsLocalFlags(queueUrl) ++ snsLocalFlags ++ dbConfig.flags
 
           val identifiersDao = mock[IdentifiersDao]
 
