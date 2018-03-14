@@ -30,11 +30,11 @@ class VersionedHybridStoreTest
 
   import uk.ac.wellcome.dynamo._
 
-  override lazy val bucketName = "versioned-hybrid-store-test"
+  def withTestHybridStore(bucketName: String) = withVersionedHybridStore[ExampleRecord, Assertion](bucketName)_
 
   it("stores a versioned record if it has never been seen before") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, tableName) =>
+    withLocalS3Bucket { bucketName =>
+      withTestHybridStore(bucketName) { case (hybridStore, tableName) =>
         val record = ExampleRecord(
           id = "1111",
           content = "One ocelot in orange"
@@ -43,21 +43,21 @@ class VersionedHybridStoreTest
         val future = hybridStore.updateRecord(record.id)(record)(identity)()
 
         whenReady(future) { _ =>
-          getJsonFor(tableName, record) shouldBe toJson(record).get
+          getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
         }
+      }
     }
   }
 
   it("applies the given transformation to an existing record") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, tableName) =>
+    withLocalS3Bucket { bucketName =>
+      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) { case (hybridStore, tableName) =>
         val record = ExampleRecord(
           id = "1111",
           content = "One ocelot in orange"
         )
 
-        val expectedRecord = record
-          .copy(content = "new content")
+        val expectedRecord = record.copy(content = "new content")
 
         val t = (e: ExampleRecord) => e.copy(content = "new content")
 
@@ -67,14 +67,15 @@ class VersionedHybridStoreTest
             .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
         whenReady(future) { _ =>
-          getJsonFor(tableName, record) shouldBe toJson(expectedRecord).get
+          getJsonFor(bucketName, tableName, record) shouldBe toJson(expectedRecord).get
         }
+      }
     }
   }
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, tableName) =>
+    withLocalS3Bucket { bucketName =>
+      withTestHybridStore(bucketName) { case (hybridStore, tableName) =>
         val record = ExampleRecord(
           id = "2222",
           content = "Two teal turtles in Tenerife"
@@ -92,25 +93,27 @@ class VersionedHybridStoreTest
         }
 
         whenReady(updatedFuture) { _ =>
-          getJsonFor(tableName, updatedRecord) shouldBe toJson(updatedRecord).get
+          getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(updatedRecord).get
         }
+      }
     }
   }
 
   it("returns a future of None for a non-existent record") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, _) =>
+    withLocalS3Bucket { bucketName =>
+      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) { case (hybridStore, _) =>
         val future = hybridStore.getRecord(id = "does/notexist")
 
         whenReady(future) { result =>
           result shouldBe None
         }
+      }
     }
   }
 
   it("returns a future of Some[ExampleRecord] if the record exists") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, _) =>
+    withLocalS3Bucket { bucketName =>
+      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) { case (hybridStore, _) =>
         val record = ExampleRecord(
           id = "5555",
           content = "Five fishing flinging flint"
@@ -125,12 +128,13 @@ class VersionedHybridStoreTest
         whenReady(getFuture) { result =>
           result shouldBe Some(record)
         }
+      }
     }
   }
 
   it("does not allow creation of records with a different id than indicated") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, _) =>
+    withLocalS3Bucket { bucketName =>
+      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) { case (hybridStore, _) =>
         val record = ExampleRecord(
           id = "8934",
           content = "Five fishing flinging flint"
@@ -142,12 +146,13 @@ class VersionedHybridStoreTest
         whenReady(future.failed) { e: Throwable =>
           e shouldBe a[IllegalArgumentException]
         }
+      }
     }
   }
 
   it("does not allow transformation to a record with a different id") {
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, _) =>
+    withLocalS3Bucket { bucketName =>
+      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) { case (hybridStore, _) =>
         val record = ExampleRecord(
           id = "8934",
           content = "Five fishing flinging flint"
@@ -164,6 +169,7 @@ class VersionedHybridStoreTest
         whenReady(future.failed) { e: Throwable =>
           e shouldBe a[IllegalArgumentException]
         }
+      }
     }
   }
 
@@ -190,8 +196,8 @@ class VersionedHybridStoreTest
       number = 6
     )
 
-    withVersionedHybridStore[ExampleRecord, Assertion] {
-      case (hybridStore, tableName) =>
+    withLocalS3Bucket { bucketName =>
+      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) { case (hybridStore, tableName) =>
         val future =
           hybridStore.updateRecord(record.id)(record)(identity)(data)
 
@@ -207,6 +213,7 @@ class VersionedHybridStoreTest
           extraData.data shouldBe "a tragic triangle of triffids"
           extraData.number shouldBe 6
         }
+      }
     }
   }
 }

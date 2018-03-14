@@ -12,12 +12,14 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSReaderTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with Eventually
+    with ExtendedPatience
     with SqsFixtures {
 
   def withSqsReader[R](queueUrl: String, maxMessages: Int)(
