@@ -14,7 +14,6 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.collection.JavaConversions._
 import scala.util.Random
 
-
 trait S3 {
 
   private val localS3EndpointUrl = "http://localhost:33333"

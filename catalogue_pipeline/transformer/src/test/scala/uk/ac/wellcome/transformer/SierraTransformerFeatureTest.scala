@@ -34,7 +34,6 @@ class SierraTransformerFeatureTest
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
-
           val sierraHybridRecordMessage =
             hybridRecordSqsMessage(
               message = createValidSierraTransformableJson(
@@ -61,7 +60,8 @@ class SierraTransformerFeatureTest
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
-          withServer(flags) { _ => eventually {
+          withServer(flags) { _ =>
+            eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
               snsMessages should have size 1
 

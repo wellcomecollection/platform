@@ -3,7 +3,11 @@ package uk.ac.wellcome.transformer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.CalmTransformable
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.test.fixtures.{MessageInfo, S3, SnsFixtures, SqsFixtures}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
@@ -11,7 +15,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class CalmTransformerFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with SqsFixtures
     with SnsFixtures
@@ -20,8 +24,6 @@ class CalmTransformerFeatureTest
     with Eventually
     with ExtendedPatience
     with TransformableMessageUtils {
-
-
 
   it("transforms miro records and publishes the result to the given topic") {
     val calmTransformable =
@@ -35,7 +37,6 @@ class CalmTransformerFeatureTest
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
-          
           val calmHybridRecordMessage = hybridRecordSqsMessage(
             message = JsonUtil.toJson(calmTransformable).get,
             sourceName = "calm",
@@ -50,11 +51,9 @@ class CalmTransformerFeatureTest
             "aws.s3.bucketName" -> bucketName,
             "aws.sqs.waitTime" -> "1",
             "aws.metrics.namespace" -> "sierra-transformer"
-
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
           withServer(flags) { _ =>
-
             sqsClient.sendMessage(
               queueUrl,
               JsonUtil.toJson(calmHybridRecordMessage).get

@@ -13,7 +13,7 @@ import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 
 class MiroTransformerFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with SqsFixtures
     with SnsFixtures
@@ -34,7 +34,6 @@ class MiroTransformerFeatureTest
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
-
           sendMiroImageToSQS(
             miroID = miroID,
             data = shouldNotTransformMessage(title),
@@ -57,11 +56,15 @@ class MiroTransformerFeatureTest
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
-          withServer(flags) { _ => eventually {
+          withServer(flags) { _ =>
+            eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
               snsMessages should have size (2)
 
-              assertSNSMessageContains(snsMessages.head, secondMiroID, secondTitle)
+              assertSNSMessageContains(
+                snsMessages.head,
+                secondMiroID,
+                secondTitle)
             }
           }
         }
@@ -89,11 +92,11 @@ class MiroTransformerFeatureTest
         }"""
 
   private def sendMiroImageToSQS(
-                                  miroID: String,
-                                  data: String,
-                                  bucketName: String,
-                                  queueUrl: String
-                                ) = {
+    miroID: String,
+    data: String,
+    bucketName: String,
+    queueUrl: String
+  ) = {
     val miroTransformable =
       MiroTransformable(
         sourceId = miroID,
