@@ -1,5 +1,5 @@
 module "sierra_adapter_cluster" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v5.2.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v6.4.1"
   name   = "sierra-adapter"
 
   vpc_subnets = ["${module.vpc_sierra_adapter.subnets}"]
@@ -14,4 +14,6 @@ module "sierra_adapter_cluster" {
   ec2_instance_terminating_for_too_long_alarm_arn = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
 
   alb_log_bucket_id = "${local.alb_log_bucket_id}"
+
+  asg_spot_max = "10"
 }

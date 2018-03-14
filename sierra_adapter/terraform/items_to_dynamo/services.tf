@@ -3,10 +3,13 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_to_dynamo_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/service?ref=v5.3.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
   name   = "sierra_items_to_dynamo"
 
-  app_uri = "${module.ecr_repository_sierra_to_dynamo.repository_url}:${var.release_id}"
+  source_queue_name  = "${module.demultiplexer_queue.name}"
+  source_queue_arn   = "${module.demultiplexer_queue.arn}"
+  ecr_repository_url = "${module.ecr_repository_sierra_to_dynamo.repository_url}"
+  release_id         = "${var.release_id}"
 
   env_vars = {
     demultiplexer_queue_url = "${module.demultiplexer_queue.id}"
@@ -17,21 +20,19 @@ module "sierra_to_dynamo_service" {
 
   env_vars_length = 3
 
-  path_pattern = "/sierra_items_to_dynamo/*"
-
   cpu    = 256
   memory = 1024
 
-  deployment_minimum_healthy_percent = 0
-  deployment_maximum_percent         = 200
+  cluster_name = "${var.cluster_name}"
+  vpc_id       = "${var.vpc_id}"
 
-  cluster_id                   = "${data.aws_ecs_cluster.cluster.arn}"
-  vpc_id                       = "${var.vpc_id}"
-  loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
-  listener_https_arn           = "${var.alb_listener_https_arn}"
-  listener_http_arn            = "${var.alb_listener_http_arn}"
-  client_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  server_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
+  alb_listener_https_arn     = "${var.alb_listener_https_arn}"
+  alb_listener_http_arn      = "${var.alb_listener_http_arn}"
+  alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
 
-  https_domain = "services.wellcomecollection.org"
+  enable_alb_alarm = false
+
+  max_capacity = 50
 }
