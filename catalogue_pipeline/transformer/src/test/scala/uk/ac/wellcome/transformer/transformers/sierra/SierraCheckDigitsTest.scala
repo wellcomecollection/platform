@@ -6,15 +6,22 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 class SierraCheckDigitsTest extends FunSpec with Matchers {
 
   val testCases = Table(
+    // Example from the Sierra docs
+    ("1024364", "bibs", "b10243641"),
+
+    // Examples taken from catalogue records
     ("1828888", "bibs", "b18288881"),
-    ("1828888", "items", "i18288881")
+    ("1828888", "items", "i18288881"),
+
+    // Example from a catalogue record with an "x" check digit
+    ("1840974", "items", "i1840974x")
   )
 
   it("correctly handles all of our test cases") {
     forAll (testCases) { (sierraId: String, recordType: String, expectedId: String) =>
       val sierraRecordType = recordType match {
         case "bibs" => SierraRecordTypes.bibs
-        case "items" => SierraRecordTypes.bibs
+        case "items" => SierraRecordTypes.items
       }
 
       transformer.addCheckDigit(sierraId, recordType = sierraRecordType) shouldBe expectedId
