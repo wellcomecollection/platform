@@ -44,6 +44,8 @@ trait SqsFixtures {
     val queueName: String = Random.alphanumeric take 10 mkString
     val url = sqsClient.createQueue(queueName).getQueueUrl
 
+    sqsClient.setQueueAttributes(url, Map("VisibilityTimeout" -> "1"))
+
     try {
       testWith(url)
     } finally {
