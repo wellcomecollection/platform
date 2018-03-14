@@ -27,9 +27,32 @@ class SierraTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
+    val id = "b001"
+    val title = "A pot of possums"
+    val lastModifiedDate = Instant.now()
+
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
+
+          val sierraHybridRecordMessage =
+            hybridRecordSqsMessage(
+              message = createValidSierraTransformableJson(
+                id = id,
+                title = title,
+                lastModifiedDate = lastModifiedDate
+              ),
+              sourceName = "sierra",
+              version = 1,
+              s3Client = s3Client,
+              bucketName = bucketName
+            )
+
+          sqsClient.sendMessage(
+            queueUrl,
+            JsonUtil.toJson(sierraHybridRecordMessage).get
+          )
+
           val flags: Map[String, String] = Map(
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sns.topic.arn" -> topicArn,
@@ -38,31 +61,7 @@ class SierraTransformerFeatureTest
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
-          withServer(flags) { _ =>
-
-            val id = "b001"
-            val title = "A pot of possums"
-            val lastModifiedDate = Instant.now()
-
-            val sierraHybridRecordMessage =
-              hybridRecordSqsMessage(
-                message = createValidSierraTransformableJson(
-                  id = id,
-                  title = title,
-                  lastModifiedDate = lastModifiedDate
-                ),
-                sourceName = "sierra",
-                version = 1,
-                s3Client = s3Client,
-                bucketName = bucketName
-              )
-
-            sqsClient.sendMessage(
-              queueUrl,
-              JsonUtil.toJson(sierraHybridRecordMessage).get
-            )
-
-            eventually {
+          withServer(flags) { _ => eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
               snsMessages should have size 1
 
@@ -79,7 +78,6 @@ class SierraTransformerFeatureTest
               actualWork.sourceIdentifier shouldBe sourceIdentifier
               actualWork.title shouldBe Some(title)
               actualWork.identifiers shouldBe List(sourceIdentifier)
-
             }
           }
         }

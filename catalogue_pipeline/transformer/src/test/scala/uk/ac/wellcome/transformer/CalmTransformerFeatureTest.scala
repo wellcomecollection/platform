@@ -21,10 +21,28 @@ class CalmTransformerFeatureTest
     with ExtendedPatience
     with TransformableMessageUtils {
 
+
+
   it("transforms miro records and publishes the result to the given topic") {
+    val calmTransformable =
+      CalmTransformable(
+        sourceId = "RecordID1",
+        RecordType = "Collection",
+        AltRefNo = "AltRefNo1",
+        RefNo = "RefNo1",
+        data = """{"AccessStatus": ["public"]}""")
+
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
+          
+          val calmHybridRecordMessage = hybridRecordSqsMessage(
+            message = JsonUtil.toJson(calmTransformable).get,
+            sourceName = "calm",
+            version = 1,
+            s3Client = s3Client,
+            bucketName = bucketName
+          )
 
           val flags: Map[String, String] = Map(
             "aws.sqs.queue.url" -> queueUrl,
@@ -36,22 +54,6 @@ class CalmTransformerFeatureTest
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
           withServer(flags) { _ =>
-
-            val calmTransformable =
-              CalmTransformable(
-                sourceId = "RecordID1",
-                RecordType = "Collection",
-                AltRefNo = "AltRefNo1",
-                RefNo = "RefNo1",
-                data = """{"AccessStatus": ["public"]}""")
-
-            val calmHybridRecordMessage = hybridRecordSqsMessage(
-              message = JsonUtil.toJson(calmTransformable).get,
-              sourceName = "calm",
-              version = 1,
-              s3Client = s3Client,
-              bucketName = bucketName
-            )
 
             sqsClient.sendMessage(
               queueUrl,

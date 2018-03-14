@@ -25,9 +25,30 @@ class MiroTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms miro records and publishes the result to the given topic") {
+    val miroID = "M0000001"
+    val title = "A guide for a giraffe"
+
+    val secondMiroID = "M0000002"
+    val secondTitle = "A song about a snake"
+
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
         withLocalS3Bucket { bucketName =>
+
+          sendMiroImageToSQS(
+            miroID = miroID,
+            data = shouldNotTransformMessage(title),
+            bucketName = bucketName,
+            queueUrl = queueUrl
+          )
+
+          sendMiroImageToSQS(
+            miroID = secondMiroID,
+            data = shouldTransformMessage(secondTitle),
+            bucketName = bucketName,
+            queueUrl = queueUrl
+          )
+
           val flags: Map[String, String] = Map(
             "aws.sqs.queue.url" -> queueUrl,
             "aws.sns.topic.arn" -> topicArn,
@@ -36,29 +57,7 @@ class MiroTransformerFeatureTest
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags ++ snsLocalFlags ++ sqsLocalFlags
 
-          withServer(flags) { _ =>
-
-            val miroID = "M0000001"
-            val title = "A guide for a giraffe"
-
-            val secondMiroID = "M0000002"
-            val secondTitle = "A song about a snake"
-
-            sendMiroImageToSQS(
-              miroID = miroID,
-              data = shouldNotTransformMessage(title),
-              bucketName = bucketName,
-              queueUrl = queueUrl
-            )
-
-            sendMiroImageToSQS(
-              miroID = secondMiroID,
-              data = shouldTransformMessage(secondTitle),
-              bucketName = bucketName,
-              queueUrl = queueUrl
-            )
-
-            eventually {
+          withServer(flags) { _ => eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
               snsMessages should have size (2)
 
