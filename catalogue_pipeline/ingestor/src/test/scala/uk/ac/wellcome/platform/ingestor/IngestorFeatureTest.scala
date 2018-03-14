@@ -60,11 +60,7 @@ class IngestorFeatureTest
           .get
       )
 
-      val flags = Map(
-        "aws.region" -> "localhost",
-        "aws.sqs.queue.url" -> queueUrl,
-        "aws.sqs.waitTime" -> "1"
-      ) ++ sqsLocalFlags ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queueUrl) ++ esLocalFlags(indexName, itemType)
 
       withLocalElasticsearchIndex(indexName, itemType) { _ =>
         withServer(flags) { _ =>
@@ -107,11 +103,7 @@ class IngestorFeatureTest
         invalidMessage
       )
 
-      val flags = Map(
-        "aws.region" -> "localhost",
-        "aws.sqs.queue.url" -> queueUrl,
-        "aws.sqs.waitTime" -> "1"
-      ) ++ sqsLocalFlags ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queueUrl) ++ esLocalFlags(indexName, itemType)
 
       withServer(flags) { _ =>
         // After a message is read, it stays invisible for 1 second and then it gets sent again.

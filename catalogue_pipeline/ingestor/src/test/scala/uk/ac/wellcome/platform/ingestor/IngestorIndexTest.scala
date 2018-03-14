@@ -28,11 +28,7 @@ class IngestorIndexTest
     }
 
     withLocalSqsQueue { queueUrl =>
-      val flags = Map(
-        "aws.region" -> "localhost",
-        "aws.sqs.queue.url" -> queueUrl,
-        "aws.sqs.waitTime" -> "1"
-      ) ++ sqsLocalFlags ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queueUrl) ++ esLocalFlags(indexName, itemType)
 
       withServer(flags) { _ =>
         eventually {

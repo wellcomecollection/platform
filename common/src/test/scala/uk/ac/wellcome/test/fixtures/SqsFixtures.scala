@@ -23,11 +23,13 @@ trait SqsFixtures {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  val sqsLocalFlags = Map(
+  def sqsLocalFlags(queueUrl: String) = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.sqs.accessKey" -> accessKey,
     "aws.sqs.secretKey" -> secretKey,
-    "aws.region" -> "localhost"
+    "aws.region" -> "localhost",
+    "aws.sqs.queue.url" -> queueUrl,
+    "aws.sqs.waitTime" -> "1"
   )
 
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder
