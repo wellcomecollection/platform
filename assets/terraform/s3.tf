@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "working_storage" {
   }
 
   lifecycle_rule {
-    id     = "transition_all_to_standard_ia"
+    id = "transition_all_to_standard_ia"
 
     transition {
       days          = 30
