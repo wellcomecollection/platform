@@ -21,13 +21,13 @@ trait S3 {
   private val accessKey = "accessKey1"
   private val secretKey = "verySecretKey1"
 
-  val s3LocalFlags: Map[String, String] =
-    Map(
-      "aws.s3.endpoint" -> localS3EndpointUrl,
-      "aws.s3.accessKey" -> accessKey,
-      "aws.s3.secretKey" -> secretKey,
-      "aws.region" -> "localhost"
-    )
+  def s3LocalFlags(bucketName: String) = Map(
+    "aws.s3.endpoint" -> localS3EndpointUrl,
+    "aws.s3.accessKey" -> accessKey,
+    "aws.s3.secretKey" -> secretKey,
+    "aws.region" -> "localhost",
+    "aws.s3.bucketName" -> bucketName
+  )
 
   val credentials = new AWSStaticCredentialsProvider(
     new BasicAWSCredentials(accessKey, secretKey))
