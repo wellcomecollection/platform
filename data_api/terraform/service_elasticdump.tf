@@ -4,12 +4,12 @@ module "elasticdump" {
 
   source_queue_name  = "${module.elasticdump_queue.name}"
   source_queue_arn   = "${module.elasticdump_queue.arn}"
-  ecr_repository_url = "${module.ecr_repository.repository_url}"
+  ecr_repository_url = "${module.ecr_repository_elasticdump.repository_url}"
   release_id         = "${var.release_ids["elasticdump"]}"
 
   env_vars = {
     sqs_queue_url = "${module.elasticdump_queue.id}"
-    upload_bucket = "${var.upload_bucket}"
+    upload_bucket = "${aws_s3_bucket.private_data.id}"
     es_username   = "${var.es_index}"
     es_password   = "${var.es_port}"
     es_name       = "${var.es_region}"
@@ -23,14 +23,14 @@ module "elasticdump" {
 
   env_vars_length = 8
 
-  cluster_name = "${var.cluster_name}"
-  vpc_id       = "${var.vpc_id}"
+  cluster_name = "${module.data_api_cluster.cluster_name}"
+  vpc_id       = "${module.vpc_data_api.vpc_id}"
 
-  alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
-  alb_listener_https_arn     = "${var.alb_listener_https_arn}"
-  alb_listener_http_arn      = "${var.alb_listener_http_arn}"
-  alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
+  alb_cloudwatch_id          = "${module.data_api_cluster.alb_cloudwatch_id}"
+  alb_listener_https_arn     = "${module.data_api_cluster.alb_listener_https_arn}"
+  alb_listener_http_arn      = "${module.data_api_cluster.alb_listener_http_arn}"
+  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
+  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 
   enable_alb_alarm = false
 
