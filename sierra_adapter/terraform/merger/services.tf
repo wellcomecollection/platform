@@ -38,5 +38,5 @@ module "sierra_merger_service" {
 
   enable_alb_alarm = false
 
-  max_capacity = 15
+  max_capacity = 50
 }

@@ -34,5 +34,5 @@ module "sierra_to_dynamo_service" {
 
   enable_alb_alarm = false
 
-  max_capacity = 15
+  max_capacity = 50
 }
