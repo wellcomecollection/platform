@@ -10,8 +10,8 @@ module "sierra_merger_service" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
   name   = "sierra_${local.resource_type_singular}_merger"
 
-  source_queue_name = "${module.updates_queue.name}"
-  source_queue_arn  = "${module.updates_queue.arn}"
+  source_queue_name  = "${module.updates_queue.name}"
+  source_queue_arn   = "${module.updates_queue.arn}"
   ecr_repository_url = "${module.ecr_repository_sierra_merger.repository_url}"
   release_id         = "${var.release_id}"
 
@@ -27,8 +27,8 @@ module "sierra_merger_service" {
 
   env_vars_length = 4
 
-  cluster_name               = "${var.cluster_name}"
-  vpc_id                     = "${var.vpc_id}"
+  cluster_name = "${var.cluster_name}"
+  vpc_id       = "${var.vpc_id}"
 
   alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
   alb_listener_https_arn     = "${var.alb_listener_https_arn}"
