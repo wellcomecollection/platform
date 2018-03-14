@@ -71,10 +71,6 @@ class IdMinterFeatureTest
           withServer(flags) { _ =>
             eventuallyTableExists(dbConfig)
 
-            sqsClient.setQueueAttributes(
-              queueUrl,
-              Map("VisibilityTimeout" -> "1"))
-
             val miroID = "M0001234"
             val title = "A limerick about a lion"
 
@@ -126,10 +122,6 @@ class IdMinterFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
 
           withServer(flags) { _ =>
-            sqsClient.setQueueAttributes(
-              queueUrl,
-              Map("VisibilityTimeout" -> "1"))
-
             sqsClient.sendMessage(queueUrl, "not a json string")
 
             val miroId = "1234"
