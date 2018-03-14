@@ -1,6 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.ac.wellcome.models.{
   Agent,
   IdentifierSchemes,
@@ -23,41 +24,17 @@ class MiroTransformableTransformerTest
       SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
   }
 
-  describe(
-    "The INNOPAC ID should be passed through as the Sierra system number") {
-    it("plain numeric ID") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "12345678",
-        expectedSierraNumber = "b1234567"
-      )
-    }
+  it("passes through the INNOPAC ID as the Sierra system number") {
+    forAll(Table("", ".", "b", "B", ".b", ".B")) { prefix =>
+      forAll(Table("8", "x")) { checkDigit =>
+        val innopacId = s"${prefix}1234567${checkDigit}"
+        val expectedSierraNumber = s"b1234567${checkDigit}"
 
-    it("with an x for a check digit") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "1234567x",
-        expectedSierraNumber = "b1234567"
-      )
-    }
-
-    it("with a leading b on the b-number") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "b12345678",
-        expectedSierraNumber = "b1234567"
-      )
-    }
-
-    it("with a leading B on the b-number") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = "b12345678",
-        expectedSierraNumber = "b1234567"
-      )
-    }
-
-    it("with a leading .b on the b-number") {
-      transformRecordAndCheckSierraSystemNumber(
-        innopacId = ".b12345678",
-        expectedSierraNumber = "b1234567"
-      )
+        transformRecordAndCheckSierraSystemNumber(
+          innopacId = innopacId,
+          expectedSierraNumber = "b12345678"
+        )
+      }
     }
   }
 
