@@ -1,12 +1,18 @@
 package uk.ac.wellcome.platform.snapshot_convertor
 
-import com.twitter.finagle.http.Status.Ok
-import com.twitter.finatra.http.EmbeddedHttpServer
+import com.amazonaws.services.s3.model.{ObjectMetadata, S3ObjectInputStream}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
+import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.io.Source
+
 
 class SnapshotConvertorFeatureTest
   extends FunSpec
@@ -14,39 +20,71 @@ class SnapshotConvertorFeatureTest
     with SqsFixtures
     with SnsFixtures
     with S3
+    with fixtures.Server
     with ScalaFutures
-    with Matchers {
+    with Matchers
+    with Eventually
+    with ExtendedPatience {
 
-  def withServer[R](queueUrl: String, topicArn: String, bucketName: String)(
-    testWith: TestWith[EmbeddedHttpServer, R]) = {
-    val server: EmbeddedHttpServer =
-      new EmbeddedHttpServer(
-        new Server(),
-        flags = Map(
-          "aws.s3.bucketName" -> bucketName,
-          "aws.region" -> "eu-west-1",
-          "aws.sns.topic.arn" -> topicArn,
-          "aws.sqs.queue.url" -> queueUrl
-        ) ++ snsLocalFlags ++ cloudWatchLocalEndpointFlag ++ sqsLocalFlags ++ s3LocalFlags
-      )
-
-    server.start()
-
-    try {
-      testWith(server)
-    } finally {
-      server.close()
-    }
-  }
-
-  it("does not fail") {
+  it("converts a gzipped elasticdump from S3 into the correct format in the target bucket") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
-          withServer(queueUrl, topicArn, bucketName) { server =>
 
-           true shouldBe false
+          val flags = Map(
+            "aws.region" -> "eu-west-1"
+          ) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ cloudWatchLocalEndpointFlag
 
+          val key = "elastic_dump_example.txt.gz"
+          val input = getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
+          val metadata = new ObjectMetadata()
+
+          s3Client.putObject(bucketName, key, input, metadata)
+
+          withServer(flags) { _ =>
+
+            val objectKey = "location/of/resource"
+            val expectedLocation = "location/of/target"
+
+            val conversionJob = ConversionJob(
+              bucketName = bucketName,
+              objectKey = key
+            )
+
+            val completedConversionJob = CompletedConversionJob(
+              conversionJob = conversionJob,
+              targetLocation = "location/of/target"
+            )
+
+
+            val sqsMessage = SQSMessage(
+              None,
+              toJson(conversionJob).get,
+              "topic",
+              "message",
+              "now"
+            )
+
+            sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+
+            eventually {
+
+              val messages = listMessagesReceivedFromSNS(topicArn)
+
+              messages should have size 1
+
+              JsonUtil
+                .fromJson[CompletedConversionJob](
+                messages.head.message
+              ).get shouldBe completedConversionJob
+
+              val s3Object = s3Client.getObject(bucketName, expectedLocation)
+              val stream: S3ObjectInputStream = s3Object.getObjectContent
+
+              val outputLines = Source.fromInputStream(stream).getLines.mkString
+
+              true shouldBe false
+            }
           }
         }
       }
