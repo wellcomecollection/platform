@@ -1,8 +1,25 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class SierraCheckDigitsTest extends FunSpec with Matchers {
+
+  val testCases = Table(
+    ("1828888", "bibs", "b18288881"),
+    ("1828888", "items", "i18288881")
+  )
+
+  it("correctly handles all of our test cases") {
+    forAll (testCases) { (sierraId: String, recordType: String, expectedId: String) =>
+      val sierraRecordType = recordType match {
+        case "bibs" => SierraRecordTypes.bibs
+        case "items" => SierraRecordTypes.bibs
+      }
+
+      transformer.addCheckDigit(sierraId, recordType = sierraRecordType) shouldBe expectedId
+    }
+  }
 
   it("throws an error if passed a Sierra ID which is non-numeric") {
     val caught = intercept[RuntimeException] {
