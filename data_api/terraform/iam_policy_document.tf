@@ -35,3 +35,15 @@ data "aws_iam_policy_document" "public_data_bucket_full_access_policy" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "allow_s3_elasticdump_write" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.private_data.arn}/elasticdump/*",
+    ]
+  }
+}
