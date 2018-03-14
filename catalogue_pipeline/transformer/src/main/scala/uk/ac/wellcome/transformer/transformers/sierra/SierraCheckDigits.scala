@@ -31,7 +31,7 @@ trait SierraCheckDigits {
     // Then pick the record type prefix.
     val prefix = recordType match {
       case SierraRecordTypes.bibs => "b"
-      case SierraRecordTypes.items => "s"
+      case SierraRecordTypes.items => "i"
       case _ => throw new RuntimeException(
         s"Received unrecognised record type: $recordType"
       )
