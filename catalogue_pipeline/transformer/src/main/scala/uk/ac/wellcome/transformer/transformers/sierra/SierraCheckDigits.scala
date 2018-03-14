@@ -22,7 +22,7 @@ trait SierraCheckDigits {
     // else is an error.
     val regexMatch = """^[0-9]{7}$""".r.unapplySeq(sierraId)
     val checkDigit = regexMatch match {
-      case Some(s) => getCheckDigit(s)
+      case Some(s) => getCheckDigit(s.head)
       case _ => throw new RuntimeException(
         s"Expected 7-digit numeric ID, got $sierraId"
       )
