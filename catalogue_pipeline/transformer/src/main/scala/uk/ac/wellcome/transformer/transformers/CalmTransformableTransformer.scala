@@ -18,7 +18,7 @@ class CalmTransformableTransformer
         _ =>
           Some(
             UnidentifiedWork(
-              title = Some("placeholder title for a Calm record"),
+              title = Some("placeholder title"),
               sourceIdentifier = SourceIdentifier(
                 IdentifierSchemes.calmPlaceholder,
                 "value"

@@ -7,7 +7,7 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -21,8 +21,9 @@ import uk.ac.wellcome.models.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.test.utils.SNSLocal
-import uk.ac.wellcome.transformer.utils.TransformableSQSMessageUtils
+import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures, TestWith}
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -32,23 +33,25 @@ import scala.concurrent.duration._
 
 class SQSMessageReceiverTest
     extends FunSpec
-    with MockitoSugar
-    with SNSLocal
-    with ScalaFutures
     with Matchers
-    with IntegrationPatience
-    with TransformableSQSMessageUtils {
-
-  override lazy val bucketName: String = "test-sqs-message-receiver-bucket"
+    with SqsFixtures
+    with SnsFixtures
+    with S3
+    with Eventually
+    with ExtendedPatience
+    with MockitoSugar
+    with ScalaFutures
+    with TransformableMessageUtils {
 
   val sourceIdentifier =
     SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
 
   val work = UnidentifiedWork(
-    title = Some("placeholder title for a Calm record"),
+    title = Some("placeholder title"),
     sourceIdentifier = sourceIdentifier,
     version = 1,
-    identifiers = List(sourceIdentifier))
+    identifiers = List(sourceIdentifier)
+  )
 
   val metricsSender: MetricsSender = new MetricsSender(
     namespace = "record-receiver-tests",
@@ -56,111 +59,182 @@ class SQSMessageReceiverTest
     mock[AmazonCloudWatch],
     ActorSystem()
   )
-  val topicArn = createTopicAndReturnArn("test-sqs-message-retriever")
-  val snsWriter = new SNSWriter(snsClient, SNSConfig(topicArn))
-  val recordReceiver =
-    new SQSMessageReceiver(snsWriter, s3Client, bucketName, metricsSender)
 
-  it("should receive a message and send it to SNS client") {
-    val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
-      createValidCalmTramsformableJson(
-        RecordID = "abcdef",
-        RecordType = "collection",
-        AltRefNo = "AB/CD/12",
-        RefNo = "AB/CD/12",
-        data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
-      ),
-      "calm"
-    )
+  def withSQSMessageReceiver[R](
+    topicArn: String,
+    bucketName: String,
+    maybeSnsWriter: Option[SNSWriter] = None
+  )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
-    val future = recordReceiver.receiveMessage(calmSqsMessage)
+    val snsWriter =
+      maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topicArn)))
+    val recordReceiver =
+      new SQSMessageReceiver(snsWriter, s3Client, bucketName, metricsSender)
 
-    whenReady(future) { _ =>
-      val messages = listMessagesReceivedFromSNS()
-      messages should have size 1
-      messages.head.message shouldBe JsonUtil.toJson(work).get
-      messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+    testWith(recordReceiver)
+  }
+
+  it("receives a message and send it to SNS client") {
+
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
+            message = createValidCalmTramsformableJson(
+              RecordID = "abcdef",
+              RecordType = "collection",
+              AltRefNo = "AB/CD/12",
+              RefNo = "AB/CD/12",
+              data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
+            ),
+            sourceName = "calm",
+            version = 1,
+            s3Client = s3Client,
+            bucketName = bucketName
+          )
+
+          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(calmSqsMessage)
+
+            whenReady(future) { _ =>
+              val messages = listMessagesReceivedFromSNS(topicArn)
+              messages should have size 1
+              messages.head.message shouldBe JsonUtil.toJson(work).get
+              messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+            }
+          }
+        }
+      }
     }
   }
-  it("should receive a message and add the version to the transformed work") {
+  it("receives a message and add the version to the transformed work") {
     val id = "b001"
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
     val version = 5
 
-    val sierraMessage: SQSMessage = hybridRecordSqsMessage(
-      createValidSierraTransformableJson(id, title, lastModifiedDate),
-      "sierra",
-      version = version
-    )
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val sierraMessage: SQSMessage = hybridRecordSqsMessage(
+            message =
+              createValidSierraTransformableJson(id, title, lastModifiedDate),
+            sourceName = "sierra",
+            version = version,
+            s3Client = s3Client,
+            bucketName = bucketName
+          )
 
-    val future = recordReceiver.receiveMessage(sierraMessage)
+          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(sierraMessage)
 
-    whenReady(future) { _ =>
-      val messages = listMessagesReceivedFromSNS()
-      messages should have size 1
-      messages.head.message shouldBe JsonUtil
-        .toJson(UnidentifiedWork(
-          title = Some(title),
-          sourceIdentifier =
-            SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id),
-          version = version,
-          identifiers =
-            List(SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id))
-        ))
-        .get
-      messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+            whenReady(future) { _ =>
+              val messages = listMessagesReceivedFromSNS(topicArn)
+              messages should have size 1
+              messages.head.message shouldBe JsonUtil
+                .toJson(UnidentifiedWork(
+                  title = Some(title),
+                  sourceIdentifier =
+                    SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id),
+                  version = version,
+                  identifiers = List(
+                    SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id))
+                ))
+                .get
+              messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+            }
+          }
+        }
+      }
     }
   }
 
-  it("should return a failed future if it's unable to parse the SQS message") {
-    val invalidCalmSqsMessage: SQSMessage =
-      hybridRecordSqsMessage("not a json string", "calm")
+  it("returns a failed future if it's unable to parse the SQS message") {
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val invalidCalmSqsMessage: SQSMessage =
+            hybridRecordSqsMessage(
+              message = "not a json string",
+              sourceName = "calm",
+              version = 1,
+              s3Client = s3Client,
+              bucketName = bucketName
+            )
 
-    val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
+          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
-    whenReady(future.failed) { x =>
-      x shouldBe a[GracefulFailureException]
+            whenReady(future.failed) { x =>
+              x shouldBe a[GracefulFailureException]
+            }
+          }
+        }
+      }
     }
   }
 
-  it("should send no message where Transformable work is None") {
-    val snsWriter = mockSNSWriter
+  it("sends no message where Transformable work is None") {
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val snsWriter = mockSNSWriter
 
-    val recordReceiver =
-      new SQSMessageReceiver(snsWriter, s3Client, bucketName, metricsSender)
+          withSQSMessageReceiver(topicArn, bucketName, Some(snsWriter)) {
+            recordReceiver =>
+              val future = recordReceiver.receiveMessage(
+                createValidEmptySierraBibSQSMessage(
+                  id = "000",
+                  s3Client = s3Client,
+                  bucketName = bucketName
+                )
+              )
 
-    val future = recordReceiver.receiveMessage(
-      createValidEmptySierraBibSQSMessage("000")
-    )
-
-    whenReady(future) { x =>
-      verify(snsWriter, Mockito.never())
-        .writeMessage(anyString, any[String])
+              whenReady(future) { x =>
+                verify(snsWriter, Mockito.never())
+                  .writeMessage(anyString, any[String])
+              }
+          }
+        }
+      }
     }
   }
 
   it(
-    "should return a failed future if it's unable to transform the transformable object") {
-    val failingTransformCalmSqsMessage: SQSMessage =
-      hybridRecordSqsMessage(
-        createValidCalmTramsformableJson(
-          RecordID = "abcdef",
-          RecordType = "collection",
-          AltRefNo = "AB/CD/12",
-          RefNo = "AB/CD/12",
-          data = """not a json string"""
-        ),
-        "calm")
+    "returns a failed future if it's unable to transform the transformable object") {
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val failingTransformCalmSqsMessage: SQSMessage =
+            hybridRecordSqsMessage(
+              message = createValidCalmTramsformableJson(
+                RecordID = "abcdef",
+                RecordType = "collection",
+                AltRefNo = "AB/CD/12",
+                RefNo = "AB/CD/12",
+                data = """not a json string"""
+              ),
+              sourceName = "calm",
+              version = 1,
+              s3Client = s3Client,
+              bucketName = bucketName
+            )
 
-    val future = recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
+          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+            val future =
+              recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
-    whenReady(future.failed) { x =>
-      x shouldBe a[GracefulFailureException]
+            whenReady(future.failed) { x =>
+              x shouldBe a[GracefulFailureException]
+            }
+          }
+        }
+      }
     }
   }
 
   it("should return a failed future if it's unable to publish the work") {
+
     val id = "b123"
     val sierraTransformable: Transformable =
       SierraTransformable(
@@ -172,19 +246,30 @@ class SQSMessageReceiverTest
               data = s"""{"id": "$id"}""",
               modifiedDate = Instant.now))
           .get)
-    val message =
-      hybridRecordSqsMessage(
-        JsonUtil.toJson(sierraTransformable).get,
-        "sierra")
 
-    val mockSNS = mockFailPublishMessage
-    val recordReceiver =
-      new SQSMessageReceiver(mockSNS, s3Client, bucketName, metricsSender)
+    withLocalSnsTopic { topicArn =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalS3Bucket { bucketName =>
+          val message = hybridRecordSqsMessage(
+            message = JsonUtil.toJson(sierraTransformable).get,
+            sourceName = "sierra",
+            version = 1,
+            s3Client = s3Client,
+            bucketName = bucketName
+          )
 
-    val future = recordReceiver.receiveMessage(message)
+          val snsWriter = mockFailPublishMessage
 
-    whenReady(future.failed) { x =>
-      x.getMessage should be("Failed publishing message")
+          withSQSMessageReceiver(topicArn, bucketName, Some(snsWriter)) {
+            recordReceiver =>
+              val future = recordReceiver.receiveMessage(message)
+
+              whenReady(future.failed) { x =>
+                x.getMessage should be("Failed publishing message")
+              }
+          }
+        }
+      }
     }
   }
 
