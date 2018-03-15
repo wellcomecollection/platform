@@ -13,30 +13,15 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
 
   it("ignores records with the wrong MARC field") {
     assertFindsCorrectLettering(
-      lettering = Some("An ambiance of accordions"),
       varFields = List(
         VarField(
           fieldTag = "p",
-          marcTag = "260",
+          marcTag = "300",
           indicator1 = " ",
-          indicator2 = " ",
-          subfields = List()
-        )
-      ),
-      expectedLettering = None
-    )
-  }
-
-  it("ignores records with the right MARC field but wrong indicator 1") {
-    assertFindsCorrectLettering(
-      lettering = Some("Bellowing bassoons in the basement"),
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = "246",
-          indicator1 = "2",
           indicator2 = "6",
-          subfields = List()
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Alas, ailments are annoying")
+          )
         )
       ),
       expectedLettering = None
@@ -45,57 +30,85 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
 
   it("ignores records with the right MARC field but wrong indicator 2") {
     assertFindsCorrectLettering(
-      lettering = Some("Cantering clarinets for a concert"),
       varFields = List(
         VarField(
           fieldTag = "p",
           marcTag = "246",
-          indicator1 = "1",
+          indicator1 = " ",
           indicator2 = "7",
-          subfields = List()
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Alas, ailments are annoying")
+          )
         )
       ),
       expectedLettering = None
     )
   }
 
-  it("picks up lettering if the correct MARC field is present") {
+  it("ignores records with the MARC field and 2nd indicator but wrong subfield") {
     assertFindsCorrectLettering(
-      lettering = Some("Dancing to a drum"),
       varFields = List(
         VarField(
           fieldTag = "p",
           marcTag = "246",
-          indicator1 = "1",
+          indicator1 = " ",
           indicator2 = "6",
-          subfields = List()
-        )
-      ),
-      expectedLettering = Some("Dancing to a drum")
-    )
-  }
-
-  it(
-    "passes through nothing if the lettering is missing, even if the MARC is correct") {
-    assertFindsCorrectLettering(
-      lettering = None,
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = "246",
-          indicator1 = "1",
-          indicator2 = "6",
-          subfields = List()
+          subfields = List(
+            MarcSubfield(tag = "b", content = "Belligerent beavers beneath a bridge")
+          )
         )
       ),
       expectedLettering = None
     )
   }
 
-  val transformer = new Object with SierraLettering
+  it("passes through a single instance of 246 .6 $$a, if present") {
+    assertFindsCorrectLettering(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "246",
+          indicator1 = " ",
+          indicator2 = "6",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Crowded crows carry a chocolate crepe")
+          )
+        )
+      ),
+      expectedLettering = Some("Crowded crows carry a chocolate crepe")
+    )
+  }
+
+
+  it("joins multiple instances of 246 .6 $$a, if present") {
+    assertFindsCorrectLettering(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "246",
+          indicator1 = " ",
+          indicator2 = "6",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Daring dalmations dance with danger")
+          )
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "246",
+          indicator1 = "1",
+          indicator2 = "6",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Enterprising eskimos exile every eagle")
+          )
+        )
+      ),
+      expectedLettering = Some("Daring dalmations dance with danger\n\nEnterprising eskimos exile every eagle")
+    )
+  }
+
+  val transformer = new SierraLettering { }
 
   private def assertFindsCorrectLettering(
-    lettering: Option[String],
     varFields: List[VarField],
     expectedLettering: Option[String]
   ) = {
@@ -103,7 +116,6 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
     val bibData = SierraBibData(
       id = "b1234567",
       title = Some("A libel of lions"),
-      lettering = lettering,
       varFields = varFields
     )
 
