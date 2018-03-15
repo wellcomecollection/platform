@@ -107,7 +107,6 @@ class S3ObjectStoreTest
 
   it("retrieves a versioned object from s3") {
     withLocalS3Bucket { bucketName =>
-
       val content = "Some content!"
       val prefix = "foo"
 

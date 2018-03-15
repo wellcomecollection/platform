@@ -9,9 +9,7 @@ import uk.ac.wellcome.storage.VersionedHybridStore
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 
-trait LocalVersionedHybridStore
-    extends LocalDynamoDb[HybridRecord]
-    with S3 {
+trait LocalVersionedHybridStore extends LocalDynamoDb[HybridRecord] with S3 {
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -26,8 +24,8 @@ trait LocalVersionedHybridStore
 
   def withVersionedHybridStore[T <: Id, R](bucketName: String)(
     testWith: TestWith[(VersionedHybridStore[T], String), R]) = {
-    withVersionedDao { case (dao, tableName) =>
-
+    withVersionedDao {
+      case (dao, tableName) =>
         val store = new VersionedHybridStore[T](
           sourcedObjectStore = new S3ObjectStore(
             s3Client = s3Client,

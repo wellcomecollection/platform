@@ -37,8 +37,11 @@ class WorksIndexTest
         eventually {
           for {
             indexName <- eventuallyIndexName
-             _ <- elasticClient.execute(indexInto(indexName / "work").doc(sampleWorkJson))
-             hits <- elasticClient.execute(search(s"$indexName/work").matchAllQuery()).map {_.hits.hits }
+            _ <- elasticClient.execute(
+              indexInto(indexName / "work").doc(sampleWorkJson))
+            hits <- elasticClient
+              .execute(search(s"$indexName/work").matchAllQuery())
+              .map { _.hits.hits }
           } yield {
             hits should have size 1
 
@@ -50,15 +53,15 @@ class WorksIndexTest
   }
 
   it("does not put an invalid work") {
-      withLocalElasticsearchIndex("works", "work") { eventuallyIndexName =>
-
+    withLocalElasticsearchIndex("works", "work") { eventuallyIndexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
       val eventualResponse =
         for {
           indexName <- eventuallyIndexName
-          response <- elasticClient.execute(indexInto(indexName / "work").doc(badTestObjectJson))
+          response <- elasticClient.execute(
+            indexInto(indexName / "work").doc(badTestObjectJson))
         } yield response
 
       whenReady(eventualResponse.failed) { exception =>

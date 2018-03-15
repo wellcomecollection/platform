@@ -51,7 +51,7 @@ trait ElasticsearchFixtures
   }
 
   def withLocalElasticsearchIndex[R](indexName: String, itemType: String)(
-   testWith: TestWith[Future[String], R]): R = {
+    testWith: TestWith[Future[String], R]): R = {
 
     val index = new WorksIndex(
       client = elasticClient,
