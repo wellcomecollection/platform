@@ -16,4 +16,20 @@ resource "aws_s3_bucket" "working_storage" {
 
     enabled = true
   }
+
+  # To protect against accidental deletions, we enable versioning on this
+  # bucket and expire non-current versions after 30 days.  This gives us an
+  # additional safety net against mistakes.
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    enabled = true
+
+    noncurrent_version_expiration {
+      days = 30
+    }
+  }
 }
