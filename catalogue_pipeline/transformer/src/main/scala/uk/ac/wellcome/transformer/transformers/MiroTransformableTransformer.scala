@@ -192,7 +192,7 @@ class MiroTransformableTransformer
         //                      be an X
         //    $                 end of the string
         //
-        val regexMatch = """^(?:\.?[bB])?([0-9]{7})[0-9xX]$""".r.unapplySeq(s)
+        val regexMatch = """^(?:\.?[bB])?([0-9]{7}[0-9xX])$""".r.unapplySeq(s)
         regexMatch match {
           case Some(s) =>
             s.map { id =>
