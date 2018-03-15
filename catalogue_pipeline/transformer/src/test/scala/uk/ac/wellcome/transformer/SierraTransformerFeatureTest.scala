@@ -27,7 +27,7 @@ class SierraTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
-    val id = "b001"
+    val id = "1001001"
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 

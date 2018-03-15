@@ -108,7 +108,7 @@ class SQSMessageReceiverTest
     }
   }
   it("receives a message and add the version to the transformed work") {
-    val id = "b001"
+    val id = "5005005"
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
     val version = 5
@@ -235,7 +235,7 @@ class SQSMessageReceiverTest
 
   it("should return a failed future if it's unable to publish the work") {
 
-    val id = "b123"
+    val id = "1001001"
     val sierraTransformable: Transformable =
       SierraTransformable(
         sourceId = id,

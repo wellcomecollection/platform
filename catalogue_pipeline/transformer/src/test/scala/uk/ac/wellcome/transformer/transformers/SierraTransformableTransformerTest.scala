@@ -26,7 +26,7 @@ class SierraTransformableTransformerTest
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
-    val id = "b5757575"
+    val id = "5757575"
     val title = "A morning mixture of molasses and muesli"
     val data =
       s"""
@@ -42,12 +42,12 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
-        "i111" -> sierraItemRecord(
-          id = "i111",
+        "5151515" -> sierraItemRecord(
+          id = "5151515",
           title = title,
           bibIds = List(id)),
-        "i222" -> sierraItemRecord(
-          id = "i222",
+        "5252525" -> sierraItemRecord(
+          id = "5252525",
           title = title,
           bibIds = List(id))
       )
@@ -60,26 +60,20 @@ class SierraTransformableTransformerTest
     val work = transformedSierraRecord.get.get
 
     val sourceIdentifier1 =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i111")
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i51515155")
     val sourceIdentifier2 =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i222")
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i52525259")
 
-    work.items shouldBe List(
-      UnidentifiedItem(
-        sourceIdentifier = sourceIdentifier1,
-        identifiers = List(sourceIdentifier1)
-      ),
-      UnidentifiedItem(
-        sourceIdentifier = sourceIdentifier2,
-        identifiers = List(sourceIdentifier2)
-      )
+    work.items.map { _.sourceIdentifier } shouldBe List(
+      sourceIdentifier1,
+      sourceIdentifier2
     )
   }
 
   it("should extract information from items") {
     val modifiedDate = Instant.now
-    val bibId = "b1234567"
-    val itemId = "i1234567"
+    val bibId = "6262626"
+    val itemId = "6363636"
     val locationType = "sgmed"
     val locationLabel = "A museum of mermaids"
     val bibData =
@@ -117,8 +111,17 @@ class SierraTransformableTransformerTest
     triedMaybeWork.get.isDefined shouldBe true
     val work = triedMaybeWork.get.get
     work.items should have size 1
-    val expectedSourceIdentifier =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, itemId)
+    val expectedSourceIdentifiers = List(
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        value = "i63636360"
+      ),
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.sierraIdentifier,
+        value = itemId
+      )
+    )
+
     work.items.head shouldBe UnidentifiedItem(
       sourceIdentifier = expectedSourceIdentifier,
       identifiers = List(expectedSourceIdentifier),
@@ -127,7 +130,7 @@ class SierraTransformableTransformerTest
 
   it("should not perform a transformation without bibData") {
     val sierraTransformable =
-      SierraTransformable(sourceId = "000", maybeBibData = None)
+      SierraTransformable(sourceId = "0102010", maybeBibData = None)
 
     val transformedSierraRecord =
       transformer.transform(sierraTransformable, version = 1)
@@ -139,14 +142,14 @@ class SierraTransformableTransformerTest
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
     val sierraTransformable = SierraTransformable(
-      sourceId = "b111",
+      sourceId = "1113111",
       maybeBibData = None,
       itemData = Map(
-        "i111" -> sierraItemRecord(
-          id = "i111",
+        "1313131" -> sierraItemRecord(
+          id = "1313131",
           title = "An incomplete invocation of items",
           modifiedDate = "2001-01-01T01:01:01Z",
-          bibIds = List("b111")
+          bibIds = List("1113111")
         ))
     )
 
@@ -157,7 +160,7 @@ class SierraTransformableTransformerTest
   }
 
   it("performs a transformation on a work using all varfields") {
-    val id = "000"
+    val id = "0606060"
     val title = "Hi Diddle Dee Dee"
     val lettering = "An actor's life for me"
 
@@ -238,15 +241,21 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    val identifier =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+    val sourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      value = "b06060602"
+    )
+    val sierraIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.sierraIdentifier,
+      value = id
+    )
 
     transformedSierraRecord.get shouldBe Some(
       UnidentifiedWork(
         title = Some(title),
-        sourceIdentifier = identifier,
+        sourceIdentifier = sourceIdentifier,
         version = 1,
-        identifiers = List(identifier),
+        identifiers = List(sourceIdentifier, sierraIdentifier),
         description = Some("A delightful description of a dead daisy."),
         publishers = List(Organisation(label = "Peaceful Poetry")),
         lettering = Some(lettering),
@@ -256,7 +265,7 @@ class SierraTransformableTransformerTest
   }
 
   it("makes deleted works invisible") {
-    val id = "000"
+    val id = "1789871"
     val title = "Hi Diddle Dee Dee"
     val data =
       s"""
@@ -277,22 +286,28 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    val identifier =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+    val sourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      value = "b17898717"
+    )
+    val sierraIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.sierraIdentifier,
+      value = id
+    )
 
     transformedSierraRecord.get shouldBe Some(
       UnidentifiedWork(
         title = Some(title),
-        sourceIdentifier = identifier,
+        sourceIdentifier = sourceIdentifier,
         version = 1,
-        identifiers = List(identifier),
+        identifiers = List(sourceIdentifier, sierraIdentifier),
         visible = false,
         publicationDate = None)
     )
   }
 
-  it("makes supressed works invisible") {
-    val id = "000"
+  it("makes suppressed works invisible") {
+    val id = "0001000"
     val title = "Hi Diddle Dee Dee"
     val data =
       s"""
@@ -313,24 +328,30 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    val identifier =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id)
+    val sourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      value = "b00010005"
+    )
+    val sierraIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.sierraIdentifier,
+      value = id
+    )
 
     transformedSierraRecord.get shouldBe Some(
       UnidentifiedWork(
         title = Some(title),
-        sourceIdentifier = identifier,
+        sourceIdentifier = sourceIdentifier,
         version = 1,
-        identifiers = List(identifier),
+        identifiers = List(sourceIdentifier, sierraIdentifier),
         visible = false,
         publicationDate = None)
     )
   }
 
   it("transforms bib records that don't have a title") {
-    // This example is taken from a failure observed in the transformer, based on
-    // real records from Sierra.
-    val id = "b2524736"
+    // This example is taken from a failure observed in the transformer,
+    // based on real records from Sierra.
+    val id = "2524736"
     val data =
       s"""
          |{
@@ -357,7 +378,7 @@ class SierraTransformableTransformerTest
   }
 
   it("includes the physical description, if present") {
-    val id = "b7000007"
+    val id = "7000007"
     val physicalDescription = "A dusty depiction of dodos"
 
     val data =
@@ -396,7 +417,7 @@ class SierraTransformableTransformerTest
   }
 
   it("includes the extent, if present") {
-    val id = "b8000008"
+    val id = "8000008"
     val extent = "Purple pages"
 
     val data =
@@ -434,7 +455,7 @@ class SierraTransformableTransformerTest
   }
 
   it("includes place of publications") {
-    val id = "b8000008"
+    val id = "8008008"
     val place = "Purple pages"
 
     val data =

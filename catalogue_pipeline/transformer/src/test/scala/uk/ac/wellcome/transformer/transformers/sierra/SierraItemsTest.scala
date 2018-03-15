@@ -88,20 +88,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
   describe("transformItemData") {
     it("returns UnidentifiedItem if an item is not deleted") {
-      val item = SierraItemData(id = "i4000002", deleted = false)
-
-      val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraSystemNumber,
-        value = "i4000002"
-      )
-
-      val expectedItem = UnidentifiedItem(
-        sourceIdentifier = sourceIdentifier,
-        identifiers = List(sourceIdentifier),
-        locations = List()
-      )
-
-      transformer.transformItemData(item) shouldBe expectedItem
+      val item = SierraItemData(id = "4000002", deleted = false)
+      transformer.transformItemData(item) shouldBe a[UnidentifiedItem]
     }
 
     it("creates both forms of the Sierra ID in 'identifiers'") {
@@ -136,8 +124,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
   describe("getItems") {
     it("removes items with deleted=true") {
-      val item1 = SierraItemData(id = "i3000001", deleted = true)
-      val item2 = SierraItemData(id = "i3000002", deleted = false)
+      val item1 = SierraItemData(id = "3000001", deleted = true)
+      val item2 = SierraItemData(id = "3000002", deleted = false)
 
       val itemData = Map(
         item1.id -> SierraItemRecord(
@@ -155,7 +143,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       )
 
       val transformable = SierraTransformable(
-        sourceId = "b3333333",
+        sourceId = "3333333",
         itemData = itemData
       )
 
