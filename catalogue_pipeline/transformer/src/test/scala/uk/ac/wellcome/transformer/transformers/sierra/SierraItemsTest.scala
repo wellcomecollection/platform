@@ -109,7 +109,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val sourceIdentifier1 = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
-        value = "i4000004a"
+        value = "i40000047"
       )
       val sourceIdentifier2 = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraIdentifier,
@@ -126,7 +126,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val sourceIdentifier = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
-        value = "i5000005a"
+        value = "i50000056"
       )
 
       val transformedItem = transformer.transformItemData(item)

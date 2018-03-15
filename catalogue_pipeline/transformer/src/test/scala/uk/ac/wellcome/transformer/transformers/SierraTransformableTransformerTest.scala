@@ -490,7 +490,7 @@ class SierraTransformableTransformerTest
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraSystemNumber,
-      value = "b9000009a"
+      value = "b90000092"
     )
 
     transformedSierraRecord.get.get.sourceIdentifier
