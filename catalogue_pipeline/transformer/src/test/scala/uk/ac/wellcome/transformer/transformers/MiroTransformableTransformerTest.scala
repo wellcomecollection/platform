@@ -25,14 +25,14 @@ class MiroTransformableTransformerTest
   }
 
   it("passes through the INNOPAC ID as the Sierra system number") {
-    forAll(Table("", ".", "b", "B", ".b", ".B")) { prefix =>
+    forAll(Table("", "b", "B", ".b", ".B")) { prefix =>
       forAll(Table("8", "x")) { checkDigit =>
         val innopacId = s"${prefix}1234567${checkDigit}"
         val expectedSierraNumber = s"b1234567${checkDigit}"
 
         transformRecordAndCheckSierraSystemNumber(
           innopacId = innopacId,
-          expectedSierraNumber = "b12345678"
+          expectedSierraNumber = s"b1234567${checkDigit}"
         )
       }
     }

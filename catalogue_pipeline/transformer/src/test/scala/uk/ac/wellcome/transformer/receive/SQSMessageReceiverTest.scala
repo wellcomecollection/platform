@@ -128,17 +128,24 @@ class SQSMessageReceiverTest
           withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
 
+            val sourceIdentifier = SourceIdentifier(
+              identifierScheme = IdentifierSchemes.sierraSystemNumber,
+              value = "b50050059"
+            )
+            val sierraIdentifier = SourceIdentifier(
+              identifierScheme = IdentifierSchemes.sierraIdentifier,
+              value = id
+            )
+
             whenReady(future) { _ =>
               val messages = listMessagesReceivedFromSNS(topicArn)
               messages should have size 1
               messages.head.message shouldBe JsonUtil
                 .toJson(UnidentifiedWork(
                   title = Some(title),
-                  sourceIdentifier =
-                    SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id),
+                  sourceIdentifier = sourceIdentifier,
                   version = version,
-                  identifiers = List(
-                    SourceIdentifier(IdentifierSchemes.sierraSystemNumber, id))
+                  identifiers = List(sourceIdentifier, sierraIdentifier)
                 ))
                 .get
               messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
@@ -184,7 +191,7 @@ class SQSMessageReceiverTest
             recordReceiver =>
               val future = recordReceiver.receiveMessage(
                 createValidEmptySierraBibSQSMessage(
-                  id = "000",
+                  id = "0101010",
                   s3Client = s3Client,
                   bucketName = bucketName
                 )

@@ -123,8 +123,8 @@ class SierraTransformableTransformerTest
     )
 
     work.items.head shouldBe UnidentifiedItem(
-      sourceIdentifier = expectedSourceIdentifier,
-      identifiers = List(expectedSourceIdentifier),
+      sourceIdentifier = expectedSourceIdentifiers.head,
+      identifiers = expectedSourceIdentifiers,
       locations = List(PhysicalLocation(locationType, locationLabel)))
   }
 
