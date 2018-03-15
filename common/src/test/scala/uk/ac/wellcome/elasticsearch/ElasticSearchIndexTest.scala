@@ -77,8 +77,11 @@ class ElasticSearchIndexTest
       eventually {
         for {
           indexName <- eventuallyIndexName
-          _ <- elasticClient.execute(indexInto(indexName / testType).doc(testObjectJson))
-          hits <- elasticClient.execute(search(s"$indexName/$testType").matchAllQuery()).map { _.hits.hits  }
+          _ <- elasticClient.execute(
+            indexInto(indexName / testType).doc(testObjectJson))
+          hits <- elasticClient
+            .execute(search(s"$indexName/$testType").matchAllQuery())
+            .map { _.hits.hits }
         } yield {
           hits should have size 1
 
