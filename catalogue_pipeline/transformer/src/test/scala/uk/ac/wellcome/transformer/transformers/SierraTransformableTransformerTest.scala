@@ -477,15 +477,16 @@ class SierraTransformableTransformerTest
     val id = "9000009"
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData = Some(SierraBibRecord(
-        id = id,
-        data = s"""{"id": "$id"}""",
-        modifiedDate = now()
-      ))
+      maybeBibData = Some(
+        SierraBibRecord(
+          id = id,
+          data = s"""{"id": "$id"}""",
+          modifiedDate = now()
+        ))
     )
 
     val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version=1)
+      transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
     val expectedSourceIdentifier = SourceIdentifier(
