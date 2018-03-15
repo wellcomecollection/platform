@@ -149,7 +149,7 @@
    *     ]
    *
    
-   /* Populate wwork:contribution. Rules:
+   /* Populate wwork:contributors. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "100", "110" (removing this from scope "111")
    * 2. Platform "name" populate from subfield "a"
@@ -223,7 +223,7 @@
    * 
    * 
    * 1. For all bibliographic records use "marcTag": "655".
-   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order and type as "QualifiedConcept".
+   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double dash ' -- ' and type as "QualifiedConcept".
    * 3. If only "a" subfield is populated type as "Concept". 
    * 4. Populate platform "concept" "label" with subfield "a".
    * 5. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
@@ -263,7 +263,7 @@
    /* Populate wwork:subjects. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "650".
-   * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in order and type as "QualifiedConcept".
+   * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double dash ' -- '  and type as "QualifiedConcept".
    * 3. If only "a" subfield is populated type as "Concept". 
    * 4. Populate platform "concept" "label" with subfield "a".
    * 5. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
