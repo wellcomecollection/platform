@@ -39,7 +39,10 @@ class SierraTransformableTransformer
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
-                sierraBibData.id
+                value = addCheckDigit(
+                  sierraBibData.id,
+                  resourceType = SierraRecordTypes.bibs
+                )
               ),
               version = version,
               identifiers = getIdentifiers(sierraBibData),
