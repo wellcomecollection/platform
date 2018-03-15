@@ -71,7 +71,6 @@ class ElasticSearchIndexTest
 
   it("creates an index into which doc of the expected type can be put") {
     withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
-
       val testObject = TestObject("id", "description", true)
       val testObjectJson = JsonUtil.toJson(testObject).get
 
@@ -84,7 +83,7 @@ class ElasticSearchIndexTest
               indexInto(indexName / testType)
                 .doc(testObjectJson))
 
-                val hits = elasticClient
+          val hits = elasticClient
             .execute(search(s"$indexName/$testType").matchAllQuery())
             .map {
               _.hits.hits
@@ -100,14 +99,14 @@ class ElasticSearchIndexTest
 
   it("create an index where inserting a doc of an unexpected type fails") {
     withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
-
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
       val eventuallyResponse =
         for {
           indexName <- eventuallyIndexName
-          response <- elasticClient.execute(indexInto(indexName / testType).doc(badTestObjectJson))
+          response <- elasticClient.execute(
+            indexInto(indexName / testType).doc(badTestObjectJson))
         } yield response
 
       whenReady(eventuallyResponse.failed) { exception =>
@@ -118,27 +117,31 @@ class ElasticSearchIndexTest
 
   it("updates an already existing index with a compatible mapping") {
     withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
-      withLocalElasticsearchIndex(CompatibleTestIndex) { eventuallyCompatibleIndexName =>
+      withLocalElasticsearchIndex(CompatibleTestIndex) {
+        eventuallyCompatibleIndexName =>
+          val compatibleTestObject =
+            CompatibleTestObject("id", "description", 5, true)
+          val compatibleTestObjectJson =
+            JsonUtil.toJson(compatibleTestObject).get
 
-        val compatibleTestObject =
-          CompatibleTestObject("id", "description", 5, true)
-        val compatibleTestObjectJson = JsonUtil.toJson(compatibleTestObject).get
+          eventually {
+            for {
+              _ <- eventuallyIndexName
+              testIndexName <- eventuallyCompatibleIndexName
+              _ <- elasticClient.execute(
+                indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
+              hits <- elasticClient
+                .execute(search(s"$testIndexName/$testType").matchAllQuery())
+                .map { _.hits.hits }
+            } yield {
+              hits should have size 1
 
-        eventually {
-          for {
-            _ <- eventuallyIndexName
-            testIndexName <- eventuallyCompatibleIndexName
-            _ <- elasticClient.execute(indexInto(testIndexName / testType)doc(compatibleTestObjectJson))
-            hits <- elasticClient.execute(search(s"$testIndexName/$testType").matchAllQuery()).map { _.hits.hits }
-          } yield {
-            hits should have size 1
-
-            assertJsonStringsAreEqual(
-              hits.head.sourceAsString,
-              compatibleTestObjectJson
-            )
+              assertJsonStringsAreEqual(
+                hits.head.sourceAsString,
+                compatibleTestObjectJson
+              )
+            }
           }
-        }
       }
     }
   }
