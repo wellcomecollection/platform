@@ -20,7 +20,10 @@ trait SierraIdentifiers extends SierraCheckDigits {
     List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
-        value = addCheckDigit(bibData.id)
+        value = addCheckDigit(
+          bibData.id,
+          resourceType = SierraRecordTypes.bibs
+        )
       ),
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraIdentifier,
