@@ -36,7 +36,6 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SqsFixtures {
 
-  val indexName = "works"
   val itemType = "work"
 
   val metricsSender: MetricsSender =
@@ -46,8 +45,6 @@ class IngestorWorkerServiceTest
       mock[AmazonCloudWatch],
       ActorSystem())
 
-  val workIndexer =
-    new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
   val actorSystem = ActorSystem()
 
   def createWork(canonicalId: String,
@@ -76,10 +73,15 @@ class IngestorWorkerServiceTest
       title = "A monstrous monolith of moss"
     )
 
+    val indexName = "works"
+
     val sqsMessage = messageFromString(toJson(work).get)
 
+    val workIndexer =
+      new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
+
     withLocalSqsQueue { queueUrl =>
-      withLocalElasticsearchIndex(indexName = indexName, itemType = itemType) {
+      withLocalElasticsearchIndex(indexName, itemType) {
         _ =>
           val service = new IngestorWorkerService(
             identifiedWorkIndexer = workIndexer,
@@ -102,6 +104,7 @@ class IngestorWorkerServiceTest
 
   it("should return a failed future if the input string is not a Work") {
     val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
+    val indexName = "works"
 
     withLocalSqsQueue { queueUrl =>
       val workIndexer = new WorkIndexer(
