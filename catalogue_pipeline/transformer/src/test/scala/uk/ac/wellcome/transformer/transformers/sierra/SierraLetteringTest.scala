@@ -45,7 +45,8 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
     )
   }
 
-  it("ignores records with the MARC field and 2nd indicator but wrong subfield") {
+  it(
+    "ignores records with the MARC field and 2nd indicator but wrong subfield") {
     assertFindsCorrectLettering(
       varFields = List(
         VarField(
@@ -54,7 +55,9 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
           indicator1 = " ",
           indicator2 = "6",
           subfields = List(
-            MarcSubfield(tag = "b", content = "Belligerent beavers beneath a bridge")
+            MarcSubfield(
+              tag = "b",
+              content = "Belligerent beavers beneath a bridge")
           )
         )
       ),
@@ -71,14 +74,15 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
           indicator1 = " ",
           indicator2 = "6",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Crowded crows carry a chocolate crepe")
+            MarcSubfield(
+              tag = "a",
+              content = "Crowded crows carry a chocolate crepe")
           )
         )
       ),
       expectedLettering = Some("Crowded crows carry a chocolate crepe")
     )
   }
-
 
   it("joins multiple instances of 246 .6 $$a, if present") {
     assertFindsCorrectLettering(
@@ -89,7 +93,9 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
           indicator1 = " ",
           indicator2 = "6",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Daring dalmations dance with danger")
+            MarcSubfield(
+              tag = "a",
+              content = "Daring dalmations dance with danger")
           )
         ),
         VarField(
@@ -98,15 +104,18 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
           indicator1 = "1",
           indicator2 = "6",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Enterprising eskimos exile every eagle")
+            MarcSubfield(
+              tag = "a",
+              content = "Enterprising eskimos exile every eagle")
           )
         )
       ),
-      expectedLettering = Some("Daring dalmations dance with danger\n\nEnterprising eskimos exile every eagle")
+      expectedLettering = Some(
+        "Daring dalmations dance with danger\n\nEnterprising eskimos exile every eagle")
     )
   }
 
-  val transformer = new SierraLettering { }
+  val transformer = new SierraLettering {}
 
   private def assertFindsCorrectLettering(
     varFields: List[VarField],
