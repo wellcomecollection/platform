@@ -100,84 +100,136 @@
    * Note: This is populated currently by ISO 639-2 language codes
    */
 
-
-
    /* Populate wwork:creators. Rules:
    * 
-   * 1. For all bibliographic records use "marcTag": "100", "110" and "111"
-   * 2. Platform "label" populate with concatenated subfields in citation/list order
-   * 3. Platform "concept" populate with subfield "a"
-   * 4. For "100" type as "Person"
-   * 5. For "110" type as "Organisation"
-   * 6. For "111" type as "Event"
-   * 7. If subfield 0 contains a value to use to populate "identifiers" after stripping first two letters (ls, sh). Check we want to do this. Platform "authority" is defined by first two letters of code; n or nr. Indicators can also help disabiguate the authority. 
-   * 8. For all other subfields populate "qualifiers" apart from 6,9,4 populate "qualifierType" with the subfield type (kebab-case) 
-   * 9. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * 10. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
-   * 11. Inaddition to excluding 6,9,4 also exclude 4 and 5 
+   * 1. For all bibliographic records use "marcTag": "100", "110" (removing this from scope "111")
+   * 2. Platform "name" populate from subfield "a"
+   * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
+   * 4. For "110" type as "Organisation"
+   * 5. Ignore: For "111" type as "Event"
+   * 6. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
+   * ignore for now 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
+   * ignore for now 9. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
+   * ignore for now 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
    *
-   * Note: need to remove trailing punctuation on subfields. The punctuation is there for the purpose of the concatentation of concept and qualifiers.
+   * Note: Do we need to remove trailing punctuation on subfields? The punctuation is there for the purpose of the concatentation of concept and qualifiers.
    *
-   *
-   * Example:
+   * Example person:
    *  "creators": [
    *     {
-   *        "label": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
+   *        "id": "b26h7qf3"
+   *        "name": "Jacobs, Philip P.",
+   *        "prefixes": ["Sir"] ,
+   *        "numeration": "II" ,
    *        "type": "Person" , 
    *        "identifiers": [
    *        {
    *           "value": "2005016805",
    *           "type": "Identifier",
-   *           "identifierScheme": "lcsh"
+   *           "identifierScheme": "lc-names"
    *        }
    *        ]
    *     } 
    *     ]
    *
+   * Example organisation:
+   *  "creators": [
+   *     {
+   *        "id": "8t677qf3"
+   *        "name": "International Labour Organisation",
+   *        "type": "Organisation" ,
+   *        "identifiers": [
+   *        {
+   *           "value": "2005016805",
+   *           "type": "Identifier",
+   *           "identifierScheme": "lc-names"
+   *        }
+   *        ]
+   *     } 
+   *     ]
    *
-      * Example:
+   
+   /* Populate wwork:contribution. Rules:
+   * 
+   * 1. For all bibliographic records use "marcTag": "100", "110" (removing this from scope "111")
+   * 2. Platform "name" populate from subfield "a"
+   * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
+   * 4. For "110" type as "Organisation"
+   * 5. Ignore: For "111" type as "Event"
+   * 6. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
+   * ignore for now 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
+   * ignore for now 9. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
+   * ignore for now 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
+   * 11. Populate roles "label" with the contents of subfield e for both 100 and 110.
+   *
+   *
+   *
+   * Example:
    *  "contributors": [
    *     {
    *        "type": "Contributor" , 
    *        "agent": {
    *           "id": "a24s7qf3" ,
-   *           "name": "Jacobs, Philip P. (Philip Peter), 1879-1940.",
+   *           "name": "Jacobs, Philip P.",
+   *           "prefixes": ["Sir"] ,
+   *           "numeration": "II" ,
    *           "type": "Person",
    *           "identifiers": [
    *        {
    *           "value": "2005016805",
    *           "type": "Identifier",
-   *           "identifierScheme": "lcsh"
+   *           "identifierScheme": "lc-names"
    *        }
    *        ]   
-   *     "contributions": [
+   *     "roles": [
    *        {
-   *           "contribution": "editor" ,        
    *           "label": "Editor",
-   *           "type": "Contribution"  
+   *           "type": "ContributionRole"  
+   *        } 
+   *     ] ,
+   *  } ,
+   * ],
+   *
+   * Example:
+   *  "contributors": [
+   *     {
+   *        "type": "Contributor" , 
+   *        "agent": {
+   *           "id": "a24s7qf3" ,
+   *           "name": "International Labour Organisation",
+   *           "type": "Organisation",
+   *           "identifiers": [
+   *        {
+   *           "value": "2005016805",
+   *           "type": "Identifier",
+   *           "identifierScheme": "lc-names"
+   *        }
+   *        ]   
+   *     "roles": [
+   *        {
+   *           "label": "Sponsor",
+   *           "type": "ContributionRole"  
    *        } 
    *     ] ,
    *  } ,
    * ],
    *
    *
-
    *
    */
 
 
    /* Populate wwork:genres. Rules:
    * 
-   * 1. For all bibliographic records use "marcTag": "655"
-   * 2. If more than one subfield is populated then populate platform "label" with concatenated subfields in citation/list order and type as "QualifiedConcept".
-   * 3. If only "a" subfield is populated type as "Concept".   
-   * 4. If 655 is populated with a indentified concept from an authority (as indicated by use of second indicator) then populate id with Wellcome id for concept
-   * 5. populate platform "concept" with subfield "a".
-   * 6. When this concept has associated identifiers populate "identifiers" with value (subfield 0) and identity scheme (second indicator or if indicator 7 look to subfield 2) Secound indicator 0=lcsh 2=mesh
-   * 8. For each subfield, for subfields a-z ingnore 0-7, populate "qualifiers" with a "label", type "Concept" (subfield "y" type as "Period" and type z as "Place") and populate "qualiferType" with the subfield name kebab-case.
+   * 
+   * 1. For all bibliographic records use "marcTag": "655".
+   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order and type as "QualifiedConcept".
+   * 3. If only "a" subfield is populated type as "Concept". 
+   * 4. Populate platform "concept" "label" with subfield "a".
+   * 5. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
+   * 6. For each subfield, for subfields v,x,y,z populate "qualifers" with a "label", type "Concept" (except subfield "y" type as "Period" and "z" as "Place") and populate "qualifierType" with v=form-subdivision, x=general-subdivision, y=chronological-subdivsion, z=geographic-subdivision.
    * 
    *
-   * Note: need to removing trailing punctuation on subfields
    *
    *
    *"genres": [
@@ -211,14 +263,13 @@
    /* Populate wwork:subjects. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "650".
-   * 2. If more than one subfield is populated. populate platform "label" with concatenated (with hyphens) subfields in citation/list order and type as "QualifiedConcept".
-   * 3. if only "a" subfield is populated type as "Concept". 
-   * 4. populate platform "concept" with subfield "a".
-   * 5. When this concept has assocaited identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator or if indicator 7 look at subfield 2. 
-   * 6. For each subfield, for subfields a-z ingnore 0-7, populate "qualifers" with a "label", type "Concept" (except subfield "y" and "d" type as "Period" and type "c" and "z" as "Place") and populate "qualifierType" with the subfield name kebab-case.
+   * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in order and type as "QualifiedConcept".
+   * 3. If only "a" subfield is populated type as "Concept". 
+   * 4. Populate platform "concept" "label" with subfield "a".
+   * 5. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
+   * 6. For each subfield, for subfields v,x,y,z populate "qualifers" with a "label", type "Concept" (except subfield "y" type as "Period" and "z" as "Place") and populate "qualifierType" with v=form-subdivision, x=general-subdivision, y=chronological-subdivsion, z=geographic-subdivision.
    * 
    *
-   * Note: need to removing trailing punctuation on subfields
    *
    *
    *"subjects": [
@@ -286,17 +337,17 @@
    *  },
    */
 
-   /* Populate wwork:placeOfPublication
+   /* Populate wwork:placeOfPublications
    * 
    * 1. For bibliographic records where "260" is populated
    * 2. Platform "placeOfPublication" "label" populate with 260 subfield "a"
    * 3. Type as "Place"
-   * 4. Also for all bibliographic records use fixed field "country" to populate "placeOfPublication" with..
-   * 5. Platform "id" is populated from "code"
+   * Ignore 4. Also for all bibliographic records use fixed field "country" to populate "placeOfPublication" with..
+   * Ignore 5. Platform "id" is populated from "code"
    * 6. Platform "label" is populated from "name"
    * 7. Type as "Place"
    *
-   * Note: American states seem to be valid entries for Marc countries: http://www.loc.gov/marc/countries/countries_code.html
+   * Note: For now we have not pulled in the marc countries. American states seem to be valid entries for Marc countries: http://www.loc.gov/marc/countries/countries_code.html
    *
    *
    * Example:
@@ -374,7 +425,7 @@
    /* wwwork:physicalDescription
    * 
    * 1. For bibliographic records where "300" subfield "b" are populated
-   * 2. Populate "physcialDetails"
+   * 2. Populate "physicalDescription"
    * 3. 
    *
    * Example:
