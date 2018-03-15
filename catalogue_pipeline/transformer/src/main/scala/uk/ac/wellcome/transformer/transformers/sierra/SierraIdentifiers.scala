@@ -22,7 +22,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
         value = addCheckDigit(
           bibData.id,
-          resourceType = SierraRecordTypes.bibs
+          recordType = SierraRecordTypes.bibs
         )
       ),
       SourceIdentifier(

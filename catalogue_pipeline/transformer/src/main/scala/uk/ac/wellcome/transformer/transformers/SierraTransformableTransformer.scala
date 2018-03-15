@@ -41,7 +41,7 @@ class SierraTransformableTransformer
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
                 value = addCheckDigit(
                   sierraBibData.id,
-                  resourceType = SierraRecordTypes.bibs
+                  recordType = SierraRecordTypes.bibs
                 )
               ),
               version = version,
