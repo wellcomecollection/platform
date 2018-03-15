@@ -79,7 +79,9 @@ class SierraTransformerFeatureTest
 
               actualWork.sourceIdentifier shouldBe sourceIdentifier
               actualWork.title shouldBe Some(title)
-              actualWork.identifiers shouldBe List(sourceIdentifier, sierraIdentifier)
+              actualWork.identifiers shouldBe List(
+                sourceIdentifier,
+                sierraIdentifier)
             }
           }
         }
