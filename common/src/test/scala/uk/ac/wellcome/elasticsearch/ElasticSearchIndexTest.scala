@@ -70,13 +70,12 @@ class ElasticSearchIndexTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = JsonUtil.toJson(testObject).get
 
       eventually {
         for {
-          indexName <- eventuallyIndexName
           _ <- elasticClient.execute(
             indexInto(indexName / testType).doc(testObjectJson))
           hits <- elasticClient
@@ -92,13 +91,12 @@ class ElasticSearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
       val eventuallyResponse =
         for {
-          indexName <- eventuallyIndexName
           response <- elasticClient.execute(
             indexInto(indexName / testType).doc(badTestObjectJson))
         } yield response
@@ -110,9 +108,9 @@ class ElasticSearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndex(TestIndex) { eventuallyIndexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       withLocalElasticsearchIndex(CompatibleTestIndex) {
-        eventuallyCompatibleIndexName =>
+        testIndexName =>
           val compatibleTestObject =
             CompatibleTestObject("id", "description", 5, true)
           val compatibleTestObjectJson =
@@ -120,8 +118,6 @@ class ElasticSearchIndexTest
 
           eventually {
             for {
-              _ <- eventuallyIndexName
-              testIndexName <- eventuallyCompatibleIndexName
               _ <- elasticClient.execute(
                 indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
               hits <- elasticClient

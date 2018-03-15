@@ -31,12 +31,11 @@ class WorksIndexTest
 
   it("puts a valid work") {
     forAll { sampleWork: IdentifiedWork =>
-      withLocalElasticsearchIndex("works", "work") { eventuallyIndexName =>
+      withLocalElasticsearchIndex("works", "work") { indexName =>
         val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
         eventually {
           for {
-            indexName <- eventuallyIndexName
             _ <- elasticClient.execute(
               indexInto(indexName / "work").doc(sampleWorkJson))
             hits <- elasticClient
@@ -53,13 +52,12 @@ class WorksIndexTest
   }
 
   it("does not put an invalid work") {
-    withLocalElasticsearchIndex("works", "work") { eventuallyIndexName =>
+    withLocalElasticsearchIndex("works", "work") { indexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
       val eventualResponse =
         for {
-          indexName <- eventuallyIndexName
           response <- elasticClient.execute(
             indexInto(indexName / "work").doc(badTestObjectJson))
         } yield response
