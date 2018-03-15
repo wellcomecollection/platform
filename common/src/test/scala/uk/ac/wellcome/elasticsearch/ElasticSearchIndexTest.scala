@@ -7,7 +7,7 @@ import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.utils.{ElasticSearchLocal, JsonTestUtil}
+import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
 
@@ -77,18 +77,9 @@ class ElasticSearchIndexTest
       eventually {
         for {
           indexName <- eventuallyIndexName
+          _ <- elasticClient.execute(indexInto(indexName / testType).doc(testObjectJson))
+          hits <- elasticClient.execute(search(s"$indexName/$testType").matchAllQuery()).map { _.hits.hits  }
         } yield {
-          elasticClient
-            .execute(
-              indexInto(indexName / testType)
-                .doc(testObjectJson))
-
-          val hits = elasticClient
-            .execute(search(s"$indexName/$testType").matchAllQuery())
-            .map {
-              _.hits.hits
-            }
-            .await
           hits should have size 1
 
           assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)

@@ -69,15 +69,7 @@ class VersionedDaoTest
 
     it("returns a future of None if the record isn't in dynamo") {
       withVersionedDao {
-        case (versionedDao, tableName) =>
-          val testVersioned = TestVersioned(
-            id = "testSource/b110101001",
-            data = "whatever",
-            version = 0
-          )
-
-          Scanamo.put(dynamoDbClient)(tableName)(testVersioned)
-
+        case (versionedDao, _) =>
           whenReady(versionedDao.getRecord[TestVersioned]("testSource/b88888")) {
             record =>
               record shouldBe None
