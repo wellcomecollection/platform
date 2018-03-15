@@ -94,6 +94,8 @@ object IdentifierSchemes extends Logging {
         IdentifierSchemes.miroImageNumber
       case s: String if s == IdentifierSchemes.sierraSystemNumber.toString =>
         IdentifierSchemes.sierraSystemNumber
+      case s: String if s == IdentifierSchemes.sierraIdentifier.toString =>
+        IdentifierSchemes.sierraIdentifier
       case s: String if s == IdentifierSchemes.calmAltRefNo.toString =>
         IdentifierSchemes.calmAltRefNo
       case s: String if s == IdentifierSchemes.calmPlaceholder.toString =>
