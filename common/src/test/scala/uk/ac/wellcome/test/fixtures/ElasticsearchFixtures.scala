@@ -52,7 +52,7 @@ trait ElasticsearchFixtures
 
   def withLocalElasticsearchIndex[R](
     indexName: String = Random.alphanumeric take 10 mkString,
-    itemType: String)(testWith: TestWith[Future[String], R]): R = {
+    itemType: String)(testWith: TestWith[String, R]): R = {
 
     val index = new WorksIndex(
       client = elasticClient,
@@ -64,14 +64,12 @@ trait ElasticsearchFixtures
   }
 
   def withLocalElasticsearchIndex[R](index: ElasticSearchIndex)(
-    testWith: TestWith[Future[String], R]): R = {
+    testWith: TestWith[String, R]): R = {
+
+    index.create.await
 
     try {
-      testWith {
-        for {
-          _ <- index.create
-        } yield index.indexName
-      }
+      testWith(index.indexName)
     } finally {
       elasticClient.execute(deleteIndex(index.indexName))
     }
