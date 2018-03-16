@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait SierraItems extends Logging with SierraLocation {
+trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
   def extractItemData(
     sierraTransformable: SierraTransformable): List[SierraItemData] = {
     sierraTransformable.itemData.values
@@ -33,13 +33,23 @@ trait SierraItems extends Logging with SierraLocation {
     info(s"Attempting to transform ${sierraItemData.id}")
     UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
-        IdentifierSchemes.sierraSystemNumber,
-        sierraItemData.id
+        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        value = addCheckDigit(
+          sierraItemData.id,
+          recordType = SierraRecordTypes.items
+        )
       ),
       identifiers = List(
         SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
-          sierraItemData.id
+          addCheckDigit(
+            sierraItemData.id,
+            recordType = SierraRecordTypes.items
+          )
+        ),
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.sierraIdentifier,
+          value = sierraItemData.id
         )
       ),
       locations = getLocation(sierraItemData).toList

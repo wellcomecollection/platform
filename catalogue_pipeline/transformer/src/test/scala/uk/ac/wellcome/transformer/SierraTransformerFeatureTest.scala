@@ -27,7 +27,7 @@ class SierraTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
-    val id = "b001"
+    val id = "1001001"
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
 
@@ -63,8 +63,13 @@ class SierraTransformerFeatureTest
               snsMessages should have size 1
 
               val sourceIdentifier = SourceIdentifier(
-                IdentifierSchemes.sierraSystemNumber,
-                id
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                value = "b10010014"
+              )
+
+              val sierraIdentifier = SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraIdentifier,
+                value = id
               )
 
               val actualWork =
@@ -74,7 +79,9 @@ class SierraTransformerFeatureTest
 
               actualWork.sourceIdentifier shouldBe sourceIdentifier
               actualWork.title shouldBe Some(title)
-              actualWork.identifiers shouldBe List(sourceIdentifier)
+              actualWork.identifiers shouldBe List(
+                sourceIdentifier,
+                sierraIdentifier)
             }
           }
         }
