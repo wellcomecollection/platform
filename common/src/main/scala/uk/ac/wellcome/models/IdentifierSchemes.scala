@@ -1,35 +1,8 @@
 package uk.ac.wellcome.models
 
-import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
-import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.{
-  JsonDeserialize,
-  JsonSerialize
-}
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._
-
-class IdentifierSchemeDeserialiser
-    extends JsonDeserializer[IdentifierSchemes.IdentifierScheme] {
-
-  override def deserialize(
-    p: JsonParser,
-    ctxt: DeserializationContext): IdentifierSchemes.IdentifierScheme = {
-    val node: JsonNode = p.getCodec.readTree(p)
-    val identifierScheme = node.asText()
-    IdentifierSchemes.createIdentifierScheme(identifierScheme)
-  }
-}
-
-class IdentifierSchemeSerialiser
-    extends JsonSerializer[IdentifierSchemes.IdentifierScheme] {
-  override def serialize(value: IdentifierSchemes.IdentifierScheme,
-                         gen: JsonGenerator,
-                         serializers: SerializerProvider): Unit = {
-    gen.writeString(value.toString)
-  }
-}
 
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
@@ -41,11 +14,11 @@ object IdentifierSchemes extends Logging {
     calmPlaceholder,
     calmAltRefNo,
     sierraSystemNumber,
+    sierraIdentifier,
     marcCountries)
 
-  @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
-  @JsonSerialize(using = classOf[IdentifierSchemeSerialiser])
   sealed trait IdentifierScheme
+
   // Corresponds to the image number in Miro, e.g. V00127563.
   case object miroImageNumber extends IdentifierScheme {
     override def toString: String = "miro-image-number"
