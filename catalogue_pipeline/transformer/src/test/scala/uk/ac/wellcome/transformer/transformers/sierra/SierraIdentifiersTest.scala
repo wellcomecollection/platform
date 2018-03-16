@@ -9,11 +9,15 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
 
   it("passes through the main identifier from the bib record") {
     assertIdentifiersAreCorrect(
-      bibDataId = "b1782863",
+      bibDataId = "1782863",
       expectedIdentifiers = List(
         SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
-          value = "b1782863"
+          value = "b17828636"
+        ),
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.sierraIdentifier,
+          value = "1782863"
         )
       )
     )
