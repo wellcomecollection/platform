@@ -48,6 +48,11 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "value": "value"
       |    }
       |  ],
+      |  "workType": {
+      |    "id": "id",
+      |    "label": "label",
+      |    "ontologyType" : "WorkType"
+      |  },
       |  "description": "description",
       |  "physicalDescription": "$physicalDescription",
       |  "extent": "$extent",
@@ -156,11 +161,18 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val publishers = List(publisher)
+
+  val workType = WorkType(
+    id = "id",
+    label = "label"
+  )
+
   val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
     sourceIdentifier = identifier,
     version = 1,
     identifiers = List(identifier),
+    workType = Some(workType),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),
     extent = Some(extent),

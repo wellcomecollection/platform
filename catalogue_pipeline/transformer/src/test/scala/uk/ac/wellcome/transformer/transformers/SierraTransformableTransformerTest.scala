@@ -495,6 +495,42 @@ class SierraTransformableTransformerTest
 
   }
 
+  it("includes the work type, if present") {
+    val id = "6547529"
+    val workTypeId = "xxx"
+    val workTypeValue = "A parchment of penguin pemmican pierced playfully with pencils."
+
+    val workType = WorkType(
+      id = workTypeId,
+      label = workTypeValue
+    )
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Doddering dinosaurs are daring in dance",
+         |    "materialType": {
+         |      "code": "$workTypeId",
+         |      "value": "$workTypeValue"
+         |    },
+         |   "varFields": []
+         | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.workType shouldBe Some(
+      workType)
+  }
+
   it("uses the full Sierra system number as the source identifier") {
     val id = "9000009"
     val sierraTransformable = SierraTransformable(
