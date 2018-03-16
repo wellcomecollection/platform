@@ -70,12 +70,13 @@ class ElasticSearchIndexTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
+    withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = JsonUtil.toJson(testObject).get
 
       eventually {
         for {
+          indexName <- eventualIndexName
           _ <- elasticClient.execute(
             indexInto(indexName / testType).doc(testObjectJson))
           hits <- elasticClient
@@ -91,12 +92,13 @@ class ElasticSearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
+    withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
       val eventuallyResponse =
         for {
+          indexName <- eventualIndexName
           response <- elasticClient.execute(
             indexInto(indexName / testType).doc(badTestObjectJson))
         } yield response
@@ -108,8 +110,9 @@ class ElasticSearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
-      withLocalElasticsearchIndex(CompatibleTestIndex) { testIndexName =>
+    withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
+      withLocalElasticsearchIndexAsync(CompatibleTestIndex) {
+        eventualTestIndexName =>
         val compatibleTestObject =
           CompatibleTestObject("id", "description", 5, true)
         val compatibleTestObjectJson =
@@ -117,6 +120,8 @@ class ElasticSearchIndexTest
 
         eventually {
           for {
+            _ <- eventualIndexName
+            testIndexName <- eventualTestIndexName
             _ <- elasticClient.execute(
               indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
             hits <- elasticClient
