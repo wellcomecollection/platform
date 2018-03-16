@@ -196,9 +196,11 @@ class SierraTransformableTransformerTest
       VarField(
         fieldTag = "?",
         marcTag = "246",
-        indicator1 = "1",
+        indicator1 = " ",
         indicator2 = "6",
-        subfields = List()
+        subfields = List(
+          MarcSubfield(tag = "a", content = lettering)
+        )
       )
     )
 
@@ -224,7 +226,6 @@ class SierraTransformableTransformerTest
          |{
          | "id": "$id",
          | "title": "$title",
-         | "lettering": "$lettering",
          | "varFields": ${toJson(marcFields).get}
          |}
         """.stripMargin
