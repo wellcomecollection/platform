@@ -25,6 +25,10 @@ case class DisplayWork(
     value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
     String] = None,
   @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.display.models.WorkType]",
+    value = "The type of work.") workType: Option[
+    DisplayWorkType] = None,
+  @ApiModelProperty(
     dataType = "String",
     value =
       "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
@@ -107,6 +111,7 @@ case object DisplayWork {
         if (includes.identifiers)
           Some(work.identifiers.map { DisplayIdentifier(_) })
         else None,
+      workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
         if (includes.thumbnail)
           work.thumbnail.map { DisplayLocation(_) } else None,
