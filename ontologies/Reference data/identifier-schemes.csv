@@ -6,7 +6,7 @@ CalmAltRefNo,calm-altref-no,CALM alter no
 LCGMGPC,lc-gmgpc,Library of Congress Thesaurus for Graphic Materials
 LCSH,lcsh,Library of Congress Subject Headings
 LCNames,lc-names,Library of Congress Name authority records
-MESHId,mesh-id,MESH identifier
+MESHId,mesh,MESH identifier
 CALMRecordId,calm-record-id,CALM record identifier
 PerserviceGUID,preservica-guid,Perservica GUID
 CALMAuthorityCode,calm-authority-code,CALM authority code
