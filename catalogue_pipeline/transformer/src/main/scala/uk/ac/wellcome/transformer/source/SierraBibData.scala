@@ -9,6 +9,7 @@ case class SierraBibData(
   suppressed: Boolean = false,
   country: Option[Country] = None,
   lang: Option[Language] = None,
+  materialType: Option[SierraMaterialType] = None,
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
 )
