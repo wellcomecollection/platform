@@ -8,15 +8,6 @@ import cats.syntax.either._
   *  the strings that will be presented to users of the API.
   */
 object IdentifierSchemes extends Logging {
-  private final val knownIdentifierSchemes = Seq(
-    miroImageNumber,
-    miroLibraryReference,
-    calmPlaceholder,
-    calmAltRefNo,
-    sierraSystemNumber,
-    sierraIdentifier,
-    marcCountries)
-
   sealed trait IdentifierScheme
 
   // Corresponds to the image number in Miro, e.g. V00127563.
@@ -59,6 +50,15 @@ object IdentifierSchemes extends Logging {
   case object marcCountries extends IdentifierScheme {
     override def toString: String = "marc-countries"
   }
+
+  private final val knownIdentifierSchemes = Seq(
+    miroImageNumber,
+    miroLibraryReference,
+    calmPlaceholder,
+    calmAltRefNo,
+    sierraSystemNumber,
+    sierraIdentifier,
+    marcCountries)
 
   private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
