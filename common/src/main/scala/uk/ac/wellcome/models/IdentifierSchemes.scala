@@ -8,7 +8,7 @@ import cats.syntax.either._
   *  the strings that will be presented to users of the API.
   */
 object IdentifierSchemes extends Logging {
-  final val identifierSchemes = Seq(
+  private final val knownIdentifierSchemes = Seq(
     miroImageNumber,
     miroLibraryReference,
     calmPlaceholder,
@@ -60,28 +60,16 @@ object IdentifierSchemes extends Logging {
     override def toString: String = "marc-countries"
   }
 
-  def createIdentifierScheme(
+  private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
-    identifierScheme match {
-      case s: String if s == IdentifierSchemes.miroImageNumber.toString =>
-        IdentifierSchemes.miroImageNumber
-      case s: String if s == IdentifierSchemes.sierraSystemNumber.toString =>
-        IdentifierSchemes.sierraSystemNumber
-      case s: String if s == IdentifierSchemes.sierraIdentifier.toString =>
-        IdentifierSchemes.sierraIdentifier
-      case s: String if s == IdentifierSchemes.calmAltRefNo.toString =>
-        IdentifierSchemes.calmAltRefNo
-      case s: String if s == IdentifierSchemes.calmPlaceholder.toString =>
-        IdentifierSchemes.calmPlaceholder
-      case s: String if s == IdentifierSchemes.miroLibraryReference.toString =>
-        IdentifierSchemes.miroLibraryReference
-      case s: String if s == IdentifierSchemes.marcCountries.toString =>
-        IdentifierSchemes.marcCountries
-      case identifierScheme =>
-        val errorMessage = s"$identifierScheme is not a valid identifierScheme"
-        error(errorMessage)
-        throw new Exception(errorMessage)
-    }
+      knownIdentifierSchemes
+        .filter { _.toString == identifierScheme }
+        .headOption
+        .getOrElse {
+          val errorMessage = s"$identifierScheme is not a valid identifierScheme"
+          error(errorMessage)
+          throw new Exception(errorMessage)
+        }
   }
 
   implicit val identifierSchemesDecoder
