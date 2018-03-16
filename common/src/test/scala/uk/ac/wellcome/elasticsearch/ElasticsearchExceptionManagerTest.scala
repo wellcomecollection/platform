@@ -2,15 +2,15 @@ package uk.ac.wellcome.elasticsearch
 
 import org.elasticsearch.client.{Response, ResponseException}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.test.utils.ElasticSearchLocal
 import com.sksamuel.elastic4s.http.ElasticDsl._
+import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
 
 import scala.util.Success
 
 class ElasticsearchExceptionManagerTest
     extends FunSpec
     with Matchers
-    with ElasticSearchLocal {
+    with ElasticsearchFixtures {
 
   it("extracts the errorType from an elasticsearch exception") {
     val resp = elasticClient

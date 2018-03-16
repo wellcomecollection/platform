@@ -3,34 +3,37 @@ package uk.ac.wellcome.sns
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SNSConfig
-import uk.ac.wellcome.test.utils.SNSLocal
+import uk.ac.wellcome.test.fixtures.SnsFixtures
 
 class SNSWriterTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with SNSLocal
+    with SnsFixtures
     with IntegrationPatience {
 
-  val topicArn = createTopicAndReturnArn("test-topic-name")
-  val snsConfig = SNSConfig(topicArn)
+//  val topicArn = createTopicAndReturnArn("test-topic-name")
+//
 
   it(
     "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
-    val snsWriter = new SNSWriter(snsClient, snsConfig)
-    val message = "sns-writer-test-message"
-    val subject = "sns-writer-test-subject"
-    val futurePublishAttempt = snsWriter.writeMessage(
-      message = message,
-      subject = subject
-    )
+    withLocalSnsTopic { arn =>
+      val snsConfig = SNSConfig(arn)
+      val snsWriter = new SNSWriter(snsClient, snsConfig)
+      val message = "sns-writer-test-message"
+      val subject = "sns-writer-test-subject"
+      val futurePublishAttempt = snsWriter.writeMessage(
+        message = message,
+        subject = subject
+      )
 
-    whenReady(futurePublishAttempt) { publishAttempt =>
-      val messages = listMessagesReceivedFromSNS()
-      messages should have size (1)
-      messages.head.message shouldBe message
-      messages.head.subject shouldBe subject
-      publishAttempt.id should be(Right(messages.head.messageId))
+      whenReady(futurePublishAttempt) { publishAttempt =>
+        val messages = listMessagesReceivedFromSNS(arn)
+        messages should have size (1)
+        messages.head.message shouldBe message
+        messages.head.subject shouldBe subject
+        publishAttempt.id should be(Right(messages.head.messageId))
+      }
     }
   }
 
