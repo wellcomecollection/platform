@@ -22,7 +22,10 @@ cover the interval.
 
 For example, calling the script with arguments
 
-    --start='10:00' --end='10:59' --window_length=15 --resource=bibs
+    start           = 10:00
+    end             = 10:59
+    window_length   = 15
+    resource        = bibs
 
 which generate four windows:
 
