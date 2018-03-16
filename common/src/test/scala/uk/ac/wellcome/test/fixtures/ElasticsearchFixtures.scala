@@ -75,6 +75,33 @@ trait ElasticsearchFixtures
     }
   }
 
+  def withLocalElasticsearchIndexAsync[R](index: ElasticSearchIndex)(
+    testWith: TestWith[Future[String], R]): R = {
+
+    try {
+      testWith {
+        for {
+          _ <- index.create
+        } yield index.indexName
+      }
+    } finally {
+      elasticClient.execute(deleteIndex(index.indexName))
+    }
+  }
+
+  def withLocalElasticsearchIndexAsync[R](
+    indexName: String = Random.alphanumeric take 10 mkString,
+    itemType: String)(testWith: TestWith[Future[String], R]): R = {
+
+    val index = new WorksIndex(
+      client = elasticClient,
+      name = indexName,
+      itemType = itemType
+    )
+
+    withLocalElasticsearchIndexAsync(index)(testWith)
+  }
+
   def assertElasticsearchEventuallyHasWork(work: IdentifiedWork,
                                            indexName: String,
                                            itemType: String) = {
