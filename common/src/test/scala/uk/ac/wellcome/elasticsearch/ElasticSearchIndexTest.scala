@@ -113,29 +113,29 @@ class ElasticSearchIndexTest
     withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
       withLocalElasticsearchIndexAsync(CompatibleTestIndex) {
         eventualTestIndexName =>
-        val compatibleTestObject =
-          CompatibleTestObject("id", "description", 5, true)
-        val compatibleTestObjectJson =
-          JsonUtil.toJson(compatibleTestObject).get
+          val compatibleTestObject =
+            CompatibleTestObject("id", "description", 5, true)
+          val compatibleTestObjectJson =
+            JsonUtil.toJson(compatibleTestObject).get
 
-        eventually {
-          for {
-            _ <- eventualIndexName
-            testIndexName <- eventualTestIndexName
-            _ <- elasticClient.execute(
-              indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
-            hits <- elasticClient
-              .execute(search(s"$testIndexName/$testType").matchAllQuery())
-              .map { _.hits.hits }
-          } yield {
-            hits should have size 1
+          eventually {
+            for {
+              _ <- eventualIndexName
+              testIndexName <- eventualTestIndexName
+              _ <- elasticClient.execute(
+                indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
+              hits <- elasticClient
+                .execute(search(s"$testIndexName/$testType").matchAllQuery())
+                .map { _.hits.hits }
+            } yield {
+              hits should have size 1
 
-            assertJsonStringsAreEqual(
-              hits.head.sourceAsString,
-              compatibleTestObjectJson
-            )
+              assertJsonStringsAreEqual(
+                hits.head.sourceAsString,
+                compatibleTestObjectJson
+              )
+            }
           }
-        }
       }
     }
   }

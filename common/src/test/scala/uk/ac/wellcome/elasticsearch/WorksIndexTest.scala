@@ -31,23 +31,26 @@ class WorksIndexTest
 
   it("puts a valid work") {
     forAll { sampleWork: IdentifiedWork =>
-      withLocalElasticsearchIndexAsync(itemType = "work") { eventualIndexName =>
-        val sampleWorkJson = JsonUtil.toJson(sampleWork).get
+      withLocalElasticsearchIndexAsync(itemType = "work") {
+        eventualIndexName =>
+          val sampleWorkJson = JsonUtil.toJson(sampleWork).get
 
-        eventually {
-          for {
-            indexName <- eventualIndexName
-            _ <- elasticClient.execute(
-              indexInto(indexName / "work").doc(sampleWorkJson))
-            hits <- elasticClient
-              .execute(search(s"$indexName/work").matchAllQuery())
-              .map { _.hits.hits }
-          } yield {
-            hits should have size 1
+          eventually {
+            for {
+              indexName <- eventualIndexName
+              _ <- elasticClient.execute(
+                indexInto(indexName / "work").doc(sampleWorkJson))
+              hits <- elasticClient
+                .execute(search(s"$indexName/work").matchAllQuery())
+                .map { _.hits.hits }
+            } yield {
+              hits should have size 1
 
-            assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
+              assertJsonStringsAreEqual(
+                hits.head.sourceAsString,
+                sampleWorkJson)
+            }
           }
-        }
       }
     }
   }
