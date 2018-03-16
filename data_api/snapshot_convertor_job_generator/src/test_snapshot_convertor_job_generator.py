@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import os
 
 from snapshot_convertor_job_generator import _run
 
