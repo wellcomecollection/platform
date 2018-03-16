@@ -7,7 +7,8 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 class IdentifierSchemesTest extends FunSpec with Matchers with JsonTestUtil {
 
   it("serialises a known identifier scheme to JSON") {
-    val data: Map[String, IdentifierSchemes.IdentifierScheme] = Map("scheme" -> IdentifierSchemes.miroImageNumber)
+    val data: Map[String, IdentifierSchemes.IdentifierScheme] =
+      Map("scheme" -> IdentifierSchemes.miroImageNumber)
     val expectedJsonString = """{"scheme": "miro-image-number"}"""
     val actualJsonString = toJson(data).get
 
@@ -17,7 +18,8 @@ class IdentifierSchemesTest extends FunSpec with Matchers with JsonTestUtil {
   it("deserialises a known identifier scheme from JSON") {
     val jsonString = """{"scheme": "sierra-identifier"}"""
     val expectedData = Map("scheme" -> IdentifierSchemes.sierraIdentifier)
-    val actualData = fromJson[Map[String, IdentifierSchemes.IdentifierScheme]](jsonString).get
+    val actualData =
+      fromJson[Map[String, IdentifierSchemes.IdentifierScheme]](jsonString).get
 
     actualData shouldBe expectedData
   }

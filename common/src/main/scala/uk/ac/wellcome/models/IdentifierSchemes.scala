@@ -62,14 +62,14 @@ object IdentifierSchemes extends Logging {
 
   private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
-      knownIdentifierSchemes
-        .filter { _.toString == identifierScheme }
-        .headOption
-        .getOrElse {
-          val errorMessage = s"$identifierScheme is not a valid identifierScheme"
-          error(errorMessage)
-          throw new Exception(errorMessage)
-        }
+    knownIdentifierSchemes
+      .filter { _.toString == identifierScheme }
+      .headOption
+      .getOrElse {
+        val errorMessage = s"$identifierScheme is not a valid identifierScheme"
+        error(errorMessage)
+        throw new Exception(errorMessage)
+      }
   }
 
   implicit val identifierSchemesDecoder
