@@ -1,0 +1,4 @@
+sns:
+  image: wellcome/fake-sns
+  ports:
+    - "9292:9292"
