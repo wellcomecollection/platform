@@ -25,6 +25,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "id": "${works(0).canonicalId}",
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
+                          |     "workType": {
+                          |       "id": "id",
+                          |       "label": "label",
+                          |       "type": "WorkType"
+                          |     },
                           |     "lettering": "${works(0).lettering.get}",
                           |     "createdDate": ${period(
                             works(0).createdDate.get)},
@@ -39,6 +44,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "id": "${works(1).canonicalId}",
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
+                          |     "workType": {
+                          |       "id": "id",
+                          |       "label": "label",
+                          |       "type": "WorkType"
+                          |     },
                           |     "lettering": "${works(1).lettering.get}",
                           |     "createdDate": ${period(
                             works(1).createdDate.get)},
@@ -53,6 +63,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "id": "${works(2).canonicalId}",
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
+                          |     "workType": {
+                          |       "id": "id",
+                          |       "label": "label",
+                          |       "type": "WorkType"
+                          |     },
                           |     "lettering": "${works(2).lettering.get}",
                           |     "createdDate": ${period(
                             works(2).createdDate.get)},
@@ -69,7 +84,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should return a single work when requested with id") {
+   it("should return a single work when requested with id") {
     val work = workWith(
       canonicalId = canonicalId,
       title = title,
@@ -93,6 +108,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "id": "$canonicalId",
                           | "title": "$title",
                           | "description": "$description",
+                          | "workType": {
+                          |       "id": "id",
+                          |       "label": "label",
+                          |       "type": "WorkType"
+                          | },
                           | "lettering": "$lettering",
                           | "createdDate": ${period(work.createdDate.get)},
                           | "creators": [ ${agent(work.creators(0))} ],
@@ -258,6 +278,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "id": "${works(1).canonicalId}",
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
+                          |     "workType" : {
+                          |        "id" : "id",
+                          |        "label" : "label",
+                          |        "type" : "WorkType"
+                          |      },
                           |     "lettering": "${works(1).lettering.get}",
                           |     "createdDate": ${period(
                             works(1).createdDate.get)},
@@ -289,6 +314,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "id": "${works(0).canonicalId}",
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
+                          |     "workType" : {
+                          |        "id" : "id",
+                          |        "label" : "label",
+                          |        "type" : "WorkType"
+                          |      },
                           |     "lettering": "${works(0).lettering.get}",
                           |     "createdDate": ${period(
                             works(0).createdDate.get)},
@@ -320,6 +350,11 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "id": "${works(2).canonicalId}",
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
+                          |     "workType" : {
+                          |        "id" : "id",
+                          |        "label" : "label",
+                          |        "type" : "WorkType"
+                          |      },
                           |     "lettering": "${works(2).lettering.get}",
                           |     "createdDate": ${period(
                             works(2).createdDate.get)},

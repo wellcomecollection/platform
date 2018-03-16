@@ -25,7 +25,7 @@ case class DisplayWork(
     value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
     String] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.WorkType]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayWorkType]",
     value = "The type of work.") workType: Option[
     DisplayWorkType] = None,
   @ApiModelProperty(
