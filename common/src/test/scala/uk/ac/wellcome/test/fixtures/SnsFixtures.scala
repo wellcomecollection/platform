@@ -1,12 +1,16 @@
 package uk.ac.wellcome.test.fixtures
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.services.sns._
+import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import scala.util.Random
 
 trait SnsFixtures {
@@ -32,8 +36,8 @@ trait SnsFixtures {
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  def withLocalSnsTopic[R](testWith: TestWith[String, R]) = {
-    val topicName: String = Random.alphanumeric take 10 mkString
+  def withLocalSnsTopic[R](testWith: TestWith[String, R]): R = {
+    val topicName = Random.alphanumeric take 10 mkString
     val arn = snsClient.createTopic(topicName).getTopicArn
 
     try {
@@ -42,6 +46,11 @@ trait SnsFixtures {
       snsClient.deleteTopic(arn)
     }
   }
+
+  private val mapper =
+    (new ObjectMapper(new YAMLFactory()) with ScalaObjectMapper)
+      .registerModule(DefaultScalaModule)
+      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
   def listMessagesReceivedFromSNS(topicArn: String): List[MessageInfo] = {
     /*
@@ -64,14 +73,14 @@ trait SnsFixtures {
      */
 
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
-
-    val mapper = new ObjectMapper(new YAMLFactory()) with ScalaObjectMapper
-
-    mapper.registerModule(DefaultScalaModule)
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-    val messages: Messages = mapper.readValue(string, classOf[Messages])
-
+    val messages = mapper.readValue(string, classOf[Messages])
     messages.messages.filter(_.topic_arn == topicArn)
   }
 }
+
+case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
+case class TopicInfo(arn: String, name: String)
+case class MessageInfo(@JsonProperty(":id") messageId: String,
+                       @JsonProperty(":message") message: String,
+                       @JsonProperty(":subject") subject: String,
+                       @JsonProperty(":topic_arn") topic_arn: String)

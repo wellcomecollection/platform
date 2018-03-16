@@ -14,9 +14,10 @@ import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 
 import scala.concurrent.Future
-import scala.util.{Random, Try}
+import scala.util.Random
 
 trait ElasticsearchFixtures
     extends Eventually
@@ -49,24 +50,56 @@ trait ElasticsearchFixtures
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
-  def withLocalElasticsearchIndex[R](indexName: String, itemType: String)(
-    testWith: TestWith[String, R]) = {
+  def withLocalElasticsearchIndex[R](
+    indexName: String = Random.alphanumeric take 10 mkString,
+    itemType: String)(testWith: TestWith[String, R]): R = {
+
     val index = new WorksIndex(
       client = elasticClient,
       name = indexName,
       itemType = itemType
     )
 
-    index.create.map { _ =>
-      elasticClient.execute(indexExists(indexName)).await.isExists should be(
-        true)
-    }.await
+    withLocalElasticsearchIndex(index)(testWith)
+  }
+
+  def withLocalElasticsearchIndex[R](index: ElasticSearchIndex)(
+    testWith: TestWith[String, R]): R = {
+
+    index.create.await
 
     try {
-      testWith(indexName)
+      testWith(index.indexName)
     } finally {
-      Try { elasticClient.execute(deleteIndex(indexName)) }
+      elasticClient.execute(deleteIndex(index.indexName))
     }
+  }
+
+  def withLocalElasticsearchIndexAsync[R](index: ElasticSearchIndex)(
+    testWith: TestWith[Future[String], R]): R = {
+
+    try {
+      testWith {
+        for {
+          _ <- index.create
+        } yield index.indexName
+      }
+    } finally {
+      elasticClient.execute(deleteIndex(index.indexName))
+    }
+  }
+
+  def withLocalElasticsearchIndexAsync[R](
+    indexName: String = Random.alphanumeric take 10 mkString,
+    itemType: String)(testWith: TestWith[Future[String], R]): R = {
+
+    val index = new WorksIndex(
+      client = elasticClient,
+      name = indexName,
+      itemType = itemType
+    )
+
+    withLocalElasticsearchIndexAsync(index)(testWith)
   }
 
   def assertElasticsearchEventuallyHasWork(work: IdentifiedWork,

@@ -67,10 +67,3 @@ trait SqsFixtures {
   }
 
 }
-
-case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
-case class TopicInfo(arn: String, name: String)
-case class MessageInfo(@JsonProperty(":id") messageId: String,
-                       @JsonProperty(":message") message: String,
-                       @JsonProperty(":subject") subject: String,
-                       @JsonProperty(":topic_arn") topic_arn: String)
