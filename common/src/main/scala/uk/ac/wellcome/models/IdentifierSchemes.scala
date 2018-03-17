@@ -1,51 +1,15 @@
 package uk.ac.wellcome.models
 
-import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
-import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.{
-  JsonDeserialize,
-  JsonSerialize
-}
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._
-
-class IdentifierSchemeDeserialiser
-    extends JsonDeserializer[IdentifierSchemes.IdentifierScheme] {
-
-  override def deserialize(
-    p: JsonParser,
-    ctxt: DeserializationContext): IdentifierSchemes.IdentifierScheme = {
-    val node: JsonNode = p.getCodec.readTree(p)
-    val identifierScheme = node.asText()
-    IdentifierSchemes.createIdentifierScheme(identifierScheme)
-  }
-}
-
-class IdentifierSchemeSerialiser
-    extends JsonSerializer[IdentifierSchemes.IdentifierScheme] {
-  override def serialize(value: IdentifierSchemes.IdentifierScheme,
-                         gen: JsonGenerator,
-                         serializers: SerializerProvider): Unit = {
-    gen.writeString(value.toString)
-  }
-}
 
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
   */
 object IdentifierSchemes extends Logging {
-  final val identifierSchemes = Seq(
-    miroImageNumber,
-    miroLibraryReference,
-    calmPlaceholder,
-    calmAltRefNo,
-    sierraSystemNumber,
-    marcCountries)
-
-  @JsonDeserialize(using = classOf[IdentifierSchemeDeserialiser])
-  @JsonSerialize(using = classOf[IdentifierSchemeSerialiser])
   sealed trait IdentifierScheme
+
   // Corresponds to the image number in Miro, e.g. V00127563.
   case object miroImageNumber extends IdentifierScheme {
     override def toString: String = "miro-image-number"
@@ -87,28 +51,25 @@ object IdentifierSchemes extends Logging {
     override def toString: String = "marc-countries"
   }
 
-  def createIdentifierScheme(
+  private final val knownIdentifierSchemes = Seq(
+    miroImageNumber,
+    miroLibraryReference,
+    calmPlaceholder,
+    calmAltRefNo,
+    sierraSystemNumber,
+    sierraIdentifier,
+    marcCountries)
+
+  private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
-    identifierScheme match {
-      case s: String if s == IdentifierSchemes.miroImageNumber.toString =>
-        IdentifierSchemes.miroImageNumber
-      case s: String if s == IdentifierSchemes.sierraSystemNumber.toString =>
-        IdentifierSchemes.sierraSystemNumber
-      case s: String if s == IdentifierSchemes.sierraIdentifier.toString =>
-        IdentifierSchemes.sierraIdentifier
-      case s: String if s == IdentifierSchemes.calmAltRefNo.toString =>
-        IdentifierSchemes.calmAltRefNo
-      case s: String if s == IdentifierSchemes.calmPlaceholder.toString =>
-        IdentifierSchemes.calmPlaceholder
-      case s: String if s == IdentifierSchemes.miroLibraryReference.toString =>
-        IdentifierSchemes.miroLibraryReference
-      case s: String if s == IdentifierSchemes.marcCountries.toString =>
-        IdentifierSchemes.marcCountries
-      case identifierScheme =>
+    knownIdentifierSchemes
+      .filter { _.toString == identifierScheme }
+      .headOption
+      .getOrElse {
         val errorMessage = s"$identifierScheme is not a valid identifierScheme"
         error(errorMessage)
         throw new Exception(errorMessage)
-    }
+      }
   }
 
   implicit val identifierSchemesDecoder
