@@ -60,7 +60,7 @@ class SierraTransformerFeatureTest
           withServer(flags) { _ =>
             eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages should have size 1
+              snsMessages.size should be >= 1
 
               val sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
@@ -72,16 +72,18 @@ class SierraTransformerFeatureTest
                 value = id
               )
 
-              val actualWork =
-                JsonUtil
-                  .fromJson[UnidentifiedWork](snsMessages.head.message)
-                  .get
+              snsMessages.map { snsMessage =>
+                val actualWork =
+                  JsonUtil
+                    .fromJson[UnidentifiedWork](snsMessage.message)
+                    .get
 
-              actualWork.sourceIdentifier shouldBe sourceIdentifier
-              actualWork.title shouldBe Some(title)
-              actualWork.identifiers shouldBe List(
-                sourceIdentifier,
-                sierraIdentifier)
+                actualWork.sourceIdentifier shouldBe sourceIdentifier
+                actualWork.title shouldBe Some(title)
+                actualWork.identifiers shouldBe List(
+                  sourceIdentifier,
+                  sierraIdentifier)
+              }
             }
           }
         }
