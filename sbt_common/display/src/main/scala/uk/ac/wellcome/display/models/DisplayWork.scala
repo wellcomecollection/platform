@@ -26,8 +26,7 @@ case class DisplayWork(
     String] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayWorkType]",
-    value = "The type of work.") workType: Option[
-    DisplayWorkType] = None,
+    value = "The type of work.") workType: Option[DisplayWorkType] = None,
   @ApiModelProperty(
     dataType = "String",
     value =

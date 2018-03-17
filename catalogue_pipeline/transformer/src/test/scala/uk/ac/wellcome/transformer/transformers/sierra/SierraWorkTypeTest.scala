@@ -4,7 +4,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.WorkType
 import uk.ac.wellcome.transformer.source.{SierraBibData, SierraMaterialType}
 
-
 class SierraWorkTypeTest extends FunSpec with Matchers {
 
   val transformer = new SierraWorkType {}
@@ -17,18 +16,18 @@ class SierraWorkTypeTest extends FunSpec with Matchers {
     val bibData = SierraBibData(
       id = "b1234567",
       title = Some("A trifle of tangy tangerine tigers"),
-      materialType = Some(SierraMaterialType(
-        code = workTypeId,
-        value = sierraValue
-      ))
+      materialType = Some(
+        SierraMaterialType(
+          code = workTypeId,
+          value = sierraValue
+        ))
     )
 
-    val expectedWorkType= WorkType(
+    val expectedWorkType = WorkType(
       id = workTypeId,
       label = sierraValue
     )
 
-    transformer.getWorkType(bibData = bibData) shouldBe Some(
-      expectedWorkType)
+    transformer.getWorkType(bibData = bibData) shouldBe Some(expectedWorkType)
   }
 }

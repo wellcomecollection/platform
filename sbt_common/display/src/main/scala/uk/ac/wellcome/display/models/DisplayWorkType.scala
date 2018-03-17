@@ -8,14 +8,14 @@ import uk.ac.wellcome.models.{Place, WorkType}
   value = "Place",
   description = "A place"
 )
-case class DisplayWorkType (
-                         @ApiModelProperty(
-                           dataType = "String"
-                         ) id: String,
-                         @ApiModelProperty(
-                           dataType = "String"
-                         ) label: String
-                       ) {
+case class DisplayWorkType(
+  @ApiModelProperty(
+    dataType = "String"
+  ) id: String,
+  @ApiModelProperty(
+    dataType = "String"
+  ) label: String
+) {
   @JsonProperty("type") val ontologyType: String = "WorkType"
 }
 

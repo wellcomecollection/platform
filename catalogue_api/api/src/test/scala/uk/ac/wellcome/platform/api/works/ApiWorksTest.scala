@@ -84,7 +84,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-   it("should return a single work when requested with id") {
+  it("should return a single work when requested with id") {
     val work = workWith(
       canonicalId = canonicalId,
       title = title,
