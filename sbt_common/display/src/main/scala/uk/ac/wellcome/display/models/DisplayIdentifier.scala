@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.SourceIdentifier
 
 @ApiModel(
   value = "Identifier",
@@ -11,7 +11,7 @@ import uk.ac.wellcome.models._
 )
 case class DisplayIdentifier(
   @ApiModelProperty(value =
-    "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system.") identifierScheme: IdentifierSchemes.IdentifierScheme,
+    "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system.") identifierScheme: String,
   @ApiModelProperty(value = "The value of the thing. e.g. an identifier") value: String) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "Identifier"
@@ -20,6 +20,6 @@ case class DisplayIdentifier(
 object DisplayIdentifier {
   def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifier =
     DisplayIdentifier(
-      identifierScheme = sourceIdentifier.identifierScheme,
+      identifierScheme = sourceIdentifier.identifierScheme.toString,
       value = sourceIdentifier.value)
 }
