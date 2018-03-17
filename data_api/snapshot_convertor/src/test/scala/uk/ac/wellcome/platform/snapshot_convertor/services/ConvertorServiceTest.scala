@@ -3,8 +3,11 @@ package uk.ac.wellcome.platform.snapshot_convertor.services
 import com.amazonaws.services.s3.model.ObjectMetadata
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.platform.snapshot_convertor.models.ConversionJob
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.test.fixtures.{S3, TestWith}
+import uk.ac.wellcome.utils.JsonUtil
+
+import scala.io.Source
 
 class ConvertorServiceTest
   extends FunSpec
@@ -34,7 +37,11 @@ class ConvertorServiceTest
 
         val future = service.runConversion(conversionJob)
 
-        whenReady(future) { _ =>
+        whenReady(future) { completedConversionJob: CompletedConversionJob =>
+
+          val displayWorks = Source.fromURL(completedConversionJob.targetLocation)
+            .mkString.split("\n")
+          
           false shouldBe true
         }
       }
