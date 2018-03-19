@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{AbstractAgent, Organisation, Person}
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraCreatorsTest extends FunSpec with Matchers {
 
@@ -94,11 +98,12 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "110",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name)))))
+          subfields = List(MarcSubfield(tag = "a", content = name))))
+    )
 
-      val creators = transformer.getCreators(bibData)
+    val creators = transformer.getCreators(bibData)
 
-      creators should contain only Organisation(label = name)
+    creators should contain only Organisation(label = name)
   }
 
 }
