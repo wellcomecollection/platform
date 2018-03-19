@@ -53,8 +53,11 @@ object Dependencies {
     "io.circe" %% "circe-generic"% versions.circeVersion,
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
+  )
+
+  val circeOpticsDependencies = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val jacksonDependencies = Seq(
@@ -109,8 +112,7 @@ object Dependencies {
 
   val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
-  val idminterDependencies
-    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
+  val idminterDependencies = commonDependencies ++ mysqlDependencies ++ circeOpticsDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
@@ -120,9 +122,9 @@ object Dependencies {
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
-  )
+  ) ++ circeOpticsDependencies
 
-  val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
+  val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies ++ circeOpticsDependencies
 
-  val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies
+  val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies ++ circeOpticsDependencies
 }
