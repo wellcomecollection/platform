@@ -22,15 +22,17 @@ class SierraLanguageTest extends FunSpec with Matchers with SierraData {
   it("picks up the language from the lang field") {
     val bibData = SierraBibData(
       id = "2000002",
-      lang = Some(SierraLanguage(
-        code = "eng",
-        name = "English"
-      ))
+      lang = Some(
+        SierraLanguage(
+          code = "eng",
+          name = "English"
+        ))
     )
 
-    transformer.getLanguage(bibData = bibData) shouldBe Some(Language(
-      id = "eng",
-      label = "English"
-    ))
+    transformer.getLanguage(bibData = bibData) shouldBe Some(
+      Language(
+        id = "eng",
+        label = "English"
+      ))
   }
 }
