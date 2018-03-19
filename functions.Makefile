@@ -132,7 +132,8 @@ define publish_service
 	    wellcome/publish_service:latest \
 	        --project="$(1)" \
 	        --namespace=uk.ac.wellcome \
-	        --infra-bucket="$(INFRA_BUCKET)"
+	        --infra-bucket="$(INFRA_BUCKET)" \
+			--sns-topic="arn:aws:sns:eu-west-1:760097843905:ecr_pushes"
 endef
 
 
