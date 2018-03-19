@@ -87,7 +87,7 @@ object Dependencies {
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
+  ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
