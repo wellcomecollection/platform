@@ -29,7 +29,7 @@ trait SierraExtent extends MarcUtils {
       bibData = bibData,
       marcTag = "300",
       marcSubfieldTag = "a"
-    )
+    ).flatten
 
     if (matchingSubfields.isEmpty) {
       None
