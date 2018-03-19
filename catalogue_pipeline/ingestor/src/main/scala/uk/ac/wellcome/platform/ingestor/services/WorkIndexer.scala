@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import javax.inject.{Inject, Singleton}
 
+import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.IndexResponse
@@ -13,6 +14,7 @@ import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
@@ -24,6 +26,11 @@ class WorkIndexer @Inject()(
   metricsSender: MetricsSender
 ) extends Logging
     with ElasticsearchExceptionManager {
+
+  implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {
+    override def json(t: IdentifiedWork): String =
+      toJson(t).get
+  }
 
   def indexWork(work: IdentifiedWork): Future[Any] = {
 

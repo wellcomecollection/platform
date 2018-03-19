@@ -4,7 +4,8 @@ import com.sksamuel.elastic4s.ElasticDsl.{deleteIndex, index}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import uk.ac.wellcome.test.fixtures.{ElasticsearchFixtures, SqsFixtures}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.test.fixtures.SqsFixtures
 
 class IngestorIndexTest
     extends FunSpec

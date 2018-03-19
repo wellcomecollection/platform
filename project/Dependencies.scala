@@ -53,8 +53,11 @@ object Dependencies {
     "io.circe" %% "circe-generic"% versions.circeVersion,
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
+  )
+
+  val circeOpticsDependencies = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val jacksonDependencies = Seq(
@@ -87,17 +90,19 @@ object Dependencies {
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
+  ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ swaggerDependencies
 
+  val commonElasticsearchDependencies = commonDependencies ++ esDependencies
+
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ dynamoDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies
+  val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
 
   val transformerDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies
@@ -105,22 +110,21 @@ object Dependencies {
   val calmAdapterDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies
 
-  val ingestorDependencies: Seq[ModuleID] = commonDependencies
+  val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
-  val idminterDependencies
-    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
+  val idminterDependencies = commonDependencies ++ mysqlDependencies ++ circeOpticsDependencies
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
   val snapshotConvertorDependencies: Seq[ModuleID] = commonDependencies
 
-  val recorderDependencies: Seq[ModuleID] = Seq()
+  val recorderDependencies = commonDependencies ++ circeOpticsDependencies
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
-  )
+  ) ++ circeOpticsDependencies
 
-  val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
+  val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies ++ circeOpticsDependencies
 
-  val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies
+  val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies ++ circeOpticsDependencies
 }

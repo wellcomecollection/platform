@@ -182,7 +182,7 @@ def affects_tests(path, task):
     )
     if (
         task.startswith(sbt_free_tasks) and
-        path.startswith(('common/', 'project/', 'build.sbt'))
+        path.startswith(('common/', 'project/', 'build.sbt', 'sbt_common'))
     ):
         print(
             "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %

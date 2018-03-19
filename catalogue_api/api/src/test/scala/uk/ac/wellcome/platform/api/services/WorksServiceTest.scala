@@ -7,7 +7,7 @@ import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.models.WorksIncludes
 import uk.ac.wellcome.display.models.{DisplayIdentifier, DisplayWork}
 import uk.ac.wellcome.platform.api.models.DisplayResultList
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
