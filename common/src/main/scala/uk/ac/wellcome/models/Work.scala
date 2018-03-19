@@ -15,7 +15,7 @@ trait Work extends Versioned with Identifiable {
   val lettering: Option[String]
   val createdDate: Option[Period]
   val subjects: List[AbstractConcept]
-  val creators: List[Agent]
+  val creators: List[AbstractAgent]
   val genres: List[AbstractConcept]
   val thumbnail: Option[Location]
   val publishers: List[AbstractAgent]
@@ -36,7 +36,7 @@ case class UnidentifiedWork(title: Option[String],
                             lettering: Option[String] = None,
                             createdDate: Option[Period] = None,
                             subjects: List[AbstractConcept] = Nil,
-                            creators: List[Agent] = Nil,
+                            creators: List[AbstractAgent] = Nil,
                             genres: List[AbstractConcept] = Nil,
                             thumbnail: Option[Location] = None,
                             items: List[UnidentifiedItem] = Nil,
@@ -60,7 +60,7 @@ case class IdentifiedWork(canonicalId: String,
                           lettering: Option[String] = None,
                           createdDate: Option[Period] = None,
                           subjects: List[AbstractConcept] = Nil,
-                          creators: List[Agent] = Nil,
+                          creators: List[AbstractAgent] = Nil,
                           genres: List[AbstractConcept] = Nil,
                           thumbnail: Option[Location] = None,
                           items: List[IdentifiedItem] = Nil,
