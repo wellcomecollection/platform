@@ -15,7 +15,11 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamo
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecord
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
@@ -23,12 +27,17 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, LocalDynamoDb, SqsFixtures, TestWith}
+import uk.ac.wellcome.test.fixtures.{
+  AkkaFixtures,
+  LocalDynamoDb,
+  SqsFixtures,
+  TestWith
+}
 
 import scala.concurrent.duration._
 
 class SierraItemsToDynamoWorkerServiceTest
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb[SierraItemRecord]
     with SqsFixtures
     with Matchers
@@ -47,15 +56,16 @@ class SierraItemsToDynamoWorkerServiceTest
     tableName: String
   )
 
-  def withSierraWorkerService[R](testWith: TestWith[ServiceFixtures, R]): Unit = {
+  def withSierraWorkerService[R](
+    testWith: TestWith[ServiceFixtures, R]): Unit = {
     withActorSystem { actorSystem =>
       withLocalDynamoDbTable { tableName =>
         withLocalSqsQueue { queueUrl =>
-
           val mockPutMetricDataResult = mock[PutMetricDataResult]
           val mockCloudWatch = mock[AmazonCloudWatch]
 
-          when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
+          when(mockCloudWatch.putMetricData(any()))
+            .thenReturn(mockPutMetricDataResult)
           val mockMetrics = new MetricsSender(
             "namespace",
             100 milliseconds,
@@ -63,21 +73,24 @@ class SierraItemsToDynamoWorkerServiceTest
             actorSystem
           )
 
-          val sierraItemsToDynamoWorkerService = new SierraItemsToDynamoWorkerService(
-            reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-            system = actorSystem,
-            metrics = mockMetrics,
-            versionedDao = new VersionedDao(
-              dynamoDbClient = dynamoDbClient,
-              dynamoConfig = DynamoConfig(tableName)
+          val sierraItemsToDynamoWorkerService =
+            new SierraItemsToDynamoWorkerService(
+              reader =
+                new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+              system = actorSystem,
+              metrics = mockMetrics,
+              versionedDao = new VersionedDao(
+                dynamoDbClient = dynamoDbClient,
+                dynamoConfig = DynamoConfig(tableName)
+              )
             )
-          )
 
-          testWith(ServiceFixtures(
-            service = sierraItemsToDynamoWorkerService,
-            queueUrl = queueUrl,
-            tableName = tableName
-          ))
+          testWith(
+            ServiceFixtures(
+              service = sierraItemsToDynamoWorkerService,
+              queueUrl = queueUrl,
+              tableName = tableName
+            ))
         }
       }
     }
@@ -85,7 +98,6 @@ class SierraItemsToDynamoWorkerServiceTest
 
   it("reads a sierra record from sqs an inserts it into DynamoDb") {
     withSierraWorkerService { fixtures =>
-
       val id = "i12345"
       val bibId = "b54321"
       val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
@@ -105,7 +117,8 @@ class SierraItemsToDynamoWorkerServiceTest
         Scanamo.scan[SierraItemRecord](dynamoDbClient)(fixtures.tableName) should have size 1
 
         val scanamoResult =
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(fixtures.tableName)('id -> id)
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(fixtures.tableName)(
+            'id -> id)
 
         scanamoResult shouldBe defined
         scanamoResult.get shouldBe Right(
@@ -116,7 +129,6 @@ class SierraItemsToDynamoWorkerServiceTest
 
   it("returns a GracefulFailureException if it receives an invalid message") {
     withSierraWorkerService { fixtures =>
-
       val message =
         """
           |{
@@ -125,7 +137,12 @@ class SierraItemsToDynamoWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
 
       whenReady(fixtures.service.processMessage(sqsMessage).failed) { ex =>
         ex shouldBe a[GracefulFailureException]

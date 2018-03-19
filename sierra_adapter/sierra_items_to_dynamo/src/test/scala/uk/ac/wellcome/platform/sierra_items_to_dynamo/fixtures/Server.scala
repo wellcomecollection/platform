@@ -8,9 +8,9 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.{Server => AppServer}
 
 trait Server extends AmazonCloudWatchFlag { this: Suite =>
   def withServer[R](
-                     flags: Map[String, String],
-                     modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity
-                   )(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    flags: Map[String, String],
+    modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity
+  )(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer = modifyServer(
       new EmbeddedHttpServer(

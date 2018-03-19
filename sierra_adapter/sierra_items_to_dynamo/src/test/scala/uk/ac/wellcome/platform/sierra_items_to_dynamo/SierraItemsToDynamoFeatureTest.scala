@@ -11,14 +11,21 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.{
+  AmazonCloudWatchFlag,
+  ExtendedPatience,
+  SQSLocal
+}
 import uk.ac.wellcome.dynamo._
 import io.circe.generic.extras.semiauto._
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecord
+}
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SqsFixtures}
 
 class SierraItemsToDynamoFeatureTest
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb[SierraItemRecord]
     with SqsFixtures
     with fixtures.Server
@@ -32,13 +39,9 @@ class SierraItemsToDynamoFeatureTest
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { tableName =>
       withLocalSqsQueue { queueUrl =>
-
-        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(tableName) ++ Map(
-          "aws.dynamo.tableName" -> tableName
-        )
+        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(tableName)
 
         withServer(flags) { server =>
-
           val id = "i12345"
           val bibId = "b54321"
           val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
@@ -58,11 +61,17 @@ class SierraItemsToDynamoFeatureTest
             Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
 
             val scanamoResult =
-              Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id)
-            
+              Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+                'id -> id)
+
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(
-              SierraItemRecord(id, data, modifiedDate, List(bibId), version = 1))
+              SierraItemRecord(
+                id,
+                data,
+                modifiedDate,
+                List(bibId),
+                version = 1))
           }
         }
       }
