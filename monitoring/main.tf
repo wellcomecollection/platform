@@ -30,6 +30,7 @@ module "deployment_tracking" {
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 
   non_critical_slack_webhook = "${var.non_critical_slack_webhook}"
+  lambda_pushes_topic_name   = "${module.lambda_pushes_topic.name}"
   ecr_pushes_topic_name      = "${module.ecr_pushes_topic.name}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
