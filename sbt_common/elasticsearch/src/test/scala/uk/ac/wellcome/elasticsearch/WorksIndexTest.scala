@@ -5,8 +5,8 @@ import org.scalacheck.Arbitrary
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
 import com.sksamuel.elastic4s.http.ElasticDsl._

@@ -20,7 +20,8 @@ import uk.ac.wellcome.models.{
   SourceIdentifier
 }
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.fixtures.{ElasticsearchFixtures, SqsFixtures}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.test.fixtures.SqsFixtures
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

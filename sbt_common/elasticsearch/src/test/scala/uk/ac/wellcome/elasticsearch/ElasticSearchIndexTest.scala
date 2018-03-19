@@ -9,7 +9,7 @@ import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

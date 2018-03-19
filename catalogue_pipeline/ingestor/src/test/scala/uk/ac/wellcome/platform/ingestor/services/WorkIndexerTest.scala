@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.{
   IdentifierSchemes,
   SourceIdentifier
 }
-import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.duration._
