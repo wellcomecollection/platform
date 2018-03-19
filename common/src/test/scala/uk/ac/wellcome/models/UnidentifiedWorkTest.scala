@@ -26,6 +26,13 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   // for steam locomotives, reaching 126 mph.
   val publicationDate = "3 July 1938"
 
+  // Reskitkish is a fictional language from the "Wayfarers" series of novels,
+  // and requires large lungs to speak effectively.
+  val language = Language(
+    id = "res",
+    label = "Reskitkish"
+  )
+
   val unidentifiedWorkJson: String =
     s"""
       |{
@@ -118,6 +125,11 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |     "ontologyType": "Place"
       |   }
       |  ],
+      |   "language": {
+      |     "id": "${language.id}",
+      |     "label": "${language.label}",
+      |     "ontologyType": "Language"
+      |   },
       |  "ontologyType": "Work"
       |}
     """.stripMargin
@@ -161,7 +173,8 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(Place("Madrid"))
+    placesOfPublication = List(Place("Madrid")),
+    language = Some(language)
   )
 
   it("should serialise an unidentified Work as JSON") {
