@@ -99,7 +99,7 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ dynamoDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies
+  val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
 
   val transformerDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies
@@ -107,7 +107,7 @@ object Dependencies {
   val calmAdapterDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies
 
-  val ingestorDependencies: Seq[ModuleID] = commonDependencies
+  val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
   val idminterDependencies
     : Seq[ModuleID] = commonDependencies ++ mysqlDependencies

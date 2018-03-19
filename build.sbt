@@ -24,16 +24,20 @@ lazy val common = project
 lazy val common_display = doSharedSetup(project, "sbt_common/display")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
+// We still inherit from the main common because we need one of the models it
+// contains (IdentifiedWork) to construct an implicit Indexable object.
 lazy val common_elasticsearch = doSharedSetup(project, "sbt_common/elasticsearch")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
 lazy val api = doSharedSetup(project, "catalogue_api/api")
   .dependsOn(common_display % "compile->compile;test->test")
+  .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
 
 lazy val ingestor = doSharedSetup(project, "catalogue_pipeline/ingestor")
+  .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
