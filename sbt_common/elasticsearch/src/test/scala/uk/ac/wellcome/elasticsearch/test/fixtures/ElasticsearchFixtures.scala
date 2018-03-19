@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.elasticsearch.test.fixtures
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.finatra.modules.ElasticCredentials
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.elasticsearch.models.IdentifiedWork
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._

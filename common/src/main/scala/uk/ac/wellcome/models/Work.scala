@@ -1,6 +1,5 @@
 package uk.ac.wellcome.models
 
-import com.sksamuel.elastic4s.Indexable
 import uk.ac.wellcome.utils.JsonUtil._
 
 /** A representation of a work in our ontology */
@@ -66,8 +65,3 @@ case class IdentifiedWork(canonicalId: String,
                           visible: Boolean = true,
                           ontologyType: String = "Work")
     extends Work
-
-case object IdentifiedWork extends Indexable[IdentifiedWork] {
-  override def json(t: IdentifiedWork): String =
-    toJson(t).get
-}

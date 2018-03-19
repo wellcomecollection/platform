@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.elasticsearch.test.utils
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
