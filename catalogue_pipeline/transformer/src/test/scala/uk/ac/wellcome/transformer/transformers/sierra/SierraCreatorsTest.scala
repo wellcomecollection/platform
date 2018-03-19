@@ -57,16 +57,20 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Person(name = name, prefixes = List(prefix), numeration = Some(numeration))
+    creators should contain only Person(
+      name = name,
+      prefixes = List(prefix),
+      numeration = Some(numeration))
   }
 
-  it("extracts multiple prefixes from marcTag 100 c"){
+  it("extracts multiple prefixes from marcTag 100 c") {
     val name = "Samuel Vines"
     val prefixes = List("Commander", "His Grace, The Duke of Ankh")
 
-    val prefixSubfields = prefixes.map( prefix => MarcSubfield(tag = "c", content = prefix))
+    val prefixSubfields =
+      prefixes.map(prefix => MarcSubfield(tag = "c", content = prefix))
 
-    val subfields =  prefixSubfields :+ MarcSubfield(tag = "a", content = name)
+    val subfields = prefixSubfields :+ MarcSubfield(tag = "a", content = name)
     val bibData = SierraBibData(
       id = "1234567",
       title = None,
@@ -89,10 +93,18 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 }
 
 trait SierraCreators extends MarcUtils {
-  def getCreators(bibData: SierraBibData): List[AbstractAgent] = getMatchingSubfields(bibData, "100", List("a", "b", "c")).map{subfields =>
-    val name = subfields.collectFirst{ case MarcSubfield("a", content) => content}
-    val numeration = subfields.collectFirst { case MarcSubfield("b", content) => content }
-    val prefixes = subfields.collect { case MarcSubfield("c", content) => content }
-    Person(name = name.get, prefixes = prefixes, numeration = numeration)
-  }
+  def getCreators(bibData: SierraBibData): List[AbstractAgent] =
+    getMatchingSubfields(bibData, "100", List("a", "b", "c")).map {
+      subfields =>
+        val name = subfields.collectFirst {
+          case MarcSubfield("a", content) => content
+        }
+        val numeration = subfields.collectFirst {
+          case MarcSubfield("b", content) => content
+        }
+        val prefixes = subfields.collect {
+          case MarcSubfield("c", content) => content
+        }
+        Person(name = name.get, prefixes = prefixes, numeration = numeration)
+    }
 }
