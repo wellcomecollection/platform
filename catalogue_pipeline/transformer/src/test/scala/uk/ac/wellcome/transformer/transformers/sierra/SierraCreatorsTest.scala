@@ -29,7 +29,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Person(name = name)
+    creators should contain only Person(label = name)
   }
 
   it("extracts the creator numeration and prefix if present from marcTag 100") {
@@ -56,7 +56,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
     val creators = transformer.getCreators(bibData)
 
     creators should contain only Person(
-      name = name,
+      label = name,
       prefixes = List(prefix),
       numeration = Some(numeration))
   }
@@ -83,7 +83,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Person(name = name, prefixes = prefixes)
+    creators should contain only Person(label = name, prefixes = prefixes)
   }
 
   it("extracts organisations from marcTag 110") {

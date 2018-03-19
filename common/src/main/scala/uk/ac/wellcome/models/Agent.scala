@@ -1,6 +1,7 @@
 package uk.ac.wellcome.models
 
 sealed trait AbstractAgent {
+  val label: String
   val ontologyType: String
 }
 
@@ -14,7 +15,7 @@ case class Organisation(
   ontologyType: String = "Organisation"
 ) extends AbstractAgent
 
-case class Person(name: String,
+case class Person(label: String,
                   prefixes: List[String] = Nil,
                   numeration: Option[String] = None,
                   ontologyType: String = "Person")
