@@ -93,6 +93,8 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ swaggerDependencies
 
+  val commonElasticsearchDependencies = commonDependencies ++ esDependencies
+
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ dynamoDependencies

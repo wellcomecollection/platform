@@ -19,9 +19,13 @@ lazy val common = project
   .enablePlugins(DockerComposePlugin)
   .settings(libraryDependencies ++= Dependencies.commonDependencies)
 
+// We still inherit from the main common because we need the models it
+// contains (e.g. IdentifiedWork) to construct display models.
 lazy val common_display = doSharedSetup(project, "sbt_common/display")
-  .settings(Common.settings: _*)
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
+
+lazy val common_elasticsearch = doSharedSetup(project, "sbt_common/elasticsearch")
+  .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
 lazy val api = doSharedSetup(project, "catalogue_api/api")
   .dependsOn(common_display % "compile->compile;test->test")
@@ -70,6 +74,7 @@ lazy val root = (project in file("."))
   .aggregate(
     common,
     common_display,
+    common_elasticsearch,
     api,
     ingestor,
     transformer,

@@ -6,3 +6,9 @@ sbt-display-test:
 
 sbt-display-publish:
 	echo "Nothing to do!"
+
+sbt-elasticsearch-test:
+	$(call sbt_test_no_docker,common_elasticsearch)
+
+sbt-elasticsearch-publish:
+	echo "Nothing to do!"
