@@ -17,6 +17,7 @@ class SierraTransformableTransformer
     with SierraPhysicalDescription
     with SierraExtent
     with SierraItems
+    with SierraLanguage
     with SierraLettering
     with SierraPublishers
     with SierraTitle
@@ -54,7 +55,8 @@ class SierraTransformableTransformer
               publishers = getPublishers(sierraBibData),
               visible = !(sierraBibData.deleted || sierraBibData.suppressed),
               publicationDate = getPublicationDate(sierraBibData),
-              placesOfPublication = getPlacesOfPublication(sierraBibData)
+              placesOfPublication = getPlacesOfPublication(sierraBibData),
+              language = getLanguage(sierraBibData)
             ))
         }
 
