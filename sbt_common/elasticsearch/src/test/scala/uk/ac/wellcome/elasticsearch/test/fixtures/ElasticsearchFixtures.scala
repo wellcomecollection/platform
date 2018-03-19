@@ -11,6 +11,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._

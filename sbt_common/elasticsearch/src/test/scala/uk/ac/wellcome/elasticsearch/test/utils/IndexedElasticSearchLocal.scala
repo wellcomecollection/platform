@@ -8,6 +8,7 @@ import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.utils.JsonTestUtil
 
 import scala.concurrent.Future
 
