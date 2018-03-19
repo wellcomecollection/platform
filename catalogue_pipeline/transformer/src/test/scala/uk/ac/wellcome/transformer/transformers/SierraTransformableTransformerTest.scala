@@ -518,4 +518,34 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get.get.sourceIdentifier
   }
+
+  it("uses the lang for the language field") {
+    val id = "1020201"
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData = Some(
+        SierraBibRecord(
+          id = id,
+          data = s"""{
+            "id": "$id",
+            "lang": {
+              "code": "fra",
+              "name": "French"
+            }
+          }""",
+          modifiedDate = now()
+        ))
+    )
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    val expectedLanguage = Language(
+      id = "fra",
+      label = "French"
+    )
+
+    transformedSierraRecord.get.get.language.get shouldBe expectedLanguage
+  }
 }
