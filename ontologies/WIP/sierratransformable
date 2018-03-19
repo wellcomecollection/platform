@@ -85,8 +85,8 @@
    */
 
    /* Populate wwork:language. Rules
-   * 
-   * 1. For all bibliographic records use "language"
+   *
+   * 1. For all bibliographic records use "lang"
    * 2. Platform "id" is populated from "code"
    * 3. Platform "label" is populated from "name"
    * 
