@@ -118,7 +118,7 @@ object Dependencies {
 
   val snapshotConvertorDependencies: Seq[ModuleID] = commonDependencies
 
-  val recorderDependencies: Seq[ModuleID] = Seq()
+  val recorderDependencies = commonDependencies ++ circeOpticsDependencies
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
