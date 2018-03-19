@@ -17,4 +17,5 @@ case class Organisation(
 case class Person(name: String,
                   prefix: Option[String] = None,
                   numeration: Option[String] = None,
-                  ontologyType: String = "Person") extends AbstractAgent
+                  ontologyType: String = "Person")
+    extends AbstractAgent
