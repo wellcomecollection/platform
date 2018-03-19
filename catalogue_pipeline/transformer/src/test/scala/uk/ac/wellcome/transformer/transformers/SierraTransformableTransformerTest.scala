@@ -621,6 +621,6 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get.get.creators should contain only Person(
-      name = name)
+      label = name)
   }
 }
