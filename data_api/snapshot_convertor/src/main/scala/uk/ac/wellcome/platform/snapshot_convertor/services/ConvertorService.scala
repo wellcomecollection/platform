@@ -5,7 +5,10 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
@@ -25,13 +28,14 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.io.Source
 
-class ConvertorService @Inject()(
-                                  @Flag("aws.s3.bucketName") bucketName: String,
-                                  actorSystem: ActorSystem,
-                                  awsConfig: AWSConfig,
-                                  s3Client: AmazonS3) extends Logging {
+class ConvertorService @Inject()(@Flag("aws.s3.bucketName") bucketName: String,
+                                 actorSystem: ActorSystem,
+                                 awsConfig: AWSConfig,
+                                 s3Client: AmazonS3)
+    extends Logging {
 
-  def runConversion(conversionJob: ConversionJob): Future[CompletedConversionJob] = {
+  def runConversion(
+    conversionJob: ConversionJob): Future[CompletedConversionJob] = {
     info(s"ConvertorService running $conversionJob")
 
     val credentialsProvider = DefaultAWSCredentialsProviderChain
@@ -67,11 +71,11 @@ class ConvertorService @Inject()(
 
 //  CompletedConversionJob(conversionJob)
 
-
     val objectKey = conversionJob.objectKey
 
     // This should deal with compressed files
-    val inputStream = s3Client.getObject(bucketName, objectKey)
+    val inputStream = s3Client
+      .getObject(bucketName, objectKey)
       .getObjectContent()
 
     val sourceLines = Source.fromInputStream(inputStream).getLines()
@@ -89,10 +93,12 @@ class ConvertorService @Inject()(
       items = true
     )
 
-    val displayWorks = identifiedWorks.map(identifiedWork => DisplayWork(
-      work = identifiedWork,
-      includes = includes
-    ))
+    val displayWorks = identifiedWorks.map(
+      identifiedWork =>
+        DisplayWork(
+          work = identifiedWork,
+          includes = includes
+      ))
 
     // this should be Jackson
     val displayWorksString = displayWorks

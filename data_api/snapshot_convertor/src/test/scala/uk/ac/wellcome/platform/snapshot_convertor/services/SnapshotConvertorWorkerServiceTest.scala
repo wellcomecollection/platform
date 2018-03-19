@@ -17,9 +17,8 @@ import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures, TestWith}
 
 import scala.concurrent.duration._
 
-
 class SnapshotConvertorWorkerServiceTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MockitoSugar
     with SnsFixtures
@@ -28,10 +27,10 @@ class SnapshotConvertorWorkerServiceTest
     with S3 {
 
   def withSnapshotConvertorWorkerService[R](
-     topicArn: String,
-     queueUrl: String,
-     bucketName: String
-   )(testWith: TestWith[SnapshotConvertorWorkerService, R]) = {
+    topicArn: String,
+    queueUrl: String,
+    bucketName: String
+  )(testWith: TestWith[SnapshotConvertorWorkerService, R]) = {
 
     val metricsSender: MetricsSender = new MetricsSender(
       namespace = "record-receiver-tests",
@@ -70,32 +69,33 @@ class SnapshotConvertorWorkerServiceTest
     testWith(snapshotConvertorWorkerService)
   }
 
-  it("returns a successful Future if the snapshot conversion completes correctly") {
+  it(
+    "returns a successful Future if the snapshot conversion completes correctly") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
-
           val key = "elastic_dump_example.txt.gz"
-          val input = getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
+          val input =
+            getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
           val metadata = new ObjectMetadata()
 
           s3Client.putObject(bucketName, key, input, metadata)
 
-          withSnapshotConvertorWorkerService(topicArn, queueUrl, bucketName) { service =>
+          withSnapshotConvertorWorkerService(topicArn, queueUrl, bucketName) {
+            service =>
+              val sqsMessage = SQSMessage(
+                subject = None,
+                body = "<xml>What is JSON.</xl?>",
+                topic = "topic",
+                messageType = "message",
+                timestamp = "now"
+              )
 
-            val sqsMessage = SQSMessage(
-              subject = None,
-              body = "<xml>What is JSON.</xl?>",
-              topic = "topic",
-              messageType = "message",
-              timestamp = "now"
-            )
+              val future = service.processMessage(message = sqsMessage)
 
-            val future = service.processMessage(message = sqsMessage)
-
-            whenReady(future) { _ =>
-              false shouldBe true
-            }
+              whenReady(future) { _ =>
+                false shouldBe true
+              }
           }
         }
       }

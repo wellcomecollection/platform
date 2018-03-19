@@ -6,16 +6,18 @@ import org.scalatest.Matchers
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.io.Source
 
-
 class SnapshotConvertorFeatureTest
-  extends FunSpec
+    extends FunSpec
     with AmazonCloudWatchFlag
     with SqsFixtures
     with SnsFixtures
@@ -26,23 +28,24 @@ class SnapshotConvertorFeatureTest
     with Eventually
     with ExtendedPatience {
 
-  it("converts a gzipped elasticdump from S3 into the correct format in the target bucket") {
+  it(
+    "converts a gzipped elasticdump from S3 into the correct format in the target bucket") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
-
           val flags = Map(
             "aws.region" -> "eu-west-1"
-          ) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ cloudWatchLocalEndpointFlag
+          ) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
+            bucketName) ++ cloudWatchLocalEndpointFlag
 
           val key = "elastic_dump_example.txt.gz"
-          val input = getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
+          val input =
+            getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
           val metadata = new ObjectMetadata()
 
           s3Client.putObject(bucketName, key, input, metadata)
 
           withServer(flags) { _ =>
-
             val objectKey = "location/of/resource"
             val expectedLocation = "location/of/target"
 
@@ -55,7 +58,6 @@ class SnapshotConvertorFeatureTest
               conversionJob = conversionJob,
               targetLocation = "location/of/target"
             )
-
 
             val sqsMessage = SQSMessage(
               None,
@@ -75,13 +77,15 @@ class SnapshotConvertorFeatureTest
 
               JsonUtil
                 .fromJson[CompletedConversionJob](
-                messages.head.message
-              ).get shouldBe completedConversionJob
+                  messages.head.message
+                )
+                .get shouldBe completedConversionJob
 
               val s3Object = s3Client.getObject(bucketName, expectedLocation)
               val stream: S3ObjectInputStream = s3Object.getObjectContent
 
-              val outputLines = Source.fromInputStream(stream).getLines.mkString
+              val outputLines =
+                Source.fromInputStream(stream).getLines.mkString
 
               true shouldBe false
             }
