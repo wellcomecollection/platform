@@ -5,7 +5,6 @@ Sends Slack notifications for ECR pushes.
 
 import json
 import os
-import textwrap
 
 from botocore.vendored import requests
 
