@@ -584,4 +584,43 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get.get.language.get shouldBe expectedLanguage
   }
+
+  it("extracts creators if present") {
+    val id = "8008008"
+    val name = "Rincewind"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "English earwigs earn evidence of evil",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "100",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$name"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.creators should contain only Person(
+      name = name)
+  }
 }
