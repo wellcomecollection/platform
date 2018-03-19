@@ -16,7 +16,7 @@ case class Organisation(
 ) extends AbstractAgent
 
 case class Person(label: String,
-                  prefixes: List[String] = Nil,
+                  prefix: Option[String] = None,
                   numeration: Option[String] = None,
                   ontologyType: String = "Person")
     extends AbstractAgent
