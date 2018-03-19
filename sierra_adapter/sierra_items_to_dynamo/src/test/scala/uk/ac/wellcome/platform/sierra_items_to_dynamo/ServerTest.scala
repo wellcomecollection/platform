@@ -6,6 +6,9 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SqsFixtures}
 
+import uk.ac.wellcome.dynamo._
+
+
 class ServerTest
     extends FunSpec
       with LocalDynamoDb[SierraItemRecord]

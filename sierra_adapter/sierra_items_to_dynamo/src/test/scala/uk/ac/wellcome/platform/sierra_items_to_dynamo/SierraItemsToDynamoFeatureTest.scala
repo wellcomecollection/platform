@@ -13,6 +13,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.dynamo._
+import io.circe.generic.extras.semiauto._
 import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SqsFixtures}
 
@@ -25,7 +26,8 @@ class SierraItemsToDynamoFeatureTest
     with Eventually
     with ExtendedPatience {
 
-  override lazy val evidence = DynamoFormat[SierraItemRecord]
+  override lazy val evidence: DynamoFormat[SierraItemRecord] =
+    DynamoFormat[SierraItemRecord]
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { tableName =>
