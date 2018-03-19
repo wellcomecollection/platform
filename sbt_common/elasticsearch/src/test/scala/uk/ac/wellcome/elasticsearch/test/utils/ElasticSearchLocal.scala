@@ -8,7 +8,7 @@ import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
-import uk.ac.wellcome.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
