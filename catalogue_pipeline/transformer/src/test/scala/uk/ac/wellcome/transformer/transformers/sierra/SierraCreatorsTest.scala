@@ -1,17 +1,15 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{AbstractAgent, Person}
-import uk.ac.wellcome.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.models.{AbstractAgent, Organisation, Person}
+import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
 
 class SierraCreatorsTest extends FunSpec with Matchers {
 
+  val transformer = new SierraCreators {}
+
   it("extracts the creator name from marcTag 100 a") {
-    val name = "Samuel Vines"
+    val name = "Carrot Ironfoundersson"
 
     val bibData = SierraBibData(
       id = "1234567",
@@ -24,8 +22,6 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name))))
     )
-
-    val transformer = new SierraCreators {}
 
     val creators = transformer.getCreators(bibData)
 
@@ -52,8 +48,6 @@ class SierraCreatorsTest extends FunSpec with Matchers {
             MarcSubfield(tag = "c", content = prefix))
         ))
     )
-
-    val transformer = new SierraCreators {}
 
     val creators = transformer.getCreators(bibData)
 
@@ -83,28 +77,47 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           subfields = subfields))
     )
 
-    val transformer = new SierraCreators {}
-
     val creators = transformer.getCreators(bibData)
 
     creators should contain only Person(name = name, prefixes = prefixes)
   }
 
+  it("extracts organisations from marcTag 110") {
+    val name = "Ankh-Morpork City Watch"
+
+    val bibData = SierraBibData(
+      id = "1234567",
+      title = None,
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name)))))
+
+      val creators = transformer.getCreators(bibData)
+
+      creators should contain only Organisation(label = name)
+  }
+
 }
 
 trait SierraCreators extends MarcUtils {
-  def getCreators(bibData: SierraBibData): List[AbstractAgent] =
-    getMatchingSubfields(bibData, "100", List("a", "b", "c")).map {
-      subfields =>
-        val name = subfields.collectFirst {
-          case MarcSubfield("a", content) => content
-        }
-        val numeration = subfields.collectFirst {
-          case MarcSubfield("b", content) => content
-        }
-        val prefixes = subfields.collect {
-          case MarcSubfield("c", content) => content
-        }
-        Person(name = name.get, prefixes = prefixes, numeration = numeration)
+
+  def getCreators(bibData: SierraBibData): List[AbstractAgent] = {
+
+    val persons = getMatchingSubfields(bibData, "100", List("a", "b", "c")).map { subfields =>
+      val name = subfields.collectFirst { case MarcSubfield("a", content) => content }
+      val numeration = subfields.collectFirst { case MarcSubfield("b", content) => content }
+      val prefixes = subfields.collect { case MarcSubfield("c", content) => content }
+      Person(name = name.get, prefixes = prefixes, numeration = numeration)
     }
+
+    val organisations = getMatchingSubfields(bibData, "110", "a").map{ subfields =>
+      Organisation(subfields.head.content)
+    }
+
+    persons ++ organisations
+  }
 }
