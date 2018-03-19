@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.snapshot_convertor.models
 
-case class CompletedConversionJob(conversionJob: ConversionJob, targetLocation: String)
+import akka.http.scaladsl.model.Uri
 
-object CompletedConversionJob {
-  def apply(conversionJob: ConversionJob): CompletedConversionJob =
-    CompletedConversionJob(conversionJob, "foo")
-}
+case class CompletedConversionJob(
+  conversionJob: ConversionJob,
+  targetLocation: Uri
+)

@@ -55,7 +55,8 @@ class SnapshotConvertorWorkerServiceTest
     )
 
     val convertorService = new ConvertorService(
-      s3Client: AmazonS3
+      bucketName,
+      s3Client
     )
 
     val snapshotConvertorWorkerService = new SnapshotConvertorWorkerService(
