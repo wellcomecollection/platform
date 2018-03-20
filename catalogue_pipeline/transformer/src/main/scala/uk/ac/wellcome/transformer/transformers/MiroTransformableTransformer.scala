@@ -167,7 +167,10 @@ class MiroTransformableTransformer
   private def getIdentifiers(miroData: MiroTransformableData,
                              miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
-      SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber, ontologyType = "Work",value = miroId)
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        ontologyType = "Work",
+        value = miroId)
     )
 
     // Add the Sierra system number from the INNOPAC ID, if it's present.
@@ -197,7 +200,10 @@ class MiroTransformableTransformer
         regexMatch match {
           case Some(s) =>
             s.map { id =>
-              SourceIdentifier(identifierScheme = IdentifierSchemes.sierraSystemNumber,ontologyType = "Work", value = s"b$id")
+              SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                ontologyType = "Work",
+                value = s"b$id")
             }
           case _ =>
             throw new RuntimeException(
