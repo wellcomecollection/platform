@@ -79,6 +79,10 @@ case class DisplayWork(
     value =
       "Relates the publication of a work to a date when the work has been formally published."
   ) publicationDate: Option[DisplayPeriod] = None,
+  @ApiModelProperty(
+    dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
+    value = "Relates a work to its primary language."
+  ) language: Option[DisplayLanguage] = None,
   visible: Boolean = true
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
@@ -115,6 +119,7 @@ case object DisplayWork {
       publishers = work.publishers.map(DisplayAgent(_)),
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
+      language = work.language.map { DisplayLanguage(_) },
       visible = work.visible
     )
   }

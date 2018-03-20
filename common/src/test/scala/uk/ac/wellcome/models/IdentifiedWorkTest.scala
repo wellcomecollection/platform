@@ -26,6 +26,13 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
   // seeing the quokka when exploring near Australia.
   val physicalDescription = "A kind of rat as big as a cat"
 
+  // wow very language such doge much javascript
+  // (In the future, everything will compile to JavaScript.)
+  val language = Language(
+    id = "dog",
+    label = "Dogescript"
+  )
+
   val identifiedWorkJson: String =
     s"""
       |{
@@ -117,6 +124,11 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |   "label": "Spain",
       |   "ontologyType": "Place"
       |  }],
+      |   "language": {
+      |     "id": "${language.id}",
+      |     "label": "${language.label}",
+      |     "ontologyType": "Language"
+      |   },
       |  "visible":true,
       |  "ontologyType": "Work"
       |}
@@ -164,7 +176,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(Place(label = "Spain"))
+    placesOfPublication = List(Place(label = "Spain")),
+    language = Some(language)
   )
 
   it("should serialise an identified Item as Work") {
