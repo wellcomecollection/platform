@@ -5,8 +5,8 @@ import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.{Place, WorkType}
 
 @ApiModel(
-  value = "Place",
-  description = "A place"
+  value = "WorkType",
+  description = "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
 )
 case class DisplayWorkType(
   @ApiModelProperty(

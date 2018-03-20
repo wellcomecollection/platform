@@ -5,7 +5,7 @@ import uk.ac.wellcome.models._
 
 class ApiWorksTest extends ApiWorksTestBase {
 
-  it("should return a list of works") {
+  it("returns a list of works") {
 
     val works = createWorks(3)
 
@@ -26,8 +26,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
                           |     "workType": {
-                          |       "id": "id",
-                          |       "label": "label",
+                          |       "id": "1dz4yn34va",
+                          |       "label": "An aggregation of angry archipelago aged ankylosaurs.",
                           |       "type": "WorkType"
                           |     },
                           |     "lettering": "${works(0).lettering.get}",
@@ -45,8 +45,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
                           |     "workType": {
-                          |       "id": "id",
-                          |       "label": "label",
+                          |       "id": "b00p4900p",
+                          |       "label": "Brewed bears being backwards behind baleen.",
                           |       "type": "WorkType"
                           |     },
                           |     "lettering": "${works(1).lettering.get}",
@@ -64,8 +64,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
                           |     "workType": {
-                          |       "id": "id",
-                          |       "label": "label",
+                          |       "id": "c4t54r3l1f3",
+                          |       "label": "Creamed clams cut cunningly by Calligula.",
                           |       "type": "WorkType"
                           |     },
                           |     "lettering": "${works(2).lettering.get}",
@@ -84,7 +84,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should return a single work when requested with id") {
+  it("returns a single work when requested with id") {
     val work = workWith(
       canonicalId = canonicalId,
       title = title,
@@ -109,8 +109,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "title": "$title",
                           | "description": "$description",
                           | "workType": {
-                          |       "id": "id",
-                          |       "label": "label",
+                          |       "id": "b34r54r3",
+                          |       "label": "Dreaming dunkleosteus dancing dangerously.",
                           |       "type": "WorkType"
                           | },
                           | "lettering": "$lettering",
@@ -126,7 +126,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should be able to render an item if the items include is present") {
+  it("renders an item if the items include is present") {
     val work = workWith(
       canonicalId = "b4heraz7",
       title = "Inside an irate igloo",
@@ -163,8 +163,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "always includes 'items' if the items include is present, even with no items") {
+  it("includes 'items' if the items include is present, even with no items") {
     val work = workWith(
       canonicalId = "dgdb712",
       title = "Without windows or wind or washing-up liquid",
@@ -194,7 +193,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should include credit information in API responses") {
+  it("includes credit information in API responses") {
     val location = DigitalLocation(
       locationType = "thumbnail-image",
       url = "",
@@ -255,7 +254,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
+    "returns the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
     val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
@@ -279,8 +278,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
                           |     "workType" : {
-                          |        "id" : "id",
-                          |        "label" : "label",
+                          |        "id" : "h1gg5b050n",
+                          |        "label" : "Poached paleognaths picking packs of prepacked platypus.",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(1).lettering.get}",
@@ -315,8 +314,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
                           |     "workType" : {
-                          |        "id" : "id",
-                          |        "label" : "label",
+                          |        "id" : "n0s0up4u",
+                          |        "label" : "Red ruby rollerskates racing Rob Roy relentlessly.",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(0).lettering.get}",
@@ -351,8 +350,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
                           |     "workType" : {
-                          |        "id" : "id",
-                          |        "label" : "label",
+                          |        "id" : "4nyw4yw84m3",
+                          |        "label" : "Mulled molluscs masking many malign makers.",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(2).lettering.get}",
@@ -373,7 +372,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return a BadRequest when malformed query parameters are presented") {
+    "returns a BadRequest when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -381,7 +380,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("should ignore parameters that are unused when making an api request") {
+  it("ignores parameters that are unused when making an api request") {
     server.httpGet(
       path = s"/$apiPrefix/works?foo=bar",
       andExpect = Status.Ok,
@@ -390,7 +389,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return a not found error when requesting a single work with a non existing id") {
+    "returns a not found error when requesting a single work with a non existing id") {
     val badId = "non-existing-id"
     server.httpGet(
       path = s"/$apiPrefix/works/$badId",
@@ -400,7 +399,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return an HTTP Bad Request error if the user asks for a page size just over the maximum") {
+    "returns an HTTP Bad Request error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -411,7 +410,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return an HTTP Bad Request error if the user asks for an overly large page size") {
+    "returns an HTTP Bad Request error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -422,7 +421,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return an HTTP Bad Request error if the user asks for zero-length pages") {
+    "returns an HTTP Bad Request error if the user asks for zero-length pages") {
     val pageSize = 0
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -433,7 +432,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "should return an HTTP Bad Request error if the user asks for a negative page size") {
+    "returns an HTTP Bad Request error if the user asks for a negative page size") {
     val pageSize = -50
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -443,7 +442,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("should return an HTTP Bad Request error if the user asks for page 0") {
+  it("returns an HTTP Bad Request error if the user asks for page 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=0",
       andExpect = Status.BadRequest,
@@ -451,8 +450,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "should return an HTTP Bad Request error if the user asks for a page before 0") {
+  it("returns an HTTP Bad Request error if the user asks for a page before 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
@@ -461,8 +459,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "should return multiple errors if there's more than one invalid parameter") {
+  it("returns multiple errors if there's more than one invalid parameter") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=-60&page=-50",
       andExpect = Status.BadRequest,
@@ -471,7 +468,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("should return matching results if doing a full-text search") {
+  it("returns matching results if doing a full-text search") {
     val work1 = workWith(
       canonicalId = "1234",
       title = "A drawing of a dodo"
@@ -514,7 +511,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should include subject information in API responses") {
+  it("includes subject information in API responses") {
     val workWithSubjects = IdentifiedWork(
       title = Some("A seal selling seaweed sandwiches in Scotland"),
       sourceIdentifier = sourceIdentifier,
@@ -550,7 +547,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should include genre information in API responses") {
+  it("includes genre information in API responses") {
     val workWithSubjects = IdentifiedWork(
       title = Some("A guppy in a greenhouse"),
       sourceIdentifier = sourceIdentifier,
@@ -585,8 +582,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should include a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+  it("includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "Test1234"
@@ -648,8 +644,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should include a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+  it("includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val srcIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "Test1234"
@@ -683,8 +678,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+  it("always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
     val work = workWith(
       canonicalId = "a87na87",
       title = "Idling inkwells of indigo images",
@@ -714,8 +708,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should be able to look at different Elasticsearch indices based on the ?index query parameter") {
+  it("can look at different Elasticsearch indices based on the ?index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A whale on a wave"
@@ -769,8 +762,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should be able to search different Elasticsearch indices based on the ?_index query parameter") {
+  it("can search different Elasticsearch indices based on the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A wombat wallowing under a willow"
@@ -832,7 +824,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should return a Bad Request error if asked for an invalid include") {
+  it("returns a Bad Request error if asked for an invalid include") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo",
@@ -842,8 +834,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should return a Bad Request error if asked for more than one invalid include") {
+  it("returns a Bad Request error if asked for more than one invalid include") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,bar",
@@ -854,8 +845,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should return a Bad Request error if asked for a mixture of valid and invalid includes") {
+  it("returns a Bad Request error if asked for a mixture of valid and invalid includes") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
@@ -866,8 +856,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should return a Bad Request error if asked for an invalid include on an individual work") {
+  it("returns a Bad Request error if asked for an invalid include on an individual work") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
@@ -877,8 +866,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should include the thumbnail field if available and we use the thumbnail include") {
+  it("includes the thumbnail field if available and we use the thumbnail include") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",
@@ -916,7 +904,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should not include the thumbnail if we omit the thumbnail include") {
+  it("does not include the thumbnail if we omit the thumbnail include") {
     val work = identifiedWorkWith(
       canonicalId = "5678",
       title = "An otter omitted from an occasion in Oslo",
@@ -953,7 +941,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("should return Not Found if you look up a non-existent index") {
+  it("returns Not Found if you look up a non-existent index") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?_index=foobarbaz",
@@ -963,8 +951,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should return an Internal Server error if you try to search a malformed index") {
+  it("returns an Internal Server error if you try to search a malformed index") {
     // We need to do something that reliably triggers an internal exception
     // in the Elasticsearch handler.
     //
@@ -986,8 +973,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "should return a Bad Request error if you try to page beyond the first 10000 works") {
+  it("returns a Bad Request error if you try to page beyond the first 10000 works") {
     val queries = List(
       "page=10000",
       "pageSize=100&page=101",
