@@ -147,26 +147,13 @@ def affects_tests(path, task):
     # which doesn't use this sbt-common lib, we can ignore changes to it.
     #
     # The project directory and build.sbt are also Scala-specific.
-    sbt_free_tasks = (
-        'loris',
-        'monitoring',
-        'shared_infra',
-        's3_demultiplexer',
-        'sierra_window_generator',
-        'reindex_job_creator',
-        'complete_reindex',
-        'reindex_shard_generator',
-        'resharder',
-        'snapshot_scheduler',
-    )
-    if (
-        task.startswith(sbt_free_tasks) and
-        path.startswith(('common/', 'project/', 'build.sbt', 'sbt_common'))
-    ):
-        print(
-            "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
-            (path, task))
-        return False
+    if path.startswith(('common/', 'project/', 'build.sbt', 'sbt_common/')):
+        for project in get_projects(ROOT):
+            if project.type != 'sbt_app' and task.startswith(project.name):
+                print(
+                    "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
+                    (path, task))
+                return False
 
     # Otherwise, we were unable to decide if this change was important.
     # We assume that it is, so we'll run tests just in case.
