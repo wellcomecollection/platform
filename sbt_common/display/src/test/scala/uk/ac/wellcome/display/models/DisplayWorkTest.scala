@@ -95,8 +95,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        new DisplayAgent(label = "Henry Hare", ontologyType = "Agent"),
-        new DisplayAgent(label = "Harriet Heron", ontologyType = "Agent")
+        DisplayAgent(label = "Henry Hare", ontologyType = "Agent"),
+        DisplayAgent(label = "Harriet Heron", ontologyType = "Agent")
       )
     }
 
@@ -115,13 +115,34 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        new DisplayAgent(label = "Janet Jackson", ontologyType = "Agent"),
-        new DisplayAgent(
-          label = "Juniper Journals",
-          ontologyType = "Organisation")
+        DisplayAgent(label = "Janet Jackson"),
+        DisplayOrganisation(
+          label = "Juniper Journals")
       )
     }
   }
+
+    it("parses a work with persons and organisations as creators") {
+      val work = IdentifiedWork(
+        title = Some("Jumping over jackals in Japan"),
+        sourceIdentifier = sourceIdentifier,
+        version = 1,
+        identifiers = Nil,
+        canonicalId = "j7tw9jv3",
+        creators = List(
+          Person("Esmerelda Weatherwax", prefix = Some("Witch")),
+          Organisation("Juniper Journals")
+        )
+      )
+
+      val displayWork = DisplayWork(work)
+      displayWork.creators shouldBe List(
+        DisplayPerson(label = "Esmerelda Weatherwax", prefix = Some("Witch")),
+        DisplayOrganisation(
+          label = "Juniper Journals")
+      )
+    }
+
 
   it("gets the publicationDate from a Work") {
     val work = IdentifiedWork(
