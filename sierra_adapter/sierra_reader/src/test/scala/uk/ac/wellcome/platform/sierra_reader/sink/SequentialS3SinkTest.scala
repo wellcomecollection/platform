@@ -1,15 +1,17 @@
 package uk.ac.wellcome.platform.sierra_reader.sink
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Source
+import akka.Done
+import akka.stream.scaladsl.{Sink, Source}
+import io.circe.Json
 import io.circe.parser._
+import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3}
+import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConversions._
+import scala.concurrent.Future
 
 class SequentialS3SinkTest
     extends FunSpec
@@ -20,18 +22,26 @@ class SequentialS3SinkTest
     with ScalaFutures
     with ExtendedPatience {
 
-  it("puts a single JSON in S3") {
+  private def withSink(bucketName: String, keyPrefix: String, offset: Int = 0)(testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
     withActorSystem { system =>
       implicit val executionContext = system.dispatcher
-      withLocalS3Bucket { bucketName =>
-        val sink =
-          SequentialS3Sink(
-            s3Client,
-            bucketName = bucketName,
-            keyPrefix = "testA_")
+      val sink = SequentialS3Sink(
+        s3Client,
+        bucketName = bucketName,
+        keyPrefix = keyPrefix,
+        offset = offset
+      )
 
-        val json = parse(s"""{"hello": "world"}""").right.get
+      testWith(sink)
+    }
+  }
 
+
+  it("puts a single JSON in S3") {
+    val json = parse(s"""{"hello": "world"}""").right.get
+    
+    withLocalS3Bucket { bucketName =>
+      withSink(bucketName = bucketName, keyPrefix = "testA_") { sink =>
         val futureDone = Source
           .single(json)
           .zipWithIndex
@@ -49,19 +59,12 @@ class SequentialS3SinkTest
   }
 
   it("puts multiple JSON bodies into S3") {
-    withActorSystem { system =>
-      implicit val executionContext = system.dispatcher
-      withLocalS3Bucket { bucketName =>
-        val sink =
-          SequentialS3Sink(
-            s3Client,
-            bucketName = bucketName,
-            keyPrefix = "testB_")
+    val json0 = parse(s"""{"red": "orange"}""").right.get
+    val json1 = parse(s"""{"orange": "yellow"}""").right.get
+    val json2 = parse(s"""{"yellow": "green"}""").right.get
 
-        val json0 = parse(s"""{"red": "orange"}""").right.get
-        val json1 = parse(s"""{"orange": "yellow"}""").right.get
-        val json2 = parse(s"""{"yellow": "green"}""").right.get
-
+    withLocalS3Bucket { bucketName =>
+      withSink(bucketName = bucketName, keyPrefix = "testB_") { sink =>
         val futureDone = Source(List(json0, json1, json2)).zipWithIndex
           .runWith(sink)
 
@@ -84,19 +87,12 @@ class SequentialS3SinkTest
   }
 
   it("uses the offset if provided") {
-    withActorSystem { system =>
-      implicit val executionContext = system.dispatcher
-      withLocalS3Bucket { bucketName =>
-        val sink = SequentialS3Sink(
-          s3Client,
-          bucketName = bucketName,
-          keyPrefix = "testC_",
-          offset = 3)
+    val json0 = parse(s"""{"red": "orange"}""").right.get
+    val json1 = parse(s"""{"orange": "yellow"}""").right.get
+    val json2 = parse(s"""{"yellow": "green"}""").right.get
 
-        val json0 = parse(s"""{"red": "orange"}""").right.get
-        val json1 = parse(s"""{"orange": "yellow"}""").right.get
-        val json2 = parse(s"""{"yellow": "green"}""").right.get
-
+    withLocalS3Bucket { bucketName =>
+      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) { sink =>
         val futureDone = Source(List(json0, json1, json2)).zipWithIndex
           .runWith(sink)
 
