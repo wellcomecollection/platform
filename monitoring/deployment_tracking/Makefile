@@ -5,7 +5,7 @@ STACK_ROOT  = monitoring/deployment_tracking
 
 SBT_APPS    =
 ECS_TASKS   =
-LAMBDAS     = notify_ecr_pushes notify_old_deploys service_deployment_status
+LAMBDAS     = notify_pushes notify_old_deploys service_deployment_status
 
 TF_NAME     =
 TF_PATH     =

@@ -8,11 +8,12 @@ module "service_deployment_status" {
   infra_bucket           = "${var.infra_bucket}"
 }
 
-module "notify_ecr_pushes" {
-  source = "notify_ecr_pushes"
+module "notify_pushes" {
+  source = "notify_pushes"
 
-  ecr_pushes_topic_name = "${var.ecr_pushes_topic_name}"
-  slack_webhook         = "${var.non_critical_slack_webhook}"
+  lambda_pushes_topic_name = "${var.lambda_pushes_topic_name}"
+  ecr_pushes_topic_name    = "${var.ecr_pushes_topic_name}"
+  slack_webhook            = "${var.non_critical_slack_webhook}"
 
   lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
   infra_bucket           = "${var.infra_bucket}"
