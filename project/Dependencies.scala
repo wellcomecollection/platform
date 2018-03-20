@@ -87,17 +87,19 @@ object Dependencies {
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ esDependencies ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
+  ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ swaggerDependencies
 
+  val commonElasticsearchDependencies = commonDependencies ++ esDependencies
+
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   ) ++ dynamoDependencies
 
-  val apiDependencies: Seq[ModuleID] = commonDependencies
+  val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
 
   val transformerDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies
@@ -105,7 +107,7 @@ object Dependencies {
   val calmAdapterDependencies
     : Seq[ModuleID] = commonDependencies ++ akkaDependencies
 
-  val ingestorDependencies: Seq[ModuleID] = commonDependencies
+  val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
   val idminterDependencies
     : Seq[ModuleID] = commonDependencies ++ mysqlDependencies

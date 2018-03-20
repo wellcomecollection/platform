@@ -3,7 +3,7 @@ package uk.ac.wellcome.elasticsearch
 import org.elasticsearch.client.{Response, ResponseException}
 import org.scalatest.{FunSpec, Matchers}
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import uk.ac.wellcome.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 
 import scala.util.Success
 
