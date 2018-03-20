@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.elasticsearch.test.utils
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.index.IndexResponse
@@ -8,6 +8,7 @@ import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.utils.JsonTestUtil
 
 import scala.concurrent.Future
 

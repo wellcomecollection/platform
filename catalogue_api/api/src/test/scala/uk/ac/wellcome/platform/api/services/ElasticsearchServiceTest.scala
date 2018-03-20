@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.WorksUtil
 import uk.ac.wellcome.models.WorksIncludes
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ElasticsearchServiceTest

@@ -33,6 +33,7 @@ cache:
     - common/target
 
     - sbt_common/display/target
+    - sbt_common/elasticsearch/target
 
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
@@ -58,6 +59,7 @@ jobs:
     - stage: test
       env: TASK=sbt-common-test
     - env: TASK=sbt-display-test
+    - env: TASK=sbt-elasticsearch-test
 
     # Catalogue pipeline stack
     - env: TASK=transformer-test

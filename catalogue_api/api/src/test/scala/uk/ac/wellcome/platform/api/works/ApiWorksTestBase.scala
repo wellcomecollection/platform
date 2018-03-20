@@ -1,12 +1,14 @@
 package uk.ac.wellcome.platform.api.works
 
+import com.sksamuel.elastic4s.Indexable
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.{Server, WorksUtil}
-import uk.ac.wellcome.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.utils.JsonUtil._
 
 class ApiWorksTestBase
     extends FunSpec
@@ -16,6 +18,11 @@ class ApiWorksTestBase
 
   val indexName = "works"
   val itemType = "work"
+
+  implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {
+    override def json(t: IdentifiedWork): String =
+      toJson(t).get
+  }
 
   implicit val jsonMapper = IdentifiedWork
   override val server =
