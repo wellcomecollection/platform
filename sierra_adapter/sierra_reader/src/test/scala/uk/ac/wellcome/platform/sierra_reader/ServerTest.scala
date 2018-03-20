@@ -1,29 +1,27 @@
 package uk.ac.wellcome.platform.sierra_reader
 
 import com.twitter.finagle.http.Status._
-import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, S3Local, SQSLocal}
+import uk.ac.wellcome.test.fixtures.{S3, SqsFixtures}
 
 class ServerTest
     extends FeatureTest
-    with AmazonCloudWatchFlag
-    with S3Local
-    with SQSLocal {
-
-  override lazy val bucketName = "sierra-reader-servertest-bucket"
-
-  val server = new EmbeddedHttpServer(
-    new Server(),
-    Map(
-      "reader.resourceType" -> "bibs"
-    ) ++ s3LocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag
-  )
+    with fixtures.Server
+    with S3
+    with SqsFixtures {
 
   test("it shows the healthcheck message") {
-    server.httpGet(
-      path = "/management/healthcheck",
-      andExpect = Ok,
-      withJsonBody = """{"message": "ok"}""")
+    withLocalS3Bucket { bucketName =>
+      withLocalSqsQueue { queueUrl =>
+        val flags = s3LocalFlags(bucketName) ++ sqsLocalFlags(queueUrl)
+
+        withServer(flags) { server =>
+          server.httpGet(
+            path = "/management/healthcheck",
+            andExpect = Ok,
+            withJsonBody = """{"message": "ok"}""")
+        }
+      }
+    }
   }
 }
