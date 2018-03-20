@@ -41,8 +41,9 @@ class MiroTransformableTransformer
         UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
-            IdentifierSchemes.miroImageNumber,
-            miroTransformable.sourceId),
+            identifierScheme = IdentifierSchemes.miroImageNumber,
+            ontologyType = "Work",
+            value = miroTransformable.sourceId),
           version = version,
           identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
           description = description,
@@ -166,7 +167,7 @@ class MiroTransformableTransformer
   private def getIdentifiers(miroData: MiroTransformableData,
                              miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)
+      SourceIdentifier(identifierScheme = IdentifierSchemes.miroImageNumber, ontologyType = "Work",value = miroId)
     )
 
     // Add the Sierra system number from the INNOPAC ID, if it's present.
@@ -196,7 +197,7 @@ class MiroTransformableTransformer
         regexMatch match {
           case Some(s) =>
             s.map { id =>
-              SourceIdentifier(IdentifierSchemes.sierraSystemNumber, s"b$id")
+              SourceIdentifier(identifierScheme = IdentifierSchemes.sierraSystemNumber,ontologyType = "Work", value = s"b$id")
             }
           case _ =>
             throw new RuntimeException(
@@ -217,8 +218,9 @@ class MiroTransformableTransformer
         .collect {
           case (Some(label), Some(value)) =>
             SourceIdentifier(
-              IdentifierSchemes.miroLibraryReference,
-              s"$label $value"
+              identifierScheme = IdentifierSchemes.miroLibraryReference,
+              ontologyType = "Work",
+              value = s"$label $value"
             )
         }
 
@@ -317,9 +319,9 @@ class MiroTransformableTransformer
     List(
       UnidentifiedItem(
         sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId),
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", miroId),
         identifiers = List(
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", miroId)
         ),
         locations = List(
           DigitalLocation(

@@ -20,14 +20,16 @@ class CalmTransformableTransformer
             UnidentifiedWork(
               title = Some("placeholder title"),
               sourceIdentifier = SourceIdentifier(
-                IdentifierSchemes.calmPlaceholder,
-                "value"
+                identifierScheme = IdentifierSchemes.calmPlaceholder,
+                ontologyType = "Work",
+                value = "value"
               ),
               version = version,
               identifiers = List(
                 SourceIdentifier(
-                  IdentifierSchemes.calmPlaceholder,
-                  "value"
+                  identifierScheme = IdentifierSchemes.calmPlaceholder,
+                  ontologyType = "Work",
+                  value = "value"
                 ))
             )))
 }

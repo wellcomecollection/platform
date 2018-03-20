@@ -97,10 +97,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val sourceIdentifier1 = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Item",
         value = "i40000047"
       )
       val sourceIdentifier2 = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraIdentifier,
+        ontologyType = "Item",
         value = "4000004"
       )
 
@@ -114,6 +116,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val sourceIdentifier = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Item",
         value = "i50000056"
       )
 

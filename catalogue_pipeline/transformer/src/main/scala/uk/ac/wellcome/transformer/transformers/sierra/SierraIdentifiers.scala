@@ -20,6 +20,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
     List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Work",
         value = addCheckDigit(
           bibData.id,
           recordType = SierraRecordTypes.bibs
@@ -27,6 +28,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
       ),
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraIdentifier,
+        ontologyType = "Work",
         value = bibData.id
       )
     )

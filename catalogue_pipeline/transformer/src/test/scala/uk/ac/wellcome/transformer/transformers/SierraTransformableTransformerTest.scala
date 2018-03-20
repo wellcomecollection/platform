@@ -60,9 +60,11 @@ class SierraTransformableTransformerTest
     val work = transformedSierraRecord.get.get
 
     val sourceIdentifier1 =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i51515155")
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Item","i51515155")
     val sourceIdentifier2 =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "i52525259")
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Item", "i52525259")
 
     work.items.map { _.sourceIdentifier } shouldBe List(
       sourceIdentifier1,
@@ -114,10 +116,12 @@ class SierraTransformableTransformerTest
     val expectedSourceIdentifiers = List(
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Item",
         value = "i63636360"
       ),
       SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraIdentifier,
+        ontologyType = "Item",
         value = itemId
       )
     )
@@ -244,10 +248,12 @@ class SierraTransformableTransformerTest
 
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      ontologyType = "Work",
       value = "b06060602"
     )
     val sierraIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraIdentifier,
+      ontologyType = "Work",
       value = id
     )
 
@@ -290,10 +296,12 @@ class SierraTransformableTransformerTest
 
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      ontologyType = "Work",
       value = "b17898717"
     )
     val sierraIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraIdentifier,
+      ontologyType = "Work",
       value = id
     )
 
@@ -332,10 +340,12 @@ class SierraTransformableTransformerTest
 
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      ontologyType = "Work",
       value = "b00010005"
     )
     val sierraIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraIdentifier,
+      ontologyType = "Work",
       value = id
     )
 
@@ -550,6 +560,7 @@ class SierraTransformableTransformerTest
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.sierraSystemNumber,
+      ontologyType = "Work",
       value = "b90000092"
     )
 
