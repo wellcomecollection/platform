@@ -1,12 +1,8 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{AbstractAgent, Organisation, Person}
-import uk.ac.wellcome.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.models.{AbstractAgent, Organisation, UnidentifiablePerson}
+import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
 
 class SierraCreatorsTest extends FunSpec with Matchers {
 
@@ -29,7 +25,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Person(label = name)
+    creators should contain only UnidentifiablePerson(label = name)
   }
 
   it("extracts the creator numeration and prefix if present from marcTag 100") {
@@ -55,7 +51,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Person(
+    creators should contain only UnidentifiablePerson(
       label = name,
       prefix = Some(prefix),
       numeration = Some(numeration))
@@ -83,7 +79,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Person(
+    creators should contain only UnidentifiablePerson(
       label = name,
       prefix = Some(prefixes.mkString(" ")))
   }
