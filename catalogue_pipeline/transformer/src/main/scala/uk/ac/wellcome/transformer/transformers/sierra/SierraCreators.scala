@@ -53,7 +53,10 @@ trait SierraCreators extends MarcUtils {
     codes.distinct match {
       case Nil => Unidentifiable(agent)
       case Seq(code) =>
-        val sourceIdentifier = SourceIdentifier(identifierScheme = IdentifierSchemes.libraryOfCongressNames, ontologyType = agent.ontologyType,value = code.trim)
+        val sourceIdentifier = SourceIdentifier(
+          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          ontologyType = agent.ontologyType,
+          value = code.trim)
         Identifiable(agent, sourceIdentifier, List(sourceIdentifier))
       case _ =>
         throw new RuntimeException(

@@ -108,8 +108,14 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Person",code)
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier))
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Person",
+      code)
+    creators should contain only Identifiable(
+      Person(label = name),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier))
   }
 
   it(
@@ -133,8 +139,14 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Person",code.trim)
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Person",
+      code.trim)
+    creators should contain only Identifiable(
+      Person(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
 //  it("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
@@ -182,8 +194,14 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Person",code)
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Person",
+      code)
+    creators should contain only Identifiable(
+      Person(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
   it(
@@ -253,8 +271,14 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Organisation",code)
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Organisation",
+      code)
+    creators should contain only Identifiable(
+      Organisation(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
   it(
@@ -278,8 +302,14 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Organisation",code.trim)
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Organisation",
+      code.trim)
+    creators should contain only Identifiable(
+      Organisation(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
   it(
@@ -305,8 +335,14 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Organisation",code)
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Organisation",
+      code)
+    creators should contain only Identifiable(
+      Organisation(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
   it(
