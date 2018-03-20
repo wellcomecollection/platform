@@ -30,18 +30,29 @@ trait SierraCreators extends MarcUtils {
             prefix = prefixString,
             numeration = numeration)
 
-          codes.distinct match{
-            case Nil => Unidentifiable(person)
-            case Seq(code) => Identifiable(person, SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim))
-            case _ => throw new RuntimeException(s"Multiple identifiers in subfield $$0: $codes")
-          }
+          identify(codes, person)
       }
 
-    val organisations = getMatchingSubfields(bibData, "110", "a").map {
+    val organisations = getMatchingSubfields(bibData, "110", List("a", "0")).map {
       subfields =>
-        Unidentifiable(Organisation(subfields.head.content))
+        val name = subfields.collectFirst {
+          case MarcSubfield("a", content) => content
+        }
+        val codes = subfields.collect {
+          case MarcSubfield("0", content) => content
+        }
+        val organisation = Organisation(name.get)
+        identify(codes, organisation)
     }
 
     persons ++ organisations
+  }
+
+  private def identify(codes: List[String], agent: AbstractAgent) = {
+    codes.distinct match {
+      case Nil => Unidentifiable(agent)
+      case Seq(code) => Identifiable(agent, SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim))
+      case _ => throw new RuntimeException(s"Multiple identifiers in subfield $$0: $codes")
+    }
   }
 }
