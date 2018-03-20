@@ -29,5 +29,28 @@ case object DisplayAbstractAgent {
     }
 }
 
-case class DisplayPerson(label: String, prefix: Option[String]= None, numeration: Option[String]= None, ontologyType: String = "Person") extends DisplayAbstractAgent
-case class DisplayOrganisation(label: String, ontologyType: String = "Organisation") extends DisplayAbstractAgent
+@ApiModel(
+  value = "Person"
+)
+case class DisplayPerson(
+                          @ApiModelProperty(
+  value = "The name of the person"
+) label: String,
+                          @ApiModelProperty(
+  dataType = "String",
+  value =
+    "The title of the person"
+)prefix: Option[String]= None,
+                          @ApiModelProperty(
+  dataType = "String",
+  value =
+    "The numerationof the person"
+)numeration: Option[String]= None,
+                          @JsonProperty("type") ontologyType: String = "Person") extends DisplayAbstractAgent
+
+@ApiModel(
+  value = "Organisation"
+)
+case class DisplayOrganisation(@ApiModelProperty(
+  value = "The name of the organisation"
+)label: String, @JsonProperty("type") ontologyType: String = "Organisation") extends DisplayAbstractAgent
