@@ -22,17 +22,27 @@ def main(event, context):
     project = data['project']
     git_branch = data['git_branch']
     commit_id = data['commit_id']
-    commit_msg = data['commit_msg']
+    commit_msg = data['commit_msg'].splitlines()[0]
+
+    if data['push_type'] == 'aws_lambda':
+        name = project.replace('.zip', '')
+        message = f'{iam_user} has published a new *{name}* ZIP to S3.'
+        username = 'lambda-pushes'
+        icon_emoji = 'lambda'
+    else:
+        message = f'{iam_user} has pushed a new *{project}* image to ECR.'
+        username = 'ecr-pushes'
+        icon_emoji = 'ecr'
 
     lines = [
-        f'{iam_user} has pushed a new *{project}* image to ECR.',
+        message,
         f'Git branch: {git_branch} ({commit_id})',
         f'Commit message: {commit_msg!r}',
     ]
 
     slack_data = {
-        'username': 'ecr-pushes',
-        'icon_emoji': ':ecr:',
+        'username': username,
+        'icon_emoji': f':{icon_emoji}:',
         'attachments': [{
             'color': '#F58536',
             'fields': [{'value': l} for l in lines]
