@@ -9,13 +9,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
-import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.util.ByteString
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.regions.AwsRegionProvider
-import com.twitter.inject.annotations.Flag
-import io.circe.Json
-import io.circe.parser.parse
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
@@ -24,40 +18,29 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import akka.stream.scaladsl.{Compression, Framing, Keep, Sink, Source}
+import com.twitter.finatra.json.FinatraObjectMapper
+import io.circe.Json
+import io.circe.parser.parse
 
 
-class ConvertorService @Inject()(@Flag("aws.s3.bucketName") bucketName: String,
-                                 actorSystem: ActorSystem,
-                                 awsConfig: AWSConfig)
-    extends Logging {
+class ConvertorService @Inject()(actorSystem: ActorSystem,
+                                 awsConfig: AWSConfig,
+                                 s3Client: S3Client,
+                                 mapper: FinatraObjectMapper
+                                ) extends Logging {
 
   def runConversion(
     conversionJob: ConversionJob): Future[CompletedConversionJob] = {
+
     info(s"ConvertorService running $conversionJob")
 
-    val credentialsProvider = DefaultAWSCredentialsProviderChain
-      .getInstance()
-
-    val regionProvider =
-      new AwsRegionProvider {
-        def getRegion: String = awsConfig.region
-      }
-
-    val settings = new S3Settings(
-      bufferType = MemoryBufferType,
-      proxy = None,
-      credentialsProvider = credentialsProvider,
-      s3RegionProvider = regionProvider,
-      pathStyleAccess = false,
-      endpointUrl = None
-    )
-
-    val actorMaterializer = ActorMaterializer()(actorSystem)
     val objectKey = conversionJob.objectKey
     val targetObjectKey = "target.txt.gz"
 
-    val s3Client = new S3Client(settings)(actorSystem, actorMaterializer)
-    val (s3Source: Source[ByteString, _], _) = s3Client.download(bucketName, objectKey)
+    val (s3Source: Source[ByteString, _], _) = s3Client.download(
+      bucket = conversionJob.bucketName,
+      key = objectKey
+    )
 
     val includes = WorksIncludes(
       identifiers = true,
@@ -65,28 +48,40 @@ class ConvertorService @Inject()(@Flag("aws.s3.bucketName") bucketName: String,
       items = true
     )
 
-    val uncompressedSource = s3Source
+    val source = s3Source
       .via(Compression.gunzip())
-      .via(Framing.delimiter(ByteString("."), Int.MaxValue))
+      .via(Framing.delimiter(ByteString("\n"), Int.MaxValue))
       .map(_.utf8String)
-      .map(JsonUtil.fromJson[IdentifiedWork](_).get)
+      .map(sourceString => (parse(sourceString).right.get \\ "_source").head)
+      .map(_.as[IdentifiedWork])
+      .collect {
+        case Right(identifiedWork) => Some(identifiedWork)
+        case Left(parseFailure) => {
+          warn("Failed to parse identifiedWork!", parseFailure)
+
+          None
+        }
+      }
+      .collect { case Some(identifiedWork) => identifiedWork }
       .map(work => DisplayWork(work, includes))
-      .map(JsonUtil.toJson(_).get)
+      .map(mapper.writeValueAsString(_))
       .map(ByteString(_))
       .via(Compression.gzip)
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
-      s3Client.multipartUpload(bucketName, targetObjectKey)
+      s3Client.multipartUpload(
+        bucket = conversionJob.bucketName,
+        key = targetObjectKey
+      )
 
-    val runnable = s3Source.toMat(s3Sink)(Keep.right)
+    val future = source.runWith(s3Sink)(ActorMaterializer()(actorSystem))
 
-    val future = runnable.run()(actorMaterializer)
+    future.map { result =>
 
-    // this should be an app variable
-    val host = "http://localhost:33333"
-    val targetLocation = Uri(s"$host/$objectKey")
+      // this should be an app variable
+      val host = "http://localhost:33333"
+      val targetLocation = Uri(s"$host/$targetObjectKey")
 
-    future.map { _ =>
       CompletedConversionJob(
         conversionJob,
         targetLocation
