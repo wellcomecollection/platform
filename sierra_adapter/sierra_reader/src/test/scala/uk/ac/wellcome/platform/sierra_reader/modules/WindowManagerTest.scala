@@ -19,19 +19,15 @@ class WindowManagerTest
     with ScalaFutures
     with ExtendedPatience {
 
-  case class FixtureParams(bucketName: String, windowManager: WindowManager)
-
   private def withWindowManager(bucketName: String)(testWith: TestWith[WindowManager, Assertion]) = {
-    withLocalS3Bucket { bucketName =>
-      val windowManager = new WindowManager(
-        s3client = s3Client,
-        bucketName = bucketName,
-        fields = "title",
-        resourceType = SierraResourceTypes.bibs
-      )
+    val windowManager = new WindowManager(
+      s3client = s3Client,
+      bucketName = bucketName,
+      fields = "title",
+      resourceType = SierraResourceTypes.bibs
+    )
 
-      testWith(windowManager)
-    }
+    testWith(windowManager)
   }
 
   it("returns an empty ID and offset 0 if there isn't a window in progress") {
