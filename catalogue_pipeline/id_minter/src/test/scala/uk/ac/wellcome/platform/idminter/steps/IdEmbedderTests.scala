@@ -83,6 +83,61 @@ class IdEmbedderTests
     }
   }
 
+  it("mints identifiers for creators in work") {
+    val workIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      value = "1234"
+    )
+
+    val creatorIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      value = "1234"
+    )
+
+    val person = Person(label = "The Librarian")
+    val originalWork = UnidentifiedWork(
+      title = Some("crap"),
+      sourceIdentifier = workIdentifier,
+      creators = List(Identifiable(person, sourceIdentifier = creatorIdentifier, identifiers = List(creatorIdentifier))),
+      version = 1)
+
+    val newWorkCanonicalId = "5467"
+
+    setUpIdentifierGeneratorMock(
+      workIdentifier,
+      originalWork.ontologyType,
+      newWorkCanonicalId
+    )
+    val newCreatorCanonicalId = "8901"
+
+    setUpIdentifierGeneratorMock(
+      creatorIdentifier,
+      "Person",
+      newCreatorCanonicalId
+    )
+
+    val newWorkFuture = idEmbedder.embedId(
+      json = parse(
+        toJson(originalWork).get
+      ).right.get
+    )
+
+    val expectedWork = IdentifiedWork(
+      canonicalId = newWorkCanonicalId,
+      title = originalWork.title,
+      sourceIdentifier = originalWork.sourceIdentifier,
+      creators = List(Identified(agent = person, canonicalId = newCreatorCanonicalId, identifiers = List(creatorIdentifier))),
+      version = originalWork.version
+    )
+
+    whenReady(newWorkFuture) { newWorkJson =>
+      assertJsonStringsAreEqual(
+        newWorkJson.toString(),
+        toJson(expectedWork).get
+      )
+    }
+  }
+
   it("should return a failed future if the call to IdentifierGenerator fails") {
     val identifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,

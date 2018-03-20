@@ -79,36 +79,4 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     }
     insertIntoDbFuture
   }
-
-  /* For a given source identifier scheme (e.g. "miro-image-number") and a
-   * corresponding column in the SQL database (e.g. i.MiroID), add a condition
-   * to the SQL query that looks for matching identifiers.
-   *
-   * Note that we look for equality _or_ null -- in the case where the
-   * database only has a partial match, we want that.  Consider the following
-   * example:
-   *
-   *            canonical ID  | Calm ID | Miro ID | Sierra ID
-   *           ---------------+---------+---------+-----------
-   *            zgz4vf4q      | 1234    | abcd    | null
-   *
-   * If we find a Sierra record with (Miro = abcd, Sierra = IVDC), we want
-   * to find this record even though it doesn't have a complete match.
-   */
-  private def addConditionForLookingUpID(
-    sql: ConditionSQLBuilder[String],
-    sourceIdentifiers: List[SourceIdentifier],
-    column: SQLSyntax,
-    identifierScheme: IdentifierSchemes.IdentifierScheme)
-    : ConditionSQLBuilder[String] = {
-    val sourceID = sourceIdentifiers.filter {
-      _.identifierScheme == identifierScheme
-    }
-    if (sourceID.isEmpty) {
-      sql
-    } else {
-      sql.and.withRoundBracket(
-        _.eq(column, sourceID.head.value).or.isNull(column))
-    }
-  }
 }
