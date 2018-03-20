@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraCreatorsTest extends FunSpec with Matchers {
 
@@ -51,10 +55,11 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Unidentifiable(Person(
-      label = name,
-      prefix = Some(prefix),
-      numeration = Some(numeration)))
+    creators should contain only Unidentifiable(
+      Person(
+        label = name,
+        prefix = Some(prefix),
+        numeration = Some(numeration)))
   }
 
   it("extracts multiple prefixes from marcTag 100 c") {
@@ -79,9 +84,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Unidentifiable(Person(
-      label = name,
-      prefix = Some(prefixes.mkString(" "))))
+    creators should contain only Unidentifiable(
+      Person(label = name, prefix = Some(prefixes.mkString(" "))))
   }
 
   it("extracts the creator identifier from marcTag 100 0") {
@@ -97,16 +101,23 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "100",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = code))))
     )
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier))
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(
+      Person(label = name),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier))
   }
 
-  it("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
+  it(
+    "extracts the creator identifier removing trailing and leading from marcTag 100 0") {
     val name = "Carrot Ironfoundersson"
     val code = " 123456 "
 
@@ -119,13 +130,19 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "100",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = code))))
     )
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
+    creators should contain only Identifiable(
+      Person(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
 //  it("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
@@ -150,7 +167,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 //    creators should contain only Identifiable(Person(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code.trim))
 //  }
 
-  it("extracts the creator identifier from marcTag 100 0 if there is more than one but they are the same") {
+  it(
+    "extracts the creator identifier from marcTag 100 0 if there is more than one but they are the same") {
     val name = "Greebo"
     val code = "123456"
 
@@ -163,16 +181,25 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "100",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code), MarcSubfield(tag = "0", content = code))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = code),
+            MarcSubfield(tag = "0", content = code))
+        ))
     )
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(
+      Person(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
-  it("fails extracting the creator identifier from marcTag 100 0 if there is more than one and they are different") {
+  it(
+    "fails extracting the creator identifier from marcTag 100 0 if there is more than one and they are different") {
     val name = "Errol"
     val firstCode = "123456"
     val secondCode = "654321"
@@ -186,7 +213,11 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "100",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = firstCode), MarcSubfield(tag = "0", content = secondCode))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = firstCode),
+            MarcSubfield(tag = "0", content = secondCode))
+        ))
     )
 
     intercept[RuntimeException] {
@@ -227,16 +258,23 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "110",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = code))))
     )
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(
+      Organisation(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
-  it("extracts the creator identifier removing trailing and leading from marcTag 110 0") {
+  it(
+    "extracts the creator identifier removing trailing and leading from marcTag 110 0") {
     val name = "The Assassins' Guild"
     val code = " 123456 "
 
@@ -249,16 +287,23 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "110",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = code))))
     )
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
+    creators should contain only Identifiable(
+      Organisation(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
-  it("extracts the creator identifier from marcTag 110 0 if there is more than one but they are the same") {
+  it(
+    "extracts the creator identifier from marcTag 110 0 if there is more than one but they are the same") {
     val name = "The Fools' Guild"
     val code = "123456"
 
@@ -271,16 +316,25 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "110",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code), MarcSubfield(tag = "0", content = code))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = code),
+            MarcSubfield(tag = "0", content = code))
+        ))
     )
 
     val creators = transformer.getCreators(bibData)
 
-    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(
+      Organisation(label = name),
+      sourceIdentifier = sourceIdentifier,
+      List(sourceIdentifier))
   }
 
-  it("fails extracting the creator identifier from marcTag 110 0 if there is more than one and they are different") {
+  it(
+    "fails extracting the creator identifier from marcTag 110 0 if there is more than one and they are different") {
     val name = "The Fools' Guild"
     val firstCode = "123456"
     val secondCode = "654321"
@@ -294,7 +348,11 @@ class SierraCreatorsTest extends FunSpec with Matchers {
           marcTag = "110",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = firstCode), MarcSubfield(tag = "0", content = secondCode))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = firstCode),
+            MarcSubfield(tag = "0", content = secondCode))
+        ))
     )
 
     intercept[RuntimeException] {

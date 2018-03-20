@@ -67,7 +67,8 @@ object IdentifierSchemes extends Logging {
 
   private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
-    knownIdentifierSchemes.find(_.toString == identifierScheme)
+    knownIdentifierSchemes
+      .find(_.toString == identifierScheme)
       .getOrElse {
         val errorMessage = s"$identifierScheme is not a valid identifierScheme"
         error(errorMessage)

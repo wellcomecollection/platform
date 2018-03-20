@@ -206,7 +206,9 @@ class MiroTransformableTransformerTest
     expectedCreators: List[String]
   ) = {
     val transformedWork = transformWork(data = data)
-    transformedWork.creators shouldBe expectedCreators.map {creator =>  Unidentifiable(Agent(creator)) }
+    transformedWork.creators shouldBe expectedCreators.map { creator =>
+      Unidentifiable(Agent(creator))
+    }
   }
 
   it("should have no description if no image_image_desc field is present") {

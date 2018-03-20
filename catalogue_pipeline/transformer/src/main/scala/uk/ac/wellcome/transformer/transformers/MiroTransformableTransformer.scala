@@ -228,16 +228,23 @@ class MiroTransformableTransformer
   /*
    * <image_creator>: the Creator, which maps to our property "hasCreator"
    */
-  private def getCreators(miroData: MiroTransformableData): List[Unidentifiable[Agent]] = {
+  private def getCreators(
+    miroData: MiroTransformableData): List[Unidentifiable[Agent]] = {
     val primaryCreators = miroData.creator match {
-      case Some(creator) => creator.map { c => Unidentifiable(Agent(c)) }
+      case Some(creator) =>
+        creator.map { c =>
+          Unidentifiable(Agent(c))
+        }
       case None => List()
     }
 
     // <image_secondary_creator>: what MIRO calls Secondary Creator, which
     // will also just have to map to our object property "hasCreator"
     val secondaryCreators = miroData.secondaryCreator match {
-      case Some(creator) => creator.map { c => Unidentifiable(Agent(c)) }
+      case Some(creator) =>
+        creator.map { c =>
+          Unidentifiable(Agent(c))
+        }
       case None => List()
     }
 
