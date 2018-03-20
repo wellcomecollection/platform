@@ -82,8 +82,7 @@ class IdentifierGeneratorTest
       }.update().apply()
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234"),
-        "Work"
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234")
       )
 
       triedId shouldBe Success("5678")
@@ -95,8 +94,7 @@ class IdentifierGeneratorTest
       implicit val session = fixtures.dbConfig.session
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234"),
-        "Work"
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234")
       )
 
       triedId shouldBe a[Success[_]]
@@ -138,8 +136,7 @@ class IdentifierGeneratorTest
     )
 
     val triedLookup = identifiersDao.lookupId(
-      sourceIdentifier = sourceIdentifier,
-      ontologyType = "Work"
+      sourceIdentifier = sourceIdentifier
     )
 
     when(triedLookup)
@@ -153,8 +150,7 @@ class IdentifierGeneratorTest
     withIdentifierGenerator(Some(identifiersDao)) { fixtures =>
       val triedGeneratingId =
         fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-          sourceIdentifier,
-          "Work"
+          sourceIdentifier
         )
 
       triedGeneratingId shouldBe a[Failure[_]]
@@ -170,8 +166,7 @@ class IdentifierGeneratorTest
       val miroId = "1234"
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, ontologyType, miroId),
-        ontologyType
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, ontologyType, miroId)
       )
 
       val id = triedId.get
