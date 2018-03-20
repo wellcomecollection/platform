@@ -158,8 +158,7 @@ class IdEmbedderTests
     when(
       mockIdentifierGenerator
         .retrieveOrGenerateCanonicalId(
-          identifier,
-          originalWork.ontologyType
+          identifier
         )
     ).thenReturn(Try(throw expectedException))
 
@@ -422,8 +421,7 @@ class IdEmbedderTests
     when(
       mockIdentifierGenerator
         .retrieveOrGenerateCanonicalId(
-          sourceIdentifier,
-          ontologyType
+          sourceIdentifier
         )
     ).thenReturn(Try(newCanonicalId))
   }

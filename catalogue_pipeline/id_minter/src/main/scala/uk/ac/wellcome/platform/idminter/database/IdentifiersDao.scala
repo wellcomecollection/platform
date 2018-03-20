@@ -24,8 +24,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    * source identifiers.
    */
   def lookupId(
-    sourceIdentifier: SourceIdentifier,
-    ontologyType: String
+    sourceIdentifier: SourceIdentifier
   ): Try[Option[Identifier]] = Try {
 
     val sourceSystem = sourceIdentifier.identifierScheme.toString
@@ -33,14 +32,14 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
 
     // TODO: handle gracefully, don't TryBackoff ad infinitum
     blocking {
-      info(s"Matching ($sourceIdentifier, $ontologyType)")
+      info(s"Matching ($sourceIdentifier)")
 
       val i = identifiers.i
       val query = withSQL {
         select
           .from(identifiers as i)
           .where
-          .eq(i.OntologyType, ontologyType)
+          .eq(i.OntologyType, sourceIdentifier.ontologyType)
           .and
           .eq(i.SourceSystem, sourceSystem)
           .and
