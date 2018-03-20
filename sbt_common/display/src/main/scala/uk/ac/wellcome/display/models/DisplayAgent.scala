@@ -20,19 +20,18 @@ case class DisplayAgent(
 ) extends DisplayAbstractAgent
 
 case object DisplayAbstractAgent {
-  def apply(agent: AbstractAgent): DisplayAbstractAgent =
-    agent match {
-      case a: Agent =>
+  def apply(displayableAgent: IdentifiedOrUnidentifiable[AbstractAgent]): DisplayAbstractAgent =
+    displayableAgent match {
+      case Unidentifiable(a: Agent) =>
         DisplayAgent(
           label = a.label
         )
-      case p: Person =>
-        DisplayPerson(
-          label = p.label,
-          prefix = p.prefix,
-          numeration = p.numeration)
-      case o: Organisation => DisplayOrganisation(o.label)
-
+      case Identified(a: Agent, _) => throw new RuntimeException()
+      case Identified(p: Person, id) => DisplayPerson(p.label, p.prefix, p.numeration, p.ontologyType)
+      case Unidentifiable(p: Person) =>
+        DisplayPerson(p.label, p.prefix, p.numeration, p.ontologyType)
+      case Identified(o: Organisation, id) => DisplayOrganisation(o.label, o.ontologyType)
+      case Unidentifiable(o: Organisation) => DisplayOrganisation(o.label, o.ontologyType)
     }
 }
 

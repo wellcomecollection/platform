@@ -88,8 +88,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
         identifiers = Nil,
         canonicalId = "hz2hrba9",
         publishers = List(
-          Agent("Henry Hare"),
-          Agent("Harriet Heron")
+          Unidentifiable(Agent("Henry Hare")),
+          Unidentifiable(Agent("Harriet Heron"))
         )
       )
 
@@ -108,8 +108,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
         identifiers = Nil,
         canonicalId = "j7tw9jv3",
         publishers = List(
-          Agent("Janet Jackson"),
-          Organisation("Juniper Journals")
+          Unidentifiable(Agent("Janet Jackson")),
+          Unidentifiable(Organisation("Juniper Journals"))
         )
       )
 
@@ -129,8 +129,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
       creators = List(
-        Person("Esmerelda Weatherwax", prefix = Some("Witch")),
-        Organisation("Juniper Journals")
+        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
+        Unidentifiable(Organisation("Juniper Journals"))
       )
     )
 
