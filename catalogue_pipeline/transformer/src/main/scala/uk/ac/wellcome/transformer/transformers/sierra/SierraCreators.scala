@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.{AbstractAgent, Organisation, Person}
+import uk.ac.wellcome.models.{AbstractAgent, Organisation, UnidentifiablePerson}
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
 
 trait SierraCreators extends MarcUtils {
@@ -23,7 +23,7 @@ trait SierraCreators extends MarcUtils {
           val prefixString =
             if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-          Person(
+          UnidentifiablePerson(
             label = name.get,
             prefix = prefixString,
             numeration = numeration)
