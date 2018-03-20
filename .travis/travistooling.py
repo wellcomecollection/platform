@@ -7,6 +7,8 @@ import os
 import subprocess
 import sys
 
+from parse_makefiles import get_projects
+
 
 # Root of the Git repository
 ROOT = subprocess.check_output([
@@ -75,47 +77,24 @@ def affects_tests(path, task):
         print("~~~ %s is ignored because it's a Terraform file" % path)
         return False
 
-    # For each task, which directories only have an effect on this task?
+    # Some directories only affect one task.
     #
-    # For example, changes to the ``loris`` directory only have an effect
-    # on the ``loris`` task; in any other task changes to that directory
-    # can be ignored.
-    task_specific_directories = {
-        'loris': ['loris'],
-        'id_minter': ['catalogue_pipeline/id_minter'],
-        'ingestor': ['catalogue_pipeline/ingestor'],
-        'transformer': ['catalogue_pipeline/transformer'],
-        'api': ['catalogue_api'],
-        'monitoring': ['monitoring'],
-        'shared_infra': ['shared_infra'],
-        'nginx': ['nginx'],
-
-        'reindexer_worker': ['reindexer/reindexer_worker'],
-        'reindex_job_creator': ['reindexer/reindex_job_creator'],
-        'complete_reindex': ['reindexer/complete_reindex'],
-        'reindex_shard_generator': ['reindexer/reindex_shard_generator'],
-        'resharder': ['reindexer/resharder'],
-
-        's3_demultiplexer': ['sierra_adapter/s3_demultiplexer'],
-        'sierra_window_generator': ['sierra_adapter/sierra_window_generator'],
-        'sierra_reader': ['sierra_adapter/sierra_reader'],
-        'sierra_items_to_dynamo': ['sierra_adapter/sierra_items_to_dynamo'],
-        'sierra_bib_merger': ['sierra_adapter/sierra_bib_merger'],
-        'sierra_item_merger': ['sierra_adapter/sierra_item_merger'],
-
-        'snapshot_scheduler': ['data_api/snapshot_scheduler'],
+    # For example, the ``catalogue_api/api`` directory only contains code
+    # for the api Scala app, so changes in this directory cannot affect
+    # any other task.
+    exclusive_directories = {
+        t.exclusive_path: t.name for t in get_projects(ROOT)
     }
 
-    # If we have a change to a file which is specific to a particular task,
-    # but we're *not* in that task, this change is unimportant.
-    for prefix, directories in task_specific_directories.items():
-        if not task.startswith(prefix) and path.startswith(tuple(directories)):
-            print('~~~ Ignoring %s; it only affects %s tests' % (path, task))
-            return False
-
-        if task.startswith(prefix) and path.startswith(tuple(directories)):
-            print("+++ %s is definitely part of the %s tests" % (path, task))
-            return True
+    for dir_name, task_name in exclusive_directories.items():
+        if path.startswith(dir_name):
+            if task.startswith(task_name):
+                print(
+                    "+++ %s is definitely part of the %s tests" % (path, task))
+                return True
+            else:
+                print('~~~ Ignoring %s; it only affects %s tests' % (path, task_name))
+                return False
 
     # A number of Sierra-related tasks share code/Makefiles in the
     # sierra_adapter directory.  If we're definitely in a project which
