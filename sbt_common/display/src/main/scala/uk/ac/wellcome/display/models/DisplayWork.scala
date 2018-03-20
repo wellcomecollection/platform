@@ -45,7 +45,7 @@ case class DisplayWork(
     dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
-  ) creators: List[DisplayAgent] = List(),
+  ) creators: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
@@ -72,7 +72,7 @@ case class DisplayWork(
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAgent] = List(),
+  ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
     value = "Show a list of places of publication."
@@ -107,7 +107,7 @@ case object DisplayWork {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      creators = work.creators.map { DisplayAgent(_) },
+      creators = work.creators.map { DisplayAbstractAgent(_) },
       subjects = work.subjects.map { DisplayConcept(_) },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
@@ -124,7 +124,7 @@ case object DisplayWork {
             DisplayItem(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAgent(_)),
+      publishers = work.publishers.map(DisplayAbstractAgent(_)),
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
       language = work.language.map { DisplayLanguage(_) },
