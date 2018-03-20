@@ -51,7 +51,9 @@ trait SierraCreators extends MarcUtils {
   private def identify(codes: List[String], agent: AbstractAgent) = {
     codes.distinct match {
       case Nil => Unidentifiable(agent)
-      case Seq(code) => Identifiable(agent, SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim))
+      case Seq(code) =>
+        val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
+        Identifiable(agent, sourceIdentifier, List(sourceIdentifier))
       case _ => throw new RuntimeException(s"Multiple identifiers in subfield $$0: $codes")
     }
   }
