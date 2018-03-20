@@ -88,7 +88,11 @@ case class DisplayWork(
   ) language: Option[DisplayLanguage] = None,
   visible: Boolean = true
 ) {
-  @ApiModelProperty(readOnly = true, value = "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc.")
+  @ApiModelProperty(
+    readOnly = true,
+    value =
+      "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
+  )
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 

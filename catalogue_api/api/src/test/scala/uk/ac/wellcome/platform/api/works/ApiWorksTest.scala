@@ -109,8 +109,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "title": "$title",
                           | "description": "$description",
                           | "workType": {
-                          |       "id": s"${workType.id}",
-                          |       "label": s"${workType.label}",
+                          |       "id": "${workType.id}",
+                          |       "label": "${workType.label}",
                           |       "type": "WorkType"
                           | },
                           | "lettering": "$lettering",
@@ -351,7 +351,7 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "description": "${works(2).description.get}",
                           |     "workType" : {
                           |        "id" : "${works(2).workType.get.id}",
-                          |        "label" : "${works(2).workType.get.id}",
+                          |        "label" : "${works(2).workType.get.label}",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(2).lettering.get}",
@@ -371,8 +371,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "returns a BadRequest when malformed query parameters are presented") {
+  it("returns a BadRequest when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -582,7 +581,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+  it(
+    "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "Test1234"
@@ -644,7 +644,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+  it(
+    "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val srcIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       value = "Test1234"
@@ -678,7 +679,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+  it(
+    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
     val work = workWith(
       canonicalId = "a87na87",
       title = "Idling inkwells of indigo images",
@@ -708,7 +710,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("can look at different Elasticsearch indices based on the ?index query parameter") {
+  it(
+    "can look at different Elasticsearch indices based on the ?index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A whale on a wave"
@@ -762,7 +765,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("can search different Elasticsearch indices based on the ?_index query parameter") {
+  it(
+    "can search different Elasticsearch indices based on the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A wombat wallowing under a willow"
@@ -845,7 +849,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a Bad Request error if asked for a mixture of valid and invalid includes") {
+  it(
+    "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
@@ -856,7 +861,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a Bad Request error if asked for an invalid include on an individual work") {
+  it(
+    "returns a Bad Request error if asked for an invalid include on an individual work") {
     eventually {
       server.httpGet(
         path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
@@ -866,7 +872,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes the thumbnail field if available and we use the thumbnail include") {
+  it(
+    "includes the thumbnail field if available and we use the thumbnail include") {
     val work = identifiedWorkWith(
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",
@@ -973,7 +980,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a Bad Request error if you try to page beyond the first 10000 works") {
+  it(
+    "returns a Bad Request error if you try to page beyond the first 10000 works") {
     val queries = List(
       "page=10000",
       "pageSize=100&page=101",

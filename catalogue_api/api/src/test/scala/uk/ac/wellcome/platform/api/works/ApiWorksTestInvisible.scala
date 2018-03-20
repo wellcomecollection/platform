@@ -51,8 +51,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "title": "${works(0).title.get}",
           |     "description": "${works(0).description.get}",
           |     "workType": {
-          |       "id": "id",
-          |       "label": "label",
+          |       "id": "${works(0).workType.get.id}",
+          |       "label": "${works(0).workType.get.label}",
           |       "type": "WorkType"
           |     },
           |     "lettering": "${works(0).lettering.get}",
@@ -69,8 +69,8 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "title": "${works(1).title.get}",
           |     "description": "${works(1).description.get}",
           |     "workType": {
-          |       "id": "id",
-          |       "label": "label",
+          |       "id": "${works(1).workType.get.id}",
+          |       "label": "${works(1).workType.get.label}",
           |       "type": "WorkType"
           |     },
           |     "lettering": "${works(1).lettering.get}",

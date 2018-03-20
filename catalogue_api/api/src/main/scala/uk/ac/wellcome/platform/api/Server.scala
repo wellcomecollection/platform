@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.api
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.json.modules.FinatraJacksonModule
 import com.twitter.finatra.json.utils.CamelCasePropertyNamingStrategy
@@ -10,7 +14,11 @@ import io.swagger.models.Swagger
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.api.controllers._
-import uk.ac.wellcome.platform.api.finatra.exceptions.{CaseClassMappingExceptionWrapper, ElasticsearchResponseExceptionMapper, GeneralExceptionMapper}
+import uk.ac.wellcome.platform.api.finatra.exceptions.{
+  CaseClassMappingExceptionWrapper,
+  ElasticsearchResponseExceptionMapper,
+  GeneralExceptionMapper
+}
 import uk.ac.wellcome.models.WorksIncludesDeserializerModule
 
 object ServerMain extends Server
