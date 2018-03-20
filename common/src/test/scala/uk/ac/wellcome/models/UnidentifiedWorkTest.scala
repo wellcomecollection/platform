@@ -39,12 +39,14 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "title": "title",
       |  "sourceIdentifier": {
       |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "ontologyType": "Work",
       |    "value": "value"
       |  },
       |  "version": 1,
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "ontologyType": "Work",
       |      "value": "value"
       |    }
       |  ],
@@ -99,11 +101,13 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    {
       |      "sourceIdentifier": {
       |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "ontologyType": "Item",
       |        "value": "value"
       |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |          "ontologyType": "Item",
       |          "value": "value"
       |        }
       |      ],
@@ -156,14 +160,21 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     license = License_CCBY
   )
 
-  val identifier = SourceIdentifier(
+  val workIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Work",
+    value = "value"
+  )
+
+  val itemIdentifier = SourceIdentifier(
+    identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Item",
     value = "value"
   )
 
   val item = UnidentifiedItem(
-    sourceIdentifier = identifier,
-    identifiers = List(identifier),
+    sourceIdentifier = itemIdentifier,
+    identifiers = List(itemIdentifier),
     locations = List(location)
   )
 
@@ -180,9 +191,9 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
-    sourceIdentifier = identifier,
+    sourceIdentifier = workIdentifier,
     version = 1,
-    identifiers = List(identifier),
+    identifiers = List(workIdentifier),
     workType = Some(workType),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),

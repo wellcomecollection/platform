@@ -82,7 +82,7 @@ class IdentifierGeneratorTest
       }.update().apply()
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234"),
         "Work"
       )
 
@@ -95,7 +95,7 @@ class IdentifierGeneratorTest
       implicit val session = fixtures.dbConfig.session
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "1234"),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234"),
         "Work"
       )
 
@@ -133,6 +133,7 @@ class IdentifierGeneratorTest
 
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      "Work",
       value = "1234"
     )
 
@@ -169,7 +170,7 @@ class IdentifierGeneratorTest
       val miroId = "1234"
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId),
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, ontologyType, miroId),
         ontologyType
       )
 

@@ -42,6 +42,7 @@ class SierraTransformableTransformer
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                ontologyType = "Work",
                 value = addCheckDigit(
                   sierraBibData.id,
                   recordType = SierraRecordTypes.bibs

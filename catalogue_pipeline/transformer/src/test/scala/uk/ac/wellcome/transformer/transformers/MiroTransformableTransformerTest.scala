@@ -16,7 +16,7 @@ class MiroTransformableTransformerTest
       MiroID = MiroID
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", MiroID))
   }
 
   it("passes through the INNOPAC ID as the Sierra system number") {
@@ -345,9 +345,10 @@ class MiroTransformableTransformerTest
       MiroID = miroID
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work",miroID),
       SourceIdentifier(
         IdentifierSchemes.sierraSystemNumber,
+        "Work",
         expectedSierraNumber)
     )
   }
@@ -364,10 +365,10 @@ class MiroTransformableTransformerTest
       MiroID = "V0175278"
     )
     val miroIDList = List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "V0175278")
+      SourceIdentifier(IdentifierSchemes.miroImageNumber,  "Work","V0175278")
     )
     val libraryRefList = expectedValues.map {
-      SourceIdentifier(IdentifierSchemes.miroLibraryReference, _)
+      SourceIdentifier(IdentifierSchemes.miroLibraryReference,  "Work",_)
     }
     work.identifiers shouldBe (miroIDList ++ libraryRefList)
   }
