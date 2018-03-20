@@ -166,7 +166,10 @@ class IdentifierGeneratorTest
       val miroId = "1234"
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, ontologyType, miroId)
+        SourceIdentifier(
+          IdentifierSchemes.miroImageNumber,
+          ontologyType,
+          miroId)
       )
 
       val id = triedId.get

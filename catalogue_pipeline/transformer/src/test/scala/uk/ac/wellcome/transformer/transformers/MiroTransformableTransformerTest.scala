@@ -345,7 +345,7 @@ class MiroTransformableTransformerTest
       MiroID = miroID
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work",miroID),
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", miroID),
       SourceIdentifier(
         IdentifierSchemes.sierraSystemNumber,
         "Work",
@@ -365,10 +365,10 @@ class MiroTransformableTransformerTest
       MiroID = "V0175278"
     )
     val miroIDList = List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber,  "Work","V0175278")
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "V0175278")
     )
     val libraryRefList = expectedValues.map {
-      SourceIdentifier(IdentifierSchemes.miroLibraryReference,  "Work",_)
+      SourceIdentifier(IdentifierSchemes.miroLibraryReference, "Work", _)
     }
     work.identifiers shouldBe (miroIDList ++ libraryRefList)
   }

@@ -101,8 +101,13 @@ class IdEmbedderTests
     val originalWork = UnidentifiedWork(
       title = Some("crap"),
       sourceIdentifier = workIdentifier,
-      creators = List(Identifiable(person, sourceIdentifier = creatorIdentifier, identifiers = List(creatorIdentifier))),
-      version = 1)
+      creators = List(
+        Identifiable(
+          person,
+          sourceIdentifier = creatorIdentifier,
+          identifiers = List(creatorIdentifier))),
+      version = 1
+    )
 
     val newWorkCanonicalId = "5467"
 
@@ -129,7 +134,11 @@ class IdEmbedderTests
       canonicalId = newWorkCanonicalId,
       title = originalWork.title,
       sourceIdentifier = originalWork.sourceIdentifier,
-      creators = List(Identified(agent = person, canonicalId = newCreatorCanonicalId, identifiers = List(creatorIdentifier))),
+      creators = List(
+        Identified(
+          agent = person,
+          canonicalId = newCreatorCanonicalId,
+          identifiers = List(creatorIdentifier))),
       version = originalWork.version
     )
 

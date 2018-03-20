@@ -44,7 +44,10 @@ class SQSMessageReceiverTest
     with TransformableMessageUtils {
 
   val sourceIdentifier =
-    SourceIdentifier(identifierScheme = IdentifierSchemes.calmPlaceholder, ontologyType = "Work", value = "value")
+    SourceIdentifier(
+      identifierScheme = IdentifierSchemes.calmPlaceholder,
+      ontologyType = "Work",
+      value = "value")
 
   val work = UnidentifiedWork(
     title = Some("placeholder title"),

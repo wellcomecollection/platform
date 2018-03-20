@@ -75,7 +75,10 @@ class IdMinterFeatureTest
             val title = "A limerick about a lion"
 
             val identifier =
-              SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work",miroID)
+              SourceIdentifier(
+                IdentifierSchemes.miroImageNumber,
+                "Work",
+                miroID)
 
             val work = UnidentifiedWork(
               title = Some(title),
