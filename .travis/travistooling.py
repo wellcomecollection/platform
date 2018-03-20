@@ -99,48 +99,30 @@ def affects_tests(path, task):
     # A number of Sierra-related tasks share code/Makefiles in the
     # sierra_adapter directory.  If we're definitely in a project which
     # has nothing to do with Sierra, we can ignore changes in this dir.
-    sierra_free_tasks = (
-        'loris',
-        'id_minter',
-        'ingestor',
-        'reindexer_worker',
-        'reindex_job_creator',
-        'complete_reindex',
-        'reindex_shard_generator',
-        'resharder',
-        'transformer',
-        'api',
-        'monitoring',
-        'shared_infra',
-        'nginx',
-        'snapshot_scheduler',
-        'sbt-display',
-        'sbt-common',
-    )
-    if (
-        task.startswith(sierra_free_tasks) and
-        path.startswith('sierra_adapter/')
-    ):
-        print(
-            "~~~ Ignoring %s; sierra_adapter changes don't affect %s tests" %
-            (path, task))
-        return False
+    if path.startswith('sierra_adapter/'):
+        for project in get_projects(ROOT):
+            if (
+                not project.exclusive_path.startswith('sierra_adapter/') and
+                task.startswith(project.name)
+            ):
+                print(
+                    "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
+                    (path, task))
+                return False
 
     # Within the sierra_adapter stack, there's an sbt common lib.  If we're
     # in a Sierra project that doesn't use sbt, we can ignore that too.
-    sbt_common_free_tasks = (
-        's3_demultiplexer',
-        'sierra_window_generator',
-        'snapshot_scheduler',
-    )
-    if (
-        task.startswith(sbt_common_free_tasks) and
-        path.startswith('sierra_adapter/common/')
-    ):
-        print(
-            "~~~ Ignoring %s; sierra-common changes don't affect %s tests" %
-            (path, task))
-        return False
+    if path.startswith('sierra_adapter/common'):
+        for project in get_projects(ROOT):
+            if (
+                project.type != 'sbt_app' and
+                task.startswith(project.name)
+            ):
+                assert project.exclusive_path.startswith('sierra_adapter/')
+                print(
+                    "~~~ Ignoring %s; sierra-common changes don't affect %s tests" %
+                    (path, task))
+                return False
 
     # The top-level common directory contains some Scala files which are
     # shared across multiple projects.  If we're definitely in a project
