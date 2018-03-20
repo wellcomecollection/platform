@@ -12,8 +12,8 @@ trait WorksUtil {
   val period = Period("the past")
   val agent = Agent("a person")
   val workType = WorkType(
-    id = "id",
-    label = "label"
+    id = "1dz4yn34va",
+    label = "An aggregation of angry archipelago aged ankylosaurs."
   )
 
   val sourceIdentifier = SourceIdentifier(

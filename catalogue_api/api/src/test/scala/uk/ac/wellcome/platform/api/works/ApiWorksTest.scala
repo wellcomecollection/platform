@@ -26,8 +26,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
                           |     "workType": {
-                          |       "id": "1dz4yn34va",
-                          |       "label": "An aggregation of angry archipelago aged ankylosaurs.",
+                          |       "id": "${works(0).workType.get.id}",
+                          |       "label": "${works(0).workType.get.label}",
                           |       "type": "WorkType"
                           |     },
                           |     "lettering": "${works(0).lettering.get}",
@@ -45,8 +45,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
                           |     "workType": {
-                          |       "id": "b00p4900p",
-                          |       "label": "Brewed bears being backwards behind baleen.",
+                          |       "id": "${works(1).workType.get.id}",
+                          |       "label": "${works(1).workType.get.label}",
                           |       "type": "WorkType"
                           |     },
                           |     "lettering": "${works(1).lettering.get}",
@@ -64,8 +64,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
                           |     "workType": {
-                          |       "id": "c4t54r3l1f3",
-                          |       "label": "Creamed clams cut cunningly by Calligula.",
+                          |       "id": "${works(2).workType.get.id}",
+                          |       "label": "${works(2).workType.get.label}",
                           |       "type": "WorkType"
                           |     },
                           |     "lettering": "${works(2).lettering.get}",
@@ -109,8 +109,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | "title": "$title",
                           | "description": "$description",
                           | "workType": {
-                          |       "id": "b34r54r3",
-                          |       "label": "Dreaming dunkleosteus dancing dangerously.",
+                          |       "id": s"${workType.id}",
+                          |       "label": s"${workType.label}",
                           |       "type": "WorkType"
                           | },
                           | "lettering": "$lettering",
@@ -278,8 +278,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(1).title.get}",
                           |     "description": "${works(1).description.get}",
                           |     "workType" : {
-                          |        "id" : "h1gg5b050n",
-                          |        "label" : "Poached paleognaths picking packs of prepacked platypus.",
+                          |        "id" : "${works(1).workType.get.id}",
+                          |        "label" : "${works(1).workType.get.label}",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(1).lettering.get}",
@@ -314,8 +314,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(0).title.get}",
                           |     "description": "${works(0).description.get}",
                           |     "workType" : {
-                          |        "id" : "n0s0up4u",
-                          |        "label" : "Red ruby rollerskates racing Rob Roy relentlessly.",
+                          |        "id" : "${works(0).workType.get.id}",
+                          |        "label" : "${works(0).workType.get.label}",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(0).lettering.get}",
@@ -350,8 +350,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "title": "${works(2).title.get}",
                           |     "description": "${works(2).description.get}",
                           |     "workType" : {
-                          |        "id" : "4nyw4yw84m3",
-                          |        "label" : "Mulled molluscs masking many malign makers.",
+                          |        "id" : "${works(2).workType.get.id}",
+                          |        "label" : "${works(2).workType.get.id}",
                           |        "type" : "WorkType"
                           |      },
                           |     "lettering": "${works(2).lettering.get}",
