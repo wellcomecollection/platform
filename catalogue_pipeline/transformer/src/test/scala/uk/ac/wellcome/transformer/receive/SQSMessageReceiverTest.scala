@@ -44,7 +44,7 @@ class SQSMessageReceiverTest
     with TransformableMessageUtils {
 
   val sourceIdentifier =
-    SourceIdentifier(IdentifierSchemes.calmPlaceholder, "value")
+    SourceIdentifier(identifierScheme = IdentifierSchemes.calmPlaceholder, ontologyType = "Work", value = "value")
 
   val work = UnidentifiedWork(
     title = Some("placeholder title"),
@@ -130,10 +130,12 @@ class SQSMessageReceiverTest
 
             val sourceIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.sierraSystemNumber,
+              ontologyType = "Work",
               value = "b50050059"
             )
             val sierraIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.sierraIdentifier,
+              ontologyType = "Work",
               value = id
             )
 

@@ -55,6 +55,7 @@ class IdentifiersDaoTest
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifier.OntologyType,
           value = identifier.SourceId
         )
 
@@ -82,6 +83,7 @@ class IdentifiersDaoTest
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          identifier.OntologyType,
           value = "not_an_existing_value"
         )
 

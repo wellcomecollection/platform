@@ -75,8 +75,9 @@ class CalmTransformerFeatureTest
     AccessStatus: Option[String]): Any = {
 
     val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.calmPlaceholder,
-      "value"
+      identifierScheme = IdentifierSchemes.calmPlaceholder,
+      ontologyType = "Work",
+      value = "value"
     )
 
     //currently for calm data we only output hardcoded sample values
