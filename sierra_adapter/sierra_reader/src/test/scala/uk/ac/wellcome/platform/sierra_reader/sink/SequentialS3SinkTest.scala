@@ -25,7 +25,10 @@ class SequentialS3SinkTest
       implicit val executionContext = system.dispatcher
       withLocalS3Bucket { bucketName =>
         val sink =
-          SequentialS3Sink(s3Client, bucketName = bucketName, keyPrefix = "testA_")
+          SequentialS3Sink(
+            s3Client,
+            bucketName = bucketName,
+            keyPrefix = "testA_")
 
         val json = parse(s"""{"hello": "world"}""").right.get
 
@@ -50,7 +53,10 @@ class SequentialS3SinkTest
       implicit val executionContext = system.dispatcher
       withLocalS3Bucket { bucketName =>
         val sink =
-          SequentialS3Sink(s3Client, bucketName = bucketName, keyPrefix = "testB_")
+          SequentialS3Sink(
+            s3Client,
+            bucketName = bucketName,
+            keyPrefix = "testB_")
 
         val json0 = parse(s"""{"red": "orange"}""").right.get
         val json1 = parse(s"""{"orange": "yellow"}""").right.get

@@ -30,12 +30,19 @@ class SierraReaderFeatureTest
             |}
             """.stripMargin
 
-          val sqsMessage =  SQSMessage(Some("subject"), message, "topic", "messageType", "timestamp")
+          val sqsMessage = SQSMessage(
+            Some("subject"),
+            message,
+            "topic",
+            "messageType",
+            "timestamp")
           sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
           eventually {
             // This comes from the wiremock recordings for Sierra API response
-            s3Client.listObjects(bucketName).getObjectSummaries should have size 2
+            s3Client
+              .listObjects(bucketName)
+              .getObjectSummaries should have size 2
           }
         }
       }

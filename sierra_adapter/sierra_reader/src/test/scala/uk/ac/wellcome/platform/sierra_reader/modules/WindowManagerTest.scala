@@ -19,7 +19,8 @@ class WindowManagerTest
     with ScalaFutures
     with ExtendedPatience {
 
-  private def withWindowManager(bucketName: String)(testWith: TestWith[WindowManager, Assertion]) = {
+  private def withWindowManager(bucketName: String)(
+    testWith: TestWith[WindowManager, Assertion]) = {
     val windowManager = new WindowManager(
       s3client = s3Client,
       bucketName = bucketName,
@@ -51,7 +52,10 @@ class WindowManagerTest
         s3Client.putObject(bucketName, s"$prefix/0000.json", "[]")
 
         val record =
-          SierraRecord(id = "b1794165", data = "{}", modifiedDate = Instant.now())
+          SierraRecord(
+            id = "b1794165",
+            data = "{}",
+            modifiedDate = Instant.now())
 
         s3Client.putObject(
           bucketName,
