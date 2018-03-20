@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models
 
-sealed trait Item extends Identifiable {
+sealed trait Item {
   val sourceIdentifier: SourceIdentifier
   val identifiers: List[SourceIdentifier]
   val locations: List[Location]
@@ -12,8 +12,7 @@ case class UnidentifiedItem(
   identifiers: List[SourceIdentifier] = Nil,
   locations: List[Location] = List(),
   ontologyType: String = "Item"
-) extends Identifiable
-    with Item
+) extends Item
 
 case class IdentifiedItem(
   canonicalId: String,
@@ -21,5 +20,4 @@ case class IdentifiedItem(
   identifiers: List[SourceIdentifier] = Nil,
   locations: List[Location] = List(),
   ontologyType: String = "Item"
-) extends Identifiable
-    with Item
+) extends Item

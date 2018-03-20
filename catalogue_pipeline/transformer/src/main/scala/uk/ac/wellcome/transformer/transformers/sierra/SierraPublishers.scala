@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.{Agent, Organisation}
+import uk.ac.wellcome.models.{Agent, Organisation, Unidentifiable}
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraPublishers {
@@ -25,7 +25,7 @@ trait SierraPublishers {
   // https://www.loc.gov/marc/bibliographic/bd260.html
   // https://www.loc.gov/marc/bibliographic/bd264.html
   //
-  def getPublishers(bibData: SierraBibData): List[Organisation] = {
+  def getPublishers(bibData: SierraBibData): List[Unidentifiable[Organisation]] = {
     val matchingFields = bibData.varFields
       .filter { _.marcTag.contains("260") }
 
@@ -41,9 +41,9 @@ trait SierraPublishers {
     matchingSubfields
       .filter { _.tag == "b" }
       .map { subfield =>
-        Organisation(
+        Unidentifiable(Organisation(
           label = subfield.content
-        )
+        ))
       }
   }
 }

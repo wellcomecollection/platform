@@ -3,7 +3,7 @@ package uk.ac.wellcome.models
 import uk.ac.wellcome.utils.JsonUtil._
 
 /** A representation of a work in our ontology */
-trait Work extends Versioned with Identifiable {
+trait Work extends Versioned {
   val title: Option[String]
   val sourceIdentifier: SourceIdentifier
   val version: Int
@@ -15,10 +15,10 @@ trait Work extends Versioned with Identifiable {
   val lettering: Option[String]
   val createdDate: Option[Period]
   val subjects: List[AbstractConcept]
-  val creators: List[AbstractAgent]
+  val creators: List[IdentityState[AbstractAgent]]
   val genres: List[AbstractConcept]
   val thumbnail: Option[Location]
-  val publishers: List[AbstractAgent]
+  val publishers: List[IdentityState[AbstractAgent]]
   val publicationDate: Option[Period]
   val language: Option[Language]
   val visible: Boolean
@@ -36,11 +36,11 @@ case class UnidentifiedWork(title: Option[String],
                             lettering: Option[String] = None,
                             createdDate: Option[Period] = None,
                             subjects: List[AbstractConcept] = Nil,
-                            creators: List[AbstractAgent] = Nil,
+                            creators: List[IdentifieableOrUnidentifiable[AbstractAgent]] = Nil,
                             genres: List[AbstractConcept] = Nil,
                             thumbnail: Option[Location] = None,
                             items: List[UnidentifiedItem] = Nil,
-                            publishers: List[AbstractAgent] = Nil,
+                            publishers: List[IdentifieableOrUnidentifiable[AbstractAgent]] = Nil,
                             publicationDate: Option[Period] = None,
                             placesOfPublication: List[Place] = Nil,
                             language: Option[Language] = None,
@@ -60,11 +60,11 @@ case class IdentifiedWork(canonicalId: String,
                           lettering: Option[String] = None,
                           createdDate: Option[Period] = None,
                           subjects: List[AbstractConcept] = Nil,
-                          creators: List[AbstractAgent] = Nil,
+                          creators: List[IdentifiedOrUnidentifiable[AbstractAgent]] = Nil,
                           genres: List[AbstractConcept] = Nil,
                           thumbnail: Option[Location] = None,
                           items: List[IdentifiedItem] = Nil,
-                          publishers: List[AbstractAgent] = Nil,
+                          publishers: List[IdentifiedOrUnidentifiable[AbstractAgent]] = Nil,
                           publicationDate: Option[Period] = None,
                           placesOfPublication: List[Place] = Nil,
                           language: Option[Language] = None,
