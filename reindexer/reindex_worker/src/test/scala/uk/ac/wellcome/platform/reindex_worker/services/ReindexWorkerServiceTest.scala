@@ -22,7 +22,8 @@ import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.utils.{SNSLocal, SQSLocal}
+import uk.ac.wellcome.test.fixtures.SnsFixtures
+import uk.ac.wellcome.test.utils.SQSLocal
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,7 +35,7 @@ class ReindexWorkerServiceTest
     with Matchers
     with DynamoDBLocal[TestRecord]
     with MockitoSugar
-    with SNSLocal
+    with SnsFixtures
     with SQSLocal
     with ScalaFutures {
 
@@ -53,7 +54,6 @@ class ReindexWorkerServiceTest
     DynamoFormat[TestRecord]
 
   val queueUrl = createQueueAndReturnUrl("reindex-worker-service-test-q")
-  val topicArn = createTopicAndReturnArn("reindex-worker-service-test-topic")
 
   it("returns a successful Future if the reindex completes correctly") {
     val reindexJob = ReindexJob(
@@ -155,30 +155,32 @@ class ReindexWorkerServiceTest
 
   private def reindexWorkerService(
     dynamoTableName: String = tableName): ReindexWorkerService = {
-    new ReindexWorkerService(
-      targetService = new ReindexService(
-        dynamoDBClient = dynamoDbClient,
-        metricsSender = metricsSender,
-        versionedDao = new VersionedDao(
-          dynamoDbClient = dynamoDbClient,
+    withLocalSnsTopic { topicArn =>
+      new ReindexWorkerService(
+        targetService = new ReindexService(
+          dynamoDBClient = dynamoDbClient,
+          metricsSender = metricsSender,
+          versionedDao = new VersionedDao(
+            dynamoDbClient = dynamoDbClient,
+            dynamoConfig = DynamoConfig(table = dynamoTableName)
+          ),
           dynamoConfig = DynamoConfig(table = dynamoTableName)
         ),
-        dynamoConfig = DynamoConfig(table = dynamoTableName)
-      ),
-      reader = new SQSReader(
-        sqsClient = sqsClient,
-        sqsConfig = SQSConfig(
-          queueUrl = queueUrl,
-          waitTime = 1 second,
-          maxMessages = 1
-        )
-      ),
-      snsWriter = new SNSWriter(
-        snsClient = snsClient,
-        snsConfig = SNSConfig(topicArn = topicArn)
-      ),
-      system = actorSystem,
-      metrics = metricsSender
-    )
+        reader = new SQSReader(
+          sqsClient = sqsClient,
+          sqsConfig = SQSConfig(
+            queueUrl = queueUrl,
+            waitTime = 1 second,
+            maxMessages = 1
+          )
+        ),
+        snsWriter = new SNSWriter(
+          snsClient = snsClient,
+          snsConfig = SNSConfig(topicArn = topicArn)
+        ),
+        system = actorSystem,
+        metrics = metricsSender
+      )
+    }
   }
 }
