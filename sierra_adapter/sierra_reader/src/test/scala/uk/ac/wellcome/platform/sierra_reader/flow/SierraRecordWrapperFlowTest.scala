@@ -18,7 +18,8 @@ class SierraRecordWrapperFlowTest
     with ExtendedPatience
     with Matchers {
 
-  private def withRecordWrapperFlow(testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
+  private def withRecordWrapperFlow(
+    testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
     withActorSystem { system =>
       implicit val executionContext = system.dispatcher
       val wrapperFlow = SierraRecordWrapperFlow()
@@ -44,7 +45,8 @@ class SierraRecordWrapperFlowTest
         modifiedDate = updatedDate
       )
 
-      val futureRecord = Source.single(json)
+      val futureRecord = Source
+        .single(json)
         .via(wrapperFlow)
         .runWith(Sink.head)
 
@@ -72,7 +74,8 @@ class SierraRecordWrapperFlowTest
         modifiedDate = updatedDate
       )
 
-      val futureRecord = Source.single(json)
+      val futureRecord = Source
+        .single(json)
         .via(wrapperFlow)
         .runWith(Sink.head)
 
@@ -98,7 +101,8 @@ class SierraRecordWrapperFlowTest
         modifiedDate = s"${deletedDate}T00:00:00Z"
       )
 
-      val futureRecord = Source.single(json)
+      val futureRecord = Source
+        .single(json)
         .via(wrapperFlow)
         .runWith(Sink.head)
 
@@ -116,7 +120,8 @@ class SierraRecordWrapperFlowTest
         |  "comment": "XML is coming!"
         |}""".stripMargin).right.get
 
-      val futureUnit = Source.single(invalidSierraJson)
+      val futureUnit = Source
+        .single(invalidSierraJson)
         .via(wrapperFlow)
         .runWith(Sink.head)
       whenReady(futureUnit.failed) { _ =>

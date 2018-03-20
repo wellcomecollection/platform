@@ -22,7 +22,8 @@ class SequentialS3SinkTest
     with ScalaFutures
     with ExtendedPatience {
 
-  private def withSink(bucketName: String, keyPrefix: String, offset: Int = 0)(testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
+  private def withSink(bucketName: String, keyPrefix: String, offset: Int = 0)(
+    testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
     withActorSystem { system =>
       implicit val executionContext = system.dispatcher
       val sink = SequentialS3Sink(
@@ -36,10 +37,9 @@ class SequentialS3SinkTest
     }
   }
 
-
   it("puts a single JSON in S3") {
     val json = parse(s"""{"hello": "world"}""").right.get
-    
+
     withLocalS3Bucket { bucketName =>
       withSink(bucketName = bucketName, keyPrefix = "testA_") { sink =>
         val futureDone = Source
@@ -92,23 +92,24 @@ class SequentialS3SinkTest
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) { sink =>
-        val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-          .runWith(sink)
+      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) {
+        sink =>
+          val futureDone = Source(List(json0, json1, json2)).zipWithIndex
+            .runWith(sink)
 
-        whenReady(futureDone) { _ =>
-          val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
-          s3objects.map {
-            _.getKey()
-          } shouldBe List(
-            "testC_0003.json",
-            "testC_0004.json",
-            "testC_0005.json")
+          whenReady(futureDone) { _ =>
+            val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
+            s3objects.map {
+              _.getKey()
+            } shouldBe List(
+              "testC_0003.json",
+              "testC_0004.json",
+              "testC_0005.json")
 
-          getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
-          getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
-          getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
-        }
+            getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
+            getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
+            getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
+          }
       }
     }
   }
