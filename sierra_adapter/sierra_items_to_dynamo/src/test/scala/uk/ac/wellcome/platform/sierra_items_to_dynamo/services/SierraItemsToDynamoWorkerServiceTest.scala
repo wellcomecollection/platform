@@ -2,31 +2,26 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import java.time.Instant
 
-import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
   SierraItemRecord,
   SierraRecord
 }
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.SierraItemRecordDao
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures
 import uk.ac.wellcome.test.fixtures.{
   AkkaFixtures,
   LocalDynamoDb,
