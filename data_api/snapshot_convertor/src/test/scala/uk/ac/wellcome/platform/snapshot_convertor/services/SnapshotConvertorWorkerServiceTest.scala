@@ -11,9 +11,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SNSConfig, SQSConfig, SQSMessage}
+import uk.ac.wellcome.platform.snapshot_convertor.fixtures.ConvertorServiceFixture
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures, TestWith}
+import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
 
@@ -23,13 +24,13 @@ class SnapshotConvertorWorkerServiceTest
     with MockitoSugar
     with SnsFixtures
     with SqsFixtures
+    with AkkaFixtures
     with ScalaFutures
-    with S3 {
+    with ConvertorServiceFixture {
 
   def withSnapshotConvertorWorkerService[R](
     topicArn: String,
-    queueUrl: String,
-    bucketName: String
+    queueUrl: String
   )(testWith: TestWith[SnapshotConvertorWorkerService, R]) = {
 
     val metricsSender: MetricsSender = new MetricsSender(
@@ -53,20 +54,18 @@ class SnapshotConvertorWorkerServiceTest
       snsConfig = SNSConfig(topicArn = topicArn)
     )
 
-    val convertorService = new ConvertorService(
-      bucketName,
-      s3Client
-    )
+    withConvertorService { fixtures =>
 
-    val snapshotConvertorWorkerService = new SnapshotConvertorWorkerService(
-      convertorService: ConvertorService,
-      sqsReader: SQSReader,
-      snsWriter: SNSWriter,
-      system = ActorSystem(),
-      metrics = metricsSender
-    )
+      val snapshotConvertorWorkerService = new SnapshotConvertorWorkerService(
+        fixtures.convertorService,
+        sqsReader,
+        snsWriter,
+        fixtures.actorSystem,
+        metricsSender
+      )
 
-    testWith(snapshotConvertorWorkerService)
+      testWith(snapshotConvertorWorkerService)
+    }
   }
 
   it(
@@ -81,7 +80,7 @@ class SnapshotConvertorWorkerServiceTest
 
           s3Client.putObject(bucketName, key, input, metadata)
 
-          withSnapshotConvertorWorkerService(topicArn, queueUrl, bucketName) {
+          withSnapshotConvertorWorkerService(topicArn, queueUrl) {
             service =>
               val sqsMessage = SQSMessage(
                 subject = None,

@@ -3,17 +3,14 @@ package uk.ac.wellcome.platform.snapshot_convertor.services
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
-import akka.stream.alpakka.s3.scaladsl.S3Client
+import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
+import akka.util.ByteString
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.regions.AwsRegionProvider
 import com.twitter.inject.annotations.Flag
@@ -26,12 +23,12 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-import scala.io.Source
+import akka.stream.scaladsl.{Compression, Framing, Keep, Sink, Source}
+
 
 class ConvertorService @Inject()(@Flag("aws.s3.bucketName") bucketName: String,
                                  actorSystem: ActorSystem,
-                                 awsConfig: AWSConfig,
-                                 s3Client: AmazonS3)
+                                 awsConfig: AWSConfig)
     extends Logging {
 
   def runConversion(
@@ -46,8 +43,6 @@ class ConvertorService @Inject()(@Flag("aws.s3.bucketName") bucketName: String,
         def getRegion: String = awsConfig.region
       }
 
-    val materialiser = ActorMaterializer()
-
     val settings = new S3Settings(
       bufferType = MemoryBufferType,
       proxy = None,
@@ -57,63 +52,41 @@ class ConvertorService @Inject()(@Flag("aws.s3.bucketName") bucketName: String,
       endpointUrl = None
     )
 
-//    val s3Client = new S3Client(settings)(actorSystem, materialiser)
-
-//
-//    val (s3Source: Source[ByteString, _], _) = s3Client.download(bucket, bucketKey)
-//
-//    import akka.stream.scaladsl.Compression
-//    val uncompressed = s3Source
-//      .via(Compression.gunzip())
-//      .map(_.utf8String)
-//      .via(Framing.delimiter(ByteString("."), Int.MaxValue))
-//      .map(JsonUtil.fromJson[IdentifiedWork])
-
-//  CompletedConversionJob(conversionJob)
-
+    val actorMaterializer = ActorMaterializer()(actorSystem)
     val objectKey = conversionJob.objectKey
+    val targetObjectKey = "target.txt.gz"
 
-    // This should deal with compressed files
-    val inputStream = s3Client
-      .getObject(bucketName, objectKey)
-      .getObjectContent()
+    val s3Client = new S3Client(settings)(actorSystem, actorMaterializer)
+    val (s3Source: Source[ByteString, _], _) = s3Client.download(bucketName, objectKey)
 
-    val sourceLines = Source.fromInputStream(inputStream).getLines()
-
-    // we should do this in a streaming fashion
-    val identifiedWorks = sourceLines.map(getResponseString => {
-      val source: Json = (parse(getResponseString).right.get \\ "_source").head
-      source.as[IdentifiedWork].right.get
-    })
-
-    // we need to make sure that all includes params are true
     val includes = WorksIncludes(
       identifiers = true,
       thumbnail = true,
       items = true
     )
 
-    val displayWorks = identifiedWorks.map(
-      identifiedWork =>
-        DisplayWork(
-          work = identifiedWork,
-          includes = includes
-      ))
+    val uncompressedSource = s3Source
+      .via(Compression.gunzip())
+      .via(Framing.delimiter(ByteString("."), Int.MaxValue))
+      .map(_.utf8String)
+      .map(JsonUtil.fromJson[IdentifiedWork](_).get)
+      .map(work => DisplayWork(work, includes))
+      .map(JsonUtil.toJson(_).get)
+      .map(ByteString(_))
+      .via(Compression.gzip)
 
-    // this should be Jackson
-    val displayWorksString = displayWorks
-      .map(displayWork => JsonUtil.toJson(displayWork).get)
-      .mkString("\n")
+    val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
+      s3Client.multipartUpload(bucketName, targetObjectKey)
 
-    // this should put to a different bucket
-    s3Client.putObject(bucketName, "target.txt", displayWorksString)
+    val runnable = s3Source.toMat(s3Sink)(Keep.right)
+
+    val future = runnable.run()(actorMaterializer)
 
     // this should be an app variable
     val host = "http://localhost:33333"
-
     val targetLocation = Uri(s"$host/$objectKey")
 
-    Future {
+    future.map { _ =>
       CompletedConversionJob(
         conversionJob,
         targetLocation
