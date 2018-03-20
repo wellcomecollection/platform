@@ -19,6 +19,7 @@ trait Work extends Versioned with Identifiable {
   val thumbnail: Option[Location]
   val publishers: List[AbstractAgent]
   val publicationDate: Option[Period]
+  val language: Option[Language]
   val visible: Boolean
   val ontologyType: String
 }
@@ -40,6 +41,7 @@ case class UnidentifiedWork(title: Option[String],
                             publishers: List[AbstractAgent] = Nil,
                             publicationDate: Option[Period] = None,
                             placesOfPublication: List[Place] = Nil,
+                            language: Option[Language] = None,
                             visible: Boolean = true,
                             ontologyType: String = "Work")
     extends Work
@@ -62,6 +64,7 @@ case class IdentifiedWork(canonicalId: String,
                           publishers: List[AbstractAgent] = Nil,
                           publicationDate: Option[Period] = None,
                           placesOfPublication: List[Place] = Nil,
+                          language: Option[Language] = None,
                           visible: Boolean = true,
                           ontologyType: String = "Work")
     extends Work

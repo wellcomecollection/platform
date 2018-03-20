@@ -165,4 +165,24 @@ class DisplayWorkTest extends FunSpec with Matchers {
     val displayWork = DisplayWork(work)
     displayWork.extent shouldBe Some(extent)
   }
+
+  it("gets the language from a Work") {
+    val language = Language(
+      id = "bsl",
+      label = "British Sign Language"
+    )
+
+    val work = IdentifiedWork(
+      title = Some("A largesse of leaping Libyan lions"),
+      canonicalId = "lfk6nkje",
+      sourceIdentifier = sourceIdentifier,
+      language = Some(language),
+      version = 1
+    )
+
+    val displayWork = DisplayWork(work)
+    val displayLanguage = displayWork.language.get
+    displayLanguage.id shouldBe language.id
+    displayLanguage.label shouldBe language.label
+  }
 }

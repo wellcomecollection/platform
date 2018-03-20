@@ -76,6 +76,12 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
+  val language = objectField("language").fields(
+    keywordField("id"),
+    textField("language"),
+    keywordField("ontologyType")
+  )
+
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
     Seq(
       keywordField("canonicalId"),
@@ -102,6 +108,7 @@ class WorksIndex @Inject()(client: HttpClient,
       items,
       publishers,
       date("publicationDate"),
+      language,
       location("thumbnail")
     )
 
