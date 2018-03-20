@@ -15,8 +15,16 @@ case class Organisation(
   ontologyType: String = "Organisation"
 ) extends AbstractAgent
 
-case class Person(label: String,
+case class IdentifiablePerson(label: String,
+                  prefix: Option[String] = None,
+                  numeration: Option[String] = None,
+                  ontologyType: String = "Person",
+                  sourceIdentifier: SourceIdentifier)
+    extends AbstractAgent with Identifiable
+
+case class UnidentifiablePerson(label: String,
                   prefix: Option[String] = None,
                   numeration: Option[String] = None,
                   ontologyType: String = "Person")
-    extends AbstractAgent
+  extends AbstractAgent
+

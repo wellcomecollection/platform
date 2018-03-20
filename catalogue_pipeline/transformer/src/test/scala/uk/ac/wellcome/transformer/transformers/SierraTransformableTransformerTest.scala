@@ -620,7 +620,7 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    transformedSierraRecord.get.get.creators should contain only Person(
+    transformedSierraRecord.get.get.creators should contain only UnidentifiablePerson(
       label = name)
   }
 }
