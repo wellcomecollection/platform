@@ -4,7 +4,7 @@ import collections
 import os
 
 Project = collections.namedtuple('Project',
-    ['type', 'exclusive_path']
+    ['name', 'type', 'exclusive_path']
 )
 
 
@@ -46,6 +46,7 @@ def _get_projects_from_makefile(root, path):
 
         for t in targets:
             yield Project(
+                name=t,
                 type=project_type,
                 exclusive_path=os.path.join(root, t)
             )
