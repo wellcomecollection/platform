@@ -228,26 +228,26 @@ class MiroTransformableTransformer
   /*
    * <image_creator>: the Creator, which maps to our property "hasCreator"
    */
-  private def getCreators(miroData: MiroTransformableData): List[Agent] = {
+  private def getCreators(miroData: MiroTransformableData): List[Unidentifiable[Agent]] = {
     val primaryCreators = miroData.creator match {
-      case Some(c) => c.map { Agent(_) }
+      case Some(creator) => creator.map { c => Unidentifiable(Agent(c)) }
       case None => List()
     }
 
     // <image_secondary_creator>: what MIRO calls Secondary Creator, which
     // will also just have to map to our object property "hasCreator"
-    val secondaryCreators: List[Agent] = miroData.secondaryCreator match {
-      case Some(c) => c.map { Agent(_) }
+    val secondaryCreators = miroData.secondaryCreator match {
+      case Some(creator) => creator.map { c => Unidentifiable(Agent(c)) }
       case None => List()
     }
 
     // We also add the contributor code for the non-historical images, but
     // only if the contributor *isn't* Wellcome Collection.v
-    val contributorCreators: List[Agent] = miroData.sourceCode match {
+    val contributorCreators = miroData.sourceCode match {
       case Some(code) =>
         contributorMap(code.toUpperCase) match {
           case "Wellcome Collection" => List()
-          case contributor => List(Agent(contributor))
+          case contributor => List(Unidentifiable(Agent(contributor)))
         }
       case None => List()
     }

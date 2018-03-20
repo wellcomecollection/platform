@@ -258,7 +258,7 @@ class SierraTransformableTransformerTest
         version = 1,
         identifiers = List(sourceIdentifier, sierraIdentifier),
         description = Some("A delightful description of a dead daisy."),
-        publishers = List(Organisation(label = "Peaceful Poetry")),
+        publishers = List(Unidentifiable(Organisation(label = "Peaceful Poetry"))),
         lettering = Some(lettering),
         publicationDate = Some(Period("1923."))
       )
@@ -620,7 +620,7 @@ class SierraTransformableTransformerTest
       transformer.transform(sierraTransformable, version = 1)
     transformedSierraRecord.isSuccess shouldBe true
 
-    transformedSierraRecord.get.get.creators should contain only UnidentifiablePerson(
-      label = name)
+    transformedSierraRecord.get.get.creators should contain only Unidentifiable(Person(
+      label = name))
   }
 }
