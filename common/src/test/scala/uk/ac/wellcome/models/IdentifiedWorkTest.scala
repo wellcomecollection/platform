@@ -171,7 +171,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "label"
   )
 
-  val publishers = List(publisher)
+  val publishers = List(Unidentifiable(publisher))
 
   val identifiedWork = IdentifiedWork(
     canonicalId = "canonicalId",
@@ -186,7 +186,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
-    creators = List(Agent("47")),
+    creators = List(Unidentifiable(Agent("47"))),
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
