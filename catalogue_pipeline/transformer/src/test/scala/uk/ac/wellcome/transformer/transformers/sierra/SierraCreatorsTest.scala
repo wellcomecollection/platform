@@ -211,4 +211,89 @@ class SierraCreatorsTest extends FunSpec with Matchers {
     creators should contain only Unidentifiable(Organisation(label = name))
   }
 
+  it("extracts the creator identifier from marcTag 110 0") {
+    val name = "The Unseen University"
+    val code = "123456"
+
+    val bibData = SierraBibData(
+      id = "1234567",
+      title = None,
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+    )
+
+    val creators = transformer.getCreators(bibData)
+
+    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code))
+  }
+
+  it("extracts the creator identifier removing trailing and leading from marcTag 110 0") {
+    val name = "The Assassins' Guild"
+    val code = " 123456 "
+
+    val bibData = SierraBibData(
+      id = "1234567",
+      title = None,
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+    )
+
+    val creators = transformer.getCreators(bibData)
+
+    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code.trim))
+  }
+
+  it("extracts the creator identifier from marcTag 110 0 if there is more than one but they are the same") {
+    val name = "The Fools' Guild"
+    val code = "123456"
+
+    val bibData = SierraBibData(
+      id = "1234567",
+      title = None,
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code), MarcSubfield(tag = "0", content = code))))
+    )
+
+    val creators = transformer.getCreators(bibData)
+
+    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code))
+  }
+
+  it("fails extracting the creator identifier from marcTag 110 0 if there is more than one and they are different") {
+    val name = "The Fools' Guild"
+    val firstCode = "123456"
+    val secondCode = "654321"
+
+    val bibData = SierraBibData(
+      id = "1234567",
+      title = None,
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = firstCode), MarcSubfield(tag = "0", content = secondCode))))
+    )
+
+    intercept[RuntimeException] {
+      transformer.getCreators(bibData)
+    }
+  }
+
 }
