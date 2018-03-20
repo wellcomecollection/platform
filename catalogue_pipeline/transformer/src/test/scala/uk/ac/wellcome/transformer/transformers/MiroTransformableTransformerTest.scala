@@ -2,12 +2,7 @@ package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.ac.wellcome.models.{
-  Agent,
-  IdentifierSchemes,
-  Period,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models._
 
 class MiroTransformableTransformerTest
     extends FunSpec
@@ -211,7 +206,7 @@ class MiroTransformableTransformerTest
     expectedCreators: List[String]
   ) = {
     val transformedWork = transformWork(data = data)
-    transformedWork.creators shouldBe expectedCreators.map { Agent(_) }
+    transformedWork.creators shouldBe expectedCreators.map {creator =>  Unidentifiable(Agent(creator)) }
   }
 
   it("should have no description if no image_image_desc field is present") {
@@ -332,7 +327,7 @@ class MiroTransformableTransformerTest
     )
 
     work.title shouldBe Some("A café for cats")
-    work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
+    work.creators shouldBe List(Unidentifiable(Agent("Gyokushō, a cät Ôwnêr")))
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
