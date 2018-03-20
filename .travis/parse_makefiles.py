@@ -3,9 +3,7 @@
 import collections
 import os
 
-Project = collections.namedtuple('Project',
-    ['name', 'type', 'exclusive_path']
-)
+Project = collections.namedtuple('Project', ['name', 'type', 'exclusive_path'])
 
 
 def get_projects(repo):
@@ -40,7 +38,7 @@ def _get_projects_from_makefile(root, path):
             # two terms in the line.
             targets = matching_lines[0].split()[2:]
         else:
-            raise RuntimeException(
+            raise RuntimeError(
                 "Too many %s variables in %s" % (make_variable, path)
             )
 
