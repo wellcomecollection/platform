@@ -58,6 +58,16 @@ data "aws_iam_policy_document" "travis_permissions" {
       "*",
     ]
   }
+
+  statement {
+    actions = [
+      "iam:GetUser",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "s3_alb_logs" {
