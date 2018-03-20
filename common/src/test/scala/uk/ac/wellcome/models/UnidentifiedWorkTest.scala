@@ -71,9 +71,12 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "creators": [
       |    {
-      |      "label": "47",
-      |      "ontologyType": "Agent",
-      |      "type": "Agent"
+      |      "agent" : {
+      |        "label" : "47",
+      |        "ontologyType" : "Agent",
+      |        "type" : "Agent"
+      |      },
+      |      "type" : "Unidentifiable"
       |    }
       |  ],
       |  "genres": [
@@ -117,11 +120,14 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "ontologyType": "Item"
       |    }
       |  ],
-      |  "publishers": [
+      |  "publishers" : [
       |    {
-      |      "label": "MIT Press",
-      |      "type": "Organisation",
-      |      "ontologyType": "Organisation"
+      |      "agent" : {
+      |        "label" : "MIT Press",
+      |        "ontologyType" : "Organisation",
+      |        "type" : "Organisation"
+      |      },
+      |      "type" : "Unidentifiable"
       |    }
       |  ],
       |  "visible":true,
