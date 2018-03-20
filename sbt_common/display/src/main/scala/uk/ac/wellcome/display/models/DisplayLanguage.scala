@@ -6,7 +6,8 @@ import uk.ac.wellcome.models.Language
 
 @ApiModel(
   value = "Language",
-  description = "A language recognised as one of those in the ISO 639-2 language codes."
+  description =
+    "A language recognised as one of those in the ISO 639-2 language codes."
 )
 case class DisplayLanguage(
   @ApiModelProperty(
