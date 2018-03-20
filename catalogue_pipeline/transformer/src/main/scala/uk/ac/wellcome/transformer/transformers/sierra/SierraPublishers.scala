@@ -25,7 +25,8 @@ trait SierraPublishers {
   // https://www.loc.gov/marc/bibliographic/bd260.html
   // https://www.loc.gov/marc/bibliographic/bd264.html
   //
-  def getPublishers(bibData: SierraBibData): List[Unidentifiable[Organisation]] = {
+  def getPublishers(
+    bibData: SierraBibData): List[Unidentifiable[Organisation]] = {
     val matchingFields = bibData.varFields
       .filter { _.marcTag.contains("260") }
 
@@ -41,9 +42,10 @@ trait SierraPublishers {
     matchingSubfields
       .filter { _.tag == "b" }
       .map { subfield =>
-        Unidentifiable(Organisation(
-          label = subfield.content
-        ))
+        Unidentifiable(
+          Organisation(
+            label = subfield.content
+          ))
       }
   }
 }
