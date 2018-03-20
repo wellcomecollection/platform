@@ -102,7 +102,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code))
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier))
   }
 
   it("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
@@ -123,7 +124,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code.trim))
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
+    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
   }
 
 //  it("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
@@ -166,7 +168,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Identifiable(Person(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code))
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
   }
 
   it("fails extracting the creator identifier from marcTag 100 0 if there is more than one and they are different") {
@@ -229,7 +232,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code))
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
   }
 
   it("extracts the creator identifier removing trailing and leading from marcTag 110 0") {
@@ -250,7 +254,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code.trim))
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code.trim)
+    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
   }
 
   it("extracts the creator identifier from marcTag 110 0 if there is more than one but they are the same") {
@@ -271,7 +276,8 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
     val creators = transformer.getCreators(bibData)
 
-    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code))
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, code)
+    creators should contain only Identifiable(Organisation(label = name), sourceIdentifier = sourceIdentifier, List(sourceIdentifier))
   }
 
   it("fails extracting the creator identifier from marcTag 110 0 if there is more than one and they are different") {
