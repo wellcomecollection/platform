@@ -13,9 +13,10 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
     (
       Concept(label = "Woodwork"),
       s"""{
+        "type": "Concept",
         "ontologyType": "Concept",
         "label": "Woodwork",
-        "type": null,
+        "qualifierType": null,
         "qualifiers": []
       }"""
     ),
@@ -35,15 +36,20 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
       ),
       s"""{
         "type": "QualifiedConcept",
+        "ontologyType": "QualifiedConcept",
         "label": "Dangerous diseases",
         "concept": {
           "label": "disease",
           "type": "Concept",
+          "ontologyType": "Concept",
+          "qualifierType": null,
           "qualifiers": [
             {
               "label": "dispersion & direction",
               "type": "Concept",
+              "ontologyType": "Concept",
               "qualifierType": "general-subdivision",
+              "qualifiers": []
             }
           ]
         }
