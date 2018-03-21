@@ -25,6 +25,9 @@ case class DisplayWork(
     value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
     String] = None,
   @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.display.models.DisplayWorkType]",
+    value = "The type of work.") workType: Option[DisplayWorkType] = None,
+  @ApiModelProperty(
     dataType = "String",
     value =
       "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
@@ -85,7 +88,11 @@ case class DisplayWork(
   ) language: Option[DisplayLanguage] = None,
   visible: Boolean = true
 ) {
-  @ApiModelProperty(readOnly = true, value = "A type of thing")
+  @ApiModelProperty(
+    readOnly = true,
+    value =
+      "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
+  )
   @JsonProperty("type") val ontologyType: String = "Work"
 }
 
@@ -107,6 +114,7 @@ case object DisplayWork {
         if (includes.identifiers)
           Some(work.identifiers.map { DisplayIdentifier(_) })
         else None,
+      workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
         if (includes.thumbnail)
           work.thumbnail.map { DisplayLocation(_) } else None,

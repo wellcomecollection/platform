@@ -11,6 +11,10 @@ trait WorksUtil {
 
   val period = Period("the past")
   val agent = Agent("a person")
+  val workType = WorkType(
+    id = "1dz4yn34va",
+    label = "An aggregation of angry archipelago aged ankylosaurs."
+  )
 
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,
@@ -96,6 +100,7 @@ trait WorksUtil {
       version = 1,
       identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
+      workType = Some(workType),
       description = Some(description),
       lettering = Some(lettering),
       createdDate = Some(createdDate),

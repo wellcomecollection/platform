@@ -48,6 +48,11 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "value": "value"
       |    }
       |  ],
+      |  "workType": {
+      |    "id": "id",
+      |    "label": "label",
+      |    "ontologyType" : "WorkType"
+      |  },
       |  "canonicalId": "canonicalId",
       |  "description": "description",
       |  "physicalDescription": "$physicalDescription",
@@ -156,6 +161,11 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "MIT Press"
   )
 
+  val workType = WorkType(
+    id = "id",
+    label = "label"
+  )
+
   val publishers = List(publisher)
 
   val identifiedWork = IdentifiedWork(
@@ -164,6 +174,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     sourceIdentifier = identifier,
     version = 1,
     identifiers = List(identifier),
+    workType = Some(workType),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),
     extent = Some(extent),

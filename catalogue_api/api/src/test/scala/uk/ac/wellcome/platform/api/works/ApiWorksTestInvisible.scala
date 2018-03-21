@@ -50,6 +50,11 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "id": "${works(0).canonicalId}",
           |     "title": "${works(0).title.get}",
           |     "description": "${works(0).description.get}",
+          |     "workType": {
+          |       "id": "${works(0).workType.get.id}",
+          |       "label": "${works(0).workType.get.label}",
+          |       "type": "WorkType"
+          |     },
           |     "lettering": "${works(0).lettering.get}",
           |     "createdDate": ${period(works(0).createdDate.get)},
           |     "creators": [ ${agent(works(0).creators(0))} ],
@@ -63,6 +68,11 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           |     "id": "${works(1).canonicalId}",
           |     "title": "${works(1).title.get}",
           |     "description": "${works(1).description.get}",
+          |     "workType": {
+          |       "id": "${works(1).workType.get.id}",
+          |       "label": "${works(1).workType.get.label}",
+          |       "type": "WorkType"
+          |     },
           |     "lettering": "${works(1).lettering.get}",
           |     "createdDate": ${period(works(1).createdDate.get)},
           |     "creators": [ ${agent(works(1).creators(0))} ],
