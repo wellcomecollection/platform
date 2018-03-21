@@ -11,7 +11,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       withServer(flags) { server =>
         val works = createWorks(3)
 
-        insertIntoElasticSearch(indexName, itemType, works: _*)
+        insertIntoElasticsearch(indexName, itemType, works: _*)
 
         eventually {
 
@@ -105,7 +105,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           items = List(defaultItem),
           visible = true)
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -154,7 +154,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           )
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -190,7 +190,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           title = "Without windows or wind or washing-up liquid",
           items = List()
         )
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -238,7 +238,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           version = 1,
           canonicalId = "yxh928a",
           items = List(item))
-        insertIntoElasticSearch(indexName, itemType, workWithCopyright)
+        insertIntoElasticsearch(indexName, itemType, workWithCopyright)
 
         eventually {
           server.httpGet(
@@ -288,7 +288,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       withServer(flags) { server =>
         val works = createWorks(3)
 
-        insertIntoElasticSearch(indexName, itemType, works: _*)
+        insertIntoElasticsearch(indexName, itemType, works: _*)
 
         eventually {
           server.httpGet(
@@ -566,7 +566,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           canonicalId = "5678",
           title = "A mezzotint of a mouse"
         )
-        insertIntoElasticSearch(indexName, itemType, work1, work2)
+        insertIntoElasticsearch(indexName, itemType, work1, work2)
 
         eventually {
           server.httpGet(
@@ -614,7 +614,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           canonicalId = "test_subject1",
           subjects = List(Concept("fish"), Concept("gardening"))
         )
-        insertIntoElasticSearch(indexName, itemType, workWithSubjects)
+        insertIntoElasticsearch(indexName, itemType, workWithSubjects)
 
         eventually {
           server.httpGet(
@@ -660,7 +660,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           canonicalId = "test_subject1",
           genres = List(Concept("woodwork"), Concept("etching"))
         )
-        insertIntoElasticSearch(indexName, itemType, workWithSubjects)
+        insertIntoElasticsearch(indexName, itemType, workWithSubjects)
 
         eventually {
           server.httpGet(
@@ -713,7 +713,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           identifiers = List(identifier2)
         )
 
-        insertIntoElasticSearch(indexName, itemType, work1, work2)
+        insertIntoElasticsearch(indexName, itemType, work1, work2)
 
         val works = List(work1, work2)
 
@@ -770,7 +770,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           title = "An insect huddled in an igloo",
           identifiers = List(srcIdentifier)
         )
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -806,7 +806,7 @@ class ApiWorksTest extends ApiWorksTestBase {
           title = "Idling inkwells of indigo images",
           identifiers = List()
         )
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -848,13 +848,13 @@ class ApiWorksTest extends ApiWorksTestBase {
             canonicalId = "1234",
             title = "A whale on a wave"
           )
-          insertIntoElasticSearch(indexName, itemType, work)
+          insertIntoElasticsearch(indexName, itemType, work)
 
           val work_alt = workWith(
             canonicalId = "5678",
             title = "An impostor in an igloo"
           )
-          insertIntoElasticSearchWithIndex(altIndexName, itemType, work_alt)
+          insertIntoElasticsearchWithIndex(altIndexName, itemType, work_alt)
 
           eventually {
             server.httpGet(
@@ -915,13 +915,13 @@ class ApiWorksTest extends ApiWorksTestBase {
             canonicalId = "1234",
             title = "A wombat wallowing under a willow"
           )
-          insertIntoElasticSearch(indexName, itemType, work)
+          insertIntoElasticsearch(indexName, itemType, work)
 
           val work_alt = workWith(
             canonicalId = "5678",
             title = "An impostor in an igloo"
           )
-          insertIntoElasticSearchWithIndex(altIndexName, itemType, work_alt)
+          insertIntoElasticsearchWithIndex(altIndexName, itemType, work_alt)
 
           eventually {
             server.httpGet(
@@ -1059,7 +1059,7 @@ class ApiWorksTest extends ApiWorksTestBase {
             license = License_CCBY
           )
         )
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -1102,7 +1102,7 @@ class ApiWorksTest extends ApiWorksTestBase {
             license = License_CCBY
           )
         )
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(

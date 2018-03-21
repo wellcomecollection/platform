@@ -17,7 +17,7 @@ class PublishersTest extends ApiWorksTestBase {
           publishers = List()
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -61,7 +61,7 @@ class PublishersTest extends ApiWorksTestBase {
           )
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -119,7 +119,7 @@ class PublishersTest extends ApiWorksTestBase {
           )
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(

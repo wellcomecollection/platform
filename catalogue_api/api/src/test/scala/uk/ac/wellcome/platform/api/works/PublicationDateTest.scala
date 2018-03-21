@@ -17,7 +17,7 @@ class PublicationDateTest extends ApiWorksTestBase {
           version = 1
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -58,7 +58,7 @@ class PublicationDateTest extends ApiWorksTestBase {
           version = 1
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(

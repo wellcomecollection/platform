@@ -19,7 +19,7 @@ class PlaceOfPublicationTest extends ApiWorksTestBase {
           version = 1
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(

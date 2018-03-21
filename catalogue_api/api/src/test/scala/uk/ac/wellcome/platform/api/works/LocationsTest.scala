@@ -25,7 +25,7 @@ class LocationsTest extends ApiWorksTestBase {
               locations = List(physicalLocation)))
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(

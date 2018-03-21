@@ -16,7 +16,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           visible = false
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -45,7 +45,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
         val works = createWorks(2)
 
         val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
-        insertIntoElasticSearch(indexName, itemType, worksToIndex: _*)
+        insertIntoElasticsearch(indexName, itemType, worksToIndex: _*)
 
         eventually {
           server.httpGet(
@@ -115,7 +115,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
           visible = false
         )
 
-        insertIntoElasticSearch(indexName, itemType, work, deletedWork)
+        insertIntoElasticsearch(indexName, itemType, work, deletedWork)
 
         eventually {
           server.httpGet(
