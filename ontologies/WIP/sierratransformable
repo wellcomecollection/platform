@@ -118,7 +118,7 @@
    *  "creators": [
    *     {
    *        "id": "b26h7qf3"
-   *        "name": "Jacobs, Philip P.",
+   *        "label": "Jacobs, Philip P.",
    *        "prefixes": ["Sir"] ,
    *        "numeration": "II" ,
    *        "type": "Person" , 
@@ -136,7 +136,7 @@
    *  "creators": [
    *     {
    *        "id": "8t677qf3"
-   *        "name": "International Labour Organisation",
+   *        "label": "International Labour Organisation",
    *        "type": "Organisation" ,
    *        "identifiers": [
    *        {
@@ -170,7 +170,7 @@
    *        "type": "Contributor" , 
    *        "agent": {
    *           "id": "a24s7qf3" ,
-   *           "name": "Jacobs, Philip P.",
+   *           "label": "Jacobs, Philip P.",
    *           "prefixes": ["Sir"] ,
    *           "numeration": "II" ,
    *           "type": "Person",
@@ -196,7 +196,7 @@
    *        "type": "Contributor" , 
    *        "agent": {
    *           "id": "a24s7qf3" ,
-   *           "name": "International Labour Organisation",
+   *           "label": "International Labour Organisation",
    *           "type": "Organisation",
    *           "identifiers": [
    *        {
@@ -298,6 +298,31 @@
    * },
    * ],
    *
+   * "subjects": [
+   * {
+   *   "label": "Tuberculosis - prevention & control.",
+   *   "type": "QualifiedConcept",
+   *   "concept": {
+   *     "id": "hd2891f",
+   *     "label": "Tuberculosis",
+   *     "type": "Concept",
+   *     "identifiers": [
+   *       {
+   *         "type": "Identifier",
+   *         "identifierScheme": "mesh",
+   *         "value": "D014376Q000517"
+   *       }
+   *     ],
+   *     "qualifiers": [
+   *       {
+   *         "qualifierType": "general-subdivision" ,
+   *         "label": "prevention & control",
+   *         "type": "Concept"
+   *       }
+   *     ]
+   *   }
+   * },
+   * ],
    */
 
 
