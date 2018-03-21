@@ -7,16 +7,16 @@ import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.{Server, WorksUtil}
-import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ApiWorksTestBase
     extends FunSpec
     with FeatureTestMixin
-    with IndexedElasticSearchLocal
+    with fixtures.Server
+    with ElasticsearchFixtures
     with WorksUtil {
 
-  val indexName = "works"
   val itemType = "work"
 
   implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {
@@ -25,17 +25,6 @@ class ApiWorksTestBase
   }
 
   implicit val jsonMapper = IdentifiedWork
-  override val server =
-    new EmbeddedHttpServer(
-      new Server,
-      flags = Map(
-        "es.host" -> "localhost",
-        "es.port" -> 9200.toString,
-        "es.name" -> "wellcome",
-        "es.index" -> indexName,
-        "es.type" -> itemType
-      )
-    )
 
   val apiPrefix = "catalogue/v1"
 
