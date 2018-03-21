@@ -33,7 +33,6 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         // Start by indexing a work with visible=false.
         val deletedWork = workWith(
           canonicalId = "gze7bc24",
@@ -104,7 +103,6 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         val work = workWith(
           canonicalId = "r8dx6std",
           title = "A deleted dodo"

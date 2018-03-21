@@ -43,7 +43,10 @@ class WorksServiceTest
       withWorksService(indexName) { worksService =>
         val works = createWorks(2)
 
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          works: _*)
 
         val resultListFuture = worksService.listWorks()
 
@@ -61,7 +64,10 @@ class WorksServiceTest
       withWorksService(indexName) { worksService =>
         val works = createWorks(1)
 
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          works: _*)
 
         val recordsFuture = worksService.findWorkById(works.head.canonicalId)
 
@@ -86,7 +92,10 @@ class WorksServiceTest
         )
 
         val works = List(workDodo, workMouse)
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          works: _*)
 
         val searchForCat = worksService.searchWorks("cat")
 
@@ -131,7 +140,10 @@ class WorksServiceTest
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withWorksService(indexName) { worksService =>
         val works = createWorks(3)
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          works: _*)
 
         val displayWorksFuture =
           worksService.listWorks(pageSize = 1, pageNumber = 4)
@@ -151,7 +163,10 @@ class WorksServiceTest
           canonicalId = "1234",
           title = "An etching of an emu"
         )
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, workEmu)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          workEmu)
 
         val searchForEmu = worksService.searchWorks(
           "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"

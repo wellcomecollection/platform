@@ -9,7 +9,6 @@ class PlaceOfPublicationTest extends ApiWorksTestBase {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         val work = IdentifiedWork(
           canonicalId = "avfpwgrr",
           sourceIdentifier = sourceIdentifier,

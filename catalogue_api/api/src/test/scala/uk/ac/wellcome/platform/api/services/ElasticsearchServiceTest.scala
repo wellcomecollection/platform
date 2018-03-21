@@ -50,7 +50,10 @@ class ElasticsearchServiceTest
         )
 
         val works = List(work3, work2, work1)
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          works: _*)
 
         assertSliceIsCorrect(
           searchService = searchService,
@@ -59,9 +62,9 @@ class ElasticsearchServiceTest
           expectedWorks = works.map { DisplayWork(_) }
         )
 
-        // TODO: canonicalID is the only user-defined field that we can sort on.
-        // When we have other fields we can sort on, we should extend this test
-        // for different sort orders.
+      // TODO: canonicalID is the only user-defined field that we can sort on.
+      // When we have other fields we can sort on, we should extend this test
+      // for different sort orders.
       }
     }
   }
@@ -149,8 +152,10 @@ class ElasticsearchServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName) { searchService =>
-
-        insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+        insertIntoElasticsearch(
+          indexName = indexName,
+          itemType = itemType,
+          works: _*)
 
         val displayWorks = toDisplayWorks(visibleWorks)
 
@@ -164,11 +169,14 @@ class ElasticsearchServiceTest
     }
   }
 
-  private def populateElasticsearch(
-    indexName: String,
-    worksIncludes: WorksIncludes = WorksIncludes()): List[DisplayWork] = {
+  private def populateElasticsearch(indexName: String,
+                                    worksIncludes: WorksIncludes =
+                                      WorksIncludes()): List[DisplayWork] = {
     val works = createWorks(10)
-    insertIntoElasticsearch(indexName = indexName, itemType = itemType, works: _*)
+    insertIntoElasticsearch(
+      indexName = indexName,
+      itemType = itemType,
+      works: _*)
 
     toDisplayWorks(works, worksIncludes = worksIncludes)
   }

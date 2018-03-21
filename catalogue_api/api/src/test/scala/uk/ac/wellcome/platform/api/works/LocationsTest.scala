@@ -8,7 +8,6 @@ class LocationsTest extends ApiWorksTestBase {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         val physicalLocation: Location =
           PhysicalLocation(
             locationType = "smeg",

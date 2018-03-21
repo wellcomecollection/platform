@@ -25,7 +25,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   def readTree(path: String): JsonNode = {
 
-    val flags =  Map(
+    val flags = Map(
       "api.host" -> "test.host",
       "api.scheme" -> "http",
       "api.version" -> "v99",
