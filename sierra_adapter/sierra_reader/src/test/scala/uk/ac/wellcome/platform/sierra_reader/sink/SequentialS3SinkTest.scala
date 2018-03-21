@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.sierra_reader.sink
 
 import akka.Done
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.{Sink, Source}
 import io.circe.Json
 import io.circe.parser._
@@ -14,7 +16,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class SequentialS3SinkTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with S3
     with AkkaFixtures
@@ -23,9 +25,10 @@ class SequentialS3SinkTest
     with ExtendedPatience {
 
   private def withSink(bucketName: String, keyPrefix: String, offset: Int = 0)(
-    testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
-    withActorSystem { system =>
-      implicit val executionContext = system.dispatcher
+    testWith: TestWith[(Sink[(Json, Long), Future[Done]], ActorSystem), Assertion]) = {
+    withActorSystem { actorSystem =>
+
+      implicit val executionContext = actorSystem.dispatcher
       val sink = SequentialS3Sink(
         s3Client,
         bucketName = bucketName,
@@ -33,7 +36,7 @@ class SequentialS3SinkTest
         offset = offset
       )
 
-      testWith(sink)
+      testWith((sink, actorSystem))
     }
   }
 
@@ -41,7 +44,11 @@ class SequentialS3SinkTest
     val json = parse(s"""{"hello": "world"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testA_") { sink =>
+      withSink(bucketName = bucketName, keyPrefix = "testA_") { case (sink, actorSystem) =>
+
+        implicit val system: ActorSystem = actorSystem
+        implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+
         val futureDone = Source
           .single(json)
           .zipWithIndex
@@ -64,7 +71,11 @@ class SequentialS3SinkTest
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testB_") { sink =>
+      withSink(bucketName = bucketName, keyPrefix = "testB_") { case (sink, actorSystem) =>
+
+        implicit val system: ActorSystem = actorSystem
+        implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+
         val futureDone = Source(List(json0, json1, json2)).zipWithIndex
           .runWith(sink)
 
@@ -92,24 +103,27 @@ class SequentialS3SinkTest
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) {
-        sink =>
-          val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-            .runWith(sink)
+      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) { case (sink, actorSystem) =>
 
-          whenReady(futureDone) { _ =>
-            val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
-            s3objects.map {
-              _.getKey()
-            } shouldBe List(
-              "testC_0003.json",
-              "testC_0004.json",
-              "testC_0005.json")
+        implicit val system: ActorSystem = actorSystem
+        implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
 
-            getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
-            getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
-            getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
-          }
+        val futureDone = Source(List(json0, json1, json2)).zipWithIndex
+          .runWith(sink)
+
+        whenReady(futureDone) { _ =>
+          val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
+          s3objects.map {
+            _.getKey()
+          } shouldBe List(
+            "testC_0003.json",
+            "testC_0004.json",
+            "testC_0005.json")
+
+          getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
+          getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
+          getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
+        }
       }
     }
   }

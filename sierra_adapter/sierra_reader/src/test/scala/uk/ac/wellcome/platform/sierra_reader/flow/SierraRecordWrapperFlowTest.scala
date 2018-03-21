@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.sierra_reader.flow
 
 import akka.NotUsed
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import io.circe.Json
 import io.circe.parser._
@@ -11,6 +13,9 @@ import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.test.fixtures.{AkkaFixtures, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
+import scala.concurrent.ExecutionContextExecutor
+
+
 class SierraRecordWrapperFlowTest
     extends FunSpec
     with AkkaFixtures
@@ -19,17 +24,23 @@ class SierraRecordWrapperFlowTest
     with Matchers {
 
   private def withRecordWrapperFlow(
-    testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
-    withActorSystem { system =>
-      implicit val executionContext = system.dispatcher
+    testWith: TestWith[(Flow[Json, SierraRecord, NotUsed], ActorSystem), Assertion]) = {
+    withActorSystem { actorSystem =>
+
+      implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+
       val wrapperFlow = SierraRecordWrapperFlow()
 
-      testWith(wrapperFlow)
+      testWith((wrapperFlow, actorSystem))
     }
   }
 
   it("creates a SierraRecord from a bib") {
-    withRecordWrapperFlow { wrapperFlow =>
+    withRecordWrapperFlow { case (wrapperFlow, actorSystem) =>
+
+      implicit val system: ActorSystem = actorSystem
+      implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+
       val id = "100001"
       val updatedDate = "2013-12-13T12:43:16Z"
       val json = parse(s"""
@@ -57,7 +68,11 @@ class SierraRecordWrapperFlowTest
   }
 
   it("creates a SierraRecord from an item") {
-    withRecordWrapperFlow { wrapperFlow =>
+    withRecordWrapperFlow { case (wrapperFlow, actorSystem) =>
+
+      implicit val system: ActorSystem = actorSystem
+      implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+
       val id = "400004"
       val updatedDate = "2014-04-14T14:14:14Z"
       val json = parse(s"""
@@ -86,7 +101,11 @@ class SierraRecordWrapperFlowTest
   }
 
   it("is able to handle deleted bibs") {
-    withRecordWrapperFlow { wrapperFlow =>
+    withRecordWrapperFlow { case (wrapperFlow, actorSystem) =>
+
+      implicit val system: ActorSystem = actorSystem
+      implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+
       val id = "1357947"
       val deletedDate = "2014-01-31"
       val json = parse(s"""{
@@ -113,7 +132,11 @@ class SierraRecordWrapperFlowTest
   }
 
   it("fails the stream if the record contains invalid JSON") {
-    withRecordWrapperFlow { wrapperFlow =>
+    withRecordWrapperFlow { case (wrapperFlow, actorSystem) =>
+
+      implicit val system: ActorSystem = actorSystem
+      implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+
       val invalidSierraJson = parse(s"""{
         | "missing": ["id", "updatedDate"],
         | "reason": "This JSON will not pass!",
@@ -124,6 +147,7 @@ class SierraRecordWrapperFlowTest
         .single(invalidSierraJson)
         .via(wrapperFlow)
         .runWith(Sink.head)
+
       whenReady(futureUnit.failed) { _ =>
         true shouldBe true
       }
