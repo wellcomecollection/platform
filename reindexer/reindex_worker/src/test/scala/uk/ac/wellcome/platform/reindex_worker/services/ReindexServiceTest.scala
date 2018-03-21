@@ -12,7 +12,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.test.fixtures.{AkkaFixtures, LocalDynamoDb}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.concurrent.duration._
 
@@ -20,19 +20,13 @@ class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
+    with AkkaFixtures
     with LocalDynamoDb
     with MockitoSugar
     with ExtendedPatience {
 
   override lazy val evidence: DynamoFormat[TestRecord] =
     DynamoFormat[TestRecord]
-
-  val metricsSender: MetricsSender =
-    new MetricsSender(
-      namespace = "reindexer-tests",
-      100 milliseconds,
-      mock[AmazonCloudWatch],
-      ActorSystem())
 
   val shardName = "shard"
   val currentVersion = 1
@@ -49,17 +43,27 @@ class ReindexServiceTest
   private def withReindexService(
     tableName: String,
     testWith: TestWith[ReindexService, Assertion]) = {
-      val reindexService =
-        new ReindexService(
-          dynamoDBClient = dynamoDbClient,
-          dynamoConfig = DynamoConfig(tableName),
-          metricsSender = metricsSender,
-          versionedDao = new VersionedDao(
-            dynamoDbClient = dynamoDbClient,
-            DynamoConfig(tableName))
+      withActorSystem { actorSystem =>
+
+        val metricsSender = new MetricsSender(
+          namespace = "reindexer-tests",
+          interval = 100 milliseconds,
+          amazonCloudWatch = mock[AmazonCloudWatch],
+          actorSystem = actorSystem
         )
 
-      testWith(reindexService)
+        val reindexService =
+          new ReindexService(
+            dynamoDBClient = dynamoDbClient,
+            dynamoConfig = DynamoConfig(tableName),
+            metricsSender = metricsSender,
+            versionedDao = new VersionedDao(
+              dynamoDbClient = dynamoDbClient,
+              DynamoConfig(tableName))
+          )
+
+        testWith(reindexService)
+      }
   }
 
 
