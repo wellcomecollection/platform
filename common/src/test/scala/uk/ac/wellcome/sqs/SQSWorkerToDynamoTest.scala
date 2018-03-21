@@ -96,8 +96,6 @@ class SQSWorkerToDynamoTest
     testWith: TestWith[(TestWorker, String), R]) = {
     withActorSystem { system =>
       withLocalSqsQueue { queueUrl =>
-        sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
-
         val worker = testWorkFactory(queueUrl, system)
 
         try {
