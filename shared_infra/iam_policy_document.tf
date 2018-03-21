@@ -34,7 +34,6 @@ data "aws_sns_topic" "ecr_pushes_topic" {
   name = "${local.ecr_pushes_topic_name}"
 }
 
-
 data "aws_iam_policy_document" "travis_permissions" {
   statement {
     actions = [
