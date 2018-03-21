@@ -41,6 +41,13 @@ class WorksIndex @Inject()(client: HttpClient,
       keywordField("value")
     )
 
+  val workType = objectField("workType")
+    .fields(
+      keywordField("ontologyType"),
+      keywordField("id"),
+      keywordField("label")
+    )
+
   def location(fieldName: String = "locations") =
     objectField(fieldName).fields(
       keywordField("type"),
@@ -90,6 +97,7 @@ class WorksIndex @Inject()(client: HttpClient,
       intField("version"),
       sourceIdentifier,
       identifiers,
+      workType,
       textField("title").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       textField("description").fields(

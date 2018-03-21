@@ -19,7 +19,13 @@ class SierraReaderFeatureTest
   it("reads bibs from Sierra and writes files to S3") {
     withLocalS3Bucket { bucketName =>
       withLocalSqsQueue { queueUrl =>
-        val flags = s3LocalFlags(bucketName) ++ sqsLocalFlags(queueUrl)
+        val flags = s3LocalFlags(bucketName) ++ sqsLocalFlags(queueUrl) ++ Map(
+          "reader.resourceType" -> "bibs",
+          "sierra.apiUrl" -> "http://localhost:8080",
+          "sierra.oauthKey" -> "key",
+          "sierra.oauthSecret" -> "secret",
+          "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
+        )
 
         withServer(flags) { _ =>
           val message =

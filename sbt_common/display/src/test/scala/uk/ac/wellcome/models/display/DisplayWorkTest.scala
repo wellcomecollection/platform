@@ -151,6 +151,29 @@ class DisplayWorkTest extends FunSpec with Matchers {
     displayWork.physicalDescription shouldBe Some(physicalDescription)
   }
 
+  it("gets the workType from a Work") {
+    val workType = WorkType(
+      id = "id",
+      label = "Proud pooch pavement plops"
+    )
+
+    val expectedDisplayWork = DisplayWorkType(
+      id = workType.id,
+      label = workType.label
+    )
+
+    val work = IdentifiedWork(
+      title = Some("Moving a mighty mouse to Madagascar"),
+      canonicalId = "mtc2wvrg",
+      sourceIdentifier = sourceIdentifier,
+      workType = Some(workType),
+      version = 1
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.workType shouldBe Some(expectedDisplayWork)
+  }
+
   it("gets the extent from a Work") {
     val extent = "Bound in boxes of bark"
 

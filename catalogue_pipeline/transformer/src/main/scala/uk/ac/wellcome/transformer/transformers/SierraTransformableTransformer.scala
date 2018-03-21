@@ -15,6 +15,7 @@ class SierraTransformableTransformer
     with SierraIdentifiers
     with SierraDescription
     with SierraPhysicalDescription
+    with SierraWorkType
     with SierraExtent
     with SierraItems
     with SierraLanguage
@@ -47,6 +48,7 @@ class SierraTransformableTransformer
               ),
               version = version,
               identifiers = getIdentifiers(sierraBibData),
+              workType = getWorkType(sierraBibData),
               description = getDescription(sierraBibData),
               physicalDescription = getPhysicalDescription(sierraBibData),
               extent = getExtent(sierraBibData),

@@ -8,6 +8,7 @@ trait Work extends Versioned with Identifiable {
   val sourceIdentifier: SourceIdentifier
   val version: Int
   val identifiers: List[SourceIdentifier]
+  val workType: Option[WorkType]
   val description: Option[String]
   val physicalDescription: Option[String]
   val extent: Option[String]
@@ -28,6 +29,7 @@ case class UnidentifiedWork(title: Option[String],
                             sourceIdentifier: SourceIdentifier,
                             version: Int,
                             identifiers: List[SourceIdentifier] = List(),
+                            workType: Option[WorkType] = None,
                             description: Option[String] = None,
                             physicalDescription: Option[String] = None,
                             extent: Option[String] = None,
@@ -51,6 +53,7 @@ case class IdentifiedWork(canonicalId: String,
                           sourceIdentifier: SourceIdentifier,
                           version: Int,
                           identifiers: List[SourceIdentifier] = List(),
+                          workType: Option[WorkType] = None,
                           description: Option[String] = None,
                           physicalDescription: Option[String] = None,
                           extent: Option[String] = None,
