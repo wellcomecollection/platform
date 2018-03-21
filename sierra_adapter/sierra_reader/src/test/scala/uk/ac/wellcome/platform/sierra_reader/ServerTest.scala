@@ -14,7 +14,6 @@ class ServerTest
   it("it shows the healthcheck message") {
     withLocalS3Bucket { bucketName =>
       withLocalSqsQueue { queueUrl =>
-
         val flags = s3LocalFlags(bucketName) ++ sqsLocalFlags(queueUrl) ++ Map(
           "reader.resourceType" -> "bibs",
           "sierra.apiUrl" -> "http://localhost:8080",

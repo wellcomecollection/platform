@@ -25,7 +25,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 
 import collection.JavaConversions._
 
-
 class SierraReaderWorkerServiceTest
     extends FunSpec
     with MockitoSugar
@@ -49,7 +48,9 @@ class SierraReaderWorkerServiceTest
       mockCloudWatch,
       ActorSystem())
 
-  case class FixtureParams(worker: SierraReaderWorkerService, queueUrl: String, bucketName: String)
+  case class FixtureParams(worker: SierraReaderWorkerService,
+                           queueUrl: String,
+                           bucketName: String)
 
   def withSierraReaderWorkerService(
     fields: String,
@@ -118,7 +119,8 @@ class SierraReaderWorkerServiceTest
         "windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
       eventually {
-        val objects = s3Client.listObjects(fixtures.bucketName).getObjectSummaries
+        val objects =
+          s3Client.listObjects(fixtures.bucketName).getObjectSummaries
 
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
         objects.map { _.getKey() } shouldBe pageNames
@@ -161,7 +163,8 @@ class SierraReaderWorkerServiceTest
         "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
       eventually {
-        val objects = s3Client.listObjects(fixtures.bucketName).getObjectSummaries
+        val objects =
+          s3Client.listObjects(fixtures.bucketName).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames
@@ -223,7 +226,8 @@ class SierraReaderWorkerServiceTest
         "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
       eventually {
-        val objects = s3Client.listObjects(fixtures.bucketName).getObjectSummaries
+        val objects =
+          s3Client.listObjects(fixtures.bucketName).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames
@@ -239,7 +243,8 @@ class SierraReaderWorkerServiceTest
     }
   }
 
-  private def getRecordsFromS3(bucketName: String, key: String): List[SierraRecord] =
+  private def getRecordsFromS3(bucketName: String,
+                               key: String): List[SierraRecord] =
     fromJson[List[SierraRecord]](getContentFromS3(bucketName, key)).get
 
   it(

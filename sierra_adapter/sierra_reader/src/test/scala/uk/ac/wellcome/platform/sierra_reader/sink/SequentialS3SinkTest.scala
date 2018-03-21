@@ -16,7 +16,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class SequentialS3SinkTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with S3
     with AkkaFixtures
@@ -25,9 +25,9 @@ class SequentialS3SinkTest
     with ExtendedPatience {
 
   private def withSink(bucketName: String, keyPrefix: String, offset: Int = 0)(
-    testWith: TestWith[(Sink[(Json, Long), Future[Done]], ActorSystem), Assertion]) = {
+    testWith: TestWith[(Sink[(Json, Long), Future[Done]], ActorSystem),
+                       Assertion]) = {
     withActorSystem { actorSystem =>
-
       implicit val executionContext = actorSystem.dispatcher
       val sink = SequentialS3Sink(
         s3Client,
@@ -44,23 +44,24 @@ class SequentialS3SinkTest
     val json = parse(s"""{"hello": "world"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testA_") { case (sink, actorSystem) =>
+      withSink(bucketName = bucketName, keyPrefix = "testA_") {
+        case (sink, actorSystem) =>
+          implicit val system: ActorSystem = actorSystem
+          implicit val materializer: Materializer =
+            ActorMaterializer()(actorSystem)
 
-        implicit val system: ActorSystem = actorSystem
-        implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+          val futureDone = Source
+            .single(json)
+            .zipWithIndex
+            .runWith(sink)
 
-        val futureDone = Source
-          .single(json)
-          .zipWithIndex
-          .runWith(sink)
+          whenReady(futureDone) { _ =>
+            val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
+            s3objects should have size 1
+            s3objects.head.getKey() shouldBe "testA_0000.json"
 
-        whenReady(futureDone) { _ =>
-          val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
-          s3objects should have size 1
-          s3objects.head.getKey() shouldBe "testA_0000.json"
-
-          getJsonFromS3(bucketName, "testA_0000.json") shouldBe json
-        }
+            getJsonFromS3(bucketName, "testA_0000.json") shouldBe json
+          }
       }
     }
   }
@@ -71,28 +72,29 @@ class SequentialS3SinkTest
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testB_") { case (sink, actorSystem) =>
+      withSink(bucketName = bucketName, keyPrefix = "testB_") {
+        case (sink, actorSystem) =>
+          implicit val system: ActorSystem = actorSystem
+          implicit val materializer: Materializer =
+            ActorMaterializer()(actorSystem)
 
-        implicit val system: ActorSystem = actorSystem
-        implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+          val futureDone = Source(List(json0, json1, json2)).zipWithIndex
+            .runWith(sink)
 
-        val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-          .runWith(sink)
+          whenReady(futureDone) { _ =>
+            val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
+            s3objects should have size 3
+            s3objects.map {
+              _.getKey()
+            } shouldBe List(
+              "testB_0000.json",
+              "testB_0001.json",
+              "testB_0002.json")
 
-        whenReady(futureDone) { _ =>
-          val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
-          s3objects should have size 3
-          s3objects.map {
-            _.getKey()
-          } shouldBe List(
-            "testB_0000.json",
-            "testB_0001.json",
-            "testB_0002.json")
-
-          getJsonFromS3(bucketName, "testB_0000.json") shouldBe json0
-          getJsonFromS3(bucketName, "testB_0001.json") shouldBe json1
-          getJsonFromS3(bucketName, "testB_0002.json") shouldBe json2
-        }
+            getJsonFromS3(bucketName, "testB_0000.json") shouldBe json0
+            getJsonFromS3(bucketName, "testB_0001.json") shouldBe json1
+            getJsonFromS3(bucketName, "testB_0002.json") shouldBe json2
+          }
       }
     }
   }
@@ -103,27 +105,28 @@ class SequentialS3SinkTest
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
     withLocalS3Bucket { bucketName =>
-      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) { case (sink, actorSystem) =>
+      withSink(bucketName = bucketName, keyPrefix = "testC_", offset = 3) {
+        case (sink, actorSystem) =>
+          implicit val system: ActorSystem = actorSystem
+          implicit val materializer: Materializer =
+            ActorMaterializer()(actorSystem)
 
-        implicit val system: ActorSystem = actorSystem
-        implicit val materializer: Materializer = ActorMaterializer()(actorSystem)
+          val futureDone = Source(List(json0, json1, json2)).zipWithIndex
+            .runWith(sink)
 
-        val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-          .runWith(sink)
+          whenReady(futureDone) { _ =>
+            val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
+            s3objects.map {
+              _.getKey()
+            } shouldBe List(
+              "testC_0003.json",
+              "testC_0004.json",
+              "testC_0005.json")
 
-        whenReady(futureDone) { _ =>
-          val s3objects = s3Client.listObjects(bucketName).getObjectSummaries
-          s3objects.map {
-            _.getKey()
-          } shouldBe List(
-            "testC_0003.json",
-            "testC_0004.json",
-            "testC_0005.json")
-
-          getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
-          getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
-          getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
-        }
+            getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
+            getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
+            getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
+          }
       }
     }
   }
