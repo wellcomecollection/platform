@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.{DynamoFormat, Scanamo}
+import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -12,7 +13,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, LocalDynamoDb}
+import uk.ac.wellcome.test.fixtures.{AkkaFixtures, LocalDynamoDb, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.concurrent.duration._
 
@@ -21,7 +22,7 @@ class ReindexServiceTest
     with ScalaFutures
     with Matchers
     with AkkaFixtures
-    with LocalDynamoDb
+    with LocalDynamoDb[TestRecord]
     with MockitoSugar
     with ExtendedPatience {
 
@@ -40,14 +41,13 @@ class ReindexServiceTest
     reindexVersion = currentVersion
   )
 
-  private def withReindexService(
-    tableName: String,
+  private def withReindexService(tableName: String)(
     testWith: TestWith[ReindexService, Assertion]) = {
       withActorSystem { actorSystem =>
 
         val metricsSender = new MetricsSender(
           namespace = "reindex-service-test",
-          interval = 100 milliseconds,
+          flushInterval = 100 milliseconds,
           amazonCloudWatch = mock[AmazonCloudWatch],
           actorSystem = actorSystem
         )
@@ -151,7 +151,7 @@ class ReindexServiceTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexService("does-not-exist") { reindexService =>
+    withReindexService("does-not-exist") { service =>
       val reindexJob = ReindexJob(
         shardId = "sierra/000",
         desiredVersion = 2
