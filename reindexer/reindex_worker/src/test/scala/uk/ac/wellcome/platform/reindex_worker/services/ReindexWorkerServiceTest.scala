@@ -48,6 +48,57 @@ class ReindexWorkerServiceTest
   override lazy val evidence: DynamoFormat[TestRecord] =
     DynamoFormat[TestRecord]
 
+  def withReindexWorkerService(tableName: String, indexName: String)(
+      testWith: TestWith[ReindexWorkerService, Assertion]) = {
+    withActorSystem { actorSystem =>
+
+      val metricsSender = new MetricsSender(
+        namespace = "reindex-worker-service-test",
+        flushInterval = 100 milliseconds,
+        amazonCloudWatch = mock[AmazonCloudWatch],
+        actorSystem = actorSystem
+      )
+
+      withLocalSqsQueue { queueUrl =>
+        withLocalSnsTopic { topicArn =>
+
+          val workerService = new ReindexWorkerService(
+            targetService = new ReindexService(
+              dynamoDBClient = dynamoDbClient,
+              metricsSender = metricsSender,
+              versionedDao = new VersionedDao(
+                dynamoDbClient = dynamoDbClient,
+                dynamoConfig = DynamoConfig(table = tableName)
+              ),
+              dynamoConfig = DynamoConfig(table = tableName),
+              indexName = indexName
+            ),
+            reader = new SQSReader(
+              sqsClient = sqsClient,
+              sqsConfig = SQSConfig(
+                queueUrl = queueUrl,
+                waitTime = 1 second,
+                maxMessages = 1
+              )
+            ),
+            snsWriter = new SNSWriter(
+              snsClient = snsClient,
+              snsConfig = SNSConfig(topicArn = topicArn)
+            ),
+            system = actorSystem,
+            metrics = metricsSender
+          )
+
+          try {
+            testWith(workerService)
+          } finally {
+            workerService.stop()
+          }
+        }
+      }
+    }
+  }
+
   it("returns a successful Future if the reindex completes correctly") {
     withLocalDynamoDbTableAndIndex { fixtures =>
       val tableName = fixtures.tableName
@@ -161,56 +212,6 @@ class ReindexWorkerServiceTest
       val future = service.processMessage(message = sqsMessage)
 
       whenReady(future.failed) { _ shouldBe exception }
-    }
-  }
-
-  def withReindexWorkerService(tableName: String, indexName: String)(
-      testWith: TestWith[ReindexWorkerService, Assertion]) = {
-    withActorSystem { actorSystem =>
-
-      val metricsSender = new MetricsSender(
-        namespace = "reindex-worker-service-test",
-        flushInterval = 100 milliseconds,
-        amazonCloudWatch = mock[AmazonCloudWatch],
-        actorSystem = actorSystem
-      )
-
-      withLocalSqsQueue { queueUrl =>
-        withLocalSnsTopic { topicArn =>
-
-          val workerService = new ReindexWorkerService(
-            targetService = new ReindexService(
-              dynamoDBClient = dynamoDbClient,
-              metricsSender = metricsSender,
-              versionedDao = new VersionedDao(
-                dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(table = tableName)
-              ),
-              dynamoConfig = DynamoConfig(table = tableName)
-            ),
-            reader = new SQSReader(
-              sqsClient = sqsClient,
-              sqsConfig = SQSConfig(
-                queueUrl = queueUrl,
-                waitTime = 1 second,
-                maxMessages = 1
-              )
-            ),
-            snsWriter = new SNSWriter(
-              snsClient = snsClient,
-              snsConfig = SNSConfig(topicArn = topicArn)
-            ),
-            system = actorSystem,
-            metrics = metricsSender
-          )
-
-          try {
-            testWith(workerService)
-          } finally {
-            workerService.stop()
-          }
-        }
-      }
     }
   }
 }

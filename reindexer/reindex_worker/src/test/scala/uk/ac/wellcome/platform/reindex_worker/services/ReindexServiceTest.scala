@@ -59,7 +59,8 @@ class ReindexServiceTest
             metricsSender = metricsSender,
             versionedDao = new VersionedDao(
               dynamoDbClient = dynamoDbClient,
-              DynamoConfig(tableName))
+              DynamoConfig(tableName)),
+            indexName = indexName
           )
 
         testWith(reindexService)
