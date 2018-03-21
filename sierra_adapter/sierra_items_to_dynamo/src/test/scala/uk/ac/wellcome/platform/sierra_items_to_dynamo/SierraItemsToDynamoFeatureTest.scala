@@ -38,7 +38,8 @@ class SierraItemsToDynamoFeatureTest
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { tableName =>
       withLocalSqsQueue { queueUrl =>
-        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(tableName)
+        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(
+          tableName)
 
         withServer(flags) { server =>
           val id = "i12345"
