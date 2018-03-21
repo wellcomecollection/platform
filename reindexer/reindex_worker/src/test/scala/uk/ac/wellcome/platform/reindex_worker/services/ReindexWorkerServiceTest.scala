@@ -49,8 +49,10 @@ class ReindexWorkerServiceTest
     DynamoFormat[TestRecord]
 
   it("returns a successful Future if the reindex completes correctly") {
-    withLocalDynamoDbTable { tableName =>
-      withReindexWorkerService(tableName) { service =>
+    withLocalDynamoDbTableAndIndex { fixtures =>
+      val tableName = fixtures.tableName
+      val indexName = fixtures.indexName
+      withReindexWorkerService(tableName, indexName) { service =>
         val reindexJob = ReindexJob(
           shardId = "sierra/123",
           desiredVersion = 6
@@ -95,8 +97,10 @@ class ReindexWorkerServiceTest
 
   it(
     "returns a failed Future if it cannot parse the SQS message as a ReindexJob") {
-    withLocalDynamoDbTable { tableName =>
-      withReindexWorkerService(tableName) { service =>
+    withLocalDynamoDbTableAndIndex { fixtures =>
+      val tableName = fixtures.tableName
+      val indexName = fixtures.indexName
+      withReindexWorkerService(tableName, indexName) { service =>
         val sqsMessage = SQSMessage(
           subject = None,
           body = "<xml>What is JSON.</xl?>",
@@ -160,7 +164,7 @@ class ReindexWorkerServiceTest
     }
   }
 
-  def withReindexWorkerService(tableName: String)(
+  def withReindexWorkerService(tableName: String, indexName: String)(
       testWith: TestWith[ReindexWorkerService, Assertion]) = {
     withActorSystem { actorSystem =>
 

@@ -41,7 +41,7 @@ class ReindexServiceTest
     reindexVersion = currentVersion
   )
 
-  private def withReindexService(tableName: String)(
+  private def withReindexService(tableName: String, indexName: String)(
     testWith: TestWith[ReindexService, Assertion]) = {
       withActorSystem { actorSystem =>
 
@@ -68,8 +68,10 @@ class ReindexServiceTest
 
 
   it("only updates records with a lower than desired reindexVersion") {
-    withLocalDynamoDbTable { tableName =>
-      withReindexService(tableName) { reindexService =>
+    withLocalDynamoDbTableAndIndex { fixtures =>
+      val tableName = fixtures.tableName
+      val indexName = fixtures.indexName
+      withReindexService(tableName, indexName) { reindexService =>
         val newerRecord = exampleRecord.copy(
           id = "id1",
           reindexVersion = desiredVersion + 1
@@ -100,8 +102,7 @@ class ReindexServiceTest
         )
 
         whenReady(reindexService.runReindex(reindexJob)) { _ =>
-          val records =
-            Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
+          val records = Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
 
           records should contain theSameElementsAs expectedRecords
         }
@@ -110,8 +111,10 @@ class ReindexServiceTest
   }
 
   it("updates records in the specified shard") {
-    withLocalDynamoDbTable { tableName =>
-      withReindexService(tableName) { reindexService =>
+    withLocalDynamoDbTableAndIndex { fixtures =>
+      val tableName = fixtures.tableName
+      val indexName = fixtures.indexName
+      withReindexService(tableName, indexName) { reindexService =>
         val inShardRecords = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
@@ -151,7 +154,7 @@ class ReindexServiceTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexService("does-not-exist") { service =>
+    withReindexService("does-not-exist", "no-such-index") { service =>
       val reindexJob = ReindexJob(
         shardId = "sierra/000",
         desiredVersion = 2
