@@ -9,19 +9,16 @@ import org.scalatest.Matchers
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.utils.{ExtendedPatience, S3Local}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures._
-
-import scala.collection.JavaConversions._
-import org.mockito.Matchers.{any, anyString}
+import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3, SqsFixtures, TestWith}
+import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
@@ -29,15 +26,13 @@ import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 class SierraReaderWorkerServiceTest
     extends FunSpec
     with MockitoSugar
-    with S3Local
+    with S3
     with SqsFixtures
     with AkkaFixtures
     with Eventually
     with Matchers
     with ExtendedPatience
     with ScalaFutures {
-
-  override lazy val bucketName = "sierra-reader-test-bucket"
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]
@@ -61,26 +56,28 @@ class SierraReaderWorkerServiceTest
   )(testWith: TestWith[FixtureParams, Assertion]) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueue { queueUrl =>
-        val worker = new SierraReaderWorkerService(
-          reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
-          s3client = s3Client,
-          windowManager =
-            new WindowManager(s3Client, bucketName, fields, resourceType),
-          batchSize = batchSize,
-          resourceType = resourceType,
-          bucketName = bucketName,
-          system = actorSystem,
-          metrics = mockMetrics,
-          apiUrl = apiUrl,
-          sierraOauthKey = "key",
-          sierraOauthSecret = "secret",
-          fields = fields
-        )
+        withLocalS3Bucket { bucketName =>
+          val worker = new SierraReaderWorkerService(
+            reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+            s3client = s3Client,
+            windowManager =
+              new WindowManager(s3Client, bucketName, fields, resourceType),
+            batchSize = batchSize,
+            resourceType = resourceType,
+            bucketName = bucketName,
+            system = actorSystem,
+            metrics = mockMetrics,
+            apiUrl = apiUrl,
+            sierraOauthKey = "key",
+            sierraOauthSecret = "secret",
+            fields = fields
+          )
 
-        try {
-          testWith(FixtureParams(worker, queueUrl))
-        } finally {
-          worker.stop()
+          try {
+            testWith(FixtureParams(worker, queueUrl))
+          } finally {
+            worker.stop()
+          }
         }
       }
     }
