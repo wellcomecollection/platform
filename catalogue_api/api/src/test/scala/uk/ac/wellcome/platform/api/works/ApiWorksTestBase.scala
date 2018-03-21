@@ -2,17 +2,15 @@ package uk.ac.wellcome.platform.api.works
 
 import com.sksamuel.elastic4s.Indexable
 import com.twitter.finagle.http.Status
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.{Server, WorksUtil}
+import uk.ac.wellcome.platform.api.fixtures
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ApiWorksTestBase
     extends FunSpec
-    with FeatureTestMixin
     with fixtures.Server
     with ElasticsearchFixtures
     with WorksUtil {
