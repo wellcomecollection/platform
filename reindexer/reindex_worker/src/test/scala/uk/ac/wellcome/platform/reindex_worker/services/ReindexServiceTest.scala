@@ -46,7 +46,7 @@ class ReindexServiceTest
       withActorSystem { actorSystem =>
 
         val metricsSender = new MetricsSender(
-          namespace = "reindexer-tests",
+          namespace = "reindex-service-test",
           interval = 100 milliseconds,
           amazonCloudWatch = mock[AmazonCloudWatch],
           actorSystem = actorSystem
