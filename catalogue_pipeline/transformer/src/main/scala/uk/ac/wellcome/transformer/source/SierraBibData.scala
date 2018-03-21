@@ -1,6 +1,9 @@
 package uk.ac.wellcome.transformer.source
 
-import uk.ac.wellcome.transformer.source.sierra.{Country => SierraCountry, Language => SierraLanguage}
+import uk.ac.wellcome.transformer.source.sierra.{
+  Country => SierraCountry,
+  Language => SierraLanguage
+}
 
 case class SierraBibData(
   id: String,
