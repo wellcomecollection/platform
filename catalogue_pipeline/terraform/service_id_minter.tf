@@ -34,5 +34,5 @@ module "id_minter" {
 
   enable_alb_alarm = false
 
-  max_capacity = 5
+  max_capacity = 4
 }
