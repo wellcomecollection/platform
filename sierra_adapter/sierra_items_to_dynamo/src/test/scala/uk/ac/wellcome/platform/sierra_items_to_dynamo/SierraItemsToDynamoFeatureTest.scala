@@ -2,67 +2,79 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import java.time.Instant
 
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.locals.SierraItemsToDynamoDBLocal
 import uk.ac.wellcome.test.utils.{
   AmazonCloudWatchFlag,
   ExtendedPatience,
   SQSLocal
 }
 import uk.ac.wellcome.dynamo._
+import io.circe.generic.extras.semiauto._
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord,
   SierraRecord
 }
+import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SqsFixtures}
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
-    with FeatureTestMixin
-    with SQSLocal
-    with SierraItemsToDynamoDBLocal
-    with AmazonCloudWatchFlag
+    with LocalDynamoDb[SierraItemRecord]
+    with SqsFixtures
+    with fixtures.Server
     with Matchers
+    with Eventually
     with ExtendedPatience {
-  val queueUrl = createQueueAndReturnUrl("sierra-test-queue")
 
-  override protected def server = new EmbeddedHttpServer(
-    new Server(),
-    Map(
-      "aws.sqs.queue.url" -> queueUrl,
-      "aws.sqs.waitTime" -> "1"
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
-      tableName)
-  )
+  override lazy val evidence: DynamoFormat[SierraItemRecord] =
+    DynamoFormat[SierraItemRecord]
 
   it("reads items from Sierra and adds them to DynamoDB") {
-    val id = "i12345"
-    val bibId = "b54321"
-    val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
-    val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
-    val message = SierraRecord(id, data, modifiedDate)
+    withLocalDynamoDbTable { tableName =>
+      withLocalSqsQueue { queueUrl =>
+        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(
+          tableName)
 
-    val sqsMessage =
-      SQSMessage(
-        Some("subject"),
-        toJson(message).get,
-        "topic",
-        "messageType",
-        "timestamp")
-    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+        withServer(flags) { server =>
+          val id = "i12345"
+          val bibId = "b54321"
+          val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
+          val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
+          val message = SierraRecord(id, data, modifiedDate)
 
-    eventually {
-      Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
-      val scanamoResult =
-        Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)('id -> id)
-      scanamoResult shouldBe defined
-      scanamoResult.get shouldBe Right(
-        SierraItemRecord(id, data, modifiedDate, List(bibId), version = 1))
+          val sqsMessage =
+            SQSMessage(
+              Some("subject"),
+              toJson(message).get,
+              "topic",
+              "messageType",
+              "timestamp")
+          sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+
+          eventually {
+            Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1
+
+            val scanamoResult =
+              Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+                'id -> id)
+
+            scanamoResult shouldBe defined
+            scanamoResult.get shouldBe Right(
+              SierraItemRecord(
+                id,
+                data,
+                modifiedDate,
+                List(bibId),
+                version = 1))
+          }
+        }
+      }
     }
   }
 }
