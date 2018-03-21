@@ -36,7 +36,8 @@ class SierraItemsToDynamoFeatureTest
     Map(
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1"
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(tableName)
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
+      tableName)
   )
 
   it("reads items from Sierra and adds them to DynamoDB") {

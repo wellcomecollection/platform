@@ -49,9 +49,8 @@ class ReindexWorkerServiceTest
     DynamoFormat[TestRecord]
 
   def withReindexWorkerService(tableName: String, indexName: String)(
-      testWith: TestWith[ReindexWorkerService, Assertion]) = {
+    testWith: TestWith[ReindexWorkerService, Assertion]) = {
     withActorSystem { actorSystem =>
-
       val metricsSender = new MetricsSender(
         namespace = "reindex-worker-service-test",
         flushInterval = 100 milliseconds,
@@ -61,7 +60,6 @@ class ReindexWorkerServiceTest
 
       withLocalSqsQueue { queueUrl =>
         withLocalSnsTopic { topicArn =>
-
           val workerService = new ReindexWorkerService(
             targetService = new ReindexService(
               dynamoDBClient = dynamoDbClient,
@@ -138,7 +136,9 @@ class ReindexWorkerServiceTest
 
         whenReady(future) { _ =>
           val actualRecords: List[TestRecord] =
-            Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
+            Scanamo
+              .scan[TestRecord](dynamoDbClient)(tableName)
+              .map(_.right.get)
 
           actualRecords shouldBe expectedRecords
         }
@@ -173,7 +173,6 @@ class ReindexWorkerServiceTest
 
   it("returns a failed Future if the reindex job fails") {
     withActorSystem { actorSystem =>
-
       val metricsSender = new MetricsSender(
         namespace = "reindex-worker-service-test",
         flushInterval = 100 milliseconds,

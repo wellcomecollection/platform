@@ -43,30 +43,28 @@ class ReindexServiceTest
 
   private def withReindexService(tableName: String, indexName: String)(
     testWith: TestWith[ReindexService, Assertion]) = {
-      withActorSystem { actorSystem =>
+    withActorSystem { actorSystem =>
+      val metricsSender = new MetricsSender(
+        namespace = "reindex-service-test",
+        flushInterval = 100 milliseconds,
+        amazonCloudWatch = mock[AmazonCloudWatch],
+        actorSystem = actorSystem
+      )
 
-        val metricsSender = new MetricsSender(
-          namespace = "reindex-service-test",
-          flushInterval = 100 milliseconds,
-          amazonCloudWatch = mock[AmazonCloudWatch],
-          actorSystem = actorSystem
+      val reindexService =
+        new ReindexService(
+          dynamoDBClient = dynamoDbClient,
+          dynamoConfig = DynamoConfig(tableName),
+          metricsSender = metricsSender,
+          versionedDao = new VersionedDao(
+            dynamoDbClient = dynamoDbClient,
+            DynamoConfig(tableName)),
+          indexName = indexName
         )
 
-        val reindexService =
-          new ReindexService(
-            dynamoDBClient = dynamoDbClient,
-            dynamoConfig = DynamoConfig(tableName),
-            metricsSender = metricsSender,
-            versionedDao = new VersionedDao(
-              dynamoDbClient = dynamoDbClient,
-              DynamoConfig(tableName)),
-            indexName = indexName
-          )
-
-        testWith(reindexService)
-      }
+      testWith(reindexService)
+    }
   }
-
 
   it("only updates records with a lower than desired reindexVersion") {
     withLocalDynamoDbTableAndIndex { fixtures =>
@@ -95,7 +93,8 @@ class ReindexServiceTest
           )
         )
 
-        records.foreach(record => Scanamo.put(dynamoDbClient)(tableName)(record))
+        records.foreach(record =>
+          Scanamo.put(dynamoDbClient)(tableName)(record))
 
         val reindexJob = ReindexJob(
           shardId = shardName,
@@ -103,7 +102,9 @@ class ReindexServiceTest
         )
 
         whenReady(reindexService.runReindex(reindexJob)) { _ =>
-          val records = Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
+          val records = Scanamo
+            .scan[TestRecord](dynamoDbClient)(tableName)
+            .map(_.right.get)
 
           records should contain theSameElementsAs expectedRecords
         }
@@ -145,7 +146,9 @@ class ReindexServiceTest
 
         whenReady(reindexService.runReindex(reindexJob)) { _ =>
           val testRecords =
-            Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
+            Scanamo
+              .scan[TestRecord](dynamoDbClient)(tableName)
+              .map(_.right.get)
 
           testRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
           testRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords

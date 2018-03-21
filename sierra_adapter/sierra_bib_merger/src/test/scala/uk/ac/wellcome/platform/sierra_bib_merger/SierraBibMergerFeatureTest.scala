@@ -43,7 +43,8 @@ class SierraBibMergerFeatureTest
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
       "aws.s3.bucketName" -> bucketName
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(tableName) ++ s3LocalFlags
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
+      tableName) ++ s3LocalFlags
   )
 
   def bibRecordString(id: String,
