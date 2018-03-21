@@ -29,15 +29,16 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       DisplayConcept(
         label = "Dangerous diseases",
-        concept = DisplayConcept(
+        concept = Some(DisplayConcept(
           label = "disease",
           qualifiers = List(
             DisplayConcept(
-              qualifierType = "general-subdivision",
+              qualifierType = Some("general-subdivision"),
               label = "dispersion & direction"
             )
           )
-        )
+        )),
+        ontologyType = "QualifiedConcept"
       )
     )
   )
