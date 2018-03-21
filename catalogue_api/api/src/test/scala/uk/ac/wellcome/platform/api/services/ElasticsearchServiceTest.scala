@@ -21,11 +21,11 @@ class ElasticsearchServiceTest
 
   val itemType = "work"
 
-  private def withElasticSearchService(index: String)(
+  private def withElasticSearchService(indexName: String)(
     testWith: TestWith[ElasticSearchService, Assertion]) = {
 
     val searchService = new ElasticSearchService(
-      defaultIndex = index,
+      defaultIndex = indexName,
       documentType = itemType,
       elasticClient = elasticClient
     )
