@@ -137,6 +137,10 @@ def affects_tests(path, task):
                     (path, task))
                 return False
 
+    if path.startswith('.travis'):
+        print("~~~ All changes to the .travis directory are irrelevant")
+        return False
+
     # Otherwise, we were unable to decide if this change was important.
     # We assume that it is, so we'll run tests just in case.
     print("+++ Unable to decide if %s is significant, so assume it is" % path)
