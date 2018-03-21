@@ -95,13 +95,14 @@ jobs:
     # Shared infra stack
     - env: TASK=shared_infra-test
 
-    # Loris stack
-    - env: TASK=loris-build
     # (not under active development)
+
+    # Loris stack
+    # - env: TASK=loris-build
     # - env: TASK=cache_cleaner-build
 
     # Monitoring stack
-    - env: TASK=monitoring-test
+    # - env: TASK=monitoring-test
 
 stages:
   - format
