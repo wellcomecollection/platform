@@ -11,10 +11,9 @@ import uk.ac.wellcome.models.AbstractConcept
 case class DisplayConcept(
   @ApiModelProperty(
     dataType = "String"
-  ) label: String
-) {
+  ) label: String,
   @JsonProperty("type") val ontologyType: String = "Concept"
-}
+)
 
 case object DisplayConcept {
   def apply(concept: AbstractConcept): DisplayConcept = DisplayConcept(
