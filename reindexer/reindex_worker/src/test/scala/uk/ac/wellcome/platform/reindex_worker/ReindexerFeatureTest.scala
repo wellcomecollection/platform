@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexRecord
 }
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SnsFixtures, SqsFixtures}
-import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
@@ -30,6 +30,7 @@ class ReindexerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
+    with ExtendedPatience
     with fixtures.Server
     with LocalDynamoDb[TestRecord]
     with SnsFixtures
