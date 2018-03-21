@@ -27,8 +27,6 @@ class ReindexServiceTest
   override lazy val evidence: DynamoFormat[TestRecord] =
     DynamoFormat[TestRecord]
 
-  override lazy val tableName: String = "table"
-
   val metricsSender: MetricsSender =
     new MetricsSender(
       namespace = "reindexer-tests",
