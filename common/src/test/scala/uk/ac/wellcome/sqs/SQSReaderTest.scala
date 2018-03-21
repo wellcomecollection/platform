@@ -24,7 +24,6 @@ class SQSReaderTest
 
   def withSqsReader[R](queueUrl: String, maxMessages: Int)(
     testWith: TestWith[SQSReader, R]) = {
-    sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "1"))
     val sqsConfig = SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
