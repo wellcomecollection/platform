@@ -13,6 +13,8 @@ trait LocalDynamoDb[T <: Versioned with Id] extends DynamoDBLocalClients {
 
   implicit val evidence: DynamoFormat[T]
 
+  case class FixtureParams(tableName: String, indexName: String)
+
   def withLocalDynamoDbTable[R](testWith: TestWith[String, R]): R = {
     val tableName = Random.alphanumeric.take(10).mkString
     val indexName = Random.alphanumeric.take(10).mkString
@@ -20,6 +22,19 @@ trait LocalDynamoDb[T <: Versioned with Id] extends DynamoDBLocalClients {
     try {
       createTable(tableName, indexName)
       testWith(tableName)
+    } finally {
+      deleteAllTables()
+    }
+  }
+
+  def withLocalDynamoDbTableAndIndex[R](
+      testWith: TestWith[FixtureParams, R]): R = {
+    val tableName = Random.alphanumeric.take(10).mkString
+    val indexName = Random.alphanumeric.take(10).mkString
+
+    try {
+      createTable(tableName, indexName)
+      testWith(FixtureParams(tableName, indexName))
     } finally {
       deleteAllTables()
     }
