@@ -113,12 +113,13 @@
    * ignore for now 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
    *
    * Note: Do we need to remove trailing punctuation on subfields? The punctuation is there for the purpose of the concatentation of concept and qualifiers.
+   * Note: review name versus label for 2nd phase
    *
    * Example person:
    *  "creators": [
    *     {
    *        "id": "b26h7qf3"
-   *        "name": "Jacobs, Philip P.",
+   *        "label": "Jacobs, Philip P.",
    *        "prefixes": ["Sir"] ,
    *        "numeration": "II" ,
    *        "type": "Person" , 
@@ -136,7 +137,7 @@
    *  "creators": [
    *     {
    *        "id": "8t677qf3"
-   *        "name": "International Labour Organisation",
+   *        "label": "International Labour Organisation",
    *        "type": "Organisation" ,
    *        "identifiers": [
    *        {
@@ -170,7 +171,7 @@
    *        "type": "Contributor" , 
    *        "agent": {
    *           "id": "a24s7qf3" ,
-   *           "name": "Jacobs, Philip P.",
+   *           "label": "Jacobs, Philip P.",
    *           "prefixes": ["Sir"] ,
    *           "numeration": "II" ,
    *           "type": "Person",
@@ -196,7 +197,7 @@
    *        "type": "Contributor" , 
    *        "agent": {
    *           "id": "a24s7qf3" ,
-   *           "name": "International Labour Organisation",
+   *           "label": "International Labour Organisation",
    *           "type": "Organisation",
    *           "identifiers": [
    *        {
@@ -270,7 +271,7 @@
    * 6. For each subfield, for subfields v,x,y,z populate "qualifers" with a "label", type "Concept" (except subfield "y" type as "Period" and "z" as "Place") and populate "qualifierType" with v=form-subdivision, x=general-subdivision, y=chronological-subdivsion, z=geographic-subdivision.
    * 
    *
-   *
+   * Qualified concept
    *
    *"subjects": [
    * {
@@ -298,6 +299,25 @@
    * },
    * ],
    *
+   *
+   *
+   * Unqualifed concept
+   *            
+   *"subjects": [
+   * {
+   *   "label": "Tuberculosis - prevention & control.",
+   *   "type": "Concept",
+   *   "id": "hd2891f",
+   *   "label": "Tuberculosis",
+   *     "identifiers": [
+   *       {
+   *         "type": "Identifier",
+   *         "identifierScheme": "mesh",
+   *         "value": "D014376Q000517"
+   *       }
+   *     ],
+   *  }
+   * ],
    */
 
 
