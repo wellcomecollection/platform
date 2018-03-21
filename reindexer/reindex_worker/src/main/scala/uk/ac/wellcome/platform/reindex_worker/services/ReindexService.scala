@@ -23,7 +23,8 @@ import scala.concurrent.Future
 class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
                                metricsSender: MetricsSender,
                                versionedDao: VersionedDao,
-                               dynamoConfig: DynamoConfig)
+                               dynamoConfig: DynamoConfig,
+                               indexName: String = "reindexTracker")
     extends Logging {
 
   def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
@@ -32,7 +33,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     val table = Table[ReindexRecord](dynamoConfig.table)
 
     // TODO: The name of the GSI should be a config flag.
-    val index = table.index("reindexTracker")
+    val index = table.index(indexName)
 
     // We start by querying DynamoDB for every record in the reindex shard
     // that has an out-of-date reindexVersion.  If a shard was especially
