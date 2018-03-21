@@ -61,13 +61,10 @@ class WorksIndexTest
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
-      val eventualResponse =
-        for {
-          response <- elasticClient.execute(
-            indexInto(indexName / "work").doc(badTestObjectJson))
-        } yield response
+      val response = elasticClient.execute(
+        indexInto(indexName / "work").doc(badTestObjectJson))
 
-      whenReady(eventualResponse.failed) { exception =>
+      whenReady(response.failed) { exception =>
         exception shouldBe a[ResponseException]
       }
     }
