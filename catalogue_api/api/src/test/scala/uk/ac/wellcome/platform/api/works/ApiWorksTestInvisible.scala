@@ -7,7 +7,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
 
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = workWith(
@@ -30,7 +30,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
   }
 
   it("excludes works with visible=false from list results") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
 
@@ -101,7 +101,7 @@ class ApiWorksTestInvisible extends ApiWorksTestBase {
   }
 
   it("excludes works with visible=false from search results") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
 

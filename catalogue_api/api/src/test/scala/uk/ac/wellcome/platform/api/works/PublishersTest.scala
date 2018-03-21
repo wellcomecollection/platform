@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.{Agent, IdentifiedWork, Organisation, Person}
 class PublishersTest extends ApiWorksTestBase {
 
   it("includes an empty publishers field if the work has no publishers") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = IdentifiedWork(
@@ -47,7 +47,7 @@ class PublishersTest extends ApiWorksTestBase {
   }
 
   it("includes the publishers field for agent publishers") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = IdentifiedWork(
@@ -100,7 +100,7 @@ class PublishersTest extends ApiWorksTestBase {
   }
 
   it("includes the publishers field with a mixture of agents/organisations/persons") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = IdentifiedWork(

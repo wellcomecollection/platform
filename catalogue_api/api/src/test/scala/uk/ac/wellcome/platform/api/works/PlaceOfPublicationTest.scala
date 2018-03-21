@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.{IdentifiedWork, Period, Place}
 class PlaceOfPublicationTest extends ApiWorksTestBase {
 
   it("includes the placesOfPublication field") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
 

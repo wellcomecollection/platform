@@ -6,7 +6,7 @@ import uk.ac.wellcome.models._
 class ApiWorksTest extends ApiWorksTestBase {
 
   it("returns a list of works") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val works = createWorks(3)
@@ -92,7 +92,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should return a single work when requested with id") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = workWith(
@@ -139,7 +139,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("should be able to render an item if the items include is present") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = workWith(
@@ -182,7 +182,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "always includes 'items' if the items include is present, even with no items") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = workWith(
@@ -217,7 +217,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("includes credit information in API responses") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val location = DigitalLocation(
@@ -283,7 +283,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val works = createWorks(3)
@@ -408,7 +408,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("returns a BadRequest when malformed query parameters are presented") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         server.httpGet(
@@ -421,7 +421,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("ignores parameters that are unused when making an api request") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         server.httpGet(
@@ -435,7 +435,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns a not found error when requesting a single work with a non existing id") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val badId = "non-existing-id"
@@ -450,7 +450,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns an HTTP Bad Request error if the user asks for a page size just over the maximum") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val pageSize = 101
@@ -466,7 +466,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns an HTTP Bad Request error if the user asks for an overly large page size") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val pageSize = 100000
@@ -482,7 +482,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns an HTTP Bad Request error if the user asks for zero-length pages") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val pageSize = 0
@@ -498,7 +498,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns an HTTP Bad Request error if the user asks for a negative page size") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val pageSize = -50
@@ -513,7 +513,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("returns an HTTP Bad Request error if the user asks for page 0") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         server.httpGet(
@@ -527,7 +527,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns an HTTP Bad Request error if the user asks for a page before 0") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         server.httpGet(
@@ -541,7 +541,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("returns multiple errors if there's more than one invalid parameter") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         server.httpGet(
@@ -555,7 +555,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("returns matching results if doing a full-text search") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work1 = workWith(
@@ -603,7 +603,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("includes subject information in API responses") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val workWithSubjects = IdentifiedWork(
@@ -643,8 +643,13 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
+<<<<<<< HEAD
   it("includes genre information in API responses") {
     withLocalElasticsearchIndex(itemType) { indexName =>
+=======
+  it("should include genre information in API responses") {
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+>>>>>>> Give the type system some help, it's a bit dim today
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val workWithSubjects = IdentifiedWork(
@@ -685,7 +690,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val identifier1 = SourceIdentifier(
@@ -753,7 +758,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val srcIdentifier = SourceIdentifier(
@@ -793,7 +798,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "includes 'identifiers' with the identifiers include, even if there are no identifiers") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = workWith(
@@ -827,10 +832,16 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
+<<<<<<< HEAD
   it("looks at different indices based on the ?index query parameter") {
     withLocalElasticsearchIndex(itemType) { indexName =>
+=======
+  it(
+    "can look at different Elasticsearch indices based on the ?index query parameter") {
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+>>>>>>> Give the type system some help, it's a bit dim today
       val flags = esLocalFlags(indexName, itemType)
-      withLocalElasticsearchIndex(itemType) { altIndexName =>
+      withLocalElasticsearchIndex(itemType = itemType) { altIndexName =>
         withServer(flags) { server =>
 
           val work = workWith(
@@ -889,10 +900,16 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
+<<<<<<< HEAD
   it("searches different indices based on the ?_index query parameter") {
     withLocalElasticsearchIndex(itemType) { indexName =>
+=======
+  it(
+    "can search different Elasticsearch indices based on the ?_index query parameter") {
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+>>>>>>> Give the type system some help, it's a bit dim today
       val flags = esLocalFlags(indexName, itemType)
-      withLocalElasticsearchIndex(itemType) { altIndexName =>
+      withLocalElasticsearchIndex(itemType = itemType) { altIndexName =>
         withServer(flags) { server =>
           val work = workWith(
             canonicalId = "1234",
@@ -959,7 +976,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("returns a Bad Request error if asked for an invalid include") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         eventually {
@@ -975,7 +992,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns a Bad Request error if asked for more than one invalid include") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         eventually {
@@ -991,8 +1008,28 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
+<<<<<<< HEAD
+=======
+    "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      val flags = esLocalFlags(indexName, itemType)
+      withServer(flags) { server =>
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
+            andExpect = Status.BadRequest,
+            withJsonBody =
+              badRequest("includes: 'foo', 'bar' are not valid includes")
+          )
+        }
+      }
+    }
+  }
+
+  it(
+>>>>>>> Give the type system some help, it's a bit dim today
     "returns a Bad Request error if asked for an invalid include on an individual work") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         eventually {
@@ -1006,8 +1043,97 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
+<<<<<<< HEAD
+=======
+  it(
+    "includes the thumbnail field if available and we use the thumbnail include") {
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      val flags = esLocalFlags(indexName, itemType)
+      withServer(flags) { server =>
+        val work = identifiedWorkWith(
+          canonicalId = "1234",
+          title = "A thorn in the thumb tells a traumatic tale",
+          thumbnail = DigitalLocation(
+            locationType = "thumbnail-image",
+            url = "https://iiif.example.org/1234/default.jpg",
+            license = License_CCBY
+          )
+        )
+        insertIntoElasticSearch(indexName, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?includes=thumbnail",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                              |{
+                              |  ${resultList()},
+                              |  "results": [
+                              |   {
+                              |     "type": "Work",
+                              |     "id": "${work.canonicalId}",
+                              |     "title": "${work.title.get}",
+                              |     "creators": [ ],
+                              |     "subjects": [ ],
+                              |     "genres": [ ],
+                              |     "publishers": [ ],
+                              |     "placesOfPublication": [ ],
+                              |     "thumbnail": ${location(work.thumbnail.get)}
+                              |   }
+                              |  ]
+                              |}
+              """.stripMargin
+          )
+        }
+      }
+    }
+  }
+
+  it("does not include the thumbnail if we omit the thumbnail include") {
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      val flags = esLocalFlags(indexName, itemType)
+      withServer(flags) { server =>
+        val work = identifiedWorkWith(
+          canonicalId = "5678",
+          title = "An otter omitted from an occasion in Oslo",
+          thumbnail = DigitalLocation(
+            locationType = "thumbnail-image",
+            url = "",
+            license = License_CCBY
+          )
+        )
+        insertIntoElasticSearch(indexName, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                              |{
+                              |  ${resultList()},
+                              |  "results": [
+                              |   {
+                              |     "type": "Work",
+                              |     "id": "${work.canonicalId}",
+                              |     "title": "${work.title.get}",
+                              |     "creators": [ ],
+                              |     "subjects": [ ],
+                              |     "genres": [ ],
+                              |     "publishers": [ ],
+                              |     "placesOfPublication": [ ]
+                              |   }
+                              |  ]
+                              |}
+              """.stripMargin
+          )
+        }
+      }
+    }
+  }
+
+>>>>>>> Give the type system some help, it's a bit dim today
   it("returns Not Found if you look up a non-existent index") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         eventually {
@@ -1023,7 +1149,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
   it(
     "returns an Internal Server error if you try to search a malformed index") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
 
@@ -1051,7 +1177,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("returns a Bad Request error if you try to page beyond the first 10000 works") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val queries = List(

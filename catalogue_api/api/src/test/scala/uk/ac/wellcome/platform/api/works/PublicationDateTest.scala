@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.{IdentifiedWork, Period}
 class PublicationDateTest extends ApiWorksTestBase {
 
   it("omits the publicationDate field if it is empty") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = IdentifiedWork(
@@ -47,7 +47,7 @@ class PublicationDateTest extends ApiWorksTestBase {
   }
 
   it("includes the publicationDate field if it is present on the Work") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val work = IdentifiedWork(

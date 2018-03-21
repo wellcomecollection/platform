@@ -5,7 +5,7 @@ import uk.ac.wellcome.models._
 
 class LocationsTest extends ApiWorksTestBase {
   it("should render a physical location correctly") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
 
