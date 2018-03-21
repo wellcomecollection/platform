@@ -135,10 +135,6 @@ class ReindexerFeatureTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withServer(queueUrl, topicArn) { server =>
-          sqsClient.setQueueAttributes(
-            queueUrl,
-            Map("VisibilityTimeout" -> "1"))
-
           val expectedRecords = createReindexableData(queueUrl)
 
           eventually {
@@ -159,10 +155,6 @@ class ReindexerFeatureTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withServer(queueUrl, topicArn) { server =>
-          sqsClient.setQueueAttributes(
-            queueUrl,
-            Map("VisibilityTimeout" -> "1"))
-
           val expectedRecords = createReindexableData(queueUrl)
 
           val expectedMessage = CompletedReindexJob(
@@ -192,10 +184,6 @@ class ReindexerFeatureTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withBadServer(queueUrl, topicArn) { server =>
-          sqsClient.setQueueAttributes(
-            queueUrl,
-            Map("VisibilityTimeout" -> "1"))
-
           val expectedRecords = createReindexableData(queueUrl)
 
           // We wait some time to ensure that the message is not processed
