@@ -272,31 +272,32 @@
    *
    *
    *
-   *"subjects": [
-   * {
-   *   "label": "Tuberculosis - prevention & control.",
-   *   "type": "QualifiedConcept",
-   *   "concept": {
-   *     "id": "hd2891f",
-   *     "label": "Tuberculosis",
-   *     "type": "Concept",
-   *     "identifiers": [
-   *       {
-   *         "type": "Identifier",
-   *         "identifierScheme": "mesh",
-   *         "value": "D014376Q000517"
-   *       }
-   *     ],
-   *     "qualifiers": [
-   *       {
-   *         "qualifierType": "general-subdivision" ,
-   *         "label": "prevention & control",
-   *         "type": "Concept"
-   *       }
-   *     ]
-   *   }
-   * },
-   * ],
+   *
+   *  "subjects": [
+   *    {
+   *      "label": "Tuberculosis - prevention & control.",
+   *      "type": "QualifiedConcept",
+   *      "concept": {
+   *        "id": "hd2891f",
+   *        "label": "Tuberculosis",
+   *        "type": "Concept",
+   *        "identifiers": [
+   *          {
+   *            "type": "Identifier",
+   *            "identifierScheme": "mesh",
+   *            "value": "D014376Q000517"
+   *          }
+   *        ],
+   *        "qualifiers": [
+   *          {
+   *            "qualifierType": "general-subdivision" ,
+   *            "label": "prevention & control",
+   *            "type": "Concept"
+   *          }
+   *        ]
+   *      }
+   *    },
+   *  ]
    *
    * "subjects": [
    * {
