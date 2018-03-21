@@ -2,24 +2,12 @@ package uk.ac.wellcome.platform.api
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.IdentifiedWork
 
-class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
+class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   implicit val jsonMapper = IdentifiedWork
-  override val server =
-    new EmbeddedHttpServer(
-      new Server,
-      flags = Map(
-        "api.host" -> "test.host",
-        "api.scheme" -> "http",
-        "api.version" -> "v99",
-        "api.name" -> "test"
-      )
-    )
 
   it("should return a valid JSON response") {
     val tree = readTree("/test/v99/swagger.json")
@@ -36,10 +24,20 @@ class ApiSwaggerTest extends FunSpec with FeatureTestMixin {
   }
 
   def readTree(path: String): JsonNode = {
-    val response: Response = server.httpGet(
-      path = path,
-      andExpect = Status.Ok
+
+    val flags =  Map(
+      "api.host" -> "test.host",
+      "api.scheme" -> "http",
+      "api.version" -> "v99",
+      "api.name" -> "test"
     )
+
+    val response: Response = withServer(flags) { server =>
+      server.httpGet(
+        path = path,
+        andExpect = Status.Ok
+      )
+    }
 
     val mapper = new ObjectMapper()
 
