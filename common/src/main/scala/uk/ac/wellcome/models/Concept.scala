@@ -63,6 +63,22 @@ case class Concept(
   ontologyType: String = "Concept"
 ) extends AbstractConcept
 
+case object Concept {
+  def apply(label: String, qualifierType: String): Concept =
+    Concept(
+      label = label,
+      qualifierType = Some(qualifierType),
+      qualifiers = List()
+    )
+
+  def apply(label: String, qualifierType: String, qualifiers: List[Concept]): Concept =
+    Concept(
+      label = label,
+      qualifierType = Some(qualifierType),
+      qualifiers = List()
+    )
+}
+
 case class QualifiedConcept(
   label: String,
   concept: Concept,
