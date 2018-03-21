@@ -56,129 +56,164 @@ class ReindexWorkerServiceTest
   val topicArn = createTopicAndReturnArn("reindex-worker-service-test-topic")
 
   it("returns a successful Future if the reindex completes correctly") {
-    val reindexJob = ReindexJob(
-      shardId = "sierra/123",
-      desiredVersion = 6
-    )
-
-    val testRecord = TestRecord(
-      id = "id/111",
-      version = 1,
-      someData = "A dire daliance directly dancing due down.",
-      reindexShard = reindexJob.shardId,
-      reindexVersion = reindexJob.desiredVersion - 1
-    )
-
-    Scanamo.put(dynamoDbClient)(tableName)(testRecord)
-
-    val expectedRecords = List(
-      testRecord.copy(
-        version = testRecord.version + 1,
-        reindexVersion = reindexJob.desiredVersion
+    withReindexWorkerService { service =>
+      val reindexJob = ReindexJob(
+        shardId = "sierra/123",
+        desiredVersion = 6
       )
-    )
 
-    val sqsMessage = SQSMessage(
-      subject = None,
-      body = toJson(reindexJob).get,
-      topic = "topic",
-      messageType = "message",
-      timestamp = "now"
-    )
+      val testRecord = TestRecord(
+        id = "id/111",
+        version = 1,
+        someData = "A dire daliance directly dancing due down.",
+        reindexShard = reindexJob.shardId,
+        reindexVersion = reindexJob.desiredVersion - 1
+      )
 
-    val service = reindexWorkerService()
+      Scanamo.put(dynamoDbClient)(tableName)(testRecord)
 
-    val future = service.processMessage(message = sqsMessage)
+      val expectedRecords = List(
+        testRecord.copy(
+          version = testRecord.version + 1,
+          reindexVersion = reindexJob.desiredVersion
+        )
+      )
 
-    whenReady(future) { _ =>
-      val actualRecords: List[TestRecord] =
-        Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
+      val sqsMessage = SQSMessage(
+        subject = None,
+        body = toJson(reindexJob).get,
+        topic = "topic",
+        messageType = "message",
+        timestamp = "now"
+      )
 
-      actualRecords shouldBe expectedRecords
+      val future = service.processMessage(message = sqsMessage)
+
+      whenReady(future) { _ =>
+        val actualRecords: List[TestRecord] =
+          Scanamo.scan[TestRecord](dynamoDbClient)(tableName).map(_.right.get)
+
+        actualRecords shouldBe expectedRecords
+      }
     }
   }
 
   it(
     "returns a failed Future if it cannot parse the SQS message as a ReindexJob") {
-    val sqsMessage = SQSMessage(
-      subject = None,
-      body = "<xml>What is JSON.</xl?>",
-      topic = "topic",
-      messageType = "message",
-      timestamp = "now"
-    )
+    withReindexWorkerService { service =>
+      val sqsMessage = SQSMessage(
+        subject = None,
+        body = "<xml>What is JSON.</xl?>",
+        topic = "topic",
+        messageType = "message",
+        timestamp = "now"
+      )
 
-    val service = reindexWorkerService()
+      val service = reindexWorkerService()
 
-    val future = service.processMessage(message = sqsMessage)
+      val future = service.processMessage(message = sqsMessage)
 
-    whenReady(future.failed) { result =>
-      result shouldBe a[GracefulFailureException]
-      result.getMessage should include(
-        "expected json value got < (line 1, column 1)")
+      whenReady(future.failed) { result =>
+        result shouldBe a[GracefulFailureException]
+        result.getMessage should include(
+          "expected json value got < (line 1, column 1)")
+      }
     }
   }
 
   it("returns a failed Future if the reindex job fails") {
-    val exception = new RuntimeException(
-      "Flobberworm! Fickle failure frustrates my fortunes!")
+    withActorSystem { actorSystem =>
 
-    val targetService = mock[ReindexService]
-    when(targetService.runReindex(any[ReindexJob]))
-      .thenReturn(Future { throw exception })
+      val metricsSender = new MetricsSender(
+        namespace = "reindex-service-test",
+        interval = 100 milliseconds,
+        amazonCloudWatch = mock[AmazonCloudWatch],
+        actorSystem = actorSystem
+      )
 
-    val service = new ReindexWorkerService(
-      targetService = targetService,
-      reader = mock[SQSReader],
-      snsWriter = mock[SNSWriter],
-      system = actorSystem,
-      metrics = metricsSender
-    )
+      val exception = new RuntimeException(
+        "Flobberworm! Fickle failure frustrates my fortunes!")
 
-    val reindexJob = ReindexJob(
-      shardId = "sierra/444",
-      desiredVersion = 4
-    )
+      val targetService = mock[ReindexService]
+      when(targetService.runReindex(any[ReindexJob]))
+        .thenReturn(Future { throw exception })
 
-    val sqsMessage = SQSMessage(
-      subject = None,
-      body = toJson(reindexJob).get,
-      topic = "topic",
-      messageType = "message",
-      timestamp = "now"
-    )
+      val service = new ReindexWorkerService(
+        targetService = targetService,
+        reader = mock[SQSReader],
+        snsWriter = mock[SNSWriter],
+        system = actorSystem,
+        metrics = metricsSender
+      )
 
-    val future = service.processMessage(message = sqsMessage)
+      val reindexJob = ReindexJob(
+        shardId = "sierra/444",
+        desiredVersion = 4
+      )
 
-    whenReady(future.failed) { _ shouldBe exception }
+      val sqsMessage = SQSMessage(
+        subject = None,
+        body = toJson(reindexJob).get,
+        topic = "topic",
+        messageType = "message",
+        timestamp = "now"
+      )
+
+      val future = service.processMessage(message = sqsMessage)
+
+      whenReady(future.failed) { _ shouldBe exception }
+    }
   }
 
-  private def reindexWorkerService(
-    dynamoTableName: String = tableName): ReindexWorkerService = {
-    new ReindexWorkerService(
-      targetService = new ReindexService(
-        dynamoDBClient = dynamoDbClient,
-        metricsSender = metricsSender,
-        versionedDao = new VersionedDao(
-          dynamoDbClient = dynamoDbClient,
-          dynamoConfig = DynamoConfig(table = dynamoTableName)
-        ),
-        dynamoConfig = DynamoConfig(table = dynamoTableName)
-      ),
-      reader = new SQSReader(
-        sqsClient = sqsClient,
-        sqsConfig = SQSConfig(
-          queueUrl = queueUrl,
-          waitTime = 1 second,
-          maxMessages = 1
-        )
-      ),
-      snsWriter = new SNSWriter(
-        snsClient = snsClient,
-        snsConfig = SNSConfig(topicArn = topicArn)
-      ),
-      system = actorSystem,
-      metrics = metricsSender
-    )
+  def withReindexWorkerService(
+      testWith: TestWith[ReindexWorkerService, Assertion]) = {
+    withActorSystem { actorSystem =>
+
+      val metricsSender = new MetricsSender(
+        namespace = "reindex-service-test",
+        interval = 100 milliseconds,
+        amazonCloudWatch = mock[AmazonCloudWatch],
+        actorSystem = actorSystem
+      )
+
+      withLocalDynamoDbTable { tableName =>
+        withLocalSqsQueue { queueUrl =>
+          withLocalTopicArn { topicArn =>
+
+            val workerService = new ReindexWorkerService(
+              targetService = new ReindexService(
+                dynamoDBClient = dynamoDbClient,
+                metricsSender = metricsSender,
+                versionedDao = new VersionedDao(
+                  dynamoDbClient = dynamoDbClient,
+                  dynamoConfig = DynamoConfig(table = dynamoTableName)
+                ),
+                dynamoConfig = DynamoConfig(table = dynamoTableName)
+              ),
+              reader = new SQSReader(
+                sqsClient = sqsClient,
+                sqsConfig = SQSConfig(
+                  queueUrl = queueUrl,
+                  waitTime = 1 second,
+                  maxMessages = 1
+                )
+              ),
+              snsWriter = new SNSWriter(
+                snsClient = snsClient,
+                snsConfig = SNSConfig(topicArn = topicArn)
+              ),
+              system = actorSystem,
+              metrics = metricsSender
+            )
+
+            try {
+              testWith(FixtureParams(worker, queueUrl))
+            } finally {
+              worker.stop()
+            }
+          }
+        }
+      }
+    }
   }
 }
