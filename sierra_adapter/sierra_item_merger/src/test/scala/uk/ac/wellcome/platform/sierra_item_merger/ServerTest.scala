@@ -24,7 +24,8 @@ class ServerTest
     new Server(),
     flags = Map(
       "aws.sqs.queue.url" -> queueUrl
-    ) ++ s3LocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags("serverTest")
+    ) ++ s3LocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
+      "serverTest")
   )
 
   test("it shows the healthcheck message") {

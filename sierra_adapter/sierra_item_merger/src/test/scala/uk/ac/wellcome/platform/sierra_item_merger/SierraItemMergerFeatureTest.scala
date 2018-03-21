@@ -23,7 +23,8 @@ class SierraItemMergerFeatureTest
       "aws.sqs.queue.url" -> queueUrl,
       "aws.sqs.waitTime" -> "1",
       "aws.s3.bucketName" -> bucketName
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(tableName) ++ s3LocalFlags
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
+      tableName) ++ s3LocalFlags
   )
 
   it("stores an item from SQS") {

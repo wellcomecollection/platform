@@ -28,7 +28,7 @@ trait LocalDynamoDb[T <: Versioned with Id] extends DynamoDBLocalClients {
   }
 
   def withLocalDynamoDbTableAndIndex[R](
-      testWith: TestWith[FixtureParams, R]): R = {
+    testWith: TestWith[FixtureParams, R]): R = {
     val tableName = Random.alphanumeric.take(10).mkString
     val indexName = Random.alphanumeric.take(10).mkString
 
