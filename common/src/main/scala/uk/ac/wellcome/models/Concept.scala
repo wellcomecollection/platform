@@ -71,7 +71,9 @@ case object Concept {
       qualifiers = List()
     )
 
-  def apply(label: String, qualifierType: String, qualifiers: List[Concept]): Concept =
+  def apply(label: String,
+            qualifierType: String,
+            qualifiers: List[Concept]): Concept =
     Concept(
       label = label,
       qualifierType = Some(qualifierType),

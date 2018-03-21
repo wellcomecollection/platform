@@ -9,7 +9,6 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
 
   val testCases = Table(
     ("concept", "expectedJson"),
-
     (
       Concept(label = "Woodwork"),
       s"""{
@@ -20,7 +19,6 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
         "qualifiers": []
       }"""
     ),
-
     (
       QualifiedConcept(
         label = "Dangerous diseases",
