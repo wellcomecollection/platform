@@ -5,6 +5,7 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -25,7 +26,8 @@ import uk.ac.wellcome.test.fixtures.{
   AkkaFixtures,
   LocalDynamoDb,
   SnsFixtures,
-  SqsFixtures
+  SqsFixtures,
+  TestWith
 }
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -38,7 +40,7 @@ class ReindexWorkerServiceTest
     with Matchers
     with MockitoSugar
     with AkkaFixtures
-    with LocalDynamoDb
+    with LocalDynamoDb[TestRecord]
     with SnsFixtures
     with SqsFixtures
     with ScalaFutures {
@@ -103,8 +105,6 @@ class ReindexWorkerServiceTest
           timestamp = "now"
         )
 
-        val service = reindexWorkerService()
-
         val future = service.processMessage(message = sqsMessage)
 
         whenReady(future.failed) { result =>
@@ -120,8 +120,8 @@ class ReindexWorkerServiceTest
     withActorSystem { actorSystem =>
 
       val metricsSender = new MetricsSender(
-        namespace = "reindex-service-test",
-        interval = 100 milliseconds,
+        namespace = "reindex-worker-service-test",
+        flushInterval = 100 milliseconds,
         amazonCloudWatch = mock[AmazonCloudWatch],
         actorSystem = actorSystem
       )
@@ -160,20 +160,19 @@ class ReindexWorkerServiceTest
     }
   }
 
-  def withReindexWorkerService(
-      tableName: String,
+  def withReindexWorkerService(tableName: String)(
       testWith: TestWith[ReindexWorkerService, Assertion]) = {
     withActorSystem { actorSystem =>
 
       val metricsSender = new MetricsSender(
-        namespace = "reindex-service-test",
-        interval = 100 milliseconds,
+        namespace = "reindex-worker-service-test",
+        flushInterval = 100 milliseconds,
         amazonCloudWatch = mock[AmazonCloudWatch],
         actorSystem = actorSystem
       )
 
       withLocalSqsQueue { queueUrl =>
-        withLocalTopicArn { topicArn =>
+        withLocalSnsTopic { topicArn =>
 
           val workerService = new ReindexWorkerService(
             targetService = new ReindexService(
@@ -181,9 +180,9 @@ class ReindexWorkerServiceTest
               metricsSender = metricsSender,
               versionedDao = new VersionedDao(
                 dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(table = dynamoTableName)
+                dynamoConfig = DynamoConfig(table = tableName)
               ),
-              dynamoConfig = DynamoConfig(table = dynamoTableName)
+              dynamoConfig = DynamoConfig(table = tableName)
             ),
             reader = new SQSReader(
               sqsClient = sqsClient,
@@ -202,9 +201,9 @@ class ReindexWorkerServiceTest
           )
 
           try {
-            testWith(FixtureParams(worker, queueUrl))
+            testWith(workerService)
           } finally {
-            worker.stop()
+            workerService.stop()
           }
         }
       }
