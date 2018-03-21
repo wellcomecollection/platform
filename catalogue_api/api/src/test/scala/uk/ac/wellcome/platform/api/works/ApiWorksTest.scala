@@ -854,7 +854,7 @@ class ApiWorksTest extends ApiWorksTestBase {
             canonicalId = "5678",
             title = "An impostor in an igloo"
           )
-          insertIntoElasticsearchWithIndex(altIndexName, itemType, work_alt)
+          insertIntoElasticsearch(altIndexName, itemType, work_alt)
 
           eventually {
             server.httpGet(
@@ -921,7 +921,7 @@ class ApiWorksTest extends ApiWorksTestBase {
             canonicalId = "5678",
             title = "An impostor in an igloo"
           )
-          insertIntoElasticsearchWithIndex(altIndexName, itemType, work_alt)
+          insertIntoElasticsearch(altIndexName, itemType, work_alt)
 
           eventually {
             server.httpGet(
