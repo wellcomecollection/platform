@@ -9,7 +9,10 @@ import com.twitter.finatra.json.FinatraObjectMapper
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.Matchers.all
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3, TestWith}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -28,7 +31,7 @@ import scala.concurrent.duration.Duration
 import scala.util.Try
 
 class ConvertorServiceTest
-  extends FunSpec
+    extends FunSpec
     with ScalaFutures
     with AkkaFixtures
     with Matchers
@@ -41,7 +44,8 @@ class ConvertorServiceTest
     val key = "elasticdump_example.txt.gz"
 
     val expectedIdentifiedWorksGetResponseStream =
-      new GZIPInputStream(new BufferedInputStream(getClass.getResourceAsStream(s"/$key")))
+      new GZIPInputStream(
+        new BufferedInputStream(getClass.getResourceAsStream(s"/$key")))
 
     val expectedIdentifiedWorksGetResponseStrings =
       Source
@@ -67,7 +71,7 @@ class ConvertorServiceTest
         DisplayWork(
           work = work,
           includes = includes
-        ))
+      ))
 
     val input = getClass.getResourceAsStream(s"/$key")
     val metadata = new ObjectMetadata()
@@ -81,8 +85,8 @@ class ConvertorServiceTest
     "converts a gzipped elasticdump from S3 into the correct format in the target bucket") {
 
     withConvertorService { fixtures =>
-      withCompressedTestDump(fixtures.bucketName) { case (expectedDisplayWorks, key) =>
-
+      withCompressedTestDump(fixtures.bucketName) {
+        case (expectedDisplayWorks, key) =>
           val conversionJob = ConversionJob(
             bucketName = fixtures.bucketName,
             objectKey = key
@@ -91,26 +95,28 @@ class ConvertorServiceTest
           val future = fixtures.convertorService.runConversion(conversionJob)
 
           whenReady(future) { completedConversionJob =>
-
             val inputStream = s3Client
-                .getObject(fixtures.bucketName, "target.txt.gz")
-                .getObjectContent
+              .getObject(fixtures.bucketName, "target.txt.gz")
+              .getObjectContent
 
-              val sourceLines = scala.io.Source.fromInputStream(
+            val sourceLines = scala.io.Source
+              .fromInputStream(
                 new GZIPInputStream(new BufferedInputStream(inputStream)))
-                  .mkString.split("\n")
+              .mkString
+              .split("\n")
 
-              val displayWorks = sourceLines.map(getResponseString => {
-                val source: Json = (parse(getResponseString).right.get \\ "_source").head
+            val displayWorks = sourceLines.map(getResponseString => {
+              val source: Json =
+                (parse(getResponseString).right.get \\ "_source").head
 
-                val displayWork = mapper.parse[DisplayWork](source.noSpaces)
+              val displayWork = mapper.parse[DisplayWork](source.noSpaces)
 
-                displayWork
-              })
+              displayWork
+            })
 
-              all(displayWorks) shouldBe a[DisplayWork]
+            all(displayWorks) shouldBe a[DisplayWork]
 
-              displayWorks should contain theSameElementsAs expectedDisplayWorks
+            displayWorks should contain theSameElementsAs expectedDisplayWorks
           }
 
       }

@@ -17,7 +17,8 @@ trait Akka extends Eventually {
     }
   }
 
-  def withMaterializer[R](actorSystem: ActorSystem)(testWith: TestWith[Materializer, R]): R = {
+  def withMaterializer[R](actorSystem: ActorSystem)(
+    testWith: TestWith[Materializer, R]): R = {
     val materializer = ActorMaterializer()(actorSystem)
 
     try {

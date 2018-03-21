@@ -55,7 +55,6 @@ class SnapshotConvertorWorkerServiceTest
     )
 
     withConvertorService { fixtures =>
-
       val snapshotConvertorWorkerService = new SnapshotConvertorWorkerService(
         fixtures.convertorService,
         sqsReader,
@@ -80,21 +79,20 @@ class SnapshotConvertorWorkerServiceTest
 
           s3Client.putObject(bucketName, key, input, metadata)
 
-          withSnapshotConvertorWorkerService(topicArn, queueUrl) {
-            service =>
-              val sqsMessage = SQSMessage(
-                subject = None,
-                body = "<xml>What is JSON.</xl?>",
-                topic = "topic",
-                messageType = "message",
-                timestamp = "now"
-              )
+          withSnapshotConvertorWorkerService(topicArn, queueUrl) { service =>
+            val sqsMessage = SQSMessage(
+              subject = None,
+              body = "<xml>What is JSON.</xl?>",
+              topic = "topic",
+              messageType = "message",
+              timestamp = "now"
+            )
 
-              val future = service.processMessage(message = sqsMessage)
+            val future = service.processMessage(message = sqsMessage)
 
-              whenReady(future) { _ =>
-                false shouldBe true
-              }
+            whenReady(future) { _ =>
+              false shouldBe true
+            }
           }
         }
       }

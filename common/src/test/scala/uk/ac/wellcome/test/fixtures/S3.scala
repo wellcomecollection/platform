@@ -4,7 +4,11 @@ import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{
+  AWSStaticCredentialsProvider,
+  BasicAWSCredentials,
+  DefaultAWSCredentialsProviderChain
+}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.AwsRegionProvider
 import com.amazonaws.services.s3.model.S3ObjectSummary
@@ -44,7 +48,6 @@ trait S3 extends Logging with Eventually {
     .withEndpointConfiguration(
       new EndpointConfiguration(localS3EndpointUrl, regionName))
     .build()
-
 
   def withLocalS3Bucket[R](testWith: TestWith[String, R]) = {
     val bucketName: String = (Random.alphanumeric take 10 mkString).toLowerCase
@@ -88,7 +91,9 @@ trait S3 extends Logging with Eventually {
 }
 
 trait S3AkkaClient extends S3 with AkkaFixtures {
-  def withS3AkkaClient[R](actorSystem: ActorSystem, materializer: Materializer)(testWith: TestWith[S3Client, R]): R = {
+  def withS3AkkaClient[R](
+    actorSystem: ActorSystem,
+    materializer: Materializer)(testWith: TestWith[S3Client, R]): R = {
 
     val s3AkkaClient = new S3Client(
       new S3Settings(

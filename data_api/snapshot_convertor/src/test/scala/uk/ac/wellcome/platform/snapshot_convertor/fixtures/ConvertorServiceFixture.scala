@@ -23,7 +23,6 @@ trait ConvertorServiceFixture extends S3AkkaClient {
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
           withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-
             val convertorService = new ConvertorService(
               actorSystem = actorSystem,
               awsConfig = AWSConfig(region = "localhost"),
@@ -31,8 +30,11 @@ trait ConvertorServiceFixture extends S3AkkaClient {
               mapper = mapper
             )
 
-            testWith(ConvertorServiceFixtures(
-              convertorService, actorSystem, bucketName))
+            testWith(
+              ConvertorServiceFixtures(
+                convertorService,
+                actorSystem,
+                bucketName))
 
           }
         }

@@ -4,7 +4,10 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
@@ -22,12 +25,11 @@ import com.twitter.finatra.json.FinatraObjectMapper
 import io.circe.Json
 import io.circe.parser.parse
 
-
 class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  awsConfig: AWSConfig,
                                  s3Client: S3Client,
-                                 mapper: FinatraObjectMapper
-                                ) extends Logging {
+                                 mapper: FinatraObjectMapper)
+    extends Logging {
 
   def runConversion(
     conversionJob: ConversionJob): Future[CompletedConversionJob] = {
@@ -77,7 +79,6 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val future = source.runWith(s3Sink)(ActorMaterializer()(actorSystem))
 
     future.map { result =>
-
       // this should be an app variable
       val host = "http://localhost:33333"
       val targetLocation = Uri(s"$host/$targetObjectKey")
