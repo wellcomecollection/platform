@@ -20,9 +20,9 @@ class ServerTest
   val server = new EmbeddedHttpServer(
     new Server(),
     flags = Map(
-      "aws.dynamo.tableName" -> "serverTestTable",
       "aws.sqs.queue.url" -> queueUrl
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags
+    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
+      "serverTestTable")
   )
 
   test("it shows the healthcheck message") {

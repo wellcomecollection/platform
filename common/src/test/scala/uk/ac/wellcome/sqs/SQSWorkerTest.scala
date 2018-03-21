@@ -40,7 +40,6 @@ class SQSWorkerTest
   def withSqsWorker[R](actors: ActorSystem,
                        metrics: MetricsSender,
                        queueUrl: String)(testWith: TestWith[SQSWorker, R]) = {
-    sqsClient.setQueueAttributes(queueUrl, Map("VisibilityTimeout" -> "0"))
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1))
 
     val testWorker =
