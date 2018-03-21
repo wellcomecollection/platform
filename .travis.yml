@@ -53,9 +53,6 @@ jobs:
     - env: TASK=travis-format
       stage: format
 
-    # (not under active development)
-    # - env: TASK=nginx-build
-
     - stage: test
       env: TASK=sbt-common-test
     - env: TASK=sbt-display-test
@@ -96,6 +93,9 @@ jobs:
     - env: TASK=shared_infra-test
 
     # (not under active development)
+
+    # nginx stack
+    # - env: TASK=nginx-build
 
     # Loris stack
     # - env: TASK=loris-build
