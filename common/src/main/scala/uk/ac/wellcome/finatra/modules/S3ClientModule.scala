@@ -48,7 +48,8 @@ object S3ClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesAkkaS3Client(awsConfig: AWSConfig, actorSystem: ActorSystem): S3Client = {
+  def providesAkkaS3Client(awsConfig: AWSConfig,
+                           actorSystem: ActorSystem): S3Client = {
     val regionProvider =
       new AwsRegionProvider {
         def getRegion: String = awsConfig.region
