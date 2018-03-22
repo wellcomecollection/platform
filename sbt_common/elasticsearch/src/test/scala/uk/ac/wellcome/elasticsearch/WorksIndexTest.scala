@@ -1,12 +1,12 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search}
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Shrink}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import org.scalacheck.ScalacheckShapeless._
 import com.sksamuel.elastic4s.http.ElasticDsl._
@@ -22,28 +22,35 @@ class WorksIndexTest
     with Matchers
     with JsonTestUtil
     with BeforeAndAfterEach
+    with ExtendedPatience
     with PropertyChecks {
 
-  implicitly[Arbitrary[IdentifiedWork]]
+  // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
+  // With IdentifiedWork, that means that it never actually completes.
+  implicit val noShrink = Shrink.shrinkAny[IdentifiedWork]
 
   it("puts a valid work") {
-    withLocalElasticsearchIndex(itemType = "work") {
-      indexName =>
-      forAll { sampleWork: IdentifiedWork =>
+    forAll { sampleWork: IdentifiedWork =>
+      withLocalElasticsearchIndex(itemType = "work") { indexName =>
         val sampleWorkJson = toJson(sampleWork).get
 
-        val eventualHits =
-          for {
-            _ <- elasticClient.execute(
+        val futureIndexResponse = elasticClient.execute(
               indexInto(indexName / "work").doc(sampleWorkJson))
-            hits <- elasticClient
-              .execute(search(s"$indexName/work").matchAllQuery())
-              .map { _.hits.hits }
-          } yield hits
 
-        whenReady(eventualHits) { hits =>
-           hits should have size 1
-           assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
+        whenReady(futureIndexResponse) { _ =>
+          // Elasticsearch is eventually consistent so, when the future completes,
+          // the documents might not immediately appear in search
+          eventually {
+            val hits = elasticClient
+              .execute(search(s"$indexName/work").matchAllQuery())
+              .map {
+                _.hits.hits
+              }
+              .await
+
+            hits should have size 1
+            assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
+          }
         }
       }
     }
