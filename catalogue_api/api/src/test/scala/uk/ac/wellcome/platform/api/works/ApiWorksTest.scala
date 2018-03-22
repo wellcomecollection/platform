@@ -414,7 +414,8 @@ class ApiWorksTest extends ApiWorksTestBase {
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=penguin",
           andExpect = Status.BadRequest,
-          withJsonBody = badRequest("pageSize: 'penguin' is not a valid Integer")
+          withJsonBody =
+            badRequest("pageSize: 'penguin' is not a valid Integer")
         )
       }
     }
@@ -457,8 +458,8 @@ class ApiWorksTest extends ApiWorksTestBase {
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
           andExpect = Status.BadRequest,
-          withJsonBody =
-            badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
+          withJsonBody = badRequest(
+            s"pageSize: [$pageSize] is not less than or equal to 100")
         )
       }
     }
@@ -473,8 +474,8 @@ class ApiWorksTest extends ApiWorksTestBase {
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
           andExpect = Status.BadRequest,
-          withJsonBody =
-            badRequest(s"pageSize: [$pageSize] is not less than or equal to 100")
+          withJsonBody = badRequest(
+            s"pageSize: [$pageSize] is not less than or equal to 100")
         )
       }
     }
@@ -489,8 +490,8 @@ class ApiWorksTest extends ApiWorksTestBase {
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
           andExpect = Status.BadRequest,
-          withJsonBody =
-            badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
+          withJsonBody = badRequest(
+            s"pageSize: [$pageSize] is not greater than or equal to 1")
         )
       }
     }
@@ -505,8 +506,8 @@ class ApiWorksTest extends ApiWorksTestBase {
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
           andExpect = Status.BadRequest,
-          withJsonBody =
-            badRequest(s"pageSize: [$pageSize] is not greater than or equal to 1")
+          withJsonBody = badRequest(
+            s"pageSize: [$pageSize] is not greater than or equal to 1")
         )
       }
     }
@@ -519,14 +520,14 @@ class ApiWorksTest extends ApiWorksTestBase {
         server.httpGet(
           path = s"/$apiPrefix/works?page=0",
           andExpect = Status.BadRequest,
-          withJsonBody = badRequest("page: [0] is not greater than or equal to 1")
+          withJsonBody =
+            badRequest("page: [0] is not greater than or equal to 1")
         )
       }
     }
   }
 
-  it(
-    "returns an HTTP Bad Request error if the user asks for a page before 0") {
+  it("returns an HTTP Bad Request error if the user asks for a page before 0") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
@@ -671,7 +672,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                               |     "title": "${workWithSubjects.title.get}",
                               |     "creators": [],
                               |     "subjects": [ ],
-                              |     "genres": [ ${concepts(workWithSubjects.genres)} ],
+                              |     "genres": [ ${concepts(
+                                workWithSubjects.genres)} ],
                               |     "publishers": [ ],
                               |     "placesOfPublication": [ ]
                               |   }
@@ -769,7 +771,8 @@ class ApiWorksTest extends ApiWorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
+            path =
+              s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
             andExpect = Status.Ok,
             withJsonBody = s"""
                               |{
@@ -805,7 +808,8 @@ class ApiWorksTest extends ApiWorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
+            path =
+              s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
             andExpect = Status.Ok,
             withJsonBody = s"""
                               |{
@@ -832,7 +836,6 @@ class ApiWorksTest extends ApiWorksTestBase {
       val flags = esLocalFlags(indexName, itemType)
       withLocalElasticsearchIndex(itemType = itemType) { altIndexName =>
         withServer(flags) { server =>
-
           val work = workWith(
             canonicalId = "1234",
             title = "A whale on a wave"
@@ -867,7 +870,8 @@ class ApiWorksTest extends ApiWorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works/${work_alt.canonicalId}?_index=$altIndexName",
+              path =
+                s"/$apiPrefix/works/${work_alt.canonicalId}?_index=$altIndexName",
               andExpect = Status.Ok,
               withJsonBody = s"""
                                 |{
@@ -973,8 +977,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "returns a Bad Request error if asked for more than one invalid include") {
+  it("returns a Bad Request error if asked for more than one invalid include") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
@@ -1124,12 +1127,10 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "returns an Internal Server error if you try to search a malformed index") {
+  it("returns an Internal Server error if you try to search a malformed index") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         // We need to do something that reliably triggers an internal exception
         // in the Elasticsearch handler.
         //
@@ -1153,7 +1154,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a Bad Request error if you try to page beyond the first 10000 works") {
+  it(
+    "returns a Bad Request error if you try to page beyond the first 10000 works") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
@@ -1168,8 +1170,8 @@ class ApiWorksTest extends ApiWorksTestBase {
             server.httpGet(
               path = s"/$apiPrefix/works?$query",
               andExpect = Status.BadRequest,
-              withJsonBody =
-                badRequest("Only the first 10000 works are available in the API.")
+              withJsonBody = badRequest(
+                "Only the first 10000 works are available in the API.")
             )
           }
         }
