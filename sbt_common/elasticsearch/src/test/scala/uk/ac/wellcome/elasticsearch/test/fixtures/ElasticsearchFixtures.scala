@@ -90,9 +90,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def withLocalElasticsearchIndexAsync[R](
+  def withLocalElasticsearchIndexAsync[Assertion](
     indexName: String = Random.alphanumeric take 10 mkString,
-    itemType: String)(testWith: TestWith[Future[String], R]): R = {
+    itemType: String)(testWith: TestWith[Future[String], Assertion]): Assertion = {
 
     val index = new WorksIndex(
       client = elasticClient,
