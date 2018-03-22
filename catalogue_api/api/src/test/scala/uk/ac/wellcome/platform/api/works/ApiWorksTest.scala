@@ -136,7 +136,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       items = List(
         itemWith(
           canonicalId = "c3a599u5",
-          identifier = defaultSourceIdentifier,
+          identifier = defaultItemSourceIdentifier,
           location = defaultLocation
         )
       )
@@ -591,6 +591,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "Test1234"
     )
     val work1 = workWith(
@@ -601,6 +602,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     val identifier2 = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "DTest5678"
     )
     val work2 = workWith(
@@ -654,6 +656,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val srcIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "Test1234"
     )
     val work = workWith(

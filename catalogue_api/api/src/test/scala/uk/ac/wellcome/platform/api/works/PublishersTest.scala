@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
-import uk.ac.wellcome.models.{Agent, IdentifiedWork, Organisation, Person}
+import uk.ac.wellcome.models.{Agent, IdentifiedWork, Organisation, Person, Unidentifiable}
 
 class PublishersTest extends ApiWorksTestBase {
 
@@ -48,8 +48,8 @@ class PublishersTest extends ApiWorksTestBase {
       version = 1,
       title = Some("A party of purple panthers in Paris"),
       publishers = List(
-        Agent("Percy Parrot"),
-        Agent("Patricia Parrakeet")
+        Unidentifiable(Agent("Percy Parrot")),
+        Unidentifiable(Agent("Patricia Parrakeet"))
       )
     )
 
@@ -71,14 +71,8 @@ class PublishersTest extends ApiWorksTestBase {
           |      "subjects": [ ],
           |      "genres": [ ],
           |      "publishers": [
-          |        {
-          |          "label": "${work.publishers(0).label}",
-          |          "type": "Agent"
-          |        },
-          |        {
-          |          "label": "${work.publishers(1).label}",
-          |          "type": "Agent"
-          |        }
+          |        ${agent(work.publishers(0))},
+          |        ${agent(work.publishers(1))}
           |      ],
           |      "placesOfPublication": [ ]
           |    }
@@ -98,12 +92,9 @@ class PublishersTest extends ApiWorksTestBase {
       version = 1,
       title = Some("Vultures vying for victory"),
       publishers = List(
-        Agent("Vivian Violet"),
-        Organisation("Verily Volumes"),
-        Person(
-          label = "Havelock Vetinari",
-          prefix = Some("Lord Patrician"),
-          numeration = Some("I"))
+        Unidentifiable(Agent("Vivian Violet")),
+        Unidentifiable(Organisation("Verily Volumes")),
+        Unidentifiable(Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I")))
       )
     )
 
