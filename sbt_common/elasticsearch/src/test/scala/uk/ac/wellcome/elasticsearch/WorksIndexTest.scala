@@ -35,7 +35,7 @@ class WorksIndexTest
         val sampleWorkJson = toJson(sampleWork).get
 
         val futureIndexResponse = elasticClient.execute(
-              indexInto(indexName / "work").doc(sampleWorkJson))
+          indexInto(indexName / "work").doc(sampleWorkJson))
 
         whenReady(futureIndexResponse) { _ =>
           // Elasticsearch is eventually consistent so, when the future completes,

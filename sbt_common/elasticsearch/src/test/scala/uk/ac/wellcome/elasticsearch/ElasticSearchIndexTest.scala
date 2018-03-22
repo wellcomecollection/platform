@@ -109,31 +109,29 @@ class ElasticSearchIndexTest
 
   it("updates an already existing index with a compatible mapping") {
     withLocalElasticsearchIndex(TestIndex) { _ =>
-      withLocalElasticsearchIndex(CompatibleTestIndex) {
-        testIndexName =>
+      withLocalElasticsearchIndex(CompatibleTestIndex) { testIndexName =>
+        val compatibleTestObject =
+          CompatibleTestObject("id", "description", 5, true)
+        val compatibleTestObjectJson =
+          JsonUtil.toJson(compatibleTestObject).get
 
-          val compatibleTestObject =
-            CompatibleTestObject("id", "description", 5, true)
-          val compatibleTestObjectJson =
-            JsonUtil.toJson(compatibleTestObject).get
+        val eventualHits =
+          for {
+            _ <- elasticClient.execute(
+              indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
+            hits <- elasticClient
+              .execute(search(s"$testIndexName/$testType").matchAllQuery())
+              .map { _.hits.hits }
+          } yield hits
 
-          val eventualHits =
-            for {
-              _ <- elasticClient.execute(
-                indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
-              hits <- elasticClient
-                .execute(search(s"$testIndexName/$testType").matchAllQuery())
-                .map { _.hits.hits }
-            } yield hits
+        whenReady(eventualHits) { hits =>
+          hits should have size 1
 
-          whenReady(eventualHits) { hits =>
-                       hits should have size 1
-
-            assertJsonStringsAreEqual(
-              hits.head.sourceAsString,
-              compatibleTestObjectJson
-            )
-          }
+          assertJsonStringsAreEqual(
+            hits.head.sourceAsString,
+            compatibleTestObjectJson
+          )
+        }
       }
     }
   }
