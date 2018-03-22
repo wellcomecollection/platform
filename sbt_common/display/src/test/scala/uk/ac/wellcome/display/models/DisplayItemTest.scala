@@ -19,6 +19,7 @@ class DisplayItemTest extends FunSpec with Matchers {
 
   val identifier: SourceIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Item",
     value = "value"
   )
 
@@ -48,6 +49,7 @@ class DisplayItemTest extends FunSpec with Matchers {
           "canonicalId": "b71876a",
           "sourceIdentifier": {
             "identifierScheme": "miro-image-number",
+            "ontologyType": "Item",
             "value": "B718760"
           },
           "locations": [],
@@ -70,6 +72,7 @@ class DisplayItemTest extends FunSpec with Matchers {
           "canonicalId": "mr953zsh",
           "sourceIdentifier": {
             "identifierScheme": "miro-image-number",
+            "ontologyType": "Item",
             "value": "M9530000"
           },
           "identifiers": [],
