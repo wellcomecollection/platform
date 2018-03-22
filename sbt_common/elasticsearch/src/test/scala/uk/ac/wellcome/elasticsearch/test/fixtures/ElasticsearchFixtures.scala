@@ -19,7 +19,6 @@ import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 
 import scala.concurrent.Future
 import scala.util.Random
-import org.scalatest.compatible.Assertion
 
 trait ElasticsearchFixtures
     extends Eventually
