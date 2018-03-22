@@ -81,7 +81,7 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
-              assertStored(bucketName, tableName, expectedSierraTransformable)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
             }
           }
         }
@@ -126,8 +126,8 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable2 = SierraTransformable(bibRecord = record2)
 
-              assertStored(bucketName, tableName, expectedSierraTransformable1)
-              assertStored(bucketName, tableName, expectedSierraTransformable2)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable1)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable2)
             }
           }
         }
@@ -176,7 +176,7 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
-              assertStored(bucketName, tableName, expectedSierraTransformable)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
             }
           }
         }
@@ -229,7 +229,7 @@ class SierraBibMergerFeatureTest
               // enough time for this update to have gone through (if it was going to).
               Thread.sleep(5000)
 
-              assertStored(bucketName, tableName, expectedSierraTransformable)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
             }
           }
         }
@@ -269,19 +269,13 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
-              assertStored(bucketName, tableName, expectedSierraTransformable)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
             }
           }
         }
       }
     }
   }
-
-  private def assertStored(bucketName: String, tableName: String, transformable: SierraTransformable) =
-    assertJsonStringsAreEqual(
-      getJsonFor[SierraTransformable](bucketName, tableName, transformable),
-      toJson(transformable).get
-    )
 
   private def sendMessageToSQS(body: String, queueUrl: String) = {
     val message = SQSMessage(
