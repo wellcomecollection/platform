@@ -83,7 +83,9 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
-              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              eventually {
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              }
             }
           }
         }
@@ -128,8 +130,10 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable2 = SierraTransformable(bibRecord = record2)
 
-              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable1)
-              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable2)
+              eventually {
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable1)
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable2)
+              }
             }
           }
         }
@@ -178,7 +182,9 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
-              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              eventually {
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              }
             }
           }
         }
@@ -271,7 +277,9 @@ class SierraBibMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(bibRecord = record)
 
-              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              eventually {
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              }
             }
           }
         }
