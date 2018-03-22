@@ -108,7 +108,7 @@ class WorksIndex @Inject()(client: HttpClient,
 
   val language = objectField("language").fields(
     keywordField("id"),
-    textField("language"),
+    textField("label"),
     keywordField("ontologyType")
   )
 
