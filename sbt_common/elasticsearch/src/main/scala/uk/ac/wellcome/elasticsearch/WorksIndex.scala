@@ -64,6 +64,29 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
+  def concept(fieldName: String) = objectField(fieldName).fields(
+    textField("label"),
+    keywordField("ontologyType"),
+    keywordField("type"),
+    keywordField("qualifierType"),
+    objectField("qualifiers").fields(
+      textField("label"),
+      keywordField("ontologyType"),
+      keywordField("qualifierType")
+    ),
+    // Nested concept -- if qualified concept
+    objectField("concept").fields(
+      textField("label"),
+      keywordField("ontologyType"),
+      keywordField("qualifierType"),
+      objectField("qualifiers").fields(
+        textField("label"),
+        keywordField("ontologyType"),
+        keywordField("qualifierType")
+      )
+    )
+  )
+
   def labelledTextField(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType")
@@ -110,8 +133,8 @@ class WorksIndex @Inject()(client: HttpClient,
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
       labelledTextField("creators"),
-      labelledTextField("subjects"),
-      labelledTextField("genres"),
+      concept("subjects"),
+      concept("genres"),
       labelledTextField("placesOfPublication"),
       items,
       publishers,

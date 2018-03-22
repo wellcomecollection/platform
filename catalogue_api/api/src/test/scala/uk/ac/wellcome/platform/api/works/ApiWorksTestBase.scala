@@ -126,7 +126,7 @@ class ApiWorksTestBase
       "description": "$description"
     }"""
 
-  def concept(con: Concept) =
+  def concept(con: AbstractConcept) =
     s"""
     {
       "type": "${con.ontologyType}",
@@ -134,7 +134,7 @@ class ApiWorksTestBase
     }
     """
 
-  def concepts(concepts: List[Concept]) =
+  def concepts(concepts: List[AbstractConcept]) =
     concepts
       .map { concept(_) }
       .mkString(",")
