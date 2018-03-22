@@ -76,7 +76,6 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    {
       |      "agent" : {
       |        "label" : "47",
-      |        "ontologyType" : "Agent",
       |        "type" : "Agent"
       |      },
       |      "type" : "Unidentifiable"
@@ -130,7 +129,6 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    {
       |      "agent" : {
       |        "label" : "MIT Press",
-      |        "ontologyType" : "Organisation",
       |        "type" : "Organisation"
       |      },
       |      "type" : "Unidentifiable"

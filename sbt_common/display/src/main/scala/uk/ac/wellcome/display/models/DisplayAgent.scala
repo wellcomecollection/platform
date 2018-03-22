@@ -27,15 +27,15 @@ case object DisplayAbstractAgent {
         DisplayAgent(
           label = a.label
         )
-      case Identified(a: Agent, _) => throw new RuntimeException()
-      case Identified(p: Person, id) =>
-        DisplayPerson(p.label, p.prefix, p.numeration, p.ontologyType)
+      case Identified(_: Agent, _, _) => throw new RuntimeException()
+      case Identified(p: Person, id, identifiers) =>
+        DisplayPerson(p.label, p.prefix, p.numeration)
       case Unidentifiable(p: Person) =>
-        DisplayPerson(p.label, p.prefix, p.numeration, p.ontologyType)
-      case Identified(o: Organisation, id) =>
-        DisplayOrganisation(o.label, o.ontologyType)
+        DisplayPerson(p.label, p.prefix, p.numeration)
+      case Identified(o: Organisation, id, identifiers) =>
+        DisplayOrganisation(o.label)
       case Unidentifiable(o: Organisation) =>
-        DisplayOrganisation(o.label, o.ontologyType)
+        DisplayOrganisation(o.label)
     }
 }
 
