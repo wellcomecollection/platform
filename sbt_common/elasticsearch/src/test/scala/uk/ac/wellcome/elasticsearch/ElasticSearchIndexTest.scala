@@ -70,13 +70,12 @@ class ElasticSearchIndexTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = JsonUtil.toJson(testObject).get
 
       eventually {
         for {
-          indexName <- eventualIndexName
           _ <- elasticClient.execute(
             indexInto(indexName / testType).doc(testObjectJson))
           hits <- elasticClient
@@ -92,13 +91,12 @@ class ElasticSearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
       val eventuallyResponse =
         for {
-          indexName <- eventualIndexName
           response <- elasticClient.execute(
             indexInto(indexName / testType).doc(badTestObjectJson))
         } yield response
@@ -110,31 +108,31 @@ class ElasticSearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndexAsync(TestIndex) { eventualIndexName =>
-      withLocalElasticsearchIndexAsync(CompatibleTestIndex) {
-        eventualTestIndexName =>
+    withLocalElasticsearchIndex(TestIndex) { _ =>
+      withLocalElasticsearchIndex(CompatibleTestIndex) {
+        testIndexName =>
+
           val compatibleTestObject =
             CompatibleTestObject("id", "description", 5, true)
           val compatibleTestObjectJson =
             JsonUtil.toJson(compatibleTestObject).get
 
-          eventually {
+          val eventualHits =
             for {
-              _ <- eventualIndexName
-              testIndexName <- eventualTestIndexName
               _ <- elasticClient.execute(
                 indexInto(testIndexName / testType) doc (compatibleTestObjectJson))
               hits <- elasticClient
                 .execute(search(s"$testIndexName/$testType").matchAllQuery())
                 .map { _.hits.hits }
-            } yield {
-              hits should have size 1
+            } yield hits
 
-              assertJsonStringsAreEqual(
-                hits.head.sourceAsString,
-                compatibleTestObjectJson
-              )
-            }
+          whenReady(eventualHits) { hits =>
+                       hits should have size 1
+
+            assertJsonStringsAreEqual(
+              hits.head.sourceAsString,
+              compatibleTestObjectJson
+            )
           }
       }
     }

@@ -19,6 +19,7 @@ import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 
 import scala.concurrent.Future
 import scala.util.Random
+import org.scalatest.compatible.Assertion
 
 trait ElasticsearchFixtures
     extends Eventually
@@ -52,7 +53,7 @@ trait ElasticsearchFixtures
   }
 
   def withLocalElasticsearchIndex[R](
-    indexName: String = Random.alphanumeric take 10 mkString,
+    indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
     itemType: String)(testWith: TestWith[String, R]): R = {
 
     val index = new WorksIndex(
@@ -74,33 +75,6 @@ trait ElasticsearchFixtures
     } finally {
       elasticClient.execute(deleteIndex(index.indexName))
     }
-  }
-
-  def withLocalElasticsearchIndexAsync[R](index: ElasticSearchIndex)(
-    testWith: TestWith[Future[String], R]): R = {
-
-    try {
-      testWith {
-        for {
-          _ <- index.create
-        } yield index.indexName
-      }
-    } finally {
-      elasticClient.execute(deleteIndex(index.indexName))
-    }
-  }
-
-  def withLocalElasticsearchIndexAsync[Assertion](
-    indexName: String = Random.alphanumeric take 10 mkString,
-    itemType: String)(testWith: TestWith[Future[String], Assertion]): Assertion = {
-
-    val index = new WorksIndex(
-      client = elasticClient,
-      name = indexName,
-      itemType = itemType
-    )
-
-    withLocalElasticsearchIndexAsync(index)(testWith)
   }
 
   def assertElasticsearchEventuallyHasWork(work: IdentifiedWork,
