@@ -30,13 +30,10 @@ class VersionedHybridStoreTest
 
   import uk.ac.wellcome.dynamo._
 
-  def withTestHybridStore(bucketName: String) =
-    withVersionedHybridStore[ExampleRecord, Assertion](bucketName) _
-
   it("stores a versioned record if it has never been seen before") {
     withLocalS3Bucket { bucketName =>
-      withTestHybridStore(bucketName) {
-        case (hybridStore, tableName) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val record = ExampleRecord(
             id = "1111",
             content = "One ocelot in orange"
@@ -47,14 +44,15 @@ class VersionedHybridStoreTest
           whenReady(future) { _ =>
             getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
           }
+        }
       }
     }
   }
 
   it("applies the given transformation to an existing record") {
     withLocalS3Bucket { bucketName =>
-      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) {
-        case (hybridStore, tableName) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val record = ExampleRecord(
             id = "1111",
             content = "One ocelot in orange"
@@ -73,14 +71,15 @@ class VersionedHybridStoreTest
             getJsonFor(bucketName, tableName, record) shouldBe toJson(
               expectedRecord).get
           }
+        }
       }
     }
   }
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
     withLocalS3Bucket { bucketName =>
-      withTestHybridStore(bucketName) {
-        case (hybridStore, tableName) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val record = ExampleRecord(
             id = "2222",
             content = "Two teal turtles in Tenerife"
@@ -101,27 +100,29 @@ class VersionedHybridStoreTest
             getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(
               updatedRecord).get
           }
+        }
       }
     }
   }
 
   it("returns a future of None for a non-existent record") {
     withLocalS3Bucket { bucketName =>
-      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) {
-        case (hybridStore, _) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val future = hybridStore.getRecord(id = "does/notexist")
 
           whenReady(future) { result =>
             result shouldBe None
           }
+        }
       }
     }
   }
 
   it("returns a future of Some[ExampleRecord] if the record exists") {
     withLocalS3Bucket { bucketName =>
-      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) {
-        case (hybridStore, _) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val record = ExampleRecord(
             id = "5555",
             content = "Five fishing flinging flint"
@@ -137,14 +138,15 @@ class VersionedHybridStoreTest
           whenReady(getFuture) { result =>
             result shouldBe Some(record)
           }
+        }
       }
     }
   }
 
   it("does not allow creation of records with a different id than indicated") {
     withLocalS3Bucket { bucketName =>
-      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) {
-        case (hybridStore, _) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val record = ExampleRecord(
             id = "8934",
             content = "Five fishing flinging flint"
@@ -157,14 +159,15 @@ class VersionedHybridStoreTest
           whenReady(future.failed) { e: Throwable =>
             e shouldBe a[IllegalArgumentException]
           }
+        }
       }
     }
   }
 
   it("does not allow transformation to a record with a different id") {
     withLocalS3Bucket { bucketName =>
-      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) {
-        case (hybridStore, _) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val record = ExampleRecord(
             id = "8934",
             content = "Five fishing flinging flint"
@@ -181,6 +184,7 @@ class VersionedHybridStoreTest
           whenReady(future.failed) { e: Throwable =>
             e shouldBe a[IllegalArgumentException]
           }
+        }
       }
     }
   }
@@ -209,8 +213,8 @@ class VersionedHybridStoreTest
     )
 
     withLocalS3Bucket { bucketName =>
-      withVersionedHybridStore[ExampleRecord, Assertion](bucketName) {
-        case (hybridStore, tableName) =>
+      withLocalDynamoDbTable { tableName =>
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
           val future =
             hybridStore.updateRecord(record.id)(record)(identity)(data)
 
@@ -227,6 +231,7 @@ class VersionedHybridStoreTest
             extraData.data shouldBe "a tragic triangle of triffids"
             extraData.number shouldBe 6
           }
+        }
       }
     }
   }
