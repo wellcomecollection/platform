@@ -74,7 +74,6 @@ class WorksIndex @Inject()(client: HttpClient,
       keywordField("ontologyType"),
       keywordField("qualifierType")
     ),
-
     // Nested concept -- if qualified concept
     objectField("concept").fields(
       textField("label"),
