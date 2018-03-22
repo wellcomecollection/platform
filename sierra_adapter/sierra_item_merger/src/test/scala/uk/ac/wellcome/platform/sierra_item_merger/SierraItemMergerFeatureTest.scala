@@ -1,89 +1,114 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
-import org.scalatest.FunSpec
+import org.scalatest.concurrent.Eventually
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.s3.KeyPrefixGenerator
+import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, S3, SqsFixtures}
 
 class SierraItemMergerFeatureTest
     extends FunSpec
-    with FeatureTestMixin
-    with AmazonCloudWatchFlag
+    with Matchers
+    with Eventually
+    with fixtures.Server
+    with SqsFixtures
+    with S3
+    with LocalVersionedHybridStore
     with SierraItemMergerTestUtil {
 
-  override protected def server = new EmbeddedHttpServer(
-    new Server(),
-    flags = Map(
-      "aws.sqs.queue.url" -> queueUrl,
-      "aws.sqs.waitTime" -> "1",
-      "aws.s3.bucketName" -> bucketName
-    ) ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
-      tableName) ++ s3LocalFlags
-  )
-
   it("stores an item from SQS") {
-    val id = "i1000001"
-    val bibId = "b1000001"
+    withLocalSqsQueue { queueUrl =>
+      withLocalS3Bucket { bucketName =>
+        withLocalDynamoDbTable { tableName =>
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(tableName)
+          withServer(flags) { _ =>
+            withVersionedHybridStore[SierraTransformable](bucketName, tableName) { hybridStore =>
+              val id = "i1000001"
+              val bibId = "b1000001"
 
-    val record = sierraItemRecord(
-      id = id,
-      updatedDate = "2001-01-01T01:01:01Z",
-      bibIds = List(bibId)
-    )
+              val record = sierraItemRecord(
+                id = id,
+                updatedDate = "2001-01-01T01:01:01Z",
+                bibIds = List(bibId)
+              )
 
-    sendItemRecordToSQS(record)
+              sendItemRecordToSQS(record, queueUrl = queueUrl)
 
-    val expectedSierraTransformable = SierraTransformable(
-      sourceId = bibId,
-      itemData = Map(id -> record)
-    )
+              val expectedSierraTransformable = SierraTransformable(
+                sourceId = bibId,
+                itemData = Map(id -> record)
+              )
 
-    assertStored(expectedSierraTransformable)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+            }
+          }
+        }
+      }
+    }
   }
 
   it("stores multiple items from SQS") {
-    val bibId1 = "b1000001"
+    withLocalSqsQueue { queueUrl =>
+      withLocalS3Bucket { bucketName =>
+        withLocalDynamoDbTable { tableName =>
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(tableName)
+          withServer(flags) { _ =>
+            withVersionedHybridStore[SierraTransformable](bucketName, tableName) { hybridStore =>
+              val bibId1 = "b1000001"
 
-    val id1 = "1000001"
+              val id1 = "1000001"
 
-    val record1 = sierraItemRecord(
-      id = id1,
-      updatedDate = "2001-01-01T01:01:01Z",
-      bibIds = List(bibId1)
-    )
+              val record1 = sierraItemRecord(
+                id = id1,
+                updatedDate = "2001-01-01T01:01:01Z",
+                bibIds = List(bibId1)
+              )
 
-    sendItemRecordToSQS(record1)
+              sendItemRecordToSQS(record1, queueUrl = queueUrl)
 
-    val bibId2 = "b2000002"
-    val id2 = "2000002"
+              val bibId2 = "b2000002"
+              val id2 = "2000002"
 
-    val record2 = sierraItemRecord(
-      id = id2,
-      updatedDate = "2002-02-02T02:02:02Z",
-      bibIds = List(bibId2)
-    )
+              val record2 = sierraItemRecord(
+                id = id2,
+                updatedDate = "2002-02-02T02:02:02Z",
+                bibIds = List(bibId2)
+              )
 
-    sendItemRecordToSQS(record2)
+              sendItemRecordToSQS(record2, queueUrl = queueUrl)
 
-    eventually {
-      val expectedSierraTransformable1 = SierraTransformable(
-        sourceId = bibId1,
-        itemData = Map(id1 -> record1)
-      )
+              eventually {
+                val expectedSierraTransformable1 = SierraTransformable(
+                  sourceId = bibId1,
+                  itemData = Map(id1 -> record1)
+                )
 
-      val expectedSierraTransformable2 = SierraTransformable(
-        sourceId = bibId2,
-        itemData = Map(id2 -> record2)
-      )
+                val expectedSierraTransformable2 = SierraTransformable(
+                  sourceId = bibId2,
+                  itemData = Map(id2 -> record2)
+                )
 
-      assertStored(expectedSierraTransformable1)
-      assertStored(expectedSierraTransformable2)
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable1)
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable2)
+              }
+            }
+          }
+        }
+      }
     }
+  }
+
+  private def sendItemRecordToSQS(itemRecord: SierraItemRecord, queueUrl: String) = {
+    val message = SQSMessage(
+      subject = Some("Test message sent by SierraItemMergerWorkerServiceTest"),
+      body = toJson(itemRecord).get,
+      topic = "topic",
+      messageType = "messageType",
+      timestamp = "2001-01-01T01:01:01Z"
+    )
+    sqsClient.sendMessage(queueUrl, toJson(message).get)
   }
 }
