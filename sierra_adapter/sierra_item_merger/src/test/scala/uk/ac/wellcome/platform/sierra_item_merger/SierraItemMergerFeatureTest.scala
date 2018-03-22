@@ -8,11 +8,13 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, S3, SqsFixtures}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
+    with ExtendedPatience
     with fixtures.Server
     with SqsFixtures
     with S3
@@ -42,7 +44,9 @@ class SierraItemMergerFeatureTest
                 itemData = Map(id -> record)
               )
 
-              assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              eventually {
+                assertStored[SierraTransformable](bucketName, tableName, expectedSierraTransformable)
+              }
             }
           }
         }
