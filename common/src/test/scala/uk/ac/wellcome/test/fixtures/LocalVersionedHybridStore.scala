@@ -2,6 +2,7 @@ package uk.ac.wellcome.test.fixtures
 
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
+import io.circe.Encoder
 import org.scalatest.{Assertion, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.aws.DynamoConfig
@@ -46,7 +47,7 @@ trait LocalVersionedHybridStore
     }
   }
 
-  def assertStored[T <: Id](bucketName: String, tableName: String, record: T) =
+  def assertStored[T <: Id](bucketName: String, tableName: String, record: T)(implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
       getJsonFor[T](bucketName, tableName, record),
       toJson(record).get
