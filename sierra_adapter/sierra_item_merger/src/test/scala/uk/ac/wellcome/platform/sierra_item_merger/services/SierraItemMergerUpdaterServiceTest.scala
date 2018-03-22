@@ -14,13 +14,16 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.mockito.Mockito._
 import org.mockito.Matchers._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SqsFixtures, TestWith}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
+    with Eventually
+    with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
     with LocalVersionedHybridStore
@@ -110,8 +113,7 @@ class SierraItemMergerUpdaterServiceTest
               )
             )
 
-            val f1 =
-              hybridStore.updateRecord(oldRecord.id)(
+            hybridStore.updateRecord(oldRecord.id)(
                 oldRecord
               )(identity)(SourceMetadata(oldRecord.sourceName))
 
@@ -133,32 +135,32 @@ class SierraItemMergerUpdaterServiceTest
               )
             )
 
-            val f2 =
-              hybridStore.updateRecord(newRecord.id)(
-                newRecord
-              )(identity)(SourceMetadata(newRecord.sourceName))
+            hybridStore.updateRecord(newRecord.id)(
+              newRecord
+            )(identity)(SourceMetadata(newRecord.sourceName))
 
-            whenReady(Future.sequence(List(f1, f2))) { _ =>
-              whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
-                val expectedNewSierraTransformable =
-                  SierraTransformable(
-                    sourceId = bibIdNotExisting,
-                    maybeBibData = None,
-                    itemData = Map(itemRecord.id -> itemRecord)
-                  )
+            sierraUpdaterService.update(itemRecord)
 
-                assertStored[SierraTransformable](bucketName, tableName, expectedNewSierraTransformable)
-
-                val expectedUpdatedSierraTransformable = oldRecord.copy(
-                  itemData = Map(
-                    itemId -> itemRecord,
-                    "i888" -> otherItem
-                  )
+            eventually {
+              val expectedNewSierraTransformable =
+                SierraTransformable(
+                  sourceId = bibIdNotExisting,
+                  maybeBibData = None,
+                  itemData = Map(itemRecord.id -> itemRecord)
                 )
 
-                assertStored[SierraTransformable](bucketName, tableName, expectedUpdatedSierraTransformable)
-                assertStored[SierraTransformable](bucketName, tableName, newRecord)
-              }
+              assertStored[SierraTransformable](bucketName, tableName, expectedNewSierraTransformable)
+
+              val expectedUpdatedSierraTransformable = oldRecord.copy(
+                itemData = Map(
+                  itemId -> itemRecord,
+                  "i888" -> otherItem
+                )
+              )
+
+              assertStored[SierraTransformable](bucketName, tableName, expectedUpdatedSierraTransformable)
+              assertStored[SierraTransformable](bucketName, tableName, newRecord)
+
             }
           }
         }
@@ -238,16 +240,14 @@ class SierraItemMergerUpdaterServiceTest
               sourceId = bibId2
             )
 
-            val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
+            hybridStore.updateRecord(sierraTransformable1.id)(
               sierraTransformable1
             )(_ => sierraTransformable1)(
               SourceMetadata(sierraTransformable1.sourceName))
 
-            val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
+            hybridStore.updateRecord(sierraTransformable2.id)(
               sierraTransformable2
             )(identity)(SourceMetadata(sierraTransformable2.sourceName))
-
-            val eventualUnits = Future.sequence(List(f1, f2))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -263,16 +263,17 @@ class SierraItemMergerUpdaterServiceTest
               )
             )
 
-            whenReady(eventualUnits.flatMap(_ =>
-              sierraUpdaterService.update(unlinkItemRecord))) { _ =>
-              val expectedSierraRecord1 = sierraTransformable1.copy(
-                itemData = Map.empty
-              )
+            sierraUpdaterService.update(unlinkItemRecord)
 
-              val expectedSierraRecord2 = sierraTransformable2.copy(
-                itemData = expectedItemData
-              )
+            val expectedSierraRecord1 = sierraTransformable1.copy(
+              itemData = Map.empty
+            )
 
+            val expectedSierraRecord2 = sierraTransformable2.copy(
+              itemData = expectedItemData
+            )
+
+            eventually {
               assertStored[SierraTransformable](bucketName, tableName, expectedSierraRecord1)
               assertStored[SierraTransformable](bucketName, tableName, expectedSierraRecord2)
             }
@@ -331,20 +332,22 @@ class SierraItemMergerUpdaterServiceTest
               itemRecord.id -> unlinkItemRecord
             )
 
-            whenReady(Future.sequence(List(f1, f2))) { _ =>
-              whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
-                val expectedSierraRecord1 = sierraTransformable1.copy(
-                  itemData = Map.empty
-                )
+            sierraUpdaterService.update(unlinkItemRecord)
 
-                // In this situation the item was already linked to sierraTransformable2
-                // but the modified date is updated in line with the item update
-                val expectedSierraRecord2 = sierraTransformable2.copy(
-                  itemData = expectedItemData
-                )
+            val expectedSierraRecord1 = sierraTransformable1.copy(
+              itemData = Map.empty
+            )
 
-                assertStored[SierraTransformable](bucketName, tableName, expectedSierraRecord1)
-              }
+            // In this situation the item was already linked to sierraTransformable2
+            // but the modified date is updated in line with the item update
+            val expectedSierraRecord2 = sierraTransformable2.copy(
+              itemData = expectedItemData
+            )
+
+
+            eventually {
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraRecord1)
+              assertStored[SierraTransformable](bucketName, tableName, expectedSierraRecord2)
             }
           }
         }
@@ -442,7 +445,7 @@ class SierraItemMergerUpdaterServiceTest
                 ))
             )
 
-            val f1 = hybridStore.updateRecord(sierraRecord.id)(
+            hybridStore.updateRecord(sierraRecord.id)(
               sierraRecord
             )(identity)(SourceMetadata(sierraRecord.sourceName))
 
@@ -452,10 +455,10 @@ class SierraItemMergerUpdaterServiceTest
               bibIds = List(bibId)
             )
 
-            whenReady(f1) { _ =>
-              whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
-                assertStored[SierraTransformable](bucketName, tableName, sierraRecord)
-              }
+            sierraUpdaterService.update(oldItemRecord)
+
+            eventually {
+              assertStored[SierraTransformable](bucketName, tableName, sierraRecord)
             }
           }
         }
