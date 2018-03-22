@@ -70,6 +70,15 @@ trait ElasticsearchFixtures
 
     index.create.await
 
+    // Elasticsearch is eventually consistent, so the future
+    // completing doesn't actually mean that the index exists yet
+    eventually {
+      elasticClient
+        .execute(indexExists(index.indexName))
+        .await
+        .isExists should be(true)
+    }
+
     try {
       testWith(index.indexName)
     } finally {
