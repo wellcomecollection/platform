@@ -17,6 +17,7 @@ case class Identifiable[T](agent: T,
     extends IdentityState[T]
     with IdentifieableOrUnidentifiable[T]
 
-case class Unidentifiable[T](agent: T) extends IdentityState[T]
+case class Unidentifiable[T](agent: T)
+    extends IdentityState[T]
     with IdentifiedOrUnidentifiable[T]
     with IdentifieableOrUnidentifiable[T]
