@@ -295,10 +295,10 @@ class SierraBibMergerFeatureTest
     }
   }
 
-  private def sendMessageToSQS(message: String, queueUrl: String) = {
+  private def sendMessageToSQS(body: String, queueUrl: String) = {
     val message = SQSMessage(
       subject = Some("Test message sent by SierraBibMergerWorkerServiceTest"),
-      body = message,
+      body = body,
       topic = "topic",
       messageType = "messageType",
       timestamp = "2001-01-01T01:01:01Z"
