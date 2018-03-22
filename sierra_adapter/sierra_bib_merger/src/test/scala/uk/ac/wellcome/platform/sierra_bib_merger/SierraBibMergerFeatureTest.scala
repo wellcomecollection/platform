@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
+import io.circe.Encoder
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
@@ -57,6 +58,8 @@ class SierraBibMergerFeatureTest
       |      }
       |    }
     """.stripMargin
+
+  implicit val encoder = Encoder[SierraTransformable]
 
   it("should store a bib in the hybrid store") {
     withLocalSqsQueue { queueUrl =>
