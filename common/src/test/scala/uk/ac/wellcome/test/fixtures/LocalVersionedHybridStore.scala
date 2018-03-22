@@ -14,7 +14,8 @@ trait LocalVersionedHybridStore extends LocalDynamoDb[HybridRecord] with S3 {
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  def withVersionedDao(tableName: String)(testWith: TestWith[VersionedDao, Assertion]) {
+  def withVersionedDao(tableName: String)(
+    testWith: TestWith[VersionedDao, Assertion]) {
     val dao = new VersionedDao(
       dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(tableName)

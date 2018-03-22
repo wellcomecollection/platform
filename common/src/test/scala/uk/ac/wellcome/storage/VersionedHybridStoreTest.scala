@@ -33,17 +33,19 @@ class VersionedHybridStoreTest
   it("stores a versioned record if it has never been seen before") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val record = ExampleRecord(
-            id = "1111",
-            content = "One ocelot in orange"
-          )
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val record = ExampleRecord(
+              id = "1111",
+              content = "One ocelot in orange"
+            )
 
-          val future = hybridStore.updateRecord(record.id)(record)(identity)()
+            val future =
+              hybridStore.updateRecord(record.id)(record)(identity)()
 
-          whenReady(future) { _ =>
-            getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
-          }
+            whenReady(future) { _ =>
+              getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
+            }
         }
       }
     }
@@ -52,25 +54,26 @@ class VersionedHybridStoreTest
   it("applies the given transformation to an existing record") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val record = ExampleRecord(
-            id = "1111",
-            content = "One ocelot in orange"
-          )
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val record = ExampleRecord(
+              id = "1111",
+              content = "One ocelot in orange"
+            )
 
-          val expectedRecord = record.copy(content = "new content")
+            val expectedRecord = record.copy(content = "new content")
 
-          val t = (e: ExampleRecord) => e.copy(content = "new content")
+            val t = (e: ExampleRecord) => e.copy(content = "new content")
 
-          val future =
-            hybridStore
-              .updateRecord(record.id)(record)(identity)()
-              .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
+            val future =
+              hybridStore
+                .updateRecord(record.id)(record)(identity)()
+                .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
-          whenReady(future) { _ =>
-            getJsonFor(bucketName, tableName, record) shouldBe toJson(
-              expectedRecord).get
-          }
+            whenReady(future) { _ =>
+              getJsonFor(bucketName, tableName, record) shouldBe toJson(
+                expectedRecord).get
+            }
         }
       }
     }
@@ -79,27 +82,29 @@ class VersionedHybridStoreTest
   it("updates DynamoDB and S3 if it sees a new version of a record") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val record = ExampleRecord(
-            id = "2222",
-            content = "Two teal turtles in Tenerife"
-          )
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val record = ExampleRecord(
+              id = "2222",
+              content = "Two teal turtles in Tenerife"
+            )
 
-          val updatedRecord = record.copy(
-            content = "Throwing turquoise tangerines in Tanzania"
-          )
+            val updatedRecord = record.copy(
+              content = "Throwing turquoise tangerines in Tanzania"
+            )
 
-          val future = hybridStore.updateRecord(record.id)(record)(identity)()
+            val future =
+              hybridStore.updateRecord(record.id)(record)(identity)()
 
-          val updatedFuture = future.flatMap { _ =>
-            hybridStore.updateRecord(updatedRecord.id)(updatedRecord)(_ =>
-              updatedRecord)()
-          }
+            val updatedFuture = future.flatMap { _ =>
+              hybridStore.updateRecord(updatedRecord.id)(updatedRecord)(_ =>
+                updatedRecord)()
+            }
 
-          whenReady(updatedFuture) { _ =>
-            getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(
-              updatedRecord).get
-          }
+            whenReady(updatedFuture) { _ =>
+              getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(
+                updatedRecord).get
+            }
         }
       }
     }
@@ -108,12 +113,13 @@ class VersionedHybridStoreTest
   it("returns a future of None for a non-existent record") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val future = hybridStore.getRecord(id = "does/notexist")
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val future = hybridStore.getRecord(id = "does/notexist")
 
-          whenReady(future) { result =>
-            result shouldBe None
-          }
+            whenReady(future) { result =>
+              result shouldBe None
+            }
         }
       }
     }
@@ -122,22 +128,23 @@ class VersionedHybridStoreTest
   it("returns a future of Some[ExampleRecord] if the record exists") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val record = ExampleRecord(
-            id = "5555",
-            content = "Five fishing flinging flint"
-          )
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val record = ExampleRecord(
+              id = "5555",
+              content = "Five fishing flinging flint"
+            )
 
-          val putFuture =
-            hybridStore.updateRecord(record.id)(record)(identity)()
+            val putFuture =
+              hybridStore.updateRecord(record.id)(record)(identity)()
 
-          val getFuture = putFuture.flatMap { _ =>
-            hybridStore.getRecord(record.id)
-          }
+            val getFuture = putFuture.flatMap { _ =>
+              hybridStore.getRecord(record.id)
+            }
 
-          whenReady(getFuture) { result =>
-            result shouldBe Some(record)
-          }
+            whenReady(getFuture) { result =>
+              result shouldBe Some(record)
+            }
         }
       }
     }
@@ -146,19 +153,20 @@ class VersionedHybridStoreTest
   it("does not allow creation of records with a different id than indicated") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val record = ExampleRecord(
-            id = "8934",
-            content = "Five fishing flinging flint"
-          )
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val record = ExampleRecord(
+              id = "8934",
+              content = "Five fishing flinging flint"
+            )
 
-          val future =
-            hybridStore.updateRecord(id = "not_the_same_id")(record)(
-              identity)()
+            val future =
+              hybridStore.updateRecord(id = "not_the_same_id")(record)(
+                identity)()
 
-          whenReady(future.failed) { e: Throwable =>
-            e shouldBe a[IllegalArgumentException]
-          }
+            whenReady(future.failed) { e: Throwable =>
+              e shouldBe a[IllegalArgumentException]
+            }
         }
       }
     }
@@ -167,23 +175,24 @@ class VersionedHybridStoreTest
   it("does not allow transformation to a record with a different id") {
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val record = ExampleRecord(
-            id = "8934",
-            content = "Five fishing flinging flint"
-          )
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val record = ExampleRecord(
+              id = "8934",
+              content = "Five fishing flinging flint"
+            )
 
-          val recordWithDifferentId = record.copy(id = "not_the_same_id")
+            val recordWithDifferentId = record.copy(id = "not_the_same_id")
 
-          val future = for {
-            _ <- hybridStore.updateRecord(record.id)(record)(identity)()
-            _ <- hybridStore.updateRecord(record.id)(record)(_ =>
-              recordWithDifferentId)()
-          } yield ()
+            val future = for {
+              _ <- hybridStore.updateRecord(record.id)(record)(identity)()
+              _ <- hybridStore.updateRecord(record.id)(record)(_ =>
+                recordWithDifferentId)()
+            } yield ()
 
-          whenReady(future.failed) { e: Throwable =>
-            e shouldBe a[IllegalArgumentException]
-          }
+            whenReady(future.failed) { e: Throwable =>
+              e shouldBe a[IllegalArgumentException]
+            }
         }
       }
     }
@@ -214,23 +223,24 @@ class VersionedHybridStoreTest
 
     withLocalS3Bucket { bucketName =>
       withLocalDynamoDbTable { tableName =>
-        withVersionedHybridStore[ExampleRecord](bucketName, tableName) { hybridStore =>
-          val future =
-            hybridStore.updateRecord(record.id)(record)(identity)(data)
+        withVersionedHybridStore[ExampleRecord](bucketName, tableName) {
+          hybridStore =>
+            val future =
+              hybridStore.updateRecord(record.id)(record)(identity)(data)
 
-          whenReady(future) { _ =>
-            val maybeResult =
-              Scanamo.get[ExtraData](dynamoDbClient)(tableName)(
-                'id -> record.id)
+            whenReady(future) { _ =>
+              val maybeResult =
+                Scanamo.get[ExtraData](dynamoDbClient)(tableName)(
+                  'id -> record.id)
 
-            maybeResult shouldBe defined
-            maybeResult.get.isRight shouldBe true
+              maybeResult shouldBe defined
+              maybeResult.get.isRight shouldBe true
 
-            val extraData = maybeResult.get.right.get
+              val extraData = maybeResult.get.right.get
 
-            extraData.data shouldBe "a tragic triangle of triffids"
-            extraData.number shouldBe 6
-          }
+              extraData.data shouldBe "a tragic triangle of triffids"
+              extraData.number shouldBe 6
+            }
         }
       }
     }
