@@ -56,8 +56,8 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
 
       if (obj.contains("type")) {
         (("type", Json.fromString("Identified")) +:
-        ("canonicalId", Json.fromString(canonicalId)) +: obj)
-        .remove("sourceIdentifier")
+          ("canonicalId", Json.fromString(canonicalId)) +: obj)
+          .remove("sourceIdentifier")
       } else {
         ("canonicalId", Json.fromString(canonicalId)) +: obj
       }
