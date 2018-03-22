@@ -48,5 +48,4 @@ trait LocalVersionedHybridStore extends LocalDynamoDb[HybridRecord] with S3 {
 
     getJsonFromS3(bucketName, hybridRecord.s3key).noSpaces
   }
-
 }
