@@ -9,6 +9,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.SourceMetadata
+import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SqsFixtures}
 
 import scala.concurrent.ExecutionContext.Implicits.global
