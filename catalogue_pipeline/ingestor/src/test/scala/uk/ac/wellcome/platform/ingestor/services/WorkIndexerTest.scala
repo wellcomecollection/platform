@@ -119,8 +119,9 @@ class WorkIndexerTest
                  visible: Boolean = true,
                  version: Int = 1): IdentifiedWork = {
     val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
-      sourceId
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = sourceId
     )
 
     IdentifiedWork(

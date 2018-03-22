@@ -32,7 +32,7 @@ class IngestorFeatureTest
 
   it("reads an identified work from the queue and ingests it") {
     val sourceIdentifier =
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "5678")
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", "5678")
 
     val workString = JsonUtil
       .toJson(
