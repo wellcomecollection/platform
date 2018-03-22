@@ -81,7 +81,7 @@ trait WorksUtil {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work","5678")
+        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "5678")
       ),
       canonicalId = canonicalId,
       thumbnail = Some(thumbnail)
