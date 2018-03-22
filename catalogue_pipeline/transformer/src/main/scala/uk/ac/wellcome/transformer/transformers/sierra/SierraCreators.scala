@@ -31,7 +31,7 @@ trait SierraCreators extends MarcUtils {
             prefix = prefixString,
             numeration = numeration)
 
-          identify(codes, person)
+          identify(codes, person, "Person")
       }
 
     val organisations =
@@ -43,19 +43,19 @@ trait SierraCreators extends MarcUtils {
           case MarcSubfield("0", content) => content
         }
         val organisation = Organisation(name.get)
-        identify(codes, organisation)
+        identify(codes, organisation, "Organisation")
       }
 
     persons ++ organisations
   }
 
-  private def identify(codes: List[String], agent: AbstractAgent) = {
+  private def identify(codes: List[String], agent: AbstractAgent, ontologyType: String) = {
     codes.distinct match {
       case Nil => Unidentifiable(agent)
       case Seq(code) =>
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.libraryOfCongressNames,
-          ontologyType = agent.ontologyType,
+          ontologyType = ontologyType,
           value = code.trim)
         Identifiable(agent, sourceIdentifier, List(sourceIdentifier))
       case _ =>
