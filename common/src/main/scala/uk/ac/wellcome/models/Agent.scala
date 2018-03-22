@@ -6,11 +6,11 @@ sealed trait AbstractAgent {
 
 case class Agent(
   label: String
-                ) extends AbstractAgent
+) extends AbstractAgent
 
 case class Organisation(
   label: String
-                       ) extends AbstractAgent
+) extends AbstractAgent
 
 case class Person(label: String,
                   prefix: Option[String] = None,
