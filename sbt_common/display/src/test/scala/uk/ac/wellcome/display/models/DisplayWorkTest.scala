@@ -47,6 +47,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
   val sourceIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.sierraSystemNumber,
+    ontologyType = "Work",
     value = "b1234567"
   )
 
