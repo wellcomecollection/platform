@@ -643,13 +643,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-<<<<<<< HEAD
   it("includes genre information in API responses") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
-=======
-  it("should include genre information in API responses") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
->>>>>>> Give the type system some help, it's a bit dim today
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
         val workWithSubjects = IdentifiedWork(
@@ -832,14 +827,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-<<<<<<< HEAD
   it("looks at different indices based on the ?index query parameter") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
-=======
-  it(
-    "can look at different Elasticsearch indices based on the ?index query parameter") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
->>>>>>> Give the type system some help, it's a bit dim today
       val flags = esLocalFlags(indexName, itemType)
       withLocalElasticsearchIndex(itemType = itemType) { altIndexName =>
         withServer(flags) { server =>
@@ -900,14 +889,9 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-<<<<<<< HEAD
   it("searches different indices based on the ?_index query parameter") {
     withLocalElasticsearchIndex(itemType) { indexName =>
-=======
-  it(
-    "can search different Elasticsearch indices based on the ?_index query parameter") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
->>>>>>> Give the type system some help, it's a bit dim today
       val flags = esLocalFlags(indexName, itemType)
       withLocalElasticsearchIndex(itemType = itemType) { altIndexName =>
         withServer(flags) { server =>
@@ -1008,8 +992,6 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-<<<<<<< HEAD
-=======
     "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
@@ -1027,7 +1009,6 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
->>>>>>> Give the type system some help, it's a bit dim today
     "returns a Bad Request error if asked for an invalid include on an individual work") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
@@ -1043,8 +1024,6 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-<<<<<<< HEAD
-=======
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
@@ -1131,7 +1110,6 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
->>>>>>> Give the type system some help, it's a bit dim today
   it("returns Not Found if you look up a non-existent index") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
