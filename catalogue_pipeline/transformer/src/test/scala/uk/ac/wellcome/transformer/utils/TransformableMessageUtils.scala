@@ -18,7 +18,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.test.utils.S3Local
 import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableMessageUtils {
