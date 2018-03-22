@@ -49,7 +49,9 @@ trait SierraCreators extends MarcUtils {
     persons ++ organisations
   }
 
-  private def identify(codes: List[String], agent: AbstractAgent, ontologyType: String) = {
+  private def identify(codes: List[String],
+                       agent: AbstractAgent,
+                       ontologyType: String) = {
     codes.distinct match {
       case Nil => Unidentifiable(agent)
       case Seq(code) =>
