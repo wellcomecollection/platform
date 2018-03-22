@@ -890,7 +890,6 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it("searches different indices based on the ?_index query parameter") {
-    withLocalElasticsearchIndex(itemType) { indexName =>
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withLocalElasticsearchIndex(itemType = itemType) { altIndexName =>
