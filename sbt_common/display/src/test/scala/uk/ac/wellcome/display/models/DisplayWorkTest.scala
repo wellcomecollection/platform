@@ -96,8 +96,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        DisplayAgent(label = "Henry Hare", ontologyType = "Agent"),
-        DisplayAgent(label = "Harriet Heron", ontologyType = "Agent")
+        DisplayAgent(id = None, identifiers = None, label = "Henry Hare", ontologyType = "Agent"),
+        DisplayAgent(id = None, identifiers = None, label = "Harriet Heron", ontologyType = "Agent")
       )
     }
 
@@ -116,8 +116,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        DisplayAgent(label = "Janet Jackson"),
-        DisplayOrganisation(label = "Juniper Journals")
+        DisplayAgent(id = None, identifiers = None, label = "Janet Jackson"),
+        DisplayOrganisation(id = None, identifiers = None, label = "Juniper Journals")
       )
     }
   }
@@ -137,8 +137,8 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
     val displayWork = DisplayWork(work)
     displayWork.creators shouldBe List(
-      DisplayPerson(label = "Esmerelda Weatherwax", prefix = Some("Witch")),
-      DisplayOrganisation(label = "Juniper Journals")
+      DisplayPerson(id = None, identifiers = None, label = "Esmerelda Weatherwax", prefix = Some("Witch")),
+      DisplayOrganisation(id = None, identifiers = None, label = "Juniper Journals")
     )
   }
 

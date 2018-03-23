@@ -112,11 +112,11 @@ class ApiWorksTestBase
   def identifiedOrUnidentifiable[T](displayableAgent: IdentifiedOrUnidentifiable[T], f :T => String) =
     displayableAgent match {
       case Unidentifiable(ag) => f(ag)
-      case Identified(ag, canonicalId, identifiers) =>
+      case Identified(ag, id, identifiers) =>
         val agent = parse(f(ag)).right.get.asObject.get
         val identifiersJson = identifiers.map{sourceIdentifier=>
           parse(identifier(sourceIdentifier)).right.get}
-        val newJson = ("canonicalId", Json.fromString(canonicalId)) +: ("identifiers", Json.arr(identifiersJson : _*)) +: agent
+        val newJson = ("id", Json.fromString(id)) +: ("identifiers", Json.arr(identifiersJson : _*)) +: agent
         Json.fromJsonObject(newJson).spaces2
     }
 
