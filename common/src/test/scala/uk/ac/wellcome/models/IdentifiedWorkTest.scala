@@ -73,7 +73,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "creators": [
       |    {
       |      "label": "47",
-      |      "ontologyType": "Agent"
+      |      "ontologyType": "Agent",
+      |      "type": "Agent"
       |    }
       |  ],
       |  "genres": [
