@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Article"@en ;
     dcterms:created "2018-01-15"^^xsd:date ;
-    dcterms:description "An article ontology describing the type of articles created by Wellcome."@en .
+    dcterms:description "An ontology describing editorial articles and their relationships."@en .
 
 ###### classes ###  
     
