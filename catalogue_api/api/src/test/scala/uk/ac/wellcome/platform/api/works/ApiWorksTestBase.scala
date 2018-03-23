@@ -106,8 +106,8 @@ class ApiWorksTestBase
 
   def abstractAgent(ag: AbstractAgent) =
     ag match {
-      case a :Agent =>  agent(a)
-      case o :Organisation =>  organisation(o)
+      case a: Agent => agent(a)
+      case o: Organisation => organisation(o)
       case p: Person => person(p)
     }
 
