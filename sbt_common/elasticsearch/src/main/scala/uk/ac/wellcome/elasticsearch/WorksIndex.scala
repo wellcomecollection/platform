@@ -92,12 +92,13 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
-  def indentified(fieldName: String, fields: Seq[FieldDefinition]) = objectField(fieldName).fields(
-    textField("type"),
-    objectField("agent").fields(fields),
-    keywordField("canonicalId"),
-    identifiers
-  )
+  def indentified(fieldName: String, fields: Seq[FieldDefinition]) =
+    objectField(fieldName).fields(
+      textField("type"),
+      objectField("agent").fields(fields),
+      keywordField("canonicalId"),
+      identifiers
+    )
 
   val agent = Seq(
     textField("label"),
