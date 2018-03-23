@@ -15,21 +15,20 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
         "type": "Concept",
         "ontologyType": "Concept",
         "label": "Woodwork",
-        "qualifierType": null,
-        "qualifiers": []
+        "qualifierType": null
       }"""
     ),
     (
       QualifiedConcept(
         label = "Dangerous diseases",
         concept = Concept(
-          label = "disease",
-          qualifiers = List(
-            Concept(
-              qualifierType = "general-subdivision",
-              label = "dispersion & direction"
-            )
-          )
+          label = "disease"
+//          qualifiers = List(
+//            Concept(
+//              qualifierType = "general-subdivision",
+//              label = "dispersion & direction"
+//            )
+//          )
         )
       ),
       s"""{
@@ -39,15 +38,7 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
         "concept": {
           "label": "disease",
           "ontologyType": "Concept",
-          "qualifierType": null,
-          "qualifiers": [
-            {
-              "label": "dispersion & direction",
-              "ontologyType": "Concept",
-              "qualifierType": "general-subdivision",
-              "qualifiers": []
-            }
-          ]
+          "qualifierType": null
         }
       }"""
     )
