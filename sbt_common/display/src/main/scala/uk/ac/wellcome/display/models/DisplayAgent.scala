@@ -21,12 +21,11 @@ case object DisplayAbstractAgent {
     agent match {
       case a: Agent =>
         DisplayAgent(
-          label = a.label,
-          ontologyType = a.ontologyType
+          label = a.label
         )
       case p: Person =>
-        DisplayPerson(p.label, p.prefix, p.numeration, p.ontologyType)
-      case o: Organisation => DisplayOrganisation(o.label, o.ontologyType)
+        DisplayPerson(label = p.label, prefix = p.prefix, numeration = p.numeration)
+      case o: Organisation => DisplayOrganisation(o.label)
 
     }
 }
