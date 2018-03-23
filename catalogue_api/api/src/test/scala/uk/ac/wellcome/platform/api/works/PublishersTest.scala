@@ -77,8 +77,8 @@ class PublishersTest extends ApiWorksTestBase {
           |      "subjects": [ ],
           |      "genres": [ ],
           |      "publishers": [
-          |        ${abstractAgent(work.publishers(0))},
-          |        ${abstractAgent(work.publishers(1))}
+          |        ${identifiedOrUnidentifiable(work.publishers(0), abstractAgent)},
+          |        ${identifiedOrUnidentifiable(work.publishers(1), abstractAgent)}
           |      ],
           |      "placesOfPublication": [ ]
           |    }
@@ -122,9 +122,9 @@ class PublishersTest extends ApiWorksTestBase {
           |      "subjects": [ ],
           |      "genres": [ ],
           |      "publishers": [
-          |        ${abstractAgent(work.publishers(0))},
-          |        ${abstractAgent(work.publishers(1))},
-          |        ${abstractAgent(work.publishers(2))}
+          |        ${identifiedOrUnidentifiable(work.publishers(0), abstractAgent)},
+          |        ${identifiedOrUnidentifiable(work.publishers(1), abstractAgent)},
+          |        ${identifiedOrUnidentifiable(work.publishers(2), abstractAgent)}
           |      ],
           |      "placesOfPublication": [ ]
           |    }

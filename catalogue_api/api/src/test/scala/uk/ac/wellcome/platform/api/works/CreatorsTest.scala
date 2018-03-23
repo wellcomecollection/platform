@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
-import uk.ac.wellcome.models.{Agent, IdentifiedWork, Organisation, Person}
+import uk.ac.wellcome.models._
 
 class CreatorsTest extends ApiWorksTestBase {
 
@@ -49,12 +49,9 @@ class CreatorsTest extends ApiWorksTestBase {
       version = 1,
       title = Some("Vultures vying for victory"),
       creators = List(
-        Agent("Vivian Violet"),
-        Organisation("Verily Volumes"),
-        Person(
-          label = "Havelock Vetinari",
-          prefix = Some("Lord Patrician"),
-          numeration = Some("I"))
+        Unidentifiable(Agent("Vivian Violet")),
+        Unidentifiable(Organisation("Verily Volumes")),
+        Unidentifiable(Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I")))
       )
     )
 
@@ -73,9 +70,9 @@ class CreatorsTest extends ApiWorksTestBase {
           |      "id": "${work.canonicalId}",
           |      "title": "${work.title.get}",
           |      "creators": [
-          |        ${abstractAgent(work.creators(0))},
-          |        ${abstractAgent(work.creators(1))},
-          |        ${abstractAgent(work.creators(2))}
+          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
+          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
+          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)}
           |      ],
           |      "subjects": [ ],
           |      "genres": [ ],
