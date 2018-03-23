@@ -116,13 +116,14 @@ class ElasticSearchIndexTest
           JsonUtil.toJson(compatibleTestObject).get
 
         val futureInsert = elasticClient.execute(
-              indexInto(testIndexName / testType) doc compatibleTestObjectJson)
+          indexInto(testIndexName / testType) doc compatibleTestObjectJson)
 
         whenReady(futureInsert) { _ =>
           eventually {
             val hits = elasticClient
               .execute(search(s"$testIndexName/$testType").matchAllQuery())
-              .map { _.hits.hits }.await
+              .map { _.hits.hits }
+              .await
 
             hits should have size 1
 
