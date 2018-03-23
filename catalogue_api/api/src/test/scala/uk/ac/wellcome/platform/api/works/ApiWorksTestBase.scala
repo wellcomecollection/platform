@@ -104,23 +104,35 @@ class ApiWorksTestBase
       "value": "${identifier.value}"
     }"""
 
-  def agent(ag: AbstractAgent) =
+  def abstractAgent(ag: AbstractAgent) =
     ag match {
-      case a :Agent =>  s"""{
-        "type": "Agent",
-        "label": "${a.label}"
+      case a :Agent =>  agent(a)
+      case o :Organisation =>  organisation(o)
+      case p: Person => person(p)
+    }
+
+  def person(p: Person) = {
+    s"""{
+        "type": "Person",
+        ${optionalString("prefix", p.prefix)},
+        ${optionalString("numeration", p.numeration)},
+        "label": "${p.label}"
       }"""
-      case o :Organisation =>  s"""{
+  }
+
+  def organisation(o: Organisation) = {
+    s"""{
         "type": "Organisation",
         "label": "${o.label}"
       }"""
-      case p: Person => s"""{
-        "type": "Person",
-        ${optionalString("prefix",p.prefix)},
-        ${optionalString("numeration", p.prefix)},
-        "label": "${p.label}"
+  }
+
+  def agent(a: Agent) = {
+    s"""{
+        "type": "Agent",
+        "label": "${a.label}"
       }"""
-    }
+  }
 
   def optionalString(fieldName: String, maybeValue: Option[String]) =
     maybeValue match {
