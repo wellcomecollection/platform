@@ -9,6 +9,10 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.{Server, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil._
+import io.circe.parser._
+import cats.syntax.either._
+import io.circe.optics.JsonPath
+import io.circe.optics.JsonPath.root
 
 class ApiWorksTestBase
     extends FunSpec
@@ -103,6 +107,18 @@ class ApiWorksTestBase
       "identifierScheme": "${identifier.identifierScheme}",
       "value": "${identifier.value}"
     }"""
+
+  def identifiedOrUnidentifiable[T](displayableAgent: IdentifiedOrUnidentifiable[T], f :T => String) =
+    displayableAgent match {
+      case Unidentifiable(ag) => f(ag)
+      case Identified(ag, canonicalId, identifiers) =>
+        val agent = parse(f(ag)).right.get
+        val agentWithCanonicalId = root.canonicalId.string.modify(_ => canonicalId)(agent)
+        root.identifiers.arr.modify(_ => identifiers.map{sourceIdentifier=>
+          parse(identifier(sourceIdentifier)).right.get
+        }.toVector)(agentWithCanonicalId).spaces2
+
+    }
 
   def abstractAgent(ag: AbstractAgent) =
     ag match {
