@@ -92,6 +92,14 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
+  def agent(fieldName: String) = objectField(fieldName).fields(
+    textField("label"),
+    keywordField("type"),
+    keywordField("prefix"),
+    keywordField("numeration"),
+    keywordField("ontologyType")
+  )
+
   val items = objectField("items").fields(
     keywordField("canonicalId"),
     sourceIdentifier,
@@ -100,12 +108,6 @@ class WorksIndex @Inject()(client: HttpClient,
     booleanField("visible"),
     keywordField("ontologyType")
   )
-  val publishers = objectField("publishers").fields(
-    textField("label"),
-    keywordField("type"),
-    keywordField("ontologyType")
-  )
-
   val language = objectField("language").fields(
     keywordField("id"),
     textField("label"),
@@ -132,12 +134,12 @@ class WorksIndex @Inject()(client: HttpClient,
       textField("lettering").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
-      labelledTextField("creators"),
+      agent("creators"),
       concept("subjects"),
       concept("genres"),
       labelledTextField("placesOfPublication"),
       items,
-      publishers,
+      agent("publishers"),
       date("publicationDate"),
       language,
       location("thumbnail")
