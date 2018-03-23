@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Works ontology"@en ;
     dcterms:created "2017-02-13"^^xsd:date ;
-    dcterms:description "Ontology describing the properties of works"@en .
+    dcterms:description "An ontology describing library and archive works, including their physical items and relationships."@en .
     
 #######  Classes #####  
 
