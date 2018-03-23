@@ -42,7 +42,7 @@ case class DisplayWork(
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) creators: List[DisplayAbstractAgent] = List(),
@@ -70,7 +70,7 @@ case class DisplayWork(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
