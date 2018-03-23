@@ -104,11 +104,32 @@ class ApiWorksTestBase
       "value": "${identifier.value}"
     }"""
 
-  def agent(ag: Agent) =
-    s"""{
-      "type": "Agent",
-      "label": "${ag.label}"
-    }"""
+  def agent(ag: AbstractAgent) =
+    ag match {
+      case a :Agent =>  s"""{
+        "type": "Agent",
+        "label": "${a.label}"
+      }"""
+      case o :Organisation =>  s"""{
+        "type": "Organisation",
+        "label": "${o.label}"
+      }"""
+      case p: Person => s"""{
+        "type": "Person",
+        ${optionalString("prefix",p.prefix)},
+        ${optionalString("numeration", p.prefix)},
+        "label": "${p.label}"
+      }"""
+    }
+
+  def optionalString(fieldName: String, maybeValue: Option[String]) =
+    maybeValue match {
+      case None => ""
+      case Some(p) =>
+        s"""
+           "$fieldName": "$p"
+         """
+    }
 
   def period(p: Period) =
     s"""{
