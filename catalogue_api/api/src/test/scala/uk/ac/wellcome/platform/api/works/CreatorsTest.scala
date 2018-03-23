@@ -51,7 +51,11 @@ class CreatorsTest extends ApiWorksTestBase {
       creators = List(
         Unidentifiable(Agent("Vivian Violet")),
         Unidentifiable(Organisation("Verily Volumes")),
-        Unidentifiable(Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I")))
+        Unidentifiable(
+          Person(
+            label = "Havelock Vetinari",
+            prefix = Some("Lord Patrician"),
+            numeration = Some("I")))
       )
     )
 
@@ -70,9 +74,15 @@ class CreatorsTest extends ApiWorksTestBase {
           |      "id": "${work.canonicalId}",
           |      "title": "${work.title.get}",
           |      "creators": [
-          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.creators(1), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.creators(2), abstractAgent)}
+          |        ${identifiedOrUnidentifiable(
+                            work.creators(0),
+                            abstractAgent)},
+          |        ${identifiedOrUnidentifiable(
+                            work.creators(1),
+                            abstractAgent)},
+          |        ${identifiedOrUnidentifiable(
+                            work.creators(2),
+                            abstractAgent)}
           |      ],
           |      "subjects": [ ],
           |      "genres": [ ],
@@ -93,9 +103,36 @@ class CreatorsTest extends ApiWorksTestBase {
       version = 1,
       title = Some("Vultures vying for victory"),
       creators = List(
-        Identified(Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I")), canonicalId="hgfedcba", identifiers = List(SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, ontologyType = "Organisation",value = "hv"))),
-        Identified(Organisation(label = "Unseen University"), canonicalId = "abcdefgh", identifiers = List(SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, ontologyType = "Organisation",value = "uu"))),
-        Identified(Agent(label = "The Librarian"), canonicalId = "blahbluh", identifiers = List(SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, ontologyType = "Organisation",value = "uu")))
+        Identified(
+          Person(
+            label = "Havelock Vetinari",
+            prefix = Some("Lord Patrician"),
+            numeration = Some("I")),
+          canonicalId = "hgfedcba",
+          identifiers = List(
+            SourceIdentifier(
+              IdentifierSchemes.libraryOfCongressNames,
+              ontologyType = "Organisation",
+              value = "hv"))
+        ),
+        Identified(
+          Organisation(label = "Unseen University"),
+          canonicalId = "abcdefgh",
+          identifiers = List(
+            SourceIdentifier(
+              IdentifierSchemes.libraryOfCongressNames,
+              ontologyType = "Organisation",
+              value = "uu"))
+        ),
+        Identified(
+          Agent(label = "The Librarian"),
+          canonicalId = "blahbluh",
+          identifiers = List(
+            SourceIdentifier(
+              IdentifierSchemes.libraryOfCongressNames,
+              ontologyType = "Organisation",
+              value = "uu"))
+        )
       )
     )
 
@@ -114,9 +151,15 @@ class CreatorsTest extends ApiWorksTestBase {
                           |      "id": "${work.canonicalId}",
                           |      "title": "${work.title.get}",
                           |      "creators": [
-                          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
-                          |        ${identifiedOrUnidentifiable(work.creators(1), abstractAgent)},
-                          |        ${identifiedOrUnidentifiable(work.creators(2), abstractAgent)}
+                          |        ${identifiedOrUnidentifiable(
+                            work.creators(0),
+                            abstractAgent)},
+                          |        ${identifiedOrUnidentifiable(
+                            work.creators(1),
+                            abstractAgent)},
+                          |        ${identifiedOrUnidentifiable(
+                            work.creators(2),
+                            abstractAgent)}
                           |      ],
                           |      "subjects": [ ],
                           |      "genres": [ ],
