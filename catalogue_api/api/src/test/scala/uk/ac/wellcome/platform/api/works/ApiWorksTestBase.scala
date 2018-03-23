@@ -11,6 +11,7 @@ import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.utils.JsonUtil._
 import io.circe.parser._
 import cats.syntax.either._
+import io.circe.{Json, JsonObject}
 import io.circe.optics.JsonPath
 import io.circe.optics.JsonPath.root
 
@@ -112,12 +113,11 @@ class ApiWorksTestBase
     displayableAgent match {
       case Unidentifiable(ag) => f(ag)
       case Identified(ag, canonicalId, identifiers) =>
-        val agent = parse(f(ag)).right.get
-        val agentWithCanonicalId = root.canonicalId.string.modify(_ => canonicalId)(agent)
-        root.identifiers.arr.modify(_ => identifiers.map{sourceIdentifier=>
-          parse(identifier(sourceIdentifier)).right.get
-        }.toVector)(agentWithCanonicalId).spaces2
-
+        val agent = parse(f(ag)).right.get.asObject.get
+        val identifiersJson = identifiers.map{sourceIdentifier=>
+          parse(identifier(sourceIdentifier)).right.get}
+        val newJson = ("canonicalId", Json.fromString(canonicalId)) +: ("identifiers", Json.arr(identifiersJson : _*)) +: agent
+        Json.fromJsonObject(newJson).spaces2
     }
 
   def abstractAgent(ag: AbstractAgent) =

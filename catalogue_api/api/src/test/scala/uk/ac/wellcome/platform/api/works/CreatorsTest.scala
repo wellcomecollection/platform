@@ -71,8 +71,8 @@ class CreatorsTest extends ApiWorksTestBase {
           |      "title": "${work.title.get}",
           |      "creators": [
           |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)}
+          |        ${identifiedOrUnidentifiable(work.creators(1), abstractAgent)},
+          |        ${identifiedOrUnidentifiable(work.creators(2), abstractAgent)}
           |      ],
           |      "subjects": [ ],
           |      "genres": [ ],
@@ -81,6 +81,48 @@ class CreatorsTest extends ApiWorksTestBase {
           |    }
           |  ]
           |}
+          """.stripMargin
+      )
+    }
+  }
+
+  it("displays identified and unidentifiable creators") {
+    val work = IdentifiedWork(
+      canonicalId = "v9w6cz66",
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      title = Some("Vultures vying for victory"),
+      creators = List(
+        Unidentifiable(Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I"))),
+        Identified(Organisation(label = "Unseen University"), canonicalId = "abcdefgh", identifiers = List(SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, ontologyType = "Organisation",value = "uu")))
+      )
+    )
+
+    insertIntoElasticSearch(work)
+
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works",
+        andExpect = Status.Ok,
+        withJsonBody = s"""
+                          |{
+                          |  ${resultList(totalResults = 1)},
+                          |  "results": [
+                          |    {
+                          |      "type": "Work",
+                          |      "id": "${work.canonicalId}",
+                          |      "title": "${work.title.get}",
+                          |      "creators": [
+                          |        ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
+                          |        ${identifiedOrUnidentifiable(work.creators(1), abstractAgent)}
+                          |      ],
+                          |      "subjects": [ ],
+                          |      "genres": [ ],
+                          |      "publishers": [],
+                          |      "placesOfPublication": [ ]
+                          |    }
+                          |  ]
+                          |}
           """.stripMargin
       )
     }
