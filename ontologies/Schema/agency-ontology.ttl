@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Agency"@en ;
     dcterms:created "2017-08-16"^^xsd:date ;
-    dcterms:description "A agency ontology describing people, organisations and their relationships"@en .
+    dcterms:description "An ontology describing people, organisations and their relationships."@en .
 
 ###### classes ###  
     
