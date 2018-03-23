@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Location ontology"@en ;
     dcterms:created "2017-07-25"^^xsd:date ;
-    dcterms:description "Ontology describing the locations through which items are accessed"@en .
+    dcterms:description "An ontology describing how museum and library items can be accessed."@en .
     
     ###### classes ###  
 
