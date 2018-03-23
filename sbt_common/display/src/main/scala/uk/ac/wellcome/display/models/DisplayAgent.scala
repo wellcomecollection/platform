@@ -13,6 +13,8 @@ sealed trait DisplayAbstractAgent
   value = "Agent"
 )
 case class DisplayAgent(
+                       id: Option[String],
+                       identifiers: Option[List[DisplayIdentifier]],
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
@@ -25,24 +27,40 @@ case object DisplayAbstractAgent {
     displayableAgent match {
       case Unidentifiable(a: Agent) =>
         DisplayAgent(
+          id = None, identifiers = None,
           label = a.label
         )
-      case Identified(_: Agent, _, _) => throw new RuntimeException()
+      case Identified(a: Agent, id, identifiers) =>  DisplayAgent(
+        id = Some(id),
+        identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+        label = a.label
+      )
       case Identified(p: Person, id, identifiers) =>
-        DisplayPerson(p.label, p.prefix, p.numeration)
+        DisplayPerson(id = Some(id),identifiers = Some(identifiers.map(DisplayIdentifier(_))), label = p.label, prefix = p.prefix, numeration = p.numeration)
       case Unidentifiable(p: Person) =>
-        DisplayPerson(p.label, p.prefix, p.numeration)
+        DisplayPerson(id = None, identifiers = None,label = p.label, prefix = p.prefix, numeration = p.numeration)
       case Identified(o: Organisation, id, identifiers) =>
-        DisplayOrganisation(o.label)
+        DisplayOrganisation(id = Some(id),identifiers = Some(identifiers.map(DisplayIdentifier(_))), o.label)
       case Unidentifiable(o: Organisation) =>
-        DisplayOrganisation(o.label)
+        DisplayOrganisation(id = None, identifiers = None, label = o.label)
     }
 }
 
 @ApiModel(
   value = "Person"
 )
-case class DisplayPerson(@ApiModelProperty(
+case class DisplayPerson( @ApiModelProperty(
+  dataType = "String",
+  readOnly = true,
+  value = "The canonical identifier given to a thing.")
+                          id: Option[String],
+                          @ApiModelProperty(
+                            dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+                            value =
+                              "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
+                          )
+                         identifiers: Option[List[DisplayIdentifier]],
+                          @ApiModelProperty(
                            value = "The name of the person"
                          ) label: String,
                          @ApiModelProperty(
@@ -59,7 +77,18 @@ case class DisplayPerson(@ApiModelProperty(
 @ApiModel(
   value = "Organisation"
 )
-case class DisplayOrganisation(@ApiModelProperty(
+case class DisplayOrganisation( @ApiModelProperty(
+  dataType = "String",
+  readOnly = true,
+  value = "The canonical identifier given to a thing.")
+                                id: Option[String],
+                                @ApiModelProperty(
+                                  dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+                                  value =
+                                    "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
+                                )
+                               identifiers: Option[List[DisplayIdentifier]],
+                                @ApiModelProperty(
                                  value = "The name of the organisation"
                                ) label: String,
                                @JsonProperty("type") ontologyType: String =
