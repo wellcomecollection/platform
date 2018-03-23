@@ -7,11 +7,16 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 import org.scalacheck.ScalacheckShapeless._
 import org.scalacheck.Shrink
 
-class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil with PropertyChecks {
+class IdentifiedWorkTest
+    extends FunSpec
+    with Matchers
+    with JsonTestUtil
+    with PropertyChecks {
 
   implicit val noShrink = Shrink.shrinkAny[IdentifiedWork]
 
-  it("json serialisation and deserialisation doesn't change the original IdenfiedWork"){
+  it(
+    "json serialisation and deserialisation doesn't change the original IdenfiedWork") {
     forAll { identifiedWork: IdentifiedWork =>
       val json = toJson(identifiedWork).get
 
