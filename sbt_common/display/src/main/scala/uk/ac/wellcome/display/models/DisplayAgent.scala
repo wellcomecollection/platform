@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.{AbstractAgent, Agent, Organisation, Person}
 
+@ApiModel(
+  value = "Agent"
+)
 sealed trait DisplayAbstractAgent
 
 @ApiModel(
