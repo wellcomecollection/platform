@@ -77,8 +77,12 @@ class PublishersTest extends ApiWorksTestBase {
           |      "subjects": [ ],
           |      "genres": [ ],
           |      "publishers": [
-          |        ${identifiedOrUnidentifiable(work.publishers(0), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.publishers(1), abstractAgent)}
+          |        ${identifiedOrUnidentifiable(
+                            work.publishers(0),
+                            abstractAgent)},
+          |        ${identifiedOrUnidentifiable(
+                            work.publishers(1),
+                            abstractAgent)}
           |      ],
           |      "placesOfPublication": [ ]
           |    }
@@ -100,7 +104,11 @@ class PublishersTest extends ApiWorksTestBase {
       publishers = List(
         Unidentifiable(Agent("Vivian Violet")),
         Unidentifiable(Organisation("Verily Volumes")),
-        Unidentifiable(Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I")))
+        Unidentifiable(
+          Person(
+            label = "Havelock Vetinari",
+            prefix = Some("Lord Patrician"),
+            numeration = Some("I")))
       )
     )
 
@@ -122,9 +130,15 @@ class PublishersTest extends ApiWorksTestBase {
           |      "subjects": [ ],
           |      "genres": [ ],
           |      "publishers": [
-          |        ${identifiedOrUnidentifiable(work.publishers(0), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.publishers(1), abstractAgent)},
-          |        ${identifiedOrUnidentifiable(work.publishers(2), abstractAgent)}
+          |        ${identifiedOrUnidentifiable(
+                            work.publishers(0),
+                            abstractAgent)},
+          |        ${identifiedOrUnidentifiable(
+                            work.publishers(1),
+                            abstractAgent)},
+          |        ${identifiedOrUnidentifiable(
+                            work.publishers(2),
+                            abstractAgent)}
           |      ],
           |      "placesOfPublication": [ ]
           |    }

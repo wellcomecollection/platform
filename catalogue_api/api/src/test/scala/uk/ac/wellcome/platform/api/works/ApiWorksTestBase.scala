@@ -109,14 +109,19 @@ class ApiWorksTestBase
       "value": "${identifier.value}"
     }"""
 
-  def identifiedOrUnidentifiable[T](displayableAgent: IdentifiedOrUnidentifiable[T], f :T => String) =
+  def identifiedOrUnidentifiable[T](
+    displayableAgent: IdentifiedOrUnidentifiable[T],
+    f: T => String) =
     displayableAgent match {
       case Unidentifiable(ag) => f(ag)
       case Identified(ag, id, identifiers) =>
         val agent = parse(f(ag)).right.get.asObject.get
-        val identifiersJson = identifiers.map{sourceIdentifier=>
-          parse(identifier(sourceIdentifier)).right.get}
-        val newJson = ("id", Json.fromString(id)) +: ("identifiers", Json.arr(identifiersJson : _*)) +: agent
+        val identifiersJson = identifiers.map { sourceIdentifier =>
+          parse(identifier(sourceIdentifier)).right.get
+        }
+        val newJson = ("id", Json.fromString(id)) +: (
+          "identifiers",
+          Json.arr(identifiersJson: _*)) +: agent
         Json.fromJsonObject(newJson).spaces2
     }
 
