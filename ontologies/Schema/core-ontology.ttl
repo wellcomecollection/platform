@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Core"@en ;
     dcterms:created "2017-02-13"^^xsd:date ;
-    dcterms:description "An ontology describing common and non-domain specific classses and properties that are used across our ontologies."@en .
+    dcterms:description "An ontology describing common and non-domain specific classses and properties used across our ontologies."@en .
 
 ###### classes ###  
     
