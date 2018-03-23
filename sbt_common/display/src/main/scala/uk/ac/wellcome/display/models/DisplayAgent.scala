@@ -24,7 +24,10 @@ case object DisplayAbstractAgent {
           label = a.label
         )
       case p: Person =>
-        DisplayPerson(label = p.label, prefix = p.prefix, numeration = p.numeration)
+        DisplayPerson(
+          label = p.label,
+          prefix = p.prefix,
+          numeration = p.numeration)
       case o: Organisation => DisplayOrganisation(o.label)
 
     }

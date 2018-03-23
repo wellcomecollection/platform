@@ -33,7 +33,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(0).lettering.get}",
                           |     "createdDate": ${period(
                             works(0).createdDate.get)},
-                          |     "creators": [ ${abstractAgent(works(0).creators(0))} ],
+                          |     "creators": [ ${abstractAgent(
+                            works(0).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -52,7 +53,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(1).lettering.get}",
                           |     "createdDate": ${period(
                             works(1).createdDate.get)},
-                          |     "creators": [ ${abstractAgent(works(1).creators(0))} ],
+                          |     "creators": [ ${abstractAgent(
+                            works(1).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -71,7 +73,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(2).lettering.get}",
                           |     "createdDate": ${period(
                             works(2).createdDate.get)},
-                          |     "creators": [ ${abstractAgent(works(2).creators(0))} ],
+                          |     "creators": [ ${abstractAgent(
+                            works(2).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -285,7 +288,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(1).lettering.get}",
                           |     "createdDate": ${period(
                             works(1).createdDate.get)},
-                          |     "creators": [ ${abstractAgent(works(1).creators(0))} ],
+                          |     "creators": [ ${abstractAgent(
+                            works(1).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -321,7 +325,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(0).lettering.get}",
                           |     "createdDate": ${period(
                             works(0).createdDate.get)},
-                          |     "creators": [ ${abstractAgent(works(0).creators(0))} ],
+                          |     "creators": [ ${abstractAgent(
+                            works(0).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -357,7 +362,8 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(2).lettering.get}",
                           |     "createdDate": ${period(
                             works(2).createdDate.get)},
-                          |     "creators": [ ${abstractAgent(works(2).creators(0))} ],
+                          |     "creators": [ ${abstractAgent(
+                            works(2).creators(0))} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],

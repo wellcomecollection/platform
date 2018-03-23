@@ -89,7 +89,8 @@ class PublishersTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes the publishers field with a mixture of agents/organisations/persons") {
+  it(
+    "includes the publishers field with a mixture of agents/organisations/persons") {
 
     val work = IdentifiedWork(
       canonicalId = "v9w6cz66",
@@ -99,7 +100,10 @@ class PublishersTest extends ApiWorksTestBase {
       publishers = List(
         Agent("Vivian Violet"),
         Organisation("Verily Volumes"),
-        Person(label = "Havelock Vetinari", prefix = Some("Lord Patrician"), numeration = Some("I"))
+        Person(
+          label = "Havelock Vetinari",
+          prefix = Some("Lord Patrician"),
+          numeration = Some("I"))
       )
     )
 
