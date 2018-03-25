@@ -52,7 +52,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
     val source = s3Source
       .via(Compression.gunzip())
-      .via(Framing.delimiter(ByteString("\n"), Int.MaxValue))
+      .via(Framing.delimiter(ByteString("\n"), Int.MaxValue, allowTruncation = true))
       .map(_.utf8String)
       .map(sourceString => (parse(sourceString).right.get \\ "_source").head)
       .map(_.as[IdentifiedWork])
