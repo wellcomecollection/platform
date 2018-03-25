@@ -37,7 +37,8 @@ class ConvertorServiceTest
   it(
     "converts a gzipped elasticdump from S3 into the correct format in the target bucket") {
 
-    val expectedDisplayWork = """
+    val expectedDisplayWork =
+      """
       {
          "id":"uhwweqqu",
          "title":"Handbuch der acuten Infectionskrankheiten. 1. Theil",
@@ -124,7 +125,6 @@ class ConvertorServiceTest
 
     withConvertorService { fixtures =>
       withCompressedTestDump(fixtures.bucketName) { key =>
-
         val conversionJob = ConversionJob(
           bucketName = fixtures.bucketName,
           objectKey = key
@@ -138,15 +138,15 @@ class ConvertorServiceTest
             .getObjectContent
 
           val actualDisplayWorkJson = parse(
-              scala.io.Source
-                .fromInputStream(
-                  new GZIPInputStream(new BufferedInputStream(inputStream)))
-                .mkString
-                .split("\n")
-                .head
-            )
+            scala.io.Source
+              .fromInputStream(
+                new GZIPInputStream(new BufferedInputStream(inputStream)))
+              .mkString
+              .split("\n")
+              .head
+          )
 
-          actualDisplayWorkJson should be (parse(expectedDisplayWork))
+          actualDisplayWorkJson should be(parse(expectedDisplayWork))
         }
 
       }
