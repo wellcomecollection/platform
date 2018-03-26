@@ -1,37 +1,34 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
+import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTest
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  DynamoDBLocalClients,
-  S3Local,
-  SQSLocal
-}
+import org.scalatest.FunSpec
+import uk.ac.wellcome.storage.HybridRecord
+import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, S3, SqsFixtures}
 
 class ServerTest
-    extends FeatureTest
-    with AmazonCloudWatchFlag
-    with DynamoDBLocalClients
-    with S3Local
-    with SQSLocal {
+  extends FunSpec
+    with LocalDynamoDb[HybridRecord]
+    with fixtures.Server
+    with S3
+    with SqsFixtures {
 
-  override lazy val bucketName = "sierra-item-merger-servertest-bucket"
-  val queueUrl = createQueueAndReturnUrl("sierra-item-merger-servertest-q")
+  override lazy val evidence: DynamoFormat[HybridRecord] =
+    DynamoFormat[HybridRecord]
 
-  val server = new EmbeddedHttpServer(
-    new Server(),
-    flags = Map(
-      "aws.sqs.queue.url" -> queueUrl
-    ) ++ s3LocalFlags ++ sqsLocalFlags ++ cloudWatchLocalEndpointFlag ++ dynamoDbLocalEndpointFlags(
-      "serverTest")
-  )
-
-  test("it shows the healthcheck message") {
-    server.httpGet(
-      path = "/management/healthcheck",
-      andExpect = Ok,
-      withJsonBody = """{"message": "ok"}""")
+  it("shows the healthcheck message") {
+    withLocalSqsQueue { queueUrl =>
+      withLocalS3Bucket { bucketName =>
+        withLocalDynamoDbTable { tableName =>
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(tableName)
+          withServer(flags) { server =>
+            server.httpGet(
+              path = "/management/healthcheck",
+              andExpect = Ok,
+              withJsonBody = """{"message": "ok"}""")
+          }
+        }
+      }
+    }
   }
 }

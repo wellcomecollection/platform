@@ -2,14 +2,21 @@ package uk.ac.wellcome.test.fixtures
 
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
-import org.scalatest.Assertion
+import io.circe.Encoder
+import org.scalatest.{Assertion, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
-trait LocalVersionedHybridStore extends LocalDynamoDb[HybridRecord] with S3 {
+trait LocalVersionedHybridStore
+    extends LocalDynamoDb[HybridRecord]
+    with S3
+    with JsonTestUtil
+    with Matchers {
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
@@ -39,6 +46,12 @@ trait LocalVersionedHybridStore extends LocalDynamoDb[HybridRecord] with S3 {
       testWith(store)
     }
   }
+
+  def assertStored[T <: Id](bucketName: String, tableName: String, record: T)(implicit encoder: Encoder[T]) =
+    assertJsonStringsAreEqual(
+      getJsonFor[T](bucketName, tableName, record),
+      toJson(record).get
+    )
 
   def getJsonFor[T <: Id](bucketName: String, tableName: String, record: T) = {
     val hybridRecord = Scanamo
