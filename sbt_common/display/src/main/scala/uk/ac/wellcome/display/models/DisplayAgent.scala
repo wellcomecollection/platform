@@ -22,8 +22,8 @@ case class DisplayAgent(
 ) extends DisplayAbstractAgent
 
 case object DisplayAbstractAgent {
-  def apply(displayableAgent: Displayable[AbstractAgent])
-    : DisplayAbstractAgent =
+  def apply(
+    displayableAgent: Displayable[AbstractAgent]): DisplayAbstractAgent =
     displayableAgent match {
       case Unidentifiable(a: Agent) =>
         DisplayAgent(
