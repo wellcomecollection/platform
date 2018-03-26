@@ -133,7 +133,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
     }
   }
 
-  it("parses a work with persons and organisations as creators") {
+  it("parses a work with unidentifiable persons and organisations as creators") {
     val work = IdentifiedWork(
       title = Some("Jumping over jackals in Japan"),
       sourceIdentifier = sourceIdentifier,
@@ -156,6 +156,35 @@ class DisplayWorkTest extends FunSpec with Matchers {
       DisplayOrganisation(
         id = None,
         identifiers = None,
+        label = "Juniper Journals")
+    )
+  }
+
+  it("parses a work with a mixture of identifed or unidentifable persons and organisations as creators") {
+    val canonicalId = "abcdefgh"
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Organisation", "EW")
+    val work = IdentifiedWork(
+      title = Some("Jumping over jackals in Japan"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = Nil,
+      canonicalId = "j7tw9jv3",
+      creators = List(
+        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
+        Identified(Organisation("Juniper Journals"), canonicalId = canonicalId, identifiers = List(sourceIdentifier))
+      )
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.creators shouldBe List(
+      DisplayPerson(
+        id = None,
+        identifiers = None,
+        label = "Esmerelda Weatherwax",
+        prefix = Some("Witch")),
+      DisplayOrganisation(
+        id = Some(canonicalId),
+        identifiers = Some(List(DisplayIdentifier(IdentifierSchemes.libraryOfCongressNames.toString, sourceIdentifier.value))),
         label = "Juniper Journals")
     )
   }
