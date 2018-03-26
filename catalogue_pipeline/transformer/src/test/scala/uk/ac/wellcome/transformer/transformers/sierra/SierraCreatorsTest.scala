@@ -153,7 +153,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
   // This is ignored until we get better information as to
   // how we want to clean the identifiers data
   ignore(
-    "extracts the creator identifier removing trailing and leading from marcTag 100 0") {
+    "normalises the creator identifier marcTag 100 0") {
     val name = "The Luggage"
     val code = "n 123456"
     val cleanedCode = "123456"
