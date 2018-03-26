@@ -1,11 +1,3 @@
-output "bucket_miro_images_sync_arn" {
-  value = "${aws_s3_bucket.miro-images-sync.arn}"
-}
-
-output "bucket_miro_images_sync_id" {
-  value = "${aws_s3_bucket.miro-images-sync.id}"
-}
-
 # Outputs required for Loris
 
 output "vpc_api_id" {
