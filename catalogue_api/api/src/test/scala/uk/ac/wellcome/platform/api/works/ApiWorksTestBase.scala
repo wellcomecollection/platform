@@ -110,8 +110,8 @@ class ApiWorksTestBase
     }"""
 
   def identifiedOrUnidentifiable[T](
-    displayableAgent: IdentifiedOrUnidentifiable[T],
-    f: T => String) =
+                                     displayableAgent: Displayable[T],
+                                     f: T => String) =
     displayableAgent match {
       case Unidentifiable(ag) => f(ag)
       case Identified(ag, id, identifiers) =>
