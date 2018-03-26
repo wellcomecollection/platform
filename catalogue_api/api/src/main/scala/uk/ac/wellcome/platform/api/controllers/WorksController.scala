@@ -8,7 +8,7 @@ import com.twitter.inject.annotations.Flag
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import scala.collection.JavaConverters._
-import uk.ac.wellcome.models.{Error, WorksIncludes}
+import uk.ac.wellcome.models.{Error, IdentifiedWork, WorksIncludes}
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 
@@ -146,18 +146,14 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
       worksService
         .findWorkById(canonicalId = request.id, index = request._index)
         .map {
-          case Some(work) =>
-            Some(DisplayWork(work = work, includes = includes))
-          case None => None
-        }
-        .map {
 
           // If the work is visible, we return the complete work.  If it's
           // present but hidden, we need to return an HTTP 410 Gone.
-          case Some(work: DisplayWork) =>
+          case Some(work: IdentifiedWork) =>
             if (work.visible) {
+              val result = DisplayWork(work = work, includes = includes)
               response.ok.json(
-                ResultResponse(context = contextUri, result = work))
+                ResultResponse(context = contextUri, result = result))
             } else {
               val result = Error(
                 variant = "http-410",

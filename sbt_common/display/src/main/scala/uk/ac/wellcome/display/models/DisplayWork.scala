@@ -85,8 +85,7 @@ case class DisplayWork(
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
     value = "Relates a work to its primary language."
-  ) language: Option[DisplayLanguage] = None,
-  visible: Boolean = true
+  ) language: Option[DisplayLanguage] = None
 ) {
   @ApiModelProperty(
     readOnly = true,
@@ -127,8 +126,7 @@ case object DisplayWork {
       publishers = work.publishers.map(DisplayAbstractAgent(_)),
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
-      language = work.language.map { DisplayLanguage(_) },
-      visible = work.visible
+      language = work.language.map { DisplayLanguage(_) }
     )
   }
 
