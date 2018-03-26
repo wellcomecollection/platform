@@ -149,27 +149,31 @@ class SierraCreatorsTest extends FunSpec with Matchers {
       List(sourceIdentifier))
   }
 
-//  it("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
-//    val name = "The Luggage"
-//    val code = "n 123456"
-//    val cleanedCode = "123456"
-//
-//    val bibData = SierraBibData(
-//      id = "1234567",
-//      title = None,
-//      varFields = List(
-//        VarField(
-//          fieldTag = "p",
-//          marcTag = "100",
-//          indicator1 = "",
-//          indicator2 = "",
-//          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
-//    )
-//
-//    val creators = transformer.getCreators(bibData)
-//
-//    creators should contain only Identifiable(Person(label = name), sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames,code.trim))
-//  }
+  // TODO: find out the identifiers normalisation rules
+  // This is ignored until we get better information as to
+  // how we want to clean the identifiers data
+  ignore("extracts the creator identifier removing trailing and leading from marcTag 100 0") {
+    val name = "The Luggage"
+    val code = "n 123456"
+    val cleanedCode = "123456"
+
+    val bibData = SierraBibData(
+      id = "1234567",
+      title = None,
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "0", content = code))))
+    )
+
+    val creators = transformer.getCreators(bibData)
+
+    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.libraryOfCongressNames, "Person",code.trim)
+    creators should contain only Identifiable(Person(label = name), sourceIdentifier = sourceIdentifier, identifiers = List(sourceIdentifier))
+  }
 
   it(
     "extracts the creator identifier from marcTag 100 0 if there is more than one but they are the same") {
