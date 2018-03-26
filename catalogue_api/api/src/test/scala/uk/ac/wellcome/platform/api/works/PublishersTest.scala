@@ -99,7 +99,8 @@ class PublishersTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes the publishers field with a mixture of agents/organisations/persons") {
+  it(
+    "includes the publishers field with a mixture of agents/organisations/persons") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
