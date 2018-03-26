@@ -9,7 +9,6 @@ class CreatorsTest extends ApiWorksTestBase {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         val work = IdentifiedWork(
           canonicalId = "zm9q6c6h",
           sourceIdentifier = sourceIdentifier,
@@ -52,7 +51,6 @@ class CreatorsTest extends ApiWorksTestBase {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val flags = esLocalFlags(indexName, itemType)
       withServer(flags) { server =>
-
         val work = IdentifiedWork(
           canonicalId = "v9w6cz66",
           sourceIdentifier = sourceIdentifier,
