@@ -16,7 +16,7 @@ trait SierraCreators extends MarcUtils {
   * TODO: Figure out if we have to normalise further.
  */
 def getCreators(bibData: SierraBibData)
-  : List[IdentifieableOrUnidentifiable[AbstractAgent]] = {
+  : List[MaybeDisplayable[AbstractAgent]] = {
 
   val persons =
     getMatchingSubfields(bibData, "100", List("a", "b", "c", "0")).map {
