@@ -17,7 +17,7 @@ class CreatorsTest extends ApiWorksTestBase {
           creators = List()
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
@@ -66,7 +66,7 @@ class CreatorsTest extends ApiWorksTestBase {
           )
         )
 
-        insertIntoElasticSearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         eventually {
           server.httpGet(
