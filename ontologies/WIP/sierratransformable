@@ -103,11 +103,11 @@
    /* Populate wwork:creators. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "100", "110" (removing this from scope "111")
-   * 2. Platform "name" populate from subfield "a"
+   * 2. Platform "label" populate from subfield "a"
    * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
    * 4. For "110" type as "Organisation"
    * 5. Ignore: For "111" type as "Event"
-   * 6. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
+   * 6. If subfield 0 contains a value use it to populate "identifiers". The "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
    * ignore for now 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
    * ignore for now 9. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
    * ignore for now 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
