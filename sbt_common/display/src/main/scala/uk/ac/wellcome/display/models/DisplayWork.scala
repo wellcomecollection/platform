@@ -25,7 +25,7 @@ case class DisplayWork(
     value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
     String] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayWorkType]",
+    dataType = "uk.ac.wellcome.display.models.DisplayWorkType",
     value = "The type of work.") workType: Option[DisplayWorkType] = None,
   @ApiModelProperty(
     dataType = "String",
@@ -42,7 +42,6 @@ case class DisplayWork(
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) creators: List[DisplayAbstractAgent] = List(),
@@ -52,12 +51,12 @@ case class DisplayWork(
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
   ) subjects: List[DisplayConcept] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value = "Relates a work to the genre that describes the work's content.") genres: List[
     DisplayConcept] = List(),
   @ApiModelProperty(
@@ -74,7 +73,6 @@ case class DisplayWork(
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
     value = "Show a list of places of publication."
   ) placesOfPublication: List[DisplayPlace] = List(),
   @ApiModelProperty(
