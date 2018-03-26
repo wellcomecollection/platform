@@ -152,8 +152,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
   // TODO: find out the identifiers normalisation rules
   // This is ignored until we get better information as to
   // how we want to clean the identifiers data
-  ignore(
-    "normalises the creator identifier marcTag 100 0") {
+  ignore("normalises the creator identifier marcTag 100 0") {
     val name = "The Luggage"
     val code = "n 123456"
     val cleanedCode = "123456"
