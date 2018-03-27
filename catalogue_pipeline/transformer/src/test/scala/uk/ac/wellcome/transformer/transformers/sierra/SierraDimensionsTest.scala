@@ -80,6 +80,7 @@ class SierraDimensionsTest extends FunSpec with Matchers {
     )
 
     val bibData = SierraBibData(id = "d3000003", varFields = varFields)
-    transformer.getDimensions(bibData = bibData) shouldBe Some(expectedDimensions)
+    transformer.getDimensions(bibData = bibData) shouldBe Some(
+      expectedDimensions)
   }
 }
