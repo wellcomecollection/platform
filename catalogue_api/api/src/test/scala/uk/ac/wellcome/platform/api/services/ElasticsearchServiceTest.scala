@@ -43,9 +43,9 @@ class ElasticsearchServiceTest
         expectedWorks = List(work3, work2, work1).map { DisplayWork(_) }
       )
 
-      // TODO: canonicalID is the only user-defined field that we can sort on.
-      // When we have other fields we can sort on, we should extend this test
-      // for different sort orders.
+    // TODO: canonicalID is the only user-defined field that we can sort on.
+    // When we have other fields we can sort on, we should extend this test
+    // for different sort orders.
     }
   }
 
@@ -129,8 +129,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  private def populateElasticsearch(
-    indexName: String): List[DisplayWork] = {
+  private def populateElasticsearch(indexName: String): List[DisplayWork] = {
     val works = createWorks(10)
     insertIntoElasticsearch(indexName, itemType, works: _*)
 
