@@ -26,6 +26,7 @@ class SierraTransformableTransformer
     with SierraPublicationDate
     with SierraPlaceOfPublication
     with SierraCreators
+    with SierraDimensions
     with Logging {
 
   override def transformForType(
@@ -61,7 +62,8 @@ class SierraTransformableTransformer
               publicationDate = getPublicationDate(sierraBibData),
               placesOfPublication = getPlacesOfPublication(sierraBibData),
               language = getLanguage(sierraBibData),
-              creators = getCreators(sierraBibData)
+              creators = getCreators(sierraBibData),
+              dimensions = getDimensions(sierraBibData)
             ))
         }
 

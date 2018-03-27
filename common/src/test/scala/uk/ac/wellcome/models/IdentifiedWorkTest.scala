@@ -33,6 +33,10 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "Dogescript"
   )
 
+  // TRIVIA: This is the distance travelled by the Opportunity Mars rover,
+  // as of 10 January 2018.
+  val dimensions = "45 km (28 mi)"
+
   val identifiedWorkJson: String =
     s"""
       |{
@@ -147,6 +151,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |     "label": "${language.label}",
       |     "ontologyType": "Language"
       |   },
+      |   "dimensions": "$dimensions",
       |  "visible":true,
       |  "ontologyType": "Work"
       |}
@@ -208,7 +213,8 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
     placesOfPublication = List(Place(label = "Spain")),
-    language = Some(language)
+    language = Some(language),
+    dimensions = Some(dimensions)
   )
 
   it("should serialise an identified Item as Work") {

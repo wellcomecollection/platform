@@ -150,7 +150,8 @@ class WorksIndex @Inject()(client: HttpClient,
       indentified("publishers", agent),
       date("publicationDate"),
       language,
-      location("thumbnail")
+      location("thumbnail"),
+      textField("dimensions")
     )
 
   val mappingDefinition: MappingDefinition = mapping(rootIndexType)

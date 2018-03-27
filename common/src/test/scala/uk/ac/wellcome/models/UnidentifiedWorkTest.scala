@@ -33,6 +33,9 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "Reskitkish"
   )
 
+  // According to Google Maps, the distance between 183 and 215 Euston Road.
+  val dimensions = "308 ft"
+
   val unidentifiedWorkJson: String =
     s"""
       |{
@@ -148,6 +151,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |     "label": "${language.label}",
       |     "ontologyType": "Language"
       |   },
+      |   "dimensions": "$dimensions",
       |  "ontologyType": "Work"
       |}
     """.stripMargin
@@ -206,7 +210,8 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
     placesOfPublication = List(Place("Madrid")),
-    language = Some(language)
+    language = Some(language),
+    dimensions = Some(dimensions)
   )
 
   it("should serialise an unidentified Work as JSON") {

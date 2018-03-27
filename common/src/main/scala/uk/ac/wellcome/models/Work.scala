@@ -21,6 +21,7 @@ trait Work extends Versioned {
   val publishers: List[IdentityState[AbstractAgent]]
   val publicationDate: Option[Period]
   val language: Option[Language]
+  val dimensions: Option[String]
   val visible: Boolean
   val ontologyType: String
 }
@@ -45,6 +46,7 @@ case class UnidentifiedWork(
   publicationDate: Option[Period] = None,
   placesOfPublication: List[Place] = Nil,
   language: Option[Language] = None,
+  dimensions: Option[String] = None,
   visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
@@ -69,6 +71,7 @@ case class IdentifiedWork(canonicalId: String,
                           publicationDate: Option[Period] = None,
                           placesOfPublication: List[Place] = Nil,
                           language: Option[Language] = None,
+                          dimensions: Option[String] = None,
                           visible: Boolean = true,
                           ontologyType: String = "Work")
     extends Work
