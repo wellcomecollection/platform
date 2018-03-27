@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.twitter.finatra.json.FinatraObjectMapper
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
-import uk.ac.wellcome.test.fixtures.{S3, AkkaFixtures, TestWith}
+import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3, TestWith}
 
 case class ConvertorServiceFixtures(
   convertorService: ConvertorService,
@@ -23,7 +23,6 @@ trait ConvertorServiceFixture extends S3 with AkkaFixtures {
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
           withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-
             val convertorService = new ConvertorService(
               actorSystem = actorSystem,
               awsConfig = AWSConfig(region = "localhost"),

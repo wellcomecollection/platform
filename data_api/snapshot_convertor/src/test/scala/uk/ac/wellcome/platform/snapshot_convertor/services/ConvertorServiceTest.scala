@@ -27,7 +27,6 @@ class ConvertorServiceTest
 
     withConvertorService { fixtures =>
       withExampleDump(fixtures.bucketName) { key =>
-
         val conversionJob = ConversionJob(
           bucketName = fixtures.bucketName,
           objectKey = key

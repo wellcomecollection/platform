@@ -77,16 +77,16 @@ class SnapshotConvertorWorkerServiceTest
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
           withExampleDump(bucketName) { key =>
-
             withSnapshotConvertorWorkerService(topicArn, queueUrl) { service =>
               val sqsMessage = SQSMessage(
                 subject = None,
-                body = s"""{ "bucketName": "$bucketName", "objectKey": "$key" }""",
+                body =
+                  s"""{ "bucketName": "$bucketName", "objectKey": "$key" }""",
                 topic = "topic",
                 messageType = "message",
                 timestamp = "now"
               )
-  
+
               val future = service.processMessage(message = sqsMessage)
 
               whenReady(future) { _ =>
@@ -106,26 +106,28 @@ class SnapshotConvertorWorkerServiceTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
+          val invalidElasticDump =
+            getClass.getResource("/invalid_elasticdump_example.txt.gz")
 
-          val invalidElasticDump = getClass.getResource("/invalid_elasticdump_example.txt.gz")
+          withLocalS3ObjectFromResource(bucketName, invalidElasticDump) {
+            key =>
+              withSnapshotConvertorWorkerService(topicArn, queueUrl) {
+                service =>
+                  val sqsMessage = SQSMessage(
+                    subject = None,
+                    body =
+                      s"""{ "bucketName": "$bucketName", "objectKey": "$key" }""",
+                    topic = "topic",
+                    messageType = "message",
+                    timestamp = "now"
+                  )
 
-          withLocalS3ObjectFromResource(bucketName, invalidElasticDump) { key =>
+                  val future = service.processMessage(message = sqsMessage)
 
-            withSnapshotConvertorWorkerService(topicArn, queueUrl) { service =>
-              val sqsMessage = SQSMessage(
-                subject = None,
-                body = s"""{ "bucketName": "$bucketName", "objectKey": "$key" }""",
-                topic = "topic",
-                messageType = "message",
-                timestamp = "now"
-              )
-  
-              val future = service.processMessage(message = sqsMessage)
-  
-              whenReady(future.failed) { ex =>
-                ex shouldBe a[Throwable]
+                  whenReady(future.failed) { ex =>
+                    ex shouldBe a[Throwable]
+                  }
               }
-            }
 
           }
 

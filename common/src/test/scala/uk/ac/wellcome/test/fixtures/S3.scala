@@ -72,7 +72,8 @@ trait S3 extends Logging with Eventually {
     }
   }
 
-  def withLocalS3ObjectFromResource[R](bucketName: String, resource: URL)(testWith: TestWith[String, R]) = {
+  def withLocalS3ObjectFromResource[R](bucketName: String, resource: URL)(
+    testWith: TestWith[String, R]) = {
     val metadata = new ObjectMetadata()
     val key = Paths.get(resource.toURI).getFileName.toString
 

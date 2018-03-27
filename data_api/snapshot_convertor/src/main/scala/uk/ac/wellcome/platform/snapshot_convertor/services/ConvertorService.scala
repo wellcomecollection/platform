@@ -55,8 +55,10 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       .via(Compression.gunzip())
       .via(Framing
         .delimiter(ByteString("\n"), Int.MaxValue, allowTruncation = true))
-      .map{ _.utf8String }
-      .map{ sourceString => parse(sourceString) }
+      .map { _.utf8String }
+      .map { sourceString =>
+        parse(sourceString)
+      }
       .collect {
         case Right(json) => Some(json)
         case Left(parseFailure) => {
@@ -65,7 +67,9 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
         }
       }
       .collect { case Some(json) => json }
-      .map{ json => json \\ "_source" head }
+      .map { json =>
+        json \\ "_source" head
+      }
       .map(_.as[IdentifiedWork])
       .collect {
         case Right(identifiedWork) => Some(identifiedWork)
@@ -75,9 +79,11 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
         }
       }
       .collect { case Some(identifiedWork) => identifiedWork }
-      .map{ work => DisplayWork(work, includes) }
-      .map{ mapper.writeValueAsString(_) }
-      .map{ ByteString(_) }
+      .map { work =>
+        DisplayWork(work, includes)
+      }
+      .map { mapper.writeValueAsString(_) }
+      .map { ByteString(_) }
       .via(Compression.gzip)
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
@@ -89,7 +95,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val future = source.runWith(s3Sink)(ActorMaterializer()(actorSystem))
 
     future.map { result =>
-      val targetLocation = Uri(s"$s3Endpoint/${conversionJob.bucketName}/$targetObjectKey")
+      val targetLocation =
+        Uri(s"$s3Endpoint/${conversionJob.bucketName}/$targetObjectKey")
 
       CompletedConversionJob(
         conversionJob,

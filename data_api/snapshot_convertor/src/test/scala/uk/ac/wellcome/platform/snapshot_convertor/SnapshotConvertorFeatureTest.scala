@@ -40,8 +40,7 @@ class SnapshotConvertorFeatureTest
     withLocalS3Bucket { bucketName =>
       withLocalSqsQueue { queueUrl =>
         withLocalSnsTopic { topicArn =>
-            withExampleDump(bucketName) { key =>
-
+          withExampleDump(bucketName) { key =>
             val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
               bucketName)
 
@@ -61,7 +60,8 @@ class SnapshotConvertorFeatureTest
 
               sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
-              val expectedLocation = s"$localS3EndpointUrl/$bucketName/target.txt.gz"
+              val expectedLocation =
+                s"$localS3EndpointUrl/$bucketName/target.txt.gz"
 
               val expectedCompletedConversionJob = CompletedConversionJob(
                 conversionJob = conversionJob,
@@ -71,7 +71,12 @@ class SnapshotConvertorFeatureTest
               eventually {
                 val messages = listMessagesReceivedFromSNS(topicArn)
 
-                val completedJobs = messages.map{ m => parse(m.message).right.get.as[CompletedConversionJob].right.get }
+                val completedJobs = messages.map { m =>
+                  parse(m.message).right.get
+                    .as[CompletedConversionJob]
+                    .right
+                    .get
+                }
 
                 completedJobs should contain only (expectedCompletedConversionJob)
 
@@ -81,13 +86,13 @@ class SnapshotConvertorFeatureTest
 
                 val jsons =
                   scala.io.Source
-                    .fromInputStream(
-                      new GZIPInputStream(new BufferedInputStream(inputStream)))
+                    .fromInputStream(new GZIPInputStream(
+                      new BufferedInputStream(inputStream)))
                     .mkString
                     .split("\n")
                     .map(parse(_))
                     .toSeq
- 
+
                 jsons should contain only parse(expectedDisplayWork)
 
               }
