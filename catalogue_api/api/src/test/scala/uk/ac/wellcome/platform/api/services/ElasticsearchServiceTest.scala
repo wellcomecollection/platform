@@ -5,14 +5,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.WorksUtil
-import uk.ac.wellcome.platform.api.fixtures
+import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.WorksIncludes
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ElasticsearchServiceTest
     extends FunSpec
-    with fixtures.ElasticsearchService
+    with ElasticsearchServiceFixture
     with Matchers
     with ScalaFutures
     with WorksUtil {

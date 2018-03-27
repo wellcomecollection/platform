@@ -5,7 +5,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.platform.api.services.ElasticSearchService
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait ElasticsearchService
+trait ElasticsearchServiceFixture
     extends ElasticsearchFixtures { this: Suite =>
   def withElasticSearchService(indexName: String, itemType: String)(
       testWith: TestWith[ElasticSearchService, Assertion]) = {
