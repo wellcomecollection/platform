@@ -128,7 +128,7 @@ class SierraItemMergerUpdaterServiceTest
                 )
               )
 
-              hybridStore.updateRecord(oldRecord.id)(
+              val f1 = hybridStore.updateRecord(oldRecord.id)(
                 oldRecord
               )(identity)(SourceMetadata(oldRecord.sourceName))
 
@@ -150,41 +150,42 @@ class SierraItemMergerUpdaterServiceTest
                 )
               )
 
-              hybridStore.updateRecord(newRecord.id)(
-                newRecord
-              )(identity)(SourceMetadata(newRecord.sourceName))
+              whenReady(f1) { _ =>
+                val f2 = hybridStore.updateRecord(newRecord.id)(
+                  newRecord
+                )(identity)(SourceMetadata(newRecord.sourceName))
 
-              sierraUpdaterService.update(itemRecord)
+                whenReady(f2) { _ =>
+                  whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
+                    val expectedNewSierraTransformable =
+                      SierraTransformable(
+                        sourceId = bibIdNotExisting,
+                        maybeBibData = None,
+                        itemData = Map(itemRecord.id -> itemRecord)
+                      )
 
-              eventually {
-                val expectedNewSierraTransformable =
-                  SierraTransformable(
-                    sourceId = bibIdNotExisting,
-                    maybeBibData = None,
-                    itemData = Map(itemRecord.id -> itemRecord)
-                  )
+                    assertStored[SierraTransformable](
+                      bucketName,
+                      tableName,
+                      expectedNewSierraTransformable)
 
-                assertStored[SierraTransformable](
-                  bucketName,
-                  tableName,
-                  expectedNewSierraTransformable)
+                    val expectedUpdatedSierraTransformable = oldRecord.copy(
+                      itemData = Map(
+                        itemId -> itemRecord,
+                        "i888" -> otherItem
+                      )
+                    )
 
-                val expectedUpdatedSierraTransformable = oldRecord.copy(
-                  itemData = Map(
-                    itemId -> itemRecord,
-                    "i888" -> otherItem
-                  )
-                )
-
-                assertStored[SierraTransformable](
-                  bucketName,
-                  tableName,
-                  expectedUpdatedSierraTransformable)
-                assertStored[SierraTransformable](
-                  bucketName,
-                  tableName,
-                  newRecord)
-
+                    assertStored[SierraTransformable](
+                      bucketName,
+                      tableName,
+                      expectedUpdatedSierraTransformable)
+                    assertStored[SierraTransformable](
+                      bucketName,
+                      tableName,
+                      newRecord)
+                  }
+                }
               }
             }
         }
@@ -494,7 +495,7 @@ class SierraItemMergerUpdaterServiceTest
                   ))
               )
 
-              hybridStore.updateRecord(sierraRecord.id)(
+              val f1 = hybridStore.updateRecord(sierraRecord.id)(
                 sierraRecord
               )(identity)(SourceMetadata(sierraRecord.sourceName))
 
@@ -504,13 +505,13 @@ class SierraItemMergerUpdaterServiceTest
                 bibIds = List(bibId)
               )
 
-              sierraUpdaterService.update(oldItemRecord)
-
-              eventually {
-                assertStored[SierraTransformable](
-                  bucketName,
-                  tableName,
-                  sierraRecord)
+              whenReady(f1) { _ =>
+                whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
+                  assertStored[SierraTransformable](
+                    bucketName,
+                    tableName,
+                    sierraRecord)
+                }
               }
             }
         }
