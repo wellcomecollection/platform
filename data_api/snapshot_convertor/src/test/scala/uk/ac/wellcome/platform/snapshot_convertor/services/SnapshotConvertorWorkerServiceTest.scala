@@ -14,6 +14,8 @@ import uk.ac.wellcome.models.aws.{SNSConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.ConvertorServiceFixture
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.platform.snapshot_convertor.fixtures.ExampleDump
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
@@ -25,8 +27,10 @@ class SnapshotConvertorWorkerServiceTest
     with SnsFixtures
     with SqsFixtures
     with AkkaFixtures
+    with ExampleDump
     with ScalaFutures
-    with ConvertorServiceFixture {
+    with ConvertorServiceFixture
+    with ExtendedPatience {
 
   def withSnapshotConvertorWorkerService[R](
     topicArn: String,
@@ -72,28 +76,59 @@ class SnapshotConvertorWorkerServiceTest
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
         withLocalS3Bucket { bucketName =>
-          val key = "elastic_dump_example.txt.gz"
-          val input =
-            getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
-          val metadata = new ObjectMetadata()
+          withExampleDump(bucketName) { key =>
 
-          s3Client.putObject(bucketName, key, input, metadata)
+            withSnapshotConvertorWorkerService(topicArn, queueUrl) { service =>
+              val sqsMessage = SQSMessage(
+                subject = None,
+                body = s"""{ "bucketName": "$bucketName", "objectKey": "$key" }""",
+                topic = "topic",
+                messageType = "message",
+                timestamp = "now"
+              )
+  
+              val future = service.processMessage(message = sqsMessage)
 
-          withSnapshotConvertorWorkerService(topicArn, queueUrl) { service =>
-            val sqsMessage = SQSMessage(
-              subject = None,
-              body = "<xml>What is JSON.</xl?>",
-              topic = "topic",
-              messageType = "message",
-              timestamp = "now"
-            )
-
-            val future = service.processMessage(message = sqsMessage)
-
-            whenReady(future) { _ =>
-              false shouldBe true
+              whenReady(future) { _ =>
+                future.value.isDefined shouldBe true
+              }
             }
+
           }
+
+        }
+      }
+    }
+  }
+
+  it(
+    "returns a failed Future if the snapshot conversion completes incorrectly") {
+    withLocalSqsQueue { queueUrl =>
+      withLocalSnsTopic { topicArn =>
+        withLocalS3Bucket { bucketName =>
+
+          val invalidElasticDump = getClass.getResource("/invalid_elasticdump_example.txt.gz")
+
+          withLocalS3ObjectFromResource(bucketName, invalidElasticDump) { key =>
+
+            withSnapshotConvertorWorkerService(topicArn, queueUrl) { service =>
+              val sqsMessage = SQSMessage(
+                subject = None,
+                body = s"""{ "bucketName": "$bucketName", "objectKey": "$key" }""",
+                topic = "topic",
+                messageType = "message",
+                timestamp = "now"
+              )
+  
+              val future = service.processMessage(message = sqsMessage)
+  
+              whenReady(future.failed) { ex =>
+                ex shouldBe a[Throwable]
+              }
+            }
+
+          }
+
         }
       }
     }

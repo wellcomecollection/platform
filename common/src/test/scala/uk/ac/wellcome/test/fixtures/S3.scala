@@ -18,9 +18,12 @@ import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
+import com.amazonaws.services.s3.model.ObjectMetadata
 
 import scala.collection.JavaConversions._
 import scala.util.{Random, Try}
+import java.nio.file.Paths
+import java.net.URL
 
 trait S3 extends Logging with Eventually {
 
@@ -69,6 +72,19 @@ trait S3 extends Logging with Eventually {
     }
   }
 
+  def withLocalS3ObjectFromResource[R](bucketName: String, resource: URL)(testWith: TestWith[String, R]) = {
+    val metadata = new ObjectMetadata()
+    val key = Paths.get(resource.toURI).getFileName.toString
+
+    s3Client.putObject(bucketName, key, resource.openStream(), metadata)
+
+    try {
+      testWith(key)
+    } finally {
+      safeCleanup(key) { s3Client.deleteObject(bucketName, _) }
+    }
+  }
+
   def safeCleanup[T](resource: T)(f: T => Unit): Unit = {
     Try {
       logger.debug(s"cleaning up resource=[$resource]")
@@ -95,6 +111,7 @@ trait S3AkkaClient extends S3 with AkkaFixtures {
     actorSystem: ActorSystem,
     materializer: Materializer)(testWith: TestWith[S3Client, R]): R = {
 
+    logger.debug(s"creating S3 Akka client pointing to=[$localS3EndpointUrl]")
     val s3AkkaClient = new S3Client(
       new S3Settings(
         bufferType = MemoryBufferType,

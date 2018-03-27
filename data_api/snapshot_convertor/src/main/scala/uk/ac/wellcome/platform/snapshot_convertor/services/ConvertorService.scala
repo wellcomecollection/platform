@@ -22,13 +22,14 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import akka.stream.scaladsl.{Compression, Framing, Keep, Sink, Source}
 import com.twitter.finatra.json.FinatraObjectMapper
-import io.circe.Json
 import io.circe.parser.parse
+import com.twitter.inject.annotations.Flag
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  awsConfig: AWSConfig,
                                  s3Client: S3Client,
-                                 mapper: FinatraObjectMapper)
+                                 mapper: FinatraObjectMapper,
+                                 @Flag("aws.s3.endpoint") s3Endpoint: String)
     extends Logging {
 
   def runConversion(
@@ -54,21 +55,29 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       .via(Compression.gunzip())
       .via(Framing
         .delimiter(ByteString("\n"), Int.MaxValue, allowTruncation = true))
-      .map(_.utf8String)
-      .map(sourceString => (parse(sourceString).right.get \\ "_source").head)
+      .map{ _.utf8String }
+      .map{ sourceString => parse(sourceString) }
+      .collect {
+        case Right(json) => Some(json)
+        case Left(parseFailure) => {
+          warn("Failed to parse work metatdata!", parseFailure)
+          throw parseFailure
+        }
+      }
+      .collect { case Some(json) => json }
+      .map{ json => json \\ "_source" head }
       .map(_.as[IdentifiedWork])
       .collect {
         case Right(identifiedWork) => Some(identifiedWork)
         case Left(parseFailure) => {
           warn("Failed to parse identifiedWork!", parseFailure)
-
-          None
+          throw parseFailure
         }
       }
       .collect { case Some(identifiedWork) => identifiedWork }
-      .map(work => DisplayWork(work, includes))
-      .map(mapper.writeValueAsString(_))
-      .map(ByteString(_))
+      .map{ work => DisplayWork(work, includes) }
+      .map{ mapper.writeValueAsString(_) }
+      .map{ ByteString(_) }
       .via(Compression.gzip)
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
@@ -80,9 +89,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val future = source.runWith(s3Sink)(ActorMaterializer()(actorSystem))
 
     future.map { result =>
-      // this should be an app variable
-      val host = "http://localhost:33333"
-      val targetLocation = Uri(s"$host/$targetObjectKey")
+      val targetLocation = Uri(s"$s3Endpoint/${conversionJob.bucketName}/$targetObjectKey")
 
       CompletedConversionJob(
         conversionJob,

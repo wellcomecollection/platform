@@ -75,10 +75,11 @@ object S3ClientModule extends TwitterModule {
       proxy = None,
       credentialsProvider = credentialsProvider,
       s3RegionProvider = regionProvider,
-      pathStyleAccess = false,
+      pathStyleAccess = true,
       endpointUrl = endpointUrl
     )
 
+    logger.debug(s"creating S3 Akka client with settings=[$settings]")
     new S3Client(settings)(actorSystem, actorMaterializer)
   }
 

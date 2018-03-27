@@ -13,8 +13,14 @@ import uk.ac.wellcome.platform.snapshot_convertor.models.{
 import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
+import io.circe.parser.parse
+import uk.ac.wellcome.platform.snapshot_convertor.fixtures.ExampleDump
+import scala.util.Try
 
 import scala.io.Source
+import scala.util.control.NonFatal
+import java.util.zip.GZIPInputStream
+import java.io.BufferedInputStream
 
 class SnapshotConvertorFeatureTest
     extends FunSpec
@@ -22,6 +28,7 @@ class SnapshotConvertorFeatureTest
     with SqsFixtures
     with SnsFixtures
     with S3
+    with ExampleDump
     with fixtures.Server
     with ScalaFutures
     with Matchers
@@ -30,68 +37,67 @@ class SnapshotConvertorFeatureTest
 
   it(
     "converts a gzipped elasticdump from S3 into the correct format in the target bucket") {
-    withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
-        withLocalS3Bucket { bucketName =>
-          val flags = Map(
-            "aws.region" -> "eu-west-1"
-          ) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
-            bucketName) ++ cloudWatchLocalEndpointFlag
+    withLocalS3Bucket { bucketName =>
+      withLocalSqsQueue { queueUrl =>
+        withLocalSnsTopic { topicArn =>
+            withExampleDump(bucketName) { key =>
 
-          val key = "elastic_dump_example.txt.gz"
-          val input =
-            getClass.getResourceAsStream("/elastic_dump_example.txt.gz")
-          val metadata = new ObjectMetadata()
+            val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
+              bucketName)
 
-          s3Client.putObject(bucketName, key, input, metadata)
+            withServer(flags) { _ =>
+              val conversionJob = ConversionJob(
+                bucketName = bucketName,
+                objectKey = key
+              )
 
-          withServer(flags) { _ =>
-            val objectKey = "location/of/resource"
-            val expectedLocation = "location/of/target"
+              val sqsMessage = SQSMessage(
+                None,
+                toJson(conversionJob).get,
+                "topic",
+                "message",
+                "now"
+              )
 
-            val conversionJob = ConversionJob(
-              bucketName = bucketName,
-              objectKey = key
-            )
+              sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
-            val completedConversionJob = CompletedConversionJob(
-              conversionJob = conversionJob,
-              targetLocation = "location/of/target"
-            )
+              val expectedLocation = s"$localS3EndpointUrl/$bucketName/target.txt.gz"
 
-            val sqsMessage = SQSMessage(
-              None,
-              toJson(conversionJob).get,
-              "topic",
-              "message",
-              "now"
-            )
+              val expectedCompletedConversionJob = CompletedConversionJob(
+                conversionJob = conversionJob,
+                targetLocation = expectedLocation
+              )
 
-            sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+              eventually {
+                val messages = listMessagesReceivedFromSNS(topicArn)
 
-            eventually {
+                val completedJobs = messages.map{ m => parse(m.message).right.get.as[CompletedConversionJob].right.get }
 
-              val messages = listMessagesReceivedFromSNS(topicArn)
+                completedJobs should contain only (expectedCompletedConversionJob)
 
-              messages should have size 1
+                val inputStream = s3Client
+                  .getObject(bucketName, "target.txt.gz")
+                  .getObjectContent
 
-              JsonUtil
-                .fromJson[CompletedConversionJob](
-                  messages.head.message
-                )
-                .get shouldBe completedConversionJob
+                val jsons =
+                  scala.io.Source
+                    .fromInputStream(
+                      new GZIPInputStream(new BufferedInputStream(inputStream)))
+                    .mkString
+                    .split("\n")
+                    .map(parse(_))
+                    .toSeq
+ 
+                jsons should contain only parse(expectedDisplayWork)
 
-              val s3Object = s3Client.getObject(bucketName, expectedLocation)
-              val stream: S3ObjectInputStream = s3Object.getObjectContent
+              }
 
-              val outputLines =
-                Source.fromInputStream(stream).getLines.mkString
-
-              true shouldBe false
             }
+
           }
         }
       }
     }
   }
+
 }
