@@ -2,33 +2,22 @@ package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.http.search.SearchHit
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.WorksUtil
+import uk.ac.wellcome.platform.api.fixtures
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.WorksIncludes
-import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ElasticsearchServiceTest
     extends FunSpec
-    with ElasticsearchFixtures
+    with fixtures.ElasticsearchService
     with Matchers
     with ScalaFutures
     with WorksUtil {
 
   val itemType = "work"
-
-  private def withElasticSearchService(indexName: String, itemType: String)(
-    testWith: TestWith[ElasticSearchService, Assertion]) = {
-      val searchService = new ElasticSearchService(
-        defaultIndex = indexName,
-        documentType = itemType,
-        elasticClient = elasticClient
-      )
-      testWith(searchService)
-    }
 
   it("should sort results from Elasticsearch in the correct order") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
