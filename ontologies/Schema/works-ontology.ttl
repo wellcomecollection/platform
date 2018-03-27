@@ -246,8 +246,8 @@ wwork:extent rdf:type owl:DatatypeProperty ;
     rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
     
-wwork:dimension rdf:type owl:DatatypeProperty ;
-    rdfs:label "dimension"@en ;
+wwork:dimensions rdf:type owl:DatatypeProperty ;
+    rdfs:label "dimensions"@en ;
     rdfs:comment "Expressed in centimeters, millimeters, or inches; may include a parenthetical qualifier giving the format of the item (e.g., (fol.), (8vo))."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range rdf:langString ;
