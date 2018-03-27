@@ -37,15 +37,13 @@ class WorksServiceTest
           val future = worksService.listWorks()
 
           whenReady(future) { resultList =>
-            resultList.results.map { displayWork =>
-              displayWork.results should have size 2
-              displayWork.results.head shouldBe DisplayWork(
-                works(0).canonicalId,
-                works(0).title.get)
-              displayWork.results.tail.head shouldBe DisplayWork(
-                works(1).canonicalId,
-                works(1).title.get)
-            }
+            resultList.results should have size 2
+            resultList.results.head shouldBe DisplayWork(
+              works(0).canonicalId,
+              works(0).title.get)
+            resultList.results.tail.head shouldBe DisplayWork(
+              works(1).canonicalId,
+              works(1).title.get)
           }
         }
       }
