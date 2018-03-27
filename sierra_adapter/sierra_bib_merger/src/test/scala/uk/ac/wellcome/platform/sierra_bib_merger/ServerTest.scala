@@ -20,7 +20,8 @@ class ServerTest
     withLocalSqsQueue { queueUrl =>
       withLocalS3Bucket { bucketName =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(tableName)
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+            tableName)
           withServer(flags) { server =>
             server.httpGet(
               path = "/management/healthcheck",

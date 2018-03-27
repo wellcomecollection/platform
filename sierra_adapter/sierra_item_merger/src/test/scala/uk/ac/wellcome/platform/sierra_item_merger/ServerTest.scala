@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, S3, SqsFixtures}
 
 class ServerTest
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb[HybridRecord]
     with fixtures.Server
     with S3
@@ -20,7 +20,8 @@ class ServerTest
     withLocalSqsQueue { queueUrl =>
       withLocalS3Bucket { bucketName =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(tableName)
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+            tableName)
           withServer(flags) { server =>
             server.httpGet(
               path = "/management/healthcheck",
