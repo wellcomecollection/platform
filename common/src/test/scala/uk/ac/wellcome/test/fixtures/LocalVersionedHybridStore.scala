@@ -47,7 +47,8 @@ trait LocalVersionedHybridStore
     }
   }
 
-  def assertStored[T <: Id](bucketName: String, tableName: String, record: T)(implicit encoder: Encoder[T]) =
+  def assertStored[T <: Id](bucketName: String, tableName: String, record: T)(
+    implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
       getJsonFor[T](bucketName, tableName, record),
       toJson(record).get
