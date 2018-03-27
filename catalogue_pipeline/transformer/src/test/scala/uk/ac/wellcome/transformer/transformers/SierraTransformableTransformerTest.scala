@@ -639,4 +639,42 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.get.get.creators should contain only Unidentifiable(
       Person(label = name))
   }
+
+  it("extracts dimensions if present") {
+    val id = "9009009"
+    val dimensions = "24cm"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Dastardly Danish dogs draw dubious doughnuts",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "300",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "c",
+         |           "content": "$dimensions"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.dimensions shouldBe Some(dimensions)
+  }
 }
