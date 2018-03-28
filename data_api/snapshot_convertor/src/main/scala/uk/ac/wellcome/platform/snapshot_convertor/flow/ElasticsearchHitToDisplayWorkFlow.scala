@@ -36,7 +36,8 @@ object ElasticsearchHitToDisplayWorkFlow extends Logging {
     items = true
   )
 
-  def apply()(implicit executionContext: ExecutionContext): Flow[String, DisplayWork, NotUsed] =
+  def apply()(implicit executionContext: ExecutionContext)
+    : Flow[String, DisplayWork, NotUsed] =
     Flow.fromFunction({ line =>
       val hit = fromJson[ElasticsearchHit](line) match {
         case Success(h: ElasticsearchHit) => h

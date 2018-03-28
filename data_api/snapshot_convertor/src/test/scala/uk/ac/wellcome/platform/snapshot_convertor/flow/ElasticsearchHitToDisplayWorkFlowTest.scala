@@ -7,7 +7,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, WorksIncludes}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier,
+  WorksIncludes
+}
 import uk.ac.wellcome.test.fixtures.AkkaFixtures
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
