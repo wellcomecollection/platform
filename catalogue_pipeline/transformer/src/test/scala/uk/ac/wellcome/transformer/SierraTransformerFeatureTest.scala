@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
@@ -18,8 +18,8 @@ import uk.ac.wellcome.utils.JsonUtil
 class SierraTransformerFeatureTest
     extends FunSpec
     with Matchers
-    with SqsFixtures
-    with SnsFixtures
+    with SQS
+    with SNS
     with S3
     with fixtures.Server
     with Eventually

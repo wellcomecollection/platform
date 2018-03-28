@@ -21,12 +21,12 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord,
   SierraRecord
 }
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SQS}
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
     with LocalDynamoDb[SierraItemRecord]
-    with SqsFixtures
+    with SQS
     with fixtures.Server
     with Matchers
     with Eventually

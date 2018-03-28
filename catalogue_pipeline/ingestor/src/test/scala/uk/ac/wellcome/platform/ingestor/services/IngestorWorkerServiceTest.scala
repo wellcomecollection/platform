@@ -21,7 +21,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier
 }
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.fixtures.SqsFixtures
+import uk.ac.wellcome.test.fixtures.SQS
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -35,7 +35,7 @@ class IngestorWorkerServiceTest
     with MockitoSugar
     with JsonTestUtil
     with ElasticsearchFixtures
-    with SqsFixtures {
+    with SQS {
 
   val itemType = "work"
 

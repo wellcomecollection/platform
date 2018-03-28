@@ -3,13 +3,13 @@ package uk.ac.wellcome.sns
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SNSConfig
-import uk.ac.wellcome.test.fixtures.SnsFixtures
+import uk.ac.wellcome.test.fixtures.SNS
 
 class SNSWriterTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with SnsFixtures
+    with SNS
     with IntegrationPatience {
 
 //  val topicArn = createTopicAndReturnArn("test-topic-name")
