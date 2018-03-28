@@ -1,24 +1,27 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 trait MarcUtils {
   def getMatchingSubfields(
     bibData: SierraBibData,
     marcTag: String,
-    marcSubfieldTags: List[String]): List[MarcSubfield] = {
+    marcSubfieldTags: List[String]): List[List[MarcSubfield]] =
     bibData.varFields
-      .filter { _.marcTag == Some(marcTag) }
-      .map { _.subfields }
-      .flatten
-      .filter { subfield: MarcSubfield =>
-        marcSubfieldTags.contains(subfield.tag)
+      .collect {
+        case VarField(_, _, Some(m), _, _, subfields) if m == marcTag =>
+          subfields.filter { subfield =>
+            marcSubfieldTags.contains(subfield.tag)
+          }
       }
-  }
 
   def getMatchingSubfields(bibData: SierraBibData,
                            marcTag: String,
-                           marcSubfieldTag: String): List[MarcSubfield] =
+                           marcSubfieldTag: String): List[List[MarcSubfield]] =
     getMatchingSubfields(
       bibData = bibData,
       marcTag = marcTag,

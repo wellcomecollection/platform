@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Event"@en ;
     dcterms:created "2018-01-15"^^xsd:date ;
-    dcterms:description "An event ontology describing the type of events Wellcome put on."@en .
+    dcterms:description "An ontology describing museum and library events, exhibitions and installations."@en .
 
 ###### classes ###  
     

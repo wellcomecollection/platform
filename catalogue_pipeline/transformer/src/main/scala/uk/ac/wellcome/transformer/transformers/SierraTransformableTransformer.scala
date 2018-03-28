@@ -25,6 +25,8 @@ class SierraTransformableTransformer
     with SierraLocation
     with SierraPublicationDate
     with SierraPlaceOfPublication
+    with SierraCreators
+    with SierraDimensions
     with Logging {
 
   override def transformForType(
@@ -41,6 +43,7 @@ class SierraTransformableTransformer
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                ontologyType = "Work",
                 value = addCheckDigit(
                   sierraBibData.id,
                   recordType = SierraRecordTypes.bibs
@@ -58,7 +61,9 @@ class SierraTransformableTransformer
               visible = !(sierraBibData.deleted || sierraBibData.suppressed),
               publicationDate = getPublicationDate(sierraBibData),
               placesOfPublication = getPlacesOfPublication(sierraBibData),
-              language = getLanguage(sierraBibData)
+              language = getLanguage(sierraBibData),
+              creators = getCreators(sierraBibData),
+              dimensions = getDimensions(sierraBibData)
             ))
         }
 

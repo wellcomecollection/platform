@@ -21,6 +21,9 @@ import travistooling as tooling
 
     ('project/Dependencies.scala', 'sierra_adapter-test', True),
     ('project/Dependencies.scala', 'sierra_window_generator-test', False),
+
+    ('catalogue_api/api/src/main/scala/uk/ac/wellcome/platform/api/controllers/WorksController.scala', 'api-test', True),
+    ('catalogue_api/api/src/main/scala/uk/ac/wellcome/platform/api/controllers/WorksController.scala', 'snapshot_scheduler-test', False),
 ])
 def test_affects_test(path, task, expected_result):
     assert tooling.affects_tests(path=path, task=task) == expected_result

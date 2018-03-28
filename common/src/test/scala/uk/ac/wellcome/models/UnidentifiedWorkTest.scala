@@ -33,18 +33,23 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "Reskitkish"
   )
 
+  // According to Google Maps, the distance between 183 and 215 Euston Road.
+  val dimensions = "308 ft"
+
   val unidentifiedWorkJson: String =
     s"""
       |{
       |  "title": "title",
       |  "sourceIdentifier": {
       |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "ontologyType": "Work",
       |    "value": "value"
       |  },
       |  "version": 1,
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "ontologyType": "Work",
       |      "value": "value"
       |    }
       |  ],
@@ -64,19 +69,26 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "subjects": [
       |    {
       |      "label": "subject",
-      |      "ontologyType": "Concept"
+      |      "ontologyType": "Concept",
+      |      "qualifierType": null,
+      |      "type": "Concept"
       |    }
       |  ],
       |  "creators": [
       |    {
-      |      "label": "47",
-      |      "ontologyType": "Agent"
+      |      "agent" : {
+      |        "label" : "47",
+      |        "type" : "Agent"
+      |      },
+      |      "type" : "Unidentifiable"
       |    }
       |  ],
       |  "genres": [
       |    {
       |      "label": "genre",
-      |      "ontologyType": "Concept"
+      |      "ontologyType": "Concept",
+      |      "qualifierType": null,
+      |      "type": "Concept"
       |    }
       |  ],
       |  "thumbnail": {
@@ -91,11 +103,13 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    {
       |      "sourceIdentifier": {
       |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "ontologyType": "Item",
       |        "value": "value"
       |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |          "ontologyType": "Item",
       |          "value": "value"
       |        }
       |      ],
@@ -112,11 +126,13 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "ontologyType": "Item"
       |    }
       |  ],
-      |  "publishers": [
+      |  "publishers" : [
       |    {
-      |      "label": "MIT Press",
-      |      "type": "Organisation",
-      |      "ontologyType": "Organisation"
+      |      "agent" : {
+      |        "label" : "MIT Press",
+      |        "type" : "Organisation"
+      |      },
+      |      "type" : "Unidentifiable"
       |    }
       |  ],
       |  "visible":true,
@@ -135,6 +151,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |     "label": "${language.label}",
       |     "ontologyType": "Language"
       |   },
+      |   "dimensions": "$dimensions",
       |  "ontologyType": "Work"
       |}
     """.stripMargin
@@ -145,14 +162,21 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     license = License_CCBY
   )
 
-  val identifier = SourceIdentifier(
+  val workIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Work",
+    value = "value"
+  )
+
+  val itemIdentifier = SourceIdentifier(
+    identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Item",
     value = "value"
   )
 
   val item = UnidentifiedItem(
-    sourceIdentifier = identifier,
-    identifiers = List(identifier),
+    sourceIdentifier = itemIdentifier,
+    identifiers = List(itemIdentifier),
     locations = List(location)
   )
 
@@ -160,7 +184,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "MIT Press"
   )
 
-  val publishers = List(publisher)
+  val publishers = List(Unidentifiable(publisher))
 
   val workType = WorkType(
     id = "id",
@@ -169,9 +193,9 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
-    sourceIdentifier = identifier,
+    sourceIdentifier = workIdentifier,
     version = 1,
-    identifiers = List(identifier),
+    identifiers = List(workIdentifier),
     workType = Some(workType),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),
@@ -179,14 +203,15 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
-    creators = List(Agent("47")),
+    creators = List(Unidentifiable(Agent("47"))),
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
     placesOfPublication = List(Place("Madrid")),
-    language = Some(language)
+    language = Some(language),
+    dimensions = Some(dimensions)
   )
 
   it("should serialise an unidentified Work as JSON") {

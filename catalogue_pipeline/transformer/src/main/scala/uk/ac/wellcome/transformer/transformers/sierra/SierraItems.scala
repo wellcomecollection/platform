@@ -34,6 +34,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
     UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        ontologyType = "Item",
         value = addCheckDigit(
           sierraItemData.id,
           recordType = SierraRecordTypes.items
@@ -42,13 +43,15 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
       identifiers = List(
         SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
-          addCheckDigit(
+          ontologyType = "Item",
+          value = addCheckDigit(
             sierraItemData.id,
             recordType = SierraRecordTypes.items
           )
         ),
         SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraIdentifier,
+          ontologyType = "Item",
           value = sierraItemData.id
         )
       ),

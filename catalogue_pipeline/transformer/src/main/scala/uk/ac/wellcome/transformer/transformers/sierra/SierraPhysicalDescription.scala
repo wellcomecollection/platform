@@ -28,7 +28,7 @@ trait SierraPhysicalDescription extends MarcUtils {
       bibData = bibData,
       marcTag = "300",
       marcSubfieldTag = "b"
-    )
+    ).flatten
 
     if (matchingSubfields.isEmpty) {
       None

@@ -10,6 +10,8 @@ def get_projects(repo):
     for root, _, filenames in os.walk(repo):
         if root == '.':
             continue
+        if '.terraform' in root:
+            continue
         for f in filenames:
             if f == 'Makefile':
                 path = os.path.join(root, f)

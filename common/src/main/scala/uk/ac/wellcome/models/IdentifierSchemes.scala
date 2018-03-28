@@ -51,6 +51,10 @@ object IdentifierSchemes extends Logging {
     override def toString: String = "marc-countries"
   }
 
+  case object libraryOfCongressNames extends IdentifierScheme {
+    override def toString: String = "lc-names"
+  }
+
   private final val knownIdentifierSchemes = Seq(
     miroImageNumber,
     miroLibraryReference,
@@ -58,13 +62,13 @@ object IdentifierSchemes extends Logging {
     calmAltRefNo,
     sierraSystemNumber,
     sierraIdentifier,
+    libraryOfCongressNames,
     marcCountries)
 
   private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
     knownIdentifierSchemes
-      .filter { _.toString == identifierScheme }
-      .headOption
+      .find(_.toString == identifierScheme)
       .getOrElse {
         val errorMessage = s"$identifierScheme is not a valid identifierScheme"
         error(errorMessage)

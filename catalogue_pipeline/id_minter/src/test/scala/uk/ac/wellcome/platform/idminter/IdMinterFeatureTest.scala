@@ -26,7 +26,7 @@ class IdMinterFeatureTest
 
   private def generateSqsMessage(MiroID: String): SQSMessage = {
     val identifier =
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID)
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", MiroID)
 
     val work = UnidentifiedWork(
       title = Some("A query about a queue of quails"),
@@ -75,7 +75,10 @@ class IdMinterFeatureTest
             val title = "A limerick about a lion"
 
             val identifier =
-              SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID)
+              SourceIdentifier(
+                IdentifierSchemes.miroImageNumber,
+                "Work",
+                miroID)
 
             val work = UnidentifiedWork(
               title = Some(title),

@@ -2,12 +2,7 @@ package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.ac.wellcome.models.{
-  Agent,
-  IdentifierSchemes,
-  Period,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models._
 
 class MiroTransformableTransformerTest
     extends FunSpec
@@ -21,7 +16,7 @@ class MiroTransformableTransformerTest
       MiroID = MiroID
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, MiroID))
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", MiroID))
   }
 
   it("passes through the INNOPAC ID as the Sierra system number") {
@@ -211,7 +206,9 @@ class MiroTransformableTransformerTest
     expectedCreators: List[String]
   ) = {
     val transformedWork = transformWork(data = data)
-    transformedWork.creators shouldBe expectedCreators.map { Agent(_) }
+    transformedWork.creators shouldBe expectedCreators.map { creator =>
+      Unidentifiable(Agent(creator))
+    }
   }
 
   it("should have no description if no image_image_desc field is present") {
@@ -332,7 +329,7 @@ class MiroTransformableTransformerTest
     )
 
     work.title shouldBe Some("A café for cats")
-    work.creators shouldBe List(Agent("Gyokushō, a cät Ôwnêr"))
+    work.creators shouldBe List(Unidentifiable(Agent("Gyokushō, a cät Ôwnêr")))
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
@@ -348,9 +345,10 @@ class MiroTransformableTransformerTest
       MiroID = miroID
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroID),
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", miroID),
       SourceIdentifier(
         IdentifierSchemes.sierraSystemNumber,
+        "Work",
         expectedSierraNumber)
     )
   }
@@ -367,10 +365,10 @@ class MiroTransformableTransformerTest
       MiroID = "V0175278"
     )
     val miroIDList = List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "V0175278")
+      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "V0175278")
     )
     val libraryRefList = expectedValues.map {
-      SourceIdentifier(IdentifierSchemes.miroLibraryReference, _)
+      SourceIdentifier(IdentifierSchemes.miroLibraryReference, "Work", _)
     }
     work.identifiers shouldBe (miroIDList ++ libraryRefList)
   }

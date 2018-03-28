@@ -1,10 +1,9 @@
 package uk.ac.wellcome.display.models
 
-import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
 
-@JsonIgnoreProperties(Array("visible"))
 @ApiModel(
   value = "Work",
   description =
@@ -42,10 +41,10 @@ case class DisplayWork(
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
-  ) creators: List[DisplayAgent] = List(),
+  ) creators: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
@@ -70,9 +69,9 @@ case class DisplayWork(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAgent] = List(),
+  ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
     value = "Show a list of places of publication."
@@ -86,7 +85,9 @@ case class DisplayWork(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
     value = "Relates a work to its primary language."
   ) language: Option[DisplayLanguage] = None,
-  visible: Boolean = true
+  @ApiModelProperty(
+    dataType = "String"
+  ) dimensions: Option[String] = None
 ) {
   @ApiModelProperty(
     readOnly = true,
@@ -107,7 +108,7 @@ case object DisplayWork {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      creators = work.creators.map { DisplayAgent(_) },
+      creators = work.creators.map { DisplayAbstractAgent(_) },
       subjects = work.subjects.map { DisplayConcept(_) },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
@@ -124,11 +125,11 @@ case object DisplayWork {
             DisplayItem(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAgent(_)),
+      publishers = work.publishers.map(DisplayAbstractAgent(_)),
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
       language = work.language.map { DisplayLanguage(_) },
-      visible = work.visible
+      dimensions = work.dimensions
     )
   }
 

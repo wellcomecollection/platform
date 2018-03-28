@@ -64,8 +64,47 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
+  def concept(fieldName: String) = objectField(fieldName).fields(
+    textField("label"),
+    keywordField("ontologyType"),
+    keywordField("type"),
+    keywordField("qualifierType"),
+    objectField("qualifiers").fields(
+      textField("label"),
+      keywordField("ontologyType"),
+      keywordField("qualifierType")
+    ),
+    // Nested concept -- if qualified concept
+    objectField("concept").fields(
+      textField("label"),
+      keywordField("ontologyType"),
+      keywordField("qualifierType"),
+      objectField("qualifiers").fields(
+        textField("label"),
+        keywordField("ontologyType"),
+        keywordField("qualifierType")
+      )
+    )
+  )
+
   def labelledTextField(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
+    keywordField("ontologyType")
+  )
+
+  def indentified(fieldName: String, fields: Seq[FieldDefinition]) =
+    objectField(fieldName).fields(
+      textField("type"),
+      objectField("agent").fields(fields),
+      keywordField("canonicalId"),
+      identifiers
+    )
+
+  val agent = Seq(
+    textField("label"),
+    keywordField("type"),
+    keywordField("prefix"),
+    keywordField("numeration"),
     keywordField("ontologyType")
   )
 
@@ -77,15 +116,9 @@ class WorksIndex @Inject()(client: HttpClient,
     booleanField("visible"),
     keywordField("ontologyType")
   )
-  val publishers = objectField("publishers").fields(
-    textField("label"),
-    keywordField("type"),
-    keywordField("ontologyType")
-  )
-
   val language = objectField("language").fields(
     keywordField("id"),
-    textField("language"),
+    textField("label"),
     keywordField("ontologyType")
   )
 
@@ -109,15 +142,16 @@ class WorksIndex @Inject()(client: HttpClient,
       textField("lettering").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
-      labelledTextField("creators"),
-      labelledTextField("subjects"),
-      labelledTextField("genres"),
+      indentified("creators", agent),
+      concept("subjects"),
+      concept("genres"),
       labelledTextField("placesOfPublication"),
       items,
-      publishers,
+      indentified("publishers", agent),
       date("publicationDate"),
       language,
-      location("thumbnail")
+      location("thumbnail"),
+      textField("dimensions")
     )
 
   val mappingDefinition: MappingDefinition = mapping(rootIndexType)

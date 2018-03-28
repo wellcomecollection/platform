@@ -49,6 +49,12 @@ data "aws_iam_policy_document" "travis_permissions" {
     actions = [
       "s3:PutObject",
       "s3:GetObject",
+      "s3:HeadObject",
+
+      # Required in case Travis tries to publish a Lambda that doesn't exist
+      # yet.  It complains about not having HeadObject permissions, but it
+      # really needs both of them.
+      "s3:ListObject",
     ]
 
     resources = [

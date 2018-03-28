@@ -41,8 +41,9 @@ class MiroTransformableTransformer
         UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
-            IdentifierSchemes.miroImageNumber,
-            miroTransformable.sourceId),
+            identifierScheme = IdentifierSchemes.miroImageNumber,
+            ontologyType = "Work",
+            value = miroTransformable.sourceId),
           version = version,
           identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
           description = description,
@@ -166,7 +167,10 @@ class MiroTransformableTransformer
   private def getIdentifiers(miroData: MiroTransformableData,
                              miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.miroImageNumber,
+        ontologyType = "Work",
+        value = miroId)
     )
 
     // Add the Sierra system number from the INNOPAC ID, if it's present.
@@ -196,7 +200,10 @@ class MiroTransformableTransformer
         regexMatch match {
           case Some(s) =>
             s.map { id =>
-              SourceIdentifier(IdentifierSchemes.sierraSystemNumber, s"b$id")
+              SourceIdentifier(
+                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                ontologyType = "Work",
+                value = s"b$id")
             }
           case _ =>
             throw new RuntimeException(
@@ -217,8 +224,9 @@ class MiroTransformableTransformer
         .collect {
           case (Some(label), Some(value)) =>
             SourceIdentifier(
-              IdentifierSchemes.miroLibraryReference,
-              s"$label $value"
+              identifierScheme = IdentifierSchemes.miroLibraryReference,
+              ontologyType = "Work",
+              value = s"$label $value"
             )
         }
 
@@ -228,26 +236,33 @@ class MiroTransformableTransformer
   /*
    * <image_creator>: the Creator, which maps to our property "hasCreator"
    */
-  private def getCreators(miroData: MiroTransformableData): List[Agent] = {
+  private def getCreators(
+    miroData: MiroTransformableData): List[Unidentifiable[Agent]] = {
     val primaryCreators = miroData.creator match {
-      case Some(c) => c.map { Agent(_) }
+      case Some(creator) =>
+        creator.map { c =>
+          Unidentifiable(Agent(c))
+        }
       case None => List()
     }
 
     // <image_secondary_creator>: what MIRO calls Secondary Creator, which
     // will also just have to map to our object property "hasCreator"
-    val secondaryCreators: List[Agent] = miroData.secondaryCreator match {
-      case Some(c) => c.map { Agent(_) }
+    val secondaryCreators = miroData.secondaryCreator match {
+      case Some(creator) =>
+        creator.map { c =>
+          Unidentifiable(Agent(c))
+        }
       case None => List()
     }
 
     // We also add the contributor code for the non-historical images, but
     // only if the contributor *isn't* Wellcome Collection.v
-    val contributorCreators: List[Agent] = miroData.sourceCode match {
+    val contributorCreators = miroData.sourceCode match {
       case Some(code) =>
         contributorMap(code.toUpperCase) match {
           case "Wellcome Collection" => List()
-          case contributor => List(Agent(contributor))
+          case contributor => List(Unidentifiable(Agent(contributor)))
         }
       case None => List()
     }
@@ -310,9 +325,9 @@ class MiroTransformableTransformer
     List(
       UnidentifiedItem(
         sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId),
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", miroId),
         identifiers = List(
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, miroId)
+          SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", miroId)
         ),
         locations = List(
           DigitalLocation(
