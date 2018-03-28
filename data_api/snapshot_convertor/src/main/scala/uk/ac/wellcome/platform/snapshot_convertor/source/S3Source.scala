@@ -9,7 +9,7 @@ import akka.util.ByteString
   * source emits the (uncompressed) lines from that file, one line at a time.
   */
 object S3Source {
-  def apply(s3client: S3Client, bucketName: String, key: String): Source[String, NotUsed] = {
+  def apply(s3client: S3Client, bucketName: String, key: String): Source[String, Any] = {
     val (s3download: Source[ByteString, _], _) = s3client.download(bucket = bucketName, key = key)
 
     s3download

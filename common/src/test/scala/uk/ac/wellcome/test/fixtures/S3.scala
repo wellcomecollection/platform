@@ -7,19 +7,17 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
-import org.scalatest.Matchers
-import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConversions._
 import scala.util.Random
 
 trait S3 {
 
-  private val localS3EndpointUrl = "http://localhost:33333"
+  protected val localS3EndpointUrl = "http://localhost:33333"
+  protected val regionName = "localhost"
 
-  private val accessKey = "accessKey1"
-  private val secretKey = "verySecretKey1"
+  protected val accessKey = "accessKey1"
+  protected val secretKey = "verySecretKey1"
 
   def s3LocalFlags(bucketName: String) = Map(
     "aws.s3.endpoint" -> localS3EndpointUrl,
