@@ -13,7 +13,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier,
   WorksIncludes
 }
-import uk.ac.wellcome.test.fixtures.AkkaFixtures
+import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 class ElasticsearchHitToDisplayWorkFlowTest
     extends FunSpec
     with Matchers
-    with AkkaFixtures
+    with Akka
     with ScalaFutures
     with ExtendedPatience {
 
