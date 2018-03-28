@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraContributorsTest extends FunSpec with Matchers {
 
@@ -25,10 +29,13 @@ class SierraContributorsTest extends FunSpec with Matchers {
 
     val contributors = transformer.getContributors(bibData)
 
-    contributors should contain only Contributor(agent = Unidentifiable(Person(label = name)), roles = Nil)
+    contributors should contain only Contributor(
+      agent = Unidentifiable(Person(label = name)),
+      roles = Nil)
   }
 
-  it("extracts the creator name and contribution role from marcTag 100 $$a $$e respectively") {
+  it(
+    "extracts the creator name and contribution role from marcTag 100 $$a $$e respectively") {
     val name = "Carrot Ironfoundersson"
     val contributionRole = "Captain"
 
@@ -41,12 +48,17 @@ class SierraContributorsTest extends FunSpec with Matchers {
           marcTag = "100",
           indicator1 = "",
           indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name), MarcSubfield(tag = "e", content = contributionRole))))
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "e", content = contributionRole))
+        ))
     )
 
     val contributors = transformer.getContributors(bibData)
 
-    contributors should contain only Contributor(agent = Unidentifiable(Person(label = name)), roles = List(ContributionRole(label = contributionRole)))
+    contributors should contain only Contributor(
+      agent = Unidentifiable(Person(label = name)),
+      roles = List(ContributionRole(label = contributionRole)))
   }
 
 //  it("extracts the creator numeration and prefix if present from marcTag 100") {
