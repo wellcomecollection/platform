@@ -9,7 +9,7 @@ import io.circe.parser._
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConversions._
@@ -19,7 +19,7 @@ class SequentialS3SinkTest
     extends FunSpec
     with Matchers
     with S3
-    with AkkaFixtures
+    with Akka
     with BeforeAndAfterAll
     with ScalaFutures
     with ExtendedPatience {

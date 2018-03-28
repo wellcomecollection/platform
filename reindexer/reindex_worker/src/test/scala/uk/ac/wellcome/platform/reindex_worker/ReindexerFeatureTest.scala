@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord
 }
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -33,8 +33,8 @@ class ReindexerFeatureTest
     with ExtendedPatience
     with fixtures.Server
     with LocalDynamoDb[TestRecord]
-    with SnsFixtures
-    with SqsFixtures
+    with SNS
+    with SQS
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[TestRecord] =

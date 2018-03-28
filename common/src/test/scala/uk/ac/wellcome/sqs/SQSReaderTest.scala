@@ -20,7 +20,7 @@ class SQSReaderTest
     with ScalaFutures
     with Eventually
     with ExtendedPatience
-    with SqsFixtures {
+    with SQS {
 
   def withSqsReader[R](queueUrl: String, maxMessages: Int)(
     testWith: TestWith[SQSReader, R]) = {
