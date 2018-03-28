@@ -88,7 +88,7 @@ def _wrap(row):
         }]}
 
 
-def _dynamodb_item(id, reindex_shard=None, version=1):
+def _dynamodb_item(id, reindex_shard=None, reindex_version=None, version=1):
     source_name, source_id = id.split('/')
     data = {
         'id': {'S': id},
@@ -97,16 +97,18 @@ def _dynamodb_item(id, reindex_shard=None, version=1):
     }
     if reindex_shard:
         data['reindexShard'] = {'S': reindex_shard}
+    if reindex_version:
+        data['reindexVersion'] = {'N': reindex_version}
 
     return data
 
 
-def _dynamo_event(id, reindex_shard=None, version=1):
-    data = _dynamodb_item(id, reindex_shard, version)
+def _dynamo_event(id, reindex_shard=None, reindex_version=None, version=1):
+    data = _dynamodb_item(id, reindex_shard, reindex_version, version)
     return _wrap(data)
 
 
-def test_adds_shard_to_new_record(dynamodb_client, source_data_table):
+def test_adds_shard_and_reindex_version_to_new_record(dynamodb_client, source_data_table):
     dynamodb_client.put_item(
         TableName=source_data_table,
         Item=_dynamodb_item(id='sierra/b1111111')
@@ -122,6 +124,7 @@ def test_adds_shard_to_new_record(dynamodb_client, source_data_table):
     )
 
     assert item['Item']['reindexShard']['S'] == 'sierra/2403'
+    assert item['Item']['reindexVersion']['N'] == '0'
 
 
 def test_updates_shard_on_old_record(dynamodb_client, source_data_table):
@@ -145,15 +148,39 @@ def test_updates_shard_on_old_record(dynamodb_client, source_data_table):
     assert item['Item']['reindexShard']['S'] == 'sierra/2698'
 
 
-def test_does_nothing_if_shard_up_to_date(dynamodb_client, source_data_table):
+def test_adds_reindex_version_if_not_exists_and_shard_exists(dynamodb_client, source_data_table):
     dynamodb_client.put_item(
         TableName=source_data_table,
-        Item=_dynamodb_item(id='sierra/b3333333', version=3)
+        Item=_dynamodb_item(id='sierra/b3333333')
+    )
+
+    event = _dynamo_event(
+        id='sierra/b3333333',
+        reindex_shard='sierra/2993'
+    )
+
+    main(event=event, dynamodb_client=dynamodb_client)
+
+    item = dynamodb_client.get_item(
+        TableName=source_data_table,
+        Key={'id': {'S': 'sierra/b3333333'}}
+    )
+
+    assert item['Item']['reindexVersion']['N'] == '0'
+
+
+def test_does_nothing_if_shard_up_to_date_and_reindex_version_is_present(dynamodb_client, source_data_table):
+    dynamodb_client.put_item(
+        TableName=source_data_table,
+        Item=_dynamodb_item(id='sierra/b3333333',
+                            reindex_version=str(10),
+                            version=3)
     )
 
     event = _dynamo_event(
         id='sierra/b3333333',
         reindex_shard='sierra/2993',
+        reindex_version=str(10),
         version=3
     )
 
