@@ -33,7 +33,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(0).lettering.get}",
                           |     "createdDate": ${period(
                             works(0).createdDate.get)},
-                          |     "creators": [ ${agent(works(0).creators(0))} ],
+                          |     "creators": [ ${identifiedOrUnidentifiable(
+                            works(0).creators(0),
+                            abstractAgent)} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -52,7 +54,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(1).lettering.get}",
                           |     "createdDate": ${period(
                             works(1).createdDate.get)},
-                          |     "creators": [ ${agent(works(1).creators(0))} ],
+                          |     "creators": [ ${identifiedOrUnidentifiable(
+                            works(1).creators(0),
+                            abstractAgent)} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -71,7 +75,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(2).lettering.get}",
                           |     "createdDate": ${period(
                             works(2).createdDate.get)},
-                          |     "creators": [ ${agent(works(2).creators(0))} ],
+                          |     "creators": [ ${identifiedOrUnidentifiable(
+                            works(2).creators(0),
+                            abstractAgent)} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -115,7 +121,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           | },
                           | "lettering": "$lettering",
                           | "createdDate": ${period(work.createdDate.get)},
-                          | "creators": [ ${agent(work.creators(0))} ],
+                          | "creators": [ ${identifiedOrUnidentifiable(
+                            work.creators(0),
+                            abstractAgent)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
@@ -133,7 +141,7 @@ class ApiWorksTest extends ApiWorksTestBase {
       items = List(
         itemWith(
           canonicalId = "c3a599u5",
-          identifier = defaultSourceIdentifier,
+          identifier = defaultItemSourceIdentifier,
           location = defaultLocation
         )
       )
@@ -285,7 +293,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(1).lettering.get}",
                           |     "createdDate": ${period(
                             works(1).createdDate.get)},
-                          |     "creators": [ ${agent(works(1).creators(0))} ],
+                          |     "creators": [ ${identifiedOrUnidentifiable(
+                            works(1).creators(0),
+                            abstractAgent)} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -321,7 +331,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(0).lettering.get}",
                           |     "createdDate": ${period(
                             works(0).createdDate.get)},
-                          |     "creators": [ ${agent(works(0).creators(0))} ],
+                          |     "creators": [ ${identifiedOrUnidentifiable(
+                            works(0).creators(0),
+                            abstractAgent)} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -357,7 +369,9 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "lettering": "${works(2).lettering.get}",
                           |     "createdDate": ${period(
                             works(2).createdDate.get)},
-                          |     "creators": [ ${agent(works(2).creators(0))} ],
+                          |     "creators": [ ${identifiedOrUnidentifiable(
+                            works(2).creators(0),
+                            abstractAgent)} ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
@@ -585,6 +599,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "Test1234"
     )
     val work1 = workWith(
@@ -595,6 +610,7 @@ class ApiWorksTest extends ApiWorksTestBase {
 
     val identifier2 = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "DTest5678"
     )
     val work2 = workWith(
@@ -648,6 +664,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     val srcIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "Test1234"
     )
     val work = workWith(

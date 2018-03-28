@@ -55,12 +55,12 @@ class IdentifiersDaoTest
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifier.OntologyType,
           value = identifier.SourceId
         )
 
         val triedLookup = fixtures.identifiersDao.lookupId(
-          sourceIdentifier = sourceIdentifier,
-          ontologyType = identifier.OntologyType
+          sourceIdentifier = sourceIdentifier
         )
 
         triedLookup shouldBe Success(Some(identifier))
@@ -82,12 +82,12 @@ class IdentifiersDaoTest
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          identifier.OntologyType,
           value = "not_an_existing_value"
         )
 
         val triedLookup = fixtures.identifiersDao.lookupId(
-          sourceIdentifier = sourceIdentifier,
-          ontologyType = identifier.OntologyType
+          sourceIdentifier = sourceIdentifier
         )
 
         triedLookup shouldBe Success(None)
@@ -100,8 +100,7 @@ class IdentifiersDaoTest
                                        ontologyType: String = "TestWork") = {
 
     val triedLookup = identifiersDao.lookupId(
-      sourceIdentifier = sourceIdentifier,
-      ontologyType = ontologyType
+      sourceIdentifier = sourceIdentifier
     )
 
     val identifier = triedLookup.get.get
@@ -113,8 +112,7 @@ class IdentifiersDaoTest
                                          ontologyType: String = "TestWork") {
 
     val triedLookup = identifiersDao.lookupId(
-      sourceIdentifier = sourceIdentifier,
-      ontologyType = ontologyType
+      sourceIdentifier = sourceIdentifier
     )
 
     val identifier = triedLookup.get

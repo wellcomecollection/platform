@@ -33,18 +33,24 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "Dogescript"
   )
 
+  // TRIVIA: This is the distance travelled by the Opportunity Mars rover,
+  // as of 10 January 2018.
+  val dimensions = "45 km (28 mi)"
+
   val identifiedWorkJson: String =
     s"""
       |{
       |  "title": "title",
       |  "sourceIdentifier": {
       |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |    "ontologyType": "Work",
       |    "value": "value"
       |  },
       |  "version": 1,
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "ontologyType": "Work",
       |      "value": "value"
       |    }
       |  ],
@@ -65,19 +71,26 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "subjects": [
       |    {
       |      "label": "subject",
-      |      "ontologyType": "Concept"
+      |      "ontologyType": "Concept",
+      |      "qualifierType": null,
+      |      "type": "Concept"
       |    }
       |  ],
       |  "creators": [
       |    {
-      |      "label": "47",
-      |      "ontologyType": "Agent"
+      |      "agent" : {
+      |        "label" : "47",
+      |        "type" : "Agent"
+      |      },
+      |      "type" : "Unidentifiable"
       |    }
       |  ],
       |  "genres": [
       |    {
       |      "label": "genre",
-      |      "ontologyType": "Concept"
+      |      "ontologyType": "Concept",
+      |      "qualifierType": null,
+      |      "type": "Concept"
       |    }
       |  ],
       |  "thumbnail": {
@@ -93,11 +106,13 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "canonicalId": "canonicalId",
       |      "sourceIdentifier": {
       |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "ontologyType": "Item",
       |        "value": "value"
       |      },
       |      "identifiers": [
       |        {
       |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |          "ontologyType": "Item",
       |          "value": "value"
       |        }
       |      ],
@@ -116,9 +131,11 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "publishers": [
       |    {
-      |      "label": "MIT Press",
-      |      "ontologyType": "Organisation",
-      |      "type": "Organisation"
+      |      "agent" : {
+      |        "label" : "MIT Press",
+      |        "type" : "Organisation"
+      |      },
+      |      "type" : "Unidentifiable"
       |    }
       |  ],
       |  "publicationDate": {
@@ -134,6 +151,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |     "label": "${language.label}",
       |     "ontologyType": "Language"
       |   },
+      |   "dimensions": "$dimensions",
       |  "visible":true,
       |  "ontologyType": "Work"
       |}
@@ -145,15 +163,22 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     license = License_CCBY
   )
 
-  val identifier = SourceIdentifier(
+  val workIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Work",
+    value = "value"
+  )
+
+  val itemIdentifier = SourceIdentifier(
+    identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Item",
     value = "value"
   )
 
   val item = IdentifiedItem(
     canonicalId = "canonicalId",
-    sourceIdentifier = identifier,
-    identifiers = List(identifier),
+    sourceIdentifier = itemIdentifier,
+    identifiers = List(itemIdentifier),
     locations = List(location)
   )
 
@@ -166,14 +191,14 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "label"
   )
 
-  val publishers = List(publisher)
+  val publishers = List(Unidentifiable(publisher))
 
   val identifiedWork = IdentifiedWork(
     canonicalId = "canonicalId",
     title = Some("title"),
-    sourceIdentifier = identifier,
+    sourceIdentifier = workIdentifier,
     version = 1,
-    identifiers = List(identifier),
+    identifiers = List(workIdentifier),
     workType = Some(workType),
     description = Some("description"),
     physicalDescription = Some(physicalDescription),
@@ -181,14 +206,15 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
-    creators = List(Agent("47")),
+    creators = List(Unidentifiable(Agent("47"))),
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
     placesOfPublication = List(Place(label = "Spain")),
-    language = Some(language)
+    language = Some(language),
+    dimensions = Some(dimensions)
   )
 
   it("should serialise an identified Item as Work") {

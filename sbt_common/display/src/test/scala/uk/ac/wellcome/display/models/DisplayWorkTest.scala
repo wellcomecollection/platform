@@ -47,6 +47,7 @@ class DisplayWorkTest extends FunSpec with Matchers {
 
   val sourceIdentifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.sierraSystemNumber,
+    ontologyType = "Work",
     value = "b1234567"
   )
 
@@ -88,15 +89,23 @@ class DisplayWorkTest extends FunSpec with Matchers {
         identifiers = Nil,
         canonicalId = "hz2hrba9",
         publishers = List(
-          Agent("Henry Hare"),
-          Agent("Harriet Heron")
+          Unidentifiable(Agent("Henry Hare")),
+          Unidentifiable(Agent("Harriet Heron"))
         )
       )
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        new DisplayAgent(label = "Henry Hare", ontologyType = "Agent"),
-        new DisplayAgent(label = "Harriet Heron", ontologyType = "Agent")
+        DisplayAgent(
+          id = None,
+          identifiers = None,
+          label = "Henry Hare",
+          ontologyType = "Agent"),
+        DisplayAgent(
+          id = None,
+          identifiers = None,
+          label = "Harriet Heron",
+          ontologyType = "Agent")
       )
     }
 
@@ -108,19 +117,88 @@ class DisplayWorkTest extends FunSpec with Matchers {
         identifiers = Nil,
         canonicalId = "j7tw9jv3",
         publishers = List(
-          Agent("Janet Jackson"),
-          Organisation("Juniper Journals")
+          Unidentifiable(Agent("Janet Jackson")),
+          Unidentifiable(Organisation("Juniper Journals"))
         )
       )
 
       val displayWork = DisplayWork(work)
       displayWork.publishers shouldBe List(
-        new DisplayAgent(label = "Janet Jackson", ontologyType = "Agent"),
-        new DisplayAgent(
-          label = "Juniper Journals",
-          ontologyType = "Organisation")
+        DisplayAgent(id = None, identifiers = None, label = "Janet Jackson"),
+        DisplayOrganisation(
+          id = None,
+          identifiers = None,
+          label = "Juniper Journals")
       )
     }
+  }
+
+  it("parses a work with unidentifiable persons and organisations as creators") {
+    val work = IdentifiedWork(
+      title = Some("Jumping over jackals in Japan"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = Nil,
+      canonicalId = "j7tw9jv3",
+      creators = List(
+        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
+        Unidentifiable(Organisation("Juniper Journals"))
+      )
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.creators shouldBe List(
+      DisplayPerson(
+        id = None,
+        identifiers = None,
+        label = "Esmerelda Weatherwax",
+        prefix = Some("Witch")),
+      DisplayOrganisation(
+        id = None,
+        identifiers = None,
+        label = "Juniper Journals")
+    )
+  }
+
+  it(
+    "parses a work with a mixture of identifed or unidentifable persons and organisations as creators") {
+    val canonicalId = "abcdefgh"
+    val sourceIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      "Organisation",
+      "EW")
+    val work = IdentifiedWork(
+      title = Some("Jumping over jackals in Japan"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = Nil,
+      canonicalId = "j7tw9jv3",
+      creators = List(
+        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
+        Identified(
+          Organisation("Juniper Journals"),
+          canonicalId = canonicalId,
+          identifiers = List(sourceIdentifier))
+      )
+    )
+
+    val displayWork = DisplayWork(work)
+    displayWork.creators shouldBe List(
+      DisplayPerson(
+        id = None,
+        identifiers = None,
+        label = "Esmerelda Weatherwax",
+        prefix = Some("Witch")),
+      DisplayOrganisation(
+        id = Some(canonicalId),
+        identifiers = Some(
+          List(
+            DisplayIdentifier(
+              IdentifierSchemes.libraryOfCongressNames.toString,
+              sourceIdentifier.value))),
+        label = "Juniper Journals"
+      )
+    )
   }
 
   it("gets the publicationDate from a Work") {

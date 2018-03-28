@@ -45,7 +45,8 @@ class IdEmbedderTests
 
   it("should set the canonicalId given by the IdentifierGenerator on the work") {
     val identifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "1234"
     )
 
@@ -83,9 +84,76 @@ class IdEmbedderTests
     }
   }
 
+  it("mints identifiers for creators in work") {
+    val workIdentifier = SourceIdentifier(
+      IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = "1234"
+    )
+
+    val creatorIdentifier = SourceIdentifier(
+      IdentifierSchemes.libraryOfCongressNames,
+      ontologyType = "Person",
+      value = "1234"
+    )
+
+    val person = Person(label = "The Librarian")
+    val originalWork = UnidentifiedWork(
+      title = Some("crap"),
+      sourceIdentifier = workIdentifier,
+      creators = List(
+        Identifiable(
+          person,
+          sourceIdentifier = creatorIdentifier,
+          identifiers = List(creatorIdentifier))),
+      version = 1
+    )
+
+    val newWorkCanonicalId = "5467"
+
+    setUpIdentifierGeneratorMock(
+      workIdentifier,
+      originalWork.ontologyType,
+      newWorkCanonicalId
+    )
+    val newCreatorCanonicalId = "8901"
+
+    setUpIdentifierGeneratorMock(
+      creatorIdentifier,
+      "Person",
+      newCreatorCanonicalId
+    )
+
+    val newWorkFuture = idEmbedder.embedId(
+      json = parse(
+        toJson(originalWork).get
+      ).right.get
+    )
+
+    val expectedWork = IdentifiedWork(
+      canonicalId = newWorkCanonicalId,
+      title = originalWork.title,
+      sourceIdentifier = originalWork.sourceIdentifier,
+      creators = List(
+        Identified(
+          agent = person,
+          canonicalId = newCreatorCanonicalId,
+          identifiers = List(creatorIdentifier))),
+      version = originalWork.version
+    )
+
+    whenReady(newWorkFuture) { newWorkJson =>
+      assertJsonStringsAreEqual(
+        newWorkJson.toString(),
+        toJson(expectedWork).get
+      )
+    }
+  }
+
   it("should return a failed future if the call to IdentifierGenerator fails") {
     val identifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
       value = "1234"
     )
 
@@ -99,8 +167,7 @@ class IdEmbedderTests
     when(
       mockIdentifierGenerator
         .retrieveOrGenerateCanonicalId(
-          identifier,
-          originalWork.ontologyType
+          identifier
         )
     ).thenReturn(Try(throw expectedException))
 
@@ -115,6 +182,7 @@ class IdEmbedderTests
   it("should add canonicalIds to all items") {
     val identifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,
+      ontologyType = "Item",
       value = "1234"
     )
 
@@ -126,6 +194,7 @@ class IdEmbedderTests
     val originalItem2 = UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
         IdentifierSchemes.miroImageNumber,
+        ontologyType = "Item",
         value = "1235"
       ),
       locations = List()
@@ -244,12 +313,13 @@ class IdEmbedderTests
 
     it("identify a document that is Identifiable") {
 
+      val ontologyType = "false capitals"
       val sourceIdentifier = SourceIdentifier(
         IdentifierSchemes.miroImageNumber,
+        ontologyType = ontologyType,
         "sydney"
       )
 
-      val ontologyType = "false capitals"
       val newCanonicalId =
         generateMockCanonicalId(sourceIdentifier, ontologyType)
 
@@ -263,6 +333,7 @@ class IdEmbedderTests
       {
         "sourceIdentifier": {
           "identifierScheme": "${sourceIdentifier.identifierScheme}",
+          "ontologyType": "$ontologyType",
           "value": "${sourceIdentifier.value}"
         },
         "ontologyType": "$ontologyType"
@@ -274,6 +345,7 @@ class IdEmbedderTests
         "canonicalId": "$newCanonicalId",
         "sourceIdentifier": {
           "identifierScheme": "${sourceIdentifier.identifierScheme}",
+          "ontologyType": "$ontologyType",
           "value": "${sourceIdentifier.value}"
         },
         "ontologyType": "$ontologyType"
@@ -288,12 +360,13 @@ class IdEmbedderTests
     }
 
     it("identify a document with a key that is identifiable") {
+      val ontologyType = "fictional cities"
+
       val sourceIdentifier = SourceIdentifier(
         IdentifierSchemes.miroImageNumber,
+        ontologyType = ontologyType,
         "king's landing"
       )
-
-      val ontologyType = "fictional cities"
 
       val newCanonicalId = generateMockCanonicalId(
         sourceIdentifier,
@@ -313,6 +386,7 @@ class IdEmbedderTests
         "item": {
           "sourceIdentifier": {
             "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "ontologyType": "$ontologyType",
             "value": "${sourceIdentifier.value}"
           },
           "ontologyType": "$ontologyType"
@@ -328,6 +402,7 @@ class IdEmbedderTests
           "canonicalId": "$newCanonicalId",
           "sourceIdentifier": {
             "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "ontologyType": "$ontologyType",
             "value": "${sourceIdentifier.value}"
           },
           "ontologyType": "$ontologyType"
@@ -355,8 +430,7 @@ class IdEmbedderTests
     when(
       mockIdentifierGenerator
         .retrieveOrGenerateCanonicalId(
-          sourceIdentifier,
-          ontologyType
+          sourceIdentifier
         )
     ).thenReturn(Try(newCanonicalId))
   }

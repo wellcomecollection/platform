@@ -36,7 +36,7 @@ trait SierraPublicationDate extends MarcUtils {
       bibData = bibData,
       marcTag = "260",
       marcSubfieldTag = "c"
-    )
+    ).flatten
 
     if (matchingSubfields.isEmpty) {
       None

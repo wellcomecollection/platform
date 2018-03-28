@@ -12,11 +12,13 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |{
       |  "sourceIdentifier": {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "ontologyType": "Item",
       |      "value": "value"
       |  },
       |  "identifiers": [
       |    {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "ontologyType": "Item",
       |      "value": "value"
       |    }
       |  ],
@@ -47,6 +49,7 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
 
   val identifier = SourceIdentifier(
     identifierScheme = IdentifierSchemes.miroImageNumber,
+    ontologyType = "Item",
     value = "value"
   )
 

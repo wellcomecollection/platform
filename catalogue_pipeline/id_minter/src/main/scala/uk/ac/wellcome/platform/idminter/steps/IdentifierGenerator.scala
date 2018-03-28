@@ -17,14 +17,12 @@ class IdentifierGenerator @Inject()(
     with TwitterModuleFlags {
 
   def retrieveOrGenerateCanonicalId(
-    identifier: SourceIdentifier,
-    ontologyType: String
+    identifier: SourceIdentifier
   ): Try[String] = {
     Try {
       identifiersDao
         .lookupId(
-          sourceIdentifier = identifier,
-          ontologyType = ontologyType
+          sourceIdentifier = identifier
         )
         .flatMap {
           case Some(id) =>
@@ -32,7 +30,7 @@ class IdentifierGenerator @Inject()(
             Try(id.CanonicalId)
           case None =>
             val result =
-              generateAndSaveCanonicalId(identifier, ontologyType)
+              generateAndSaveCanonicalId(identifier)
             if (result.isSuccess)
               metricsSender.incrementCount("generated-new-id")
 
@@ -42,8 +40,7 @@ class IdentifierGenerator @Inject()(
   }
 
   private def generateAndSaveCanonicalId(
-    identifier: SourceIdentifier,
-    ontologyType: String
+    identifier: SourceIdentifier
   ): Try[String] = {
 
     val canonicalId = Identifiable.generate
@@ -51,7 +48,7 @@ class IdentifierGenerator @Inject()(
       .saveIdentifier(
         Identifier(
           CanonicalId = canonicalId,
-          OntologyType = ontologyType,
+          OntologyType = identifier.ontologyType,
           SourceSystem = identifier.identifierScheme.toString,
           SourceId = identifier.value
         ))

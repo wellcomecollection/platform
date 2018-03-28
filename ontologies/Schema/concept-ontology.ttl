@@ -9,7 +9,7 @@
     rdf:type owl:Ontology ;
     dcterms:title "Concept"@en ;
     dcterms:created "2017-08-16"^^xsd:date ;
-    dcterms:description "A concept ontology describing concepts and their relationships"@en .
+    dcterms:description "An ontology describing concepts, their classification and relationships."@en .
 
 ###### classes ###  
     

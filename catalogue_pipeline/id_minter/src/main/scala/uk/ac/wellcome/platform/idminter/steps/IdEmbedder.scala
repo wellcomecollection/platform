@@ -13,6 +13,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.annotation.tailrec
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import uk.ac.wellcome.models.Identified
 
 class IdEmbedder @Inject()(metricsSender: MetricsSender,
                            identifierGenerator: IdentifierGenerator)
@@ -46,15 +47,21 @@ class IdEmbedder @Inject()(metricsSender: MetricsSender,
   private def addIdentifierToJsonObject(obj: JsonObject): JsonObject = {
     if (obj.contains("sourceIdentifier")) {
       val sourceIdentifier = parseSourceIdentifier(obj)
-      val ontologyType = obj("ontologyType").get.asString.get
 
       val canonicalId = identifierGenerator
         .retrieveOrGenerateCanonicalId(
-          identifier = sourceIdentifier,
-          ontologyType = ontologyType
+          identifier = sourceIdentifier
         )
         .get
-      ("canonicalId", Json.fromString(canonicalId)) +: obj
+
+      if (obj.contains("type")) {
+        (("type", Json.fromString("Identified")) +:
+          ("canonicalId", Json.fromString(canonicalId)) +: obj)
+          .remove("sourceIdentifier")
+      } else {
+        ("canonicalId", Json.fromString(canonicalId)) +: obj
+      }
+
     } else obj
   }
 

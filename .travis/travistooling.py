@@ -83,7 +83,8 @@ def affects_tests(path, task):
     # for the api Scala app, so changes in this directory cannot affect
     # any other task.
     exclusive_directories = {
-        t.exclusive_path: t.name for t in get_projects(ROOT)
+        os.path.relpath(t.exclusive_path, start=ROOT): t.name
+        for t in get_projects(ROOT)
     }
 
     for dir_name, task_name in exclusive_directories.items():
@@ -136,6 +137,10 @@ def affects_tests(path, task):
                     "~~~ Ignoring %s; sbt-common changes don't affect %s tests" %
                     (path, task))
                 return False
+
+    if path.startswith('.travis'):
+        print("~~~ All changes to the .travis directory are irrelevant")
+        return False
 
     # Otherwise, we were unable to decide if this change was important.
     # We assume that it is, so we'll run tests just in case.
