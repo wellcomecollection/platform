@@ -34,12 +34,15 @@ class S3SourceTest
 
           val key = "test001.txt.gz"
 
-          whenReady(gzipContent(materializer, expectedLines.mkString("\n"))) { content =>
-            s3Client.putObject(bucketName, key, content)
+          whenReady(gzipContent(materializer, expectedLines.mkString("\n"))) {
+            content =>
+              s3Client.putObject(bucketName, key, content)
           }
 
           val source = S3Source(
-            s3client = akkaS3client, bucketName = bucketName, key = key
+            s3client = akkaS3client,
+            bucketName = bucketName,
+            key = key
           )
 
           val future = source.runWith(Sink.head)
@@ -51,7 +54,8 @@ class S3SourceTest
     }
   }
 
-  private def gzipContent(actorMaterializer: ActorMaterializer, content: String): Future[String] = {
+  private def gzipContent(actorMaterializer: ActorMaterializer,
+                          content: String): Future[String] = {
     implicit val materializer: ActorMaterializer = actorMaterializer
 
     Source
