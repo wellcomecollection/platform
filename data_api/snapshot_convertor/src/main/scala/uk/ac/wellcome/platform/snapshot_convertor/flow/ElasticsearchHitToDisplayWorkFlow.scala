@@ -4,13 +4,21 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.Decoder
-import io.circe.generic.extras.Configuration
+import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
+
+case class ElasticsearchHit(
+  @JsonKey("_index") index: String,
+  @JsonKey("_type") documentType: String,
+  @JsonKey("_id") id: String,
+  @JsonKey("_score") score: Int,
+  @JsonKey("_source") source: IdentifiedWork
+)
 
 /** Converts lines from an Elasticsearch snapshot into DisplayWorks.
   *
@@ -20,25 +28,6 @@ import scala.util.{Failure, Success}
   */
 object ElasticsearchHitToDisplayWorkFlow extends Logging {
 
-  case class ElasticsearchHit(
-    index: String,
-    documentType: String,
-    id: String,
-    score: Int,
-    source: IdentifiedWork
-  )
-
-  implicit val config: Configuration = Configuration.default.copy(
-    transformMemberNames = {
-      case "index" => "_index"
-      case "documentType" => "_type"
-      case "id" => "_id"
-      case "score" => "_score"
-      case "source" => "_source"
-      case other => other
-    }
-  )
-
   // TODO: Can we get a convenience wrapper for WorksIncludes that just
   // fills in everything?
   val includes = WorksIncludes(
@@ -47,12 +36,10 @@ object ElasticsearchHitToDisplayWorkFlow extends Logging {
     items = true
   )
 
-  implicit val decoder: Decoder[ElasticsearchHit] = Decoder[ElasticsearchHit]
-
   def apply()(implicit executionContext: ExecutionContext): Flow[String, DisplayWork, NotUsed] =
     Flow.fromFunction({ line =>
       val hit = fromJson[ElasticsearchHit](line) match {
-        case Success(hit: ElasticsearchHit) => hit
+        case Success(h: ElasticsearchHit) => h
         case Failure(parseFailure) => {
           warn("Failed to parse work metadata!", parseFailure)
           throw parseFailure
