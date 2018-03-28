@@ -10,14 +10,14 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContextExecutor
 
 class SierraRecordWrapperFlowTest
     extends FunSpec
-    with AkkaFixtures
+    with Akka
     with ScalaFutures
     with ExtendedPatience
     with Matchers {
@@ -38,7 +38,7 @@ class SierraRecordWrapperFlowTest
   it("creates a SierraRecord from a bib") {
     withRecordWrapperFlow {
       case (wrapperFlow, actorSystem) =>
-        implicit val system: ActorSystem = actorSystem
+        implicit val system = actorSystem
         implicit val materializer: Materializer =
           ActorMaterializer()(actorSystem)
 

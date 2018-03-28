@@ -3,13 +3,13 @@ package uk.ac.wellcome.platform.sierra_reader
 import com.twitter.finagle.http.Status._
 import com.twitter.inject.server.FeatureTest
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{S3, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{S3, SQS}
 
 class ServerTest
     extends FunSpec
     with fixtures.Server
     with S3
-    with SqsFixtures {
+    with SQS {
 
   it("it shows the healthcheck message") {
     withLocalS3Bucket { bucketName =>

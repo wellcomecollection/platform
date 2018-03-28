@@ -21,8 +21,8 @@ class SQSWorkerTest
     extends FunSpec
     with MockitoSugar
     with Eventually
-    with AkkaFixtures
-    with SqsFixtures {
+    with Akka
+    with SQS {
 
   def withMockMetricSender[R](testWith: TestWith[MetricsSender, R]): R = {
     val metricsSender: MetricsSender = mock[MetricsSender]

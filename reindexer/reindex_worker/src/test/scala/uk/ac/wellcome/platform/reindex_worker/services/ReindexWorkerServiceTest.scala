@@ -22,13 +22,7 @@ import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.fixtures.{
-  AkkaFixtures,
-  LocalDynamoDb,
-  SnsFixtures,
-  SqsFixtures,
-  TestWith
-}
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,10 +33,10 @@ class ReindexWorkerServiceTest
     extends FunSpec
     with Matchers
     with MockitoSugar
-    with AkkaFixtures
+    with Akka
     with LocalDynamoDb[TestRecord]
-    with SnsFixtures
-    with SqsFixtures
+    with SNS
+    with SQS
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[TestRecord] =

@@ -4,14 +4,14 @@ import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SQS}
 
 import uk.ac.wellcome.dynamo._
 
 class ServerTest
     extends FunSpec
     with LocalDynamoDb[SierraItemRecord]
-    with SqsFixtures
+    with SQS
     with fixtures.Server {
 
   override lazy val evidence = DynamoFormat[SierraItemRecord]

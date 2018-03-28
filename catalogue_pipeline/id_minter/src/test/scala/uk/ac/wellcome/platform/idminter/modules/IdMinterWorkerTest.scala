@@ -12,13 +12,13 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao
 }
 import uk.ac.wellcome.platform.idminter.{fixtures, Server}
-import uk.ac.wellcome.test.fixtures.{SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdMinterWorkerTest
     extends FunSpec
-    with SqsFixtures
-    with SnsFixtures
+    with SQS
+    with SNS
     with fixtures.IdentifiersDatabase
     with fixtures.Server
     with Eventually

@@ -11,8 +11,8 @@ import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 class ServerTest
     extends FunSpec
     with AmazonCloudWatchFlag
-    with SqsFixtures
-    with SnsFixtures
+    with SQS
+    with SNS
     with S3
     with ScalaFutures {
 

@@ -17,7 +17,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 
 import scala.util.Try
 
-trait SqsFixtures {
+trait SQS {
 
   private val sqsEndpointUrl = "http://localhost:9324"
 

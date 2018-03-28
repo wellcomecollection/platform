@@ -22,24 +22,19 @@ import uk.ac.wellcome.utils.JsonUtil._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.test.fixtures.{
-  AkkaFixtures,
-  LocalDynamoDb,
-  SqsFixtures,
-  TestWith
-}
+import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec
     with LocalDynamoDb[SierraItemRecord]
-    with SqsFixtures
+    with SQS
     with Matchers
     with Eventually
     with ExtendedPatience
     with MockitoSugar
-    with AkkaFixtures
+    with Akka
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
