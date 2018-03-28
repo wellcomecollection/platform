@@ -42,7 +42,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
 
         # If the reindex shard doesn't match the current schema, we'll
         # create a new one.
-        if row.get('reindexShard') == new_reindex_shard:
+        if row.get('reindexShard') == new_reindex_shard and 'reindexVersion' in row:
             print(
                 f'{row["id"]} already has an up-to-date reindexShard; skipping'
             )
@@ -59,11 +59,12 @@ def main(event, _ctxt=None, dynamodb_client=None):
             dynamodb_client.update_item(
                 TableName=table_name,
                 Key={'id': {'S': id}},
-                UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
+                UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard, reindexVersion=:reindexVersion',
                 ConditionExpression='version < :newVersion',
                 ExpressionAttributeValues={
                     ':newVersion': {'N': str(version + 1)},
                     ':reindexShard': {'S': new_reindex_shard},
+                    ':reindexVersion': {'N': str(0)},
                 }
             )
         except botocore.exceptions.ClientError as e:
