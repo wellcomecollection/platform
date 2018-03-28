@@ -6,6 +6,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.DisplayWork
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, WorksIncludes}
 import uk.ac.wellcome.test.fixtures.AkkaFixtures
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -65,94 +66,56 @@ class ElasticsearchHitToDisplayWorkFlowTest
       }
     }
   }
-  //
-  // it("creates a SierraRecord from an item") {
-  //   withRecordWrapperFlow {
-  //     case (wrapperFlow, actorSystem) =>
-  //       implicit val system: ActorSystem = actorSystem
-  //       implicit val materializer: Materializer =
-  //         ActorMaterializer()(actorSystem)
-  //
-  //       val id = "400004"
-  //       val updatedDate = "2014-04-14T14:14:14Z"
-  //       val json = parse(s"""
-  //       |{
-  //       | "id": "$id",
-  //       | "updatedDate": "$updatedDate",
-  //       | "bibIds": ["4", "44", "444", "4444"]
-  //       |}
-  //     """.stripMargin).right.get
-  //
-  //       val expectedRecord = SierraRecord(
-  //         id = id,
-  //         data = json.noSpaces,
-  //         modifiedDate = updatedDate
-  //       )
-  //
-  //       val futureRecord = Source
-  //         .single(json)
-  //         .via(wrapperFlow)
-  //         .runWith(Sink.head)
-  //
-  //       whenReady(futureRecord) { sierraRecord =>
-  //         sierraRecord shouldBe expectedRecord
-  //       }
-  //   }
-  // }
-  //
-  // it("is able to handle deleted bibs") {
-  //   withRecordWrapperFlow {
-  //     case (wrapperFlow, actorSystem) =>
-  //       implicit val system: ActorSystem = actorSystem
-  //       implicit val materializer: Materializer =
-  //         ActorMaterializer()(actorSystem)
-  //
-  //       val id = "1357947"
-  //       val deletedDate = "2014-01-31"
-  //       val json = parse(s"""{
-  //                         |  "id" : "$id",
-  //                         |  "deletedDate" : "$deletedDate",
-  //                         |  "deleted" : true
-  //                         |}""".stripMargin).right.get
-  //
-  //       val expectedRecord = SierraRecord(
-  //         id = id,
-  //         data = json.noSpaces,
-  //         modifiedDate = s"${deletedDate}T00:00:00Z"
-  //       )
-  //
-  //       val futureRecord = Source
-  //         .single(json)
-  //         .via(wrapperFlow)
-  //         .runWith(Sink.head)
-  //
-  //       whenReady(futureRecord) { sierraRecord =>
-  //         sierraRecord shouldBe expectedRecord
-  //       }
-  //   }
-  // }
-  //
-  // it("fails the stream if the record contains invalid JSON") {
-  //   withRecordWrapperFlow {
-  //     case (wrapperFlow, actorSystem) =>
-  //       implicit val system: ActorSystem = actorSystem
-  //       implicit val materializer: Materializer =
-  //         ActorMaterializer()(actorSystem)
-  //
-  //       val invalidSierraJson = parse(s"""{
-  //       | "missing": ["id", "updatedDate"],
-  //       | "reason": "This JSON will not pass!",
-  //       |  "comment": "XML is coming!"
-  //       |}""".stripMargin).right.get
-  //
-  //       val futureUnit = Source
-  //         .single(invalidSierraJson)
-  //         .via(wrapperFlow)
-  //         .runWith(Sink.head)
-  //
-  //       whenReady(futureUnit.failed) { _ =>
-  //         true shouldBe true
-  //       }
-  //   }
-  // }
+
+  it("returns a failed Future if it gets invalid JSON") {
+    withActorSystem { actorSystem =>
+      implicit val executionContext: ExecutionContextExecutor =
+        actorSystem.dispatcher
+      implicit val system: ActorSystem = actorSystem
+      implicit val materializer: Materializer =
+        ActorMaterializer()(actorSystem)
+
+      val flow = ElasticsearchHitToDisplayWorkFlow()
+
+      val elasticsearchHitJson = s"""MARC?XML RAARGH NOTJSON"""
+
+      val future = Source
+        .single(elasticsearchHitJson)
+        .via(flow)
+        .runWith(Sink.head)
+
+      whenReady(future.failed) { result =>
+        result shouldBe a[GracefulFailureException]
+      }
+    }
+  }
+
+  it("returns a failed Future if it gets valid JSON but _source isn't a Work") {
+    withActorSystem { actorSystem =>
+      implicit val executionContext: ExecutionContextExecutor =
+        actorSystem.dispatcher
+      implicit val system: ActorSystem = actorSystem
+      implicit val materializer: Materializer =
+        ActorMaterializer()(actorSystem)
+
+      val flow = ElasticsearchHitToDisplayWorkFlow()
+
+      val elasticsearchHitJson = s"""{
+        "_index": "rd8a35zw",
+        "_type": "work",
+        "_id": "ndpwrqer",
+        "_score": 1,
+        "_source": {"foo": "bar", "baz": "bat"}
+      }"""
+
+      val future = Source
+        .single(elasticsearchHitJson)
+        .via(flow)
+        .runWith(Sink.head)
+
+      whenReady(future.failed) { result =>
+        result shouldBe a[GracefulFailureException]
+      }
+    }
+  }
 }
