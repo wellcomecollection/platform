@@ -7,6 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
 import uk.ac.wellcome.test.fixtures.Akka
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
 
@@ -14,6 +15,7 @@ class S3SourceTest
     extends FunSpec
     with Matchers
     with ScalaFutures
+    with ExtendedPatience
     with Akka
     with AkkaS3 {
 
@@ -32,7 +34,7 @@ class S3SourceTest
 
           val key = "test001.txt.gz"
 
-          whenReady(gzipContent(expectedLines.mkString("\n"))) { content =>
+          whenReady(gzipContent(materializer, expectedLines.mkString("\n"))) { content =>
             s3Client.putObject(bucketName, key, content)
           }
 
@@ -49,7 +51,9 @@ class S3SourceTest
     }
   }
 
-  private def gzipContent(content: String): Future[String] = {
+  private def gzipContent(actorMaterializer: ActorMaterializer, content: String): Future[String] = {
+    implicit val materializer: ActorMaterializer = actorMaterializer
+
     Source
       .single(content)
       .map { ByteString(_) }
