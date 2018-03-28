@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier
 }
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.test.fixtures.SqsFixtures
+import uk.ac.wellcome.test.fixtures.SQS
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
@@ -25,7 +25,7 @@ class IngestorFeatureTest
     with ScalaFutures
     with fixtures.Server
     with ElasticsearchFixtures
-    with SqsFixtures {
+    with SQS {
 
   val indexName = "works"
   val itemType = "work"

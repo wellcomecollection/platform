@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.{UnidentifiedWork}
 import uk.ac.wellcome.models.transformable.{MiroTransformable}
-import uk.ac.wellcome.test.fixtures.{S3, SnsFixtures, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.test.fixtures.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
@@ -15,8 +15,8 @@ import uk.ac.wellcome.utils.JsonUtil
 class MiroTransformerFeatureTest
     extends FunSpec
     with Matchers
-    with SqsFixtures
-    with SnsFixtures
+    with SQS
+    with SNS
     with S3
     with fixtures.Server
     with Eventually

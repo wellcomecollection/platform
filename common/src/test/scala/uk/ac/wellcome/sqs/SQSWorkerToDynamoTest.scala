@@ -30,8 +30,8 @@ class SQSWorkerToDynamoTest
     with Matchers
     with Eventually
     with ExtendedPatience
-    with AkkaFixtures
-    with SqsFixtures {
+    with Akka
+    with SQS {
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]

@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 import scala.util.Random
 
-trait SnsFixtures {
+trait SNS {
 
   private val localSNSEndpointUrl = "http://localhost:9292"
 

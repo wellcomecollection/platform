@@ -13,7 +13,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, LocalDynamoDb, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, LocalDynamoDb, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.concurrent.duration._
 
@@ -21,7 +21,7 @@ class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with AkkaFixtures
+    with Akka
     with LocalDynamoDb[TestRecord]
     with MockitoSugar
     with ExtendedPatience {

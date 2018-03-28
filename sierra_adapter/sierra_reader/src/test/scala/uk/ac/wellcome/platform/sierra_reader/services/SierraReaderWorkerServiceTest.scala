@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{AkkaFixtures, S3, SqsFixtures, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, S3, SQS, TestWith}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.utils.JsonUtil._
@@ -29,8 +29,8 @@ class SierraReaderWorkerServiceTest
     extends FunSpec
     with MockitoSugar
     with S3
-    with SqsFixtures
-    with AkkaFixtures
+    with SQS
+    with Akka
     with Eventually
     with Matchers
     with ExtendedPatience
