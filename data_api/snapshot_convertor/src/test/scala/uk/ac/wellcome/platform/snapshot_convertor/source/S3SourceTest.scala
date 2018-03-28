@@ -44,9 +44,9 @@ class S3SourceTest
             key = key
           )
 
-          val future = source.runWith(Sink.head)
+          val future = source.runWith(Sink.seq)
           whenReady(future) { result =>
-            result shouldBe expectedLines.mkString("\n")
+            result.toList shouldBe expectedLines
           }
         }
       }
