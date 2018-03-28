@@ -5,11 +5,7 @@ import com.twitter.inject.server.FeatureTest
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{S3, SQS}
 
-class ServerTest
-    extends FunSpec
-    with fixtures.Server
-    with S3
-    with SQS {
+class ServerTest extends FunSpec with fixtures.Server with S3 with SQS {
 
   it("it shows the healthcheck message") {
     withLocalS3Bucket { bucketName =>
