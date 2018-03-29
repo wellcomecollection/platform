@@ -54,13 +54,13 @@ class StringToGzipFlowTest
         .runWith(fileSink)
 
       whenReady(future) { _ =>
-
         // Unzip the file, then open it and check it contains the strings
         // we'd expect.  This is the Busybox version of gzip, which strips
         // the .gz from the filename.
         s"gunzip ${tmpfile.getPath}" !!
 
-        val fileContents = fromFile(tmpfile.getPath.replace(".txt.gz", ".txt")).mkString
+        val fileContents =
+          fromFile(tmpfile.getPath.replace(".txt.gz", ".txt")).mkString
 
         // Files have a trailing newline
         val expectedContents = expectedLines.mkString("\n") + "\n"

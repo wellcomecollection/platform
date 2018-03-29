@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext
   */
 object StringToGzipFlow extends Logging {
 
-  def apply()(implicit executionContext: ExecutionContext): Flow[String, ByteString, NotUsed] =
+  def apply()(implicit executionContext: ExecutionContext)
+    : Flow[String, ByteString, NotUsed] =
     Flow[String]
       .map { _ + "\n" }
       .map { ByteString(_) }
