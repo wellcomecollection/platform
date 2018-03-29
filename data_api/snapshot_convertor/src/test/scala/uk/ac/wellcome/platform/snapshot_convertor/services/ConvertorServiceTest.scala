@@ -10,6 +10,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.{
+  AllWorksIncludes,
   IdentifiedWork,
   IdentifierSchemes,
   SourceIdentifier
@@ -92,7 +93,7 @@ class ConvertorServiceTest
 
                   val contents = readGzipFile(downloadFile.getPath)
                   val expectedContents = works
-                    .map { DisplayWork(_) }
+                    .map { DisplayWork(_, includes = AllWorksIncludes()) }
                     .map { toJson(_).get }
                     .mkString("\n") + "\n"
 
