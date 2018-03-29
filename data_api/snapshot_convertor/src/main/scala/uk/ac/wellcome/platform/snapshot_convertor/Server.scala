@@ -2,11 +2,18 @@ package uk.ac.wellcome.platform.snapshot_convertor
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.snapshot_convertor.modules.{AkkaS3ClientModule, SnapshotConvertorWorkerModule}
+import uk.ac.wellcome.platform.snapshot_convertor.modules.{
+  AkkaS3ClientModule,
+  SnapshotConvertorWorkerModule
+}
 
 object ServerMain extends Server
 

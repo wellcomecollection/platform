@@ -25,7 +25,8 @@ trait AkkaS3 extends S3 {
       endpointUrl = Some(localS3EndpointUrl)
     )
 
-    val s3AkkaClient = new S3Client(s3Settings = s3Settings)(actorSystem, materializer)
+    val s3AkkaClient =
+      new S3Client(s3Settings = s3Settings)(actorSystem, materializer)
 
     testWith(s3AkkaClient)
   }
