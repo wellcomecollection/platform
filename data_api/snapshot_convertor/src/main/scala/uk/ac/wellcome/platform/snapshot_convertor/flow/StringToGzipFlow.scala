@@ -15,6 +15,7 @@ object StringToGzipFlow extends Logging {
 
   def apply()(implicit executionContext: ExecutionContext): Flow[String, ByteString, NotUsed] =
     Flow[String]
+      .map { _ + "\n" }
       .map { ByteString(_) }
       .via(Compression.gzip)
 }

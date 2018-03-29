@@ -63,7 +63,11 @@ class StringToGzipFlowTest
         s"gunzip ${tmpfile.getPath}" !!
 
         val fileContents = fromFile(tmpfile.getPath.replace(".txt.gz", ".txt")).mkString
-        fileContents shouldBe expectedLines.mkString("\n")
+
+        // Files have a trailing newline
+        val expectedContents = expectedLines.mkString("\n") + "\n"
+
+        fileContents shouldBe expectedContents
       }
     }
   }
