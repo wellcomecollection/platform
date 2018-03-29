@@ -12,14 +12,12 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.util.ByteString
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.aws.AWSConfig
-import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import akka.stream.scaladsl.{Compression, Sink}
 import com.twitter.finatra.json.FinatraObjectMapper
-import io.circe.parser.parse
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.platform.snapshot_convertor.flow.ElasticsearchHitToDisplayWorkFlow
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
@@ -36,12 +34,6 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
     val targetObjectKey = "target.txt.gz"
 
-    val includes = WorksIncludes(
-      identifiers = true,
-      thumbnail = true,
-      items = true
-    )
-
     val s3source = S3Source(
       s3client = s3Client,
       bucketName = conversionJob.bucketName,
@@ -49,32 +41,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     )
 
     val source = s3source
-      .map { sourceString =>
-        parse(sourceString)
-      }
-      .collect {
-        case Right(json) => Some(json)
-        case Left(parseFailure) => {
-          warn("Failed to parse work metatdata!", parseFailure)
-          throw parseFailure
-        }
-      }
-      .collect { case Some(json) => json }
-      .map { json =>
-        json \\ "_source" head
-      }
-      .map(_.as[IdentifiedWork])
-      .collect {
-        case Right(identifiedWork) => Some(identifiedWork)
-        case Left(parseFailure) => {
-          warn("Failed to parse identifiedWork!", parseFailure)
-          throw parseFailure
-        }
-      }
-      .collect { case Some(identifiedWork) => identifiedWork }
-      .map { work =>
-        DisplayWork(work, includes)
-      }
+      .via(ElasticsearchHitToDisplayWorkFlow())
       .map { mapper.writeValueAsString(_) }
       .map { ByteString(_) }
       .via(Compression.gzip)
