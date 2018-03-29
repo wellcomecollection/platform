@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.snapshot_convertor.flow
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
-import io.circe.Decoder
 import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
