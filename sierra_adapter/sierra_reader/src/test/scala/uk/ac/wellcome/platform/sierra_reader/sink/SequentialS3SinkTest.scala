@@ -37,7 +37,7 @@ class SequentialS3SinkTest
       offset = offset
     )
 
-    testWith(sinks)
+    testWith(sink)
   }
 
   it("puts a single JSON in S3") {
@@ -48,12 +48,12 @@ class SequentialS3SinkTest
         withSink(
           actorSystem = actorSystem,
           bucketName = bucketName,
-          keyPrefix = "testA_") {
+          keyPrefix = "testA_") { sink =>
           withMaterializer(actorSystem) { materializer =>
             val futureDone = Source
               .single(json)
               .zipWithIndex
-              .runWith(sink)
+              .runWith(sink)(materializer)
 
             whenReady(futureDone) { _ =>
               val s3objects =
@@ -79,10 +79,10 @@ class SequentialS3SinkTest
         withSink(
           actorSystem = actorSystem,
           bucketName = bucketName,
-          keyPrefix = "testA_") {
+          keyPrefix = "testA_") { sink =>
           withMaterializer(actorSystem) { materializer =>
             val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-              .runWith(sink)
+              .runWith(sink)(materializer)
 
             whenReady(futureDone) { _ =>
               val s3objects =
@@ -115,10 +115,10 @@ class SequentialS3SinkTest
         withSink(
           actorSystem = actorSystem,
           bucketName = bucketName,
-          keyPrefix = "testA_") {
+          keyPrefix = "testA_") { sink =>
           withMaterializer(actorSystem) { materializer =>
             val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-              .runWith(sink)
+              .runWith(sink)(materializer)
 
             whenReady(futureDone) { _ =>
               val s3objects =
