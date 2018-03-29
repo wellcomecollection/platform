@@ -9,6 +9,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier
 }
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
+import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -19,6 +20,7 @@ class ConvertorServiceTest
     with Akka
     with AkkaS3
     with S3
+    with GzipUtils
     with ExtendedPatience {
 
   private def withConvertorService(bucketName: String)(
@@ -59,7 +61,8 @@ class ConvertorServiceTest
         val elasticsearchJsons = works.map { work =>
           s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(work).get}}"""
         }
-        contents = elasticsearchJsons.mkString("\n")
+        val content = elasticsearchJsons.mkString("\n")
+        val gzipContent = createGzipFile(content)
       }
     }
   }
