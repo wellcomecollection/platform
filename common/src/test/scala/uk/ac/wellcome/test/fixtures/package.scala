@@ -6,6 +6,18 @@ package object fixtures extends FixtureComposers {
 
   type Fixture[L, R] = TestWith[L, R] => R
 
+  private val noop = (x: Any) => ()
+
+  def fixture[L, R](create: => L, destroy: L => Unit = noop): Fixture[L, R] =
+    (testWith: TestWith[L, R]) => {
+      val loan = create
+      try {
+        testWith(loan)
+      } finally {
+        destroy(loan)
+      }
+    }
+
   implicit class ComposableFixture[L1, R](
     private val thisFixture: Fixture[L1, R]) {
 
