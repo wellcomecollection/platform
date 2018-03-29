@@ -20,14 +20,11 @@ object Dependencies {
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val sierraStreamsSourceVersion = "0.2"
-    val akkaStreamAlpakkaS3 = "0.17"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    "com.typesafe.akka" %% "akka-agent" % versions.akka,
-    "com.typesafe.akka" %% "akka-stream" % versions.akka,
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
+    "com.typesafe.akka" %% "akka-agent" % versions.akka
   )
 
   val awsDependencies: Seq[ModuleID] = Seq(
