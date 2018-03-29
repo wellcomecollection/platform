@@ -8,8 +8,10 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{
+  AllWorksIncludes,
   IdentifiedWork,
   IdentifierSchemes,
   SourceIdentifier
@@ -93,7 +95,7 @@ class SnapshotConvertorFeatureTest
 
                 val contents = readGzipFile(downloadFile.getPath)
                 val expectedContents = works
-                  .map { DisplayWork(_) }
+                  .map { DisplayWork(_, includes = AllWorksIncludes()) }
                   .map { toJson(_).get }
                   .mkString("\n") + "\n"
 
