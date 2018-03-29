@@ -4,15 +4,13 @@ import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.Uri.Path
-import akka.stream.scaladsl.{FileIO, Flow, Keep, RunnableGraph, Sink, Source}
+import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import scala.io.Source.fromFile
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.sys.process._
 import scala.concurrent.{ExecutionContextExecutor, Future}
