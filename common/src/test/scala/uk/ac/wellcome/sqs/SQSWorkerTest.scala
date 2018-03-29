@@ -37,9 +37,10 @@ class SQSWorkerTest
     testWith(metricsSender)
   }
 
-  def withSqsWorker[R](actors: ActorSystem,
-                       queueUrl: String,
-                       metrics: MetricsSender)(testWith: TestWith[SQSWorker, R]) = {
+  def withSqsWorker[R](
+    actors: ActorSystem,
+    queueUrl: String,
+    metrics: MetricsSender)(testWith: TestWith[SQSWorker, R]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1))
 
     val testWorker =
@@ -65,9 +66,9 @@ class SQSWorkerTest
 
   def withFixtures[R] =
     withActorSystem[R] _ and
-    withLocalSqsQueue[R] _ and
-    withMockMetricSender[R] _ and
-    withSqsWorker[R] _
+      withLocalSqsQueue[R] _ and
+      withMockMetricSender[R] _ and
+      withSqsWorker[R] _
 
   it("processes messages") {
     withFixtures {

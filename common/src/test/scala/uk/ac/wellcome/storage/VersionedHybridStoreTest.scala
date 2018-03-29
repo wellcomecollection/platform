@@ -22,149 +22,155 @@ case class ExampleRecord(
 ) extends Id
 
 class VersionedHybridStoreTest
-  extends FunSpec
-  with Matchers
-  with ScalaFutures
-  with ExtendedPatience
-  with LocalVersionedHybridStore {
+    extends FunSpec
+    with Matchers
+    with ScalaFutures
+    with ExtendedPatience
+    with LocalVersionedHybridStore {
 
   import uk.ac.wellcome.dynamo._
 
   def withFixtures[R] =
     withLocalS3Bucket[R] _ and
-    withLocalDynamoDbTable[R] _ and
-    withVersionedHybridStore[ExampleRecord, R] _
+      withLocalDynamoDbTable[R] _ and
+      withVersionedHybridStore[ExampleRecord, R] _
 
   it("stores a versioned record if it has never been seen before") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val record = ExampleRecord(
-        id = "1111",
-        content = "One ocelot in orange"
-      )
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val record = ExampleRecord(
+          id = "1111",
+          content = "One ocelot in orange"
+        )
 
-      val future =
-        hybridStore.updateRecord(record.id)(record)(identity)()
+        val future =
+          hybridStore.updateRecord(record.id)(record)(identity)()
 
-      whenReady(future) { _ =>
-        getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
-      }
+        whenReady(future) { _ =>
+          getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
+        }
     }
   }
 
   it("applies the given transformation to an existing record") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val record = ExampleRecord(
-        id = "1111",
-        content = "One ocelot in orange"
-      )
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val record = ExampleRecord(
+          id = "1111",
+          content = "One ocelot in orange"
+        )
 
-      val expectedRecord = record.copy(content = "new content")
+        val expectedRecord = record.copy(content = "new content")
 
-      val t = (e: ExampleRecord) => e.copy(content = "new content")
+        val t = (e: ExampleRecord) => e.copy(content = "new content")
 
-      val future =
-        hybridStore
-          .updateRecord(record.id)(record)(identity)()
-          .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
+        val future =
+          hybridStore
+            .updateRecord(record.id)(record)(identity)()
+            .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
-      whenReady(future) { _ =>
-        getJsonFor(bucketName, tableName, record) shouldBe toJson(
-          expectedRecord).get
-      }
+        whenReady(future) { _ =>
+          getJsonFor(bucketName, tableName, record) shouldBe toJson(
+            expectedRecord).get
+        }
     }
   }
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val record = ExampleRecord(
-        id = "2222",
-        content = "Two teal turtles in Tenerife"
-      )
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val record = ExampleRecord(
+          id = "2222",
+          content = "Two teal turtles in Tenerife"
+        )
 
-      val updatedRecord = record.copy(
-        content = "Throwing turquoise tangerines in Tanzania"
-      )
+        val updatedRecord = record.copy(
+          content = "Throwing turquoise tangerines in Tanzania"
+        )
 
-      val future =
-        hybridStore.updateRecord(record.id)(record)(identity)()
+        val future =
+          hybridStore.updateRecord(record.id)(record)(identity)()
 
-      val updatedFuture = future.flatMap { _ =>
-        hybridStore.updateRecord(updatedRecord.id)(updatedRecord)(_ =>
-          updatedRecord)()
-      }
+        val updatedFuture = future.flatMap { _ =>
+          hybridStore.updateRecord(updatedRecord.id)(updatedRecord)(_ =>
+            updatedRecord)()
+        }
 
-      whenReady(updatedFuture) { _ =>
-        getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(
-          updatedRecord).get
-      }
+        whenReady(updatedFuture) { _ =>
+          getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(
+            updatedRecord).get
+        }
     }
   }
 
   it("returns a future of None for a non-existent record") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val future = hybridStore.getRecord(id = "does/notexist")
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val future = hybridStore.getRecord(id = "does/notexist")
 
-      whenReady(future) { result =>
-        result shouldBe None
-      }
+        whenReady(future) { result =>
+          result shouldBe None
+        }
     }
   }
 
   it("returns a future of Some[ExampleRecord] if the record exists") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val record = ExampleRecord(
-        id = "5555",
-        content = "Five fishing flinging flint"
-      )
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val record = ExampleRecord(
+          id = "5555",
+          content = "Five fishing flinging flint"
+        )
 
-      val putFuture =
-        hybridStore.updateRecord(record.id)(record)(identity)()
+        val putFuture =
+          hybridStore.updateRecord(record.id)(record)(identity)()
 
-      val getFuture = putFuture.flatMap { _ =>
-        hybridStore.getRecord(record.id)
-      }
+        val getFuture = putFuture.flatMap { _ =>
+          hybridStore.getRecord(record.id)
+        }
 
-      whenReady(getFuture) { result =>
-        result shouldBe Some(record)
-      }
+        whenReady(getFuture) { result =>
+          result shouldBe Some(record)
+        }
     }
   }
 
   it("does not allow creation of records with a different id than indicated") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val record = ExampleRecord(
-        id = "8934",
-        content = "Five fishing flinging flint"
-      )
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val record = ExampleRecord(
+          id = "8934",
+          content = "Five fishing flinging flint"
+        )
 
-      val future =
-        hybridStore.updateRecord(id = "not_the_same_id")(record)(
-          identity)()
+        val future =
+          hybridStore.updateRecord(id = "not_the_same_id")(record)(identity)()
 
-      whenReady(future.failed) { e: Throwable =>
-        e shouldBe a[IllegalArgumentException]
-      }
+        whenReady(future.failed) { e: Throwable =>
+          e shouldBe a[IllegalArgumentException]
+        }
     }
   }
 
   it("does not allow transformation to a record with a different id") {
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val record = ExampleRecord(
-        id = "8934",
-        content = "Five fishing flinging flint"
-      )
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val record = ExampleRecord(
+          id = "8934",
+          content = "Five fishing flinging flint"
+        )
 
-      val recordWithDifferentId = record.copy(id = "not_the_same_id")
+        val recordWithDifferentId = record.copy(id = "not_the_same_id")
 
-      val future = for {
-        _ <- hybridStore.updateRecord(record.id)(record)(identity)()
-        _ <- hybridStore.updateRecord(record.id)(record)(_ =>
-          recordWithDifferentId)()
-      } yield ()
+        val future = for {
+          _ <- hybridStore.updateRecord(record.id)(record)(identity)()
+          _ <- hybridStore.updateRecord(record.id)(record)(_ =>
+            recordWithDifferentId)()
+        } yield ()
 
-      whenReady(future.failed) { e: Throwable =>
-        e shouldBe a[IllegalArgumentException]
-      }
+        whenReady(future.failed) { e: Throwable =>
+          e shouldBe a[IllegalArgumentException]
+        }
     }
   }
 
@@ -186,23 +192,23 @@ class VersionedHybridStoreTest
       number = 6
     )
 
-    withFixtures { case (bucketName, tableName, hybridStore) =>
-      val future =
-        hybridStore.updateRecord(record.id)(record)(identity)(data)
+    withFixtures {
+      case (bucketName, tableName, hybridStore) =>
+        val future =
+          hybridStore.updateRecord(record.id)(record)(identity)(data)
 
-      whenReady(future) { _ =>
-        val maybeResult =
-          Scanamo.get[ExtraData](dynamoDbClient)(tableName)(
-            'id -> record.id)
+        whenReady(future) { _ =>
+          val maybeResult =
+            Scanamo.get[ExtraData](dynamoDbClient)(tableName)('id -> record.id)
 
-        maybeResult shouldBe defined
-        maybeResult.get.isRight shouldBe true
+          maybeResult shouldBe defined
+          maybeResult.get.isRight shouldBe true
 
-        val extraData = maybeResult.get.right.get
+          val extraData = maybeResult.get.right.get
 
-        extraData.data shouldBe "a tragic triangle of triffids"
-        extraData.number shouldBe 6
-      }
+          extraData.data shouldBe "a tragic triangle of triffids"
+          extraData.number shouldBe 6
+        }
     }
   }
 }

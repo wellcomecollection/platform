@@ -91,21 +91,23 @@ class SQSWorkerToDynamoTest
       }
     }
 
-  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(system: ActorSystem, queueUrl: String)(
-    testWith: TestWith[TestWorker, R]) = {
-      val worker = testWorkFactory(queueUrl, system)
+  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(
+    system: ActorSystem,
+    queueUrl: String)(testWith: TestWith[TestWorker, R]) = {
+    val worker = testWorkFactory(queueUrl, system)
 
-      try {
-        testWith(worker)
-      } finally {
-        worker.stop()
-      }
+    try {
+      testWith(worker)
+    } finally {
+      worker.stop()
+    }
   }
 
-  def withFixtures[R](testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
+  def withFixtures[R](
+    testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
     withActorSystem[R] _ and
-    withLocalSqsQueue[R] _ and
-    withTestWorker[R](testWorkFactory) _
+      withLocalSqsQueue[R] _ and
+      withTestWorker[R](testWorkFactory) _
 
   it("processes messages") {
     withFixtures() {
