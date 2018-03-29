@@ -95,14 +95,14 @@ class ElasticsearchHitToDisplayWorkFlowTest
 
   private def withFlow(
     testWith: TestWith[Flow[String, DisplayWork, NotUsed], Assertion]) = {
-      withActorSystem { actorSystem =>
-        implicit val executionContext: ExecutionContextExecutor =
-          actorSystem.dispatcher
-        withMaterializer(actorSystem) { materializer =>
-          val flow = ElasticsearchHitToDisplayWorkFlow()
+    withActorSystem { actorSystem =>
+      implicit val executionContext: ExecutionContextExecutor =
+        actorSystem.dispatcher
+      withMaterializer(actorSystem) { materializer =>
+        val flow = ElasticsearchHitToDisplayWorkFlow()
 
-          testWith(flow)
-        }
+        testWith(flow)
       }
     }
+  }
 }
